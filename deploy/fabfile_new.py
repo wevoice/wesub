@@ -23,7 +23,7 @@ from functools import wraps
 import time
 
 import fabric.colors as colors
-from fabric.api import run, sudo, env, cd, local as _local, abort, task
+from fabric.api import run, sudo, env, cd, local as _local, abort, task, put
 from fabric.tasks import execute
 from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
@@ -213,6 +213,7 @@ def _create_env(username,
     env.deploy_lock = '/tmp/.amara_deploy_{0}'.format(revision)
     env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
     env.password = os.environ.get('FABRIC_PASSWORD', None)
+    env.dev_host = 'dev.universalsubtitles.org'
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -263,7 +264,7 @@ def dev(username):
                     notification_email   = 'ehazlett@pculture.org',)
 
 @task
-def demo(username, revision=None):
+def demo(username, revision):
     """
     Configure task(s) to run in the demo environment
 
@@ -272,6 +273,11 @@ def demo(username, revision=None):
 
     """
     with Output("Configuring task(s) to run on DEMO {0}".format(revision)):
+        hosts = {
+            'app': 'app-00-dev.amara.org',
+            'data': 'data-00-dev.amara.org',
+        }
+        env.demo_hosts = hosts
         env_name = 'demo'
         _create_env(username              = username,
                     name                  = env_name,
@@ -300,7 +306,7 @@ def staging(username):
         env_name = 'staging'
         _create_env(username              = username,
                     name                  = env_name,
-                    s3_bucket             = None,
+                    s3_bucket             = 's3.staging.amara.org',
                     app_name              = 'unisubs',
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
@@ -328,7 +334,7 @@ def production(username):
         env_name = 'production'
         _create_env(username              = username,
                     name                  = env_name,
-                    s3_bucket             = None,
+                    s3_bucket             = 's3.production.amara.org',
                     app_name              = 'unisubs',
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
@@ -347,125 +353,6 @@ def production(username):
                         'data': ['data-00-production.amara.org'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
-
-# def staging(username):
-#     with Output("Configuring task(s) to run on STAGING"):
-#         _create_env(username              = username,
-#                     hosts                 = ['pcf-us-staging3.pculture.org:2191',
-#                                             'pcf-us-staging4.pculture.org:2191'],
-#                     hostnames_squid_cache = ['staging.universalsubtitles.org',
-#                                              'staging.amara.org'
-#                                              ],
-#                     s3_bucket             = 's3.staging.universalsubtitles.org',
-#                     installation_dir      = 'universalsubtitles.staging',
-#                     static_dir            = '/var/static/staging',
-#                     name                  = 'staging',
-#                     git_branch            = 'staging',
-#                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-#                     admin_dir             = '/usr/local/universalsubtitles.staging',
-#                     admin_host            = 'pcf-us-adminstg.pculture.org:2191',
-#                     celeryd_host          = 'pcf-us-adminstg.pculture.org:2191',
-#                     celeryd_proj_root     = 'universalsubtitles.staging',
-#                     separate_uslogging_db = True,
-#                     celeryd_start_cmd     = "/etc/init.d/celeryd start",
-#                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-#                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
-#
-# def dev(username):
-#     with Output("Configuring task(s) to run on DEV"):
-#         _create_env(username              = username,
-#                     hosts                 = ['dev.universalsubtitles.org:2191'],
-#                     hostnames_squid_cache = ['dev.universalsubtitles.org',
-#                                              'dev.amara.org'
-#                                              ],
-#                     s3_bucket             = None,
-#                     installation_dir      = 'universalsubtitles.dev',
-#                     static_dir            = '/var/www/universalsubtitles.dev',
-#                     name                  = 'dev',
-#                     git_branch            = 'dev',
-#                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-#                     admin_dir             = None,
-#                     admin_host            = 'dev.universalsubtitles.org:2191',
-#                     celeryd_host          = DEV_HOST,
-#                     celeryd_proj_root     = 'universalsubtitles.dev',
-#                     separate_uslogging_db = False,
-#                     celeryd_start_cmd     = "/etc/init.d/celeryd.dev start",
-#                     celeryd_stop_cmd      = "/etc/init.d/celeryd.dev stop",
-#                     celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
-#
-# def production(username):
-#     with Output("Configuring task(s) to run on PRODUCTION"):
-#         _create_env(username              = username,
-#                     hosts                 = ['pcf-us-cluster3.pculture.org:2191',
-#                                              'pcf-us-cluster4.pculture.org:2191',
-#                                              'pcf-us-cluster5.pculture.org:2191',
-#                                              'pcf-us-cluster8.pculture.org:2191',
-#                                              'pcf-us-cluster9.pculture.org:2191',
-#                                              'pcf-us-cluster10.pculture.org:2191',
-#                                              ],
-#                     hostnames_squid_cache = ['www.universalsubtitles.org',
-#                                              'www.amara.org',
-#                                              'universalsubtitles.org',
-#                                              'amara.org'
-#                                              ],
-#                     s3_bucket             = 's3.www.universalsubtitles.org',
-#                     installation_dir      = 'universalsubtitles',
-#                     static_dir            = '/var/static/production',
-#                     name                  =  None,
-#                     git_branch            = 'production',
-#                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-#                     admin_dir             = '/usr/local/universalsubtitles',
-#                     admin_host            = 'pcf-us-admin.pculture.org:2191',
-#                     celeryd_host          = 'pcf-us-admin.pculture.org:2191',
-#                     celeryd_proj_root     = 'universalsubtitles',
-#                     separate_uslogging_db = True,
-#                     celeryd_start_cmd     = "/etc/init.d/celeryd start",
-#                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-#                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
-#
-# def temp(username):
-#     with Output("Configuring task(s) to run on TEMP"):
-#         _create_env(username              = username,
-#                     hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
-#                     hostnames_squid_cache = ['tmp.universalsubtitles.org',
-#                                              'tmp.amara.org'
-#                                              ],
-#                     s3_bucket             = 's3.temp.universalsubtitles.org',
-#                     installation_dir      = 'universalsubtitles.staging',
-#                     static_dir            = '/var/static/tmp',
-#                     name                  = 'staging',
-#                     git_branch            = 'staging',
-#                     memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
-#                     admin_dir             = '/usr/local/universalsubtitles.staging',
-#                     admin_host            = 'pcf-us-admintmp.pculture.org:2191',
-#                     celeryd_host          = 'pcf-us-admintmp.pculture.org:2191',
-#                     celeryd_proj_root     = 'universalsubtitles.staging',
-#                     separate_uslogging_db = True,
-#                     celeryd_start_cmd     = "/etc/init.d/celeryd.staging start",
-#                     celeryd_stop_cmd      = "/etc/init.d/celeryd.staging stop",
-#                     celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
-#
-# def nf(username):
-#     with Output("Configuring task(s) to run on NF env"):
-#         _create_env(username              = username,
-#                     hosts                 = ['nf.universalsubtitles.org:2191'],
-#                     hostnames_squid_cache = ['nf.universalsubtitles.org',
-#                                              'nf.amara.org'
-#                                              ],
-#                     s3_bucket             = 's3.nf.universalsubtitles.org',
-#                     installation_dir      = 'universalsubtitles.nf',
-#                     static_dir            = '/var/static/nf',
-#                     name                  = 'nf',
-#                     git_branch            = 'x-nf',
-#                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-#                     admin_dir             = '/usr/local/universalsubtitles.nf',
-#                     admin_host            = 'pcf-us-adminnf.pculture.org:2191',
-#                     celeryd_host          = 'pcf-us-adminnf.pculture.org:2191',
-#                     celeryd_proj_root     = 'universalsubtitles.nf',
-#                     separate_uslogging_db = True,
-#                     celeryd_start_cmd     = "/etc/init.d/celeryd start",
-#                     celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-#                     celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
 
 def _reset_permissions(app_dir):
     sudo('chgrp -R {0} {1}'.format(env.app_group, app_dir))
@@ -782,7 +669,6 @@ def update_django_admin_media():
     """
     with Output("Uploading Django admin media"):
         media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/static/media/'.format(env.ve_dir)
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
         s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
         sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
 
@@ -798,7 +684,6 @@ def update_django_admin_media_dev():
     """
     with Output("Copying Django Admin static media"), cd(env.app_dir):
         media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
-        python_exe = '{0}/bin/python'.format(env.ve_dir)
         # copy media to local dir
         run('cp -r {0} ./media/admin'.format(media_dir))
 
@@ -821,7 +706,8 @@ def switch_branch(branch):
         _switch_branch(branch)
 
 @parallel
-def _clone_repo_demo(revision='dev', integration_revision=None):
+def _clone_repo_demo(revision='dev', integration_revision=None,
+    instance_name=None, service_password=None):
     run('git clone https://github.com/pculture/unisubs.git /var/tmp/{0}/unisubs'.format(\
         revision))
     with cd('/var/tmp/{0}/unisubs'.format(revision)):
@@ -842,8 +728,90 @@ def _clone_repo_demo(revision='dev', integration_revision=None):
     run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(
         revision, private_conf))
     run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(
-    revision, private_conf))
+        revision, private_conf))
+    run("sed -i 's/BROKER_USER.*/BROKER_USER = \"{0}\"/g' {1}".format(
+        instance_name, private_conf))
+    run("sed -i 's/BROKER_VHOST.*/BROKER_VHOST = \"/{0}\"/g' {1}".format(
+        instance_name, private_conf))
+    run("sed -i 's/BROKER_PASSWORD.*/BROKER_PASSWORD = \"{0}\"/g' {1}".format(
+        service_password, private_conf))
     _reset_permissions(env.app_dir)
+
+def _create_rabbitmq_instance(name=None, password=None):
+    """
+    Creates a RabbitMQ instance (for test envs)
+
+    :param name: RabbitMQ vhost name
+    :param password: Instance password (username is name)
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('rabbitmqctl add_vhost /{0}'.format(name))
+        sudo('rabbitmqctl add_user {0} {1}'.format(name, password))
+        sudo('rabbitmqctl set_permissions -p /{0} {0} ".*" ".*" ".*"'.format(name))
+
+def _remove_rabbitmq_instance(name=None):
+    """
+    Removes a RabbitMQ instance (for test envs)
+
+    :param name: RabbitMQ vhost name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('rabbitmqctl delete_user {0}'.format(name))
+        sudo('rabbitmqctl delete_vhost /{0}'.format(name))
+
+def _create_celery_instance(name=None):
+    """
+    Creates a Celery worker instance
+
+    :param name: Celery instance name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    celeryd_tmpl = """
+description "unisubs: celeryd ({0})"
+start on runlevel [2345]
+stop on runlevel [06]
+
+exec /var/tmp/{0}/ve/bin/python /var/tmp/{0}/unisubs/manage.py celeryd -B -c 4 \
+-E -f /var/tmp/{0}/celeryd.log --settings unisubs_settings
+""".format(name)
+    celerycam_tmpl = """
+description "unisubs: celerycam ({0})"
+start on runlevel [2345]
+stop on runlevel [06]
+
+exec /var/tmp/{0}/ve/bin/python /var/tmp/{0}/unisubs/manage.py celerycam \
+-f /var/tmp/{0}/celerycam.log --settings unisubs_settings
+""".format(name)
+    with settings(warn_only=True):
+        with open('.temp-celeryd', 'w') as f:
+            f.write(celeryd_tmpl)
+        put('.temp-celeryd', '/etc/init/celeryd.{0}.conf'.format(name),
+            use_sudo=True)
+        with open('.temp-celerycam', 'w') as f:
+            f.write(celerycam_tmpl)
+        put('.temp-celerycam', '/etc/init/celerycam.{0}.conf'.format(name),
+            use_sudo=True)
+        os.remove('.temp-celeryd')
+        os.remove('.temp-celerycam')
+
+def _remove_celery_instance(name=None):
+    """
+    Removes a Celery instance
+
+    :param name: Celery instance name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('service celeryd.{0} stop'.format(name))
+        sudo('service celerycam.{0} stop'.format(name))
+        sudo('rm -f /etc/init/celeryd.{0}.conf'.format(name))
+        sudo('rm -f /etc/init/celerycam.{0}.conf'.format(name))
 
 @task
 @parallel
@@ -855,65 +823,77 @@ def create_demo(integration_revision=None, skip_media=False):
     :param skip_media: Skip media compilation (default: False)
 
     """
-    hosts = {
-        'app': 'app-00-dev.amara.org',
-        'data': 'data-00-dev.amara.org',
-    }
-    env.hosts = hosts.values()
+    env.hosts = env.demo_hosts.values()
     revision = env.revision
+    instance_name = revision.replace('-', '_')
+    service_password = ''.join(random.Random().sample(string.letters+string.digits, 8))
     with Output("Creating app directories"):
-        for k,v in hosts.iteritems():
+        for k,v in env.demo_hosts.iteritems():
             env.host_string = v
-            run('mkdir -p /var/tmp/{0}'.format(revision))
+            run('mkdir -p /var/tmp/{0}'.format(instance_name))
     with Output("Configuring Nginx"):
-        env.host_string = hosts['app']
+        env.host_string = env.demo_hosts.get('app')
         # nginx config
-        run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(revision))
+        run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(instance_name))
         run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{0}.conf".format(\
             revision))
         run("sed -i 's/root \/opt\/apps\/dev/root \/var\/tmp\/{0}/g' /tmp/{0}.conf".format(\
-            revision))
+            instance_name))
         run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
-            revision))
-        sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(revision))
+            instance_name))
+        sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(instance_name))
     with Output("Configuring uWSGI"):
         # uwsgi ini
-        run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(revision))
+        run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(instance_name))
         run("sed -i 's/socket.*/socket = \/tmp\/uwsgi_{0}.sock/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         run("sed -i 's/virtualenv.*/virtualenv = \/var\/tmp\/{0}\/ve/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         run("sed -i 's/wsgi-file.*/wsgi-file = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         run("sed -i 's/log-syslog.*/log-syslog = uwsgi.unisubs.{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         run("sed -i 's/touch-reload.*/touch-reload = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         run("sed -i 's/pythonpath.*/pythonpath = \/var\/tmp\/{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
-            revision))
+            instance_name))
         # uwsgi upstart
     with Output("Configuring upstart"):
-        run('cp /etc/init/uwsgi.unisubs.dev.conf /tmp/uwsgi.unisubs.{0}.conf'.format(revision))
-        run("sed -i 's/exec.*/exec uwsgi --ini \/var\/tmp\/{0}\/uwsgi.unisubs.{0}.ini/g' /tmp/uwsgi.unisubs.{0}.conf".format(revision))
-        sudo("mv /tmp/uwsgi.unisubs.{0}.conf /etc/init/uwsgi.unisubs.demo.{0}.conf".format(revision))
-        run('mv /tmp/uwsgi.unisubs.{0}.ini /var/tmp/{0}/uwsgi.unisubs.{0}.ini'.format(revision))
+        run('cp /etc/init/uwsgi.unisubs.dev.conf /tmp/uwsgi.unisubs.{0}.conf'.format(instance_name))
+        run("sed -i 's/exec.*/exec uwsgi --ini \/var\/tmp\/{0}\/uwsgi.unisubs.{0}.ini/g' /tmp/uwsgi.unisubs.{0}.conf".format(instance_name))
+        sudo("mv /tmp/uwsgi.unisubs.{0}.conf /etc/init/uwsgi.unisubs.demo.{0}.conf".format(instance_name))
+        run('mv /tmp/uwsgi.unisubs.{0}.ini /var/tmp/{0}/uwsgi.unisubs.{0}.ini'.format(instance_name))
         
+    # services
+    # celery
+    with Output("Configuring Celery"):
+        _create_celery_instance(name=instance_name)
+    # rabbitmq
+    with Output("Configuring RabbitMQ"):
+        _create_rabbitmq_instance(name=instance_name, password=service_password)
+    # TODO:
+    # RDS DB instance
+    # Django site with <revision>.demo.amara.org url
+    # solr instance
+    return
+    # clone code
     with Output("Cloning and building environments"):
-        execute(_clone_repo_demo, revision=revision, 
-            integration_revision=integration_revision)
-    env.host_string = hosts['app']
+        execute(_clone_repo_demo, revision=revision,
+            integration_revision=integration_revision,
+            instance_name=instance_name, service_password=service_password)
+    env.host_string = env.demo_hosts.get('app')
     # compile media
     if not skip_media:
         with Output("Compiling static media.  This may take a moment"):
             # create a symlink to google closure library for compilation
-            sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(revision))
-            with cd('/var/tmp/{0}/unisubs'.format(revision)), settings(warn_only=True):
-                python_exe = '/var/tmp/{0}/ve/bin/python'.format(revision)
+            sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(instance_name))
+            with cd('/var/tmp/{0}/unisubs'.format(instance_name)), settings(warn_only=True):
+                python_exe = '/var/tmp/{0}/ve/bin/python'.format(instance_name)
                 run('{0} deploy/create_commit_file.py'.format(python_exe))
                 run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
     with Output("Starting {0} demo".format(revision)):
         sudo('service nginx reload')
-        sudo('service uwsgi.unisubs.demo.{0} start'.format(revision))
+        sudo('service uwsgi.unisubs.demo.{0} start'.format(instance_name))
     print('\nDone. Demo should be available at http://{0}.demo.amara.org'.format(revision))
 
 @task
@@ -924,23 +904,26 @@ def remove_demo():
     :param revision: Revision that was used in launching the demo
 
     """
-    hosts = {
-        'app': 'app-00-dev.amara.org',
-        'data': 'data-00-dev.amara.org',
-    }
-    env.host_string = hosts['app']
     revision = env.revision
+    instance_name = revision.replace('-', '_')
     # remove demo
     with Output("Stopping uWSGI"):
+        env.host_string = env.demo_hosts.get('app')
         with settings(warn_only=True):
-            sudo('service uwsgi.unisubs.demo.{0} stop'.format(revision))
+            sudo('service uwsgi.unisubs.demo.{0} stop'.format(instance_name))
+    with Output("Removing Celery instance"):
+        _remove_celery_instance(instance_name)
+    with Output("Removing RabbitMQ instance"):
+        _remove_rabbitmq_instance(instance_name)
     with Output("Removing nginx config"):
-        sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(revision))
-        sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(revision))
+        env.host_string = env.demo_hosts.get('app')
+        sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(instance_name))
+        sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(instance_name))
     with Output("Restarting nginx"):
+        env.host_string = env.demo_hosts.get('app')
         sudo('service nginx reload')
     with Output("Removing app directories for {0}".format(revision)):
-        for k,v in hosts.iteritems():
+        for k,v in env.demo_hosts.iteritems():
             env.host_string = v
-            sudo('rm -rf /var/tmp/{0}'.format(revision))
+            sudo('rm -rf /var/tmp/{0}'.format(instance_name))
 
