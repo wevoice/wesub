@@ -652,6 +652,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
 
     """
     python_exe = '{0}/bin/python'.format(env.ve_dir)
+    # must be ran before we compile anything
     with Output("Updating commit"), cd(env.app_dir):
         run('{0} deploy/create_commit_file.py'.format(python_exe))
         run('cat commit.py')
