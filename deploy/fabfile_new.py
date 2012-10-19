@@ -122,6 +122,7 @@ class Output(object):
         self.fastprint(s + '\n')
 
 def _notify(subj, msg, to):
+    env.host_string = env.dev_host
     run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, to))
 
 def _lock(*args, **kwargs):
@@ -570,8 +571,7 @@ def update_solr_schema():
 
 def _bounce_memcached():
     with Output("Bouncing memcached"):
-        sudo('service memcached stop')
-        sudo('service memcached start')
+        sudo('/etc/init.d/memcached restart')
 
 @task
 @roles('data')
@@ -603,7 +603,8 @@ def bounce_celery():
     '''
     _bounce_celery()
 
-def _deploy(branch=None, integration_branch=None, skip_celery=False):
+@roles('app', 'data')
+def _update_code(branch=None, integration_branch=None):
     with Output("Updating the main unisubs repo"), cd(env.app_dir):
         if branch:
             _switch_branch(branch)
@@ -614,16 +615,10 @@ def _deploy(branch=None, integration_branch=None, skip_celery=False):
         with cd(env.app_dir):
             with settings(warn_only=True):
                 run("find . -name '*.pyc' -delete")
-    execute(update_static_media)
-    if skip_celery == False:
-        execute(_bounce_celery)
-    execute(_bounce_memcached)
-    ##test_services()
-    execute(_reload_app_servers)
 
 @task
-@roles('app', 'data')
-def deploy(branch=None, integration_branch=None, skip_celery=False):
+def deploy(branch=None, integration_branch=None, skip_celery=False,
+    skip_media=False):
     """
     This is how code gets reloaded:
 
@@ -637,7 +632,18 @@ def deploy(branch=None, integration_branch=None, skip_celery=False):
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    _deploy(branch, integration_branch, skip_celery)
+    if not branch:
+        branch = env.revision
+    if not integration_branch:
+        integration_branch = env.revision
+    execute(_update_code, branch=branch, integration_branch=integration_branch)
+    if skip_media == False:
+        execute(update_static_media)
+    if skip_celery == False:
+        execute(bounce_celery)
+    execute(bounce_memcached)
+    ##test_services()
+    execute(reload_app_servers)
     _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()), env.notification_email)
 
 @task
