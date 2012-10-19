@@ -270,6 +270,7 @@ class Command(BaseCommand):
         cmd_str =  ("java -jar %s --js %s %s --js_output_file %s %s %s "
                     "--define goog.NATIVE_ARRAY_PROTOTYPES=false "
                     "--output_wrapper (function(){%%output%%})(); "
+                    "--warning_level QUIET "
                     "--compilation_level %s") % \
                     (compiler_jar, calcdeps_js, deps, compiled_js,
                      debug_arg, extra_defines_arg, optimization_type)
@@ -278,6 +279,7 @@ class Command(BaseCommand):
             logging.info( "calling %s" % cmd_str)
         output,err = call_command(cmd_str)
         if err:
+            # if an error comes up, is will look like:
             sys.stderr.write("Error compiling : %s \n%s" % (bundle_name, err))
 
         with open(compiled_js, 'r') as compiled_js_file:
