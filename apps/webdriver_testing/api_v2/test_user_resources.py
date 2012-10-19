@@ -42,4 +42,15 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
                     'last_name': 'User_1',
                     }
         user_data = self.api_create_user(**new_user)
-        print user_data['username']
+        self.assertEqual('newuser', user_data['username'])
+
+    def test_create__invalid_username(self):
+        new_user = {'username': 'new user',
+                    'email': 'newuser@example.com',
+                    'first_name': 'New', 
+                    'last_name': 'User_1',
+                    }
+        user_data = self.api_create_user(**new_user)
+        self.assertEqual('newuser', user_data['username'])
+
+    

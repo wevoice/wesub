@@ -77,7 +77,8 @@ class VideosTab(ATeamPage):
             print 'Filter is closed'
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
-        self.click_by_css('a.chzn-single span')
+        self.click_by_css('div#lang-filter_chzn')
+                          #a.chzn-single span')
         self.select_from_chosen(self._LANG_FILTER, [language])
 
     def video_sort(self, sort_option):
@@ -95,7 +96,7 @@ class VideosTab(ATeamPage):
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
         
-        self.click_by_css('div.filter-chunk:nth-child(3) > '
+        self.click_by_css('div.filter-chunk:nth-child(2) > '
             'div a.chzn-single span')
         self.select_from_chosen(self._SORT_FILTER, [sort_option])
 
