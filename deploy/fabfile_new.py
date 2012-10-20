@@ -366,6 +366,7 @@ def reset_permissions():
     _reset_permissions(env.ve_dir)
 
 def _git_pull():
+    run('git log -r -1')
     run('git checkout --force')
     run('git pull --ff-only')
     run('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
@@ -386,6 +387,8 @@ def _git_checkout_branch_and_reset(commit, branch='dev', run_as_sudo=False):
     cmd = run
     if run_as_sudo:
         cmd = sudo
+    if not branch:
+        branch = env.revision
     cmd('git fetch')
     cmd('git checkout %s' % branch)
     cmd('git reset --hard %s' % commit)
@@ -632,10 +635,6 @@ def deploy(branch=None, integration_branch=None, skip_celery=False,
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    if not branch:
-        branch = env.revision
-    if not integration_branch:
-        integration_branch = env.revision
     execute(_update_code, branch=branch, integration_branch=integration_branch)
     if skip_media == False:
         execute(update_static_media)
