@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-19 01:43-0500\n"
+"POT-Creation-Date: 2012-10-20 01:43-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1552,19 +1552,19 @@ msgstr ""
 msgid "Your changes have been saved."
 msgstr ""
 
-#: apps/videos/views.py:648
+#: apps/videos/views.py:600
 msgid "You have not permission change this URL"
 msgstr ""
 
-#: apps/videos/views.py:653 apps/videos/views.py:684
+#: apps/videos/views.py:605 apps/videos/views.py:636
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:668
+#: apps/videos/views.py:620
 msgid "You have not permission delete this URL"
 msgstr ""
 
-#: apps/videos/views.py:672
+#: apps/videos/views.py:624
 msgid "You can't remove primary URL"
 msgstr ""
 
