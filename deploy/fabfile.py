@@ -182,7 +182,7 @@ def local(*args, **kwargs):
 #:- syncdb on all environment
 #:- memechached and solr for `dev`
 #:- media compilation on all environments
-DEV_HOST = 'dev.universalsubtitles.org:2191'
+DEV_HOST = 'pcf-us-dev.pculture.org:2191'
 
 
 def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
@@ -240,8 +240,8 @@ def staging(username):
 def dev(username):
     with Output("Configuring task(s) to run on DEV"):
         _create_env(username              = username,
-                    hosts                 = ['dev.universalsubtitles.org:2191'],
-                    hostnames_squid_cache = ['dev.universalsubtitles.org',
+                    hosts                 = ['pcf-us-dev.pculture.org:2191'],
+                    hostnames_squid_cache = ['pcf-us-dev.pculture.org',
                                              'dev.amara.org'
                                              ],
                     s3_bucket             = None,
@@ -251,7 +251,7 @@ def dev(username):
                     git_branch            = 'dev',
                     memcached_bounce_cmd  = '/etc/init.d/memcached restart',
                     admin_dir             = None,
-                    admin_host            = 'dev.universalsubtitles.org:2191',
+                    admin_host            = 'pcf-us-dev.pculture.org:2191',
                     celeryd_host          = DEV_HOST,
                     celeryd_proj_root     = 'universalsubtitles.dev',
                     separate_uslogging_db = False,
