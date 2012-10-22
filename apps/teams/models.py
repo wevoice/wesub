@@ -2438,9 +2438,9 @@ class BillingReport(models.Model):
             if not language.is_complete and language.percent_done < 97:
                 return False
 
-            if (version.datetime_started <= start or
-                    version.datetime_started >= end):
-                return False
+        if (version.datetime_started <= start or
+                version.datetime_started >= end):
+            return False
 
         return True
 
