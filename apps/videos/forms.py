@@ -378,7 +378,7 @@ class SubtitlesUploadForm(forms.Form):
         language.language = lang_code
 
         if not translated_from:
-            language.is_original = True
+            language.is_original = not video.has_original_language()
         else:
             language.is_original = False
             language.is_forked = False
