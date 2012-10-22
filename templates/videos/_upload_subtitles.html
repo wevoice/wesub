@@ -24,6 +24,10 @@
                         {% else %}
                         {% if form.translated_from %}
                         <div style="margin: 10px 0 10px 0;"><label>{% trans 'Translated from' %}</label>{{ form.translated_from }}</div>
+                        {% else %}
+                        <div style="margin: 20px 0 10px 0;">
+                            <p class="feedback-message">{% trans "Did you translate from another language? Uploading before the source language is completed means you won't be able to use our translation interface" %}</p>
+                        </div>
                         {% endif %}
                         {% endif %}
               <div><input type="file" name="draft" id="subtitles-file-field" /></div>
