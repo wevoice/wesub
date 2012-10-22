@@ -20,7 +20,7 @@
         window.DIFFING_URL = '{% block diffing_link %}{% url videos:diffing 11111 22222 %}{% endblock %}';
         window.LANGUAGE_ID = '{{ language.id }}';
         window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
-        window.TASK = '{% firstof task '' %}';
+        window.TASK = '{% firstof task|default_if_none:""|escapejs '' %}';
         {% if task %}
             window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
             window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
@@ -34,6 +34,9 @@
                 window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
                 window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
             {% endif %}
+        {% endif %}
+        {% if task.get_type_display == 'Translate' %}
+            window.TASK_TRANSLATE_TO_LANGUAGE = '{{ task.language }}';
         {% endif %}
     </script>
 {% endblock %}

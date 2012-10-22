@@ -607,8 +607,8 @@ def can_publish_edits_immediately(team_video, user, lang):
 
 def can_post_edit_subtitles(team, user):
     """ Returns wheter the user has permission to post edit an original language """
-    role = get_role_for_target(user, team)
-    return role in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]
+    member = get_member(user, team)
+    return member.role != ROLE_CONTRIBUTOR
 
 def can_unpublish_subs(team_video, user, lang):
     """Return whether the user has permission to unpublish subtitles.

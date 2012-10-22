@@ -56,6 +56,7 @@ from functools import partial
 logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 # Teams
@@ -124,7 +125,7 @@ class Team(models.Model):
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
 
     # these allow unisubs to do things on user's behalf such as uploding subs to Youtub
-    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='tseams', verbose_name=_('third party accounts'))
+    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",  related_name='teams', verbose_name=_('third party accounts'))
 
     points = models.IntegerField(default=0, editable=False)
     applicants = models.ManyToManyField(User, through='Application', related_name='applicated_teams', verbose_name=_('applicants'))
@@ -2071,6 +2072,9 @@ class Task(models.Model):
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language should be a valid code."
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)
@@ -2431,12 +2435,12 @@ class BillingReport(models.Model):
 
         # 97% is done according to our contracts
         if version.moderation_status == UNMODERATED:
-            if not language.is_complete or language.percent_done < 97:
+            if not language.is_complete and language.percent_done < 97:
                 return False
 
-            if (version.datetime_started <= start or
-                    version.datetime_started >= end):
-                return False
+        if (version.datetime_started <= start or
+                version.datetime_started >= end):
+            return False
 
         return True
 
@@ -2452,14 +2456,16 @@ class BillingReport(models.Model):
 
         old_version_counter = 1
 
-        for i, data in enumerate(lang_data):
-            lang, ver = data
+        result = []
 
+        for lang, ver in lang_data:
             if ver and ver.datetime_started < start_date:
-                lang_data.pop(i)
                 old_version_counter += 1
+                continue
 
-        return lang_data, old_version_counter
+            result.append((lang, ver))
+
+        return result, old_version_counter
 
     def _get_row_data(self, host, header=None):
         if not header:
@@ -2500,7 +2506,7 @@ class BillingReport(models.Model):
                     end = subs[-1].start_time
 
                 rows.append([
-                    tv.video.title.encode('utf-8'),
+                    tv.video.title_display_unabridged().encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),

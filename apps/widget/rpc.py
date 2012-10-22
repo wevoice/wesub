@@ -324,7 +324,7 @@ class Rpc(BaseRpc):
         if (language and language.is_complete_and_synced()
                      and team.moderates_videos()
                      and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you can't post-edit these subtitles.")
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
             
         # Check that there are no open tasks for this action.
@@ -430,7 +430,12 @@ class Rpc(BaseRpc):
 
         # If this is a translation, include the subtitles it's based on in the response.
         if base_language:
-            original_subtitles = self._subtitles_dict(base_language.latest_version())
+            version = base_language.latest_version()
+
+            if not version:
+                return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }
+
+            original_subtitles = self._subtitles_dict(version)
             return_dict['original_subtitles'] = original_subtitles
 
         # If we know the original language code for this video, make sure it's

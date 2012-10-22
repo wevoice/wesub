@@ -92,12 +92,12 @@ unisubs.player.BrightcoveVideoPlayer.prototype.decorateInternal = function(eleme
 
 unisubs.player.BrightcoveVideoPlayer.prototype.logExternalInterfaceError_ = function() {
     unisubs.Rpc.call(
-        'log_brightCove_ei_failure', { 'page_url': window.location.href });
+        'log_brightCove_ei_failure', { 'page_url': window['location']['href'] });
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
     unisubs.player.BrightcoveVideoPlayer.superClass_.createDom.call(this);
-    var sizeFromConfig = this.sizeFromConfig_();
+    var sizeFromConfig = this.videoSource_.sizeFromConfig();
     if (!this.forDialog_ && sizeFromConfig)
         this.playerSize_ = sizeFromConfig;
     else
@@ -110,6 +110,16 @@ unisubs.player.BrightcoveVideoPlayer.prototype.createDom = function() {
 unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
     unisubs.player.BrightcoveVideoPlayer.superClass_.enterDocument.call(this);
     if (!this.swfEmbedded_) {
+
+        // If the Brightcove JS API has not been included (and it's not currently loading), load it.
+        if (typeof window['brightcove'] === 'undefined' && typeof window['unisubs']['brightcoveLoading'] === 'undefined') {
+            window['unisubs']['brightcoveLoading'] = true;
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'http://admin.brightcove.com/js/BrightcoveExperiences_all.js';
+            document.body.appendChild(script);
+        }
+
         this.swfEmbedded_ = true;
         var videoContainer = this.getDomHelper().createDom('div');
         
@@ -118,9 +128,17 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
         videoConf["playerID"] = this.videoSource_.getPlayerID();
 
         videoConf["playerKey"] = this.videoSource_.getPlayerKey();
+        var sizeFromConfig = this.videoSource_.sizeFromConfig();
+        if (!this.forDialog_ && sizeFromConfig){
+            this.playerSize_ = sizeFromConfig;
+        } else {
+            this.playerSize_ = this.forDialog_ ?
+            unisubs.player.AbstractVideoPlayer.DIALOG_SIZE :
+            unisubs.player.AbstractVideoPlayer.DEFAULT_SIZE;
+        }
         videoConf["videoID"] = this.videoSource_.getVideoID();
-        videoConf["width"]  = videoConf["width"] || 480;
-        videoConf["height"]  = videoConf["height"] || 412;
+        videoConf["width"]  = this.playerSize_.width;
+        videoConf["height"]  = this.playerSize_.height;
         videoConf['uuid'] = this.playerElemID_;
         var embedString = ' <object id="{{uuid}}" class="BrightcoveExperience"> <param name="bgcolor" value="#FFFFFF" /> <param name="width" value="{{width}}" /> <param name="height" value="{{height}}" /><param name="playerID" value="{{playerID}}" /><param name="playerKey" value="{{playerKey}}" /><param name="wmode" value="transparent" /><param name="isVid" value="true" /><param name="dynamicStreaming" value="true" /><param name="@videoPlayer" value="{{videoID}}" /></object>';
 
@@ -130,13 +148,26 @@ unisubs.player.BrightcoveVideoPlayer.prototype.enterDocument = function() {
         videoContainer.innerHTML = embedString;
         videoContainer.id = unisubs.randomString();
         this.getElement().appendChild(videoContainer);
-        brightcove.createExperiences();
+
+        this.waitForBrightcoveThenInit();
 
     }
     this.getHandler().
         listen(this.progressTimer_, goog.Timer.TICK, this.progressTick_).
         listen(this.timeUpdateTimer_, goog.Timer.TICK, this.timeUpdateTick_);
     this.progressTimer_.start();
+};
+
+unisubs.player.BrightcoveVideoPlayer.prototype.waitForBrightcoveThenInit = function() {
+    var that = this;
+
+    if (typeof window['brightcove'] == 'undefined') {
+        setTimeout(function() {
+            that.waitForBrightcoveThenInit();
+        }, 500);
+    } else {
+        window['brightcove']['createExperiences']();
+    }
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.sizeFromConfig_ = function() {
@@ -171,9 +202,9 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
     if (playerAPIID == this.playerElemID_) {
         this.setDimensionsKnownInternal();
         this.player_ = goog.dom.getElement(this.playerElemID_);
-        this.bcPlayer_ = brightcove["getExperience"](this.playerElemID_);
-        var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
-        experienceModule.addEventListener(BCExperienceEvent.TEMPLATE_READY, 
+        this.bcPlayer_ = window['brightcove']["getExperience"](this.playerElemID_);
+        var experienceModule = this.bcPlayer_['getModule']('experience');
+        experienceModule.addEventListener('templateReady',
                                           goog.bind(this.onBrightcoveTemplateReady_, this));
         unisubs.style.setSize(this.player_, this.playerSize_);
         goog.array.forEach(this.commands_, function(cmd) { cmd(); });
@@ -182,13 +213,13 @@ unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateLoaded_ =
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.onBrightcoveTemplateReady_ = function(pEvent){
-    var experienceModule = this.bcPlayer_.getModule(APIModules.EXPERIENCE);
-    experienceModule.removeEventListener(BCExperienceEvent.TEMPLATE_READY, goog.bind(this.onBrightcoveTemplateReady_, this));
-    this.bcPlayerController_ =  this.bcPlayer_.getModule(APIModules.VIDEO_PLAYER); 
+    var experienceModule = this.bcPlayer_['getModule']('experience');
+    experienceModule.removeEventListener('templateReady', goog.bind(this.onBrightcoveTemplateReady_, this));
+    this.bcPlayerController_ =  this.bcPlayer_['getModule']('videoPlayer');
     this.bcPlayerController_.addEventListener(
-         BCMediaEvent.PLAY, goog.bind(this.onPlayerPlay_, this));
+         'mediaPlay', goog.bind(this.onPlayerPlay_, this));
     this.bcPlayerController_.addEventListener(
-         BCMediaEvent.STOP, goog.bind(this.onPlayerPause_, this));
+         'mediaStop', goog.bind(this.onPlayerPause_, this));
     this.state_ = unisubs.player.BrightcoveVideoPlayer.State_.BUFFERING;
 };
 
@@ -212,7 +243,7 @@ unisubs.player.BrightcoveVideoPlayer.prototype.isFinished_ = function(){
 };
 
 unisubs.player.BrightcoveVideoPlayer.prototype.onPlayerPause_ = function(e) {
-    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PLAY);
+    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PAUSE);
     this.state_ = unisubs.player.BrightcoveVideoPlayer.State_.PAUSED;
     this.timeUpdateTimer_.stop();
     if (this.isFinished_()) this.onPlayerComplete_();
@@ -275,10 +306,11 @@ unisubs.player.BrightcoveVideoPlayer.prototype.isPlayingInternal = function() {
     return this.bcPlayerController_  && this.bcPlayerController_["isPlaying"]();
 };
 unisubs.player.BrightcoveVideoPlayer.prototype.playInternal = function () {
-    if (this.bcPlayerController_)
+    if (this.bcPlayerController_){
         this.bcPlayerController_['play']();
-    else
+    } else{
         this.commands_.push(goog.bind(this.playInternal, this));
+    }
 };
 unisubs.player.BrightcoveVideoPlayer.prototype.pauseInternal = function() {
     if (this.bcPlayerController_)

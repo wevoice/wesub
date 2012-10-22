@@ -113,6 +113,7 @@ update_metadata_choices()
 WRITELOCK_EXPIRATION = 30 # 30 seconds
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 class AlreadyEditingException(Exception):
@@ -1159,6 +1160,9 @@ class SubtitleLanguage(models.Model):
     def save(self, updates_timestamp=True, *args, **kwargs):
         if updates_timestamp:
             self.created = datetime.now()
+        #if self.language:
+            #assert self.language in VALID_LANGUAGE_CODES, \
+                #"Subtitle Language %s should be a valid code." % self.language
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
     def calculate_percent_done(self):
@@ -1260,8 +1264,9 @@ class SubtitleVersionManager(models.Manager):
     def not_restricted_by_moderation(self):
         return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
 
-    def new_version(self, parser, language, user,
-                    translated_from=None, note="", timestamp=None, moderation_status=None):
+    def new_version(self, parser, language, user, translated_from=None,
+            note="", timestamp=None, moderation_status=None, title='',
+            description=''):
 
         from utils.unisubsmarkup import html_to_markup
 
@@ -1270,12 +1275,12 @@ class SubtitleVersionManager(models.Manager):
 
         if last_version is not None:
             version_no = last_version.version_no + 1
-            title = last_version.title
-            description = last_version.description
+            title = title or last_version.title
+            description = description or last_version.description
         else:
             video = language.video
-            title = video.get_title_display()
-            description = video.get_description_display()
+            title = title or video.get_title_display()
+            description = description or video.get_description_display()
 
         forked = not bool(translated_from)
         original_subs = None
