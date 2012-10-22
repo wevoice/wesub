@@ -363,12 +363,12 @@ unisubs.translate.Dialog.prototype.forkAndClose = function() {
 unisubs.translate.Dialog.prototype.forkImpl_ = function() {
     this.subtitleState_.fork();
     this.serverModel_.fork(this.standardSubState_);
+    this.serverModel_.getCaptionSet().setPreviousAndNextCaptions();
     this.hideToFork();
     var dialog = this.opener_.openSubtitlingDialog(
         this.serverModel_,
         this.subtitleState_);
-    //this.opener_.onDialogOpened_(dialog);
-    window.location.reload();
+    this.opener_.onDialogOpened_(dialog);
 };
 unisubs.translate.Dialog.prototype.disposeCurrentPanels_ = function() {
     if (this.currentSubtitlePanel_) {

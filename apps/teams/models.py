@@ -58,6 +58,7 @@ from functools import partial
 logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 # Teams
@@ -2103,6 +2104,9 @@ class Task(models.Model):
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language should be a valid code."
         result = super(Task, self).save(*args, **kwargs)
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)
@@ -2463,12 +2467,12 @@ class BillingReport(models.Model):
 
         # 97% is done according to our contracts
         if version.moderation_status == UNMODERATED:
-            if not language.is_complete or language.percent_done < 97:
+            if not language.is_complete and language.percent_done < 97:
                 return False
 
-            if (version.datetime_started <= start or
-                    version.datetime_started >= end):
-                return False
+        if (version.datetime_started <= start or
+                version.datetime_started >= end):
+            return False
 
         return True
 
@@ -2534,7 +2538,7 @@ class BillingReport(models.Model):
                     end = subs[-1].start_time
 
                 rows.append([
-                    tv.video.title.encode('utf-8'),
+                    tv.video.title_display_unabridged().encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
                     round((end - start) / 60, 2),

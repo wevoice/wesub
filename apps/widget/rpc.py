@@ -417,6 +417,16 @@ class Rpc(BaseRpc):
                         "timing_mode": self.get_timing_mode(language),
                         "subtitles": subtitles }
 
+        # If this is a translation, include the subtitles it's based on in the response.
+        if base_language:
+            version = base_language.latest_version()
+
+            if not version:
+                return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }
+
+            original_subtitles = self._subtitles_dict(version)
+            return_dict['original_subtitles'] = original_subtitles
+
         # If we know the original language code for this video, make sure it's
         # saved and there's a SubtitleLanguage for it in the database.
         #

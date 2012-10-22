@@ -114,6 +114,7 @@ update_metadata_choices()
 WRITELOCK_EXPIRATION = 30 # 30 seconds
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 class AlreadyEditingException(Exception):
@@ -1183,6 +1184,9 @@ class SubtitleLanguage(models.Model):
     def save(self, updates_timestamp=True, *args, **kwargs):
         if updates_timestamp:
             self.created = datetime.now()
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language %s should be a valid code." % self.language
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
     def calculate_percent_done(self):
