@@ -193,6 +193,7 @@ def _create_env(username,
                 app_name,
                 app_dir,
                 app_group,
+                builder_host,
                 revision,
                 ve_dir,
                 separate_uslogging_db,
@@ -206,6 +207,7 @@ def _create_env(username,
     env.app_name = app_name
     env.app_dir = app_dir
     env.app_group = app_group
+    env.builder_host = builder_host
     env.revision = revision
     env.ve_dir = ve_dir
     env.separate_uslogging_db = separate_uslogging_db
@@ -215,6 +217,8 @@ def _create_env(username,
     env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
     env.password = os.environ.get('FABRIC_PASSWORD', None)
     env.dev_host = 'dev.universalsubtitles.org'
+    env.build_apps_root = '/opt/media_compile/apps'
+    env.build_ve_root = '/opt/media_compile/ve'
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -229,6 +233,7 @@ def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
                     app_name              = 'unisubs',
                     app_dir               = '/opt/apps/local/unisubs/',
                     app_group             = 'deploy',
+                    builder_host          = 'app.local',
                     revision              = 'staging',
                     ve_dir                = '/opt/ve/local/unisubs',
                     separate_uslogging_db = False,
@@ -238,6 +243,7 @@ def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
                         'data': ['10.10.10.120'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
+        env.dev_host = '10.10.10.115'
 
 @task
 def dev(username):
@@ -254,6 +260,7 @@ def dev(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -287,6 +294,7 @@ def demo(username, revision):
                     app_dir               = '/var/tmp/{0}/unisubs/'.format(
                         revision),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = revision,
                     ve_dir                = '/var/tmp/{0}/ve'.format(
                         revision),
@@ -312,6 +320,7 @@ def staging(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -340,6 +349,7 @@ def production(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -364,6 +374,8 @@ def _reset_permissions(app_dir):
 def reset_permissions():
     _reset_permissions(env.app_dir)
     _reset_permissions(env.ve_dir)
+    # reset builder dir
+    env.host_string = env.builder_host
 
 def _git_pull():
     run('git log -r -1')
@@ -496,12 +508,14 @@ def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
 
-def _update_integration(run_as_sudo=True, branch='dev'):
-    with Output("Updating nested unisubs-integration repositories"):
-        with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
+def _update_integration(run_as_sudo=True, branch='dev', app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating integration repository"):
+        with cd(os.path.join(app_dir, 'unisubs-integration')), \
             settings(warn_only=True):
             _git_checkout_branch_and_reset(
-                _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
+                _get_optional_repo_version(app_dir, 'unisubs-integration'),
                 branch=branch,
                 run_as_sudo=run_as_sudo
             )
@@ -606,18 +620,23 @@ def bounce_celery():
     '''
     _bounce_celery()
 
-@roles('app', 'data')
-def _update_code(branch=None, integration_branch=None):
-    with Output("Updating the main unisubs repo"), cd(env.app_dir):
+def _update_code(branch=None, integration_branch=None, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating the main unisubs repo"), cd(app_dir):
         if branch:
-            _switch_branch(branch)
+            _switch_branch(branch, app_dir=app_dir)
         else:
             _git_pull()
-    with Output("Updating integration repo"):
-        execute(_update_integration, branch=integration_branch)
-        with cd(env.app_dir):
-            with settings(warn_only=True):
-                run("find . -name '*.pyc' -delete")
+    # update integration repo
+    execute(_update_integration, branch=integration_branch, app_dir=app_dir)
+    with cd(app_dir):
+        with settings(warn_only=True):
+            run("find . -name '*.pyc' -delete")
+
+@roles('app', 'data')
+def update_code(branch=None, integration_branch=None):
+    _update_code(branch=branch, integration_branch=integration_branch)
 
 @task
 def deploy(branch=None, integration_branch=None, skip_celery=False,
@@ -635,7 +654,7 @@ def deploy(branch=None, integration_branch=None, skip_celery=False,
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    execute(_update_code, branch=branch, integration_branch=integration_branch)
+    execute(update_code, branch=branch, integration_branch=integration_branch)
     if skip_media == False:
         execute(update_static_media)
     if skip_celery == False:
@@ -647,7 +666,6 @@ def deploy(branch=None, integration_branch=None, skip_celery=False,
 
 @task
 @runs_once
-@roles('app')
 def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
     """
     Compiles and uploads static media to S3
@@ -656,16 +674,31 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     :param skip_s3: Skip upload to S3 (default: False)
 
     """
-    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    env.host_string = env.builder_host
+    ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
+    build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    _reset_permissions(build_dir)
+    _reset_permissions(env.build_ve_root)
+    # update repositories
+    with Output("Updating the main unisubs repo"), cd(build_dir):
+        _switch_branch(env.revision, app_dir=build_dir)
+        _git_pull()
     # must be ran before we compile anything
-    with Output("Updating commit"), cd(env.app_dir):
-        run('{0} deploy/create_commit_file.py'.format(python_exe))
+    with Output("Updating commit"), cd(build_dir):
+        run('python deploy/create_commit_file.py')
         run('cat commit.py')
+    # virtualenv
+    with Output("Updating virtualenv"):
+        run('virtualenv -q {0}'.format(ve_dir))
+        with cd('{0}/deploy'.format(build_dir)):
+            run('{0}/bin/pip install -U -r requirements.txt'.format(
+                ve_dir))
     if skip_compile == False:
-        with Output("Compiling media"), cd(env.app_dir), settings(warn_only=True):
+        with Output("Compiling media"), cd(build_dir), settings(warn_only=True):
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
     if env.s3_bucket and skip_s3 == False:
-        with Output("Uploading to S3"), cd(env.app_dir):
+        with Output("Uploading to S3"), cd(build_dir):
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
 @task
@@ -696,8 +729,10 @@ def update_django_admin_media_dev():
         # copy media to local dir
         run('cp -r {0} ./media/admin'.format(media_dir))
 
-def _switch_branch(branch):
-    with cd(env.app_dir), settings(warn_only=True):
+def _switch_branch(branch, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with cd(app_dir), settings(warn_only=True):
         run('git fetch')
         run('git branch --track {0} origin/{0}'.format(branch))
         run('git checkout {0}'.format(branch))
