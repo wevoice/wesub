@@ -1160,9 +1160,9 @@ class SubtitleLanguage(models.Model):
     def save(self, updates_timestamp=True, *args, **kwargs):
         if updates_timestamp:
             self.created = datetime.now()
-        #if self.language:
-            #assert self.language in VALID_LANGUAGE_CODES, \
-                #"Subtitle Language %s should be a valid code." % self.language
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language %s should be a valid code." % self.language
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
     def calculate_percent_done(self):
