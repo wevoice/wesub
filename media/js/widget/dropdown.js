@@ -229,7 +229,7 @@ unisubs.widget.DropDown.prototype.moderatedResponseReceived_ = function(jsonResu
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
     if (jsonResult['can_subtitle'] || jsonResult['can_translate']) {
-        goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
+        this.addActionLinks_();
     } else {
         var e = $d('li', 'unisubs-moderated',
            $d('p', null,
@@ -246,15 +246,22 @@ unisubs.widget.DropDown.prototype.addModeratedActionLinks_ = function() {
 unisubs.widget.DropDown.prototype.addModeratedNotice_ = function() {
     this.videoActions_.appendChild(this.moderatedNotice_);
 };
+/**
+ * Add action links to the drop-down menu.
+ *
+ * This should only be called after we have checked that the user has
+ * permission to edit the subtitles.
+ *
+ * @this {DropDown}
+ */
 unisubs.widget.DropDown.prototype.addActionLinks_ = function() {
-    this.videoActions_.appendChild(this.addLanguageLink_);
-    this.videoActions_.appendChild(this.improveSubtitlesLink_);
+    goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
+    goog.dom.insertChildAt(this.videoActions_, this.improveSubtitlesLink_, 1);
 };
 unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.getDomHelper().removeChildren(this.videoActions_);
     this.getDomHelper().removeChildren(this.settingsActions_);
 
-    this.videoActions_.appendChild(this.improveSubtitlesLink_);
     if (this.isModerated()) {
         if (unisubs.isEmbeddedInDifferentDomain()) {
             this.addModeratedNotice_();
