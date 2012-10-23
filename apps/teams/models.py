@@ -38,6 +38,7 @@ from apps.comments.models import Comment
 from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
+from apps.subtitles import shims
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
@@ -49,8 +50,11 @@ from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from videos.models import Video, SubtitleLanguage, SubtitleVersion
-from subtitles.models import SubtitleVersion as NewSubtitleVersion
+from videos.models import Video, SubtitleVersion
+from subtitles.models import (
+    SubtitleVersion as NewSubtitleVersion,
+    SubtitleLanguage as NewSubtitleLanguage
+)
 from subtitles import pipeline
 
 from functools import partial
@@ -59,6 +63,23 @@ logger = logging.getLogger(__name__)
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
+
+def publicize_version(subtitle_version, author):
+    """Create a new SubtitleVersion that's a public copy of the given version.
+
+    author should be the person making this happen, *not* the author of the
+    original version.
+
+    """
+    pipeline.add_subtitles(
+        video=subtitle_version.video,
+        language_code=subtitle_version.language_code,
+        subtitles=subtitle_version.get_subtitles(),
+        title=subtitle_version.title,
+        description=subtitle_version.description,
+        author=author,
+        visibility='public',
+    )
 
 
 # Teams
@@ -1658,64 +1679,24 @@ class Task(models.Model):
     def _add_comment(self):
         """Add a comment on the SubtitleLanguage for this task with the body as content."""
         if self.body.strip():
-            lang_ct = ContentType.objects.get_for_model(SubtitleLanguage)
+            lang_ct = ContentType.objects.get_for_model(NewSubtitleLanguage)
             comment = Comment(
                 content=self.body,
-                object_pk=self.subtitle_version.language.pk,
+                object_pk=self.new_subtitle_version.subtitle_language.pk,
                 content_type=lang_ct,
                 submit_date=self.completed,
                 user=self.assignee,
             )
             comment.save()
-            notifier.send_video_comment_notification.delay(comment.pk,
-                                    version_pk=self.subtitle_version.pk)
+            notifier.send_video_comment_notification.delay(
+                comment.pk, version_pk=self.subtitle_version.pk)
 
     def future(self):
         """Return whether this task expires in the future."""
         return self.expiration_date > datetime.datetime.now()
 
-    def get_widget_url(self):
-        """Return a URL for whatever dialog is used to perform this task."""
-        mode = Task.TYPE_NAMES[self.type].lower()
-        if self.subtitle_version:
-            base_url = self.subtitle_version.language.get_widget_url(mode, self.pk)
-        else:
-            video = self.team_video.video
-            if self.language and video.subtitle_language(self.language):
-                lang = video.subtitle_language(self.language)
-                base_url = reverse("videos:translation_history", kwargs={
-                    "video_id": video.video_id,
-                    "lang": lang.language,
-                    "lang_id": lang.pk,
-                })
-            else:
-                # subtitle tasks might not have a language
-                base_url = video.get_absolute_url()
-        return base_url + "?t=%s" % self.pk
-
 
     # Functions related to task completion.
-    def _set_version_moderation_status(self):
-        """Set this task's subtitle_version's moderation_status to the appropriate value.
-
-        This assumes that this task is an Approve/Review task, and that the
-        approved field is set to Approved or Rejected.
-
-        """
-        assert self.get_type_display() in ('Approve', 'Review'), \
-               "Tried to set version moderation status from a non-review/approval task."
-
-        assert self.get_approved_display() in ('Approved', 'Rejected'), \
-               "Tried to set version moderation status from an un-ruled-upon task."
-
-        if self.approved == Task.APPROVED_IDS['Approved']:
-            moderation_status = 'public'
-        else:
-            moderation_status = 'private'
-
-        NewSubtitleVersion.objects.filter(pk=self.new_subtitle_version.pk).update(
-                visibility=moderation_status)
-
     def _send_back(self, sends_notification=True):
         """Handle "rejection" of this task.
 
@@ -1730,7 +1711,7 @@ class Task(models.Model):
 
         """
         # when sending back, instead of always sending back
-        # to the first step (translate/subtitle) go to the 
+        # to the first step (translate/subtitle) go to the
         # step before this one:
         # Translate/Subtitle -> Review -> Approve
         # also, you can just send back approve and review tasks.
@@ -1774,25 +1755,6 @@ class Task(models.Model):
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
-
-    def _publicize_version(self, author, subtitle_version=None):
-        """Create a new SubtitleVersion that's a public copy of the current tip.
-
-        author should be the person making this happen, *not* the author of the
-        original tip.
-
-        """
-        subtitle_version = subtitle_version or self.new_subtitle_version
-
-        pipeline.add_subtitles(
-            video=subtitle_version.video,
-            language_code=subtitle_version.language_code,
-            subtitles=subtitle_version.get_subtitles(),
-            title=subtitle_version.title,
-            description=subtitle_version.description,
-            author=author,
-            visibility='public',
-        )
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1955,7 +1917,7 @@ class Task(models.Model):
             # determines whether the subtitles go public.
             if approval:
                 # Make these subtitles public!
-                self._publicize_version(self.assignee)
+                publicize_version(self.new_subtitle_version, self.assignee)
 
                 # If the subtitles are okay, go ahead and autocreate translation
                 # tasks if necessary.
@@ -1985,7 +1947,7 @@ class Task(models.Model):
 
         if approval:
             # The subtitles are acceptable, so make them public!
-            self._publicize_version(self.assignee)
+            publicize_version(self.new_subtitle_version, self.assignee)
 
             # Create translation tasks if necessary.
             if self.workflow.autocreate_translate:
@@ -2007,25 +1969,41 @@ class Task(models.Model):
 
 
     def get_perform_url(self):
-        '''Return the URL that will open whichever dialog is necessary to perform this task.'''
+        """Return a URL for whatever dialog is used to perform this task."""
+
         mode = Task.TYPE_NAMES[self.type].lower()
-        if self.get_subtitle_version():
-            base_url = self.get_subtitle_version().language.get_widget_url(mode, self.pk)
+
+        if self.new_subtitle_version:
+            sl = self.new_subtitle_version.subtitle_language
+            base_url = shims.get_widget_url(sl, mode=mode, task_id=self.pk)
         else:
             video = self.team_video.video
-            if self.language and video.subtitle_language(self.language) :
-                lang = video.subtitle_language(self.language)
-                base_url = reverse("videos:translation_history", kwargs={
-                    "video_id": video.video_id,
-                    "lang": lang.language,
-                    "lang_id": lang.pk,
-                })
+
+            if self.language:
+                sl = video.subtitle_languge(language_code=self.language)
+
+                if sl:
+                    base_url = reverse("videos:translation_history", kwargs={
+                        "video_id": video.video_id,
+                        "lang": sl.language_code,
+                        "lang_id": sl.pk,
+                    })
+                else:
+                    # The subtitleLanguage may not exist (yet).
+                    base_url = video.get_absolute_url()
             else:
-                # subtitle tasks might not have a language
+                # Subtitle tasks might not have a language.
                 base_url = video.get_absolute_url()
-        return base_url+  "?t=%s" % self.pk
+
+        return base_url + "?t=%s" % self.pk
 
     def get_reviewer(self):
+        """For Approve tasks, return the last user to Review these subtitles.
+
+        May be None if this task is not an Approve task, or if we can't figure
+        out the last reviewer for any reason.
+
+        """
         if self.get_type_display() == 'Approve':
             previous = Task.objects.complete().filter(
                 team_video=self.team_video,
@@ -2034,11 +2012,7 @@ class Task(models.Model):
                 type=Task.TYPE_IDS['Review']).order_by('-completed')[:1]
 
             if previous:
-                reviewer = previous[0].assignee
-            else:
-                reviewer = None
-
-            return reviewer
+                return previous[0].assignee
 
     def set_expiration(self):
         """Set the expiration_date of this task.  Does not save().
@@ -2084,23 +2058,34 @@ class Task(models.Model):
         return self._subtitle_version
 
     def is_blocked(self):
+        """Return whether this task is "blocked".
+
+        "Blocked" means that it's a translation task but the source language
+        isn't ready to be translated yet.
+
+        """
         if self.get_type_display() != 'Translate':
             return False
 
-        subtitle_version = self.get_subtitle_version()
+        sv = self.get_subtitle_version()
 
-        if not subtitle_version:
+        if not sv:
             return False
 
-        standard_language = subtitle_version.language.standard_language
+        source_language = sv.get_translation_source_language()
 
-        if not standard_language:
+        complete = (source_language and
+                    source_language.subtitles_complete and
+                    source_language.get_tip().get_subtitles().fully_synced)
+
+        if complete:
             return False
-
-        return not standard_language.is_complete_and_synced()
+        else:
+            return True
 
     def save(self, update_team_video_index=True, *args, **kwargs):
-        if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
+        is_review_or_approve = self.get_type_display() in ('Review', 'Approve')
+        if is_review_or_approve and not self.deleted:
             assert self.subtitle_version, \
                    "Review and Approve tasks must have a subtitle_version!"
 
@@ -2108,26 +2093,11 @@ class Task(models.Model):
             assert self.language in VALID_LANGUAGE_CODES, \
                 "Subtitle Language should be a valid code."
         result = super(Task, self).save(*args, **kwargs)
+
         if update_team_video_index:
             update_one_team_video.delay(self.team_video.pk)
+
         return result
-
-
-def task_moderate_version(sender, instance, created, **kwargs):
-    """If we create a review or approval task for this subtitle_version, mark it.
-
-    It *must* be awaiting moderation if we've just created one of these tasks
-    (and it's not a pre-completed task).
-
-    """
-    if created and instance.subtitle_version:
-        if instance.type in (Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']):
-            if not instance.completed:
-                instance.subtitle_version.moderation_status = WAITING_MODERATION
-                instance.subtitle_version.save()
-
-post_save.connect(task_moderate_version, Task,
-                  dispatch_uid="teams.task.task_moderate_version")
 
 
 # Settings
@@ -2584,7 +2554,7 @@ class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     can_request_paid_captions = models.BooleanField(default=False)
-    
+
     # The `admins` field specifies users who can do just about anything within
     # the partner realm.
     admins = models.ManyToManyField('auth.CustomUser',
