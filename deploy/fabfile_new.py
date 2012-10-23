@@ -378,7 +378,6 @@ def reset_permissions():
     env.host_string = env.builder_host
 
 def _git_pull():
-    run('git log -r -1')
     run('git checkout --force')
     run('git pull --ff-only')
     run('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
