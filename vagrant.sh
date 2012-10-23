@@ -29,7 +29,7 @@ else
 fi
 
 # run puppet
-puppet apply --verbose --modulepath /tmp/amara-puppet/puppetmaster/modules /tmp/puppet/lucid64.pp
+puppet apply --verbose --modulepath /tmp/amara-puppet/puppetmaster/modules /tmp/puppet/lucid64.pp --reports=log
 
 # create initial virtualenv if needed
 if [ ! -d "$VE_DIR" ]; then

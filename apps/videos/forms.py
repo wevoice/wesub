@@ -384,7 +384,7 @@ class SubtitlesUploadForm(forms.Form):
             language.is_forked = False
 
             # iuck
-            if translated_from.is_original:
+            if translated_from.is_original or not translated_from.standard_language:
                 language.standard_language = translated_from
             else:
                 language.standard_language = translated_from.standard_language
