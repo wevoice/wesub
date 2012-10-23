@@ -30,7 +30,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
                     'official_signoffs',
                     'pending_collaborators',
                     'expired_pending_collaborators',
-                    'unexpired_pending_collaborators']
+                    'unexpired_pending_collaborators',
+                    'is_forked']
     list_filter = ['created', 'language_code']
     search_fields = ['video__title', 'video__video_id', 'language_code']
     raw_id_fields = ['video']

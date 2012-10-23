@@ -371,6 +371,11 @@ class SubtitleLanguage(models.Model):
     # independently of versions though.
     subtitles_complete = models.BooleanField(default=False)
 
+    # This field is a temporary shim until we move to the new user interface.
+    # A "forked" language is one that was originally a translation but has since
+    # been changed to be a standalone language.
+    is_forked = models.BooleanField(default=False)
+
     # Writelocking
     writelock_time = models.DateTimeField(null=True, blank=True,
                                           editable=False)
@@ -693,6 +698,9 @@ class SubtitleLanguage(models.Model):
         could be revisited in the future.
 
         """
+        if self.is_forked:
+            return None
+
         tip_version = self.get_tip()
         if not tip_version:
             return None
