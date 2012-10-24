@@ -680,20 +680,25 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     env.host_string = env.builder_host
     ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
     build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
+    integration_dir = '{0}/unisubs-integration'.format(build_dir)
     python_exe = '{0}/bin/python'.format(ve_dir)
+    rev = run('cat {0}/optional/unisubs-integration'.format(build_dir))
     _reset_permissions(build_dir)
     _reset_permissions(env.build_ve_root)
     # update repositories
     with Output("Updating the main unisubs repo"), cd(build_dir):
         _switch_branch(env.revision, app_dir=build_dir)
         _git_pull()
+    with Output("Updating the integration repo"), cd(integration_dir):
+        _git_checkout(rev, as_sudo=True)
     # must be ran before we compile anything
     with Output("Updating commit"), cd(build_dir):
         run('python deploy/create_commit_file.py')
         run('cat commit.py')
     # virtualenv
     with Output("Updating virtualenv"):
-        run('virtualenv -q {0}'.format(ve_dir))
+        with settings(warn_only=True):
+            run('virtualenv -q {0}'.format(ve_dir))
         with cd('{0}/deploy'.format(build_dir)):
             run('{0}/bin/pip install -U -r requirements.txt'.format(
                 ve_dir))
@@ -1019,14 +1024,15 @@ def create_demo(integration_revision=None, skip_media=False):
     # rabbitmq
     with Output("Configuring RabbitMQ"), settings(warn_only=True):
         _create_rabbitmq_instance(name=instance_name, password=service_password)
-    # TODO:
     # RDS DB instance
     with Output("Configuring RDS"), settings(warn_only=True):
         _create_rds_instance(name=instance_name, password=service_password)
     # solr instance
     with Output("Configuring Solr"):
         _create_solr_instance(name=instance_name)
+    # TODO:
     # Django site with <revision>.demo.amara.org url
+    # jenkins instance
     # clone code
     with Output("Cloning and building environments"):
         execute(_clone_repo_demo, revision=revision,
