@@ -1239,17 +1239,15 @@ def language_summary(language, team_video=-1, user=None):
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
         'in_progress': language.is_writelocked,
-        'disabled_from': False,
-        'disabled_to': False }
+        'disabled_from': False }
 
     if team_video:
         tasks = team_video.task_set.incomplete().filter(language=language.language)
         if tasks:
             task = tasks[0]
-            if user and user != task.assignee:
-                summary['disabled_to'] = True
+            summary['disabled_to'] = user and user != task.assignee
 
-    if language.latest_version():
+    if language.latest_version() and 'disabled_to' not in summary:
         # Languages with existing subtitles cannot be selected as a "to"
         # language in the "add new translation" dialog.  If you want to work on
         # that language, select it and hit "Improve these Subtitles" instead.
