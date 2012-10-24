@@ -693,7 +693,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         run('cat commit.py')
     # virtualenv
     with Output("Updating virtualenv"):
-        run('virtualenv -q {0}'.format(ve_dir))
+        #run('virtualenv -q {0}'.format(ve_dir))
         with cd('{0}/deploy'.format(build_dir)):
             run('{0}/bin/pip install -U -r requirements.txt'.format(
                 ve_dir))
@@ -1019,14 +1019,15 @@ def create_demo(integration_revision=None, skip_media=False):
     # rabbitmq
     with Output("Configuring RabbitMQ"), settings(warn_only=True):
         _create_rabbitmq_instance(name=instance_name, password=service_password)
-    # TODO:
     # RDS DB instance
     with Output("Configuring RDS"), settings(warn_only=True):
         _create_rds_instance(name=instance_name, password=service_password)
     # solr instance
     with Output("Configuring Solr"):
         _create_solr_instance(name=instance_name)
+    # TODO:
     # Django site with <revision>.demo.amara.org url
+    # jenkins instance
     # clone code
     with Output("Cloning and building environments"):
         execute(_clone_repo_demo, revision=revision,
