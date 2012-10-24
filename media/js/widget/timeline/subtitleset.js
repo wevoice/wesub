@@ -47,6 +47,7 @@ unisubs.timeline.SubtitleSet.DISPLAY_NEW = 'displaynew';
 unisubs.timeline.SubtitleSet.CLEAR_TIMES = 'cleartimes';
 unisubs.timeline.SubtitleSet.RESET_SUBS = 'resetsubs';
 unisubs.timeline.SubtitleSet.REMOVE = 'remove';
+unisubs.timeline.SubtitleSet.RENDER_NEW = 'rendernew';
 
 unisubs.timeline.SubtitleSet.prototype.getSubsToDisplay = function() {
     return this.subsToDisplay_;
@@ -81,6 +82,9 @@ unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
     }
     else if (e.type == et.DELETE) {
         this.deleteCaption_(e.caption);
+    }else{
+        this.dispatchEvent(unisubs.timeline.SubtitleSet.RENDER_NEW);
+
     }
 };
 unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {

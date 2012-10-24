@@ -174,9 +174,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = funct
           'sub_order': subtitleJson['sub_order'],
           'start_time': subtitleJson['start_time'],
           'end_time': subtitleJson['end_time']
-    }
+    };
 
     var c = new unisubs.subtitle.EditableCaption(null, newSub);
+    c.setParentEventTarget(this);
     this.captions_.push(c);
     return c;
 };
