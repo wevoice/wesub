@@ -29,6 +29,10 @@ from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
 from fabric.decorators import roles, runs_once, parallel
 import fabric.state
+try:
+    import simplejson as json
+except:
+    import json
 
 ADD_TIMESTAMPS = """ | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' """
 WRITE_LOG = """ | tee /tmp/%s.log """
@@ -193,6 +197,7 @@ def _create_env(username,
                 app_name,
                 app_dir,
                 app_group,
+                builder_host,
                 revision,
                 ve_dir,
                 separate_uslogging_db,
@@ -206,6 +211,7 @@ def _create_env(username,
     env.app_name = app_name
     env.app_dir = app_dir
     env.app_group = app_group
+    env.builder_host = builder_host
     env.revision = revision
     env.ve_dir = ve_dir
     env.separate_uslogging_db = separate_uslogging_db
@@ -215,6 +221,8 @@ def _create_env(username,
     env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
     env.password = os.environ.get('FABRIC_PASSWORD', None)
     env.dev_host = 'dev.universalsubtitles.org'
+    env.build_apps_root = '/opt/media_compile/apps'
+    env.build_ve_root = '/opt/media_compile/ve'
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -229,6 +237,7 @@ def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
                     app_name              = 'unisubs',
                     app_dir               = '/opt/apps/local/unisubs/',
                     app_group             = 'deploy',
+                    builder_host          = 'app.local',
                     revision              = 'staging',
                     ve_dir                = '/opt/ve/local/unisubs',
                     separate_uslogging_db = False,
@@ -238,6 +247,7 @@ def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
                         'data': ['10.10.10.120'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
+        env.dev_host = '10.10.10.115'
 
 @task
 def dev(username):
@@ -254,6 +264,7 @@ def dev(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -287,6 +298,7 @@ def demo(username, revision):
                     app_dir               = '/var/tmp/{0}/unisubs/'.format(
                         revision),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = revision,
                     ve_dir                = '/var/tmp/{0}/ve'.format(
                         revision),
@@ -312,6 +324,7 @@ def staging(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -340,6 +353,7 @@ def production(username):
                     app_dir               = '/opt/apps/{0}/unisubs/'.format(
                         env_name),
                     app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -364,9 +378,10 @@ def _reset_permissions(app_dir):
 def reset_permissions():
     _reset_permissions(env.app_dir)
     _reset_permissions(env.ve_dir)
+    # reset builder dir
+    env.host_string = env.builder_host
 
 def _git_pull():
-    run('git log -r -1')
     run('git checkout --force')
     run('git pull --ff-only')
     run('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
@@ -496,12 +511,14 @@ def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
         run('rm {0}/disabled'.format(env.app_dir))
 
-def _update_integration(run_as_sudo=True, branch='dev'):
-    with Output("Updating nested unisubs-integration repositories"):
-        with cd(os.path.join(env.app_dir, 'unisubs-integration')), \
+def _update_integration(run_as_sudo=True, branch='dev', app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating integration repository"):
+        with cd(os.path.join(app_dir, 'unisubs-integration')), \
             settings(warn_only=True):
             _git_checkout_branch_and_reset(
-                _get_optional_repo_version(env.app_dir, 'unisubs-integration'),
+                _get_optional_repo_version(app_dir, 'unisubs-integration'),
                 branch=branch,
                 run_as_sudo=run_as_sudo
             )
@@ -606,18 +623,23 @@ def bounce_celery():
     '''
     _bounce_celery()
 
-@roles('app', 'data')
-def _update_code(branch=None, integration_branch=None):
-    with Output("Updating the main unisubs repo"), cd(env.app_dir):
+def _update_code(branch=None, integration_branch=None, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating the main unisubs repo"), cd(app_dir):
         if branch:
-            _switch_branch(branch)
+            _switch_branch(branch, app_dir=app_dir)
         else:
             _git_pull()
-    with Output("Updating integration repo"):
-        execute(_update_integration, branch=integration_branch)
-        with cd(env.app_dir):
-            with settings(warn_only=True):
-                run("find . -name '*.pyc' -delete")
+    # update integration repo
+    execute(_update_integration, branch=integration_branch, app_dir=app_dir)
+    with cd(app_dir):
+        with settings(warn_only=True):
+            run("find . -name '*.pyc' -delete")
+
+@roles('app', 'data')
+def update_code(branch=None, integration_branch=None):
+    _update_code(branch=branch, integration_branch=integration_branch)
 
 @task
 def deploy(branch=None, integration_branch=None, skip_celery=False,
@@ -635,7 +657,7 @@ def deploy(branch=None, integration_branch=None, skip_celery=False,
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    execute(_update_code, branch=branch, integration_branch=integration_branch)
+    execute(update_code, branch=branch, integration_branch=integration_branch)
     if skip_media == False:
         execute(update_static_media)
     if skip_celery == False:
@@ -647,7 +669,6 @@ def deploy(branch=None, integration_branch=None, skip_celery=False,
 
 @task
 @runs_once
-@roles('app')
 def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
     """
     Compiles and uploads static media to S3
@@ -656,16 +677,31 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     :param skip_s3: Skip upload to S3 (default: False)
 
     """
-    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    env.host_string = env.builder_host
+    ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
+    build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    _reset_permissions(build_dir)
+    _reset_permissions(env.build_ve_root)
+    # update repositories
+    with Output("Updating the main unisubs repo"), cd(build_dir):
+        _switch_branch(env.revision, app_dir=build_dir)
+        _git_pull()
     # must be ran before we compile anything
-    with Output("Updating commit"), cd(env.app_dir):
-        run('{0} deploy/create_commit_file.py'.format(python_exe))
+    with Output("Updating commit"), cd(build_dir):
+        run('python deploy/create_commit_file.py')
         run('cat commit.py')
+    # virtualenv
+    with Output("Updating virtualenv"):
+        run('virtualenv -q {0}'.format(ve_dir))
+        with cd('{0}/deploy'.format(build_dir)):
+            run('{0}/bin/pip install -U -r requirements.txt'.format(
+                ve_dir))
     if skip_compile == False:
-        with Output("Compiling media"), cd(env.app_dir), settings(warn_only=True):
+        with Output("Compiling media"), cd(build_dir), settings(warn_only=True):
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
     if env.s3_bucket and skip_s3 == False:
-        with Output("Uploading to S3"), cd(env.app_dir):
+        with Output("Uploading to S3"), cd(build_dir):
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
 
 @task
@@ -696,8 +732,10 @@ def update_django_admin_media_dev():
         # copy media to local dir
         run('cp -r {0} ./media/admin'.format(media_dir))
 
-def _switch_branch(branch):
-    with cd(env.app_dir), settings(warn_only=True):
+def _switch_branch(branch, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with cd(app_dir), settings(warn_only=True):
         run('git fetch')
         run('git branch --track {0} origin/{0}'.format(branch))
         run('git checkout {0}'.format(branch))
@@ -740,10 +778,18 @@ def _clone_repo_demo(revision='dev', integration_revision=None,
         revision, private_conf))
     run("sed -i 's/BROKER_USER.*/BROKER_USER = \"{0}\"/g' {1}".format(
         instance_name, private_conf))
-    run("sed -i 's/BROKER_VHOST.*/BROKER_VHOST = \"/{0}\"/g' {1}".format(
+    run("sed -i 's/BROKER_VHOST.*/BROKER_VHOST = \"\/{0}\"/g' {1}".format(
         instance_name, private_conf))
     run("sed -i 's/BROKER_PASSWORD.*/BROKER_PASSWORD = \"{0}\"/g' {1}".format(
         service_password, private_conf))
+    run("sed -i 's/DATABASE_NAME.*/DATABASE_NAME = \"{0}\"/g' {1}".format(
+        instance_name, private_conf))
+    run("sed -i 's/DATABASE_USER.*/DATABASE_USER = \"{0}\"/g' {1}".format(
+        instance_name, private_conf))
+    run("sed -i 's/DATABASE_PASSWORD.*/DATABASE_PASSWORD = \"{0}\"/g' {1}".format(
+        service_password, private_conf))
+    run("sed -i 's/HAYSTACK_SOLR_URL.*/HAYSTACK_SOLR_URL = \"http:\/\/{0}:8983\/solr\/{1}\"/g' {2}".format(env.demo_hosts.get('data'),
+        instance_name, private_conf))
     _reset_permissions(env.app_dir)
 
 def _create_rabbitmq_instance(name=None, password=None):
@@ -822,6 +868,99 @@ def _remove_celery_instance(name=None):
         sudo('rm -f /etc/init/celeryd.{0}.conf'.format(name))
         sudo('rm -f /etc/init/celerycam.{0}.conf'.format(name))
 
+def _create_rds_instance(name=None, password=None):
+    """
+    Creates an RDS instance (on dev RDS host)
+
+    :param name: RDS DB name (also used for username)
+    :param password: RDS user password
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    with hide('running', 'stdout', 'warnings'):
+        conf = sudo('cat /etc/amara_config.json')
+        try:
+            conf = json.loads(conf)
+        except:
+            raise RuntimeError('Unable to parse Amara config')
+        env_cfg = conf.get('rds').get('environments').get('dev')
+        user = env_cfg.get('user')
+        host = env_cfg.get('host')
+        password = env_cfg.get('password')
+        sql_cmd = 'mysql -u{0} -p{1} -h{2}'.format(user, password, host)
+        run('echo "create user {0} identified by \'{1}\';" | {2}'.format(
+            name, password, sql_cmd))
+        run('echo "create database {0};" | {1}'.format(
+            name, sql_cmd))
+        # can't grant all as RDS doesn't allow it
+        run('echo "grant select,insert,update,delete,create,index,alter,'\
+            'create temporary tables,lock tables,execute,create view,show view,'\
+            'create routine, alter routine on {0}.* to {0}@\'%\';" | {1}'.format(
+            name, sql_cmd))
+
+def _remove_rds_instance(name=None):
+    """
+    Notifies for RDS instance removal
+
+    :param name: RDS instance name
+
+    """
+    msg = "Notification for RDS instance {0} removal by {1}".format(name,
+        env.user)
+    _notify('RDS Instance Removal', msg, env.notification_email)
+
+def _create_solr_instance(name=None):
+    """
+    Creates a Solr instance (for demos)
+
+    :param name: Solr core name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    solr_cfg = '/etc/solr_extra_cores.json'
+    try:
+        solr_config = run('cat {0}'.format(solr_cfg))
+        solr_extra_cores = json.loads(solr_config)
+    except:
+        raise RuntimeError('Unable to parse extra solr core config')
+    if name not in solr_extra_cores:
+        solr_extra_cores.append(name)
+    with open('.temp-solr', 'w') as f:
+        f.write(json.dumps(solr_extra_cores))
+    put('.temp-solr', '{0}'.format(solr_cfg),
+        use_sudo=True)
+    os.remove('.temp-solr')
+    # run puppet to create core
+    with hide('running', 'warnings'), settings(warn_only=True):
+        sudo('puppet agent -t --server puppet.amara.org')
+
+def _remove_solr_instance(name=None):
+    """
+    Removes Solr instance (for demos)
+
+    :param name: Solr core name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    solr_cfg = '/etc/solr_extra_cores.json'
+    try:
+        solr_config = run('cat {0}'.format(solr_cfg))
+        solr_extra_cores = json.loads(solr_config)
+    except:
+        raise RuntimeError('Unable to parse extra solr core config')
+    if name in solr_extra_cores:
+        solr_extra_cores.remove(name)
+    with open('.temp-solr', 'w') as f:
+        f.write(json.dumps(solr_extra_cores))
+    put('.temp-solr', '{0}'.format(solr_cfg),
+        use_sudo=True)
+    os.remove('.temp-solr')
+    sudo('rm -rf /etc/solr/conf/{0}'.format(name))
+    sudo('service tomcat6 restart')
+
+def _create_instance_name(name):
+    return name.replace('-', '_')[:8]
+
 @task
 @parallel
 def create_demo(integration_revision=None, skip_media=False):
@@ -834,7 +973,7 @@ def create_demo(integration_revision=None, skip_media=False):
     """
     env.hosts = env.demo_hosts.values()
     revision = env.revision
-    instance_name = revision.replace('-', '_')
+    instance_name = _create_instance_name(env.revision)
     service_password = ''.join(random.Random().sample(string.letters+string.digits, 8))
     with Output("Creating app directories"):
         for k,v in env.demo_hosts.iteritems():
@@ -875,16 +1014,19 @@ def create_demo(integration_revision=None, skip_media=False):
         
     # services
     # celery
-    with Output("Configuring Celery"):
+    with Output("Configuring Celery"), settings(warn_only=True):
         _create_celery_instance(name=instance_name)
     # rabbitmq
-    with Output("Configuring RabbitMQ"):
+    with Output("Configuring RabbitMQ"), settings(warn_only=True):
         _create_rabbitmq_instance(name=instance_name, password=service_password)
     # TODO:
     # RDS DB instance
-    # Django site with <revision>.demo.amara.org url
+    with Output("Configuring RDS"), settings(warn_only=True):
+        _create_rds_instance(name=instance_name, password=service_password)
     # solr instance
-    return
+    with Output("Configuring Solr"):
+        _create_solr_instance(name=instance_name)
+    # Django site with <revision>.demo.amara.org url
     # clone code
     with Output("Cloning and building environments"):
         execute(_clone_repo_demo, revision=revision,
@@ -914,7 +1056,7 @@ def remove_demo():
 
     """
     revision = env.revision
-    instance_name = revision.replace('-', '_')
+    instance_name = _create_instance_name(env.revision)
     # remove demo
     with Output("Stopping uWSGI"):
         env.host_string = env.demo_hosts.get('app')
@@ -924,6 +1066,10 @@ def remove_demo():
         _remove_celery_instance(instance_name)
     with Output("Removing RabbitMQ instance"):
         _remove_rabbitmq_instance(instance_name)
+    with Output("Removing RDS instance"):
+        _remove_rds_instance(instance_name)
+    with Output("Removing Solr instance"):
+        _remove_solr_instance(instance_name)
     with Output("Removing nginx config"):
         env.host_string = env.demo_hosts.get('app')
         sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(instance_name))
