@@ -386,6 +386,8 @@ Creating new subtitles for a language:
     :query subtitles: The subtitles to submit
     :query sub_format: The format used to parse the subs. The same formats as
         for fetching subtitles are accepted. Optional - defaults to ``srt``.
+    :title: Give a title to the new revision
+    :description: Give a description to the new revision
 
 This will create a new subtitle version with the new subtitles.
 
