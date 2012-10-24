@@ -27,7 +27,7 @@ import time
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.db.models import Q
 from django.db import IntegrityError
 from django.utils.dateformat import format as date_format
@@ -113,6 +113,7 @@ update_metadata_choices()
 WRITELOCK_EXPIRATION = 30 # 30 seconds
 
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 class AlreadyEditingException(Exception):
@@ -1159,6 +1160,9 @@ class SubtitleLanguage(models.Model):
     def save(self, updates_timestamp=True, *args, **kwargs):
         if updates_timestamp:
             self.created = datetime.now()
+        #if self.language:
+            #assert self.language in VALID_LANGUAGE_CODES, \
+                #"Subtitle Language %s should be a valid code." % self.language
         super(SubtitleLanguage, self).save(*args, **kwargs)
 
     def calculate_percent_done(self):
@@ -1191,6 +1195,16 @@ class SubtitleLanguage(models.Model):
         if version:
             return version[0].unpublish(delete=delete)
 
+    def first_version_with_status(self, status):
+        try:
+            return self.subtitleversion_set.filter(
+                    moderation_status=status).order_by('datetime_started')[0]
+        except IndexError:
+            return None
+
+    @property
+    def first_approved_version(self):
+        return self.first_version_with_status(APPROVED)
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -1250,8 +1264,9 @@ class SubtitleVersionManager(models.Manager):
     def not_restricted_by_moderation(self):
         return self.get_query_set().exclude(moderation_status__in=[WAITING_MODERATION, REJECTED])
 
-    def new_version(self, parser, language, user,
-                    translated_from=None, note="", timestamp=None, moderation_status=None):
+    def new_version(self, parser, language, user, translated_from=None,
+            note="", timestamp=None, moderation_status=None, title='',
+            description=''):
 
         from utils.unisubsmarkup import html_to_markup
 
@@ -1260,12 +1275,12 @@ class SubtitleVersionManager(models.Manager):
 
         if last_version is not None:
             version_no = last_version.version_no + 1
-            title = last_version.title
-            description = last_version.description
+            title = title or last_version.title
+            description = description or last_version.description
         else:
             video = language.video
-            title = video.get_title_display()
-            description = video.get_description_display()
+            title = title or video.get_title_display()
+            description = description or video.get_description_display()
 
         forked = not bool(translated_from)
         original_subs = None
@@ -2470,9 +2485,16 @@ class VideoUrl(models.Model):
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
 
+def video_url_remove_handler(sender, instance, **kwargs):
+    print('Invalidating cache')
+    video_cache.invalidate_cache(instance.video.video_id)
 
+
+models.signals.pre_save.connect(create_video_id, sender=Video)
+models.signals.pre_delete.connect(video_delete_handler, sender=Video)
 post_save.connect(Action.create_video_url_handler, VideoUrl)
 post_save.connect(video_cache.on_video_url_save, VideoUrl)
+pre_delete.connect(video_cache.on_video_url_delete, VideoUrl)
 
 
 # VideoFeed

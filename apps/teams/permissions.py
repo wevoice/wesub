@@ -425,6 +425,7 @@ def can_view_settings_tab(team, user):
 
     return role in [ROLE_ADMIN, ROLE_OWNER]
 
+
 def can_change_team_settings(team, user):
     return can_view_settings_tab(team, user)
 
@@ -604,6 +605,10 @@ def can_publish_edits_immediately(team_video, user, lang):
 
     return True
 
+def can_post_edit_subtitles(team, user):
+    """ Returns wheter the user has permission to post edit an original language """
+    member = get_member(user, team)
+    return member.role != ROLE_CONTRIBUTOR
 
 def can_unpublish_subs(team_video, user, lang):
     """Return whether the user has permission to unpublish subtitles.

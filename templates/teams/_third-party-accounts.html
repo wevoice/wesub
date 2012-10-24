@@ -34,7 +34,7 @@
                     {% if account.oauth_access_token %}
                         <ul class="actions">
                             <li><a href="" title="Unlink this account">Remove</a></li>
-                            <li><a href="" title="Sync existing subtitles ">Sync now</a></li> 
+                            <li><a href="{{ account|sync_third_party_account:team }}" title="Sync existing subtitles ">Sync now</a></li> 
                         </ul>
                     {% endif %}
                 </li>

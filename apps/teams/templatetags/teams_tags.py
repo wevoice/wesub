@@ -554,3 +554,9 @@ def can_delete_subtitles_for(user, video):
         return False
 
     return _can_delete_subs(team_video, user)
+
+@register.filter
+def sync_third_party_account(account, team):
+    return reverse('teams:sync-third-party-account',
+            kwargs={'slug': team.slug, 'account_id': account.pk})
+

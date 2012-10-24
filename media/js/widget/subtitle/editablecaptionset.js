@@ -49,10 +49,9 @@ unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_complet
         this.captions_,
         unisubs.subtitle.EditableCaption.orderCompare);
     var i;
-    for (i = 1; i < this.captions_.length; i++) {
-        this.captions_[i - 1].setNextCaption(this.captions_[i]);
-        this.captions_[i].setPreviousCaption(this.captions_[i - 1]);
-    }
+
+    this.setPreviousAndNextCaptions();
+
     this.completed = opt_completed;
 
     this.title = opt_title;
@@ -175,9 +174,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = funct
           'sub_order': subtitleJson['sub_order'],
           'start_time': subtitleJson['start_time'],
           'end_time': subtitleJson['end_time']
-    }
+    };
 
     var c = new unisubs.subtitle.EditableCaption(null, newSub);
+    c.setParentEventTarget(this);
     this.captions_.push(c);
     return c;
 };
@@ -351,6 +351,12 @@ unisubs.subtitle.EditableCaptionSet.prototype.makeMap = function() {
             map[c.getCaptionID()] = c;
         });
     return map;
+};
+unisubs.subtitle.EditableCaptionSet.prototype.setPreviousAndNextCaptions = function() {
+    for (i = 1; i < this.captions_.length; i++) {
+        this.captions_[i - 1].setNextCaption(this.captions_[i]);
+        this.captions_[i].setPreviousCaption(this.captions_[i - 1]);
+    }
 };
 
 unisubs.subtitle.EditableCaptionSet.prototype.hasTitleChanged = function() {

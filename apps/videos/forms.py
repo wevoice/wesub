@@ -176,7 +176,11 @@ class SubtitlesUploadForm(forms.Form):
         self.fields['language'].choices = [('', '--Select language--')] + get_language_choices()
         self.fields['video_language'].choices = get_language_choices()
         choices = [(sl.language, sl.language_display()) for sl in video.subtitlelanguage_set.all() if sl.is_complete_and_synced()]
-        self.fields['translated_from'].choices = choices
+
+        if choices:
+            self.fields['translated_from'].choices = [('', '--Select language--')] + choices
+        else:
+            del self.fields['translated_from']
 
     def clean_video(self):
         video = self.cleaned_data['video']
@@ -327,7 +331,7 @@ class SubtitlesUploadForm(forms.Form):
 
     def save(self):
         is_complete = self.cleaned_data['is_complete']
-        translated_from_language = self.cleaned_data['translated_from']
+        translated_from_language = self.cleaned_data.get('translated_from', '')
         video = self.cleaned_data['video']
 
         # no matter what, txt cannot be complete because they don't have time data.
@@ -374,13 +378,13 @@ class SubtitlesUploadForm(forms.Form):
         language.language = lang_code
 
         if not translated_from:
-            language.is_original = True
+            language.is_original = not video.has_original_language()
         else:
             language.is_original = False
             language.is_forked = False
 
             # iuck
-            if translated_from.is_original:
+            if translated_from.is_original or not translated_from.standard_language:
                 language.standard_language = translated_from
             else:
                 language.standard_language = translated_from.standard_language

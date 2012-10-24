@@ -20,7 +20,7 @@
         <script type="text/javascript">
             window.VIDEO_ID = '{{ video.pk }}';
             window.TITLE_ERROR = '{% trans "Enter non-empty title" %}';
-            window.TASK = '{% firstof task '' %}';
+            window.TASK = '{% firstof task|default_if_none:""|escapejs '' %}';
             window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
             window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
             {% if video.team_set.all.0 %}
@@ -35,6 +35,9 @@
                 {% else %}
                     window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
                 {% endif %}
+            {% endif %}
+            {% if task.get_type_display == 'Translate' %}
+                window.TASK_TRANSLATE_TO_LANGUAGE = '{{ task.language }}';
             {% endif %}
         </script>
     {% endblock %}

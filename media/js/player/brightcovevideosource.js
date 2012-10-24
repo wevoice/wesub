@@ -119,11 +119,21 @@ unisubs.player.BrightcoveVideoSource.prototype.setVideoConfig = function(config)
 unisubs.player.BrightcoveVideoSource.prototype.getVideoURL = function() {
     return this.videoConfig_["url"];
 };
+unisubs.player.BrightcoveVideoSource.prototype.sizeFromConfig = function() {
+    if (this.videoConfig_ && this.videoConfig_['width'] &&
+        this.videoConfig_['height']) {
+        return new goog.math.Size(
+            parseInt(this.videoConfig_['width'], 0), parseInt(this.videoConfig_['height'], 0));
+    }
+    else {
+        return null;
+    }
+};
 
 unisubs.player.BrightcoveVideoSource.EMBED_SOURCE = "http://c.brightcove.com/services/viewer/federated_f9?isVid=1&isUI=1";
 unisubs.player.BrightcoveVideoSource.prototype.toString = function() {
     return "BrightcoveVideoSource " + this.videoID_;
-}
+};
 
 /**
 * Checks if this video url is indeed for this MediaSource type, returns a
