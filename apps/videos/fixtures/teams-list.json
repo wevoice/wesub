@@ -60,7 +60,7 @@
         "is_original": true,
         "translations": [
         {
-            "code": "ge",
+            "code": "pt-br",
             "num_subs": 9
         }]
     }], 
@@ -70,7 +70,7 @@
     "url": "http://www.example.com/5.mp4",
     "langs": [
     {
-        "code": "pt_BR",
+        "code": "pt-br",
         "num_subs": 0,
         "is_complete": false,
         "is_original": true,

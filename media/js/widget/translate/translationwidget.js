@@ -53,11 +53,20 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
 
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
+    // If we're reviewing or approving a translation, we need to display the timing
+    // from the *translation*, not the original.
+    var timingToDisplay;
+    if (this.dialog_.reviewOrApprovalType_) {
+        timingToDisplay = this.translation_.json['start_time'];
+    } else {
+        timingToDisplay = this.subtitle_['start_time'];
+    }
+
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
               $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
-                         unisubs.formatTime(this.subtitle_['start_time'])),
+                         unisubs.formatTime(timingToDisplay)),
               $d('span', 'unisubs-title unisubs-title-notime', this.subtitle_['text']),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
