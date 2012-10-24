@@ -1154,59 +1154,6 @@ class TestCache(TestCase):
         video_id = video_cache.get_video_id(url)
         video_cache.get_subtitles_dict(video_id, 0, 0, lambda x: x)
 
-from widget.srt_subs import TTMLSubtitles, SRTSubtitles, SBVSubtitles, TXTSubtitles, SSASubtitles
-
-class TestSubtitlesGenerator(TestCase):
-    fixtures = ['test_widget.json']
-
-    def setUp(self):
-        self.video = Video.objects.all()[:1].get()
-        self.subtitles = []
-        self.cyrillic_text = u'Не аглійські субтитри. Її'
-        self.subtitles.append({
-            'start': 0,
-            'end': 1,
-            'text': u''
-        })
-        self.subtitles.append({
-            'start': 1,
-            'end': 2,
-            'text': self.cyrillic_text
-        })
-        self.subtitles.append({
-            'start': 359999.0,
-            'end': 359999.0,
-            'text': u"Andres Martinez: Right. And I guess é I'm tempted to cut to what is the answer."
-        })
-
-    def test_ttml(self):
-        handler = TTMLSubtitles
-        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='en-us', video=self.video))
-        text = unicode(h)
-        self.assertTrue(text)
-        self.assertIn(self.cyrillic_text , text)
-        # make sure ttml generates the correct bcp47 for the most common cases
-        # on the xml:lang tag
-        self.assertIn('xml:lang="en-US"', text)
-        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='en', video=self.video))
-        self.assertIn('xml:lang="en"', unicode(h))
-        h = handler(self.subtitles, self.video, sl=SubtitleLanguage(language='ug_Arab-cn', video=self.video))
-        self.assertIn('xml:lang="ug_Arab-CN"', unicode(h))
-
-
-    def test_one_subtitle(self):
-        subtitles = [{
-            'text': u'Witam, jestem Fr\xe9d\xe9ric Couchet, General Manager, od kwietnia',
-            'end': 3.1000000000000001,
-            'start': 0.0
-        }]
-        self.assertTrue(unicode(SRTSubtitles(subtitles, self.video)))
-        self.assertTrue(unicode(TTMLSubtitles(subtitles, self.video, sl=SubtitleLanguage(language='en-us', video=self.video))))
-        self.assertTrue(unicode(SSASubtitles(subtitles, self.video)))
-        self.assertTrue(unicode(SBVSubtitles(subtitles, self.video)))
-        self.assertTrue(unicode(TXTSubtitles(subtitles, self.video)))
-
-
 class TestCaching(TestCase):
     fixtures = ['test_widget.json']
 

@@ -299,7 +299,6 @@ def base_widget_params(request, extra_params={}):
     return json.dumps(params)[1:-1]
 
 def download_subtitles(request, format):
-    #FIXME: use GenerateSubtitlesHandler
     video_id = request.GET.get('video_id')
     lang_id = request.GET.get('lang_pk')
     revision = request.GET.get('revision', None)

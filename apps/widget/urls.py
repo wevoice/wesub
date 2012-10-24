@@ -17,10 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.conf.urls.defaults import url, patterns
 
-from widget.srt_subs import (
-    TTMLSubtitles, TXTSubtitles, SRTSubtitles, SBVSubtitles, DFXPSubtitles
-)
-
 urlpatterns = patterns(
     'widget.views',
     url(r'^rpc/xd/(\w+)$', 'xd_rpc'),
