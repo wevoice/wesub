@@ -809,6 +809,43 @@ class VideoTest(TestCase):
         cache_id_3 = video_cache.get_video_id(video_url)
         self.assertEqual(cache_id_3, cache_id_2)
 
+    def test_video_title(self):
+        # make a video
+        youtube_url = 'http://www.youtube.com/watch?v=pQ9qX8lcaBQ'
+        video, created = Video.get_or_create_for_url(youtube_url)
+        # test title before any subtitles are added
+        self.assertEquals(video.title, "The Sea Organ of Zadar")
+        # Make a subtitle language
+        lang = SubtitleLanguage(video=video, language='en', is_original=True)
+        lang.save()
+        # delete the cached _original_subtitle attribute to let the new
+        # language be found.
+        if hasattr(video, '_original_subtitle'):
+            del video._original_subtitle
+        # add a subtitle
+        fake_parser = []
+        v = SubtitleVersion.objects.new_version(fake_parser, lang, self.user,
+                                            title="New Title")
+        def check_title(correct_title):
+            # reload the video to ensure we have the latest version
+            self.assertEquals(Video.objects.get(pk=video.pk).title,
+                              correct_title)
+        check_title("New Title")
+        # update subtitle
+        SubtitleVersion.objects.new_version(fake_parser, lang, self.user,
+                                            title="Title 2")
+        check_title("Title 2")
+        # add a subtitle for a different language
+        other_lang = SubtitleLanguage(video=video, language='ru',
+                                      is_original=False)
+        other_lang.save()
+        SubtitleVersion.objects.new_version(fake_parser, other_lang,
+                                            self.user, title="Title 3")
+        check_title("Title 2")
+        # revert
+        video.version(0).rollback(self.user)
+        check_title("New Title")
+
 class RpcTest(TestCase):
     fixtures = ['test.json']
 

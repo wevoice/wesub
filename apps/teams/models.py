@@ -623,7 +623,6 @@ class Project(models.Model):
 class TeamVideo(models.Model):
     team = models.ForeignKey(Team)
     video = models.OneToOneField(Video)
-    title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True,
         help_text=_(u'Use this space to explain why you or your team need to '
                     u'caption or subtitle this video. Adding a note makes '
@@ -646,7 +645,7 @@ class TeamVideo(models.Model):
         unique_together = (('team', 'video'),)
 
     def __unicode__(self):
-        return self.title or unicode(self.video)
+        return unicode(self.video)
 
     def link_to_page(self):
         if self.all_languages:

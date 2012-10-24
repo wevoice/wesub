@@ -1406,6 +1406,9 @@ class SubtitleVersion(SubtitleCollection):
             if self.user:
                 self.language.video.followers.remove(self.user)
                 self.language.followers.add(self.user)
+            if self.language.is_original and self.title != self.video.title:
+                self.video.title = self.title
+                self.video.save()
 
     def changed_from(self, other_subs):
         my_subs = self.subtitles()
