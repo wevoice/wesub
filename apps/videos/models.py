@@ -2483,8 +2483,6 @@ class VideoUrl(models.Model):
     def save(self, updates_timestamp=True, *args, **kwargs):
         if updates_timestamp:
             self.created = datetime.now()
-
-        assert self.type, "Type must be valid"
         super(VideoUrl, self).save(*args, **kwargs)
 
 def video_url_remove_handler(sender, instance, **kwargs):
