@@ -682,13 +682,14 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
     integration_dir = '{0}/unisubs-integration'.format(build_dir)
     python_exe = '{0}/bin/python'.format(ve_dir)
-    rev = run('cat {0}/optional/unisubs-integration'.format(build_dir))
+    with hide('running', 'stdout'):
+        rev = run('cat {0}/optional/unisubs-integration'.format(build_dir))
     _reset_permissions(build_dir)
     _reset_permissions(env.build_ve_root)
     # update repositories
     with Output("Updating the main unisubs repo"), cd(build_dir):
-        _switch_branch(env.revision, app_dir=build_dir)
         _git_pull()
+        _switch_branch(env.revision, app_dir=build_dir)
     with Output("Updating the integration repo"), cd(integration_dir):
         _git_checkout(rev, as_sudo=True)
     # must be ran before we compile anything
