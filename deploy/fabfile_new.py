@@ -890,11 +890,12 @@ def _create_rds_instance(name=None, password=None):
         except:
             raise RuntimeError('Unable to parse Amara config')
         env_cfg = conf.get('rds').get('environments').get('dev')
-        user = env_cfg.get('user')
-        host = env_cfg.get('host')
-        password = env_cfg.get('password')
-        sql_cmd = 'mysql -u{0} -p{1} -h{2}'.format(user, password, host)
-        run('echo "create user {0} identified by \'{1}\';" | {2}'.format(
+        rds_user = env_cfg.get('user')
+        rds_host = env_cfg.get('host')
+        rds_password = env_cfg.get('password')
+        sql_cmd = 'mysql -u{0} -p{1} -h{2}'.format(rds_user, rds_password,
+            rds_host)
+        run('echo "create user {0}@\'%\' identified by \'{1}\';" | {2}'.format(
             name, password, sql_cmd))
         run('echo "create database {0};" | {1}'.format(
             name, sql_cmd))
@@ -963,6 +964,23 @@ def _remove_solr_instance(name=None):
     os.remove('.temp-solr')
     sudo('rm -rf /etc/solr/conf/{0}'.format(name))
     sudo('service tomcat6 restart')
+
+def _configure_demo_db(name=None):
+    """
+    Syncs demo database
+
+    :param name: Application instance name
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    app_dir = '/var/tmp/{0}/unisubs'.format(name)
+    ve_dir = '/var/tmp/{0}/ve'.format(name)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    with cd(app_dir):
+        run('{0} manage.py syncdb --all --noinput --settings=unisubs_settings'.format(
+        python_exe))
+        run('{0} manage.py migrate --fake --noinput --settings=unisubs_settings'.format(
+        python_exe))
 
 def _create_instance_name(name):
     return name.replace('-', '_')[:8]
@@ -1035,14 +1053,18 @@ def create_demo(integration_revision=None, skip_media=False):
     # Django site with <revision>.demo.amara.org url
     # jenkins instance
     # clone code
-    with Output("Cloning and building environments"):
+    with Output("Cloning and building environments"), settings(warn_only=True):
+        env.hosts = env.demo_hosts.values()
         execute(_clone_repo_demo, revision=revision,
             integration_revision=integration_revision,
             instance_name=instance_name, service_password=service_password)
     env.host_string = env.demo_hosts.get('app')
+    # DB sync
+    with Output("Syncing and migrating database"):
+        _configure_demo_db(name=instance_name)
     # compile media
     if not skip_media:
-        with Output("Compiling static media.  This may take a moment"):
+        with Output("Compiling static media"):
             # create a symlink to google closure library for compilation
             sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(instance_name))
             with cd('/var/tmp/{0}/unisubs'.format(instance_name)), settings(warn_only=True):
@@ -1052,7 +1074,7 @@ def create_demo(integration_revision=None, skip_media=False):
     with Output("Starting {0} demo".format(revision)):
         sudo('service nginx reload')
         sudo('service uwsgi.unisubs.demo.{0} start'.format(instance_name))
-    print('\nDone. Demo should be available at http://{0}.demo.amara.org'.format(revision))
+    print('\nDemo should be available at http://{0}.demo.amara.org'.format(revision))
 
 @task
 def remove_demo():
