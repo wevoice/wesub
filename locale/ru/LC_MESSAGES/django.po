@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-24 01:42-0500\n"
+"POT-Creation-Date: 2012-10-25 01:43-0500\n"
 "PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/"
@@ -339,51 +339,51 @@ msgstr ""
 msgid "Your profile has been updated."
 msgstr "Ваш профиль был обновлён."
 
-#: apps/search/forms.py:28
+#: apps/search/forms.py:27
 msgid "Relevance"
 msgstr "Релевантность"
 
-#: apps/search/forms.py:29
+#: apps/search/forms.py:28
 msgid "Most languages"
 msgstr "Больше всех языков"
 
-#: apps/search/forms.py:30
+#: apps/search/forms.py:29
 msgid "Views Today"
 msgstr "Просмотров сегодня"
 
-#: apps/search/forms.py:31
+#: apps/search/forms.py:30
 msgid "Views This Week"
 msgstr "Просмотров на этой неделе"
 
-#: apps/search/forms.py:32
+#: apps/search/forms.py:31
 msgid "Views This Month"
 msgstr "Просмотров в этом месяце"
 
-#: apps/search/forms.py:33
+#: apps/search/forms.py:32
 msgid "Total Views"
 msgstr "Просмотров всего"
 
-#: apps/search/forms.py:35
+#: apps/search/forms.py:34
 msgid "query"
 msgstr "запрос"
 
-#: apps/search/forms.py:37
+#: apps/search/forms.py:36
 msgid "Sort By"
 msgstr "Сортировать по"
 
-#: apps/search/forms.py:38
+#: apps/search/forms.py:37
 msgid "Subtitled Into"
 msgstr "Переведено на"
 
-#: apps/search/forms.py:39 apps/search/forms.py:41
+#: apps/search/forms.py:38 apps/search/forms.py:40
 msgid "Left blank for any language"
 msgstr "Оставьте пустым для любого языка"
 
-#: apps/search/forms.py:40
+#: apps/search/forms.py:39
 msgid "Video In"
 msgstr "Язык"
 
-#: apps/search/forms.py:63 apps/search/forms.py:99
+#: apps/search/forms.py:62 apps/search/forms.py:97
 msgid "All Languages"
 msgstr "Все языки"
 
