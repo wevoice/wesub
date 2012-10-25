@@ -69,6 +69,161 @@ def _strip_nones(d):
 
 
 # Private Implementation ------------------------------------------------------
+def _perform_team_operations(version, committer, complete):
+    """Perform any teams-based operations that need to happen to this version.
+
+    If the version is not on a video from a team, does nothing.
+
+    Otherwise, performs all the extra fiddly steps that need to happen to
+    appease the teams system gods.
+
+    """
+    team_video = version.video.get_team_video()
+
+    if not team_video:
+        return
+
+    _record_workflow_origin(team_video, version)
+    _update_visibility_and_tasks(team_video, version, committer, complete)
+
+def _record_workflow_origin(team_video, version):
+    """Figure out and record where the given version started out.
+
+    Should be used right after creation.
+
+    This is a giant ugly hack.  It can be killed once the new UI is in place.
+    I'm sorry.
+
+    """
+    if version and not version.get_workflow_origin():
+        tasks = team_video.task_set.incomplete()
+        tasks = list(tasks.filter(language=version.language.language)[:1])
+
+        if tasks:
+            open_task_type = tasks[0].get_type_display()
+
+            workflow_origin = {
+                'Subtitle': 'transcribe',
+                'Translate': 'translate',
+                'Review': 'review',
+                'Approve': 'approve'
+            }.get(open_task_type)
+
+            if workflow_origin:
+                version.set_workflow_origin(workflow_origin)
+
+def _user_can_bypass_moderation(team_video, version, committer):
+    """Determine whether the given committer can bypass moderation for this video.
+
+    A user can bypass moderation iff:
+
+    1) They are a moderator.
+    2) This version is a post-publish edit.
+    3) The subtitles are complete.
+
+    Note that version.subtitle_language.subtitles_complete must be correctly set
+    *before* this for this to work properly.
+
+    TODO: Can we eliminate that property?  Are moderators going to be submitting
+    incomplete subtitles as post-publish edits?  Why would that happen?
+
+    """
+    from apps.teams.permissions import can_publish_edits_immediately
+    subtitle_language = version.subtitle_language
+
+    subtitles_are_complete = subtitle_language.subtitles_complete
+    is_post_publish_edit = (version.sibling_set.public()
+                                               .exclude(id=version.id)
+                                               .exists())
+    user_can_bypass = can_publish_edits_immediately(team_video, committer,
+                                                    subtitle_language.language_code)
+
+    return subtitles_are_complete and is_post_publish_edit and user_can_bypass
+
+def _update_visibility_and_tasks(team_video, version, committer, complete):
+    """Set the appropriate visibility flags for the new version.
+
+    I hate everything about this.  This is all going to go away once the new UI
+    is in place and we tear out the tasks system.  That day cannot come soon
+    enough.
+
+    """
+    workflow = team_video.get_workflow()
+    subtitle_language = version.subtitle_language
+    language_code = subtitle_language.language_code
+
+    # If the team does not use tasks, all versions are just public and we're
+    # done here.
+    if not workflow.allows_tasks:
+        return
+
+    # Determine if we need to moderate these subtitles and create a
+    # review/approve task for them if so.
+    can_bypass_moderation = _user_can_bypass_moderation(team_video, version,
+                                                        committer)
+    if not can_bypass_moderation:
+        if workflow.review_allowed or workflow.approve_allowed:
+            version.visibility = 'private'
+            version.save()
+
+    outstanding_tasks = team_video.task_set.incomplete().filter(
+            language__in=[language_code, ''])
+
+    if outstanding_tasks.exists():
+        # There are tasks for this video.  If this version isn't published yet,
+        # it belongs to those tasks, so update them.
+        if version.visibility != 'public':
+            outstanding_tasks.update(subtitle_version=version,
+                                     language=language_code)
+    elif not can_bypass_moderation:
+        from apps.teams.models import Task
+
+        # We know there are no existing tasks for this video, but it's also not
+        # directly been published (maybe), so we need to create the appropriate
+        # task for it.
+        task_type = None
+
+        if complete:
+            # If the subtitles are complete, then the new task will be either
+            # a review or approve, depending on the team.
+            if workflow.review_allowed:
+                task_type = Task.TYPE_IDS['Review']
+            elif workflow.approve_allowed:
+                task_type = Task.TYPE_IDS['Approve']
+
+            # Note that we may not have selected either of these, if the team
+            # does not require review or approval.  That's okay, we're done in
+            # that case.
+        else:
+            # Otherwise the new task will be a subtitle or translate, depending
+            # on the type of subs.
+            if subtitle_language.is_primary_audio_language():
+                task_type = Task.TYPE_IDS['Subtitle']
+            else:
+                task_type = Task.TYPE_IDS['Translate']
+
+        if task_type:
+            # We know the type of task we need to create, so go ahead and make
+            # it.
+            task = Task(team=team_video.team, team_video=team_video,
+                        language=language_code, type=task_type,
+                        subtitle_version=version)
+
+            # Assign it to the correct user.
+            if task.get_type_display() in ('Subtitle', 'Translate'):
+                # If it's a subtitle/translate task, then someone just added
+                # some incomplete subtitles.  We'll assign it to them by
+                # default.
+                task.assignee = committer
+            else:
+                # Otherwise it's a review/approve task, so we'll see if anyone
+                # has reviewed or approved this before.  If so, assign it back
+                # to them.  Otherwise just leave it unassigned.
+                task.assignee = task._find_previous_assignee(
+                    task.get_type_display())
+
+            task.save()
+
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
 
@@ -111,7 +266,7 @@ def _get_language(video, language_code):
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
-                   rollback_of_version_number):
+                   rollback_of_version_number, committer, complete):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -119,6 +274,10 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     """
     sl, language_needs_save = _get_language(video, language_code)
+
+    if complete != None:
+        sl.subtitles_complete = complete
+        language_needs_save = True
 
     if language_needs_save:
         sl.save()
@@ -130,6 +289,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
+
+    _perform_team_operations(version, committer, complete)
 
     return version
 
@@ -146,6 +307,8 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'title': target.title,
         'description': target.description,
         'visibility_override': None,
+        'complete': None,
+        'committer': None,
     }
 
     # If any version in the history is public, then rollbacks should also result
@@ -171,7 +334,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
 def unsafe_add_subtitles(video, language_code, subtitles,
                          title=None, description=None, author=None,
                          visibility=None, visibility_override=None,
-                         parents=None):
+                         parents=None, committer=None, complete=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -184,12 +347,12 @@ def unsafe_add_subtitles(video, language_code, subtitles,
     """
     return _add_subtitles(video, language_code, subtitles, title, description,
                           author, visibility, visibility_override, parents,
-                          None)
+                          None, committer, complete)
 
 def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
-                  parents=None):
+                  parents=None, committer=None, complete=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -222,11 +385,22 @@ def add_subtitles(video, language_code, subtitles,
     the previous version of the language (if any) will always be marked as
     a parent.
 
+    Committer can be given as a CustomUser object.  This should be the user
+    actually performing the action of adding the subtitles.  Permissions and
+    such will be checked as if this user is adding them.  If omitted, the
+    permission checks will be skipped, as if a "superuser" were adding the
+    subtitles.
+
+    Complete can be given as a boolean.  If given, the SubtitleLanguage's
+    subtitles_complete attribute will be set appropriately.  If omitted, it will
+    not be adjusted.
+
     """
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
-                              visibility_override, parents, None)
+                              visibility_override, parents, None, committer,
+                              complete)
 
 
 def unsafe_rollback_to(video, language_code, version_number,
