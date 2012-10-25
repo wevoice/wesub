@@ -16,11 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import codecs
 import feedparser
 import json
 import os
-import re
 from datetime import datetime
 from StringIO import StringIO
 
@@ -41,9 +39,6 @@ from apps.auth.models import CustomUser as User
 from messages.models import Message
 from teams.models import Team, TeamVideo, Workflow, TeamMember
 from testhelpers.views import _create_videos
-from utils.subtitles import (
-    SrtSubtitleParser, YoutubeSubtitleParser, TxtSubtitleParser, DfxpSubtitleParser
-)
 from subtitles import models as sub_models
 from subtitles.pipeline import add_subtitles
 from videos import metadata_manager
@@ -71,7 +66,6 @@ from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
 from vidscraper.sites import blip
 from widget import video_cache
 from widget.rpc import Rpc
-from widget.srt_subs import TTMLSubtitles
 from widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
     NotAuthenticatedUser
@@ -339,105 +333,6 @@ class BusinessLogicTest(TestCase):
         v2.save()
 
         self.assertEquals(v1.pk, language.first_approved_version.pk)
-
-
-class SubtitleParserTest(TestCase):
-    def _assert_sub(self, sub, start_time, end_time, sub_text):
-        self.assertEqual(sub['start_time'], start_time)
-        self.assertEqual(sub['end_time'], end_time)
-        self.assertEqual(sub['subtitle_text'], sub_text)
-
-    def test_srt(self):
-        parser = SrtSubtitleParser(SRT_TEXT)
-        result = list(parser)
-
-        self._assert_sub(
-            result[0], 0.0, 0.0,
-            u'Don\'t show this text it may be used to insert hidden data')
-        self._assert_sub(
-            result[1], 1.5, 4.5,
-            u'SubRip subtitles capability tester 1.2p by ale5000\n<b>Use Media Player Classic as reference</b>\nThis text should be blue')
-        self._assert_sub(
-            result[2], 4.5, 4.5,
-            u'Hidden')
-        self._assert_sub(
-            result[3], 7.501, 11.5,
-            u'This should be an E with an accent: \xc8\n\u65e5\u672c\u8a9e')
-        self._assert_sub(
-            result[4], 55.501, 58.5,
-            u'Hide these tags:')
-
-    def test_srt_with_blank(self):
-        parser = SrtSubtitleParser(SRT_TEXT_WITH_BLANK)
-        result = list(parser)
-
-        self._assert_sub(
-            result[0], 13.34, 24.655,
-            u'sure I get all the colors\nnice-- is equal to 17.')
-        self._assert_sub(
-            result[1], 24.655, 27.43,
-            u'')
-        self._assert_sub(
-            result[2], 27.43, 29.79,
-            u'So what\'s different about this\nthan what we saw in the last')
-
-    def test_srt_with_timecode_without_decimal(self):
-        parser = SrtSubtitleParser(SRT_TEXT_WITH_TIMECODE_WITHOUT_DECIMAL)
-        result = list(parser)
-
-        self._assert_sub(
-            result[0], 61.64, 65.7,
-            u'this, I guess we could say,\nequation or this inequality')
-        self._assert_sub(
-            result[1], 65.7, 70,
-            u'by negative 1, I want to\nunderstand what happens.')
-        self._assert_sub(
-            result[2], 70, 78.36,
-            u'So what\'s the relation between\nnegative x and negative 5?')
-        self._assert_sub(
-            result[3], 78.36, 81.5,
-            u'When I say what\'s the relation,\nis it greater than or is')
-
-    def test_youtube(self):
-        path = os.path.join(os.path.dirname(__file__), 'fixtures/youtube_subs_response.json')
-        parser = YoutubeSubtitleParser(open(path).read())
-        subs = list(parser)
-        self.assertAlmostEqual(subs[0]['start_time'], 0.82)
-        self.assertAlmostEqual(subs[0]['end_time'], 6.85)
-
-    def test_txt(self):
-        parser = TxtSubtitleParser(TXT_TEXT)
-        result = list(parser)
-
-        self.assertEqual(3, len(result))
-
-        self.assertEqual(-1, result[0]['start_time'])
-        self.assertEqual(-1, result[0]['end_time'])
-        self.assertEqual('Here is sub 1.', result[0]['subtitle_text'])
-
-        self.assertEqual(-1, result[1]['start_time'])
-        self.assertEqual(-1, result[1]['end_time'])
-        self.assertEqual('Here is sub 2.', result[1]['subtitle_text'])
-
-    def test_srt_with_trailing_spaces(self):
-        parser = SrtSubtitleParser(SRT_TEXT_WITH_TRAILING_SPACE)
-        result = list(parser)
-
-        self.assertEqual(6, len(result))
-
-        # making sure that the lines that have trailing spaces are
-        # being parsed
-        self._assert_sub(
-            result[0], 10.0, 14.0,
-            u'Merci. Félicitations aux étudiants \n[de l\'association Libertés Numériques -- NdR]')
-        self._assert_sub(
-            result[1], 14.1, 16,
-            u'd’avoir organisé cette réunion.')
-        self._assert_sub(
-            result[2], 16.1, 19.9,
-            u'Ils ont eu raison, non seulement \nà cause de la célébrité de Richard')
-
-       
 
 class WebUseTest(TestCase):
     def _make_objects(self, video_id="S7HMxzLmS9gw"):
@@ -2134,7 +2029,7 @@ def refresh_obj(m):
 
 class FollowTest(WebUseTest):
 
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self._make_objects()
@@ -2332,35 +2227,12 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
         self.language = sub_models.SubtitleLanguage.objects.get_or_create(
             video=self.video,  language_code='en')[0]
 
-    def tearDown(self):
-        TTMLSubtitles.use_named_styles = True
-
-    def test_dfxp_parser(self):
-        fixture_path = os.path.join(settings.PROJECT_ROOT, 'apps', 'videos', 'fixtures', 'sample.dfxp')
-        input_text =  codecs.open(fixture_path, 'r', encoding='utf-8').read()
-        parser = DfxpSubtitleParser(input_text)
-        result = list(parser)
-        self.assertEqual(len(result),3 )
-        line_break_sub  = result[0]
-        line_break_text = line_break_sub['subtitle_text']
-        self.assertEqual(line_break_text, "Don't worry\nbe happy\nDon't worry\nbe happy")
-        self.assertTrue(line_break_text.find("\n") > -1)
-        italic_sub = result[1]
-        italic_text = italic_sub['subtitle_text']
-        self.assertEquals(italic_text, "This should be in *italic*")
-
-        bold_sub = result[2]
-        bold_text = bold_sub['subtitle_text']
-        self.assertEquals(bold_text, "This should be in **bold**")
-
     def test_dfxp_serializer(self):
-        TTMLSubtitles.use_named_styles = False
         quick_add_subs(self.language, [ 'Here we go!'])
         content = self._download_subs(self.language, 'dfxp')
         serialized = DFXPParser(content)
         self.assertEqual(len(serialized.to_internal()), 1)
         self.assertEqual(babelsubs.storage.get_contents(serialized.to_internal().get_subtitles()[0]),'Here we go!')
-        
 
 def quick_add_subs(language, subs_texts, escape=True):
     subtitles = babelsubs.storage.SubtitleSet(language_code=language.language_code)

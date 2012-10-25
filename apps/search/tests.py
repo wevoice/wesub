@@ -36,7 +36,7 @@ def reset_solr():
     call_command('update_index')
 
 class TestSearch(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json']
+    fixtures = ['staging_users.json', 'staging_videos.json', 'subtitle_fixtures.json']
     titles = (
         u"Kisses in Romania's Food Market - Hairy Bikers Cookbook - BBC",
         u"Don't believe the hype - A Bit of Stephen Fry & Hugh Laurie - BBC comedy sketch",

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-23 01:41-0500\n"
+"POT-Creation-Date: 2012-10-25 01:41-0500\n"
 "PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
@@ -336,51 +336,51 @@ msgstr ""
 msgid "Your profile has been updated."
 msgstr "El vostre perfil ha estat actualitzat."
 
-#: apps/search/forms.py:28
+#: apps/search/forms.py:27
 msgid "Relevance"
 msgstr "Rellevància"
 
-#: apps/search/forms.py:29
+#: apps/search/forms.py:28
 msgid "Most languages"
 msgstr "Idiomes principals"
 
-#: apps/search/forms.py:30
+#: apps/search/forms.py:29
 msgid "Views Today"
 msgstr "Visites d'avui"
 
-#: apps/search/forms.py:31
+#: apps/search/forms.py:30
 msgid "Views This Week"
 msgstr "Visites d'aquesta setmana"
 
-#: apps/search/forms.py:32
+#: apps/search/forms.py:31
 msgid "Views This Month"
 msgstr "Visites d'aquest mes"
 
-#: apps/search/forms.py:33
+#: apps/search/forms.py:32
 msgid "Total Views"
 msgstr "Visites totals"
 
-#: apps/search/forms.py:35
+#: apps/search/forms.py:34
 msgid "query"
 msgstr "pregunta"
 
-#: apps/search/forms.py:37
+#: apps/search/forms.py:36
 msgid "Sort By"
 msgstr "Ordenar per"
 
-#: apps/search/forms.py:38
+#: apps/search/forms.py:37
 msgid "Subtitled Into"
 msgstr "Subtitulat al"
 
-#: apps/search/forms.py:39 apps/search/forms.py:41
+#: apps/search/forms.py:38 apps/search/forms.py:40
 msgid "Left blank for any language"
 msgstr "Deixar en blanc per a qualssevol idioma"
 
-#: apps/search/forms.py:40
+#: apps/search/forms.py:39
 msgid "Video In"
 msgstr "Vídeo en"
 
-#: apps/search/forms.py:63 apps/search/forms.py:99
+#: apps/search/forms.py:62 apps/search/forms.py:97
 msgid "All Languages"
 msgstr "Tots els idiomes"
 
