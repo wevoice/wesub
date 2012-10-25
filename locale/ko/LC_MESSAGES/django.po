@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-23 01:31-0500\n"
+"POT-Creation-Date: 2012-10-25 01:32-0500\n"
 "PO-Revision-Date: 2012-10-19 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/"
@@ -332,51 +332,51 @@ msgstr ""
 msgid "Your profile has been updated."
 msgstr "프로필이 업데이트 되었습니다."
 
-#: apps/search/forms.py:28
+#: apps/search/forms.py:27
 msgid "Relevance"
 msgstr "관련성"
 
-#: apps/search/forms.py:29
+#: apps/search/forms.py:28
 msgid "Most languages"
 msgstr "대부분의 언어"
 
-#: apps/search/forms.py:30
+#: apps/search/forms.py:29
 msgid "Views Today"
 msgstr "오늘 시청 수"
 
-#: apps/search/forms.py:31
+#: apps/search/forms.py:30
 msgid "Views This Week"
 msgstr "이번 주 시청 수"
 
-#: apps/search/forms.py:32
+#: apps/search/forms.py:31
 msgid "Views This Month"
 msgstr "이번 달 시청 수"
 
-#: apps/search/forms.py:33
+#: apps/search/forms.py:32
 msgid "Total Views"
 msgstr "총 시청 수"
 
-#: apps/search/forms.py:35
+#: apps/search/forms.py:34
 msgid "query"
 msgstr "검색어"
 
-#: apps/search/forms.py:37
+#: apps/search/forms.py:36
 msgid "Sort By"
 msgstr "정렬하기"
 
-#: apps/search/forms.py:38
+#: apps/search/forms.py:37
 msgid "Subtitled Into"
 msgstr "으로 자막"
 
-#: apps/search/forms.py:39 apps/search/forms.py:41
+#: apps/search/forms.py:38 apps/search/forms.py:40
 msgid "Left blank for any language"
 msgstr "모든 언어에 왼쪽 빈 칸"
 
-#: apps/search/forms.py:40
+#: apps/search/forms.py:39
 msgid "Video In"
 msgstr "비디오"
 
-#: apps/search/forms.py:63 apps/search/forms.py:99
+#: apps/search/forms.py:62 apps/search/forms.py:97
 msgid "All Languages"
 msgstr "모든 언어"
 
