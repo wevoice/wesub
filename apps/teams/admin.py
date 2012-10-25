@@ -115,7 +115,8 @@ class TaskAdmin(admin.ModelAdmin):
     #    for some reason.
     # 2. It's only a few extra queries, so it's not the end of the world.
     list_display = ('id', 'type', 'team_title', 'team_video_title',
-                    'language_title', 'assignee_name', 'is_complete', 'deleted', 'created')
+                    'language_title', 'assignee_name', 'is_complete', 'deleted',
+                    'subtitle_version', 'new_subtitle_version')
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__title',

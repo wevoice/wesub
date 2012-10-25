@@ -26,8 +26,8 @@
     </script>
 {% else %}
     {% if task.get_subtitle_version %}
-        <a class="perform" href="{{ task.get_widget_url }}">{% trans "Resume" %}</a>
+        <a class="perform" href="{{ task.get_perform_url }}">{% trans "Resume" %}</a>
     {% else %}
-        <a class="perform" href="{{ task.get_widget_url }}">{% trans "Start now" %}</a>
+        <a class="perform" href="{{ task.get_perform_url }}">{% trans "Start now" %}</a>
     {% endif %}
 {% endif %}

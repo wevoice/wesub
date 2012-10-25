@@ -560,8 +560,8 @@ class Video(models.Model):
                 return self._original_subtitle_language()
             else:
                 return (self.newsubtitlelanguage_set
-                                .having_nonempty_tip()
-                                .filter(language_code=language_code)[:1].get())
+                            .having_nonempty_tip()
+                            .filter(language_code=language_code)[:1].get())
         except models.ObjectDoesNotExist:
             return None
 

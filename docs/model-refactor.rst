@@ -234,6 +234,9 @@ Let's look at another example::
 Currently there is no way to translate a language from 2 or more sources, so at
 most the lineage maps for all existing data will have one key, value pair.
 
+``is_forked`` is staying put, but only temporarily.  Once we implement the new
+UI we can remove it forever.
+
 Porting
 ~~~~~~~
 

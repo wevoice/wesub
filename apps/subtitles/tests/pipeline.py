@@ -571,6 +571,38 @@ class TestBasicAdding(TestCase):
         assert (en1 and en2 and en3 and fr1 and fr2 and fr3 and fr4 and
                 de1 and de2 and cy1 and cy2)
 
+    def test_completion(self):
+        def _get_sl_completion():
+            sl = SubtitleLanguage.objects.get(video=self.video,
+                                              language_code='en')
+            return sl.subtitles_complete
+
+        def _add(complete):
+            pipeline.add_subtitles(self.video, 'en', [], complete=complete)
+
+        # Completion defaults to false.
+        _add(None)
+        self.assertEqual(_get_sl_completion(), False)
+
+        # And stays false.
+        _add(False)
+        self.assertEqual(_get_sl_completion(), False)
+
+        _add(False)
+        self.assertEqual(_get_sl_completion(), False)
+
+        # Until we specifically set it to true.
+        _add(True)
+        self.assertEqual(_get_sl_completion(), True)
+
+        # Then it stays true.
+        _add(None)
+        self.assertEqual(_get_sl_completion(), True)
+
+        # Until we explicitely set it back to false.
+        _add(False)
+        self.assertEqual(_get_sl_completion(), False)
+
 
 class TestRollbacks(TestCase):
     def setUp(self):
