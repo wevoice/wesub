@@ -758,6 +758,7 @@ class SubtitleLanguage(models.Model):
             qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
         return qs
 
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):
