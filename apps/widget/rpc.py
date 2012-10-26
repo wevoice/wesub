@@ -736,7 +736,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed):
+    def _update_language_attributes_for_save(self, language, completed, forked=False):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -748,6 +748,10 @@ class Rpc(BaseRpc):
             if language.is_complete != completed:
                 must_trigger_api_language_edited = True
             language.is_complete = completed
+
+        if forked:
+            language.standard_language = None
+            language.is_forked = True
 
         language.save()
 
@@ -769,7 +773,7 @@ class Rpc(BaseRpc):
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed)
+        self._update_language_attributes_for_save(language, completed, forked=forked)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
