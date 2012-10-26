@@ -266,15 +266,8 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
 
     // If this is a first-time translate task, set the to-language to the
     // language that we're translating into.
-    if (window.TASK_TRANSLATE_TO_LANGUAGE) {
+    if (window['TASK_TRANSLATE_TO_LANGUAGE']) {
 
-        // Closure doesn't seem to have a nice way to select an element by its
-        // data attributes, so we'll do it the old-fashioned way.
-        //
-        // (Otherwise I would handle this by attaching data-real-language code to
-        // each option and select that way.)
-        //
-        // Anyway, back to business:
         var toLanguageOptions = goog.dom.getChildren(renderedToLanguages);
 
         for (var tl = 0; tl < toLanguageOptions.length; tl++) {
@@ -286,7 +279,7 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
 
             // If this for-real language code matches this task's language code,
             // let's preselect that option.
-            if (window.TASK_TRANSLATE_TO_LANGUAGE == toLanguageCodeForReal) {
+            if (window['TASK_TRANSLATE_TO_LANGUAGE'] == toLanguageCodeForReal) {
                 goog.dom.forms.setValue(renderedToLanguages, toLanguageOptions[tl].value);
                 break;
             }

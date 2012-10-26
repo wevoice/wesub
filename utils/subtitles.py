@@ -34,7 +34,9 @@ from utils.html import unescape as unescape_html
 
 
 # see video.models.Subtitle..start_time
-MAX_SUB_TIME = (60 * 60 * 100) - 1
+MAX_SUB_TIME = (60 * 60 * 100 * 1000) - 1000
+# formats that cap num of hours in 1 digit
+MAX_SUB_TIME_ONE_HOUR_DIGIT = (60 * 60 * 10 * 1000) - 1000
 DEFAULT_ALLOWED_TAGS = ['i', 'b', 'u']
 def is_version_same(version, parser):
     if not version:
@@ -72,6 +74,51 @@ def strip_tags(text, tags=None):
         # sometimes "<None>" are being passed, and bleach will throw
         # an assertion error, see http://sentry.pculture.org:9000/amaraproduction/group/936/
         return ""
+TIME_EXPRESSION_METRIC = re.compile(r'(?P<num>[\d]{1,})(?P<unit>(h|ms|s|m|f|t))')
+TIME_EXPRESSION_CLOCK_TIME = re.compile(r'(?P<hours>[\d]{2,3}):(?P<minutes>[\d]{2}):(?P<seconds>[\d]{2})(?:.(?P<fraction>[\d]{1,3}))?')
+def time_expression_to_milliseconds(time_expression, tick_rate=None):
+    """
+    Parses possible values from time expressions[1] to a normalized value
+    in milliseconds.
+
+    We don't support all possible forms now, only clock time, metric and tick.
+    [1] http://www.w3.org/TR/ttaf1-dfxp/#timing-value-timeExpression
+    """
+    if not time_expression:
+        return 0
+    res = None
+    match = TIME_EXPRESSION_CLOCK_TIME.match(time_expression)
+    if match:
+        groups = match.groupdict()
+        hour = int(groups['hours'])
+        minutes = int(groups['minutes'])
+        seconds  = int(groups['seconds'])
+        milliseconds = int(groups['fraction'] or 0)
+        res =  (((hour * 3600) + (minutes * 60) + seconds ) * 1000 ) + milliseconds
+    else:
+        match = TIME_EXPRESSION_METRIC.match(time_expression)
+        if match:
+            groups = match.groupdict()
+            num, unit = int(groups['num']), groups['unit']
+            if unit == 't':
+                if not tick_rate:
+                    raise ValueError("Ticks need a tick rate, mate.")
+                return 1000 * (num / float(tick_rate))
+            multiplier = {
+                "h": 3600 * 1000,
+                "m": 60 * 1000,
+                "s": 1000,
+                "ms": 1,
+                'f': 0,
+            }.get(unit, None)
+            res =  num * multiplier
+    if  res is None:
+        raise ValueError("Time expression %s can't be parsed" % time_expression)
+    if res >= MAX_SUB_TIME:
+        return None
+    return res
+
+
     
 def save_subtitle(video, language, parser, user=None, update_video=True,
                   forks=True, as_forked=True, translated_from=None):
@@ -290,11 +337,20 @@ class YoutubeXMLParser(SubtitleParser):
             except IndexError:
                 yield self._get_data(item)
 
+    def _to_milliseconds(self, time_val):
+        if time_val.find('.') > -1:
+            seconds, milliseconds  = [int(x) for x in time_val.split(".")]
+        else:
+            seconds = int(time_val)
+            milliseconds = 0
+        return (seconds * 1000 ) + milliseconds
+
     def _get_data(self, item, next_item=None):
         output = {}
-        output['start_time'] = float(item.get('start'))
+
+        output['start_time'] = self._to_milliseconds(item.get('start'))
         if next_item is not None:
-            output['end_time'] = float(next_item.get('start'))
+            output['end_time'] = self._to_milliseconds(next_item.get('start'))
         else:
             output['end_time'] = -1
 
@@ -329,8 +385,8 @@ class YoutubeSubtitleParser(SubtitleParser):
 
     def _get_data(self, item):
         output = {}
-        output['start_time'] = item['start_ms'] / 1000.
-        output['end_time'] = (item['start_ms'] + item['dur_ms']) / 1000.
+        output['start_time'] = item['start_ms'] 
+        output['end_time'] = (item['start_ms'] + item['dur_ms']) 
         output['subtitle_text'] = item['text']
         return output
 
@@ -424,13 +480,15 @@ class TtmlSubtitleParser(SubtitleParser):
 
         try:
             hour, min, sec = begin.split(':')
+            sec, milliseconds = sec.split(".")
 
-            start = int(hour)*60*60 + int(min)*60 + float(sec)
+            start = ((int(hour)*60*60 + int(min)*60 + int(sec) ) * 1000) + int(milliseconds)
             if start > MAX_SUB_TIME:
                 return -1
 
             d_hour, d_min, d_sec = dur.split(':')
-            end =  + int(d_hour)*60*60 + int(d_min)*60 + float(d_sec)
+            d_sec, d_milliseconds = d_sec.split(".")
+            end =  + ((int(d_hour)*60*60 + int(d_min)*60 + int(d_sec)) * 1000) + int(d_milliseconds)
             if is_duration:
                 end += start
         except ValueError:
@@ -466,11 +524,11 @@ class DfxpSubtitleParser(SubtitleParser):
             self.style_map = generate_style_map(dom)
             t = dom.getElementsByTagName('tt')[0]
             
-            self.tickRate = 0;
+            self.tick_rate = 0;
             
             for attr in t.attributes.values():
                 if attr.localName == "tickRate":
-                    self.tickRate = int(attr.value)
+                    self.tick_rate = int(attr.value)
                         
             self.nodes = dom.getElementsByTagName('body')[0].getElementsByTagName('p')
         except (ExpatError, IndexError):
@@ -483,22 +541,7 @@ class DfxpSubtitleParser(SubtitleParser):
         return bool(len(self.nodes))
 
     def _get_time(self, t):
-        try:
-            if t.endswith('t'):
-                ticks = int(t.split('t')[0])
-            
-                start = ticks / float(self.tickRate)
-            
-            else:
-                hour, min, sec = t.split(':')
-            
-                start = int(hour)*60*60 + int(min)*60 + float(sec)
-                if start > MAX_SUB_TIME:
-                    return -1
-        except ValueError:
-            return -1
-
-        return start
+        return time_expression_to_milliseconds (t, self.tick_rate)
 
     def _replace_els(self, node, attrname, attrvalue, tagname):
         """
@@ -547,8 +590,20 @@ class DfxpSubtitleParser(SubtitleParser):
         for item in self.nodes:
             yield self._get_data(item)
 
+def fraction_to_milliseconds(str_milli):
+    """
+    Converts milliseonds as an integer string to a 3 padded string, e.g.
+    1 -> 001
+    10 -> 010
+    100 -> 100
+    """
+    if not str_milli:
+        return 0
+    return int(str_milli.ljust(3, '0')) % 1000
+
 class SrtSubtitleParser(SubtitleParser):
     _clean_pattern = re.compile(r'\{.*?\}', re.DOTALL)
+    MAX_SUB_TIME = MAX_SUB_TIME
 
     def __init__(self, subtitles):
         pattern = r'\d+\s*?\n'
@@ -561,9 +616,14 @@ class SrtSubtitleParser(SubtitleParser):
         self.subtitles = self.subtitles.replace('\r\n', '\n')+'\n\n'
 
     def _get_time(self, hour, min, sec, secfr):
-        if secfr is None:
-            secfr = '0'
-        return int(hour)*60*60+int(min)*60+int(sec)+float('.'+secfr)
+        milliseconds = fraction_to_milliseconds(secfr)
+        res =  (1000 * (
+            (int(hour)*60*60 )+
+            (int(min)*60) +
+            int(sec))) + milliseconds
+        if res >= self.MAX_SUB_TIME:
+            return None
+        return res
 
     def _get_data(self, match):
         r = match.groupdict()
@@ -576,6 +636,7 @@ class SrtSubtitleParser(SubtitleParser):
 
 class SbvSubtitleParser(SrtSubtitleParser):
 
+    MAX_SUB_TIME = MAX_SUB_TIME_ONE_HOUR_DIGIT
     def __init__(self, subtitles):
         pattern = r'(?P<s_hour>\d{1}):(?P<s_min>\d{2}):(?P<s_sec>\d{2})\.(?P<s_secfr>\d{3})'
         pattern += r','
@@ -587,6 +648,7 @@ class SbvSubtitleParser(SrtSubtitleParser):
         self.subtitles = self.subtitles.replace('\r\n', '\n')+u'\n\n'
 
 class SsaSubtitleParser(SrtSubtitleParser):
+    MAX_SUB_TIME = MAX_SUB_TIME_ONE_HOUR_DIGIT
     def __init__(self, file):
         pattern = r'Dialogue: [\w=]+,' #Dialogue: <Marked> or <Layer>,
         pattern += r'(?P<s_hour>\d):(?P<s_min>\d{2}):(?P<s_sec>\d{2})[\.\:](?P<s_secfr>\d+),' #<Start>,

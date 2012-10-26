@@ -26,7 +26,7 @@ unisubs.timeline.TimelineSub = function(
 {
     goog.ui.Component.call(this);
     this.subtitle_ = subtitle;
-    this.pixelsPerSecond_ = pixelsPerSecond;
+    this.pixelsPerMillisecond_ = pixelsPerSecond  / 1000;
     this.pixelOffset_ = opt_pixelOffset ? opt_pixelOffset : 0;
     this.editing_ = false;
     this.documentEventHandler_ = new goog.events.EventHandler(this);
@@ -92,17 +92,18 @@ unisubs.timeline.TimelineSub.prototype.onMouseOut_ = function(event) {
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseMoveLeft_ = function(event) {
     // moving left grabber
-    this.subtitle_.getEditableCaption().setStartTime(
-        this.grabberMousedownTime_ +
+    var time = this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerSecond_);
+            this.pixelsPerMillisecond_;
+    
+    this.subtitle_.getEditableCaption().setStartTime(parseInt(time));
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseMoveRight_ = function(event) {
     // moving right grabber
-    this.subtitle_.getEditableCaption().setEndTime(
-        this.grabberMousedownTime_ +
+    var time =         this.grabberMousedownTime_ +
             (event.clientX - this.grabberMousedownClientX_) /
-            this.pixelsPerSecond_);
+            this.pixelsPerMillisecond_;
+    this.subtitle_.getEditableCaption().setEndTime(parseInt(time));
 };
 unisubs.timeline.TimelineSub.prototype.onDocMouseUp_ = function(event) {
     this.editing_ = false;
@@ -161,14 +162,14 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
         unisubs.style.setWidth(
             this.getElement(),
             (this.subtitle_.getEndTime() - this.subtitle_.getStartTime()) *
-                this.pixelsPerSecond_);
+                this.pixelsPerMillisecond_);
         this.existingSubEnd_ = this.subtitle_.getEndTime();
     }
     if (this.subtitle_.getStartTime() != this.existingSubStart_) {
         unisubs.style.setPosition(
             this.getElement(),
             this.subtitle_.getStartTime() *
-                this.pixelsPerSecond_ -
+                this.pixelsPerMillisecond_ -
                 this.pixelOffset_,
             null);
         this.existingSubStart_ = this.subtitle_.getStartTime();

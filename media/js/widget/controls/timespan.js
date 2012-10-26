@@ -31,7 +31,7 @@ unisubs.controls.TimeSpan = function(videoPlayer) {
 goog.inherits(unisubs.controls.TimeSpan, goog.ui.Component);
 unisubs.controls.TimeSpan.prototype.createDom = function() {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    this.timeElapsedLabel_ = $d('div', 'unisubs-timeElapsed')
+    this.timeElapsedLabel_ = $d('div', 'unisubs-timeElapsed');
     this.totalTimeLabel_ = $d('span');
     this.setElementInternal(
         $d('span', 'unisubs-timespan',
@@ -54,13 +54,13 @@ unisubs.controls.TimeSpan.prototype.videoTimeUpdate_ = function() {
             if (duration == 0)
                 return;
             goog.dom.setTextContent(this.totalTimeLabel_,
-                                    '/' + unisubs.formatTime(duration, true));
+                                    '/' + unisubs.formatTime(duration * 1000, true));
             this.durationSet_ = true;
         }
         var playheadSecs = ~~this.videoPlayer_.getPlayheadTime();
         this.currentlyDisplayedSecond_ = playheadSecs;
         goog.dom.setTextContent(
             this.timeElapsedLabel_,
-            unisubs.formatTime(playheadSecs, true));
+            unisubs.formatTime(playheadSecs * 1000, true));
     }
 };
