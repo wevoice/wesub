@@ -15,47 +15,37 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-from django.core.urlresolvers import reverse
-from django import template
-from django.template.defaultfilters import linebreaks
-from django.utils.translation import ungettext
 
-from videos import format_time
+from django import template
+from django.core.urlresolvers import reverse
+from django.template.defaultfilters import linebreaks
+
+from apps.subtitles.forms import SubtitlesUploadForm
+from apps.videos import format_time
+from apps.videos.forms import CreateVideoUrlForm
 from utils.unisubsmarkup import markup_to_html
-from videos.forms import SubtitlesUploadForm, CreateVideoUrlForm
+
 
 register = template.Library()
+
 
 @register.inclusion_tag('videos/_upload_subtitles.html', takes_context=True)
 def upload_subtitles(context, video):
     context['video'] = video
     initial = {}
-    if context.get('language') and context['language'].language:
-        initial['language'] = context['language'].language
-    else:
-        initial['language'] = ''
 
-    original_language = video.subtitle_language()
-    if original_language and original_language.language_code:
-        initial['video_language'] = original_language.language_code
+    current_language = context.get('language')
+    if current_language:
+        initial['language_code'] = current_language.language_code
 
-    context['form'] = SubtitlesUploadForm(context['user'], video, initial=initial)
+    primary_language = video.get_primary_audio_subtitle_language()
+    if primary_language:
+        initial['primary_audio_language_code'] = primary_language.language_code
+
+    context['form'] = SubtitlesUploadForm(context['user'], video,
+                                          initial=initial)
+
     return context
-
-@register.simple_tag
-def complete_indicator(language, mode='normal'):
-    if language.is_primary_audio_language or language.is_forked:
-        if language.subtitles_complete and language.subtitle_count > 0:
-            return "100%"
-        if mode == 'pct':
-            if language.subtitle_count == 0:
-                return "0%"
-            else:
-                return "??"
-        v = language.version()
-        count = v and v.subtitle_count or 0
-        return ungettext('%(count)s Line', '%(count)s Lines', count) % {'count': count}
-    return '%i%%' % language.percent_done
 
 @register.simple_tag
 def complete_color(language):

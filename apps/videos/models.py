@@ -514,6 +514,14 @@ class Video(models.Model):
         """
         return NO_SUBTITLES if self.latest_version() is None else SUBTITLES_FINISHED
 
+    def get_primary_audio_subtitle_language(self):
+        """Return the SubtitleLanguage for the primary audio language, or None.
+
+        Caches the result in the object.
+
+        """
+        return self._original_subtitle_language()
+
     def _original_subtitle_language(self):
         """Return the SubtitleLanguage in the original language of this video, or None.
 
@@ -720,8 +728,8 @@ class Video(models.Model):
         return False
 
     def completed_subtitle_languages(self, public_only=True):
-        return [sl for sl in self.subtitlelanguage_set.all()
-                if sl.is_complete_and_synced(public_only=public_only)]
+        return [sl for sl in self.newsubtitlelanguage_set.all()
+                if sl.is_complete_and_synced(public=public_only)]
 
     def get_title_display(self):
         """Return a suitable title to display to a user for this video.
