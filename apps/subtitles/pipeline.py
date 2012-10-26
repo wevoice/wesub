@@ -140,6 +140,100 @@ def _user_can_bypass_moderation(team_video, version, committer):
 
     return subtitles_are_complete and is_post_publish_edit and user_can_bypass
 
+def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
+                              complete):
+    """Handle any existing tasks for this subtitle addition."""
+    from apps.teams.permissions import can_assign_task
+
+    language_code = version.language_code
+
+    # There are tasks for this video.  If this version isn't published yet, it
+    # belongs to those tasks, so update them.
+    if version.visibility != 'public':
+        outstanding_tasks.update(subtitle_version=version,
+                                 language=language_code)
+
+    # There may be existing subtitle/translate tasks.
+    outstanding_subtrans_tasks = (
+        team_video.task_set.incomplete_subtitle_or_translate()
+                           .filter(language=language_code)
+    )
+
+    if outstanding_subtrans_tasks.exists():
+        task = outstanding_subtrans_tasks.get()
+
+        # If there are any outstanding subtitle/translate tasks that are
+        # unassigned, we can go ahead and assign them to the committer (as long
+        # as they have permission to do so).
+        if not task.assignee and committer and can_assign_task(task, committer):
+            task.assignee = committer
+
+            # We save here only if the subtitles are not complete, because
+            # .complete() actually saves the task too.
+            if not complete:
+                task.save()
+
+        # Also, if the subtitles are complete, we can mark that outstanding
+        # subtitle/translate task as complete.
+        if complete:
+            task.complete()
+
+    # Outstanding review/approve tasks will need to be handled elsewhere.
+    # TODO: Handle those here as well?
+
+def _create_necessary_tasks(version, team_video, workflow, committer, complete):
+    """Create any necessary tasks for the newly added version.
+
+    By the time we call this function we know that:
+
+    * There are no existing open tasks for this version/language.
+    * The committer cannot bypass moderation.
+
+    So we may (or may not) need to create a task for this version/language.
+
+    """
+    from apps.teams.models import Task
+
+    if complete:
+        # If the subtitles are complete, then the new task will be either
+        # a review or approve, depending on the team.
+        if workflow.review_allowed:
+            task_type = Task.TYPE_IDS['Review']
+        elif workflow.approve_allowed:
+            task_type = Task.TYPE_IDS['Approve']
+        else:
+            # Note that we may not have selected either of these, if the team
+            # does not require review or approval.  That's okay, we're done in
+            # that case.
+            return
+    else:
+        # Otherwise the new task will be a subtitle or translate, depending
+        # on the type of subs.
+        if version.subtitle_language.is_primary_audio_language():
+            task_type = Task.TYPE_IDS['Subtitle']
+        else:
+            task_type = Task.TYPE_IDS['Translate']
+
+    # We now know the type of task we need to create, so go ahead and make it.
+    task = Task(team=team_video.team, team_video=team_video,
+                language=version.language_code, type=task_type,
+                subtitle_version=version)
+
+    # Assign it to the correct user.
+    if task.get_type_display() in ('Subtitle', 'Translate'):
+        # If it's a subtitle/translate task, then someone just added
+        # some incomplete subtitles.  We'll assign it to them by
+        # default.
+        task.assignee = committer
+    else:
+        # Otherwise it's a review/approve task, so we'll see if anyone
+        # has reviewed or approved this before.  If so, assign it back
+        # to them.  Otherwise just leave it unassigned.
+        task.assignee = task._find_previous_assignee(
+            task.get_type_display())
+
+    task.save()
+
 def _update_visibility_and_tasks(team_video, version, committer, complete):
     """Set the appropriate visibility flags for the new version.
 
@@ -149,80 +243,43 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
 
     """
     workflow = team_video.get_workflow()
-    subtitle_language = version.subtitle_language
-    language_code = subtitle_language.language_code
 
     # If the team does not use tasks, all versions are just public and we're
-    # done here.
+    # done here.  God help you if you have a team that has some existing tasks
+    # and switches to "no tasks allowed".
     if not workflow.allows_tasks:
         return
 
-    # Determine if we need to moderate these subtitles and create a
-    # review/approve task for them if so.
+    # We know the workflow uses tasks.  However, the user may be able to bypass
+    # the moderation system in some cases.
     can_bypass_moderation = _user_can_bypass_moderation(team_video, version,
                                                         committer)
+
+    # If the user cannot bypass moderation, and the team's workflow requires
+    # a review or approval step, then the version needs to be marked as private.
     if not can_bypass_moderation:
         if workflow.review_allowed or workflow.approve_allowed:
             version.visibility = 'private'
             version.save()
 
+    # Okay, so now we have an appropriately-visibile version.  Next we see if
+    # there are any outstanding tasks for this version/language.
     outstanding_tasks = team_video.task_set.incomplete().filter(
-            language__in=[language_code, ''])
+            language__in=[version.language_code, ''])
 
     if outstanding_tasks.exists():
-        # There are tasks for this video.  If this version isn't published yet,
-        # it belongs to those tasks, so update them.
-        if version.visibility != 'public':
-            outstanding_tasks.update(subtitle_version=version,
-                                     language=language_code)
-    elif not can_bypass_moderation:
-        from apps.teams.models import Task
-
-        # We know there are no existing tasks for this video, but it's also not
-        # directly been published (maybe), so we need to create the appropriate
-        # task for it.
-        task_type = None
-
-        if complete:
-            # If the subtitles are complete, then the new task will be either
-            # a review or approve, depending on the team.
-            if workflow.review_allowed:
-                task_type = Task.TYPE_IDS['Review']
-            elif workflow.approve_allowed:
-                task_type = Task.TYPE_IDS['Approve']
-
-            # Note that we may not have selected either of these, if the team
-            # does not require review or approval.  That's okay, we're done in
-            # that case.
+        # If so, handle them.
+        _handle_outstanding_tasks(outstanding_tasks, version, team_video,
+                                  committer, complete)
+    else:
+        # Otherwise, there are no existing tasks.  We probably want to make
+        # some, *unless* the user can bypass moderation.  If that's the case we
+        # don't need to bother.
+        if can_bypass_moderation:
+            pass
         else:
-            # Otherwise the new task will be a subtitle or translate, depending
-            # on the type of subs.
-            if subtitle_language.is_primary_audio_language():
-                task_type = Task.TYPE_IDS['Subtitle']
-            else:
-                task_type = Task.TYPE_IDS['Translate']
-
-        if task_type:
-            # We know the type of task we need to create, so go ahead and make
-            # it.
-            task = Task(team=team_video.team, team_video=team_video,
-                        language=language_code, type=task_type,
-                        subtitle_version=version)
-
-            # Assign it to the correct user.
-            if task.get_type_display() in ('Subtitle', 'Translate'):
-                # If it's a subtitle/translate task, then someone just added
-                # some incomplete subtitles.  We'll assign it to them by
-                # default.
-                task.assignee = committer
-            else:
-                # Otherwise it's a review/approve task, so we'll see if anyone
-                # has reviewed or approved this before.  If so, assign it back
-                # to them.  Otherwise just leave it unassigned.
-                task.assignee = task._find_previous_assignee(
-                    task.get_type_display())
-
-            task.save()
+            _create_necessary_tasks(version, team_video, workflow, committer,
+                                    complete)
 
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
