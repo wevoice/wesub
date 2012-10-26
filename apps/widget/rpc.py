@@ -284,11 +284,20 @@ class Rpc(BaseRpc):
         else:
             return 'normal'
 
-    # Ugly hack to disable timing changes for T translations :(
-    def get_timing_mode(self, language):
+
+    def get_timing_mode(self, language, user):
+        """
+        Decides if allows forking. Criteria:
+        - hard coded ted teams can't fork, ever
+        - Non team videos, can fork, always
+        - For team videos, the user must have permission to subtitle
+        (not only translate)
+        """
         team_video = language.video.get_team_video()
         _TED_TEAMS = ['ted', 'ted-transcribe']
         if team_video and team_video.team.slug.lower() in _TED_TEAMS:
+            return 'off'
+        elif team_video and not can_create_and_edit_subtitles(user, team_video, language):
             return 'off'
         else:
             return 'on'
@@ -324,7 +333,7 @@ class Rpc(BaseRpc):
         if (language and language.is_complete_and_synced()
                      and team.moderates_videos()
                      and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you can't post-edit these subtitles.")
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
             
         # Check that there are no open tasks for this action.
@@ -425,12 +434,17 @@ class Rpc(BaseRpc):
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
-                        "timing_mode": self.get_timing_mode(language),
+                        "timing_mode": self.get_timing_mode(language, request.user),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
         if base_language:
-            original_subtitles = self._subtitles_dict(base_language.latest_version())
+            version = base_language.latest_version()
+
+            if not version:
+                return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }
+
+            original_subtitles = self._subtitles_dict(version)
             return_dict['original_subtitles'] = original_subtitles
 
         # If we know the original language code for this video, make sure it's
@@ -474,7 +488,7 @@ class Rpc(BaseRpc):
                             "can_edit" : True,
                             "session_pk" : session.pk,
                             "caption_display_mode": self.get_caption_display_mode(session.language),
-                            "timing_mode": self.get_timing_mode(session.language),
+                            "timing_mode": self.get_timing_mode(session.language, request.user),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \
@@ -722,7 +736,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed):
+    def _update_language_attributes_for_save(self, language, completed, forked=False):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -734,6 +748,10 @@ class Rpc(BaseRpc):
             if language.is_complete != completed:
                 must_trigger_api_language_edited = True
             language.is_complete = completed
+
+        if forked:
+            language.standard_language = None
+            language.is_forked = True
 
         language.save()
 
@@ -755,7 +773,7 @@ class Rpc(BaseRpc):
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed)
+        self._update_language_attributes_for_save(language, completed, forked=forked)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
@@ -1234,17 +1252,15 @@ def language_summary(language, team_video=-1, user=None):
         'dependent': language.is_dependent(),
         'subtitle_count': language.subtitle_count,
         'in_progress': language.is_writelocked,
-        'disabled_from': False,
-        'disabled_to': False }
+        'disabled_from': False }
 
     if team_video:
         tasks = team_video.task_set.incomplete().filter(language=language.language)
         if tasks:
             task = tasks[0]
-            if user and user != task.assignee:
-                summary['disabled_to'] = True
+            summary['disabled_to'] = user and user != task.assignee
 
-    if language.latest_version():
+    if language.latest_version() and 'disabled_to' not in summary:
         # Languages with existing subtitles cannot be selected as a "to"
         # language in the "add new translation" dialog.  If you want to work on
         # that language, select it and hit "Improve these Subtitles" instead.

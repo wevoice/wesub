@@ -61,14 +61,27 @@ unisubs.player.MediaSource.bestHTML5VideoSource_ = function(videoSources) {
         if (unisubs.player.supportsVideoType(preferenceOrdering[i])) {
             var videoSource = unisubs.player.MediaSource.html5VideoSource_(
                 videoSources, preferenceOrdering[i]);
-            if (videoSource != null)
+
+            if (videoSource != null) {
                 return videoSource;
+            }
         }
     }
     return null;
 };
 
 /**
+ * Given a list of videoSpecs, try to choose the best video url for the given
+ * video and browser.
+ *
+ * Here is the bulk of it:
+ *
+ * We go down the list looking for an html5 video.  When we find one, we check
+ * if the browser can play.  If it can play, we return.
+ *
+ * If the browser can't play it, we keep going.
+ *
+ * If we hit a non html5 video, we break and return that video.
  *
  * @param {Array} videoSpecs This is an array in which each element is either 
  *   a string (for a url) or an object with properties "url" and "config".
@@ -78,22 +91,41 @@ unisubs.player.MediaSource.bestVideoSource = function(videoSpecs) {
     var videoSources = goog.array.map(videoSpecs, function(spec) {
         return unisubs.player.MediaSource.videoSourceForSpec_(spec);
     });
-    var videoSource = null;
-    if (videoSources && videoSources.length != 0){
-        return videoSources[0];
+
+    var videoSource;
+
+    for (var i=0; i < videoSources.length; i++) {
+        videoSource = videoSources[i];
+
+        if (videoSource && videoSource instanceof unisubs.player.Html5VideoSource) {
+            if (videoSource.isBestVideoSource()) {
+                return videoSource;
+            }
+
+        } else {
+            // the first non-html5 video should break the loop
+            break;
+        }
     }
+
     videoSource = unisubs.player.MediaSource.bestHTML5VideoSource_(videoSources);
     // browser does not support any available html5 formats. Return a flash format.
     videoSource = goog.array.find(
         videoSources,
         function(v) { return !(v instanceof unisubs.player.Html5VideoSource); });
-    if (videoSource != null)
+
+    if (videoSource !== null) {
         return videoSource;
+    }
+
     // if we got this far, first return mp4 for flowplayer fallback. then return anything.
     videoSource = unisubs.player.MediaSource.html5VideoSource_(
         videoSources, unisubs.player.Html5VideoType.H264);
-    if (videoSource != null)
+
+    if (videoSource !== null) {
         return videoSource;
+    }
+
     return videoSources.length > 0 ? videoSources[0] : null;
 };
 

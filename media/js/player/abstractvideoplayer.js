@@ -129,7 +129,6 @@ unisubs.player.AbstractVideoPlayer.prototype.play = function(opt_suppressEvent) 
     if (this.isLoadingStopped_){
 	    throw new Error("can't play, loading is stopped");
     }
-
     if (!opt_suppressEvent)
         this.dispatchEvent(
             unisubs.player.AbstractVideoPlayer.EventType.PLAY_CALLED);

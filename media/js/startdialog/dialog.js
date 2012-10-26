@@ -195,10 +195,15 @@ unisubs.startdialog.Dialog.prototype.responseReceived_ = function(jsonResult) {
 
 unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     var fromLanguages = this.model_.fromLanguages();
-    goog.style.showElement(
-        this.fromLanguageSection_, fromLanguages.length > 0);
 
-    if (fromLanguages.length > 0) {
+    var enabledFromLanguages = goog.array.filter(fromLanguages, function(vl) {
+        return !vl.DISABLED_FROM;
+    });
+
+    goog.style.showElement(
+        this.fromLanguageSection_, enabledFromLanguages.length > 0);
+
+    if (enabledFromLanguages.length > 0) {
         var fromLanguageContents = [];
 
         if (this.translateAllowed_) {
@@ -261,8 +266,24 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
 
     // If this is a first-time translate task, set the to-language to the
     // language that we're translating into.
-    if (window.TASK_TRANSLATE_TO_LANGUAGE) {
-        goog.dom.forms.setValue(renderedToLanguages, window.TASK_TRANSLATE_TO_LANGUAGE);
+    if (window['TASK_TRANSLATE_TO_LANGUAGE']) {
+
+        var toLanguageOptions = goog.dom.getChildren(renderedToLanguages);
+
+        for (var tl = 0; tl < toLanguageOptions.length; tl++) {
+
+            // Remove integers from the language code to get the real language code.
+            // See: http://bit.ly/R4jdL3
+            var toLanguageCode = toLanguageOptions[tl].value;
+            var toLanguageCodeForReal = toLanguageCode.replace(/\d+/g, '');
+
+            // If this for-real language code matches this task's language code,
+            // let's preselect that option.
+            if (window['TASK_TRANSLATE_TO_LANGUAGE'] == toLanguageCodeForReal) {
+                goog.dom.forms.setValue(renderedToLanguages, toLanguageOptions[tl].value);
+                break;
+            }
+        }
     }
 };
 unisubs.startdialog.Dialog.prototype.addFromLanguageSection_ = function($d) {
