@@ -25,22 +25,22 @@
                     <input type="hidden" name="video" value="{{ video.id }}" />
                     <div style="margin: 5px 0 5px 0;">
                         <label>{% trans 'Language' %}</label>
-                        {{ form.language }}
+                        {{ form.language_code }}
                     </div>
                     {% if not video.has_original_language %}
                         <div style="margin: 10px 0 10px 0;">
                             <label>{% trans 'Video Language' %}</label>
-                            {{ form.video_language }}
+                            {{ form.primary_audio_language_code }}
                         </div>
 
                         <p class="notice">
                             {% trans "Please double check the primary spoken language. This step cannot be undone." %}
                         </p>
                     {% else %}
-                        {% if form.translated_from %}
+                        {% if form.from_language_code %}
                             <div style="margin: 10px 0 10px 0;">
                                 <label>{% trans 'Translated from' %}</label>
-                                {{ form.translated_from }}
+                                {{ form.from_language_code }}
                             </div>
                         {% endif %}
                     {% endif %}
@@ -48,8 +48,8 @@
                         <input type="file" name="draft" id="subtitles-file-field" />
                     </div>
                     <div>
-                        <input type="checkbox" name="is_complete" id="updload-subtitles-form-is_complete" checked="checked"/>
-                        <label for="upload-subtitles-form-is_complete">{% trans "This subtitle file is 100% complete" %}</label>
+                        <input type="checkbox" name="complete" id="upload-subtitles-form-complete" checked="checked"/>
+                        <label for="upload-subtitles-form-complete">{% trans "This subtitle file is 100% complete" %}</label>
                     </div>
                     <div style="margin: 5px 0 15px 0;">
                         <button class="green_button small upload-subtitles-submit-button-" style="margin: 0 0 15px 0; float: right">{% trans "Upload" %}</button>
