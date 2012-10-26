@@ -16,54 +16,59 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
+import urllib, urllib2
+
+import simplejson as json
+from babelsubs import get_available_formats
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.db.models import Sum
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
-from django.views.generic.list_detail import object_list
-from django.views.decorators.http import require_POST
-from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
-    VideoUrl, AlreadyEditingException, restrict_versions
-from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
-    SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm, \
-    AddFromFeedForm
-import widget
-from django.contrib.sites.models import Site
-from django.conf import settings
-import simplejson as json
-from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from widget.views import base_widget_params
-from vidscraper.errors import Error as VidscraperError
-from auth.models import CustomUser as User
-from utils import send_templated_email
-from django.contrib.auth import logout
-from videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
-from gdata.service import RequestError
-from django.db.models import Sum
-from django.db import transaction
-from django.utils.translation import ugettext
 from django.utils.encoding import force_unicode
-from statistic.models import EmailShareStatistic
-import urllib, urllib2
-from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
-from videos.rpc import VideosApiClass
-from utils.rpc import RpcRouter
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext, ugettext_lazy as _
+from django.views.decorators.http import require_POST
+from django.views.generic.list_detail import object_list
+from gdata.service import RequestError
+from vidscraper.errors import Error as VidscraperError
+
+import widget
+from apps.auth.models import CustomUser as User
+from apps.statistic.models import EmailShareStatistic
+from apps.subtitles import models as sub_models
+from apps.teams.models import Task
+from apps.videos import permissions
+from apps.videos.decorators import get_video_revision, get_video_from_code
+from apps.videos.forms import (
+    VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
+    SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm,
+    AddFromFeedForm
+)
+from apps.videos.models import (
+    Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException,
+    restrict_versions
+)
+from apps.videos.rpc import VideosApiClass
+from apps.videos.search_indexes import VideoIndex
+from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
+from apps.videos.tasks import video_changed_tasks
+from apps.widget.views import base_widget_params
+from utils import send_templated_email
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
+from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
-from django.utils.http import urlquote_plus
-from videos import permissions
-from videos.tasks import video_changed_tasks
-from videos.search_indexes import VideoIndex
-import datetime
-from videos.decorators import get_video_revision, get_video_from_code
-from apps.teams.models import Task
 
-from subtitles import models as sub_models
-from babelsubs import get_available_formats
 
 AVAILABLE_SUBTITLE_FORMATS = get_available_formats()
 
