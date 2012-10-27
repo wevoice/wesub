@@ -58,6 +58,11 @@ elif INSTALLATION == PRODUCTION:
     )
     # only send actual email on the production server
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+elif INSTALLATION == DEMO:
+    DEBUG = True
+    REDIS_DB = "4"
+    SENTRY_TESTING = True
+
 elif INSTALLATION == LOCAL:
     ADMINS = (
         ('Evan', 'ehazlett@pculture.org'),
