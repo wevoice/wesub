@@ -223,6 +223,7 @@ def _create_env(username,
     env.dev_host = 'dev.universalsubtitles.org'
     env.build_apps_root = '/opt/media_compile/apps'
     env.build_ve_root = '/opt/media_compile/ve'
+    env.demo_domain = 'demo.amara.org'
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -544,15 +545,15 @@ def _update_solr_schema():
         sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
                 python_exe,
                 env.revision))
-        run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
         sudo('service tomcat6 restart')
+        run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
 
     # Fly, you fools!
 
     managepy_file = os.path.join(env.app_dir, 'manage.py')
 
     # The -u here is for "unbuffered" so the lines get outputted immediately.
-    manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
+    manage_cmd = '%s -u %s rebuild_index_ordered -v 2 --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
     mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s %s' % (env.host_string, env.notification_email)
     log_cmd = WRITE_LOG % 'solr_reindexing'
 
@@ -678,10 +679,18 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
 
     """
     env.host_string = env.builder_host
-    ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
-    build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
-    integration_dir = '{0}/unisubs-integration'.format(build_dir)
-    python_exe = '{0}/bin/python'.format(ve_dir)
+    if env.environment == 'demo':
+        env.host_string = env.demo_hosts.get('app')
+        root_dir = '/var/tmp/{0}'.format(env.revision)
+        build_dir = '{0}/unisubs'.format(root_dir)
+        ve_dir = '{0}/ve'.format(root_dir)
+        integration_dir = '{0}/unisubs-integration'.format(build_dir)
+        python_exe = '{0}/bin/python'.format(ve_dir)
+    else:
+        ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
+        build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
+        integration_dir = '{0}/unisubs-integration'.format(build_dir)
+        python_exe = '{0}/bin/python'.format(ve_dir)
     with hide('running', 'stdout'):
         rev = run('cat {0}/optional/unisubs-integration'.format(build_dir))
     _reset_permissions(build_dir)
@@ -709,6 +718,11 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     if env.s3_bucket and skip_s3 == False:
         with Output("Uploading to S3"), cd(build_dir):
             run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
+    # temporary fix for dev until better dev compile solution
+    # this also assumes the "builder" host is the same as dev (app-00-dev)
+    if env.environment == 'dev':
+        with cd(build_dir):
+            sudo('cp -rf media/static-cache {0}/media/'.format(env.app_dir))
 
 @task
 @runs_once
@@ -758,6 +772,40 @@ def switch_branch(branch):
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
 
+def _create_nginx_instance(name=None, url_prefix=None):
+    """
+    Creates an Nginx instance (for demos)
+
+    :param name: Name of instance
+    :param url_prefix: URL prefix (default: name)
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    if not url_prefix:
+        url_prefix = name
+    # nginx config
+    run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(name))
+    run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{1}.conf".format(\
+        url_prefix, name))
+    run("sed -i 's/root \/opt\/apps\/dev/root \/var\/tmp\/{0}/g' /tmp/{0}.conf".format(\
+        name))
+    run("sed -i 's/root \/opt\/ve\/dev\/unisubs/root \/var\/tmp\/{0}\/ve/g' /tmp/{0}.conf".format(\
+        name))
+    run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
+        name))
+    sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(name))
+
+def _remove_nginx_instance(name=None):
+    """
+    Removes an Nginx instance (for demos)
+
+    :param name: Name of instance
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(name))
+    sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(name))
+
 @parallel
 def _clone_repo_demo(revision='dev', integration_revision=None,
     instance_name=None, service_password=None):
@@ -775,28 +823,77 @@ def _clone_repo_demo(revision='dev', integration_revision=None,
     # install requirements
     with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
         run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
-    # copy private config
+    _reset_permissions(env.app_dir)
+
+@parallel
+def _configure_demo_app_settings(name=None, revision=None, service_password=None, \
+    url_prefix=None):
+    """
+    Configures application settings (for demos)
+
+    :param name: Instance name
+    :param revision: Application revision
+    :param service_password: Demo instance service password
+    :param url_prefix: Instance url prefix
+
+    """
+    if not url_prefix:
+        url_prefix = revision
+    # private config
     private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
     run('cp /opt/apps/dev/unisubs/server_local_settings.py {0}'.format(private_conf))
+    run("sed -i 's/^INSTALLATION.*/INSTALLATION = DEMO/g' {0}".format(
+        private_conf))
     run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(
-        revision, private_conf))
+        url_prefix, private_conf))
     run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(
-        revision, private_conf))
+        url_prefix, private_conf))
     run("sed -i 's/BROKER_USER.*/BROKER_USER = \"{0}\"/g' {1}".format(
-        instance_name, private_conf))
+        name, private_conf))
     run("sed -i 's/BROKER_VHOST.*/BROKER_VHOST = \"\/{0}\"/g' {1}".format(
-        instance_name, private_conf))
+        name, private_conf))
     run("sed -i 's/BROKER_PASSWORD.*/BROKER_PASSWORD = \"{0}\"/g' {1}".format(
         service_password, private_conf))
     run("sed -i 's/DATABASE_NAME.*/DATABASE_NAME = \"{0}\"/g' {1}".format(
-        instance_name, private_conf))
+        name, private_conf))
     run("sed -i 's/DATABASE_USER.*/DATABASE_USER = \"{0}\"/g' {1}".format(
-        instance_name, private_conf))
+        name, private_conf))
     run("sed -i 's/DATABASE_PASSWORD.*/DATABASE_PASSWORD = \"{0}\"/g' {1}".format(
         service_password, private_conf))
     run("sed -i 's/HAYSTACK_SOLR_URL.*/HAYSTACK_SOLR_URL = \"http:\/\/{0}:8983\/solr\/{1}\"/g' {2}".format(env.demo_hosts.get('data'),
-        instance_name, private_conf))
-    _reset_permissions(env.app_dir)
+        name, private_conf))
+
+def _configure_demo_app(name=None, revision=None, url_prefix=None):
+    """
+    Configures demo app (Django site, etc.)
+
+    :param name: Application instance name
+    :param revision: Application revision
+    :param url_prefix: Application instance URL prefix
+
+    """
+    if not url_prefix:
+        url_prefix = revision
+    env.host_string = env.demo_hosts.get('app')
+    private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
+    app_dir = '/var/tmp/{0}/unisubs'.format(name)
+    ve_dir = '/var/tmp/{0}/ve'.format(name)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    with cd(app_dir):
+        run('{0} deploy/create_commit_file.py'.format(python_exe))
+    app_shell = '{0} manage.py shell --settings=unisubs_settings'.format(
+        python_exe)
+    django_site_cmd = 'from django.contrib.sites.models import Site ;' \
+        'Site.objects.create(domain="{0}.{1}", name="{0}").id'.format(
+        url_prefix, env.demo_domain)
+    site_id = None
+    with cd(app_dir):
+        # this is horrible scraping to get the new site id
+        # someone please make this better
+        out = run('echo \'{0}\' | {1}'.format(django_site_cmd, app_shell))
+        site_id = out.splitlines()[-3].split('>>>')[-1].strip().strip('L')
+    run("sed -i 's/SITE_ID.*/SITE_ID = {0}/g' {1}".format(
+        site_id, private_conf))
 
 def _create_rabbitmq_instance(name=None, password=None):
     """
@@ -979,7 +1076,7 @@ def _configure_demo_db(name=None):
     with cd(app_dir):
         run('{0} manage.py syncdb --all --noinput --settings=unisubs_settings'.format(
         python_exe))
-        run('{0} manage.py migrate --fake --noinput --settings=unisubs_settings'.format(
+        run('{0} manage.py migrate --fake --settings=unisubs_settings'.format(
         python_exe))
 
 def _create_instance_name(name):
@@ -987,33 +1084,27 @@ def _create_instance_name(name):
 
 @task
 @parallel
-def create_demo(integration_revision=None, skip_media=False):
+def create_demo(integration_revision=None, skip_media=False, url_prefix=None):
     """
     Deploys the specified revision for live testing
 
     :param integration_revision: Integrations revision to test
     :param skip_media: Skip media compilation (default: False)
+    :param url_prefix: URL prefix for instance (i.e.: mybranch - default: revision or branch)
 
     """
     env.hosts = env.demo_hosts.values()
     revision = env.revision
     instance_name = _create_instance_name(env.revision)
     service_password = ''.join(random.Random().sample(string.letters+string.digits, 8))
+    if not url_prefix:
+        url_prefix = revision
     with Output("Creating app directories"):
         for k,v in env.demo_hosts.iteritems():
             env.host_string = v
             run('mkdir -p /var/tmp/{0}'.format(instance_name))
     with Output("Configuring Nginx"):
-        env.host_string = env.demo_hosts.get('app')
-        # nginx config
-        run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(instance_name))
-        run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{0}.conf".format(\
-            revision))
-        run("sed -i 's/root \/opt\/apps\/dev/root \/var\/tmp\/{0}/g' /tmp/{0}.conf".format(\
-            instance_name))
-        run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
-            instance_name))
-        sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(instance_name))
+        _create_nginx_instance(name=instance_name, url_prefix=url_prefix)
     with Output("Configuring uWSGI"):
         # uwsgi ini
         run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(instance_name))
@@ -1049,22 +1140,31 @@ def create_demo(integration_revision=None, skip_media=False):
     # solr instance
     with Output("Configuring Solr"):
         _create_solr_instance(name=instance_name)
-    # TODO:
-    # Django site with <revision>.demo.amara.org url
-    # jenkins instance
     # clone code
     with Output("Cloning and building environments"), settings(warn_only=True):
         env.hosts = env.demo_hosts.values()
         execute(_clone_repo_demo, revision=revision,
             integration_revision=integration_revision,
             instance_name=instance_name, service_password=service_password)
-    env.host_string = env.demo_hosts.get('app')
+    with Output("Configuring application settings"):
+        env.host_string = env.demo_hosts.get('app')
+        env.hosts = env.demo_hosts.values()
+        execute(_configure_demo_app_settings, instance_name, revision, service_password,
+            url_prefix)
     # DB sync
     with Output("Syncing and migrating database"):
+        env.host_string = env.demo_hosts.get('app')
         _configure_demo_db(name=instance_name)
+    # Django site with <revision>.demo.amara.org url
+    with Output("Configuring demo settings"):
+        env.host_string = env.demo_hosts.get('app')
+        _configure_demo_app(instance_name, revision, service_password)
+    # TODO:
+    # jenkins instance
     # compile media
     if not skip_media:
         with Output("Compiling static media"):
+            env.host_string = env.demo_hosts.get('app')
             # create a symlink to google closure library for compilation
             sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(instance_name))
             with cd('/var/tmp/{0}/unisubs'.format(instance_name)), settings(warn_only=True):
@@ -1072,9 +1172,10 @@ def create_demo(integration_revision=None, skip_media=False):
                 run('{0} deploy/create_commit_file.py'.format(python_exe))
                 run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
     with Output("Starting {0} demo".format(revision)):
+        env.host_string = env.demo_hosts.get('app')
         sudo('service nginx reload')
         sudo('service uwsgi.unisubs.demo.{0} start'.format(instance_name))
-    print('\nDemo should be available at http://{0}.demo.amara.org'.format(revision))
+    print('\nDemo should be available at http://{0}.demo.amara.org'.format(url_prefix))
 
 @task
 def remove_demo():
@@ -1100,9 +1201,7 @@ def remove_demo():
     with Output("Removing Solr instance"):
         _remove_solr_instance(instance_name)
     with Output("Removing nginx config"):
-        env.host_string = env.demo_hosts.get('app')
-        sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(instance_name))
-        sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(instance_name))
+        _remove_nginx_instance(instance_name)
     with Output("Restarting nginx"):
         env.host_string = env.demo_hosts.get('app')
         sudo('service nginx reload')
