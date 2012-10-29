@@ -26,10 +26,7 @@ from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles.pipeline import add_subtitles
-from apps.videos.models import (
-    Video, SubtitleLanguage, Subtitle, SubtitleVersion
-)
-
+from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -38,6 +35,7 @@ SRT = u"""1
 00:00:00,004 --> 00:00:02,093
 We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
 """
+
 
 def create_langs_and_versions(video, langs, user=None):
     from subtitles import pipeline
@@ -69,30 +67,6 @@ def _create_trans( video, latest_version=None, lang_code=None, forked=False):
             for s in latest_version.subtitle_set.all():
                 s.duplicate_for(v).save()
         return translation
-
-def create_version(lang, subs=None, user=None):
-    latest = lang.latest_version()
-    version_no = latest and latest.version_no + 1 or 1
-    version = SubtitleVersion(version_no=version_no,
-                              user=user or User.objects.all()[0],
-                              language=lang,
-                              datetime_started=datetime.now())
-    version.is_forked = lang.is_forked
-    version.save()
-    if subs is None:
-        subs = []
-        for x in xrange(0,5):
-            subs.append({
-                "subtitle_text": "hey %s" % x,
-                "subtitle_id": "%s-%s-%s" % (version_no, lang.pk, x),
-                "start_time": x,
-                "end_time": (x* 1.0) - 0.1
-            })
-    for sub in subs:
-        s = Subtitle(**sub)
-        s.version  = version
-        s.save()
-    return version
 
 
 def refresh_obj(m):
