@@ -26,7 +26,6 @@ from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles.pipeline import add_subtitles
-from apps.videos import metadata_manager
 from apps.videos.forms import VideoForm
 from apps.videos.models import (
     Video, SubtitleLanguage, Subtitle, SubtitleVersion
@@ -125,7 +124,6 @@ class WebUseTest(TestCase):
         self.client.login(**self.auth)
 
 
-
 class TestVideoForm(TestCase):
     def setUp(self):
         self.vimeo_urls = ("http://vimeo.com/17853047",)
@@ -162,15 +160,4 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-
-class TestMetadataManager(TestCase):
-
-    fixtures = ['staging_users.json', 'staging_videos.json']
-
-    def test_language_count(self):
-        video = Video.objects.all()[0]
-        create_langs_and_versions(video, ['en'])
-        metadata_manager.update_metadata(video.pk)
-        video = Video.objects.all()[0]
-        self.assertEqual(video.languages_count, 1)
 
