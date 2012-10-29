@@ -34,7 +34,6 @@ from apps.videos.models import (
 from apps.videos.rpc import VideosApiClass
 from apps.videos.types import video_type_registrar
 
-from utils.unisubsmarkup import html_to_markup, markup_to_html
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -188,21 +187,6 @@ def create_version(lang, subs=None, user=None):
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
 
-class MarkupHtmlTest(TestCase):
-
-    def test_markup_to_html(self):
-        t = "there **bold text** there"
-        self.assertEqual(
-            "there <b>bold text</b> there",
-            markup_to_html(t)
-        )
-
-    def test_html_to_markup(self):
-        t = "there <b>bold text</b> there"
-        self.assertEqual(
-            "there **bold text** there",
-            html_to_markup(t)
-        )
 def quick_add_subs(language, subs_texts, escape=True):
     subtitles = babelsubs.storage.SubtitleSet(language_code=language.language_code)
     for i,text in enumerate(subs_texts):
