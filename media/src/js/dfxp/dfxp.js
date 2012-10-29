@@ -26,10 +26,10 @@ var DFXP = function(DFXP) {
     this.init = function(xml) {
 
         // Store the original XML for comparison later.
-        this.$o = $(xml.documentElement).clone();
+        this.$originalXml = $(xml.documentElement).clone();
 
         // Store the working XML for local edits.
-        this.$w = $(xml.documentElement).clone();
+        this.$xml = $(xml.documentElement).clone();
 
     };
 
@@ -59,16 +59,56 @@ var DFXP = function(DFXP) {
 
     };
 
+    this.addSubtitle = function(after, newAttrs) {
+        /*
+         * For adding a new subtitle to this set.
+         *
+         * If `after` is provided, we'll place the new subtitle directly
+         * after that one. Otherwise, we'll place the new subtitle at the
+         * end.
+         *
+         * `newAttrs` is an optional JSON object specifying the attributes to
+         * be applied to the new element.
+         */
+
+        var subtitles = this.getSubtitles();
+
+        if (!after) {
+            after = subtitles[subtitles.length - 1];
+        }
+
+        // Create the new element and any specified attributes.
+        var newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
+
+        // Finally, place the new subtitle.
+        $(after).after(newSubtitle);
+
+        return newSubtitle;
+    };
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
          * Returns: true || false
          */
 
-        var oString = that.utils.xmlToString(that.$o.get(0));
-        var wString = that.utils.xmlToString(that.$w.get(0));
+        var originalString = that.utils.xmlToString(that.$originalXml.get(0));
+        var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
-        return oString != wString;
+        return originalString != xmlString;
+    };
+    this.getSubtitles = function() {
+        /*
+         * Retrieve the current set of subtitles.
+         */
+
+        return $('div > p', this.$xml);
+    };
+    this.subtitlesCount = function() {
+        /*
+         * Retrieve the current number of subtitles.
+         */
+
+        return this.getSubtitles().length;
     };
 };
 
