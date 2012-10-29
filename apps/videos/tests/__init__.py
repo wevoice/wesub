@@ -1,3 +1,4 @@
+from apps.videos.tests.celery_tasks import *
 from apps.videos.tests.downloads import *
 from apps.videos.tests.feeds import *
 from apps.videos.tests.following import *
