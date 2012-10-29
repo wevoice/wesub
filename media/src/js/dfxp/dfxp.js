@@ -83,7 +83,7 @@ var DFXP = function(DFXP) {
         // Finally, place the new subtitle.
         $(after).after(newSubtitle);
 
-        return newSubtitle;
+        return newSubtitle.get(0);
     };
     this.changesMade = function() {
         /*
