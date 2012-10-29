@@ -24,7 +24,6 @@ from StringIO import StringIO
 
 import math_captcha
 import babelsubs
-from babelsubs.parsers.dfxp import DFXPParser
 from django.conf import settings
 from django.core import mail
 from django.core.cache import cache
@@ -38,7 +37,6 @@ from apps.auth.models import CustomUser as User
 from apps.comments.forms import CommentForm
 from apps.comments.models import Comment
 from apps.messages.models import Message
-from apps.subtitles import models as sub_models
 from apps.subtitles.pipeline import add_subtitles
 from apps.teams.models import Team, TeamVideo, Workflow, TeamMember
 from apps.testhelpers.views import _create_videos
@@ -1607,31 +1605,6 @@ class MarkupHtmlTest(TestCase):
             "there **bold text** there",
             html_to_markup(t)
         )
-class BaseDownloadTest(object):
-
-    def _download_subs(self, language, format):
-        url = reverse("widget:download" , args=(format,))
-        res = self.client.get(url, {
-            'video_id': language.video.video_id,
-            'lang_pk': language.pk
-        })
-        self.assertEqual(res.status_code, 200)
-        return res.content
-
-class DFXPTest(WebUseTest, BaseDownloadTest):
-    def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        self.language = sub_models.SubtitleLanguage.objects.get_or_create(
-            video=self.video,  language_code='en')[0]
-
-    def test_dfxp_serializer(self):
-        quick_add_subs(self.language, [ 'Here we go!'])
-        content = self._download_subs(self.language, 'dfxp')
-        serialized = DFXPParser(content)
-        self.assertEqual(len(serialized.to_internal()), 1)
-        self.assertEqual(babelsubs.storage.get_contents(serialized.to_internal().get_subtitles()[0]),'Here we go!')
-
 def quick_add_subs(language, subs_texts, escape=True):
     subtitles = babelsubs.storage.SubtitleSet(language_code=language.language_code)
     for i,text in enumerate(subs_texts):
