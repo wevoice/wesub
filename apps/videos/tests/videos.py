@@ -58,150 +58,16 @@ from utils.unisubsmarkup import html_to_markup, markup_to_html
 
 math_captcha.forms.math_clean = lambda form: None
 
-SRT_TEXT = u'''1
-00:00:00,000 --> 00:00:00,000
-Don't show this text it may be used to insert hidden data
-
-2
-00:00:01,500 --> 00:00:04,500
-SubRip subtitles capability tester 1.2p by ale5000
-<b>Use Media Player Classic as reference</b>
-<font color="#0000FF">This text should be blue</font>
-
-3
-00:00:04,500 --> 00:00:04,500
-{\an2}Hidden
-
-4
-00:00:07,501 --> 00:00:11,500
-This should be an E with an accent: È
-日本語
-
-5
-00:00:55,501 --> 00:00:58,500
-Hide these tags: {\some_letters_or_numbers_or_chars}
-'''
-
-SRT_TEXT_WITH_BLANK = u'''1
-00:00:13,34 --> 00:00:24,655
-sure I get all the colors
-nice-- is equal to 17.
-
-2
-00:00:24,655 --> 00:00:27,43
-
-3
-00:00:27,43 --> 00:00:29,79
-So what's different about this
-than what we saw in the last
-'''
-
-SRT_TEXT_WITH_TIMECODE_WITHOUT_DECIMAL = u'''1
-00:01:01,64 --> 00:01:05,7
-this, I guess we could say,
-equation or this inequality
-
-2
-00:01:05,7 --> 00:01:10
-by negative 1, I want to
-understand what happens.
-
-3
-00:01:10 --> 00:01:18,36
-So what's the relation between
-negative x and negative 5?
-
-4
-00:01:18,36 --> 00:01:21,5
-When I say what's the relation,
-is it greater than or is
-'''
-
-SRT_TEXT_WITH_TRAILING_SPACE = u'''1
-00:00:10,000 --> 00:00:14,000
-Merci. Félicitations aux étudiants
-[de l'association Libertés Numériques -- NdR]
-
-
-
-2
-00:00:14,100 --> 00:00:16,000
-d’avoir organisé cette réunion.
-
-
-
-3
-00:00:16,100 --> 00:00:19,900
-Ils ont eu raison, non seulement
-à cause de la célébrité de Richard
-
-
-
-4
-00:00:20,000 --> 00:00:22,200
-mais aussi parce que les sujets
-nous intéressent beaucoup.
-
-
-
-5
-00:00:22,300 --> 00:00:25,000
-Ils nous intéressent particulièrement
-ici à Sciences Po
-
-
-
-6
-00:00:25,100 --> 00:00:29,200
-puisque nous essayons d’abord
-d’étudier les controverses
-'''
-
-
-TXT_TEXT = u'''Here is sub 1.
-
-Here is sub 2.
-
-And, sub 3.
-'''
-
-DFXP_TEXT = u'''<?xml version="1.0" encoding="UTF-8"?>
-<tt xmlns:tts="http://www.w3.org/2006/04/ttaf1#styling" xmlns="http://www.w3.org/2006/04/ttaf1">
-  <head/>
-  <body>
-    <div>
-      <p begin="00:00:00.04" end="00:00:03.18">We started Universal Subtitles because we believe</p>
-      <p begin="00:00:03.18" end="00:00:06.70">every video on the web should be subtitle-able.</p>
-      <p begin="00:00:06.70" end="00:00:11.17">Millions of deaf and hard-of-hearing viewers require subtitles to access video.</p>
-      <p begin="00:00:11.17" end="00:00:15.40">Videomakers and websites should really care about this stuff too.</p>
-      <p begin="00:00:15.40" end="00:00:21.01">Subtitles give them access to a wider audience and they also get better search rankings.</p>
-      <p begin="00:00:21.01" end="00:00:26.93">Universal Subtitles makes it incredibly easy to add subtitles to almost any video.</p>
-      <p begin="00:00:26.93" end="00:00:32.43">Take an existing video on the web, <br/>submit the URL to our website</p>
-      <p begin="00:00:32.43" end="00:00:37.37">and then type along with the dialog to create the subtitles</p>
-      <p begin="00:00:38.75" end="00:00:43.65">After that, tap on your keyboard to sync them with the video.</p>
-      <p begin="00:00:44.71" end="00:00:47.52">Then you're done— we give you an embed code for the video</p>
-      <p begin="00:00:47.52" end="00:00:49.89">that you can put on any website</p>
-      <p begin="00:00:49.89" end="00:00:53.42">at that point, viewers are able to use the subtitles and can also</p>
-      <p begin="00:00:53.42" end="00:00:56.04">contribute to translations.</p>
-      <p begin="00:00:56.04" end="00:01:01.54">We support videos on YouTube, Blip.TV, Ustream, and many more.</p>
-      <p begin="00:01:01.54" end="00:01:05.10">Plus we're adding more services all the time</p>
-      <p begin="00:01:05.10" end="00:01:09.04">Universal Subtitles works with many popular video formats,</p>
-      <p begin="00:01:09.04" end="00:01:14.35">such as MP4, theora, webM and over HTML 5.</p>
-      <p begin="00:01:14.35" end="00:01:19.61">This should be in <span tts:fontWeight="bold">bold</span></p>
-      <p begin="00:01:19.61" end="00:01:23.31">This should be in <span tts:fontStyle="italic">italic</span></p>
-    </div>
-  </body>
-</tt>
-'''
+SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
 
 def create_langs_and_versions(video, langs, user=None):
     from subtitles import pipeline
 
-    SRT = u"""1
-00:00:00,004 --> 00:00:02,093
-We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
-"""
-    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    subtitles = (babelsubs.load_from(SRT, type='srt', language='en')
+                          .to_internal())
     return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
 
 class GenericTest(TestCase):
