@@ -22,6 +22,7 @@ import StringIO
 from HTMLParser import HTMLParser
 from libs.unilangs import unilangs
 
+from utils.subtitles import MAX_SUB_TIME, MAX_SUB_TIME_ONE_HOUR_DIGIT
 def captions_and_translations_to_srt(captions_and_translations):
     # TODO: note this loads the entire string into memory, which will not
     # scale beautifully. In future, possibly stream directly to response.
@@ -142,6 +143,14 @@ class MGSubtitles(BaseSubtitles):
 
 GenerateSubtitlesHandler.register(MGSubtitles)
 
+def milliseconds_to_time_components(milliseconds):
+    if milliseconds == -1  or milliseconds == None:
+        return milliseconds_to_time_components(MAX_SUB_TIME)
+    seconds, fraction = divmod(int(milliseconds), 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return hours, minutes, seconds, fraction
+
 class SRTSubtitles(BaseSubtitles):
     file_type = 'srt'
 
@@ -154,7 +163,8 @@ class SRTSubtitles(BaseSubtitles):
         parser = HTMLParser()
         i = 1
         for item in self.subtitles:
-            if self.isnumber(item['start']) and self.isnumber(item['end']):
+            text = item['text'].strip()
+            if text:
                 output.append(unicode(i))
                 start = self.format_time(item['start'])
                 end = self.format_time(item['end'])
@@ -165,15 +175,12 @@ class SRTSubtitles(BaseSubtitles):
 
         return self.line_delimiter.join(output)
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
-        if hours < 0:
-            hours = 99
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%02i:%02i:%02i,%03i' % (hours, minutes, seconds, fr_seconds)
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
+        return "%02i:%02i:%02i,%03i" % (hours, minutes, seconds, milliseconds)
 
+
+       
 GenerateSubtitlesHandler.register(SRTSubtitles)
 
 class SBVSubtitles(BaseSubtitles):
@@ -186,23 +193,19 @@ class SBVSubtitles(BaseSubtitles):
         output = []
 
         for item in self.subtitles:
-            if self.isnumber(item['start']) and self.isnumber(item['end']):
+            text = item['text'].strip()
+            if text:
                 start = self.format_time(item['start'])
                 end = self.format_time(item['end'])
                 output.append(u'%s,%s' % (start, end))
-                output.append(item['text'].strip())
+                output.append(text)
                 output.append(u'')
 
         return self.line_delimiter.join(output)
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
-        if hours < 0:
-            hours = 9
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 1000)
-        return u'%01i:%02i:%02i.%03i' % (hours, minutes, seconds, fr_seconds)
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
+        return u'%01i:%02i:%02i.%03i' % (min(hours, 9), minutes, seconds, milliseconds)
 
 GenerateSubtitlesHandler.register(SBVSubtitles)
 
@@ -224,6 +227,7 @@ GenerateSubtitlesHandler.register(TXTSubtitles)
 class SSASubtitles(BaseSubtitles):
     file_type = 'ssa'
 
+    MAX_SUB_TIME = MAX_SUB_TIME_ONE_HOUR_DIGIT
     def __unicode__(self):
         #add BOM to fix python default behaviour, because players don't play without it
         return u''.join([unicode(codecs.BOM_UTF8, "utf8"), self._start(), self._content(), self._end()])
@@ -235,14 +239,11 @@ class SSASubtitles(BaseSubtitles):
     def _end(self):
         return u''
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 9
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
+        return u'%i:%02i:%02i.%s' % (min(hours, 9), minutes, seconds, str(milliseconds).rjust(3, '0'))
 
     def _clean_text(self, text):
         return text.replace('\n', ' ')
@@ -254,10 +255,10 @@ class SSASubtitles(BaseSubtitles):
         output.append(u'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text%s' % dl)
         tpl = u'Dialogue: 0,%s,%s,Default,,0000,0000,0000,,%s%s'
         for item in self.subtitles:
-            if self.isnumber(item['start']) and self.isnumber(item['end']):
+            text = self._clean_text(item['text'].strip())
+            if text:
                 start = self.format_time(item['start'])
                 end = self.format_time(item['end'])
-                text = self._clean_text(item['text'].strip())
                 output.append(tpl % (start, end, text, dl))
         return ''.join(output)
 
@@ -326,7 +327,7 @@ class TTMLSubtitles(BaseSubtitles):
         underline_declaration = 'tts:textDecoration="underline"' if TTMLSubtitles.use_named_styles else 'style="underlined"'
             
         for i,item in enumerate(self.subtitles):
-            if item['text'] and self.isnumber(item['start']) and self.isnumber(item['end']):
+            if item['text']:
                 # as we're replacing new lines with <br>s we need to create
                 # the element from a fragment,and also from the formateed <b> and <i> to
                 # the correct span / style
@@ -347,14 +348,11 @@ class TTMLSubtitles(BaseSubtitles):
 
         return dom
 
-    def format_time(self, time):
-        hours = int(floor(time / 3600))
+    def format_time(self, milliseconds):
+        hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 99
-        minutes = int(floor(time % 3600 / 60))
-        seconds = int(time % 60)
-        fr_seconds = int(time % 1 * 100)
-        return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, fr_seconds)
+        return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, milliseconds)
 
 GenerateSubtitlesHandler.register(TTMLSubtitles, 'ttml')
 

@@ -284,11 +284,20 @@ class Rpc(BaseRpc):
         else:
             return 'normal'
 
-    # Ugly hack to disable timing changes for T translations :(
-    def get_timing_mode(self, language):
+
+    def get_timing_mode(self, language, user):
+        """
+        Decides if allows forking. Criteria:
+        - hard coded ted teams can't fork, ever
+        - Non team videos, can fork, always
+        - For team videos, the user must have permission to subtitle
+        (not only translate)
+        """
         team_video = language.video.get_team_video()
         _TED_TEAMS = ['ted', 'ted-transcribe']
         if team_video and team_video.team.slug.lower() in _TED_TEAMS:
+            return 'off'
+        elif team_video and not can_create_and_edit_subtitles(user, team_video, language):
             return 'off'
         else:
             return 'on'
@@ -425,7 +434,7 @@ class Rpc(BaseRpc):
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
-                        "timing_mode": self.get_timing_mode(language),
+                        "timing_mode": self.get_timing_mode(language, request.user),
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
@@ -479,7 +488,7 @@ class Rpc(BaseRpc):
                             "can_edit" : True,
                             "session_pk" : session.pk,
                             "caption_display_mode": self.get_caption_display_mode(session.language),
-                            "timing_mode": self.get_timing_mode(session.language),
+                            "timing_mode": self.get_timing_mode(session.language, request.user),
                             "subtitles" : subtitles }
             if session.base_language:
                 return_dict['original_subtitles'] = \
@@ -727,7 +736,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed):
+    def _update_language_attributes_for_save(self, language, completed, forked=False):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -739,6 +748,10 @@ class Rpc(BaseRpc):
             if language.is_complete != completed:
                 must_trigger_api_language_edited = True
             language.is_complete = completed
+
+        if forked:
+            language.standard_language = None
+            language.is_forked = True
 
         language.save()
 
@@ -760,7 +773,7 @@ class Rpc(BaseRpc):
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed)
+        self._update_language_attributes_for_save(language, completed, forked=forked)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)

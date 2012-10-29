@@ -2509,7 +2509,7 @@ class BillingReport(models.Model):
                     tv.video.title_display_unabridged().encode('utf-8'),
                     host + tv.video.get_absolute_url(),
                     language.language,
-                    round((end - start) / 60, 2),
+                    round((end - start) / (60 * 1000), 2),
                     v.datetime_started.strftime("%Y-%m-%d %H:%M:%S"),
                     old_version_counter,
                 ])

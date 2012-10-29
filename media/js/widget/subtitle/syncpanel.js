@@ -198,7 +198,7 @@ unisubs.subtitle.SyncPanel.prototype.handleKeyUp_ = function(event) {
 unisubs.subtitle.SyncPanel.prototype.upPressed_ = function() {
     if (this.videoPlayer_.isPlaying()) {
         this.captionManager_.disableCaptionEvents(true);
-        var downPlayheadTime_ = this.videoPlayer_.getPlayheadTime();
+        var downPlayheadTime_ = this.videoPlayer_.getPlayheadTime() * 1000;
         var currentSub = this.subtitles_.findLastForTime(downPlayheadTime_);
         currentSub.setEndTime(downPlayheadTime_);
         this.captionManager_.disableCaptionEvents(false);
@@ -215,7 +215,7 @@ unisubs.subtitle.SyncPanel.prototype.downPressed_ = function() {
         this.downHeld_ = true;
         this.videoStarted_ = true;
         this.downPlayheadTime_ =
-            this.videoPlayer_.getPlayheadTime();
+            this.videoPlayer_.getPlayheadTime() * 1000;
         this.downSub_ =
             this.subtitles_.findLastForTime(this.downPlayheadTime_);
     }
@@ -223,8 +223,8 @@ unisubs.subtitle.SyncPanel.prototype.downPressed_ = function() {
 unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
     this.captionManager_.disableCaptionEvents(false);
     this.downHeld_ = false;
-    var playheadTime = this.videoPlayer_.getPlayheadTime();
-    var startTime = playheadTime - 0.3;
+    var playheadTime = this.videoPlayer_.getPlayheadTime() * 1000;
+    var startTime = playheadTime - 300;
     if (startTime < 0) {
         startTime = 0;
     }
@@ -252,6 +252,7 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
     }
 
     this.downSub_ = null;
+    // in milliseconds here, even though players return them in seconds
     this.downPlayheadTime_ = -1;
 };
 unisubs.subtitle.SyncPanel.prototype.startOverClicked_ = function() {

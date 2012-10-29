@@ -31,10 +31,10 @@ def is_synced(obj):
         return False
     return is_synced_value(obj.start_time) and is_synced_value(obj.start_time)
 
-def format_time(time):
-    if not is_synced_value(time):
+def format_time(milliseconds):
+    if not is_synced_value(milliseconds):
          return ""
-    t = int(round(time))
+    t = int(round(milliseconds / 1000.0))
     s = t % 60
     s = s > 9 and s or '0%s' % s
     return '%s:%s' % (t / 60, s)
