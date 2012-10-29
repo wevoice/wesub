@@ -59,13 +59,16 @@ var DFXP = function(DFXP) {
 
     };
 
-    this.addSubtitle = function(after) {
+    this.addSubtitle = function(after, newAttrs) {
         /*
          * For adding a new subtitle to this set.
          *
          * If `after` is provided, we'll place the new subtitle directly
          * after that one. Otherwise, we'll place the new subtitle at the
          * end.
+         *
+         * `newAttrs` is an optional JSON object specifying the attributes to
+         * be applied to the new element.
          */
 
         var subtitles = this.getSubtitles();
@@ -74,17 +77,22 @@ var DFXP = function(DFXP) {
             after = subtitles[subtitles.length - 1];
         }
 
-        // We need to create the element manually first, so we can return it.
+        // First, create the new element manually.
         var newSubtitle = document.createElement('p');
-
-        // Place the new subtitle.
-        $(after).after(newSubtitle);
 
         // Init some basic attributes that we need for subtitles.
         $(newSubtitle).attr({
             'begin': '',
             'end': ''
         });
+
+        // If we have newAttrs, apply them to the new element.
+        if (newAttrs) {
+            $(newSubtitle).attr(newAttrs);
+        }
+
+        // Finally, place the new subtitle.
+        $(after).after(newSubtitle);
 
         return newSubtitle;
     };
