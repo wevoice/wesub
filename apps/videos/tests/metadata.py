@@ -21,7 +21,7 @@ from django.test import TestCase
 
 from apps.videos import metadata_manager
 from apps.videos.models import Video
-from apps.videos.tests.videos import create_langs_and_versions
+from apps.videos.tests.utils import create_langs_and_versions
 
 
 class TestMetadataManager(TestCase):

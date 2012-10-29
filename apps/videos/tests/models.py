@@ -22,7 +22,7 @@ from django.test import TestCase
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.videos import create_langs_and_versions
+from apps.videos.tests.utils import create_langs_and_versions
 from apps.widget import video_cache
 
 

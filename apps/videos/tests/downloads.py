@@ -23,7 +23,7 @@ from django.core.urlresolvers import reverse
 
 from apps.subtitles import models as sub_models
 from apps.videos.models import Video
-from apps.videos.tests.videos import WebUseTest, quick_add_subs
+from apps.videos.tests.utils import WebUseTest, quick_add_subs
 
 
 class BaseDownloadTest(object):

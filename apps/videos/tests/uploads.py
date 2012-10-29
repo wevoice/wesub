@@ -26,7 +26,7 @@ from apps.auth.models import CustomUser as User
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, Subtitle
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.videos import WebUseTest, refresh_obj, _create_trans
+from apps.videos.tests.utils import WebUseTest, refresh_obj, _create_trans
 from apps.widget.rpc import Rpc
 from apps.widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
