@@ -1248,40 +1248,6 @@ def create_version(lang, subs=None, user=None):
     return version
 
 
-class TestSubtitleMetadata(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json']
-
-    def test_reviewed_by_setting(self):
-        version = SubtitleVersion.objects.all()[0]
-        user = User.objects.all()[0]
-
-        self.assertEqual(version.get_reviewed_by(), None,
-            "Version's reviewed_by metadata is not originally None.")
-
-        version_pk = version.pk
-        version.set_reviewed_by(user)
-
-        version = SubtitleVersion.objects.get(pk=version_pk)
-
-        self.assertEqual(version.get_reviewed_by().pk, user.pk,
-            "Version's reviewed_by metadata is not the correct User.")
-
-    def test_approved_by_setting(self):
-        version = SubtitleVersion.objects.all()[0]
-        user = User.objects.all()[0]
-
-        self.assertEqual(version.get_approved_by(), None,
-            "Version's approved_by metadata is not originally None.")
-
-        version_pk = version.pk
-        version.set_approved_by(user)
-
-        version = SubtitleVersion.objects.get(pk=version_pk)
-
-        self.assertEqual(version.get_approved_by().pk, user.pk,
-            "Version's approved_by metadata is not the correct User.")
-
-
 def refresh_obj(m):
     return m.__class__._default_manager.get(pk=m.pk)
 

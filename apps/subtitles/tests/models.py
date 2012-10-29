@@ -402,6 +402,7 @@ class TestSubtitleVersion(TestCase):
         sv2 = add_subtitles(self.video, 'en', subtitles_2)
         sv3 = add_subtitles(self.video, 'en', subtitles_3)
         sv4 = add_subtitles(self.video, 'en', subtitles_4)
+        assert sv4 # Shut up, Pyflakes.
 
         self.assertEquals((1.0, 1.0), sv1.get_changes())
         # 50% of text and 50% of timing is new
@@ -1611,3 +1612,54 @@ class TestTeamInteractions(TestCase):
         self.assertEqual(_get_versions(fr2, u1), [1, 5, 6])
         self.assertEqual(_get_versions(fr2, u2), [1, 2, 3, 4, 5, 6])
         self.assertEqual(_get_versions(fr2, up), [1, 5, 6])
+
+
+class TestSubtitleMetadata(TestCase):
+    fixtures = ['staging_users.json', 'staging_videos.json']
+
+    def setUp(self):
+        self.video = make_video()
+        self.sl_en = make_sl(self.video, 'en')
+        self.user = User.objects.all()[0]
+
+    def test_reviewed_by_setting(self):
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_reviewed_by(), None,
+            "Version's reviewed_by metadata is not originally None.")
+
+        version.set_reviewed_by(self.user)
+
+        self.assertEqual(version.get_reviewed_by().pk, self.user.pk,
+            "Version's reviewed_by metadata is not the correct User.")
+
+        version = refresh(version)
+
+        self.assertEqual(version.get_reviewed_by().pk, self.user.pk,
+            "Version's reviewed_by metadata is not the correct User.")
+
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_reviewed_by(), None,
+            "Versions should not inherit reviewed_by metadata.")
+
+    def test_approved_by_setting(self):
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_approved_by(), None,
+            "Version's approved_by metadata is not originally None.")
+
+        version.set_approved_by(self.user)
+
+        self.assertEqual(version.get_approved_by().pk, self.user.pk,
+            "Version's approved_by metadata is not the correct User.")
+
+        version = refresh(version)
+
+        self.assertEqual(version.get_approved_by().pk, self.user.pk,
+            "Version's approved_by metadata is not the correct User.")
+
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_approved_by(), None,
+            "Versions should not inherit approved_by metadata.")
