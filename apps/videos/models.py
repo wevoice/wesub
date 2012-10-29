@@ -515,6 +515,14 @@ class Video(models.Model):
         """
         return NO_SUBTITLES if self.latest_version() is None else SUBTITLES_FINISHED
 
+    def get_primary_audio_subtitle_language(self):
+        """Return the SubtitleLanguage for the primary audio language, or None.
+
+        Caches the result in the object.
+
+        """
+        return self._original_subtitle_language()
+
     def _original_subtitle_language(self):
         """Return the SubtitleLanguage in the original language of this video, or None.
 

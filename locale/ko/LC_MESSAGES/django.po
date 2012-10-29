@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
+#   <jungsu93@gmail.com>, 2012.
 # MinJung Kim <serenakim27@gmail.com>, 2011.
 # Seokwon Yang <seokwon@gmail.com>, 2012.
 #   <yunki.park@gmail.com>, 2012.
@@ -10,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 01:31-0500\n"
-"PO-Revision-Date: 2012-10-19 06:54+0000\n"
+"POT-Creation-Date: 2012-10-29 01:31-0500\n"
+"PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/ko/)\n"
@@ -229,7 +230,7 @@ msgstr ""
 
 #: apps/messages/tasks.py:419
 msgid "Your subtitles have been reviewed"
-msgstr ""
+msgstr "당신의 자막이 검토되었습니다."
 
 #: apps/messages/tasks.py:421
 msgid " and published"
@@ -237,7 +238,7 @@ msgstr ""
 
 #: apps/messages/tasks.py:524
 msgid "Your subtitles have been approved and published!"
-msgstr ""
+msgstr "당신의 자막이 승인 및 게시되었습니다!"
 
 #: apps/messages/tasks.py:530
 msgid "Your subtitles have been returned for further editing"
@@ -391,6 +392,84 @@ msgstr "비디오 보기 통계"
 #: apps/statistic/models.py:63 apps/statistic/models.py:64
 msgid "Widget view statistic"
 msgstr "위젯 시청 수 통계"
+
+#: apps/subtitles/forms.py:78
+msgid ""
+"Sorry, we can't upload your subtitles because work on this language is "
+"already in progress."
+msgstr ""
+
+#: apps/subtitles/forms.py:92
+msgid "The language already exists and is not a translation."
+msgstr ""
+
+#: apps/subtitles/forms.py:98
+#, python-format
+msgid "The language already exists as a translation from %s."
+msgstr ""
+
+#: apps/subtitles/forms.py:126
+#, python-format
+msgid ""
+"Sorry, we cannot upload subtitles for this language because this would fork "
+"the %s translation made from it."
+msgstr ""
+
+#: apps/subtitles/forms.py:148
+msgid ""
+"Sorry, we can't upload your subtitles because another user is already "
+"assigned to this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:155
+msgid ""
+"Sorry, we can't upload your subtitles because you do not have permission to "
+"claim this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:166
+msgid ""
+"Sorry, we can't upload your subtitles because a draft for this language is "
+"already in moderation."
+msgstr ""
+
+#: apps/subtitles/forms.py:179
+msgid ""
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to transcribe subtitles."
+msgstr ""
+
+#: apps/subtitles/forms.py:187
+msgid ""
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to translate subtitles."
+msgstr ""
+
+#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+msgid ""
+"Sorry, we couldn't upload your file because the number of lines in your "
+"translation ({0}) doesn't match the original ({1})."
+msgstr ""
+
+#: apps/subtitles/forms.py:211
+#, python-format
+msgid "File size must be less than %d kb."
+msgstr ""
+
+#: apps/subtitles/forms.py:219
+#, python-format
+msgid "Unsupported format. Please upload one of the following: %s"
+msgstr ""
+
+#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/videos/forms.py:84
+msgid "Can not detect file encoding"
+msgstr "파일 인코딩을 찾을 수 없음"
+
+#: apps/subtitles/forms.py:249
+msgid "Somebody is subtitling this video right now. Try later."
+msgstr ""
+"누군가가 지금 이 비디오에 자막을 만들고 있습니다. 나중에 다시 시도해 주세요."
 
 #: apps/teams/admin.py:60
 #, python-format
@@ -568,39 +647,27 @@ msgstr ""
 msgid "You cannot perform that task."
 msgstr ""
 
-#: apps/teams/forms.py:634 apps/videos/forms.py:198
+#: apps/teams/forms.py:634
 msgid "Invalid language to translate from."
 msgstr ""
 
-#: apps/teams/forms.py:643 apps/videos/forms.py:71 apps/videos/forms.py:89
-#: apps/videos/forms.py:207
+#: apps/teams/forms.py:643 apps/videos/forms.py:58 apps/videos/forms.py:76
 msgid "File size should be less {0} kb"
 msgstr "파일 크기는 {0}kb보다 작아야 합니다."
 
-#: apps/teams/forms.py:648 apps/videos/forms.py:212
+#: apps/teams/forms.py:648
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr ""
 
-#: apps/teams/forms.py:655 apps/videos/forms.py:76 apps/videos/forms.py:97
-#: apps/videos/forms.py:219
-msgid "Can not detect file encoding"
-msgstr "파일 인코딩을 찾을 수 없음"
-
-#: apps/teams/forms.py:668 apps/videos/forms.py:99 apps/videos/forms.py:224
+#: apps/teams/forms.py:668 apps/videos/forms.py:86
 msgid "Incorrect subtitles format"
 msgstr "잘못된 자막 포맷입니다."
 
-#: apps/teams/forms.py:741 apps/videos/forms.py:321
+#: apps/teams/forms.py:741
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
-msgstr ""
-
-#: apps/teams/forms.py:747 apps/videos/forms.py:328
-msgid ""
-"Sorry, we couldn't upload your file because the number of lines in your "
-"translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
 #: apps/teams/models.py:108
@@ -633,7 +700,7 @@ msgstr ""
 
 #: apps/teams/models.py:121
 msgid "Admins only"
-msgstr ""
+msgstr "관리자 전용"
 
 #: apps/teams/models.py:141 apps/teams/models.py:2554
 msgid "name"
@@ -673,7 +740,7 @@ msgstr "사용자"
 
 #: apps/teams/models.py:151
 msgid "third party accounts"
-msgstr ""
+msgstr "다른 사이트 계정"
 
 #: apps/teams/models.py:154
 msgid "applicants"
@@ -721,11 +788,11 @@ msgstr "번역 정책"
 
 #: apps/teams/models.py:187
 msgid "maximum tasks per member"
-msgstr ""
+msgstr "회원 당 최대 작업 숫자"
 
 #: apps/teams/models.py:189
 msgid "task expiration (days)"
-msgstr ""
+msgstr "작업 만료 (일)"
 
 #: apps/teams/models.py:202 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
@@ -784,7 +851,7 @@ msgstr "팀이 존재하지 않습니다."
 msgid "You are already a member of this team."
 msgstr "당신은 이미 이 팀의 멤버입니다."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:912
+#: apps/teams/rpc.py:50 apps/teams/views.py:911
 msgid "You are now a member of this team."
 msgstr "이제 이 팀의 멤버입니다."
 
@@ -812,7 +879,7 @@ msgstr ""
 msgid ""
 "Your application has been submitted. You will be notified of the team "
 "administrator's response"
-msgstr ""
+msgstr "당신의 신청서가 제출되었습니다. 팀 관리자의 답변이 통보될 것 입니다."
 
 #: apps/teams/rpc.py:78
 msgid "You can't join this team by application."
@@ -851,21 +918,21 @@ msgstr "해당 사용자에게는 그 역할을 줄 수 없습니다."
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "새로운 %(team)s의 동영상이 자막을 만들 준비가 되었습니다!"
 
-#: apps/teams/views.py:132 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:129 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "이름"
 
-#: apps/teams/views.py:133 templates/teams/teams-list.html:47
+#: apps/teams/views.py:130 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "가장 최근"
 
-#: apps/teams/views.py:134 templates/teams/teams-list.html:44
+#: apps/teams/views.py:131 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "대부분의 회원"
 
-#: apps/teams/views.py:177
+#: apps/teams/views.py:174
 #, python-format
 msgid ""
 "\n"
@@ -898,185 +965,185 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:203
+#: apps/teams/views.py:200
 msgid "You do not have permission to delete this team."
-msgstr ""
+msgstr "당신은 이 팀을 삭제할 권한이 없습니다."
 
-#: apps/teams/views.py:217 apps/teams/views.py:259 apps/teams/views.py:287
-#: apps/teams/views.py:321 apps/teams/views.py:376 apps/teams/views.py:1596
-#: apps/teams/views.py:1611
+#: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
+#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1595
+#: apps/teams/views.py:1610
 msgid "You do not have permission to edit this team."
-msgstr ""
+msgstr "당신은 이 팀을 수정할 권한이 없습니다."
 
-#: apps/teams/views.py:246 apps/teams/views.py:306 apps/teams/views.py:391
+#: apps/teams/views.py:243 apps/teams/views.py:303 apps/teams/views.py:388
 msgid "Settings saved."
 msgstr ""
 
-#: apps/teams/views.py:272
+#: apps/teams/views.py:269
 msgid "Guidelines and messages updated."
-msgstr ""
+msgstr "가이드라인과 메세지가 업데이트되었습니다."
 
-#: apps/teams/views.py:537
+#: apps/teams/views.py:536
 msgid "You can't add that video to this team/project."
-msgstr ""
+msgstr "이 비디오를 팀/프로젝트에 추가할 수 없습니다."
 
-#: apps/teams/views.py:574
+#: apps/teams/views.py:573
 msgid "The video has been moved to the new team."
 msgstr ""
 
-#: apps/teams/views.py:587
+#: apps/teams/views.py:586
 msgid "You can't add videos to this team/project."
 msgstr ""
 
-#: apps/teams/views.py:605
+#: apps/teams/views.py:604
 msgid "You can't edit this video."
 msgstr "이 동영상을 편집할 수 없습니다."
 
-#: apps/teams/views.py:614
+#: apps/teams/views.py:613
 msgid "Video has been updated."
 msgstr "동영상이 업데이트 되었습니다."
 
-#: apps/teams/views.py:642
+#: apps/teams/views.py:641
 msgid "Request must be a POST request."
 msgstr "요청은  POST request 야 합니다."
 
-#: apps/teams/views.py:650
+#: apps/teams/views.py:649
 msgid "You can't delete that video."
 msgstr ""
 
-#: apps/teams/views.py:654
+#: apps/teams/views.py:653
 msgid "You can't remove that video."
 msgstr "동영상을 삭제 할 수 없습니다."
 
-#: apps/teams/views.py:666
+#: apps/teams/views.py:665
 msgid "Video has been deleted from Amara."
 msgstr ""
 
-#: apps/teams/views.py:669
+#: apps/teams/views.py:668
 msgid "Video has been removed from the team."
-msgstr ""
+msgstr "비디오가 팀에서 삭제되었습니다."
 
-#: apps/teams/views.py:791
+#: apps/teams/views.py:790
 msgid "Member has been removed from the team."
 msgstr "회원이 팀으로부터 삭제되었습니다."
 
-#: apps/teams/views.py:794
+#: apps/teams/views.py:793
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "\"팀 탈퇴\" 버튼을 이용하여 팀에서 탈퇴할 수 있습니다."
 
-#: apps/teams/views.py:797
+#: apps/teams/views.py:796
 msgid "You don't have permission to remove this member from the team."
 msgstr "이 회원을 팀에서 제거할 수 있는 권한이 없습니다."
 
-#: apps/teams/views.py:831
+#: apps/teams/views.py:830
 msgid "Application approved."
 msgstr "신청 승인."
 
-#: apps/teams/views.py:833 apps/teams/views.py:854
+#: apps/teams/views.py:832 apps/teams/views.py:853
 msgid "Application does not exist."
 msgstr "신청서가 존재하지 않습니다."
 
-#: apps/teams/views.py:835 apps/teams/views.py:856
+#: apps/teams/views.py:834 apps/teams/views.py:855
 msgid "Application already processed."
 msgstr ""
 
-#: apps/teams/views.py:837
+#: apps/teams/views.py:836
 msgid "You can't approve applications."
 msgstr "지원 내용을 승인할 수 없습니다."
 
-#: apps/teams/views.py:852
+#: apps/teams/views.py:851
 msgid "Application denied."
 msgstr "신청서가 거부되었습니다."
 
-#: apps/teams/views.py:858
+#: apps/teams/views.py:857
 msgid "You can't deny applications."
 msgstr "지원 내용을 거부할 수 없습니다."
 
-#: apps/teams/views.py:868
+#: apps/teams/views.py:867
 msgid "You cannot invite people to this team."
 msgstr "팀에 인원을 초대할 수 없습니다."
 
-#: apps/teams/views.py:899
+#: apps/teams/views.py:898
 msgid "This invite is no longer valid"
 msgstr ""
 
-#: apps/teams/views.py:908
+#: apps/teams/views.py:907
 msgid "You cannot join this team."
 msgstr "팀에 가입할 수 없습니다."
 
-#: apps/teams/views.py:962
+#: apps/teams/views.py:961
 msgid "You have left this team."
 msgstr "당신은 이 팀을 나갔습니다."
 
-#: apps/teams/views.py:1018
+#: apps/teams/views.py:1017
 msgid "Member saved."
 msgstr ""
 
-#: apps/teams/views.py:1155
+#: apps/teams/views.py:1154
 msgid "You cannot view this team's tasks."
 msgstr "이 팀의 작업을 삭제할 수 없습니다."
 
-#: apps/teams/views.py:1314 apps/teams/views.py:1317
+#: apps/teams/views.py:1313 apps/teams/views.py:1316
 msgid "You are not allowed to perform this task."
 msgstr "이 작업을 할 수 있도록 허락되지 않았습니다."
 
-#: apps/teams/views.py:1372
+#: apps/teams/views.py:1371
 msgid "Task deleted."
 msgstr "작업이 삭제되었습니다."
 
-#: apps/teams/views.py:1374
+#: apps/teams/views.py:1373
 msgid "You cannot delete this task."
 msgstr "이 작업을 삭제할 수 없습니다."
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1398
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1401
+#: apps/teams/views.py:1400
 msgid "Task assigned."
 msgstr "작업이 할당되었습니다."
 
-#: apps/teams/views.py:1403
+#: apps/teams/views.py:1402
 msgid "You cannot assign this task."
 msgstr "이 작업을 할당할 수 없습니다."
 
-#: apps/teams/views.py:1425
+#: apps/teams/views.py:1424
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1450
+#: apps/teams/views.py:1449
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1454
+#: apps/teams/views.py:1453
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1472
+#: apps/teams/views.py:1471
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1523
+#: apps/teams/views.py:1522
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1535
+#: apps/teams/views.py:1534
 msgid "Project added."
 msgstr "프로젝트가 추가되었습니다."
 
-#: apps/teams/views.py:1552
+#: apps/teams/views.py:1551
 msgid "You cannot edit that project."
 msgstr "해당 프로젝트를 수정할 수 없습니다."
 
-#: apps/teams/views.py:1563
+#: apps/teams/views.py:1562
 msgid "Project deleted."
 msgstr "프로젝트가 삭제되었습니다."
 
-#: apps/teams/views.py:1581
+#: apps/teams/views.py:1580
 msgid "Project saved."
 msgstr "프로젝트가 저장되었습니다."
 
-#: apps/teams/views.py:1621
+#: apps/teams/views.py:1620
 msgid "Successfully synced subtitles."
 msgstr ""
 
@@ -1095,23 +1162,23 @@ msgstr ""
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "누군가 이 비디오에 자막 만드는 것을 도와줄 수 있을까요? %(url)s"
 
-#: apps/videos/forms.py:67
+#: apps/videos/forms.py:54
 msgid "File should have txt format"
 msgstr "파일은 txt 포맷이어야 합니다."
 
-#: apps/videos/forms.py:80
+#: apps/videos/forms.py:67
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "파일을 인코딩할 수 없습니다. utf8 인코딩이 있어야 합니다."
 
-#: apps/videos/forms.py:92
+#: apps/videos/forms.py:79
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr "잘못된 포맷입니다. .srt, .ssa, .sbv .xml(TTML 포맷)을 업로드 하세요. "
 
-#: apps/videos/forms.py:125 apps/videos/forms.py:572 utils/validators.py:38
+#: apps/videos/forms.py:112 apps/videos/forms.py:196 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "확인할 수 없는 주소입니다."
 
-#: apps/videos/forms.py:131 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:118 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1120,50 +1187,11 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr ""
 
-#: apps/videos/forms.py:142
+#: apps/videos/forms.py:129
 msgid "You have not permission add video URL for this video"
 msgstr "당신은 이 비디오에 대한 동영상 URL을 추가할 권한이 없습니다."
 
-#: apps/videos/forms.py:188
-msgid "Somebody is subtitling this video right now. Try later."
-msgstr ""
-"누군가가 지금 이 비디오에 자막을 만들고 있습니다. 나중에 다시 시도해 주세요."
-
-#: apps/videos/forms.py:255 apps/videos/forms.py:291
-msgid ""
-"Sorry, we can't upload your subtitles because work on this language is "
-"already in progress."
-msgstr ""
-
-#: apps/videos/forms.py:260
-msgid "The language already exists and already has a version"
-msgstr ""
-
-#: apps/videos/forms.py:265
-#, python-format
-msgid ""
-"The language already exists and you can't change its translation from %s"
-msgstr ""
-
-#: apps/videos/forms.py:274
-msgid ""
-"Sorry, we cannot upload subtitles for this language because this would ruin "
-"translations made from it"
-msgstr ""
-
-#: apps/videos/forms.py:303
-msgid ""
-"Sorry, we can't upload your subtitles because a draft for this language is "
-"already in moderation."
-msgstr ""
-
-#: apps/videos/forms.py:309 apps/videos/forms.py:312
-msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have sufficient permission."
-msgstr ""
-
-#: apps/videos/forms.py:557
+#: apps/videos/forms.py:181
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1171,7 +1199,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: apps/videos/forms.py:560 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:184 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1186,31 +1214,31 @@ msgstr ""
 "com/myvideo.ogg 또는 http://mysite.com/myipadvideo.m4v\n"
 "만약 문제가 있다면 <a href=\"mailto:%s\">문의해 주세요.</a> "
 
-#: apps/videos/forms.py:588
+#: apps/videos/forms.py:212
 msgid "Youtube usernames"
 msgstr "YouTube 사용자 이름"
 
-#: apps/videos/forms.py:588
+#: apps/videos/forms.py:212
 msgid "Enter usernames separated by comma."
 msgstr "사용자 이름을 쉼표로 구분해서 입력해 주세요."
 
-#: apps/videos/forms.py:589
+#: apps/videos/forms.py:213
 msgid "Youtube page link."
 msgstr "Youtube 페이지 링크"
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:214
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "예: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:591
+#: apps/videos/forms.py:215
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 
-#: apps/videos/forms.py:592
+#: apps/videos/forms.py:216
 msgid "Save feed"
 msgstr "피드 저장"
 
-#: apps/videos/forms.py:592
+#: apps/videos/forms.py:216
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1218,7 +1246,7 @@ msgstr ""
 "나중에 이 피드로 부터 동영상을 추가하기를 원한다면 선택하세요. 오직 유효한 피"
 "드만 저장이 됩니다."
 
-#: apps/videos/forms.py:635
+#: apps/videos/forms.py:259
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1226,13 +1254,13 @@ msgstr ""
 "죄송합니다, 우리는 당신이 제공하는 URL에서 유효한 피드를 찾을 수 없습니다. "
 "URL을 확인하고 다시 시도해 주세요."
 
-#: apps/videos/forms.py:640
+#: apps/videos/forms.py:264
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:652
+#: apps/videos/forms.py:276
 msgid "captcha"
 msgstr "보안 문자"
 
@@ -1252,7 +1280,7 @@ msgstr "위젯 시청"
 msgid "Views"
 msgstr "시청"
 
-#: apps/videos/models.py:1145
+#: apps/videos/models.py:1153
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1260,21 +1288,21 @@ msgstr ""
 "죄송합니다. 현재 누군가가 당신이 업로드 하고 있거나 번역하고 있는 언어를 편집"
 "하고 있기 때문에 자막을 업로드할 수 없습니다."
 
-#: apps/videos/models.py:2007
+#: apps/videos/models.py:2015
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2012
+#: apps/videos/models.py:2020
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:2025
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1283,7 +1311,7 @@ msgstr ""
 "거절된 <a href=\"%(language_url)s\">%(language)s</a> 자막 <a href=\"%"
 "(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:2030
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1292,39 +1320,39 @@ msgstr ""
 "승인된 <a href=\"%(language_url)s\">%(language)s</a> 자막<a href=\"%"
 "(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:2035
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2033
+#: apps/videos/models.py:2041
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:2038
+#: apps/videos/models.py:2046
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "추가된 비디오 <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2040
+#: apps/videos/models.py:2048
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 비디오가 추가 되었습니다."
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2054
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>의 제목이 변경 되었습니다."
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2056
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>의 제목이 변경 되었습니다."
 
-#: apps/videos/models.py:2063
+#: apps/videos/models.py:2071
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1333,7 +1361,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 대한 <a href=\"%(comments_url)"
 "s\">%(language)s 자막의</a> 제목이 변경 되었습니다."
 
-#: apps/videos/models.py:2065
+#: apps/videos/models.py:2073
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1342,17 +1370,17 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 대한 <a href=\"%(comments_url)"
 "s\">%(language)s 자막에 </a> 댓글이 추가 되었습니다."
 
-#: apps/videos/models.py:2068
+#: apps/videos/models.py:2076
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>에 댓글이 달렸습니다."
 
-#: apps/videos/models.py:2070
+#: apps/videos/models.py:2078
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>에 댓글이 추가 되었습니다."
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2086
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1361,7 +1389,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>을 위한 <a href=\"%(language_url)"
 "s\">%(language)s 자막이 </a> 시작 되었습니다."
 
-#: apps/videos/models.py:2080
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1370,7 +1398,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 대한 <a href=\"%(language_url)"
 "s\">%(language)s 자막이</a> 시작 되었습니다."
 
-#: apps/videos/models.py:2091
+#: apps/videos/models.py:2099
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1379,7 +1407,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 대한 <a href=\"%(language_url)"
 "s\">%(language)s 자막이</a> 편집 되었습니다."
 
-#: apps/videos/models.py:2093
+#: apps/videos/models.py:2101
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1388,109 +1416,109 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 대한 <a href=\"%(language_url)"
 "s\">%(language)s 자막이</a> 편집 되었습니다."
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2107
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 새로운 URL이 추가 되었습니다."
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2109
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>에 새로운 URL이 추가 되었습니다."
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2114
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:2111
+#: apps/videos/models.py:2119
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2133
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2131
+#: apps/videos/models.py:2139
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2203
+#: apps/videos/models.py:2211
 msgid "add video"
 msgstr "동영상 추가"
 
-#: apps/videos/models.py:2204
+#: apps/videos/models.py:2212
 msgid "change title"
 msgstr "제목 변경"
 
-#: apps/videos/models.py:2205
+#: apps/videos/models.py:2213
 msgid "comment"
 msgstr "코멘트"
 
-#: apps/videos/models.py:2206
+#: apps/videos/models.py:2214
 msgid "add version"
 msgstr "버전 추가"
 
-#: apps/videos/models.py:2207
+#: apps/videos/models.py:2215
 msgid "add translation"
 msgstr "번역 추가"
 
-#: apps/videos/models.py:2208
+#: apps/videos/models.py:2216
 msgid "add video url"
 msgstr "동영상 URL 추가"
 
-#: apps/videos/models.py:2209
+#: apps/videos/models.py:2217
 msgid "request subtitles"
 msgstr "자막 요청"
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2218
 msgid "approve version"
 msgstr "승인된 버젼"
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2219
 msgid "add contributor"
 msgstr "기여자 추가"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2220
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2221
 msgid "reject version"
 msgstr "reject version"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2222
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2223
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2224
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2225
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2226
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2227
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2476
+#: apps/videos/models.py:2484
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1585,7 +1613,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "막 이 비디오 %(language_name)s에 자막이 있는 버전을 발견 하였습니다."
 
-#: apps/videos/views.py:166
+#: apps/videos/views.py:170
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1596,53 +1624,42 @@ msgstr ""
 "나, 귀하의 사이트에 대한 소스 코드를 얻을 수 있습니다. 자막을 추가하거나 개선"
 "하기 위해, 비디오 아래의 버튼을 클릭합니다."
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:178
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:179
+#: apps/videos/views.py:183
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "몇 분 안에 기존 자막을 불러올 것입니다."
 
 #: apps/videos/views.py:287
 msgid ""
-"Thank you for uploading. It will take a minute or so for your subtitles to "
+"Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr ""
-"업로드 해주셔서 감사합니다. 귀하의 자막이 나타나는데는 잠시 시간이 걸립니다."
 
-#: apps/videos/views.py:289
-msgid "Your changes have been saved."
-msgstr "변경 내용이 저장되었습니다."
-
-#: apps/videos/views.py:600
+#: apps/videos/views.py:592
 msgid "You have not permission change this URL"
 msgstr "당신은 이 URL을 변경할 권한이 없습니다."
 
-#: apps/videos/views.py:605 apps/videos/views.py:636
+#: apps/videos/views.py:597 apps/videos/views.py:628
 msgid "Object does not exist"
 msgstr "개체가 존재하지 않습니다."
 
-#: apps/videos/views.py:620
+#: apps/videos/views.py:612
 msgid "You have not permission delete this URL"
 msgstr "이 URL을 삭제할 권한이 없습니다."
 
-#: apps/videos/views.py:624
+#: apps/videos/views.py:616
 msgid "You can't remove primary URL"
 msgstr ""
 
 #: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "지금은 피드를 사용할 수 없습니다."
-
-#: apps/videos/templatetags/subtitles_tags.py:57
-#, python-format
-msgid "%(count)s Line"
-msgid_plural "%(count)s Lines"
-msgstr[0] "%(count)s 라인"
 
 #: apps/videos/types/dailymotion.py:85
 msgid "Video is unavailable"
@@ -1928,7 +1945,7 @@ msgstr "Permalink"
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
 #: templates/teams/_context_team.html:93
 msgid "Share"
-msgstr ""
+msgstr "공유"
 
 #: templates/_sharing_widget.html:14
 msgid "Get Embed Code"
@@ -2048,7 +2065,7 @@ msgstr ""
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
-msgstr ""
+msgstr "비디오 자막 만들기"
 
 #: templates/base.html:71
 msgid "Watch"
@@ -2081,7 +2098,7 @@ msgstr "대하여"
 
 #: templates/base.html:106
 msgid "Jobs"
-msgstr ""
+msgstr "작업"
 
 #: templates/base.html:109
 msgid "Contact Us"
@@ -4233,7 +4250,7 @@ msgstr "메시지가 성공적으로 전송되었습니다."
 
 #: templates/messages/list.html:38 templates/messages/sent.html:31
 msgid "Compose"
-msgstr ""
+msgstr "작성"
 
 #: templates/messages/list.html:74
 msgid "Mark Read"
@@ -4886,11 +4903,11 @@ msgstr ""
 
 #: templates/teams/_actions.html:43
 msgid "Your application is pending"
-msgstr ""
+msgstr "당신의 지원서는 보류 중입니다."
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
-msgstr ""
+msgstr "팀에 가입"
 
 #: templates/teams/_actions.html:64
 msgid "Want to create your own subtitling team? Contact "
@@ -4968,12 +4985,12 @@ msgstr "비디오 페이지"
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show all"
-msgstr ""
+msgstr "모두보기"
 
 #: templates/teams/_context_project.html:31
 #: templates/teams/_context_team.html:59
 msgid "Task"
-msgstr ""
+msgstr "작업"
 
 #: templates/teams/_context_project.html:81
 msgid "Other"
@@ -4983,7 +5000,7 @@ msgstr ""
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr ""
+msgstr "프로젝트"
 
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
@@ -4999,7 +5016,7 @@ msgstr ""
 
 #: templates/teams/_context_team.html:53
 msgid "Member"
-msgstr ""
+msgstr "멤버"
 
 #: templates/teams/_context_team.html:83
 msgid "Your tasks"
@@ -5007,11 +5024,11 @@ msgstr ""
 
 #: templates/teams/_context_team.html:87
 msgid "All available tasks"
-msgstr ""
+msgstr "가능한 모든 작업"
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
-msgstr ""
+msgstr "모든 비디오"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "According to your"
@@ -5045,7 +5062,7 @@ msgstr ""
 
 #: templates/teams/_subnav_settings.html:5 templates/teams/create.html:43
 msgid "Team Details"
-msgstr ""
+msgstr "팀 세부 정보"
 
 #: templates/teams/_subnav_settings.html:13
 #: templates/teams/settings-permissions.html:92
@@ -5167,7 +5184,7 @@ msgstr "편집"
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
-msgstr ""
+msgstr "삭제"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5216,7 +5233,7 @@ msgstr "지원서가 없습니다."
 
 #: templates/teams/base.html:39
 msgid "Edit team"
-msgstr ""
+msgstr "팀 수정"
 
 #: templates/teams/create.html:6
 msgid "Create team"
@@ -5371,7 +5388,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:43
 msgid "Assign a role"
-msgstr ""
+msgstr "역할 할당"
 
 #: templates/teams/invite_members.html:45
 msgid "Role to be assigned to the user if they accept your invitation."
@@ -5393,7 +5410,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr ""
+msgstr "모든 멤버"
 
 #: templates/teams/members-list.html:56
 msgid "admins"
@@ -5813,7 +5830,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:288
 msgid "Perform Task"
-msgstr ""
+msgstr "작업 시작"
 
 #: templates/teams/tasks.html:297
 msgid "You have reached the maximum number of tasks."
@@ -5838,12 +5855,12 @@ msgid ""
 "and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "언어"
 
-#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:23
+#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:37
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
 msgstr ""
@@ -6139,7 +6156,7 @@ msgstr "의견 보내기"
 
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
-#: templates/videos/_upload_subtitles.html:5
+#: templates/videos/_upload_subtitles.html:11
 #: templates/videos/_video_url_panel.html:43
 #: templates/videos/video-view.html:69
 msgid "Close"
@@ -6299,7 +6316,7 @@ msgid "Upload TXT file"
 msgstr "TXT 파일 업로드"
 
 #: templates/videos/_paste_transcription.html:144
-#: templates/videos/_upload_subtitles.html:38
+#: templates/videos/_upload_subtitles.html:61
 msgid "Login to upload subtitles"
 msgstr "자막을 업로드 하기 위해 로그인"
 
@@ -6316,42 +6333,44 @@ msgstr ""
 msgid "Translation Project"
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:2
+#: templates/videos/_upload_subtitles.html:6
 msgid "upload"
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:6
+#: templates/videos/_upload_subtitles.html:12
 msgid "Upload Subtitles"
 msgstr "자막 업로드"
 
-#: templates/videos/_upload_subtitles.html:10
+#: templates/videos/_upload_subtitles.html:16
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. "
-"Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
-"              or .xml (for TTML) are accepted.\n"
-"              "
+"                    Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT "
+"format.\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
+"xml\n"
+"                    (for TTML) are accepted.\n"
+"                "
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:22
+#: templates/videos/_upload_subtitles.html:32
 msgid "Video Language"
 msgstr "비디오 언어"
 
-#: templates/videos/_upload_subtitles.html:26
+#: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:31
+#: templates/videos/_upload_subtitles.html:52
 #, python-format
 msgid "This subtitle file is 100%% complete"
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:33
-#: templates/videos/_upload_subtitles.html:48
+#: templates/videos/_upload_subtitles.html:55
+#: templates/videos/_upload_subtitles.html:71
 msgid "Upload"
 msgstr "업로드"
 
-#: templates/videos/_upload_subtitles.html:47
+#: templates/videos/_upload_subtitles.html:70
 msgid ""
 "If you believe your subtitle file is compatible, <a href='mailto:"
 "feedback@universalsubtitles.org'>send it to us</a>"
@@ -6359,7 +6378,7 @@ msgstr ""
 "귀하의 자막 파일이 호환이 된다고 믿으신다면, <a href='mailto:"
 "feedback@universalsubtitles.org'>우리에게 그것을 보내주십시오. </a>"
 
-#: templates/videos/_upload_subtitles.html:49
+#: templates/videos/_upload_subtitles.html:72
 msgid "Processing, please be patient..."
 msgstr ""
 

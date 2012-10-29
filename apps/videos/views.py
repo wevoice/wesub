@@ -29,7 +29,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
-from django.db import transaction
 from django.db.models import Sum
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -46,13 +45,13 @@ import widget
 from apps.auth.models import CustomUser as User
 from apps.statistic.models import EmailShareStatistic
 from apps.subtitles import models as sub_models
+from apps.subtitles.forms import SubtitlesUploadForm
 from apps.teams.models import Task
 from apps.videos import permissions
 from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
-    SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm,
-    AddFromFeedForm
+    CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm
 )
 from apps.videos.models import (
     Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException,
@@ -272,45 +271,33 @@ def actions_list(request, video_id):
                        extra_context=extra_context)
 
 @login_required
-@transaction.commit_manually
 def upload_subtitles(request):
-    output = dict(success=False)
+    output = {'success': False}
     video = Video.objects.get(id=request.POST['video'])
     form = SubtitlesUploadForm(request.user, video, request.POST, request.FILES)
 
+    response = lambda s: HttpResponse('<textarea>%s</textarea>' % json.dumps(s))
+
     try:
-        valid = form.is_valid()
-    except Exception, e:
-        output['errors'] = {"_all__":[force_unicode(e)]}
-        return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
-
-    if valid:
-        try:
-            language = form.save()
+        if form.is_valid():
+            version = form.save()
             output['success'] = True
-            if form._sl_created:
-                output['msg'] = ugettext(u'Thank you for uploading. It will take a minute or so for your subtitles to appear.')
-            else:
-                output['msg'] = ugettext(u'Your changes have been saved.')
-            output['next'] = language.get_absolute_url()
-            transaction.commit()
-        except AlreadyEditingException, e:
-            output['errors'] = {"_all__":[force_unicode(e.msg)]}
-            transaction.rollback()
-        except Exception, e:
-            output['errors'] = {"_all__":[force_unicode(e)]}
-            transaction.rollback()
-            from raven.contrib.django.models import client
-            client.create_from_exception()
+            output['next'] = version.subtitle_language.get_absolute_url()
+            output['msg'] = ugettext(
+                u'Thank you for uploading. '
+                u'It may take a minute or so for your subtitles to appear.')
+        else:
+            output['errors'] = form.get_errors()
+    except AlreadyEditingException, e:
+        output['errors'] = {'__all__': [force_unicode(e.msg)]}
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+        from raven.contrib.django.models import client
+        client.create_from_exception()
+        output['errors'] = {'__all__': [force_unicode(e)]}
 
-    else:
-        output['errors'] = form.get_errors()
-        transaction.rollback()
-
-    if transaction.is_dirty():
-        transaction.rollback()
-
-    return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
+    return response(output)
 
 @login_required
 def upload_transcription_file(request):

@@ -17,7 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import random
-import csv
 
 import babelsubs
 from django.db import transaction
@@ -54,8 +53,8 @@ from teams.forms import (
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
-    BillingReport, ApplicationInvalidException
+    Setting, TeamLanguagePreference, InviteExpiredException, BillingReport,
+    ApplicationInvalidException
 )
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
@@ -65,8 +64,6 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video, can_remove_video
 )
-from teams.moderation_const import APPROVED
-from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
@@ -76,7 +73,7 @@ from teams.tasks import (
 from apps.videos.tasks import video_changed_tasks
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
 from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn, Timer
+from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
@@ -410,6 +407,8 @@ def _default_project_for_team(team):
             return None
     else:
         return None
+
+
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
@@ -1611,7 +1610,7 @@ def sync_third_party_account(request, slug, account_id):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    account = team.third_party_accounts.get(pk=account_id)
+    team.third_party_accounts.get(pk=account_id)
     for video in team.videos.all():
         version = video.latest_version()
         if version is not None:
@@ -1621,6 +1620,7 @@ def sync_third_party_account(request, slug, account_id):
     messages.success(request, _(u'Successfully synced subtitles.'))
     return HttpResponseRedirect(reverse('teams:third-party-accounts',
         kwargs={'slug': team.slug}))
+
 
 # Unpublishing
 def _create_task_after_unpublishing(subtitle_version):

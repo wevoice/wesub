@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-26 01:36-0500\n"
-"PO-Revision-Date: 2012-10-19 06:55+0000\n"
+"POT-Creation-Date: 2012-10-29 01:36-0500\n"
+"PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/lv_LV/)\n"
@@ -396,6 +396,87 @@ msgstr "Video skatījumu statistika"
 msgid "Widget view statistic"
 msgstr "Sīkrīka skatījumu statistika"
 
+#: apps/subtitles/forms.py:78
+msgid ""
+"Sorry, we can't upload your subtitles because work on this language is "
+"already in progress."
+msgstr ""
+"Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs "
+"valodas jau ir sākts."
+
+#: apps/subtitles/forms.py:92
+msgid "The language already exists and is not a translation."
+msgstr ""
+
+#: apps/subtitles/forms.py:98
+#, python-format
+msgid "The language already exists as a translation from %s."
+msgstr ""
+
+#: apps/subtitles/forms.py:126
+#, python-format
+msgid ""
+"Sorry, we cannot upload subtitles for this language because this would fork "
+"the %s translation made from it."
+msgstr ""
+
+#: apps/subtitles/forms.py:148
+msgid ""
+"Sorry, we can't upload your subtitles because another user is already "
+"assigned to this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:155
+msgid ""
+"Sorry, we can't upload your subtitles because you do not have permission to "
+"claim this language."
+msgstr ""
+
+#: apps/subtitles/forms.py:166
+msgid ""
+"Sorry, we can't upload your subtitles because a draft for this language is "
+"already in moderation."
+msgstr ""
+
+#: apps/subtitles/forms.py:179
+msgid ""
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to transcribe subtitles."
+msgstr ""
+
+#: apps/subtitles/forms.py:187
+msgid ""
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to translate subtitles."
+msgstr ""
+
+#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+msgid ""
+"Sorry, we couldn't upload your file because the number of lines in your "
+"translation ({0}) doesn't match the original ({1})."
+msgstr ""
+"Piedodiet, mums neizdevās augšuplielādēt Jūsu datni, jo rindiņu skaits Jūsu "
+"({0}) tulkojumā neatbilst oriģinālam ({1})."
+
+#: apps/subtitles/forms.py:211
+#, python-format
+msgid "File size must be less than %d kb."
+msgstr ""
+
+#: apps/subtitles/forms.py:219
+#, python-format
+msgid "Unsupported format. Please upload one of the following: %s"
+msgstr ""
+
+#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/videos/forms.py:84
+msgid "Can not detect file encoding"
+msgstr "Neizdevās noteikt datnes kodējumu"
+
+#: apps/subtitles/forms.py:249
+msgid "Somebody is subtitling this video right now. Try later."
+msgstr "Kāds pašlaik šim video pievieno subtitrus. Mēģiniet vēlāk."
+
 #: apps/teams/admin.py:60
 #, python-format
 msgid "%(count)s messages sent"
@@ -573,44 +654,30 @@ msgstr "Jums nav atļaujas atpublicēt šos subtitrus."
 msgid "You cannot perform that task."
 msgstr "Jūs nevarat veikt šo uzdevumu."
 
-#: apps/teams/forms.py:634 apps/videos/forms.py:198
+#: apps/teams/forms.py:634
 msgid "Invalid language to translate from."
 msgstr "Nederīga valoda, no kuras tulkot."
 
-#: apps/teams/forms.py:643 apps/videos/forms.py:71 apps/videos/forms.py:89
-#: apps/videos/forms.py:207
+#: apps/teams/forms.py:643 apps/videos/forms.py:58 apps/videos/forms.py:76
 msgid "File size should be less {0} kb"
 msgstr "Datnes izmēram būtu jābūt mazākam par {0} kb"
 
-#: apps/teams/forms.py:648 apps/videos/forms.py:212
+#: apps/teams/forms.py:648
 #, python-format
 msgid "Incorrect format. Upload %s"
 msgstr "Nepareizs formāts. Augšuplādējiet %s"
 
-#: apps/teams/forms.py:655 apps/videos/forms.py:76 apps/videos/forms.py:97
-#: apps/videos/forms.py:219
-msgid "Can not detect file encoding"
-msgstr "Neizdevās noteikt datnes kodējumu"
-
-#: apps/teams/forms.py:668 apps/videos/forms.py:99 apps/videos/forms.py:224
+#: apps/teams/forms.py:668 apps/videos/forms.py:86
 msgid "Incorrect subtitles format"
 msgstr "Nepareizs subtitru formāts"
 
-#: apps/teams/forms.py:741 apps/videos/forms.py:321
+#: apps/teams/forms.py:741
 msgid ""
 "Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
 "the previous version ({1})."
 msgstr ""
 "Atvainojiet, mums neizdevās augšupielādēt Jūsu datni, jo tajā ir mazāk "
 "rindiņas ({0}), nekā iepriekšējā versijā ({1})."
-
-#: apps/teams/forms.py:747 apps/videos/forms.py:328
-msgid ""
-"Sorry, we couldn't upload your file because the number of lines in your "
-"translation ({0}) doesn't match the original ({1})."
-msgstr ""
-"Piedodiet, mums neizdevās augšuplielādēt Jūsu datni, jo rindiņu skaits Jūsu "
-"({0}) tulkojumā neatbilst oriģinālam ({1})."
 
 #: apps/teams/models.py:108
 msgid "Open"
@@ -793,7 +860,7 @@ msgstr "Komanda nepastāv"
 msgid "You are already a member of this team."
 msgstr "Jūs jau esat šīs komandas dalībnieks."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:912
+#: apps/teams/rpc.py:50 apps/teams/views.py:911
 msgid "You are now a member of this team."
 msgstr "Nu jūs esat šīs komandas dalībnieks."
 
@@ -863,21 +930,21 @@ msgstr "Jūs nevarat šim dalībniekam piešķirt šo lomu."
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Jauns %(team)s video gatavs subtitrēšanai!"
 
-#: apps/teams/views.py:132 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:129 templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Nosaukums"
 
-#: apps/teams/views.py:133 templates/teams/teams-list.html:47
+#: apps/teams/views.py:130 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Jaunākie"
 
-#: apps/teams/views.py:134 templates/teams/teams-list.html:44
+#: apps/teams/views.py:131 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Visvairāk lietotāju"
 
-#: apps/teams/views.py:177
+#: apps/teams/views.py:174
 #, python-format
 msgid ""
 "\n"
@@ -913,186 +980,186 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:203
+#: apps/teams/views.py:200
 msgid "You do not have permission to delete this team."
 msgstr "Jums nav atļaujas šīs komandas dzēšanai."
 
-#: apps/teams/views.py:217 apps/teams/views.py:259 apps/teams/views.py:287
-#: apps/teams/views.py:321 apps/teams/views.py:376 apps/teams/views.py:1596
-#: apps/teams/views.py:1611
+#: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
+#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1595
+#: apps/teams/views.py:1610
 msgid "You do not have permission to edit this team."
 msgstr "Jums nav atļaujas šīs komandas rediģēšanai."
 
-#: apps/teams/views.py:246 apps/teams/views.py:306 apps/teams/views.py:391
+#: apps/teams/views.py:243 apps/teams/views.py:303 apps/teams/views.py:388
 msgid "Settings saved."
 msgstr "Uzstādījumi saglabāti."
 
-#: apps/teams/views.py:272
+#: apps/teams/views.py:269
 msgid "Guidelines and messages updated."
 msgstr "Vadlīnijas un ziņojumu atjaunināti."
 
-#: apps/teams/views.py:537
+#: apps/teams/views.py:536
 msgid "You can't add that video to this team/project."
 msgstr "Jūs nevarat pievienot šo video šai komandai/projektam."
 
-#: apps/teams/views.py:574
+#: apps/teams/views.py:573
 msgid "The video has been moved to the new team."
 msgstr "Video ir ticis pārvietots uz jaunu komandu."
 
-#: apps/teams/views.py:587
+#: apps/teams/views.py:586
 msgid "You can't add videos to this team/project."
 msgstr "Jūs nevarat pievienot video šai komandai/projektam."
 
-#: apps/teams/views.py:605
+#: apps/teams/views.py:604
 msgid "You can't edit this video."
 msgstr "Jūs nevarat rediģēt šo video."
 
-#: apps/teams/views.py:614
+#: apps/teams/views.py:613
 msgid "Video has been updated."
 msgstr "Video ir ticis atjaunināts."
 
-#: apps/teams/views.py:642
+#: apps/teams/views.py:641
 msgid "Request must be a POST request."
 msgstr ""
 
-#: apps/teams/views.py:650
+#: apps/teams/views.py:649
 msgid "You can't delete that video."
 msgstr "Jūs nevarat izdzēst šo video."
 
-#: apps/teams/views.py:654
+#: apps/teams/views.py:653
 msgid "You can't remove that video."
 msgstr "Jūs nevarat noņemt šo video."
 
-#: apps/teams/views.py:666
+#: apps/teams/views.py:665
 msgid "Video has been deleted from Amara."
 msgstr "Video no Amara ir ticis dzēsts."
 
-#: apps/teams/views.py:669
+#: apps/teams/views.py:668
 msgid "Video has been removed from the team."
 msgstr "Video ir ticis noņemts no komandas."
 
-#: apps/teams/views.py:791
+#: apps/teams/views.py:790
 msgid "Member has been removed from the team."
 msgstr "Dalībnieks ir ticis noņemts no komandas."
 
-#: apps/teams/views.py:794
+#: apps/teams/views.py:793
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Izmantojiet pogu „Pamest šo komandu”, lai noņemtu sevi no šīs komandas."
 
-#: apps/teams/views.py:797
+#: apps/teams/views.py:796
 msgid "You don't have permission to remove this member from the team."
 msgstr "Jums nav atļaujas izmest šo dalībnieku no komandas."
 
-#: apps/teams/views.py:831
+#: apps/teams/views.py:830
 msgid "Application approved."
 msgstr "Pieteikums apstiprināts."
 
-#: apps/teams/views.py:833 apps/teams/views.py:854
+#: apps/teams/views.py:832 apps/teams/views.py:853
 msgid "Application does not exist."
 msgstr "Pieteikums nepastāv."
 
-#: apps/teams/views.py:835 apps/teams/views.py:856
+#: apps/teams/views.py:834 apps/teams/views.py:855
 msgid "Application already processed."
 msgstr "Pieteikums jau apstrādāts."
 
-#: apps/teams/views.py:837
+#: apps/teams/views.py:836
 msgid "You can't approve applications."
 msgstr "Jūs nevarat apstiprināt pieteikumus."
 
-#: apps/teams/views.py:852
+#: apps/teams/views.py:851
 msgid "Application denied."
 msgstr "Pieteikums noraidīts."
 
-#: apps/teams/views.py:858
+#: apps/teams/views.py:857
 msgid "You can't deny applications."
 msgstr "Jūs nevarat noraidīt pieteikumus."
 
-#: apps/teams/views.py:868
+#: apps/teams/views.py:867
 msgid "You cannot invite people to this team."
 msgstr "Jūs uzaicināt cilvēkus pievienoties šai komandai."
 
-#: apps/teams/views.py:899
+#: apps/teams/views.py:898
 msgid "This invite is no longer valid"
 msgstr "Šis ielūgums vairs nav derīgs"
 
-#: apps/teams/views.py:908
+#: apps/teams/views.py:907
 msgid "You cannot join this team."
 msgstr "Jūs nevarat pievienoties šai komandai."
 
-#: apps/teams/views.py:962
+#: apps/teams/views.py:961
 msgid "You have left this team."
 msgstr "Jūs esat pametis šo komandu."
 
-#: apps/teams/views.py:1018
+#: apps/teams/views.py:1017
 msgid "Member saved."
 msgstr "Dalībnieks saglabāts."
 
-#: apps/teams/views.py:1155
+#: apps/teams/views.py:1154
 msgid "You cannot view this team's tasks."
 msgstr "Jūs nevarat apskatīt šīs komandas uzdevumus."
 
-#: apps/teams/views.py:1314 apps/teams/views.py:1317
+#: apps/teams/views.py:1313 apps/teams/views.py:1316
 msgid "You are not allowed to perform this task."
 msgstr "Jums nav atļaujas veikt šo uzdevumu."
 
-#: apps/teams/views.py:1372
+#: apps/teams/views.py:1371
 msgid "Task deleted."
 msgstr "Uzdevums dzēsts."
 
-#: apps/teams/views.py:1374
+#: apps/teams/views.py:1373
 msgid "You cannot delete this task."
 msgstr "Jūs nevarat izdzēst šo uzdevumu."
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1398
 msgid "Task declined."
 msgstr "Atteikts no uzdevuma."
 
-#: apps/teams/views.py:1401
+#: apps/teams/views.py:1400
 msgid "Task assigned."
 msgstr "Uzdevums piešķir."
 
-#: apps/teams/views.py:1403
+#: apps/teams/views.py:1402
 msgid "You cannot assign this task."
 msgstr "Jūs nevarat piešķirt šo uzdevumu."
 
-#: apps/teams/views.py:1425
+#: apps/teams/views.py:1424
 msgid "Invalid assignment attempt."
 msgstr "Nederīgs piešķiršanas mēģinājums."
 
-#: apps/teams/views.py:1450
+#: apps/teams/views.py:1449
 msgid "Draft uploaded successfully."
 msgstr "Jaunā versija veiksmīgi augšupielādēta."
 
-#: apps/teams/views.py:1454
+#: apps/teams/views.py:1453
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1472
+#: apps/teams/views.py:1471
 msgid "You are not allowed to download this transcript."
 msgstr "Jums nav atļaujas lejuplādēt šo transkriptu."
 
-#: apps/teams/views.py:1523
+#: apps/teams/views.py:1522
 msgid "There's already a project with this name"
 msgstr "Projekts ar šādu nosaukumu jau pastāv"
 
-#: apps/teams/views.py:1535
+#: apps/teams/views.py:1534
 msgid "Project added."
 msgstr "Projekts pievienots."
 
-#: apps/teams/views.py:1552
+#: apps/teams/views.py:1551
 msgid "You cannot edit that project."
 msgstr "Jūs nevarat rediģēt šo projektu."
 
-#: apps/teams/views.py:1563
+#: apps/teams/views.py:1562
 msgid "Project deleted."
 msgstr "Projekts dzēsts."
 
-#: apps/teams/views.py:1581
+#: apps/teams/views.py:1580
 msgid "Project saved."
 msgstr "Projekts saglabāts."
 
-#: apps/teams/views.py:1621
+#: apps/teams/views.py:1620
 msgid "Successfully synced subtitles."
 msgstr ""
 
@@ -1113,24 +1180,24 @@ msgstr "Subtitri veiksmīgi atpublicēti."
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Vai kāds var man palīdzēt subtitrēt šos video? %(url)s"
 
-#: apps/videos/forms.py:67
+#: apps/videos/forms.py:54
 msgid "File should have txt format"
 msgstr "Datnei jābūt txt formātā"
 
-#: apps/videos/forms.py:80
+#: apps/videos/forms.py:67
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Neizdevās šifrēt datni. Tai jābūt utf8 kodējumā."
 
-#: apps/videos/forms.py:92
+#: apps/videos/forms.py:79
 msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
 msgstr ""
 "Nepareizs formāts. Augšuplādējiet .srt, .ssa, .sbv vai .xml (TTML  formātus)"
 
-#: apps/videos/forms.py:125 apps/videos/forms.py:572 utils/validators.py:38
+#: apps/videos/forms.py:112 apps/videos/forms.py:196 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Šī URL ir bojāta saite."
 
-#: apps/videos/forms.py:131 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:118 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1144,53 +1211,11 @@ msgstr ""
 "vietni vai formātu padarītu saderīgu, vai arī ja uzskatāt, ka ir radusies "
 "kāda kļūme."
 
-#: apps/videos/forms.py:142
+#: apps/videos/forms.py:129
 msgid "You have not permission add video URL for this video"
 msgstr "Jums nav atļaujas šim video pievienot URL."
 
-#: apps/videos/forms.py:188
-msgid "Somebody is subtitling this video right now. Try later."
-msgstr "Kāds pašlaik šim video pievieno subtitrus. Mēģiniet vēlāk."
-
-#: apps/videos/forms.py:255 apps/videos/forms.py:291
-msgid ""
-"Sorry, we can't upload your subtitles because work on this language is "
-"already in progress."
-msgstr ""
-"Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs "
-"valodas jau ir sākts."
-
-#: apps/videos/forms.py:260
-msgid "The language already exists and already has a version"
-msgstr "Valoda jau pastāv un tai jau ir versija"
-
-#: apps/videos/forms.py:265
-#, python-format
-msgid ""
-"The language already exists and you can't change its translation from %s"
-msgstr ""
-
-#: apps/videos/forms.py:274
-msgid ""
-"Sorry, we cannot upload subtitles for this language because this would ruin "
-"translations made from it"
-msgstr ""
-
-#: apps/videos/forms.py:303
-msgid ""
-"Sorry, we can't upload your subtitles because a draft for this language is "
-"already in moderation."
-msgstr ""
-
-#: apps/videos/forms.py:309 apps/videos/forms.py:312
-msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and "
-"you don't have sufficient permission."
-msgstr ""
-"Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo šī valoda tiek "
-"moderēta un Jums nav nepieciešamās atļaujas."
-
-#: apps/videos/forms.py:557
+#: apps/videos/forms.py:181
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1201,7 +1226,7 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja "
 "rodas kāda problēma."
 
-#: apps/videos/forms.py:560 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:184 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1218,33 +1243,33 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja rodas "
 "kāda problēma."
 
-#: apps/videos/forms.py:588
+#: apps/videos/forms.py:212
 msgid "Youtube usernames"
 msgstr "Youtube lietotājvārdi"
 
-#: apps/videos/forms.py:588
+#: apps/videos/forms.py:212
 msgid "Enter usernames separated by comma."
 msgstr "Ievadiet lietotājvārdus, atdalot tos ar komatiem."
 
-#: apps/videos/forms.py:589
+#: apps/videos/forms.py:213
 msgid "Youtube page link."
 msgstr "Youtube lapas saite"
 
-#: apps/videos/forms.py:590
+#: apps/videos/forms.py:214
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Piemēram: http://www.youtube.com/lietotājs/lietotājvārds"
 
-#: apps/videos/forms.py:591
+#: apps/videos/forms.py:215
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Atbalsta: Youtube, Vimeo un Dailymotion. Pievienotas tikai atbalstītās "
 "vietnes."
 
-#: apps/videos/forms.py:592
+#: apps/videos/forms.py:216
 msgid "Save feed"
 msgstr "Saglabāt barotni"
 
-#: apps/videos/forms.py:592
+#: apps/videos/forms.py:216
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1252,7 +1277,7 @@ msgstr ""
 "Izvēlēties, ja vēlaties no šīs barotnes pievienot video arī turpmāk. "
 "Saglabātas tiks tikai derīgas RSS barotnes."
 
-#: apps/videos/forms.py:635
+#: apps/videos/forms.py:259
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1260,13 +1285,13 @@ msgstr ""
 "Piedodiet, mums jūsu norādītajā vietrādī URL neizdevās atrast derīgu "
 "barotni. Lūdzu, pārbaudiet vietrādi un mēģiniet vēlreiz."
 
-#: apps/videos/forms.py:640
+#: apps/videos/forms.py:264
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:652
+#: apps/videos/forms.py:276
 msgid "captcha"
 msgstr "CAPTCHA"
 
@@ -1286,20 +1311,20 @@ msgstr "velsiešu valoda"
 msgid "Views"
 msgstr "Skatījumu"
 
-#: apps/videos/models.py:1145
+#: apps/videos/models.py:1153
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:2007
+#: apps/videos/models.py:2015
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2012
+#: apps/videos/models.py:2020
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1308,7 +1333,7 @@ msgstr ""
 "apstiprināja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:2025
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1317,7 +1342,7 @@ msgstr ""
 "  noraidīja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:2030
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1326,7 +1351,7 @@ msgstr ""
 "  apstiprināja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:2035
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1335,32 +1360,32 @@ msgstr ""
 "noraidīja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2033
+#: apps/videos/models.py:2041
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  dzēsts video „%(title)s”"
 
-#: apps/videos/models.py:2038
+#: apps/videos/models.py:2046
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2040
+#: apps/videos/models.py:2048
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "pievienots video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2054
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "nomainīts nosaukums video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2056
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Video <a href=\"%(video_url)s\">%(video_name)s</a> nomainīts nosaukums"
 
-#: apps/videos/models.py:2063
+#: apps/videos/models.py:2071
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1369,7 +1394,7 @@ msgstr ""
 "komentēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(comments_url)s\">%(language)s subtitrus</a>"
 
-#: apps/videos/models.py:2065
+#: apps/videos/models.py:2073
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1378,17 +1403,17 @@ msgstr ""
 "Video <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%(comments_url)s"
 "\">%(language)s </a>s subtitriem pievienots komentārs"
 
-#: apps/videos/models.py:2068
+#: apps/videos/models.py:2076
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja komentāru <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2070
+#: apps/videos/models.py:2078
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots komentārs"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2086
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1397,14 +1422,14 @@ msgstr ""
 "sāka <a href=\"%(language_url)s\">%(language)s subtitrus</a> video <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2080
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2091
+#: apps/videos/models.py:2099
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1413,7 +1438,7 @@ msgstr ""
 "rediģēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s subtitrus</a> "
 
-#: apps/videos/models.py:2093
+#: apps/videos/models.py:2101
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1422,110 +1447,110 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> video <a href=\"%(language_url)s"
 "\">%(language)s subtitri</a> tika rediģēti"
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2107
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "pievienoja jaunu video <a href=\"%(video_url)s\">%(video_name)s</a> vietrādi "
 "URL"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2109
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots jauns vietrādis URL"
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2114
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "pievienojās %(team)s komandai kā %(role)s"
 
-#: apps/videos/models.py:2111
+#: apps/videos/models.py:2119
 #, python-format
 msgid "left the %s team"
 msgstr "pameta %s komandu"
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2133
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2131
+#: apps/videos/models.py:2139
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2203
+#: apps/videos/models.py:2211
 msgid "add video"
 msgstr "pievienot video"
 
-#: apps/videos/models.py:2204
+#: apps/videos/models.py:2212
 msgid "change title"
 msgstr "mainīt nosaukumu"
 
-#: apps/videos/models.py:2205
+#: apps/videos/models.py:2213
 msgid "comment"
 msgstr "komentēt"
 
-#: apps/videos/models.py:2206
+#: apps/videos/models.py:2214
 msgid "add version"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2207
+#: apps/videos/models.py:2215
 msgid "add translation"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2208
+#: apps/videos/models.py:2216
 msgid "add video url"
 msgstr "pievienot video url"
 
-#: apps/videos/models.py:2209
+#: apps/videos/models.py:2217
 msgid "request subtitles"
 msgstr "prasīt subtitrus"
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2218
 msgid "approve version"
 msgstr "apstiprināt versiju"
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2219
 msgid "add contributor"
 msgstr "pievienot artavnieku"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2220
 msgid "remove contributor"
 msgstr "noņemt artavnieku"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2221
 msgid "reject version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2222
 msgid "review version"
 msgstr "pārskatīt versiju"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2223
 msgid "accept version"
 msgstr "pieņemt versiju"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2224
 msgid "decline version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2225
 msgid "delete video"
 msgstr "dzēst video"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2226
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2227
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2476
+#: apps/videos/models.py:2484
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1619,7 +1644,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 
-#: apps/videos/views.py:166
+#: apps/videos/views.py:170
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1627,54 +1652,42 @@ msgid ""
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:174
+#: apps/videos/views.py:178
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:179
+#: apps/videos/views.py:183
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Esošie subtitri tiks importētie turpmāko minūšu laikā."
 
 #: apps/videos/views.py:287
 msgid ""
-"Thank you for uploading. It will take a minute or so for your subtitles to "
+"Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
-msgstr "Paldies par augšupielādi. Subtitriem būtu jāparādās pēc pāris minūtēm."
+msgstr ""
 
-#: apps/videos/views.py:289
-msgid "Your changes have been saved."
-msgstr "Jūsu veiktās izmaiņas saglabātas."
-
-#: apps/videos/views.py:600
+#: apps/videos/views.py:592
 msgid "You have not permission change this URL"
 msgstr "Jums nav atļaujas mainīt šo URL"
 
-#: apps/videos/views.py:605 apps/videos/views.py:636
+#: apps/videos/views.py:597 apps/videos/views.py:628
 msgid "Object does not exist"
 msgstr "Objekts nepastāv"
 
-#: apps/videos/views.py:620
+#: apps/videos/views.py:612
 msgid "You have not permission delete this URL"
 msgstr "Jums nav atļaujas dzēst šo URL"
 
-#: apps/videos/views.py:624
+#: apps/videos/views.py:616
 msgid "You can't remove primary URL"
 msgstr "Jūs nevarat noņemt galveno vietrādi URL."
 
 #: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "Barotne pašlaik ir nepieejama."
-
-#: apps/videos/templatetags/subtitles_tags.py:57
-#, python-format
-msgid "%(count)s Line"
-msgid_plural "%(count)s Lines"
-msgstr[0] "%(count)s līnijas"
-msgstr[1] "%(count)s līnija"
-msgstr[2] "%(count)s līnijas"
 
 #: apps/videos/types/dailymotion.py:85
 msgid "Video is unavailable"
@@ -6044,12 +6057,12 @@ msgid ""
 "and video description in the onsite editor and to submit the final version."
 msgstr ""
 
-#: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:20
+#: templates/teams/tasks.html:336 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "Valoda"
 
-#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:23
+#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:37
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
 msgstr ""
@@ -6377,7 +6390,7 @@ msgstr "Nosūtīt atsauksmes"
 
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
-#: templates/videos/_upload_subtitles.html:5
+#: templates/videos/_upload_subtitles.html:11
 #: templates/videos/_video_url_panel.html:43
 #: templates/videos/video-view.html:69
 msgid "Close"
@@ -6534,7 +6547,7 @@ msgid "Upload TXT file"
 msgstr "Augšupielādēt TXT datni"
 
 #: templates/videos/_paste_transcription.html:144
-#: templates/videos/_upload_subtitles.html:38
+#: templates/videos/_upload_subtitles.html:61
 msgid "Login to upload subtitles"
 msgstr "Ieejiet, lai varētu augšupielādēt subtitrus"
 
@@ -6551,48 +6564,44 @@ msgstr "Apskatīt komandu:"
 msgid "Translation Project"
 msgstr "Tulkošanas projekts"
 
-#: templates/videos/_upload_subtitles.html:2
+#: templates/videos/_upload_subtitles.html:6
 msgid "upload"
 msgstr "augšupielādēt"
 
-#: templates/videos/_upload_subtitles.html:6
+#: templates/videos/_upload_subtitles.html:12
 msgid "Upload Subtitles"
 msgstr "Augšupielādēt subtitrus"
 
-#: templates/videos/_upload_subtitles.html:10
+#: templates/videos/_upload_subtitles.html:16
 msgid ""
 "\n"
-"              Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT format. "
-"Only files ending in .srt, .ssa, .sbv, .dfxp, .txt\n"
-"              or .xml (for TTML) are accepted.\n"
-"              "
+"                    Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT "
+"format.\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
+"xml\n"
+"                    (for TTML) are accepted.\n"
+"                "
 msgstr ""
-"\n"
-"              Mūsu vietne pieņem SRT, SSA, SBV, DFXP, TTML, un TXT formātus. "
-"Tiek pieņemtas tikai datnes, kuru nosaukumi beidzas ar .srt, .ssa, .sbv, ."
-"dfxp, .txt\n"
-"              vai .xml (TTML).\n"
-"              "
 
-#: templates/videos/_upload_subtitles.html:22
+#: templates/videos/_upload_subtitles.html:32
 msgid "Video Language"
 msgstr "Video valoda"
 
-#: templates/videos/_upload_subtitles.html:26
+#: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
 msgstr "Pārtulkots no"
 
-#: templates/videos/_upload_subtitles.html:31
+#: templates/videos/_upload_subtitles.html:52
 #, python-format
 msgid "This subtitle file is 100%% complete"
 msgstr "Šī subtitru datne ir 100%% pabeigta"
 
-#: templates/videos/_upload_subtitles.html:33
-#: templates/videos/_upload_subtitles.html:48
+#: templates/videos/_upload_subtitles.html:55
+#: templates/videos/_upload_subtitles.html:71
 msgid "Upload"
 msgstr "Augšupielādēt"
 
-#: templates/videos/_upload_subtitles.html:47
+#: templates/videos/_upload_subtitles.html:70
 msgid ""
 "If you believe your subtitle file is compatible, <a href='mailto:"
 "feedback@universalsubtitles.org'>send it to us</a>"
@@ -6600,7 +6609,7 @@ msgstr ""
 "Ja uzskatāt, ka Jūsu subtitru datne ir saderīga, <a href='mailto:"
 "feedback@universalsubtitles.org'>atsūtiet to mums</a>"
 
-#: templates/videos/_upload_subtitles.html:49
+#: templates/videos/_upload_subtitles.html:72
 msgid "Processing, please be patient..."
 msgstr ""
 

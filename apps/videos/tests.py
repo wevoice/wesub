@@ -1913,22 +1913,6 @@ class TestTemplateTags(TestCase):
         data = json.load(open(fixture_path))
         self.videos = _create_videos(data, [])
 
-    def test_complete_indicator(self):
-        from apps.videos.templatetags.subtitles_tags import complete_indicator
-        # one original  complete
-        l = SubtitleLanguage.objects.filter(is_original=True, is_complete=True)[0]
-        self.assertEqual("100%", complete_indicator(l))
-        # one original non complete with 0 subs
-
-        l = SubtitleLanguage.objects.filter(is_forked=True, is_complete=False)[0]
-        self.assertEqual("0 Lines", complete_indicator(l))
-        # one original noncomplete 2 subs
-        l = SubtitleLanguage.objects.filter(video__title="6", is_original=True)[0]
-        self.assertEqual("2 Lines", complete_indicator(l))
-        # one trans non complete
-        l = SubtitleLanguage.objects.filter(video__title="b", language='pt')[0]
-        self.assertEqual("60%", complete_indicator(l))
-
 
     def test_language_url_for_empty_lang(self):
         v = self.videos[0]
