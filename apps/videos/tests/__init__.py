@@ -2,9 +2,10 @@ from apps.videos.tests.celery_tasks import *
 from apps.videos.tests.downloads import *
 from apps.videos.tests.feeds import *
 from apps.videos.tests.following import *
-from apps.videos.tests.uploads import *
+from apps.videos.tests.models import *
 from apps.videos.tests.syncing import *
 from apps.videos.tests.template_tags import *
+from apps.videos.tests.uploads import *
 from apps.videos.tests.videos import *
 from apps.videos.tests.video_types import *
 from apps.videos.tests.video_urls import *
