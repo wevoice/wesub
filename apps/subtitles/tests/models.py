@@ -27,9 +27,7 @@ from babelsubs.storage import SubtitleSet
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
-from apps.subtitles.models import (
-    SubtitleLanguage, Collaborator, SubtitleVersion
-)
+from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.tests.utils import (
     make_video, make_video_2, make_video_3, make_sl, refresh, ids, parent_ids,
     ancestor_ids
@@ -402,6 +400,7 @@ class TestSubtitleVersion(TestCase):
         sv2 = add_subtitles(self.video, 'en', subtitles_2)
         sv3 = add_subtitles(self.video, 'en', subtitles_3)
         sv4 = add_subtitles(self.video, 'en', subtitles_4)
+        assert sv4 # Shut up, Pyflakes.
 
         self.assertEquals((1.0, 1.0), sv1.get_changes())
         # 50% of text and 50% of timing is new
@@ -1210,308 +1209,6 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
 
 
-class TestCollaborator(TestCase):
-    def setUp(self):
-        self.video = make_video()
-        self.sl = make_sl(self.video, 'en')
-
-
-    def test_create_collaborators(self):
-        users = User.objects.all()
-
-        u1 = users[0]
-        u2 = users[1]
-
-        c1 = Collaborator(subtitle_language=self.sl, user=u1)
-        c2 = Collaborator(subtitle_language=self.sl, user=u2)
-
-        c1.save()
-        c2.save()
-
-        # Make sure basic defaults are correct.
-        self.assertEqual(c1.user_id, u1.id)
-        self.assertEqual(c1.subtitle_language.language_code, 'en')
-        self.assertEqual(c1.signoff, False)
-        self.assertEqual(c1.signoff_is_official, False)
-        self.assertEqual(c1.expired, False)
-
-        self.assertEqual(c2.user_id, u2.id)
-        self.assertEqual(c2.subtitle_language.language_code, 'en')
-        self.assertEqual(c2.signoff, False)
-        self.assertEqual(c2.signoff_is_official, False)
-        self.assertEqual(c2.expired, False)
-
-        # Make sure both objects got created properly, and get_for finds them.
-        cs = Collaborator.objects.get_for(self.sl)
-        self.assertEqual(cs.count(), 2)
-
-        # Make sure we can't create two Collaborators for the same
-        # language/video combination.
-        self.assertRaises(IntegrityError,
-                          lambda: Collaborator(subtitle_language=self.sl,
-                                               user=u1).save())
-
-    def test_signoff_retrieval(self):
-        users = User.objects.all()
-
-        u1 = users[0]
-        u2 = users[1]
-
-        c1 = Collaborator(subtitle_language=self.sl, user=u1)
-        c2 = Collaborator(subtitle_language=self.sl, user=u2)
-
-        c1.save()
-        c2.save()
-
-        cs = Collaborator.objects
-        sl = self.sl
-
-        # collab signoff is_official expired
-        # 1
-        # 2
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 2)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 0)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 0)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
-
-        # collab signoff is_official expired
-        # 1      ✔
-        # 2
-        c1.signoff = True
-        c1.save()
-
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 1)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 1)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
-
-        # collab signoff is_official
-        # 1      ✔
-        # 2      ✔
-        c2.signoff = True
-        c2.save()
-
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 2)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 0)
-
-        # collab signoff is_official expired
-        # 1      ✔       ✔
-        # 2      ✔
-        c1.signoff_is_official = True
-        c1.save()
-
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 1)
-
-        # collab signoff is_official expired
-        # 1      ✔       ✔
-        # 2      ✔       ✔
-        c2.signoff_is_official = True
-        c2.save()
-
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 0)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 2)
-
-        # collab signoff is_official expired
-        # 1
-        # 2
-        c1.signoff = False
-        c1.signoff_is_official = False
-        c1.save()
-
-        c2.signoff = False
-        c2.signoff_is_official = False
-        c2.save()
-
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
-
-        # collab signoff is_official expired
-        # 1                          ✔
-        # 2
-        c1.expired = True
-        c1.save()
-
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 1)
-        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
-
-        # collab signoff is_official expired
-        # 1                          ✔
-        # 2                          ✔
-        c2.expired = True
-        c2.save()
-
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
-        self.assertEqual(cs.get_unsignedoff_for(sl, include_expired=True).count(), 2)
-
-        # collab signoff is_official expired
-        # 1      ✔       ✔           ✔
-        # 2      ✔                   ✔
-        c1.signoff = True
-        c1.signoff_is_official = True
-        c1.save()
-
-        c2.signoff = True
-        c2.signoff_is_official = False
-        c2.save()
-
-        self.assertEqual(cs.get_for(sl).count(), 2)
-        self.assertEqual(cs.get_unsignedoff_for(sl).count(), 0)
-        self.assertEqual(cs.get_all_signoffs_for(sl).count(), 2)
-        self.assertEqual(cs.get_peer_signoffs_for(sl).count(), 1)
-        self.assertEqual(cs.get_official_signoffs_for(sl).count(), 1)
-
-
-class TestSubtitleLanguageCollaboratorInteractions(TestCase):
-    def setUp(self):
-        self.video = make_video()
-
-        self.sl = make_sl(self.video, 'en')
-
-        users = User.objects.all()
-
-        u1 = users[0]
-        u2 = users[1]
-        u3 = users[2]
-
-        self.c1 = Collaborator(subtitle_language=self.sl, user=u1)
-        self.c2 = Collaborator(subtitle_language=self.sl, user=u2)
-        self.c3 = Collaborator(subtitle_language=self.sl, user=u3)
-
-        self.c1.save()
-        self.c2.save()
-        self.c3.save()
-
-
-    def test_signoff_counts(self):
-        """Test the various types of signoff counting.
-
-        Does not test expiration at all.
-
-        """
-        sl = self.sl
-
-        # collab signoff official
-        # 1
-        # 2
-        # 3
-        sl = refresh(sl)
-
-        self.assertEqual(sl.unofficial_signoff_count, 0)
-        self.assertEqual(sl.official_signoff_count, 0)
-        self.assertEqual(sl.pending_signoff_count, 3)
-
-        # collab signoff official
-        # 1      ✔
-        # 2
-        # 3
-        self.c1.signoff = True
-        self.c1.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.unofficial_signoff_count, 1)
-        self.assertEqual(sl.official_signoff_count, 0)
-        self.assertEqual(sl.pending_signoff_count, 2)
-
-        # collab signoff official
-        # 1      ✔       ✔
-        # 2
-        # 3
-        self.c1.signoff_is_official = True
-        self.c1.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.unofficial_signoff_count, 0)
-        self.assertEqual(sl.official_signoff_count, 1)
-        self.assertEqual(sl.pending_signoff_count, 2)
-
-        # collab signoff official
-        # 1      ✔       ✔
-        # 2      ✔
-        # 3      ✔
-        self.c2.signoff = True
-        self.c2.save()
-        self.c3.signoff = True
-        self.c3.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.unofficial_signoff_count, 2)
-        self.assertEqual(sl.official_signoff_count, 1)
-        self.assertEqual(sl.pending_signoff_count, 0)
-
-    def test_pending_expiration_counts(self):
-        """Tests the effects of collaborator expiration on signoff counts."""
-
-        sl = self.sl
-
-        # collab signoff expired
-        # 1
-        # 2
-        # 3
-        sl = refresh(sl)
-
-        self.assertEqual(sl.pending_signoff_count, 3)
-        self.assertEqual(sl.pending_signoff_expired_count, 0)
-        self.assertEqual(sl.pending_signoff_unexpired_count, 3)
-
-        # collab signoff expired
-        # 1              ✔
-        # 2
-        # 3
-        self.c1.expired = True
-        self.c1.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.pending_signoff_count, 3)
-        self.assertEqual(sl.pending_signoff_expired_count, 1)
-        self.assertEqual(sl.pending_signoff_unexpired_count, 2)
-
-        # collab signoff expired
-        # 1              ✔
-        # 2              ✔
-        # 3              ✔
-        self.c2.expired = True
-        self.c2.save()
-        self.c3.expired = True
-        self.c3.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.pending_signoff_count, 3)
-        self.assertEqual(sl.pending_signoff_expired_count, 3)
-        self.assertEqual(sl.pending_signoff_unexpired_count, 0)
-
-        # collab signoff expired
-        # 1              ✔
-        # 2      ✔       ✔
-        # 3              ✔
-        self.c2.signoff = True
-        self.c2.save()
-
-        sl = refresh(sl)
-
-        self.assertEqual(sl.pending_signoff_count, 2)
-        self.assertEqual(sl.pending_signoff_expired_count, 2)
-        self.assertEqual(sl.pending_signoff_unexpired_count, 0)
-
-        self.assertEqual(sl.unofficial_signoff_count, 1)
-
-
 class TestTeamInteractions(TestCase):
     def setUp(self):
         users = User.objects.all()
@@ -1611,3 +1308,54 @@ class TestTeamInteractions(TestCase):
         self.assertEqual(_get_versions(fr2, u1), [1, 5, 6])
         self.assertEqual(_get_versions(fr2, u2), [1, 2, 3, 4, 5, 6])
         self.assertEqual(_get_versions(fr2, up), [1, 5, 6])
+
+
+class TestSubtitleMetadata(TestCase):
+    fixtures = ['staging_users.json', 'staging_videos.json']
+
+    def setUp(self):
+        self.video = make_video()
+        self.sl_en = make_sl(self.video, 'en')
+        self.user = User.objects.all()[0]
+
+    def test_reviewed_by_setting(self):
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_reviewed_by(), None,
+            "Version's reviewed_by metadata is not originally None.")
+
+        version.set_reviewed_by(self.user)
+
+        self.assertEqual(version.get_reviewed_by().pk, self.user.pk,
+            "Version's reviewed_by metadata is not the correct User.")
+
+        version = refresh(version)
+
+        self.assertEqual(version.get_reviewed_by().pk, self.user.pk,
+            "Version's reviewed_by metadata is not the correct User.")
+
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_reviewed_by(), None,
+            "Versions should not inherit reviewed_by metadata.")
+
+    def test_approved_by_setting(self):
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_approved_by(), None,
+            "Version's approved_by metadata is not originally None.")
+
+        version.set_approved_by(self.user)
+
+        self.assertEqual(version.get_approved_by().pk, self.user.pk,
+            "Version's approved_by metadata is not the correct User.")
+
+        version = refresh(version)
+
+        self.assertEqual(version.get_approved_by().pk, self.user.pk,
+            "Version's approved_by metadata is not the correct User.")
+
+        version = self.sl_en.add_version()
+
+        self.assertEqual(version.get_approved_by(), None,
+            "Versions should not inherit approved_by metadata.")
