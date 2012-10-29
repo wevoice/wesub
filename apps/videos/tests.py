@@ -32,44 +32,44 @@ from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from vidscraper.sites import blip
 
-from comments.forms import CommentForm
-from comments.models import Comment
 from apps.auth.models import CustomUser as User
-from messages.models import Message
-from teams.models import Team, TeamVideo, Workflow, TeamMember
-from testhelpers.views import _create_videos
-from subtitles import models as sub_models
-from subtitles.pipeline import add_subtitles
-from videos import metadata_manager
-from utils.unisubsmarkup import html_to_markup, markup_to_html
-from videos.feed_parser import FeedParser
-from videos.forms import VideoForm
-from videos.models import (
+from apps.comments.forms import CommentForm
+from apps.comments.models import Comment
+from apps.messages.models import Message
+from apps.subtitles import models as sub_models
+from apps.subtitles.pipeline import add_subtitles
+from apps.teams.models import Team, TeamVideo, Workflow, TeamMember
+from apps.testhelpers.views import _create_videos
+from apps.videos import metadata_manager
+from apps.videos.feed_parser import FeedParser
+from apps.videos.forms import VideoForm
+from apps.videos.models import (
     Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, SubtitleLanguage,
     VideoUrl, VideoFeed, Subtitle, SubtitleVersion, VIDEO_TYPE_HTML5,
     VIDEO_TYPE_BRIGHTCOVE
 )
-from videos.rpc import VideosApiClass
-from videos.share_utils import _make_email_url
-from videos.tasks import video_changed_tasks, send_change_title_email
-from videos.types import video_type_registrar, VideoTypeError
-from videos.types.base import VideoType, VideoTypeRegistrar
-from videos.types.bliptv import BlipTvVideoType
-from videos.types.brigthcove  import BrightcoveVideoType
-from videos.types.dailymotion import DailymotionVideoType
-from videos.types.flv import FLVVideoType
-from videos.types.htmlfive import HtmlFiveVideoType
-from videos.types.mp3 import Mp3VideoType
-from videos.types.vimeo import VimeoVideoType
-from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
-from vidscraper.sites import blip
-from widget import video_cache
-from widget.rpc import Rpc
-from widget.tests import (
+from apps.videos.rpc import VideosApiClass
+from apps.videos.share_utils import _make_email_url
+from apps.videos.tasks import video_changed_tasks, send_change_title_email
+from apps.videos.types import video_type_registrar, VideoTypeError
+from apps.videos.types.base import VideoType, VideoTypeRegistrar
+from apps.videos.types.bliptv import BlipTvVideoType
+from apps.videos.types.brigthcove  import BrightcoveVideoType
+from apps.videos.types.dailymotion import DailymotionVideoType
+from apps.videos.types.flv import FLVVideoType
+from apps.videos.types.htmlfive import HtmlFiveVideoType
+from apps.videos.types.mp3 import Mp3VideoType
+from apps.videos.types.vimeo import VimeoVideoType
+from apps.videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
+from apps.widget import video_cache
+from apps.widget.rpc import Rpc
+from apps.widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,
     NotAuthenticatedUser
 )
+from utils.unisubsmarkup import html_to_markup, markup_to_html
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -133,43 +133,43 @@ When I say what's the relation,
 is it greater than or is
 '''
 
-SRT_TEXT_WITH_TRAILING_SPACE = u'''1 
+SRT_TEXT_WITH_TRAILING_SPACE = u'''1
 00:00:10,000 --> 00:00:14,000
-Merci. Félicitations aux étudiants 
+Merci. Félicitations aux étudiants
 [de l'association Libertés Numériques -- NdR]
 
 
 
-2 
+2
 00:00:14,100 --> 00:00:16,000
 d’avoir organisé cette réunion.
 
 
 
-3 
+3
 00:00:16,100 --> 00:00:19,900
-Ils ont eu raison, non seulement 
+Ils ont eu raison, non seulement
 à cause de la célébrité de Richard
 
 
 
 4
 00:00:20,000 --> 00:00:22,200
-mais aussi parce que les sujets 
-nous intéressent beaucoup. 
+mais aussi parce que les sujets
+nous intéressent beaucoup.
 
 
 
 5
 00:00:22,300 --> 00:00:25,000
-Ils nous intéressent particulièrement 
-ici à Sciences Po 
+Ils nous intéressent particulièrement
+ici à Sciences Po
 
 
 
 6
 00:00:25,100 --> 00:00:29,200
-puisque nous essayons d’abord 
+puisque nous essayons d’abord
 d’étudier les controverses
 '''
 
@@ -211,7 +211,7 @@ DFXP_TEXT = u'''<?xml version="1.0" encoding="UTF-8"?>
 '''
 
 def create_langs_and_versions(video, langs, user=None):
-    from subtitles import pipeline            
+    from subtitles import pipeline
 
     SRT = u"""1
 00:00:00,004 --> 00:00:02,093
@@ -1050,7 +1050,7 @@ class ViewsTest(WebUseTest):
         self.assertEqual(final_num_subs, num_subs)
 
     def test_diffing(self):
-        version = self.video.version(version_no=0)
+        version = self.video.version(version_number=1)
         last_version = self.video.version()
         response = self._simple_test('videos:diffing', [version.id, last_version.id])
         self.assertEqual(len(response.context['captions']), 5)
