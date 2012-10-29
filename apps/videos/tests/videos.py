@@ -17,8 +17,6 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import json
-import os
 from datetime import datetime
 
 import math_captcha
@@ -384,25 +382,6 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-
-class TestTemplateTags(TestCase):
-    def setUp(self):
-        from django.conf import settings
-        self.auth = {
-            "username": u"admin",
-            "password": u"admin"
-        }
-        fixture_path = os.path.join(settings.PROJECT_ROOT, "apps", "videos", "fixtures", "teams-list.json")
-        data = json.load(open(fixture_path))
-        self.videos = _create_videos(data, [])
-
-
-    def test_language_url_for_empty_lang(self):
-        v = self.videos[0]
-        l = SubtitleLanguage(video=v, has_version=True)
-        l.save()
-        from videos.templatetags.subtitles_tags import language_url
-        language_url(None, l)
 
 
 class TestMetadataManager(TestCase):
