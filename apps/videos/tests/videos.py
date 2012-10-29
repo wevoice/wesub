@@ -29,9 +29,8 @@ from apps.subtitles.pipeline import add_subtitles
 from apps.videos import metadata_manager
 from apps.videos.forms import VideoForm
 from apps.videos.models import (
-    Video, Action, SubtitleLanguage, Subtitle, SubtitleVersion
+    Video, SubtitleLanguage, Subtitle, SubtitleVersion
 )
-from apps.videos.rpc import VideosApiClass
 from apps.videos.types import video_type_registrar
 
 
@@ -125,27 +124,6 @@ class WebUseTest(TestCase):
     def _login(self):
         self.client.login(**self.auth)
 
-
-class RpcTest(TestCase):
-    fixtures = ['test.json']
-
-    def setUp(self):
-        self.rpc = VideosApiClass()
-        self.user = User.objects.get(username='admin')
-        self.video = Video.objects.get(video_id='iGzkk7nwWX8F')
-
-
-    def test_change_title_video(self):
-        title = u'New title'
-        self.rpc.change_title_video(self.video.pk, title, self.user)
-
-        video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(video.title, title)
-        try:
-            Action.objects.get(video=self.video, new_video_title=title,
-                               action_type=Action.CHANGE_TITLE)
-        except Action.DoesNotExist:
-            self.fail()
 
 
 class TestVideoForm(TestCase):
