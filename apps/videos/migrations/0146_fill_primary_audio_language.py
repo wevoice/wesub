@@ -41,10 +41,12 @@ class Migration(DataMigration):
         "Write your backwards methods here."
         for video in chunkediter(orm.Video.objects.all()):
             try:
-                sl = orm.SubtitleLanguage.objects.get(
+                candidates = orm.SubtitleLanguage.objects.filter(
                     video=video, language=video.primary_audio_language)
-                sl.is_original = True
-                sl.save()
+                if candidates.exists():
+                    sl = candidates[0]
+                    sl.is_original = True
+                    sl.save()
             except models.ObjectDoesNotExist:
                 pass
 
