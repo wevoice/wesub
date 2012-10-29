@@ -16,11 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import feedparser
 import json
 import os
 from datetime import datetime
-from StringIO import StringIO
 
 import math_captcha
 import babelsubs
@@ -41,19 +39,15 @@ from apps.subtitles.pipeline import add_subtitles
 from apps.teams.models import Team, TeamVideo, Workflow, TeamMember
 from apps.testhelpers.views import _create_videos
 from apps.videos import metadata_manager
-from apps.videos.feed_parser import FeedParser
 from apps.videos.forms import VideoForm
 from apps.videos.models import (
     Video, Action, VIDEO_TYPE_YOUTUBE, UserTestResult, SubtitleLanguage,
-    VideoUrl, VideoFeed, Subtitle, SubtitleVersion, VIDEO_TYPE_HTML5
+    VideoUrl, Subtitle, SubtitleVersion, VIDEO_TYPE_HTML5
 )
 from apps.videos.rpc import VideosApiClass
 from apps.videos.share_utils import _make_email_url
 from apps.videos.tasks import video_changed_tasks, send_change_title_email
 from apps.videos.types import video_type_registrar
-from apps.videos.types.dailymotion import DailymotionVideoType
-from apps.videos.types.htmlfive import HtmlFiveVideoType
-from apps.videos.types.vimeo import VimeoVideoType
 from apps.videos.types.youtube import YoutubeVideoType
 from apps.widget import video_cache
 from apps.widget.rpc import Rpc
@@ -811,69 +805,6 @@ class ViewsTest(WebUseTest):
             self.assertEqual(response.status_code, 200)
 
 
-class TestFeedsSubmit(TestCase):
-    def setUp(self):
-        self.client.login(username='admin', password='admin')
-
-    def test_video_feed_submit(self):
-        old_count = Video.objects.count()
-        data = {
-            'feed_url': u'http://blip.tv/coxman/rss'
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        self.assertNotEqual(old_count, Video.objects.count())
-        self.assertEqual(Video.objects.count(), 7)
-
-    def test_video_youtube_username_submit(self):
-        old_count = Video.objects.count()
-        data = {
-            'usernames': u'fernandotakai'
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        self.assertNotEqual(old_count, Video.objects.count())
-        self.assertEqual(Video.objects.count(), 17)
-
-    def test_empty_feed_submit(self):
-        base_open_resource = feedparser._open_resource
-
-        def _open_resource_mock(*args, **kwargs):
-            return StringIO(str(u"".join([u"<?xml version='1.0' encoding='UTF-8'?>",
-            u"<feed xmlns='http://www.w3.org/2005/Atom' xmlns:openSearch='http://a9.com/-/spec/opensearchrss/1.0/'>",
-            u"<id>http://gdata.youtube.com/feeds/api/users/test/uploads</id>",
-            u"<updated>2011-07-05T09:17:40.888Z</updated>",
-            u"<category scheme='http://schemas.google.com/g/2005#kind' term='http://gdata.youtube.com/schemas/2007#video'/>",
-            u"<title type='text'>Uploads by test</title>",
-            u"<logo>http://www.youtube.com/img/pic_youtubelogo_123x63.gif</logo>",
-            u"<link rel='related' type='application/atom+xml' href='https://gdata.youtube.com/feeds/api/users/test'/>",
-            u"<link rel='alternate' type='text/html' href='https://www.youtube.com/profile_videos?user=test'/>",
-            u"<link rel='http://schemas.google.com/g/2005#feed' type='application/atom+xml' href='https://gdata.youtube.com/feeds/api/users/test/uploads'/>",
-            u"<link rel='http://schemas.google.com/g/2005#batch' type='application/atom+xml' href='https://gdata.youtube.com/feeds/api/users/test/uploads/batch'/>",
-            u"<link rel='self' type='application/atom+xml' href='https://gdata.youtube.com/feeds/api/users/test/uploads?start-index=1&amp;max-results=25'/>",
-            u"<author><name>test</name><uri>https://gdata.youtube.com/feeds/api/users/test</uri></author>",
-            u"<generator version='2.0' uri='http://gdata.youtube.com/'>YouTube data API</generator>",
-            u"<openSearch:totalResults>0</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex>",
-            u"<openSearch:itemsPerPage>25</openSearch:itemsPerPage></feed>"])))
-
-        feedparser._open_resource = _open_resource_mock
-
-        old_count = Video.objects.count()
-        feed_url = u'http://gdata.youtube.com/feeds/api/users/testempty/uploads'
-        data = {
-            'feed_url': feed_url,
-            'save_feed': True
-        }
-        response = self.client.post(reverse('videos:create_from_feed'), data)
-        self.assertRedirects(response, reverse('videos:create'))
-        self.assertEqual(old_count, Video.objects.count())
-
-        vf = VideoFeed.objects.get(url=feed_url)
-        self.assertEqual(vf.last_link, '')
-
-        feedparser._open_resource = base_open_resource
-
-
 class TestTasks(TestCase):
     fixtures = ['test.json']
 
@@ -1237,75 +1168,6 @@ class TestVideoForm(TestCase):
     def test_dailymotion_urls(self):
         self._test_urls(self.daily_motion_urls)
 
-
-class TestFeedParser(TestCase):
-    #TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
-    #RSS should look like this http://www.dailymotion.com/rss/ru/featured/channel/tech/1
-    #but not from supported site
-    youtube_feed_url_pattern =  'https://gdata.youtube.com/feeds/api/users/%s/uploads'
-    youtube_username = 'universalsubtitles'
-
-    mit_feed_url = 'http://ocw.mit.edu/rss/new/ocw_youtube_videos.xml'
-
-    vimeo_feed_url = 'http://vimeo.com/blakewhitman/videos/rss'
-
-    def setUp(self):
-        pass
-
-    def test_vimeo_feed_parsing(self):
-        # vimeo is blocking us from jenkins, we need to coordinate with
-        # them on how best to proceed here
-        return
-        feed_parser = FeedParser(self.vimeo_feed_url)
-        vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, VimeoVideoType))
-
-        video, created = Video.get_or_create_for_url(vt=vt)
-        self.assertTrue(video)
-
-    def test_youtube_feed_parsing(self):
-        feed_url = self.youtube_feed_url_pattern % self.youtube_username
-
-        feed_parser = FeedParser(feed_url)
-        vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, YoutubeVideoType))
-
-        video, created = Video.get_or_create_for_url(vt=vt)
-        self.assertTrue(video)
-
-    def test_mit_feed_parsing(self):
-        """
-        If this test fails - try check few feed entries. Not all entries from
-        MIT feed contain videos, so if sometime they delete some etries - test
-        can fail.
-        """
-        feed_parser = FeedParser(self.mit_feed_url)
-        vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, HtmlFiveVideoType))
-
-        video, created = Video.get_or_create_for_url(vt=vt)
-        self.assertTrue(video)
-
-# FIXME: this test is failing, and it looks like it's because of the feed.
-#    def test_enclosure_parsing(self):
-#        feed_url = 'http://webcast.berkeley.edu/media/common/rss/Computer_Science_10__001_Spring_2011_Video__webcast.rss'
-#
-#        feed_parser = FeedParser(feed_url)
-#        vt, info, entry = feed_parser.items().next()
-#        self.assertTrue(isinstance(vt, HtmlFiveVideoType))
-#
-#        video, created = Video.get_or_create_for_url(vt=vt)
-#        self.assertTrue(video)
-
-    def test_dailymotion_feed_parsing(self):
-        feed_url = 'http://www.dailymotion.com/rss/ru/featured/channel/tech/1'
-
-        feed_parser = FeedParser(feed_url)
-        vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, DailymotionVideoType))
-
-        video, created = Video.get_or_create_for_url(vt=vt)
-        self.assertTrue(video)
 
 class TestTemplateTags(TestCase):
     def setUp(self):
