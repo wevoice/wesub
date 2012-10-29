@@ -21,13 +21,11 @@ from datetime import datetime
 
 import math_captcha
 import babelsubs
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles.pipeline import add_subtitles
-from apps.testhelpers.views import _create_videos
 from apps.videos import metadata_manager
 from apps.videos.forms import VideoForm
 from apps.videos.models import (
@@ -35,8 +33,6 @@ from apps.videos.models import (
 )
 from apps.videos.rpc import VideosApiClass
 from apps.videos.types import video_type_registrar
-from apps.widget.rpc import Rpc
-from apps.widget.tests import RequestMockup
 
 from utils.unisubsmarkup import html_to_markup, markup_to_html
 
@@ -54,120 +50,6 @@ def create_langs_and_versions(video, langs, user=None):
     subtitles = (babelsubs.load_from(SRT, type='srt', language='en')
                           .to_internal())
     return [pipeline.add_subtitles(video, l, subtitles) for l in langs]
-
-class GenericTest(TestCase):
-    def test_languages(self):
-        langs = [l[1] for l in settings.ALL_LANGUAGES]
-        langs_set = set(langs)
-        self.assertEqual(len(langs), len(langs_set))
-
-class BusinessLogicTest(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json']
-
-    def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.user = User.objects.get(username=self.auth['username'])
-
-    def test_rollback_to_dependent(self):
-        """
-        Here is the use case:
-        we have en -> fr, both on version 0
-        fr is forked and edited, fr is now on version 1
-        now, we rollback to fr.
-        we should have french on v2 as a dependent language of en
-        addign a sub to en should make french have that sub as well
-        """
-        data = {
-            "url": "http://www.example.com/sdf.mp4",
-            "langs": [
-                {
-                    "code": "en",
-                    "num_subs": 4,
-                    "is_complete": False,
-                    "is_original": True,
-                    "translations": [
-                        {
-                            "code": "fr",
-                            "num_subs": 4,
-                            "is_complete": True,
-                            "is_original": False,
-                            "translations": [],
-                        }],
-                }],
-
-            "title": "c" }
-
-        _create_videos([data], [])
-        v = Video.objects.get(title='c')
-
-        en = v.subtitle_language('en')
-        en_version = en.version()
-        fr = v.subtitle_language('fr')
-        fr_version = fr.version()
-        for ens, frs in zip(en_version.ordered_subtitles(),
-                            fr_version.ordered_subtitles()):
-            self.assertEqual(ens.start_time, frs.start_time)
-            self.assertEqual(ens.end_time, frs.end_time)
-        self.assertFalse(fr.is_forked)
-        # now, for on uploade
-        self.client.login(**self.auth)
-
-        rpc = Rpc()
-        request = RequestMockup(user=self.user)
-        request.user = self.user
-        return_value = rpc.start_editing(
-            request,
-            v.video_id,
-            "fr",
-            base_language_pk=en.pk
-        )
-        session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2.3,
-                     'end_time': 3.4,
-                     'sub_order': 4.0}]
-        rpc.finished_subtitles(request, session_pk, inserted, forked=True);
-
-        fr = refresh_obj(fr)
-        self.assertEquals(fr.subtitleversion_set.all().count(), 2)
-        self.assertTrue(fr.is_forked)
-        self.assertFalse(Subtitle.objects.filter(version=fr_version).count() ==
-                         Subtitle.objects.filter(version=fr.version()).count() )
-        # now, when we rollback, we want to make sure we end up with
-        # the correct subs and a non forked language
-        fr_version = refresh_obj(fr_version)
-        fr_version.rollback(self.user)
-        fr = refresh_obj(fr)
-        fr_version_2 = fr.version()
-        self.assertFalse(fr_version_2== fr_version)
-        new_subs = fr_version_2.ordered_subtitles()
-        old_subs = fr_version.ordered_subtitles()
-        self.assertEqual(len(new_subs), len(old_subs))
-        for ens, frs in zip(en_version.ordered_subtitles(),
-                            fr_version_2.ordered_subtitles()):
-            self.assertEqual(ens.start_time, frs.start_time)
-            self.assertEqual(ens.end_time, frs.end_time)
-        self.assertFalse(fr.is_forked)
-
-    def test_first_approved(self):
-        from apps.teams.moderation_const import APPROVED
-        language = SubtitleLanguage.objects.all()[0]
-
-        for i in range(1, 10):
-            SubtitleVersion.objects.create(language=language,
-                    datetime_started=datetime(2012, 1, i, 0, 0, 0),
-                    version_no=i)
-
-        v1 = SubtitleVersion.objects.get(language=language, version_no=3)
-        v2 = SubtitleVersion.objects.get(language=language, version_no=6)
-
-        v1.moderation_status = APPROVED
-        v1.save()
-        v2.moderation_status = APPROVED
-        v2.save()
-
-        self.assertEquals(v1.pk, language.first_approved_version.pk)
 
 class WebUseTest(TestCase):
     def _make_objects(self, video_id="S7HMxzLmS9gw"):
