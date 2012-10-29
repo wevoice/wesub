@@ -26,10 +26,10 @@ var DFXP = function(DFXP) {
     this.init = function(xml) {
 
         // Store the original XML for comparison later.
-        this.$o = $(xml.documentElement).clone();
+        this.$originalXml = $(xml.documentElement).clone();
 
         // Store the working XML for local edits.
-        this.$w = $(xml.documentElement).clone();
+        this.$xml = $(xml.documentElement).clone();
 
     };
 
@@ -65,10 +65,24 @@ var DFXP = function(DFXP) {
          * Returns: true || false
          */
 
-        var oString = that.utils.xmlToString(that.$o.get(0));
-        var wString = that.utils.xmlToString(that.$w.get(0));
+        var originalString = that.utils.xmlToString(that.$originalXml.get(0));
+        var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
-        return oString != wString;
+        return originalString != xmlString;
+    };
+    this.getSubtitles = function() {
+        /*
+         * Retrieve the current set of subtitles.
+         */
+
+        return $('div > p', this.$xml);
+    };
+    this.subtitlesCount = function() {
+        /*
+         * Retrieve the current number of subtitles.
+         */
+
+        return this.getSubtitles().length;
     };
 };
 
