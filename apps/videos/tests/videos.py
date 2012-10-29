@@ -31,7 +31,7 @@ from apps.testhelpers.views import _create_videos
 from apps.videos import metadata_manager
 from apps.videos.forms import VideoForm
 from apps.videos.models import (
-    Video, Action, SubtitleLanguage, Subtitle, SubtitleVersion, VIDEO_TYPE_HTML5
+    Video, Action, SubtitleLanguage, Subtitle, SubtitleVersion
 )
 from apps.videos.rpc import VideosApiClass
 from apps.videos.tasks import video_changed_tasks
@@ -186,43 +186,6 @@ class WebUseTest(TestCase):
     def _login(self):
         self.client.login(**self.auth)
 
-
-class Html5ParseTest(TestCase):
-    def _assert(self, start_url, end_url):
-        video, created = Video.get_or_create_for_url(start_url)
-        vu = video.videourl_set.all()[:1].get()
-        self.assertEquals(VIDEO_TYPE_HTML5, vu.type)
-        self.assertEquals(end_url, vu.url)
-
-    def test_ogg(self):
-        self._assert(
-            'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
-            'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv')
-
-    def test_blip_ogg(self):
-        self._assert(
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.ogv',
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.ogv')
-
-    def test_blip_ogg_with_query_string(self):
-        self._assert(
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.ogv?bri=1.4&brs=1317',
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.ogv')
-
-    def test_mp4(self):
-        self._assert(
-            'http://videos.mozilla.org/firefox/3.5/switch/switch.mp4',
-            'http://videos.mozilla.org/firefox/3.5/switch/switch.mp4')
-
-    def test_blip_mp4_with_file_get(self):
-        self._assert(
-            'http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.mp4',
-            'http://blip.tv/file/get/Miropcf-AboutUniversalSubtitles847.mp4')
-
-    def test_blip_mp4_with_query_string(self):
-        self._assert(
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.mp4?bri=1.4&brs=1317',
-            'http://a59.video2.blip.tv/8410006747301/Miropcf-AboutUniversalSubtitles847.mp4')
 
 class VideoTest(TestCase):
     def setUp(self):
