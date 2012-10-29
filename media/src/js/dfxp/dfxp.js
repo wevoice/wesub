@@ -77,19 +77,8 @@ var DFXP = function(DFXP) {
             after = subtitles[subtitles.length - 1];
         }
 
-        // First, create the new element manually.
-        var newSubtitle = document.createElement('p');
-
-        // Init some basic attributes that we need for subtitles.
-        $(newSubtitle).attr({
-            'begin': '',
-            'end': ''
-        });
-
-        // If we have newAttrs, apply them to the new element.
-        if (newAttrs) {
-            $(newSubtitle).attr(newAttrs);
-        }
+        // Create the new element and any specified attributes.
+        var newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
 
         // Finally, place the new subtitle.
         $(after).after(newSubtitle);
