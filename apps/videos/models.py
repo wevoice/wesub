@@ -19,6 +19,7 @@
 import logging
 logger = logging.getLogger("videos-models")
 
+import math
 import string
 import random
 from datetime import datetime, date, timedelta
@@ -1853,9 +1854,13 @@ class Subtitle(models.Model):
     subtitle_order = models.FloatField(null=True)
     subtitle_text = models.CharField(max_length=1024, blank=True)
     # in seconds. if no start time is set, should be null.
-    start_time = models.FloatField(null=True)
+    start_time_seconds = models.FloatField(null=True, db_column='start_time')
+    # storing both so we don't need to migrate everyone at once
+    start_time = models.IntegerField(null=True, default=None, db_column='start_time_ms')
     # in seconds. if no end time is set, should be null.
-    end_time = models.FloatField(null=True)
+    end_time_seconds = models.FloatField(null=True, db_column='end_time')
+    # storing both so we don't need to migrate everyone at once
+    end_time = models.IntegerField(null=True, default=None, db_column='end_time_ms')
     start_of_paragraph = models.BooleanField(default=False)
 
     objects = SubtitleManager()
@@ -1904,6 +1909,7 @@ class Subtitle(models.Model):
             if 'end_time' in caption_dict:
                 self.end_time = caption_dict['end_time']
 
+        
     def save(self, *args, **kwargs):
         # Normalize start_time and end_time to None (separately) if either is
         # not a valid time.

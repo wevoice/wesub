@@ -95,8 +95,10 @@ unisubs.CaptionManager.prototype.captionSetUpdate_ = function(event) {
 };
 
 unisubs.CaptionManager.prototype.timeUpdate_ = function() {
+    // players will emit playhead time in seconds
+    // the rest of the system will use milliseconds
     this.sendEventsForPlayheadTime_(
-	this.videoPlayer_.getPlayheadTime());
+	this.videoPlayer_.getPlayheadTime() * 1000);
 };
 
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =

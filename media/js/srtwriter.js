@@ -42,20 +42,26 @@ unisubs.SRTWriter.writeSrtTimeLine_ = function(sub, stringBuffer) {
     stringBuffer.append('\n');
 };
 
-unisubs.SRTWriter.writeSrtTime_ = function(seconds, stringBuffer) {
-    if (seconds == -1 || !goog.isDefAndNotNull(seconds)) {
+unisubs.SRTWriter.writeSrtTime_ = function(milliseconds, stringBuffer) {
+    // be paranoid if we passed float as a milliseconds
+    milliseconds = parseInt(milliseconds);
+    if (milliseconds == -1 || !goog.isDefAndNotNull(milliseconds)) {
         stringBuffer.append("99:59:59,000");
     }
     else {
-        var secondsInt = Math.floor(seconds);
-        var p = goog.string.padNumber;
+    var time = Math.floor(milliseconds / 1000);
+    var hours = ~~ (time / 3600);
+    var minutes = ~~ ((time % 3600) / 60);
+    var fraction = milliseconds % 1000;
+    var p = goog.string.padNumber;
+    var seconds = time % 60;
         stringBuffer.
-            append(p(Math.floor(secondsInt / 3600) , 2)).
+            append(p(hours , 2)).
             append(':').
-            append(p(Math.floor(secondsInt / 60) % 60, 2)).
+            append(p(minutes, 2)).
             append(':').
-            append(p(secondsInt % 60, 2)).
+            append(p(seconds, 2)).
             append(',').
-            append(p(Math.floor(seconds * 1000) % 1000, 3));
+            append(p(fraction, 3));
     }
 };

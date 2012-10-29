@@ -1177,7 +1177,7 @@ class SubtitleVersion(models.Model):
 
     def set_reviewed_by(self, user):
         """Set the User that reviewed this version."""
-        self.language.followers.add(user)
+        self.subtitle_language.followers.add(user)
         self._set_metadata('reviewed_by', user.pk)
 
     def set_approved_by(self, user):

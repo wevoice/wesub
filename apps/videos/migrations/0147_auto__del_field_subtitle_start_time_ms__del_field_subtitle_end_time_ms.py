@@ -1,19 +1,22 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        db.rename_column('videos_video', 'primary_audio_language',
-                         'primary_audio_language_code')
-    
+        pass
+        # this is here because south needs to have the correct fronzen
+        # description  for the models, we're just changing their names on
+        # the python code, not on the db to avoid a lenghty migration
+        
+   
     
     def backwards(self, orm):
-        db.rename_column('videos_video', 'primary_audio_language_code',
-                         'primary_audio_language')
+        pass
+          
     
     models = {
         'accountlinker.thirdpartyaccount': {
@@ -58,7 +61,7 @@ class Migration(DataMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 10, 3, 15, 26, 52, 416617)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -66,7 +69,7 @@ class Migration(DataMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 10, 3, 15, 26, 52, 413638)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -167,7 +170,7 @@ class Migration(DataMigration):
             'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"}),
             'all_languages': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'completed_languages': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['videos.SubtitleLanguage']", 'symmetrical': 'False', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'partner_id': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '100', 'blank': 'True'}),
@@ -192,10 +195,12 @@ class Migration(DataMigration):
         },
         'videos.subtitle': {
             'Meta': {'unique_together': "(('version', 'subtitle_id'),)", 'object_name': 'Subtitle'},
-            'end_time': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'end_time': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'db_column': "'end_time_ms'"}),
+            'end_time_seconds': ('django.db.models.fields.FloatField', [], {'null': 'True', 'db_column': "'end_time'"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'start_of_paragraph': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'start_time': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'start_time': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'db_column': "'start_time_ms'"}),
+            'start_time_seconds': ('django.db.models.fields.FloatField', [], {'null': 'True', 'db_column': "'start_time'"}),
             'subtitle_id': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
             'subtitle_order': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
             'subtitle_text': ('django.db.models.fields.CharField', [], {'max_length': '1024', 'blank': 'True'}),
@@ -283,7 +288,6 @@ class Migration(DataMigration):
             'is_subtitled': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'languages_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'db_index': 'True'}),
             'moderated_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'moderating'", 'null': 'True', 'to': "orm['teams.Team']"}),
-            'primary_audio_language_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '16', 'blank': 'True'}),
             's3_thumbnail': ('utils.amazon.fields.S3EnabledImageField', [], {'thumb_options': "{'upscale': True, 'crop': 'smart'}", 'max_length': '100', 'thumb_sizes': '((290, 165), (120, 90))', 'blank': 'True'}),
             'small_thumbnail': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
             'subtitles_fetched_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'db_index': 'True'}),

@@ -38,7 +38,7 @@ logger = logging.getLogger("authbelt.views")
 def _youtube_request_uri():
     if getattr(settings, 'YOUTUBE_CLIENT_FORCE_HTTPS', True):
         return universal_url("accountlinker:youtube-oauth-callback",
-                protocol_override='https'),
+                protocol_override='https')
     else:
         return universal_url("accountlinker:youtube-oauth-callback")
 
