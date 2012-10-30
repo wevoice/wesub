@@ -140,10 +140,10 @@ var DFXP = function(DFXP) {
 
         return $('div > p', this.$xml);
     };
-    this.needsSyncing = function(index) {
+    this.needsSyncing = function(indexOrElement) {
         /*
-         * Given the zero-index of the subtitle to be checked,
-         * determine whether the subtitle needs to be synced.
+         * Given the zero-index or the element of the subtitle to be
+         * checked, determine whether the subtitle needs to be synced.
          *
          * In most cases, if a subtitle has either no start time,
          * or no end time, it needs to be synced. However, if the
@@ -153,12 +153,26 @@ var DFXP = function(DFXP) {
          * Returns: true || false
          */
 
-        // If an index is not provided, throw an error.
-        if (!index) {
-            throw new Error('DFXP: You must supply an index to needsSyncing()');
+        // If an index or an object is not provided, throw an error.
+        if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
+            throw new Error('DFXP: You must supply either an index or an element to needsSyncing()');
         }
 
-        var subtitle = this.getSubtitles().get(index);
+        var subtitle;
+
+        // If indexOrElement is a number, we'll need to query the DOM to
+        // get the element.
+        //
+        // Note: you should only use this approach for checking one-off
+        // subtitles. If you're checking more than one subtitle, it's much
+        // faster to pass along pre-selected elements instead.
+        if (typeof indexOrElement === 'number') {
+            subtitle = this.getSubtitles().get(indexOrElement);
+
+        // Otherwise, just use the element.
+        } else {
+            subtitle = indexOrElement;
+        }
 
         if (subtitle) {
 
@@ -192,6 +206,23 @@ var DFXP = function(DFXP) {
          *
          * Returns: true || false
          */
+
+        var needsAnySynced = false;
+
+        // Caching the current subtitle set drastically cuts down on processing
+        // time for iterating through large subtitle sets.
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+
+            // We're going to pass the actual element instead of an integer. This
+            // means needsSyncing doesn't need to hit the DOM to find the element.
+            if (this.needsSyncing($subtitles.get(i))) {
+                needsAnySynced = true;
+            }
+        }
+
+        return needsAnySynced;
     };
     this.setEndTime = function(index, endTime) {
         /*
