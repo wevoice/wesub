@@ -69,12 +69,12 @@ var DFXP = function(DFXP) {
          *
          * `newAttrs` is an optional JSON object specifying the attributes to
          * be applied to the new element.
+         *
+         * Returns: new subtitle element
          */
 
-        var subtitles = this.getSubtitles();
-
         if (!after) {
-            after = subtitles[subtitles.length - 1];
+            after = this.getLastSubtitle();
         }
 
         // Create the new element and any specified attributes.
@@ -88,6 +88,7 @@ var DFXP = function(DFXP) {
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
+         *
          * Returns: true || false
          */
 
@@ -96,16 +97,141 @@ var DFXP = function(DFXP) {
 
         return originalString != xmlString;
     };
+    this.removeSubtitle = function(index) {
+        /*
+         * Given the zero-index of the subtitle to be removed,
+         * remove it from the node tree.
+         *
+         * Returns: true || false
+         */
+
+        // If an index is not provided, throw an error.
+        if (!index) {
+            throw new Error('DFXP: You must supply an index to removeSubtitle()');
+        }
+
+        var subtitle = this.getSubtitles().get(index);
+
+        if (subtitle) {
+            $(subtitle).remove();
+            return true;
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
+    this.getLastSubtitle = function() {
+        /*
+         * Retrieve the last subtitle in this set.
+         *
+         * Returns: last subtitle element
+         */
+
+        // Cache the selection.
+        var $subtitles = this.getSubtitles();
+
+        return $subtitles[$subtitles.length - 1];
+    };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
+         *
+         * Returns: jQuery selection of nodes.
          */
 
         return $('div > p', this.$xml);
     };
+    this.needsSyncing = function(index) {
+        /*
+         * Given the zero-index of the subtitle to be checked,
+         * determine whether the subtitle needs to be synced.
+         *
+         * In most cases, if a subtitle has either no start time,
+         * or no end time, it needs to be synced. However, if the
+         * subtitle is the last in the list, the end time may be
+         * omitted.
+         *
+         * Returns: true || false
+         */
+
+        // If an index is not provided, throw an error.
+        if (!index) {
+            throw new Error('DFXP: You must supply an index to needsSyncing()');
+        }
+
+        var subtitle = this.getSubtitles().get(index);
+
+        if (subtitle) {
+
+            var $subtitle = $(subtitle);
+
+            var startTime = $subtitle.attr('begin');
+            var endTime = $subtitle.attr('end');
+
+            // If start time is empty, it always needs to be synced.
+            if (startTime === '') {
+                return true;
+            }
+
+            // If the end time is empty and this is not the last subtitle,
+            // it needs to be synced.
+            if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+                return true;
+            }
+
+            // Otherwise, we're good.
+            return false;
+
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
+    this.needsAnySynced = function() {
+        /*
+         * Determine whether any of the subtitles in the set need
+         * to be synced.
+         *
+         * Returns: true || false
+         */
+    };
+    this.setEndTime = function(index, endTime) {
+        /*
+         * Given the zero-index of the subtitle to be updated,
+         * set the end time.
+         *
+         * Returns: true
+         */
+
+        var subtitle = this.getSubtitles().get(index);
+
+        if (subtitle) {
+            $(subtitle).attr('end', endTime);
+            return true;
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
+    this.setStartTime = function(index, startTime) {
+        /*
+         * Given the zero-index of the subtitle to be updated,
+         * set the start time.
+         *
+         * Returns: true
+         */
+
+        var subtitle = this.getSubtitles().get(index);
+
+        if (subtitle) {
+            $(subtitle).attr('begin', startTime);
+            return true;
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
     this.subtitlesCount = function() {
         /*
          * Retrieve the current number of subtitles.
+         *
+         * Returns: integer
          */
 
         return this.getSubtitles().length;
