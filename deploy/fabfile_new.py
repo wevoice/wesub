@@ -198,6 +198,7 @@ def _create_env(username,
                 app_dir,
                 app_group,
                 builder_host,
+                lb_host,
                 revision,
                 ve_dir,
                 separate_uslogging_db,
@@ -212,6 +213,7 @@ def _create_env(username,
     env.app_dir = app_dir
     env.app_group = app_group
     env.builder_host = builder_host
+    env.lb_host = lb_host
     env.revision = revision
     env.ve_dir = ve_dir
     env.separate_uslogging_db = separate_uslogging_db
@@ -224,6 +226,7 @@ def _create_env(username,
     env.build_apps_root = '/opt/media_compile/apps'
     env.build_ve_root = '/opt/media_compile/ve'
     env.demo_domain = 'demo.amara.org'
+    env.lb_config = '/etc/nginx/conf.d/unisubs.{0}.conf'.format(env.environment)
 
 @task
 def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
@@ -239,6 +242,7 @@ def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
                     app_dir               = '/opt/apps/local/unisubs/',
                     app_group             = 'deploy',
                     builder_host          = 'app.local',
+                    lb_host               = 'lb.local',
                     revision              = 'staging',
                     ve_dir                = '/opt/ve/local/unisubs',
                     separate_uslogging_db = False,
@@ -266,6 +270,7 @@ def dev(username):
                         env_name),
                     app_group             = 'deploy',
                     builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = None,
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -300,6 +305,7 @@ def demo(username, revision):
                         revision),
                     app_group             = 'deploy',
                     builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = None,
                     revision              = revision,
                     ve_dir                = '/var/tmp/{0}/ve'.format(
                         revision),
@@ -326,6 +332,7 @@ def staging(username):
                         env_name),
                     app_group             = 'deploy',
                     builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = 'lb-staging.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -355,6 +362,7 @@ def production(username):
                         env_name),
                     app_group             = 'deploy',
                     builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = 'lb-production.amara.org',
                     revision              = env_name,
                     ve_dir                = '/opt/ve/{0}/unisubs'.format(
                         env_name),
@@ -475,6 +483,34 @@ def update_environment(extra=''):
         with cd(env.app_dir):
             run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
 
+def _enable_lb_node(name=None):
+    """
+    Enables a node in the LB
+
+    """
+    if env.lb_host:
+        old_host = name
+        with settings(warn_only=True):
+            env.host_string = env.lb_host
+            sudo("sed -i 's/server {0}.*/server {0};/g' {1}".format(
+                name, env.lb_config))
+            sudo('service nginx reload')
+        env.host_string = old_host
+
+def _disable_lb_node(name=None):
+    """
+    Disables a node in the LB
+
+    """
+    if env.lb_host:
+        old_host = name
+        with settings(warn_only=True):
+            env.host_string = env.lb_host
+            sudo("sed -i 's/server {0}.*/server {0} down;/g' {1}".format(
+                name, env.lb_config))
+            sudo('service nginx reload')
+        env.host_string = old_host
+
 def _reload_app_servers(hard=False):
     with Output("Reloading application servers"):
         """
@@ -493,6 +529,11 @@ def _reload_app_servers(hard=False):
             with cd(env.app_dir):
                 run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
                 run('touch deploy/unisubs.wsgi')
+        # disable node on LB
+        _disable_lb_node(env.host_string)
+        with settings(warn_only=True):
+            run('wget -q -T 120 http://{0}/en/'.format(env.host_string))
+        _enable_lb_node(env.host_string)
 
 @task
 @roles('app')
@@ -691,8 +732,6 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
         integration_dir = '{0}/unisubs-integration'.format(build_dir)
         python_exe = '{0}/bin/python'.format(ve_dir)
-    with hide('running', 'stdout'):
-        rev = run('cat {0}/optional/unisubs-integration'.format(build_dir))
     _reset_permissions(build_dir)
     _reset_permissions(env.build_ve_root)
     # update repositories
@@ -700,7 +739,11 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         _git_pull()
         _switch_branch(env.revision, app_dir=build_dir)
     with Output("Updating the integration repo"), cd(integration_dir):
-        _git_checkout(rev, as_sudo=True)
+        _git_checkout_branch_and_reset(
+            _get_optional_repo_version(build_dir, 'unisubs-integration'),
+            branch=None,
+            run_as_sudo=True
+        )
     # must be ran before we compile anything
     with Output("Updating commit"), cd(build_dir):
         run('python deploy/create_commit_file.py')
@@ -708,7 +751,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
     # virtualenv
     with Output("Updating virtualenv"):
         with settings(warn_only=True):
-            run('virtualenv -q {0}'.format(ve_dir))
+            run('virtualenv --distribute -q {0}'.format(ve_dir))
         with cd('{0}/deploy'.format(build_dir)):
             run('{0}/bin/pip install -U -r requirements.txt'.format(
                 ve_dir))
