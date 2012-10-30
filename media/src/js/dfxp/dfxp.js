@@ -97,6 +97,33 @@ var DFXP = function(DFXP) {
 
         return originalString != xmlString;
     };
+    this.endTime = function(index, endTime) {
+        /*
+         * Given the zero-index of the subtitle to be updated,
+         * set the end time.
+         *
+         * If no endTime is provided, simply return the current
+         * end time.
+         *
+         * Returns: current end time (string)
+         */
+
+        var subtitle = this.getSubtitles().get(index);
+
+        if (subtitle) {
+
+            var $subtitle = $(subtitle);
+
+            if (endTime) {
+                $subtitle.attr('end', endTime);
+            }
+
+            return $subtitle.attr('end');
+
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
     this.removeSubtitle = function(index) {
         /*
          * Given the zero-index of the subtitle to be removed,
@@ -224,36 +251,29 @@ var DFXP = function(DFXP) {
 
         return needsAnySynced;
     };
-    this.setEndTime = function(index, endTime) {
-        /*
-         * Given the zero-index of the subtitle to be updated,
-         * set the end time.
-         *
-         * Returns: true
-         */
-
-        var subtitle = this.getSubtitles().get(index);
-
-        if (subtitle) {
-            $(subtitle).attr('end', endTime);
-            return true;
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
-        }
-    };
-    this.setStartTime = function(index, startTime) {
+    this.startTime = function(index, startTime) {
         /*
          * Given the zero-index of the subtitle to be updated,
          * set the start time.
          *
-         * Returns: true
+         * If no startTime is provided, simply return the current
+         * start time.
+         *
+         * Returns: current start time (string)
          */
 
         var subtitle = this.getSubtitles().get(index);
 
         if (subtitle) {
-            $(subtitle).attr('begin', startTime);
-            return true;
+
+            var $subtitle = $(subtitle);
+
+            if (startTime) {
+                $subtitle.attr('begin', startTime);
+            }
+
+            return $subtitle.attr('begin');
+
         } else {
             throw new Error('DFXP: No subtitle exists with that index.');
         }
