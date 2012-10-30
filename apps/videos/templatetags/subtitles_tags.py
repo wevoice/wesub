@@ -75,7 +75,8 @@ def language_url(request, lang):
 
     """
     lc = lang.language_code or 'unknown'
-    return reverse('videos:translation_history', args=[lang.video.video_id, lc, lang.pk])
+    return reverse('videos:translation_history',
+                   args=[lang.video.video_id, lc, lang.pk])
 
 @register.filter
 def format_sub_time(t):
