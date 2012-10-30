@@ -97,24 +97,20 @@ var DFXP = function(DFXP) {
 
         return originalString != xmlString;
     };
-    this.endTime = function(index, endTime) {
+    this.endTime = function(indexOrElement, endTime) {
         /*
-         * Given the zero-index of the subtitle to be updated,
-         * set the end time.
-         *
-         * If no endTime is provided, simply return the current
-         * end time.
+         * Either get or set the end time for the subtitle.
          *
          * Returns: current end time (string)
          */
 
-        var subtitle = this.getSubtitles().get(index);
+        var subtitle = this.getSubtitle(indexOrElement);
 
         if (subtitle) {
 
             var $subtitle = $(subtitle);
 
-            if (endTime) {
+            if (typeof endTime !== 'undefined') {
                 $subtitle.attr('end', endTime);
             }
 
@@ -124,27 +120,23 @@ var DFXP = function(DFXP) {
             throw new Error('DFXP: No subtitle exists with that index.');
         }
     };
-    this.removeSubtitle = function(index) {
+    this.removeSubtitle = function(indexOrElement) {
         /*
          * Given the zero-index of the subtitle to be removed,
          * remove it from the node tree.
          *
-         * Returns: true || false
+         * Returns: true
          */
 
-        // If an index is not provided, throw an error.
-        if (!index) {
-            throw new Error('DFXP: You must supply an index to removeSubtitle()');
+        var subtitle = this.getSubtitle(indexOrElement);
+
+        if (!subtitle) {
+            return false;
         }
 
-        var subtitle = this.getSubtitles().get(index);
+        $(subtitle).remove();
 
-        if (subtitle) {
-            $(subtitle).remove();
-            return true;
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
-        }
+        return true;
     };
     this.getLastSubtitle = function() {
         /*
@@ -156,7 +148,39 @@ var DFXP = function(DFXP) {
         // Cache the selection.
         var $subtitles = this.getSubtitles();
 
-        return $subtitles[$subtitles.length - 1];
+        return this.getSubtitle($subtitles.length - 1);
+    };
+    this.getSubtitle = function(indexOrElement) {
+        /*
+         * Returns: subtitle element
+         */
+
+        // If an index or an object is not provided, throw an error.
+        if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
+            throw new Error('DFXP: You must supply either an index or an element.');
+        }
+
+        var subtitle;
+
+        // If indexOrElement is a number, we'll need to query the DOM to
+        // get the element.
+        //
+        // Note: you should only use this approach for checking one-off
+        // subtitles. If you're checking more than one subtitle, it's much
+        // faster to pass along pre-selected elements instead.
+        if (typeof indexOrElement === 'number') {
+            subtitle = this.getSubtitles().get(indexOrElement);
+
+        // Otherwise, just use the element.
+        } else {
+            subtitle = indexOrElement;
+        }
+
+        if (!subtitle) {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+
+        return subtitle;
     };
     this.getSubtitles = function() {
         /*
@@ -180,51 +204,25 @@ var DFXP = function(DFXP) {
          * Returns: true || false
          */
 
-        // If an index or an object is not provided, throw an error.
-        if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
-            throw new Error('DFXP: You must supply either an index or an element to needsSyncing()');
+        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(subtitle);
+
+        var startTime = $subtitle.attr('begin');
+        var endTime = $subtitle.attr('end');
+
+        // If start time is empty, it always needs to be synced.
+        if (startTime === '') {
+            return true;
         }
 
-        var subtitle;
-
-        // If indexOrElement is a number, we'll need to query the DOM to
-        // get the element.
-        //
-        // Note: you should only use this approach for checking one-off
-        // subtitles. If you're checking more than one subtitle, it's much
-        // faster to pass along pre-selected elements instead.
-        if (typeof indexOrElement === 'number') {
-            subtitle = this.getSubtitles().get(indexOrElement);
-
-        // Otherwise, just use the element.
-        } else {
-            subtitle = indexOrElement;
+        // If the end time is empty and this is not the last subtitle,
+        // it needs to be synced.
+        if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+            return true;
         }
 
-        if (subtitle) {
-
-            var $subtitle = $(subtitle);
-
-            var startTime = $subtitle.attr('begin');
-            var endTime = $subtitle.attr('end');
-
-            // If start time is empty, it always needs to be synced.
-            if (startTime === '') {
-                return true;
-            }
-
-            // If the end time is empty and this is not the last subtitle,
-            // it needs to be synced.
-            if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
-                return true;
-            }
-
-            // Otherwise, we're good.
-            return false;
-
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
-        }
+        // Otherwise, we're good.
+        return false;
     };
     this.needsAnySynced = function() {
         /*
@@ -251,32 +249,24 @@ var DFXP = function(DFXP) {
 
         return needsAnySynced;
     };
-    this.startTime = function(index, startTime) {
+    this.content = function(index) {
+
+    };
+    this.startTime = function(indexOrElement, startTime) {
         /*
-         * Given the zero-index of the subtitle to be updated,
-         * set the start time.
-         *
-         * If no startTime is provided, simply return the current
-         * start time.
+         * Either get or set the start time for the subtitle.
          *
          * Returns: current start time (string)
          */
 
-        var subtitle = this.getSubtitles().get(index);
+        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(subtitle);
 
-        if (subtitle) {
-
-            var $subtitle = $(subtitle);
-
-            if (startTime) {
-                $subtitle.attr('begin', startTime);
-            }
-
-            return $subtitle.attr('begin');
-
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
+        if (typeof startTime !== 'undefined') {
+            $subtitle.attr('begin', startTime);
         }
+
+        return $subtitle.attr('begin');
     };
     this.subtitlesCount = function() {
         /*
