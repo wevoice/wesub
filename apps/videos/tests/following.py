@@ -23,7 +23,7 @@ from django.core.cache import cache
 
 from apps.teams.models import Team, TeamMember, TeamVideo, Workflow
 from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
-from apps.videos.tests.videos import WebUseTest
+from apps.videos.tests.utils import WebUseTest
 from apps.videos.types.youtube import YoutubeVideoType
 
 

@@ -99,22 +99,22 @@ class VideosApiClass(object):
 
         user_langs = get_user_languages_from_request(request)
 
-        langs = list(video.subtitlelanguage_set.filter(subtitle_count__gt=0, has_version=True).order_by('-subtitle_count'))
+        langs = list(video.newsubtitlelanguage_set.having_nonempty_tip())
 
         first_languages = [] #user languages and original
         other_languages = [] #other languages already ordered by subtitle_count
 
-        for l in langs:
-            if l.language in user_langs or l.is_original:
-                first_languages.append(l)
+        for language in langs:
+            if language.language_code in user_langs or language.is_primary_audio_language():
+                first_languages.append(language)
             else:
-                other_languages.append(l)
+                other_languages.append(language)
 
         def _cmp_first_langs(lang1, lang2):
             """
             languages should original in user_langs
             """
-            in_user_language_cmp = cmp(lang1.language in user_langs, lang2.language in user_langs)
+            in_user_language_cmp = cmp(lang1.language_code in user_langs, lang2.language_code in user_langs)
 
             #one is not in user language
             if in_user_language_cmp != 0:
@@ -122,7 +122,7 @@ class VideosApiClass(object):
 
             if lang1.language in user_langs:
                 #both in user's language, sort alphabetically
-                return cmp(lang2.get_language_display(), lang1.get_language_display())
+                return cmp(lang2.get_language_code_display(), lang1.get_language_code_display())
 
             #one should be original
             return cmp(lang1.is_original, lang2.is_original)
@@ -132,7 +132,7 @@ class VideosApiClass(object):
         #fill first languages to LANGS_COUNT
         if len(first_languages) < LANGS_COUNT:
             other_languages = other_languages[:(LANGS_COUNT-len(first_languages))]
-            other_languages.sort(lambda l1, l2: cmp(l1.get_language_display(), l2.get_language_display()))
+            other_languages.sort(lambda l1, l2: cmp(l1.get_language_code_display(), l2.get_language_code_display()))
             langs = first_languages + other_languages
         else:
             langs = first_languages[:LANGS_COUNT]
@@ -141,6 +141,7 @@ class VideosApiClass(object):
             'video': video,
             'languages': langs
         }
+
         return {
             'content': render_to_string('videos/_video_languages.html', context)
         }
