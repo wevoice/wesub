@@ -33,7 +33,8 @@ from profiles.rpc import ProfileApiClass
 from utils.amazon import S3StorageError
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, SubtitleLanguage, VideoUrl
+from videos.models import Action, VideoUrl
+from subtitles.models import SubtitleLanguage
 
 
 rpc_router = RpcRouter('profiles:rpc_router', {
@@ -113,11 +114,13 @@ def my_videos(request):
 
     if q:
         qs = qs.filter(Q(title__icontains=q)|Q(description__icontains=q))
+
     context = {
         'user_info': user,
         'my_videos': True,
         'query': q
     }
+
     qs = qs._clone(OptimizedQuerySet)
 
     return object_list(request, queryset=qs,
