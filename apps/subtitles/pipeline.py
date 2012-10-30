@@ -97,7 +97,8 @@ def _record_workflow_origin(team_video, version):
     """
     if version and not version.get_workflow_origin():
         tasks = team_video.task_set.incomplete()
-        tasks = list(tasks.filter(language=version.language.language)[:1])
+        tasks = list(
+            tasks.filter(language=version.subtitle_language.language_code)[:1])
 
         if tasks:
             open_task_type = tasks[0].get_type_display()
