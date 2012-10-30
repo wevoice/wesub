@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-29 01:39-0500\n"
+"POT-Creation-Date: 2012-10-30 01:39-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -1262,29 +1262,29 @@ msgstr "视频已经加入后台。如果你已登录，你将会在它完成时
 msgid "captcha"
 msgstr "验证码"
 
-#: apps/videos/models.py:139
+#: apps/videos/models.py:140
 msgid "in seconds"
 msgstr "几秒内"
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:164
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:166
 msgid "Widget views"
 msgstr "工具查看"
 
-#: apps/videos/models.py:167
+#: apps/videos/models.py:168
 msgid "Views"
 msgstr "查看"
 
-#: apps/videos/models.py:1153
+#: apps/videos/models.py:1154
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr "抱歉，你现在不能上传字幕，因为某人正在编辑你上传或者翻译的这个语言"
 
-#: apps/videos/models.py:2015
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1293,7 +1293,7 @@ msgstr ""
 "  已评审视频<a href=\"%(video_url)s\">%(video_name)s</a>的 <a href=\"%"
 "(language_url)s\">%(language)s</a>字幕"
 
-#: apps/videos/models.py:2020
+#: apps/videos/models.py:2026
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1302,7 +1302,7 @@ msgstr ""
 "  已接受 <a href=\"%(language_url)s\">%(language)s</a>  <a href=\"%"
 "(video_url)s\">%(video_name)s</a>的字幕"
 
-#: apps/videos/models.py:2025
+#: apps/videos/models.py:2031
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1311,7 +1311,7 @@ msgstr ""
 "  拒绝  <a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%"
 "(language_url)s\">%(language)s</a> 字幕"
 
-#: apps/videos/models.py:2030
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1320,7 +1320,7 @@ msgstr ""
 "  通过<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(language_url)"
 "s\">%(language)s</a> 字幕"
 
-#: apps/videos/models.py:2035
+#: apps/videos/models.py:2041
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1329,32 +1329,32 @@ msgstr ""
 "  已拒绝 <a href=\"%(language_url)s\">%(language)s</a>  <a href=\"%"
 "(video_url)s\">%(video_name)s</a>的字幕"
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2047
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  删除视频 \"%(title)s\""
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2052
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加视频 <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2054
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 视频已添加"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2060
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>已变更的标题"
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2062
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>的标题已改变"
 
-#: apps/videos/models.py:2071
+#: apps/videos/models.py:2077
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1363,7 +1363,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(comments_url)s\">%"
 "(language)s 字幕</a>已评注"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2079
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1372,17 +1372,17 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>的<a href=\"%(comments_url)s\">%"
 "(language)s 字幕</a>已添加评注"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2082
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> 的评注"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2084
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加至<a href=\"%(video_url)s\">%(video_name)s</a>的评注"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2092
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1391,128 +1391,128 @@ msgstr ""
 "启动  <a href=\"%(video_url)s\">%(video_name)s</a> 的<a href=\"%"
 "(language_url)s\">%(language)s subtitles</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2094
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2105
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2107
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2113
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "添加新的链接给 <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2115
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "为 <a href=\"%(video_url)s\">%(video_name)s</a>添加的新链接"
 
-#: apps/videos/models.py:2114
+#: apps/videos/models.py:2120
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "作为%(role)s 加入 %(team)s 小组"
 
-#: apps/videos/models.py:2119
+#: apps/videos/models.py:2125
 #, python-format
 msgid "left the %s team"
 msgstr "离开 %s 小组"
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2139
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2145
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2217
 msgid "add video"
 msgstr "添加视频"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2218
 msgid "change title"
 msgstr "更改标题"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2219
 msgid "comment"
 msgstr "评论"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2220
 msgid "add version"
 msgstr "添加版本"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2221
 msgid "add translation"
 msgstr "添加翻译"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2222
 msgid "add video url"
 msgstr "添加视频url"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2223
 msgid "request subtitles"
 msgstr "请求字幕"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2224
 msgid "approve version"
 msgstr "批准此版本"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2225
 msgid "add contributor"
 msgstr "添加贡献者"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2226
 msgid "remove contributor"
 msgstr "移除贡献者"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2227
 msgid "reject version"
 msgstr "拒绝此版本"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2228
 msgid "review version"
 msgstr "回顾版本"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2229
 msgid "accept version"
 msgstr "接受译文"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2230
 msgid "decline version"
 msgstr "拒绝译文"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2231
 msgid "delete video"
 msgstr "删除视频"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2232
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2233
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2484
+#: apps/videos/models.py:2490
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1683,24 +1683,24 @@ msgstr "未定义错误"
 msgid "Video embedding disabled by owner"
 msgstr "拥有者禁用视频嵌入"
 
-#: apps/widget/rpc.py:315
+#: apps/widget/rpc.py:324
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "这些字幕正在调整中。参见 %s 小组页面以获得如何贡献的信息。"
 
-#: apps/widget/rpc.py:317
+#: apps/widget/rpc.py:326
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "抱歉，这些字幕是私有的。"
 
-#: apps/widget/rpc.py:327
+#: apps/widget/rpc.py:336
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1029 apps/widget/rpc.py:1070
+#: apps/widget/rpc.py:1042 apps/widget/rpc.py:1083
 msgid "\n"
 msgstr "\n"
 
