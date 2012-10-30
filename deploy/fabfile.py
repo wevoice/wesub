@@ -23,13 +23,22 @@ from functools import wraps
 import time
 
 import fabric.colors as colors
-from fabric.api import run, sudo, env, cd, local as _local, abort
+from fabric.api import run, sudo, env, cd, local as _local, abort, task, put
+from fabric.tasks import execute
 from fabric.context_managers import settings, hide
 from fabric.utils import fastprint
-
+from fabric.decorators import roles, runs_once, parallel
+import fabric.state
+try:
+    import simplejson as json
+except:
+    import json
 
 ADD_TIMESTAMPS = """ | awk '{ print strftime("[%Y-%m-%d %H:%M:%S]"), $0; fflush(); }' """
 WRITE_LOG = """ | tee /tmp/%s.log """
+
+# hide 'running' by default
+fabric.state.output['running'] = False
 
 # Output Management -----------------------------------------------------------
 PASS_THROUGH = ('sudo password: ', 'Sorry, try again.')
@@ -79,7 +88,8 @@ class Output(object):
 
     """
     def __init__(self, message=""):
-        self.message = message
+        host = '({0})'.format(env.host) if env.host else ''
+        self.message = '{0} {1}'.format(message, host)
 
     def __enter__(self):
         if self.message:
@@ -93,7 +103,6 @@ class Output(object):
             fastprint(colors.yellow("+" + "-" * 78 + "+\n", bold=True))
             fastprint(colors.yellow("| " + self.message.ljust(76) + " |\n", bold=True))
             fastprint(colors.yellow("+" + "-" * 78 + "+\n", bold=True))
-
         return self
 
     def __exit__(self, type, value, tb):
@@ -115,6 +124,10 @@ class Output(object):
 
     def fastprintln(self, s):
         self.fastprint(s + '\n')
+
+def _notify(subj, msg, to):
+    env.host_string = env.dev_host
+    run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, to))
 
 def _lock(*args, **kwargs):
     """
@@ -138,14 +151,6 @@ def _unlock(*args, **kwargs):
     with settings(hide('running', 'stdout', 'stderr'), warn_only=True):
         run('rm -f {0}'.format(env.deploy_lock))
 
-def remove_lock():
-    """
-    Removes lock from hosts (in the event of a failed task)
-
-    """
-    with Output('Removing lock'):
-        _execute_on_all_hosts(lambda dir: _unlock(dir))
-
 def lock_required(f):
     """
     Decorator for the lock / unlock functionality
@@ -153,18 +158,28 @@ def lock_required(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        _execute_on_all_hosts(lambda dir: _lock(dir, task=f.func_name))
+        _lock()
         out = None
         try:
             out = f(*args, **kwargs)
         except:
             pass
         finally:
-            _execute_on_all_hosts(lambda dir: _unlock(dir))
+            _unlock()
         return out
     return decorated
 
-def local(*args, **kwargs):
+@task
+@roles('app', 'data')
+def remove_lock():
+    """
+    Removes lock from hosts (in the event of a failed task)
+
+    """
+    with Output('Removing lock'):
+        _unlock()
+
+def _local(*args, **kwargs):
     '''Override Fabric's local() to facilitate output logging.'''
     capture = kwargs.get('capture')
 
@@ -176,190 +191,273 @@ def local(*args, **kwargs):
     else:
         print out
 
-
-#:This environment is responsible for:
-#:
-#:- syncdb on all environment
-#:- memechached and solr for `dev`
-#:- media compilation on all environments
-DEV_HOST = 'pcf-us-dev.pculture.org:2191'
-
-
-def _create_env(username, hosts, hostnames_squid_cache, s3_bucket,
-                installation_dir, static_dir, name, git_branch,
-                memcached_bounce_cmd,
-                admin_dir, admin_host, celeryd_host, celeryd_proj_root,
-                separate_uslogging_db=False,
-                celeryd_start_cmd="",
-                celeryd_stop_cmd="",
-                celeryd_bounce_cmd="",
-                web_dir=None):
+def _create_env(username,
+                name,
+                s3_bucket,
+                app_name,
+                app_dir,
+                app_group,
+                builder_host,
+                lb_host,
+                revision,
+                ve_dir,
+                separate_uslogging_db,
+                key_filename=env.key_filename,
+                roledefs={},
+                notification_email=None):
     env.user = username
-    env.web_hosts = hosts
-    env.hosts = []
-    env.deploy_lock = '/tmp/.unisubs_deploy_{0}'.format(git_branch)
-    env.hostnames_squid_cache = hostnames_squid_cache
+    env.name = name
+    env.environment = name
     env.s3_bucket = s3_bucket
-    env.web_dir = web_dir or '/var/www/{0}'.format(installation_dir)
-    env.static_dir = static_dir
-    env.installation_name = name
-    env.git_branch = git_branch
-    env.memcached_bounce_cmd = memcached_bounce_cmd
-    env.admin_dir = admin_dir
-    env.admin_host = admin_host
+    env.app_name = app_name
+    env.app_dir = app_dir
+    env.app_group = app_group
+    env.builder_host = builder_host
+    env.lb_host = lb_host
+    env.revision = revision
+    env.ve_dir = ve_dir
     env.separate_uslogging_db = separate_uslogging_db
-    env.celeryd_start_cmd=celeryd_start_cmd
-    env.celeryd_stop_cmd=celeryd_stop_cmd
-    env.celeryd_bounce_cmd=celeryd_bounce_cmd
-    env.celeryd_host = celeryd_host
-    env.celeryd_proj_root = celeryd_proj_root
+    env.key_filename = key_filename
+    env.roledefs = roledefs
+    env.deploy_lock = '/tmp/.amara_deploy_{0}'.format(revision)
+    env.notification_email = notification_email or 'universalsubtitles-dev@pculture.org'
+    env.password = os.environ.get('FABRIC_PASSWORD', None)
+    env.dev_host = 'dev.universalsubtitles.org'
+    env.build_apps_root = '/opt/media_compile/apps'
+    env.build_ve_root = '/opt/media_compile/ve'
+    env.demo_domain = 'demo.amara.org'
+    env.lb_config = '/etc/nginx/conf.d/unisubs.{0}.conf'.format(env.environment)
 
-def staging(username):
-    with Output("Configuring task(s) to run on STAGING"):
-        _create_env(username              = username,
-                    hosts                 = ['pcf-us-staging3.pculture.org:2191',
-                                            'pcf-us-staging4.pculture.org:2191'],
-                    hostnames_squid_cache = ['staging.universalsubtitles.org',
-                                             'staging.amara.org'
-                                             ],
-                    s3_bucket             = 's3.staging.universalsubtitles.org',
-                    installation_dir      = 'universalsubtitles.staging',
-                    static_dir            = '/var/static/staging',
-                    name                  = 'staging',
-                    git_branch            = 'staging',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-                    admin_dir             = '/usr/local/universalsubtitles.staging',
-                    admin_host            = 'pcf-us-adminstg.pculture.org:2191',
-                    celeryd_host          = 'pcf-us-adminstg.pculture.org:2191',
-                    celeryd_proj_root     = 'universalsubtitles.staging',
-                    separate_uslogging_db = True,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
+@task
+def local(username='vagrant', key='~/.vagrant.d/insecure_private_key'):
+    """
+    Configure task(s) to run in the local environment
 
-def dev(username):
-    with Output("Configuring task(s) to run on DEV"):
+    """
+    with Output("Configuring task(s) to run on LOCAL"):
         _create_env(username              = username,
-                    hosts                 = ['pcf-us-dev.pculture.org:2191'],
-                    hostnames_squid_cache = ['pcf-us-dev.pculture.org',
-                                             'dev.amara.org'
-                                             ],
-                    s3_bucket             = None,
-                    installation_dir      = 'universalsubtitles.dev',
-                    static_dir            = '/var/www/universalsubtitles.dev',
-                    name                  = 'dev',
-                    git_branch            = 'dev',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-                    admin_dir             = None,
-                    admin_host            = 'pcf-us-dev.pculture.org:2191',
-                    celeryd_host          = DEV_HOST,
-                    celeryd_proj_root     = 'universalsubtitles.dev',
+                    name                  = 'local',
+                    s3_bucket             = 's3.local.amara.org',
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/local/unisubs/',
+                    app_group             = 'deploy',
+                    builder_host          = 'app.local',
+                    lb_host               = 'lb.local',
+                    revision              = 'staging',
+                    ve_dir                = '/opt/ve/local/unisubs',
                     separate_uslogging_db = False,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd.dev start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd.dev stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd.dev restart &&  /etc/init.d/celeryevcam.dev start")
+                    key_filename          = key,
+                    roledefs              = {
+                        'app': ['10.10.10.115'],
+                        'data': ['10.10.10.120'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+        env.dev_host = '10.10.10.115'
 
+@task
+def dev(username):
+    """
+    Configure task(s) to run in the dev environment
+
+    """
+    with Output("Configuring task(s) to run on DEV"):
+        env_name = 'dev'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = None,
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': ['app-00-dev.amara.org'],
+                        'data': ['data-00-dev.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
+def demo(username, revision):
+    """
+    Configure task(s) to run in the demo environment
+
+    :param username: Username
+    :param revision: Revision of demo
+
+    """
+    with Output("Configuring task(s) to run on DEMO {0}".format(revision)):
+        hosts = {
+            'app': 'app-00-dev.amara.org',
+            'data': 'data-00-dev.amara.org',
+        }
+        env.demo_hosts = hosts
+        env_name = 'demo'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = None,
+                    app_name              = 'unisubs',
+                    app_dir               = '/var/tmp/{0}/unisubs/'.format(
+                        revision),
+                    app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = None,
+                    revision              = revision,
+                    ve_dir                = '/var/tmp/{0}/ve'.format(
+                        revision),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': ['app-00-dev.amara.org'],
+                        'data': ['data-00-dev.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
+def staging(username):
+    """
+    Configure task(s) to run in the staging environment
+
+    """
+    with Output("Configuring task(s) to run on STAGING"):
+        env_name = 'staging'
+        _create_env(username              = username,
+                    name                  = env_name,
+                    s3_bucket             = 's3.staging.amara.org',
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = 'lb-staging.amara.org',
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': [
+                            'app-00-staging.amara.org',
+                            'app-01-staging.amara.org',
+                        ],
+                        'data': ['data-00-staging.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
+
+@task
 def production(username):
+    """
+    Configure task(s) to run in the production environment
+
+    """
     with Output("Configuring task(s) to run on PRODUCTION"):
+        env_name = 'production'
         _create_env(username              = username,
-                    hosts                 = ['pcf-us-cluster3.pculture.org:2191',
-                                             'pcf-us-cluster4.pculture.org:2191',
-                                             'pcf-us-cluster5.pculture.org:2191',
-                                             'pcf-us-cluster8.pculture.org:2191',
-                                             'pcf-us-cluster9.pculture.org:2191',
-                                             'pcf-us-cluster10.pculture.org:2191',
-                                             ],
-                    hostnames_squid_cache = ['www.universalsubtitles.org',
-                                             'www.amara.org',
-                                             'universalsubtitles.org',
-                                             'amara.org'
-                                             ],
-                    s3_bucket             = 's3.www.universalsubtitles.org',
-                    installation_dir      = 'universalsubtitles',
-                    static_dir            = '/var/static/production',
-                    name                  =  None,
-                    git_branch            = 'production',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-                    admin_dir             = '/usr/local/universalsubtitles',
-                    admin_host            = 'pcf-us-admin.pculture.org:2191',
-                    celeryd_host          = 'pcf-us-admin.pculture.org:2191',
-                    celeryd_proj_root     = 'universalsubtitles',
-                    separate_uslogging_db = True,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart  && /etc/init.d/celeryevcam start ")
+                    name                  = env_name,
+                    s3_bucket             = 's3.production.amara.org',
+                    app_name              = 'unisubs',
+                    app_dir               = '/opt/apps/{0}/unisubs/'.format(
+                        env_name),
+                    app_group             = 'deploy',
+                    builder_host          = 'app-00-dev.amara.org',
+                    lb_host               = 'lb-production.amara.org',
+                    revision              = env_name,
+                    ve_dir                = '/opt/ve/{0}/unisubs'.format(
+                        env_name),
+                    separate_uslogging_db = False,
+                    roledefs              = {
+                        'app': [
+                            'app-00-production.amara.org',
+                            'app-01-production.amara.org',
+                            'app-02-production.amara.org',
+                            'app-03-production.amara.org',
+                        ],
+                        'data': ['data-00-production.amara.org'],
+                    },
+                    notification_email   = 'ehazlett@pculture.org',)
 
-def temp(username):
-    with Output("Configuring task(s) to run on TEMP"):
-        _create_env(username              = username,
-                    hosts                 = ['pcf-us-tmp1.pculture.org:2191',],
-                    hostnames_squid_cache = ['tmp.universalsubtitles.org',
-                                             'tmp.amara.org'
-                                             ],
-                    s3_bucket             = 's3.temp.universalsubtitles.org',
-                    installation_dir      = 'universalsubtitles.staging',
-                    static_dir            = '/var/static/tmp',
-                    name                  = 'staging',
-                    git_branch            = 'staging',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached-staging restart',
-                    admin_dir             = '/usr/local/universalsubtitles.staging',
-                    admin_host            = 'pcf-us-admintmp.pculture.org:2191',
-                    celeryd_host          = 'pcf-us-admintmp.pculture.org:2191',
-                    celeryd_proj_root     = 'universalsubtitles.staging',
-                    separate_uslogging_db = True,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd.staging start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd.staging stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd.staging restart &&  /etc/init.d/celeryevcam.staging start")
+def _reset_permissions(app_dir):
+    sudo('chgrp -R {0} {1}'.format(env.app_group, app_dir))
+    sudo('chmod -R g+w {0}'.format(app_dir))
 
-def nf(username):
-    with Output("Configuring task(s) to run on NF env"):
-        _create_env(username              = username,
-                    hosts                 = ['nf.universalsubtitles.org:2191'],
-                    hostnames_squid_cache = ['nf.universalsubtitles.org',
-                                             'nf.amara.org'
-                                             ],
-                    s3_bucket             = 's3.nf.universalsubtitles.org',
-                    installation_dir      = 'universalsubtitles.nf',
-                    static_dir            = '/var/static/nf',
-                    name                  = 'nf',
-                    git_branch            = 'x-nf',
-                    memcached_bounce_cmd  = '/etc/init.d/memcached restart',
-                    admin_dir             = '/usr/local/universalsubtitles.nf',
-                    admin_host            = 'pcf-us-adminnf.pculture.org:2191',
-                    celeryd_host          = 'pcf-us-adminnf.pculture.org:2191',
-                    celeryd_proj_root     = 'universalsubtitles.nf',
-                    separate_uslogging_db = True,
-                    celeryd_start_cmd     = "/etc/init.d/celeryd start",
-                    celeryd_stop_cmd      = "/etc/init.d/celeryd stop",
-                    celeryd_bounce_cmd    = "/etc/init.d/celeryd restart &&  /etc/init.d/celeryevcam start")
+@task
+@roles('app', 'data')
+def reset_permissions():
+    _reset_permissions(env.app_dir)
+    _reset_permissions(env.ve_dir)
+    # reset builder dir
+    env.host_string = env.builder_host
 
+def _git_pull():
+    run('git checkout --force')
+    run('git pull --ff-only')
+    run('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
+    run('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _reset_permissions('.')
+
+def _git_checkout(commit, as_sudo=False):
+    cmd = run
+    if as_sudo:
+        cmd = sudo
+    cmd('git fetch')
+    cmd('git checkout --force %s' % commit)
+    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _reset_permissions('.')
+
+def _git_checkout_branch_and_reset(commit, branch='dev', run_as_sudo=False):
+    cmd = run
+    if run_as_sudo:
+        cmd = sudo
+    if not branch:
+        branch = env.revision
+    cmd('git fetch')
+    cmd('git checkout %s' % branch)
+    cmd('git reset --hard %s' % commit)
+    cmd('chgrp {0} -R .git 2> /dev/null; /bin/true'.format(env.app_group))
+    cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
+    _reset_permissions('.')
+
+def _get_optional_repo_version(app_dir, repo):
+    '''Find the optional repo version by looking at its file in optional/.'''
+    with cd(os.path.join(app_dir, 'optional')):
+        return run('cat {0}'.format(repo))
+
+@task
 @lock_required
-def syncdb():
+@runs_once
+@roles('app')
+def syncdb(extra=''):
     """Run python manage.py syncdb for the main and logging databases"""
 
-    with Output("Syncing database"):
-        env.host_string = DEV_HOST
-        with cd(os.path.join(env.static_dir, 'unisubs')):
+    with Output("Syncing database") as out:
+        with cd(env.app_dir):
             _git_pull()
-            run('{0}/env/bin/python manage.py syncdb '
-                '--settings=unisubs_settings'.format(env.static_dir))
+            cmd = '{0}/bin/python manage.py syncdb {1} --settings=unisubs_settings'.format(\
+                env.ve_dir, extra)
+            #run('{0}/bin/python manage.py syncdb '
+            #    '--settings=unisubs_settings'.format(env.ve_dir))
+            run(cmd, pty=True)
             if env.separate_uslogging_db:
-                run('{0}/env/bin/python manage.py syncdb '
+                run('{0}/bin/python manage.py syncdb '
                     '--database=uslogging --settings=unisubs_settings'.format(
-                        env.static_dir))
-
+                        env.ve_dir))
+@task
 @lock_required
-def migrate(app_name=''):
+@runs_once
+@roles('app')
+def migrate(app_name='', extra=''):
     with Output("Performing migrations"):
-        env.host_string = DEV_HOST
-        with cd(os.path.join(env.static_dir, 'unisubs')):
+        with cd(env.app_dir):
             _git_pull()
             if env.separate_uslogging_db:
-                run('{0}/env/bin/python manage.py migrate uslogging '
+                run('{0}/bin/python manage.py migrate uslogging '
                     '--database=uslogging --settings=unisubs_settings'.format(
-                        env.static_dir))
+                        env.ve_dir))
 
-            manage_cmd = 'yes no | {0}/env/bin/python -u manage.py migrate {1} --settings=unisubs_settings 2>&1'.format(env.static_dir, app_name)
+            manage_cmd = 'yes no | {0}/bin/python -u manage.py migrate {1} {2} --settings=unisubs_settings 2>&1'.format(env.ve_dir, app_name, extra)
             timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
             log_cmd = WRITE_LOG % 'database_migrations'
 
@@ -372,250 +470,103 @@ def migrate(app_name=''):
             )
             run(cmd)
 
-def run_command(command):
-    '''Run a python manage.py command'''
-    cmdname = command.split(' ', 1)[0]
-    with Output("Running python manage.py {0} ...".format(cmdname)):
-        env.host_string = DEV_HOST
-        with cd(os.path.join(env.static_dir, 'unisubs')):
+@task
+@roles('app', 'data')
+def update_environment(extra=''):
+    with Output('Updating environment'):
+        with cd(os.path.join(env.app_dir, 'deploy')):
             _git_pull()
-            run('{0}/env/bin/python manage.py {1} '
-                '--settings=unisubs_settings'.format(env.static_dir, command))
+            run('export PIP_REQUIRE_VIRTUALENV=true')
+            # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
+            run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(env.ve_dir, extra), pty=True)
+            _reset_permissions(env.app_dir)
+        with cd(env.app_dir):
+            run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
 
-def _run_shell(base_dir, command, is_sudo=False):
-    if is_sudo:
-        f = sudo
-    else:
-        f = run
-    with cd(os.path.join(base_dir, 'unisubs')):
-        f('sh ../env/bin/activate && %s' % command)
+def _enable_lb_node(name=None):
+    """
+    Enables a node in the LB
 
-def run_shell(command, is_sudo=False):
-    """Run the given command inside the virtual env for each host/environment."""
-
-    with Output("Running '{0}' on all hosts".format(command)):
-        _execute_on_all_hosts(lambda dir: _run_shell(dir, command, bool(is_sudo)))
-
-def migrate_fake(app_name):
-    '''Fake a migration to 0001 for the specified app
-
-    Unfortunately, one must do this when moving an app to South for the first
-    time.
-
-    See http://south.aeracode.org/docs/convertinganapp.html and
-    http://south.aeracode.org/ticket/430 for more details. Perhaps this will be
-    changed in a subsequent version, but now we're stuck with this solution.
-
-    '''
-    with Output("Faking migration for {0}".format(app_name)):
-        env.host_string = DEV_HOST
-        with cd(os.path.join(env.static_dir, 'unisubs')):
-            run('yes no | {0}/env/bin/python manage.py migrate {1} 0001 --fake --settings=unisubs_settings'.format(env.static_dir, app_name))
-
-@lock_required
-def refresh_db():
-    # Should really be checking for 'production'
-    if env.installation_name is None:
-        Output("Cannot refresh production database")
-        return
-
-    with Output("Refreshing database"):
-        add_disabled()
-        stop_celeryd()
-
-        env.host_string = env.web_hosts[0]
-        sudo('/scripts/amara_reset_db.sh {0}'.format(env.installation_name))
-        sudo('/scripts/amara_refresh_db.sh {0}'.format(env.installation_name))
-        promote_django_admins()
-        bounce_memcached()
-        run('{0}/env/bin/python manage.py fix_static_files '
-            '--settings=unisubs_settings'.format(env.static_dir))
-
-        start_celeryd()
-        removed_disabled()
-
-def _execute_on_all_hosts(cmd):
-    # horrible hack to not have dev_host be called twice ; this needs refactoring
-    dev_host = False
-    for host in env.web_hosts:
-        if host == DEV_HOST: dev_host = True
-        env.host_string = host
-        cmd(env.web_dir)
-    if not dev_host:
-        env.host_string = DEV_HOST
-        cmd(env.static_dir)
-    if env.admin_dir is not None:
-        env.host_string = env.admin_host
-        cmd(env.admin_dir)
-
-
-def _switch_branch(dir, branch_name):
-    with cd(os.path.join(dir, 'unisubs')):
-        _git_pull()
-        run('git fetch')
-        # the following command will harmlessly fail if branch already exists.
-        # don't be intimidated by the one-line message.
+    """
+    if env.lb_host:
+        old_host = name
         with settings(warn_only=True):
-            run('git branch --track {0} origin/{0}'.format(branch_name))
-            run('git checkout {0}'.format(branch_name))
-        _git_pull()
+            env.host_string = env.lb_host
+            sudo("sed -i 's/server {0}.*/server {0};/g' {1}".format(
+                name, env.lb_config))
+            sudo('service nginx reload')
+        env.host_string = old_host
 
-def switch_branch(branch_name):
-    """Switch the unisubs repository to the given git branch"""
-
-    with Output("Switching to branch {0}".format(branch_name)):
-        _execute_on_all_hosts(lambda dir: _switch_branch(dir, branch_name))
-
-
-def _remove_pip_package(base_dir, package_name):
-    with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
-        run('yes y | {0}/env/bin/pip uninstall {1}'.format(base_dir, package_name), pty=True)
-        #_clear_permissions(os.path.join(base_dir, 'env'))
-
-def remove_pip_package(package_egg_name):
-    with Output("Removing pip package '{0}'".format(package_egg_name)):
-        _execute_on_all_hosts(lambda dir: _remove_pip_package(dir, package_egg_name))
-
-def _update_environment(base_dir, flags=''):
-    with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
-        _git_pull()
-        run('export PIP_REQUIRE_VIRTUALENV=true')
-        # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        run('yes i | {0}/env/bin/pip install {1} -r requirements.txt'.format(base_dir, flags), pty=True)
-        #_clear_permissions(os.path.join(base_dir, 'env'))
-
-def _update_environment_parallel(base_dir, flags=''):
+def _disable_lb_node(name=None):
     """
-    This is the new way to build the virtualenv ; it will completely re-build
-    each time.  However, this must also be done only when parallel tasks
-    are implemented as this takes a long time to run on staging and production.
+    Disables a node in the LB
 
     """
-    with cd(os.path.join(base_dir, 'unisubs', 'deploy')):
-        _git_pull()
-        env_dir = '{0}/env'.format(base_dir)
-        tmp_env_dir = '{0}/env_{1}'.format(base_dir, int(time.time()))
-        # gather existing envs
-        envs = run('find {0}/ -type d -name "env_*"'.format(base_dir))
-        run('export PIP_REQUIRE_VIRTUALENV=true')
-        # create new venv for fresh environment
-        run('virtualenv --no-site-packages {0}'.format(tmp_env_dir))
-        # see http://lincolnloop.com/blog/2010/jul/1/automated-no-prompt-deployment-pip/
-        res = run('yes i | {0}/bin/pip install {1} -r requirements.txt'.format(tmp_env_dir, flags), pty=True)
-        # check if pip failed and abort if so
-        if res.failed:
-            # if fail ; abort
-            abort('Error occurred during pip install: {0}'.format(res))
-        # all good ; overwrite symlink to prod
-        run('if [ -e {1} ]; then rm -rf {1}; fi ; ln -sf {0} {1}'.format(tmp_env_dir, env_dir))
-        # remove previous envs
-        run('rm -rf {0}'.format(' '.join(envs.split('\n'))))
-        #_clear_permissions(os.path.join(base_dir, 'env'))
+    if env.lb_host:
+        old_host = name
+        with settings(warn_only=True):
+            env.host_string = env.lb_host
+            sudo("sed -i 's/server {0}.*/server {0} down;/g' {1}".format(
+                name, env.lb_config))
+            sudo('service nginx reload')
+        env.host_string = old_host
 
-@lock_required
-def update_environment(flags=''):
-    with Output("Updating virtualenv"):
-        _execute_on_all_hosts(lambda dir: _update_environment(dir, flags))
-
-def _clear_permissions(dir):
-    sudo('chgrp pcf-web -R {0}'.format(dir))
-    sudo('chmod g+w -R {0}'.format(dir))
-
-def clear_environment_permissions():
-    with Output("Clearing environment permissions"):
-        _execute_on_all_hosts(
-            lambda dir: _clear_permissions(os.path.join(dir, 'env')))
-
-def clear_permissions():
-    with Output("Clearing permissions"):
-        for host in env.web_hosts:
-            env.host_string = host
-            _clear_permissions('{0}/unisubs'.format(env.web_dir))
-
-
-def _git_pull():
-    run('git checkout --force')
-    run('git pull --ff-only')
-    #run('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #run('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
-
-def _git_checkout(commit, as_sudo=False):
-    cmd = run
-    if as_sudo:
-        cmd = sudo
-    cmd('git fetch')
-    cmd('git checkout --force %s' % commit)
-    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
-
-def _git_checkout_branch_and_reset(commit, branch='master', as_sudo=False):
-    cmd = run
-    if as_sudo:
-        cmd = sudo
-    cmd('git fetch')
-    cmd('git checkout %s' % branch)
-    cmd('git reset --hard %s' % commit)
-    #cmd('chgrp pcf-web -R .git 2> /dev/null; /bin/true')
-    #cmd('chmod g+w -R .git 2> /dev/null; /bin/true')
-    #_clear_permissions('.')
-
-
-def _get_optional_repo_version(dir, repo):
-    '''Find the optional repo version by looking at its file in optional/.'''
-    with cd(os.path.join(dir, 'unisubs', 'optional')):
-        return run('cat {0}'.format(repo))
-
-
-def _reload_app_server(dir=None):
-    """
-    Reloading the app server will both make sure we have a
-    valid commit guid (by running the create_commit_file)
-    and also that we make the server reload code (currently
-    with mod_wsgi this is touching the wsgi file)
-    """
-    with cd('{0}/unisubs'.format(dir or env.web_dir)):
-        run('python deploy/create_commit_file.py')
-        run('touch deploy/unisubs.wsgi')
-
-def reload_app_servers():
+def _reload_app_servers(hard=False):
     with Output("Reloading application servers"):
-        for host in env.web_hosts:
-            env.host_string = host
-            _reload_app_server()
+        """
+        Reloading the app server will both make sure we have a
+        valid commit guid (by running the create_commit_file)
+        and also that we make the server reload code (currently
+        with mod_wsgi this is touching the wsgi file)
+        """
+        if hard:
+            if env.environment == 'demo':
+                script = 'uwsgi.unisubs.demo.{0}'.format(env.revision)
+            else:
+                script = 'uwsgi.unisubs.{0}'.format(env.environment)
+            sudo('service {0} restart'.format(script))
+        else:
+            with cd(env.app_dir):
+                run('{0}/bin/python deploy/create_commit_file.py'.format(env.ve_dir))
+                run('touch deploy/unisubs.wsgi')
+        # disable node on LB
+        _disable_lb_node(env.host_string)
+        with settings(warn_only=True):
+            run('wget -q -T 120 http://{0}/en/'.format(env.host_string))
+        _enable_lb_node(env.host_string)
 
+@task
+@roles('app')
+def reload_app_servers(hard=False):
+    _reload_app_servers(hard)
 
 # Maintenance Mode
+@task
+@roles('app')
 def add_disabled():
     with Output("Putting the site into maintenance mode"):
-        for host in env.web_hosts:
-            env.host_string = host
-            run('touch {0}/unisubs/disabled'.format(env.web_dir))
+        run('touch {0}/disabled'.format(env.app_dir))
 
+@task
+@roles('app')
 def remove_disabled():
     with Output("Taking the site out of maintenance mode"):
-        for host in env.web_hosts:
-            env.host_string = host
-            run('rm {0}/unisubs/disabled'.format(env.web_dir))
+        run('rm {0}/disabled'.format(env.app_dir))
 
-
-def _update_integration(dir, as_sudo=True):
-    '''
-    Actually update the integration repo on a single host.
-    Has to be run as root, else all users on all servers must have
-    the right key for the private repo.
-    '''
-
-    with cd(os.path.join(dir, 'unisubs', 'unisubs-integration')):
-        with settings(warn_only=True):
+def _update_integration(run_as_sudo=True, branch='dev', app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating integration repository"):
+        with cd(os.path.join(app_dir, 'unisubs-integration')), \
+            settings(warn_only=True):
             _git_checkout_branch_and_reset(
-                _get_optional_repo_version(dir, 'unisubs-integration'),
-                branch=env.git_branch,
-                as_sudo=as_sudo
+                _get_optional_repo_version(app_dir, 'unisubs-integration'),
+                branch=branch,
+                run_as_sudo=run_as_sudo
             )
-
-def update_integration():
+@task
+@roles('app', 'data')
+def update_integration(run_as_sudo=True, branch=None):
     '''Update the integration repo to the version recorded in the site repo.
 
     At the moment it is assumed that the optional/unisubs-integration file
@@ -626,18 +577,115 @@ def update_integration():
     TODO: Run this from update_web automatically
 
     '''
-    with Output("Updating nested unisubs-integration repositories"):
-        _execute_on_all_hosts(_update_integration)
+    _update_integration(run_as_sudo, branch)
 
-def _notify(subj, msg, audience='sysadmin@pculture.org ehazlett@pculture.org'):
-    mail_from_host = 'pcf-us-dev.pculture.org:2191'
+def _update_solr_schema():
+    python_exe = '{0}/bin/python'.format(env.ve_dir)
+    with cd(env.app_dir):
+        _git_pull()
+        sudo('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
+                python_exe,
+                env.revision))
+        sudo('service tomcat6 restart')
+        run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
 
-    old_host = env.host_string
-    env.host_string = mail_from_host
-    run("echo '{1}' | mailx -s '{0}' {2}".format(subj, msg, audience))
-    env.host_string = old_host
+    # Fly, you fools!
 
-def update_web():
+    managepy_file = os.path.join(env.app_dir, 'manage.py')
+
+    # The -u here is for "unbuffered" so the lines get outputted immediately.
+    manage_cmd = '%s -u %s rebuild_index_ordered -v 2 --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
+    mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s %s' % (env.host_string, env.notification_email)
+    log_cmd = WRITE_LOG % 'solr_reindexing'
+
+    # The single quotes in the ack command needs to be escaped, because
+    # we're in a single quoted ANSI C-style string from the sh -c in the
+    # screen command.
+    #
+    # We can't use a double quoted string for the sh -c call because of the
+    # $0 in the ack script.
+    timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
+
+    cmd = (
+        "screen -d -m sh -c $'" +
+            manage_cmd +
+            timestamp_cmd +
+            log_cmd +
+            mail_cmd +
+        "'"
+    )
+
+    run(cmd, pty=False)
+
+@task
+@lock_required
+@runs_once
+@roles('data')
+def update_solr_schema():
+    '''Update the Solr schema and rebuild the index.
+
+    The rebuilding will be done asynchronously with screen and an email will
+    be sent when it finishes.
+
+    '''
+    with Output("Updating Solr schema (and rebuilding the index)"):
+        execute(_update_solr_schema)
+
+def _bounce_memcached():
+    with Output("Bouncing memcached"):
+        sudo('/etc/init.d/memcached restart')
+
+@task
+@roles('data')
+def bounce_memcached():
+    '''Bounce memcached (purging the cache).
+
+    Should be done at the end of each deploy.
+
+    '''
+    _bounce_memcached()
+
+def _bounce_celery():
+    with Output("Bouncing celeryd"):
+        with settings(warn_only=True):
+            sudo('service celeryd.{0} stop'.format(env.revision))
+            sudo('service celeryd.{0} start'.format(env.revision))
+    with Output("Bouncing celerycam"):
+        with settings(warn_only=True):
+            sudo('service celerycam.{0} stop'.format(env.revision))
+            sudo('service celerycam.{0} start'.format(env.revision))
+
+@task
+@roles('data')
+def bounce_celery():
+    '''Bounce celery daemons.
+
+    Should be done at the end of each deploy.
+
+    '''
+    _bounce_celery()
+
+def _update_code(branch=None, integration_branch=None, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with Output("Updating the main unisubs repo"), cd(app_dir):
+        if branch:
+            _switch_branch(branch, app_dir=app_dir)
+        else:
+            _git_pull()
+    # update integration repo
+    execute(_update_integration, branch=integration_branch, app_dir=app_dir)
+    with cd(app_dir):
+        with settings(warn_only=True):
+            run("find . -name '*.pyc' -delete")
+
+@roles('app', 'data')
+def update_code(branch=None, integration_branch=None):
+    _update_code(branch=branch, integration_branch=integration_branch)
+
+@task
+def deploy(branch=None, integration_branch=None, skip_celery=False,
+    skip_media=False):
     """
     This is how code gets reloaded:
 
@@ -651,363 +699,557 @@ def update_web():
     any failure on these steps need to be fixed or will result in
     breakage
     """
-    with Output("Updating the main unisubs repositories"):
-        if env.admin_dir is not None:
-            env.host_string = env.admin_host
-            with cd(os.path.join(env.admin_dir, 'unisubs')):
-                _git_pull()
-                _update_integration(env.admin_dir)
+    execute(update_code, branch=branch, integration_branch=integration_branch)
+    if skip_media == False:
+        execute(update_static_media)
+    if skip_celery == False:
+        execute(bounce_celery)
+    execute(bounce_memcached)
+    ##test_services()
+    execute(reload_app_servers)
+    _notify("Amara {0} deployment".format(env.environment), "Deployed by {0} to {1} at {2} UTC".format(env.user, env.environment, datetime.utcnow()), env.notification_email)
 
-    with Output("Updating the unisubs-integration repositories"):
-        for host in env.web_hosts:
-            env.host_string = host
-            with cd('{0}/unisubs'.format(env.web_dir)):
-                _git_pull()
-                _update_integration(env.web_dir)
-                with settings(warn_only=True):
-                    run("find . -name '*.pyc' -print0 | xargs -0 rm")
+@task
+@runs_once
+def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile=False, skip_s3=False):
+    """
+    Compiles and uploads static media to S3
 
-    bounce_celeryd()
-    bounce_memcached()
-    test_services()
-    reload_app_servers()
+    :param compilation_level: Level of optimization (default: ADVANCED_OPTIMIZATIONS)
+    :param skip_s3: Skip upload to S3 (default: False)
 
-    # Workaround that 'None' implies 'production'
-    installation_name = 'production' if env.installation_name is None else env.installation_name
-
-    if env.installation_name != 'dev' or env.user != 'jenkins':
-        _notify("Amara {0} deployment".format(env.installation_name), "Deployed by {0} to {1} at {2} UTC".format(env.user,  installation_name, datetime.utcnow()))
-
-# Services
-def update_solr_schema():
-    '''Update the Solr schema and rebuild the index.
-
-    The rebuilding will be done asynchronously with screen and an email will
-    be sent when it finishes.
-
-    '''
-    with Output("Updating Solr schema (and rebuilding the index)"):
-        if env.admin_dir:
-            # staging and production
-            env.host_string = env.admin_host
-            dir = env.admin_dir
-            python_exe = '{0}/env/bin/python'.format(env.admin_dir)
-            with cd(os.path.join(dir, 'unisubs')):
-                _git_pull()
-                run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/{1}/conf/schema.xml'.format(
-                        python_exe,
-                        'production' if env.installation_name is None else 'staging'))
-                run('{0} manage.py reload_solr_core --settings=unisubs_settings'.format(python_exe))
-        else:
-            # dev
-            env.host_string = DEV_HOST
-            dir = env.web_dir
-            python_exe = '{0}/env/bin/python'.format(env.web_dir)
-            with cd(os.path.join(dir, 'unisubs')):
-                _git_pull()
-                run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/main/conf/schema.xml'.format(python_exe))
-                run('{0} manage.py build_solr_schema --settings=unisubs_settings > /etc/solr/conf/testing/conf/schema.xml'.format(python_exe))
-            sudo('service tomcat6 restart')
-
-        # Fly, you fools!
-
-        managepy_file = os.path.join(dir, 'unisubs', 'manage.py')
-
-        # The -u here is for "unbuffered" so the lines get outputted immediately.
-        manage_cmd = '%s -u %s rebuild_index_ordered --noinput --settings=unisubs_settings 2>&1' % (python_exe, managepy_file)
-        mail_cmd = ' | mail -s Solr_index_rebuilt_on_%s universalsubtitles-dev@pculture.org' % env.host_string
-        log_cmd = WRITE_LOG % 'solr_reindexing'
-
-        # The single quotes in the ack command needs to be escaped, because
-        # we're in a single quoted ANSI C-style string from the sh -c in the
-        # screen command.
-        #
-        # We can't use a double quoted string for the sh -c call because of the
-        # $0 in the ack script.
-        timestamp_cmd = ADD_TIMESTAMPS.replace("'", r"\'")
-
-        cmd = (
-            "screen -d -m sh -c $'" +
-                manage_cmd +
-                timestamp_cmd +
-                log_cmd +
-                mail_cmd +
-            "'"
+    """
+    env.host_string = env.builder_host
+    if env.environment == 'demo':
+        env.host_string = env.demo_hosts.get('app')
+        root_dir = '/var/tmp/{0}'.format(env.revision)
+        build_dir = '{0}/unisubs'.format(root_dir)
+        ve_dir = '{0}/ve'.format(root_dir)
+        integration_dir = '{0}/unisubs-integration'.format(build_dir)
+        python_exe = '{0}/bin/python'.format(ve_dir)
+    else:
+        ve_dir = '{0}/{1}/unisubs'.format(env.build_ve_root, env.environment)
+        build_dir = '{0}/{1}/unisubs'.format(env.build_apps_root, env.environment)
+        integration_dir = '{0}/unisubs-integration'.format(build_dir)
+        python_exe = '{0}/bin/python'.format(ve_dir)
+    _reset_permissions(build_dir)
+    _reset_permissions(env.build_ve_root)
+    # update repositories
+    with Output("Updating the main unisubs repo"), cd(build_dir):
+        _git_pull()
+        _switch_branch(env.revision, app_dir=build_dir)
+    with Output("Updating the integration repo"), cd(integration_dir):
+        _git_checkout_branch_and_reset(
+            _get_optional_repo_version(build_dir, 'unisubs-integration'),
+            branch=None,
+            run_as_sudo=True
         )
+    # must be ran before we compile anything
+    with Output("Updating commit"), cd(build_dir):
+        run('python deploy/create_commit_file.py')
+        run('cat commit.py')
+    # virtualenv
+    with Output("Updating virtualenv"):
+        with settings(warn_only=True):
+            run('virtualenv --distribute -q {0}'.format(ve_dir))
+        with cd('{0}/deploy'.format(build_dir)):
+            run('{0}/bin/pip install -U -r requirements.txt'.format(
+                ve_dir))
+    if skip_compile == False:
+        with Output("Compiling media"), cd(build_dir), settings(warn_only=True):
+            run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
+    if env.s3_bucket and skip_s3 == False:
+        with Output("Uploading to S3"), cd(build_dir):
+            run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
+    # temporary fix for dev until better dev compile solution
+    # this also assumes the "builder" host is the same as dev (app-00-dev)
+    if env.environment == 'dev':
+        with cd(build_dir):
+            sudo('cp -rf media/static-cache {0}/media/'.format(env.app_dir))
 
-        run(cmd, pty=False)
-
-def bounce_memcached():
-    '''Bounce the memcached server (purging the cache).
-
-    Should be done at the end of each deploy.
-
-    '''
-    with Output("Bouncing memcached"):
-        if env.admin_dir:
-            env.host_string = env.admin_host
-        else:
-            env.host_string = DEV_HOST
-        sudo(env.memcached_bounce_cmd, pty=False)
-
-
-def _do_celeryd(cmd):
-    if env.admin_dir:
-        env.host_string = env.admin_host
-    else:
-        env.host_string = DEV_HOST
-    if bool(cmd):
-        sudo(cmd, pty=False)
-
-def start_celeryd():
-    """Start the celeryd workers
+@task
+@runs_once
+@roles('data')
+def update_django_admin_media():
+    """
+    Uploads Django Admin static media to S3
 
     """
-    with Output("Starting celeryd"):
-        _do_celeryd(env.celeryd_start_cmd)
+    with Output("Uploading Django admin media"):
+        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/static/media/'.format(env.ve_dir)
+        s3_bucket = 's3.{0}.amara.org/admin/'.format(env.environment)
+        sudo('s3cmd -P -c /etc/s3cfg sync {0} s3://{1}'.format(media_dir, s3_bucket))
 
-def stop_celeryd():
-    """Stop the celeryd workers safely
+@task
+@roles('app')
+def update_django_admin_media_dev():
+    """
+    Uploads Django Admin static media for dev
 
-    This should allow them to finish the task they're working on.
+    This is separate from the update_django_admin_media task as this needs to
+    run on each webserver for the dev environment.
 
     """
-    with Output("Stopping celeryd"):
-        _do_celeryd(env.celeryd_stop_cmd)
+    with Output("Copying Django Admin static media"), cd(env.app_dir):
+        media_dir = '{0}/lib/python2.6/site-packages/django/contrib/admin/media/'.format(env.ve_dir)
+        # copy media to local dir
+        run('cp -r {0} ./media/admin'.format(media_dir))
 
-def bounce_celeryd():
-    """Bounce the celeryd workers safely
-
-    This should allow them to finish the task they're working on before
-    restarting.
-
-    """
-    with Output("Bouncing celeryd"):
-        _do_celeryd(env.celeryd_bounce_cmd)
-
-
-def test_celeryd():
-    """Ensure celeryd is running
-
-    Only checks for the presence of a running process -- not whether that
-    process is still responding to requests and such.
-
-    TODO: Perform a stricter check.
-
-    """
-    with Output("Testing Celery"):
-        env.host_string = env.celeryd_host
-        output = run('ps aux | grep "%s/unisubs/manage\.py.*celeryd.*" | grep -v grep' % env.celeryd_proj_root)
-        assert len(output.split('\n'))
-
-def test_services():
-    """Test Celery, memcached, and assorted other services"""
-    test_memcached()
-    test_celeryd()
-    with Output("Testing other services"):
-        for host in env.web_hosts:
-            env.host_string = host
-            with cd(os.path.join(env.web_dir, 'unisubs')):
-                run('{0}/env/bin/python manage.py test_services --settings=unisubs_settings'.format(
-                    env.web_dir))
-
-def test_memcached():
-    """Ensure memcached is running, working, and sane"""
-    with Output("Testing memcached"):
-        alphanum = string.letters+string.digits
-        host_set = set([(h, env.web_dir,) for h in env.web_hosts])
-        if env.admin_dir:
-            host_set.add((env.admin_host, env.admin_dir,))
-        for host in host_set:
-            random_string = ''.join(
-                [alphanum[random.randint(0, len(alphanum)-1)]
-                for i in xrange(12)])
-            env.host_string = host[0]
-            with cd(os.path.join(host[1], 'unisubs')):
-                run('../env/bin/python manage.py set_memcached {0} --settings=unisubs_settings'.format(
-                    random_string))
-            other_hosts = host_set - set([host])
-            for other_host in other_hosts:
-                env.host_string = other_host[0]
-                output = ''
-                with cd(os.path.join(other_host[1], 'unisubs')):
-                    output = run('../env/bin/python manage.py get_memcached --settings=unisubs_settings')
-                if output.find(random_string) == -1:
-                    raise Exception('Machines {0} and {1} are using different memcached instances'.format(
-                            host[0], other_host[0]))
-
-
-# Static Media
-def _update_static(dir, compilation_level):
-    with cd(os.path.join(dir, 'unisubs')):
-        media_dir = '{0}/unisubs/media/'.format(dir)
-        python_exe = '{0}/env/bin/python'.format(dir)
+def _switch_branch(branch, app_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    with cd(app_dir), settings(warn_only=True):
+        run('git fetch')
+        run('git branch --track {0} origin/{0}'.format(branch))
+        run('git checkout {0}'.format(branch))
         _git_pull()
-        #_clear_permissions(media_dir)
-        run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
-
-def _save_embedjs_on_app_servers():
-    '''
-    For mozilla, we'll craft a special url that servers the embed.js file
-    straight from squid in order to be able to set the CORS heades
-    (amazon's s3 does not allow that header to be set)
-    '''
-    # to find the url, we must revsolve the current STATIC_ROOT
-    if env.admin_dir:
-        env.host_string = env.admin_host
-        base_dir = env.admin_dir
-    else:
-        env.host_string = DEV_HOST
-        base_dir = env.web_dir
-    # we need to update the rep for the admin host, else
-    # we'll end up with an old STATIC_URL, we should fix this with
-    # the corect layouts for each server (and stop all special casing
-    # for each env)
-    with cd(os.path.join(base_dir, 'unisubs')):
-        _git_pull()
-
-    with cd(os.path.join(base_dir, 'unisubs')):
-        python_exe = '{0}/env/bin/python'.format(base_dir)
-        res = run('{0} manage.py  get_settings_values STATIC_URL_BASE --single-host --settings=unisubs_settings'.format(python_exe))
-        media_url = res.replace("\n", "").strip()
-        url = "%sembed.js" % media_url
-    for host in env.web_hosts:
-        # save STATIC_URL/embed.js in the local file system so squid can serve it
-        final_path = os.path.join(env.web_dir, "unisubs", "media", "js", "embed.js")
-        env.host_string = host
-        cmd_str = "curl --compressed --silent %s > %s" % (url, final_path)
-        run(cmd_str)
-        # now  purge the squid cache
-        for hostname_in_cache in env.hostnames_squid_cache:
-           sudo('/usr/bin/squidclient -p  80 -m PURGE  http://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
-           sudo('/usr/bin/squidclient -p 443 -m PURGE https://{0}/unisubs/media/js/embed.js'.format(hostname_in_cache))
-
-def update_static(compilation_level='ADVANCED_OPTIMIZATIONS'):
-    """Recompile static media and upload the results to S3"""
-
-    with Output("Recompiling and uploading static media"):
-        env.host_string = DEV_HOST
-        if env.s3_bucket is not None:
-            with cd(os.path.join(env.static_dir, 'unisubs')):
-                _update_static(env.static_dir, compilation_level)
-                python_exe = '{0}/env/bin/python'.format(env.static_dir)
-                run('{0} manage.py  send_to_s3 --settings=unisubs_settings'.format(python_exe))
-        else:
-            _update_static(env.web_dir, compilation_level)
-        _save_embedjs_on_app_servers()
-
-@lock_required
-def update():
-    update_static()
-    update_web()
-
-def _promote_django_admins(dir, email=None, new_password=None, userlist_path=None):
-    with cd(os.path.join(dir, 'unisubs')):
-        python_exe = '{0}/env/bin/python'.format(dir)
-        args = ""
-        if email is not None:
-            args += "--email=%s" % (email)
-        if new_password is not None:
-            args += "--pass=%s" % (new_password)
-        if userlist_path is not None:
-            args += "--userlist-path=%s" % (userlist_path)
-        cmd_str ='{0} manage.py promote_admins {1} --settings=unisubs_settings'.format(python_exe, args)
-        run(cmd_str)
-
-def promote_django_admins(email=None, new_password=None, userlist_path=None):
+@task
+@roles('app', 'data')
+def switch_branch(branch):
     """
-    Make sure identified users are can access the admin site.
-    If new_password is provided will reset the user's password
-    You can pass either one user email, or a path to a json file with
-    'email', 'new_password' objects.
+    Switches the current branch
 
-    Examples:
-    fab staging:serveruser promote_django_admins:email=arthur@example.com
-    """
-    env.host_string = env.web_hosts[0]
-    return _promote_django_admins(env.web_dir, email, new_password, userlist_path)
-
-@lock_required
-def update_translations():
-    """Update the translations
-
-    What it does:
-
-    - Pushes new strings in english and new languages to transifex.
-    - Pulls all changes from transifex, for all languages.
-    - Adds only the *.mo and *.po files to the index area.
-    - Commits to the rep with a predefined message.
-    - Pushes to origin.
-
-    Caveats:
-
-    - If any of these steps fail, it will stop execution.
-    - At some point, this is pretty much about syncing two repos, so conflicts
-      can appear.
-    - This assumes that we do not edit translation .po files on the file system.
-    - This assumes that we want to push with a "git push".
-    - You must have the  .transifexrc file into your home (this has auth
-      credentials is stored outside of source control).
+    :param branch: Name of branch to switch
 
     """
-    with Output("Updating translations"):
-        run('cd {0} && sh update_translations.sh'.format(os.path.dirname(__file__)))
+    with Output('Switching to {0}'.format(branch)):
+        _switch_branch(branch)
 
-
-def _test_email(dir, to_address):
-    with cd(os.path.join(dir, 'unisubs')):
-        run('{0}/env/bin/python manage.py test_email {1} '
-            '--settings=unisubs_settings'.format(dir, to_address))
-
-def test_email(to_address):
-    with Output("Testing email"):
-        _execute_on_all_hosts(lambda dir: _test_email(dir, to_address))
-
-
-def build_docs():
+def _create_nginx_instance(name=None, url_prefix=None):
     """
-    Builds the documentation using sphinx.
-    If the environment uses s3, will also uplaod the generated docs
-    dir to the root of the bucket.
-    """
-    with Output("Generating documentation"):
-        env.host_string = DEV_HOST
-        with cd(os.path.join(env.static_dir, 'unisubs')):
-            run('%s/env/bin/sphinx-build docs/ media/docs/' % (env.static_dir))
-        if env.s3_bucket is not None:
-            with cd(os.path.join(env.static_dir, 'unisubs')):
-                python_exe = '{0}/env/bin/python'.format(env.static_dir)
-                run('{0} manage.py  upload_docs --settings=unisubs_settings'.format(python_exe))
+    Creates an Nginx instance (for demos)
 
-def _get_settings_values(dir, *settings_name):
-    with cd(os.path.join(dir, 'unisubs')):
-        run('../env/bin/python manage.py get_settings_values %s --settings=unisubs_settings' % " ".join(settings_name))
-
-def get_settings_values(*settings_names):
-    """Connect to all servers and print a given Django setting
-
-    Usage:
-
-        fab env:user get_settings_values:EMAIL_BACKEND,MEDIA_URL
+    :param name: Name of instance
+    :param url_prefix: URL prefix (default: name)
 
     """
-    _execute_on_all_hosts(lambda dir: _get_settings_values(dir, *settings_names))
+    env.host_string = env.demo_hosts.get('app')
+    if not url_prefix:
+        url_prefix = name
+    # nginx config
+    run('cp /etc/nginx/conf.d/amara_dev.conf /tmp/{0}.conf'.format(name))
+    run("sed -i 's/server_name.*;/server_name {0}.demo.amara.org;/g' /tmp/{1}.conf".format(\
+        url_prefix, name))
+    run("sed -i 's/root \/opt\/apps\/dev/root \/var\/tmp\/{0}/g' /tmp/{0}.conf".format(\
+        name))
+    run("sed -i 's/root \/opt\/ve\/dev\/unisubs/root \/var\/tmp\/{0}\/ve/g' /tmp/{0}.conf".format(\
+        name))
+    run("sed -i 's/uwsgi_pass.*;/uwsgi_pass unix:\/\/\/tmp\/uwsgi_{0}.sock;/g' /tmp/{0}.conf".format(\
+        name))
+    sudo("mv /tmp/{0}.conf /etc/nginx/conf.d/{0}.conf".format(name))
 
-def test_access(is_sudo=False):
+def _remove_nginx_instance(name=None):
     """
-    Makes sure the user can connect to all relevant hosts.
-    If any value is passed as an argument, makes sure the user can
-    connect and sudo on all hosts.
-    """
-    run_command = run
-    if is_sudo:
-        run_command = sudo
-    _execute_on_all_hosts(lambda dir: run_command('date'))
+    Removes an Nginx instance (for demos)
 
-try:
-    from local_env import *
-    def local (username):
-        _create_env(**local_env_data)
-except ImportError:
-    pass
+    :param name: Name of instance
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    sudo('rm -f /etc/nginx/conf.d/{0}.conf'.format(name))
+    sudo('rm -f /etc/init/uwsgi.unisubs.demo.{0}.conf'.format(name))
+
+@parallel
+def _clone_repo_demo(revision='dev', integration_revision=None,
+    instance_name=None, service_password=None):
+    run('git clone https://github.com/pculture/unisubs.git /var/tmp/{0}/unisubs'.format(\
+        revision))
+    with cd('/var/tmp/{0}/unisubs'.format(revision)):
+        run('git checkout --force {0}'.format(revision))
+    sudo('git clone git@github.com:pculture/unisubs-integration.git /var/tmp/{0}/unisubs/unisubs-integration'.format(revision))
+    if not integration_revision:
+        integration_revision = _get_optional_repo_version(env.app_dir, 'unisubs-integration')
+    with cd('/var/tmp/{0}/unisubs/unisubs-integration'.format(revision)):
+        sudo('git checkout --force {0}'.format(integration_revision))
+    # build virtualenv
+    run('virtualenv /var/tmp/{0}/ve'.format(revision))
+    # install requirements
+    with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
+        run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
+    _reset_permissions(env.app_dir)
+
+@parallel
+def _configure_demo_app_settings(name=None, revision=None, service_password=None, \
+    url_prefix=None):
+    """
+    Configures application settings (for demos)
+
+    :param name: Instance name
+    :param revision: Application revision
+    :param service_password: Demo instance service password
+    :param url_prefix: Instance url prefix
+
+    """
+    if not url_prefix:
+        url_prefix = revision
+    # private config
+    private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
+    run('cp /opt/apps/dev/unisubs/server_local_settings.py {0}'.format(private_conf))
+    run("sed -i 's/^INSTALLATION.*/INSTALLATION = DEMO/g' {0}".format(
+        private_conf))
+    run("sed -i 's/MEDIA_URL.*/MEDIA_URL = \"http:\/\/{0}.demo.amara.org\/user-data\/\"/g' {1}".format(
+        url_prefix, private_conf))
+    run("sed -i 's/STATIC_URL.*/STATIC_URL = \"http:\/\/{0}.demo.amara.org\/site_media\/\"/g' {1}".format(
+        url_prefix, private_conf))
+    run("sed -i 's/BROKER_USER.*/BROKER_USER = \"{0}\"/g' {1}".format(
+        name, private_conf))
+    run("sed -i 's/BROKER_VHOST.*/BROKER_VHOST = \"\/{0}\"/g' {1}".format(
+        name, private_conf))
+    run("sed -i 's/BROKER_PASSWORD.*/BROKER_PASSWORD = \"{0}\"/g' {1}".format(
+        service_password, private_conf))
+    run("sed -i 's/DATABASE_NAME.*/DATABASE_NAME = \"{0}\"/g' {1}".format(
+        name, private_conf))
+    run("sed -i 's/DATABASE_USER.*/DATABASE_USER = \"{0}\"/g' {1}".format(
+        name, private_conf))
+    run("sed -i 's/DATABASE_PASSWORD.*/DATABASE_PASSWORD = \"{0}\"/g' {1}".format(
+        service_password, private_conf))
+    run("sed -i 's/HAYSTACK_SOLR_URL.*/HAYSTACK_SOLR_URL = \"http:\/\/{0}:8983\/solr\/{1}\"/g' {2}".format(env.demo_hosts.get('data'),
+        name, private_conf))
+
+def _configure_demo_app(name=None, revision=None, url_prefix=None):
+    """
+    Configures demo app (Django site, etc.)
+
+    :param name: Application instance name
+    :param revision: Application revision
+    :param url_prefix: Application instance URL prefix
+
+    """
+    if not url_prefix:
+        url_prefix = revision
+    env.host_string = env.demo_hosts.get('app')
+    private_conf = '/var/tmp/{0}/unisubs/server_local_settings.py'.format(revision)
+    app_dir = '/var/tmp/{0}/unisubs'.format(name)
+    ve_dir = '/var/tmp/{0}/ve'.format(name)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    with cd(app_dir):
+        run('{0} deploy/create_commit_file.py'.format(python_exe))
+    app_shell = '{0} manage.py shell --settings=unisubs_settings'.format(
+        python_exe)
+    django_site_cmd = 'from django.contrib.sites.models import Site ;' \
+        'Site.objects.create(domain="{0}.{1}", name="{0}").id'.format(
+        url_prefix, env.demo_domain)
+    site_id = None
+    with cd(app_dir):
+        # this is horrible scraping to get the new site id
+        # someone please make this better
+        out = run('echo \'{0}\' | {1}'.format(django_site_cmd, app_shell))
+        site_id = out.splitlines()[-3].split('>>>')[-1].strip().strip('L')
+    run("sed -i 's/SITE_ID.*/SITE_ID = {0}/g' {1}".format(
+        site_id, private_conf))
+
+def _create_rabbitmq_instance(name=None, password=None):
+    """
+    Creates a RabbitMQ instance (for test envs)
+
+    :param name: RabbitMQ vhost name
+    :param password: Instance password (username is name)
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('rabbitmqctl add_vhost /{0}'.format(name))
+        sudo('rabbitmqctl add_user {0} {1}'.format(name, password))
+        sudo('rabbitmqctl set_permissions -p /{0} {0} ".*" ".*" ".*"'.format(name))
+
+def _remove_rabbitmq_instance(name=None):
+    """
+    Removes a RabbitMQ instance (for test envs)
+
+    :param name: RabbitMQ vhost name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('rabbitmqctl delete_user {0}'.format(name))
+        sudo('rabbitmqctl delete_vhost /{0}'.format(name))
+
+def _create_celery_instance(name=None):
+    """
+    Creates a Celery worker instance
+
+    :param name: Celery instance name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    celeryd_tmpl = """
+description "unisubs: celeryd ({0})"
+start on runlevel [2345]
+stop on runlevel [06]
+
+exec /var/tmp/{0}/ve/bin/python /var/tmp/{0}/unisubs/manage.py celeryd -B -c 4 \
+-E -f /var/tmp/{0}/celeryd.log --settings unisubs_settings
+""".format(name)
+    celerycam_tmpl = """
+description "unisubs: celerycam ({0})"
+start on runlevel [2345]
+stop on runlevel [06]
+
+exec /var/tmp/{0}/ve/bin/python /var/tmp/{0}/unisubs/manage.py celerycam \
+-f /var/tmp/{0}/celerycam.log --settings unisubs_settings
+""".format(name)
+    with settings(warn_only=True):
+        with open('.temp-celeryd', 'w') as f:
+            f.write(celeryd_tmpl)
+        put('.temp-celeryd', '/etc/init/celeryd.{0}.conf'.format(name),
+            use_sudo=True)
+        with open('.temp-celerycam', 'w') as f:
+            f.write(celerycam_tmpl)
+        put('.temp-celerycam', '/etc/init/celerycam.{0}.conf'.format(name),
+            use_sudo=True)
+        os.remove('.temp-celeryd')
+        os.remove('.temp-celerycam')
+
+def _remove_celery_instance(name=None):
+    """
+    Removes a Celery instance
+
+    :param name: Celery instance name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    with settings(warn_only=True):
+        sudo('service celeryd.{0} stop'.format(name))
+        sudo('service celerycam.{0} stop'.format(name))
+        sudo('rm -f /etc/init/celeryd.{0}.conf'.format(name))
+        sudo('rm -f /etc/init/celerycam.{0}.conf'.format(name))
+
+def _create_rds_instance(name=None, password=None):
+    """
+    Creates an RDS instance (on dev RDS host)
+
+    :param name: RDS DB name (also used for username)
+    :param password: RDS user password
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    with hide('running', 'stdout', 'warnings'):
+        conf = sudo('cat /etc/amara_config.json')
+        try:
+            conf = json.loads(conf)
+        except:
+            raise RuntimeError('Unable to parse Amara config')
+        env_cfg = conf.get('rds').get('environments').get('dev')
+        rds_user = env_cfg.get('user')
+        rds_host = env_cfg.get('host')
+        rds_password = env_cfg.get('password')
+        sql_cmd = 'mysql -u{0} -p{1} -h{2}'.format(rds_user, rds_password,
+            rds_host)
+        run('echo "create user {0}@\'%\' identified by \'{1}\';" | {2}'.format(
+            name, password, sql_cmd))
+        run('echo "create database {0};" | {1}'.format(
+            name, sql_cmd))
+        # can't grant all as RDS doesn't allow it
+        run('echo "grant select,insert,update,delete,create,index,alter,'\
+            'create temporary tables,lock tables,execute,create view,show view,'\
+            'create routine, alter routine on {0}.* to {0}@\'%\';" | {1}'.format(
+            name, sql_cmd))
+
+def _remove_rds_instance(name=None):
+    """
+    Notifies for RDS instance removal
+
+    :param name: RDS instance name
+
+    """
+    msg = "Notification for RDS instance {0} removal by {1}".format(name,
+        env.user)
+    _notify('RDS Instance Removal', msg, env.notification_email)
+
+def _create_solr_instance(name=None):
+    """
+    Creates a Solr instance (for demos)
+
+    :param name: Solr core name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    solr_cfg = '/etc/solr_extra_cores.json'
+    try:
+        solr_config = run('cat {0}'.format(solr_cfg))
+        solr_extra_cores = json.loads(solr_config)
+    except:
+        raise RuntimeError('Unable to parse extra solr core config')
+    if name not in solr_extra_cores:
+        solr_extra_cores.append(name)
+    with open('.temp-solr', 'w') as f:
+        f.write(json.dumps(solr_extra_cores))
+    put('.temp-solr', '{0}'.format(solr_cfg),
+        use_sudo=True)
+    os.remove('.temp-solr')
+    # run puppet to create core
+    with hide('running', 'warnings'), settings(warn_only=True):
+        sudo('puppet agent -t --server puppet.amara.org')
+
+def _remove_solr_instance(name=None):
+    """
+    Removes Solr instance (for demos)
+
+    :param name: Solr core name
+
+    """
+    env.host_string = env.demo_hosts.get('data')
+    solr_cfg = '/etc/solr_extra_cores.json'
+    try:
+        solr_config = run('cat {0}'.format(solr_cfg))
+        solr_extra_cores = json.loads(solr_config)
+    except:
+        raise RuntimeError('Unable to parse extra solr core config')
+    if name in solr_extra_cores:
+        solr_extra_cores.remove(name)
+    with open('.temp-solr', 'w') as f:
+        f.write(json.dumps(solr_extra_cores))
+    put('.temp-solr', '{0}'.format(solr_cfg),
+        use_sudo=True)
+    os.remove('.temp-solr')
+    sudo('rm -rf /etc/solr/conf/{0}'.format(name))
+    sudo('service tomcat6 restart')
+
+def _configure_demo_db(name=None):
+    """
+    Syncs demo database
+
+    :param name: Application instance name
+
+    """
+    env.host_string = env.demo_hosts.get('app')
+    app_dir = '/var/tmp/{0}/unisubs'.format(name)
+    ve_dir = '/var/tmp/{0}/ve'.format(name)
+    python_exe = '{0}/bin/python'.format(ve_dir)
+    with cd(app_dir):
+        run('{0} manage.py syncdb --all --noinput --settings=unisubs_settings'.format(
+        python_exe))
+        run('{0} manage.py migrate --fake --settings=unisubs_settings'.format(
+        python_exe))
+
+def _create_instance_name(name):
+    return name.replace('-', '_')[:8]
+
+@task
+@parallel
+def create_demo(integration_revision=None, skip_media=False, url_prefix=None):
+    """
+    Deploys the specified revision for live testing
+
+    :param integration_revision: Integrations revision to test
+    :param skip_media: Skip media compilation (default: False)
+    :param url_prefix: URL prefix for instance (i.e.: mybranch - default: revision or branch)
+
+    """
+    env.hosts = env.demo_hosts.values()
+    revision = env.revision
+    instance_name = _create_instance_name(env.revision)
+    service_password = ''.join(random.Random().sample(string.letters+string.digits, 8))
+    if not url_prefix:
+        url_prefix = revision
+    with Output("Creating app directories"):
+        for k,v in env.demo_hosts.iteritems():
+            env.host_string = v
+            run('mkdir -p /var/tmp/{0}'.format(instance_name))
+    with Output("Configuring Nginx"):
+        _create_nginx_instance(name=instance_name, url_prefix=url_prefix)
+    with Output("Configuring uWSGI"):
+        # uwsgi ini
+        run('cp /etc/uwsgi.unisubs.dev.ini /tmp/uwsgi.unisubs.{0}.ini'.format(instance_name))
+        run("sed -i 's/socket.*/socket = \/tmp\/uwsgi_{0}.sock/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        run("sed -i 's/virtualenv.*/virtualenv = \/var\/tmp\/{0}\/ve/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        run("sed -i 's/wsgi-file.*/wsgi-file = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        run("sed -i 's/log-syslog.*/log-syslog = uwsgi.unisubs.{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        run("sed -i 's/touch-reload.*/touch-reload = \/var\/tmp\/{0}\/unisubs\/deploy\/unisubs.wsgi/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        run("sed -i 's/pythonpath.*/pythonpath = \/var\/tmp\/{0}/g' /tmp/uwsgi.unisubs.{0}.ini".format(\
+            instance_name))
+        # uwsgi upstart
+    with Output("Configuring upstart"):
+        run('cp /etc/init/uwsgi.unisubs.dev.conf /tmp/uwsgi.unisubs.{0}.conf'.format(instance_name))
+        run("sed -i 's/exec.*/exec uwsgi --ini \/var\/tmp\/{0}\/uwsgi.unisubs.{0}.ini/g' /tmp/uwsgi.unisubs.{0}.conf".format(instance_name))
+        sudo("mv /tmp/uwsgi.unisubs.{0}.conf /etc/init/uwsgi.unisubs.demo.{0}.conf".format(instance_name))
+        run('mv /tmp/uwsgi.unisubs.{0}.ini /var/tmp/{0}/uwsgi.unisubs.{0}.ini'.format(instance_name))
+        
+    # services
+    # celery
+    with Output("Configuring Celery"), settings(warn_only=True):
+        _create_celery_instance(name=instance_name)
+    # rabbitmq
+    with Output("Configuring RabbitMQ"), settings(warn_only=True):
+        _create_rabbitmq_instance(name=instance_name, password=service_password)
+    # RDS DB instance
+    with Output("Configuring RDS"), settings(warn_only=True):
+        _create_rds_instance(name=instance_name, password=service_password)
+    # solr instance
+    with Output("Configuring Solr"):
+        _create_solr_instance(name=instance_name)
+    # clone code
+    with Output("Cloning and building environments"), settings(warn_only=True):
+        env.hosts = env.demo_hosts.values()
+        execute(_clone_repo_demo, revision=revision,
+            integration_revision=integration_revision,
+            instance_name=instance_name, service_password=service_password)
+    with Output("Configuring application settings"):
+        env.host_string = env.demo_hosts.get('app')
+        env.hosts = env.demo_hosts.values()
+        execute(_configure_demo_app_settings, instance_name, revision, service_password,
+            url_prefix)
+    # DB sync
+    with Output("Syncing and migrating database"):
+        env.host_string = env.demo_hosts.get('app')
+        _configure_demo_db(name=instance_name)
+    # Django site with <revision>.demo.amara.org url
+    with Output("Configuring demo settings"):
+        env.host_string = env.demo_hosts.get('app')
+        _configure_demo_app(instance_name, revision, service_password)
+    # TODO:
+    # jenkins instance
+    # compile media
+    if not skip_media:
+        with Output("Compiling static media"):
+            env.host_string = env.demo_hosts.get('app')
+            # create a symlink to google closure library for compilation
+            sudo('ln -sf /opt/google-closure /var/tmp/{0}/unisubs/media/js/closure-library'.format(instance_name))
+            with cd('/var/tmp/{0}/unisubs'.format(instance_name)), settings(warn_only=True):
+                python_exe = '/var/tmp/{0}/ve/bin/python'.format(instance_name)
+                run('{0} deploy/create_commit_file.py'.format(python_exe))
+                run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, 'ADVANCED_OPTIMIZATIONS'))
+    with Output("Starting {0} demo".format(revision)):
+        env.host_string = env.demo_hosts.get('app')
+        sudo('service nginx reload')
+        sudo('service uwsgi.unisubs.demo.{0} start'.format(instance_name))
+    print('\nDemo should be available at http://{0}.demo.amara.org'.format(url_prefix))
+
+@task
+def remove_demo():
+    """
+    Removes live testing demo
+
+    :param revision: Revision that was used in launching the demo
+
+    """
+    revision = env.revision
+    instance_name = _create_instance_name(env.revision)
+    # remove demo
+    with Output("Stopping uWSGI"):
+        env.host_string = env.demo_hosts.get('app')
+        with settings(warn_only=True):
+            sudo('service uwsgi.unisubs.demo.{0} stop'.format(instance_name))
+    with Output("Removing Celery instance"):
+        _remove_celery_instance(instance_name)
+    with Output("Removing RabbitMQ instance"):
+        _remove_rabbitmq_instance(instance_name)
+    with Output("Removing RDS instance"):
+        _remove_rds_instance(instance_name)
+    with Output("Removing Solr instance"):
+        _remove_solr_instance(instance_name)
+    with Output("Removing nginx config"):
+        _remove_nginx_instance(instance_name)
+    with Output("Restarting nginx"):
+        env.host_string = env.demo_hosts.get('app')
+        sudo('service nginx reload')
+    with Output("Removing app directories for {0}".format(revision)):
+        for k,v in env.demo_hosts.iteritems():
+            env.host_string = v
+            sudo('rm -rf /var/tmp/{0}'.format(instance_name))
 
