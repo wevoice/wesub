@@ -69,12 +69,12 @@ var DFXP = function(DFXP) {
          *
          * `newAttrs` is an optional JSON object specifying the attributes to
          * be applied to the new element.
+         *
+         * Returns: new subtitle element
          */
 
-        var subtitles = this.getSubtitles();
-
         if (!after) {
-            after = subtitles[subtitles.length - 1];
+            after = this.getLastSubtitle();
         }
 
         // Create the new element and any specified attributes.
@@ -88,6 +88,7 @@ var DFXP = function(DFXP) {
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
+         *
          * Returns: true || false
          */
 
@@ -96,16 +97,182 @@ var DFXP = function(DFXP) {
 
         return originalString != xmlString;
     };
+    this.endTime = function(indexOrElement, endTime) {
+        /*
+         * Either get or set the end time for the subtitle.
+         *
+         * Returns: current end time (string)
+         */
+
+        var subtitle = this.getSubtitle(indexOrElement);
+
+        if (subtitle) {
+
+            var $subtitle = $(subtitle);
+
+            if (typeof endTime !== 'undefined') {
+                $subtitle.attr('end', endTime);
+            }
+
+            return $subtitle.attr('end');
+
+        } else {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+    };
+    this.removeSubtitle = function(indexOrElement) {
+        /*
+         * Given the zero-index of the subtitle to be removed,
+         * remove it from the node tree.
+         *
+         * Returns: true
+         */
+
+        var subtitle = this.getSubtitle(indexOrElement);
+
+        if (!subtitle) {
+            return false;
+        }
+
+        $(subtitle).remove();
+
+        return true;
+    };
+    this.getLastSubtitle = function() {
+        /*
+         * Retrieve the last subtitle in this set.
+         *
+         * Returns: last subtitle element
+         */
+
+        // Cache the selection.
+        var $subtitles = this.getSubtitles();
+
+        return this.getSubtitle($subtitles.length - 1);
+    };
+    this.getSubtitle = function(indexOrElement) {
+        /*
+         * Returns: subtitle element
+         */
+
+        // If an index or an object is not provided, throw an error.
+        if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
+            throw new Error('DFXP: You must supply either an index or an element.');
+        }
+
+        var subtitle;
+
+        // If indexOrElement is a number, we'll need to query the DOM to
+        // get the element.
+        //
+        // Note: you should only use this approach for checking one-off
+        // subtitles. If you're checking more than one subtitle, it's much
+        // faster to pass along pre-selected elements instead.
+        if (typeof indexOrElement === 'number') {
+            subtitle = this.getSubtitles().get(indexOrElement);
+
+        // Otherwise, just use the element.
+        } else {
+            subtitle = indexOrElement;
+        }
+
+        if (!subtitle) {
+            throw new Error('DFXP: No subtitle exists with that index.');
+        }
+
+        return subtitle;
+    };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
+         *
+         * Returns: jQuery selection of nodes.
          */
 
         return $('div > p', this.$xml);
     };
+    this.needsSyncing = function(indexOrElement) {
+        /*
+         * Given the zero-index or the element of the subtitle to be
+         * checked, determine whether the subtitle needs to be synced.
+         *
+         * In most cases, if a subtitle has either no start time,
+         * or no end time, it needs to be synced. However, if the
+         * subtitle is the last in the list, the end time may be
+         * omitted.
+         *
+         * Returns: true || false
+         */
+
+        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(subtitle);
+
+        var startTime = $subtitle.attr('begin');
+        var endTime = $subtitle.attr('end');
+
+        // If start time is empty, it always needs to be synced.
+        if (startTime === '') {
+            return true;
+        }
+
+        // If the end time is empty and this is not the last subtitle,
+        // it needs to be synced.
+        if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+            return true;
+        }
+
+        // Otherwise, we're good.
+        return false;
+    };
+    this.needsAnySynced = function() {
+        /*
+         * Determine whether any of the subtitles in the set need
+         * to be synced.
+         *
+         * Returns: true || false
+         */
+
+        var needsAnySynced = false;
+
+        // Caching the current subtitle set drastically cuts down on processing
+        // time for iterating through large subtitle sets.
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+
+            // We're going to pass the actual element instead of an integer. This
+            // means needsSyncing doesn't need to hit the DOM to find the element.
+            if (this.needsSyncing($subtitles.get(i))) {
+                needsAnySynced = true;
+            }
+        }
+
+        return needsAnySynced;
+    };
+    this.content = function(index) {
+
+    };
+    this.startTime = function(indexOrElement, startTime) {
+        /*
+         * Either get or set the start time for the subtitle.
+         *
+         * Returns: current start time (string)
+         */
+
+        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(subtitle);
+
+        if (typeof startTime !== 'undefined') {
+            $subtitle.attr('begin', startTime);
+        }
+
+        return $subtitle.attr('begin');
+    };
     this.subtitlesCount = function() {
         /*
          * Retrieve the current number of subtitles.
+         *
+         * Returns: integer
          */
 
         return this.getSubtitles().length;
