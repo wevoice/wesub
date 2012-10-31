@@ -22,107 +22,146 @@ from django.test import TestCase
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.utils import create_langs_and_versions
+from apps.videos.tests.data import (
+    get_video, make_subtitle_language, make_subtitle_version
+)
 from apps.widget import video_cache
 
 
 class TestVideo(TestCase):
-    def _create_video(self, video_url):
-        video, created = Video.get_or_create_for_url(video_url)
-        self.failUnless(video)
-        self.failUnless(created)
-        more_video, created = Video.get_or_create_for_url(video_url)
-        self.failIf(created)
-        self.failUnlessEqual(video, more_video)
-
     def setUp(self):
         self.user = User.objects.all()[0]
         self.youtube_video = 'http://www.youtube.com/watch?v=pQ9qX8lcaBQ'
         self.html5_video = 'http://mirrorblender.top-ix.org/peach/bigbuckbunny_movies/big_buck_bunny_1080p_stereo.ogg'
 
-    def test_video_create(self):
-        self._create_video(self.youtube_video)
-        self._create_video(self.html5_video)
+    def test_get_or_create_for_url(self):
+        def _assert_create_and_get(video_url):
+            video, created = Video.get_or_create_for_url(video_url)
+            self.assertIsNotNone(video)
+            self.assertTrue(created)
 
-    def test_video_cache_busted_on_delete(self):
-        start_url = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
-        video, created = Video.get_or_create_for_url(start_url)
+            video2, created = Video.get_or_create_for_url(video_url)
+            self.assertEqual(video.pk, video2.pk)
+            self.assertFalse(created)
+
+        _assert_create_and_get(self.youtube_video)
+        _assert_create_and_get(self.html5_video)
+
+    def test_url_cache(self):
+        video = get_video(1)
         video_url = video.get_video_url()
-        video_pk = video.pk
 
+        # After adding the video, we should be able to look up its ID in the
+        # cache, given just the URL.
         cache_id_1 = video_cache.get_video_id(video_url)
-        self.assertTrue(cache_id_1)
+        self.assertIsNotNone(cache_id_1)
+        self.assertTrue(Video.objects.filter(video_id=cache_id_1).exists())
+
+        # Remove the video (and make sure it's gone).
         video.delete()
-        self.assertEqual(Video.objects.filter(pk=video_pk).count() , 0)
-        # when cache is not cleared this will return arn
+        self.assertFalse(Video.objects.exists())
+
+        # Trying to get the video ID out of the cache now actually *creates* the
+        # video!
         cache_id_2 = video_cache.get_video_id(video_url)
+        self.assertTrue(Video.objects.exists())
+
+        # The video_id will be different than before (since this is a new Video
+        # record) and the cache should have been updated properly.
         self.assertNotEqual(cache_id_1, cache_id_2)
-        # create a new video with the same url, has to have same# key
-        video2, created= Video.get_or_create_for_url(start_url)
-        video_url = video2.get_video_url()
-        cache_id_3 = video_cache.get_video_id(video_url)
-        self.assertEqual(cache_id_3, cache_id_2)
+        self.assertTrue(Video.objects.filter(video_id=cache_id_2).exists())
+
+        # Now try to create a new video with the same URL.  This should return
+        # the existing video.
+        video2, created = Video.get_or_create_for_url(video_url)
+        self.assertFalse(created)
+
+        video2_url = video2.get_video_url()
+
+        # The cache should still have the correct ID, of course.
+        cache_id_3 = video_cache.get_video_id(video2_url)
+        self.assertEqual(cache_id_2, cache_id_3)
+        self.assertEqual(Video.objects.count(), 1)
 
 class TestModelsSaving(TestCase):
     # TODO: These tests may be more at home in the celery_tasks test file...
-    fixtures = ['test.json', 'subtitle_fixtures.json']
-
-    def setUp(self):
-        self.video = Video.objects.all()[:1].get()
-        self.language = self.video.subtitle_language()
-
     def test_video_languages_count(self):
-        #test if fixtures has correct data
-        langs_count = self.video.newsubtitlelanguage_set.having_nonempty_tip().count()
+        # TODO: Merge this into the metadata tests file?
+        video = get_video()
 
-        self.assertEqual(self.video.languages_count, langs_count)
-        self.assertTrue(self.video.languages_count > 0)
+        # Start with no languages.
+        self.assertEqual(video.languages_count, 0)
+        self.assertEqual(video.newsubtitlelanguage_set.having_nonempty_tip()
+                                                      .count(),
+                         0)
 
-        self.video.languages_count = 0
-        self.video.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(id=self.video.id)
-        self.assertEqual(self.video.languages_count, langs_count)
+        # Create one.
+        sl_en = make_subtitle_language(video, 'en')
+        make_subtitle_version(sl_en, [(100, 200, "foo")])
+
+        # The query should immediately show it.
+        self.assertEqual(video.newsubtitlelanguage_set.having_nonempty_tip()
+                                                      .count(),
+                         1)
+
+        # But the model object will not.
+        self.assertEqual(video.languages_count, 0)
+
+        # Even if we refresh it, the model still doesn't show it.
+        video = Video.objects.get(pk=video.pk)
+        self.assertEqual(video.languages_count, 0)
+
+        # Until we run the proper tasks.
+        video_changed_tasks.delay(video.pk)
+
+        # But we still need to refresh it to see the change.
+        self.assertEqual(video.languages_count, 0)
+        video = Video.objects.get(pk=video.pk)
+        self.assertEqual(video.languages_count, 1)
 
     def test_subtitle_language_save(self):
-        self.assertEqual(self.video.complete_date, None)
-        self.assertEqual(self.video.subtitlelanguage_set.count(), 1)
+        def _refresh(video):
+            video_changed_tasks.delay(video.pk)
+            return Video.objects.get(pk=video.pk)
 
-        self.language.subtitles_complete = True
-        self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
+        # Start out with a video with one language.
+        # By default languages are not complete, so the video should not be
+        # complete either.
+        video = get_video()
+        sl_en = make_subtitle_language(video, 'en')
+        self.assertIsNone(video.complete_date)
+        self.assertEqual(video.newsubtitlelanguage_set.count(), 1)
 
-        self.language.subtitles_complete = False
-        self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(self.video.complete_date, None)
+        # Marking the language as complete doesn't complete the video on its own
+        # -- we need at least one version!
+        sl_en.subtitles_complete = True
+        sl_en.save()
+        video = _refresh(video)
+        self.assertIsNone(video.complete_date)
 
-        version = create_langs_and_versions(self.video, ['ru'])
-        new_language = version[0].subtitle_language
-        new_language.subtitles_complete = True
-        new_language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
+        # But an unsynced version can't be complete either!
+        # TODO: uncomment once babelsubs supports unsynced subs...
+        # make_subtitle_version(sl_en, [(100, None, "foo")])
+        # video = _refresh(video)
+        # self.assertIsNone(video.complete_date)
 
-        self.language.subtitles_complete = True
-        self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
+        # A synced version (plus the previously set flag on the language) should
+        # result in a completed video.
+        make_subtitle_version(sl_en, [(100, 200, "foo")])
+        video = _refresh(video)
+        self.assertIsNotNone(video.complete_date)
 
-        new_language.subtitles_complete = False
-        new_language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertNotEqual(self.video.complete_date, None)
+        # Unmarking the language as complete should uncomplete the video.
+        sl_en.subtitles_complete = False
+        sl_en.save()
+        video = _refresh(video)
+        self.assertIsNone(video.complete_date)
 
-        self.language.subtitles_complete = False
-        self.language.save()
-        video_changed_tasks.delay(self.video.pk)
-        self.video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(self.video.complete_date, None)
+        # Any completed language is enough to complete the video.
+        sl_ru = make_subtitle_language(video, 'ru')
+        make_subtitle_version(sl_ru, [(100, 200, "bar")])
+        sl_ru.subtitles_complete = True
+        sl_ru.save()
 
+        video = _refresh(video)
+        self.assertIsNotNone(video.complete_date)

@@ -97,8 +97,7 @@ def _record_workflow_origin(team_video, version):
     """
     if version and not version.get_workflow_origin():
         tasks = team_video.task_set.incomplete()
-        tasks = list(
-            tasks.filter(language=version.subtitle_language.language_code)[:1])
+        tasks = list(tasks.filter(language=version.language_code)[:1])
 
         if tasks:
             open_task_type = tasks[0].get_type_display()
@@ -151,7 +150,7 @@ def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
     # There are tasks for this video.  If this version isn't published yet, it
     # belongs to those tasks, so update them.
     if version.visibility != 'public':
-        outstanding_tasks.update(subtitle_version=version,
+        outstanding_tasks.update(new_subtitle_version=version,
                                  language=language_code)
 
     # There may be existing subtitle/translate tasks.
@@ -210,6 +209,7 @@ def _create_necessary_tasks(version, team_video, workflow, committer, complete):
     else:
         # Otherwise the new task will be a subtitle or translate, depending
         # on the type of subs.
+        # TODO: More advanced logic here?
         if version.subtitle_language.is_primary_audio_language():
             task_type = Task.TYPE_IDS['Subtitle']
         else:
@@ -218,7 +218,7 @@ def _create_necessary_tasks(version, team_video, workflow, committer, complete):
     # We now know the type of task we need to create, so go ahead and make it.
     task = Task(team=team_video.team, team_video=team_video,
                 language=version.language_code, type=task_type,
-                subtitle_version=version)
+                new_subtitle_version=version)
 
     # Assign it to the correct user.
     if task.get_type_display() in ('Subtitle', 'Translate'):
@@ -282,6 +282,11 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
             _create_necessary_tasks(version, team_video, workflow, committer,
                                     complete)
 
+def _update_followers(subtitle_language, author):
+    """Update language followers when adding a new version."""
+    if author:
+        subtitle_language.followers.add(author)
+
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
 
@@ -322,6 +327,7 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
+
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
                    rollback_of_version_number, committer, complete):
@@ -348,6 +354,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     version = sl.add_version(subtitles=subtitles, **data)
 
+    _update_followers(sl, author)
     _perform_team_operations(version, committer, complete)
 
     return version

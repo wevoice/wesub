@@ -59,7 +59,7 @@ var DFXP = function(DFXP) {
 
     };
 
-    this.addSubtitle = function(after, newAttrs) {
+    this.addSubtitle = function(after, newAttrs, content) {
         /*
          * For adding a new subtitle to this set.
          *
@@ -70,20 +70,54 @@ var DFXP = function(DFXP) {
          * `newAttrs` is an optional JSON object specifying the attributes to
          * be applied to the new element.
          *
+         * `content` is an optional string to set the initial content.
+         *
          * Returns: new subtitle element
          */
 
-        if (!after) {
+        if (typeof after != 'number') {
             after = this.getLastSubtitle();
         }
 
-        // Create the new element and any specified attributes.
-        var newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
+        // Create the new element manually. If you create with jQuery, it'll use
+        // the document's namespace as the default namespace, which is ugly.
+        var newSubtitle = document.createElementNS('', 'p');
+
+        // Init the default attrs and combine them with the defined newAttrs if
+        // required.
+        newAttrs = $.extend({
+            'begin': '',
+            'end': ''
+        }, newAttrs);
+
+        var $newSubtitle = $(newSubtitle).attr(newAttrs);
+
+        if (typeof content !== 'undefined') {
+            this.content($newSubtitle, content);
+        }
 
         // Finally, place the new subtitle.
-        $(after).after(newSubtitle);
+        //
+        // If after is -1, we need to place the subtitle at the beginning.
+        if (after === -1) {
 
-        return newSubtitle.get(0);
+            // Get the very first subtitle.
+            var $firstSubtitle = this.getSubtitle(0);
+
+            // Place this new subtitle before the first subtitle.
+            $firstSubtitle.before($newSubtitle);
+
+        // Otherwise, place it after the designated subtitle.
+        } else {
+
+            // First just make sure that the previous subtitle exists.
+            var $previousSubtitle = this.getSubtitle(after);
+
+            // Then place it.
+            $previousSubtitle.after($newSubtitle);
+        }
+
+        return $newSubtitle.get(0);
     };
     this.changesMade = function() {
         /*
@@ -97,6 +131,29 @@ var DFXP = function(DFXP) {
 
         return originalString != xmlString;
     };
+    this.content = function(indexOrElement, content) {
+        /*
+         * Either get or set the HTML content for the subtitle.
+         *
+         * Returns: current content (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof content !== 'undefined') {
+            $subtitle.text(content);
+        }
+
+        // OK. So, when parsing an XML node, you can't just get the HTML content.
+        // We need to retrieve the total contents of the node by using "contents()",
+        // but that returns an array of objects, like ['<b>', 'hi', '</b>', '<br />'],
+        // etc. So we create a temporary div, and append the array to it, and retrieve
+        // the rendered HTML that way. Then remove the temporary div.
+        //
+        // Reference: http://bit.ly/SwbPeR
+        return $('<div>').append($subtitle.contents().clone()).remove().html();
+
+    };
     this.endTime = function(indexOrElement, endTime) {
         /*
          * Either get or set the end time for the subtitle.
@@ -104,39 +161,22 @@ var DFXP = function(DFXP) {
          * Returns: current end time (string)
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
-        if (subtitle) {
-
-            var $subtitle = $(subtitle);
-
-            if (typeof endTime !== 'undefined') {
-                $subtitle.attr('end', endTime);
-            }
-
-            return $subtitle.attr('end');
-
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
+        if (typeof endTime !== 'undefined') {
+            $subtitle.attr('end', endTime);
         }
+
+        return $subtitle.attr('end');
     };
-    this.removeSubtitle = function(indexOrElement) {
+    this.getFirstSubtitle = function() {
         /*
-         * Given the zero-index of the subtitle to be removed,
-         * remove it from the node tree.
+         * Retrieve the first subtitle in this set.
          *
-         * Returns: true
+         * Returns: first subtitle element
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
-
-        if (!subtitle) {
-            return false;
-        }
-
-        $(subtitle).remove();
-
-        return true;
+        return this.getSubtitle(0).get(0);
     };
     this.getLastSubtitle = function() {
         /*
@@ -148,11 +188,11 @@ var DFXP = function(DFXP) {
         // Cache the selection.
         var $subtitles = this.getSubtitles();
 
-        return this.getSubtitle($subtitles.length - 1);
+        return this.getSubtitle($subtitles.length - 1).get(0);
     };
     this.getSubtitle = function(indexOrElement) {
         /*
-         * Returns: subtitle element
+         * Returns: jQuery selection of element
          */
 
         // If an index or an object is not provided, throw an error.
@@ -180,49 +220,16 @@ var DFXP = function(DFXP) {
             throw new Error('DFXP: No subtitle exists with that index.');
         }
 
-        return subtitle;
+        return $(subtitle);
     };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
          *
-         * Returns: jQuery selection of nodes.
+         * Returns: jQuery selection of nodes
          */
 
         return $('div > p', this.$xml);
-    };
-    this.needsSyncing = function(indexOrElement) {
-        /*
-         * Given the zero-index or the element of the subtitle to be
-         * checked, determine whether the subtitle needs to be synced.
-         *
-         * In most cases, if a subtitle has either no start time,
-         * or no end time, it needs to be synced. However, if the
-         * subtitle is the last in the list, the end time may be
-         * omitted.
-         *
-         * Returns: true || false
-         */
-
-        var subtitle = this.getSubtitle(indexOrElement);
-        var $subtitle = $(subtitle);
-
-        var startTime = $subtitle.attr('begin');
-        var endTime = $subtitle.attr('end');
-
-        // If start time is empty, it always needs to be synced.
-        if (startTime === '') {
-            return true;
-        }
-
-        // If the end time is empty and this is not the last subtitle,
-        // it needs to be synced.
-        if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
-            return true;
-        }
-
-        // Otherwise, we're good.
-        return false;
     };
     this.needsAnySynced = function() {
         /*
@@ -249,8 +256,51 @@ var DFXP = function(DFXP) {
 
         return needsAnySynced;
     };
-    this.content = function(index) {
+    this.needsSyncing = function(indexOrElement) {
+        /*
+         * Given the zero-index or the element of the subtitle to be
+         * checked, determine whether the subtitle needs to be synced.
+         *
+         * In most cases, if a subtitle has either no start time,
+         * or no end time, it needs to be synced. However, if the
+         * subtitle is the last in the list, the end time may be
+         * omitted.
+         *
+         * Returns: true || false
+         */
 
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        var startTime = $subtitle.attr('begin');
+        var endTime = $subtitle.attr('end');
+
+        // If start time is empty, it always needs to be synced.
+        if (startTime === '') {
+            return true;
+        }
+
+        // If the end time is empty and this is not the last subtitle,
+        // it needs to be synced.
+        if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+            return true;
+        }
+
+        // Otherwise, we're good.
+        return false;
+    };
+    this.removeSubtitle = function(indexOrElement) {
+        /*
+         * Given the zero-index of the subtitle to be removed,
+         * remove it from the node tree.
+         *
+         * Returns: true
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        $subtitle.remove();
+
+        return true;
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
@@ -259,8 +309,7 @@ var DFXP = function(DFXP) {
          * Returns: current start time (string)
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
-        var $subtitle = $(subtitle);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof startTime !== 'undefined') {
             $subtitle.attr('begin', startTime);

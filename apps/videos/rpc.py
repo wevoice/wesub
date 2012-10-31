@@ -16,26 +16,22 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
-from videos.models import Video, SubtitleLanguage, Action
-from django.utils.translation import ugettext as _
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs
-from utils.translation import get_user_languages_from_request
-from django.template.loader import render_to_string
-from django.template import RequestContext
+import datetime
+
 from django.conf import settings
-from videos.search_indexes import VideoIndex
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.template import RequestContext
+from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
+
+from apps.videos.models import Video, SubtitleLanguage, Action
+from apps.videos.search_indexes import VideoIndex
+from apps.videos.tasks import send_change_title_email
 from utils.celery_search_index import update_search_index
 from utils.multi_query_set import MultiQuerySet
-from videos.tasks import send_change_title_email
-from django.template.defaultfilters import slugify
-import datetime
+from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs
+from utils.translation import get_user_languages_from_request
 
 VIDEOS_ON_PAGE = VideoIndex.IN_ROW*5
 
