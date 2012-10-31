@@ -79,8 +79,18 @@ var DFXP = function(DFXP) {
             after = this.getLastSubtitle();
         }
 
-        // Create the new element and any specified attributes.
-        var $newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
+        // Create the new element manually. If you create with jQuery, it'll use
+        // the document's namespace as the default namespace, which is ugly.
+        var newSubtitle = document.createElementNS('', 'p');
+
+        // Init the default attrs and combine them with the defined newAttrs if
+        // required.
+        newAttrs = $.extend({
+            'begin': '',
+            'end': ''
+        }, newAttrs);
+
+        var $newSubtitle = $(newSubtitle).attr(newAttrs);
 
         if (typeof content !== 'undefined') {
             this.content($newSubtitle, content);
