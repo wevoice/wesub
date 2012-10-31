@@ -62,8 +62,9 @@ elif INSTALLATION == DEMO:
     DEBUG = True
     REDIS_DB = "4"
     SENTRY_TESTING = True
-
 elif INSTALLATION == LOCAL:
+    SITE_ID = 14
+    SITE_NAME = 'unisubsstaging'
     ADMINS = (
         ('Evan', 'ehazlett@pculture.org'),
     )

@@ -17,32 +17,15 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import os
-import json
-
-from django.conf import settings
 from django.test import TestCase
 
-from apps.testhelpers.views import _create_videos
-from apps.videos.models import SubtitleLanguage
 from apps.videos.templatetags.subtitles_tags import language_url
+from apps.videos.tests.data import get_video, make_subtitle_language
 
 
 class TestTemplateTags(TestCase):
-    def setUp(self):
-        self.auth = {
-            "username": u"admin",
-            "password": u"admin"
-        }
-        fixture_path = os.path.join(settings.PROJECT_ROOT,
-                                    "apps", "videos", "fixtures",
-                                    "teams-list.json")
-        data = json.load(open(fixture_path))
-        self.videos = _create_videos(data, [])
-
     def test_language_url_for_empty_lang(self):
-        v = self.videos[0]
-        l = SubtitleLanguage(video=v, has_version=True)
-        l.save()
-        language_url(None, l)
+        v = get_video(1)
+        sl = make_subtitle_language(v, 'en')
+        self.assertIsNotNone(language_url(None, sl))
 

@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 01:31-0500\n"
+"POT-Creation-Date: 2012-10-31 01:31-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/"
@@ -321,7 +321,7 @@ msgstr "두 비밀번호가 일치하지 않습니다."
 msgid "Your email was updated."
 msgstr "귀하의 이메일을 업데이트 했습니다."
 
-#: apps/profiles/views.py:61
+#: apps/profiles/views.py:62
 msgid ""
 "File server unavailable. Try later. You can edit some other information "
 "without any problem."
@@ -329,7 +329,7 @@ msgstr ""
 "파일 서버를 사용할 수 없습니다. 나중에 시도해 보십시오. 다른 정보는 아무런 문"
 "제 없이 편집하실 수 있습니다."
 
-#: apps/profiles/views.py:144
+#: apps/profiles/views.py:147
 msgid "Your profile has been updated."
 msgstr "프로필이 업데이트 되었습니다."
 
@@ -1535,51 +1535,51 @@ msgstr "당신은 허가를 받지 않았습니다."
 msgid "Incorrect video ID"
 msgstr "잘못된 동영상 ID"
 
-#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:331
+#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:332
 msgid "Video does not exist"
 msgstr "동영상이 존재하지 않습니다"
 
-#: apps/videos/rpc.py:315 apps/videos/rpc.py:340
+#: apps/videos/rpc.py:316 apps/videos/rpc.py:341
 msgid "Title can't be empty"
 msgstr "제목은 비워둘 수 없습니다."
 
-#: apps/videos/rpc.py:329
+#: apps/videos/rpc.py:330
 msgid "Title can't be changed for this video"
 msgstr "이 동영상의 제목은 수정할 수 없습니다."
 
-#: apps/videos/rpc.py:333 apps/videos/rpc.py:351
+#: apps/videos/rpc.py:334 apps/videos/rpc.py:352
 msgid "Title was changed success"
 msgstr "제목이 성공적으로 변경되었습니다."
 
-#: apps/videos/rpc.py:345
+#: apps/videos/rpc.py:346
 msgid "Subtitle language does not exist"
 msgstr "자막 언어가 존재하지 않습니다."
 
-#: apps/videos/rpc.py:353
+#: apps/videos/rpc.py:354
 msgid "This is not forked translation"
 msgstr "이것을 번역하실 수 없습니다."
 
-#: apps/videos/rpc.py:362 apps/videos/rpc.py:378
+#: apps/videos/rpc.py:363 apps/videos/rpc.py:379
 msgid "Video does not exist."
 msgstr "동영상이 존재하지 않습니다."
 
-#: apps/videos/rpc.py:369
+#: apps/videos/rpc.py:370
 msgid "You are following this video now."
 msgstr "당신은 이제 이 비디오를 팔로우 합니다."
 
-#: apps/videos/rpc.py:385
+#: apps/videos/rpc.py:386
 msgid "You stopped following this video now."
 msgstr "이제 이 비디오를 그만 팔로우 합니다."
 
-#: apps/videos/rpc.py:394 apps/videos/rpc.py:407
+#: apps/videos/rpc.py:395 apps/videos/rpc.py:408
 msgid "Subtitles does not exist."
 msgstr "자막이 존재하지 않습니다."
 
-#: apps/videos/rpc.py:398
+#: apps/videos/rpc.py:399
 msgid "You are following this subtitles now."
 msgstr "당신은 이제 이 자막을 팔로우 합니다."
 
-#: apps/videos/rpc.py:411
+#: apps/videos/rpc.py:412
 msgid "You stopped following this subtitles now."
 msgstr "이제 이 자막을 그만 팔로우 합니다."
 

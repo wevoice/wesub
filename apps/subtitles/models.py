@@ -585,6 +585,7 @@ class SubtitleLanguage(models.Model):
 
         sv = SubtitleVersion(*args, **kwargs)
 
+        sv.set_subtitles(kwargs.get('subtitles', None))
         self._sanity_check_parents(sv, parents)
 
         sv.full_clean()
@@ -842,7 +843,7 @@ class SubtitleVersion(models.Model):
     # Subtitles are stored in a text blob, serialized as base64'ed zipped XML
     # (oh the joys of Django).  Use the subtitles property to get and set them.
     # You shouldn't be touching this field.
-    serialized_subtitles = models.TextField(blank=True)
+    serialized_subtitles = models.TextField()
 
     # Lineage is stored as a blob of JSON to save on DB rows.  You shouldn't
     # need to touch this field yourself, use the lineage property.

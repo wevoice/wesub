@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 01:32-0500\n"
+"POT-Creation-Date: 2012-10-31 01:32-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/universalsubtitles/"
@@ -328,7 +328,7 @@ msgstr "De twee wachtwoorden kwamen niet overeen."
 msgid "Your email was updated."
 msgstr "Je e-mail is geüpdatet"
 
-#: apps/profiles/views.py:61
+#: apps/profiles/views.py:62
 msgid ""
 "File server unavailable. Try later. You can edit some other information "
 "without any problem."
@@ -336,7 +336,7 @@ msgstr ""
 "File server niet beschikbaar. Probeer later opnieuw.  Je kan de overige "
 "informatie zonder probleem bewerken."
 
-#: apps/profiles/views.py:144
+#: apps/profiles/views.py:147
 msgid "Your profile has been updated."
 msgstr "Je profiel is bijgewerkt."
 
@@ -1545,51 +1545,51 @@ msgstr "Je hebt geen toelating"
 msgid "Incorrect video ID"
 msgstr "Fout video-ID"
 
-#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:331
+#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:332
 msgid "Video does not exist"
 msgstr "Video bestaat niet"
 
-#: apps/videos/rpc.py:315 apps/videos/rpc.py:340
+#: apps/videos/rpc.py:316 apps/videos/rpc.py:341
 msgid "Title can't be empty"
 msgstr "Titel kan niet blanco zijn"
 
-#: apps/videos/rpc.py:329
+#: apps/videos/rpc.py:330
 msgid "Title can't be changed for this video"
 msgstr "De titel van deze video kan niet gewijzigd worden"
 
-#: apps/videos/rpc.py:333 apps/videos/rpc.py:351
+#: apps/videos/rpc.py:334 apps/videos/rpc.py:352
 msgid "Title was changed success"
 msgstr "De titel is met succes gewijzigd"
 
-#: apps/videos/rpc.py:345
+#: apps/videos/rpc.py:346
 msgid "Subtitle language does not exist"
 msgstr "De taal voor ondertiteling bestaat niet"
 
-#: apps/videos/rpc.py:353
+#: apps/videos/rpc.py:354
 msgid "This is not forked translation"
 msgstr ""
 
-#: apps/videos/rpc.py:362 apps/videos/rpc.py:378
+#: apps/videos/rpc.py:363 apps/videos/rpc.py:379
 msgid "Video does not exist."
 msgstr "Video bestaat niet."
 
-#: apps/videos/rpc.py:369
+#: apps/videos/rpc.py:370
 msgid "You are following this video now."
 msgstr "Je volgt deze video nu."
 
-#: apps/videos/rpc.py:385
+#: apps/videos/rpc.py:386
 msgid "You stopped following this video now."
 msgstr "Je volgt deze video nu niet meer."
 
-#: apps/videos/rpc.py:394 apps/videos/rpc.py:407
+#: apps/videos/rpc.py:395 apps/videos/rpc.py:408
 msgid "Subtitles does not exist."
 msgstr "Ondertitels bestaat niet."
 
-#: apps/videos/rpc.py:398
+#: apps/videos/rpc.py:399
 msgid "You are following this subtitles now."
 msgstr "Je volgt deze ondertitels nu."
 
-#: apps/videos/rpc.py:411
+#: apps/videos/rpc.py:412
 msgid "You stopped following this subtitles now."
 msgstr "Je volgt deze ondertitels nu niet meer."
 

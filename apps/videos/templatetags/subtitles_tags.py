@@ -49,21 +49,10 @@ def upload_subtitles(context, video):
 
 @register.simple_tag
 def complete_color(language):
-    if language.is_primary_audio_language or language.is_forked:
-        if language.subtitles_complete:
-            return 'eighty'
-        else:
-            return 'full'
-
-    val = language.percent_done
-    if val >= 95:
+    if not language.subtitles_complete:
         return 'eighty'
-    elif val >= 80:
-        return 'sixty'
-    elif val >= 30:
-        return 'fourty'
     else:
-        return 'twenty'
+        return 'full'
 
 @register.inclusion_tag('videos/_video_url_panel.html', takes_context=True)
 def video_url_panel(context):
@@ -86,7 +75,8 @@ def language_url(request, lang):
 
     """
     lc = lang.language_code or 'unknown'
-    return reverse('videos:translation_history', args=[lang.video.video_id, lc, lang.pk])
+    return reverse('videos:translation_history',
+                   args=[lang.video.video_id, lc, lang.pk])
 
 @register.filter
 def format_sub_time(t):
