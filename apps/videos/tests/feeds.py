@@ -46,14 +46,13 @@ class TestFeedsSubmit(TestCase):
         self.assertEqual(Video.objects.count(), 7)
 
     def test_video_youtube_username_submit(self):
-        old_count = Video.objects.count()
+        self.assertEqual(Video.objects.count(), 0)
         data = {
-            'usernames': u'fernandotakai'
+            'usernames': u'amaratestuser'
         }
         response = self.client.post(reverse('videos:create_from_feed'), data)
         self.assertRedirects(response, reverse('videos:create'))
-        self.assertNotEqual(old_count, Video.objects.count())
-        self.assertEqual(Video.objects.count(), 17)
+        self.assertEqual(Video.objects.count(), 3)
 
     def test_empty_feed_submit(self):
         base_open_resource = feedparser._open_resource
@@ -94,9 +93,9 @@ class TestFeedsSubmit(TestCase):
         feedparser._open_resource = base_open_resource
 
 class TestFeedParser(TestCase):
-    #TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
-    #RSS should look like this http://www.dailymotion.com/rss/ru/featured/channel/tech/1
-    #but not from supported site
+    # TODO: add test for MediaFeedEntryParser. I just can't find RSS link for it
+    # RSS should look like this http://www.dailymotion.com/rss/ru/featured/channel/tech/1
+    # but not from supported site
     youtube_feed_url_pattern =  'https://gdata.youtube.com/feeds/api/users/%s/uploads'
     youtube_username = 'universalsubtitles'
 
