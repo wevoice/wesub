@@ -150,7 +150,7 @@ def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
     # There are tasks for this video.  If this version isn't published yet, it
     # belongs to those tasks, so update them.
     if version.visibility != 'public':
-        outstanding_tasks.update(subtitle_version=version,
+        outstanding_tasks.update(new_subtitle_version=version,
                                  language=language_code)
 
     # There may be existing subtitle/translate tasks.
@@ -209,6 +209,7 @@ def _create_necessary_tasks(version, team_video, workflow, committer, complete):
     else:
         # Otherwise the new task will be a subtitle or translate, depending
         # on the type of subs.
+        # TODO: More advanced logic here?
         if version.subtitle_language.is_primary_audio_language():
             task_type = Task.TYPE_IDS['Subtitle']
         else:
@@ -217,7 +218,7 @@ def _create_necessary_tasks(version, team_video, workflow, committer, complete):
     # We now know the type of task we need to create, so go ahead and make it.
     task = Task(team=team_video.team, team_video=team_video,
                 language=version.language_code, type=task_type,
-                subtitle_version=version)
+                new_subtitle_version=version)
 
     # Assign it to the correct user.
     if task.get_type_display() in ('Subtitle', 'Translate'):
@@ -320,6 +321,7 @@ def _get_language(video, language_code):
         language_needs_save = True
 
     return sl, language_needs_save
+
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
