@@ -247,7 +247,7 @@ class TeamVideoTest(TestCase):
         video = Video.objects.filter(teamvideo__isnull=True)[0]
         project = Project.objects.create(slug="one-project", team=self.team)
 
-        team_video = TeamVideo.objects.create(video=video, team=self.team, title="", description="",
+        team_video = TeamVideo.objects.create(video=video, team=self.team, description="",
                                  added_by=self.user, project=project)
 
         self.assertTrue(team_video)
@@ -282,7 +282,6 @@ class TeamsTest(TestCase):
         data = {
             "description": u"",
             "language": language,
-            "title": u"",
             "video_url": video_url,
             "thumbnail": u"",
         }
@@ -719,13 +718,11 @@ class TeamsTest(TestCase):
         #-------edit team video -----------------
         team = Team.objects.get(pk=1)
         tv = team.teamvideo_set.get(pk=1)
-        tv.title = ''
         tv.description = ''
         tv.save()
         data = {
             "languages-MAX_NUM_FORMS": u"",
             "languages-INITIAL_FORMS": u"0",
-            "title": u"change title",
             "languages-0-language": u"el",
             "languages-0-id": u"",
             "languages-TOTAL_FORMS": u"1",
@@ -740,7 +737,6 @@ class TeamsTest(TestCase):
         response = self.client.post(url, data)
         self.assertRedirects(response, reverse("teams:team_video", kwargs={"team_video_pk": tv.pk}))
         tv = team.teamvideo_set.get(pk=1)
-        self.assertEqual(tv.title, u"change title")
         self.assertEqual(tv.description, u"and description")
         meta = tv.video.metadata()
         self.assertEqual(meta.get('author'), 'Test Author')
