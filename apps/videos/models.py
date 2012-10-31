@@ -716,11 +716,8 @@ class Video(models.Model):
 
     @property
     def is_complete(self):
-        """
-        We consider complete a video which has one or more
-        subtitle languages either marked as complete, or
-        having 100%  as the percent_done.
-        """
+        """Return whether at least one of this video's languages is marked complete."""
+
         for sl in self.newsubtitlelanguage_set.all():
             if sl.is_complete_and_synced():
                 return True
