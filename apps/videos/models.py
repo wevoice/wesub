@@ -604,9 +604,8 @@ class Video(models.Model):
     def latest_version(self, language_code=None, public_only=True):
         """Return the latest SubtitleVersion for this video matching the given criteria.
 
-        If language is given (it must be a SubtitleLanguage, NOT a string
-        language code) the version will be looked up for that, otherwise the
-        original language will be used.
+        If language is given (as a language code string) the version will be
+        looked up for that, otherwise the original language will be used.
 
         If public_only is True (the default) only versions visible to the public
         (i.e.: not moderated) will be considered.  If it is false all versions
