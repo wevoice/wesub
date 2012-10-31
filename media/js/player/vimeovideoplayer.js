@@ -135,7 +135,10 @@ unisubs.player.VimeoVideoPlayer.prototype.timeUpdateTick_ = function(e) {
         this.sendTimeUpdateInternal();
 };
 unisubs.player.VimeoVideoPlayer.prototype.getDuration = function() {
-    return this.player_['api_getDuration']();
+    if (this.player_ && this.player_['api_getDuration']){
+        return this.player_['api_getDuration']();
+    }
+    return 0;
 };
 unisubs.player.VimeoVideoPlayer.prototype.getBufferedLength = function() {
     return this.player_ ? 1 : 0;
