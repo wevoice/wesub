@@ -143,6 +143,20 @@ var Site = function(Site) {
             $opt.attr('selected', 'selected');
             $select.trigger('liszt:updated');
         },
+        defaultProjFilterOption: function() {
+             /*
+              * Get the project filter option object to use if no project is
+              * specificied in the GET params.
+              */
+              if (window.TEAM_SLUG == 'ted') {
+                // Need to special case for TED
+                $opt = $('option[id="project-opt-tedtalks"]');
+                if($opt.length > 0) {
+                        return $opt;
+                }
+              }
+              return $('option[id="project-opt-any"]');
+        },
         resetProjFilter: function($select) {
             if (typeof $select == 'undefined') {
                 $select = $('select#project-filter');
@@ -151,18 +165,12 @@ var Site = function(Site) {
             if (window.REQUEST_GET_PROJECT) {
                 $opt = $('option[id="project-opt-' + window.REQUEST_GET_PROJECT + '"]');
             } else {
-                $opt = $('option[id="project-opt-any"]');
+                $opt = this.defaultProjFilterOption();
             }
 
-            // Reset the chosen selector if we have no query args indicating that we have
-            // a project.
-            //
-            // Unless this is the TED team, of course.
-            if (window.TEAM_SLUG != 'ted') {
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
-            }
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
