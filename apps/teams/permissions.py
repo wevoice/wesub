@@ -515,7 +515,7 @@ def can_review(team_video, user, lang=None, allow_own=False):
 
     subtitle_version = team_video._cached_version_for_review
 
-    if lang and subtitle_version.user_id == user.id:
+    if lang and subtitle_version.author_id == user.id:
         if can_review_own_subtitles(role, team_video):
             return True
         else:
