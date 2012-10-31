@@ -62,8 +62,10 @@ VIDEO_URLS = ('http://youtu.be/heKK95DAKms',
               'http://youtu.be/e4MSN6IImpI',
               'http://youtu.be/i_0DXxNeaQ0',)
 
-def get_video(n=1, user=None):
-    video, _ = Video.get_or_create_for_url(VIDEO_URLS[n], user=user)
+def get_video(n=1, user=None, url=None):
+    if not url:
+        url = VIDEO_URLS[n]
+    video, _ = Video.get_or_create_for_url(url, user=user)
     return video
 
 
