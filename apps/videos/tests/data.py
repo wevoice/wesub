@@ -22,7 +22,10 @@ from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage
-
+from apps.teams.models import Team, TeamMember, TeamVideo, Workflow
+from teams.permissions_const import (
+    ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER, ROLE_CONTRIBUTOR
+)
 
 # Normal Users ----------------------------------------------------------------
 def get_user(n=1):
@@ -72,8 +75,60 @@ def make_subtitle_language(video, language_code):
 
 
 # Subtitle Versions -----------------------------------------------------------
-def make_subtitle_version(subtitle_language, subtitles=[], author=None):
+def make_subtitle_version(subtitle_language, subtitles=[], author=None,
+                          parents=None, committer=None, complete=None):
+    committer = committer or author
     return pipeline.add_subtitles(subtitle_language.video,
                                   subtitle_language.language_code,
                                   subtitles,
-                                  author=author)
+                                  author=author,
+                                  parents=parents,
+                                  committer=committer,
+                                  complete=complete)
+
+
+# Teams -----------------------------------------------------------------------
+def get_team(n=1, reviewers='', approvers=''):
+    slug = 'test_team_%s' % n
+    try:
+        team = Team.objects.get(slug=slug)
+    except Team.DoesNotExist:
+        team = Team.objects.create(name='Test Team %s' % n,
+                                   slug=slug)
+
+        if reviewers or approvers:
+            reviewers = reviewers.rstrip('s')
+            approvers = approvers.rstrip('s')
+
+            review = {'peer': 10, 'manager': 20, 'admin': 30}.get(reviewers, 00)
+            approve = {'manager': 10, 'admin': 20}.get(approvers, 00)
+
+            Workflow.objects.create(team=team, review_allowed=review,
+                                    approve_allowed=approve)
+
+            team.workflow_enabled = True
+            team.save()
+
+    return team
+
+def get_team_member(user, team, role='contributor'):
+    try:
+        tm = TeamMember.objects.get(user=user, team=team)
+    except TeamMember.DoesNotExist:
+        role = {
+            'contributor': ROLE_CONTRIBUTOR,
+            'manager': ROLE_MANAGER,
+            'admin': ROLE_ADMIN,
+            'owner': ROLE_OWNER,
+        }.get(role)
+        tm = TeamMember.objects.create(user=user, team=team, role=role)
+
+    return tm
+
+def get_team_video(video, team, user):
+    try:
+        tv = TeamVideo.objects.get(video=video, team=team)
+    except TeamVideo.DoesNotExist:
+        tv = TeamVideo.objects.create(video=video, team=team, added_by=user)
+
+    return tv
