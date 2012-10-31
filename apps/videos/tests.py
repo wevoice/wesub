@@ -255,8 +255,8 @@ class BusinessLogicTest(TestCase):
 
             "title": "c" }
 
-        _create_videos([data], [])
-        v = Video.objects.get(title='c')
+        videos = _create_videos([data], [])
+        v = videos[0]
 
         en = v.subtitle_language('en')
         en_version = en.version()
@@ -2331,10 +2331,12 @@ class TestTemplateTags(TestCase):
         l = SubtitleLanguage.objects.filter(is_forked=True, is_complete=False)[0]
         self.assertEqual("0 Lines", complete_indicator(l))
         # one original noncomplete 2 subs
-        l = SubtitleLanguage.objects.filter(video__title="6", is_original=True)[0]
+        video = self.videos[6]
+        l = SubtitleLanguage.objects.filter(video=video, is_original=True)[0]
         self.assertEqual("2 Lines", complete_indicator(l))
         # one trans non complete
-        l = SubtitleLanguage.objects.filter(video__title="b", language='pt')[0]
+        video = self.videos[1]
+        l = SubtitleLanguage.objects.filter(video=video, language='pt')[0]
         self.assertEqual("60%", complete_indicator(l))
 
 
