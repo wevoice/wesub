@@ -109,14 +109,15 @@ def update_video_feed(video_feed_id):
         client.captureMessage(msg)
 
 @task()
-def video_changed_tasks(video_pk, new_version_id=None):
+def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=False):
     from videos import metadata_manager
     from videos.models import Video
     from teams.models import TeamVideo
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
-        _update_captions_in_original_service(new_version_id)
+        if not skip_third_party_sync:
+            _update_captions_in_original_service(new_version_id)
 
     video = Video.objects.get(pk=video_pk)
 
