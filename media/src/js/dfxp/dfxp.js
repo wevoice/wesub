@@ -59,7 +59,7 @@ var DFXP = function(DFXP) {
 
     };
 
-    this.addSubtitle = function(after, newAttrs) {
+    this.addSubtitle = function(after, newAttrs, content) {
         /*
          * For adding a new subtitle to this set.
          *
@@ -70,6 +70,8 @@ var DFXP = function(DFXP) {
          * `newAttrs` is an optional JSON object specifying the attributes to
          * be applied to the new element.
          *
+         * `content` is an optional string to set the initial content.
+         *
          * Returns: new subtitle element
          */
 
@@ -78,12 +80,16 @@ var DFXP = function(DFXP) {
         }
 
         // Create the new element and any specified attributes.
-        var newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
+        var $newSubtitle = $('<p begin="" end=""></p>').attr(newAttrs || {});
+
+        if (typeof content !== 'undefined') {
+            this.content($newSubtitle, content);
+        }
 
         // Finally, place the new subtitle.
-        $(after).after(newSubtitle);
+        $(after).after($newSubtitle);
 
-        return newSubtitle.get(0);
+        return $newSubtitle.get(0);
     };
     this.changesMade = function() {
         /*
@@ -104,21 +110,13 @@ var DFXP = function(DFXP) {
          * Returns: current end time (string)
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
-        if (subtitle) {
-
-            var $subtitle = $(subtitle);
-
-            if (typeof endTime !== 'undefined') {
-                $subtitle.attr('end', endTime);
-            }
-
-            return $subtitle.attr('end');
-
-        } else {
-            throw new Error('DFXP: No subtitle exists with that index.');
+        if (typeof endTime !== 'undefined') {
+            $subtitle.attr('end', endTime);
         }
+
+        return $subtitle.attr('end');
     };
     this.removeSubtitle = function(indexOrElement) {
         /*
@@ -128,13 +126,9 @@ var DFXP = function(DFXP) {
          * Returns: true
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
-        if (!subtitle) {
-            return false;
-        }
-
-        $(subtitle).remove();
+        $subtitle.remove();
 
         return true;
     };
@@ -148,11 +142,11 @@ var DFXP = function(DFXP) {
         // Cache the selection.
         var $subtitles = this.getSubtitles();
 
-        return this.getSubtitle($subtitles.length - 1);
+        return this.getSubtitle($subtitles.length - 1).get(0);
     };
     this.getSubtitle = function(indexOrElement) {
         /*
-         * Returns: subtitle element
+         * Returns: jQuery selection of element
          */
 
         // If an index or an object is not provided, throw an error.
@@ -180,13 +174,13 @@ var DFXP = function(DFXP) {
             throw new Error('DFXP: No subtitle exists with that index.');
         }
 
-        return subtitle;
+        return $(subtitle);
     };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
          *
-         * Returns: jQuery selection of nodes.
+         * Returns: jQuery selection of nodes
          */
 
         return $('div > p', this.$xml);
@@ -204,8 +198,7 @@ var DFXP = function(DFXP) {
          * Returns: true || false
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
-        var $subtitle = $(subtitle);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
         var startTime = $subtitle.attr('begin');
         var endTime = $subtitle.attr('end');
@@ -249,7 +242,27 @@ var DFXP = function(DFXP) {
 
         return needsAnySynced;
     };
-    this.content = function(index) {
+    this.content = function(indexOrElement, content) {
+        /*
+         * Either get or set the HTML content for the subtitle.
+         *
+         * Returns: current content (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof content !== 'undefined') {
+            $subtitle.text(content);
+        }
+
+        // OK. So, when parsing an XML node, you can't just get the HTML content.
+        // We need to retrieve the total contents of the node by using "contents()",
+        // but that returns an array of objects, like ['<b>', 'hi', '</b>', '<br />'],
+        // etc. So we create a temporary div, and append the array to it, and retrieve
+        // the rendered HTML that way. Then remove the temporary div.
+        //
+        // Reference: http://bit.ly/SwbPeR
+        return $('<div>').append($subtitle.contents().clone()).remove().html();
 
     };
     this.startTime = function(indexOrElement, startTime) {
@@ -259,8 +272,7 @@ var DFXP = function(DFXP) {
          * Returns: current start time (string)
          */
 
-        var subtitle = this.getSubtitle(indexOrElement);
-        var $subtitle = $(subtitle);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof startTime !== 'undefined') {
             $subtitle.attr('begin', startTime);
