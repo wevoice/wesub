@@ -21,16 +21,43 @@ from django.test import TestCase
 
 from apps.videos import metadata_manager
 from apps.videos.models import Video
-from apps.videos.tests.utils import create_langs_and_versions
+from apps.videos.tests.data import (
+    get_video, make_subtitle_language, make_subtitle_version
+)
 
 
 class TestMetadataManager(TestCase):
     fixtures = ['staging_users.json', 'staging_videos.json']
 
     def test_language_count(self):
-        video = Video.objects.all()[0]
-        create_langs_and_versions(video, ['en'])
-        metadata_manager.update_metadata(video.pk)
-        video = Video.objects.all()[0]
-        self.assertEqual(video.languages_count, 1)
+        video = get_video()
+        video_pk = video.pk
 
+        def _assert_count(n):
+            metadata_manager.update_metadata(video_pk)
+            video = Video.objects.get(pk=video_pk)
+            self.assertEqual(video.languages_count, n)
+
+        _assert_count(0)
+
+        # Empty languages do not count toward the language count!
+        sl_en = make_subtitle_language(video, 'en')
+        _assert_count(0)
+
+        # Neither do empty versions.
+        make_subtitle_version(sl_en, subtitles=[])
+        _assert_count(0)
+
+        # But languages with non-empty versions do.
+        make_subtitle_version(sl_en, subtitles=[(100, 200, 'foo')])
+        _assert_count(1)
+
+        # One more for good measure.
+        sl_fr = make_subtitle_language(video, 'fr')
+        _assert_count(1)
+
+        make_subtitle_version(sl_fr, subtitles=[])
+        _assert_count(1)
+
+        make_subtitle_version(sl_fr, subtitles=[(100, 200, 'bar')])
+        _assert_count(2)
