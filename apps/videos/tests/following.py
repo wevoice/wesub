@@ -17,179 +17,120 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import datetime
-
-from django.core.cache import cache
-
-from apps.teams.models import Team, TeamMember, TeamVideo, Workflow
-from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
+from apps.teams.models import Task
+from apps.videos.tests.data import (
+    get_user, get_video, get_team, get_team_member, get_team_video,
+    make_subtitle_language, make_subtitle_version
+)
 from apps.videos.tests.utils import WebUseTest
-from apps.videos.types.youtube import YoutubeVideoType
 
 
 class TestFollowingVideos(WebUseTest):
-    fixtures = ['test.json', 'subtitle_fixtures.json']
-
-    def setUp(self):
-        self._make_objects()
-        self.vt = YoutubeVideoType
-        self.data = [{
-            'url': 'http://www.youtube.com/watch#!v=UOtJUmiUZ08&feature=featured&videos=Qf8YDn9mbGs',
-            'video_id': 'UOtJUmiUZ08'
-        },{
-            'url': 'http://www.youtube.com/v/6Z5msRdai-Q',
-            'video_id': '6Z5msRdai-Q'
-        },{
-            'url': 'http://www.youtube.com/watch?v=woobL2yAxD4',
-            'video_id': 'woobL2yAxD4'
-        },{
-            'url': 'http://www.youtube.com/watch?v=woobL2yAxD4&amp;playnext=1&amp;videos=9ikUhlPnCT0&amp;feature=featured',
-            'video_id': 'woobL2yAxD4'
-        }]
-        self.shorter_url = "http://youtu.be/HaAVZ2yXDBo"
-        cache.clear()
+    def _assertFollowers(self, item, users):
+        self.assertEqual(set(item.followers.values_list('id', flat=True)),
+                         set([user.id for user in users]))
 
     def test_create_video(self):
-        """
-        When a video is created, the submitter should follow that video.
-        """
-        self._login()
-        video, created = Video.get_or_create_for_url(
-                video_url="http://example.com/123.mp4", user=self.user)
+        # Videos without authors should not have any followers.
+        video = get_video(1)
+        self._assertFollowers(video, [])
 
-        self.assertTrue(video.followers.filter(pk=self.user.pk).exists())
+        # But submitters automatically follow their videos.
+        user = get_user()
+        video = get_video(2, user=user)
+        self._assertFollowers(video, [user])
 
     def test_create_edit_subs(self):
-        """
-        Trascriber, translator should follow language, not video.
-        """
-        self._login()
+        video = get_video(1)
+        sl_en = make_subtitle_language(video, 'en')
 
-        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
-        video, created = Video.get_or_create_for_url(youtube_url)
-        self.assertEquals(2, SubtitleLanguage.objects.count())
-        SubtitleVersion.objects.all().delete()
+        # Start off with zero followers.
+        self._assertFollowers(video, [])
+        self._assertFollowers(sl_en, [])
 
-        # Create a transcription
+        # Transcriber/translator should follow only the language, not the video.
+        en_author = get_user(1)
+        make_subtitle_version(sl_en, author=en_author)
+        self._assertFollowers(video, [])
+        self._assertFollowers(sl_en, [en_author])
 
-        language = SubtitleLanguage.objects.get(language='en')
-        language.is_original = True
-        language.save()
-        self.assertFalse(language.followers.filter(pk=self.user.pk).exists())
+        # Create a "translation".
+        sl_ru = make_subtitle_language(video, 'ru')
+        self.assertEqual(sl_ru.followers.count(), 0)
 
-        version = SubtitleVersion(language=language, user=self.user,
-                datetime_started=datetime.now(), version_no=0,
-                is_forked=False)
-        version.save()
+        ru_author = get_user(2)
+        make_subtitle_version(sl_ru, author=ru_author, parents=[('en', 1)])
 
-        # Trascription author follows language, not video
-        self.assertTrue(version.is_transcription)
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
-        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
+        # Translation editors should follow only the language, not the video.
+        self.assertEqual(sl_ru.get_translation_source_language_code(), 'en')
+        self._assertFollowers(video, [])
+        self._assertFollowers(sl_en, [en_author])
+        self._assertFollowers(sl_ru, [ru_author])
 
-        # Create a translation
-        czech = SubtitleLanguage.objects.create(language='ru', is_original=False,
-                video=video)
-        self.assertEquals(3, SubtitleLanguage.objects.count())
+        # Editors should also follow only the language, not the video.
+        editor = get_user(3)
 
-        version = SubtitleVersion(language=czech, user=self.user,
-                datetime_started=datetime.now(), version_no=0,
-                is_forked=False)
-        version.save()
+        make_subtitle_version(sl_en, author=editor)
+        self._assertFollowers(video, [])
+        self._assertFollowers(sl_en, [en_author, editor])
+        self._assertFollowers(sl_ru, [ru_author])
 
-        # Translation creator follows language, not video
-        self.assertTrue(version.is_translation)
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
-        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
-
-        # Now editing --------------------------------------------------------
-
-        self.assertNotEquals(language.pk, czech.pk)
-        video.followers.clear()
-        language.followers.clear()
-        czech.followers.clear()
-
-        version = SubtitleVersion(language=language, user=self.user,
-                datetime_started=datetime.now(), version_no=1,
-                is_forked=False)
-        version.save()
-
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
-        self.assertTrue(language.followers.filter(pk=self.user.pk).exists())
-
-        version = SubtitleVersion(language=czech, user=self.user,
-                datetime_started=datetime.now(), version_no=1,
-                is_forked=False)
-        version.save()
-
-        self.assertFalse(video.followers.filter(pk=self.user.pk).exists())
-        self.assertTrue(czech.followers.filter(pk=self.user.pk).exists())
+        make_subtitle_version(sl_ru, author=editor)
+        self._assertFollowers(video, [])
+        self._assertFollowers(sl_en, [en_author, editor])
+        self._assertFollowers(sl_ru, [ru_author, editor])
 
     def test_review_subs(self):
-        """
-        When you review a set of subtitles, you should follow that language.
-        """
-        self._login()
-        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
+        team = get_team(1, reviewers='peers')
 
-        vt = self.vt(youtube_url)
-        video, created = Video.get_or_create_for_url(youtube_url)
+        author = get_user(1)
+        get_team_member(author, team)
 
-        lang = vt.get_subtitled_languages()[0]
+        reviewer = get_user(2)
+        get_team_member(reviewer, team)
 
-        language = SubtitleLanguage.objects.get(language='en')
-        version = SubtitleVersion(language=language,
-                datetime_started=datetime.now(), version_no=10)
-        version.save()
+        video = get_video(1)
+        video.primary_audio_language_code = 'en'
+        video.save()
+        get_team_video(video, team, author)
 
-        team, created = Team.objects.get_or_create(name='name', slug='slug')
-        TeamMember.objects.create(team=team, user=self.user,
-                role=TeamMember.ROLE_OWNER)
-        team_video, _= TeamVideo.objects.get_or_create(team=team, video=video,
-                added_by=self.user)
-        Workflow.objects.create(team=team, team_video=team_video,
-                review_allowed=30
-                )
+        # Make some initial subtitles.
+        # This should create a review task for them.
+        sl_en = make_subtitle_language(video, 'en')
+        sv = make_subtitle_version(sl_en, author=author, complete=True)
 
-        sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(1, sl.followers.count())
-        latest = video.latest_version(language_code='en')
-        latest.set_reviewed_by(self.user)
-        latest.save()
+        self._assertFollowers(sl_en, [author])
+        self.assertEqual(Task.objects.count(), 1)
+        self.assertEqual(Task.objects.incomplete_review().count(), 1)
 
-        self.assertEquals(2, sl.followers.count())
+        # When you review a set of subtitles, you should follow that language.
+        sv.set_reviewed_by(reviewer)
+        self._assertFollowers(sl_en, [author, reviewer])
 
-    def test_approve_not(self):
-        """
-        When you approve subtitles, you should *not* follow anything.
-        """
-        self._login()
-        youtube_url = 'http://www.youtube.com/watch?v=XDhJ8lVGbl8'
+    def test_approve_subs(self):
+        team = get_team(1, approvers='managers')
 
-        vt = self.vt(youtube_url)
-        video, created = Video.get_or_create_for_url(youtube_url)
+        author = get_user(1)
+        get_team_member(author, team)
 
-        lang = vt.get_subtitled_languages()[0]
+        approver = get_user(2)
+        get_team_member(approver, team)
 
-        language = SubtitleLanguage.objects.get(language='en')
-        version = SubtitleVersion(language=language,
-                datetime_started=datetime.now(), version_no=10)
-        version.save()
+        video = get_video(1)
+        video.primary_audio_language_code = 'en'
+        video.save()
+        get_team_video(video, team, author)
 
-        team, created = Team.objects.get_or_create(name='name', slug='slug')
-        TeamMember.objects.create(team=team, user=self.user,
-                role=TeamMember.ROLE_OWNER)
-        team_video, _= TeamVideo.objects.get_or_create(team=team, video=video,
-                added_by=self.user)
-        Workflow.objects.create(team=team, team_video=team_video,
-                review_allowed=30
-                )
+        # Make some initial subtitles.
+        # This should create an approve task for them.
+        sl_en = make_subtitle_language(video, 'en')
+        sv = make_subtitle_version(sl_en, author=author, complete=True)
 
-        sl = video.subtitle_language(lang['lang_code'])
-        self.assertEquals(1, sl.followers.count())
-        latest = video.latest_version(language_code='en')
-        latest.set_approved_by(self.user)
-        latest.save()
+        self._assertFollowers(sl_en, [author])
+        self.assertEqual(Task.objects.count(), 1)
+        self.assertEqual(Task.objects.incomplete_approve().count(), 1)
 
-        self.assertEquals(1, sl.followers.count())
-
+        # When you approve a set of subtitles, you should NOT follow that
+        # language.
+        sv.set_approved_by(approver)
+        self._assertFollowers(sl_en, [author])

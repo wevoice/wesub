@@ -497,6 +497,10 @@ class SubtitleLanguage(models.Model):
             return False
 
         version = self.get_tip(public)
+
+        if not version:
+            return False
+
         subtitles = version.get_subtitles()
 
         return subtitles.fully_synced
