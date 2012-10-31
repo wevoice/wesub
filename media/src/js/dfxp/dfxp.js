@@ -75,7 +75,7 @@ var DFXP = function(DFXP) {
          * Returns: new subtitle element
          */
 
-        if (!after) {
+        if (typeof after != 'number') {
             after = this.getLastSubtitle();
         }
 
@@ -97,7 +97,25 @@ var DFXP = function(DFXP) {
         }
 
         // Finally, place the new subtitle.
-        $(after).after($newSubtitle);
+        //
+        // If after is -1, we need to place the subtitle at the beginning.
+        if (after === -1) {
+
+            // Get the very first subtitle.
+            var $firstSubtitle = this.getSubtitle(0);
+
+            // Place this new subtitle before the first subtitle.
+            $firstSubtitle.before($newSubtitle);
+
+        // Otherwise, place it after the designated subtitle.
+        } else {
+
+            // First just make sure that the previous subtitle exists.
+            var $previousSubtitle = this.getSubtitle(after);
+
+            // Then place it.
+            $previousSubtitle.after($newSubtitle);
+        }
 
         return $newSubtitle.get(0);
     };
@@ -141,6 +159,15 @@ var DFXP = function(DFXP) {
         $subtitle.remove();
 
         return true;
+    };
+    this.getFirstSubtitle = function() {
+        /*
+         * Retrieve the first subtitle in this set.
+         *
+         * Returns: first subtitle element
+         */
+
+        return this.getSubtitle(0).get(0);
     };
     this.getLastSubtitle = function() {
         /*
