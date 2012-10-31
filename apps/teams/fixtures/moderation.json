@@ -50,7 +50,6 @@
         "fields": {
             "all_languages": false, 
             "description": "", 
-            "title": "", 
             "video": 5, 
             "team": 2, 
             "thumbnail": "", 
@@ -64,7 +63,6 @@
         "fields": {
             "all_languages": false, 
             "description": "", 
-            "title": "", 
             "video": 6, 
             "team": 2, 
             "thumbnail": "", 
@@ -78,7 +76,6 @@
         "fields": {
             "all_languages": false, 
             "description": "", 
-            "title": "", 
             "video": 7, 
             "team": 2, 
             "thumbnail": "", 
