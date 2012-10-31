@@ -510,7 +510,8 @@ def can_review(team_video, user, lang=None, allow_own=False):
 
     # Users usually cannot review their own subtitles.
     if not hasattr(team_video, '_cached_version_for_review'):
-        team_video._cached_version_for_review = team_video.video.latest_version(language_code=lang, public_only=False)
+        team_video._cached_version_for_review = team_video.video.latest_version(
+            language_code=lang, public_only=False)
 
     subtitle_version = team_video._cached_version_for_review
 
