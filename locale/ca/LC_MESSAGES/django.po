@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-30 01:41-0500\n"
+"POT-Creation-Date: 2012-10-31 01:41-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
@@ -324,7 +324,7 @@ msgstr "Les dues contrasenyes no coincideixen."
 msgid "Your email was updated."
 msgstr "El vostre correu electrònic s'ha actualitat"
 
-#: apps/profiles/views.py:61
+#: apps/profiles/views.py:62
 msgid ""
 "File server unavailable. Try later. You can edit some other information "
 "without any problem."
@@ -332,7 +332,7 @@ msgstr ""
 "El servidor de fitxers no està disponible. Proveu de nou més endavant. Podeu "
 "editar alguna informació sense cap problema."
 
-#: apps/profiles/views.py:144
+#: apps/profiles/views.py:147
 msgid "Your profile has been updated."
 msgstr "El vostre perfil ha estat actualitzat."
 
@@ -1566,51 +1566,51 @@ msgstr "No teniu permisos."
 msgid "Incorrect video ID"
 msgstr "Identificador de vídeo incorrecte"
 
-#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:331
+#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:332
 msgid "Video does not exist"
 msgstr "El vídeo no existeix"
 
-#: apps/videos/rpc.py:315 apps/videos/rpc.py:340
+#: apps/videos/rpc.py:316 apps/videos/rpc.py:341
 msgid "Title can't be empty"
 msgstr "El títol no pot estar buit."
 
-#: apps/videos/rpc.py:329
+#: apps/videos/rpc.py:330
 msgid "Title can't be changed for this video"
 msgstr "No es pot canviar el títol per a aquest vídeo"
 
-#: apps/videos/rpc.py:333 apps/videos/rpc.py:351
+#: apps/videos/rpc.py:334 apps/videos/rpc.py:352
 msgid "Title was changed success"
 msgstr "El títol fou canviat amb èxit"
 
-#: apps/videos/rpc.py:345
+#: apps/videos/rpc.py:346
 msgid "Subtitle language does not exist"
 msgstr "No existeix l'idioma dels subtítols"
 
-#: apps/videos/rpc.py:353
+#: apps/videos/rpc.py:354
 msgid "This is not forked translation"
 msgstr "Aquesta no és una traducció bifurcada"
 
-#: apps/videos/rpc.py:362 apps/videos/rpc.py:378
+#: apps/videos/rpc.py:363 apps/videos/rpc.py:379
 msgid "Video does not exist."
 msgstr "No existeix el vídeo."
 
-#: apps/videos/rpc.py:369
+#: apps/videos/rpc.py:370
 msgid "You are following this video now."
 msgstr "Esteu seguint aquest vídeo."
 
-#: apps/videos/rpc.py:385
+#: apps/videos/rpc.py:386
 msgid "You stopped following this video now."
 msgstr "Heu deixat de seguir aquest vídeo."
 
-#: apps/videos/rpc.py:394 apps/videos/rpc.py:407
+#: apps/videos/rpc.py:395 apps/videos/rpc.py:408
 msgid "Subtitles does not exist."
 msgstr "No existeix cap subtítol."
 
-#: apps/videos/rpc.py:398
+#: apps/videos/rpc.py:399
 msgid "You are following this subtitles now."
 msgstr "Esteu seguint aquest subtítol."
 
-#: apps/videos/rpc.py:411
+#: apps/videos/rpc.py:412
 msgid "You stopped following this subtitles now."
 msgstr "Heu deixat de seguir aquest subtítol."
 
