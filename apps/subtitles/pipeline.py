@@ -282,6 +282,11 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
             _create_necessary_tasks(version, team_video, workflow, committer,
                                     complete)
 
+def _update_followers(subtitle_language, author):
+    """Update language followers when adding a new version."""
+    if author:
+        subtitle_language.followers.add(author)
+
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
 
@@ -349,6 +354,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     version = sl.add_version(subtitles=subtitles, **data)
 
+    _update_followers(sl, author)
     _perform_team_operations(version, committer, complete)
 
     return version
