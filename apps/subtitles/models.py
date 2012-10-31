@@ -490,8 +490,7 @@ class SubtitleLanguage(models.Model):
             return None
 
     def is_complete_and_synced(self, public=False):
-        """ Verifies if this language not only has covered all the audio
-        on the video with text but also if those subtitles are correctly synced """
+        """Return whether this language's subtitles are complete and fully synced."""
 
         if not self.subtitles_complete:
             return False
