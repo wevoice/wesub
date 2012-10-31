@@ -25,10 +25,7 @@ from django.test import TestCase
 
 from apps.videos.feed_parser import FeedParser
 from apps.videos.models import Video, VideoFeed
-from apps.videos.types.dailymotion import DailymotionVideoType
-from apps.videos.types.htmlfive import HtmlFiveVideoType
 from apps.videos.types.vimeo import VimeoVideoType
-from apps.videos.types.youtube import YoutubeVideoType
 
 
 class TestFeedsSubmit(TestCase):
@@ -118,11 +115,16 @@ class TestFeedParser(TestCase):
         self.assertTrue(video)
 
     def test_youtube_feed_parsing(self):
+        # I hate you, Python.
+        from videos.types.youtube import YoutubeVideoType as YoutubeVideoTypeA
+        from apps.videos.types.youtube import YoutubeVideoType as YoutubeVideoTypeB
+
         feed_url = self.youtube_feed_url_pattern % self.youtube_username
 
         feed_parser = FeedParser(feed_url)
         vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, YoutubeVideoType))
+        self.assertTrue(isinstance(vt, YoutubeVideoTypeA)
+                        or isinstance(vt, YoutubeVideoTypeB))
 
         video, created = Video.get_or_create_for_url(vt=vt)
         self.assertTrue(video)
@@ -133,9 +135,14 @@ class TestFeedParser(TestCase):
         MIT feed contain videos, so if sometime they delete some etries - test
         can fail.
         """
+        # Python.  What are you doing?  Python.  Stahp.
+        from videos.types.htmlfive import HtmlFiveVideoType as HtmlFiveVideoTypeA
+        from apps.videos.types.htmlfive import HtmlFiveVideoType as HtmlFiveVideoTypeB
+
         feed_parser = FeedParser(self.mit_feed_url)
         vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, HtmlFiveVideoType))
+        self.assertTrue(isinstance(vt, HtmlFiveVideoTypeA)
+                        or isinstance(vt, HtmlFiveVideoTypeB))
 
         video, created = Video.get_or_create_for_url(vt=vt)
         self.assertTrue(video)
@@ -152,11 +159,16 @@ class TestFeedParser(TestCase):
 #        self.assertTrue(video)
 
     def test_dailymotion_feed_parsing(self):
+        # Welp.
+        from videos.types.dailymotion import DailymotionVideoType as DailymotionVideoTypeA
+        from apps.videos.types.dailymotion import DailymotionVideoType as DailymotionVideoTypeB
+
         feed_url = 'http://www.dailymotion.com/rss/ru/featured/channel/tech/1'
 
         feed_parser = FeedParser(feed_url)
         vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, DailymotionVideoType))
+        self.assertTrue(isinstance(vt, DailymotionVideoTypeA)
+                        or isinstance(vt, DailymotionVideoTypeB))
 
         video, created = Video.get_or_create_for_url(vt=vt)
         self.assertTrue(video)
