@@ -1329,7 +1329,9 @@ class Workflow(models.Model):
         '''
         if not workflows:
             team = Workflow._get_target_team(id, type)
-            workflows = list(Workflow.objects.filter(team=team.id).select_related('project', 'team', 'team_video'))
+            workflows = list(Workflow.objects.filter(team=team.id)
+                                             .select_related('project', 'team',
+                                                             'team_video'))
         else:
             team = workflows[0].team
 
@@ -1382,7 +1384,8 @@ class Workflow(models.Model):
 
         '''
         if not hasattr(team_video, '_cached_workflow'):
-            team_video._cached_workflow = Workflow.get_for_target(team_video.id, 'team_video', workflows)
+            team_video._cached_workflow = Workflow.get_for_target(
+                    team_video.id, 'team_video', workflows)
         return team_video._cached_workflow
 
     @classmethod
@@ -1639,9 +1642,11 @@ class Task(models.Model):
     # This is used when rejecting versions, and may be used elsewhere in the
     # future as well.
     review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
-                                            null=True, related_name='tasks_based_on')
+                                            null=True,
+                                            related_name='tasks_based_on')
     new_review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
-                                                null=True, related_name='tasks_based_on_new')
+                                                null=True,
+                                                related_name='tasks_based_on_new')
 
     deleted = models.BooleanField(default=False)
 
