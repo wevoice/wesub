@@ -27,8 +27,6 @@ from apps.videos.tests.data import (
 
 
 class TestMetadataManager(TestCase):
-    fixtures = ['staging_users.json', 'staging_videos.json']
-
     def test_language_count(self):
         video = get_video()
         video_pk = video.pk
