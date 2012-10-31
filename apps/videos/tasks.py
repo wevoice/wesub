@@ -33,7 +33,9 @@ from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
 from videos.models import VideoFeed, Video
-from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.models import (
+    SubtitleLanguage, SubtitleVersion, get_caption_diff_data
+)
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
@@ -263,8 +265,6 @@ def _make_caption_data(new_version, old_version):
 
 
 def _send_letter_caption(caption_version):
-    from subtitles.models import SubtitleVersion, get_caption_diff_data
-
     domain = Site.objects.get_current().domain
 
     language = caption_version.subtitle_language
