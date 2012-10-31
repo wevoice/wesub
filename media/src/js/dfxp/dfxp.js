@@ -75,7 +75,7 @@ var DFXP = function(DFXP) {
          * Returns: new subtitle element
          */
 
-        if (!after) {
+        if (typeof after != 'number') {
             after = this.getLastSubtitle();
         }
 
@@ -97,7 +97,25 @@ var DFXP = function(DFXP) {
         }
 
         // Finally, place the new subtitle.
-        $(after).after($newSubtitle);
+        //
+        // If after is -1, we need to place the subtitle at the beginning.
+        if (after === -1) {
+
+            // Get the very first subtitle.
+            var $firstSubtitle = this.getSubtitle(0);
+
+            // Place this new subtitle before the first subtitle.
+            $firstSubtitle.before($newSubtitle);
+
+        // Otherwise, place it after the designated subtitle.
+        } else {
+
+            // First just make sure that the previous subtitle exists.
+            var $previousSubtitle = this.getSubtitle(after);
+
+            // Then place it.
+            $previousSubtitle.after($newSubtitle);
+        }
 
         return $newSubtitle.get(0);
     };
@@ -112,6 +130,29 @@ var DFXP = function(DFXP) {
         var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
         return originalString != xmlString;
+    };
+    this.content = function(indexOrElement, content) {
+        /*
+         * Either get or set the HTML content for the subtitle.
+         *
+         * Returns: current content (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof content !== 'undefined') {
+            $subtitle.text(content);
+        }
+
+        // OK. So, when parsing an XML node, you can't just get the HTML content.
+        // We need to retrieve the total contents of the node by using "contents()",
+        // but that returns an array of objects, like ['<b>', 'hi', '</b>', '<br />'],
+        // etc. So we create a temporary div, and append the array to it, and retrieve
+        // the rendered HTML that way. Then remove the temporary div.
+        //
+        // Reference: http://bit.ly/SwbPeR
+        return $('<div>').append($subtitle.contents().clone()).remove().html();
+
     };
     this.endTime = function(indexOrElement, endTime) {
         /*
@@ -128,19 +169,14 @@ var DFXP = function(DFXP) {
 
         return $subtitle.attr('end');
     };
-    this.removeSubtitle = function(indexOrElement) {
+    this.getFirstSubtitle = function() {
         /*
-         * Given the zero-index of the subtitle to be removed,
-         * remove it from the node tree.
+         * Retrieve the first subtitle in this set.
          *
-         * Returns: true
+         * Returns: first subtitle element
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        $subtitle.remove();
-
-        return true;
+        return this.getSubtitle(0).get(0);
     };
     this.getLastSubtitle = function() {
         /*
@@ -195,6 +231,31 @@ var DFXP = function(DFXP) {
 
         return $('div > p', this.$xml);
     };
+    this.needsAnySynced = function() {
+        /*
+         * Determine whether any of the subtitles in the set need
+         * to be synced.
+         *
+         * Returns: true || false
+         */
+
+        var needsAnySynced = false;
+
+        // Caching the current subtitle set drastically cuts down on processing
+        // time for iterating through large subtitle sets.
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+
+            // We're going to pass the actual element instead of an integer. This
+            // means needsSyncing doesn't need to hit the DOM to find the element.
+            if (this.needsSyncing($subtitles.get(i))) {
+                needsAnySynced = true;
+            }
+        }
+
+        return needsAnySynced;
+    };
     this.needsSyncing = function(indexOrElement) {
         /*
          * Given the zero-index or the element of the subtitle to be
@@ -227,53 +288,19 @@ var DFXP = function(DFXP) {
         // Otherwise, we're good.
         return false;
     };
-    this.needsAnySynced = function() {
+    this.removeSubtitle = function(indexOrElement) {
         /*
-         * Determine whether any of the subtitles in the set need
-         * to be synced.
+         * Given the zero-index of the subtitle to be removed,
+         * remove it from the node tree.
          *
-         * Returns: true || false
-         */
-
-        var needsAnySynced = false;
-
-        // Caching the current subtitle set drastically cuts down on processing
-        // time for iterating through large subtitle sets.
-        var $subtitles = this.getSubtitles();
-
-        for (var i = 0; i < $subtitles.length; i++) {
-
-            // We're going to pass the actual element instead of an integer. This
-            // means needsSyncing doesn't need to hit the DOM to find the element.
-            if (this.needsSyncing($subtitles.get(i))) {
-                needsAnySynced = true;
-            }
-        }
-
-        return needsAnySynced;
-    };
-    this.content = function(indexOrElement, content) {
-        /*
-         * Either get or set the HTML content for the subtitle.
-         *
-         * Returns: current content (string)
+         * Returns: true
          */
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
-        if (typeof content !== 'undefined') {
-            $subtitle.text(content);
-        }
+        $subtitle.remove();
 
-        // OK. So, when parsing an XML node, you can't just get the HTML content.
-        // We need to retrieve the total contents of the node by using "contents()",
-        // but that returns an array of objects, like ['<b>', 'hi', '</b>', '<br />'],
-        // etc. So we create a temporary div, and append the array to it, and retrieve
-        // the rendered HTML that way. Then remove the temporary div.
-        //
-        // Reference: http://bit.ly/SwbPeR
-        return $('<div>').append($subtitle.contents().clone()).remove().html();
-
+        return true;
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
