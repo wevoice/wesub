@@ -82,6 +82,10 @@ unisubs.subtitle.Dialog.State_ = {
 
 };
 
+// if the last sub is unsyced how much to consider it's end time 
+// (after start time), in milliseconds
+unisubs.subtitle.Dialog.END_TIME_PADDING = 4000;
+
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
     this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
@@ -329,7 +333,7 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
             // We are satisifed with the start and end times of all captions.
             //
             // However, if the last caption has no end time, set it to either a) the duration of the video or b) the start time
-            // of the caption + 4 seconds.
+            // of the caption + end time padding seconds.
             if (this.captionSet_.captions_[this.captionSet_.captions_.length -1].getEndTime() ==
                     unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
 
@@ -337,9 +341,9 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 
                 var newEndTime;
                 if (this.videoPlayer_.getDuration()) {
-                    newEndTime = Math.min(this.videoPlayer_.getDuration(), cap.getStartTime() + 4.0);
+                    newEndTime = Math.min(this.videoPlayer_.getDuration() * 1000, cap.getStartTime() + unisubs.subtitle.Dialog.END_TIME_PADDING);
                 } else {
-                    newEndTime = cap.getStartTime() + 4.0;
+                    newEndTime = cap.getStartTime() + unisubs.subtitle.Dialog.END_TIME_PADDING;
                 }
 
                 cap.setEndTime(newEndTime);
