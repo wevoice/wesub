@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 01:42-0500\n"
+"POT-Creation-Date: 2012-11-01 01:42-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/"
@@ -177,7 +177,7 @@ msgid "You should enter subject or message."
 msgstr "Вы должны ввести тему или сообщение."
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
-#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:43
+#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:39
 msgid "You should be authenticated."
 msgstr "Вы должны быть авторизированы."
 
@@ -718,11 +718,11 @@ msgstr "Управляющие и администраторы"
 msgid "Admins only"
 msgstr "Только администраторы"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2554
+#: apps/teams/models.py:141 apps/teams/models.py:2559
 msgid "name"
 msgstr "название"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2555
+#: apps/teams/models.py:142 apps/teams/models.py:2560
 msgid "slug"
 msgstr "короткий адрес"
 
@@ -1307,7 +1307,7 @@ msgstr ""
 msgid "Views"
 msgstr "Просмотров"
 
-#: apps/videos/models.py:1154
+#: apps/videos/models.py:1149
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1315,7 +1315,7 @@ msgstr ""
 "Простите, вы не можете сейчас загрузить субтитры, так как кто-то редактирует "
 "язык, перевод на который вы загружаете"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2016
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1324,7 +1324,7 @@ msgstr ""
 "  проверил субтитры на языке \"<a href=\"%(language_url)s\">%(language)s</a>"
 "\" для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1333,7 +1333,7 @@ msgstr ""
 "  принял субтитры на языке \"<a href=\"%(language_url)s\">%(language)s</a>\" "
 "для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2031
+#: apps/videos/models.py:2026
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1342,7 +1342,7 @@ msgstr ""
 "  отклонил субтитры на языке \"<a href=\"%(language_url)s\">%(language)s</a>"
 "\" для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2036
+#: apps/videos/models.py:2031
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1351,41 +1351,41 @@ msgstr ""
 "  одобрил субтитры на языке \"<a href=\"%(language_url)s\">%(language)s</a>"
 "\" для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2042
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  удалил видео \"%(title)s\""
 
-#: apps/videos/models.py:2052
+#: apps/videos/models.py:2047
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "добавил видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2049
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "Видео <a href=\"%(video_url)s\">%(video_name)s</a> добавлено"
 
-#: apps/videos/models.py:2060
+#: apps/videos/models.py:2055
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "изменил название для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2062
+#: apps/videos/models.py:2057
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Название видео <a href=\"%(video_url)s\">%(video_name)s</a> было изменено."
 
-#: apps/videos/models.py:2077
+#: apps/videos/models.py:2072
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1394,7 +1394,7 @@ msgstr ""
 "прокомментировал <a href=\"%(comments_url)s\">субтитры на языке \"%(language)"
 "s\"</a> для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2079
+#: apps/videos/models.py:2074
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1403,18 +1403,18 @@ msgstr ""
 "Комментарий добавлен к <a href=\"%(comments_url)s\">субтитрам на языке \"%"
 "(language)s\"</a> для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2082
+#: apps/videos/models.py:2077
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "прокомментировал видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2084
+#: apps/videos/models.py:2079
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Комментарий добавлен для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2092
+#: apps/videos/models.py:2087
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1423,7 +1423,7 @@ msgstr ""
 "начал <a href=\"%(language_url)s\">субтитры на языке \"%(language)s\"</a> "
 "для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1432,7 +1432,7 @@ msgstr ""
 "начаты <a href=\"%(language_url)s\">Субтитры на языке\"%(language)s\"</a> "
 "для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2105
+#: apps/videos/models.py:2100
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1441,7 +1441,7 @@ msgstr ""
 "отредактировал <a href=\"%(language_url)s\">субтитры на языке \"%(language)s"
 "\"</a> для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2102
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1450,108 +1450,108 @@ msgstr ""
 "отредактированы <a href=\"%(language_url)s\">субтитры на языке \"%(language)s"
 "\"</a> для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2113
+#: apps/videos/models.py:2108
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "добавлен новый URL для видео <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2115
+#: apps/videos/models.py:2110
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2115
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "присоединился к команде %(team)s как %(role)s"
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2120
 #, python-format
 msgid "left the %s team"
 msgstr "покинул команду %s"
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2134
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2145
+#: apps/videos/models.py:2140
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2212
 msgid "add video"
 msgstr "добавить видео"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2213
 msgid "change title"
 msgstr "изменить название"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2214
 msgid "comment"
 msgstr "комментировать"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2215
 msgid "add version"
 msgstr "добавить версию"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2216
 msgid "add translation"
 msgstr "добавить перевод"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2217
 msgid "add video url"
 msgstr "добавить url видео"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2218
 msgid "request subtitles"
 msgstr "запрос субтитров"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2219
 msgid "approve version"
 msgstr "одобрить версию"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2220
 msgid "add contributor"
 msgstr "добавить контрибьютора"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2221
 msgid "remove contributor"
 msgstr "удалить контрибьютора"
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2222
 msgid "reject version"
 msgstr "отклонить версию"
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2223
 msgid "review version"
 msgstr "проверить версию"
 
-#: apps/videos/models.py:2229
+#: apps/videos/models.py:2224
 msgid "accept version"
 msgstr "принять версию"
 
-#: apps/videos/models.py:2230
+#: apps/videos/models.py:2225
 msgid "decline version"
 msgstr "отклонить версию"
 
-#: apps/videos/models.py:2231
+#: apps/videos/models.py:2226
 msgid "delete video"
 msgstr "удалить видео"
 
-#: apps/videos/models.py:2232
+#: apps/videos/models.py:2227
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2233
+#: apps/videos/models.py:2228
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2490
+#: apps/videos/models.py:2485
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1560,59 +1560,59 @@ msgstr ""
 "Этот URL уже <a href=\"%(url)s\">существует</a> как видео в нашей системе. "
 "Вы не можете добавить его как второй URL. "
 
-#: apps/videos/rpc.py:54 apps/videos/rpc.py:70
+#: apps/videos/rpc.py:50 apps/videos/rpc.py:66
 msgid "You have not permission"
 msgstr "У Вас нет полномочий"
 
-#: apps/videos/rpc.py:59 apps/videos/rpc.py:75
+#: apps/videos/rpc.py:55 apps/videos/rpc.py:71
 msgid "Incorrect video ID"
 msgstr "Некорректный идентификатор видео"
 
-#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:332
+#: apps/videos/rpc.py:58 apps/videos/rpc.py:74 apps/videos/rpc.py:328
 msgid "Video does not exist"
 msgstr "Видео не существует"
 
-#: apps/videos/rpc.py:316 apps/videos/rpc.py:341
+#: apps/videos/rpc.py:312 apps/videos/rpc.py:337
 msgid "Title can't be empty"
 msgstr "Заголовок не может быть пустым"
 
-#: apps/videos/rpc.py:330
+#: apps/videos/rpc.py:326
 msgid "Title can't be changed for this video"
 msgstr "Нельзя изменить заголовок этого видео"
 
-#: apps/videos/rpc.py:334 apps/videos/rpc.py:352
+#: apps/videos/rpc.py:330 apps/videos/rpc.py:348
 msgid "Title was changed success"
 msgstr "Заголовок был успешно изменён"
 
-#: apps/videos/rpc.py:346
+#: apps/videos/rpc.py:342
 msgid "Subtitle language does not exist"
 msgstr "Язык субтитров не существует"
 
-#: apps/videos/rpc.py:354
+#: apps/videos/rpc.py:350
 msgid "This is not forked translation"
 msgstr ""
 
-#: apps/videos/rpc.py:363 apps/videos/rpc.py:379
+#: apps/videos/rpc.py:359 apps/videos/rpc.py:375
 msgid "Video does not exist."
 msgstr "Видео не существует."
 
-#: apps/videos/rpc.py:370
+#: apps/videos/rpc.py:366
 msgid "You are following this video now."
 msgstr "Вы теперь следите за этим видео."
 
-#: apps/videos/rpc.py:386
+#: apps/videos/rpc.py:382
 msgid "You stopped following this video now."
 msgstr "Вы прекратили следить за этим видео."
 
-#: apps/videos/rpc.py:395 apps/videos/rpc.py:408
+#: apps/videos/rpc.py:391 apps/videos/rpc.py:404
 msgid "Subtitles does not exist."
 msgstr "Субтитры не существуют."
 
-#: apps/videos/rpc.py:399
+#: apps/videos/rpc.py:395
 msgid "You are following this subtitles now."
 msgstr "Вы теперь следите за этими субтитрами."
 
-#: apps/videos/rpc.py:412
+#: apps/videos/rpc.py:408
 msgid "You stopped following this subtitles now."
 msgstr "Вы прекратили следить за этими субтитрами."
 

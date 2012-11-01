@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-31 01:37-0500\n"
+"POT-Creation-Date: 2012-11-01 01:38-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/"
@@ -173,7 +173,7 @@ msgid "You should enter subject or message."
 msgstr "題名もしくは本文を入力してください。"
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
-#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:43
+#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:39
 msgid "You should be authenticated."
 msgstr "認証が必要です。"
 
@@ -712,11 +712,11 @@ msgstr "マネジャーと管理人"
 msgid "Admins only"
 msgstr "管理人のみ"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2554
+#: apps/teams/models.py:141 apps/teams/models.py:2559
 msgid "name"
 msgstr "名前"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2555
+#: apps/teams/models.py:142 apps/teams/models.py:2560
 msgid "slug"
 msgstr "怠け者"
 
@@ -1300,7 +1300,7 @@ msgstr "ウィジェット視聴数"
 msgid "Views"
 msgstr "視聴数"
 
-#: apps/videos/models.py:1154
+#: apps/videos/models.py:1149
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1308,7 +1308,7 @@ msgstr ""
 "誰かが同じ言語でアップロードか翻訳をおこなっているので、あなたの字幕をアップ"
 "ロードする事ができません。"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2016
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1317,7 +1317,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>の<a href=\"%(language_url)s\">%"
 "(language)s</a>の字幕をレビューしました。"
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1326,7 +1326,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s</a>での<a href=\"%(video_url)s\">%"
 "(video_name)s</a>の字幕を受け入れました。"
 
-#: apps/videos/models.py:2031
+#: apps/videos/models.py:2026
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1335,7 +1335,7 @@ msgstr ""
 "  <a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%"
 "(language_url)s\">%(language)s</a>の字幕を棄却しました"
 
-#: apps/videos/models.py:2036
+#: apps/videos/models.py:2031
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1344,7 +1344,7 @@ msgstr ""
 "  <a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%"
 "(language_url)s\">%(language)s</a> の字幕を承認しました"
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1353,32 +1353,32 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s</a>での<a href=\"%(video_url)s\">%"
 "(video_name)s</a>の字幕を拒否しました。"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2042
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "「%(title)s」というビデオを削除しました。"
 
-#: apps/videos/models.py:2052
+#: apps/videos/models.py:2047
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>を追加しました"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2049
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>が追加されました"
 
-#: apps/videos/models.py:2060
+#: apps/videos/models.py:2055
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>のタイトルを変更しました"
 
-#: apps/videos/models.py:2062
+#: apps/videos/models.py:2057
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>のタイトルが変更されました"
 
-#: apps/videos/models.py:2077
+#: apps/videos/models.py:2072
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1387,7 +1387,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%(comments_url)"
 "s\">%(language)s subtitles</a>にコメントしました"
 
-#: apps/videos/models.py:2079
+#: apps/videos/models.py:2074
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1396,17 +1396,17 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%(comments_url)"
 "s\">%(language)s subtitles</a>にコメントされました"
 
-#: apps/videos/models.py:2082
+#: apps/videos/models.py:2077
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>にコメントしました"
 
-#: apps/videos/models.py:2084
+#: apps/videos/models.py:2079
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>にコメントされました"
 
-#: apps/videos/models.py:2092
+#: apps/videos/models.py:2087
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1415,7 +1415,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対して<a href=\"%(language_url)"
 "s\">%(language)s subtitles</a>を開始しました"
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1424,7 +1424,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対して<a href=\"%(language_url)"
 "s\">%(language)s subtitles</a> が開始されました"
 
-#: apps/videos/models.py:2105
+#: apps/videos/models.py:2100
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1433,7 +1433,7 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%(language_url)"
 "s\">%(language)s subtitles</a> を編集しました"
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2102
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1442,108 +1442,108 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に対する<a href=\"%(language_url)"
 "s\">%(language)s subtitles</a> が編集されました"
 
-#: apps/videos/models.py:2113
+#: apps/videos/models.py:2108
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a>に新しいURLを追加しました"
 
-#: apps/videos/models.py:2115
+#: apps/videos/models.py:2110
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a>に新しいURLが追加されました"
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2115
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "%(role)sとして%(team)sチームに入会しました。"
 
-#: apps/videos/models.py:2125
+#: apps/videos/models.py:2120
 #, python-format
 msgid "left the %s team"
 msgstr "%sチームを脱会しました。"
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2134
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2145
+#: apps/videos/models.py:2140
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2212
 msgid "add video"
 msgstr "ビデオを追加する"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2213
 msgid "change title"
 msgstr "タイトルを変更する"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2214
 msgid "comment"
 msgstr "コメントする"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2215
 msgid "add version"
 msgstr "改訂を追加する"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2216
 msgid "add translation"
 msgstr "翻訳を追加する"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2217
 msgid "add video url"
 msgstr "URLを追加する"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2218
 msgid "request subtitles"
 msgstr "字幕を要求する"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2219
 msgid "approve version"
 msgstr "改訂を承認する"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2220
 msgid "add contributor"
 msgstr "寄稿者を追加する"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2221
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2222
 msgid "reject version"
 msgstr "改訂を棄却する"
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2223
 msgid "review version"
 msgstr "バージョンをレビューする"
 
-#: apps/videos/models.py:2229
+#: apps/videos/models.py:2224
 msgid "accept version"
 msgstr "バージョンを受け入れる"
 
-#: apps/videos/models.py:2230
+#: apps/videos/models.py:2225
 msgid "decline version"
 msgstr "バージョンを拒否する"
 
-#: apps/videos/models.py:2231
+#: apps/videos/models.py:2226
 msgid "delete video"
 msgstr "ビデオを削除する"
 
-#: apps/videos/models.py:2232
+#: apps/videos/models.py:2227
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2233
+#: apps/videos/models.py:2228
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2490
+#: apps/videos/models.py:2485
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1552,59 +1552,59 @@ msgstr ""
 "このビデオの URL は既に<a href=\"%(url)s\">存在している</a>ため、追加できませ"
 "ん。"
 
-#: apps/videos/rpc.py:54 apps/videos/rpc.py:70
+#: apps/videos/rpc.py:50 apps/videos/rpc.py:66
 msgid "You have not permission"
 msgstr "権限がありません"
 
-#: apps/videos/rpc.py:59 apps/videos/rpc.py:75
+#: apps/videos/rpc.py:55 apps/videos/rpc.py:71
 msgid "Incorrect video ID"
 msgstr "ビデオIDが正しくありません"
 
-#: apps/videos/rpc.py:62 apps/videos/rpc.py:78 apps/videos/rpc.py:332
+#: apps/videos/rpc.py:58 apps/videos/rpc.py:74 apps/videos/rpc.py:328
 msgid "Video does not exist"
 msgstr "ビデオは存在しません"
 
-#: apps/videos/rpc.py:316 apps/videos/rpc.py:341
+#: apps/videos/rpc.py:312 apps/videos/rpc.py:337
 msgid "Title can't be empty"
 msgstr "タイトルを空欄にすることはできません。"
 
-#: apps/videos/rpc.py:330
+#: apps/videos/rpc.py:326
 msgid "Title can't be changed for this video"
 msgstr "ビデオのタイトルは変更できません"
 
-#: apps/videos/rpc.py:334 apps/videos/rpc.py:352
+#: apps/videos/rpc.py:330 apps/videos/rpc.py:348
 msgid "Title was changed success"
 msgstr "タイトルが変更されました。"
 
-#: apps/videos/rpc.py:346
+#: apps/videos/rpc.py:342
 msgid "Subtitle language does not exist"
 msgstr "字幕言語が存在しません。"
 
-#: apps/videos/rpc.py:354
+#: apps/videos/rpc.py:350
 msgid "This is not forked translation"
 msgstr "これは曖昧な翻訳ではありません。"
 
-#: apps/videos/rpc.py:363 apps/videos/rpc.py:379
+#: apps/videos/rpc.py:359 apps/videos/rpc.py:375
 msgid "Video does not exist."
 msgstr "ビデオは存在しません。"
 
-#: apps/videos/rpc.py:370
+#: apps/videos/rpc.py:366
 msgid "You are following this video now."
 msgstr "あなたは今このビデオをフォローしています。"
 
-#: apps/videos/rpc.py:386
+#: apps/videos/rpc.py:382
 msgid "You stopped following this video now."
 msgstr "あなたは今このビデオのフォローを中止しました。"
 
-#: apps/videos/rpc.py:395 apps/videos/rpc.py:408
+#: apps/videos/rpc.py:391 apps/videos/rpc.py:404
 msgid "Subtitles does not exist."
 msgstr "字幕は存在しません。"
 
-#: apps/videos/rpc.py:399
+#: apps/videos/rpc.py:395
 msgid "You are following this subtitles now."
 msgstr "字幕をフォローしています。"
 
-#: apps/videos/rpc.py:412
+#: apps/videos/rpc.py:408
 msgid "You stopped following this subtitles now."
 msgstr "字幕のフォローを中止しました。"
 
