@@ -360,7 +360,6 @@ class SubtitlesUploadForm(forms.Form):
         title, description = self._find_title_description(language_code)
         parents = self._find_parents(from_language_code)
 
-        print self._parsed_subtitles
         version = pipeline.add_subtitles(
             self.video, language_code, self._parsed_subtitles,
             title=title, description=description, author=self.user,
