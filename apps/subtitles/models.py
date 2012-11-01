@@ -1224,6 +1224,10 @@ class SubtitleVersion(models.Model):
     def has_subtitles(self):
         return self.subtitle_count is not 0
 
+    def is_synced(self):
+        return self.get_subtitles().fully_synced
+
+
 class SubtitleVersionMetadata(models.Model):
     """This model is used to add extra metadata to SubtitleVersions.
 
