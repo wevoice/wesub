@@ -20,13 +20,14 @@
 import babelsubs
 from babelsubs.parsers.dfxp import DFXPParser
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
 from apps.subtitles import models as sub_models
 from apps.videos.models import Video
-from apps.videos.tests.utils import WebUseTest, quick_add_subs
+from apps.videos.tests.utils import quick_add_subs
 
 
-class BaseDownloadTest(object):
+class DFXPTest(TestCase):
     def _download_subs(self, language, format):
         url = reverse("widget:download" , args=(format,))
         res = self.client.get(url, {
@@ -36,8 +37,6 @@ class BaseDownloadTest(object):
         self.assertEqual(res.status_code, 200)
         return res.content
 
-
-class DFXPTest(WebUseTest, BaseDownloadTest):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
