@@ -362,7 +362,7 @@ def _update_captions_in_original_service(version_pk):
     except SubtitleVersion.DoesNotExist:
         return
     ThirdPartyAccount.objects.mirror_on_third_party(
-        version.video, version.language, UPDATE_VERSION_ACTION, version)
+        version.video, version.subtitle_language, UPDATE_VERSION_ACTION, version)
 
 @task
 def delete_captions_in_original_service(language_pk):

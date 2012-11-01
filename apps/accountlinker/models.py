@@ -116,7 +116,7 @@ def can_be_synced(version):
             # We can't mirror unsynced or non-public versions.
             return False
 
-        if not version.language.is_complete:
+        if not version.subtitle_language.subtitles_complete:
             # Don't sync incomplete languages
             return False
 
