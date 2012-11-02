@@ -39,6 +39,8 @@ def get_user(n=1):
             is_active=True, is_superuser=False, is_staff=False,
             password="sha1$6b3dc$72c6a16f127d2c217f72009632c745effef7eb3f",
         )
+        user.set_password('password')
+        user.save()
     return user
 
 
