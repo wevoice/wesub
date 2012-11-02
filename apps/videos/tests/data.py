@@ -78,7 +78,8 @@ def make_subtitle_language(video, language_code):
 
 # Subtitle Versions -----------------------------------------------------------
 def make_subtitle_version(subtitle_language, subtitles=[], author=None,
-                          parents=None, committer=None, complete=None):
+                          parents=None, committer=None, complete=None,
+                          title=None, description=None):
     committer = committer or author
     return pipeline.add_subtitles(subtitle_language.video,
                                   subtitle_language.language_code,
@@ -86,7 +87,14 @@ def make_subtitle_version(subtitle_language, subtitles=[], author=None,
                                   author=author,
                                   parents=parents,
                                   committer=committer,
-                                  complete=complete)
+                                  complete=complete,
+                                  title=title,
+                                  description=description)
+
+def make_rollback_to(subtitle_language, version_number):
+    return pipeline.rollback_to(subtitle_language.video,
+                                subtitle_language.language_code,
+                                version_number)
 
 
 # Teams -----------------------------------------------------------------------
