@@ -17,37 +17,40 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-import babelsubs
 from babelsubs.parsers.dfxp import DFXPParser
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
-from apps.subtitles import models as sub_models
-from apps.videos.models import Video
-from apps.videos.tests.utils import WebUseTest, quick_add_subs
+from apps.videos.tests.data import (
+    get_video, make_subtitle_language, make_subtitle_version
+)
 
 
-class BaseDownloadTest(object):
-    def _download_subs(self, language, format):
-        url = reverse("widget:download" , args=(format,))
+class DFXPTest(TestCase):
+    def _download_subs(self, subtitle_language, format):
+        url = reverse("widget:download", args=[format])
         res = self.client.get(url, {
-            'video_id': language.video.video_id,
-            'lang_pk': language.pk
+            'video_id': subtitle_language.video.video_id,
+            'lang_pk': subtitle_language.pk
         })
         self.assertEqual(res.status_code, 200)
         return res.content
 
-
-class DFXPTest(WebUseTest, BaseDownloadTest):
-    def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
-        self.language = sub_models.SubtitleLanguage.objects.get_or_create(
-            video=self.video,  language_code='en')[0]
-
     def test_dfxp_serializer(self):
-        quick_add_subs(self.language, [ 'Here we go!'])
-        content = self._download_subs(self.language, 'dfxp')
+        video = get_video()
+        sl_en = make_subtitle_language(video, 'en')
+        make_subtitle_version(sl_en, [(100, 200, 'Here we go!')])
+
+        content = self._download_subs(sl_en, 'dfxp')
         serialized = DFXPParser(content)
-        self.assertEqual(len(serialized.to_internal()), 1)
-        self.assertEqual(babelsubs.storage.get_contents(serialized.to_internal().get_subtitles()[0]),'Here we go!')
+        subtitle_set = serialized.to_internal()
+
+        self.assertEqual(len(subtitle_set), 1)
+
+        start, end, content, meta = list(subtitle_set)[0]
+
+        self.assertEqual(start, 100)
+        self.assertEqual(end, 200)
+        self.assertEqual(content, 'Here we go!')
+        self.assertEqual(meta, {'new_paragraph': 'true'})
 

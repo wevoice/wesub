@@ -531,8 +531,9 @@ class Video(models.Model):
         """
         if not hasattr(self, '_original_subtitle'):
             try:
-                original = self.newsubtitlelanguage_set \
-                            .filter(language_code=self.primary_audio_language_code)[:1].get()
+                palc = self.primary_audio_language_code
+                original = (self.newsubtitlelanguage_set
+                                .filter(language_code=palc)[:1].get())
             except models.ObjectDoesNotExist:
                 original = None
 
@@ -547,9 +548,7 @@ class Video(models.Model):
         this will effectively be cached in-object as well.
 
         """
-        original_language = self._original_subtitle_language()
-        if original_language:
-            return original_language.language != ''
+        return True if self._original_subtitle_language() else False
 
     def subtitle_language(self, language_code=None):
         """Return the SubtitleLanguage for this video with the given language code, or None.
