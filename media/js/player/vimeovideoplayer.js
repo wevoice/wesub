@@ -164,6 +164,16 @@ unisubs.player.VimeoVideoPlayer.prototype.setPlayheadTime = function(playheadTim
     if (this.player_) {
         this.player_['api_seekTo'](playheadTime);
         this.sendTimeUpdateInternal();
+
+        // Vimeo has a bug when setting the playheadTime to 0. This is a series of hacks
+        // to at least make Vimeo videos playable until we get around to upgrading to the
+        // latest Vimeo player.
+        if (playheadTime === 0) {
+            this.player_['api_seekTo'](1);
+            this.play();
+            this.pause();
+            this.play();
+        }
     }
     else
         this.commands_.push(goog.bind(this.setPlayheadTime, this, playheadTime));
