@@ -690,6 +690,14 @@ def _update_code(branch=None, integration_branch=None, app_dir=None):
         with settings(warn_only=True):
             run("find . -name '*.pyc' -delete")
 
+def _update_virtualenv(app_dir=None, ve_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    if not ve_dir:
+        ve_dir = env.ve_dir
+    with Output("Updating virtualenv"), cd(os.path.join(app_dir, 'deploy')):
+        run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
+
 @roles('app', 'data')
 def update_code(branch=None, integration_branch=None):
     _update_code(branch=branch, integration_branch=integration_branch)
@@ -764,8 +772,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         with settings(warn_only=True):
             run('virtualenv --distribute -q {0}'.format(ve_dir))
         with cd('{0}/deploy'.format(build_dir)):
-            run('{0}/bin/pip install -U -r requirements.txt'.format(
-                ve_dir))
+            run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
     if skip_compile == False:
         with Output("Compiling media"), cd(build_dir), settings(warn_only=True):
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
@@ -876,7 +883,7 @@ def _clone_repo_demo(revision='dev', integration_revision=None,
     run('virtualenv /var/tmp/{0}/ve'.format(revision))
     # install requirements
     with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
-        run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
+        run('yes i | /var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision), pty=True)
     _reset_permissions(env.app_dir)
 
 @parallel
@@ -1276,6 +1283,7 @@ def _configure_scaling_instances(skip_puppet=False):
         with Output("Running Puppet"), settings(warn_only=True), hide('running', 'stdout'):
             sudo('puppet agent -t --server puppet.amara.org')
     _update_code()
+    _update_virtualenv()
     with Output("Restarting uWSGI"):
         sudo('service uwsgi.unisubs.{0} restart'.format(env.environment))
         with settings(warn_only=True), hide('running', 'stdout'):
