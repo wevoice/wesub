@@ -81,8 +81,11 @@ def quick_add_subs(language, subs_texts, escape=True):
 
 
 class WebUseTest(TestCase):
-    def _make_objects(self, video_id="S7HMxzLmS9gw"):
+    def __init__(self, *args, **kwargs):
         self.auth = dict(username='admin', password='admin')
+        super(WebUseTest, self).__init__(*args, **kwargs)
+
+    def _make_objects(self, video_id="S7HMxzLmS9gw"):
         self.user = User.objects.get(username=self.auth['username'])
         self.video = Video.objects.get(video_id=video_id)
         self.video.followers.add(self.user)

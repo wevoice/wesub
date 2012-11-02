@@ -27,7 +27,6 @@ from .videos.types import (
     video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 )
 from teams.models import Team
-from teams.moderation_const import APPROVED, UNMODERATED
 from auth.models import CustomUser as User
 
 from utils.metrics import Meter
@@ -105,24 +104,18 @@ def check_authorization(video):
 
 
 def can_be_synced(version):
-    """
-    Determine if a subtitle version can be synced to Youtube.
+    """Return whether a subtitle version can be synced to Youtube.
 
-    A version must be public, synced and complete; it must also be either
-    "approved" or "unmoderated".
+    A version must be public, synced and complete.
+
     """
     if version:
-        if not version.is_public or not version.is_synced():
+        if not version.is_public() or not version.is_synced():
             # We can't mirror unsynced or non-public versions.
             return False
 
         if not version.subtitle_language.subtitles_complete:
             # Don't sync incomplete languages
-            return False
-
-        status = version.moderation_status
-
-        if (status != APPROVED) and (status != UNMODERATED):
             return False
 
     return True

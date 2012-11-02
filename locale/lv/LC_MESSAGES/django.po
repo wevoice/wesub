@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-01 01:36-0500\n"
+"POT-Creation-Date: 2012-11-02 01:36-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
@@ -1311,20 +1311,20 @@ msgstr "velsiešu valoda"
 msgid "Views"
 msgstr "Skatījumu"
 
-#: apps/videos/models.py:1149
+#: apps/videos/models.py:1148
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:2016
+#: apps/videos/models.py:2015
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2020
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1333,7 +1333,7 @@ msgstr ""
 "apstiprināja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2025
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1342,7 +1342,7 @@ msgstr ""
 "  noraidīja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2031
+#: apps/videos/models.py:2030
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1351,7 +1351,7 @@ msgstr ""
 "  apstiprināja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2036
+#: apps/videos/models.py:2035
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1360,32 +1360,32 @@ msgstr ""
 "noraidīja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2042
+#: apps/videos/models.py:2041
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  dzēsts video „%(title)s”"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2046
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2049
+#: apps/videos/models.py:2048
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "pievienots video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2055
+#: apps/videos/models.py:2054
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "nomainīts nosaukums video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2057
+#: apps/videos/models.py:2056
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Video <a href=\"%(video_url)s\">%(video_name)s</a> nomainīts nosaukums"
 
-#: apps/videos/models.py:2072
+#: apps/videos/models.py:2071
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1394,7 +1394,7 @@ msgstr ""
 "komentēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(comments_url)s\">%(language)s subtitrus</a>"
 
-#: apps/videos/models.py:2074
+#: apps/videos/models.py:2073
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1403,17 +1403,17 @@ msgstr ""
 "Video <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%(comments_url)s"
 "\">%(language)s </a>s subtitriem pievienots komentārs"
 
-#: apps/videos/models.py:2077
+#: apps/videos/models.py:2076
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja komentāru <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2079
+#: apps/videos/models.py:2078
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots komentārs"
 
-#: apps/videos/models.py:2087
+#: apps/videos/models.py:2086
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1422,14 +1422,14 @@ msgstr ""
 "sāka <a href=\"%(language_url)s\">%(language)s subtitrus</a> video <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2089
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2100
+#: apps/videos/models.py:2099
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1438,7 +1438,7 @@ msgstr ""
 "rediģēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s subtitrus</a> "
 
-#: apps/videos/models.py:2102
+#: apps/videos/models.py:2101
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1447,110 +1447,110 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> video <a href=\"%(language_url)s"
 "\">%(language)s subtitri</a> tika rediģēti"
 
-#: apps/videos/models.py:2108
+#: apps/videos/models.py:2107
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "pievienoja jaunu video <a href=\"%(video_url)s\">%(video_name)s</a> vietrādi "
 "URL"
 
-#: apps/videos/models.py:2110
+#: apps/videos/models.py:2109
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots jauns vietrādis URL"
 
-#: apps/videos/models.py:2115
+#: apps/videos/models.py:2114
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "pievienojās %(team)s komandai kā %(role)s"
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2119
 #, python-format
 msgid "left the %s team"
 msgstr "pameta %s komandu"
 
-#: apps/videos/models.py:2134
+#: apps/videos/models.py:2133
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2140
+#: apps/videos/models.py:2139
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2211
 msgid "add video"
 msgstr "pievienot video"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2212
 msgid "change title"
 msgstr "mainīt nosaukumu"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2213
 msgid "comment"
 msgstr "komentēt"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2214
 msgid "add version"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2215
 msgid "add translation"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2216
 msgid "add video url"
 msgstr "pievienot video url"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2217
 msgid "request subtitles"
 msgstr "prasīt subtitrus"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2218
 msgid "approve version"
 msgstr "apstiprināt versiju"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2219
 msgid "add contributor"
 msgstr "pievienot artavnieku"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2220
 msgid "remove contributor"
 msgstr "noņemt artavnieku"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2221
 msgid "reject version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2222
 msgid "review version"
 msgstr "pārskatīt versiju"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2223
 msgid "accept version"
 msgstr "pieņemt versiju"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2224
 msgid "decline version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2225
 msgid "delete video"
 msgstr "dzēst video"
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2226
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2227
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2485
+#: apps/videos/models.py:2484
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "

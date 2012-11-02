@@ -230,7 +230,7 @@ def _create_env(username,
     env.demo_domain = 'demo.amara.org'
     env.lb_config = '/etc/nginx/conf.d/unisubs.{0}.conf'.format(env.environment)
     env.scaling_aws_key = 'pcf_ec2_keys_amara'
-    env.scaling_instance_type = 'm1.small'
+    env.scaling_instance_type = 'm1.medium'
     env.scaling_security_groups = ['amara-app', 'amara-core']
 
 @task
@@ -542,7 +542,7 @@ def _reload_app_servers(hard=False):
         # disable node on LB
         _disable_lb_node(env.host_string)
         with settings(warn_only=True):
-            run('wget -q -T 120 http://{0}/en/'.format(env.host_string))
+            run('wget -q -T 120 --delete-after http://{0}/en/'.format(env.host_string))
         _enable_lb_node(env.host_string)
 
 @task
@@ -685,10 +685,18 @@ def _update_code(branch=None, integration_branch=None, app_dir=None):
             _git_pull()
         run('python deploy/create_commit_file.py')
     # update integration repo
-    execute(_update_integration, branch=integration_branch, app_dir=app_dir)
+    _update_integration(branch=integration_branch, app_dir=app_dir)
     with cd(app_dir):
         with settings(warn_only=True):
             run("find . -name '*.pyc' -delete")
+
+def _update_virtualenv(app_dir=None, ve_dir=None):
+    if not app_dir:
+        app_dir = env.app_dir
+    if not ve_dir:
+        ve_dir = env.ve_dir
+    with Output("Updating virtualenv"), cd(os.path.join(app_dir, 'deploy')):
+        run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
 
 @roles('app', 'data')
 def update_code(branch=None, integration_branch=None):
@@ -764,8 +772,7 @@ def update_static_media(compilation_level='ADVANCED_OPTIMIZATIONS', skip_compile
         with settings(warn_only=True):
             run('virtualenv --distribute -q {0}'.format(ve_dir))
         with cd('{0}/deploy'.format(build_dir)):
-            run('{0}/bin/pip install -U -r requirements.txt'.format(
-                ve_dir))
+            run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
     if skip_compile == False:
         with Output("Compiling media"), cd(build_dir), settings(warn_only=True):
             run('{0} manage.py  compile_media --compilation-level={1} --settings=unisubs_settings'.format(python_exe, compilation_level))
@@ -826,6 +833,19 @@ def switch_branch(branch):
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
 
+def _get_amara_config():
+    old_host = env.host_string
+    env.host_string = env.dev_host
+    conf = None
+    with hide('running', 'stdout'):
+        conf = sudo('cat /etc/amara_config.json')
+    try:
+        conf = json.loads(conf)
+    except:
+        raise RuntimeError('Unable to parse Amara config')
+    env.host_string = old_host
+    return conf
+
 def _create_nginx_instance(name=None, url_prefix=None):
     """
     Creates an Nginx instance (for demos)
@@ -876,7 +896,7 @@ def _clone_repo_demo(revision='dev', integration_revision=None,
     run('virtualenv /var/tmp/{0}/ve'.format(revision))
     # install requirements
     with cd('/var/tmp/{0}/unisubs/deploy'.format(revision)):
-        run('/var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision))
+        run('yes i | /var/tmp/{0}/ve/bin/pip install -r requirements.txt'.format(revision), pty=True)
     _reset_permissions(env.app_dir)
 
 @parallel
@@ -1035,11 +1055,7 @@ def _create_rds_instance(name=None, password=None):
     """
     env.host_string = env.demo_hosts.get('app')
     with hide('running', 'stdout', 'warnings'):
-        conf = sudo('cat /etc/amara_config.json')
-        try:
-            conf = json.loads(conf)
-        except:
-            raise RuntimeError('Unable to parse Amara config')
+        conf = _get_amara_config()
         env_cfg = conf.get('rds').get('environments').get('dev')
         rds_user = env_cfg.get('user')
         rds_host = env_cfg.get('host')
@@ -1265,7 +1281,11 @@ def remove_demo():
             sudo('rm -rf /var/tmp/{0}'.format(instance_name))
 
 @task
-def _configure_scaling_instances(skip_puppet=False):
+def configure_scaling_instances(skip_puppet=False):
+    """
+    Configures instances upon scaling
+
+    """
     hostname = 'app-scaling-{0}'.format(env.environment)
     with Output("Updating hostname"), hide('running', 'stdout'):
         sudo('echo "{0}.amara.org" > /etc/hostname'.format(hostname))
@@ -1276,10 +1296,11 @@ def _configure_scaling_instances(skip_puppet=False):
         with Output("Running Puppet"), settings(warn_only=True), hide('running', 'stdout'):
             sudo('puppet agent -t --server puppet.amara.org')
     _update_code()
+    _update_virtualenv()
     with Output("Restarting uWSGI"):
         sudo('service uwsgi.unisubs.{0} restart'.format(env.environment))
         with settings(warn_only=True), hide('running', 'stdout'):
-            run('wget -q -T 60 http://{0}/en/'.format(env.host_string))
+            run('wget -q -T 60 --delete-after http://{0}/en/'.format(env.host_string))
 
 def _wait_for_instance_ready(instance=None):
     while True:
@@ -1305,8 +1326,8 @@ def _update_lb_config(config):
         f.write(config)
     put('.tmp_lb', env.lb_config, use_sudo=True)
     sudo('/etc/init.d/nginx reload')
+    os.remove('.tmp_lb')
 
-@task
 def _add_nodes_to_lb(hosts=[]):
     """
     Adds specified nodes to current environment load balancer
@@ -1325,7 +1346,6 @@ def _add_nodes_to_lb(hosts=[]):
         nginx_cfg.insert(1, '    server {0};'.format(host))
     _update_lb_config('\n'.join(nginx_cfg))
 
-@task
 def _remove_nodes_from_lb(hosts=[]):
     """
     Removes specified hosts from current environment load balancer
@@ -1343,8 +1363,7 @@ def _remove_nodes_from_lb(hosts=[]):
         [nginx_cfg.remove(x) for x in nginx_cfg if x.find(host) > -1]
     _update_lb_config('\n'.join(nginx_cfg))
 
-@task
-def _configure_scaling_lb(hosts=[], action=None):
+def _configure_scaling_lb(hosts=[], action=None, scaling_instances=None):
     if not env.lb_host or not action: return
     action = action.lower()
     with Output("Configuring load balancer"):
@@ -1361,47 +1380,58 @@ def _configure_scaling_lb(hosts=[], action=None):
             _add_nodes_to_lb(hosts)
         elif action == 'down':
             _remove_nodes_from_lb(hosts)
-            # re-enable cron
-            # TODO: check if any running scaled instances and leave cron disabled
-            # otherwise the puppet agent will reset the nginx config which will
-            # take the scaled instances out of the upstream
-            #env.host_string = env.lb_host
-            #sudo('/etc/init.d/cron start')
+            if not scaling_instances:
+                print('No remaining scaling instances ; enabling cron')
+                # re-enable cron
+                env.host_string = env.lb_host
+                sudo('/etc/init.d/cron start')
         else:
             print('Invalid scaling action')
 
+def _get_current_scaling_instances(ec2_conn, state=None):
+    """
+    Gets existing scaling instances for the current environment
+
+    :param ec2_conn: Boto EC2 connection
+    :param state: Current instance state to check (running, stopped)
+
+    """
+    # check for stopped instances
+    all_res = ec2_conn.get_all_instances()
+    scaling_instances = []
+    for r in all_res:
+        for i in r.instances:
+            tags = i.__dict__.get('tags', {})
+            if tags.has_key('scaling-instance') and \
+                tags.get('scaling-env') == env.environment and \
+                i.state == state:
+                scaling_instances.append(i)
+    return scaling_instances
+
 @task
-def scale(action='up', instances=1, skip_puppet=False):
+def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
     """
     Scales application server instances
 
     :param action: 'up' or 'down' for scaling direction
     :param instances: Number of instances to scale (default: 1)
     :param skip_puppet: Skip initial Puppet provisioning (default: False)
+    :param skip_lb: Skip load balancer configuration (default: False)
 
     """
     import boto
-    env.host_string = env.dev_host
-    with hide('running', 'stdout'):
-        conf = sudo('cat /etc/amara_config.json')
-    try:
-        conf = json.loads(conf)
-    except:
-        raise RuntimeError('Unable to parse Amara config')
+    conf = _get_amara_config()
     instances = int(instances)
     env_cfg = conf.get('ec2')
     aws_id = env_cfg.get('user')
     aws_key = env_cfg.get('key')
     ec2_conn = boto.connect_ec2(aws_id, aws_key)
-    # check for stopped instances
-    all_instances = ec2_conn.get_all_instances()
-    scaling_instances = []
     action = action.lower()
     if action == 'up':
         state = 'stopped'
     else:
         state = 'running'
-    [scaling_instances.append(x.instances[0]) for x in all_instances if x.instances[0].__dict__.get('tags', {}).has_key('scaling-instance') and x.instances[0].__dict__.get('tags', {}).get('scaling-env') == env.environment and x.instances[0].state == state]
+    scaling_instances = _get_current_scaling_instances(ec2_conn, state)
     if action == 'up':
         # disable known hosts in paramiko to prevent ssh hanging
         env.disable_known_hosts = True
@@ -1426,7 +1456,7 @@ def scale(action='up', instances=1, skip_puppet=False):
                     ec2_conn.create_tags([i.id], {
                         'scaling-instance': '1',
                         'scaling-env': env.environment,
-                        'Name': 'app-scaling-{0}'.format(env.environment)
+                        'Name': 'pcf-amara-app-scaling-{0}'.format(env.environment)
                     })
                 [scaling_instances.append for x in res.instances]
             for i in scaling_instances:
@@ -1434,10 +1464,11 @@ def scale(action='up', instances=1, skip_puppet=False):
                     i.start()
                     _wait_for_instance_ready(i)
         [env.hosts.append(x.public_dns_name) for x in scaling_instances]
-        # configure instances in parallel
-        execute(_configure_scaling_instances, skip_puppet=skip_puppet)
-        # configure lb
-        _configure_scaling_lb(hosts=env.hosts, action=action)
+        # configure instances
+        execute(configure_scaling_instances, skip_puppet=skip_puppet)
+        if skip_lb == False:
+            # configure lb
+            _configure_scaling_lb(hosts=env.hosts, action=action)
         _notify("Amara Scaling ({0})".format(env.environment),
             "Scaled {0} environment by {1} instance(s)".format(env.environment,
             instances), env.notification_email)
@@ -1446,13 +1477,72 @@ def scale(action='up', instances=1, skip_puppet=False):
         with Output("Scaling down by {0} instance(s)".format(instances)):
             hosts = []
             stopped_instances = scaling_instances[:instances]
+            print('Stopping instances: {0}'.format(', '.join([x.id
+                for x in stopped_instances])))
             [hosts.append(i.public_dns_name) for i in stopped_instances]
             [i.stop() for i in stopped_instances]
+        # get remaining instances
+        remaining_instances = _get_current_scaling_instances(ec2_conn, state)
+        if skip_lb == False:
             # configure lb
-        _configure_scaling_lb(hosts=hosts, action=action)
+            _configure_scaling_lb(hosts=hosts, action=action,
+                scaling_instances=remaining_instances)
         _notify("Amara Scaling ({0})".format(env.environment),
             "Request to terminate scaled instance(s) for {0} environment: {1}".format(env.environment, ','.join([i.id for i in stopped_instances])), env.notification_email)
     else:
         print('Invalid scaling action')
         return
+
+@task
+def run_new_relic(license=None):
+    """
+    Configures application servers for new relic for current environment
+
+    :param license: New Relic license key
+
+    """
+    ve_dir = env.ve_dir
+    sudo('{0}/bin/pip install newrelic'.format(ve_dir))
+    with settings(warn_only=True):
+        sudo('service uwsgi.unisubs.{0} stop'.format(env.environment))
+    script = "export NEW_RELIC_APP_NAME=\'Amara ({2})\'\n"\
+        "export NEW_RELIC_LICENSE_KEY={0}\n"\
+        "{1}/bin/newrelic-admin run-program uwsgi "\
+        "--pidfile /tmp/newrelic_uwsgi.pid "\
+        "--ini /etc/uwsgi.unisubs.{2}.ini".format(license, ve_dir,
+            env.environment)
+    sudo('echo \"{0}\" > /tmp/run_newrelic.sh'.format(script))
+    sudo('screen -d -m bash /tmp/run_newrelic.sh', pty=False)
+
+@task
+def stop_new_relic():
+    """
+    Stops the New Relic agent for the current environment
+
+    """
+    with settings(warn_only=True):
+        sudo('killall -9 uwsgi')
+        sudo('service uwsgi.unisubs.{0} start'.format(env.environment))
+
+@task
+@roles('app')
+def enable_new_relic():
+    """
+    Enables the New Relic agent across environment application servers
+
+    """
+    conf = _get_amara_config()
+    license = conf.get('newrelic', {}).get('license')
+    with Output("Configuring and starting uWSGI with New Relic"):
+        execute(run_new_relic, license)
+
+@task
+@roles('app')
+def disable_new_relic():
+    """
+    Disables the New Relic agent and starts uWSGI
+
+    """
+    with Output("Disabling New Relic agent"):
+        execute(stop_new_relic)
 

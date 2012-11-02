@@ -26,6 +26,9 @@ from apps.auth.models import CustomUser as User
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, Subtitle
 from apps.videos.tasks import video_changed_tasks
+from apps.videos.tests.data import (
+    get_video
+)
 from apps.videos.tests.utils import WebUseTest, refresh_obj, _create_trans
 from apps.widget.rpc import Rpc
 from apps.widget.tests import (
@@ -33,49 +36,163 @@ from apps.widget.tests import (
     NotAuthenticatedUser
 )
 
+up = os.path.dirname
+
+def refresh(m):
+    return m.__class__._default_manager.get(pk=m.pk)
+
+class UploadRequiresLoginTest(WebUseTest):
+    def test_upload_requires_login(self):
+        # When not logged in trying to upload should redirect to the login page.
+        self._simple_test('videos:upload_subtitles', status=302)
 
 class UploadSubtitlesTest(WebUseTest):
     fixtures = ['test.json']
 
-    def _make_data(self, lang='ru', video_pk=None):
-        if video_pk is None:
-            video_pk = self.video.id
-        return {
-            'language': lang,
-            'video_language': 'en',
-            'video': video_pk,
-            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/test.srt')),
-            'is_complete': True
-            }
+    def _srt(self, filename):
+        return os.path.join(up(up(__file__)), 'fixtures/%s' % filename)
 
-
-    def _make_altered_data(self, video=None, language_code='ru', subs_filename='test_altered.srt'):
-        video = video or self.video
+    def _data(self, video, language_code, primary_audio_language_code,
+              from_language_code, complete, draft):
         return {
-            'language': language_code,
             'video': video.pk,
-            'video_language': 'en',
-            'draft': open(os.path.join(os.path.dirname(__file__), 'fixtures/%s' % subs_filename))
-            }
+            'language_code': language_code,
+            'primary_audio_language_code': primary_audio_language_code,
+            'from_language_code': from_language_code or '',
+            'complete': '1' if complete else '0',
+            'draft': draft,
+        }
+
+    def _upload(self, video, language_code, primary_audio_language_code,
+                from_language_code, complete, filename):
+        with open(self._srt(filename)) as draft:
+            return self.client.post(
+                reverse('videos:upload_subtitles'),
+                self._data(video, language_code, primary_audio_language_code,
+                           from_language_code, complete, draft))
+
 
     def setUp(self):
-        self._make_objects()
-
-    def test_upload_subtitles(self):
-        self._simple_test('videos:upload_subtitles', status=302)
-
         self._login()
 
-        data = self._make_data()
+    def test_upload_subtitles_primary_language(self):
+        # Start with a fresh video.
+        video = get_video()
+        self.assertEqual(video.primary_audio_language_code, '')
+        self.assertFalse(video.has_original_language())
+        self.assertIsNone(video.complete_date)
 
-        language = self.video.subtitle_language(data['language'])
-        self.assertEquals(language, None)
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        # Upload subtitles in the primary audio language.
+        response = self._upload(video, 'en', 'en', None, True, 'test.srt')
         self.assertEqual(response.status_code, 200)
 
-        video = Video.objects.get(pk=self.video.pk)
+        video = refresh(video)
+
+        # The writelock should be gone once the subtitles have been uploaded.
         self.assertFalse(video.is_writelocked)
+
+        # The video should now have a primary audio language, since it was set
+        # as part of the upload process.
+        self.assertEqual(video.primary_audio_language_code, 'en')
+        self.assertTrue(video.has_original_language())
+
+        # Ensure that the subtitles actually got uploaded too.
+        sl_en = video.subtitle_language()
+        self.assertIsNotNone(sl_en)
+        self.assertEqual(sl_en.subtitleversion_set.count(), 1)
+
+        en1 = sl_en.get_tip()
+        subtitles = en1.get_subtitles()
+        self.assertEqual(en1.subtitle_count, 32)
+        self.assertEqual(len(subtitles), 32)
+
+        # Now that we've uploaded a complete set of subtitles, the video and
+        # language should be marked as completed.
+        self.assertIsNotNone(video.complete_date)
+        self.assertTrue(sl_en.subtitles_complete)
+
+        # Let's make sure they didn't get mistakenly marked as a translation.
+        self.assertIsNone(sl_en.get_translation_source_language())
+
+        # Upload another version just to be sure.
+        response = self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self.assertEqual(response.status_code, 200)
+
+        video = refresh(video)
+        sl_en = refresh(sl_en)
+
+        self.assertEqual(sl_en.subtitleversion_set.count(), 2)
+
+    def test_upload_subtitles_non_primary_language(self):
+        # Start with a fresh video.
+        video = get_video()
+        self.assertEqual(video.primary_audio_language_code, '')
+        self.assertFalse(video.has_original_language())
+        self.assertIsNone(video.complete_date)
+
+        # Upload subtitles in a language other than the primary.
+        response = self._upload(video, 'fr', 'en', None, True, 'test.srt')
+        self.assertEqual(response.status_code, 200)
+
+        video = refresh(video)
+
+        # The writelock should be gone once the subtitles have been uploaded.
+        self.assertFalse(video.is_writelocked)
+
+        # The video should now have a primary audio language, since it was set
+        # as part of the upload process.
+        self.assertEqual(video.primary_audio_language_code, 'en')
+
+        # But it doesn't have a SubtitleLanguage for it.
+        self.assertFalse(video.has_original_language())
+        self.assertIsNone(video.subtitle_language())
+        self.assertIsNone(video.get_primary_audio_subtitle_language())
+
+        # Ensure that the subtitles actually got uploaded too.
+        sl_fr = video.subtitle_language('fr')
+        self.assertIsNotNone(sl_fr)
+        self.assertEqual(sl_fr.subtitleversion_set.count(), 1)
+
+        fr1 = sl_fr.get_tip()
+        subtitles = fr1.get_subtitles()
+        self.assertEqual(fr1.subtitle_count, 32)
+        self.assertEqual(len(subtitles), 32)
+
+        # Now that we've uploaded a complete set of subtitles, the video and
+        # language should be marked as completed.
+        self.assertIsNotNone(video.complete_date)
+        self.assertTrue(sl_fr.subtitles_complete)
+
+        # Let's make sure they didn't get mistakenly marked as a translation.
+        # They're not in the primary language but are still a transcription.
+        self.assertIsNone(sl_fr.get_translation_source_language())
+
+        # Upload another version just to be sure.
+        response = self._upload(video, 'fr', 'en', None, True, 'test.srt')
+        self.assertEqual(response.status_code, 200)
+
+        video = refresh(video)
+        sl_fr = refresh(sl_fr)
+
+        self.assertFalse(video.has_original_language())
+        self.assertIsNone(video.subtitle_language())
+        self.assertIsNone(video.get_primary_audio_subtitle_language())
+        self.assertIsNotNone(video.complete_date)
+        self.assertTrue(sl_fr.subtitles_complete)
+        self.assertEqual(sl_fr.subtitleversion_set.count(), 2)
+
+    def test_upload_subtitles(self):
+        video = get_video()
+
+        with open(self._srt('test.srt')) as draft:
+            response = self.client.post(
+                reverse('videos:upload_subtitles'),
+                self._data(video, 'ru', 'en', None, True, draft))
+
+        self.assertEqual(response.status_code, 200)
+
+        video = refresh(video)
+
         original_language = video.subtitle_language()
         self.assertEqual(original_language.language, data['video_language'])
 
@@ -105,21 +222,6 @@ class UploadSubtitlesTest(WebUseTest):
         language = video.subtitle_language(data['language'])
         self.assertEqual(language.is_complete, data['is_complete'])
         self.assertFalse(video.is_writelocked)
-
-    def test_upload_original_subtitles(self):
-        self._login()
-        data = self._make_data(lang='en')
-        video = Video.objects.get(pk=self.video.pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(1, video.subtitlelanguage_set.count())
-        language = video.subtitle_language()
-        self.assertEqual('en', language.language)
-        self.assertTrue(language.is_original)
-        self.assertTrue(language.has_version)
-        self.assertTrue(video.is_subtitled)
 
     def test_upload_translation(self):
         self._login()
@@ -152,24 +254,6 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertTrue(video.is_subtitled)
         self.assertTrue(language.is_dependent())
         self.assertEquals(language.standard_language.language, "en")
-
-    def test_upload_twice(self):
-        self._login()
-        data = self._make_data()
-        self.client.post(reverse('videos:upload_subtitles'), data)
-        language = self.video.subtitle_language(data['language'])
-        version_no = language.latest_version(public_only=True).version_no
-        self.assertEquals(1, language.subtitleversion_set.count())
-        num_languages_1 = self.video.subtitlelanguage_set.all().count()
-        # now post the same file.
-        data = self._make_data()
-        self.client.post(reverse('videos:upload_subtitles'), data)
-        self._make_objects()
-        language = self.video.subtitle_language(data['language'])
-        self.assertEquals(1, language.subtitleversion_set.count())
-        self.assertEquals(version_no, language.latest_version(public_only=True).version_no)
-        num_languages_2 = self.video.subtitlelanguage_set.all().count()
-        self.assertEquals(num_languages_1, num_languages_2)
 
     def test_upload_over_translated(self):
         # for https://www.pivotaltracker.com/story/show/11804745
