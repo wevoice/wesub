@@ -124,13 +124,13 @@ def get_caption_diff_data(first_version, second_version):
     first_map = {}
     second_map = {}
 
-    for start, end, text in first_captions:
+    for start, end, text, _ in first_captions:
         id = str(start) + str(end)
         if not id in subtitles:
             subtitles[id] = (start, end, text)
         first_map[id] = (start, end, text)
 
-    for start, end, text in second_captions:
+    for start, end, text, _ in second_captions:
         id = str(start) + str(end)
         if not id in subtitles:
             subtitles[id] = (start, end, text)

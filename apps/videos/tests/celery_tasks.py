@@ -52,15 +52,12 @@ class TestCeleryTasks(TestCase):
         self.latest_version.author.is_active = True
         self.latest_version.author.save()
 
-        self.language.followers.add(self.latest_version.author)
         self.video.followers.clear()
+        self.language.followers.add(self.latest_version.author)
         self.video.followers.add(self.latest_version.author)
 
     def test_send_change_title_email(self):
-        user = User.objects.all()[:1].get()
-
-        self.assertFalse(self.video.followers.count() == 1
-                         and self.video.followers.all()[:1].get() == user)
+        user = User.objects.all()[2]
 
         old_title = self.video.title
         new_title = u'New title'
@@ -170,7 +167,6 @@ class TestCeleryTasks(TestCase):
         people = set(self.video.followers.filter(notify_by_email=True))
         people.update(self.language.followers.filter(notify_by_email=True))
 
-        #from ipdb import set_trace; set_trace()
         number = len(list(people)) - 1  # for the editor
         self.assertEqual(len(mail.outbox), number)
 
@@ -204,7 +200,6 @@ class TestCeleryTasks(TestCase):
         # Messages sent?
         self.assertFalse(self.video.user.notify_by_message)
         self.assertFalse(User.objects.get(pk=self.video.user.pk).notify_by_message)
-        from ipdb import set_trace; set_trace()
         followers = self.video.followers.filter(
                 notify_by_message=True).exclude(pk__in=[e.pk for e in excludes])
 
