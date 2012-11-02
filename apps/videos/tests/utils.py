@@ -95,7 +95,10 @@ class WebUseTest(TestCase):
         self.assertEqual(response.status_code, status)
         return response
 
-    def _login(self):
-        self.client.login(**self.auth)
+    def _login(self, user=None):
+        if user:
+            self.client.login(username=user.username, password='password')
+        else:
+            self.client.login(**self.auth)
 
 
