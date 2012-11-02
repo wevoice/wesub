@@ -354,6 +354,8 @@ def staging(username):
                         'data': ['data-00-staging.amara.org'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
+        # override default instance type
+        env.scaling_instance_type = 'm1.small'
 
 @task
 def production(username):
@@ -696,7 +698,7 @@ def _update_virtualenv(app_dir=None, ve_dir=None):
     if not ve_dir:
         ve_dir = env.ve_dir
     with Output("Updating virtualenv"), cd(os.path.join(app_dir, 'deploy')):
-        run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
+        sudo('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
 
 @roles('app', 'data')
 def update_code(branch=None, integration_branch=None):
@@ -1322,11 +1324,8 @@ def _update_lb_config(config):
     :param config: Config as text
 
     """
-    with open('.tmp_lb', 'w') as f:
-        f.write(config)
-    put('.tmp_lb', env.lb_config, use_sudo=True)
+    sudo('echo \'{0}\' > {1}'.format(config, env.lb_config))
     sudo('/etc/init.d/nginx reload')
-    os.remove('.tmp_lb')
 
 def _add_nodes_to_lb(hosts=[]):
     """
@@ -1502,6 +1501,9 @@ def run_new_relic(license=None):
 
     """
     ve_dir = env.ve_dir
+    # stop cron from restarting "normal" uwsgi
+    with settings(warn_only=True):
+        sudo('/etc/init.d/cron stop')
     sudo('{0}/bin/pip install newrelic'.format(ve_dir))
     with settings(warn_only=True):
         sudo('service uwsgi.unisubs.{0} stop'.format(env.environment))
@@ -1523,6 +1525,8 @@ def stop_new_relic():
     with settings(warn_only=True):
         sudo('killall -9 uwsgi')
         sudo('service uwsgi.unisubs.{0} start'.format(env.environment))
+        # start cron
+        sudo('/etc/init.d/cron start')
 
 @task
 @roles('app')
