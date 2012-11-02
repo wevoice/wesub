@@ -60,8 +60,8 @@ venv
 user-data/video
 media/static-cache
 .ropeproject
-/tags
-/tags.bak
+./tags
+./tags.bak
 history.png
 history.dot
 apps/webdriver_testing/Screenshots/*.png
