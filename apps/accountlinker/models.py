@@ -104,10 +104,12 @@ def check_authorization(video):
 
 
 def can_be_synced(version):
-    """Return whether a subtitle version can be synced to Youtube.
+    """
+    Return whether a subtitle version can be synced to Youtube.
 
     A version must be public, synced and complete.
 
+    TODO: take visibility into account
     """
     if version:
         if not version.is_public() or not version.is_synced():

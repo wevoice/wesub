@@ -20,17 +20,25 @@ from django.test import TestCase
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from accountlinker.models import (
     ThirdPartyAccount, YoutubeSyncRule, check_authorization, can_be_synced
 )
-from videos.models import Video, VideoUrl, SubtitleVersion
+from videos.models import Video, VideoUrl
 from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
+from subtitles.pipeline import add_subtitles
 
 
 class AccountTest(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
+
+    def setUp(self):
+        self.vurl = VideoUrl.objects.filter(type='Y')[1]
+        subs = [
+            (0, 1000, 'Hello', {}),
+            (2000, 5000, 'word', {})
+        ]
+        add_subtitles(self.vurl.video, 'en', subs)
 
     def test_retrieval(self):
 
@@ -118,49 +126,14 @@ class AccountTest(TestCase):
         self.assertTrue(ignore)
 
     def test_not_complete(self):
-        vurl = VideoUrl.objects.filter(type='Y')[1]
-        version = vurl.video.subtitle_language('en').latest_version()
-        self.assertFalse(version.language.is_complete)
+        version = self.vurl.video.subtitle_language().get_tip()
+        self.assertFalse(version.subtitle_language.subtitles_complete)
         self.assertFalse(can_be_synced(version))
 
-        version.language.is_complete = True
-        version.language.save()
+        version.subtitle_language.subtitles_complete = True
+        version.subtitle_language.save()
 
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
-        self.assertEquals(version.moderation_status, UNMODERATED)
 
-        self.assertTrue(can_be_synced(version))
-
-        vurl = VideoUrl.objects.filter(type='Y')[0]
-        version = vurl.video.subtitle_language('en').latest_version()
-
-        language = version.language
-        language.is_complete = True
-        language.save()
-
-        self.assertTrue(version.language.is_complete)
-        self.assertEquals(version.moderation_status, UNMODERATED)
-        self.assertTrue(version.is_public)
-        self.assertFalse(version.is_synced())
-
-        self.assertFalse(can_be_synced(version))
-
-    def test_not_approved(self):
-        vurl = VideoUrl.objects.filter(type='Y')[1]
-        version = vurl.video.subtitle_language('en').latest_version()
-
-        version.language.is_complete = True
-        version.language.save()
-
-        self.assertTrue(version.is_public)
-        self.assertTrue(version.is_synced())
-        self.assertEquals(version.moderation_status, UNMODERATED)
-
-        version.moderation_status = WAITING_MODERATION
-        version.save()
-        self.assertFalse(can_be_synced(version))
-
-        version.moderation_status = APPROVED
-        version.save()
         self.assertTrue(can_be_synced(version))
