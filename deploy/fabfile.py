@@ -833,6 +833,19 @@ def switch_branch(branch):
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
 
+def _get_amara_config():
+    old_host = env.host_string
+    env.host_string = env.dev_host
+    conf = None
+    with hide('running', 'stdout'):
+        conf = sudo('cat /etc/amara_config.json')
+    try:
+        conf = json.loads(conf)
+    except:
+        raise RuntimeError('Unable to parse Amara config')
+    env.host_string = old_host
+    return conf
+
 def _create_nginx_instance(name=None, url_prefix=None):
     """
     Creates an Nginx instance (for demos)
@@ -1042,11 +1055,7 @@ def _create_rds_instance(name=None, password=None):
     """
     env.host_string = env.demo_hosts.get('app')
     with hide('running', 'stdout', 'warnings'):
-        conf = sudo('cat /etc/amara_config.json')
-        try:
-            conf = json.loads(conf)
-        except:
-            raise RuntimeError('Unable to parse Amara config')
+        conf = _get_amara_config()
         env_cfg = conf.get('rds').get('environments').get('dev')
         rds_user = env_cfg.get('user')
         rds_host = env_cfg.get('host')
@@ -1411,13 +1420,7 @@ def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
 
     """
     import boto
-    env.host_string = env.dev_host
-    with hide('running', 'stdout'):
-        conf = sudo('cat /etc/amara_config.json')
-    try:
-        conf = json.loads(conf)
-    except:
-        raise RuntimeError('Unable to parse Amara config')
+    conf = _get_amara_config()
     instances = int(instances)
     env_cfg = conf.get('ec2')
     aws_id = env_cfg.get('user')
@@ -1489,4 +1492,57 @@ def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
     else:
         print('Invalid scaling action')
         return
+
+@task
+def run_new_relic(license=None):
+    """
+    Configures application servers for new relic for current environment
+
+    :param license: New Relic license key
+
+    """
+    ve_dir = env.ve_dir
+    sudo('{0}/bin/pip install newrelic'.format(ve_dir))
+    with settings(warn_only=True):
+        sudo('service uwsgi.unisubs.{0} stop'.format(env.environment))
+    script = "export NEW_RELIC_APP_NAME=\'Amara ({2})\'\n"\
+        "export NEW_RELIC_LICENSE_KEY={0}\n"\
+        "{1}/bin/newrelic-admin run-program uwsgi "\
+        "--pidfile /tmp/newrelic_uwsgi.pid "\
+        "--ini /etc/uwsgi.unisubs.{2}.ini".format(license, ve_dir,
+            env.environment)
+    sudo('echo \"{0}\" > /tmp/run_newrelic.sh'.format(script))
+    sudo('screen -d -m bash /tmp/run_newrelic.sh', pty=False)
+
+@task
+def stop_new_relic():
+    """
+    Stops the New Relic agent for the current environment
+
+    """
+    with settings(warn_only=True):
+        sudo('killall -9 uwsgi')
+        sudo('service uwsgi.unisubs.{0} start'.format(env.environment))
+
+@task
+@roles('app')
+def enable_new_relic():
+    """
+    Enables the New Relic agent across environment application servers
+
+    """
+    conf = _get_amara_config()
+    license = conf.get('newrelic', {}).get('license')
+    with Output("Configuring and starting uWSGI with New Relic"):
+        execute(run_new_relic, license)
+
+@task
+@roles('app')
+def disable_new_relic():
+    """
+    Disables the New Relic agent and starts uWSGI
+
+    """
+    with Output("Disabling New Relic agent"):
+        execute(stop_new_relic)
 
