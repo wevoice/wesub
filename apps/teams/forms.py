@@ -63,7 +63,7 @@ class EditTeamVideoForm(forms.ModelForm):
 
     class Meta:
         model = TeamVideo
-        fields = ('title', 'description', 'thumbnail', 'project',)
+        fields = ('description', 'thumbnail', 'project',)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user")
@@ -171,7 +171,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
 
     class Meta:
         model = TeamVideo
-        fields = ('video_url', 'language', 'title', 'description', 'thumbnail', 'project',)
+        fields = ('video_url', 'language', 'description', 'thumbnail', 'project',)
 
     def __init__(self, team, user, *args, **kwargs):
         self.team = team

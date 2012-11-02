@@ -30,6 +30,8 @@ var Site = function(Site) {
         this.$html = $('html');
         this.$body = $('html');
 
+        this.pageShowCallbacks = new Array();
+
         // Base JS (any page that extends base.html)
         if (this.$html.hasClass('base')) {
             this.Views['base']();
@@ -40,6 +42,25 @@ var Site = function(Site) {
             this.Views[this.$html.attr('id')]();
         }
 
+    };
+    this.onPageShow = function() {
+        if(this.onPageShowCalled == null) {
+            // This is the initial load of the page, we don't need to do
+            // anything this time around.
+            this.onPageShowCalled = true;
+            return;
+        }
+        for(var i=0; i < this.pageShowCallbacks.length; i++) {
+            this.pageShowCallbacks[i]();
+        }
+    };
+    this.callOnPageShow = function(callback) {
+        /*
+         * Schedule a function to be called during future "pageshow" events.
+         * This fires when the user navigates away from the page, then back to
+         * it, and the page is in the back-forward cache on FF/chrome.
+         */
+        this.pageShowCallbacks.push(callback);
     };
     this.Utils = {
         /*
@@ -143,6 +164,20 @@ var Site = function(Site) {
             $opt.attr('selected', 'selected');
             $select.trigger('liszt:updated');
         },
+        defaultProjFilterOption: function() {
+             /*
+              * Get the project filter option object to use if no project is
+              * specificied in the GET params.
+              */
+              if (window.TEAM_SLUG == 'ted') {
+                // Need to special case for TED
+                $opt = $('option[id="project-opt-tedtalks"]');
+                if($opt.length > 0) {
+                        return $opt;
+                }
+              }
+              return $('option[id="project-opt-any"]');
+        },
         resetProjFilter: function($select) {
             if (typeof $select == 'undefined') {
                 $select = $('select#project-filter');
@@ -151,18 +186,12 @@ var Site = function(Site) {
             if (window.REQUEST_GET_PROJECT) {
                 $opt = $('option[id="project-opt-' + window.REQUEST_GET_PROJECT + '"]');
             } else {
-                $opt = $('option[id="project-opt-any"]');
+                $opt = that.Utils.defaultProjFilterOption();
             }
 
-            // Reset the chosen selector if we have no query args indicating that we have
-            // a project.
-            //
-            // Unless this is the TED team, of course.
-            if (window.TEAM_SLUG != 'ted') {
-                $select.children().removeAttr('selected');
-                $opt.attr('selected', 'selected');
-                $select.trigger('liszt:updated');
-            }
+            $select.children().removeAttr('selected');
+            $opt.attr('selected', 'selected');
+            $select.trigger('liszt:updated');
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
@@ -676,6 +705,10 @@ var Site = function(Site) {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             that.Utils.resetLangFilter($('select#id_task_language'));
             that.Utils.resetProjFilter();
+            that.callOnPageShow(function() {
+                that.Utils.resetLangFilter($('select#id_task_language'));
+            });
+            that.callOnPageShow(that.Utils.resetProjFilter);
             that.Utils.chosenify();
         },
         team_video_edit: function() {
@@ -743,6 +776,8 @@ var Site = function(Site) {
 
             that.Utils.resetLangFilter();
             that.Utils.resetProjFilter();
+            that.callOnPageShow(that.Utils.resetLangFilter);
+            that.callOnPageShow(that.Utils.resetProjFilter);
             that.Utils.chosenify();
         },
         team_settings_permissions: function() {
@@ -956,4 +991,7 @@ var Site = function(Site) {
 $(function() {
     window.site = new Site();
     window.site.init();
+    $(window).bind('pageshow', function() {
+        window.site.onPageShow()
+    });
 });
