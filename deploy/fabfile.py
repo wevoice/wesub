@@ -230,7 +230,7 @@ def _create_env(username,
     env.demo_domain = 'demo.amara.org'
     env.lb_config = '/etc/nginx/conf.d/unisubs.{0}.conf'.format(env.environment)
     env.scaling_aws_key = 'pcf_ec2_keys_amara'
-    env.scaling_instance_type = 'm1.small'
+    env.scaling_instance_type = 'm1.medium'
     env.scaling_security_groups = ['amara-app', 'amara-core']
 
 @task
@@ -542,7 +542,7 @@ def _reload_app_servers(hard=False):
         # disable node on LB
         _disable_lb_node(env.host_string)
         with settings(warn_only=True):
-            run('wget -q -T 120 http://{0}/en/'.format(env.host_string))
+            run('wget -q -T 120 --delete-after http://{0}/en/'.format(env.host_string))
         _enable_lb_node(env.host_string)
 
 @task
@@ -685,7 +685,7 @@ def _update_code(branch=None, integration_branch=None, app_dir=None):
             _git_pull()
         run('python deploy/create_commit_file.py')
     # update integration repo
-    execute(_update_integration, branch=integration_branch, app_dir=app_dir)
+    _update_integration(branch=integration_branch, app_dir=app_dir)
     with cd(app_dir):
         with settings(warn_only=True):
             run("find . -name '*.pyc' -delete")
@@ -1272,7 +1272,11 @@ def remove_demo():
             sudo('rm -rf /var/tmp/{0}'.format(instance_name))
 
 @task
-def _configure_scaling_instances(skip_puppet=False):
+def configure_scaling_instances(skip_puppet=False):
+    """
+    Configures instances upon scaling
+
+    """
     hostname = 'app-scaling-{0}'.format(env.environment)
     with Output("Updating hostname"), hide('running', 'stdout'):
         sudo('echo "{0}.amara.org" > /etc/hostname'.format(hostname))
@@ -1287,7 +1291,7 @@ def _configure_scaling_instances(skip_puppet=False):
     with Output("Restarting uWSGI"):
         sudo('service uwsgi.unisubs.{0} restart'.format(env.environment))
         with settings(warn_only=True), hide('running', 'stdout'):
-            run('wget -q -T 60 http://{0}/en/'.format(env.host_string))
+            run('wget -q -T 60 --delete-after http://{0}/en/'.format(env.host_string))
 
 def _wait_for_instance_ready(instance=None):
     while True:
@@ -1313,8 +1317,8 @@ def _update_lb_config(config):
         f.write(config)
     put('.tmp_lb', env.lb_config, use_sudo=True)
     sudo('/etc/init.d/nginx reload')
+    os.remove('.tmp_lb')
 
-@task
 def _add_nodes_to_lb(hosts=[]):
     """
     Adds specified nodes to current environment load balancer
@@ -1333,7 +1337,6 @@ def _add_nodes_to_lb(hosts=[]):
         nginx_cfg.insert(1, '    server {0};'.format(host))
     _update_lb_config('\n'.join(nginx_cfg))
 
-@task
 def _remove_nodes_from_lb(hosts=[]):
     """
     Removes specified hosts from current environment load balancer
@@ -1351,8 +1354,7 @@ def _remove_nodes_from_lb(hosts=[]):
         [nginx_cfg.remove(x) for x in nginx_cfg if x.find(host) > -1]
     _update_lb_config('\n'.join(nginx_cfg))
 
-@task
-def _configure_scaling_lb(hosts=[], action=None):
+def _configure_scaling_lb(hosts=[], action=None, scaling_instances=None):
     if not env.lb_host or not action: return
     action = action.lower()
     with Output("Configuring load balancer"):
@@ -1369,23 +1371,43 @@ def _configure_scaling_lb(hosts=[], action=None):
             _add_nodes_to_lb(hosts)
         elif action == 'down':
             _remove_nodes_from_lb(hosts)
-            # re-enable cron
-            # TODO: check if any running scaled instances and leave cron disabled
-            # otherwise the puppet agent will reset the nginx config which will
-            # take the scaled instances out of the upstream
-            #env.host_string = env.lb_host
-            #sudo('/etc/init.d/cron start')
+            if not scaling_instances:
+                print('No remaining scaling instances ; enabling cron')
+                # re-enable cron
+                env.host_string = env.lb_host
+                sudo('/etc/init.d/cron start')
         else:
             print('Invalid scaling action')
 
+def _get_current_scaling_instances(ec2_conn, state=None):
+    """
+    Gets existing scaling instances for the current environment
+
+    :param ec2_conn: Boto EC2 connection
+    :param state: Current instance state to check (running, stopped)
+
+    """
+    # check for stopped instances
+    all_res = ec2_conn.get_all_instances()
+    scaling_instances = []
+    for r in all_res:
+        for i in r.instances:
+            tags = i.__dict__.get('tags', {})
+            if tags.has_key('scaling-instance') and \
+                tags.get('scaling-env') == env.environment and \
+                i.state == state:
+                scaling_instances.append(i)
+    return scaling_instances
+
 @task
-def scale(action='up', instances=1, skip_puppet=False):
+def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
     """
     Scales application server instances
 
     :param action: 'up' or 'down' for scaling direction
     :param instances: Number of instances to scale (default: 1)
     :param skip_puppet: Skip initial Puppet provisioning (default: False)
+    :param skip_lb: Skip load balancer configuration (default: False)
 
     """
     import boto
@@ -1401,15 +1423,12 @@ def scale(action='up', instances=1, skip_puppet=False):
     aws_id = env_cfg.get('user')
     aws_key = env_cfg.get('key')
     ec2_conn = boto.connect_ec2(aws_id, aws_key)
-    # check for stopped instances
-    all_instances = ec2_conn.get_all_instances()
-    scaling_instances = []
     action = action.lower()
     if action == 'up':
         state = 'stopped'
     else:
         state = 'running'
-    [scaling_instances.append(x.instances[0]) for x in all_instances if x.instances[0].__dict__.get('tags', {}).has_key('scaling-instance') and x.instances[0].__dict__.get('tags', {}).get('scaling-env') == env.environment and x.instances[0].state == state]
+    scaling_instances = _get_current_scaling_instances(ec2_conn, state)
     if action == 'up':
         # disable known hosts in paramiko to prevent ssh hanging
         env.disable_known_hosts = True
@@ -1434,7 +1453,7 @@ def scale(action='up', instances=1, skip_puppet=False):
                     ec2_conn.create_tags([i.id], {
                         'scaling-instance': '1',
                         'scaling-env': env.environment,
-                        'Name': 'app-scaling-{0}'.format(env.environment)
+                        'Name': 'pcf-amara-app-scaling-{0}'.format(env.environment)
                     })
                 [scaling_instances.append for x in res.instances]
             for i in scaling_instances:
@@ -1442,10 +1461,11 @@ def scale(action='up', instances=1, skip_puppet=False):
                     i.start()
                     _wait_for_instance_ready(i)
         [env.hosts.append(x.public_dns_name) for x in scaling_instances]
-        # configure instances in parallel
-        execute(_configure_scaling_instances, skip_puppet=skip_puppet)
-        # configure lb
-        _configure_scaling_lb(hosts=env.hosts, action=action)
+        # configure instances
+        execute(configure_scaling_instances, skip_puppet=skip_puppet)
+        if skip_lb == False:
+            # configure lb
+            _configure_scaling_lb(hosts=env.hosts, action=action)
         _notify("Amara Scaling ({0})".format(env.environment),
             "Scaled {0} environment by {1} instance(s)".format(env.environment,
             instances), env.notification_email)
@@ -1454,10 +1474,16 @@ def scale(action='up', instances=1, skip_puppet=False):
         with Output("Scaling down by {0} instance(s)".format(instances)):
             hosts = []
             stopped_instances = scaling_instances[:instances]
+            print('Stopping instances: {0}'.format(', '.join([x.id
+                for x in stopped_instances])))
             [hosts.append(i.public_dns_name) for i in stopped_instances]
             [i.stop() for i in stopped_instances]
+        # get remaining instances
+        remaining_instances = _get_current_scaling_instances(ec2_conn, state)
+        if skip_lb == False:
             # configure lb
-        _configure_scaling_lb(hosts=hosts, action=action)
+            _configure_scaling_lb(hosts=hosts, action=action,
+                scaling_instances=remaining_instances)
         _notify("Amara Scaling ({0})".format(env.environment),
             "Request to terminate scaled instance(s) for {0} environment: {1}".format(env.environment, ','.join([i.id for i in stopped_instances])), env.notification_email)
     else:
