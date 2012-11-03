@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 01:43-0500\n"
+"POT-Creation-Date: 2012-11-03 01:43-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Croatian (http://www.transifex.com/projects/p/"
@@ -705,11 +705,11 @@ msgstr "Upravljači i administratori"
 msgid "Admins only"
 msgstr "Samo administratori"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2559
+#: apps/teams/models.py:141 apps/teams/models.py:2558
 msgid "name"
 msgstr "ime"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2560
+#: apps/teams/models.py:142 apps/teams/models.py:2559
 msgid "slug"
 msgstr "komad"
 
@@ -804,7 +804,7 @@ msgstr "istek zadatka (dani)"
 msgid "Teams"
 msgstr "Ekipe"
 
-#: apps/teams/models.py:651
+#: apps/teams/models.py:650
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -813,33 +813,33 @@ msgstr ""
 "natpise ili titlove na ovaj videozapis. Dodavanjem te bilješke volonteri će "
 "vjerojatnije pomoći!"
 
-#: apps/teams/models.py:655
+#: apps/teams/models.py:654
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Automatski postavljamo slike prikaza za pojedine stranice, npr. Youtube"
 
-#: apps/teams/models.py:657
+#: apps/teams/models.py:656
 msgid "Need help with all languages"
 msgstr "Trebamo pomoć za sve jezike"
 
-#: apps/teams/models.py:658
+#: apps/teams/models.py:657
 msgid "If you check this, other languages will not be displayed."
 msgstr "Ako uključite ovo, drugi jezici se neće prikazivati."
 
-#: apps/teams/models.py:946 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:945 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Vlasnik"
 
-#: apps/teams/models.py:947 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:946 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Upravitelj"
 
-#: apps/teams/models.py:948 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:947 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Administrator"
 
-#: apps/teams/models.py:949 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:948 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Suradnik"
 
@@ -977,8 +977,8 @@ msgid "You do not have permission to delete this team."
 msgstr "Nemate dozvolu za brisanje ovog tima."
 
 #: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1595
-#: apps/teams/views.py:1610
+#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
+#: apps/teams/views.py:1607
 msgid "You do not have permission to edit this team."
 msgstr "Nemate dozvolu za uređivanje ovog tima."
 
@@ -1086,81 +1086,81 @@ msgstr "Napustili ste ovu ekipu."
 msgid "Member saved."
 msgstr "Član je spremljen."
 
-#: apps/teams/views.py:1154
+#: apps/teams/views.py:1151
 msgid "You cannot view this team's tasks."
 msgstr ""
 
-#: apps/teams/views.py:1313 apps/teams/views.py:1316
+#: apps/teams/views.py:1310 apps/teams/views.py:1313
 msgid "You are not allowed to perform this task."
 msgstr "Nemate dozvolu za izvršenje ovog zadatka."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1368
 msgid "Task deleted."
 msgstr ""
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1370
 msgid "You cannot delete this task."
 msgstr ""
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1395
 msgid "Task declined."
 msgstr ""
 
-#: apps/teams/views.py:1400
+#: apps/teams/views.py:1397
 msgid "Task assigned."
 msgstr ""
 
-#: apps/teams/views.py:1402
+#: apps/teams/views.py:1399
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1421
 msgid "Invalid assignment attempt."
 msgstr ""
 
-#: apps/teams/views.py:1449
+#: apps/teams/views.py:1446
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1453
+#: apps/teams/views.py:1450
 msgid "/n"
 msgstr ""
 
-#: apps/teams/views.py:1471
+#: apps/teams/views.py:1468
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1522
+#: apps/teams/views.py:1519
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1534
+#: apps/teams/views.py:1531
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1551
+#: apps/teams/views.py:1548
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1562
+#: apps/teams/views.py:1559
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1580
+#: apps/teams/views.py:1577
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1620
+#: apps/teams/views.py:1617
 msgid "Successfully synced subtitles."
 msgstr ""
 
-#: apps/teams/views.py:1724
+#: apps/teams/views.py:1721
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1758
+#: apps/teams/views.py:1755
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1297,21 +1297,21 @@ msgstr ""
 "Oprostite, trenutno ne možete učitavati titlove jer netko uređuje jezik čiji "
 "prijevod učitavate"
 
-#: apps/videos/models.py:2015
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2020
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2025
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1320,7 +1320,7 @@ msgstr ""
 "  odčačen <a href=\"%(language_url)s\">%(language)s</a> titlova za <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2030
+#: apps/videos/models.py:2033
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1329,39 +1329,39 @@ msgstr ""
 "  odobreni <a href=\"%(language_url)s\">%(language)s</a> titlovi za <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2035
+#: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2044
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2049
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "dodan videozapis <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2051
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> videozapis dodan"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2057
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "promjenjen naslov za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2059
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Naslov je izmijenjen u <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2071
+#: apps/videos/models.py:2074
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1370,7 +1370,7 @@ msgstr ""
 "komentira/o/la je <a href=\"%(comments_url)s\">%(language)s titlove</a> for "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1379,17 +1379,17 @@ msgstr ""
 "Dodan je komentar za <a href=\"%(comments_url)s\">%(language)s titlove</a> "
 "za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2079
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentira/o/la je <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2081
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Dodan je komentar za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1398,7 +1398,7 @@ msgstr ""
 "započeti <a href=\"%(language_url)s\">%(language)s titlovi</a> za <a href=\"%"
 "(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2091
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1407,7 +1407,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s titlovi</a> pokrenuti za <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2102
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1416,7 +1416,7 @@ msgstr ""
 "uredi/o/la <a href=\"%(language_url)s\">%(language)s titlove</a> za<a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2104
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1425,107 +1425,107 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s titlovi</a> uređeni za <a href=\"%"
 "(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2110
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "dodan novi URL za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2112
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Dodan je novi URL za <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2114
+#: apps/videos/models.py:2117
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:2119
+#: apps/videos/models.py:2122
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2136
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2142
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2214
 msgid "add video"
 msgstr "dodaj videozapis"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2215
 msgid "change title"
 msgstr "promijeni naslov"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2216
 msgid "comment"
 msgstr "komentiraj"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2217
 msgid "add version"
 msgstr "dodaj verziju"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2218
 msgid "add translation"
 msgstr "dodaj prijevod"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2219
 msgid "add video url"
 msgstr "dodaj URL videozapisa"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2220
 msgid "request subtitles"
 msgstr "zatraži titlove"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2221
 msgid "approve version"
 msgstr "odobri verziju"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2222
 msgid "add contributor"
 msgstr "dodaj suradnika"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2223
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2224
 msgid "reject version"
 msgstr "odbaci verziju"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2225
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2226
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2227
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2228
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2229
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2230
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2484
+#: apps/videos/models.py:2487
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "

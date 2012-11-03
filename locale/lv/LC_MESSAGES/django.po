@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 01:36-0500\n"
+"POT-Creation-Date: 2012-11-03 01:36-0500\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
@@ -711,11 +711,11 @@ msgstr "Pārvaldnieki un administratori"
 msgid "Admins only"
 msgstr "Tikai administratori"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2559
+#: apps/teams/models.py:141 apps/teams/models.py:2558
 msgid "name"
 msgstr "nosaukums"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2560
+#: apps/teams/models.py:142 apps/teams/models.py:2559
 msgid "slug"
 msgstr ""
 
@@ -810,7 +810,7 @@ msgstr "uzdevuma termiņš (dienas)"
 msgid "Teams"
 msgstr "Komandas"
 
-#: apps/teams/models.py:651
+#: apps/teams/models.py:650
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -818,33 +818,33 @@ msgstr ""
 "Izmantojiet šo lauku, lai izskaidrotu, kādēļ Jūsu komanda vēlās subtitrēt šo "
 "video. Šāda informācija palielina iespēju, ka pieteiksies vairāk brīvprātīgo!"
 
-#: apps/teams/models.py:655
+#: apps/teams/models.py:654
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Mēs sīktēlus paņemam automātiski no konkrētām mājaslapām, piemēram, Youtube"
 
-#: apps/teams/models.py:657
+#: apps/teams/models.py:656
 msgid "Need help with all languages"
 msgstr "Nepieciešama palīdzība ar visām valodām"
 
-#: apps/teams/models.py:658
+#: apps/teams/models.py:657
 msgid "If you check this, other languages will not be displayed."
 msgstr "Ja Jūs šo atķeksējat, citas valodas netiks parādītas"
 
-#: apps/teams/models.py:946 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:945 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Īpašnieks"
 
-#: apps/teams/models.py:947 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:946 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Pārvaldītājs"
 
-#: apps/teams/models.py:948 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:947 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Administrācija"
 
-#: apps/teams/models.py:949 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:948 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Artavnieks"
 
@@ -985,8 +985,8 @@ msgid "You do not have permission to delete this team."
 msgstr "Jums nav atļaujas šīs komandas dzēšanai."
 
 #: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1595
-#: apps/teams/views.py:1610
+#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
+#: apps/teams/views.py:1607
 msgid "You do not have permission to edit this team."
 msgstr "Jums nav atļaujas šīs komandas rediģēšanai."
 
@@ -1095,75 +1095,75 @@ msgstr "Jūs esat pametis šo komandu."
 msgid "Member saved."
 msgstr "Dalībnieks saglabāts."
 
-#: apps/teams/views.py:1154
+#: apps/teams/views.py:1151
 msgid "You cannot view this team's tasks."
 msgstr "Jūs nevarat apskatīt šīs komandas uzdevumus."
 
-#: apps/teams/views.py:1313 apps/teams/views.py:1316
+#: apps/teams/views.py:1310 apps/teams/views.py:1313
 msgid "You are not allowed to perform this task."
 msgstr "Jums nav atļaujas veikt šo uzdevumu."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1368
 msgid "Task deleted."
 msgstr "Uzdevums dzēsts."
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1370
 msgid "You cannot delete this task."
 msgstr "Jūs nevarat izdzēst šo uzdevumu."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1395
 msgid "Task declined."
 msgstr "Atteikts no uzdevuma."
 
-#: apps/teams/views.py:1400
+#: apps/teams/views.py:1397
 msgid "Task assigned."
 msgstr "Uzdevums piešķir."
 
-#: apps/teams/views.py:1402
+#: apps/teams/views.py:1399
 msgid "You cannot assign this task."
 msgstr "Jūs nevarat piešķirt šo uzdevumu."
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1421
 msgid "Invalid assignment attempt."
 msgstr "Nederīgs piešķiršanas mēģinājums."
 
-#: apps/teams/views.py:1449
+#: apps/teams/views.py:1446
 msgid "Draft uploaded successfully."
 msgstr "Jaunā versija veiksmīgi augšupielādēta."
 
-#: apps/teams/views.py:1453
+#: apps/teams/views.py:1450
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1471
+#: apps/teams/views.py:1468
 msgid "You are not allowed to download this transcript."
 msgstr "Jums nav atļaujas lejuplādēt šo transkriptu."
 
-#: apps/teams/views.py:1522
+#: apps/teams/views.py:1519
 msgid "There's already a project with this name"
 msgstr "Projekts ar šādu nosaukumu jau pastāv"
 
-#: apps/teams/views.py:1534
+#: apps/teams/views.py:1531
 msgid "Project added."
 msgstr "Projekts pievienots."
 
-#: apps/teams/views.py:1551
+#: apps/teams/views.py:1548
 msgid "You cannot edit that project."
 msgstr "Jūs nevarat rediģēt šo projektu."
 
-#: apps/teams/views.py:1562
+#: apps/teams/views.py:1559
 msgid "Project deleted."
 msgstr "Projekts dzēsts."
 
-#: apps/teams/views.py:1580
+#: apps/teams/views.py:1577
 msgid "Project saved."
 msgstr "Projekts saglabāts."
 
-#: apps/teams/views.py:1620
+#: apps/teams/views.py:1617
 msgid "Successfully synced subtitles."
 msgstr ""
 
-#: apps/teams/views.py:1724
+#: apps/teams/views.py:1721
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1171,7 +1171,7 @@ msgstr ""
 "Nederīgs atpublicēšanas pieprasījums. \n"
 "Kļūdas: \n"
 
-#: apps/teams/views.py:1758
+#: apps/teams/views.py:1755
 msgid "Successfully unpublished subtitles."
 msgstr "Subtitri veiksmīgi atpublicēti."
 
@@ -1317,14 +1317,14 @@ msgid ""
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:2015
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2020
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1333,7 +1333,7 @@ msgstr ""
 "apstiprināja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2025
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1342,7 +1342,7 @@ msgstr ""
 "  noraidīja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2030
+#: apps/videos/models.py:2033
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1351,7 +1351,7 @@ msgstr ""
 "  apstiprināja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2035
+#: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1360,32 +1360,32 @@ msgstr ""
 "noraidīja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2044
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  dzēsts video „%(title)s”"
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2049
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2051
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "pievienots video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2057
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "nomainīts nosaukums video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2059
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Video <a href=\"%(video_url)s\">%(video_name)s</a> nomainīts nosaukums"
 
-#: apps/videos/models.py:2071
+#: apps/videos/models.py:2074
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1394,7 +1394,7 @@ msgstr ""
 "komentēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(comments_url)s\">%(language)s subtitrus</a>"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1403,17 +1403,17 @@ msgstr ""
 "Video <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%(comments_url)s"
 "\">%(language)s </a>s subtitriem pievienots komentārs"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2079
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja komentāru <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2081
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots komentārs"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1422,14 +1422,14 @@ msgstr ""
 "sāka <a href=\"%(language_url)s\">%(language)s subtitrus</a> video <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2091
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2102
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1438,7 +1438,7 @@ msgstr ""
 "rediģēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s subtitrus</a> "
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2104
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1447,110 +1447,110 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> video <a href=\"%(language_url)s"
 "\">%(language)s subtitri</a> tika rediģēti"
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2110
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "pievienoja jaunu video <a href=\"%(video_url)s\">%(video_name)s</a> vietrādi "
 "URL"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2112
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots jauns vietrādis URL"
 
-#: apps/videos/models.py:2114
+#: apps/videos/models.py:2117
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "pievienojās %(team)s komandai kā %(role)s"
 
-#: apps/videos/models.py:2119
+#: apps/videos/models.py:2122
 #, python-format
 msgid "left the %s team"
 msgstr "pameta %s komandu"
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2136
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2142
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2214
 msgid "add video"
 msgstr "pievienot video"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2215
 msgid "change title"
 msgstr "mainīt nosaukumu"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2216
 msgid "comment"
 msgstr "komentēt"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2217
 msgid "add version"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2218
 msgid "add translation"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2219
 msgid "add video url"
 msgstr "pievienot video url"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2220
 msgid "request subtitles"
 msgstr "prasīt subtitrus"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2221
 msgid "approve version"
 msgstr "apstiprināt versiju"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2222
 msgid "add contributor"
 msgstr "pievienot artavnieku"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2223
 msgid "remove contributor"
 msgstr "noņemt artavnieku"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2224
 msgid "reject version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2225
 msgid "review version"
 msgstr "pārskatīt versiju"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2226
 msgid "accept version"
 msgstr "pieņemt versiju"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2227
 msgid "decline version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2228
 msgid "delete video"
 msgstr "dzēst video"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2229
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2230
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2484
+#: apps/videos/models.py:2487
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
