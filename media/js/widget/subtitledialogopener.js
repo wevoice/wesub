@@ -217,11 +217,11 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         } else if (unisubs.mode == 'approve') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
                                                       unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL);
-        } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
-            dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
-        } else {
+        } else if (subtitles.originalSubtitles) {
             dialog = this.openDependentTranslationDialog_(
                 serverModel, subtitles, originalSubtitles);
+        } else {
+            dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
         }
 
         // TODO: This is an ugly hack for NF.  We should remove it once we
