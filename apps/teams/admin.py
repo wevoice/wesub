@@ -102,8 +102,7 @@ class TeamVideoAdmin(admin.ModelAdmin):
 class WorkflowAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'team', 'project', 'team_video', 'created')
     list_filter = ('created', 'modified')
-    search_fields = ('team__name', 'project__name', 'team_video__title',
-                     'team_video__video__title')
+    search_fields = ('team__name', 'project__name', 'team_video__video__title')
     raw_id_fields = ('team', 'team_video', 'project')
     ordering = ('-created',)
 
@@ -119,8 +118,7 @@ class TaskAdmin(admin.ModelAdmin):
                     'language_title', 'assignee_name', 'is_complete', 'deleted', 'created')
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
-                     'assignee__last_name', 'team_video__title',
-                     'team_video__video__title')
+                     'assignee__last_name', 'team_video__video__title')
     raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version',
                      'review_base_version')
 
