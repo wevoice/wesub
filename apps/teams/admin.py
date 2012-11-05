@@ -114,7 +114,7 @@ class TaskAdmin(admin.ModelAdmin):
     # 1. MySQL was performing a full table scan when using the select_related()
     #    for some reason.
     # 2. It's only a few extra queries, so it's not the end of the world.
-    list_display = ('id', 'type', 'team_title', 'team_video__video__title',
+    list_display = ('id', 'type', 'team_title', 'team_video_title',
                     'language_title', 'assignee_name', 'is_complete', 'deleted', 'created')
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
