@@ -46,6 +46,7 @@ from apps.auth.models import CustomUser as User
 from apps.statistic.models import EmailShareStatistic
 from apps.subtitles import models as sub_models
 from apps.subtitles.forms import SubtitlesUploadForm
+from apps.subtitles.pipeline import rollback_to
 from apps.teams.models import Task
 from apps.videos import permissions
 from apps.videos.decorators import get_video_revision, get_video_from_code
@@ -494,16 +495,18 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 def rollback(request, version):
     if version.video.is_moderated:
         return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
-    is_writelocked = version.language.is_writelocked
+    is_writelocked = version.subtitle_language.is_writelocked
     if is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
     elif not version.next_version():
         messages.error(request, message=u'Can not rollback to the last version')
     else:
         messages.success(request, message=u'Rollback successful')
-        version = version.rollback(request.user)
+        version = rollback_to(version.video,
+                version.subtitle_language.language_code,
+                version_number=version.version_number)
         video_changed_tasks.delay(version.video.id, version.id)
-        return redirect(version.language.get_absolute_url()+'#revisions')
+        return redirect(version.subtitle_language.get_absolute_url()+'#revisions')
     return redirect(version)
 
 @get_video_revision
