@@ -18,13 +18,19 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
     
     def setUp(self):
         WebdriverTestCase.setUp(self)
+
+        #Create the test user and api key
         self.user = UserFactory.create(username = 'user')
-        self.video_language_pg = video_language_page.VideoLanguagePage(self)
         data_helpers.create_user_api_key(self, self.user)
+      
+        #Create some test data and set subtitle data dir
         self.test_video = data_helpers.create_video(self, 
             'http://www.example.com/upload_test.mp4')
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
+
+        self.video_language_pg = video_language_page.VideoLanguagePage(self)
+
 
 
     def api_upload_subs(self, test_format, test_lang_code):
@@ -218,8 +224,8 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
         self.assertNotEqual(404, status)
-
-        self.assertFalse('Needs verification steps added here')
+        print response
+        self.assertEqual(lang_code, response['versions'][-1][lang_code])
 
 
     def test_fetch__rst(self):
@@ -234,10 +240,9 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
 
         url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
             video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request( self, url_part ) 
+        status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
         self.assertNotEqual(404, status)
-
         self.assertFalse('Needs verification steps added here')
 
     def test_fetch__srt(self):
@@ -252,7 +257,7 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
 
         url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
             video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request( self, url_part ) 
+        status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
         self.assertNotEqual(404, status)
 
@@ -309,7 +314,7 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         version = 2
         output_format = 'srt'
         data = {
-            'language': lang_code,
+            'language_code': lang_code,
             'video_language': lang_code,
             'video': self.test_video.pk,
             'draft': open('apps/webdriver_testing/subtitle_data/'
