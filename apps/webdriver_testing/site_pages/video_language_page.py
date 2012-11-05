@@ -28,10 +28,11 @@ class VideoLanguagePage(VideoPage):
         line_elements = self.browser.find_elements_by_css_selector(
             self._SUB_LINES)
         for el in line_elements:
-            html_text = el.text
-            sublist = html_text.split('\n')
-            temp = [i for i in sublist if "<br>" not in i]
-            displayed_subtitles.append(" ".join(temp))
+            #html_text = el.text
+            #sublist = html_text.split('\n')
+            #temp = [i for i in sublist if "<br>" not in i]
+            #displayed_subtitles.append(" ".join(temp))
+            displayed_subtitles.append(el.text)
         return displayed_subtitles
 
 

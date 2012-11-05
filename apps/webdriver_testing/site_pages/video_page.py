@@ -11,6 +11,7 @@ class VideoPage(UnisubsPage):
 
     _URL = "videos/%s"  # %s is the unique onsite video id
     _VIDEO_TITLE = "div.content h2.main-title a.title-container"
+    _DESCRIPTION = "div#description"
     _EMBEDDED_VIDEO = "div.unisubs-widget div.unisubs-videoTab-container"
     _SUBTITLE_MENU = "a.unisubs-subtitleMeLink span.unisubs-tabTextchoose"
     _LIKE_FACEBOOK = "li.unisubs-facebook-like button"
@@ -44,16 +45,17 @@ class VideoPage(UnisubsPage):
     _EDIT = ""
 
     #UPLOAD SUBTITLES DIALOG
-    _SELECT_LANGUAGE = 'select#id_language'
-    _TRANSLATE_FROM = 'select#id_translated_from'
+    _SELECT_LANGUAGE = 'select#id_language_code'
+    _TRANSLATE_FROM = 'select#id_from_language_code'
+    _PRIMARY_AUDIO = 'select#id_primary_audio_language_code'
     _SUBTITLES_FILE = 'input#subtitles-file-field'
     _IS_COMPLETE = 'input#updload-subtitles-form-is_complete' #checked default
 
     _UPLOAD_SUBMIT = 'form#upload-subtitles-form button.green_button'
     _FEEDBACK_MESSAGE = 'p.feedback-message'
     _CLOSE = 'div#upload_subs-div a.close'
-    UPLOAD_SUCCESS_TEXT = ('Thank you for uploading. It will take a '
-        'minute or so for your subtitles to appear.')
+    UPLOAD_SUCCESS_TEXT = ('Thank you for uploading. It may take a minute or '
+                           'so for your subtitles to appear.')
 
     
 
@@ -66,13 +68,17 @@ class VideoPage(UnisubsPage):
     def upload_subtitles(self, 
                          sub_lang, 
                          sub_file,
-                         translated_from=None, 
-                         is_complete=True):
+                         audio_lang = None,
+                         translated_from = None, 
+                         is_complete = True):
         #Open the dialog
         self.click_by_css(self._UPLOAD_SUBTITLES)
         #Choose the language
         self.wait_for_element_present(self._SELECT_LANGUAGE)
         self.select_option_by_text(self._SELECT_LANGUAGE, sub_lang)
+        #Set the audio language
+        if audio_lang:
+            self.select_option_by_text(self._PRIMARY_AUDIO)
         #Set the translation_from field
         if translated_from:
             self.select_option_by_text(self._TRANSLATED_FROM)
@@ -106,9 +112,19 @@ class VideoPage(UnisubsPage):
         urlfrag = url_parts.split('/')[3]
         return urlfrag
 
+    def description_text(self):
+        return self.get_text_by_css(self._DESCRIPTION)
+
     def video_embed_present(self):
         if self.is_element_present(self._EMBEDDED_VIDEO):
             return True
 
     def add_subtitles(self):
         self.click_by_css(self._ADD_SUBTITLES)
+
+    def team_slug(self, slug):
+        """Return true if the team stub is linked on the video page.
+        """
+        team_link = "a[href*='/teams/%s/']" % slug
+        if self.is_element_present(team_link):
+            return True
