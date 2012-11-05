@@ -66,6 +66,17 @@ class VideosTab(ATeamPage):
             self.select_option_by_text(self._PROJECT, project)
         self.click_by_css(self._SUBMIT) 
 
+    def _open_filters(self):
+        curr_url = self.current_url()
+        if 'project=' in curr_url:
+            print 'filter should already be open'
+        elif self.is_element_present(self._FILTER_OPEN):
+            print 'filter is open'
+        else:
+            print 'Filter is closed'
+            self.click_by_css(self._FILTERS)
+            self.wait_for_element_present(self._FILTER_OPEN)
+            self.wait_for_element_visible('div.filter-chunk')
 
     def sub_lang_filter(self, language):
         """Filter the displayed videos by subtitle language'
@@ -73,11 +84,8 @@ class VideosTab(ATeamPage):
         Valid choices are the full language name spelled out.
         ex: English, or Serbian, Latin
         """
-        if not self.is_element_present(self._FILTER_OPEN):
-            print 'Filter is closed'
-            self.click_by_css(self._FILTERS)
-            self.wait_for_element_present(self._FILTER_OPEN)
-        self.click_by_css('a.chzn-single span')
+        self._open_filters()
+        self.click_by_css('div#lang-filter_chzn a.chzn-single')
         self.select_from_chosen(self._LANG_FILTER, [language])
 
     def video_sort(self, sort_option):
@@ -91,12 +99,10 @@ class VideosTab(ATeamPage):
                             least subtitles
 
         """
-        if not self.is_element_present(self._FILTER_OPEN):
-            self.click_by_css(self._FILTERS)
-            self.wait_for_element_present(self._FILTER_OPEN)
-        
-        self.click_by_css('div.filter-chunk:nth-child(3) > '
-            'div a.chzn-single span')
+        self._open_filters() 
+        filter_chunks = self.browser.find_elements_by_css_selector('div.filter-chunk')
+        span_chunk = filter_chunks[-1].find_element_by_css_selector('div a.chzn-single span')
+        span_chunk.click()
         self.select_from_chosen(self._SORT_FILTER, [sort_option])
 
     def _video_element(self, video):

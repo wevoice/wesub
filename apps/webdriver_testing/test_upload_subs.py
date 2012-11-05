@@ -7,7 +7,7 @@ from apps.webdriver_testing.editor_pages import subtitle_editor
 import codecs
 import os
 
-class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
+class TestCaseUploadSubsUntimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
     """
     
@@ -100,7 +100,7 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         message = self.video_pg.upload_subtitles('Russian', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
         subtitle_lang = test_video3.subtitle_language('ru') 
-        self.assertEqual( 2, subtitle_lang.version_number )
+        self.assertEqual(2, subtitle_lang.get_tip().version_number)
 
     def test__version__overwrite_existing(self):
         """Uploading a new set of subs is created as a new version.
@@ -120,9 +120,9 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         sub_lang = test_video4.subtitle_language('ar')
         self.video_pg.page_refresh()
         subtitle_lang = test_video4.subtitle_language('ar') 
-        self.assertEqual(2, subtitle_lang.version_number)
+        self.assertEqual(2, subtitle_lang.get_tip().version_number)
     
-    def test__upload__additional_translation(self):
+    def test_upload__additional_translation(self):
         """Uploading a new set of subs is created as a new version.
 
         Uploaded subs replace the existing version.
@@ -139,7 +139,7 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
         self.video_pg.page_refresh()
         subtitle_lang = test_video4.subtitle_language('sv') 
-        self.assertEqual(1, subtitle_lang.version_number)
+        self.assertEqual(1, subtitle_lang.get_tip().version_number)
 
         self.assertEqual(43, subtitle_lang.get_subtitle_count() )
 
@@ -159,6 +159,7 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         displayed_list = video_language_pg.displayed_lines()
+
         self.assertEqual(expected_list, displayed_list)
 
     def test_edit(self):
@@ -180,7 +181,7 @@ class WebdriverTestCaseUploadSubsUntimedText(WebdriverTestCase):
         video_language_pg.edit_subtitles()
         sub_editor = subtitle_editor.SubtitleEditor(self)
         sub_editor.continue_past_help()
-        editor_sub_list = subtitle_editor.subtitles_list()
+        editor_sub_list = sub_editor.subtitles_list()
 
         #Verify uploaded subs are displayed in the Editor
         self.assertEqual(expected_list, editor_sub_list)
@@ -221,9 +222,8 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
 
         """
         self.video_pg.upload_subtitles(lang, sub_file)
-        subtitle_lang = self.test_video.subtitle_language(lang_code) 
-        self.assertEqual( expected_count, 
-            subtitle_lang.get_subtitle_count())
+        subtitle_lang = self.test_video.subtitle_language(lang_code)
+        self.assertEqual(expected_count, subtitle_lang.get_subtitle_count())
         self.video_pg.page_refresh()
 
 
@@ -275,5 +275,5 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         """
         test_file = 'Timed_text.sv.dfxp'
         sub_file = os.path.join(self.subs_data_dir, test_file)       
-        self.upload_and_verify(sub_file, 'Swedish', 'sv', 43 )
+        self.upload_and_verify(sub_file, 'Swedish', 'sv', 72 )
 

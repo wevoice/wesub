@@ -77,9 +77,7 @@ class NavPage(Page):
         return self.get_text_by_css(self.SITE_NAME)
 
     def is_logged_in(self):
-        if self.is_element_present(self.LOGIN['css']):
-            return False
-        elif self.is_element_present(self.PROFILE['css']):
+        if self.is_element_present(self.PROFILE['css']):
             return True
 
     def logout(self):
