@@ -36,6 +36,17 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
         self.create_pg.submit_video(url)
         assert_true(self.create_pg.submit_success())
 
+
+    def test_create__brightcove(self):
+        """Add a brightcove video.
+
+        """
+        #Brightcove support added under this ticket: 
+        #https://unisubs.sifterapp.com/issues/1648
+        url = 'http://bcove.me/8yxc6sxy'
+        self.create_pg.submit_video(url)
+        assert_true(self.create_pg.submit_success())
+
     def test_create__dailymotion(self):
         """Add a dailymotion video.
 

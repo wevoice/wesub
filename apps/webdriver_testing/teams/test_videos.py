@@ -299,7 +299,8 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         """Filter on the project page by language.
 
         """
-        project_page = self.team.slug+'/p/team-project-two'
+        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
 
         data = json.load(open('apps/videos/fixtures/teams-list.json'))
         videos = _create_videos(data, [])
@@ -309,7 +310,7 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
                 video=video, 
                 added_by=self.manager_user,
                 project = self.project2)
-        self.videos_tab.open_videos_tab(project_page)
+        self.videos_tab.open_page(project_page)
         self.videos_tab.sub_lang_filter(language = 'English')
         self.assertTrue(self.videos_tab.video_present('c'))
 
@@ -317,7 +318,10 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         """Sort on the project page by most subtitles.
 
         """
-        project_page = self.team.slug+'/p/team-project-two'
+        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
+
+        print project_page
 
         data = json.load(open('apps/videos/fixtures/teams-list.json'))
         videos1 = _create_videos(data, [])
@@ -331,18 +335,23 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
                 video=video, 
                 added_by=self.manager_user,
                 project = self.project2)
-        self.videos_tab.open_videos_tab(project_page)
+
+        self.videos_tab.open_page(project_page)
         self.videos_tab.video_sort(sort_option = 'most subtitles')
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'lots of translations')
+        
+
 
 
     def test_remove(self):
         """Remove a video from the team project.
 
         """
-        project_page = self.team.slug+'/p/team-project-two'
-        self.videos_tab.open_videos_tab(project_page)
+        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
+
+        self.videos_tab.open_page(project_page)
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
             project = self.project2.name)
@@ -358,18 +367,21 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
 
         """
         video_title = 'Video Ranger Message (1950s) - Classic TV PSA'
-        project1_page = self.team.slug+'/p/team-project-one'
-        project2_page = self.team.slug+'/p/team-project-two'
+        project1_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+            self.project1.slug)
+        project2_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
             project = self.project2.name)
-        self.videos_tab.open_videos_tab(project2_page)
+        self.videos_tab.open_page(project2_page)
+
         self.videos_tab.edit_video(
             video=video_title,
             project = self.project1.name, 
             )
-        self.videos_tab.open_videos_tab(project1_page)
+        self.videos_tab.open_page(project1_page)
         self.assertTrue(self.videos_tab.video_present(video_title))
 
 

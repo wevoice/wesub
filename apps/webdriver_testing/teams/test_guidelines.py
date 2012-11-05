@@ -4,11 +4,10 @@ from apps.webdriver_testing.site_pages.teams import messages_tab
 from apps.webdriver_testing.site_pages.teams import tasks_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
+from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing import data_helpers
-from apps.teams.models import TeamMember
-from apps.teams.models import TaskManager
 import time
 
 class WebdriverTestCaseTeamGuidelines(WebdriverTestCase):    
@@ -50,10 +49,9 @@ class WebdriverTestCaseTeamGuidelines(WebdriverTestCase):
                 language_code = language,
                 preferred = True)
 
-        self.team_member = TeamMemberFactory.create(
+        self.team_member = TeamContributorMemberFactory.create(
             team=self.team,
-            user=UserFactory.create(username='TeamMember'),
-            role=TeamMember.ROLE_CONTRIBUTOR).user
+            user=UserFactory.create(username='TeamMember')).user
 
         #ADD THE TEST MESSAGES TO THE TEST TEAM
         self.messages_tab.log_in(self.team_owner.username, 'password')
