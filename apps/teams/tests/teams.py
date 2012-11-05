@@ -417,7 +417,7 @@ class TeamsTest(TestCase):
         team = Team.objects.get(pk=1)
         tv = team.teamvideo_set.exclude(video__subtitlelanguage__language='')[:1].get()
         # create a few languages with subs
-        from videos.tests import create_langs_and_versions
+        from videos.tests.utils import create_langs_and_versions
         video = tv.video
         video.is_public = False
         video.moderated_by = team
