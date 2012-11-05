@@ -23,10 +23,13 @@ from apps.auth.models import CustomUser as User
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.tests.data import (
-    get_video, make_subtitle_language, make_subtitle_version
+    get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
 )
 from apps.widget import video_cache
 
+
+def refresh(m):
+    return m.__class__._default_manager.get(pk=m.pk)
 
 class TestVideo(TestCase):
     def setUp(self):
@@ -82,6 +85,43 @@ class TestVideo(TestCase):
         cache_id_3 = video_cache.get_video_id(video2_url)
         self.assertEqual(cache_id_2, cache_id_3)
         self.assertEqual(Video.objects.count(), 1)
+
+    def test_video_title(self):
+        video = get_video(url='http://www.youtube.com/watch?v=pQ9qX8lcaBQ')
+
+        def _assert_title(correct_title):
+            self.assertEquals(refresh(video).title, correct_title)
+
+        # Test title before any subtitles are added.
+        _assert_title("The Sea Organ of Zadar")
+
+        # Make a subtitle language in the primary language.
+        video.primary_audio_language_code = 'en'
+        video.save()
+        sl_en = make_subtitle_language(video, 'en')
+
+        # Just adding languages shouldn't affect the title.
+        _assert_title("The Sea Organ of Zadar")
+
+        # Add subtitles with a custom title.  The title should be updated to
+        # reflect this.
+        make_subtitle_version(sl_en, [], title="New Title")
+        _assert_title("New Title")
+
+        # New versions should continue update the title properly.
+        make_subtitle_version(sl_en, [], title="New Title 2")
+        _assert_title("New Title 2")
+
+        # Versions in a non-primary-audio-language should not affect the video
+        # title.
+        sl_ru = make_subtitle_language(video, 'ru')
+        make_subtitle_version(sl_ru, [], title="New Title 3")
+        _assert_title("New Title 2")
+
+        # Rollbacks (of the primary audio language) should affect the title just
+        # like a new version.
+        make_rollback_to(sl_en, 1)
+        _assert_title("New Title")
 
 class TestModelsSaving(TestCase):
     # TODO: These tests may be more at home in the celery_tasks test file...

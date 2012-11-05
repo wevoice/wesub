@@ -34,6 +34,8 @@ unisubs.widget.DropDown = function(videoID, dropDownContents, videoTab) {
     this.subtitleState_ = null;
     this.shown_ = false;
     this.languageClickHandler_ = new goog.events.EventHandler(this);
+    this.showAddLanguageLink_ = false;
+    this.showImproveSubtitlesLink_ = false;
 };
 
 goog.inherits(unisubs.widget.DropDown, goog.ui.Component);
@@ -228,14 +230,9 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
 unisubs.widget.DropDown.prototype.moderatedResponseReceived_ = function(jsonResult) {
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
-    if (jsonResult['can_subtitle'] || jsonResult['can_translate']) {
-        this.addActionLinks_();
-    } else {
-        var e = $d('li', 'unisubs-moderated',
-           $d('p', null,
-              'These subtitles are moderated. You do not have permission to add a language.'));
-        goog.dom.insertChildAt(this.videoActions_, e, 0);
-    }
+    this.showAddLanguageLink_ = jsonResult['can_translate'];
+    this.showImproveSubtitlesLink_ = jsonResult['can_subtitle'];
+    this.addActionLinks_();
 };
 unisubs.widget.DropDown.prototype.addModeratedActionLinks_ = function() {
     unisubs.Rpc.call(
@@ -244,7 +241,7 @@ unisubs.widget.DropDown.prototype.addModeratedActionLinks_ = function() {
         goog.bind(this.moderatedResponseReceived_, this));
 };
 unisubs.widget.DropDown.prototype.addModeratedNotice_ = function() {
-    this.videoActions_.appendChild(this.moderatedNotice_);
+    goog.dom.insertChildAt(this.videoActions_, this.moderatedNotice_, 0);
 };
 /**
  * Add action links to the drop-down menu.
@@ -255,8 +252,15 @@ unisubs.widget.DropDown.prototype.addModeratedNotice_ = function() {
  * @this {DropDown}
  */
 unisubs.widget.DropDown.prototype.addActionLinks_ = function() {
-    goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
-    goog.dom.insertChildAt(this.videoActions_, this.improveSubtitlesLink_, 1);
+    if(this.showImproveSubtitlesLink_) {
+      goog.dom.insertChildAt(this.videoActions_, this.improveSubtitlesLink_, 0);
+    }
+    if(this.showAddLanguageLink_) {
+      goog.dom.insertChildAt(this.videoActions_, this.addLanguageLink_, 0);
+    }
+    if(!(this.showAddLanguageLink_ || this.showImproveSubtitlesLink_)) {
+      this.addModeratedNotice_();
+    }
 };
 unisubs.widget.DropDown.prototype.updateActions_ = function() {
     this.getDomHelper().removeChildren(this.videoActions_);
@@ -269,6 +273,8 @@ unisubs.widget.DropDown.prototype.updateActions_ = function() {
             this.addModeratedActionLinks_();
         }
     } else {
+        this.showAddLanguageLink_ = true;
+        this.showImproveSubtitlesLink_ = true;
         this.addActionLinks_();
     }
 

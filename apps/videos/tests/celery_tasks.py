@@ -27,35 +27,37 @@ from apps.auth.models import CustomUser as User
 from apps.comments.forms import CommentForm
 from apps.comments.models import Comment
 from apps.messages.models import Message
-from apps.videos.models import (
-    Video, SubtitleLanguage, SubtitleVersion, Subtitle
+from apps.videos.models import Video
+from apps.subtitles.models import (
+    SubtitleLanguage, SubtitleVersion
 )
+from apps.subtitles import pipeline
+
 from apps.videos.tasks import video_changed_tasks, send_change_title_email
+from apps.videos.tests import utils
 
 
 class TestCeleryTasks(TestCase):
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self.user = User.objects.get(pk=2)
         self.video = Video.objects.all()[:1].get()
         self.language = self.video.subtitle_language()
-        self.language.language = 'en'
+        self.language.language_code = 'en'
         self.language.save()
-        self.latest_version = self.language.latest_version(public_only=True)
+        self.latest_version = self.language.get_tip()
 
-        self.latest_version.user.notify_by_email = True
-        self.latest_version.user.is_active = True
-        self.latest_version.user.save()
+        self.latest_version.author.notify_by_email = True
+        self.latest_version.author.is_active = True
+        self.latest_version.author.save()
 
-        self.language.followers.add(self.latest_version.user)
-        self.video.followers.add(self.latest_version.user)
+        self.video.followers.clear()
+        self.language.followers.add(self.latest_version.author)
+        self.video.followers.add(self.latest_version.author)
 
     def test_send_change_title_email(self):
-        user = User.objects.all()[:1].get()
-
-        self.assertFalse(self.video.followers.count() == 1
-                         and self.video.followers.all()[:1].get() == user)
+        user = User.objects.all()[2]
 
         old_title = self.video.title
         new_title = u'New title'
@@ -129,44 +131,29 @@ class TestCeleryTasks(TestCase):
                 email='maker@gmail.com', notify_by_email=True,
                 notify_by_message=True)
 
-        latest_version = self.language.latest_version()
-        latest_version.language.followers.clear()
-        latest_version.language.followers.add(user_language_only)
+        self.language.followers.clear()
+        self.language.followers.add(user_language_only)
+        latest_version = self.language.get_tip()
         latest_version.title = 'Old title'
         latest_version.description = 'Old description'
         latest_version.save()
 
         # Create another language
-        lan2 = SubtitleLanguage.objects.create(video=self.video, language='ru')
+        lan2 = SubtitleLanguage.objects.create(video=self.video, language_code='ru')
         lan2.followers.add(user_language2_only)
-        self.assertEquals(2, SubtitleLanguage.objects.count())
+        self.assertEquals(4, SubtitleLanguage.objects.count())
 
-        v = SubtitleVersion()
-        v.language = self.language
-        v.datetime_started = datetime.now()
-        v.version_no = latest_version.version_no+1
-        v.user = user_edit_maker
-        v.title = 'New title'
-        v.description = 'New description'
-        v.save()
-
-        for s in latest_version.subtitle_set.all():
-            s.duplicate_for(v).save()
-
-        s = Subtitle()
-        s.version = v
-        s.subtitle_id = 'asdasdsadasdasdasd'
-        s.subtitle_order = 5
-        s.subtitle_text = 'new subtitle'
-        s.start_time = 50
-        s.end_time = 51
-        s.save()
+        subtitles = self.language.get_tip().get_subtitles()
+        subtitles.append_subtitle(1500, 3000, 'new text')
+        version = pipeline.add_subtitles(self.video, self.language.language_code, 
+                                         subtitles, author=user_edit_maker,
+                                         title="New title", description="New description")
 
         # Clear the box because the above generates some emails
         mail.outbox = []
 
         # Kick it off
-        video_changed_tasks.delay(v.video.id, v.id)
+        video_changed_tasks(version.video.id, version.id)
 
         # --------------------------------------------------------------------
 
@@ -193,7 +180,7 @@ class TestCeleryTasks(TestCase):
 
         # Make sure that all followers of the video got notified
         # Excluding the author of the new version
-        excludes = list(User.objects.filter(email__in=[v.user.email]).all())
+        excludes = list(User.objects.filter(email__in=[version.author.email]).all())
         self.assertEquals(1, len(excludes))
         followers = self.video.notification_list(excludes)
         self.assertTrue(excludes[0].notify_by_email and
@@ -275,6 +262,7 @@ class TestCeleryTasks(TestCase):
             'object_pk': self.language.pk,
             'content_type': ContentType.objects.get_for_model(self.language).pk
             })
+
         form.save(self.user, commit=True)
 
         self.assertEquals(Message.objects.count(),

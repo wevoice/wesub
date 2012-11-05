@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-02 01:34-0500\n"
+"POT-Creation-Date: 2012-11-05 01:34-0600\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/"
@@ -726,11 +726,11 @@ msgstr "Διευθυντές και Διαχειριστές"
 msgid "Admins only"
 msgstr "Μόνο για διαχειριστές"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2559
+#: apps/teams/models.py:141 apps/teams/models.py:2558
 msgid "name"
 msgstr "όνομα"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2560
+#: apps/teams/models.py:142 apps/teams/models.py:2559
 msgid "slug"
 msgstr ""
 
@@ -826,7 +826,7 @@ msgstr "Λήξη εργασίας (ημέρες)"
 msgid "Teams"
 msgstr "Ομάδες"
 
-#: apps/teams/models.py:651
+#: apps/teams/models.py:650
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -836,34 +836,34 @@ msgstr ""
 "το βίντεο. Προσθέτοντας μερικές σημειώσεις, θα είναι πιο πιθανό για τους "
 "εθελοντές να βοηθήσουν!"
 
-#: apps/teams/models.py:655
+#: apps/teams/models.py:654
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Πιάνουμε υποχρεωτικά τα thumbnails για κάποιες ιστοσελίδες, π.χ. για το "
 "Youtube"
 
-#: apps/teams/models.py:657
+#: apps/teams/models.py:656
 msgid "Need help with all languages"
 msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσες"
 
-#: apps/teams/models.py:658
+#: apps/teams/models.py:657
 msgid "If you check this, other languages will not be displayed."
 msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
 
-#: apps/teams/models.py:946 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:945 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
-#: apps/teams/models.py:947 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:946 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:948 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:947 apps/teams/permissions_const.py:44
 #: templates/base.html:118
 msgid "Admin"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:949 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:948 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Συνεισφέρων"
 
@@ -1004,8 +1004,8 @@ msgid "You do not have permission to delete this team."
 msgstr "Δεν έχετε δικαίωμα να διαγράψετε αυτή την ομάδα."
 
 #: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1595
-#: apps/teams/views.py:1610
+#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
+#: apps/teams/views.py:1607
 msgid "You do not have permission to edit this team."
 msgstr "Δεν έχετε δικαίωμα να τροποποιήσετε αυτή την ομάδα."
 
@@ -1118,81 +1118,81 @@ msgstr "Έχετε εγκαταλείψει αυτή την ομάδα."
 msgid "Member saved."
 msgstr "Το Μέλος έχει αποθηκευθεί."
 
-#: apps/teams/views.py:1154
+#: apps/teams/views.py:1151
 msgid "You cannot view this team's tasks."
 msgstr "Δεν μπορείτε να δείτε τις εργασίες αυτής της ομάδας."
 
-#: apps/teams/views.py:1313 apps/teams/views.py:1316
+#: apps/teams/views.py:1310 apps/teams/views.py:1313
 msgid "You are not allowed to perform this task."
 msgstr "Δεν είστε εξουσιοδοτημένοι να κάνετε αυτή την εργασία."
 
-#: apps/teams/views.py:1371
+#: apps/teams/views.py:1368
 msgid "Task deleted."
 msgstr "Η εργασία διεγράφη."
 
-#: apps/teams/views.py:1373
+#: apps/teams/views.py:1370
 msgid "You cannot delete this task."
 msgstr "Δεν μπορείτε να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/views.py:1398
+#: apps/teams/views.py:1395
 msgid "Task declined."
 msgstr "Απόρριψη εργασίας."
 
-#: apps/teams/views.py:1400
+#: apps/teams/views.py:1397
 msgid "Task assigned."
 msgstr "Έγινε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1402
+#: apps/teams/views.py:1399
 msgid "You cannot assign this task."
 msgstr "Δεν μπορείτε να κάνετε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1424
+#: apps/teams/views.py:1421
 msgid "Invalid assignment attempt."
 msgstr "Άκυρη προσπάθεια ανάθεσης."
 
-#: apps/teams/views.py:1449
+#: apps/teams/views.py:1446
 msgid "Draft uploaded successfully."
 msgstr "Το προσχέδιο/draft φορτώθηκε με επιτυχία."
 
-#: apps/teams/views.py:1453
+#: apps/teams/views.py:1450
 msgid "/n"
 msgstr "/n"
 
-#: apps/teams/views.py:1471
+#: apps/teams/views.py:1468
 msgid "You are not allowed to download this transcript."
 msgstr "Δεν σας επιτρέπεται να μεταφορτώσετε αυτή τη μεταγραφή/ transcript"
 
-#: apps/teams/views.py:1522
+#: apps/teams/views.py:1519
 msgid "There's already a project with this name"
 msgstr "Υπάρχει ήδη ένα project με αυτό το όνομα"
 
-#: apps/teams/views.py:1534
+#: apps/teams/views.py:1531
 msgid "Project added."
 msgstr "Το project προστέθηκε."
 
-#: apps/teams/views.py:1551
+#: apps/teams/views.py:1548
 msgid "You cannot edit that project."
 msgstr "Δεν μπορείτε να τροποποιήσετε αυτό το project."
 
-#: apps/teams/views.py:1562
+#: apps/teams/views.py:1559
 msgid "Project deleted."
 msgstr "Το project διεγράφη."
 
-#: apps/teams/views.py:1580
+#: apps/teams/views.py:1577
 msgid "Project saved."
 msgstr "Το project αποθηκεύθηκε."
 
-#: apps/teams/views.py:1620
+#: apps/teams/views.py:1617
 msgid "Successfully synced subtitles."
 msgstr ""
 
-#: apps/teams/views.py:1724
+#: apps/teams/views.py:1721
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1758
+#: apps/teams/views.py:1755
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -1345,7 +1345,7 @@ msgstr ""
 "κάποιος άλλος επεξεργάζεται την γλώσσα που εσείς φορτώνετε ή κάποια "
 "μετάφρασή της"
 
-#: apps/videos/models.py:2015
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1354,7 +1354,7 @@ msgstr ""
 "  έγινε αναθεώρηση <a href=\"%(language_url)s\">%(language)s</a> υποτίτλων "
 "για τα <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2020
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1363,7 +1363,7 @@ msgstr ""
 "  έγιναν αποδεκτοί <a href=\"%(language_url)s\">%(language)s</a> υπότιτλοι "
 "για το βίντεο <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2025
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1372,7 +1372,7 @@ msgstr ""
 "  απερρίφθησαν οι υπότιτλοι στα <a href=\"%(language_url)s\">%(language)s</"
 "a> για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2030
+#: apps/videos/models.py:2033
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1381,7 +1381,7 @@ msgstr ""
 "  εγκρίθηκαν οι υπότιτλοι στα <a href=\"%(language_url)s\">%(language)s</a> "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2035
+#: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1390,32 +1390,32 @@ msgstr ""
 "  απερρίφθησαν <a href=\"%(language_url)s\">%(language)s</a> υπότιτλοι για "
 "το βίντεο <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2041
+#: apps/videos/models.py:2044
 #, python-format
 msgid "  deleted video \"%(title)s\""
 msgstr "  Διεγράφη το βίντεο \"%(title)s\""
 
-#: apps/videos/models.py:2046
+#: apps/videos/models.py:2049
 #, python-format
 msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "προσετέθη video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2051
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> προσετέθη video"
 
-#: apps/videos/models.py:2054
+#: apps/videos/models.py:2057
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "άλλαξε ο τίτλος για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2059
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Ο τίτλος άλλαξε για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2071
+#: apps/videos/models.py:2074
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1424,7 +1424,7 @@ msgstr ""
 "έγιναν σχόλια για τους <a href=\"%(comments_url)s\">%(language)s υπότιτλους</"
 "a> σχετικά με το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1433,18 +1433,18 @@ msgstr ""
 "Προσετέθη ένα Σχόλιο για το <a href=\"%(comments_url)s\">%(language)s "
 "subtitles</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2079
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "έγιναν σχόλια για τα <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2081
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Προσετέθη ένα Σχόλιο για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2089
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1453,7 +1453,7 @@ msgstr ""
 "αρχίσαν <a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> για το <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2091
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1462,7 +1462,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> άρχισαν για το <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2099
+#: apps/videos/models.py:2102
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1471,7 +1471,7 @@ msgstr ""
 "τροποποιήθηκαν <a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2104
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1480,109 +1480,109 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> τροποποιήθηκαν "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2110
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "προσετέθη ένα νέο URL για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2112
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Ένα νέο URL προσετέθη για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2114
+#: apps/videos/models.py:2117
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "εγγραφήκατε στην ομάδα %(team)s με την ιδιότητα του %(role)s"
 
-#: apps/videos/models.py:2119
+#: apps/videos/models.py:2122
 #, python-format
 msgid "left the %s team"
 msgstr "εγκαταλείψατε την ομάδα %s"
 
-#: apps/videos/models.py:2133
+#: apps/videos/models.py:2136
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2139
+#: apps/videos/models.py:2142
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2214
 msgid "add video"
 msgstr "προσθήκη βίντεο"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2215
 msgid "change title"
 msgstr "αλλαγή τίτλου"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2216
 msgid "comment"
 msgstr "σχόλιο"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2217
 msgid "add version"
 msgstr "προσθήκη έκδοσης"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2218
 msgid "add translation"
 msgstr "προσθήκη μετάφρασης"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2219
 msgid "add video url"
 msgstr "προσθήκη video url"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2220
 msgid "request subtitles"
 msgstr "ζητήστε τους υπότιτλους"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2221
 msgid "approve version"
 msgstr "έγκριση εκδόσεως"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2222
 msgid "add contributor"
 msgstr "προσθήκη Συνεισφέροντος"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2223
 msgid "remove contributor"
 msgstr "Διαγραφή ατόμου που συνεισέφερε"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2224
 msgid "reject version"
 msgstr "Απόρριψη έκδοσης"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2225
 msgid "review version"
 msgstr "Αναθεώρηση έκδοσης"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2226
 msgid "accept version"
 msgstr "Αποδοχή έκδοσης"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2227
 msgid "decline version"
 msgstr "Απόορριψη έκδοσης"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2228
 msgid "delete video"
 msgstr "Διαγραφή βίντεο"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2229
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2230
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2484
+#: apps/videos/models.py:2487
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "

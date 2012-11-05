@@ -717,11 +717,9 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
         obj = language
         object_pk = language.pk
         content_type = ContentType.objects.get_for_model(language)
-        exclude = [c.user for c in language.collaborator_set
-                                           .filter(user__notify_by_message=False)
-                                           .values_list("user")]
+        exclude = [c.user for c in language.followers.filter(notify_by_message=False)]
         exclude.append(comment.user)
-        message_followers = [c.user for c in language.collaborator_set.exclude(user__in=exclude)]
+        message_followers = language.notification_list(exclude)
     else:
         obj = video
         object_pk = video.pk

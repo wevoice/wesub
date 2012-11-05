@@ -124,13 +124,13 @@ def get_caption_diff_data(first_version, second_version):
     first_map = {}
     second_map = {}
 
-    for start, end, text in first_captions:
+    for start, end, text, _ in first_captions:
         id = str(start) + str(end)
         if not id in subtitles:
             subtitles[id] = (start, end, text)
         first_map[id] = (start, end, text)
 
-    for start, end, text in second_captions:
+    for start, end, text, _ in second_captions:
         id = str(start) + str(end)
         if not id in subtitles:
             subtitles[id] = (start, end, text)
@@ -418,9 +418,11 @@ class SubtitleLanguage(models.Model):
     class Meta:
         unique_together = [('video', 'language_code')]
 
+
+    # Writelocking
     @property
     def is_writelocked(self):
-        """Is this video writelocked for subtitling?"""
+        """Return whether this language is writelocked for subtitling."""
         if self.writelock_time == None:
             return False
         delta = datetime.datetime.now() - self.writelock_time
@@ -428,25 +430,62 @@ class SubtitleLanguage(models.Model):
         return seconds < WRITELOCK_EXPIRATION
 
     def can_writelock(self, key):
-        """Can I place a writelock on this video for subtitling?"""
-        return self.writelock_session_key == key or \
-            not self.is_writelocked
+        """Return whether a user with the session key can writelock this language."""
+        return self.writelock_session_key == key or not self.is_writelocked
 
-    def writelock(self, user, key):
-        """Writelock this video for subtitling."""
+    def writelock(self, user, key, save=True):
+        """Writelock this language for subtitling and save it.
+
+        This method does NO permission checking.  If you want that you'll need
+        to use can_writelock() yourself before calling this (probably in
+        a transaction).
+
+        `user` is the User who should own the lock.
+
+        `key` is their session key which you can get through request.browser_id
+
+        `save` determines whether this method will save the SubtitleLanguage for
+        you.  Pass False if you want to handle saving yourself.
+
+        """
         if user.is_authenticated():
             self.writelock_owner = user
         else:
             self.writelock_owner = None
+
         self.writelock_session_key = key
         self.writelock_time = datetime.datetime.now()
 
+        if save:
+            self.save()
 
-    def release_writelock(self):
-        """Writelock this video for subtitling."""
+    def release_writelock(self, save=True):
+        """Writelock this language for subtitling and save it.
+
+        `save` determines whether this method will save the SubtitleLanguage
+        for you.  Pass False if you want to handle saving yourself.
+
+        """
         self.writelock_owner = None
         self.writelock_session_key = ''
         self.writelock_time = None
+
+        if save:
+            self.save()
+
+    def get_writelock_owner_name(self):
+        """Return the human-readable name of the owner of this language's writelock.
+
+        This assumes that the language actually IS writelocked.  If that's not
+        the case this method will return nonsensical data, so you'll need to
+        check that first.
+
+        """
+        if self.writelock_owner == None:
+            return "anonymous"
+        else:
+            return self.writelock_owner.__unicode__()
+
 
     def is_rtl(self):
         return is_rtl(self.language_code)
@@ -457,7 +496,6 @@ class SubtitleLanguage(models.Model):
             (self.id or '(unsaved)'), self.video.video_id,
             self.get_language_code_display()
         )
-
 
     def save(self, *args, **kwargs):
         creating = not self.pk
@@ -761,6 +799,7 @@ class SubtitleLanguage(models.Model):
                 exclude = [exclude]
             qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
         return qs
+
 
 
 # SubtitleVersions ------------------------------------------------------------

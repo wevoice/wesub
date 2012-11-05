@@ -27,7 +27,7 @@ from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, Subtitle
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.tests.data import (
-    get_video
+    get_video, get_user, make_subtitle_language
 )
 from apps.videos.tests.utils import WebUseTest, refresh_obj, _create_trans
 from apps.widget.rpc import Rpc
@@ -74,6 +74,7 @@ class UploadSubtitlesTest(WebUseTest):
 
     def setUp(self):
         self._login()
+
 
     def test_upload_subtitles_primary_language(self):
         # Start with a fresh video.
@@ -180,6 +181,48 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertIsNotNone(video.complete_date)
         self.assertTrue(sl_fr.subtitles_complete)
         self.assertEqual(sl_fr.subtitleversion_set.count(), 2)
+
+    def test_upload_respects_lock(self):
+        user1 = get_user(1)
+        user2 = get_user(2)
+        video = get_video()
+        sl_en = make_subtitle_language(video, 'en')
+        request1 = RequestMockup(user1)
+
+        # Lock the language for user 1.
+        sl_en.writelock(user1, request1.browser_id)
+        self.assertTrue(sl_en.is_writelocked)
+
+        # Now try to upload subtitles as user 2.
+        self._login(user2)
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+
+        # The subtitles should not have been created.
+        #
+        # We can't really tests the response here because the upload_subtitles
+        # view is terrible and always returns a 200 with a horrible mix of HTML
+        # and JSON as a response.  So instead we'll just make sure that the
+        # subtitles were not actually created.
+        self.assertFalse(sl_en.subtitleversion_set.exists())
+
+        # User 1 has the writelock, so uploading subtitles should work for them.
+        self._login(user1)
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self.assertEqual(sl_en.subtitleversion_set.count(), 1)
+
+        # User 1 still has the writelock, so user 2 still can't upload.
+        self._login(user2)
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self.assertEqual(sl_en.subtitleversion_set.count(), 1)
+
+        # Release the writelock.
+        sl_en.release_writelock()
+
+        # Now user 2 can finally upload their subtitles.
+        self._login(user2)
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self.assertEqual(sl_en.subtitleversion_set.count(), 2)
+
 
     def test_upload_subtitles(self):
         video = get_video()
@@ -291,21 +334,6 @@ class UploadSubtitlesTest(WebUseTest):
         data = self._make_data(lang='en', video_pk=video_pk)
         response = self.client.post(reverse('videos:upload_subtitles'), data)
         self.assertEqual(response.status_code, 200)
-
-    def test_upload_respects_lock(self):
-        request = RequestMockup(User.objects.all()[0])
-        session = create_two_sub_dependent_session(request)
-        video = session.video
-
-        self._login()
-        translated = video.subtitlelanguage_set.all().filter(language='es')[0]
-        translated.writelock(request)
-        translated.save()
-        data = self._make_data(lang='en', video_pk=video.pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content[10:-11])
-        self.assertFalse(data['success'])
 
 
     def test_upload_then_rollback_preservs_dependends(self):

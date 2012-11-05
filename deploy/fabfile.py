@@ -354,6 +354,8 @@ def staging(username):
                         'data': ['data-00-staging.amara.org'],
                     },
                     notification_email   = 'ehazlett@pculture.org',)
+        # override default instance type
+        env.scaling_instance_type = 'm1.small'
 
 @task
 def production(username):
@@ -696,7 +698,7 @@ def _update_virtualenv(app_dir=None, ve_dir=None):
     if not ve_dir:
         ve_dir = env.ve_dir
     with Output("Updating virtualenv"), cd(os.path.join(app_dir, 'deploy')):
-        run('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
+        sudo('yes i | {0}/bin/pip install -r requirements.txt'.format(ve_dir), pty=True)
 
 @roles('app', 'data')
 def update_code(branch=None, integration_branch=None):
@@ -832,6 +834,19 @@ def switch_branch(branch):
     """
     with Output('Switching to {0}'.format(branch)):
         _switch_branch(branch)
+
+def _get_amara_config():
+    old_host = env.host_string
+    env.host_string = env.dev_host
+    conf = None
+    with hide('running', 'stdout'):
+        conf = sudo('cat /etc/amara_config.json')
+    try:
+        conf = json.loads(conf)
+    except:
+        raise RuntimeError('Unable to parse Amara config')
+    env.host_string = old_host
+    return conf
 
 def _create_nginx_instance(name=None, url_prefix=None):
     """
@@ -1042,11 +1057,7 @@ def _create_rds_instance(name=None, password=None):
     """
     env.host_string = env.demo_hosts.get('app')
     with hide('running', 'stdout', 'warnings'):
-        conf = sudo('cat /etc/amara_config.json')
-        try:
-            conf = json.loads(conf)
-        except:
-            raise RuntimeError('Unable to parse Amara config')
+        conf = _get_amara_config()
         env_cfg = conf.get('rds').get('environments').get('dev')
         rds_user = env_cfg.get('user')
         rds_host = env_cfg.get('host')
@@ -1313,11 +1324,8 @@ def _update_lb_config(config):
     :param config: Config as text
 
     """
-    with open('.tmp_lb', 'w') as f:
-        f.write(config)
-    put('.tmp_lb', env.lb_config, use_sudo=True)
+    sudo('echo \'{0}\' > {1}'.format(config, env.lb_config))
     sudo('/etc/init.d/nginx reload')
-    os.remove('.tmp_lb')
 
 def _add_nodes_to_lb(hosts=[]):
     """
@@ -1411,13 +1419,7 @@ def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
 
     """
     import boto
-    env.host_string = env.dev_host
-    with hide('running', 'stdout'):
-        conf = sudo('cat /etc/amara_config.json')
-    try:
-        conf = json.loads(conf)
-    except:
-        raise RuntimeError('Unable to parse Amara config')
+    conf = _get_amara_config()
     instances = int(instances)
     env_cfg = conf.get('ec2')
     aws_id = env_cfg.get('user')
@@ -1489,4 +1491,62 @@ def scale(action='up', instances=1, skip_puppet=False, skip_lb=False):
     else:
         print('Invalid scaling action')
         return
+
+@task
+def run_new_relic(license=None):
+    """
+    Configures application servers for new relic for current environment
+
+    :param license: New Relic license key
+
+    """
+    ve_dir = env.ve_dir
+    # stop cron from restarting "normal" uwsgi
+    with settings(warn_only=True):
+        sudo('/etc/init.d/cron stop')
+    sudo('{0}/bin/pip install newrelic'.format(ve_dir))
+    with settings(warn_only=True):
+        sudo('service uwsgi.unisubs.{0} stop'.format(env.environment))
+    script = "export NEW_RELIC_APP_NAME=\'Amara ({2})\'\n"\
+        "export NEW_RELIC_LICENSE_KEY={0}\n"\
+        "{1}/bin/newrelic-admin run-program uwsgi "\
+        "--pidfile /tmp/newrelic_uwsgi.pid "\
+        "--ini /etc/uwsgi.unisubs.{2}.ini".format(license, ve_dir,
+            env.environment)
+    sudo('echo \"{0}\" > /tmp/run_newrelic.sh'.format(script))
+    sudo('screen -d -m bash /tmp/run_newrelic.sh', pty=False)
+
+@task
+def stop_new_relic():
+    """
+    Stops the New Relic agent for the current environment
+
+    """
+    with settings(warn_only=True):
+        sudo('killall -9 uwsgi')
+        sudo('service uwsgi.unisubs.{0} start'.format(env.environment))
+        # start cron
+        sudo('/etc/init.d/cron start')
+
+@task
+@roles('app')
+def enable_new_relic():
+    """
+    Enables the New Relic agent across environment application servers
+
+    """
+    conf = _get_amara_config()
+    license = conf.get('newrelic', {}).get('license')
+    with Output("Configuring and starting uWSGI with New Relic"):
+        execute(run_new_relic, license)
+
+@task
+@roles('app')
+def disable_new_relic():
+    """
+    Disables the New Relic agent and starts uWSGI
+
+    """
+    with Output("Disabling New Relic agent"):
+        execute(stop_new_relic)
 

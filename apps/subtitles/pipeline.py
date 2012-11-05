@@ -287,6 +287,12 @@ def _update_followers(subtitle_language, author):
     if author:
         subtitle_language.followers.add(author)
 
+def _update_video_title(subtitle_language, version):
+    if subtitle_language.is_primary_audio_language():
+        if version.title and version.video.title != version.title:
+            version.video.title = version.title
+            version.video.save()
+
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
 
@@ -354,6 +360,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     version = sl.add_version(subtitles=subtitles, **data)
 
+    _update_video_title(sl, version)
     _update_followers(sl, author)
     _perform_team_operations(version, committer, complete)
 
