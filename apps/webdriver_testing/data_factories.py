@@ -38,13 +38,19 @@ class TeamFactory(factory.Factory):
     name = factory.Sequence(lambda n: 'Test Team' + n)
     slug = factory.Sequence(lambda n: 'test-team-' + n)
 
-
 class TeamMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     team = factory.SubFactory(TeamFactory)
     role = TeamMember.ROLE_OWNER
     user = factory.SubFactory(UserFactory)
 
+class TeamContributorMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_CONTRIBUTOR
+
+class TeamAdminMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_ADMIN
 
 class TeamVideoFactory(factory.Factory):
     FACTORY_FOR = TeamVideo
@@ -79,4 +85,5 @@ class WorkflowFactory(factory.Factory):
 class TaskFactory(factory.Factory):
     FACTORY_FOR = Task 
     team_video = factory.SubFactory(TeamVideoFactory)
+
 

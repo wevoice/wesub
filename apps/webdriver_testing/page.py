@@ -24,6 +24,7 @@ class Page(object):
     def __init__(self, testsetup):
         self.browser = testsetup.browser  # BROWSER TO USE FOR TESTING
         self.base_url = testsetup.base_url
+        self.testcase = testsetup
 
     def quit(self):
         """Quit the browser.
@@ -111,9 +112,8 @@ class Page(object):
         """
         try:
             elem = self.browser.find_element_by_css_selector(element)
-        except:
-            self.record_error()
-            raise Exception(elem + "not found")
+        except Exception as e:
+            self.record_error(e)
         if no_wait:
             elem.send_keys(Keys.ENTER)
         else:
@@ -127,9 +127,8 @@ class Page(object):
         """
         try:
             elem = self.browser.find_element_by_css_selector(element)
-        except:
-            self.record_error()
-            raise Exception(elem + "not found")
+        except Exception as e:
+            self.record_error(e)
         elem.clear()
 
     def click_link_text(self, text, wait_for_element=None):
@@ -138,10 +137,8 @@ class Page(object):
         """
         try:
             elem = self.browser.find_element_by_link_text(text)
-        except:
-            curr_page = self.record_error()
-            raise Exception(("link text: {0} not found on current page: {1}")
-                            .format(str(text), str(curr_page)))
+        except Exception as e:
+            curr_page = self.record_error(e)
         elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
@@ -152,10 +149,8 @@ class Page(object):
         """
         try:
             elem = self.browser.find_element_by_partial_link_text(text)
-        except:
-            curr_page = self.record_error()
-            raise Exception(("partial link text: {0} not found on current page: \
-                             {1}").format(str(text), str(curr_page)))
+        except Exception as e:
+            curr_page = self.record_error(e)
         elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
@@ -164,7 +159,10 @@ class Page(object):
         """Enter text for provided css selector.
 
         """
-        elem = self.browser.find_element_by_css_selector(element)
+        try:
+            elem = self.browser.find_element_by_css_selector(element)
+        except Exception as e:
+            self.record_error(e)
         elem.send_keys(text)
 
     def type_special_key(self, key_name, element="body"):
@@ -279,8 +277,7 @@ class Page(object):
             if text == element_text:
                 return True
             else:
-                self.record_error()
-                raise Exception('found:' + element_text +
+                self.record_error('found:' + element_text +
                                 'but was expecting: ' + text)
                 return False
 
@@ -325,7 +322,7 @@ class Page(object):
             except:
                 pass
         else:
-            raise Exception("%s is still present" % text)
+            self.record_error('The text: %s is still present after 20 seconds' % text)
 
     def wait_for_element_visible(self, element):
         """Wait for element (by css) visible on page, within 20 seconds.
@@ -337,8 +334,7 @@ class Page(object):
             if self.is_element_visible(element):
                 break
         else:
-            self.record_error()
-            raise Exception(element + ' has not appeared')
+            self.record_error('The element %s is not visible after 20 seconds' % element)
 
     def wait_for_element_not_visible(self, element):
         """Wait for element (by css) to be hidden on page, within 20 seconds.
@@ -352,8 +348,7 @@ class Page(object):
             except:
                 break
         else:
-            self.record_error()
-            raise Exception(element + ' has not disappeared')
+            self.record_error('The element: %s is still visible after 20 seconds' % element)
 
     def get_absolute_url(self, url):
         """Return the full url.
@@ -429,16 +424,17 @@ class Page(object):
                 chosen.find_element_by_css_selector("input").click()
                 result.click()
 
-    def record_error(self):
+    def record_error(self, e=None):
         """
             Records an error.
         """
-        curr_url = self.browser.current_url.split('/')[-1]
+        if not e:
+            e = 'webdriver error' + self.browser.current_url
         print '-------------------'
         print 'Error at ' + self.browser.current_url
         print '-------------------'
-#        filename = file_name + '_' + str(time.time()).split('.')[0] + '.png'
-
-        #print 'Screenshot of error in file ' + filename
         #self.browser.get_screenshot_as_file(filename)
-        return self.browser.current_url
+        self.testcase.tearDown()
+        self.testcase.fail(str(e))
+
+

@@ -20,7 +20,7 @@ from settings import *
 from dev_settings import *
 
 
-SITE_ID = 15
+SITE_ID = 19
 STATIC_URL = "http://unisubs.example.com:80/site_media/"
 MEDIA_URL = "http://unisubs.example.com:80/user-data/"
 #DEFAULT_PROTOCOL  = 'http'
@@ -46,7 +46,7 @@ STATIC_URL_BASE = STATIC_URL
 if COMPRESS_MEDIA:
     STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
-
+DEBUG = True
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

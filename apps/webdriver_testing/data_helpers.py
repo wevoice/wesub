@@ -10,6 +10,7 @@ from tastypie.models import ApiKey
 from django.http import HttpResponse
 from django.test.client import RequestFactory
 
+
 def create_user_api_key(self, user_obj):
     self.client.login(username=user_obj.username, password='password')
     factory = RequestFactory()
@@ -30,15 +31,45 @@ def post_api_request(self, url_part, data):
               } 
     print simplejson.dumps(data)
     r = requests.post(url, data=simplejson.dumps(data), headers=headers)
+    #print r.request.full_url, r.request.data
     return r.status_code, r.json
 
+
+def put_api_request(self, url_part, data):
+    url = self.base_url + 'api2/partners/' + url_part
+    headers = { 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-apikey': self.user.api_key.key,
+                'X-api-username': self.user.username,
+              } 
+
+    r = requests.put(url, data=simplejson.dumps(data), headers=headers)
+    #print r.request.full_url, r.status_code, r.json
+    return r.status_code, r.json
+
+def delete_api_request(self, url_part):
+    url = self.base_url + 'api2/partners/' + url_part
+    headers = { 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-apikey': self.user.api_key.key,
+                'X-api-username': self.user.username,
+              } 
+
+    r = requests.delete(url, headers=headers)
+    print r.status_code, r.json, r.request.full_url
+    return r.status_code, r.json
 
 def api_get_request(self, url_part):
     url = self.base_url + 'api2/partners/' + url_part
-    r = requests.get( url )
+    headers = { 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-apikey': self.user.api_key.key,
+                'X-api-username': self.user.username,
+              }
+    r = requests.get(url, headers=headers)
+    #print r.status_code, r.request.full_url, r.headers
     return r.status_code, r.json
 
-    
 
 def create_video(self, video_url=None):
     if not video_url:
@@ -57,7 +88,7 @@ def create_video_with_subs(self, video_url=None, data=None):
     video, _ = Video.get_or_create_for_url(video_url)
     if not data:
         data = {
-        'language': 'en',
+        'language_code': 'en',
         'video_language': 'en',
         'video': video.pk,
         'draft': open('apps/videos/fixtures/test.srt'),
