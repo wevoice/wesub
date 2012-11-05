@@ -2393,8 +2393,15 @@ class TeamNotificationSetting(models.Model):
 
     def notify(self, event_name,  **kwargs):
         """Resolve the notification class for this setting and fires notfications."""
-        notification = self.get_notification_class()(self.team, self.partner,
+        notification_class = self.get_notification_class()
+
+        if not notification_class:
+            logger.error("Could not find notification class %s" % self.notification_class)
+            return
+
+        notification = notification_class(self.team, self.partner,
                 event_name,  **kwargs)
+
         if self.request_url:
             success, content = notification.send_http_request(
                 self.request_url,
