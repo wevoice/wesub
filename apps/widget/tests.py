@@ -1208,7 +1208,7 @@ class TestFormatConvertion(TestCase):
         for x in range(0,10):
             self.subs.append_subtitle(
                 from_ms=(x * 1000), to_ms=(x * 1000) + 1000,
-                content="%s - and *italics* and **bold** and >>."
+                content="%s - and *italics* and **bold** and >>." % x
             )
             
     def _retrieve(self, format):
@@ -1228,15 +1228,16 @@ class TestFormatConvertion(TestCase):
 
     def test_srt(self):
         raw, parsed = self._retrieve('srt')
-        self.assertEqual(parsed[1], (1,2,'1'))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
 
     def test_ssa(self):
         raw, parsed = self._retrieve('ssa')
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
 
     def test_dfxp(self):
         raw, parsed = self._retrieve('dfxp')
-        self.assertEqual(parsed[1], (1,2,'1'))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
 
     def test_sbv(self):
         raw, parsed = self._retrieve('sbv')
-        self.assertEqual(parsed[1], (1,2,'1'))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
