@@ -40,6 +40,29 @@ from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
 
+DFPX = """<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="">
+    <head>
+        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
+            <ttm:title/>
+            <ttm:description/>
+            <ttm:copyright/>
+        </metadata>
+
+        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">
+            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>
+        </styling>
+
+        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">
+            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>
+        </layout>
+    </head>
+    <body region="amara-subtitle-area">
+        <div>
+        <p begin="00:00:00.004" end="00:00:02.093">We<br/> started <span fontWeight="bold">Universal Subtitles</span> <span fontStyle="italic">because</span> we <span textDecoration="underline">believe</span></p></div>
+    </body>
+</tt> """
+
+
 class FakeDatetime(object):
     def __init__(self, now):
         self.now_date = now
@@ -261,29 +284,24 @@ class TestRpc(TestCase):
                          return_value['locked_by'])
 
     def test_basic(self):
+        url = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
         request_0 = RequestMockup(self.user_0)
         return_value = rpc.show_widget(
             request_0,
-            'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
+            url,
             False)
         video_id = return_value['video_id']
         return_value = rpc.start_editing(
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2300,
-                     'end_time': 3400,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request_0, session_pk, inserted)
 
-        v = models.Video.objects.get(video_id=video_id)
+        rpc.finished_subtitles(request_0, session_pk, DFPX)
 
-        self.assertEqual(1, v.subtitlelanguage_set.count())
-        sl = v.subtitlelanguage_set.all()[0]
-        self.assertTrue(sl.is_forked)
-        self.assertTrue(sl.is_original)
-        self.assertEqual(1, len(sl.latest_version().subtitles()))
+        video, _ = models.Video.get_or_create_for_url(url)
+
+        self.assertEqual(1, video.newsubtitlelanguage_set.count())
+        subtitle_language = video.subtitle_language("en")
+        self.assertEqual(1, len(subtitle_language.get_tip().get_subtitles()))
 
     def test_not_complete(self):
         request_0 = RequestMockup(self.user_0)
