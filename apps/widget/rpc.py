@@ -727,7 +727,7 @@ class Rpc(BaseRpc):
         must_trigger_api_language_edited = False
 
         if completed is not None:
-            if language.is_complete != completed:
+            if language.subtitles_complete != completed:
                 must_trigger_api_language_edited = True
             language.subtitles_complete = completed
 
