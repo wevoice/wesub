@@ -50,6 +50,7 @@ from widget.models import SubtitlingSession
 from libs.bulkops import insert_many
 
 from functools import partial
+from apps.subtitles import pipeline
 
 
 yt_logger = logging.getLogger("youtube-ei-error")
@@ -686,15 +687,7 @@ class Rpc(BaseRpc):
 
         if should_create_new_version:
             new_version, should_create_task = self._create_version(
-                session.language, user, new_title=new_title, new_description=new_description)
-
-            new_version.save()
-
-            if subtitles_changed:
-                self._save_subtitles(
-                    new_version, subtitles, new_version.is_forked)
-            else:
-                self._copy_subtitles(previous_version, new_version)
+                session.language, user, new_title=new_title, new_description=new_description, subtitles=subtitles)
 
             incomplete = new_version.is_synced() or save_for_later
 
@@ -736,11 +729,7 @@ class Rpc(BaseRpc):
         if completed is not None:
             if language.is_complete != completed:
                 must_trigger_api_language_edited = True
-            language.is_complete = completed
-
-        if forked:
-            language.standard_language = None
-            language.is_forked = True
+            language.subtitles_complete = completed
 
         language.save()
 
@@ -771,12 +760,12 @@ class Rpc(BaseRpc):
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
 
-        is_complete = language.is_complete or language.calculate_percent_done() == 100
-        user_message = self._get_user_message_for_save(user, language, is_complete)
+        user_message = self._get_user_message_for_save(user, language, language.subtitles_complete)
 
         error = self._save_tasks_for_save(
-                request, save_for_later, language, new_version, is_complete,
+                request, save_for_later, language, new_version, language.subtitles_complete,
                 task_id, task_type, task_notes, task_approved)
+
         if error:
             return error
 
@@ -919,6 +908,7 @@ class Rpc(BaseRpc):
                 Q(language=language.language_code)
               | Q(type=Task.TYPE_IDS['Subtitle'])
         )
+
         if tasks:
             for task in tasks:
                 if task.type == Task.TYPE_IDS['Subtitle']:
@@ -946,16 +936,12 @@ class Rpc(BaseRpc):
             # language.
             return 'private', True
 
-    def _create_version(self, language, user=None, new_title=None, new_description=None):
+    def _create_version(self, language, user=None, new_title=None, new_description=None, subtitles=None):
         latest_version = language.get_tip(public=False)
 
         visibility, should_create_task = self._moderate_language(language, user)
 
-        kwargs = dict(subtitle_language=language,
-                      version_number=(0 if latest_version is None
-                                  else latest_version.version_number + 1),
-                      created=datetime.now(),
-                      visibility=visibility)
+        kwargs = dict(visibility=visibility)
 
         if user is not None:
             kwargs['author'] = user
@@ -973,8 +959,14 @@ class Rpc(BaseRpc):
             kwargs['description'] = latest_version.description
         else:
             kwargs['description'] = language.video.description
-        version = language.add_version(**kwargs)
 
+        if subtitles:
+            kwargs['video'] = language.video
+            kwargs['language_code'] = language.language_code
+            kwargs['subtitles'] = subtitles
+            version = pipeline.add_subtitles(**kwargs)
+        else:
+            version = language.add_version(**kwargs)
 
         return version, should_create_task
 
