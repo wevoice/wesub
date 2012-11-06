@@ -24,8 +24,8 @@ oauth==1.0.1
 oauth2==1.5.211
 pyOpenSSL==0.9
 vendor/redis-2.4.5.tar.gz
-simplejson==2.1.1
 django-haystack==1.2.7
+simplejson==2.3.0
 pysolr==2.0.14
 chardet==1.0.1
 vendor/boto-2.1.0-0.tar.gz
