@@ -157,33 +157,21 @@ urlpatterns = patterns('',
     url(r'auth/', include('thirdpartyaccounts.urls', namespace='thirdpartyaccounts', app_name='thirdpartyaccounts')),
 )
 
-try:
+if settings.USE_INTEGRATION:
     from services import urls
     urlpatterns += patterns('',
         (r'^unisubservices/', include('services.urls', namespace='services')),
     )
-except ImportError:
-    pass
 
-try:
     from servicesauth import urls
     urlpatterns += patterns('', (r'^unisubservicesauth/',
         include('servicesauth.urls', namespace='servicesauth')),)
-except ImportError:
-    pass
-
-try:
     from api import urls
     urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
-except ImportError:
-    pass
 
-try:
     from apiv2 import urls as api2urls
     urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
         namespace=api2urls.URL_NAMESPACE),),)
-except ImportError:
-    pass
 
 if settings.DEBUG:
     urlpatterns += patterns('',
