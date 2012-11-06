@@ -22,6 +22,7 @@ var DFXP = function(DFXP) {
      */
 
     var that = this;
+    var $ = Zepto;
 
     this.init = function(xml) {
 
