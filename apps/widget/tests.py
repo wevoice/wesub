@@ -40,7 +40,7 @@ from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
 
-DFPX = """<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="">
+DFXP = """<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="">
     <head>
         <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
             <ttm:title/>
@@ -295,7 +295,9 @@ class TestRpc(TestCase):
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
 
-        rpc.finished_subtitles(request_0, session_pk, DFPX)
+        subtitle_set = SubtitleSet('en')
+        subtitle_set.append_subtitle(0, 1000, 'asd')
+        rpc.finished_subtitles(request_0, session_pk, subtitle_set.to_xml())
 
         video, _ = models.Video.get_or_create_for_url(url)
 
@@ -313,16 +315,15 @@ class TestRpc(TestCase):
         return_value = rpc.start_editing(
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2300,
-                     'end_time': 3400,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request_0, session_pk, inserted, False)
+
+        subtitle_set = SubtitleSet('en')
+        subtitle_set.append_subtitle(0, 1000, 'asd')
+
+        rpc.finished_subtitles(request_0, session_pk, subtitle_set.to_xml(), completed=False)
 
         v = models.Video.objects.get(video_id=video_id)
         sl = v.subtitle_language('en')
-        self.assertFalse(sl.is_complete)
+        self.assertFalse(sl.subtitles_complete)
 
     def test_complete_but_not_synced(self):
         request = RequestMockup(self.user_0)
