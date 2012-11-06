@@ -32,6 +32,7 @@ import babelsubs
 from auth.models import CustomUser
 from videos.models import Video, Action, SubtitleLanguage
 from videos import models
+from subtitles import models as sub_models
 from widget.models import SubtitlingSession
 from widget.rpc import Rpc
 from widget.null_rpc import NullRpc
@@ -328,27 +329,32 @@ class TestRpc(TestCase):
     def test_complete_but_not_synced(self):
         request = RequestMockup(self.user_0)
         session = create_two_sub_session(request, completed=True)
-        language = models.SubtitleLanguage.objects.get(pk=session.language.pk)
+        language = sub_models.SubtitleLanguage.objects.get(pk=session.language.pk)
+
         self.assertTrue(language.is_complete_and_synced())
+
         # right now video is complete.
-        self.assertTrue(session.video.is_complete)
         completed_langs = session.video.completed_subtitle_languages()
+
+        self.assertTrue(session.video.is_complete)
         self.assertEquals(1, len(completed_langs))
-        self.assertEquals('en', completed_langs[0].language)
+        self.assertEquals('en', completed_langs[0].language_code)
 
         return_value = rpc.start_editing(
             request, session.video.video_id, 'en',
             subtitle_language_pk=session.language.pk)
-        inserted = [{'subtitle_id': 'c',
-                     'text': 'unsynced sub',
-                     'start_time': -1,
-                     'end_time': -1,
-                     'sub_order': 3.0}]
+
+        subtitle_set = SubtitleSet('en')
+        subtitle_set.append_subtitle(None, None, 'asd')
+
         rpc.finished_subtitles(request, return_value['session_pk'],
-                               subtitles=inserted, completed=True)
+                               subtitles=subtitle_set.to_xml(), completed=True)
+
         video = Video.objects.get(pk=session.language.video.pk)
-        language = video.subtitle_language()
+        language = video.subtitle_language('en')
+        
         self.assertFalse(language.is_complete_and_synced())
+
         # since we have one unsynced subtitle, the video is no longer complete.
         self.assertFalse(video.is_complete)
         self.assertEquals(0, len(session.video.completed_subtitle_languages()))
