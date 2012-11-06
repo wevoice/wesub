@@ -1070,20 +1070,17 @@ def create_two_sub_session(request, completed=None):
         request,
         'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv',
         False)
+
     video_id = return_value['video_id']
     response = rpc.start_editing(request, video_id, 'en', original_language_code='en')
     session_pk = response['session_pk']
-    inserted = [{'subtitle_id': u'a',
-                 'text': 'hey!',
-                 'start_time': 2300,
-                 'end_time': 3400,
-                 'sub_order': 1.0},
-                {'subtitle_id': u'b',
-                 'text': 'hey!',
-                 'start_time': 3400,
-                 'end_time': 5800,
-                 'sub_order': 2.0}]
-    rpc.finished_subtitles(request, session_pk, inserted, completed=completed)
+
+    subtitle_set = SubtitleSet('en')
+    subtitle_set.append_subtitle(0, 1000, 'hey')
+    subtitle_set.append_subtitle(1000, 3500, 'jude')
+
+    rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml(), completed=completed)
+
     return SubtitlingSession.objects.get(pk=session_pk)
 
 def create_two_sub_dependent_session(request):
