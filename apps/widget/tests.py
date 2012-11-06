@@ -41,28 +41,15 @@ from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
 
-DFXP = """<tt xmlns="http://www.w3.org/ns/ttml" xml:lang="">
-    <head>
-        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">
-            <ttm:title/>
-            <ttm:description/>
-            <ttm:copyright/>
-        </metadata>
+def create_subtitle_set(number_of_subtitles=1, synced=True):
+    subtitle_set = SubtitleSet('en')
 
-        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">
-            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>
-        </styling>
+    for x in xrange(0, number_of_subtitles+1):
+        start = x * 1000 if synced else None
+        end = x * 1000 + 1000 if synced else None
+        subtitle_set.append_subtitle(start, end, 'hey you %s' % x)
 
-        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">
-            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>
-        </layout>
-    </head>
-    <body region="amara-subtitle-area">
-        <div>
-        <p begin="00:00:00.004" end="00:00:02.093">We<br/> started <span fontWeight="bold">Universal Subtitles</span> <span fontStyle="italic">because</span> we <span textDecoration="underline">believe</span></p></div>
-    </body>
-</tt> """
-
+    return subtitle_set
 
 class FakeDatetime(object):
     def __init__(self, now):
@@ -296,8 +283,7 @@ class TestRpc(TestCase):
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
 
-        subtitle_set = SubtitleSet('en')
-        subtitle_set.append_subtitle(0, 1000, 'asd')
+        subtitle_set = create_subtitle_set()
         rpc.finished_subtitles(request_0, session_pk, subtitle_set.to_xml())
 
         video, _ = models.Video.get_or_create_for_url(url)
@@ -317,9 +303,7 @@ class TestRpc(TestCase):
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
 
-        subtitle_set = SubtitleSet('en')
-        subtitle_set.append_subtitle(0, 1000, 'asd')
-
+        subtitle_set = create_subtitle_set()
         rpc.finished_subtitles(request_0, session_pk, subtitle_set.to_xml(), completed=False)
 
         v = models.Video.objects.get(video_id=video_id)
@@ -344,8 +328,7 @@ class TestRpc(TestCase):
             request, session.video.video_id, 'en',
             subtitle_language_pk=session.language.pk)
 
-        subtitle_set = SubtitleSet('en')
-        subtitle_set.append_subtitle(None, None, 'asd')
+        subtitle_set = create_subtitle_set(1, False)
 
         rpc.finished_subtitles(request, return_value['session_pk'],
                                subtitles=subtitle_set.to_xml(), completed=True)
@@ -1081,9 +1064,7 @@ def create_two_sub_session(request, completed=None):
     response = rpc.start_editing(request, video_id, 'en', original_language_code='en')
     session_pk = response['session_pk']
 
-    subtitle_set = SubtitleSet('en')
-    subtitle_set.append_subtitle(0, 1000, 'hey')
-    subtitle_set.append_subtitle(1000, 3500, 'jude')
+    subtitle_set = create_subtitle_set(2)
 
     rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml(), completed=completed)
 
@@ -1226,12 +1207,7 @@ class TestCaching(TestCase):
 class TestFormatConvertion(TestCase):
 
     def setUp(self):
-        self.subs = SubtitleSet(language_code='en')
-        for x in range(0,10):
-            self.subs.append_subtitle(
-                from_ms=(x * 1000), to_ms=(x * 1000) + 1000,
-                content="%s - and *italics* and **bold** and >>." % x
-            )
+        self.subs = create_subtitle_set(10)
             
     def _retrieve(self, format):
         res = self.client.post(reverse("widget:convert_subtitles"), {
