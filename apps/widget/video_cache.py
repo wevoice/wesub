@@ -158,7 +158,7 @@ def pk_for_default_language(video_id, language_code):
     cache_key = _subtitle_language_pk_key(video_id, language_code)
     value = cache.get(cache_key)
 
-    if not value:
+    if value is None:
         from videos.models import Video
         sl = Video.objects.get(video_id=video_id).subtitle_language(
             language_code)
@@ -171,7 +171,7 @@ def get_video_urls(video_id):
     cache_key = _video_urls_key(video_id)
     video_urls = cache.get(cache_key)
 
-    if not video_urls:
+    if video_urls is None:
         from videos.models import Video
         video_urls = [vu.effective_url for vu
                  in Video.objects.get(video_id=video_id).videourl_set.all()]
@@ -185,7 +185,7 @@ def get_subtitles_dict(video_id, language_pk, version_number,
     cache_key = _subtitles_dict_key(video_id, language_pk, version_number)
     cached_value = cache.get(cache_key)
 
-    if not cached_value:
+    if cached_value is None:
         from videos.models import Video
         from subtitles.models import SubtitleLanguage
         video = Video.objects.get(video_id=video_id)
@@ -214,10 +214,11 @@ def get_subtitles_dict(video_id, language_pk, version_number,
 
 def get_video_languages(video_id):
     from apps.widget.rpc import language_summary
+
     cache_key = _video_languages_key(video_id)
     value = cache.get(cache_key)
-    
-    if not value:
+
+    if value is None:
         from videos.models import Video
         video = Video.objects.get(video_id=video_id)
         languages = video.newsubtitlelanguage_set.having_nonempty_versions()
@@ -229,7 +230,6 @@ def get_video_languages(video_id):
 
         value = [language_summary(l) for l in languages]
         cache.set(cache_key, value, TIMEOUT)
-        return value
 
     return value
 
@@ -237,7 +237,7 @@ def get_video_completed_languages(team_video_id):
     cache_key = _video_completed_languages(team_video_id)
     languages = cache.get(cache_key)
 
-    if not languages:
+    if languages is None:
         from videos.models import SubtitleLanguage
         languages = [(sl.language, sl.language_display()) for sl in list(SubtitleLanguage.objects.filter(video__teamvideo__id=team_video_id).all())]
 
@@ -251,7 +251,7 @@ def get_video_languages_verbose(video_id, max_items=6):
     cache_key = _video_languages_verbose_key(video_id)
     data = cache.get(cache_key)
 
-    if not data:
+    if data is None:
         from videos.models import Video
         video = Video.objects.get(video_id=video_id)
         languages_with_version_total = video.subtitlelanguage_set.filter(has_version=True).order_by('-percent_done')
@@ -297,7 +297,7 @@ def get_visibility_policies(video_id):
     cache_key = _video_visibility_policy_key(video_id)
     value = cache.get(cache_key)
 
-    if value is  None:
+    if value is None:
         from videos.models import Video
 
         try:
@@ -335,7 +335,7 @@ def writelocked_langs(video_id):
     cache_key = _video_writelocked_langs_key(video_id)
     value = cache.get(cache_key)
 
-    if not value:
+    if value is None:
         treshold = datetime.datetime.now() - datetime.timedelta(seconds=WRITELOCK_EXPIRATION)
         video = Video.objects.get(video_id=video_id)
         langs = list(video.subtitlelanguage_set.filter(writelock_time__gte=treshold))
