@@ -3,15 +3,8 @@
 {% load i18n teams_tags %}
 
 {% block view_content %}
-
-    {% with "companies" as current %}
-        {% include 'enterprise/_nav.html' %}
-    {% endwith %}
-
-    <div class="grid_10 omega view">
-        <h2>{% trans 'Companies' %}</h2>
-        <p>{% blocktrans %}
-            Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.
-        {% endblocktrans %}</p> 
-    </div>
+    <h2>{% trans 'Companies' %}</h2>
+    <p>{% blocktrans %}
+        Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.
+    {% endblocktrans %}</p>
 {% endblock %}
