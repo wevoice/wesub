@@ -1,0 +1,46 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "automated-workflows" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'Automated Workflows' %}</h2>
+
+        <img src="{{ STATIC_URL }}images/enterprise/workflows.png" alt="Workflow interface" class="screen"/>
+
+        <p>{% blocktrans %}
+            Workflows enable automating the flow of content through different authoring groups, including: volunteers, private crowds (staff, employees, students, etc), and professionals. They can be used for both first pass (authoring), as well as subsequent review passes for Quality Control.
+        {% endblocktrans %}</p> 
+
+        <p>{% blocktrans %}
+            Different workflows can be chained together to create an unlimited number of highly flexible configurations. The Amara team can help you determine the best workflow for your subtitle processes and integrate it with your existing publishing platform.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Contractors with Staff Review' %}</h3>
+        <p>{% blocktrans %}
+            Use captioning and transcription contractors to create your subtitles, then require staff review and approval before they are published back to your server. Remember, no one sees your subtitles until YOU publish it.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Crowdsourced subtitles, followed by staff review' %}</h3>
+        <p>{% blocktrans %}
+            In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.
+        {% endblocktrans %}</p>
+
+        <img src="{{ STATIC_URL }}images/enterprise/review.png" alt="Review tasks" class="screen left"/>
+                            
+        <h3>{% trans 'Professionally created English captions, crowd translation' %}</h3>
+        <p>{% blocktrans %}
+            Amara offers professional- quality captions at very low cost with quick turn-around times. English can often be done in less than a day.  Once English is completed, it’s a snap to request translations from volunteers or staff. We have seen videos translated into multiple languages in just days—through a volunteer crowd.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Crowd translations, with professional quality-control' %}</h3>
+        <p>{% blocktrans %}
+            Amara is, quite simply, the most cost-effective way to get professional-level quality for foreign language video subtitles. By leveraging professional quality review, you can expect to pay roughly 75% less than the market price for traditional professional subtitles.
+        {% endblocktrans %}</p>
+    </div>
+{% endblock %}

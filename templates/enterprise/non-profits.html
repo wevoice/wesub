@@ -1,0 +1,31 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "non-profits" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'Non-profits' %}</h2>
+        <div class="screen">
+            <a href="http://www.universalsubtitles.org/en/teams/ushahidi/">
+                <img src="{{ STATIC_URL }}images/partners/ushahidi.png" alt="Ushahidi"/>
+            </a>
+            <a href="http://www.universalsubtitles.org/en/teams/world-humanitarian-day/">
+                <img src="{{ STATIC_URL }}images/partners/un.png" alt="UN"/>
+            </a>
+            <a href="http://www.universalsubtitles.org/en/teams/newshour/">
+                <img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS"/>
+            </a>
+        </div>
+        <p>{% blocktrans %}
+            Non-profit organizations use Amara to share their mission, their work, and their media around the world.  Non-profits are ideally positioned to build volunteer subtitling communities—your existing supporters will be delighted to find a new way to help support your organization.  Creating a volunteer team helps deepen engagement with your organization and lets you caption and translate videos that would be unaffordable to subtitle with a traditional approach.
+        {% endblocktrans %}</p>
+        <p>{% blocktrans %}
+            Did you know that Amara is a non-profit organization itself?  Our mission is to help make video accessible for everyone around the world.  We offer discounts for other non-profit organizations—we are always delighted to support work with a social mission.
+        {% endblocktrans %}</p>
+    </div>
+{% endblock %}

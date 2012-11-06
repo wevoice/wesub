@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block html_attrs %}id="enterprise"{% endblock %}
+
+{% block main_content %}
+    <div id="services" class="content container_12 clearfix">
+
+        {% block view_content %}{% endblock %}
+
+        <div class="page-footer">
+            <h3>{% trans 'Get started with Amara' %}</h3>
+            <p>{% trans 'Be in touch at' %}<br /><a href="mailto:enterprise@amara.org">enterprise@amara.org</a></p>
+        </div>
+    </div>
+{% endblock %}

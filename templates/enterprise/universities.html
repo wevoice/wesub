@@ -1,0 +1,23 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "universities" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'Universities' %}</h2>
+
+        <a href="http://www.universalsubtitles.org/en/teams/coursera" title="Coursera team"><img src="{{ STATIC_URL }}images/partners/coursera.png" alt="Coursera" class="screen"/></a>
+        <p>{% blocktrans %}
+            As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.
+        {% endblocktrans %}</p> 
+
+        <p>{% blocktrans %}
+            Khan Academy—one of the largest and fastest growing online education sites in the world—uses Amara to translate every video on their website, into dozens of languages
+        {% endblocktrans %}.</p>
+    </div>
+{% endblock %}

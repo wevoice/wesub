@@ -1,0 +1,17 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "government" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'Government' %}</h2>
+            <p>{% blocktrans %}
+                In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.
+            {% endblocktrans %}</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "api-integration" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'API Integration' %}</h2>
+        <img src="{{ STATIC_URL }}images/enterprise/api.png" alt="API sample" class="screen"/>
+        <p>{% blocktrans %}
+            Amara’s powerful API allows flexible integration with your existing publishing workflow.  By connecting your backend system directly to Amara, you can import and export subtitles, manage processing, and import completed subtitles directly back into your own system.  If you use a custom video player, importing subtitles via API lets your company fully control subtitle display and use of the transcript on your website.
+        {% endblocktrans %}</p>
+
+        <p><a href="http://amara.readthedocs.org/en/latest/api.html">{% trans 'Amara API Documentation' %}</a></p>
+    </div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+
+    {% with "index" as current %}
+        {% include 'enterprise/_nav.html' %}
+    {% endwith %}
+
+    <div class="grid_10 omega view">
+        <h2>{% trans 'The World’s Most Advanced Platform for Subtitles' %}</h2>
+
+        <p>{% blocktrans %}
+            Our enterprise platform offers an unmatched ability to manage subtitle creation and editing processes, and reach outstanding levels of quality at remarkably low costs.  You have total flexibility: build a volunteer community, integrate paid captioning and translation services, manage internal staff or contractors, and integrate directly with your distribution and embedding platform through our powerful API. <a href="mailto:enterprise@amara.org">Contact us</a> for more information and pricing.
+        {% endblocktrans %}</p>
+
+        <div class="grid_10 alpha omega" id="recognition">
+            <div class="grid_5 alpha">
+                <h3>{% trans 'World-class Users' %}</h3>
+                    <a href="http://www.universalsubtitles.org/en/teams/ted/">
+                      <img src="{{ STATIC_URL }}images/partners/ted.png" alt="TED team"/>
+                    </a>
+                    <a href="http://www.universalsubtitles.org/en/teams/newshour"><img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" /></a>
+                    <a href="http://eepurl.com/n24oH"><img src="{{ STATIC_URL }}images/partners/netflix.png" alt="Netflix" /></a>
+            </div>
+            <div class="grid_5 omega">
+                <h3>{% trans 'Award-Winning Technology' %}</h3>
+                <a href="/about#fcc-award"><img src="{{ STATIC_URL }}images/awards/fcc.png" alt="FCC Award Advancement in Accessibility"/></a>
+                <a href="/about#tech-award"><img src="{{ STATIC_URL }}images/awards/tech_awards.png" alt="Tech Awards 2011"/></a>
+                <a href="/about#iia-award"><img src="{{ STATIC_URL }}images/awards/iia.png" alt="Intercultural Innovation Award"/></a>
+            </div>
+        </div>
+
+        <h2>{% trans 'Unmatched Functionality and Control' %}</h2>
+
+        <img src="{{ STATIC_URL }}images/enterprise/team.png" alt="Translation team" class="screen"/>
+
+        <h3>{% trans 'Build a Translation Team' %}</h3>
+
+        <p>{% blocktrans %}
+            For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global. 
+        {% endblocktrans %}</p>
+
+        <p>
+             {% trans "See how TED uses Amara to build a global volunteer community and create extremely high quality subtitles: " %}<a href="http://www.universalsubtitles.org/en/teams/ted/">{% trans "TED Team on Amara" %}</a>. {% trans "Other companies like Netflix have completely private collaboration teams." %}
+        </p>
+        
+        <h3>{% trans 'Security and Managed Workflows' %}</h3>
+
+        <p>{% blocktrans %}
+            Create the right workflows for your content and coordinate your efforts—whether your video is completely private, restricted to premium subscribers, or public on the web.  You always control who has access to your subtitles and when to involve staff, contractors, or volunteers.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Powerful API and Publishing Integration' %}</h3>
+
+        <p>{% blocktrans %}
+            Our API helps companies tightly integrate Amara with their existing publishing and distribution workflow.  By making subtitles key part of your process, you build a global audience.
+        {% endblocktrans %}</p>
+        
+        <h3>{% trans 'Professional Services' %}</h3>
+
+        <p>{% blocktrans %}
+            Access professional services including paid captions, translations, and quality control.  Or use your own staff and contractors and use Amara to coordinate their work remotely.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Crowdsource with Professional Review' %}</h3>
+
+        <p>{% blocktrans %}
+            Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.
+        {% endblocktrans %}</p>
+        
+        <img src="{{ STATIC_URL }}images/enterprise/formats.png" alt="Video compatibility" class="screen left"/>
+
+        <h3>{% trans 'Work with Any Video Platform' %}</h3>
+
+        <p>{% blocktrans %}
+            Amara works with all the most popular video hosting services and video players, and adapts easily to your own custom player. Integrate and embed videos with subtitles without changing your current publishing workflow.
+        {% endblocktrans %}</p>
+
+        <h3>{% trans 'Subtitles Improve SEO' %}</h3>
+
+        <p>{% blocktrans %}
+            Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.
+        {% endblocktrans %}</p>
+    </div>
+{% endblock %}
