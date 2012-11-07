@@ -510,13 +510,11 @@ class TestRpc(TestCase):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
         language = sub_models.SubtitleLanguage.objects.get(pk=session.language.pk)
-        # making the language blank to imitate existing vids in system
-        language.language = ''
-        language.save()
         return_value = rpc.show_widget(request, VIDEO_URL, False)
         return_value = rpc.start_editing(request, session.video.video_id, 'en', subtitle_language_pk=language.pk)
-        self.assertEquals(1, len(return_value['subtitles']['subtitles']))
-        self.assertEquals(False, 'original_subtitles' in return_value)
+
+        self.assertEquals(len(SubtitleSet('en', return_value['subtitles']['subtitles'])), 1)
+        self.assertFalse('original_subtitles' in return_value)
 
     def test_finish_twice(self):
         request = RequestMockup(self.user_0)
