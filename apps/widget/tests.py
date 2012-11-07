@@ -210,10 +210,17 @@ class TestRpc(TestCase):
 
     def test_finish(self):
         request = RequestMockup(self.user_0)
-        version = self._create_basic_version(request)
-        language = version.language
-        self.assertTrue(language.had_version)
-        self.assertTrue(language.has_version)
+        session = self._create_basic_version(request)
+        language = session.language
+
+        self.assertTrue(sub_models.SubtitleLanguage
+                                  .objects.having_versions()
+                                  .filter(pk=language.pk).exists())
+
+        self.assertTrue(sub_models.SubtitleLanguage
+                                  .objects.having_nonempty_tip()
+                                  .filter(pk=language.pk).exists())
+
         self.assertTrue(language.video.is_subtitled)
 
     def test_get_widget_url(self):
