@@ -143,7 +143,9 @@ class TestRpc(TestCase):
         version = self._create_basic_version(request)
 
         subs = rpc.fetch_subtitles(request, version.video.video_id, version.language.pk)
-        self.assertEqual(1, len(subs['subtitles']))
+
+        sset = SubtitleSet('en', initial_data=subs['subtitles'])
+        self.assertEqual(1, len(sset))
         # can't test counters here because of redis/mysql setup (?)
 
     def test_add_alternate_urls(self):
