@@ -379,7 +379,7 @@ Once you have a parser, feed it the input string and call to_internal::
 This will give you a SubtitleSet, a wrapper around the internal storage mechanism we're using (dfxp).
 See https://github.com/pculture/babelsubs/blob/master/babelsubs/storage.py#L117
 
-The subtitle set is what subtitleversion.set_subtitles expect. The shorter form for this is:
+The subtitle set is what subtitleversion.set_subtitles expect. The shorter form for this is::
 
     from babelsubs import SubtitleParserError
     from babelsubs.parsers.base import discover
