@@ -1119,7 +1119,12 @@ class TestCaching(TestCase):
 class TestFormatConvertion(TestCase):
 
     def setUp(self):
-        self.subs = create_subtitle_set(10)
+        self.subs = SubtitleSet(language_code='en')
+        for x in range(0,10):
+            self.subs.append_subtitle(
+                from_ms=(x * 1000), to_ms=(x * 1000) + 1000,
+                content="%s - and *italics* and **bold** and >>." % x
+            )
             
     def _retrieve(self, format):
         res = self.client.post(reverse("widget:convert_subtitles"), {
