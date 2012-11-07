@@ -259,6 +259,8 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
         """
         video_id = self.test_video.video_id
         lang_code = 'en'
+        lang = self.test_video.subtitle_language(language_code=lang_code)
+        self.assertTrue(lang is not None)
         output_format = 'srt'
 
         url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(

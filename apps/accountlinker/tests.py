@@ -77,6 +77,14 @@ class AccountTest(TestCase):
         r = YoutubeSyncRule.objects.create(team='*')
         self.assertTrue(r.should_sync(video))
 
+        # Videos can have the user field set to None
+        video.user = None
+        video.save()
+
+        YoutubeSyncRule.objects.all().delete()
+        r = YoutubeSyncRule.objects.create(user='admin')
+        self.assertFalse(r.should_sync(video))
+
     def test_not_part_of_team(self):
         vurl = VideoUrl.objects.filter(type='Y',
                 video__teamvideo__isnull=True)[0]
