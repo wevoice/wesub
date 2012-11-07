@@ -148,30 +148,29 @@ class TestRpc(TestCase):
     def test_add_alternate_urls(self):
         url_0 = VIDEO_URL
         url_1 = 'http://ia700406.us.archive.org/16/items/PeopleOfHtml5-BruceLawsonmp4Version/PeopleOfHtml5-BruceLawson.mp4'
+
         request = RequestMockup(self.user_0)
-        return_value = rpc.show_widget(
-            request, url_0,
-            False, additional_video_urls=[url_1])
+        return_value = rpc.show_widget(request, url_0,
+                                       False, additional_video_urls=[url_1])
+
         video_id = return_value['video_id']
-        return_value = rpc.start_editing(
-            request, video_id, 'en', original_language_code='en')
+        return_value = rpc.start_editing(request, video_id, 'en', 
+                                         original_language_code='en')
         session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2300,
-                     'end_time': 3400,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, inserted);
-        return_value = rpc.show_widget(
-            request, url_1,
-            False, additional_video_urls=[url_0])
+
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml());
+        return_value = rpc.show_widget(request, url_1,
+                                       False, additional_video_urls=[url_0])
+
         self.assertEqual(video_id, return_value['video_id'])
-        subs = rpc.fetch_subtitles(
-            request, video_id,
-            return_value['drop_down_contents'][0]['pk'])
-        self.assertEquals(1, len(subs['subtitles']))
-        return_value = rpc.show_widget(
-            request, url_1, False)
+
+        subs = rpc.fetch_subtitles(request, video_id,
+                                   return_value['drop_down_contents'][0]['pk'])
+
+        self.assertEquals(1, len(SubtitleSet('en', subs['subtitles'])))
+
+        return_value = rpc.show_widget(request, url_1, False)
+
         self.assertEqual(video_id, return_value['video_id'])
 
     def test_keep_subtitling_dialog_open(self):
