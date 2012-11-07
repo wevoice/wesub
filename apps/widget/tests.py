@@ -488,6 +488,27 @@ class TestRpc(TestCase):
 
         self.assertTrue('en' in version.get_lineage())
 
+        response = rpc.start_editing(request, session.video.video_id, 
+                                     'es', base_language_code=sl_en.language_code)
+
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set(2).to_xml())
+        translations = rpc.fetch_subtitles(request, video.video_id, video.subtitle_language('es').pk)
+
+        subtitles = SubtitleSet('es',translations['subtitles'])
+        self.assertEquals(3, len(subtitles))
+        self.assertEquals('hey you 0', subtitles[0][2])
+        self.assertEquals('hey you 1', subtitles[1][2])
+        self.assertEquals('hey you 2', subtitles[2][2])
+
+        language = video.subtitle_language('es')
+
+        self.assertEquals(3, language.subtitleversion_set.count())
+        self.assertEquals(language.get_translation_source_language_code(), 'en')
+
+        version = language.get_tip()
+
+        self.assertTrue('en' in version.get_lineage())
+
     def test_zero_out_trans_version_1(self):
         request = RequestMockup(self.user_0)
         session = self._create_basic_dependent_version(request)
