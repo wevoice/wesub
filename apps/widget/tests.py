@@ -43,7 +43,7 @@ from django.conf import settings
 
 VIDEO_URL = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
 
-def create_subtitle_set(number_of_subtitles=1, synced=True):
+def create_subtitle_set(number_of_subtitles=0, synced=True):
     subtitle_set = SubtitleSet('en')
 
     for x in xrange(0, number_of_subtitles+1):
