@@ -110,6 +110,28 @@ def update_video_feed(video_feed_id):
         msg = '**update_video_feed**. VideoFeed does not exist. ID: %s' % video_feed_id
         client.captureMessage(msg)
 
+@task(ignore_result=False)
+def add(a, b):
+    print "TEST TASK FOR CELERY. EXECUTED WITH ARGUMENTS: %s %s" % (a, b)
+    return (a, b, a+b)
+
+@task
+def test_task(n):
+    if not n:
+        print '.'
+
+    from time import sleep
+    for i in xrange(n):
+        print '.',
+        sleep(0.5)
+
+@task
+def raise_exception(msg, **kwargs):
+    print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
+    logger = raise_exception.get_logger()
+    logger.error('Test error logging to Sentry from Celery')
+    raise TypeError(msg)
+
 @task()
 def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=False):
     from videos import metadata_manager

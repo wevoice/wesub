@@ -286,6 +286,13 @@ class Command(BaseCommand):
             compiled_js_text = compiled_js_file.read()
 
         with open(compiled_js, 'w') as compiled_js_file:
+
+            # Include dependencies needed for DFXP parsing.
+            with open(os.path.join(JS_LIB, 'src', 'js', 'third-party', 'jquery-1.8.2.min.js'), 'r') as jqueryjs_file:
+                compiled_js_file.write(jqueryjs_file.read())
+            with open(os.path.join(JS_LIB, 'src', 'js', 'dfxp', 'dfxp.js'), 'r') as dfxpjs_file:
+                compiled_js_file.write(dfxpjs_file.read())
+
             if include_flash_deps:
                 with open(os.path.join(JS_LIB, 'js', 'swfobject.js'), 'r') as swfobject_file:
                     compiled_js_file.write(swfobject_file.read())
