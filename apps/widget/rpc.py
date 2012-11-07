@@ -358,7 +358,7 @@ class Rpc(BaseRpc):
             if not can_edit:
                 return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
 
-    def _get_version_to_edit(self, language, session):
+    def _get_version_to_edit(self, language, session, base_language_code=None):
         """Return a version (and other info) that should be edited.
 
         When subtitles are going to be created or edited for a given language,
@@ -370,7 +370,7 @@ class Rpc(BaseRpc):
         version_for_subs = language.get_tip(public=False)
 
         if not version_for_subs:
-            version_for_subs, _ = self._create_version(language, user=session.user)
+            version_for_subs, _ = self._create_version(language, user=session.user, base_language_code=base_language_code)
             version_number = 0
         else:
             version_number = version_for_subs.version_number + 1
@@ -399,6 +399,7 @@ class Rpc(BaseRpc):
         if locked:
             return locked
         version = language.get_tip(public=False)
+
         # Ensure that the user is not blocked from editing this video by team
         # permissions.
         locked = self._check_team_video_locking(
@@ -413,13 +414,15 @@ class Rpc(BaseRpc):
 
         # Create the subtitling session and subtitle version for these edits.
         session = self._make_subtitling_session(request, language, base_language_code, video_id)
-        version_for_subs, version_number = self._get_version_to_edit(language, session)
+        version_for_subs, version_number = self._get_version_to_edit(language, session, base_language_code)
         session.parent = version_for_subs
         session.save()
 
         translated_from = None
+
         if base_language_code:
             translated_from = language.get_translation_source_language()
+
         subtitles = self._subtitles_dict(version_for_subs, version_number, translated_from)
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
@@ -686,8 +689,10 @@ class Rpc(BaseRpc):
             subtitles_changed or title_changed or desc_changed)
 
         if should_create_new_version:
-            new_version, should_create_task = self._create_version(
-                session.language, user, new_title=new_title, new_description=new_description, subtitles=subtitles)
+            new_version, should_create_task = self._create_version(session.language, user, 
+                                                                   new_title=new_title, 
+                                                                   new_description=new_description,
+                                                                   subtitles=subtitles)
 
             incomplete = new_version.is_synced() or save_for_later
 
@@ -936,7 +941,7 @@ class Rpc(BaseRpc):
             # language.
             return 'private', True
 
-    def _create_version(self, language, user=None, new_title=None, new_description=None, subtitles=None):
+    def _create_version(self, language, user=None, new_title=None, new_description=None, subtitles=None, base_language_code=None):
         latest_version = language.get_tip(public=False)
 
         visibility, should_create_task = self._moderate_language(language, user)
@@ -966,13 +971,20 @@ class Rpc(BaseRpc):
         else:
             kwargs['description'] = language.video.description
 
-        if subtitles:
-            kwargs['video'] = language.video
-            kwargs['language_code'] = language.language_code
-            kwargs['subtitles'] = subtitles
-            version = pipeline.add_subtitles(**kwargs)
-        else:
-            version = language.add_version(**kwargs)
+        if subtitles is None:
+            subtitles = []
+
+        kwargs['video'] = language.video
+        kwargs['language_code'] = language.language_code
+        kwargs['subtitles'] = subtitles
+
+        if base_language_code:
+            base_subtitle_language = language.video.subtitle_language(base_language_code)
+
+            if base_language_code:
+                kwargs['parents'] = [base_subtitle_language.get_tip()]
+
+        version = pipeline.add_subtitles(**kwargs)
 
         return version, should_create_task
 
