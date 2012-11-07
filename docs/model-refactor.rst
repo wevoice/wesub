@@ -352,4 +352,57 @@ Now::
 
     SubtitleLanguage.objects.having_nonempty_versions().filter(video=video)
 
+Subtitle Parsing / Generation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+We moved everything related to various subtitles formats to the external project babelsubs.
+
+Porting Parsing
+~~~~~~~~~~~~~~~
+
+First, find out the parser you need::
+
+    from babelsubs.parsers.base import discover
+    try:
+        parser = discover(format)
+    except KeyError:
+        pass # format not found
+
+Once you have a parser, feed it the input string and call to_internal::
+
+    try:
+        subtitles = parser(input_string, language='en').to_internal()
+    except SubtitleParserError as e:
+        pass # subs do not conform to format, see e.original_error for more details
+
+
+This will give you a SubtitleSet, a wrapper around the internal storage mechanism we're using (dfxp).
+See https://github.com/pculture/babelsubs/blob/master/babelsubs/storage.py#L117
+
+The subtitle set is what subtitleversion.set_subtitles expect. The shorter form for this is:
+
+    from babelsubs import SubtitleParserError
+    from babelsubs.parsers.base import discover
+    try:
+        parser = discover(format)
+        subtitles = parser(input_string, language='en').to_internal()
+    except KeyError:
+        pass # format not found
+    except SubtitleParserError as e:
+        pass # subs do not conform to format, see e.original_error for more details
+
+Those are the two places where it can fail, on fiding a suitable parser, and parsing the actual subs.
+
+Porting Generation
+~~~~~~~~~~~~~~~~~~
+
+Get the SubtitleSet for the SubtitleVersion you want to generate, then::
+
+     from babelsubs.generators import discover
+
+     subtitle_set = sub_version.get_subtitles()
+     try:
+          generator = discover(format)
+          serialized_subs = unicode(generator(subtitle_set))
+     except KeyError:
+          pass # no generator for this format found
