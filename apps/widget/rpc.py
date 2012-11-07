@@ -389,8 +389,6 @@ class Rpc(BaseRpc):
         """
 
         # TODO: remove whenever blank SubtitleLanguages become illegal.
-        self._fix_blank_original(video_id)
-
 
         # Find the subtitle language we'll be editing (if available).
         language, locked = self._get_language_for_editing(
@@ -1159,25 +1157,6 @@ class Rpc(BaseRpc):
         else:
             return None, { "can_edit": False,
                            "locked_by": language.writelock_owner_name }
-
-    def _fix_blank_original(self, video_id):
-        # TODO: remove this method as soon as blank SubtitleLanguages
-        # become illegal
-        video = models.Video.objects.get(video_id=video_id)
-        originals = video.subtitlelanguage_set.filter(is_original=True, language='')
-        to_delete = []
-        if len(originals) > 0:
-            for original in originals:
-                if not original.get_tip():
-                    # result of weird practice of saving SL with is_original=True
-                    # and blank language code on Video creation.
-                    to_delete.append(original)
-                else:
-                    # decided to mark authentic blank originals as English.
-                    original.language = 'en'
-                    original.save()
-        for sl in to_delete:
-            sl.delete()
 
     def _save_original_language(self, video_id, language_code):
         video = models.Video.objects.get(video_id=video_id)
