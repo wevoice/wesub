@@ -456,23 +456,37 @@ class TestRpc(TestCase):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
         sl_en = session.language
+
         # open translation dialog.
-        response = rpc.start_editing(
-            request, session.video.video_id, 'es', base_language_pk=sl_en.pk)
+        response = rpc.start_editing(request, session.video.video_id, 
+                                     'es', base_language_code=sl_en.language_code)
+
         session_pk = response['session_pk']
-        self.assertEquals(True, response['can_edit'])
         subs = response['subtitles']
+
+        self.assertEquals(True, response['can_edit'])
         self.assertEquals(0, subs['version'])
-        self.assertEquals(0, len(subs['subtitles']))
-        inserted = [{'subtitle_id': 'aa', 'text': 'heyoes'}]
-        rpc.finished_subtitles(request, session_pk, inserted)
+        self.assertEquals(0, len(SubtitleSet('es', subs['subtitles'])))
+
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         video = models.Video.objects.get(id=session.video.id)
-        translations = rpc.fetch_subtitles(
-            request, video.video_id, video.subtitle_language('es').pk)
-        self.assertEquals(1, len(translations['subtitles']))
-        self.assertEquals('heyoes', translations['subtitles'][0]['text'])
+        translations = rpc.fetch_subtitles(request, video.video_id, video.subtitle_language('es').pk)
+
+        subtitles = SubtitleSet('es',translations['subtitles'])
+        self.assertEquals(1, len(subtitles))
+        self.assertEquals('hey you 0', subtitles[0][2])
+
         language = video.subtitle_language('es')
-        self.assertEquals(1, language.subtitleversion_set.count())
+
+        # not sure if 2 is right. we are creating one version on start (if there's none)
+        # and another on finish.
+        # TODO: someone please take a look?
+        self.assertEquals(2, language.subtitleversion_set.count())
+        self.assertEquals(language.get_translation_source_language_code(), 'en')
+
+        version = language.get_tip()
+
+        self.assertTrue('en' in version.get_lineage())
 
     def test_zero_out_trans_version_1(self):
         request = RequestMockup(self.user_0)
