@@ -943,6 +943,12 @@ class Rpc(BaseRpc):
 
         kwargs = dict(visibility=visibility)
 
+        # it's a title/description update
+        # we can do this better btw
+        # TODO: improve-me plz
+        if new_title or new_description and not subtitles:
+            subtitles = latest_version.get_subtitles()
+
         if user is not None:
             kwargs['author'] = user
 
