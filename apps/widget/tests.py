@@ -1029,15 +1029,13 @@ def create_two_sub_session(request, completed=None):
 def create_two_sub_dependent_session(request):
     session = create_two_sub_session(request)
     sl_en = session.video.subtitle_language('en')
-    response = rpc.start_editing(
-        request, session.video.video_id,
-        'es', base_language_pk=sl_en.pk)
+
+    response = rpc.start_editing(request, session.video.video_id, 'es', base_language_code=sl_en.language_code)
     session_pk = response['session_pk']
-    inserted = [{'subtitle_id': 'a', 'text': 'a_es'},
-                {'subtitle_id': 'b', 'text': 'b_es'}]
-    rpc.finished_subtitles(
-        request, session_pk,
-        inserted)
+
+    subtitle_set = create_subtitle_set(2)
+
+    rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml())
     return SubtitlingSession.objects.get(pk=session_pk)
 
 def _make_packet(updated=[], inserted=[], deleted=[], packet_no=1):
