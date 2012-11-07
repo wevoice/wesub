@@ -1115,7 +1115,7 @@ class Rpc(BaseRpc):
                 # no languages with the language code, we must create one
                 language = new_models.SubtitleLanguage(
                     video=video, language_code=language_code,
-                    created=datetime.now() )
+                    created=datetime.now())
                 language.save()
                 created = True
             else:
@@ -1185,13 +1185,15 @@ class Rpc(BaseRpc):
             cache['language_pk'] = cache['language'].pk
         return cache
 
-    def _subtitles_dict(self, version, forced_version_number=None,  translated_from=None):
+    def _subtitles_dict(self, version, forced_version_number=None, translated_from=None):
         language = version.subtitle_language
         version_number = version.version_number if forced_version_number is None else forced_version_number
         is_latest = False
         latest_version = language.get_tip()
+
         if latest_version is None or version_number >= latest_version.version_number:
             is_latest = True
+
         return self._make_subtitles_dict(
             version.get_subtitles().to_xml(),
             language.language_code,
