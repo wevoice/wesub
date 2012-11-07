@@ -22,7 +22,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      */
 
     var that = this;
-    var $ = window.Zepto;
+    var $ = window.jQuery.noConflict();
 
     this.init = function(xml) {
 

@@ -283,7 +283,7 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-dependencies.js',
     'js/swfobject.js',
     'flowplayer/flowplayer-3.2.6.min.js',
-    'src/js/third-party/zepto.min.js',
+    'src/js/third-party/jquery-1.8.2.min.js',
     'src/js/dfxp/dfxp.js',
 ]
 
