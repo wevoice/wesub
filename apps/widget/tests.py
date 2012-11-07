@@ -760,8 +760,7 @@ class TestRpc(TestCase):
         video.title = title
         video.description = description
         video.save()
-        lang = SubtitleLanguage(language='en', is_original=False,
-                                video=video)
+        lang = sub_models.SubtitleLanguage(language_code='en', video=video)
         lang.save()
         response = rpc.start_editing(
             request, video.video_id, 'en', subtitle_language_pk=lang.pk)
