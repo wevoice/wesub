@@ -276,7 +276,11 @@ class YoutubeSyncRule(models.Model):
         return team in teams
 
     def user_in_list(self, user):
+        if not user:
+            return False
+
         users = self.user.split(',')
+
         if '*' in users:
             return True
         return user.username in users

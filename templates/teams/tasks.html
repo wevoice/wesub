@@ -21,6 +21,7 @@
         window.ASSIGNEE = '{% firstof request.user.id -1 %}';
         window.TEAM_SLUG = '{{ team.slug }}';
         window.USER_LANGS = {{ user.get_languages.count }};
+        window.REQUEST_TEAM_VIDEO = '{{ request.GET.team_video }}';
     </script>
 {% endblock %}
 

@@ -1,0 +1,31 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+    <h2>{% trans 'Universities and Online Education' %}</h2>
+    <div class="screen">
+        <a href="http://www.universalsubtitles.org/en/teams/coursera" title="Coursera team">
+            <img src="{{ STATIC_URL }}images/partners/coursera.png" alt="Coursera"/>
+        </a>
+        <a href="http://www.universalsubtitles.org/en/teams/udacity/">
+            <img src="{{ STATIC_URL }}images/partners/udacity.png" alt="Udacity"/>
+        </a>
+    </div>
+    <p>
+        {% blocktrans %}
+            Most of the leading online education companies and organizations use Amara to caption and translate video, including Coursera, Udacity, Khan Academy, TED Ed, as well as individual colleges and universities.  As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.
+        {% endblocktrans %}
+    </p> 
+
+    <p>{% trans "Learn more about our work in education:" %}</p>
+
+    <ul>
+        <li>
+            Forbes.com: <a href="http://www.forbes.com/sites/jamesmarshallcrotty/2012/10/31/udacity-launches-student-powered-effort-to-subtitle-5000-educational-videos/">Udacity, Amara Partner To Provide Free College Courses In Almost Any Language</a>
+        </li>
+        <li>
+            Gigaom: <a href="http://gigaom.com/video/coursera-amara-captions/">Coursera Partners with Amara for Crowdsourced Captioning</a>
+        </li>
+    </ul>
+{% endblock %}

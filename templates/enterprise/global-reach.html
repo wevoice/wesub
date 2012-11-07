@@ -1,0 +1,33 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+    <h2>{% trans 'Build a Global Reach' %}</h2>
+
+    <img src="{{ STATIC_URL }}images/enterprise/langs.png" alt="Workflow interface" class="screen"/>
+
+    <p>{% blocktrans %}
+        Amara is the premiere platform for taking video content global. Whether you’re working with volunteer translators, engaging your own staff, or hiring professionals, you can easily manage the end-to-end process.
+    {% endblocktrans %}</p> 
+
+    <h3>{% trans 'Volunteer Subtitle Creation' %}</h3>
+    <p>{% blocktrans %}
+        Amara currently supports some of the largest volunteer video translation efforts on the planet. Our technology makes captioning, subtitling, and translating very easy, fun, and engaging which enables ongoing, massive, collaborations.
+    {% endblocktrans %}</p> 
+
+    <h3>{% trans 'Private Crowd Subtitle Creation' %}</h3>
+    <p>{% blocktrans %}
+        If you have a workforce, student group, or any other non-public crowd, you can limit access for captioning, translating, and subtitling OR reviewing the work of peers, volunteers, or professionals.
+    {% endblocktrans %}</p>
+
+    <h3>{% trans 'Professional Captioning and Translation Services' %}</h3>
+    <p>{% blocktrans %}
+        Use professional services for captioning or subtitling into nearly any language, or even to help with quality control. All completed work is centralized on Amara, ready for incremental quality control, integration, and deployment.
+    {% endblocktrans %}</p>
+
+    <h3>{% trans 'Hybrid Approach' %}</h3>
+    <p>{% blocktrans %}
+        Many of our customers use a mix of these different approaches on the initial (subtitle authoring) pass, as well as subsequent review passes (for quality control). This is an advantage that you only get with Amara, a fully featured solution that manages the process end to end and integrates more easily than any other platform.
+    {% endblocktrans %}</p>
+{% endblock %}
