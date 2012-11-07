@@ -33,7 +33,7 @@ class BaseRpc:
             'is_complete': is_complete,
             'version': version,
             'is_latest': is_latest,
-            'base_language': base_language and base_language.language,
+            'base_language': base_language and base_language.language_code,
             'base_language_pk': base_language and base_language.pk,
             'title': title,
             'description': description,
