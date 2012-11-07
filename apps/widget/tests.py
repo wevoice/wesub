@@ -912,7 +912,7 @@ class TestRpc(TestCase):
         request_1 = RequestMockup(self.user_1, "b")
         rpc.show_widget(request_1, VIDEO_URL, False)
         response = rpc.start_editing(
-            request_1, session.video.video_id, 'es', base_language_pk=en_sl.pk)
+            request_1, session.video.video_id, 'es', base_language_code=en_sl.language_code)
         session_pk = response['session_pk']
         title = 'new title'
         rpc.finished_subtitles(request_1, session_pk, new_title=title)
@@ -955,10 +955,9 @@ class TestRpc(TestCase):
         session = self._create_basic_version(request)
         sl = session.language
         response = rpc.start_editing(
-            request, sl.video.video_id, 'es', base_language_pk=sl.pk)
+            request, sl.video.video_id, 'es', base_language_code=sl.language_code)
         session_pk = response['session_pk']
-        inserted = [{'subtitle_id': 'aa', 'text': 'heyoes'}]
-        rpc.finished_subtitles(request, session_pk, inserted)
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         return SubtitlingSession.objects.get(pk=session_pk)
 
     def _create_two_sub_forked_subs(self, request):
