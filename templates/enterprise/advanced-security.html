@@ -1,0 +1,11 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+    <h2>{% trans 'A Revolutionary Video Security Model' %}</h2>
+
+    <p>{% blocktrans %}
+        You always maintain control of your video, because it never leaves your server.  Amara doesn’t require any video uploading, so your existing security policy is always in full effect. We support OAuth, which means your users never need to log in twice—they can see your video and authenticate with both organizations at the same time. Amara makes your subtitles available from the cloud, so you can: deploy just in time via our API; cache on your server and get pinged when there are updates; or use our embeddable subtitle widget.
+    {% endblocktrans %}</p>
+{% endblock %}
