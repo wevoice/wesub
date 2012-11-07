@@ -53,7 +53,7 @@ unisubs.widget.Widget = function(widgetConfig) {
         this.baseState_ = new unisubs.widget.BaseState(baseState);
 
     // Initialize a new DFXP parser instance for later use.
-    unisubs.dfxp = new AmaraDFXPParser();
+    unisubs.dfxp = new window['AmaraDFXPParser']();
 
     unisubs.widget.Widget.widgetsCreated_.push(this);
 };
