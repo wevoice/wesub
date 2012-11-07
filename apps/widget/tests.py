@@ -583,7 +583,6 @@ class TestRpc(TestCase):
         self.assertEquals(False, language.is_forked)
 
         # now fork subtitles
-        from ipdb import set_trace; set_trace()
         response = rpc.start_editing(request, session.video.video_id, 'es', subtitle_language_pk=language.pk)
         sub_state = response['subtitles']
         self.assertEquals(True, sub_state['forked'])
