@@ -554,24 +554,19 @@ class TestRpc(TestCase):
     def test_finish_twice(self):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
-        language = models.SubtitleLanguage.objects.get(pk=session.language.pk)
-        self.assertEquals(1, language.subtitle_count)
-        first_last_version = language.last_version
+        language = session.language
+        self.assertEquals(1, language.version().subtitle_count)
+        first_version = language.version()
         response = rpc.start_editing(
             request, session.video.video_id, 'en', subtitle_language_pk=session.language.pk)
         session_pk = response['session_pk']
-        new_subs = [response['subtitles']['subtitles'][0],
-                    {'subtitle_id': 'cc',
-                     'text': 'hey!',
-                     'start_time': 5300,
-                     'end_time': 8400,
-                     'sub_order': 5.0}]
-        rpc.finished_subtitles(request, session_pk, new_subs)
-        language = models.SubtitleLanguage.objects.get(pk=session.language.pk)
-        second_last_version = language.last_version
-        self.assertTrue(second_last_version.version_no > first_last_version.version_no)
-        self.assertTrue(first_last_version.pk != second_last_version.pk)
-        self.assertEquals(2, language.subtitle_count)
+        new_subs = create_subtitle_set(4)
+        rpc.finished_subtitles(request, session_pk, new_subs.to_xml())
+        language = session.language
+        second_version = language.version()
+        self.assertTrue(second_version.version_number > first_version.version_number)
+        self.assertTrue(first_version.pk != second_version.pk)
+        self.assertEquals(len(new_subs), second_version.subtitle_count)
 
     def test_fork_then_edit(self):
         request = RequestMockup(self.user_0)
