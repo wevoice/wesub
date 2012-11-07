@@ -52,6 +52,9 @@ unisubs.widget.Widget = function(widgetConfig) {
     if (baseState)
         this.baseState_ = new unisubs.widget.BaseState(baseState);
 
+    // Initialize a new DFXP parser instance for later use.
+    unisubs.dfxp = new AmaraDFXPParser();
+
     unisubs.widget.Widget.widgetsCreated_.push(this);
 };
 goog.inherits(unisubs.widget.Widget, goog.ui.Component);

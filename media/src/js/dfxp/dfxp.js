@@ -16,7 +16,7 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var DFXP = function(DFXP) {
+var AmaraDFXPParser = function(AmaraDFXPParser) {
     /*
      * A utility for working with DFXP subs.
      */
@@ -328,19 +328,3 @@ var DFXP = function(DFXP) {
         return this.getSubtitles().length;
     };
 };
-
-$(function() {
-    $.ajax({
-        type: 'get',
-        url: '/site_media/src/js/dfxp/sample.dfxp.xml',
-        dataType: 'xml',
-        success: function(resp) {
-            window.unisubs = window.unisubs || [];
-            window.unisubs.DFXP = DFXP;
-
-            // Create an instance of the DFXP wrapper with this XML.
-            window.x = new window.unisubs.DFXP();
-            window.x.init(resp);
-        }
-    });
-});
