@@ -138,7 +138,6 @@ class TestRpc(TestCase):
         rpc.show_widget(request, VIDEO_URL, False)
 
     def test_fetch_subtitles(self):
-        #moved to MySQL in crone
         request = RequestMockup(self.user_0)
         version = self._create_basic_version(request)
 
@@ -146,7 +145,6 @@ class TestRpc(TestCase):
 
         sset = SubtitleSet('en', initial_data=subs['subtitles'])
         self.assertEqual(1, len(sset))
-        # can't test counters here because of redis/mysql setup (?)
 
     def test_add_alternate_urls(self):
         url_0 = VIDEO_URL
@@ -401,18 +399,15 @@ class TestRpc(TestCase):
         return_value = rpc.start_editing(
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': 'aa',
-                     'text': 'hey!',
-                     'start_time': 2300,
-                     'end_time': 3400,
-                     'sub_order': 1.0}]
+        sset = SubtitleSet('en')
+        sset.append_subtitle(2300, 3400, 'hey')
         response = rpc.regain_lock(request_0, session_pk)
         self.assertEqual('ok', response['response'])
         request_0.user = self.user_0
-        rpc.finished_subtitles(request_0, session_pk, inserted)
-        self.assertEqual(request_0.user.pk,
-                         Video.objects.get(video_id=video_id).\
-                             latest_version().user.pk)
+        rpc.finished_subtitles(request_0, session_pk, sset.to_xml())
+        sversion = sub_models.SubtitleVersion.objects.order_by('-pk')[0]
+        sversion.subtitle_count = 1
+        self.assertEqual(request_0.user.pk, sversion.author.pk)
 
     def test_zero_out_version_1(self):
         request_0 = RequestMockup(self.user_0)
