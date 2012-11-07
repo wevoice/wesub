@@ -412,7 +412,7 @@ class Rpc(BaseRpc):
         language.save()
 
         # Create the subtitling session and subtitle version for these edits.
-        session = self._make_subtitling_session(request, language, base_language_code)
+        session = self._make_subtitling_session(request, language, base_language_code, video_id)
         version_for_subs, version_number = self._get_version_to_edit(language, session)
         session.parent = version_for_subs
         session.save()
@@ -984,10 +984,16 @@ class Rpc(BaseRpc):
             'translations_count': models.SubtitleLanguage.objects.filter(is_original=False).count()
         }
 
-    def _make_subtitling_session(self, request, language, base_language_code, version=None):
+    def _make_subtitling_session(self, request, language, base_language_code, video_id, version=None):
+        try:
+            base_language = new_models.SubtitleLanguage.objects.get(video__video_id=video_id, 
+                                                            language_code=base_language_code)
+        except new_models.SubtitleLanguage.DoesNotExist:
+            base_language = None
+
         session = SubtitlingSession(
             language=language,
-            base_language=base_language_code,
+            base_language=base_language,
             parent_version=version,
             browser_id=request.browser_id)
         if request.user.is_authenticated():
