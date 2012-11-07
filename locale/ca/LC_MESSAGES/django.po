@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 01:41-0600\n"
+"POT-Creation-Date: 2012-11-07 01:41-0600\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
@@ -1719,11 +1719,11 @@ msgstr "Vídeo privat"
 msgid "Undefined error"
 msgstr "Error no definit"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:110
 msgid "Video embedding disabled by owner"
 msgstr "Incrustació de vídeo deshabilitada pel propietari"
 
-#: apps/widget/rpc.py:324
+#: apps/widget/rpc.py:325
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
@@ -1732,11 +1732,11 @@ msgstr ""
 "Aquests subtítols estan moderats. Informeu-vos a la pàgina de l'equip %s per "
 "a saber com contribuir."
 
-#: apps/widget/rpc.py:326
+#: apps/widget/rpc.py:327
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Ho lamentem, aquests subtítols són moderats de manera privada."
 
-#: apps/widget/rpc.py:336
+#: apps/widget/rpc.py:337
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -1744,7 +1744,7 @@ msgstr ""
 "Ho lamentem, no teniu permís per a editar aquests subtítols. Si creeu que "
 "necessiten correcció, sisplau contacteu amb l'administrador de l'equip."
 
-#: apps/widget/rpc.py:1042 apps/widget/rpc.py:1083
+#: apps/widget/rpc.py:1046 apps/widget/rpc.py:1087
 msgid "\n"
 msgstr "\n"
 

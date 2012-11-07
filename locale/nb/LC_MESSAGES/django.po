@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-06 01:44-0600\n"
+"POT-Creation-Date: 2012-11-07 01:44-0600\n"
 "PO-Revision-Date: 2012-10-27 06:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/"
@@ -1622,28 +1622,28 @@ msgstr ""
 msgid "Undefined error"
 msgstr "Udefinert error"
 
-#: apps/widget/rpc.py:109
+#: apps/widget/rpc.py:110
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:324
+#: apps/widget/rpc.py:325
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:326
+#: apps/widget/rpc.py:327
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:336
+#: apps/widget/rpc.py:337
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1042 apps/widget/rpc.py:1083
+#: apps/widget/rpc.py:1046 apps/widget/rpc.py:1087
 msgid "\n"
 msgstr ""
 
