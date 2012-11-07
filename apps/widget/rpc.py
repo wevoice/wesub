@@ -422,6 +422,9 @@ class Rpc(BaseRpc):
             translated_from = language.get_translation_source_language()
 
         subtitles = self._subtitles_dict(version_for_subs, version_number, translated_from)
+        # this is basically how it worked before. don't ask.
+        subtitles['forked'] = base_language_code is None
+
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
@@ -663,7 +666,7 @@ class Rpc(BaseRpc):
             for s in source_version.subtitle_set.all():
                 s.duplicate_for(dest_version).save()
 
-    def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description, save_for_later=None):
+    def _get_new_version_for_save(self, subtitles, language, session, user, new_title, new_description, save_for_later=None):
         """Return a new subtitle version for this save, or None if not needed."""
 
         new_version = None
@@ -721,7 +724,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed, forked=False):
+    def _update_language_attributes_for_save(self, language, completed, session):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -733,6 +736,12 @@ class Rpc(BaseRpc):
             if language.subtitles_complete != completed:
                 must_trigger_api_language_edited = True
             language.subtitles_complete = completed
+
+        # this means all 'original languages' will be marked as forks
+        # but this is cool for now because all those languages should
+        # be shown on the transcribe dialog. if there's a base language,
+        # that means we should always show the translate dialog.
+        language.is_forked = session.base_language is None
 
         language.save()
 
@@ -749,12 +758,12 @@ class Rpc(BaseRpc):
         language = session.language
 
         new_version = self._get_new_version_for_save(
-            subtitles, language, session, user, forked, new_title,
+            subtitles, language, session, user, new_title,
             new_description, save_for_later)
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed, forked=forked)
+        self._update_language_attributes_for_save(language, completed, session)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
@@ -1138,6 +1147,9 @@ class Rpc(BaseRpc):
                 language = new_models.SubtitleLanguage(
                     video=video, language_code=language_code,
                     created=datetime.now())
+
+                language.is_forked = not base_language_code and video.newsubtitlelanguage_set.exists()
+
                 language.save()
                 created = True
             else:
@@ -1199,7 +1211,7 @@ class Rpc(BaseRpc):
 
         return self._make_subtitles_dict(
             version.get_subtitles().to_xml(),
-            language.language_code,
+            language,
             language.pk,
             language.is_primary_audio_language(),
             None if translated_from is not None else language.subtitles_complete,
