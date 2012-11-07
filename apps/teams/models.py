@@ -778,12 +778,7 @@ class TeamVideo(models.Model):
         # TODO: Dedupe this and the team video delete signal.
         video = self.video
 
-        workflow = new_team.get_workflow()
-        if not (workflow.review_enabled or workflow.approve_enabled):
-            SubtitleVersion.objects.filter(language__video=video).exclude(
-                moderation_status=MODERATION.APPROVED).update(
-                    moderation_status=MODERATION.UNMODERATED)
-
+        video.newsubtitleversion_set.all().update(visibility='public')
         video.is_public = new_team.is_visible
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
