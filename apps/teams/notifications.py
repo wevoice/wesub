@@ -164,7 +164,7 @@ class BaseNotification(object):
             resp, content = h.request(url, method="POST", body=data)
             success =  200<= resp.status <400
             if success is False:
-                logger.error("Failed to send team %s " %( self.team),
+                logger.error("Failed to notify team %s " %( self.team),
                      extra={
                         'team': self.team or self.partner,
                         'url': url,
