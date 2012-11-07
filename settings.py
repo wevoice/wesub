@@ -283,6 +283,8 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-dependencies.js',
     'js/swfobject.js',
     'flowplayer/flowplayer-3.2.6.min.js',
+    'src/js/third-party/zepto.min.js',
+    'src/js/dfxp/dfxp.js',
 ]
 
 # Local time zone for this installation. Choices can be found here:
