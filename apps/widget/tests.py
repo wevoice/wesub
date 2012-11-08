@@ -184,7 +184,8 @@ class TestRpc(TestCase):
         self.assertEqual(True, return_value['can_edit'])
         subs = return_value['subtitles']
         self.assertEqual(0, subs['version'])
-        self.assertEqual(0, len(subs['subtitles']))
+        subtitles = SubtitleSet('es', subs['subtitles'])
+        self.assertEqual(0, len(subtitles))
         # the subtitling dialog pings the server, even
         # though we've done no subtitling work yet.
         rpc.regain_lock(request, return_value['session_pk'])
