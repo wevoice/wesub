@@ -23,6 +23,7 @@ import json
 from django.core.urlresolvers import reverse
 
 from apps.auth.models import CustomUser as User
+from apps.subtitles import pipeline
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, Subtitle
 from apps.videos.tasks import video_changed_tasks
@@ -47,8 +48,6 @@ class UploadRequiresLoginTest(WebUseTest):
         self._simple_test('videos:upload_subtitles', status=302)
 
 class UploadSubtitlesTest(WebUseTest):
-    fixtures = ['test.json']
-
     def _srt(self, filename):
         return os.path.join(up(up(__file__)), 'fixtures/%s' % filename)
 
@@ -76,6 +75,17 @@ class UploadSubtitlesTest(WebUseTest):
         self._login()
 
 
+    def _assertVersionCount(self, video, n):
+        self.assertEqual(video.newsubtitleversion_set.count(), n)
+
+
+    def _assertCounts(self, video, counts):
+        self.assertEqual(
+            counts, dict([(sl.language_code, sl.subtitleversion_set.count())
+                            for sl in video.newsubtitlelanguage_set.all()]))
+
+
+    # Basic uploading tests.
     def test_upload_subtitles_primary_language(self):
         # Start with a fresh video.
         video = get_video()
@@ -223,215 +233,141 @@ class UploadSubtitlesTest(WebUseTest):
         self._upload(video, 'en', 'en', None, True, 'test.srt')
         self.assertEqual(sl_en.subtitleversion_set.count(), 2)
 
+    def test_upload_unsynced_subs(self):
+        video = get_video()
+        self._upload(video, 'en', 'en', None, True, 'subs-with-unsynced.srt')
+        self._assertCounts(video, {'en': 1})
 
-    def test_upload_subtitles(self):
+        subs = video.subtitle_language('en').get_tip().get_subtitles()
+
+        fully_synced = len([1 for start, end, _, _ in subs if start and end])
+        synced_begin = len([1 for start, _, _, _ in subs if start])
+        synced_end = len([1 for _, end, _, _ in subs if end])
+        fully_unsynced = len([1 for start, end, _, _ in subs
+                              if (not start) and (not end)])
+        
+        self.assertEqual(fully_synced, 56)
+        self.assertEqual(synced_begin, 57)
+        self.assertEqual(synced_end, 56)
+        self.assertEqual(fully_unsynced, 5)
+
+
+    # Translation-related tests.
+    def test_upload_translation(self):
+        video = get_video()
+        self._assertVersionCount(video, 0)
+
+        # Try uploading a translation of language that doesn't exist.
+        self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
+
+        # This should fail.  Translations need to be based on an existing
+        # langauge.
+        self._assertVersionCount(video, 0)
+
+        # Let's upload the first language.
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._assertVersionCount(video, 1)
+
+        # And now uploading a translation should work.
+        self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
+        self._assertVersionCount(video, 2)
+
+        # Translations of translations are okay too I guess.
+        self._upload(video, 'ru', 'en', 'fr', True, 'test.srt')
+        self._assertVersionCount(video, 3)
+
+    def test_upload_translation_over_nontranslation(self):
+        video = get_video()
+        self._assertVersionCount(video, 0)
+
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._upload(video, 'de', 'en', None, True, 'test.srt')
+        self._assertVersionCount(video, 2)
+
+        # You can't upload a translation over an existing non-translation
+        # language.
+        self._upload(video, 'de', 'en', 'en', True, 'test.srt')
+        self._assertVersionCount(video, 2)
+
+    def test_upload_translation_over_other_translation(self):
+        video = get_video()
+        self._assertVersionCount(video, 0)
+
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._upload(video, 'de', 'en', None, True, 'test.srt')
+        self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
+        self._assertVersionCount(video, 3)
+
+        # You can't upload a translation from A to X, when a translation
+        # from B to X already exists (assuming A ≠ B).
+        self._upload(video, 'fr', 'en', 'de', True, 'test.srt')
+        self._assertVersionCount(video, 3)
+
+    def test_upload_to_language_with_dependents(self):
+        video = get_video()
+        self._assertVersionCount(video, 0)
+
+        # You cannot upload subtitles to a language that already has dependents.
+        # So if you create English and then create a French translation of it
+        # English is now off limits to uploads.
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
+        self._assertVersionCount(video, 2)
+
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._assertVersionCount(video, 2)
+
+    def test_upload_translation_with_fewer_subs(self):
+        video = get_video()
+        self._assertVersionCount(video, 0)
+
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._assertVersionCount(video, 1)
+
+        # Uploading a translation with a different number of subs than the
+        # original language is not allowed.
+        self._upload(video, 'is', 'en', 'en', True, 'test_fewer_subs.srt')
+        self.assertEqual(video.newsubtitlelanguage_set.count(), 1)
+
+        self._upload(video, 'is', 'en', 'en', True, 'test.srt')
+        self.assertEqual(video.newsubtitlelanguage_set.count(), 2)
+
+    def test_upload_and_rollbacks(self):
         video = get_video()
 
-        with open(self._srt('test.srt')) as draft:
-            response = self.client.post(
-                reverse('videos:upload_subtitles'),
-                self._data(video, 'ru', 'en', None, True, draft))
+        self._assertCounts(video, {})
 
-        self.assertEqual(response.status_code, 200)
+        self._upload(video, 'en', 'en', None, True, 'test.srt')
+        self._upload(video, 'en', 'en', None, True, 'test_fewer_subs.srt')
+        self._upload(video, 'fr', 'en', 'en', True, 'test_fewer_subs.srt')
+        self._assertCounts(video, {'en': 2, 'fr': 1})
 
-        video = refresh(video)
+        # We now have:
+        #
+        # en fr
+        #    1
+        #   /
+        #  /
+        # 2
+        # |
+        # 1
 
-        original_language = video.subtitle_language()
-        self.assertEqual(original_language.language, data['video_language'])
+        # Let's sanity check that we can't upload to English now that it has
+        # a dependent language (French).
+        self._upload(video, 'en', 'en', None, True, 'test_fewer_subs.srt')
+        self._assertCounts(video, {'en': 2, 'fr': 1})
 
-        language = video.subtitle_language(data['language'])
-        version = language.latest_version(public_only=True)
-        self.assertEqual(len(version.subtitles()), 32)
-        self.assertTrue(language.is_forked)
-        self.assertTrue(version.is_forked)
-        self.assertTrue(language.has_version)
-        self.assertTrue(language.had_version)
-        self.assertEqual(language.is_complete, data['is_complete'])
-        # FIXME: why should these be false?
-        # self.assertFalse(video.is_subtitled)
-        # self.assertFalse(video.was_subtitled)
-        metadata_manager.update_metadata(video.pk)
-        language = refresh_obj(language)
-        # two of the test srts end up being empty, so the subtitle_count
-        # should be real
-        self.assertEquals(30, language.subtitle_count)
-        self.assertEquals(0, language.percent_done)
+        # Now let's roll English back to v1.
+        pipeline.rollback_to(video, 'en', 1)
+        self._assertCounts(video, {'en': 3, 'fr': 1})
 
-        data = self._make_data()
-        data['is_complete'] = not data['is_complete']
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        video = Video.objects.get(pk=self.video.pk)
-        language = video.subtitle_language(data['language'])
-        self.assertEqual(language.is_complete, data['is_complete'])
-        self.assertFalse(video.is_writelocked)
+        # The translation should now be forked.
+        self.assertTrue(video.subtitle_language('fr').is_forked)
 
-    def test_upload_translation(self):
-        self._login()
-        data = self._make_data(lang='en')
-        video = Video.objects.get(pk=self.video.pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(1, video.subtitlelanguage_set.count())
-        language = video.subtitle_language()
-        self.assertEqual('en', language.language)
-        self.assertTrue(language.is_original)
-        self.assertTrue(language.has_version)
-        self.assertTrue(video.is_subtitled)
-        self.assertFalse(language.is_dependent())
-
-        data = self._make_data(lang='fr')
-        data['translated_from'] = 'en'
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        video = Video.objects.get(pk=self.video.pk)
-        self.assertEqual(2, video.subtitlelanguage_set.count())
-        language = video.subtitle_language("fr")
-        self.assertEqual('fr', language.language)
-        self.assertFalse(language.is_original)
-        self.assertTrue(language.has_version)
-        self.assertTrue(video.is_subtitled)
-        self.assertTrue(language.is_dependent())
-        self.assertEquals(language.standard_language.language, "en")
-
-    def test_upload_over_translated(self):
-        # for https://www.pivotaltracker.com/story/show/11804745
-        request = RequestMockup(User.objects.all()[0])
-        session = create_two_sub_dependent_session(request)
-        video_pk = session.language.video.pk
-        video = Video.objects.get(pk=video_pk)
-
-        self._login()
-        data = self._make_data(lang='en', video_pk=video_pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        video = Video.objects.get(pk=video_pk)
-        self.assertEqual(2, video.subtitlelanguage_set.count())
-
-    def test_upload_over_empty_translated(self):
-        request = RequestMockup(User.objects.all()[0])
-        session = create_two_sub_session(request)
-        video_pk = session.language.video.pk
-        video = Video.objects.get(pk=video_pk)
-        original_en = video.subtitlelanguage_set.filter(language='en').all()[0]
-
-        # save empty espanish
-        es = SubtitleLanguage(
-            video=video,
-            language='ht',
-            is_original=False,
-            is_forked=False,
-            standard_language=original_en)
-        es.save()
-
-        # now upload over the original english.
-        self._login()
-        data = self._make_data(lang='en', video_pk=video_pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
+        # Now that the translation is forked, we should be able to upload to
+        # English again.  Whee!
+        self._upload(video, 'en', 'en', None, True, 'test_fewer_subs.srt')
+        self._assertCounts(video, {'en': 4, 'fr': 1})
 
 
-    def test_upload_then_rollback_preservs_dependends(self):
-        self._login()
-        # for https://www.pivotaltracker.com/story/show/14311835
-        # 1. Submit a new video.
-        video, created = Video.get_or_create_for_url("http://example.com/blah.mp4")
-        # 2. Upload some original subs to this video.
-        data = self._make_data(lang='en', video_pk=video.pk)
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        original = video.subtitle_language()
-        original_version = version = original.version()
-        # 3. Upload another, different file to overwrite the original subs.
-        data = self._make_altered_data(language_code='en', video=video, subs_filename="welcome-subs.srt")
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        video = Video.objects.get(pk=video.pk)
-        version = video.version()
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue (len(version.subtitles()) != len(original_version.subtitles()))
-
-        # 4. Make a few translations.
-        pt = _create_trans(video, latest_version=version, lang_code="pt", forked=False )
-        pt_count = len(pt.latest_subtitles())
-        # 5. Roll the original subs back to #0. The translations will be wiped clean (to 0 lines).
-        original_version.rollback(self.user)
-        original_version.save()
-        video_changed_tasks.run(original_version.video.id, original_version.id)
-        # we should end up with 1 forked pts
-        pts = video.subtitlelanguage_set.filter(language='pt')
-        self.assertEqual(pts.count(), 1)
-        # one which is forkded and must retain the original count
-        pt_forked = video.subtitlelanguage_set.get(language='pt', is_forked=True)
-        self.assertEqual(len(pt_forked.latest_subtitles()), pt_count)
-        # now we roll back  to the second version, we should not be duplicating again
-        # because this rollback is already a rollback
-        version.rollback(self.user)
-        pts = video.subtitlelanguage_set.filter(language='pt')
-        self.assertEqual(pts.count(), 1)
-        self.assertEqual(len(pt_forked.latest_subtitles()), pt_count)
-
-    def test_upload_file_with_unsynced(self):
-        self._login()
-        data = self._make_data()
-        data = self._make_altered_data(subs_filename="subs-with-unsynced.srt")
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-        language = self.video.subtitlelanguage_set.get(language='ru')
-        subs = Subtitle.objects.filter(version=language.version())
-        num_subs = len(subs)
-
-        num_unsynced = len(Subtitle.objects.unsynced().filter(version=language.version()))
-
-
-        self.assertEquals(82, num_subs)
-        self.assertEquals(26 ,num_unsynced)
-
-    def test_upload_from_failed_session(self):
-        self._login()
-
-        data = self._make_data( video_pk=self.video.pk, lang='ru')
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        data = self._make_altered_data(video=self.video, language_code='ru', subs_filename='subs-from-fail-session.srt')
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        language = self.video.subtitlelanguage_set.get(language='ru')
-        subs = Subtitle.objects.filter(version=language.version())
-
-        for sub in subs[8:]:
-            self.assertEquals(None, sub.start_time)
-            self.assertEquals(None, sub.end_time)
-
-        num_subs = len(subs)
-        num_unsynced = len(Subtitle.objects.unsynced().filter(version=language.version()))
-        self.assertEquals(10, num_subs)
-        self.assertEquals(2 , num_unsynced)
-
-    def test_upload_from_widget_last_end_unsynced(self):
-        self._login()
-
-        data = self._make_altered_data(video=self.video, language_code='en', subs_filename='subs-last-unsynced.srt')
-
-        response = self.client.post(reverse('videos:upload_subtitles'), data)
-        self.assertEqual(response.status_code, 200)
-
-        language = self.video.subtitle_language('en')
-        subs = language.latest_version().subtitles()
-        self.assertEquals(7.071, subs[2].start_time)
-
-        request = RequestMockup(NotAuthenticatedUser())
-        rpc = Rpc()
-        subs = rpc.fetch_subtitles(request, self.video.video_id, language.pk)
-        last_sub = subs['subtitles'][2]
-        self.assertEquals(7.071, last_sub['start_time'])
-        self.assertEquals(-1, last_sub['end_time'])
 
