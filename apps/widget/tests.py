@@ -617,50 +617,36 @@ class TestRpc(TestCase):
         request = RequestMockup(self.user_0)
         session = create_two_sub_dependent_session(request)
 
-        language = models.SubtitleLanguage.objects.get(pk=session.language.pk)
+        language = sub_models.SubtitleLanguage.objects.get(pk=session.language.pk)
         self.assertEquals(False, language.is_forked)
-        self.assertEquals(False, language.latest_version().is_forked)
 
         # open translation dialog
-        response = rpc.start_editing(
-            request, session.video.video_id, 'es',
-            subtitle_language_pk=language.pk,
-            base_language_pk=session.video.subtitle_language().pk)
+        base_language_pk = session.video.subtitle_language('en').language_code
+        response = rpc.start_editing(request, session.video.video_id, 'es',
+                                     subtitle_language_pk=language.pk,
+                                     base_language_code=base_language_pk)
+
         session_pk = response['session_pk']
 
-        # fork mid-edit
-        subtitles = [{'subtitle_id': u'a',
-                 'text': 'uno',
-                 'start_time': 1300,
-                 'end_time': 2400,
-                 'sub_order': 1.0},
-                {'subtitle_id': u'b',
-                 'text': 'dos',
-                 'start_time': 6400,
-                 'end_time': 8800,
-                 'sub_order': 2.0}]
+        subtitles = create_subtitle_set(3).to_xml()
 
         # save as forked.
-        rpc.finished_subtitles(
-            request,
-            session_pk,
-            subtitles=subtitles,
-            forked=True)
+        rpc.finished_subtitles(request, session_pk, subtitles=subtitles, forked=True)
 
         # assert models are in correct state
         video = models.Video.objects.get(id=session.video.id)
-        self.assertEquals(2, video.subtitlelanguage_set.count())
+        self.assertEquals(2, video.newsubtitlelanguage_set.count())
+
         es = video.subtitle_language('es')
+
         self.assertEquals(True, es.is_forked)
-        self.assertEquals(2, es.subtitleversion_set.count())
-        first = es.version(0)
-        self.assertEquals(False, first.is_forked)
-        self.assertEquals(True, es.latest_version().is_forked)
-        subtitles = es.latest_version().subtitles()
-        self.assertEquals(1300, subtitles[0].start_time)
-        self.assertEquals(2400, subtitles[0].end_time)
-        self.assertEquals(6400, subtitles[1].start_time)
-        self.assertEquals(8800, subtitles[1].end_time)
+        self.assertEquals(3, es.subtitleversion_set.count())
+
+        subtitles = es.get_tip().get_subtitles()
+        self.assertEquals(0, subtitles[0].start_time)
+        self.assertEquals(1000, subtitles[0].end_time)
+        self.assertEquals(1000, subtitles[1].start_time)
+        self.assertEquals(2000, subtitles[1].end_time)
 
     def test_change_original_language_legal(self):
         request = RequestMockup(self.user_0)
