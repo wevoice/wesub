@@ -997,6 +997,21 @@ class TestRpc(TestCase):
         rpc.finished_subtitles(request, session_pk, new_subs)
         return Video.objects.get(pk=session.video.pk)
 
+    def test_edit_cicle_creates_only_one_version(self):
+        '''
+        After starting and finishing a subtitling session we should
+        end up with one additional subtitle version, no more, no less.
+        '''
+        request = RequestMockup(self.user_1, "b")
+        initial_count = sub_models.SubtitleVersion.objects.count()
+        return_value = rpc.show_widget(request, VIDEO_URL,
+            False, base_state={})
+        video_id = return_value['video_id']
+        response = rpc.start_editing(request, video_id, 'en', original_language_code='en')
+        session_pk = response['session_pk']
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
+        self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count +1)
+
 def create_two_sub_session(request, completed=None):
     return_value = rpc.show_widget(request, VIDEO_URL, False)
 
