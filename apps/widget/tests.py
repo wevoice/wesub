@@ -994,6 +994,7 @@ class TestRpc(TestCase):
             False, base_state={})
         video_id = return_value['video_id']
         response = rpc.start_editing(request, video_id, 'en', original_language_code='en')
+        self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count )
         session_pk = response['session_pk']
         rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count +1)
