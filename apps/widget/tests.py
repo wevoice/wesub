@@ -572,9 +572,12 @@ class TestRpc(TestCase):
     def test_fork_then_edit(self):
         request = RequestMockup(self.user_0)
         video = self._create_two_sub_forked_subs(request)
-        version = video.subtitle_language('es').version()
-        self.assertTrue(version.text_change > 0 and version.text_change <= 1)
-        self.assertTrue(version.time_change > 0 and version.time_change <= 1)
+        version = video.subtitle_language('es').get_tip()
+
+        time_change, text_change = version.get_changes()
+
+        self.assertTrue(text_change > 0 and text_change <= 1)
+        self.assertTrue(time_change > 0 and time_change <= 1)
 
     def test_fork(self):
         request = RequestMockup(self.user_0)
@@ -969,18 +972,14 @@ class TestRpc(TestCase):
         response = rpc.start_editing(
             request, session.video.video_id, 'es',
             subtitle_language_pk=session.video.subtitle_language('es').pk)
+
         session_pk = response['session_pk']
-        new_subs = [{'subtitle_id': 'a',
-                     'text': 'a_esd',
-                     'start_time': 2300,
-                     'end_time': 3200,
-                     'sub_order': 1.0},
-                    {'subtitle_id': 'b',
-                     'text': 'b_es',
-                     'start_time': 3400,
-                     'end_time': 5800,
-                     'sub_order': 2.0}]
-        rpc.finished_subtitles(request, session_pk, new_subs)
+
+        subtitle_set = SubtitleSet('es')
+        subtitle_set.append_subtitle(500, 1500, 'hey')
+        subtitle_set.append_subtitle(1600, 2500, 'you')
+
+        rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml())
         return Video.objects.get(pk=session.video.pk)
 
 def create_two_sub_session(request, completed=None):
