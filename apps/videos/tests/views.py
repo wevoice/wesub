@@ -275,9 +275,9 @@ class TestViews(WebUseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
 
-        mail.outbox = []
-        data['link'] = 'http://someurl.com'
         self._login()
+        data['link'] = 'http://someurl.com'
+        mail.outbox = []
         response = self.client.post(reverse('videos:email_friend'), data)
         self.assertEqual(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
