@@ -763,85 +763,52 @@ class TestRpc(TestCase):
         video = models.Video.objects.get(id=session.video.id)
         self.assertEqual(50, video.subtitle_language('fr').percent_done)
 
-    def test_create_translation_dependent_on_forked(self):
+    def test_fork_translation_dependent_on_forked(self):
         request = RequestMockup(self.user_0)
         video = self._create_two_sub_forked_subs(request)
 
-        # create a dependent french translation fr
-        response = rpc.start_editing(
-            request, video.video_id, 'fr',
-            base_language_pk=video.subtitle_language('es').pk)
+        response = rpc.start_editing(request, video.video_id, 'fr', base_language_code='es')
         session_pk = response['session_pk']
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set(2).to_xml())
 
-        inserted = [{'subtitle_id': 'a', 'text':'frenchtext'}]
+        fr_sl = models.Video.objects.get(video_id=video.video_id).subtitle_language('fr')
+        self.assertEquals(False, fr_sl.is_forked)
 
-        rpc.finished_subtitles(request, session_pk, inserted)
-        translated_lang =  video.subtitlelanguage_set.get(language='fr')
-        # french translation should start 50%
-        self.assertEqual(translated_lang.percent_done, 50)
-
-        response = rpc.start_editing(
-            request, video.video_id, 'es',
-            subtitle_language_pk=video.subtitle_language('es').pk)
-        session_pk = response['session_pk']
-
-        # add a subtitle to the spanish one
-        new_subs = [{'subtitle_id': 'a',
-                     'text': 'a_esd',
-                     'start_time': 2300,
-                     'end_time': 3200,
-                     'sub_order': 1.0},
-                    {'subtitle_id': 'b',
-                     'text': 'b_es',
-                     'start_time': 3400,
-                     'end_time': 5800,
-                     'sub_order': 2.0},
-                    {'subtitle_id': 'e',
-                      'text': 'd_es',
-                     'start_time': 4300,
-                     'end_time': 5200,
-                     'sub_order': 1.0}]
-
-        rpc.finished_subtitles(request, session_pk, new_subs)
-
-        # now check that french has 33% complete
-        translated_lang = video.subtitlelanguage_set.get(language='fr')
-        percent_done = translated_lang.percent_done
-
-        self.assertEqual(percent_done, 33)
-
-    def test_fork_translation_dependent_on_forked(self):
-        request = RequestMockup(self.user_0)
-        # first create french translation dependent on forked spanish
-        self.test_create_translation_dependent_on_forked()
         # now fork french
         return_value = rpc.show_widget(request, VIDEO_URL, False)
         video_id = return_value['video_id']
         fr_sl = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
-        response = rpc.start_editing(
-            request, video_id, 'fr', subtitle_language_pk=fr_sl.pk)
-        subtitles = response['subtitles']['subtitles']
-        self.assertEquals(1, len(subtitles))
-        self.assertEquals('frenchtext', subtitles[0]['text'])
-        self.assertEquals(2300, subtitles[0]['start_time'])
-        self.assertEquals(3200, subtitles[0]['end_time'])
+        response = rpc.start_editing(request, video_id, 'fr', subtitle_language_pk=fr_sl.pk)
+
+        subtitles = SubtitleSet('fr', response['subtitles']['subtitles'])
+
+        self.assertEquals(3, len(subtitles))
+        self.assertEquals('hey you 0', subtitles[0].text)
+        self.assertEquals(0, subtitles[0].start_time)
+        self.assertEquals(1000, subtitles[0].end_time)
 
         # update the timing on the French sub.
         session_pk = response['session_pk']
-        updated = [{'subtitle_id': subtitles[0]['subtitle_id'],
-                     'text': 'a_french_edited',
-                     'start_time': 2350,
-                     'end_time': 3200,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, updated)
+        updated = SubtitleSet('fr')
+
+        updated.append_subtitle(1020, 1500, 'hey 0')
+        updated.append_subtitle(2500, 3500, 'hey 1')
+
+        rpc.finished_subtitles(request, session_pk, updated.to_xml())
 
         french_lang = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
+        fr_version = french_lang.get_tip()
+        fr_version_subtitles = fr_version.get_subtitles()
+
         self.assertEquals(True, french_lang.is_forked)
-        self.assertEquals(2350, french_lang.latest_version().subtitles()[0].start_time)
+        self.assertEquals(1020, fr_version_subtitles[0].start_time)
 
         spanish_lang = models.Video.objects.get(video_id=video_id).subtitle_language('es')
+        es_version = spanish_lang.get_tip()
+        es_version_subtitles = es_version.get_subtitles()
+
         self.assertEquals(True, spanish_lang.is_forked)
-        self.assertEquals(2300, spanish_lang.latest_version().subtitles()[0].start_time)
+        self.assertEquals(500, es_version_subtitles[0].start_time)
 
     def test_two_subtitle_langs_can_exist(self):
         request = RequestMockup(self.user_0)
