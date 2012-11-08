@@ -27,6 +27,7 @@ from django.test import TestCase
 from apps.auth.models import CustomUser as User
 from apps.subtitles.pipeline import add_subtitles
 from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
+from apps.videos.tests.data import get_user
 
 
 math_captcha.forms.math_clean = lambda form: None
@@ -99,6 +100,6 @@ class WebUseTest(TestCase):
         if user:
             self.client.login(username=user.username, password='password')
         else:
-            self.client.login(**self.auth)
+            self._login(get_user(200))
 
 
