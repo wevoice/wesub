@@ -724,7 +724,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed, session):
+    def _update_language_attributes_for_save(self, language, completed, session, forked):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -741,7 +741,7 @@ class Rpc(BaseRpc):
         # but this is cool for now because all those languages should
         # be shown on the transcribe dialog. if there's a base language,
         # that means we should always show the translate dialog.
-        language.is_forked = session.base_language is None
+        language.is_forked = forked or session.base_language is None
 
         language.save()
 
@@ -763,7 +763,7 @@ class Rpc(BaseRpc):
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed, session)
+        self._update_language_attributes_for_save(language, completed, session, forked)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
