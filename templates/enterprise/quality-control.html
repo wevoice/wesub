@@ -1,0 +1,26 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+    <h2>{% trans 'Quality Control' %}</h2>
+
+    <img src="{{ STATIC_URL }}images/enterprise/qc.png" alt="Quality control" class="screen"/>
+
+    <p>{% blocktrans %}
+        Amara’s Flexible Workflows offer several ways to ensure outstanding quality for your subtitles.  Whether you use internal staff, outside contractors, professional services, or a volunteer community—you’ll be able to create, review, and approve workflows that meet your needs.
+    {% endblocktrans %}</p>
+
+    <p>{% trans 'Examples of QC processes:' %}</p>
+    <ul>
+        <li>{% blocktrans %}
+            Have your contractors work inside your Amara account and then require staff review before subtitles go live.
+        {% endblocktrans %}</li>
+        <li>{% blocktrans %}
+            Some universities use paid captioning services to quickly caption lecture videos and then invite experts in the university community to fix any mistakes with proper names or technical terms.
+        {% endblocktrans %}</li>
+        <li>{% blocktrans %}
+            Volunteer teams can self-manage and reach very high quality by requiring peer review of subtitles before they are published.  More senior members of the community can be promoted to a moderator role.
+        {% endblocktrans %}</li>
+    </ul>
+{% endblock %}

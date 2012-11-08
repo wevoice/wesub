@@ -16,10 +16,12 @@
     <script type="text/javascript">
         window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
         window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
+        window.REQUEST_GET_PROJECT = '{{ request.GET.project }}';
         window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
         window.ASSIGNEE = '{% firstof request.user.id -1 %}';
         window.TEAM_SLUG = '{{ team.slug }}';
         window.USER_LANGS = {{ user.get_languages.count }};
+        window.REQUEST_TEAM_VIDEO = '{{ request.GET.team_video }}';
     </script>
 {% endblock %}
 
