@@ -16,12 +16,13 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var DFXP = function(DFXP) {
+var AmaraDFXPParser = function(AmaraDFXPParser) {
     /*
      * A utility for working with DFXP subs.
      */
 
     var that = this;
+    var $ = window.jQuery.noConflict();
 
     this.init = function(xml) {
 
@@ -288,6 +289,9 @@ var DFXP = function(DFXP) {
         // Otherwise, we're good.
         return false;
     };
+    this.originalXmlToString = function() {
+        return this.utils.xmlToString(this.$originalXml.get(0));
+    };
     this.removeSubtitle = function(indexOrElement) {
         /*
          * Given the zero-index of the subtitle to be removed,
@@ -326,20 +330,7 @@ var DFXP = function(DFXP) {
 
         return this.getSubtitles().length;
     };
+    this.xmlToString = function() {
+        return this.utils.xmlToString(this.$xml.get(0));
+    };
 };
-
-$(function() {
-    $.ajax({
-        type: 'get',
-        url: '/site_media/src/js/dfxp/sample.dfxp.xml',
-        dataType: 'xml',
-        success: function(resp) {
-            window.unisubs = window.unisubs || [];
-            window.unisubs.DFXP = DFXP;
-
-            // Create an instance of the DFXP wrapper with this XML.
-            window.x = new window.unisubs.DFXP();
-            window.x.init(resp);
-        }
-    });
-});

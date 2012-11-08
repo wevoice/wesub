@@ -1,0 +1,23 @@
+{% extends 'enterprise/base.html' %}
+
+{% load i18n teams_tags %}
+
+{% block view_content %}
+    <h2>{% trans 'Film and Television' %}</h2>
+    <div class="screen">
+        <a href="http://eepurl.com/n24oH">
+          <img src="{{ STATIC_URL }}images/partners/netflix.png" alt="Netflix" />
+        </a>
+        <a href="http://www.universalsubtitles.org/en/teams/newshour">
+            <img src="{{ STATIC_URL }}images/partners/new_partner_pbs.png" alt="PBS" />
+        </a>
+    </div>
+    <p>{% blocktrans %}
+        Producers, publishers, and distributors of film and television use Amara to make captioning and translation simpler and less expensive. Amara makes it possible to caption and translate for global viewing audiences much more cost effectively than traditional approaches.
+    {% endblocktrans %}</p>
+    <p>
+        {% blocktrans %}
+            Easily manage workflows between distributed teams, whether they are staff, contractors, or viewers.  Publish completed subtitles directly through the Amara API.
+        {% endblocktrans %}
+    </p>
+{% endblock %}

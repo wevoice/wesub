@@ -157,14 +157,22 @@ class BaseNotification(object):
             data['application_id'] = self.application_pk
         if self.language_code:
             data.update({"language_code":self.language_code} )
+        data_sent = data
         data = urlencode(data)
         url = "%s?%s"  % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data)
             success =  200<= resp.status <400
             if success is False:
-                logger.error("Failed to send team notification to %s - from teams:%s, status code:%s, response:%s" %(
-                         self.team or self.partner, url, resp, content ))
+                logger.error("Failed to notify team %s " %( self.team),
+                     extra={
+                        'team': self.team or self.partner,
+                        'url': url,
+                        'response': resp,
+                        'content': content,
+                        'data_sent':data_sent,
+                    })
+
                 Meter('http-callback-notification-error').inc()
             else:
                 Meter('http-callback-notification-success').inc()

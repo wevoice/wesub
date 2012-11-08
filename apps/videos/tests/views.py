@@ -28,7 +28,7 @@ from vidscraper.sites import blip
 from apps.auth.models import CustomUser as User
 from apps.videos.share_utils import _make_email_url
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.utils import WebUseTest
+from apps.videos.tests.utils import WebUseTest, create_langs_and_versions
 from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
@@ -38,7 +38,7 @@ from apps.widget.tests import create_two_sub_session, RequestMockup
 
 
 class TestViews(WebUseTest):
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self._make_objects("iGzkk7nwWX8F")
@@ -354,9 +354,20 @@ class TestViews(WebUseTest):
 
     def test_diffing(self):
         version = self.video.version(version_number=1)
+        create_langs_and_versions(self.video, [version.language_code])
         last_version = self.video.version()
+        self.assertNotEqual(version.id, last_version.id)
+
+        subtitles = version.get_subtitles()
+
+        for x in xrange(1, 6):
+            subtitles.append_subtitle(x * 1000, x * 2000, "%x -> :D" % x)
+
+        last_version.set_subtitles(subtitles)
+        last_version.save()
+
         response = self._simple_test('videos:diffing', [version.id, last_version.id])
-        self.assertEqual(len(response.context['captions']), 5)
+        self.assertEqual(len(response.context['captions']), 81)
 
     def test_test_form_page(self):
         self._simple_test('videos:test_form_page')

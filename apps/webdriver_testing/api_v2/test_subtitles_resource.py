@@ -12,8 +12,9 @@ from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import TaskFactory
 from apps.webdriver_testing.editor_pages import subtitle_editor 
 
-class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
+class TestCaseSubtitlesUpload(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
+
     """
     
     def setUp(self):
@@ -50,6 +51,7 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, 
             create_url, 
             create_data)
+
         #Upload the subtitles via api request
         upload_url = ('videos/{0}/languages/{1}/subtitles/'.format(
             self.test_video.video_id, test_lang_code))
@@ -69,8 +71,6 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, 
             upload_url, 
             upload_data)
-        print '####'
-        print status, response
         self.assertNotEqual(500, status)
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
             test_lang_code)
@@ -180,6 +180,7 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
         sub_editor = subtitle_editor.SubtitleEditor(self)
         sub_editor.continue_past_help()
         editor_sub_list = subtitle_editor.subtitles_list()
+
         #Verify uploaded subs are displayed in the Editor
         self.assertEqual(expected_list, editor_sub_list)
         typed_subs = sub_editor.type_subs()
@@ -187,14 +188,17 @@ class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
         self.video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         displayed_list = self.video_language_pg.displayed_lines()
+
         #Verify the edited text is in the sub list
         self.assertIn("I'd like to be under the sea", displayed_list)
+
         #Verify the origal unedited text is still present in the sub list.
         self.assertIn(expected_list[9], displayed_list)
 
 
-class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
+class TestCaseSubtitlesFetch(WebdriverTestCase):
     """TestSuite for fetching subtitle information via the api.
+
     """
     
     def setUp(self):
@@ -220,12 +224,14 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         subtitle_lang = self.test_video.subtitle_language(lang_code)
         print subtitle_lang
 
-        url_part = 'videos/{0}/languages/{1}/'.format(video_id, lang_code)
+        url_part = 'videos/{0}/languages/{1}/'.format(
+            video_id, lang_code)
+
         status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
         self.assertNotEqual(404, status)
+        
         print response
-        self.assertEqual(lang_code, response['versions'][-1][lang_code])
+        self.assertEqual(lang_code, response['language_code'])
 
 
     def test_fetch__rst(self):
@@ -253,9 +259,11 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         """
         video_id = self.test_video.video_id
         lang_code = 'en'
+        lang = self.test_video.subtitle_language(language_code=lang_code)
+        self.assertTrue(lang is not None)
         output_format = 'srt'
 
-        url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
@@ -273,7 +281,7 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         lang_code = 'en'
         output_format = 'ttml'
 
-        url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
@@ -290,7 +298,7 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         lang_code = 'en'
         output_format = 'sbv'
 
-        url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
@@ -322,8 +330,11 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
             'is_complete': True
             }
         data_helpers.create_video_with_subs(self, url, data)
-        url_part = 'videos/{0}/languages/{1}/?format={2}&version={3}'.format(
-            video_id, lang_code, output_format, version)
+        url_part = ('videos/{0}/languages/{1}/subtitles/?format={2}'
+                    '&version={3}'.format(video_id, 
+					  lang_code, 
+                                          output_format, 
+                                          version))
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
         self.assertNotEqual(404, status)
@@ -339,8 +350,9 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         video_id = self.test_video.video_id
         lang_code = 'en'
         output_format = 'srt'
-        ## self.team_video already has a set of subtitles.
-        ## Create a team with moderation settings
+
+        # self.team_video already has a set of subtitles.
+        # Create a team with moderation settings
         my_team = TeamMemberFactory.create(
             team__name='Video Test',
             team__slug='video-test',
@@ -348,11 +360,13 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
             team__is_moderated = True,
             team__workflow_enabled = True,
             ).team
-        ## Set the team workflow to peer review required.
+        
+        # Set the team workflow to peer review required.
         workflow = WorkflowFactory(team = my_team)
         workflow.review_allowed = 10
         workflow.save()
-        ##  Add test_video to the team and create a transcription task.
+
+        #  Add test_video to the team and create a transcription task.
         tv = TeamVideoFactory.create(
             team=my_team, 
             video=self.test_video, 
@@ -360,6 +374,7 @@ class WebdriverTestCaseSubtitlesFetch(WebdriverTestCase):
         subtitle_lang = self.test_video.subtitle_language(lang_code)
         task = TaskFactory(type = 10, team = my_team, team_video = tv, 
             language = lang_code)
+
         #FIXME Perform the task so there is a new set of complete subs that
         # are unreviewd.
         # Probably easiest to upload a draft, then review it.

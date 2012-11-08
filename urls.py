@@ -155,35 +155,52 @@ urlpatterns = patterns('',
         app_name='profiles')),
     url(r'auth/', include('auth.urls', namespace='auth', app_name='auth')),
     url(r'auth/', include('thirdpartyaccounts.urls', namespace='thirdpartyaccounts', app_name='thirdpartyaccounts')),
+    ## Enterprise pages
+    url(r'^enterprise/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/index.html', 'selected': 'index'}, 'enterprise_page'),
+    url(r'^enterprise/global-reach/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/global-reach.html'}, 'enterprise_global_reach'),
+    url(r'^enterprise/quality-control/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/quality-control.html'}, 'enterprise_quality_control'),
+    url(r'^enterprise/automated-workflows/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/automated-workflows.html'}, 'enterprise_automated_workflows'),
+    url(r'^enterprise/subtitle-management/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/subtitle-management.html'}, 'enterprise_subtitle_management'),
+    url(r'^enterprise/advanced-security/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/advanced-security.html'}, 'enterprise_advanced_security'),
+    url(r'^enterprise/api-integration/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/api-integration.html'}, 'enterprise_api_integration'),
+    url(r'^enterprise/transcript-viewer/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/transcript-viewer.html'}, 'enterprise_transcript_viewer'),
+    url(r'^enterprise/companies/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/companies.html'}, 'enterprise_companies'),
+    url(r'^enterprise/education/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/education.html'}, 'enterprise_education'),
+    url(r'^enterprise/publishers/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/publishers.html'}, 'enterprise_publishers'),
+    url(r'^enterprise/government/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/government.html'}, 'enterprise_government'),
+    url(r'^enterprise/film-tv/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/film-tv.html'}, 'enterprise_film_tv'),
+    url(r'^enterprise/non-profits/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise/non-profits.html'}, 'enterprise_non_profits'),
 )
 
-try:
+if settings.USE_INTEGRATION:
     from services import urls
     urlpatterns += patterns('',
         (r'^unisubservices/', include('services.urls', namespace='services')),
     )
-except ImportError:
-    pass
 
-try:
     from servicesauth import urls
     urlpatterns += patterns('', (r'^unisubservicesauth/',
         include('servicesauth.urls', namespace='servicesauth')),)
-except ImportError:
-    pass
-
-try:
     from api import urls
     urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
-except ImportError:
-    pass
 
-try:
     from apiv2 import urls as api2urls
     urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
         namespace=api2urls.URL_NAMESPACE),),)
-except ImportError:
-    pass
 
 if settings.DEBUG:
     urlpatterns += patterns('',

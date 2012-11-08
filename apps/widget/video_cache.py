@@ -201,7 +201,7 @@ def get_subtitles_dict(video_id, language_pk, version_number,
         video.update_subtitles_fetched(language)
 
         if language:
-            version = language.version(version_number=version_number, public=not is_remote)
+            version = language.version(version_number=version_number, public_only=not is_remote)
 
             if version:
                 cached_value = subtitles_dict_fn(version)

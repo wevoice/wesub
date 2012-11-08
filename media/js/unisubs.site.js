@@ -165,18 +165,25 @@ var Site = function(Site) {
             $select.trigger('liszt:updated');
         },
         defaultProjFilterOption: function() {
-             /*
-              * Get the project filter option object to use if no project is
-              * specificied in the GET params.
-              */
-              if (window.TEAM_SLUG == 'ted') {
-                // Need to special case for TED
-                $opt = $('option[id="project-opt-tedtalks"]');
-                if($opt.length > 0) {
+            /*
+             * Get the project filter option object to use if no project is
+             * specificied in the GET params.
+             */
+            if (window.TEAM_SLUG == 'ted') {
+                // If this is a video's task listing, select the 'any project'
+                // option.
+                if (window.REQUEST_TEAM_VIDEO && window.REQUEST_TEAM_VIDEO !==  '') {
+                    return $('option[id="project-opt-any"]');
+                
+                // Otherwise, select the TEDTalks project.
+                } else {
+                    $opt = $('option[id="project-opt-tedtalks"]');
+                    if ($opt.length > 0) {
                         return $opt;
+                    }
                 }
-              }
-              return $('option[id="project-opt-any"]');
+            }
+            return $('option[id="project-opt-any"]');
         },
         resetProjFilter: function($select) {
             if (typeof $select == 'undefined') {
@@ -924,36 +931,6 @@ var Site = function(Site) {
 
                 return terms;
             });
-        },
-
-        enterprise: function() {
-            $('.alpha li a').click(function(e) {
-                var tab = $(this).attr('href');
-
-                history.pushState(null, '', tab)
-                changeTab(tab);
-
-                $(this).parents('.menu').find('a').removeClass('active');
-                $(this).addClass('active');
-                
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-                return false;
-            });
-            $(window).bind('popstate', function() {
-                var path = location.pathname;
-                tab = path.substr(path.lastIndexOf('/') + 1);
-
-                changeTab(tab);
-            })
-
-            var changeTab = function(tab) {
-                $('.tab-content > li').hide();
-                if(tab.indexOf("/") != -1 || tab == '') {
-                    $('.tab-content > li:first-child').show();
-                } else {
-                    $('#' + tab).show();
-                }
-            }
         },
 
         login: function() {

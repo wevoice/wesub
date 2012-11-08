@@ -3,10 +3,22 @@
     <head>
         <title>DFXP Wrapper Test</title>
         <meta charset="utf-8" />
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+        <script src="/site_media/src/js/third-party/jquery-1.8.2.min.js"></script>
         <script type="text/javascript" src="/site_media/src/js/dfxp/dfxp.js" charset="utf-8"></script>
     </head>
     <body>
-        You probably want to open the console.
+        <script type="text/javascript" charset="utf-8">
+            $(function() {
+                $.ajax({
+                    type: 'get',
+                    url: '/site_media/src/js/dfxp/sample.dfxp.xml',
+                    dataType: 'xml',
+                    success: function(resp) {
+                        x = new AmaraDFXPParser();
+                        x.init(resp);
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
