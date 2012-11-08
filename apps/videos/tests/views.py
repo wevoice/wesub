@@ -18,6 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
+import json
 
 from django.core import mail
 from django.core.cache import cache
@@ -59,7 +60,7 @@ class TestViews(WebUseTest):
         }
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('errors', json.loads(response.content))
         vid_url = 'http://www.youtube.com/watch?v=rKnDgT73v8s'
         # test make primary
         vu = VideoUrl.objects.filter(video=v)
@@ -75,9 +76,8 @@ class TestViews(WebUseTest):
         self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
 
     def test_video_url_make_primary_team_video(self):
-        self._login()
         v = Video.objects.get(video_id='KKQS8EDG1P4')
-        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        self.assertNotEqual(VideoUrl.objects.filter(video=v).count(), 0)
         # add another url
         secondary_url = 'http://www.youtube.com/watch?v=tKTZoB2Vjuk'
         data = {
@@ -86,10 +86,15 @@ class TestViews(WebUseTest):
         }
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
+        # before logging in, this should not work
+        self.assertEqual(302, response.status_code)
+        self.client.login(**self.auth)
+        response = self.client.post(url, data)
+        self.assertNotIn('errors', json.loads(response.content))
         vid_url = 'http://www.youtube.com/watch?v=KKQS8EDG1P4'
         # test make primary
         vu = VideoUrl.objects.filter(video=v)
+        self.assertTrue(vu.count() > 1)
         vu[0].make_primary()
         self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
         # check for activity
