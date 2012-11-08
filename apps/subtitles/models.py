@@ -1077,10 +1077,18 @@ class SubtitleVersion(models.Model):
         return len([s for s in self.get_subtitles().subtitle_items()])
 
     def get_changes(self):
-        """
-        Return ``(time_change, text_change)``
-        """
+        """Return (time_change, text_change).
 
+        Beware.
+
+        This was ported over from the old data model as a hack.  There are
+        probably lots of cases where it doesn't work right.
+
+        What we *really* need to do is sit down and come up with a scheme for
+        diffing subtitle versions meaningfully.  Until then, we have this
+        monstrosity.  Godspeed.
+
+        """
         # TODO: Time only changes aren't quite right.
 
         if hasattr(self, '_time_change') and hasattr(self, '_text_change'):
@@ -1093,6 +1101,14 @@ class SubtitleVersion(models.Model):
 
         subtitles = [s for s in self.get_subtitles().subtitle_items()]
         last_subtitles = [s for s in parent.get_subtitles().subtitle_items()]
+
+        if not subtitles or not last_subtitles:
+            if subtitles or last_subtitles:
+                # If one version is empty but the other isn't: 100%.
+                return (1.0, 1.0)
+            else:
+                # If both versions are empty: 100%.
+                return (0.0, 0.0)
 
         sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
                                 for s in subtitles])
