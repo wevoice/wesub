@@ -816,32 +816,30 @@ class TestRpc(TestCase):
 
         # create es dependent on en
         session = self._create_basic_dependent_version(request)
+        video = models.Video.objects.get(id=session.video.id)
 
         # create forked fr translations
-        response = rpc.start_editing(
-            request, session.video.video_id, 'fr')
+        response = rpc.start_editing(request, session.video.video_id, 'fr')
         session_pk = response['session_pk']
-        inserted = [{'subtitle_id': 'a',
-                     'text': 'a_fr',
-                     'start_time': 1300,
-                     'end_time': 2500,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, inserted)
 
-        sub_langs = models.Video.objects.get(id=session.video.id).subtitlelanguage_set.filter(language='fr')
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
 
         # now someone tries to edit es based on fr.
+        response = rpc.start_editing(request, session.video.video_id, 'es', base_language_code='fr')
 
-        response = rpc.start_editing(
-            request, session.video.video_id, 'es',
-            base_language_pk=sub_langs[0].pk)
         session_pk = response['session_pk']
-        inserted = [{'subtitle_id': 'a', 'text': 'a_es'}]
-        rpc.finished_subtitles(request, session_pk, inserted)
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set(3).to_xml())
 
-        # now we should have two SubtitleLanguages for es
-        sub_langs = models.Video.objects.get(id=session.video.id).subtitlelanguage_set.filter(language='es')
-        self.assertEquals(2, sub_langs.count())
+        sub_langs = video.newsubtitlelanguage_set.filter(language_code='es')
+        self.assertEquals(1, sub_langs.count())
+
+        # but wait, now the latest es version has fr on it's lineage.
+        es_subtitle_language = sub_langs[0]
+        version = es_subtitle_language.get_tip()
+
+        self.assertTrue('fr' in version.get_lineage())
+        self.assertTrue('es' in version.get_lineage())
+        self.assertTrue('en' in version.get_lineage())
 
     def test_edit_zero_translation(self):
         request = RequestMockup(self.user_0)
@@ -928,10 +926,10 @@ class TestRpc(TestCase):
     def _create_basic_dependent_version(self, request):
         session = self._create_basic_version(request)
         sl = session.language
-        response = rpc.start_editing(
-            request, sl.video.video_id, 'es', base_language_code=sl.language_code)
+        response = rpc.start_editing(request, sl.video.video_id, 'es', base_language_code=sl.language_code)
         session_pk = response['session_pk']
         rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
+
         return SubtitlingSession.objects.get(pk=session_pk)
 
     def _create_two_sub_forked_subs(self, request):
