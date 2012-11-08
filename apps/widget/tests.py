@@ -246,7 +246,7 @@ class TestRpc(TestCase):
         video = Video.objects.get(pk=session.video.pk)
         language = video.subtitle_language('en')
 
-        self.assertEqual(3, language.subtitleversion_set.count())
+        self.assertEqual(2, language.subtitleversion_set.count())
 
         version = language.get_tip()
         time_change, text_change = version.get_changes()
