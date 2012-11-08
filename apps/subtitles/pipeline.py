@@ -293,6 +293,13 @@ def _update_video_title(subtitle_language, version):
             version.video.title = version.title
             version.video.save()
 
+def _fork_dependents(subtitle_language):
+    dependents = [sl.id for sl in
+                  subtitle_language.get_dependent_subtitle_languages()]
+
+    if dependents:
+        SubtitleLanguage.objects.filter(id__in=dependents).update(is_forked=True)
+
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
 
@@ -367,9 +374,10 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     return version
 
 def _rollback_to(video, language_code, version_number, rollback_author):
-    target = SubtitleVersion.objects.get(video=video,
-                                         language_code=language_code,
-                                         version_number=version_number)
+    sl = SubtitleLanguage.objects.get(video=video, language_code=language_code)
+
+    current = sl.get_tip()
+    target = sl.subtitleversion_set.get(version_number=version_number)
 
     # The new version is mostly a copy of the target.
     data = {
@@ -399,7 +407,15 @@ def _rollback_to(video, language_code, version_number, rollback_author):
     # Finally, rollback versions have a special attribute to track them.
     data['rollback_of_version_number'] = version_number
 
-    return _add_subtitles(**data)
+    version = _add_subtitles(**data)
+
+    # Rolling back to a version with a different number of subtitles needs to
+    # fork the dependent translations.  For now.  Once the new UI is in place
+    # this horrible "forking" crap is going away entirely.
+    if current.subtitle_count != target.subtitle_count:
+        _fork_dependents(version.subtitle_language)
+
+    return version
 
 
 # Public API ------------------------------------------------------------------

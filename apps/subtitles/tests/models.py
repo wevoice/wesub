@@ -103,15 +103,25 @@ class TestSubtitleLanguage(TestCase):
         self.assertFalse(fr.is_primary_audio_language())
 
     def test_get_translation_source(self):
+        # Try a language with no versions.
         source_lang = make_sl(self.video, 'en')
-        # works for a language with no version
-        self.assertEqual(source_lang.get_translation_source_language(), None)
-        source_v1 = source_lang.add_version()
-        # non translated language with version
+        self.assertIsNone(source_lang.get_translation_source_language())
+
+        # Try a non translated language with one version.
+        source_lang.add_version()
         source_lang = refresh(source_lang)
-        self.assertEqual(source_lang.get_translation_source_language(), None)
+        self.assertIsNone(source_lang.get_translation_source_language())
+
+        # Try a non translated language with two versions.  This is different
+        # because the lineage map now contains a reference to itself instead of
+        # simply being empty.  It still should not be a translation though.
+        sv = source_lang.add_version()
+        source_lang = refresh(source_lang)
+        self.assertIsNone(source_lang.get_translation_source_language())
+
+        # Try a translation.
         translated = make_sl(self.video, 'fr')
-        translated.add_version(parents=[source_v1])
+        translated.add_version(parents=[sv])
         translated = refresh(translated)
         self.assertEqual(translated.get_translation_source_language(), source_lang)
         self.assertEqual(translated.get_translation_source_language_code(), source_lang.language_code)

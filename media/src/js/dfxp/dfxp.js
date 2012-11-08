@@ -289,6 +289,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Otherwise, we're good.
         return false;
     };
+    this.originalXmlToString = function() {
+        return this.utils.xmlToString(this.$originalXml.get(0));
+    };
     this.removeSubtitle = function(indexOrElement) {
         /*
          * Given the zero-index of the subtitle to be removed,
@@ -326,5 +329,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         return this.getSubtitles().length;
+    };
+    this.xmlToString = function() {
+        return this.utils.xmlToString(this.$xml.get(0));
     };
 };
