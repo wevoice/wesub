@@ -363,16 +363,16 @@ class TestRpc(TestCase):
             request_0, video_id, 'en', original_language_code='en')
         session_pk = return_value['session_pk']
         rpc.finished_subtitles(request_0, session_pk, subtitles=create_subtitle_set().to_xml())
+
         # different user opens the dialog for video
         request_1 = RequestMockup(self.user_1, "b")
         return_value = rpc.start_editing(request_1, video_id, 'en')
+
         # make sure we are getting back finished subs.
         self.assertEqual(True, return_value['can_edit'])
         subs = return_value['subtitles']
-        # this was 1 before.
-        # no idea why.
-        # please verify?
-        self.assertEqual(3, subs['version'])
+
+        self.assertEqual(1, subs['version'])
         self.assertEqual(1, len(SubtitleSet('en', subs['subtitles'])))
 
     def test_regain_lock_while_not_authenticated(self):
@@ -475,10 +475,7 @@ class TestRpc(TestCase):
 
         language = video.subtitle_language('es')
 
-        # not sure if 2 is right. we are creating one version on start (if there's none)
-        # and another on finish.
-        # TODO: someone please take a look?
-        self.assertEquals(2, language.subtitleversion_set.count())
+        self.assertEquals(1, language.subtitleversion_set.count())
         self.assertEquals(language.get_translation_source_language_code(), 'en')
 
         version = language.get_tip()
@@ -499,7 +496,7 @@ class TestRpc(TestCase):
 
         language = video.subtitle_language('es')
 
-        self.assertEquals(3, language.subtitleversion_set.count())
+        self.assertEquals(2, language.subtitleversion_set.count())
         self.assertEquals(language.get_translation_source_language_code(), 'en')
 
         version = language.get_tip()
@@ -643,7 +640,7 @@ class TestRpc(TestCase):
         es = video.subtitle_language('es')
 
         self.assertEquals(True, es.is_forked)
-        self.assertEquals(3, es.subtitleversion_set.count())
+        self.assertEquals(2, es.subtitleversion_set.count())
 
         subtitles = es.get_tip().get_subtitles()
         self.assertEquals(0, subtitles[0].start_time)
@@ -707,11 +704,15 @@ class TestRpc(TestCase):
     def test_autoplay_for_non_finished(self):
         request = RequestMockup(self.user_0)
         self._start_editing(request)
+
         # request widget with English subtitles preloaded. The widget
         # expected null subtitles in response when the language only
         # has a draft.
         return_value = rpc.show_widget(request, VIDEO_URL, False, base_state = { 'language': 'en' })
-        self.assertEquals(None, return_value['subtitles'])
+        subtitles = SubtitleSet('en', return_value['subtitles'])
+
+        # this was None before, now it's 0 because we are actually always sending a dfpx file (even if empty).
+        self.assertEquals(len(subtitles), 0)
 
     def test_ensure_language_locked_on_regain_lock(self):
         request = RequestMockup(self.user_0)
@@ -960,7 +961,7 @@ class TestRpc(TestCase):
             False, base_state={})
         video_id = return_value['video_id']
         response = rpc.start_editing(request, video_id, 'en', original_language_code='en')
-        self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count )
+        self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count)
         session_pk = response['session_pk']
         rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         self.assertEqual(sub_models.SubtitleVersion.objects.count(), initial_count +1)
