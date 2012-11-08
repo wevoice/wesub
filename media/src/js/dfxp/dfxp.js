@@ -165,7 +165,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof endTime !== 'undefined') {
-            $subtitle.attr('end', endTime);
+            if (parseFloat(endTime)) {
+                $subtitle.attr('end', endTime);
+            } else {
+                $subtitle.attr('end', '');
+            }
         }
 
         return $subtitle.attr('end');
@@ -316,7 +320,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof startTime !== 'undefined') {
-            $subtitle.attr('begin', startTime);
+            if (parseFloat(startTime)) {
+                $subtitle.attr('begin', startTime);
+            } else {
+                $subtitle.attr('begin', '');
+            }
         }
 
         return $subtitle.attr('begin');
