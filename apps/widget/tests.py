@@ -443,11 +443,10 @@ class TestRpc(TestCase):
             session_pk,
             subtitles=[])
         video = Video.objects.get(video_id=video_id)
-        language = video.subtitle_language()
+        language = SubtitlingSession.objects.get(pk=session_pk).language
         self.assertEquals(0, language.subtitleversion_set.count())
-        self.assertEquals(None, language.latest_version())
-        self.assertEquals(False, language.had_version)
-        self.assertEquals(False, language.has_version)
+        self.assertEquals(None, language.version())
+        self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=language.pk).exists())
 
     def test_start_translating(self):
         request = RequestMockup(self.user_0)
