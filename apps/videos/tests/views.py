@@ -152,8 +152,10 @@ class TestViews(WebUseTest):
         user = User.objects.exclude(id=self.user.id)[:1].get()
         user.notify_by_email = True
         user.is_active = True
+        user.valid_email = True
         user.save()
         v.followers.add(user)
+        initial_count = len(mail.outbox)
 
         data = {
             'url': u'http://www.youtube.com/watch?v=po0jY4WvCIc&feature=grec_index',
@@ -166,7 +168,7 @@ class TestViews(WebUseTest):
             v.videourl_set.get(videoid='po0jY4WvCIc')
         except ObjectDoesNotExist:
             self.fail()
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), initial_count + len(v.notification_list()))
 
     def test_video_url_remove(self):
         self._login()
