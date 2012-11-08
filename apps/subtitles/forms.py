@@ -99,37 +99,14 @@ class SubtitlesUploadForm(forms.Form):
                 % subtitle_language.get_language_code_display()))
 
     def _verify_no_dependents(self, subtitle_language):
-        # We need to find any languages that are dependent on the given
-        # language.  This is painful in the current model.  Luckily this should
-        # go away once we change the UI.
-
-        # Start with all the subtitle languages for that video.
-        sls = subtitle_language.video.newsubtitlelanguage_set
-
-        # Exclude this version.
-        sls = sls.exclude(id=subtitle_language.id)
-
-        # Now exclude those that are already forked.  They can't be dependents.
-        sls = sls.exclude(is_forked=True)
-
-        # Realize the query to get the list of remaining SubtitleLanguages that
-        # could possibly be dependents.  Hopefully there shouldn't be too many.
-        sls = list(sls)
-
-        # If the subtitle language we're thinking about uploading to appears in
-        # any of the lineage maps of the tips of these remaining languages, it
-        # has dependents and we should fail.
-        for sl in sls:
-            tip = sl.get_tip()
-            if tip and subtitle_language.language_code in tip.lineage:
-                raise forms.ValidationError(_(
-                    u"Sorry, we cannot upload subtitles for this language "
-                    u"because this would fork the %s translation made from it."
-                    % sl.get_language_code_display()
-                ))
-
-        # Otherwise this language has no dependents, so we're all good.
-        return
+        # You cannot upload to a language with dependents.
+        dependents = subtitle_language.get_dependent_subtitle_languages()
+        if dependents:
+            raise forms.ValidationError(_(
+                u"Sorry, we cannot upload subtitles for this language "
+                u"because this would fork the %s translation(s) made from it."
+                % [sl.get_language_code_display() for sl in dependents]
+            ))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
                                                      subtitle_language):

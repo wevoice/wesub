@@ -1,0 +1,10 @@
+digraph video_hHQQqHx6hdHm {
+rankdir = BT;
+en1[label="en1"];
+es1[label="es1"];
+es2[label="es2"];
+fr1[label="fr1"];
+en1 -> es1;
+es1 -> es2;
+fr1 -> es2;
+}

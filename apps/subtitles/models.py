@@ -748,7 +748,7 @@ class SubtitleLanguage(models.Model):
             return None
 
         lineage = tip_version.lineage
-        source_codes = lineage.keys()
+        source_codes = [lc for lc in lineage.keys() if lc != self.language_code]
 
         return source_codes[0] if source_codes else None
 
@@ -772,6 +772,36 @@ class SubtitleLanguage(models.Model):
                 video=self.video, language_code=source_lc)
         except (SubtitleLanguage.DoesNotExist, IndexError):
             return None
+
+    def get_dependent_subtitle_languages(self):
+        """Return subtitle languages that are dependents/translations of this.
+
+        This is a shim for the existing UI.  Once the new one comes this
+        monstrosity will be torn out.
+
+        """
+        # Start with all the subtitle languages for the video.
+        sls = self.video.newsubtitlelanguage_set
+
+        # Exclude this one.
+        sls = sls.exclude(id=self.id)
+
+        # Exclude those that are already forked.  They can't be dependents.
+        sls = sls.exclude(is_forked=True)
+
+        # Realize the query to get the list of remaining SubtitleLanguages that
+        # could possibly be dependents.  Hopefully there shouldn't be too many.
+        sls = list(sls)
+
+        # Check the lineage maps for the candidates to determine if they're
+        # dependents.
+        results = []
+        for sl in sls:
+            tip = sl.get_tip()
+            if tip and self.language_code in tip.lineage:
+                results.append(sl)
+
+        return results
 
 
     def get_widget_url(self, mode=None, task_id=None):
@@ -799,7 +829,6 @@ class SubtitleLanguage(models.Model):
                 exclude = [exclude]
             qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
         return qs
-
 
 
 # SubtitleVersions ------------------------------------------------------------
@@ -1048,10 +1077,18 @@ class SubtitleVersion(models.Model):
         return len([s for s in self.get_subtitles().subtitle_items()])
 
     def get_changes(self):
-        """
-        Return ``(time_change, text_change)``
-        """
+        """Return (time_change, text_change).
 
+        Beware.
+
+        This was ported over from the old data model as a hack.  There are
+        probably lots of cases where it doesn't work right.
+
+        What we *really* need to do is sit down and come up with a scheme for
+        diffing subtitle versions meaningfully.  Until then, we have this
+        monstrosity.  Godspeed.
+
+        """
         # TODO: Time only changes aren't quite right.
 
         if hasattr(self, '_time_change') and hasattr(self, '_text_change'):
@@ -1064,6 +1101,14 @@ class SubtitleVersion(models.Model):
 
         subtitles = [s for s in self.get_subtitles().subtitle_items()]
         last_subtitles = [s for s in parent.get_subtitles().subtitle_items()]
+
+        if not subtitles or not last_subtitles:
+            if subtitles or last_subtitles:
+                # If one version is empty but the other isn't: 100%.
+                return (1.0, 1.0)
+            else:
+                # If both versions are empty: 100%.
+                return (0.0, 0.0)
 
         sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
                                 for s in subtitles])

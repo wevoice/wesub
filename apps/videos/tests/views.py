@@ -18,6 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from datetime import datetime
+import json
 
 from django.core import mail
 from django.core.cache import cache
@@ -33,6 +34,9 @@ from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
 )
+from apps.videos.tests.data import (
+    get_video, make_subtitle_language, make_subtitle_version
+)
 from apps.widget import video_cache
 from apps.widget.tests import create_two_sub_session, RequestMockup
 
@@ -43,6 +47,9 @@ class TestViews(WebUseTest):
     def setUp(self):
         self._make_objects("iGzkk7nwWX8F")
         cache.clear()
+
+    def tearDown(self):
+        mail.outbox = []
 
     def test_video_url_make_primary(self):
         self._login()
@@ -56,7 +63,7 @@ class TestViews(WebUseTest):
         }
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('errors', json.loads(response.content))
         vid_url = 'http://www.youtube.com/watch?v=rKnDgT73v8s'
         # test make primary
         vu = VideoUrl.objects.filter(video=v)
@@ -72,9 +79,8 @@ class TestViews(WebUseTest):
         self.assertEqual(VideoUrl.objects.filter(video=v)[0].url, secondary_url)
 
     def test_video_url_make_primary_team_video(self):
-        self._login()
         v = Video.objects.get(video_id='KKQS8EDG1P4')
-        self.assertNotEqual(len(VideoUrl.objects.filter(video=v)), 0)
+        self.assertNotEqual(VideoUrl.objects.filter(video=v).count(), 0)
         # add another url
         secondary_url = 'http://www.youtube.com/watch?v=tKTZoB2Vjuk'
         data = {
@@ -83,10 +89,15 @@ class TestViews(WebUseTest):
         }
         url = reverse('videos:video_url_create')
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 200)
+        # before logging in, this should not work
+        self.assertEqual(302, response.status_code)
+        self.client.login(**self.auth)
+        response = self.client.post(url, data)
+        self.assertNotIn('errors', json.loads(response.content))
         vid_url = 'http://www.youtube.com/watch?v=KKQS8EDG1P4'
         # test make primary
         vu = VideoUrl.objects.filter(video=v)
+        self.assertTrue(vu.count() > 1)
         vu[0].make_primary()
         self.assertEqual(VideoUrl.objects.get(video=v, primary=True).url, vid_url)
         # check for activity
@@ -149,8 +160,10 @@ class TestViews(WebUseTest):
         user = User.objects.exclude(id=self.user.id)[:1].get()
         user.notify_by_email = True
         user.is_active = True
+        user.valid_email = True
         user.save()
         v.followers.add(user)
+        initial_count = len(mail.outbox)
 
         data = {
             'url': u'http://www.youtube.com/watch?v=po0jY4WvCIc&feature=grec_index',
@@ -163,7 +176,7 @@ class TestViews(WebUseTest):
             v.videourl_set.get(videoid='po0jY4WvCIc')
         except ObjectDoesNotExist:
             self.fail()
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), initial_count + len(v.notification_list()))
 
     def test_video_url_remove(self):
         self._login()
@@ -265,9 +278,9 @@ class TestViews(WebUseTest):
         self.assertEqual(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
 
-        mail.outbox = []
-        data['link'] = 'http://someurl.com'
         self._login()
+        data['link'] = 'http://someurl.com'
+        mail.outbox = []
         response = self.client.post(reverse('videos:email_friend'), data)
         self.assertEqual(response.status_code, 302)
         self.assertEquals(len(mail.outbox), 1)
@@ -308,49 +321,27 @@ class TestViews(WebUseTest):
         self.assertEqual(last_version.version_no+1, new_version.version_no)
 
     def test_model_rollback(self):
-        video = Video.objects.all()[:1].get()
-        lang = video.subtitlelanguage_set.all()[:1].get()
-        v = lang.latest_version(public_only=True)
-        v.is_forked = True
-        v.save()
+        video = get_video()
 
-        new_v = SubtitleVersion(language=lang, version_no=v.version_no+1,
-                                datetime_started=datetime.now())
-        new_v.save()
-        lang = SubtitleLanguage.objects.get(id=lang.id)
+        sl_en = make_subtitle_language(video, 'en')
+        en1 = make_subtitle_version(sl_en, [])
+        en2 = make_subtitle_version(sl_en, [(1, 2, "foo")])
 
         self._login()
 
-        self.client.get(reverse('videos:rollback', args=[v.id]), {})
-        lang = SubtitleLanguage.objects.get(id=lang.id)
-        last_v = lang.latest_version(public_only=True)
-        self.assertTrue(last_v.is_forked)
-        self.assertFalse(last_v.notification_sent)
-        self.assertEqual(last_v.version_no, new_v.version_no+1)
+        def _assert_tip_subs(subs):
+            self.assertEqual([(start, end, txt) for start, end, txt, meta in
+                              list(sl_en.get_tip().get_subtitles())],
+                             subs)
 
-    def test_rollback_updates_sub_count(self):
-        video = Video.objects.all()[:1].get()
-        lang = video.subtitlelanguage_set.all()[:1].get()
-        v = lang.latest_version(public_only=False)
-        num_subs = len(v.subtitles())
-        v.is_forked  = True
-        v.save()
-        new_v = SubtitleVersion(language=lang, version_no=v.version_no+1,
-                                datetime_started=datetime.now())
-        new_v.save()
-        for i in xrange(0,20):
-            s, created = Subtitle.objects.get_or_create(
-                version=new_v,
-                subtitle_id= "%s" % i,
-                subtitle_order=i,
-                subtitle_text="%s lala" % i
-            )
-        self._login()
-        self.client.get(reverse('videos:rollback', args=[v.id]), {})
-        last_v  = (SubtitleLanguage.objects.get(id=lang.id)
-                                           .latest_version(public_only=True))
-        final_num_subs = len(last_v.subtitles())
-        self.assertEqual(final_num_subs, num_subs)
+        # Ensure the rollback works through the view.
+        self.client.get(reverse('videos:rollback', args=[en1.id]))
+        _assert_tip_subs([])
+
+        self.client.get(reverse('videos:rollback', args=[en2.id]))
+        _assert_tip_subs([(1, 2, 'foo')])
+
+        self.assertEqual(sl_en.subtitleversion_set.count(), 4)
 
     def test_diffing(self):
         version = self.video.version(version_number=1)
