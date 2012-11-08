@@ -94,7 +94,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $newSubtitle = $(newSubtitle).attr(newAttrs);
 
         if (typeof content !== 'undefined') {
-            this.content($newSubtitle, content);
+            if (content === null) {
+                this.content($newSubtitle, '');
+            } else {
+                this.content($newSubtitle, content);
+            }
         }
 
         // Finally, place the new subtitle.
