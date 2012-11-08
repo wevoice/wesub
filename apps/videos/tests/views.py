@@ -44,6 +44,9 @@ class TestViews(WebUseTest):
         self._make_objects("iGzkk7nwWX8F")
         cache.clear()
 
+    def tearDown(self):
+        mail.outbox = []
+
     def test_video_url_make_primary(self):
         self._login()
         v = Video.objects.get(video_id='iGzkk7nwWX8F')
