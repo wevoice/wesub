@@ -1192,32 +1192,30 @@ class Rpc(BaseRpc):
 
     def _save_original_language(self, video_id, language_code):
         video = models.Video.objects.get(video_id=video_id)
-        has_original = False
-        for sl in video.subtitlelanguage_set.all():
-            if sl.is_original and sl.language != language_code:
-                sl.is_original = False
-                sl.save()
-            elif not sl.is_original and sl.language == language_code:
-                sl.is_original = True
-                sl.save()
-            if sl.is_original:
-                has_original = True
-        if not has_original:
-            sl = models.SubtitleLanguage(
-                video=video,
-                language=language_code,
-                is_forked=True,
-                is_original=True,
-                writelock_session_key='')
-            sl.save()
+
+        # try to verify if the video has an original subtitle language.
+        subtitle_language = video.subtitle_language()
+
+        if not subtitle_language:
+            video.primary_audio_language_code = language_code
+            video.save()
+
+            if not video.subtitle_language(language_code):
+                subtitle_language = models.SubtitleLanguage()
+                subtitle_language.video = video
+                subtitle_language.language_code = language_code
+
+                subtitle_language.save()
 
     def _autoplay_subtitles(self, user, video_id, language_pk, version_number):
-        cache =  video_cache.get_subtitles_dict(
-            video_id, language_pk, version_number,
-            lambda version: self._subtitles_dict(version=version))
+        cache =  video_cache.get_subtitles_dict(video_id, language_pk, 
+                                                version_number,
+                                                lambda version: self._subtitles_dict(version=version))
+
         if cache and cache.get("language", None) is not None:
             cache['language_code'] = cache['language'].language
             cache['language_pk'] = cache['language'].pk
+
         return cache
 
     def _subtitles_dict(self, version=None, language=None, session=None):
