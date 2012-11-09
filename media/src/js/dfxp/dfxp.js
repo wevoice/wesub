@@ -22,7 +22,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      */
 
     var that = this;
-    var $ = window.jQuery.noConflict();
+    var $ = window.AmarajQuery.noConflict();
 
     this.init = function(xml) {
 
