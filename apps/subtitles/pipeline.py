@@ -121,6 +121,8 @@ def _user_can_bypass_moderation(team_video, version, committer):
     2) This version is a post-publish edit.
     3) The subtitles are complete.
 
+    If no committer is specified, treat the current user as a super user.
+
     Note that version.subtitle_language.subtitles_complete must be correctly set
     *before* this for this to work properly.
 
@@ -128,6 +130,9 @@ def _user_can_bypass_moderation(team_video, version, committer):
     incomplete subtitles as post-publish edits?  Why would that happen?
 
     """
+    if not committer:
+        return True
+
     from apps.teams.permissions import can_publish_edits_immediately
     subtitle_language = version.subtitle_language
 
