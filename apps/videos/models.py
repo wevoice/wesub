@@ -59,7 +59,6 @@ from apps.teams.moderation_const import (
 from raven.contrib.django.models import client
 from babelsubs import storage
 
-
 NO_SUBTITLES, SUBTITLES_FINISHED = range(2)
 VIDEO_TYPE_HTML5 = 'H'
 VIDEO_TYPE_YOUTUBE = 'Y'
@@ -2236,6 +2235,7 @@ class Action(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     video = models.ForeignKey(Video, null=True, blank=True)
     language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    new_language = models.ForeignKey('subtitles.SubtitleLanguage', blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
     member = models.ForeignKey("teams.TeamMember", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
@@ -2382,7 +2382,7 @@ class Action(models.Model):
     @classmethod
     def create_approved_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.APPROVE_VERSION
         obj.created = kwargs.get('datetime_started' , datetime.now())
@@ -2391,7 +2391,7 @@ class Action(models.Model):
     @classmethod
     def create_rejected_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.REJECT_VERSION
         obj.created = datetime.now()
@@ -2409,7 +2409,7 @@ class Action(models.Model):
     @classmethod
     def create_accepted_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.ACCEPT_VERSION
         obj.created = datetime.now()
