@@ -698,9 +698,14 @@ class Rpc(BaseRpc):
             title_changed = new_title is not None
             desc_changed = new_description is not None
 
+        if isinstance(subtitles, basestring):
+            subtitle_set = SubtitleSet(language.language_code, subtitles)
+        elif isinstance(subtitles, SubtitleSet):
+            subtitle_set = subtitles
+
         subtitles_changed = (
             subtitles is not None
-            and (len(subtitles) > 0 or previous_version is not None)
+            and (len(subtitle_set) > 0 or previous_version is not None)
         )
 
         should_create_new_version = (
