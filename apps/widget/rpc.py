@@ -1193,15 +1193,12 @@ class Rpc(BaseRpc):
     def _save_original_language(self, video_id, language_code):
         video = models.Video.objects.get(video_id=video_id)
 
-        # try to verify if the video has an original subtitle language.
-        subtitle_language = video.subtitle_language()
-
-        if not subtitle_language:
+        if not video.primary_audio_language_code:
             video.primary_audio_language_code = language_code
             video.save()
 
             if not video.subtitle_language(language_code):
-                subtitle_language = models.SubtitleLanguage()
+                subtitle_language = new_models.SubtitleLanguage()
                 subtitle_language.video = video
                 subtitle_language.language_code = language_code
 
