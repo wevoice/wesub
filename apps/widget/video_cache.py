@@ -74,7 +74,7 @@ def invalidate_cache(video_id):
     try:
         from apps.videos.models import Video
         video = Video.objects.get(video_id=video_id)
-        for l in video.subtitlelanguage_set.all():
+        for l in video.newsubtitlelanguage_set.all():
             cache.delete(_subtitles_dict_key(video_id, l.pk))
     except Video.DoesNotExist:
         pass
