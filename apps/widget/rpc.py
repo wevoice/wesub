@@ -698,6 +698,7 @@ class Rpc(BaseRpc):
             title_changed = new_title is not None
             desc_changed = new_description is not None
 
+        subtitle_set = None
         if isinstance(subtitles, basestring):
             subtitle_set = SubtitleSet(language.language_code, subtitles)
         elif isinstance(subtitles, SubtitleSet):

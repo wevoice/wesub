@@ -422,7 +422,7 @@ class TestRpc(TestCase):
         return_value = rpc.start_editing(request_1, version.language.video.video_id, 'en')
         session_pk = return_value['session_pk']
         # user_1 deletes all the subs
-        rpc.finished_subtitles(request_1, session_pk, [])
+        rpc.finished_subtitles(request_1, session_pk, SubtitleSet('en').to_xml())
         video = Video.objects.get(pk=version.language.video.pk)
         language = SubtitlingSession.objects.get(pk=session_pk).language
         self.assertEqual(2, language.subtitleversion_set.count())
@@ -519,7 +519,7 @@ class TestRpc(TestCase):
         self.assertEquals(1, subs['version'])
         self.assertEquals(1, len(subtitles))
         # user_1 deletes the subtitles.
-        rpc.finished_subtitles(request_1, session_pk, [])
+        rpc.finished_subtitles(request_1, session_pk, SubtitleSet('en').to_xml())
         language = SubtitlingSession.objects.get(pk=session_pk).language
         self.assertEquals(2, language.subtitleversion_set.count())
         self.assertEquals(0, len(language.version().get_subtitles()))
