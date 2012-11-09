@@ -2391,7 +2391,7 @@ class Action(models.Model):
     @classmethod
     def create_rejected_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.REJECT_VERSION
         obj.created = datetime.now()
@@ -2409,7 +2409,7 @@ class Action(models.Model):
     @classmethod
     def create_accepted_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.ACCEPT_VERSION
         obj.created = datetime.now()

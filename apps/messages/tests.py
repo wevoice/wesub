@@ -449,14 +449,21 @@ class TeamBlockSettingsTest(TestCase):
         member = TeamMember.objects.create(team=team, user=user)
         team_video = TeamVideo.objects.filter(team=team)[0]
         task_assigned = Task.objects.create(team=team, team_video=team_video, type=10, assignee=member.user)
+
         sv = SubtitleVersion.objects.all()[0]
         language = team_video.video.subtitlelanguage_set.all()[0]
         language.language = 'en'
         language.save()
         sv.language = language
         sv.save()
+
+        subs = [
+            (0, 1000, 'Hello', {}),
+            (2000, 5000, 'world.', {})
+        ]
+        sv = add_subtitles(sv.video, 'en', subs)
         task_with_version = Task.objects.create(team=team, team_video=team_video, type=10, assignee=member.user,
-                                                subtitle_version=sv, language='en')
+                                                new_subtitle_version=sv, language='en')
 
         to_test = (
             ("block_invitation_sent_message", n.team_invitation_sent, (invite.pk,)),

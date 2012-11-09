@@ -423,7 +423,7 @@ def _reviewed_notification(task_pk, status):
     if task.review_base_version:
         user = task.review_base_version.user
     else:
-        user = task.subtitle_version.user
+        user = task.new_subtitle_version.author
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -431,7 +431,7 @@ def _reviewed_notification(task_pk, status):
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.subtitle_version.language.pk,
+        'lang_id': task.new_subtitle_version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -445,7 +445,7 @@ def _reviewed_notification(task_pk, status):
 
     context = {
         "team":task.team,
-        "title": task.subtitle_version.language.get_title(),
+        "title": task.new_subtitle_version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -476,13 +476,13 @@ def _reviewed_notification(task_pk, status):
 
     if status == REVIEWED_AND_SENT_BACK:
         if task.type == Task.TYPE_IDS['Review']:
-            Action.create_declined_video_handler(task.subtitle_version, reviewer)
+            Action.create_declined_video_handler(task.new_subtitle_version, reviewer)
         else:
-            Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+            Action.create_rejected_video_handler(task.new_subtitle_version, reviewer)
     elif status == REVIEWED_AND_PUBLISHED:
-        Action.create_approved_video_handler(task.subtitle_version, reviewer)
+        Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
     elif status == REVIEWED_AND_PENDING_APPROVAL:
-        Action.create_accepted_video_handler(task.subtitle_version, reviewer)
+        Action.create_accepted_video_handler(task.new_subtitle_version, reviewer)
 
     return msg, email_res
 
