@@ -512,19 +512,20 @@ class TestRpc(TestCase):
         request_1 = RequestMockup(self.user_1, "b")
         rpc.show_widget(request_1, VIDEO_URL, False)
         response = rpc.start_editing(
-            request_1, session.video.video_id, 'es', base_language_pk=en_sl.pk)
+            request_1, session.video.video_id, 'es', base_language_code='en')
         session_pk = response['session_pk']
         self.assertEquals(True, response['can_edit'])
         subs = response['subtitles']
+        subtitles = SubtitleSet('en', subs['subtitles'])
         self.assertEquals(1, subs['version'])
-        self.assertEquals(1, len(subs['subtitles']))
+        self.assertEquals(1, len(subtitles))
         # user_1 deletes the subtitles.
         rpc.finished_subtitles(request_1, session_pk, [])
-        language = Video.objects.get(pk=session.video.pk).subtitle_language('es')
+        language = SubtitlingSession.objects.get(pk=session_pk).language
         self.assertEquals(2, language.subtitleversion_set.count())
-        self.assertEquals(0, language.latest_version().subtitle_set.count())
-        self.assertEquals(True, language.had_version)
-        self.assertEquals(False, language.has_version)
+        self.assertEquals(0, len(language.version().get_subtitles()))
+        self.assertTrue(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=language.pk).exists())
+        self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_tip().filter(pk=language.pk).exists())
 
     def test_zero_out_trans_version_0(self):
         request = RequestMockup(self.user_0)
