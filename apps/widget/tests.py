@@ -337,18 +337,17 @@ class TestRpc(TestCase):
     def test_complete_with_incomplete_translation(self):
         request = RequestMockup(self.user_0)
         session = create_two_sub_session(request, completed=True)
-        sl_en = session.language
         response = rpc.start_editing(
-            request, session.video.video_id, 'es', base_language_pk=sl_en.pk)
+            request, session.video.video_id, 'es', base_language_code='en')
         session_pk = response['session_pk']
-        # only covering one.
-        inserted = [{'subtitle_id': 'a', 'text': 'a_es'}]
-        rpc.finished_subtitles(request, session_pk, subtitles=inserted)
+
+        rpc.finished_subtitles(request, session_pk, subtitles=create_subtitle_set().to_xml())
         video = Video.objects.get(pk=session.video.pk)
+
         self.assertTrue(video.is_complete)
         self.assertEquals(1, len(video.completed_subtitle_languages()))
         self.assertEquals(
-            'en', video.completed_subtitle_languages()[0].language)
+            'en', video.completed_subtitle_languages()[0].language_code)
 
     def test_incomplete_with_complete_translation(self):
         request = RequestMockup(self.user_0)
