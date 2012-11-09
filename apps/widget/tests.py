@@ -535,6 +535,7 @@ class TestRpc(TestCase):
         session_pk = response['session_pk']
         new_language = SubtitlingSession.objects.get(pk=session_pk).language
         rpc.finished_subtitles(request, session_pk, SubtitleSet('en').to_xml())
+        # creating an empty version should not store empty stuff on the db
         self.assertEquals(0, new_language.subtitleversion_set.count())
 
         self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=new_language.pk).exists())
