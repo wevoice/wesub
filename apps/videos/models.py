@@ -2338,19 +2338,19 @@ class Action(models.Model):
             obj.save()
 
     @classmethod
-    def create_caption_handler(cls, instance, timestamp=None):
-        user = instance.user
-        video = instance.language.video
-        language = instance.language
+    def create_caption_handler(cls, instance, timestamp):
+        user = instance.author
+        video = instance.video
+        language = instance.subtitle_language
 
-        obj = cls(user=user, video=video, language=language)
+        obj = cls(user=user, video=video, new_language=language)
 
-        if instance.version_no == 0:
+        if instance.version_number == 0:
             obj.action_type = cls.ADD_TRANSLATION
         else:
             obj.action_type = cls.ADD_VERSION
 
-        obj.created = instance.datetime_started
+        obj.created = timestamp
         obj.save()
 
     @classmethod

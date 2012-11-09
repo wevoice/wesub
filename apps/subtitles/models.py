@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from apps.subtitles import shims
 from apps.auth.models import CustomUser as User
-from apps.videos.models import Video
+from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
 from babelsubs import load_from
 
@@ -1054,6 +1054,7 @@ class SubtitleVersion(models.Model):
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
 
+        Action.create_caption_handler(self, self.created)
         return super(SubtitleVersion, self).save(*args, **kwargs)
 
 
