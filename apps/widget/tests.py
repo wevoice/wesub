@@ -529,16 +529,17 @@ class TestRpc(TestCase):
     def test_zero_out_trans_version_0(self):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
-        sl = session.language
+        original_language = session.language
         response = rpc.start_editing(
-            request, sl.video.video_id, 'es', base_language_pk=sl.pk)
+            request, original_language.video.video_id, 'es', base_language_code=original_language.language_code)
         session_pk = response['session_pk']
-        rpc.finished_subtitles(request, session_pk, [])
-        language = Video.objects.get(pk=session.video.pk).subtitle_language('es')
-        self.assertEquals(0, language.subtitleversion_set.count())
-        self.assertEquals(None, language.video.latest_version('es'))
-        self.assertEquals(False, language.had_version)
-        self.assertEquals(False, language.has_version)
+        new_language = SubtitlingSession.objects.get(pk=session_pk).language
+        rpc.finished_subtitles(request, session_pk, SubtitleSet('en').to_xml())
+        # creating an empty version should not store empty stuff on the db
+        self.assertEquals(0, new_language.subtitleversion_set.count())
+
+        self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=new_language.pk).exists())
+        self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_tip().filter(pk=new_language.pk).exists())
 
     def test_edit_existing_original(self):
         request = RequestMockup(self.user_0)
