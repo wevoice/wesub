@@ -826,7 +826,7 @@ def can_create_task_translate(team_video, user=None, workflows=None):
         existing_languages = set(team_video.completed_langs)
     else:
         existing_languages = set(
-                sl.language for sl in team_video.video.completed_subtitle_languages())
+                sl.language_code for sl in team_video.video.completed_subtitle_languages())
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)
