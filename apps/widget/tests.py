@@ -425,12 +425,11 @@ class TestRpc(TestCase):
         # user_1 deletes all the subs
         rpc.finished_subtitles(request_1, session_pk, [])
         video = Video.objects.get(pk=version.language.video.pk)
-        language = video.subtitle_language()
+        language = SubtitlingSession.objects.get(pk=session_pk).language
         self.assertEqual(2, language.subtitleversion_set.count())
-        self.assertEqual(
-            0, language.latest_version().subtitle_set.count())
-        self.assertEquals(True, language.had_version)
-        self.assertEquals(False, language.has_version)
+        self.assertEqual( 0, len(language.version().get_subtitles()))
+        self.assertTrue(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=language.pk).exists())
+        self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_tip().filter(pk=language.pk).exists())
 
     def test_zero_out_version_0(self):
         request_0 = RequestMockup(self.user_0)
@@ -457,7 +456,7 @@ class TestRpc(TestCase):
         sl_en = session.language
 
         # open translation dialog.
-        response = rpc.start_editing(request, session.video.video_id, 
+        response = rpc.start_editing(request, session.video.video_id,
                                      'es', base_language_code=sl_en.language_code)
 
         session_pk = response['session_pk']
@@ -484,7 +483,7 @@ class TestRpc(TestCase):
 
         self.assertTrue('en' in version.get_lineage())
 
-        response = rpc.start_editing(request, session.video.video_id, 
+        response = rpc.start_editing(request, session.video.video_id,
                                      'es', base_language_code=sl_en.language_code)
 
         rpc.finished_subtitles(request, session_pk, create_subtitle_set(2).to_xml())
