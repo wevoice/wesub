@@ -432,7 +432,7 @@ class Rpc(BaseRpc):
         translated_from = None
 
         if base_language_code:
-            translated_from = language.get_translation_source_language()
+            translated_from = language.video.subtitle_language(base_language_code)
 
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
