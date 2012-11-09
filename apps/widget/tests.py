@@ -222,6 +222,7 @@ class TestRpc(TestCase):
                                   .objects.having_nonempty_tip()
                                   .filter(pk=language.pk).exists())
 
+
         self.assertTrue(language.video.is_subtitled)
 
     def test_get_widget_url(self):
@@ -681,7 +682,7 @@ class TestRpc(TestCase):
     def test_only_one_version(self):
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
-        self.assertEquals(1, session.video.subtitlelanguage_set.count())
+        self.assertEquals(1, session.video.newsubtitlelanguage_set.count())
 
     def test_only_one_video_url(self):
         request = RequestMockup(self.user_0)
