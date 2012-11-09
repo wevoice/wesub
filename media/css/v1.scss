@@ -493,6 +493,16 @@ div.fix-chosen div.chzn-container {
         color: #a33d36;
     }
 }
+.v1 .view p.prompt {
+    clear: both;
+    margin: 0;
+    padding: .5em 10px;
+    color: #777;
+
+    a {
+        color: #555;
+    }
+}
 .v1 .listing {
     clear: both;
     padding: 0;
@@ -678,10 +688,21 @@ div.fix-chosen div.chzn-container {
     position: relative;
     width: 310px;
 
-    h3 {
-        clear: both;
-        height: 2em;
-        margin: 6px 10px 10px;
+    h4 a {
+        display: block;
+        position: absolute;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        bottom: 0; left: 1em;
+        padding: 1em;
+        width: 290px;
+        background: rgba(0,0,0,.65);
+        color: #fff;
+    }
+
+    &:hover h4 a {
+        background: rgba(0,0,0,.75);
     }
 
     .thumb {
@@ -690,9 +711,11 @@ div.fix-chosen div.chzn-container {
         position: relative;
         top: 0;
 
-        img {
-            margin: 10px 10px 0;
+        a img {
+            margin: 1em;
             width: 290px;
+            height: 180px;
+            border: none;
         }
     }
 
@@ -731,26 +754,19 @@ div.fix-chosen div.chzn-container {
     }
 
     .admin-controls {
-        background: hsla(0%, 0%, 0%, .55);
         border: none;
-        bottom: .6em;
-        opacity: 1;
-        right: 1em;
-        text-shadow: 1px 1px 1px #444;
+        bottom: -1em;
+        right: 0;
         padding: .5em;
 
         a {
             border: none;
-            color: #eee;
+            color: #999;
 
             &:hover {
-                background: transparent;
-                color: #fff;
+                color: #555;
                 text-decoration: underline;
             }
-        }
-        &:hover {
-            background: hsla(0%, 0%, 0%, .75);
         }
     }
 }
@@ -2250,6 +2266,175 @@ a.truncated-expand {
         margin-top: 10px;
     }
 }
+
+.team_dashboard .view {
+
+    .get-started {
+        clear: both;
+        font-size: 1.275em;
+        padding: 2.5em 6em 0;
+        text-align: center;
+
+        h3 {
+            margin-bottom: 1em;
+        }
+
+        p {
+            margin-bottom: 1em;
+        }
+    }
+
+    > h3 {
+        position: relative;
+        clear: both;
+        padding: 3em 10px 0;
+        font-size: 13px;
+
+        a {
+            font-weight: normal;
+            color: $lighter;
+            position: absolute;
+            top: 1.6em;
+            right: 10px;
+            font-size: .9em;
+            line-height: 15px;
+            text-decoration: none;
+        }
+    }
+
+    .listing.yours {
+
+        margin-bottom: 2em;
+
+        > li {
+            padding-left: 115px;
+            padding-right: 175px;
+
+            .thumb a img {
+                max-width: 90px;
+                border: none;
+            }
+        }
+
+        .due {
+            display: block;
+            text-align: left;
+            color: $normal;
+            font-style: italic;
+            padding-left: .5em;
+        }
+
+        .overdue {
+            color: #CA4C43;
+        }
+
+        .perform-task {
+            padding: .5em;
+            margin: 0 0 .5em 0;
+            text-align: left;
+
+            &:after {
+                content: '';
+            }
+        }
+    }
+
+    .listing.videos {
+        li {
+
+            .langs {
+                position: relative;
+                clear: both;
+                margin: 10px;
+                color: $dark;
+
+
+                > a {
+                    display: block;
+                    margin: 0;
+                    padding: .75em;
+                    border: 1px solid $fainter;
+                    @include border-radius(2px);
+                    font-weight: bold;
+                    color: $dark;
+                    @include vertical-gradient(lighten($faintest, 10%), $faintest);
+
+                    &:hover {
+                        border-color: $faint;
+                        color: $dark;
+                        @include vertical-gradient(lighten($fainter, 10%), $fainter);
+                    }
+                }
+
+                > div {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+
+                    span {
+                        display: block;
+                        padding: .75em;
+                        border-left: 1px solid $fainter;
+                        border-top: 1px solid transparent;
+                        cursor: pointer;
+                        @include multi-border-radius(0, 2px, 0, 0);
+                    }
+
+                    span.expand {
+                        color: $light;
+                        padding-right: 2em;
+                        background-image: url('../images/arrows.png');
+                        background-position: 85% -61px;
+                        background-repeat: no-repeat;
+                    }
+
+                    ul {
+                        display: none;
+                        position: absolute;
+                        width: 290px;
+                        padding: 0;
+                        top: 2.75em;
+                        right: 0;
+                        background: $faintest;
+                        z-index: 50;
+                        @include multi-border-radius(0, 0, 2px, 2px);
+                        border: 1px solid $fainter;
+                        -moz-box-sizing: border-box;
+                        -webkit-box-sizing: border-box;
+                        box-sizing: border-box;
+
+                        li {
+                            padding: 0;
+                        }
+
+                        a {
+                            display: block;
+                            padding: 1em .75em;
+                            color: $darkest;
+
+                            &:hover {
+                                background: $fainter;
+                            }
+                        }
+                    }
+
+                    &:hover {
+                        span {
+                        }
+
+                        ul {
+                            display: block;
+                        }
+                    }
+                }
+
+
+            }
+        }
+    }
+}
+
+
 #error {
 
     h1 {
