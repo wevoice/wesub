@@ -842,7 +842,7 @@ class TestRpc(TestCase):
         # starting editing but not finishing. Should create a 0% language.
         response = rpc.start_editing(
             request, session.video.video_id, 'es',
-            base_language_pk=session.video.subtitle_language('en').id)
+            base_language_code='en')
         session_pk = response['session_pk']
         rpc.release_lock(request, session_pk)
 
@@ -856,16 +856,14 @@ class TestRpc(TestCase):
         response = rpc.start_editing(
             request, video.video_id, 'es',
             subtitle_language_pk=sl_es.pk,
-            base_language_pk=sl_en.pk)
+            base_language_code='en')
         session_pk = response['session_pk']
-        inserted = [{'subtitle_id': u'a',
-                     'text': 'heyes!'}]
         # test passes if the following command executes without throwing an exception.
         response= rpc.finished_subtitles(
             request, session_pk,
-            inserted)
+            create_subtitle_set(1))
 
-        sl_es = models.SubtitleLanguage.objects.get(id=sl_es.id)
+        sl_es = sub_models.SubtitleLanguage.objects.get(id=sl_es.id)
         self.assertEquals(1, sl_es.subtitleversion_set.count())
 
     def test_set_title(self):
