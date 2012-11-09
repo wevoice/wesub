@@ -649,39 +649,32 @@ class TestRpc(TestCase):
         self.assertEquals(1000, subtitles[1].start_time)
         self.assertEquals(2000, subtitles[1].end_time)
 
+    # TODO: is this right?
     def test_change_original_language_legal(self):
         request = RequestMockup(self.user_0)
         return_value = rpc.show_widget(request, VIDEO_URL, False)
         video_id = return_value['video_id']
+
         # first claim that the original video language is english
         # and subs are in spanish.
-        return_value = rpc.start_editing(
-            request, video_id, 'es', original_language_code='en')
+        return_value = rpc.start_editing(request, video_id, 'es', original_language_code='en')
         session_pk = return_value['session_pk']
 
-        inserted = [{'subtitle_id': u'aa',
-                     'text': 'hey!',
-                     'start_time': 2300,
-                     'end_time': 3400,
-                     'sub_order': 1.0}]
-        rpc.finished_subtitles(request, session_pk, inserted)
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         rpc.show_widget(request, VIDEO_URL, False)
+
         # now claim that spanish is the original language
         es_sl = models.Video.objects.get(video_id=video_id).subtitle_language('es')
-        return_value = rpc.start_editing(
-            request, video_id, 'es',
-            subtitle_language_pk=es_sl.pk,
-            original_language_code='es')
+        return_value = rpc.start_editing(request, video_id, 'es',
+                                         subtitle_language_pk=es_sl.pk,
+                                         original_language_code='es')
+
         session_pk = return_value['session_pk']
-        inserted = [{'subtitle_id': u'sddfdsfsdf',
-                     'text': 'hey!',
-                     'start_time': 3500,
-                     'end_time': 6400,
-                     'sub_order': 2.0}]
-        rpc.finished_subtitles(
-            request, session_pk, inserted)
+
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         video = Video.objects.get(video_id=video_id)
-        self.assertEquals('es', video.subtitle_language().language)
+
+        self.assertEquals('es', video.subtitle_language().language_code)
 
     def test_only_one_version(self):
         request = RequestMockup(self.user_0)
