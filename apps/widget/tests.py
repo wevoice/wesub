@@ -674,7 +674,9 @@ class TestRpc(TestCase):
         rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
         video = Video.objects.get(video_id=video_id)
 
-        self.assertEquals('es', video.subtitle_language().language_code)
+        # even if you specify a new original language, we won't change the
+        # original language.
+        self.assertEquals('en', video.subtitle_language().language_code)
 
     def test_only_one_version(self):
         request = RequestMockup(self.user_0)
