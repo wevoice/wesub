@@ -200,12 +200,7 @@ class TestRpc(TestCase):
         # this will fail if locking is dependent on anything in session,
         # which can get cleared after login.
         request.session = {}
-        rpc.finished_subtitles(request, session.pk,
-                               [{'subtitle_id': 'aa',
-                                 'text': 'hey you!',
-                                 'start_time': 2300,
-                                 'end_time': 3400,
-                                 'sub_order': 1.0}])
+        rpc.finished_subtitles(request, session.pk, create_subtitle_set(1))
         video = Video.objects.get(pk=session.video.pk)
         self.assertEquals(1, video.subtitle_language().subtitleversion_set.count())
 
