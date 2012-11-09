@@ -2455,11 +2455,14 @@ class BillingReport(models.Model):
     def _get_lang_data(self, languages, start_date):
         workflow = self.team.get_workflow()
 
+        # TODO:
+        # These do the same for now.  If a workflow is enabled, we should get
+        # the first approved version.  Not sure how to do that yet.
         if workflow.approve_enabled:
-            lang_data = [(language, language.first_approved_version) for
+            lang_data = [(language, language.get_tip()) for
                                                 language in languages]
         else:
-            lang_data = [(language, language.latest_version()) for
+            lang_data = [(language, language.get_tip()) for
                                                 language in languages]
 
         old_version_counter = 1
@@ -2467,7 +2470,7 @@ class BillingReport(models.Model):
         result = []
 
         for lang, ver in lang_data:
-            if ver and ver.datetime_started < start_date:
+            if ver and ver.created < start_date:
                 old_version_counter += 1
                 continue
 
@@ -2487,7 +2490,7 @@ class BillingReport(models.Model):
         tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
 
         for tv in tvs:
-            languages = tv.video.subtitlelanguage_set.all()
+            languages = tv.video.newsubtitlelanguage_set.all()
 
             lang_data, old_version_counter = self._get_lang_data(languages,
                     start_date)
