@@ -517,7 +517,7 @@ def approved_notification(task_pk, published=False):
         return False
     # some tasks are being created without subtitles version, see
     # https://unisubs.sifterapp.com/projects/12298/issues/552092/comments
-    if not task.subtitle_version:
+    if not task.new_subtitle_version:
         return False
 
     if published:
@@ -528,14 +528,14 @@ def approved_notification(task_pk, published=False):
         template_txt = "messages/team-task-approved-sentback.txt"
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
-    user = task.subtitle_version.user
+    user = task.new_subtitle_version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.subtitle_version.language.pk,
+        'lang_id': task.new_subtitle_version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -543,7 +543,7 @@ def approved_notification(task_pk, published=False):
 
     context = {
         "team":task.team,
-        "title": task.subtitle_version.language.get_title(),
+        "title": task.new_subtitle_version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -566,7 +566,7 @@ def approved_notification(task_pk, published=False):
     template_name = template_html
     Meter('templated-emails-sent-by-type.teams.approval-result').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_approved_video_handler(task.subtitle_version, reviewer)
+    Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
     return msg, email_res
 
 @task
