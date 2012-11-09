@@ -709,12 +709,18 @@ class TestRpc(TestCase):
     def test_ensure_language_locked_on_regain_lock(self):
         request = RequestMockup(self.user_0)
         session = self._start_editing(request)
+
         now = datetime.now().replace(microsecond=0) + timedelta(seconds=20)
-        models.datetime = FakeDatetime(now)
-        rpc.regain_lock(request, session.pk)
+        sub_models.datetime = FakeDatetime(now)
+
+        response = rpc.regain_lock(request, session.pk)
+        self.assertEquals('ok', response['response'])
+
         video = models.Video.objects.get(pk=session.video.pk)
         language = video.subtitle_language()
+
         self.assertEquals(now, language.writelock_time)
+
         models.datetime = datetime
 
     def test_title_and_description_from_video(self):

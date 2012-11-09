@@ -18,8 +18,8 @@
 
 """Django models represention subtitles."""
 
-import datetime
 import itertools
+from datetime import datetime, date, timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -425,7 +425,7 @@ class SubtitleLanguage(models.Model):
         """Return whether this language is writelocked for subtitling."""
         if self.writelock_time == None:
             return False
-        delta = datetime.datetime.now() - self.writelock_time
+        delta = datetime.now() - self.writelock_time
         seconds = delta.days * 24 * 60 * 60 + delta.seconds
         return seconds < WRITELOCK_EXPIRATION
 
@@ -454,7 +454,7 @@ class SubtitleLanguage(models.Model):
             self.writelock_owner = None
 
         self.writelock_session_key = key
-        self.writelock_time = datetime.datetime.now()
+        self.writelock_time = datetime.now()
 
         if save:
             self.save()
@@ -501,7 +501,7 @@ class SubtitleLanguage(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.datetime.now()
+            self.created = datetime.now()
 
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
@@ -1042,7 +1042,7 @@ class SubtitleVersion(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.datetime.now()
+            self.created = datetime.now()
 
         # Sanity checking of the denormalized data.
         assert self.language_code == self.subtitle_language.language_code, \
@@ -1293,8 +1293,8 @@ class SubtitleVersion(models.Model):
             return None
 
     def revision_time(self):
-        today = datetime.date.today()
-        yesterday = today - datetime.timedelta(days=1)
+        today = date.today()
+        yesterday = today - timedelta(days=1)
         d = self.created.date()
         if d == today:
             return 'Today'
@@ -1399,7 +1399,7 @@ class Collaborator(models.Model):
         creating = not self.pk
 
         if creating and not self.created:
-            self.created = datetime.datetime.now()
+            self.created = datetime.now()
 
         if creating and not self.expiration_start:
             self.expiration_start = self.created
