@@ -3,14 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
+# Jens Hyllegaard <jens.hyllegaard@gmail.com>, 2012.
 # Morten Juhl-Johansen Zölde-Fejér <morten@writtenandread.net>, 2011.
 #   <morten_skouboe@hotmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 01:32-0600\n"
-"PO-Revision-Date: 2012-11-08 07:57+0000\n"
+"POT-Creation-Date: 2012-11-09 01:32-0600\n"
+"PO-Revision-Date: 2012-11-09 07:55+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Danish (http://www.transifex.com/projects/p/universalsubtitles/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -54,7 +55,7 @@ msgstr "Skjul"
 
 #: apps/auth/models.py:98
 msgid "Retired user"
-msgstr ""
+msgstr "Pensioneret bruger"
 
 #: apps/auth/models.py:333
 msgid "Add comment"
@@ -96,7 +97,7 @@ msgstr ""
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr ""
+msgstr "Dette er datoen hvor annonceringen begynder at vises. Og kun den nyeste vil blive vist."
 
 #: apps/auth/models.py:515
 msgid "e-mail confirmation"
@@ -333,31 +334,31 @@ msgstr ""
 
 #: apps/search/forms.py:28
 msgid "Most languages"
-msgstr ""
+msgstr "Fleste sprog"
 
 #: apps/search/forms.py:29
 msgid "Views Today"
-msgstr ""
+msgstr "Visninger i dag"
 
 #: apps/search/forms.py:30
 msgid "Views This Week"
-msgstr ""
+msgstr "Visninger i denne uge"
 
 #: apps/search/forms.py:31
 msgid "Views This Month"
-msgstr ""
+msgstr "Visninger i denne måned"
 
 #: apps/search/forms.py:32
 msgid "Total Views"
-msgstr ""
+msgstr "Total antal visninger"
 
 #: apps/search/forms.py:34
 msgid "query"
-msgstr ""
+msgstr "forespørgsel"
 
 #: apps/search/forms.py:36
 msgid "Sort By"
-msgstr ""
+msgstr "Sorter efter"
 
 #: apps/search/forms.py:37
 msgid "Subtitled Into"
@@ -373,7 +374,7 @@ msgstr ""
 
 #: apps/search/forms.py:62 apps/search/forms.py:97
 msgid "All Languages"
-msgstr ""
+msgstr "Alle sprog"
 
 #: apps/statistic/models.py:47 apps/statistic/models.py:48
 msgid "Subtitle fetch statistic"
@@ -395,72 +396,72 @@ msgstr ""
 
 #: apps/subtitles/forms.py:92
 msgid "The language already exists and is not a translation."
-msgstr ""
+msgstr "Sproget eksisterer allerede og er ikke en oversættelse."
 
 #: apps/subtitles/forms.py:98
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:126
+#: apps/subtitles/forms.py:106
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
-"the %s translation made from it."
+"the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:148
+#: apps/subtitles/forms.py:125
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:155
+#: apps/subtitles/forms.py:132
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:166
+#: apps/subtitles/forms.py:143
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:179
+#: apps/subtitles/forms.py:156
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:187
+#: apps/subtitles/forms.py:164
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+#: apps/subtitles/forms.py:177 apps/teams/forms.py:747
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:188
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:219
+#: apps/subtitles/forms.py:196
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/subtitles/forms.py:203 apps/teams/forms.py:655 apps/videos/forms.py:63
 #: apps/videos/forms.py:84
 msgid "Can not detect file encoding"
 msgstr "Kan ikke registrere filkodningen"
 
-#: apps/subtitles/forms.py:249
+#: apps/subtitles/forms.py:226
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "En anden er i gang med at lave undertekster til denne video lige nu - prøv senere."
 
@@ -475,7 +476,7 @@ msgstr ""
 
 #: apps/teams/admin.py:63
 msgid "Send message"
-msgstr ""
+msgstr "Send besked"
 
 #: apps/teams/admin.py:67
 msgid "Feature teams"
@@ -488,7 +489,7 @@ msgstr ""
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:201
 #: apps/teams/models.py:201
 msgid "Team"
-msgstr ""
+msgstr "Hold"
 
 #: apps/teams/admin.py:87 apps/teams/admin.py:207
 msgid "User"
@@ -498,7 +499,7 @@ msgstr "Bruger"
 #: libs/rosetta/templates/rosetta/languages.html:12
 #: templates/teams/_context_team.html:65
 msgid "Project"
-msgstr ""
+msgstr "Projekt"
 
 #: apps/teams/forms.py:61 apps/teams/forms.py:169
 msgid "Let's keep things tidy, shall we?"
@@ -516,7 +517,7 @@ msgstr ""
 
 #: apps/teams/forms.py:160
 msgid "Video language"
-msgstr ""
+msgstr "Videosprog"
 
 #: apps/teams/forms.py:162
 msgid "It will be saved only if video does not exist in our database."
@@ -596,7 +597,7 @@ msgstr ""
 
 #: apps/teams/forms.py:536 apps/teams/forms.py:538
 msgid "User does not exist!"
-msgstr ""
+msgstr "Bruger eksisterer ikke!"
 
 #: apps/teams/forms.py:545
 msgid "User is already a member of this team!"
@@ -659,11 +660,11 @@ msgstr ""
 
 #: apps/teams/models.py:108
 msgid "Open"
-msgstr ""
+msgstr "Åbn"
 
 #: apps/teams/models.py:109 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
-msgstr ""
+msgstr "Program"
 
 #: apps/teams/models.py:110
 msgid "Invitation by any team member"
@@ -691,15 +692,15 @@ msgstr ""
 
 #: apps/teams/models.py:141 apps/teams/models.py:2560
 msgid "name"
-msgstr ""
+msgstr "navn"
 
 #: apps/teams/models.py:142 apps/teams/models.py:2561
 msgid "slug"
-msgstr ""
+msgstr "snegl"
 
 #: apps/teams/models.py:143
 msgid "description"
-msgstr ""
+msgstr "beskrivelse"
 
 #: apps/teams/models.py:143
 msgid ""
@@ -708,7 +709,7 @@ msgstr ""
 
 #: apps/teams/models.py:145
 msgid "logo"
-msgstr ""
+msgstr "logo"
 
 #: apps/teams/models.py:146
 msgid "publicly Visible?"
@@ -723,7 +724,7 @@ msgstr ""
 
 #: apps/teams/models.py:148
 msgid "users"
-msgstr ""
+msgstr "brugere"
 
 #: apps/teams/models.py:151
 msgid "third party accounts"
@@ -784,7 +785,7 @@ msgstr ""
 #: apps/teams/models.py:202 templates/profiles/_top_user_panel.html:32
 #: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
 msgid "Teams"
-msgstr ""
+msgstr "Hold"
 
 #: apps/teams/models.py:650
 msgid ""
@@ -806,11 +807,11 @@ msgstr ""
 
 #: apps/teams/models.py:940 apps/teams/permissions_const.py:45
 msgid "Owner"
-msgstr ""
+msgstr "Ejer"
 
 #: apps/teams/models.py:941 apps/teams/permissions_const.py:46
 msgid "Manager"
-msgstr ""
+msgstr "Manager"
 
 #: apps/teams/models.py:942 apps/teams/permissions_const.py:44
 #: templates/base.html:118
@@ -819,7 +820,7 @@ msgstr "Admin"
 
 #: apps/teams/models.py:943 apps/teams/permissions_const.py:47
 msgid "Contributor"
-msgstr ""
+msgstr "Bidragyder"
 
 #: apps/teams/notifications.py:187
 msgid "New activity on your team video"
@@ -904,7 +905,7 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
-msgstr ""
+msgstr "Navn"
 
 #: apps/teams/views.py:130 templates/teams/teams-list.html:47
 msgid "Newest"
@@ -1089,7 +1090,7 @@ msgstr ""
 
 #: apps/teams/views.py:1519
 msgid "There's already a project with this name"
-msgstr ""
+msgstr "Der findes allerede et projekt med dette navn"
 
 #: apps/teams/views.py:1531
 msgid "Project added."
@@ -1101,7 +1102,7 @@ msgstr ""
 
 #: apps/teams/views.py:1559
 msgid "Project deleted."
-msgstr ""
+msgstr "Projekt slettet."
 
 #: apps/teams/views.py:1577
 msgid "Project saved."
@@ -1214,7 +1215,7 @@ msgstr ""
 
 #: apps/videos/forms.py:276
 msgid "captcha"
-msgstr ""
+msgstr "captcha"
 
 #: apps/videos/models.py:140
 msgid "in seconds"
@@ -1230,7 +1231,7 @@ msgstr ""
 
 #: apps/videos/models.py:168
 msgid "Views"
-msgstr ""
+msgstr "Visninger"
 
 #: apps/videos/models.py:1148
 msgid ""
@@ -1392,11 +1393,11 @@ msgstr ""
 
 #: apps/videos/models.py:2216
 msgid "comment"
-msgstr ""
+msgstr "kommentar"
 
 #: apps/videos/models.py:2217
 msgid "add version"
-msgstr ""
+msgstr "tilføj version"
 
 #: apps/videos/models.py:2218
 msgid "add translation"
@@ -1483,7 +1484,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:342
 msgid "Subtitle language does not exist"
-msgstr ""
+msgstr "Undertekst-sproget eksisterer ikke"
 
 #: apps/videos/rpc.py:350
 msgid "This is not forked translation"
@@ -1503,7 +1504,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:391 apps/videos/rpc.py:404
 msgid "Subtitles does not exist."
-msgstr ""
+msgstr "Undertekster eksisterer ikke."
 
 #: apps/videos/rpc.py:395
 msgid "You are following this subtitles now."
@@ -1605,28 +1606,28 @@ msgstr ""
 msgid "Undefined error"
 msgstr ""
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:325
+#: apps/widget/rpc.py:326
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:327
+#: apps/widget/rpc.py:328
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:337
+#: apps/widget/rpc.py:338
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1065 apps/widget/rpc.py:1106
+#: apps/widget/rpc.py:1085 apps/widget/rpc.py:1126
 msgid "\n"
 msgstr ""
 
@@ -1637,7 +1638,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:4
 #: libs/rosetta/templates/rosetta/languages.html:6
 msgid "Language selection"
-msgstr ""
+msgstr "Sprogvalg"
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
@@ -1649,12 +1650,12 @@ msgstr ""
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
 msgid "Home"
-msgstr ""
+msgstr "Jjem"
 
 #: libs/rosetta/templates/rosetta/languages.html:11
 #: templates/statistic/log_methods/changelist_view.html:37
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: libs/rosetta/templates/rosetta/languages.html:13
 msgid "Third party"
@@ -1663,11 +1664,11 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:15
 #: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:56
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: libs/rosetta/templates/rosetta/languages.html:29
 msgid "Progress"
-msgstr ""
+msgstr "Forløb"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/messages/new.html:14 templates/messages/sent.html:24
@@ -1679,12 +1680,12 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:72
 msgid "Translated"
-msgstr ""
+msgstr "Oversat"
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
 msgid "Fuzzy"
-msgstr ""
+msgstr "Uafklaret"
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
@@ -1692,7 +1693,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
-msgstr ""
+msgstr "Fil"
 
 #: libs/rosetta/templates/rosetta/languages.html:55
 msgid "Nothing to translate!"
@@ -1714,7 +1715,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
-msgstr ""
+msgstr "Vælg en anden fil"
 
 #: libs/rosetta/templates/rosetta/pofile.html:9
 msgid "Download this catalog"
@@ -1742,7 +1743,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:31
 msgid "Display:"
-msgstr ""
+msgstr "Vis:"
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
@@ -1759,21 +1760,21 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
 msgid "Search"
-msgstr ""
+msgstr "Søg"
 
 #: libs/rosetta/templates/rosetta/pofile.html:44
 msgid "Go"
-msgstr ""
+msgstr "Go"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:207 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
-msgstr ""
+msgstr "Forekomst(er)"
 
 #: libs/rosetta/templates/rosetta/pofile.html:72
 #: libs/rosetta/templates/rosetta/pofile.html:75
@@ -1817,11 +1818,11 @@ msgstr[1] ""
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr ""
+msgstr "Forrige"
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr ""
+msgstr "Næste"
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
@@ -1864,7 +1865,7 @@ msgstr "Permalink"
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
 #: templates/teams/_context_team.html:93
 msgid "Share"
-msgstr ""
+msgstr "Del"
 
 #: templates/_sharing_widget.html:14
 msgid "Get Embed Code"
@@ -1971,7 +1972,7 @@ msgstr ""
 
 #: templates/base.html:74
 msgid "Help"
-msgstr ""
+msgstr "Hjælp"
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
@@ -1980,7 +1981,7 @@ msgstr ""
 #: templates/base.html:102
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
-msgstr ""
+msgstr "Amara er et projekt fra <a href=\"http://participatoryculture.org/\">PCF</a>."
 
 #: templates/base.html:105 templates/profiles/view_profile.html:68
 msgid "About"
@@ -1988,7 +1989,7 @@ msgstr "Om"
 
 #: templates/base.html:106
 msgid "Jobs"
-msgstr ""
+msgstr "Jobs"
 
 #: templates/base.html:109
 msgid "Contact Us"
@@ -2000,7 +2001,7 @@ msgstr "Privatlivspolitik"
 
 #: templates/base.html:111
 msgid "Terms of Service"
-msgstr ""
+msgstr "Betingelser for brug"
 
 #: templates/base.html:121
 msgid "Sentry"
@@ -2016,7 +2017,7 @@ msgstr ""
 
 #: templates/base.html:130 templates/teams/billing/choose.html:11
 msgid "Billing"
-msgstr ""
+msgstr "Afregning"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -2340,7 +2341,7 @@ msgstr ""
 
 #: templates/faq.html:37 templates/faq.html.py:199
 msgid "Hey, you don’t list my language!"
-msgstr ""
+msgstr "Hey, mit sprog er ikke vist!"
 
 #: templates/faq.html:45
 msgid ""
@@ -2575,23 +2576,23 @@ msgstr ""
 
 #: templates/index.html:26
 msgid "Subtitle"
-msgstr ""
+msgstr "Tekst"
 
 #: templates/index.html:27
 msgid "Works with YouTube, Vimeo, HTML5, and more."
-msgstr ""
+msgstr "Virker med YouTube, Vimeo, HTML5 og flere."
 
 #: templates/index.html:30
 msgid "Features"
-msgstr ""
+msgstr "Funktioner"
 
 #: templates/index.html:32
 msgid "Embed the video anywhere"
-msgstr ""
+msgstr "Indlejr videoen overalt"
 
 #: templates/index.html:33
 msgid "Add subtitles yourself or ask viewers to help."
-msgstr ""
+msgstr "Tilføj undertekster selv, eller bed seerne om hjælp."
 
 #: templates/index.html:34
 msgid "Full site integration"
@@ -2614,7 +2615,7 @@ msgstr ""
 
 #: templates/index.html:48
 msgid "Complete Subtitling Solutions"
-msgstr ""
+msgstr "Komplette undertekst-løsninger"
 
 #: templates/index.html:50
 msgid ""
@@ -2658,11 +2659,11 @@ msgstr ""
 
 #: templates/index.html:110
 msgid "More Popular"
-msgstr ""
+msgstr "Flere populære"
 
 #: templates/index.html:111
 msgid "Most Popular Today"
-msgstr ""
+msgstr "Mest populære i dag"
 
 #: templates/index.html:113
 msgid "Top this month"
@@ -2674,12 +2675,12 @@ msgstr ""
 
 #: templates/index.html:121
 msgid "More Featured"
-msgstr ""
+msgstr "Flere fremhævede"
 
 #: templates/index.html:122 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr ""
+msgstr "Fremhævede videoer"
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -2739,7 +2740,7 @@ msgstr ""
 
 #: templates/index_old.html:77
 msgid "Amara works with these video sites and formats"
-msgstr ""
+msgstr "Amara virker med disse video-sites og formater"
 
 #: templates/index_old.html:89
 msgid "With Amara, you can:"
@@ -2747,7 +2748,7 @@ msgstr ""
 
 #: templates/index_old.html:91
 msgid "Add subtitles"
-msgstr ""
+msgstr "Tilføj undertekster"
 
 #: templates/index_old.html:92
 msgid ""
@@ -2829,7 +2830,7 @@ msgstr ""
 
 #: templates/index_old.html:149
 msgid "Try the demo"
-msgstr ""
+msgstr "Prøv demoen"
 
 #: templates/index_old.html:156
 msgid "Why Amara is different"
@@ -2850,7 +2851,7 @@ msgstr ""
 
 #: templates/index_old.html:160
 msgid "get the source code"
-msgstr ""
+msgstr "få kildekoden"
 
 #: templates/index_old.html:161
 msgid ""
@@ -3029,7 +3030,7 @@ msgstr "Se side"
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
-msgstr ""
+msgstr "Send"
 
 #: templates/auth/_email_confirmation_notification.html:6
 msgid "Resend confirmation email"
@@ -3042,7 +3043,7 @@ msgstr ""
 #: templates/auth/delete_user.html:13 templates/messages/list.html:83
 #: templates/messages/sent.html:56 templates/teams/tasks.html:427
 msgid "Delete"
-msgstr ""
+msgstr "Slet"
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:30
@@ -3050,7 +3051,7 @@ msgstr ""
 #: templates/teams/tasks.html:481 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:379
 msgid "Cancel"
-msgstr ""
+msgstr "Annullér"
 
 #: templates/auth/login.html:25
 msgid "Or use your Amara account"
@@ -3062,12 +3063,12 @@ msgstr ""
 
 #: templates/auth/login.html:29
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Glemt din adgangskode?"
 
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
 msgid "Sign In"
-msgstr ""
+msgstr "Log ind"
 
 #: templates/auth/login.html:34
 msgid "Create an Amara account"
@@ -3186,7 +3187,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:12
 msgid "Features & Benefits"
-msgstr ""
+msgstr "Funktioner og fordele"
 
 #: templates/enterprise/base.html:15
 msgid "Amara Platform"
@@ -3199,7 +3200,7 @@ msgstr ""
 #: templates/enterprise/base.html:21
 #: templates/enterprise/quality-control.html:6
 msgid "Quality Control"
-msgstr ""
+msgstr "Kvalitetskontrol"
 
 #: templates/enterprise/base.html:27
 #: templates/enterprise/subtitle-management.html:6
@@ -3217,7 +3218,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:40
 msgid "Customers"
-msgstr ""
+msgstr "Kunder"
 
 #: templates/enterprise/base.html:43 templates/enterprise/film-tv.html:6
 msgid "Film and Television"
@@ -3225,7 +3226,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:46
 msgid "Education"
-msgstr ""
+msgstr "Uddannelse"
 
 #: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
 msgid "Companies"
@@ -3245,7 +3246,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:66
 msgid "Get started with Amara"
-msgstr ""
+msgstr "Kom i gang med Amara"
 
 #: templates/enterprise/base.html:67
 msgid "Be in touch at"
@@ -3362,7 +3363,7 @@ msgstr ""
 
 #: templates/enterprise/index.html:13
 msgid "Contact us"
-msgstr ""
+msgstr "Kontakt os"
 
 #: templates/enterprise/index.html:13
 msgid "for more information and pricing."
@@ -3452,7 +3453,7 @@ msgstr ""
 
 #: templates/enterprise/index.html:72
 msgid "Work with Any Video Platform"
-msgstr ""
+msgstr "Virker med enhver videoplatform"
 
 #: templates/enterprise/index.html:74
 msgid ""
@@ -3538,7 +3539,7 @@ msgstr ""
 
 #: templates/enterprise/subtitle-management.html:12
 msgid "Import"
-msgstr ""
+msgstr "Importer"
 
 #: templates/enterprise/subtitle-management.html:13
 msgid ""
@@ -3705,7 +3706,7 @@ msgstr ""
 
 #: templates/messages/list.html:38 templates/messages/sent.html:31
 msgid "Compose"
-msgstr ""
+msgstr "Komponer"
 
 #: templates/messages/list.html:74
 msgid "Mark Read"
@@ -3713,7 +3714,7 @@ msgstr ""
 
 #: templates/messages/list.html:79
 msgid "Reply"
-msgstr ""
+msgstr "Svar"
 
 #: templates/messages/list.html:93
 msgid "You have no messages."
@@ -3722,20 +3723,20 @@ msgstr ""
 #: templates/messages/list.html:100 templates/messages/new.html:74
 #: templates/messages/sent.html:71
 msgid "Inbox"
-msgstr ""
+msgstr "Indbakke"
 
 #: templates/messages/list.html:101 templates/messages/new.html:75
 #: templates/messages/sent.html:72
 msgid "Sent"
-msgstr ""
+msgstr "Sendt"
 
 #: templates/messages/list.html:124
 msgid "Send Message"
-msgstr ""
+msgstr "Send besked"
 
 #: templates/messages/new.html:6
 msgid "Compose a Message"
-msgstr ""
+msgstr "Komponer besked"
 
 #: templates/messages/sent.html:6
 msgid "Sent Messages"
@@ -3789,7 +3790,7 @@ msgstr ""
 
 #: templates/messages/email/team-you-have-been-invited.html:16
 msgid "Reject"
-msgstr ""
+msgstr "Afvis"
 
 #: templates/messages/email/videos-imported.html:6
 #, python-format
@@ -3817,12 +3818,12 @@ msgstr ""
 
 #: templates/profiles/_filters_dashboard.html:5
 msgid "Overview"
-msgstr ""
+msgstr "Oversigt"
 
 #: templates/profiles/_filters_dashboard.html:8
 #: templates/profiles/dashboard.html:85
 msgid "Recent Activity"
-msgstr ""
+msgstr "Nylig aktivitet"
 
 #: templates/profiles/_filters_dashboard.html:11
 msgid "My Videos"
@@ -3846,36 +3847,36 @@ msgstr ""
 #: templates/search/search.html:155 templates/videos/featured_videos.html:55
 #: templates/videos/popular_videos.html:90
 msgid "Loading..."
-msgstr ""
+msgstr "Indlæser..."
 
 #: templates/profiles/_select_language_dialog.html:5
 msgid "Select your Languages"
-msgstr ""
+msgstr "Vælg dine sprog"
 
 #: templates/profiles/_select_language_dialog.html:10
 msgid "Select at least one language."
-msgstr ""
+msgstr "Vælg mindst et sprog."
 
 #: templates/profiles/_select_language_dialog.html:11
 msgid "Saving your language settings..."
-msgstr ""
+msgstr "Gemmer dine sprogindstillinger..."
 
 #: templates/profiles/_select_language_dialog.html:15
 msgid "We really need your help!"
-msgstr ""
+msgstr "Vi har virkelig brug for din hjælp!"
 
 #: templates/profiles/_select_language_dialog.html:16
 msgid "What languages do you speak?"
-msgstr ""
+msgstr "Hvilke sprog taler du?"
 
 #: templates/profiles/_select_language_dialog.html:29
 #: templates/teams/billing/choose.html:18
 msgid "Submit"
-msgstr ""
+msgstr "Indsend"
 
 #: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
 msgid "Profile"
-msgstr ""
+msgstr "Profil"
 
 #: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
 #: templates/profiles/dashboard.html:13
@@ -3897,7 +3898,7 @@ msgstr ""
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/members-list.html:102
 msgid "language"
-msgstr ""
+msgstr "sprog"
 
 #: templates/profiles/_video_detail.html:10
 #: templates/teams/_team_video_detail.html:28
@@ -3994,7 +3995,7 @@ msgstr ""
 
 #: templates/profiles/edit_profile.html:107
 msgid "Notifications"
-msgstr ""
+msgstr "Påmindelser"
 
 #: templates/profiles/edit_profile.html:110
 msgid "Send notifications to my UniversalSubtitles.org message inbox"
@@ -4028,7 +4029,7 @@ msgstr ""
 #: templates/profiles/edit_profile.html:183
 #: templates/teams/settings-permissions.html:118
 msgid "Save Changes"
-msgstr ""
+msgstr "Gem ændringer"
 
 #: templates/profiles/edit_profile.html:186
 msgid "Permanently Delete Your Profile"
@@ -4040,7 +4041,7 @@ msgstr ""
 
 #: templates/profiles/view_profile.html:56
 msgid "Member since"
-msgstr ""
+msgstr "Medlem siden"
 
 #: templates/profiles/view_profile.html:62
 msgid "Homepage"
@@ -4053,7 +4054,7 @@ msgstr ""
 #: templates/profiles/view_profile.html:82
 #: templates/teams/_subnav_settings.html:17
 msgid "Languages"
-msgstr ""
+msgstr "Sprog"
 
 #: templates/profiles/view_profile.html:98
 msgid "Memberships"
@@ -4065,7 +4066,7 @@ msgstr ""
 
 #: templates/profiles/view_profile.html:130
 msgid "Edit user"
-msgstr ""
+msgstr "Rediger bruger"
 
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
@@ -4074,7 +4075,7 @@ msgstr ""
 #: templates/registration/password_reset_form.html:8
 #: templates/registration/password_reset_form.html:14
 msgid "Password reset"
-msgstr ""
+msgstr "Nulstil adgangskode"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:12
@@ -4101,11 +4102,11 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
-msgstr ""
+msgstr "Ny adgangskode:"
 
 #: templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
-msgstr ""
+msgstr "Bekræft adgangskode:"
 
 #: templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
@@ -4124,7 +4125,7 @@ msgstr ""
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:12
 msgid "Password reset successful"
-msgstr ""
+msgstr "Nulstilling af adgangskode lykkedes."
 
 #: templates/registration/password_reset_done.html:14
 msgid ""
@@ -4166,7 +4167,7 @@ msgstr ""
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
-msgstr ""
+msgstr "E-mail adresse:"
 
 #: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
@@ -4191,12 +4192,12 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n              %(number)s sprog\n          "
+msgstr[1] "\n              %(number)s sprog\n          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
-msgstr ""
+msgstr "linjer"
 
 #: templates/search/_video_item.html:34
 msgid "Plays (this week)"
@@ -4216,7 +4217,7 @@ msgstr ""
 
 #: templates/search/search.html:89
 msgid "Search Results for"
-msgstr ""
+msgstr "Søgeresultater for "
 
 #: templates/search/search.html:122
 #, python-format
@@ -4248,7 +4249,7 @@ msgstr "Dato"
 #: templates/statistic/log_entry_model_admin.html:38
 #: templates/statistic/logger_model_admin.html:38
 msgid "Count"
-msgstr ""
+msgstr "Antal"
 
 #: templates/statistic/log_entry_model_admin.html:39
 #: templates/statistic/logger_model_admin.html:39
@@ -4267,22 +4268,22 @@ msgstr ""
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
 msgid "Day"
-msgstr ""
+msgstr "Dag"
 
 #: templates/statistic/users_statistic.html:14
 #: templates/statistic/videos_statistic.html:14
 msgid "Week"
-msgstr ""
+msgstr "Uge"
 
 #: templates/statistic/users_statistic.html:15
 #: templates/statistic/videos_statistic.html:15
 msgid "Month"
-msgstr ""
+msgstr "Måned"
 
 #: templates/statistic/users_statistic.html:16
 #: templates/statistic/videos_statistic.html:16
 msgid "TOTAL"
-msgstr ""
+msgstr "Total"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
@@ -4297,7 +4298,7 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:41
 msgid "all"
-msgstr ""
+msgstr "alle"
 
 #: templates/statistic/log_methods/changelist_view.html:55
 msgid "Class"
@@ -4305,11 +4306,11 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:56
 msgid "Method"
-msgstr ""
+msgstr "Metode"
 
 #: templates/statistic/log_methods/changelist_view.html:57
 msgid "Value"
-msgstr ""
+msgstr "Værdi"
 
 #: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
 msgid "Join via"
@@ -4341,7 +4342,7 @@ msgstr ""
 
 #: templates/teams/_actions.html:58
 msgid "Join Team"
-msgstr ""
+msgstr "Deltag i holdet"
 
 #: templates/teams/_actions.html:64
 msgid "Want to create your own subtitling team? Contact "
@@ -4357,7 +4358,7 @@ msgstr ""
 
 #: templates/teams/_application_form.html:19
 msgid "Language skill"
-msgstr ""
+msgstr "Sprogevne"
 
 #: templates/teams/_application_form.html:21
 #, python-format
@@ -4400,7 +4401,7 @@ msgstr ""
 
 #: templates/teams/_complete_team_video_detail.html:8
 msgid "Completed Languages"
-msgstr ""
+msgstr "Færdige sprog"
 
 #: templates/teams/_complete_team_video_detail.html:14
 msgid "Video Page"
@@ -4412,27 +4413,27 @@ msgstr ""
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show all"
-msgstr ""
+msgstr "Vis alt"
 
 #: templates/teams/_context_project.html:31
 #: templates/teams/_context_team.html:59
 msgid "Task"
-msgstr ""
+msgstr "Opgave"
 
 #: templates/teams/_context_project.html:81
 msgid "Other"
-msgstr ""
+msgstr "Andet"
 
 #: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr ""
+msgstr "Projekter"
 
 #: templates/teams/_context_team.html:29
 #: templates/videos/test_form_page.html:24
 msgid "video"
-msgstr ""
+msgstr "video"
 
 #: templates/teams/_context_team.html:36
 #: templates/teams/_context_team.html:114
@@ -4443,7 +4444,7 @@ msgstr ""
 
 #: templates/teams/_context_team.html:53
 msgid "Member"
-msgstr ""
+msgstr "Medlem"
 
 #: templates/teams/_context_team.html:83
 msgid "Your tasks"
@@ -4463,7 +4464,7 @@ msgstr ""
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "language choices"
-msgstr ""
+msgstr "sprogvalg"
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "there don't appear to be videos you can translate."
@@ -4503,7 +4504,7 @@ msgstr "Videoer"
 
 #: templates/teams/_tabs.html:11 templates/teams/members-list.html:6
 msgid "Members"
-msgstr ""
+msgstr "Medlemmer"
 
 #: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
 msgid "Activity"
@@ -4523,7 +4524,7 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:5
 #: templates/teams/settings-projects.html:5 templates/teams/settings.html:5
 msgid "Settings"
-msgstr ""
+msgstr "Indstillinger"
 
 #: templates/teams/_team_add_video_select.html:4
 msgid "Add this video to one of your teams"
@@ -4575,8 +4576,8 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages\n"
 "                    "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                        %(num)s sprog\n                    "
+msgstr[1] "\n                        %(num)s sprog\n                    "
 
 #: templates/teams/_team_video_detail.html:19
 #, python-format
@@ -4601,20 +4602,20 @@ msgid_plural ""
 "\n"
 "                            %(counter)s tasks\n"
 "                        "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                            1 opgave\n                        "
+msgstr[1] "\n                            %(counter)s opgaver\n                        "
 
 #: templates/teams/_team_video_detail.html:52
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
-msgstr ""
+msgstr "Redigér"
 
 #: templates/teams/_team_video_detail.html:60
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
-msgstr ""
+msgstr "Fjern"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -4635,7 +4636,7 @@ msgstr ""
 #: templates/teams/add_video.html:35 templates/teams/add_videos.html:31
 #: templates/teams/create_task.html:91 templates/teams/team_video.html:44
 msgid "Save"
-msgstr ""
+msgstr "Gem"
 
 #: templates/teams/add_videos.html:21
 msgid "Add multiple videos"
@@ -4647,15 +4648,15 @@ msgstr ""
 
 #: templates/teams/applications.html:49 templates/teams/tasks.html:63
 msgid "Approve"
-msgstr ""
+msgstr "Godkend"
 
 #: templates/teams/applications.html:52
 msgid "Deny"
-msgstr ""
+msgstr "Afvis"
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
-msgstr ""
+msgstr "Send en besked"
 
 #: templates/teams/applications.html:66
 msgid "There are no applications right now"
@@ -4667,11 +4668,11 @@ msgstr ""
 
 #: templates/teams/create.html:6
 msgid "Create team"
-msgstr ""
+msgstr "Opret hold"
 
 #: templates/teams/create.html:23 templates/teams/create.html.py:65
 msgid "Create a team"
-msgstr ""
+msgstr "Opret et hold"
 
 #: templates/teams/create.html:28 templates/teams/teams-list.html:23
 msgid "All Teams"
@@ -4683,11 +4684,11 @@ msgstr ""
 
 #: templates/teams/create.html:51
 msgid "Display Settings"
-msgstr ""
+msgstr "Vis indstillinger"
 
 #: templates/teams/create.html:57
 msgid "Create Team"
-msgstr ""
+msgstr "Opret hold"
 
 #: templates/teams/create.html:69
 msgid "Back to teams"
@@ -4703,7 +4704,7 @@ msgstr ""
 
 #: templates/teams/create_task.html:44
 msgid "New Task"
-msgstr ""
+msgstr "Ny opgave"
 
 #: templates/teams/create_task.html:45
 msgid ""
@@ -4745,7 +4746,7 @@ msgstr ""
 
 #: templates/teams/create_task.html:83
 msgid "Selected Video"
-msgstr ""
+msgstr "Valgt video"
 
 #: templates/teams/create_task.html:100
 msgid "New task form"
@@ -4782,7 +4783,7 @@ msgstr ""
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
-msgstr ""
+msgstr "Mange tak!"
 
 #: templates/teams/invite_members.html:6 templates/teams/members-list.html:45
 msgid "Invite Members"
@@ -4790,7 +4791,7 @@ msgstr ""
 
 #: templates/teams/invite_members.html:23
 msgid "Recipient"
-msgstr ""
+msgstr "Modtager"
 
 #: templates/teams/invite_members.html:29
 msgid "Begin typing to search."
@@ -4844,7 +4845,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:58
 msgid "contributor"
-msgstr ""
+msgstr "bidragyder"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
@@ -4852,13 +4853,13 @@ msgstr ""
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:83
 msgid "all languages"
-msgstr ""
+msgstr "alle sprog"
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:128
 #: templates/teams/tasks.html.py:135 templates/teams/tasks.html:142
 #: templates/teams/videos-list.html:94
 msgid "Clear"
-msgstr ""
+msgstr "Ryd"
 
 #: templates/teams/members-list.html:77
 msgid "This team has"
@@ -4878,11 +4879,11 @@ msgstr ""
 
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
-msgstr ""
+msgstr "og"
 
 #: templates/teams/members-list.html:101
 msgid "project"
-msgstr ""
+msgstr "projekt"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5027,11 +5028,11 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:71
 msgid "or ..."
-msgstr ""
+msgstr "eller ..."
 
 #: templates/teams/settings-permissions.html:77
 msgid "Reviewed"
-msgstr ""
+msgstr "Revideret"
 
 #: templates/teams/settings-permissions.html:82
 msgid "Approved"
@@ -5039,7 +5040,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:87
 msgid "Published"
-msgstr ""
+msgstr "Udgivet"
 
 #: templates/teams/settings-permissions.html:93
 msgid "Workflows enable you to add moderation steps and automate tasks"
@@ -5067,12 +5068,12 @@ msgstr ""
 #: templates/teams/settings-permissions.html:109
 #: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:60
 msgid "Review"
-msgstr ""
+msgstr "Revider"
 
 #: templates/teams/settings-permissions.html:112
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
-msgstr ""
+msgstr "Godkendelse"
 
 #: templates/teams/settings-projects-add.html:18
 #: templates/teams/settings-projects-edit.html:24
@@ -5082,12 +5083,12 @@ msgstr ""
 
 #: templates/teams/settings-projects-add.html:26
 msgid "Add new project"
-msgstr ""
+msgstr "Tilføj nyt projekt"
 
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
-msgstr ""
+msgstr "Beskrivelse"
 
 #: templates/teams/settings-projects-add.html:40
 msgid ""
@@ -5101,7 +5102,7 @@ msgstr ""
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
-msgstr ""
+msgstr "Redigér projekt"
 
 #: templates/teams/settings-projects-edit.html:76
 msgid "Are you sure you want to delete this project?"
@@ -5117,7 +5118,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:58
 msgid "Translate"
-msgstr ""
+msgstr "Oversæt"
 
 #: templates/teams/tasks.html:66
 msgid "tasks in"
@@ -5129,11 +5130,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:81
 msgid "my languages"
-msgstr ""
+msgstr "mine sprog"
 
 #: templates/teams/tasks.html:95
 msgid "assigned to"
-msgstr ""
+msgstr "tildelt til"
 
 #: templates/teams/tasks.html:97
 msgid "no one"
@@ -5174,7 +5175,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:140
 msgid "NOTE:"
-msgstr ""
+msgstr "OBS:"
 
 #: templates/teams/tasks.html:141
 msgid ""
@@ -5183,11 +5184,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:148
 msgid "Try broadening your selection using the filters above"
-msgstr ""
+msgstr "Prøv at udvide din udvælgelse ved brug af filtrene ovenfor"
 
 #: templates/teams/tasks.html:154
 msgid "Tell us what languages you speak"
-msgstr ""
+msgstr "Fortæl os hvilke sprog du taler"
 
 #: templates/teams/tasks.html:154
 msgid "and we'll narrow this list for you"
@@ -5227,11 +5228,11 @@ msgstr ""
 
 #: templates/teams/tasks.html:241 templates/videos/subtitle-view.html:48
 msgid "translated"
-msgstr ""
+msgstr "oversat"
 
 #: templates/teams/tasks.html:249
 msgid "reviewed"
-msgstr ""
+msgstr "revideret"
 
 #: templates/teams/tasks.html:251
 msgid "and edited"
@@ -5240,11 +5241,11 @@ msgstr ""
 #: templates/teams/tasks.html:253 templates/videos/subtitle-view.html:194
 #: templates/videos/subtitle-view.html:310
 msgid "by"
-msgstr ""
+msgstr "af"
 
 #: templates/teams/tasks.html:266
 msgid "Assigned to"
-msgstr ""
+msgstr "Tildelt til"
 
 #: templates/teams/tasks.html:275
 msgid "Unassigned"
@@ -5280,12 +5281,12 @@ msgstr ""
 #: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
-msgstr ""
+msgstr "Sprog"
 
 #: templates/teams/tasks.html:340 templates/videos/_upload_subtitles.html:37
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
-msgstr ""
+msgstr "Dobbelt-tjek venligst det primære talte sprog. Dette trin kan ikke fortrydes."
 
 #: templates/teams/tasks.html:345
 msgid "Translate from"
@@ -5293,7 +5294,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:350
 msgid "File:"
-msgstr ""
+msgstr "Fil:"
 
 #: templates/teams/tasks.html:353
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
@@ -5317,7 +5318,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:420
 msgid "Assign"
-msgstr ""
+msgstr "Tildel"
 
 #: templates/teams/tasks.html:436
 msgid "Delete task"
@@ -5367,7 +5368,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:41
 msgid "Sort by"
-msgstr ""
+msgstr "Sorter efter"
 
 #: templates/teams/teams-list.html:64
 msgid "Your team"
@@ -5375,7 +5376,7 @@ msgstr ""
 
 #: templates/teams/teams-list.html:67
 msgid "Private"
-msgstr ""
+msgstr "Privat"
 
 #: templates/teams/teams-list.html:74
 msgid "No description..."
@@ -5441,15 +5442,15 @@ msgstr ""
 #: templates/teams/videos-list.html:59 templates/videos/subtitle-view.html:46
 #: templates/videos/subtitle-view.html:48
 msgid "with"
-msgstr ""
+msgstr "med"
 
 #: templates/teams/videos-list.html:61
 msgid "any"
-msgstr ""
+msgstr "enhver"
 
 #: templates/teams/videos-list.html:62
 msgid "no"
-msgstr ""
+msgstr "nej"
 
 #: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
 #: templates/videos/subtitle-view.html:48
@@ -5459,11 +5460,11 @@ msgstr ""
 
 #: templates/teams/videos-list.html:73
 msgid "name, a-z"
-msgstr ""
+msgstr "navn, a-z"
 
 #: templates/teams/videos-list.html:76
 msgid "name, z-a"
-msgstr ""
+msgstr "navn, z-a"
 
 #: templates/teams/videos-list.html:79
 msgid "time, newest"
@@ -5491,7 +5492,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:123
 msgid "Remove video"
-msgstr ""
+msgstr "Fjern video"
 
 #: templates/teams/videos-list.html:130
 #, python-format
@@ -5581,7 +5582,7 @@ msgstr "Send tilbagemelding"
 #: templates/videos/_video_url_panel.html:43
 #: templates/videos/video-view.html:69
 msgid "Close"
-msgstr ""
+msgstr "Luk"
 
 #: templates/videos/_feedback_form.html:37
 msgid "Thank you for your feedback."
@@ -5646,7 +5647,7 @@ msgstr ""
 #: templates/videos/_follow_video_button.html:94
 #: templates/videos/_follow_video_button.html:147
 msgid " subtitles"
-msgstr ""
+msgstr "undertekster"
 
 #: templates/videos/_follow_video_button.html:104
 msgid "Unfollow all languages"
@@ -5658,11 +5659,11 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:144
 msgid " subtitles for this video. You can stop these emails at any time."
-msgstr ""
+msgstr "undertekster for denne video. Du kan stoppe disse e-mails til enhver tid."
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
-msgstr ""
+msgstr "Følg"
 
 #: templates/videos/_follow_video_button.html:149
 msgid ""
@@ -5721,7 +5722,7 @@ msgstr ""
 
 #: templates/videos/_paste_transcription.html:136
 msgid "Upload TXT file"
-msgstr ""
+msgstr "Upload TXT fil"
 
 #: templates/videos/_paste_transcription.html:144
 #: templates/videos/_upload_subtitles.html:61
@@ -5731,19 +5732,19 @@ msgstr "Log ind for at uploade undertekster"
 #: templates/videos/_team_list.html:5 templates/videos/video-view.html:201
 #: templates/videos/video-view.html:207
 msgid "Collaborate"
-msgstr ""
+msgstr "Samarbejd"
 
 #: templates/videos/_team_list.html:19
 msgid "View team:"
-msgstr ""
+msgstr "Vis hold:"
 
 #: templates/videos/_team_list.html:19 templates/videos/video-view.html:208
 msgid "Translation Project"
-msgstr ""
+msgstr "Oversættelsesprojekt"
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "upload"
-msgstr ""
+msgstr "upload"
 
 #: templates/videos/_upload_subtitles.html:12
 msgid "Upload Subtitles"
@@ -5760,11 +5761,11 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:32
 msgid "Video Language"
-msgstr ""
+msgstr "Videosprog"
 
 #: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
-msgstr ""
+msgstr "Oversat fra"
 
 #: templates/videos/_upload_subtitles.html:52
 #, python-format
@@ -5774,7 +5775,7 @@ msgstr ""
 #: templates/videos/_upload_subtitles.html:55
 #: templates/videos/_upload_subtitles.html:71
 msgid "Upload"
-msgstr ""
+msgstr "Upload"
 
 #: templates/videos/_upload_subtitles.html:70
 msgid ""
@@ -5789,12 +5790,12 @@ msgstr ""
 #: templates/videos/_video.html:23
 msgid "view"
 msgid_plural "views"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "visning"
+msgstr[1] "visninger"
 
 #: templates/videos/_video.html:26
 msgid "Added"
-msgstr ""
+msgstr "Tilføjet"
 
 #: templates/videos/_video.html:33
 #, python-format
@@ -5806,17 +5807,17 @@ msgid_plural ""
 "\n"
 "                    %(number)s Languages\n"
 "                "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n                    %(number)s sprog\n                "
+msgstr[1] "\n                    %(number)s sprog\n                "
 
 #: templates/videos/_video_url_panel.html:6
 msgid "Add new URL"
-msgstr ""
+msgstr "Tilføj ny URL"
 
 #: templates/videos/_video_url_panel.html:16
 #: templates/videos/_video_url_panel.html:109
 msgid "Primary"
-msgstr ""
+msgstr "Primær"
 
 #: templates/videos/_video_url_panel.html:32
 msgid "Make primary"
@@ -5824,7 +5825,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
-msgstr ""
+msgstr "Find ud af mere"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
@@ -5859,7 +5860,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:59
 msgid "Add another URL for this video"
-msgstr ""
+msgstr "Tilføj en anden URL til denne video"
 
 #: templates/videos/_video_url_panel.html:61
 msgid ""
@@ -5870,7 +5871,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
 msgid "Add"
-msgstr ""
+msgstr "Tilføj"
 
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
@@ -5897,7 +5898,7 @@ msgstr ""
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
-msgstr ""
+msgstr "Ingen videoer fundet"
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -5971,12 +5972,12 @@ msgstr "Tilbagefør til version"
 #: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
-msgstr ""
+msgstr "Titel:"
 
 #: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
-msgstr ""
+msgstr "Beskrivelse:"
 
 #: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
 #: templates/videos/subtitle-view.html:226
@@ -6031,11 +6032,11 @@ msgstr ""
 #: templates/videos/email_notification.html:27
 #: templates/videos/email_notification_non_editors.html:23
 msgid "Compare the new version to the last version"
-msgstr ""
+msgstr "Sammenlign den nye version med den sidste version"
 
 #: templates/videos/email_notification.html:28
 msgid "Compare your work to the new version"
-msgstr ""
+msgstr "Sammenlign dit arbejde med den nye version"
 
 #: templates/videos/email_notification.html:38
 #: templates/videos/email_notification.html:66
@@ -6044,12 +6045,12 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:60
 #: templates/videos/email_notification_non_editors.html:88
 msgid "Old Text"
-msgstr ""
+msgstr "Gammel tekst"
 
 #: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to title"
-msgstr ""
+msgstr "Ændringer til titel"
 
 #: templates/videos/email_notification.html:44
 #: templates/videos/email_notification.html:72
@@ -6058,7 +6059,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:66
 #: templates/videos/email_notification_non_editors.html:94
 msgid "New Text"
-msgstr ""
+msgstr "Næste tekst"
 
 #: templates/videos/email_notification.html:69
 #: templates/videos/email_notification_non_editors.html:63
@@ -6127,27 +6128,27 @@ msgstr ""
 
 #: templates/videos/email_title_changed.html:7
 msgid "The title of the video"
-msgstr ""
+msgstr "Titlen på videoen"
 
 #: templates/videos/email_title_changed.html:10
 msgid "has been changed by"
-msgstr ""
+msgstr "er blevet ændret af"
 
 #: templates/videos/email_title_changed.html:13
 msgid "has been changed"
-msgstr ""
+msgstr "er blevet ændret"
 
 #: templates/videos/email_title_changed.html:16
 msgid "The new title is"
-msgstr ""
+msgstr "Den nye titel er"
 
 #: templates/videos/email_title_changed.html:18
 msgid "If this is incorrect, go to "
-msgstr ""
+msgstr "Hvis dette er forkert, så gå til "
 
 #: templates/videos/email_title_changed.html:19
 msgid "the video page"
-msgstr ""
+msgstr "videosiden"
 
 #: templates/videos/email_title_changed.html:20
 msgid ""
@@ -6162,11 +6163,11 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:9
 msgid "was submitted by"
-msgstr ""
+msgstr "blev indsendt af"
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
-msgstr ""
+msgstr "Anonym"
 
 #: templates/videos/email_video_url_add.html:15
 msgid ""
@@ -6185,44 +6186,44 @@ msgstr ""
 #: templates/videos/featured_videos.html:32
 #: templates/videos/popular_videos.html:55 templates/videos/watch.html:18
 msgid "Watch Subtitled Videos"
-msgstr ""
+msgstr "Se tekstede videoer"
 
 #: templates/videos/latest_videos.html:20 templates/videos/volunteer.html:114
 #: templates/videos/volunteer_latest.html:21 templates/videos/watch.html:107
 msgid "Latest Videos"
-msgstr ""
+msgstr "Nyeste videoer"
 
 #: templates/videos/popular_videos.html:59 templates/videos/volunteer.html:59
 #: templates/videos/watch.html:41
 msgid "Popular Videos"
-msgstr ""
+msgstr "Populære videoer"
 
 #: templates/videos/popular_videos.html:61
 #: templates/videos/popular_videos.html:65 templates/videos/volunteer.html:61
 #: templates/videos/volunteer.html.py:65 templates/videos/watch.html:43
 #: templates/videos/watch.html.py:47
 msgid "This Week"
-msgstr ""
+msgstr "Denne uge"
 
 #: templates/videos/popular_videos.html:64 templates/videos/volunteer.html:64
 #: templates/videos/watch.html:46
 msgid "Today"
-msgstr ""
+msgstr "I dag"
 
 #: templates/videos/popular_videos.html:66 templates/videos/volunteer.html:66
 #: templates/videos/watch.html:48
 msgid "This Month"
-msgstr ""
+msgstr "Denne måned"
 
 #: templates/videos/popular_videos.html:67 templates/videos/volunteer.html:67
 #: templates/videos/watch.html:49
 msgid "This Year"
-msgstr ""
+msgstr "Dette år"
 
 #: templates/videos/popular_videos.html:68 templates/videos/volunteer.html:68
 #: templates/videos/watch.html:50
 msgid "All Time"
-msgstr ""
+msgstr "Alle tider"
 
 #: templates/videos/stop_notification.html:9
 #, python-format
@@ -6231,11 +6232,11 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:22
 msgid "Select two revisions to compare, please"
-msgstr ""
+msgstr "Vælg venligst to versioner der skal sammenlignes"
 
 #: templates/videos/subtitle-view.html:101 templates/videos/video-view.html:91
 msgid "View"
-msgstr ""
+msgstr "Vis"
 
 #: templates/videos/subtitle-view.html:107 templates/videos/video-view.html:97
 msgid "Follower"
@@ -6244,16 +6245,16 @@ msgstr ""
 #: templates/videos/subtitle-view.html:113
 #: templates/videos/video-view.html:103
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
 #: templates/videos/subtitle-view.html:119
 msgid "Line"
-msgstr ""
+msgstr "Linje"
 
 #: templates/videos/subtitle-view.html:129
 #: templates/videos/video-view.html:119
 msgid "View Subtitles"
-msgstr ""
+msgstr "Vis undertekster"
 
 #: templates/videos/subtitle-view.html:153
 #: templates/videos/subtitle-view.html:277
@@ -6263,7 +6264,7 @@ msgstr "Kommentarer"
 
 #: templates/videos/subtitle-view.html:154
 msgid "Revisions"
-msgstr ""
+msgstr "Revisioner"
 
 #: templates/videos/subtitle-view.html:159
 #: templates/videos/subtitle-view.html:380
@@ -6277,7 +6278,7 @@ msgstr "Rediger undertekster"
 
 #: templates/videos/subtitle-view.html:169
 msgid "Download"
-msgstr ""
+msgstr "Download"
 
 #: templates/videos/subtitle-view.html:184
 msgid "Draft only"
@@ -6285,17 +6286,17 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:187
 msgid "translated from"
-msgstr ""
+msgstr "oversat fra"
 
 #: templates/videos/subtitle-view.html:191
 #: templates/videos/subtitle-view.html:300
 #: templates/videos/subtitle-view.html:302
 msgid "Revision"
-msgstr ""
+msgstr "Revision"
 
 #: templates/videos/subtitle-view.html:192
 msgid "created"
-msgstr ""
+msgstr "oprettet"
 
 #: templates/videos/subtitle-view.html:238
 msgid ""
@@ -6307,7 +6308,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:242
 msgid "View revision history"
-msgstr ""
+msgstr "Vis revisionshistorik"
 
 #: templates/videos/subtitle-view.html:247
 msgid "These subtitles are in progress."
@@ -6354,11 +6355,11 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:317
 msgid "Text"
-msgstr ""
+msgstr "Tekst"
 
 #: templates/videos/subtitle-view.html:323
 msgid "No subtitles for this language."
-msgstr ""
+msgstr "Ingen undertekster for dette sprog."
 
 #: templates/videos/subtitle-view.html:332
 msgid "Roll back to this version"
@@ -6370,7 +6371,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:353
 msgid "This version only"
-msgstr ""
+msgstr "Kun denne version"
 
 #: templates/videos/subtitle-view.html:357
 msgid "This entire language and all dependent languages"
@@ -6389,11 +6390,11 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
-msgstr ""
+msgstr "Din e-mail"
 
 #: templates/videos/test_form_page.html:23
 msgid "Task 1"
-msgstr ""
+msgstr "Opgave 1"
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
@@ -6408,7 +6409,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
-msgstr ""
+msgstr "Opgave 2"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
@@ -6416,7 +6417,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"
-msgstr ""
+msgstr "Opgave 3"
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
@@ -6428,7 +6429,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:45
 msgid "Submit!"
-msgstr ""
+msgstr "Indsend!"
 
 #: templates/videos/test_form_page.html:67
 msgid "Simple Instructions"
@@ -6466,11 +6467,11 @@ msgstr ""
 
 #: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "Be the first to "
-msgstr ""
+msgstr "Vær den første til at "
 
 #: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "create subtitles"
-msgstr ""
+msgstr "oprette undertekster"
 
 #: templates/videos/video-view.html:156 templates/videos/video-view.html:184
 msgid "This video doesn't have any subtitles yet"
@@ -6482,11 +6483,11 @@ msgstr ""
 
 #: templates/videos/video-view.html:179
 msgid "Contribute"
-msgstr ""
+msgstr "Bidrag"
 
 #: templates/videos/video-view.html:184
 msgid "Create subtitles now"
-msgstr ""
+msgstr "Opret undertekster nu"
 
 #: templates/videos/video-view.html:188
 msgid "Don't see the language you're looking for?"
@@ -6494,7 +6495,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:188
 msgid "Start a new translation"
-msgstr ""
+msgstr "Start en ny oversættelse"
 
 #: templates/videos/video-view.html:194
 msgid ""
@@ -6516,7 +6517,7 @@ msgstr ""
 
 #: templates/videos/volunteer.html:23 templates/videos/watch.html:23
 msgid "More Featured Videos"
-msgstr ""
+msgstr "Flere fremhævede videoer"
 
 #: templates/videos/volunteer.html:38
 msgid "More Requested Videos"
@@ -6529,7 +6530,7 @@ msgstr ""
 
 #: templates/videos/volunteer.html:56 templates/videos/watch.html:38
 msgid "More Popular Videos"
-msgstr ""
+msgstr "Flere populære videoer"
 
 #: templates/videos/volunteer.html:112 templates/videos/watch.html:105
 msgid "More Recent Videos"
@@ -6579,4 +6580,4 @@ msgstr ""
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."
-msgstr ""
+msgstr "mere..."

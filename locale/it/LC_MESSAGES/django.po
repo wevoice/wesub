@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Claude Almansi <claude.almansi@gmail.com>, 2011, 2012.
+# Claude Almansi <claude.almansi@gmail.com>, 2011-2012.
 #   <ilaria.minetti@gmail.com>, 2012.
 # Laura Leotta <>, 2012.
 # Lorenzo Buonanno <buonanno.lorenzo@gmail.com>, 2012.
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 01:32-0600\n"
-"PO-Revision-Date: 2012-11-08 07:56+0000\n"
+"POT-Creation-Date: 2012-11-09 01:32-0600\n"
+"PO-Revision-Date: 2012-11-09 07:55+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/universalsubtitles/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -252,7 +252,7 @@ msgstr ""
 #: apps/messages/tasks.py:629
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
-msgstr ""
+msgstr "%(user)s ha lasciato un commento sul video %(title)s"
 
 #: apps/messages/views.py:125
 msgid "Message sent."
@@ -407,65 +407,65 @@ msgstr ""
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:126
+#: apps/subtitles/forms.py:106
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
-"the %s translation made from it."
+"the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:148
+#: apps/subtitles/forms.py:125
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:155
+#: apps/subtitles/forms.py:132
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:166
+#: apps/subtitles/forms.py:143
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Spiacenti, impossibile caricare i sottotitoli perchè una bozza in questa lingua è già in fase di moderazione."
 
-#: apps/subtitles/forms.py:179
+#: apps/subtitles/forms.py:156
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:187
+#: apps/subtitles/forms.py:164
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+#: apps/subtitles/forms.py:177 apps/teams/forms.py:747
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:188
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:219
+#: apps/subtitles/forms.py:196
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/subtitles/forms.py:203 apps/teams/forms.py:655 apps/videos/forms.py:63
 #: apps/videos/forms.py:84
 msgid "Can not detect file encoding"
 msgstr "La codificazione del file non è identificabile"
 
-#: apps/subtitles/forms.py:249
+#: apps/subtitles/forms.py:226
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Qualcuno sta sottotitolando ora questo video. Riprova più tardi."
 
@@ -1082,15 +1082,15 @@ msgstr "Tentativo di assegnazione non valido."
 
 #: apps/teams/views.py:1446
 msgid "Draft uploaded successfully."
-msgstr ""
+msgstr "Bozza caricata con successo."
 
 #: apps/teams/views.py:1450
 msgid "/n"
-msgstr ""
+msgstr "/n"
 
 #: apps/teams/views.py:1468
 msgid "You are not allowed to download this transcript."
-msgstr ""
+msgstr "Non sei autorizzato a scaricare questa trascrizione"
 
 #: apps/teams/views.py:1519
 msgid "There's already a project with this name"
@@ -1120,7 +1120,7 @@ msgstr ""
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
-msgstr ""
+msgstr "Richiesta di annullamento della pubblicazione non valida\nErrori:\n"
 
 #: apps/teams/views.py:1755
 msgid "Successfully unpublished subtitles."
@@ -1165,7 +1165,7 @@ msgstr "Non sei autorizzato ad aggiungere URL di video per questo video"
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr ""
+msgstr "Per favore riprova con un link a una pagina video. \n                        <a href=\"mailto:%s\">Contattaci</a> se c'è un problema."
 
 #: apps/videos/forms.py:184 apps/videos/types/forms.py:21
 #, python-format
@@ -1281,7 +1281,7 @@ msgstr ""
 #: apps/videos/models.py:2044
 #, python-format
 msgid "  deleted video \"%(title)s\""
-msgstr ""
+msgstr "Cancellato il video \"%(title)s\""
 
 #: apps/videos/models.py:2049
 #, python-format
@@ -1610,28 +1610,28 @@ msgstr "Video privato"
 msgid "Undefined error"
 msgstr "Errore indefinito"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr "L'inserimento - embed - del video è stato disattivato dal proprietario"
 
-#: apps/widget/rpc.py:325
+#: apps/widget/rpc.py:326
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:327
+#: apps/widget/rpc.py:328
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:337
+#: apps/widget/rpc.py:338
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1065 apps/widget/rpc.py:1106
+#: apps/widget/rpc.py:1085 apps/widget/rpc.py:1126
 msgid "\n"
 msgstr "\n"
 
@@ -2560,7 +2560,7 @@ msgstr ""
 
 #: templates/generic-error.html:8
 msgid "If you need assistance, please visit our support site at "
-msgstr ""
+msgstr "Se hai bisogno di assistenza, visita il nostro sito di supporto"
 
 #: templates/generic-error.html:8
 msgid "Get help"
@@ -2643,15 +2643,15 @@ msgstr "La piattaforma più vasta ed efficiente del mondo"
 
 #: templates/index.html:84
 msgid "TED"
-msgstr ""
+msgstr "TED"
 
 #: templates/index.html:89
 msgid "Mozilla"
-msgstr ""
+msgstr "Mozilla"
 
 #: templates/index.html:94
 msgid "Netflix"
-msgstr ""
+msgstr "Netfilx"
 
 #: templates/index.html:99
 msgid "Coursera"
@@ -3067,7 +3067,7 @@ msgstr ""
 
 #: templates/auth/login.html:29
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Dimenticato la tua password?"
 
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
@@ -3191,11 +3191,11 @@ msgstr ""
 
 #: templates/enterprise/base.html:12
 msgid "Features & Benefits"
-msgstr ""
+msgstr "Caratteristiche e vantaggi"
 
 #: templates/enterprise/base.html:15
 msgid "Amara Platform"
-msgstr ""
+msgstr "Piattaforma Amara"
 
 #: templates/enterprise/base.html:18
 msgid "Global Reach"
@@ -3222,7 +3222,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:40
 msgid "Customers"
-msgstr ""
+msgstr "Clienti"
 
 #: templates/enterprise/base.html:43 templates/enterprise/film-tv.html:6
 msgid "Film and Television"
@@ -3230,7 +3230,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:46
 msgid "Education"
-msgstr ""
+msgstr "Istruzione"
 
 #: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
 msgid "Companies"
@@ -3242,7 +3242,7 @@ msgstr ""
 
 #: templates/enterprise/base.html:55 templates/enterprise/government.html:6
 msgid "Government"
-msgstr ""
+msgstr "Governo"
 
 #: templates/enterprise/base.html:58
 msgid "Non-Profits"
@@ -3265,7 +3265,7 @@ msgstr ""
 
 #: templates/enterprise/education.html:6
 msgid "Universities and Online Education"
-msgstr ""
+msgstr "Università e istruzione online"
 
 #: templates/enterprise/education.html:16
 msgid ""
@@ -3367,11 +3367,11 @@ msgstr ""
 
 #: templates/enterprise/index.html:13
 msgid "Contact us"
-msgstr ""
+msgstr "Contattaci"
 
 #: templates/enterprise/index.html:13
 msgid "for more information and pricing."
-msgstr ""
+msgstr "per più informazioni e prezzi."
 
 #: templates/enterprise/index.html:17
 msgid "World-class Users"
@@ -3543,7 +3543,7 @@ msgstr ""
 
 #: templates/enterprise/subtitle-management.html:12
 msgid "Import"
-msgstr ""
+msgstr "Importa"
 
 #: templates/enterprise/subtitle-management.html:13
 msgid ""
@@ -4485,7 +4485,7 @@ msgstr "Puoi anche invitare amici che parlano altre lingue a contribuire."
 #: templates/teams/_perform_task_link.html:5
 #: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:304
 msgid "Resume"
-msgstr ""
+msgstr "Riprendi"
 
 #: templates/teams/_perform_task_link.html:7
 #: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:306
@@ -5265,7 +5265,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:318
 msgid "Download draft"
-msgstr ""
+msgstr "Scarica bozza"
 
 #: templates/teams/tasks.html:332
 msgid "Upload a draft"
@@ -5273,7 +5273,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:335
 msgid "Important:"
-msgstr ""
+msgstr "Importante:"
 
 #: templates/teams/tasks.html:335
 msgid ""
@@ -5294,7 +5294,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:345
 msgid "Translate from"
-msgstr ""
+msgstr "Traduci da"
 
 #: templates/teams/tasks.html:350
 msgid "File:"
@@ -5340,7 +5340,7 @@ msgstr "Pubblica immediatamente questi sottotitoli"
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
-msgstr ""
+msgstr "Cancella questi sottotitoli in modo permanente (cancella tutte le bozze dopo l'ultima versione pubblicata)"
 
 #: templates/teams/tasks.html:488
 msgid "Assign to User"
@@ -5441,7 +5441,7 @@ msgstr "Aggiungi Video"
 
 #: templates/teams/videos-list.html:52
 msgid "Videos in"
-msgstr ""
+msgstr "Video in"
 
 #: templates/teams/videos-list.html:59 templates/videos/subtitle-view.html:46
 #: templates/videos/subtitle-view.html:48
@@ -5769,7 +5769,7 @@ msgstr "Lingua del video"
 
 #: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
-msgstr ""
+msgstr "Tradotto da"
 
 #: templates/videos/_upload_subtitles.html:52
 #, python-format
@@ -5902,7 +5902,7 @@ msgstr ""
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
-msgstr ""
+msgstr "Nessun video trovato"
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
@@ -6054,7 +6054,7 @@ msgstr "Vecchio testo"
 #: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
 msgid "Changes to title"
-msgstr ""
+msgstr "Modifiche al titolo"
 
 #: templates/videos/email_notification.html:44
 #: templates/videos/email_notification.html:72
@@ -6509,7 +6509,7 @@ msgstr "I sottotitoli per questo video sono moderati. Se appartiene a un team, p
 
 #: templates/videos/video-view.html:208
 msgid "This video belongs to the"
-msgstr ""
+msgstr "Questo video appartiene al"
 
 #: templates/videos/video-view.html:224
 msgid "View all activity"

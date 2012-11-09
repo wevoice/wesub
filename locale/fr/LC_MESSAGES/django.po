@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 01:32-0600\n"
-"PO-Revision-Date: 2012-11-08 07:56+0000\n"
+"POT-Creation-Date: 2012-11-09 01:32-0600\n"
+"PO-Revision-Date: 2012-11-09 07:54+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/universalsubtitles/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -410,65 +410,65 @@ msgstr ""
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:126
+#: apps/subtitles/forms.py:106
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
-"the %s translation made from it."
+"the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:148
+#: apps/subtitles/forms.py:125
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:155
+#: apps/subtitles/forms.py:132
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:166
+#: apps/subtitles/forms.py:143
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:179
+#: apps/subtitles/forms.py:156
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:187
+#: apps/subtitles/forms.py:164
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+#: apps/subtitles/forms.py:177 apps/teams/forms.py:747
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr "Désolés, nous n'avons pas pu charger votre fichier parce que le nombre de lignes dans votre traduction ({0}) ne correspond pas à l'original ({1})."
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:188
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:219
+#: apps/subtitles/forms.py:196
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/subtitles/forms.py:203 apps/teams/forms.py:655 apps/videos/forms.py:63
 #: apps/videos/forms.py:84
 msgid "Can not detect file encoding"
 msgstr "L'encodage du fichier ne peut pas être détecté"
 
-#: apps/subtitles/forms.py:249
+#: apps/subtitles/forms.py:226
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Quelqu'un sous titre déjà cette vidéo actuellement. Essayez plus tard."
 
@@ -1613,28 +1613,28 @@ msgstr "Vidéo privée"
 msgid "Undefined error"
 msgstr "Erreur indéfinie"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:325
+#: apps/widget/rpc.py:326
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/widget/rpc.py:327
+#: apps/widget/rpc.py:328
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/widget/rpc.py:337
+#: apps/widget/rpc.py:338
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1065 apps/widget/rpc.py:1106
+#: apps/widget/rpc.py:1085 apps/widget/rpc.py:1126
 msgid "\n"
 msgstr "\n"
 

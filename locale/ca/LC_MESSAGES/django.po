@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-08 01:32-0600\n"
-"PO-Revision-Date: 2012-11-08 07:57+0000\n"
+"POT-Creation-Date: 2012-11-09 01:32-0600\n"
+"PO-Revision-Date: 2012-11-09 07:55+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -404,65 +404,65 @@ msgstr "Ja existeix l'idioma i no és una traducció"
 msgid "The language already exists as a translation from %s."
 msgstr "Ja existeix l'idioma com a traducció de %s"
 
-#: apps/subtitles/forms.py:126
+#: apps/subtitles/forms.py:106
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
-"the %s translation made from it."
-msgstr "Ho lamentem, no podem pujar les subtítols per a aquest idioma perquè podria bifurcar la traducció %s ja feta."
+"the %s translation(s) made from it."
+msgstr ""
 
-#: apps/subtitles/forms.py:148
+#: apps/subtitles/forms.py:125
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr "Ho lamentem, no podem pujar els vostres subtítols perquè algú altre ja ha estat assignat a aquest idioma."
 
-#: apps/subtitles/forms.py:155
+#: apps/subtitles/forms.py:132
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr "Ho lamentem, no podem pujar els vostres subtítols perquè no teniu permisos  de reclamació d'aquest idioma."
 
-#: apps/subtitles/forms.py:166
+#: apps/subtitles/forms.py:143
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Ho lamentem, no podem carregar els vostres subtítols perquè s'està moderant un esborrany per a aquest idioma."
 
-#: apps/subtitles/forms.py:179
+#: apps/subtitles/forms.py:156
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr "Ho lamentem, no podem pujar els vostres subtítols perquè aquest idioma està moderat i no teniu permisos per a transcriure subtítols."
 
-#: apps/subtitles/forms.py:187
+#: apps/subtitles/forms.py:164
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr "Ho lamentem, no podem pujar els vostres subtítols perquè aquest idioma està moderat i no teniu permisos per a traduir subtítols."
 
-#: apps/subtitles/forms.py:200 apps/teams/forms.py:747
+#: apps/subtitles/forms.py:177 apps/teams/forms.py:747
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr "Ho lamentem, no podem pujar el vostre fitxer perquè el nombre de línies a la vostra traducció ({0}) no coincideix amb l'original ({1})."
 
-#: apps/subtitles/forms.py:211
+#: apps/subtitles/forms.py:188
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr "La grandària dels fitxers ha de ser menor de %d ko."
 
-#: apps/subtitles/forms.py:219
+#: apps/subtitles/forms.py:196
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr "Format no suportat. Sisplau, pugeu-ho un dels següents formats: %s"
 
-#: apps/subtitles/forms.py:226 apps/teams/forms.py:655 apps/videos/forms.py:63
+#: apps/subtitles/forms.py:203 apps/teams/forms.py:655 apps/videos/forms.py:63
 #: apps/videos/forms.py:84
 msgid "Can not detect file encoding"
 msgstr "No es pot detectar la codificació de fitxers"
 
-#: apps/subtitles/forms.py:249
+#: apps/subtitles/forms.py:226
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Algú està subtitulant aquest vídeo ara. Proveu-ho més tard"
 
@@ -1607,28 +1607,28 @@ msgstr "Vídeo privat"
 msgid "Undefined error"
 msgstr "Error no definit"
 
-#: apps/widget/rpc.py:110
+#: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr "Incrustació de vídeo deshabilitada pel propietari"
 
-#: apps/widget/rpc.py:325
+#: apps/widget/rpc.py:326
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Aquests subtítols estan moderats. Informeu-vos a la pàgina de l'equip %s per a saber com contribuir."
 
-#: apps/widget/rpc.py:327
+#: apps/widget/rpc.py:328
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Ho lamentem, aquests subtítols són moderats de manera privada."
 
-#: apps/widget/rpc.py:337
+#: apps/widget/rpc.py:338
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
 msgstr "Ho lamentem, no teniu permís per a editar aquests subtítols. Si creeu que necessiten correcció, sisplau contacteu amb l'administrador de l'equip."
 
-#: apps/widget/rpc.py:1065 apps/widget/rpc.py:1106
+#: apps/widget/rpc.py:1085 apps/widget/rpc.py:1126
 msgid "\n"
 msgstr "\n"
 
@@ -3104,7 +3104,7 @@ msgid ""
 "\n"
 "        You always maintain control of your video, because it never leaves your server.  Amara doesn’t require any video uploading, so your existing security policy is always in full effect. We support OAuth, which means your users never need to log in twice—they can see your video and authenticate with both organizations at the same time. Amara makes your subtitles available from the cloud, so you can: deploy just in time via our API; cache on your server and get pinged when there are updates; or use our embeddable subtitle widget.\n"
 "    "
-msgstr ""
+msgstr "\nSempre tindreu el control dels vostres vídeos, perquè mai deixen els vostres servidors. Amara no requereix pujar cap vídeo, per tant la política de seguretat que ja teniu sempre serà efectiva. Suportem OAuth, el que significa que els teus usuaris mai necessitaran identificar-se dues vegades—poden vorer els vostres vídeos i autenticar-se amb totes dues organitzacions al mateix temps. Amara fa els vostres subtítols disponibles des del núvol, per tant podeu: implementar en temps real mitjançant la nostra API; Emmagatzemar als vostres servidor i obtindre avisos quan hagen actualitzacions; o fer ús del vostre giny incrustable per a subtítols. "
 
 #: templates/enterprise/api-integration.html:6
 #: templates/enterprise/base.html:33
@@ -3116,7 +3116,7 @@ msgid ""
 "\n"
 "        Amara’s powerful API allows flexible integration with your existing publishing workflow.  By connecting your backend system directly to Amara, you can import and export subtitles, manage processing, and import completed subtitles directly back into your own system.  If you use a custom video player, importing subtitles via API lets your company fully control subtitle display and use of the transcript on your website.\n"
 "    "
-msgstr ""
+msgstr "\nLa potent API d'Amara permet una integració flexible amb el vostre flux de treball de publicació existent. Per a connectar directament el vostre sistema de processador dorsal a Amara, podeu importar i exportar subtítols, gestionar el processament, i importar subtítols complets directament cap el vostre propi sistema. Si utilitzeu un reproductor de vídeo personalitzat, importar els subtítols mitjançant la API deixarà a la vostra empresa el control total de la visualització del subtítol i la utilització de la transcripció a la vostra pàgina web."
 
 #: templates/enterprise/api-integration.html:12
 msgid "Amara API Documentation"
@@ -3132,14 +3132,14 @@ msgid ""
 "\n"
 "        Workflows enable automating the flow of content through different authoring groups, including: volunteers, private crowds (staff, employees, students, etc), and professionals. They can be used for both first pass (authoring), as well as subsequent review passes for Quality Control.\n"
 "    "
-msgstr ""
+msgstr "\nEls fluxos de treball permeten automatitzar el flux de contingut mitjançant els diferents grups de creació, incloent: voluntaris, grups privats (personal, empleats, estudiants, etc), i professionals. Poden ser utilitzats en un primer pas (Creació) i també en els següents pasos de revisió per al control de qualitat."
 
 #: templates/enterprise/automated-workflows.html:14
 msgid ""
 "\n"
 "        Different workflows can be chained together to create an unlimited number of highly flexible configurations. The Amara team can help you determine the best workflow for your subtitle processes and integrate it with your existing publishing platform.\n"
 "    "
-msgstr ""
+msgstr "\nPoden encadenar-se junts diferents fluxos de treball per a crear un nombre il·limitat de configuracions altament flexibles. L'equip Amara pot ajudar-vos a determinar el millor flux de treball per al vostre procés de subtitulat i integrar-lo amb la vostra plataforma de publicació."
 
 #: templates/enterprise/automated-workflows.html:18
 msgid "Contractors with Staff Review"
@@ -3150,7 +3150,7 @@ msgid ""
 "\n"
 "        Use captioning and transcription contractors to create your subtitles, then require staff review and approval before they are published back to your server. Remember, no one sees your subtitles until YOU publish it.\n"
 "    "
-msgstr ""
+msgstr "\nUtilitzeu contractistes d'etiquetatge i transcripció per a crear els vostres subtítols, després demaneu una revisió al personal i aproveu-ho abans de que siguin publicats al vostre servidor. Recordeu, ningú podrà vorer els vostres subtítols fins que no ho publiqueu."
 
 #: templates/enterprise/automated-workflows.html:23
 msgid "Crowdsourced subtitles, followed by staff review"
@@ -3161,7 +3161,7 @@ msgid ""
 "\n"
 "        In many cases, organizations want to leverage the power of the crowd, but don’t want to leave any chance for poor quality captions or subtitles to appear on their content. This workflow keeps videos private until a staff member has approved the subtitles.\n"
 "    "
-msgstr ""
+msgstr "\nEn molts casos, les organitzacions volen aprofitar el poder de les masses, però no volen deixar de cap manera que apareguin etiquetes o subtítols de baixa qualitat als seus continguts. Aquest flux de treball manté els vídeos privats fins que un membre del personal haja aprovat els subtítols."
 
 #: templates/enterprise/automated-workflows.html:30
 msgid "Professionally created English captions, crowd translation"
@@ -3172,7 +3172,7 @@ msgid ""
 "\n"
 "        Amara offers professional- quality captions at very low cost with quick turn-around times. English can often be done in less than a day.  Once English is completed, it’s a snap to request translations from volunteers or staff. We have seen videos translated into multiple languages in just days—through a volunteer crowd.\n"
 "    "
-msgstr ""
+msgstr "\nAmara ofereix etiquetatge de qualitat professional a un preu molt baix amb un temps ràpid de resposta. En anglès pot a sovint estar fet en menys d'un dia.\nUna volta s'ha completat, es realitza una petició de traducció als voluntaris o al personal en un obrir i tancar d'ulls. Hem vist vídeos traduïts en diferents idiomes en només uns dies—mitjançant un grup de voluntaris."
 
 #: templates/enterprise/automated-workflows.html:35
 msgid "Crowd translations, with professional quality-control"
@@ -3184,7 +3184,7 @@ msgid ""
 "\n"
 "        Amara is, quite simply, the most cost-effective way to get professional-level quality for foreign language video subtitles. By leveraging professional quality review, you can expect to pay roughly 75%% less than the market price for traditional professional subtitles.\n"
 "    "
-msgstr ""
+msgstr "\nAmara és, senzillament, la manera més efectiva i barata per a obtindre subtítols amb qualitat professional en idiomes estrangers. Aprofitant una revisió professional de qualitat, podeu estalviar-se vora un 75%% menys que al preu de mercat tradicional."
 
 #: templates/enterprise/base.html:12
 msgid "Features & Benefits"
@@ -3215,7 +3215,7 @@ msgstr "Seguretat avançada"
 #: templates/enterprise/base.html:36
 #: templates/enterprise/transcript-viewer.html:20
 msgid "Transcript Viewer"
-msgstr ""
+msgstr "Visor de transcripció"
 
 #: templates/enterprise/base.html:40
 msgid "Customers"
@@ -3227,7 +3227,7 @@ msgstr "Pel·lícules i Televisió"
 
 #: templates/enterprise/base.html:46
 msgid "Education"
-msgstr ""
+msgstr "Educació"
 
 #: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
 msgid "Companies"
@@ -3258,36 +3258,36 @@ msgid ""
 "\n"
 "        Corporations need to communicate with their staff and their customers around the world, and video is becoming a major part of that process. With Amara, companies make it possible for staff, customers, and contractors to caption and translate videos, make them searchable, and share them publicly or privately.\n"
 "    "
-msgstr ""
+msgstr "\nLes corporacions necessiten comunicar-se amb els seus personals i clients arreu del món, i els vídeos són una gran part d'aquest procés. Amb Amara, les companyies fan possible la traducció de vídeos per a personal ,clients i contractistes, i els fa més fàcils de trobar i compartir, ja siga públicament com de manera privada."
 
 #: templates/enterprise/education.html:6
 msgid "Universities and Online Education"
-msgstr ""
+msgstr "Universitats i Educació en línia"
 
 #: templates/enterprise/education.html:16
 msgid ""
 "\n"
 "            Most of the leading online education companies and organizations use Amara to caption and translate video, including Coursera, Udacity, Khan Academy, TED Ed, as well as individual colleges and universities.  As online education explodes in popularity, subtitles are essential to making courses accessible and international. Colleges and universities are using Amara to make their rapidly growing video resources readily available to everyone.\n"
 "        "
-msgstr ""
+msgstr "\nMoltes de les companyies i organitzacions líders en educació en línia  utilitzen Amara per a etiquetar i traduïr vídeos, incloent Coursera, Udacity, Acadèmia Khan, TED ed, així com col·legis i universitats. Degut a la popularitat de l'educació en línia, els subtítols són necessaris per a fer els cursos accessibles i internacionals. Els col·legis i universitats utilitzen Amara per a fer de manera ràpida que els seus vídeos pugen ser fàcilment disponibles per a tot el  món."
 
 #: templates/enterprise/education.html:21
 msgid "Learn more about our work in education:"
-msgstr ""
+msgstr "Coneixeu més del nostre treball en educació:"
 
 #: templates/enterprise/film-tv.html:15
 msgid ""
 "\n"
 "        Producers, publishers, and distributors of film and television use Amara to make captioning and translation simpler and less expensive. Amara makes it possible to caption and translate for global viewing audiences much more cost effectively than traditional approaches.\n"
 "    "
-msgstr ""
+msgstr "\nProductors, editors i distribuïdors de pel·lícules i televisió utilitzen Amara per a etiquetar i traduir més fàcil i barat. Amara fa possible l'etiquetatge i la traducció per a una audiència global amb un cost més efectiu que els medis tradicionals.  "
 
 #: templates/enterprise/film-tv.html:19
 msgid ""
 "\n"
 "            Easily manage workflows between distributed teams, whether they are staff, contractors, or viewers.  Publish completed subtitles directly through the Amara API.\n"
 "        "
-msgstr ""
+msgstr "\nControleu fàcilment els fluxos de treball amb equips distribuïts, tant si són personals, contractistes o espectadors. Publiqueu directament subtítols complets gràcies a la API d'Amara."
 
 #: templates/enterprise/global-reach.html:6
 msgid "Build a Global Reach"
@@ -3298,7 +3298,7 @@ msgid ""
 "\n"
 "        Amara is the premiere platform for taking video content global. Whether you’re working with volunteer translators, engaging your own staff, or hiring professionals, you can easily manage the end-to-end process.\n"
 "    "
-msgstr ""
+msgstr "\nAmara és la primera plataforma que du els vídeos a un nivell global. Tant si treballeu amb traductors voluntaris, feu ús del vostre personal o bé contracteu a professionals, podreu gestionar fàcilment el procés de principi a fi."
 
 #: templates/enterprise/global-reach.html:14
 msgid "Volunteer Subtitle Creation"
@@ -3309,7 +3309,7 @@ msgid ""
 "\n"
 "        Amara currently supports some of the largest volunteer video translation efforts on the planet. Our technology makes captioning, subtitling, and translating very easy, fun, and engaging which enables ongoing, massive, collaborations.\n"
 "    "
-msgstr ""
+msgstr "\nAmara actualment suporta alguns dels majors esforços de traducció de vídeo voluntari del planeta. Les nostres tecnologies fan del etiquetatge, el subtitulat i la traducció una forma fàcil, divertida i atractiva que permet afavorir col·laboracions massives."
 
 #: templates/enterprise/global-reach.html:19
 msgid "Private Crowd Subtitle Creation"
@@ -3320,18 +3320,18 @@ msgid ""
 "\n"
 "        If you have a workforce, student group, or any other non-public crowd, you can limit access for captioning, translating, and subtitling OR reviewing the work of peers, volunteers, or professionals.\n"
 "    "
-msgstr ""
+msgstr "\nSi teniu personal de treball, un grup d'estudiants, o qualssevol altre grup no públic, podeu limitar l'accés al etiquetatge, les traduccions i el subtitulat, o  revisar el treball dels companys, voluntaris o professionals."
 
 #: templates/enterprise/global-reach.html:24
 msgid "Professional Captioning and Translation Services"
-msgstr ""
+msgstr "Serveis de traducció i etiquetatge professional"
 
 #: templates/enterprise/global-reach.html:25
 msgid ""
 "\n"
 "        Use professional services for captioning or subtitling into nearly any language, or even to help with quality control. All completed work is centralized on Amara, ready for incremental quality control, integration, and deployment.\n"
 "    "
-msgstr ""
+msgstr "\nUtilitzeu els serveis professionals per etiquetar o subtitular a qualssevol idioma, o inclús ajudar amb la qualitat de control. Tot el treball completat és centralitzat a Amara, preparat per a un control de qualitat incremental, d'integració i desplegament."
 
 #: templates/enterprise/global-reach.html:29
 msgid "Hybrid Approach"
@@ -3342,33 +3342,33 @@ msgid ""
 "\n"
 "        Many of our customers use a mix of these different approaches on the initial (subtitle authoring) pass, as well as subsequent review passes (for quality control). This is an advantage that you only get with Amara, a fully featured solution that manages the process end to end and integrates more easily than any other platform.\n"
 "    "
-msgstr ""
+msgstr "\nEn un primer moment, molts dels nostres clients utilitzen una combinació de diferents idees (crear subtítols), o bé una revisió posterior (per a un control de qualitat). Açò és un avantatge que només aconseguireu amb Amara, una solució plena de característiques per a gestionar els processos  de principi a fi i integrar-ho més fàcilment que en qualsevol altra plataforma."
 
 #: templates/enterprise/government.html:12
 msgid ""
 "\n"
 "        In governments around the world, making video accessible is often a legal requirement, not an option.  Amara makes it much easier to coordinate captioning and translation efforts, so that every citizen gains access.\n"
 "    "
-msgstr ""
+msgstr "\nEls governs d'arreu món, fer vídeos accessibles és a sovint un requeriment legal, i no una opció. Amara fa molt més fàcil coordinar els esforços de etiquetatge i traducció, per a que cada ciutadà obtingui accés."
 
 #: templates/enterprise/index.html:6
 msgid "The Most Efficient and Cost Effective Subtitling Platform in the World"
-msgstr ""
+msgstr "La plataforma de subtítols amb el cost més eficaç i eficient del món"
 
 #: templates/enterprise/index.html:9
 msgid ""
 "\n"
 "            Amara Enterprise offers unmatched capabilities to create, edit, and manage production ready subtitles at remarkably low costs. You have total flexibility: order captions and translations from professional services, build a volunteer community, manage internal staff or external contractors, and integrate your publishing platform through our powerful API. We can make everything you do with subtitles easier, faster, and cheaper. \n"
 "        "
-msgstr ""
+msgstr "\nL'empresa Amara ofereix facilitats inigualables per a crear, editar i gestionar la producció de subtítols a un preu realment baix. Tindreu una flexibilitat completa: demanar etiquetatge i traduccions a serveis professionals, construir una comunitat de voluntaris, gestionar el personal intern o contractistes externs i integrar la vostra plataforma de publicació amb la nostra potent API. Podem fer tot el que feu amb els subtítols més fàcil, ràpid i barat."
 
 #: templates/enterprise/index.html:13
 msgid "Contact us"
-msgstr ""
+msgstr "Contacteu amb nosaltres"
 
 #: templates/enterprise/index.html:13
 msgid "for more information and pricing."
-msgstr ""
+msgstr "per a més informació i preus."
 
 #: templates/enterprise/index.html:17
 msgid "World-class Users"
@@ -3391,7 +3391,7 @@ msgid ""
 "\n"
 "        For years, companies like Mozilla, Twitter, and Facebook have built volunteer communities to translate their websites.  Amara makes this possible for captions and subtitles.  With Amara, you can accomplish the seemingly impossible task of translating your videos into dozens of languages.  Quickly build a powerful, high-quality volunteer translation and captioning team that makes your content truly global. \n"
 "    "
-msgstr ""
+msgstr "\nDurant anys, companyies com Mozilla, Twitter, i Facebook han creat comunitats de voluntaris per a traduir les seves pàgines web. Amara ho fa possible amb els subtítols i etiquetatges. Amb Amara, podeu aconseguir tasques de traducció impossibles d'imaginar per als vostres vídeos en dotzenes d'idiomes. Ràpidament es pot construir un potent i de gran qualitat equip de traducció i etiquetatge que permet fer el vostre contingut realment global."
 
 #: templates/enterprise/index.html:43
 msgid ""
@@ -3417,7 +3417,7 @@ msgid ""
 "\n"
 "        Create the right workflows for your content and coordinate your efforts—whether your video is completely private, restricted to premium subscribers, or public on the web.  You always control who has access to your subtitles and when to involve staff, contractors, or volunteers.\n"
 "    "
-msgstr ""
+msgstr "\nCreeu els fluxos de treballs adequats per al vostre contingut i coordineu els vostres esforços—Tant si el vostre vídeo és completament privat, restringit a subscriptors \"Premium\" o públic a una web. Sempre tindreu el control de qui té accés als vostres subtítols i quan s'implica personal, contractistes o voluntaris.  "
 
 #: templates/enterprise/index.html:52
 msgid "Powerful API and Publishing Integration"
@@ -3428,7 +3428,7 @@ msgid ""
 "\n"
 "        Our API helps companies tightly integrate Amara with their existing publishing and distribution workflow.  By making subtitles key part of your process, you build a global audience.\n"
 "    "
-msgstr ""
+msgstr "\nLa nostra API ajuda a les companyies a integrar Amara amb les seves publicacions i fluxos de treball ja existents. Fer subtítols és una part clau en el vostre procés per a construir una audiència global."
 
 #: templates/enterprise/index.html:58
 msgid "Professional Services"
@@ -3439,7 +3439,7 @@ msgid ""
 "\n"
 "        Access professional services including paid captions, translations, and quality control.  Or use your own staff and contractors and use Amara to coordinate their work remotely.\n"
 "    "
-msgstr ""
+msgstr "\nAccediu als serveis professionals incloent: etiquetats de pagament, traduccions, i control de qualitat. O utilitzeu els vostre personal i contractistes i utilitzeu Amara per a coordinar llurs treball remotament."
 
 #: templates/enterprise/index.html:64
 msgid "Crowdsource with Professional Review"
@@ -3450,7 +3450,7 @@ msgid ""
 "\n"
 "        Engage a crowd and use professional quality assurance. This balances amazingly low cost with professional level quality assurance.\n"
 "    "
-msgstr ""
+msgstr "\nInvolucreu a un grup i feu ús de la garantia que ofereix la qualitat professional. Obtindreu uns sorprenents  baixos costos amb una qualitat de nivell professional."
 
 #: templates/enterprise/index.html:72
 msgid "Work with Any Video Platform"
@@ -3461,7 +3461,7 @@ msgid ""
 "\n"
 "        Amara works with all the most popular video hosting services and video players, and adapts easily to your own custom player. Integrate and embed videos with subtitles without changing your current publishing workflow.\n"
 "    "
-msgstr ""
+msgstr "\nAmara treballa amb els serveis d'allotjament i reproductors de vídeo més populars i adapta fàcilment els vostre propi reproductor personalitzat. Integreu i incrusteu vídeos amb subtítols sense canviar el vostre flux de treball de publicació."
 
 #: templates/enterprise/index.html:78
 msgid "Subtitles Improve SEO"
@@ -3472,7 +3472,7 @@ msgid ""
 "\n"
 "        Rank higher in Google and other search engines by helping them index full transcripts for all of your videos. Searchable videos are found more often.\n"
 "    "
-msgstr ""
+msgstr "\nAugmenteu el vostre posicionament a Google i altres motors de recerca indexant les transcripcions completes de tots els vostres vídeos. Els vídeos seran trobats més a sovint."
 
 #: templates/enterprise/non-profits.html:6
 msgid "Non-profits"
@@ -3483,28 +3483,28 @@ msgid ""
 "\n"
 "        Non-profit organizations use Amara to share their mission, their work, and their media around the world.  Non-profits are ideally positioned to build volunteer subtitling communities—your existing supporters will be delighted to find a new way to help support your organization.  Creating a volunteer team helps deepen engagement with your organization and lets you caption and translate videos that would be unaffordable to subtitle with a traditional approach.\n"
 "    "
-msgstr ""
+msgstr "\nLes organitzacions sense ànim de lucre utilitzen Amara per a compartir la seva missió, el seu treball, i els seus mitjans multimèdia arreu del món. Els serveis sense ànim de lucre estan ben preparats per a crear comunitats de voluntaris—els vostres seguidors estaran encantats de trobar una manera de donar suport a la vostra organització. Crear un equip de voluntaris ajuda a arrelar un compromís amb la vostra organització i permet als vostres vídeos etiquetats i traduïts ser abordables per a un subtitulat  amb un enfoc més tradicional."
 
 #: templates/enterprise/non-profits.html:21
 msgid ""
 "\n"
 "        Did you know that Amara is a non-profit organization itself?  Our mission is to help make video accessible for everyone around the world.  We offer discounts for other non-profit organizations—we are always delighted to support work with a social mission.\n"
 "    "
-msgstr ""
+msgstr "\nSaps que Amara és una organització sense ànim de lucre? La nostra missió es ajudar a fer els vídeos accessibles a tothom arreu del món. Oferim descomptes a altres organitzacions sense ànim de lucre—sempre estarem encantats de donar suport a programes socials."
 
 #: templates/enterprise/publishers.html:10
 msgid ""
 "\n"
 "        Any organization that creates video can reach more people with subtitles, and Amara provides the most options and flexibility to caption and translate your videos. Many video publishers use Amara to create volunteer communities—engaging the people who watch their videos to caption and translate them for the world, ultimately reaching more viewers.\n"
 "    "
-msgstr ""
+msgstr "\nQualssevol organització que crea vídeos pot arribar a més gent amb els subtítols, i Amara proveeix el major nombre d'opcions per a etiquetar i traduir els vostres vídeos d'una manera flexible. Molts editors de vídeo utilitzen Amara per a crear comunitats de voluntaris—involucrant a la gent que veu els seus vídeos a etiquetar i traduir los per al món, per a que al final arribi a més espectadors."
 
 #: templates/enterprise/quality-control.html:10
 msgid ""
 "\n"
 "        Amara’s Flexible Workflows offer several ways to ensure outstanding quality for your subtitles.  Whether you use internal staff, outside contractors, professional services, or a volunteer community—you’ll be able to create, review, and approve workflows that meet your needs.\n"
 "    "
-msgstr ""
+msgstr "\nEls fluxos de treball flexibles d'Amara ofereixen algunes maneres d'assegurar la qualitat dels vostres subtítols. Tant si feu ús de personal intern, com si utilitzeu contractistes externs, serveis professionals o una comunitat de voluntaris—Sempre podreu crear, revisar, i aprovar els fluxos de treball que satisfacin les vostres necessitats."
 
 #: templates/enterprise/quality-control.html:14
 msgid "Examples of QC processes:"
@@ -3515,28 +3515,28 @@ msgid ""
 "\n"
 "            Have your contractors work inside your Amara account and then require staff review before subtitles go live.\n"
 "        "
-msgstr ""
+msgstr "\nTeniu contractistes treballant a Amara i necessiteu personal per a revisar els subtítols abans de que es publiquen."
 
 #: templates/enterprise/quality-control.html:19
 msgid ""
 "\n"
 "            Some universities use paid captioning services to quickly caption lecture videos and then invite experts in the university community to fix any mistakes with proper names or technical terms.\n"
 "        "
-msgstr ""
+msgstr "\nAlgunes universitats utilitzen serveis d'etiquetatge de pagament per a etiquetar ràpidament els vídeos de les conferencies i conviden a experts de la comunitat universitària per a fixar errors amb els noms propis o termes tècnics."
 
 #: templates/enterprise/quality-control.html:22
 msgid ""
 "\n"
 "            Volunteer teams can self-manage and reach very high quality by requiring peer review of subtitles before they are published.  More senior members of the community can be promoted to a moderator role.\n"
 "        "
-msgstr ""
+msgstr "\nEls equips de voluntaris poden autogestionar i obtindre una elevada qualitat al  requerir revisions dels subtítols abans que ser publicats. Molts antics membres de la comunitat poden ascendir a un rol de moderador."
 
 #: templates/enterprise/subtitle-management.html:8
 msgid ""
 "\n"
 "        At its core, Amara is the definitive platform for managing captions and subtitles. Whether you are creating, revising, or translating subtitles—you can choose to centralize the management—or divide up your content, and delegate responsibilities and control.\n"
 "    "
-msgstr ""
+msgstr "\nAl seu nucli, Amara és definitivament una plataforma per a gestionar etiquetes i subtítols. Tant si esteu creant, revisant, o traduint subtítols—podeu elegir centralitzar la gestió—o dividir el contingut i delegar les responsabilitats i el control."
 
 #: templates/enterprise/subtitle-management.html:12
 msgid "Import"
@@ -3547,7 +3547,7 @@ msgid ""
 "\n"
 "        Your videos are never uploaded to our server (learn more about our Security Model), so you actually import pointers to existing video files—whether you’re hosting on your own server, YouTube, Vimeo, other video hosting service, or combination thereof. Import these video pointers via graphical interface or API, plus we can import a wide variety of subtitle and transcript formats in case you have pre-existing data.\n"
 "    "
-msgstr ""
+msgstr "\nEls vostres vídeos mai són pujats als nostres servidors (coneixeu més sobre el nostre model de seguretat), així que en realitat importeu punters a fitxers de vídeo existents— tant si estan allotjats al vostre propi servidor, a YouTube, Vimeo, altres serveis d'allotjament de vídeos o una combinació d'ells. Importeu aquests punters mitjançant una interfície gràfica o API, a més podem importar una àmplia varietat de formats de subtítols i transcripcions en el cas de ja tindre'ls."
 
 #: templates/enterprise/subtitle-management.html:17
 msgid "Process > Author > QC"
@@ -3558,7 +3558,7 @@ msgid ""
 "\n"
 "        Flexible workflows make creating Global Content simple; your organization can harness the power of volunteers, private crowds, and/or professional service providers for content creation and Quality Control.\n"
 "    "
-msgstr ""
+msgstr "\nEls fluxos de treball flexibles fan simple la creació de contingut global; La vostra organització pot aprofitar la potència del voluntariat, dels grups privats, i/o dels serveis professionals que proveeixen creació de continguts i control de qualitat."
 
 #: templates/enterprise/subtitle-management.html:22
 msgid "Deploy"
@@ -3569,14 +3569,14 @@ msgid ""
 "\n"
 "        Use the Amara API to bring completed subtitle data and metadata into your own backend or publishing platform.\n"
 "    "
-msgstr ""
+msgstr "\nUtilitzeu l'API d'Amara per a dur les dades i metadades d'un subtítol complet al vostre propi processador dorsal o plataforma de publicació. "
 
 #: templates/enterprise/transcript-viewer.html:23
 msgid ""
 "\n"
 "            Amara’s beautiful interactive transcript viewer lets you read the text of any video and jump to and share specific moments.  Take a look at the example below and try turning the transcript display on and off.\n"
 "        "
-msgstr ""
+msgstr "\nEl fantàstic visor de transcripció interactiu us permet llegir el text de qualsevol vídeo, ometre i compartir moments específics. Pegueu un colp d'ull a l'exemple de sota i proveu a activar i desactivar el visor de transcripció."
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
