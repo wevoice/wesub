@@ -1086,6 +1086,8 @@ div.upload-draft-modal {
         input, textarea {
             margin-bottom: .5em;
             padding: 4px;
+            font-family: inherit;
+            font-size: inherit;
         }
 
         label {
@@ -1111,6 +1113,7 @@ div.upload-draft-modal {
         input[type='file'] {
             padding: 0;
             @include block-level;
+            clear: both;
         }
 
         select {
@@ -1367,24 +1370,105 @@ div#language_picker {
 }
 
 /* Profile */
-#profile.v1 h2, #dashboard.v1 h2 {
-    line-height: 1.75em;
-
-    img {
-        border: 1px solid $fainter;
-        float: left;
-        height: 32px;
-        margin-right: .5em;
-        padding: 2px;
-        @include border-radius(3px);
+.profile.v1 .context {
+    p {
+        margin-bottom: 1em;
+    }
+    .join {
+        font-style: italic;
+        color: #999;
     }
 }
-#profile.v1 .view .avatar img {
+.profile.v1 img.avatar {
     border: 1px solid $fainter;
+    padding: 5px;
+    background: #fff;
+}
+.profile.v1 .context img.avatar {
+    margin: 0 17px;
+}
+.profile.v1 form {
+    padding-top: 3em;
+
+    .alpha {
+        margin-left: 0;
+    }
+
+    ul.listing {
+        > li {
+            margin: 0 0 .5em;
+            padding: 1em;
+            border: none;
+            background: $faintest;
+            @include border-radius;
+
+            h3 {
+                padding: 0;
+            }
+
+            .actions {
+                top: 1em;
+                right: 1em;
+
+                a:after {
+                    content: '';
+                }
+            }
+        }
+    }
+
+    .avatar-container {
+        background: #f2f2f2;
+        padding: 1em;
+        @include border-radius(3px);
+
+        button {
+            margin: 0;
+        }
+    }
+
+    .get-new-api-bt {
+        display: block;
+        float: left;
+        margin-top: 1em;
+    }
+}
+.v1.profile .third-party {
+    padding-bottom: 3.5em;
+}
+.v1.profile .user-languages .preferred {
     float: right;
-    margin-left: 1em;
-    margin-right: -60px;
-    padding: .5em;
+    font-style: italic;
+    color: #999;
+}
+/* Account */
+body.account {
+    form fieldset {
+        input[type="text"], input[type="password"] {
+            width: 95%;
+        }
+    }
+    form .alpha {
+        clear: left;
+    }
+    div.api-access {
+        fieldset {
+            legend {
+                margin-bottom: 10px;
+            }
+        }
+    }
+}
+#error {
+
+    h1 {
+        font-size: 3em;
+        padding: .75em 0 .25em;
+    }
+    p {
+        margin: 1em 0;
+        line-height: 175%;
+    }
 }
 .v1 .view .grid_4 {
     p, ul {
@@ -2444,5 +2528,20 @@ a.truncated-expand {
     p {
         margin: 1em 0;
         line-height: 175%;
+    }
+}
+.messages.v1 .view, #user-dashboard.v1 .view {
+    border-top: 1px solid $fainter;
+    margin-left: 0;
+    padding-left: 10px;
+}
+#user-dashboard.v1 .view {
+    padding-top: 2em;
+}
+.messages.v1 .context {
+    padding-top: 1em;
+
+    .selected a {
+        font-weight: bold;
     }
 }
