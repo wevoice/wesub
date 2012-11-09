@@ -741,24 +741,25 @@ class TestRpc(TestCase):
         session = create_two_sub_dependent_session(request)
         response = rpc.start_editing(
             request, session.video.video_id, 'fr',
-            base_language_pk=session.language.pk)
+            base_language_code=session.language.language_code)
+
         session_pk = response['session_pk']
-        orig_subs = response['original_subtitles']['subtitles']
-        self.assertEqual(2, len(orig_subs))
-        self.assertEqual('a_es', orig_subs[0]['text'])
-        inserted = [{'subtitle_id': 'a', 'text':'frenchtext'}]
-        rpc.finished_subtitles(request, session_pk, inserted)
+        orig_subs = SubtitleSet('en', response['original_subtitles']['subtitles'])
+
+        self.assertEqual(3, len(orig_subs))
+
+        rpc.finished_subtitles(request, session_pk, create_subtitle_set().to_xml())
+
         response = rpc.show_widget(request, VIDEO_URL, False)
         lang = [r for r in response['drop_down_contents'] if r['language'] == 'fr'][0]
         subs = rpc.fetch_subtitles(request, session.video.video_id,
                                    lang['pk'])
-        subs = subs['subtitles']
+
+        subs = SubtitleSet('fr', subs['subtitles'])
         self.assertEqual(1, len(subs))
-        self.assertEqual('frenchtext', subs[0]['text'])
-        self.assertEqual(2300, subs[0]['start_time'])
-        self.assertEqual(3400, subs[0]['end_time'])
-        video = models.Video.objects.get(id=session.video.id)
-        self.assertEqual(50, video.subtitle_language('fr').percent_done)
+        self.assertEqual('hey you 0', subs[0].text)
+        self.assertEqual(0, subs[0].start_time)
+        self.assertEqual(1000, subs[0].end_time)
 
     def test_fork_translation_dependent_on_forked(self):
         request = RequestMockup(self.user_0)
