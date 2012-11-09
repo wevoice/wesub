@@ -39,7 +39,7 @@ def _update_is_was_subtitled(video):
                                                    language_code=language_code)
                                            .exists())
 
-    if has_version:
+    if not has_version:
         if video.is_subtitled:
             video.is_subtitled = False
             video.save()
