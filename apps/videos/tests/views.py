@@ -230,13 +230,16 @@ class TestViews(WebUseTest):
 
     def test_access_video_page_no_original(self):
         request = RequestMockup(User.objects.all()[0])
+
         session = create_two_sub_session(request)
         video_pk = session.language.video.pk
         video = Video.objects.get(pk=video_pk)
-        en = video.subtitlelanguage_set.all()[0]
-        en.is_original=False
-        en.save()
+
+        video.primary_audio_language_code = ''
+        video.save()
+
         video_changed_tasks.delay(video_pk)
+
         response = self.client.get(reverse('videos:history', args=[video.video_id]))
         # Redirect for now, until we remove the concept of SubtitleLanguages
         # with blank language codes.
