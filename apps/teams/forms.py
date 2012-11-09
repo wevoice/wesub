@@ -228,14 +228,7 @@ class AddTeamVideoForm(BaseVideoBoundForm):
         return 'Video successfully added to team.'
 
     def save(self, commit=True):
-        video_language = self.cleaned_data['language']
         video = self.fields['video_url'].video
-        if video_language:
-            original_language = video.subtitle_language()
-            if original_language and not original_language.language and \
-                not video.subtitlelanguage_set.filter(language=video_language).exists():
-                original_language.language = video_language
-                original_language.save()
 
         obj = super(AddTeamVideoForm, self).save(False)
 
