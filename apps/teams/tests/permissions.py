@@ -866,6 +866,7 @@ class TestRules(BaseTestPermission):
         team.task_assign_policy = Team.TASK_ASSIGN_IDS['Any team member']
         team.save()
 
+
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
                 langs = can_create_task_translate(self.nonproject_video, user)

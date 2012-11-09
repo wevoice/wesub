@@ -13,8 +13,10 @@ from apps.auth.models import  CustomUser
 from django.db import transaction
 
 from subtitles import pipeline            
+from subtitles import models as sub_models
 
 import babelsubs
+from babelsubs.storage import SubtitleSet
 
 import logging
 logger = logging.getLogger("test-fixture-loading")
@@ -53,24 +55,21 @@ def _append_subs(version, num_subs= 2, include_timing=False, make_new_version=Tr
 
         
     
-def _add_subtitles(sub_lang, num_subs, translated_from=None):
-    version = SubtitleVersion(language=sub_lang, note="Automagically-created")
-    version.datetime_started = datetime.datetime.now()
-    version.is_forked = True
-    version.save()
-    for i in xrange(0, num_subs):
-        subtitle = Subtitle(version=version,
-                            subtitle_id="%s" % i,
-                            subtitle_order=i,
-             subtitle_text = "Sub %s for lang (%s)" % (i, sub_lang.language))
-        if not translated_from:
-             subtitle.start_time=i * 1000
-             subtitle.end_time =i + 800
+def _add_subtitles(sub_lang, num_subs, video, translated_from=None):
+    subtitle_set = SubtitleSet(sub_lang.language_code)
 
-        else:
-            subtitle.subtitle_text += " translated from (%s)" % (translated_from)
-        subtitle.save()
-    return version
+    for i in xrange(0, num_subs):
+        start_time=i * 1000
+        end_time =i + 800
+        subtitle_text = 'hey jude %s' % i
+        subtitle_set.append_subtitle(start_time, end_time, subtitle_text)
+
+    parents = []
+
+    if translated_from:
+        parents.append(translated_from.get_tip())
+
+    return pipeline.add_subtitles(video, sub_lang.language_code, subtitle_set, parents=parents)
 
 def _copy_subtitles(fromlang, tolang, maxout=None):
     version = SubtitleVersion(language=tolang, note="Automagically-copied")
@@ -88,34 +87,33 @@ def _copy_subtitles(fromlang, tolang, maxout=None):
 
 def _add_lang_to_video(video, props,  translated_from=None):
     if props.get('is_original', False):
-        sl = video.subtitle_language()
-        sl and sl.delete()
-    sub_lang = SubtitleLanguage(
-        video=video,
-        is_original = props.get('is_original', False),
-        is_complete = props.get('is_complete', False),
-        language = props.get('code'),
-        has_version=True,
-        had_version=True,
-        is_forked=True,
-    )
-    sub_lang.save()
+        video.newsubtitlelanguage_set.all().delete()
+
+    sub_lang = video.subtitle_language(props.get('code', ''))
+
+    if not video.primary_audio_language_code:
+        video.primary_audio_language_code = props.get('code', '')
+        video.save()
+
+    if not sub_lang:
+        sub_lang = sub_models.SubtitleLanguage(
+            video=video,
+            subtitles_complete=props.get('is_complete', False),
+            language_code=props.get('code'),
+            is_forked=True,
+        )
+
+        sub_lang.save()
+
     num_subs = props.get("num_subs", 0)
 
-    if not translated_from:
-        _add_subtitles(sub_lang, num_subs)
-    else:
-        sub_lang.is_original = False
-        sub_lang.is_forked = False
-        sub_lang.standard_language = translated_from
-        sub_lang.save()
-        _copy_subtitles(translated_from, sub_lang, num_subs)
+    _add_subtitles(sub_lang, num_subs, video, translated_from)
 
     for translation_prop in props.get("translations", []):
         _add_lang_to_video(video, translation_prop, translated_from=sub_lang)
 
-    sub_lang.is_complete = props.get("is_complete", False)
     sub_lang.save()
+
     from videos.tasks import video_changed_tasks
     video_changed_tasks(sub_lang.video.id)
     return sub_lang
