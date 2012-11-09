@@ -258,14 +258,16 @@ class TestRpc(TestCase):
         request_0 = RequestMockup(self.user_0)
         return_value = rpc.show_widget(request_0, VIDEO_URL, False)
         video_id = return_value['video_id']
-        rpc.start_editing(
-            request_0, video_id, 'en', original_language_code='en')
+
+        rpc.start_editing(request_0, video_id, 'en', original_language_code='en')
+
         request_1 = RequestMockup(self.user_1, "b")
         rpc.show_widget(request_1, VIDEO_URL, False)
+
         return_value = rpc.start_editing(request_1, video_id, 'en')
+
         self.assertEqual(False, return_value['can_edit'])
-        self.assertEqual(self.user_0.__unicode__(),
-                         return_value['locked_by'])
+        self.assertEqual(unicode(self.user_0), return_value['locked_by'])
 
     def test_basic(self):
         request_0 = RequestMockup(self.user_0)

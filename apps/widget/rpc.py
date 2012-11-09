@@ -1188,7 +1188,7 @@ class Rpc(BaseRpc):
             return language, None
         else:
             return None, { "can_edit": False,
-                           "locked_by": language.writelock_owner_name }
+                           "locked_by": unicode(language.writelock_owner) }
 
     def _save_original_language(self, video_id, language_code):
         video = models.Video.objects.get(video_id=video_id)
