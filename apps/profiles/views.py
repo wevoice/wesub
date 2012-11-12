@@ -166,10 +166,13 @@ def account(request):
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
 
+    third_party_accounts = request.user.third_party_accounts.all()
+
     context = {
         'form': form,
         'user_info': request.user,
-        'edit_profile_page': True
+        'edit_profile_page': True,
+        'third_party': third_party_accounts
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
