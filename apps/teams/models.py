@@ -823,8 +823,8 @@ def _create_translation_tasks(team_video, subtitle_version):
 
         # Otherwise, go ahead and create it.
         task = Task(team=team_video.team, team_video=team_video,
-                    subtitle_version=subtitle_version,
                     language=lang, type=Task.TYPE_IDS['Translate'])
+
         # we should only update the team video after all tasks for
         # this video are saved, else we end up with a lot of
         # wasted tasks
@@ -2026,35 +2026,8 @@ class Task(models.Model):
             self.expiration_date = datetime.datetime.now() + limit
 
     def get_subtitle_version(self):
-        """Return the NewSubtitleVersion for this task.
-
-        If the task has a subtitle_version attached, return it and if not, try
-        to find the latest version through the subtitle language of the video.
-
-        """
-        # autocreate sets the subtitle_version to another
-        # language's subtitle_version and that was breaking
-        # not only the interface but the new upload method.
-        has_version = (self.new_subtitle_version and
-                       self.new_subtitle_version.language_code == self.language)
-        if has_version:
-            return self.new_subtitle_version
-
-        # Otherwise we need to look up the NewSubtitleVersion for this task.  We
-        # get the tipmost version for the appropriate video/language, and we
-        # cache it for speed.
-        if not hasattr(self, "_subtitle_version"):
-            try:
-                self._subtitle_version = (
-                    NewSubtitleVersion.objects
-                                      .filter(video=self.team_video.video,
-                                              language_code=self.language)
-                                      .order_by('-version_number')[:1].get()
-                )
-            except NewSubtitleVersion.DoesNotExist:
-                self._subtitle_version = None
-
-        return self._subtitle_version
+        """Return the NewSubtitleVersion for this task."""
+        return self.new_subtitle_version
 
     def is_blocked(self):
         """Return whether this task is "blocked".
@@ -2091,6 +2064,14 @@ class Task(models.Model):
         if self.language:
             assert self.language in VALID_LANGUAGE_CODES, \
                 "Subtitle Language should be a valid code."
+
+            if self.new_subtitle_version:
+                assert (self.new_subtitle_version.language_code == self.language), \
+                    ("The task language for task %s (%s) does not match the "
+                     "language of its subtitle version (%s)."
+                     % (self.id, self.language,
+                        self.new_subtitle_version.language_code))
+
         result = super(Task, self).save(*args, **kwargs)
 
         if update_team_video_index:
