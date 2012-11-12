@@ -275,7 +275,7 @@ def actions_list(request, video_id):
 def upload_subtitles(request):
     output = {'success': False}
     video = Video.objects.get(id=request.POST['video'])
-    form = SubtitlesUploadForm(request.user, video, request.POST, request.FILES)
+    form = SubtitlesUploadForm(request.user, video, True, request.POST, request.FILES)
 
     response = lambda s: HttpResponse('<textarea>%s</textarea>' % json.dumps(s))
 

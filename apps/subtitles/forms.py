@@ -51,7 +51,7 @@ class SubtitlesUploadForm(forms.Form):
                                            choices=(),
                                            initial='')
 
-    def __init__(self, user, video, *args, **kwargs):
+    def __init__(self, user, video, allow_transcription=True, *args, **kwargs):
         self.video = video
         self.user = user
         self._sl_created = False
@@ -62,14 +62,13 @@ class SubtitlesUploadForm(forms.Form):
         choices = [(sl.language_code, sl.get_language_code_display())
                    for sl in video.newsubtitlelanguage_set.all()
                    if sl.subtitles_complete]
-        choices.append(('', 'None (Direct from Video)'))
+        if allow_transcription:
+            choices.append(('', 'None (Direct from Video)'))
 
         self.fields['from_language_code'].choices = choices
 
 
     # Validation for various restrictions on subtitle uploads.
-    # TODO: Move most of this into the subtitle pipeline file.  Perhaps as
-    # a separate function that can be called on its own.
     def _verify_not_writelocked(self, subtitle_language):
         writelocked = (subtitle_language.is_writelocked and
                        subtitle_language.writelock_owner != self.user)
