@@ -121,7 +121,8 @@ unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
     return this.json['original_text'];
 };
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
-    return this.json['text'];
+    return '';
+    //return this.json['text'];
 };
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
     return this.json['start_of_paragraph'];
