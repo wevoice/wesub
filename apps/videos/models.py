@@ -2015,14 +2015,14 @@ class ActionRenderer(object):
     def render_DELETE_VIDEO(self, item):
         kwargs = self._base_kwargs(item)
         kwargs['title'] = item.new_video_title
-        msg = _('  deleted video "%(title)s"') % kwargs
+        msg = _('  deleted a video: "%(title)s"') % kwargs
         return msg
 
     def render_ADD_VIDEO(self, item):
         if item.user:
-            msg = _(u'added video <a href="%(video_url)s">%(video_name)s</a>')
+            msg = _(u'added <a href="%(video_url)s">&#8220;%(video_name)s&#8221;</a> to Amara')
         else:
-            msg = _(u'<a href="%(video_url)s">%(video_name)s</a> video added')
+            msg = _(u'<a href="%(video_url)s">%(video_name)s</a> added to Amara')
 
         return msg % self._base_kwargs(item)
 
@@ -2147,6 +2147,12 @@ class ActionManager(models.Manager):
 
     def for_user(self, user):
         return self.filter(Q(user=user) | Q(team__in=user.teams.all())).distinct()
+
+    def for_user_team_activity(self, user):
+        return self.filter(team__in=user.teams.all()).exclude(user=user)
+
+    def for_user_video_activity(self, user):
+        return self.filter(video__in=user.videos.all()).exclude(user=user)
 
     def for_video(self, video, user=None):
         qs = Action.objects.filter(video=video)

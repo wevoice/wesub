@@ -1,9 +1,9 @@
-{% extends "profiles/base.html" %}
+{% extends "messages/base.html" %}
 
 {% load paginator i18n %}
 
 {% block title %}
-    {% trans 'My Messages' %} | Amara
+    {% trans 'Messages - Inbox' %} | Amara
 {% endblock %}
 
 {% block html_attrs %}id="messages_list"{% endblock %}
@@ -22,28 +22,17 @@
     </script>
 {% endblock %}
 
-{% block main_content %}
-
-    <h2>
-        <img src="{{ user.small_avatar }}">
-        {{ user }}
-    </h2>
-
-    {% with 'messages' as current %}
-        {% include 'profiles/_tabs.html' %}
-    {% endwith %}
-
-    <div class="view grid_9 alpha">
-        <div class="tools">
-            <a class="button" href="{% url messages:new %}">{% trans "Compose" %}</a>
-        </div>
+{% block view_content %}
+    {% comment %}<div class="tools">
+        <a href="#" class="button" id="mark-read">Mark all read</a>
+    </div>{% endcomment %}
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
 
+        <p class="view-notice">
+            You <strong>are {% if not user_info.notify_by_email %}not {% endif %}receiving</strong> message notifications via email. <a href="{% url profiles:edit %}">Edit preferences</a>.
+        </p>
         <ul class="listing messages">
-            <p class="view-notice">
-                You <strong>are {% if not user_info.notify_by_email %}not {% endif %}receiving</strong> message notifications via email. <a href="{% url profiles:edit %}">Edit preferences</a>.
-            </p>
             {% for msg in message_list %}
                 <li class="message {% if not msg.read %}unread{% endif %}">
                     <h3>
@@ -88,19 +77,11 @@
         </ul>
 
         {% if is_paginated %}{% paginator %}{% endif %}
-        {% else %}
-            <p class="empty">
-              {% trans 'You have no messages.' %}
-            </p>
-        {% endif %}
-    </div>
-
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current"><a href="{% url messages:index %}">{% trans "Inbox" %}</a></li>
-            <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
-        </ul>
-    </div>
+    {% else %}
+        <p class="empty">
+          {% trans 'You have no messages.' %}
+        </p>
+    {% endif %}
 
     <div class="bootstrap">
         <div id="msg_modal" class="modal">

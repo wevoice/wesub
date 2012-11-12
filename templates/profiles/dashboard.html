@@ -1,4 +1,4 @@
-{% extends "profiles/base.html" %}
+{% extends "base.html" %}
 
 {% load to_json i18n messages_tags media_compressor recent_activity auth_tags profiles_tags teams_tags query_string videos_tags %}
 
@@ -7,7 +7,7 @@
     {% include_bundle "widget-css"%}
 {% endblock %}
 
-{% block body_attrs %}id="dashboard" class="v1"{% endblock %}
+{% block body_attrs %}id="user-dashboard" class="v1"{% endblock %}
 {% block html_attrs %}id="profile_dashboard"{% endblock %}
 
 {% block title %}{% trans "Dashboard" %} | {{ user_info }} | Amara{% endblock %}
@@ -24,18 +24,45 @@
 
 {% block main_content %}
 
-    <h2>
-        <img src="{{ user.small_avatar }}" alt="{{ user|title }}'s avatar"/>
-        {{ user }}
-    </h2>
+    <h2>Hey {{ user }}!</h2>
 
-    {% with 'dashboard' as current %}
-        {% include 'profiles/_tabs.html' %}
-    {% endwith %}
+    <div class="context grid_4 alpha">
+        <h3>Some helpful links</h3>
+        <ul>
+            <li>
+                <a href="{% url messages:inbox %}">Read your messages</a>
+                {% if user.unread_messages.count %}
+                    <span class="count">{{ user.unread_messages.count }}</span>
+                {% endif %}
+            </li>
+            <li>
+                <a href="" title="">Edit your profile</a>
+            </li>
+            <li>
+                <a href="" title="">Edit your account</a>
+            </li>
+        </ul>
+        <a href="#">Messages</a>
+        {% with user.teams.all as user_teams %}
+            {% if user_teams %}
+                <h3>{% trans "Your teams" %}</h3>
+                <ul>
+                    {% for t in user_teams %}
+                        <li>
+                            <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                            {% if t|can_leave_team:user %}
+                                (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
 
-    <div class="view grid_9 alpha">
-        <div class="grid_5 alpha">
-            <h3>{% trans 'Open Tasks' %}</h3>
+    <div class="view grid_8 omega">
+        <h3>{% trans "Videos you're working on" %}</h3>
+        {% if tasks %}
             <ul class="listing tasks">
                 {% for task in tasks %}
                     <li>
@@ -75,15 +102,19 @@
                             {% endif %}
                         {% endwith %}
                     </li>
-                {% empty %}
-                    <li>
-                        <p>{% trans 'You have no open tasks assigned to you.' %}</p>
-                    </li>
                 {% endfor %}
             </ul>
+        {% else %}
+            <p class="empty">
+                {% blocktrans %}
+                    You're not working on anything yet.
+                {% endblocktrans %}
+            </p>
+        {% endif %}
 
-            <h3>{% trans "Recent Activity" %} (<a href="{% url profiles:actions_list %}">{% trans 'View all' %}</a>)</h3>
-            {% with action_list as events %}
+        <div class="grid_4 alpha">
+            <h3>{% trans "Activity in your teams" %}</h3>
+            {% with team_activity as events %}
                 <ul class="listing activity">
                     {% for item in events %}
                         <li>{{ item.render }}</li>
@@ -95,36 +126,16 @@
         </div>
 
         <div class="grid_4 omega">
-            <h3>{% trans 'Alerts' %}</h3>
-            <ul class="featured">
-                {% with user.unread_messages.count as new_msg_count %}
-                    {% if new_msg_count %}
-                        <li>You have <a href="{% url messages:index %}">{{ user.unread_messages.count }} unread message{{ user.unread_messages.count|pluralize }}</a></li>
-                    {% endif %}
-                {% endwith %}
-            </ul>
-
-            {% with user.teams.all as user_teams %}
-                {% if user_teams %}
-                    <h3>{% trans "Teams" %}</h3>
-                    <ul>
-                        {% for t in user_teams %}
-                            <li>
-                                <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
-                                {% if t|can_leave_team:user %}
-                                    (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team t.slug %}">{% trans "leave team" %}</a>)
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+            <h3>{% trans "Activity on your videos" %}</h3>
+            {% with video_activity as events %}
+                <ul class="listing activity">
+                    {% for item in events %}
+                        <li>{{ item.render }}</li>
+                    {% empty %}
+                        <li class="empty">{% trans 'Sorry, no activity yet.' %}</li>
+                    {% endfor %}
+                </ul>
             {% endwith %}
         </div>
-    </div>
-
-    <div class="controls grid_3 omega">
-        {% with 'overview' as current %}
-            {% include 'profiles/_filters_dashboard.html' %}
-        {% endwith %}
     </div>
 {% endblock %}
