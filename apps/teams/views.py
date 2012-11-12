@@ -49,7 +49,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
+    UnpublishForm, MoveTeamVideoForm, TaskUploadForm, ChooseTeamForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -1194,8 +1194,8 @@ def team_tasks(request, slug):
             'team_video__project',
             'assignee',
             'team',
-            'subtitle_version__language__standard_language',
-            'subtitle_version__user'))
+            'new_subtitle_version__subtitle_language',
+            'new_subtitle_version__author'))
     tasks.sort(key=lambda t: task_ids.index(t.pk))
 
     if filters.get('team_video'):
@@ -1227,10 +1227,12 @@ def team_tasks(request, slug):
     add_general_settings(request, widget_settings)
 
     team_video_pks = [t.team_video_id for t in tasks]
-    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+    video_pks = (Video.objects.filter(teamvideo__in=team_video_pks)
+                              .values_list('id', flat=True))
 
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
-                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+                       VideoUrl.objects.filter(video__in=video_pks,
+                                               primary=True)])
 
     for t in tasks:
         t.cached_video_url = video_urls.get(t.team_video.video_id)
@@ -1247,7 +1249,6 @@ def team_tasks(request, slug):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
-        'upload_draft_form': UploadDraftForm(user=request.user),
         'project_choices': team.project_set.exclude(name='_root'),
     }
 
@@ -1275,10 +1276,9 @@ def create_task(request, slug, team_video_pk):
             if task.type == Task.TYPE_IDS['Subtitle']:
                 task.language = ''
 
-            # TODO: Remove this?
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
-                task.subtitle_version = task.team_video.video.latest_version(language_code=task.language)
+                task.new_subtitle_version = task.team_video.video.latest_version(language_code=task.language)
 
             task.save()
             notifier.team_task_assigned.delay(task.pk)
@@ -1421,40 +1421,21 @@ def assign_task_ajax(request, slug):
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
 @login_required
-@transaction.commit_manually
-def upload_draft(request, slug):
-
+def upload_draft(request, slug, video_id):
     if request.POST:
-        form = UploadDraftForm(request.user, request.POST, request.FILES)
+        video = Video.objects.get(video_id=video_id)
+        form = TaskUploadForm(request.POST, request.FILES,
+                              user=request.user, video=video)
 
-        try:
-            is_valid = form.is_valid()
-        except Exception, e:
-            client.create_from_exception()
-            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
-            transaction.rollback()
-            is_valid = False
-
-        if is_valid:
-            try:
-                form.save()
-            except Exception, e:
-                messages.error(request, unicode(e))
-                transaction.rollback()
-                client.create_from_exception()
-            else:
-                messages.success(request, _(u"Draft uploaded successfully."))
-                transaction.commit()
+        if form.is_valid():
+            form.save()
+            messages.success(request, _(u"Draft uploaded successfully."))
         else:
             for key, value in form.errors.items():
-                messages.error(request, _('/n'.join([force_unicode(i) for i in value])))
+                messages.error(request, '\n'.join([force_unicode(i) for i in value]))
 
-            transaction.rollback()
-
-        if transaction.is_dirty():
-            transaction.rollback()
-
-        return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+        return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
+                                            kwargs={'slug': slug}))
     else:
         return HttpResponseBadRequest()
 

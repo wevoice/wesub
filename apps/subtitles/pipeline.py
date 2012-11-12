@@ -59,6 +59,7 @@ from django.db import transaction
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 
 
+# Utility Functions -----------------------------------------------------------
 def _strip_nones(d):
     """Strip all entries in a dictionary that have a value of None."""
 
