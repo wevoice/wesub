@@ -24,6 +24,10 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.contrib import messages
+from django.utils.translation import ugettext_lazy as _
+
+from auth.models import CustomUser as User
 
 from accountlinker.models import ThirdPartyAccount
 from localeurl.utils import universal_url
@@ -66,22 +70,35 @@ def youtube_oauth_callback(request):
     """
     import atom
     code = request.GET.get("code", None)
+
     if code is None:
         raise Exception("No code in youtube oauth callback")
+
     state = request.GET.get("state", None)
+
     if state is None:
         raise Exception("No state in youtube oauth callback")
-    values = state.split("-")
-    team_pk = values[0]
-    if len(values) > 1:
-        project_pk = values[1]
-    team = Team.objects.get(pk=team_pk)
+
+    state = json.loads(state)
+
+    if 'team' in state:
+        team_pk = state['team']
+        team = Team.objects.get(pk=team_pk)
+    else:
+        team = None
+
+    if 'user' in state:
+        user_pk = state['user']
+        user = User.objects.get(pk=user_pk)
+        if request.user.pk is not user.pk:
+            messages.error(request, _("The user who requested this action"
+                " doesn't match the current user."))
+            return redirect('/')
+    else:
+        user = None
+
+    base = "https://accounts.google.com/o/oauth2/token"
     
-    base =  "https://accounts.google.com/o/oauth2/token"
-    state = team.pk
-    
-    # When testing this locally, sometimes you will have to remove the https
-    # override.
     params = {
         "client_id": settings.YOUTUBE_CLIENT_ID,
         "client_secret": settings.YOUTUBE_CLIENT_SECRET,
@@ -94,6 +111,7 @@ def youtube_oauth_callback(request):
     response = requests.post(base, data=params, headers={
         "Content-Type": "application/x-www-form-urlencoded"
     })
+
     if response.status_code != 200:
         logger.error("Error on requesting Youtube Oauth token", extra={
                     "data": {
@@ -109,14 +127,20 @@ def youtube_oauth_callback(request):
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
     
     # make sure we don't store multiple auth tokes for the same account
-    account, created  = ThirdPartyAccount.objects.get_or_create(
-        type = VIDEO_TYPE_YOUTUBE,
-        username = author.name.text,
-        defaults = {
-            
-        'oauth_refresh_token' : content['refresh_token'],
-        'oauth_access_token' : content['access_token'],
+    account, created = ThirdPartyAccount.objects.get_or_create(
+        type=VIDEO_TYPE_YOUTUBE,
+        username=author.name.text,
+        defaults={
+            'oauth_refresh_token': content['refresh_token'],
+            'oauth_access_token': content['access_token'],
         }
     )
-    team.third_party_accounts.add(account)
-    return redirect(reverse("teams:third-party-accounts", kwargs={"slug":team.slug}))
+
+    if team:
+        team.third_party_accounts.add(account)
+        return redirect(
+            reverse("teams:third-party-accounts", kwargs={"slug": team.slug}))
+
+    if user:
+        user.third_party_accounts.add(account)
+        return redirect(reverse("profiles:account"))

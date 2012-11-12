@@ -1681,7 +1681,8 @@ def third_party_accounts(request, slug):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    new_youtube_url = _generate_youtube_oauth_request_link(str(team.pk))
+    new_youtube_url = _generate_youtube_oauth_request_link(
+            json.dumps({'team': team.pk}))
     linked_accounts = team.third_party_accounts.all()
     return {
         "team":team,

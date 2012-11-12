@@ -212,3 +212,11 @@ def remove_avatar(request):
         request.user.save()
         messages.success(request, _('Your picture has been removed.'))
     return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')
+
+
+@login_required
+def add_third_party(request):
+    from accountlinker.views import _generate_youtube_oauth_request_link
+    state = json.dumps({'user': request.user.pk})
+    url = _generate_youtube_oauth_request_link(state)
+    return redirect(url)
