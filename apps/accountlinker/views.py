@@ -90,7 +90,7 @@ def youtube_oauth_callback(request):
     if 'user' in state:
         user_pk = state['user']
         user = User.objects.get(pk=user_pk)
-        if request.user.pk is not user.pk:
+        if request.user.pk != user.pk:
             messages.error(request, _("The user who requested this action"
                 " doesn't match the current user."))
             return redirect('/')
