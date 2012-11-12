@@ -21,9 +21,8 @@ import urllib
 
 import requests
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 
@@ -37,7 +36,9 @@ from videos.models import VIDEO_TYPE_YOUTUBE
 from videos.types.youtube import YouTubeApiBridge
 
 import logging
+
 logger = logging.getLogger("authbelt.views")
+
 
 def _youtube_request_uri():
     if getattr(settings, 'YOUTUBE_CLIENT_FORCE_HTTPS', True):
@@ -45,6 +46,7 @@ def _youtube_request_uri():
                 protocol_override='https')
     else:
         return universal_url("accountlinker:youtube-oauth-callback")
+
 
 def _generate_youtube_oauth_request_link(state_str=None):
     state_str = state_str or ""
@@ -62,6 +64,7 @@ def _generate_youtube_oauth_request_link(state_str=None):
         
     }
     return "%s%s" % (base, urllib.urlencode(params))
+
 
 def youtube_oauth_callback(request):
     """
