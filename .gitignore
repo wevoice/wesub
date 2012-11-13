@@ -44,6 +44,7 @@ media/static-cache
 media/teams/*
 media/videos/*
 deploy/fabric.log
+amara-fabric/
 disabled
 server_local_settings.py
 /mediabundles_list.py
