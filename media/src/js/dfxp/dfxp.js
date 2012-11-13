@@ -26,11 +26,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     this.init = function(xml) {
 
+        var parsedXml = $.parseXML(xml);
+
         // Store the original XML for comparison later.
-        this.$originalXml = $(xml.documentElement).clone();
+        this.$originalXml = $(parsedXml.documentElement).clone();
 
         // Store the working XML for local edits.
-        this.$xml = $(xml.documentElement).clone();
+        this.$xml = $(parsedXml.documentElement).clone();
+
+        // Cache the query for the containing div.
+        this.$div = $('div', this.$xml);
 
     };
 
@@ -66,7 +71,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          *
          * If `after` is provided, we'll place the new subtitle directly
          * after that one. Otherwise, we'll place the new subtitle at the
-         * end.
+         * beginning or end depending on subtitle count.
          *
          * `newAttrs` is an optional JSON object specifying the attributes to
          * be applied to the new element.
@@ -77,7 +82,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         if (typeof after != 'number') {
-            after = this.getLastSubtitle();
+
+            // If we have subtitles, default placement should be at the end.
+            if (this.subtitlesCount()) {
+                after = this.getLastSubtitle();
+
+            // Otherwise, place the first subtitle at the beginning.
+            } else {
+                after = -1;
+            }
         }
 
         // Create the new element manually. If you create with jQuery, it'll use
@@ -106,11 +119,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // If after is -1, we need to place the subtitle at the beginning.
         if (after === -1) {
 
-            // Get the very first subtitle.
-            var $firstSubtitle = this.getSubtitle(0);
-
-            // Place this new subtitle before the first subtitle.
-            $firstSubtitle.before($newSubtitle);
+            // Prepend this new subtitle directly inside of the containing div.
+            this.$div.prepend($newSubtitle);
 
         // Otherwise, place it after the designated subtitle.
         } else {

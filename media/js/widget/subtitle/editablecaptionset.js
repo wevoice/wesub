@@ -35,22 +35,31 @@ goog.provide('unisubs.subtitle.EditableCaptionSet');
  *     when deserializing an EditableCaptionSet from memory after a finish failure. It means that 
  *     during the failed editing session, the EditableCaptionSet got forked.
  */
-unisubs.subtitle.EditableCaptionSet = function(existingJsonCaptions, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated) {
+unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated) {
     goog.events.EventTarget.call(this);
     var that = this;
     var c;
-    this.captions_ = goog.array.map(
-        existingJsonCaptions, function(caption) {
-            c = new unisubs.subtitle.EditableCaption(null, caption);
-            c.setParentEventTarget(that);
-            return c;
-        });
-    goog.array.sort(
-        this.captions_,
-        unisubs.subtitle.EditableCaption.orderCompare);
+
+    this.x = new window['AmaraDFXPParser']();
+    this.x.init(dfxp);
+
+    // TODO: For debug only.
+    window['dfxp'] = dfxp;
+    window['x'] = this.x;
+
+    //this.captions_ = goog.array.map(
+        //existingJsonCaptions, function(caption) {
+            //c = new unisubs.subtitle.EditableCaption(null, caption);
+            //c.setParentEventTarget(that);
+            //return c;
+        //});
+    //goog.array.sort(
+        //this.captions_,
+        //unisubs.subtitle.EditableCaption.orderCompare);
+
     var i;
 
-    this.setPreviousAndNextCaptions();
+    //this.setPreviousAndNextCaptions();
 
     this.completed = opt_completed;
 
