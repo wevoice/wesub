@@ -1256,7 +1256,10 @@ def team_tasks(request, slug):
         if project_slug == 'any':
             project = None
         else:
-            project = get_object_or_404(Project, team=team, slug=project_slug)
+            try:
+                project = Project.objects.get(team=team, slug=project_slug)
+            except Project.DoesNotExist:
+                project = None
     else:
         # User didn't specify a project to filter on.  We use the default
         # project only if:
