@@ -50,7 +50,7 @@ unisubs.widget.SavedSubtitles.prototype.serialize = function() {
           'title': this.CAPTION_SET.title,
           'isComplete': this.CAPTION_SET.completed,
           'forked': this.CAPTION_SET.wasForkedDuringEdits(),
-          'dfxp': this.CAPTION_SET.makeDFXPSubs() });
+          'dfxp': this.CAPTION_SET.makeDFXPString() });
 };
 
 unisubs.widget.SavedSubtitles.deserialize = function(json) {

@@ -158,7 +158,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
     var subMap = this.makeMap();
     return subMap[id];
 };
-unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPSubs = function() {
+unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     return this.x.xmlToString();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
