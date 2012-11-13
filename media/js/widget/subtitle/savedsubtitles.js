@@ -60,7 +60,7 @@ unisubs.widget.SavedSubtitles.deserialize = function(json) {
         return new unisubs.widget.SavedSubtitles(
             obj['sessionPK'], 
             new unisubs.subtitle.EditableCaptionSet(
-                obj['captionSet'], obj['isComplete'], obj['title'], 
+                obj['dfxp'], obj['isComplete'], obj['title'], 
                 obj['forked'], obj['description']));
     }
     else {
@@ -93,8 +93,9 @@ unisubs.widget.SavedSubtitles.save_ = function(index, savedSubs) {
 unisubs.widget.SavedSubtitles.fetchSaved_ = function(index) {
     var savedSubsText = unisubs.fetchFromLocalStorage(
         unisubs.widget.SavedSubtitles.STORAGEKEY_ + index);
-    if (savedSubsText)
+    if (savedSubsText) {
         return unisubs.widget.SavedSubtitles.deserialize(savedSubsText);
-    else
+    } else {
         return null;
+    }
 };

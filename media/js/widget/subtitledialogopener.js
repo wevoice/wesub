@@ -44,10 +44,12 @@ unisubs.widget.SubtitleDialogOpener.prototype.showLoading_ = function(loading) {
 unisubs.widget.SubtitleDialogOpener.prototype.getResumeEditingRecord_ = function(openDialogArgs) {
     var resumeEditingRecord = unisubs.widget.ResumeEditingRecord.fetch();
     if (resumeEditingRecord && resumeEditingRecord.matches(
-        this.videoID_, openDialogArgs))
+        this.videoID_, openDialogArgs)) {
         return resumeEditingRecord;
-    else
+    }
+    else {
         return null;
+    }
 };
 unisubs.widget.SubtitleDialogOpener.prototype.saveResumeEditingRecord_ = function(sessionPK, openDialogArgs) {
     var resumeEditingRecord = new unisubs.widget.ResumeEditingRecord(
@@ -111,8 +113,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.resumeEditing_ = function(savedSub
             if (result['response'] == 'ok') {
                 // FIXME: ouch, kinda hacky.
                 result['subtitles']['subtitles'] = 
-                    savedSubtitles.CAPTION_SET.makeJsonSubs();
-                if (savedSubtitles.CAPTION_SET.title && savedSubtitles.CAPTION_SET.title.length){
+                    savedSubtitles.CAPTION_SET.makeDFXPString();
+                if (savedSubtitles.CAPTION_SET.title && savedSubtitles.CAPTION_SET.title.length) {
                     result['subtitles']['title'] = 
                         savedSubtitles.CAPTION_SET.title;
                 }
