@@ -22,7 +22,11 @@
             <ul {% if projects|length > 6 %} class="list-collapsible"{% endif %}>
                 {% for project in projects %}
                     <li {% if forloop.counter > 6 %} class="hidden"{% endif %}>
-                        <a href="{% url teams:detail team.slug %}{% query_string request.GET project=project.slug %}">
+                        {% if '/tasks/' in request.path %}
+                            <a href="{% url teams:team_tasks team.slug %}{% query_string request.GET project=project.slug %}">
+                        {% else %}
+                            <a href="{% url teams:detail team.slug %}{% query_string request.GET project=project.slug %}">
+                        {% endif %}
                             {{ project }}
                             <span class="count">
                                 {{ project.videos_count }}
