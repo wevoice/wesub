@@ -134,6 +134,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $newSubtitle.get(0);
     };
+
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.

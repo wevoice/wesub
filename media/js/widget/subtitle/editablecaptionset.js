@@ -44,7 +44,6 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
     this.x.init(dfxp);
 
     // TODO: For debug only.
-    window['dfxp'] = dfxp;
     window['x'] = this.x;
 
     //this.captions_ = goog.array.map(
@@ -150,7 +149,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
-    return this.captions_.length;
+    return this.x.subtitlesCount();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     return this.captions_[index];
@@ -158,6 +157,9 @@ unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
 unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
     var subMap = this.makeMap();
     return subMap[id];
+};
+unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPSubs = function() {
+    return this.x.xmlToString();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
     return goog.array.map(this.captions_, function(c) { return c.json; });
