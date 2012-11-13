@@ -105,6 +105,7 @@
             
         {% if videos %}
             <h3>{% trans "Videos that need your help" %}</h3>
+            <!-- TODO Change this for non-members -->
 
             {% if user.is_authenticated and not user.get_languages %}
                 <p class="prompt">
