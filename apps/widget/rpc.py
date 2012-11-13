@@ -247,7 +247,7 @@ class Rpc(BaseRpc):
 
         original_language = None
         if video.subtitle_language():
-            original_language = video.subtitle_language().language
+            original_language = video.subtitle_language().language_code
 
         tv = video.get_team_video()
         writable_langs = list(tv.team.get_writable_langs()) if tv else []
