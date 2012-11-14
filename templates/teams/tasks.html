@@ -182,7 +182,7 @@
                         {% with task.new_subtitle_version.subtitle_language.get_translation_source_language as translated_from %}
                             <li
                                 {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                    {% if translated_from and not translated_from.get_tip() %}
+                                    {% if translated_from and not translated_from.get_tip %}
                                         class="disabled">
                                         <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ translated_from.get_language_code_display }}) is finished.</div
                                     {% endif %}
