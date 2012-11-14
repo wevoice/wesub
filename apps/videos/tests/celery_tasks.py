@@ -19,6 +19,7 @@
 
 import datetime
 
+from babelsubs.storage import SubtitleSet
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.test import TestCase
@@ -33,7 +34,7 @@ from apps.subtitles.models import (
 )
 from apps.subtitles import pipeline
 
-from apps.videos.tasks import video_changed_tasks, send_change_title_email
+from apps.videos.tasks import video_changed_tasks, send_change_title_email, send_new_version_notification
 from apps.videos.tests import utils
 
 
@@ -281,4 +282,60 @@ class TestCeleryTasks(TestCase):
                 SubtitleLanguage))
             self.assertTrue(message.user in list(followers))
             self.assertFalse(message.user in list(lan2_followers))
+
+
+class TestVideoChangedEmailNotification(TestCase):
+    def setUp(self):
+        self.user_1 = User.objects.create(username='user_1')
+        self.user_2 = User.objects.create(username='user_2')
+
+        self.video = video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+        video.primary_audio_language_code = 'en'
+        video.user = self.user_1
+        video.save()
+        mail.outbox = []
+        self.original_language = SubtitleLanguage.objects.create(video=video, language_code='en')
+        subs = SubtitleSet.from_list('en',[
+            (1000, 2000, "1"),
+            (2000, 3000, "2"),
+            (3000, 4000, "3"),
+        ])
+        self.original_language.add_version(subtitles=subs)
+
+    def test_no_version_no_breakage(self):
+        initial_count= len(mail.outbox)
+        res = send_new_version_notification(1000)
+        self.assertEqual(res, False)
+        self.assertEqual(len(mail.outbox), initial_count)
+
+    def test_email_diff_not_for_private(self):
+        # make sure we never send email for private versions
+        initial_count= len(mail.outbox)
+        version = self.original_language.get_tip()
+        version.visibility = 'private'
+        version.save()
+
+        self.assertTrue(version.is_private())
+        res = send_new_version_notification(version.pk)
+        self.assertEqual(res, False)
+        self.assertEqual(len(mail.outbox), initial_count )
+
+    def test_email_diff_notification_wont_fire_without_changes(self):
+        initial_count= len(mail.outbox)
+        # version is indentical to previous one
+        old_version = self.original_language.get_tip()
+        new_version = self.original_language.add_version(subtitles=old_version.get_subtitles())
+        # no notifications should be sent
+        res = send_new_version_notification(new_version.pk)
+        self.assertEqual(res, None)
+        self.assertEqual(len(mail.outbox), initial_count )
+
+    def test_email_diff_subtitles(self):
+        initial_count= len(mail.outbox)
+        # version is indentical to previous one
+        old_version = self.original_language.get_tip()
+        new_version = self.original_language.add_version(subtitles=old_version.get_subtitles())
+        res = send_new_version_notification(new_version.pk)
+        self.assertEqual(res, None)
+        self.assertEqual(len(mail.outbox), initial_count )
 
