@@ -216,6 +216,13 @@ def remove_avatar(request):
 
 @login_required
 def add_third_party(request):
+    account_type = request.GET.get('account_type', None)
+    if not account_type:
+        raise Http404
+
+    if account_type != 'youtube':
+        raise Http404
+
     from accountlinker.views import _generate_youtube_oauth_request_link
     state = json.dumps({'user': request.user.pk})
     url = _generate_youtube_oauth_request_link(state)

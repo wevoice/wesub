@@ -49,7 +49,7 @@
                         {% endfor %}
                     {% endif %}
                 </ul>
-                <a href="{% url profiles:add-third-party %}" title="">Add a Youtube account</a>
+                <a href="#account-modal" class="open-modal" title="">Add a Youtube account</a>
             </div>
             <div class="grid_4 alpha">
                 <fieldset>
@@ -87,4 +87,37 @@
             </div>
         </form>
     </div>
+
+    <div class="bootstrap">
+        <div class="modal" id="account-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Add Third Party Account' %}</h3>
+            </div>
+
+                <form method="get" action="{% url profiles:add-third-party %}">
+
+                    <div class="modal-body">
+                        <fieldset>
+                            <p>
+                                {% blocktrans %}
+                                Choose an account type to add:
+                                {% endblocktrans %}
+                            </p>
+
+                            <select name="account_type">
+                                <option>Select...</option>
+                                <option value="youtube">Youtube</option>
+                            </select>
+                        </fieldset>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                    </div>
+                </form>
+        </div>
+    </div>
+
 {% endblock %}
