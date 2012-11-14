@@ -229,9 +229,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        return $subtitle.next();
+        return this.getSubtitle(indexOrElement).next();
     };
     this.getPreviousSubtitle = function(indexOrElement) {
         /*
@@ -240,9 +238,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        return $subtitle.prev();
+        return this.getSubtitle(indexOrElement).prev();
     };
     this.getSubtitle = function(indexOrElement) {
         /*
