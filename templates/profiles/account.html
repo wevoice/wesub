@@ -2,6 +2,7 @@
 
 {% load i18n messages_tags %}
 
+{% block html_attrs %}id="account"{% endblock %}
 {% block body-class %}account {{ block.super }}{% endblock %}
 {% block title %}{{ user_info }} | Amara{% endblock %}
 
@@ -105,11 +106,24 @@
                                 {% endblocktrans %}
                             </p>
 
-                            <select name="account_type">
+                            <select id="account-type-select" name="account_type">
                                 <option>Select...</option>
                                 <option value="youtube">Youtube</option>
                             </select>
                         </fieldset>
+
+                        <fieldset class="account-type-copy" id="youtube-copy">
+                            {% blocktrans %}
+                                <p>
+                                    Sync is one-way only
+                                </p>
+
+                                <p>
+                                    Any existing Amara subs will be sent to Youtube
+                                </p>
+                            {% endblocktrans %}
+                        </fieldset>
+
 
                     </div>
 
