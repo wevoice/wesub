@@ -1193,9 +1193,6 @@ div.upload-draft-modal {
 .v1 .alpha .omega {
     margin-left: 60px;
 }
-#dashboard .alpha .omega {
-    margin-left: 10px;
-}
 .v1 div.submit {
     border-top: 1px solid $fainter;
     clear: both;
@@ -1316,57 +1313,73 @@ input[name="thumbnail-clear"] {
     margin: 12px 4px 12px 0 !important;
 }
 
-/* Dashboard */
-#dashboard {
-
-    .featured {
-        margin-bottom: 4em;
-        padding: 0;
-
-        li {
-            border-left: 4px solid $fainter;
-            margin: .5em 0;
-            padding: 1em;
-        }
-    }
-
-    .listing {
-        margin-bottom: 4em;
-        margin-right: 25px;
-
-        li {
-            padding: 1em 150px 1em 0;
-        }
-
-        &.tasks li {
-            min-height: 0;
-            padding: 1em 0;
-
-            p {
-                margin-bottom: 0;
-            }
-        }
-
-        .timestamp {
-            top: 1em;
-        }
-    }
-
-    .view ul {
-        padding: 0;
-    }
-}
-.v1 .only-child h2 {
-    border-bottom: 1px solid $fainter;
-    margin-bottom: 0;
-    padding: .5em 0;
-}
-
 /* Global */
 div#language_picker {
     select {
         width: 220px;
     }
+}
+/* User Dashboard */
+#user_dashboard .section {
+    clear: none;
+    margin: .5em 0;
+    border: 1px solid #eee;
+    padding: 1em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    @include border-radius(2px);
+
+    h3 {
+        font-size: 10px;
+        font-weight: normal;
+        text-align: center;
+        text-transform: uppercase;
+        color: #999;
+    }
+
+    p, ul {
+        margin-bottom: 0;
+    }
+
+    ul {
+        padding: 0;
+
+        .count {
+            
+        }
+    }
+
+    .listing > li {
+        padding: .75em 0;
+        border-style: solid;
+        border-color: #eee;
+
+        .timestamp {
+            display: block;
+            position: static;
+            text-align: left;
+            color: #999;
+        }
+
+        &:last-child {
+            border: none;
+        }
+    }
+
+    .prompt {
+        text-align: center;
+        font-size: 14px;
+        line-height: 175%;
+
+        a {
+            display: block;
+        }
+    }
+}
+
+#user_dashboard .v1 .alpha .omega {
+    margin-left: 15px;
 }
 
 /* Profile */
@@ -2351,6 +2364,7 @@ a.truncated-expand {
     }
 }
 
+/* Team Dashboard */
 .team_dashboard .view {
 
     .get-started {
@@ -2530,13 +2544,10 @@ a.truncated-expand {
         line-height: 175%;
     }
 }
-.messages.v1 .view, #user-dashboard.v1 .view {
+.messages.v1 .view {
     border-top: 1px solid $fainter;
     margin-left: 0;
     padding-left: 10px;
-}
-#user-dashboard.v1 .view {
-    padding-top: 2em;
 }
 .messages.v1 .context {
     padding-top: 1em;
