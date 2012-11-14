@@ -339,7 +339,7 @@ def download_subtitles(request, format):
     if not format in babelsubs.get_available_formats():
         raise HttpResponseServerError("Format not found")
     
-    subs_text = babelsubs.to(version.get_subtitles(), format)
+    subs_text = babelsubs.to(version.get_subtitles(), format, language=version.language_code)
     # since this is a downlaod, we can afford not to escape tags, specially true
     # since speaker change is denoted by '>>' and that would get entirely stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")
