@@ -23,9 +23,9 @@
 {% endblock %}
 
 {% block view_content %}
-    {% comment %}<div class="tools">
-        <a href="#" class="button" id="mark-read">Mark all read</a>
-    </div>{% endcomment %}
+    <div class="tools">
+        <a href="#" class="button mark-all-read" id="mark-all-read">Mark all read</a>
+    </div>
     {% if message_list %}
         {% if is_paginated %}{% paginator %}{% endif %}
 
