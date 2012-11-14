@@ -128,21 +128,20 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
     return this.x.subtitlesCount();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
-    return this.x.getCaption[index];
+    return this.x.getSubtitle(index);
 };
-unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
-    var subMap = this.makeMap();
-    return subMap[id];
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
+    //var subMap = this.makeMap();
+    //return subMap[id];
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     return this.x.xmlToString();
 };
-unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
-    return goog.array.map(this.captions_, function(c) { return c.json; });
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
+    //return goog.array.map(this.captions_, function(c) { return c.json; });
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.nonblankSubtitles = function() {
-    return goog.array.filter(
-        this.captions_, function(c) { return c.getTrimmedText() != ''; });
+    return this.x.getNonBlankSubtitles();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptionSet) {
     var myNonblanks = this.nonblankSubtitles();
@@ -155,17 +154,15 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
     return true;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = function(subtitleJson) {
-    var newSub = {
-          'subtitle_id': subtitleJson['subtitle_id'],
-          'text': '',
-          'sub_order': subtitleJson['sub_order'],
-          'start_time': subtitleJson['start_time'],
-          'end_time': subtitleJson['end_time']
-    };
+
+    var newSub = this.x.addSubtitle(null, {
+        'begin': subtitleJson['start_time'],
+        'end': subtitleJson['end_time']
+    });
 
     var c = new unisubs.subtitle.EditableCaption(null, newSub);
     c.setParentEventTarget(this);
-    this.captions_.push(c);
+
     return c;
 };
 

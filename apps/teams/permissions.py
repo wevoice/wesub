@@ -771,15 +771,19 @@ def can_create_task_subtitle(team_video, user=None, workflows=None):
 
     A subtitle task can be created iff:
 
-    * There are no subtitles for the video already.
+    * There are no public subtitles for the video already.
     * There are no subtitle tasks for it already.
     * The user has permission to create subtitle tasks.
 
     """
+    from subtitles.models import SubtitleLanguage
+
     if user and not _user_can_create_task_subtitle(user, team_video):
         return False
 
-    if team_video.subtitles_started():
+    if (SubtitleLanguage.objects.having_public_versions()
+                                .filter(video=team_video.video)
+                                .exists()):
         return False
 
     if team_video.task_set.all_subtitle().exists():

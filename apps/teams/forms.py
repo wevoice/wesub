@@ -310,10 +310,6 @@ class TaskCreateForm(ErrorableModelForm):
                            'type', cleaned_data)
             return
 
-        if self.team_video.subtitles_started():
-            self.add_error(_(u"Subtitling of this video is already in progress."),
-                           'type', cleaned_data)
-
     def _check_task_creation_translate(self, tasks, cleaned_data):
         if not self.team_video.subtitles_finished():
             self.add_error(_(u"No one has transcribed this video yet, so it can't be translated."),

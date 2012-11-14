@@ -242,6 +242,17 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitle(indexOrElement).next();
     };
+    this.getNonBlankSubtitles = function() {
+        /*
+         * Retrieve all of the subtitles that have content.
+         *
+         * Returns: jQuery selection of elements
+         */
+
+        return this.getSubtitles().filter(function() {
+            return $(this).text() !== '';
+        });
+    };
     this.getPreviousSubtitle = function(indexOrElement) {
         /*
          * Retrieve the subtitle that precedes the given subtitle.
