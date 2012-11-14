@@ -171,12 +171,6 @@ var Site = function(Site) {
              */
             if (window.TEAM_SLUG == 'ted') {
 
-                // If this is a task view for an assignee, select the 'any project'
-                // option.
-                if (window.ASSIGNEE) {
-                    return $('option[id="project-opt-any"]');
-                }
-
                 // If this is a video's task listing, select the 'any project'
                 // option.
                 if (window.REQUEST_TEAM_VIDEO && window.REQUEST_TEAM_VIDEO !==  '') {
@@ -226,6 +220,19 @@ var Site = function(Site) {
                     }
                     e.preventDefault();
                 });
+            });
+        },
+        assignTask: function(task, callback){
+            $.ajax({
+                url: window.ASSIGN_TASK_AJAX_URL,
+                type: 'POST',
+                data: {
+                    task: task,
+                    assignee: window.ASSIGNEE
+                },
+                success: function() {
+                    callback();
+                }
             });
         },
         truncateTextBlocks: function(blocks, maxHeight) {
@@ -671,26 +678,18 @@ var Site = function(Site) {
                 var $target = $(e.target);
                 $target.text('Loading...');
 
-                $.ajax({
-                    url: window.ASSIGN_TASK_AJAX_URL,
-                    type: 'POST',
-                    data: {
-                        task: $target.attr('data-id'),
-                        assignee: window.ASSIGNEE
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        $target.hide();
+                that.Utils.assignTask($target.attr('data-id'), function(){
+                    $target.hide();
 
-                        $li = $target.parent().siblings('li.hidden-perform-link');
-                        $li.show();
+                    $li = $target.parent().siblings('li.hidden-perform-link');
+                    $li.show();
 
-                        $link = $li.children('a.perform');
-                        $link.text('Loading...');
-                        if ($link.attr('href') !== '') {
-                            window.location = $link.attr('href');
-                        } else {
-                            $link.click();
-                        }
+                    $link = $li.children('a.perform');
+                    $link.text('Loading...');
+                    if ($link.attr('href') !== '') {
+                        window.location = $link.attr('href');
+                    } else {
+                        $link.click();
                     }
                 });
 
@@ -854,7 +853,7 @@ var Site = function(Site) {
         },
 
         // Profile
-        profile_dashboard: function() {
+        user_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             $('a.action-decline').click(function() {
                 $(this).siblings('form').submit();
