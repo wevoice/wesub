@@ -6,6 +6,11 @@
     background-clip: padding-box;
     border-radius: $radius;
 }
+@mixin border-box() {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 @mixin box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
     -moz-box-shadow: $horizontal $vertical $blur $color;
     -webkit-box-shadow: $horizontal $vertical $blur $color;
@@ -691,9 +696,7 @@ div.fix-chosen div.chzn-container {
     h4 a {
         display: block;
         position: absolute;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
+        @include border-box();
         bottom: 0; left: 1em;
         padding: 1em;
         width: 290px;
@@ -739,25 +742,14 @@ div.fix-chosen div.chzn-container {
         background: hsla(0%, 0%, 0%, .55);
     }
 
-    .callout {
-        color: #fff;
-        display: block;
-        padding: .75em;
-        position: absolute;
-        right: 0;
-        text-indent: 0;
-        text-shadow: 1px 1px 1px $dark;
-        top: 0;
-        @include border-radius(3px);
-        @include box-shadow(-1px, 1px, 1px, hsla(0%, 0%, 0%, .35));
-        @include vertical-gradient($normal, $dark);
-    }
-
     .admin-controls {
+        display: block;
         border: none;
-        bottom: -1em;
-        right: 0;
-        padding: .5em;
+        position: static;
+        margin: 0 1em;
+        padding: .5em 0;
+        text-align: right;
+        @include border-box();
 
         a {
             border: none;
@@ -1325,9 +1317,7 @@ div#language_picker {
     margin: .5em 0;
     border: 1px solid #eee;
     padding: 1em;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
+    @include border-box();
     @include border-radius(2px);
 
     h3 {
@@ -1360,6 +1350,7 @@ div#language_picker {
             position: static;
             text-align: left;
             color: #999;
+            width: auto;
         }
 
         &:last-child {
@@ -2382,6 +2373,16 @@ a.truncated-expand {
         }
     }
 
+    .empty, .suggestions {
+        text-align: center;
+    }
+
+    .empty {
+        font-size: 1.275em;
+        color: inherit;
+        padding-bottom: .5em;
+    }
+
     > h3 {
         position: relative;
         clear: both;
@@ -2497,9 +2498,7 @@ a.truncated-expand {
                         z-index: 50;
                         @include multi-border-radius(0, 0, 2px, 2px);
                         border: 1px solid $fainter;
-                        -moz-box-sizing: border-box;
-                        -webkit-box-sizing: border-box;
-                        box-sizing: border-box;
+                        @include border-box();
 
                         li {
                             padding: 0;

@@ -6,7 +6,7 @@
     {% trans 'Dashboard' %} - {{ team }} | Amara
 {% endblock %}
 
-{% block body_attrs %}class="v1 team_dashboard"{% endblock %}
+{% block body_attrs %}class="v1 team_dashboard" id="teams"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -88,24 +88,38 @@
                             In the section below, look for a video that interests you. Beneath the video you'll see what we need help with. Click and you're on your way!
                         {% endblocktrans %}
                     <p>
-                    <p><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about working in Amara" %}</p>
+                    <p><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about subtitling in Amara." %}</p>
                 </div>
             {% endif %}
         {% else %} {# user is not a team member #}
             <div class="get-started">
                 <h3>{% trans "Welcome!" %}</h3>
-                <p>
-                    {% blocktrans %}
-                        We've got lots of great content that we'd love your help with. Click the link below to become a member!
-                    {% endblocktrans %}
-                <p>
-                {% include "teams/_join.html" %}
+                {% if not team.is_open and not team.is_by_application %} {# team is by invite only #}
+                    <p>This team is invitation only. If you're interested in helping out, <a href="{% url teams:detail_members slug=team.slug %}admin/">contact a team admin</a>.</p>
+                {% else %}
+                    <p>
+                        {% blocktrans %}
+                            We've got lots of great content that we'd love your help with.
+                        {% endblocktrans %}
+                        {% if team.is_by_application %}
+                            {% trans " Click the link below to apply!" %}
+                        {% else %}
+                            {% trans " Click the link below to become a member!" %}
+                        {% endif %}
+                    </p>
+                    {% include "teams/_join.html" %}
+                {% endif %}
             </div>
         {% endif %}
             
-        {% if videos %}
-            <h3>{% trans "Videos that need your help" %}</h3>
-            <!-- TODO Change this for non-members -->
+        {% if not videos %}
+            <h3>
+                {% if team|is_team_member:user %}
+                    {% trans "Videos that need your help" %}
+                {% else %}
+                    {% trans "Some of the videos we're working on now" %}
+                {% endif %}
+            </h3>
 
             {% if user.is_authenticated and not user.get_languages %}
                 <p class="prompt">
@@ -187,7 +201,23 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="empty">Sorry, there don't appear to be any videos here.</p>
+            {% if team|is_team_member:user %}
+                <h3>{% trans "Videos that need your help" %}</h3>
+                <p class="empty">
+                    {% trans "Sorry, we couldn't find any videos for you." %}
+                </p>
+                <ul class="suggestions">
+                    <li>
+                        <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans "Update your language preferences" %}</a>
+                    </li>
+                    <li>
+                        <a href="{% url teams:detail team.slug %}">Browse all videos</a>
+                    </li>
+                    {% if can_add_video %}
+                        <li><a href="{% url teams:add_video team.slug %}">{% trans "Add videos to the team" %}</a></li>
+                    {% endif %}
+                </p>
+            {% endif %}
         {% endif %}
     </div>
     <script type="text/javascript">
