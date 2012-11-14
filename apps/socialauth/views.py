@@ -152,7 +152,7 @@ def openid_done(request, provider=None):
                 next = request.GET['next']
             if next is not None and len(next.strip()) >  0 :
                 return HttpResponseRedirect(next)    
-            redirect_url = reverse('profiles:my_profile')
+            redirect_url = reverse('profiles:profile', args=(user,))
             return HttpResponseRedirect(redirect_url)
         else:
             return HttpResponseRedirect(settings.LOGIN_URL)

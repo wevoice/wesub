@@ -44,7 +44,7 @@ MESSAGES_ON_PAGE = getattr(settings, 'MESSAGES_ON_PAGE', 30)
 
 
 @login_required
-def index(request, message_pk=None):
+def inbox(request, message_pk=None):
     user = request.user
     qs = Message.objects.for_user(user)
 
@@ -67,7 +67,7 @@ def index(request, message_pk=None):
 
     response = object_list(request, queryset=qs,
                        paginate_by=MESSAGES_ON_PAGE,
-                       template_name='messages/list.html',
+                       template_name='messages/inbox.html',
                        template_object_name='message',
                        extra_context=extra_context)
     try:
@@ -123,7 +123,7 @@ def new(request):
                         send_new_message_notification.delay(m.pk)
 
             messages.success(request, _(u'Message sent.'))
-            return HttpResponseRedirect(reverse('messages:index'))
+            return HttpResponseRedirect(reverse('messages:inbox'))
         else:
             if request.GET.get('user'):
                 selected_user = User.objects.get(username=request.GET['user'])
