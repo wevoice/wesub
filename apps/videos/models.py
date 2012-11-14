@@ -2004,9 +2004,9 @@ class ActionRenderer(object):
         if item.video:
             data['video_url']= item.video.get_absolute_url()
             data['video_name'] = unicode(item.video)
-        if item.language:
-            data['language'] = item.language.language_display()
-            data['language_url'] = item.language.get_absolute_url()
+        if item.new_language:
+            data['language'] = item.new_language.get_language_code_display()
+            data['language_url'] = item.new_language.get_absolute_url()
         if item.user:
             data["user_url"] = reverse("profiles:profile", kwargs={"user_id":item.user.id})
             data["user"] = item.user
@@ -2062,13 +2062,12 @@ class ActionRenderer(object):
     def render_COMMENT(self, item):
         kwargs = self._base_kwargs(item)
 
-        if item.language:
-            kwargs['comments_url'] = '%s#comments' % item.language.get_absolute_url()
-            kwargs['language'] = item.language.language_display()
+        if item.new_language:
+            kwargs['comments_url'] = '%s#comments' % item.new_language.get_absolute_url()
         else:
             kwargs['comments_url'] = '%s#comments' % kwargs['video_url']
 
-        if item.language:
+        if item.new_language:
             if item.user:
                 msg = _(u'commented on <a href="%(comments_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
             else:
@@ -2093,9 +2092,6 @@ class ActionRenderer(object):
 
     def render_ADD_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-
-        kwargs['language'] = item.new_language.get_language_code_display()
-        kwargs['language_url'] = item.new_language.get_absolute_url()
 
         if item.user:
             msg = _(u'edited <a href="%(language_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
