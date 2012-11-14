@@ -154,14 +154,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true
          */
 
-        var $subtitles = this.getSubtitles();
-
-        for (var i = 0; i < $subtitles.length; i++) {
-            $subtitles.eq(i).attr({
-                'begin': '',
-                'end': ''
-            });
-        }
+        this.getSubtitles().attr({
+            'begin': '',
+            'end': ''
+        });
     };
     this.content = function(indexOrElement, content) {
         /*
