@@ -1,5 +1,71 @@
 {% extends "base.html" %}
-{% block body_attrs %}id="profile" class="{% block body-class %}v1{% endblock %}"{% endblock %}
+
+{% load i18n profiles_tags %}
+
+{% block body_attrs %}class="{% block body-class %}profile v1{% endblock %}"{% endblock %}
 
 {% block main_content %}
+    <h2>{{ user_info|title }}</h2>
+    <div class="grid_4 context alpha">
+        <img src="{{ user|custom_avatar:240 }}" alt="{{ user_info|title }}'s avatar" class="avatar"/>
+        <h3>
+            {% trans "About" %}
+        </h3>
+        {% if user_info.biography %}
+            <p class="user_bio">
+                {{ user_info.biography|urlize|linebreaksbr }}
+            </p>
+        {% endif %}
+        {% if user_info.homepage %}
+            <p class="homepage"><a href="{{ user_info.homepage }}">{{ user_info.homepage }}</a></p>
+        {% endif %}
+        <p class="join">
+            {{ user_info }} 
+            {% if user_info|lower != user_info.username|lower %}
+                ({{ user_info.username }})
+            {% endif %}
+            joined Amara on {{ user_info.date_joined|date:"DATE_FORMAT" }}
+        </p>
+        {% with user_info.get_languages as langs %}
+            <h3>{% trans "Languages" %}</h3>
+            {% if langs %}
+                <ul class="user-languages">
+                    {% for l in langs %}
+                        <li>
+                            <span class="language">{{ l.get_language_display }}</span>
+                            {% if l.language == user_info.preferred_language and langs.count > 1 %}
+                                <span class="preferred">
+                                    <span>Preferred</span>
+                                </span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <em>
+                    {{ user_info|title }} {% trans "hasn't selected languages yet." %}
+                </em>
+            {% endif %}
+        {% endwith %}
+        {% with user_info.teams.all as user_teams %}
+            <h3>{% trans "Teams" %}</h3>
+            {% if user_teams %}
+                <ul>
+                    {% for t in user_teams %}
+                    <li>
+                        <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <em>
+                    {{ user_info|title }} {% trans "hasn't joined any teams yet." %}
+                </em>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="view grid_8 omega">
+        {% block view_content %}{% endblock %}
+    </div>
 {% endblock %}

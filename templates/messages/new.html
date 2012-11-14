@@ -1,78 +1,63 @@
-{% extends "profiles/base.html" %}
+{% extends "messages/base.html" %}
 
 {% load paginator i18n %}
-
-{% block title %}
-    {% trans 'Compose a Message' %} | Amara
-{% endblock %}
 
 {% block body-class %}new-message {{ block.super }}{% endblock %}
 {% block html_attrs %}id="messages_new"{% endblock %}
 
-{% block main_content %}
-    <h2>
-        {% trans 'Messages' %}
-    </h2>
-    {% with 'messages' as current %}
-        {% include 'profiles/_tabs.html' %}
-    {% endwith %}
-    <div class="view grid_9 alpha new-message">
-        <form action="" method="post">
-            {% csrf_token %}
+{% block title %}
+    {% trans 'Messages - New' %} | Amara
+{% endblock %}
 
-            <fieldset>
-                <legend>Compose a Message</legend>
+{% block view_content %}
+    <form action="" method="post">
+        {% csrf_token %}
 
-                {{ form.non_field_errors }}
+        <fieldset>
+            <legend>Compose a Message</legend>
 
-                <div class="group">
-                    <div class="recipient">
-                        <label for="">Recipient</label>
-                        {{ form.errors.user }}
-                        <div class="ajaxChosen">
-                            <select id="id_user" name="user">
-                                <option value="">-----</option>
-                                <option value="">Begin typing to search.</option>
-                                {% if selected_user %}
-                                    <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}
-                                        {% if selected_user.get_full_name %}
-                                            ({{ selected_user.get_full_name }})
-                                        {% endif %}
-                                    </option>
-                                {% endif %}
-                            </select>
-                        </div>
+            {{ form.non_field_errors }}
+
+            <div class="group">
+                <div class="recipient">
+                    <label for="">Recipient</label>
+                    {{ form.errors.user }}
+                    <div class="ajaxChosen">
+                        <select id="id_user" name="user">
+                            <option value="">-----</option>
+                            <option value="">Begin typing to search.</option>
+                            {% if selected_user %}
+                                <option selected="selected" value="{{ selected_user.id }}">{{ selected_user.username }}
+                                    {% if selected_user.get_full_name %}
+                                        ({{ selected_user.get_full_name }})
+                                    {% endif %}
+                                </option>
+                            {% endif %}
+                        </select>
                     </div>
-
-                    {% if not request.GET.user and request.user.messageable_teams %}
-                        <div class="or">-- or --</div>
-                        <div class="team">
-                            <label for="id_team">Team</label>
-                            {{ form.errors.team }}
-                            {{ form.team }}
-                        </div>
-                    {% endif %}
                 </div>
 
-                <label for="id_subject">Subject</label>
-                {{ form.errors.subject }}
-                {{ form.subject }}
-
-                <label for="id_content">Message</label>
-                {{ form.errors.content }}
-                {{ form.content }}
-            </fieldset>
-
-            <div class="submit">
-                <button>Send</button>
+                {% if not request.GET.user and request.user.messageable_teams %}
+                    <div class="or">-- or --</div>
+                    <div class="team">
+                        <label for="id_team">Team</label>
+                        {{ form.errors.team }}
+                        {{ form.team }}
+                    </div>
+                {% endif %}
             </div>
-        </form>
-    </div>
 
-    <div class="controls grid_3 omega">
-        <ul>
-            <li class="current"><a href="{% url messages:index %}">{% trans "Inbox" %}</a></li>
-            <li><a href="{% url messages:sent %}">{% trans "Sent" %}</a></li>
-        </ul>
-    </div>
+            <label for="id_subject">Subject</label>
+            {{ form.errors.subject }}
+            {{ form.subject }}
+
+            <label for="id_content">Message</label>
+            {{ form.errors.content }}
+            {{ form.content }}
+        </fieldset>
+
+        <div class="submit">
+            <button>Send</button>
+        </div>
+    </form>
 {% endblock %}

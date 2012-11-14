@@ -423,7 +423,10 @@ def detail(request, slug, project_slug=None, languages=None):
         if project_slug == 'any':
             project = None
         else:
-            project = get_object_or_404(Project, team=team, slug=project_slug)
+            try:
+                project = Project.objects.get(team=team, slug=project_slug)
+            except Project.DoesNotExist:
+                project = None
     else:
         project = _default_project_for_team(team)
 
@@ -696,7 +699,7 @@ def activity(request, slug):
     action_ids = list(action_ids)
 
     activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'language', 'language__video'
+            'video', 'user', 'new_language', 'new_language__video'
     ).order_by())
     activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
@@ -1142,6 +1145,94 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
+def _cache_video_url(tasks):
+    team_video_pks = [t.team_video_id for t in tasks]
+    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+
+    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
+                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+
+    for t in tasks:
+        t.cached_video_url = video_urls.get(t.team_video.video_id)
+
+@timefn
+@render_to('teams/dashboard.html')
+def dashboard(request, slug):
+
+    team = Team.get(slug, request.user)
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
+    if user:
+        user_languages = set([ul.language for ul in user.get_languages()] + [''])
+        user_filter = {'assignee':str(user.id)}
+        user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
+        _cache_video_url(user_tasks)
+    else:
+        user_languages = None
+        user_tasks = None
+
+    filters = {'assignee': 'none'}
+
+    widget_settings = {}
+    from apps.widget.rpc import add_general_settings
+    add_general_settings(request, widget_settings)
+
+    workflow = team.get_workflow()
+
+    videos = {}
+
+    allows_tasks = workflow and workflow.allows_tasks
+
+    if allows_tasks:
+        video_pks = set()
+
+        tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
+        _cache_video_url(tasks)
+
+        for task in tasks:
+            if member and not can_perform_task(user, task):
+                continue
+
+            pk = str(task.team_video.id)
+            
+            if not pk in video_pks:
+                videos[pk] = task.team_video
+                videos[pk].tasks = []
+                video_pks.add(pk)
+
+            video = videos[pk]
+            video.tasks.append(task)
+    else:
+        team_videos = team.videos.select_related("teamvideo")
+
+        if not user_languages:
+            for tv in team_videos:
+                videos[str(tv.teamvideo.id)] = tv.teamvideo 
+        else:
+            for video in team_videos.all():
+                subtitled_languages = (video.subtitlelanguage_set
+                                                 .filter(language__in=user_languages)
+                                                 .values_list("language", flat=True))
+                if len(subtitled_languages) != len(user_languages):
+                    tv = video.teamvideo
+                    tv.languages = [l for l in user_languages if l not in subtitled_languages]
+                    videos[str(tv.id)] = tv
+
+    context = {
+        'team': team,
+        'member': member,
+        'user_tasks': user_tasks,
+        'videos': videos,
+        'allows_tasks': allows_tasks,
+        'widget_settings': widget_settings
+    }
+
+    return context
+
 @timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug):
@@ -1164,7 +1255,10 @@ def team_tasks(request, slug):
         if project_slug == 'any':
             project = None
         else:
-            project = get_object_or_404(Project, team=team, slug=project_slug)
+            try:
+                project = Project.objects.get(team=team, slug=project_slug)
+            except Project.DoesNotExist:
+                project = None
     else:
         # User didn't specify a project to filter on.  We use the default
         # project only if:
@@ -1274,7 +1368,20 @@ def create_task(request, slug, team_video_pk):
             task.set_expiration()
 
             if task.type == Task.TYPE_IDS['Subtitle']:
-                task.language = ''
+                languages_with_versions = list(
+                    task.team_video.video.newsubtitlelanguage_set
+                                         .having_versions())
+
+                if not languages_with_versions:
+                    task.language = ''
+                else:
+                    # There should never be more than one language with
+                    # subtitles for a video eligible for a transcribe task.  If
+                    # for some reason there is, we'll just take the first one
+                    # the DB decides to give us.
+                    sl = languages_with_versions[0]
+                    task.language = sl.language_code
+                    task.new_subtitle_version = sl.get_tip()
 
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
@@ -1319,21 +1426,22 @@ def perform_task(request, slug=None, task_pk=None):
     return HttpResponseRedirect(task.get_perform_url())
 
 def _delete_subtitle_version(version):
-    sl = version.language
-    n = version.version_no
+    sl = version.subtitle_language
+    n = version.version_number
 
-    # Delete this specific version...
-    version.delete()
+    # "Delete" this specific version...
+    version.visibility_override = 'private'
+    version.save()
 
-    # We also want to delete all draft subs leading up to this version.
-    for v in sl.subtitleversion_set.filter(version_no__lt=n).order_by('-version_no'):
-        if v.is_public:
+    # We also want to "delete" all draft subs leading up to this version.
+    previous_versions = (sl.subtitleversion_set.filter(version_number__lt=n)
+                                               .order_by('-version_number'))
+    for v in previous_versions:
+        if v.is_public():
             break
-        v.delete()
+        v.visibility_override = 'private'
+        v.save()
 
-    # And if we've deleted everything in the language, we can delete the language as well.
-    if not sl.subtitleversion_set.exists():
-        sl.delete()
 
 def delete_task(request, slug):
     '''Mark a task as deleted.
@@ -1343,7 +1451,8 @@ def delete_task(request, slug):
 
     '''
     team = get_object_or_404(Team, slug=slug)
-    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[],
+                                            kwargs={'slug': slug}))
 
     form = TaskDeleteForm(team, request.user, data=request.POST)
     if form.is_valid():
@@ -1359,8 +1468,8 @@ def delete_task(request, slug):
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
                 if not form.cleaned_data['discard_subs'] and task.subtitle_version:
-                    task.subtitle_version.moderation_status = MODERATION.APPROVED
-                    task.subtitle_version.save()
+                    task.new_subtitle_version.visibility_override = 'public'
+                    task.new_subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)
 
         task.save()

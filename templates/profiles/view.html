@@ -1,0 +1,37 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n messages_tags recent_activity %}
+
+{% block title %}{{ user_info }} | Amara{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% url messages:rpc_api %}" type="text/javascript"></script>  
+{% endblock %}
+
+{% block view_content %}
+    {% with 'activity' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+    {% if user_info.is_active %}
+        <ul class="listing activity">
+            {% for item in action_list %}
+                <li>{{ item.render }}</li>
+            {% empty %}
+                <li class="empty">Sorry, no activity yet.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="empty">{% trans 'Profile deleted by user.' %}</p>
+    {% endif %}
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:auth_customuser_change user_info.pk %}" target="blank">{% trans 'Edit user' %}</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}
