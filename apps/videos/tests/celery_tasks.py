@@ -34,7 +34,7 @@ from apps.subtitles.models import (
 )
 from apps.subtitles import pipeline
 
-from apps.videos.tasks import video_changed_tasks, send_change_title_email, _send_notification
+from apps.videos.tasks import video_changed_tasks, send_change_title_email, send_new_version_notification
 from apps.videos.tests import utils
 
 
@@ -304,7 +304,7 @@ class TestVideoChangedEmailNotification(TestCase):
 
     def test_no_version_no_breakage(self):
         initial_count= len(mail.outbox)
-        res = _send_notification(1000)
+        res = send_new_version_notification(1000)
         self.assertEqual(res, False)
         self.assertEqual(len(mail.outbox), initial_count)
 
@@ -316,7 +316,7 @@ class TestVideoChangedEmailNotification(TestCase):
         version.save()
 
         self.assertTrue(version.is_private())
-        res = _send_notification(version.pk)
+        res = send_new_version_notification(version.pk)
         self.assertEqual(res, False)
         self.assertEqual(len(mail.outbox), initial_count )
 
@@ -326,7 +326,7 @@ class TestVideoChangedEmailNotification(TestCase):
         old_version = self.original_language.get_tip()
         new_version = self.original_language.add_version(subtitles=old_version.get_subtitles())
         # no notifications should be sent
-        res = _send_notification(new_version.pk)
+        res = send_new_version_notification(new_version.pk)
         self.assertEqual(res, None)
         self.assertEqual(len(mail.outbox), initial_count )
 
@@ -335,7 +335,7 @@ class TestVideoChangedEmailNotification(TestCase):
         # version is indentical to previous one
         old_version = self.original_language.get_tip()
         new_version = self.original_language.add_version(subtitles=old_version.get_subtitles())
-        res = _send_notification(new_version.pk)
+        res = send_new_version_notification(new_version.pk)
         self.assertEqual(res, None)
         self.assertEqual(len(mail.outbox), initial_count )
 

@@ -139,7 +139,7 @@ def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=Fal
     from teams.models import TeamVideo
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
-        _send_notification(new_version_id)
+        send_new_version_notification(new_version_id)
         if not skip_third_party_sync:
             _update_captions_in_original_service(new_version_id)
 
@@ -242,7 +242,7 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
 def upload_subtitles_to_original_service(version_pk):
     _update_captions_in_original_service(version_pk)
 
-def _send_notification(version_id):
+def send_new_version_notification(version_id):
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
