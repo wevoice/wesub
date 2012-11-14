@@ -117,30 +117,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.clearTimes = function() {
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_TIMES);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
-    var needsTranslation = false;
-    goog.array.forEach(this.captions_, function(c) {
-        if (c.getText() === '') {
-            needsTranslation = true;
-        }
-    });
-    return needsTranslation;
+    return this.x.needsAnyTranscribed();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
-
-    var that = this;
-
-    goog.array.forEach(this.captions_, function(c) {
-
-        // If the caption's original text is empty, just delete it.
-        // Otherwise, reset the text and the start/end times.
-        if (c.json['original_text'] === '') {
-            that.deleteCaption(c);
-        } else {
-            c.resetSub();
-        }
-
-    });
-
+    this.x.resetSubtitles();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };

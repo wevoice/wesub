@@ -26,13 +26,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     this.init = function(xml) {
 
-        var parsedXml = $.parseXML(xml);
+        if (typeof xml === 'string') {
+            xml = $.parseXML(xml);
+        }
 
         // Store the original XML for comparison later.
-        this.$originalXml = $(parsedXml.documentElement).clone();
+        this.$originalXml = $(xml.documentElement).clone();
 
         // Store the working XML for local edits.
-        this.$xml = $(parsedXml.documentElement).clone();
+        this.$xml = $(xml.documentElement).clone();
 
         // Cache the query for the containing div.
         this.$div = $('div', this.$xml);
@@ -146,6 +148,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
         return originalString != xmlString;
+    };
+    this.clearAllContent = function() {
+        /*
+         * Clear all of the content data for every subtitle.
+         *
+         * Returns: true
+         */
+
+        this.getSubtitles().text('');
     };
     this.clearAllTimes = function() {
         /*
@@ -289,10 +300,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true || false
          */
 
-        var needsAnySynced = false;
-
-        // Caching the current subtitle set drastically cuts down on processing
-        // time for iterating through large subtitle sets.
         var $subtitles = this.getSubtitles();
 
         for (var i = 0; i < $subtitles.length; i++) {
@@ -300,11 +307,28 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // We're going to pass the actual element instead of an integer. This
             // means needsSyncing doesn't need to hit the DOM to find the element.
             if (this.needsSyncing($subtitles.get(i))) {
-                needsAnySynced = true;
+                return true;
             }
         }
 
-        return needsAnySynced;
+        return false;
+    };
+    this.needsAnyTranscribed = function() {
+        /*
+         * Check all of the subtitles for empty content.
+         *
+         * Returns: true || false
+         */
+
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+            if (this.content($subtitles.get(i)) === '') {
+                return true;
+            }
+        }
+
+        return false;
     };
     this.needsSyncing = function(indexOrElement) {
         /*
@@ -358,7 +382,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     this.removeSubtitles = function() {
         /*
          * Remove all subtitles from the working set.
-         * Use this cautiously.
          *
          * Returns: true
          */
@@ -366,6 +389,30 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.getSubtitles().remove();
 
         return true;
+    };
+    this.resetSubtitles = function() {
+        /*
+         * For each subtitle, if the content is empty, delete the subtitle.
+         * Otherwise, just reset the text and the start/end times.
+         *
+         * Returns: true
+         */
+
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+
+            var subtitle = $subtitles.get(i);
+
+            if (this.content(subtitle) === '') {
+                $(subtitle).remove();
+            } else {
+                $(subtitle).text('').attr({
+                    'begin': '',
+                    'end': ''
+                });
+            }
+        }
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
