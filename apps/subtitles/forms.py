@@ -34,7 +34,7 @@ from utils.translation import get_language_choices
 
 ALL_LANGUAGES = [('', '--Select language--')] + get_language_choices()
 SUBTITLE_FILESIZE_LIMIT_KB = 512
-SUBTITLE_FILE_FORMATS = ('srt', 'txt')
+SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
 
 
 class SubtitlesUploadForm(forms.Form):
@@ -193,7 +193,7 @@ class SubtitlesUploadForm(forms.Form):
         if self.extension not in SUBTITLE_FILE_FORMATS:
             raise forms.ValidationError(_(
                 u'Unsupported format. Please upload one of the following: %s'
-                % SUBTITLE_FILE_FORMATS))
+                % ", ".join(SUBTITLE_FILE_FORMATS)))
 
         text = data.read()
         encoding = chardet.detect(text)['encoding']
