@@ -128,18 +128,18 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
     return this.x.subtitlesCount();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
-    return this.x.getCaption[index];
+    return this.x.getSubtitle(index);
 };
-unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
-    var subMap = this.makeMap();
-    return subMap[id];
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
+    //var subMap = this.makeMap();
+    //return subMap[id];
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     return this.x.xmlToString();
 };
-unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
-    return goog.array.map(this.captions_, function(c) { return c.json; });
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
+    //return goog.array.map(this.captions_, function(c) { return c.json; });
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.nonblankSubtitles = function() {
     return goog.array.filter(
         this.captions_, function(c) { return c.getTrimmedText() != ''; });
