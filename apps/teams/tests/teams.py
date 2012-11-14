@@ -30,7 +30,7 @@ from widget.tests import create_two_sub_session, RequestMockup
 
 from subtitles.pipeline import add_subtitles
 
-from utils.test_utils import TestCaseMessagesMixin
+from utils import test_utils
 from haystack.query import SearchQuerySet
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
@@ -224,6 +224,7 @@ class TeamVideoTest(TestCase):
         }
 
         response = self.client.post(url, data, follow=True)
+        test_utils.update_search_index.run_original()
         self.failUnlessEqual(response.status_code, 200)
         self.assertFalse(Team.objects.get(id=1).is_visible)
 
@@ -236,6 +237,7 @@ class TeamVideoTest(TestCase):
         data['is_visible'] = u'1'
 
         response = self.client.post(url, data, follow=True)
+        test_utils.update_search_index.run_original()
         self.failUnlessEqual(response.status_code, 200)
         self.assertTrue(Team.objects.get(id=1).is_visible)
 
@@ -1248,7 +1250,7 @@ class TestInvites(TestCase):
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
 
-class TestApplication(TestCase, TestCaseMessagesMixin):
+class TestApplication(TestCase, test_utils.TestCaseMessagesMixin):
     def setUp(self):
         self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
         self.owner = User.objects.create(username='test-owner')
