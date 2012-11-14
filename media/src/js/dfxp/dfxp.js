@@ -147,6 +147,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return originalString != xmlString;
     };
+    this.clearAllTimes = function() {
+        /*
+         * Clear all of the timing data for every subtitle.
+         *
+         * Returns: true
+         */
+
+        var $subtitles = this.getSubtitles();
+
+        for (var i = 0; i < $subtitles.length; i++) {
+            $subtitles.eq(i).attr({
+                'begin': '',
+                'end': ''
+            });
+        }
+    };
     this.content = function(indexOrElement, content) {
         /*
          * Either get or set the HTML content for the subtitle.
@@ -209,6 +225,28 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitles = this.getSubtitles();
 
         return this.getSubtitle($subtitles.length - 1).get(0);
+    };
+    this.getNextSubtitle = function(indexOrElement) {
+        /*
+         * Retrieve the subtitle that follows the given subtitle.
+         *
+         * Returns: subtitle element
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        return $subtitle.next();
+    };
+    this.getPreviousSubtitle = function(indexOrElement) {
+        /*
+         * Retrieve the subtitle that precedes the given subtitle.
+         *
+         * Returns: subtitle element
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        return $subtitle.prev();
     };
     this.getSubtitle = function(indexOrElement) {
         /*
@@ -322,6 +360,18 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         $subtitle.remove();
+
+        return true;
+    };
+    this.removeSubtitles = function() {
+        /*
+         * Remove all subtitles from the working set.
+         * Use this cautiously.
+         *
+         * Returns: true
+         */
+
+        this.getSubtitles().remove();
 
         return true;
     };
