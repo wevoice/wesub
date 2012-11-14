@@ -47,6 +47,14 @@ class MessagesApiClass(object):
 
         return {}
 
+    def mark_all_read(self, user):
+        if not user.is_authenticated():
+            return {'error': _('You should be authenticated.')}
+
+        Message.objects.filter(user=user).update(read=True)
+
+        return {}
+
     def send(self, rdata, user):
         if not user.is_authenticated():
             return {'error': _('You should be authenticated.')}

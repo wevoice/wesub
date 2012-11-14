@@ -30,6 +30,7 @@ from tastypie.models import ApiKey
 from auth.models import CustomUser as User
 from profiles.forms import EditUserForm, SendMessageForm, UserLanguageFormset, EditAvatarForm
 from profiles.rpc import ProfileApiClass
+from apps.messages.models import Message
 from utils.amazon import S3StorageError
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
@@ -105,6 +106,7 @@ def dashboard(request):
 
     context = {
         'user_info': user,
+        'user_messages': Message.objects.for_user(user)[:5],
         'team_activity': Action.objects.for_user_team_activity(user)[:10],
         'video_activity': Action.objects.for_user_video_activity(user)[:10],
         'tasks': tasks,
