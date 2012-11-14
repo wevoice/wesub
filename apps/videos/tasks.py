@@ -253,14 +253,14 @@ def send_new_version_notification(version_id):
         return False
 
     if version.version_number == 0 and not version.language.is_primary_audio_language():
-        return _send_letter_translation_start(version)
+        return send_new_translation_notification(version)
     else:
         time_change, text_change = version.get_changes()
         if text_change or time_change:
-            return _send_letter_caption(version)
+            return notify_for_version(version)
     return None
 
-def _send_letter_translation_start(translation_version):
+def send_new_translation_notification(translation_version):
     domain = Site.objects.get_current().domain
     video = translation_version.language.video
     language = translation_version.language
@@ -289,57 +289,57 @@ def _make_caption_data(new_version, old_version):
             "Use subtitles.models.get_caption_diff_data.")
 
 
-def _send_letter_caption(caption_version):
+def notify_for_version(version):
     domain = Site.objects.get_current().domain
 
-    language = caption_version.subtitle_language
+    language = version.subtitle_language
     video = language.video
 
     qs = SubtitleVersion.objects.filter(
             subtitle_language=language).filter(
-            version_number__lt=caption_version.version_number).order_by(
+            version_number__lt=version.version_number).order_by(
                     '-version_number')
 
     if qs.count() == 0:
         return
 
     most_recent_version = qs[0]
-    captions = get_caption_diff_data(caption_version, most_recent_version)
+    captions = get_caption_diff_data(version, most_recent_version)
 
     title = {
-        'new_title': caption_version.title,
+        'new_title': version.title,
         'old_title': most_recent_version.title,
-        'has_changed': caption_version.title != most_recent_version.title
+        'has_changed': version.title != most_recent_version.title
     }
 
     description = {
-        'new_description': caption_version.description,
+        'new_description': version.description,
         'old_description': most_recent_version.description,
-        'has_changed': caption_version.description !=
+        'has_changed': version.description !=
             most_recent_version.description
     }
 
     context = {
         'title': title,
         'description': description,
-        'version': caption_version,
+        'version': version,
         'domain': domain,
         'translation': not language.is_primary_audio_language(),
-        'video': caption_version.video,
+        'video': version.video,
         'language': language,
         'last_version': most_recent_version,
         'captions': captions,
         'video_url': video.get_absolute_url(),
         'language_url': language.get_absolute_url(),
-        'user_url': caption_version.author and caption_version.author.get_absolute_url(),
+        'user_url': version.author and version.author.get_absolute_url(),
         "STATIC_URL": settings.STATIC_URL,
     }
 
     subject = u'New edits to "%s" by %s on Amara' % (language.video,
-            caption_version.author)
+            version.author)
 
-    followers = set(video.notification_list(caption_version.author))
-    followers.update(language.notification_list(caption_version.author))
+    followers = set(video.notification_list(version.author))
+    followers.update(language.notification_list(version.author))
 
     for item in qs:
         if item.author and item.author in followers:
