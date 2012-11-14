@@ -21,6 +21,7 @@ import urllib, urllib2
 
 import simplejson as json
 from babelsubs import get_available_formats
+from babelsubs.storage import diff as diff_subs
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -520,11 +521,11 @@ def diffing(request, first_version, second_pk):
         raise "Revisions for diff videos"
 
     video = first_version.subtitle_language.video
-    captions = sub_models.get_caption_diff_data(first_version, second_version)
+    diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
 
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    context['captions'] = captions
+    context['diff_data'] = diff_data
     context['language'] = language
     context['first_version'] = first_version
     context['second_version'] = second_version

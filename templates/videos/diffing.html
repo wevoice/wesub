@@ -129,29 +129,10 @@
         </div>
 
         <table cellpadding="0" cellspacing="0">
-          {% for item in captions %}
+          {% for item in diff_data.subtitle_data %}
             <tr {% cycle 'class="even"' '' %}>
                   <td>
-                    {% if item.1.0 or item.1.0 == 0 %}
-                    <span class="time-span time_link">
-                        <span class="data">{{item.1.0|format_sub_time}}</span>
-                        <span class="badgy start">
-                            <span class="stamp_text">{{item.1.0|format_sub_time}}</span>
-                        </span>
-                        {% if item.1.1 or item.1.1 == 0 %}
-                          <span class="connector"></span>
-                          <span class="badgy end">
-                              <span class="stamp_text">{{ item.1.1|format_sub_time }}</span>
-                          </span>
-                        {% endif %}
-                    </span>
-
-                {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
-                {% endif %}
-                  <span {% if item.2.text %}class="time_change"{% endif %}>
-                    {{ item.1.2|display_subtitle|safe }}
-                  </span>
+                  {% render_subtitle_diff item 1 %}
                   </td>
             </tr>
           {% endfor %}
@@ -193,33 +174,14 @@
          </div>
 
         <table cellpadding="0" cellspacing="0">
+            {% for item in diff_data.subtitle_data %}
+                <tr {% cycle 'class="even"' '' %}>
+                    <td>
+                        {% render_subtitle_diff item 0 %}
+                    </td>
+                </tr>
+            {% endfor %}
 
-          {% for item in captions %}
-            <tr {% cycle 'class="even"' '' %}>
-                  <td>
-
-                {% if item.0 %}
-                    <span class="time-span time_link">
-                        <span class="data">{{item.0.0|format_sub_time}}</span>
-                        <span class="badgy start">
-                           <span class="stamp_text">{{ item.0.0|format_sub_time }}</span>
-                        </span>
-                        {% if item.0.1 %}
-                          <span class="connector"></span>
-                          <span class="badgy end">
-                              <span class="stamp_text">{{ item.0.1|format_sub_time }}</span>
-                          </span>
-                        {% endif %}
-                    </span>
-                {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
-                {% endif %}
-                  <span {% if item.2.text %}class="time_change"{% endif %}>
-                    {{ item.0.2|display_subtitle|safe }}
-                  </span>
-                  </td>
-            </tr>
-          {% endfor %}
         </table>
     </div>
 {% endblock %}

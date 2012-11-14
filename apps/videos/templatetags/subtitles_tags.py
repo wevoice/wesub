@@ -89,5 +89,28 @@ def display_subtitle(text):
     use the default subtitle formatiing tags (i, b, u)
     and replace \n with <br>
     """
+    if not text:
+        return ""
     txt = linebreaks(markup_to_html(text))
     return txt
+
+@register.filter
+def is_synced_value(val):
+    return bool(val) or val == 0
+
+@register.inclusion_tag("videos/_diffing-subtitle.html")
+def render_subtitle_diff(diff_item, first_version):
+    """
+    Use the diff item from babelsubs.storage.diff. -> subtitle_data
+    first_version: if we're showing the older version on not
+    """
+    if first_version:
+        subtitle = diff_item['subtitles'][0]
+    else:
+        subtitle = diff_item['subtitles'][1]
+    return {
+        'time_changed' : diff_item['time_changed'],
+        'text_changed': diff_item['text_changed'],
+        'subtitle': subtitle,
+    }
+
