@@ -246,23 +246,25 @@ def _send_notification(version_id):
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
-        return
+        return False
 
     # if version.result_of_rollback or not version.is_public:
     if version.is_private():
-        return
+        return False
 
     if version.version_number == 0 and not version.language.is_primary_audio_language():
-        _send_letter_translation_start(version)
+        return _send_letter_translation_start(version)
     else:
         time_change, text_change = version.get_changes()
         if text_change or time_change:
-            _send_letter_caption(version)
+            return _send_letter_caption(version)
+    return None
 
 def _send_letter_translation_start(translation_version):
     domain = Site.objects.get_current().domain
     video = translation_version.language.video
     language = translation_version.language
+
     for user in video.notification_list(translation_version.user):
         context = {
             'version': translation_version,
@@ -280,6 +282,7 @@ def _send_letter_translation_start(translation_version):
         send_templated_email(user, subject,
                              'videos/email_start_notification.html',
                              context, fail_silently=not settings.DEBUG)
+    return True
 
 def _make_caption_data(new_version, old_version):
     raise Exception("This function is deprecated. "
@@ -353,7 +356,6 @@ def _send_letter_caption(caption_version):
                 # TODO: Add body
                 Message.objects.create(user=item.author, subject=subject,
                         content='')
-
             followers.discard(item.author)
 
     for user in followers:
@@ -364,7 +366,7 @@ def _send_letter_caption(caption_version):
         send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
-
+    return True
 
 def _update_captions_in_original_service(version_pk):
     """Push the latest caption set for this version to the original video provider.
