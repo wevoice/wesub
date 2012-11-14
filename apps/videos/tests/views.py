@@ -361,7 +361,7 @@ class TestViews(WebUseTest):
         last_version.save()
 
         response = self._simple_test('videos:diffing', [version.id, last_version.id])
-        self.assertEqual(len(response.context['captions']), 81)
+        self.assertEqual(len(response.context['diff_data']['subtitle_data']), 81)
 
     def test_test_form_page(self):
         self._simple_test('videos:test_form_page')
