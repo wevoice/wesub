@@ -141,8 +141,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     //return goog.array.map(this.captions_, function(c) { return c.json; });
 //};
 unisubs.subtitle.EditableCaptionSet.prototype.nonblankSubtitles = function() {
-    return goog.array.filter(
-        this.captions_, function(c) { return c.getTrimmedText() != ''; });
+    return this.x.getNonBlankSubtitles();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptionSet) {
     var myNonblanks = this.nonblankSubtitles();
