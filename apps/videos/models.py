@@ -1960,7 +1960,7 @@ class ActionRenderer(object):
             info = self.render_CHANGE_TITLE(item)
         elif item.action_type == Action.COMMENT:
             info = self.render_COMMENT(item)
-        elif item.action_type == Action.ADD_VERSION and item.language:
+        elif item.action_type == Action.ADD_VERSION and item.new_language:
             info = self.render_ADD_VERSION(item)
         elif item.action_type == Action.ADD_VIDEO_URL:
             info = self.render_ADD_VIDEO_URL(item)
@@ -2094,8 +2094,8 @@ class ActionRenderer(object):
     def render_ADD_VERSION(self, item):
         kwargs = self._base_kwargs(item)
 
-        kwargs['language'] = item.language.language_display()
-        kwargs['language_url'] = item.language.get_absolute_url()
+        kwargs['language'] = item.new_language.get_language_code_display()
+        kwargs['language_url'] = item.new_language.get_absolute_url()
 
         if item.user:
             msg = _(u'edited <a href="%(language_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')

@@ -696,7 +696,7 @@ def activity(request, slug):
     action_ids = list(action_ids)
 
     activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'language', 'language__video'
+            'video', 'user', 'new_language', 'new_language__video'
     ).order_by())
     activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
