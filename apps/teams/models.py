@@ -1638,7 +1638,7 @@ class Task(models.Model):
     review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
                                             null=True,
                                             related_name='tasks_based_on')
-    new_review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
+    new_review_base_version = models.ForeignKey(NewSubtitleVersion, blank=True,
                                                 null=True,
                                                 related_name='tasks_based_on_new')
 
