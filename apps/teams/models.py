@@ -1740,9 +1740,6 @@ class Task(models.Model):
         if not self.team.members.filter(user=assignee).exists():
             assignee = None
 
-        self.subtitle_version.visibility_override = 'private'
-        self.subtitle_version.save()
-
         task = Task(team=self.team, team_video=self.team_video,
                     language=self.language, type=type, 
                     assignee=assignee)
