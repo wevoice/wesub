@@ -909,6 +909,16 @@ var Site = function(Site) {
                 set_message_data(data, $('#msg_modal'));
                 return false;
             });
+            $('.mark-all-read').bind('click', function(event) {
+                MessagesApi.mark_all_read(function(response) {
+                    if (response.error) {
+                        $.jGrowl.error(response.error);
+                    } else {
+                        window.location.reload();
+                    }
+                });
+                return false;
+            });
 
             that.Utils.messagesDeleteAndSend();
         },
