@@ -852,7 +852,7 @@ def autocreate_tasks(team_video):
     #       new team for translation, but we can probably be smarter about this
     #       if we spend some time.
     if workflow.autocreate_translate and existing_subtitles:
-        _create_translation_tasks(team_video, existing_subtitles[0].latest_version())
+        _create_translation_tasks(team_video, existing_subtitles[0].get_tip(public=True))
 
 
 def team_video_save(sender, instance, created, **kwargs):
