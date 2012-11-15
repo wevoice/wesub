@@ -1229,6 +1229,7 @@ def dashboard(request, slug):
         'user_tasks': user_tasks,
         'videos': videos,
         'allows_tasks': allows_tasks,
+        'can_add_video': can_add_video(team, request.user),
         'widget_settings': widget_settings
     }
 
