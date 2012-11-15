@@ -150,7 +150,7 @@
         {% endif %}
 
         {% if user.is_authenticated and not user.get_languages %}
-            <p class="view-notice">
+            <p class="prompt">
                 <strong><a href="#" data-modal="language_modal" id="lang_select_btn">{% trans 'Tell us what languages you speak' %}</a> {% trans "and we'll narrow this list for you" %}</strong>
             </p>
         {% else %}
