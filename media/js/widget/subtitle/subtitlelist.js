@@ -126,8 +126,8 @@ unisubs.subtitle.SubtitleList.prototype.captionsCleared_ = function(event) {
         this.removeChildAt(0, true);
 };
 unisubs.subtitle.SubtitleList.prototype.captionDeleted_ = function(e) {
-    var widget = this.subtitleMap_[e.caption.getCaptionID()];
-    delete this.subtitleMap_[e.caption.getCaptionID()];
+    var widget = this.subtitleMap_[e.caption.getCaptionIndex()];
+    delete this.subtitleMap_[e.caption.getCaptionIndex()];
     this.removeChild(widget, true);
 };
 unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
@@ -160,9 +160,9 @@ unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scr
     var dest_offset = this.getChildCount() - (this.readOnly_ ? 0 : 1);
     var subtitleWidget = this.createNewSubWidget_(subtitle);
     this.addChildAt(subtitleWidget, dest_offset, true);
-    this.subtitleMap_[subtitle.getCaptionID()] = subtitleWidget;
+    this.subtitleMap_[subtitle.getCaptionIndex()] = subtitleWidget;
     if (opt_scrollDown && typeof(opt_scrollDown) == 'boolean')
-        this.scrollToCaption(subtitle.getCaptionID());
+        this.scrollToCaption(subtitle.getCaptionIndex());
     if (!opt_dontSetLastSub)
         this.setLastSub_();
 };
@@ -171,14 +171,14 @@ unisubs.subtitle.SubtitleList.prototype.captionInserted_ = function(e) {
     var subtitleWidget = this.createNewSubWidget_(addedCaption);
     var nextCaption = addedCaption.getNextCaption();
     if (nextCaption != null) {
-        var nextWidget = this.subtitleMap_[nextCaption.getCaptionID()];
+        var nextWidget = this.subtitleMap_[nextCaption.getCaptionIndex()];
         this.addChildAt(subtitleWidget, this.indexOfChild(nextWidget), true);
     }
     else {
         this.addChildAt(subtitleWidget, this.getChildCount() - 1, true);
         this.setLastSub_();
     }
-    this.subtitleMap_[addedCaption.getCaptionID()] = subtitleWidget;
+    this.subtitleMap_[addedCaption.getCaptionIndex()] = subtitleWidget;
     subtitleWidget.switchToEditMode();
 };
 unisubs.subtitle.SubtitleList.prototype.setLastSub_ = function() {

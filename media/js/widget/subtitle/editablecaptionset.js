@@ -178,7 +178,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(nextSubOr
     var order = ((prevSub ? prevSub.getSubOrder() : 0.0) +
                  nextSub.getSubOrder()) / 2.0;
     var c = new unisubs.subtitle.EditableCaption(order);
-    unisubs.SubTracker.getInstance().trackAdd(c.getCaptionID());
+    unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
     goog.array.insertAt(this.captions_, c, index);
     if (prevSub) {
         prevSub.setNextCaption(c);
@@ -241,7 +241,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
     // Pass the new node and the DFXP parser instance to the new EditableCaption.
     var c = new unisubs.subtitle.EditableCaption(this.x.addSubtitle(), this.x);
 
-    unisubs.SubTracker.getInstance().trackAdd(c.getCaptionID());
+    unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
 
     c.setParentEventTarget(this);
 
@@ -332,7 +332,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.makeMap = function() {
     goog.array.forEach(
         this.captions_, 
         function(c) {
-            map[c.getCaptionID()] = c;
+            map[c.getCaptionIndex()] = c;
         });
     return map;
 };
