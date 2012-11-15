@@ -29,12 +29,13 @@ from django.db.models import ObjectDoesNotExist
 from haystack import site
 from raven.contrib.django.models import client
 
+from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
 from videos.models import VideoFeed, Video
 from subtitles.models import (
-    SubtitleLanguage, SubtitleVersion, get_caption_diff_data
+    SubtitleLanguage, SubtitleVersion
 )
 from videos.feed_parser import FeedParser
 
@@ -286,7 +287,7 @@ def send_new_translation_notification(translation_version):
 
 def _make_caption_data(new_version, old_version):
     raise Exception("This function is deprecated. "
-            "Use subtitles.models.get_caption_diff_data.")
+            "babelsubs.storage.diff")
 
 
 def notify_for_version(version):
@@ -304,7 +305,7 @@ def notify_for_version(version):
         return
 
     most_recent_version = qs[0]
-    captions = get_caption_diff_data(version, most_recent_version)
+    diff_data = diff_subtitles(version.get_subtitles(), most_recent_version.get_subtitles())
 
     title = {
         'new_title': version.title,
@@ -328,7 +329,7 @@ def notify_for_version(version):
         'video': version.video,
         'language': language,
         'last_version': most_recent_version,
-        'captions': captions,
+        'diff_data': diff_data,
         'video_url': video.get_absolute_url(),
         'language_url': language.get_absolute_url(),
         'user_url': version.author and version.author.get_absolute_url(),
