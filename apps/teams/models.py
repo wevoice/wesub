@@ -307,7 +307,7 @@ class Team(models.Model):
     # URLs
     @models.permalink
     def get_absolute_url(self):
-        return ('teams:detail', [self.slug])
+        return ('teams:dashboard', [self.slug])
 
     def get_site_url(self):
         """Return the full, absolute URL for this team, including http:// and the domain."""
@@ -738,8 +738,8 @@ class TeamVideo(models.Model):
         """Return whether subtitles have been started for this video."""
         from subtitles.models import SubtitleLanguage
         return (SubtitleLanguage.objects.having_nonempty_versions()
-                                       .filter(video=self.video)
-                                       .exists())
+                                        .filter(video=self.video)
+                                        .exists())
 
     def subtitles_finished(self):
         """Return whether at least one set of subtitles has been finished for this video."""

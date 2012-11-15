@@ -21,6 +21,7 @@ import urllib, urllib2
 
 import simplejson as json
 from babelsubs import get_available_formats
+from babelsubs.storage import diff as diff_subs
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -519,12 +520,19 @@ def diffing(request, first_version, second_pk):
         # this is either a bad bug, or someone evil
         raise "Revisions for diff videos"
 
+    if first_version.pk < second_version.pk:
+        # this is just stupid Instead of first, second meaning
+        # chronological order (first cames before second)
+        # it means  the opposite, so make sure the first version
+        # has a larger version no than the second
+        first_version, second_version = second_version, first_version
+
     video = first_version.subtitle_language.video
-    captions = sub_models.get_caption_diff_data(first_version, second_version)
+    diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
 
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    context['captions'] = captions
+    context['diff_data'] = diff_data
     context['language'] = language
     context['first_version'] = first_version
     context['second_version'] = second_version

@@ -1,0 +1,121 @@
+{% extends "profiles/base.html" %}
+
+{% load thumbnail i18n auth_tags %}
+
+{% block title %}{% trans "Edit Profile" %} | Amara{% endblock %}
+
+{% block email_confirmation_block %}
+    {% email_confirmation_notification 'true' %}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript">
+        jQuery(function($){
+            $('.remove-avatar').click(function(){
+                if (confirm('{% trans "Do you really want delete your picture?" %}')){
+                    $.post('{% url profiles:remove_avatar %}', {remove: true}, function(response){
+                        if ( ! response.errors){
+                            $('.user-avatar').attr('src', response.avatar);
+                            $('.remove-avatar').remove();
+                        }
+                    }, 'json');
+                }
+                return false;
+            });
+            
+            $('#id_picture').change(function(){
+                $('.edit_profile').ajaxSubmit({
+                    url: '{% url profiles:edit_avatar %}',
+                    dataType: 'json',
+                    success: function(response){
+                        if (response.error){
+                            $('#picture-errors').html('<ul class="errorlist"><li>'+response.error.picture+'</li></ul>');
+                        }else{
+                            $('#picture-errors').html('');  
+                            $('.user-avatar').attr('src', response.url);
+                        }
+                    },
+                    beforeSubmit: function(arr, $form, options) { 
+                        $('#picture-errors').html('{% trans "Saving..." %}');            
+                    }                    
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block view_content %}
+
+    {% with 'profile' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+
+    <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <h3>{% trans "Name" %}</h3>
+        <fieldset>
+            <div class="grid_4 alpha">
+                {% include "_form_field.html" with field=form.first_name %}
+            </div>
+            <div class="grid_4 omega">
+                {% include "_form_field.html" with field=form.last_name %}
+            </div>
+        </fieldset>
+
+        <h3>{% trans "About you" %}</h3>
+            <div class="grid_4 alpha">
+                <fieldset>
+                    {% include "_form_field.html" with field=form.biography %}
+                   
+                    {% include "_form_field.html" with field=form.homepage %}
+                </fieldset>
+            </div>
+            <div class="grid_4 omega">
+                <fieldset>
+                    <label>{% trans "Photo" %}</label>
+                    <div class="avatar-container">
+                        {% if user_info.avatar %}
+                            <img class="avatar" src="{{ user_info.avatar }}"/>
+                            <div><a class="remove-avatar" href="#">{% trans 'Remove current photo' %}</a></div>
+                        {% else %}
+                            <input type="file" id="id_picture" name="picture" size="6"/>
+                            <button>
+                              {% trans 'Upload photo' %}
+                            </button>         
+                        {% endif %}
+                    </div>
+                </fieldset>             
+            </div>
+
+
+        <div class="submit">
+            <button class="button save" type="submit" value="Save">
+                {% trans 'Save Changes' %}
+            </button>
+        </div>
+    </form>
+
+
+<script type="text/javascript">
+    $('.upload-picture').click(function(){
+        return false;
+    });
+</script>
+<script type="text/javascript">
+  $(".get-new-api-bt").click(function(e){
+     e.preventDefault();
+     $.ajax({
+       url: $(this).attr("href"),
+       dataType: "json",
+       type: "POST",
+       success: function(res){
+           $(".api-key-holder").text(res.key);
+           $(".api-key-status").text("Key generated, enjoy!");
+         }
+      }) ;
+     return false;
+  })
+</script>
+{% endblock %}

@@ -19,7 +19,9 @@
 
 from datetime import datetime
 import json
+from BeautifulSoup import BeautifulSoup
 
+from babelsubs.storage import SubtitleSet
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -347,21 +349,49 @@ class TestViews(WebUseTest):
         self.assertEqual(sl_en.subtitleversion_set.count(), 4)
 
     def test_diffing(self):
-        version = self.video.version(version_number=1)
-        create_langs_and_versions(self.video, [version.language_code])
-        last_version = self.video.version()
-        self.assertNotEqual(version.id, last_version.id)
+        create_langs_and_versions(self.video, ['en'])
 
-        subtitles = version.get_subtitles()
+        eng = self.video.newsubtitlelanguage_set.get(language_code='en')
+        subtitles = SubtitleSet('en')
 
-        for x in xrange(1, 6):
-            subtitles.append_subtitle(x * 1000, x * 2000, "%x -> :D" % x)
+        for x in xrange(0, 3):
+            subtitles.append_subtitle(x * 1000, x * 2000, "%x - :D" % x)
 
-        last_version.set_subtitles(subtitles)
-        last_version.save()
+        first_version = eng.add_version(subtitles=subtitles)
 
-        response = self._simple_test('videos:diffing', [version.id, last_version.id])
-        self.assertEqual(len(response.context['captions']), 81)
+        subs_data = []
+        for x in xrange(0, 3):
+            subs_data.append([x * 1000, x * 2000, "%x - :D" % x])
+        # change the timing at the second sub:
+        subs_data[1][0] = subs_data[1][0] + 200
+        # change the text on the thrid sub
+        subs_data[1][2] = 'changed'
+        # add an unsynced sub
+        subs_data.append([None, None, "no sync"])
+        second_version = eng.add_version(subtitles=SubtitleSet.from_list('en', subs_data))
+
+
+        response = self._simple_test('videos:diffing', [first_version.id, second_version.id])
+        self.assertEqual(len(response.context['diff_data']['subtitle_data']), len(subs_data))
+
+        html = BeautifulSoup(response.content)
+        # this is the unsynced sub:
+        unsynced = html.findAll("span", attrs={"class":'time-span'})
+        self.assertEqual(unsynced[0].parent.findAll('p')[0].text, 'no sync')
+        self.assertEqual(len(unsynced), 1)
+        # this are synced subs
+        synced  = html.findAll("span", attrs={"class":'time-span time-link'})
+        first_version_table = html.findAll('table', attrs={"class":'diff_subtitle_list diff_version_0'})[0]
+        subs_in_first_table = first_version_table.findAll('td')
+        # check that first version is well represented
+        self.assertEqual(len(subs_in_first_table), first_version.subtitle_count)
+
+        # now second version
+        second_version_table = html.findAll('table', attrs={"class":'diff_subtitle_list diff_version_1'})[0]
+        subs_in_second_table = second_version_table.findAll('td')
+        # check that second version is represented
+        self.assertEqual(len(subs_in_second_table), second_version.subtitle_count)
+        self.assertNotEqual(len(subs_in_first_table), len(subs_in_second_table))
 
     def test_test_form_page(self):
         self._simple_test('videos:test_form_page')
