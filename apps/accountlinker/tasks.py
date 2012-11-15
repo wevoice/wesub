@@ -44,6 +44,9 @@ def get_youtube_data(user_pk):
 def mirror_existing_youtube_videos(user_pk):
     data = get_youtube_data(user_pk)
 
+    if not data:
+        return
+
     for video, language, version in data:
         ThirdPartyAccount.objects.mirror_on_third_party(video, language,
                 UPDATE_VERSION_ACTION, version)
