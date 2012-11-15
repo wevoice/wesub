@@ -1772,7 +1772,7 @@ class Task(models.Model):
                                                     self.assignee,
                                                     self.language) and
                 subtitle_version and
-                subtitle_version.prev_version() and
+                subtitle_version.previous_version() and
                 subtitle_version.language.is_complete_and_synced())
 
     def _find_previous_assignee(self, type):
