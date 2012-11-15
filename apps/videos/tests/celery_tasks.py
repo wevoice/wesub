@@ -19,6 +19,7 @@
 
 import datetime
 
+from BeautifulSoup import BeautifulSoup
 from babelsubs.storage import SubtitleSet
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -332,10 +333,62 @@ class TestVideoChangedEmailNotification(TestCase):
 
     def test_email_diff_subtitles(self):
         initial_count= len(mail.outbox)
+        # set a user who can receive notification
+        # make sure we have a different author, else he won't get notified
+        author = User(username='author2',
+            email='author2@example.com', notify_by_email = True,
+            valid_email = True)
+        author.save(send_email_confirmation=False)
+        # bypass logic from hell
+        author.valid_email = True
+        author.save()
+
         # version is indentical to previous one
-        old_version = self.original_language.get_tip()
-        new_version = self.original_language.add_version(subtitles=old_version.get_subtitles())
+        video = Video.get_or_create_for_url("http://wwww.example.com/video-diff.mp4")[0]
+        video.followers.add(author)
+
+        language = SubtitleLanguage(video=video, language_code='en')
+        language.save()
+        subs_data = [
+            [0, 1000, '1'],
+            [1000, 2000, '2'],
+        ]
+
+        subtitles_1 = SubtitleSet.from_list('en', subs_data)
+        old_version = language.add_version(subtitles=subtitles_1, author=author)
+
+        # now we change the text on the second sub
+        subs_data[1][2] = '2 changed'
+        # add a regular sub
+        subs_data.append([2000, 3000, 'new sub'])
+        # add an unsyced
+        subs_data.append([None, None, 'no sync'])
+        subtitles_2 = SubtitleSet.from_list('en', subs_data)
+        new_version = language.add_version(subtitles=subtitles_2)
+        self.assertTrue(len(video.notification_list()) > 0)
+
         res = send_new_version_notification(new_version.pk)
-        self.assertEqual(res, None)
-        self.assertEqual(len(mail.outbox), initial_count )
+        self.assertNotEqual(res, None)
+        self.assertEqual(len(mail.outbox), initial_count + 1)
+        email_msg = mail.outbox[0]
+        # make sure this is the right message
+        self.assertIn("New edits to ", email_msg.subject)
+        self.assertIn("video-diff.mp4", email_msg.subject)
+        html = BeautifulSoup(email_msg.body)
+        html_text = "".join(html.body(text=True)).replace("\n", "")
+        # assert text and timing changes are correct
+        self.assertIn('75% of the text', html_text)
+        self.assertIn('50% of the timing was changed.', html_text)
+        # find the listed text changes to make sure they match
+        diff_table =html.findAll('table', attrs={'class':'diffs'})[0]
+        old_version_changes = []
+        new_version_changes = []
+        for i,node in enumerate(diff_table.findAll('td')):
+
+            if i % 2 == 0:
+                old_version_changes.append(node.text)
+            else:
+                new_version_changes.append(node.text)
+        self.assertEqual(old_version_changes, [u'', u'2', u''])
+        self.assertEqual(new_version_changes, [u'no sync', u'2 changed', u'new sub'])
 
