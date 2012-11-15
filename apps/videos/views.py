@@ -520,6 +520,13 @@ def diffing(request, first_version, second_pk):
         # this is either a bad bug, or someone evil
         raise "Revisions for diff videos"
 
+    if first_version.pk < second_version.pk:
+        # this is just stupid Instead of first, second meaning
+        # chronological order (first cames before second)
+        # it means  the opposite, so make sure the first version
+        # has a larger version no than the second
+        first_version, second_version = second_version, first_version
+
     video = first_version.subtitle_language.video
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
 

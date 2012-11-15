@@ -128,13 +128,15 @@
             </div>
         </div>
 
-        <table cellpadding="0" cellspacing="0">
+        <table cellpadding="0" cellspacing="0" class="diff_subtitle_list diff_version_0">
           {% for item in diff_data.subtitle_data %}
+              {%  if item.subtitles.1.text %}
             <tr {% cycle 'class="even"' '' %}>
                   <td>
-                  {% render_subtitle_diff item 1 %}
+                  {% render_subtitle_diff item 0 %}
                   </td>
             </tr>
+              {% endif %}
           {% endfor %}
         </table>
     </div>
@@ -173,13 +175,16 @@
              </div>
          </div>
 
-        <table cellpadding="0" cellspacing="0">
+        <table cellpadding="0" cellspacing="0"class="diff_subtitle_list diff_version_1">
             {% for item in diff_data.subtitle_data %}
+                {{ item.subtitles.0|pprint }}<br/>
+                {%  if item.subtitles.0.text %}
                 <tr {% cycle 'class="even"' '' %}>
                     <td>
-                        {% render_subtitle_diff item 0 %}
+                        {% render_subtitle_diff item 1 %}
                     </td>
                 </tr>
+                {%  endif %}
             {% endfor %}
 
         </table>
