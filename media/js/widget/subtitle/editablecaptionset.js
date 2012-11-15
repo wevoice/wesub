@@ -87,64 +87,40 @@ unisubs.subtitle.EditableCaptionSet.EventType = {
 /**
  * Always in ascending order by start time.
  */
-unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
-    return goog.array.filter(
-        this.captions_, function(c) { return c.getStartTime() != -1; });
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
+    //return goog.array.filter(
+        //this.captions_, function(c) { return c.getStartTime() != -1; });
+//};
 
 /**
  * Always in ascending order by start time.
  */
 unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
     return goog.array.filter(
-        this.captions_,
+        this.x.getSubtitles(),
         function(c) {
-            return c.getStartTime() != -1 ||
-                (c.getPreviousCaption() != null &&
-                 c.getPreviousCaption().getStartTime() != -1) ||
-                (c.getPreviousCaption() == null &&
-                 c.getStartTime() == -1);
+            return this.x.startTime(c) != -1 ||
+                (this.x.getPreviousSubtitle(c).length !== 0 &&
+                 this.x.startTime(this.x.getPreviousSubtitle(c)) != -1) ||
+                (this.x.getPreviousSubtitle(c).length === 0 &&
+                 this.x.startTime(c) == -1);
         });
 };
 unisubs.subtitle.EditableCaptionSet.prototype.clear = function() {
-    var caption;
-    while (this.captions_.length > 0) {
-        caption = this.captions_.pop();
-    }
+    this.x.removeSubtitles();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_ALL);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.clearTimes = function() {
-    goog.array.forEach(this.captions_, function(c) { c.clearTimes(); });
-
+    this.x.clearAllTimes();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_TIMES);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
-    var needsTranslation = false;
-    goog.array.forEach(this.captions_, function(c) {
-        if (c.getText() === '') {
-            needsTranslation = true;
-        }
-    });
-    return needsTranslation;
+    return this.x.needsAnyTranscribed();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
-
-    var that = this;
-
-    goog.array.forEach(this.captions_, function(c) {
-
-        // If the caption's original text is empty, just delete it.
-        // Otherwise, reset the text and the start/end times.
-        if (c.json['original_text'] === '') {
-            that.deleteCaption(c);
-        } else {
-            c.resetSub();
-        }
-
-    });
-
+    this.x.resetSubtitles();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
@@ -152,21 +128,20 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
     return this.x.subtitlesCount();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
-    return this.captions_[index];
+    return this.x.getSubtitle(index);
 };
-unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
-    var subMap = this.makeMap();
-    return subMap[id];
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
+    //var subMap = this.makeMap();
+    //return subMap[id];
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     return this.x.xmlToString();
 };
-unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
-    return goog.array.map(this.captions_, function(c) { return c.json; });
-};
+//unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
+    //return goog.array.map(this.captions_, function(c) { return c.json; });
+//};
 unisubs.subtitle.EditableCaptionSet.prototype.nonblankSubtitles = function() {
-    return goog.array.filter(
-        this.captions_, function(c) { return c.getTrimmedText() != ''; });
+    return this.x.getNonBlankSubtitles();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptionSet) {
     var myNonblanks = this.nonblankSubtitles();
@@ -179,17 +154,15 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
     return true;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = function(subtitleJson) {
-    var newSub = {
-          'subtitle_id': subtitleJson['subtitle_id'],
-          'text': '',
-          'sub_order': subtitleJson['sub_order'],
-          'start_time': subtitleJson['start_time'],
-          'end_time': subtitleJson['end_time']
-    };
+
+    var newSub = this.x.addSubtitle(null, {
+        'begin': subtitleJson['start_time'],
+        'end': subtitleJson['end_time']
+    });
 
     var c = new unisubs.subtitle.EditableCaption(null, newSub);
     c.setParentEventTarget(this);
-    this.captions_.push(c);
+
     return c;
 };
 

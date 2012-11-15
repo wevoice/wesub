@@ -26,7 +26,7 @@ from django.conf.urls.defaults import patterns, url
 from messages.views import rpc_router
 
 urlpatterns = patterns('messages.views',
-    url(r'^$', 'index', name='index'),
+    url(r'^$', 'inbox', name='inbox'),
     url(r'^sent/$', 'sent', name='sent'),
     url(r'^new/$', 'new', name='new'),
     url(r'^router/$', rpc_router, name='rpc_router'),

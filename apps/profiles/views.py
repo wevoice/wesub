@@ -30,6 +30,7 @@ from tastypie.models import ApiKey
 from auth.models import CustomUser as User
 from profiles.forms import EditUserForm, SendMessageForm, UserLanguageFormset, EditAvatarForm
 from profiles.rpc import ProfileApiClass
+from apps.messages.models import Message
 from utils.amazon import S3StorageError
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
@@ -43,27 +44,6 @@ rpc_router = RpcRouter('profiles:rpc_router', {
 
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 30)
 
-@login_required
-def remove_avatar(request):
-    if request.POST.get('remove'):
-        request.user.picture = ''
-        request.user.save()
-    return HttpResponse(json.dumps({'avatar': request.user.avatar()}), "text/javascript")
-
-@login_required
-def edit_avatar(request):
-    output = {}
-    form = EditAvatarForm(request.POST, instance=request.user, files=request.FILES)
-    if form.is_valid():
-        try:
-            user = form.save()
-            output['url'] =  str(user.avatar())
-        except S3StorageError:
-            output['error'] = {'picture': ugettext(u'File server unavailable. Try later. You can edit some other information without any problem.')}
-
-    else:
-        output['error'] = form.get_errors()
-    return HttpResponse('<textarea>%s</textarea>'  % json.dumps(output))
 
 class OptimizedQuerySet(LoadRelatedQuerySet):
 
@@ -78,6 +58,33 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
 
             for l in langs_qs:
                 videos[l.video_id].langs_cache.append(l)
+
+
+def activity(request, user_id=None):
+
+    if user_id:
+        try:
+            user = User.objects.get(username=user_id)
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(id=user_id)
+            except (User.DoesNotExist, ValueError):
+                raise Http404
+    else:
+        user = request.user
+
+    qs = Action.objects.filter(user=user)
+
+    extra_context = {
+        'user_info': user,
+        'can_edit': user == request.user
+    }
+
+    return object_list(request, queryset=qs, allow_empty=True,
+                       paginate_by=settings.ACTIVITIES_ONPAGE,
+                       template_name='profiles/view.html',
+                       template_object_name='action',
+                       extra_context=extra_context)
 
 @login_required
 def dashboard(request):
@@ -99,15 +106,18 @@ def dashboard(request):
 
     context = {
         'user_info': user,
-        'action_list': Action.objects.for_user(user)[:5],
+        'user_messages': Message.objects.for_user(user)[:5],
+        'team_activity': Action.objects.for_user_team_activity(user)[:10],
+        'video_activity': Action.objects.for_user_video_activity(user)[:10],
         'tasks': tasks,
         'widget_settings': widget_settings,
     }
 
     return direct_to_template(request, 'profiles/dashboard.html', context)
 
+
 @login_required
-def my_videos(request):
+def videos(request):
     user = request.user
     qs = user.videos.order_by('-edited')
     q = request.REQUEST.get('q')
@@ -125,59 +135,49 @@ def my_videos(request):
 
     return object_list(request, queryset=qs,
                        paginate_by=VIDEOS_ON_PAGE,
-                       template_name='profiles/my_videos.html',
+                       template_name='profiles/videos.html',
                        extra_context=context,
                        template_object_name='user_video')
 
 @login_required
-def edit_profile(request):
+def edit(request):
     if request.method == 'POST':
         form = EditUserForm(request.POST,
                             instance=request.user,
                             files=request.FILES, label_suffix="")
         if form.is_valid():
             form.save()
-            form_validated = True
-        else:
-            form_validated = False
-
-        formset = UserLanguageFormset(request.POST, instance=request.user)
-        if formset.is_valid() and form_validated:
-            formset.save()
             messages.success(request, _('Your profile has been updated.'))
-            return redirect('profiles:profile', user_id = request.user.username)
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
-        formset = UserLanguageFormset(instance=request.user)
+
     context = {
         'form': form,
         'user_info': request.user,
-        'formset': formset,
         'edit_profile_page': True
     }
-    return direct_to_template(request, 'profiles/edit_profile.html', context)
+    return direct_to_template(request, 'profiles/edit.html', context)
 
 @login_required
-def my_profile(request):
+def account(request):
+    if request.method == 'POST':
+        form = EditUserForm(request.POST,
+                            instance=request.user,
+                            files=request.FILES, label_suffix="")
+        if form.is_valid():
+            form.save()
+            messages.success(request, _('Your account has been updated.'))
 
-    return profile(request, user_id = request.user.id)
-
-def profile(request, user_id=None):
-    if user_id:
-        try:
-            user = User.objects.get(username=user_id)
-        except User.DoesNotExist:
-            try:
-                user = User.objects.get(id=user_id)
-            except (User.DoesNotExist, ValueError):
-                raise Http404
     else:
-        user = request.user
+        form = EditUserForm(instance=request.user, label_suffix="")
+
     context = {
-        'user_info': user,
-        'can_edit': user == request.user
+        'form': form,
+        'user_info': request.user,
+        'edit_profile_page': True
     }
-    return direct_to_template(request, 'profiles/view_profile.html', context)
+
+    return direct_to_template(request, 'profiles/account.html', context)
 
 @login_required
 def send_message(request):
@@ -191,19 +191,6 @@ def send_message(request):
     return HttpResponse(json.dumps(output), "text/javascript")
 
 @login_required
-def actions_list(request):
-    qs = Action.objects.for_user(request.user)
-    extra_context = {
-        'user_info': request.user
-    }
-
-    return object_list(request, queryset=qs, allow_empty=True,
-                       paginate_by=settings.ACTIVITIES_ONPAGE,
-                       template_name='profiles/actions_list.html',
-                       template_object_name='action',
-                       extra_context=extra_context)
-
-@login_required
 def generate_api_key(request):
     key, created = ApiKey.objects.get_or_create(user=request.user)
     if not created:
@@ -211,3 +198,19 @@ def generate_api_key(request):
         key.save()
     return HttpResponse(json.dumps({"key":key.key}))
 
+@login_required
+def edit_avatar(request):
+    form = EditAvatarForm(request.POST, instance=request.user, files=request.FILES)
+    if form.is_valid():
+        form.save()
+    else:
+        messages.error(request, _(form.errors['picture']))
+    return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')
+
+@login_required
+def remove_avatar(request):
+    if request.POST.get('remove'):
+        request.user.picture = ''
+        request.user.save()
+        messages.success(request, _('Your picture has been removed.'))
+    return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')

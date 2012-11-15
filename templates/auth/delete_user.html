@@ -11,7 +11,7 @@
   <form action="." method="post">
     {% csrf_token %}
     <button type="submit" class="green_button huge" name="delete" value="delete">{% trans 'Delete' %}</button>
-    <a class="red_button small" href="{% url profiles:my_profile %}">{% trans 'Cancel' %}</a>
+    <a class="red_button small" href="{% url profiles:profile user %}">{% trans 'Cancel' %}</a>
   </form>
 <div/>
 {% endblock %}
