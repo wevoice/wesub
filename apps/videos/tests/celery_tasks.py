@@ -343,9 +343,18 @@ class TestVideoChangedEmailNotification(TestCase):
         author.valid_email = True
         author.save()
 
+        # this is needed for the non_editor template check
+        user2 = User(username='user2',
+            email='user2@example.com', notify_by_email = True,
+            valid_email = True)
+        user2.save(send_email_confirmation=False)
+        # bypass logic from hell
+        user2.valid_email = True
+        user2.save()
         # version is indentical to previous one
         video = Video.get_or_create_for_url("http://wwww.example.com/video-diff.mp4")[0]
         video.followers.add(author)
+        video.followers.add(user2)
 
         language = SubtitleLanguage(video=video, language_code='en')
         language.save()
@@ -369,26 +378,28 @@ class TestVideoChangedEmailNotification(TestCase):
 
         res = send_new_version_notification(new_version.pk)
         self.assertNotEqual(res, None)
-        self.assertEqual(len(mail.outbox), initial_count + 1)
-        email_msg = mail.outbox[0]
-        # make sure this is the right message
-        self.assertIn("New edits to ", email_msg.subject)
-        self.assertIn("video-diff.mp4", email_msg.subject)
-        html = BeautifulSoup(email_msg.body)
-        html_text = "".join(html.body(text=True)).replace("\n", "")
-        # assert text and timing changes are correct
-        self.assertIn('75% of the text', html_text)
-        self.assertIn('50% of the timing was changed.', html_text)
-        # find the listed text changes to make sure they match
-        diff_table =html.findAll('table', attrs={'class':'diffs'})[0]
-        old_version_changes = []
-        new_version_changes = []
-        for i,node in enumerate(diff_table.findAll('td')):
-
-            if i % 2 == 0:
-                old_version_changes.append(node.text)
-            else:
-                new_version_changes.append(node.text)
-        self.assertEqual(old_version_changes, [u'', u'2', u''])
-        self.assertEqual(new_version_changes, [u'no sync', u'2 changed', u'new sub'])
+        # we expect two emails, one is the new-edits-non-editor, and
+        # the other for mail_notification.html
+        self.assertEqual(len(mail.outbox), initial_count + 2)
+        for email_number, email_msg in enumerate(mail.outbox):
+            # make sure this is the right message
+            self.assertIn("New edits to ", email_msg.subject)
+            self.assertIn("video-diff.mp4", email_msg.subject)
+            html = BeautifulSoup(email_msg.body)
+            html_text = "".join(html.body(text=True)).replace("\n", "")
+            if email_number == 0:
+                # assert text and timing changes are correct
+                self.assertIn('75% of the text', html_text)
+                self.assertIn('50% of the timing was changed.', html_text)
+            # find the listed text changes to make sure they match
+            diff_table =html.findAll('table', attrs={'class':'diffs'})[0]
+            old_version_changes = []
+            new_version_changes = []
+            for i,node in enumerate(diff_table.findAll('td')):
+                if i % 2 == 0:
+                    old_version_changes.append(node.text)
+                else:
+                    new_version_changes.append(node.text)
+            self.assertEqual(old_version_changes, [u'', u'2', u''])
+            self.assertEqual(new_version_changes, [u'no sync', u'2 changed', u'new sub'])
 
