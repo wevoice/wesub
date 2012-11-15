@@ -237,25 +237,13 @@ unisubs.subtitle.EditableCaptionSet.prototype.findSubIndex_ = function(order) {
         });
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispatchEvent) {
-    //var lastSubOrder = 0.0;
 
-    //if (this.x.subtitlesCount() > 0) {
-        //lastSubOrder = this.captions_[this.captions_.length - 1].getSubOrder();
-        //lastSub = this.x.getLastSubtitle();
-    //}
+    // Pass the new node and the DFXP parser instance to the new EditableCaption.
+    var c = new unisubs.subtitle.EditableCaption(this.x.addSubtitle(), this.x);
 
-    // Do we even need to init individual EditableCaptions with the DFXP wrapper?
-    var c = new unisubs.subtitle.EditableCaption();
-
-    // We need to bind this to EditableCaption somehow.
-    this.x.addSubtitle();
-
-    // What does this do?
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionID());
 
     c.setParentEventTarget(this);
-
-    //this.captions_.push(c);
 
     if (this.x.subtitlesCount().length > 1) {
         //var previousCaption = this.captions_[this.captions_.length - 2];

@@ -30,32 +30,36 @@ goog.provide('unisubs.subtitle.EditableCaption');
  *     we're operating. Provide this parameter iff the caption exists
  *     already in the unisubs system.
  */
-unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
+unisubs.subtitle.EditableCaption = function(node, x) {
     goog.events.EventTarget.call(this);
-    this.json = opt_jsonCaption ||
-        {
-            'subtitle_id' : unisubs.randomString(),
-            'text' : '',
-            'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            'sub_order' : opt_subOrder,
-            'start_of_paragraph': false
-        };
-    this.json['original_start_time'] = this.json['start_time'];
-    this.json['original_end_time'] = this.json['end_time'];
-    this.json['original_text'] = this.json['text'];
-    this.json['start_of_paragraph'] = this.json['start_of_paragraph'] || false;
+    //this.json = opt_jsonCaption ||
+        //{
+            //'subtitle_id' : unisubs.randomString(),
+            //'text' : '',
+            //'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
+            //'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
+            //'sub_order' : opt_subOrder,
+            //'start_of_paragraph': false
+        //};
+    //this.json['original_start_time'] = this.json['start_time'];
+    //this.json['original_end_time'] = this.json['end_time'];
+    //this.json['original_text'] = this.json['text'];
+    //this.json['start_of_paragraph'] = this.json['start_of_paragraph'] || false;
     this.previousCaption_ = null;
     this.nextCaption_ = null;
+
+    this.node = node;
+    this.x = x;
+
 };
 
 goog.inherits(unisubs.subtitle.EditableCaption, goog.events.EventTarget);
 
 unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
-    this.json['sub_order'] = jsonSub['sub_order'];
-    this.json['start_time'] = jsonSub['start_time'];
-    this.json['end_time'] = jsonSub['end_time'];
-    this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
+    //this.json['sub_order'] = jsonSub['sub_order'];
+    //this.json['start_time'] = jsonSub['start_time'];
+    //this.json['end_time'] = jsonSub['end_time'];
+    //this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
 };
 unisubs.subtitle.EditableCaption.orderCompare = function(a, b) {
     return a.getSubOrder() - b.getSubOrder();
@@ -114,15 +118,14 @@ unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
     return this.json['sub_order'];
 };
 unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrack) {
-    this.json['text'] = text;
+    this.x.content(this.node, text);
     this.changed_(false, opt_dontTrack);
 };
 unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
     return this.json['original_text'];
 };
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
-    return '';
-    //return this.json['text'];
+    return this.x.content(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
     return this.json['start_of_paragraph'];
@@ -242,7 +245,7 @@ unisubs.subtitle.EditableCaption.prototype.getMaxEndTime = function() {
          unisubs.subtitle.EditableCaption.MIN_LENGTH) : 99999;
 };
 unisubs.subtitle.EditableCaption.prototype.getCaptionID = function() {
-    return this.json['subtitle_id'];
+    return this.x.getCaptions().index(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.isShownAt = function(time) {
     return this.getStartTime() <= time &&
