@@ -1717,7 +1717,10 @@ class Task(models.Model):
         if self.type == Task.TYPE_IDS['Approve'] and self.workflow.review_enabled:
             type = Task.TYPE_IDS['Review']
         else:
-            if self.subtitle_version.language.is_original:
+            is_primary = (self.new_subtitle_version
+                              .subtitle_language
+                              .is_primary_audio_language())
+            if is_primary:
                 type = Task.TYPE_IDS['Subtitle']
             else:
                 type = Task.TYPE_IDS['Translate']
@@ -1737,15 +1740,15 @@ class Task(models.Model):
         if not self.team.members.filter(user=assignee).exists():
             assignee = None
 
-        # TODO: Shouldn't this be WAITING_MODERATION?
-        self.subtitle_version.moderation_status = WAITING_MODERATION
+        self.subtitle_version.visibility_override = 'private'
         self.subtitle_version.save()
 
         task = Task(team=self.team, team_video=self.team_video,
-                    language=self.language, type=type, assignee=assignee)
+                    language=self.language, type=type, 
+                    assignee=assignee)
 
         if type == Task.TYPE_IDS['Review']:
-            task.subtitle_version = self.subtitle_version
+            task.new_subtitle_version = self.new_subtitle_version
 
         task.set_expiration()
 
