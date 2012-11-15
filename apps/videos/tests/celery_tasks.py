@@ -400,6 +400,6 @@ class TestVideoChangedEmailNotification(TestCase):
                     old_version_changes.append(node.text)
                 else:
                     new_version_changes.append(node.text)
-            self.assertEqual(old_version_changes, [u'', u'2', u''])
-            self.assertEqual(new_version_changes, [u'no sync', u'2 changed', u'new sub'])
+            self.assertEqual(old_version_changes, [u'2', u'', u''])
+            self.assertEqual(new_version_changes, [u'2 changed',  u'new sub', u'no sync',])
 

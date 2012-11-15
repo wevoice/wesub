@@ -89,29 +89,29 @@ unisubs.subtitle.EditableCaption.MIN_LENGTH = 0.5;
  * @param {unisubs.subtitle.EditableCaption} caption Previous caption in list.
  *
  */
-unisubs.subtitle.EditableCaption.prototype.setPreviousCaption = function(caption) {
-    this.previousCaption_ = caption;
-};
+//unisubs.subtitle.EditableCaption.prototype.setPreviousCaption = function(caption) {
+    //this.previousCaption_ = caption;
+//};
 unisubs.subtitle.EditableCaption.prototype.getPreviousCaption = function() {
-    return this.previousCaption_;
+    return this.x.getPreviousSubtitle(this.node);
 };
 
 /**
  * @param {unisubs.subtitle.EditableCaption} caption Next caption in list.
  *
  */
-unisubs.subtitle.EditableCaption.prototype.setNextCaption = function(caption) {
-    this.nextCaption_ = caption;
-};
+//unisubs.subtitle.EditableCaption.prototype.setNextCaption = function(caption) {
+    //this.nextCaption_ = caption;
+//};
 unisubs.subtitle.EditableCaption.prototype.getNextCaption = function() {
-    return this.nextCaption_;
+    return this.x.getNextSubtitle(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
     return this.getSubOrder() == other.getSubOrder() &&
         this.getTrimmedText() == other.getTrimmedText() &&
         this.getStartTime() == other.getStartTime() &&
         this.getEndTime() == other.getEndTime() &&
-        this.getCaptionID() == other.getCaptionID() &&
+        this.getCaptionIndex() == other.getCaptionIndex() &&
         this.getStartOfParagraph() == other.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
@@ -128,14 +128,14 @@ unisubs.subtitle.EditableCaption.prototype.getText = function() {
     return this.x.content(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
-    return this.json['start_of_paragraph'];
+    return Boolean(this.x.startOfParagraph(this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, opt_dontTrack){
-    if (this.json['start_of_paragraph'] != Boolean(val)){
-        this.json['start_of_paragraph'] = Boolean(val);
+    if (this.getStartOfParagraph() != Boolean(val)){
+        this.x.startOfParagraph(this.node, Boolean(val));
         this.changed_(false, opt_dontTrack);
     }
-    return this.json['start_of_paragraph'];
+    return this.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
     return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
@@ -151,7 +151,7 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     startTime = Math.max(startTime, this.getMinStartTime());
-    this.json['start_time'] = startTime;
+    this.x.startTime(this.node, startTime);
     if (this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
         this.getEndTime() < startTime +
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
@@ -164,8 +164,8 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
          this.previousCaption_.setEndTime(startTime);
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
-    if (goog.isDefAndNotNull(this.json['start_time'])) {
-        return this.json['start_time'];
+    if (goog.isDefAndNotNull(this.x.startTime(this.node))) {
+        return this.x.startTime(this.node);
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -176,7 +176,7 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime = function(endTime) {
     this.changed_(false);
 };
 unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
-    this.json['end_time'] = endTime;
+    this.x.endTime(this.node, endTime);
     if (this.getStartTime() > endTime -
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
         this.setStartTime_(
@@ -194,30 +194,30 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
 unisubs.subtitle.EditableCaption.prototype.clearTimes = function() {
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
-        this.json['start_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
-        this.json['end_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
+        this.x.startTime(this.node, '');
+        this.x.endTime(this.node, '');
     }
 };
 
 unisubs.subtitle.EditableCaption.prototype.resetSub = function() {
 
-    this.setText(this.json['original_text']);
+    this.x.content(this.node, this.x.originalContent(this.node));
 
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
 
-        var previousStartTime = this.json['start_time'];
-        this.setStartTime_(this.json['original_start_time']);
+        var previousStartTime = this.x.startTime(this.node);
+        this.setStartTime_(this.x.originalStartTime(this.node));
         this.changed_(previousStartTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 
-        var previousEndTime = this.json['end_time'];
-        this.setEndTime_(this.json['original_end_time']);
+        var previousEndTime = this.x.endTime(this.node);
+        this.setEndTime_(this.x.originalEndTime(this.node));
         this.changed_(previousEndTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {
-    if (goog.isDefAndNotNull(this.json['end_time'])) {
-        return this.json['end_time'];
+    if (goog.isDefAndNotNull(this.x.endTime(this.node))) {
+        return this.x.endTime(this.node);
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -244,8 +244,8 @@ unisubs.subtitle.EditableCaption.prototype.getMaxEndTime = function() {
         (this.nextCaption_.getEndTime() -
          unisubs.subtitle.EditableCaption.MIN_LENGTH) : 99999;
 };
-unisubs.subtitle.EditableCaption.prototype.getCaptionID = function() {
-    return this.x.getCaptions().index(this.node);
+unisubs.subtitle.EditableCaption.prototype.getCaptionIndex = function() {
+    return this.x.getSubtitles().index(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.isShownAt = function(time) {
     return this.getStartTime() <= time &&
@@ -267,7 +267,7 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
 
 unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
-        unisubs.SubTracker.getInstance().trackEdit(this.getCaptionID());
+        unisubs.SubTracker.getInstance().trackEdit(this.getCaptionIndex());
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));
@@ -292,7 +292,7 @@ unisubs.subtitle.EditableCaption.toIDArray = function(editableCaptions) {
     return goog.array.map(
         editableCaptions,
         function(ec) {
-            return ec.getCaptionID();
+            return ec.getCaptionIndex();
         });
 };
 

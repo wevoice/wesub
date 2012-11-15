@@ -31,6 +31,7 @@ from apps.subtitles import shims
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
+from babelsubs.storage import diff as diff_subtitles
 from babelsubs import load_from
 
 from utils.compress import compress, decompress
@@ -103,67 +104,6 @@ def print_graphviz(video_id):
     video = Video.objects.get(video_id=video_id)
     print '\n'.join(graphviz(video))
 
-def get_caption_diff_data(first_version, second_version):
-    """
-    Return a list of captions that looks something like this:
-    [
-        [None, (0, 100, 'Hello'), {'text': True, 'time': True}]
-        [(50, 150, 'Hello'), None, {'text': True, 'time': True}]
-        [None, (200, 300, 'world!'), {'text': True, 'time': True}]
-        [(250, 350, 'world!'), None, {'text': True, 'time': True}]
-    ]
-    """
-    if second_version.version_number > first_version.version_number:
-        first_version, second_version = second_version, first_version
-
-    second_captions = [item for item in second_version.get_subtitles()]
-    first_captions = [item for item in first_version.get_subtitles()]
-
-    subtitles = {}
-
-    first_map = {}
-    second_map = {}
-
-    for start, end, text, _ in first_captions:
-        id = str(start) + str(end)
-        if not id in subtitles:
-            subtitles[id] = (start, end, text)
-        first_map[id] = (start, end, text)
-
-    for start, end, text, _ in second_captions:
-        id = str(start) + str(end)
-        if not id in subtitles:
-            subtitles[id] = (start, end, text)
-        second_map[id] = (start, end, text)
-
-    subs = [item for item in subtitles.items()]
-    subs.sort(key=lambda item: item[1][0])
-
-    captions = []
-
-    for id, s in subs:
-        try:
-            fcaption = first_map[id]
-        except KeyError:
-            fcaption = None
-
-        try:
-            scaption = second_map[id]
-        except KeyError:
-            scaption = None
-
-        if fcaption is None or scaption is None:
-            changed = dict(text=True, time=True)
-        else:
-            changed = {
-                'text': (not fcaption[2] == scaption[2]),
-                'time': (not fcaption[0] == scaption[0]),
-                'end_time': (not fcaption[1]== scaption[1])
-            }
-        data = [fcaption, scaption, changed]
-        captions.append(data)
-
-    return captions
 
 
 # Lineage functions -----------------------------------------------------------
@@ -1100,66 +1040,14 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        subtitles = [s for s in self.get_subtitles().subtitle_items()]
-        last_subtitles = [s for s in parent.get_subtitles().subtitle_items()]
+        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles())
 
-        if not subtitles or not last_subtitles:
-            if subtitles or last_subtitles:
-                # If one version is empty but the other isn't: 100%.
-                return (1.0, 1.0)
-            else:
-                # If both versions are empty: 100%.
-                return (0.0, 0.0)
 
-        sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
-                                for s in subtitles])
-        last_sub_dict = dict([("-".join(map(str, s[0:2])), s[2])
-                                for s in last_subtitles])
 
-        sub_dict_reverse = dict((v, k) for k, v in sub_dict.iteritems())
-        last_sub_dict_reverse = dict((v, k)
-                                    for k, v in last_sub_dict.iteritems())
+        self._text_change = diff_data['text_changed']
+        self._time_change = diff_data['time_changed']
 
-        text_count_changed = 0
-        time_count_changed = 0
-
-        # Same timing, different text
-        for sub_timing in sub_dict:
-            if sub_timing in last_sub_dict:
-                if not last_sub_dict[sub_timing] == sub_dict[sub_timing]:
-                    text_count_changed += 1
-
-        # Same text, different timing
-        for sub_text in sub_dict_reverse:
-            try:
-                last = last_sub_dict_reverse[sub_text]
-                current = sub_dict_reverse[sub_text]
-            except KeyError:
-                continue
-
-            if not last == current:
-                time_count_changed += 1
-
-        # How many of the timings from the old version aren't in the new one
-        for sub_timing in last_sub_dict:
-            if sub_timing not in sub_dict.keys():
-                text_count_changed += 1
-                time_count_changed += 1
-
-        # How many of the timings from the new version aren't in the old one
-        for sub_timing in sub_dict:
-            if sub_timing not in last_sub_dict.keys():
-                text_count_changed += 1
-                time_count_changed += 1
-
-        subs_length = len(subtitles)
-        time_change = min(time_count_changed / 1. / subs_length, 1)
-        text_change = min(text_count_changed / 1. / subs_length, 1)
-
-        self._text_change = text_change
-        self._time_change = time_change
-
-        return time_change, text_change
+        return  self._time_change, self._text_change
 
     @property
     def time_change(self):
