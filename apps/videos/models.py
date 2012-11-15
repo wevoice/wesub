@@ -2420,7 +2420,7 @@ class Action(models.Model):
     @classmethod
     def create_declined_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.subtitle_language
         obj.user = moderator
         obj.action_type = cls.DECLINE_VERSION
         obj.created = datetime.now()
