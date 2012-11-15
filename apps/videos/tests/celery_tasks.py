@@ -381,7 +381,6 @@ class TestVideoChangedEmailNotification(TestCase):
         # we expect two emails, one is the new-edits-non-editor, and
         # the other for mail_notification.html
         self.assertEqual(len(mail.outbox), initial_count + 2)
-        import ipdb;ipdb.set_trace()
         for email_number, email_msg in enumerate(mail.outbox):
             # make sure this is the right message
             self.assertIn("New edits to ", email_msg.subject)
