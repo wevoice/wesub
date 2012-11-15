@@ -373,6 +373,60 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Otherwise, we're good.
         return false;
     };
+    this.originalContent = function(indexOrElement, content) {
+        /*
+         * Either get or set the original HTML content for the subtitle.
+         *
+         * Returns: current original content (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof content !== 'undefined') {
+            $subtitle.attr('originalcontent', content);
+        }
+
+        return $subtitle.attr('originalcontent');
+
+    };
+    this.originalEndTime = function(indexOrElement, originalEndTime) {
+        /*
+         * Either get or set the original end time for the subtitle.
+         *
+         * Returns: current original end time (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof originalEndTime !== 'undefined') {
+            if (parseFloat(originalEndTime)) {
+                $subtitle.attr('originalend', originalEndTime);
+            } else {
+                $subtitle.attr('originalend', '');
+            }
+        }
+
+        return $subtitle.attr('originalend');
+    };
+    this.originalStartTime = function(indexOrElement, originalStartTime) {
+        /*
+         * Either get or set the original start time for the subtitle.
+         *
+         * Returns: current original start time (string)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof originalStartTime !== 'undefined') {
+            if (parseFloat(originalStartTime)) {
+                $subtitle.attr('originalbegin', originalStartTime);
+            } else {
+                $subtitle.attr('originalbegin', '');
+            }
+        }
+
+        return $subtitle.attr('originalbegin');
+    };
     this.originalXmlToString = function() {
         return this.utils.xmlToString(this.$originalXml.get(0));
     };
@@ -424,6 +478,23 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 });
             }
         }
+    };
+    this.startOfParagraph = function(indexOrElement, startOfParagraph) {
+        /*
+         * Either get or set the startofparagraph attr for the subtitle.
+         *
+         * Returns: current state of startofparagraph (boolean)
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        if (typeof startOfParagraph !== 'undefined') {
+            $subtitle.attr('startofparagraph', startOfParagraph);
+        }
+
+        // We return a string for 'false' because this is an attr on the actual
+        // XML node. It'll always be a string.
+        return $subtitle.attr('startofparagraph') || 'false';
     };
     this.startTime = function(indexOrElement, startTime) {
         /*

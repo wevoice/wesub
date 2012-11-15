@@ -1740,9 +1740,6 @@ class Task(models.Model):
         if not self.team.members.filter(user=assignee).exists():
             assignee = None
 
-        self.subtitle_version.visibility_override = 'private'
-        self.subtitle_version.save()
-
         task = Task(team=self.team, team_video=self.team_video,
                     language=self.language, type=type, 
                     assignee=assignee)
@@ -1775,7 +1772,7 @@ class Task(models.Model):
                                                     self.assignee,
                                                     self.language) and
                 subtitle_version and
-                subtitle_version.prev_version() and
+                subtitle_version.previous_version() and
                 subtitle_version.language.is_complete_and_synced())
 
     def _find_previous_assignee(self, type):
