@@ -35,6 +35,8 @@ from teams.models import Team
 from videos.models import VIDEO_TYPE_YOUTUBE
 from videos.types.youtube import YouTubeApiBridge
 
+from tasks import mirror_existing_youtube_videos
+
 import logging
 
 logger = logging.getLogger("authbelt.views")
@@ -146,4 +148,5 @@ def youtube_oauth_callback(request):
 
     if user:
         user.third_party_accounts.add(account)
+        mirror_existing_youtube_videos.delay(user.pk)
         return redirect(reverse("profiles:account"))
