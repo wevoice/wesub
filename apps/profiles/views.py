@@ -18,8 +18,9 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import  reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _, ugettext
@@ -61,7 +62,6 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
 
 
 def activity(request, user_id=None):
-
     if user_id:
         try:
             user = User.objects.get(username=user_id)
@@ -70,8 +70,12 @@ def activity(request, user_id=None):
                 user = User.objects.get(id=user_id)
             except (User.DoesNotExist, ValueError):
                 raise Http404
-    else:
+    elif request.user.is_authenticated():
         user = request.user
+    else:
+        return HttpResponseRedirect(
+            reverse("auth:login") + "?next=%s" % (request.path))
+
 
     qs = Action.objects.filter(user=user)
 
@@ -148,6 +152,7 @@ def edit(request):
         if form.is_valid():
             form.save()
             messages.success(request, _('Your profile has been updated.'))
+            return HttpResponseRedirect(reverse('profiles:edit'))
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
 
