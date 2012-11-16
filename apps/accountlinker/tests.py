@@ -185,6 +185,7 @@ class AccountTest(TestCase):
 
         for url in VideoUrl.objects.all():
             url.owner_username = 'a1'
+            url.type = 'Y'
             url.save()
 
         for sl in SubtitleLanguage.objects.all():
@@ -205,3 +206,36 @@ class AccountTest(TestCase):
         self.assertTrue(video.get_team_video() is None)
 
         self.assertTrue(can_be_synced(version))
+
+    def test_individual(self):
+        vurl = VideoUrl.objects.filter(type='Y',
+                video__teamvideo__isnull=True)[0]
+        vurl.owner_username = 'test'
+        vurl.save()
+        video = vurl.video
+        third = ThirdPartyAccount.objects.all().exists()
+        self.assertFalse(third)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+        self.assertFalse(ignore)
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                username=vurl.owner_username)
+
+        team = Team.objects.get(slug='volunteer')
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+
+        team.third_party_accounts.add(account)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+
+        user = User.objects.get(username='admin')
+        team.third_party_accounts.clear()
+        user.third_party_accounts.add(account)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
