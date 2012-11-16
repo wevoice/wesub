@@ -7,6 +7,7 @@
 {% endblock %}
 
 {% block body_attrs %}class="v1 team_dashboard" id="teams"{% endblock %}
+{% block html_attrs %}id="team_dashboard"{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -147,7 +148,7 @@
                                 <div class="langs">
                                     {% if allows_tasks %}
                                         {% if team_video.tasks|length > 1 %}
-                                            <a href="#" class="lang-list">
+                                            <a href="#" class="dropdown">
                                                 {{ team_video.tasks|length }}
                                                 {% trans " languages needed" %}
                                             </a>
