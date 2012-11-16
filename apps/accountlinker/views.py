@@ -141,6 +141,10 @@ def youtube_oauth_callback(request):
         }
     )
 
+    if not created:
+        messages.error(request, _("Account already linked."))
+        return redirect('/')
+
     if team:
         team.third_party_accounts.add(account)
         return redirect(
