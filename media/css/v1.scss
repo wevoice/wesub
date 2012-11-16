@@ -2402,14 +2402,14 @@ a.truncated-expand {
         }
     }
 
-    .empty, .suggestions {
-        text-align: center;
+    .suggestions {
+        padding-left: 10px;
     }
 
     .empty {
-        font-size: 1.275em;
+        font-size: 1em;
         color: inherit;
-        padding-bottom: .5em;
+        padding: 2em .8334em .5em;
     }
 
     > h3 {
@@ -2422,11 +2422,15 @@ a.truncated-expand {
             font-weight: normal;
             color: $lighter;
             position: absolute;
-            top: 1.6em;
-            right: 10px;
+            top: 3.25em;
+            right: 0;
             font-size: .9em;
             line-height: 15px;
             text-decoration: none;
+
+            &:hover {
+                color: $usblue;
+            }
         }
     }
 
