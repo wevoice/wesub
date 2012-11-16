@@ -35,7 +35,7 @@ rpc_router = RpcRouter('search:rpc_router', {
 def index(request):
     site = current_site(request)
     if request.GET:
-        return HttpResponseRedirect(site['BASE_URL'] + '%s#/?%s' % (reverse('search:index'), urlencode(request.GET)))
+        return HttpResponseRedirect(site['BASE_URL'] + '%s#/?%s' % (reverse('search:index'), urlencode({'q':request.GET.get('q')})))
     return {
         'form': SearchForm(sqs=VideoIndex.public())
     }
