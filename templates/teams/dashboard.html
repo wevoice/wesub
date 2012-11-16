@@ -46,7 +46,10 @@
 
         {% if team|is_team_member:user %}
             {% if user_tasks %}
-                <h3>{% trans "Videos you're working on" %}</h3>
+                <h3>
+                    {% trans "Videos you're working on" %}
+                    <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">Manage your tasks</a>
+                </h3>
 
                 <ul class="listing tasks yours">
                     {% for task in user_tasks %}
@@ -69,12 +72,12 @@
                                 </li>
                                 {% if task.expiration_date != None %}
                                     <li>
-                                    {% if task.future %}
-                                        <span class="due">{% trans "Due in" %} {{ task.expiration_date|timeuntil }}</span>
-                                    {% else %}
-                                        <span class="due overdue">{% trans "Overdue by" %} {{ task.expiration_date|timesince }}</span>
-                                    {% endif %}
-                                </li>
+                                        {% if task.future %}
+                                            <span class="due">{% trans "Due in" %} {{ task.expiration_date|timeuntil }}</span>
+                                        {% else %}
+                                            <span class="due overdue">{% trans "Overdue by" %} {{ task.expiration_date|timesince }}</span>
+                                        {% endif %}
+                                    </li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -127,80 +130,92 @@
                 </p>
             {% endif %}
 
-            <ul class="listing videos">
-                {% for id, team_video in videos.items %}
-                    <li>
-                        <div class="thumb">
-                            <a href="{{ team_video.video.get_absolute_url }}">
-                                <img src="{{ team_video.get_thumbnail }}" alt="{{ video.title }}">
-                            </a>
-                            <h4>
-                                <a href="{{ team_video.video.get_absolute_url }}">{{ team_video.video.title_display|truncatewords:15 }}</a>
-                            </h4>
-                        </div>
-                        {% if team|is_team_member:user %}
-                            <div class="langs">
-                                {% if allows_tasks %}
-                                    {% if team_video.tasks|length > 1 %}
-                                        <a href="#" class="lang-list">
-                                            {{ team_video.tasks|length }}
-                                            {% trans " languages needed" %}
-                                        </a>
-                                        <div>
-                                            <span class="expand">{% trans "View all" %}</span>
-                                            <ul>
-                                                {% for task in team_video.tasks %}
-                                                    <li>
-                                                        <a class="perform-task-{{ task.pk }}" href="{{ task.get_widget_url }}" title="Get started now">
-                                                            {% if task.get_type_display == 'Subtitle' %}
-                                                                {% trans "Create Subtitles" %}
-                                                            {% else %}
-                                                                {{ task.get_type_display }}
-                                                                {% if task.get_language_display %}
-                                                                    {{ task.get_language_display }}
-                                                                {% endif %}
-                                                            {% endif %}
-                                                        </a>
-                                                    </li>
-                                                    {% include "teams/_perform_task_js.html" %}
-                                                {% endfor %}
-                                            </ul>
-                                        </div>
-                                    {% else %}
-                                        {% with task=team_video.tasks|first %}
-                                        <a href="{{ task.get_widget_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
-                                                {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                                    Create {{ task.get_language_display }} subtitles
-                                                {% else %}
-                                                    {{ task.get_type_display }}
-                                                    {{ task.get_language_display }} subtitles
-                                                {% endif %}
+            {% if not member.has_max_tasks %}
+
+                <ul class="listing videos">
+                    {% for id, team_video in videos.items %}
+                        <li>
+                            <div class="thumb">
+                                <a href="{{ team_video.video.get_absolute_url }}">
+                                    <img src="{{ team_video.get_thumbnail }}" alt="{{ video.title }}">
+                                </a>
+                                <h4>
+                                    <a href="{{ team_video.video.get_absolute_url }}">{{ team_video.video.title_display|truncatewords:15 }}</a>
+                                </h4>
+                            </div>
+                            {% if team|is_team_member:user %}
+                                <div class="langs">
+                                    {% if allows_tasks %}
+                                        {% if team_video.tasks|length > 1 %}
+                                            <a href="#" class="lang-list">
+                                                {{ team_video.tasks|length }}
+                                                {% trans " languages needed" %}
                                             </a>
-                                            {% include "teams/_perform_task_js.html" %}
+                                            <div>
+                                                <span class="expand">{% trans "View all" %}</span>
+                                                <ul>
+                                                    {% for task in team_video.tasks %}
+                                                        <li>
+                                                            <a class="perform-task-{{ task.pk }}" href="{{ task.get_widget_url }}" title="Get started now">
+                                                                {% if task.get_type_display == 'Subtitle' %}
+                                                                    {% trans "Create Subtitles" %}
+                                                                {% else %}
+                                                                    {{ task.get_type_display }}
+                                                                    {% if task.get_language_display %}
+                                                                        {{ task.get_language_display }}
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </a>
+                                                        </li>
+                                                        {% include "teams/_perform_task_js.html" %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% else %} {# there is only one task for this video #}
+                                            {% with task=team_video.tasks|first %}
+                                            <a href="{{ task.get_widget_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
+                                                    {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+                                                        Create {{ task.get_language_display }} subtitles
+                                                    {% else %}
+                                                        {{ task.get_type_display }}
+                                                        {{ task.get_language_display }} subtitles
+                                                    {% endif %}
+                                                </a>
+                                                {% include "teams/_perform_task_js.html" %}
+                                            {% endwith %}
+                                        {% endif %}
+                                    {% else %} {# this is a non-task team #}
+                                        {% if team_video.video.languages_count < 1 %}
+                                            <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
+                                        {% else %} {# this video already has languages #}
+                                            <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add a new translation' %}</a>
+                                        {% endif %}
+                                        {% with v=team_video.video %}
+                                            <script type="text/javascript">
+                                                $('#video-{{ team_video.id }}').click(function(){
+                                                    var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
+                                                    var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
+                                                    op.showStartDialog();
+                                                });
+                                            </script>
                                         {% endwith %}
                                     {% endif %}
-                                {% else %}
-                                    {% if team_video.video.languages_count < 1 %}
-                                        <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
-                                    {% else %}
-                                        <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add a new translation' %}</a>
-                                    {% endif %}
-                                    {% with v=team_video.video %}
-                                        <script type="text/javascript">
-                                            $('#video-{{ team_video.id }}').click(function(){
-                                                var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
-                                                var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
-                                                op.showStartDialog();
-                                            });
-                                        </script>
-                                    {% endwith %}
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %} {# member already has max tasks #}
+                <p class="empty">
+                    {% trans "Sorry, you've reached the maximum number of tasks for this team." %}
+                </p>
+                <ul class="suggestions">
+                    <li>
+                        <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">Manage your tasks</a>
                     </li>
-                {% endfor %}
-            </ul>
-        {% else %}
+                </ul>
+            {% endif %}
+        {% else %} {# there are no videos to show #}
             {% if team|is_team_member:user %}
                 <h3>{% trans "Videos that need your help" %}</h3>
                 <p class="empty">
@@ -216,7 +231,7 @@
                     {% if can_add_video %}
                         <li><a href="{% url teams:add_video team.slug %}">{% trans "Add videos to the team" %}</a></li>
                     {% endif %}
-                </p>
+                </ul>
             {% endif %}
         {% endif %}
     </div>
