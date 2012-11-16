@@ -42,9 +42,11 @@ def get_youtube_data(user_pk):
 
 @task()
 def mirror_existing_youtube_videos(user_pk):
+    logger.info('Starting sync of existing youtube videos, pk: %s' % user_pk)
     data = get_youtube_data(user_pk)
 
     if not data:
+        logger.info('No videos/subtitles to upload.')
         return
 
     for video, language, version in data:
