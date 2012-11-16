@@ -105,31 +105,33 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    if (this.captions_.length == 0)
+    var subs = this.x.getSubtitles();
+
+    if (subs.length == 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
-        playheadTime < this.captions_[0].getStartTime())
+        playheadTime < this.x.startTime(this.x.getSubtitle(0)))
         return;
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
-        this.captions_[this.currentCaptionIndex_] : null;
+        this.x.getSubtitle(this.currentCaptionIndex_) : null;
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null &&
-	curCaption.isShownAt(playheadTime))
+	this.x.isShownAt(curCaption, playheadTime))
         return;
 
-    var nextCaption = this.currentCaptionIndex_ < this.captions_.length - 1 ?
-        this.captions_[this.currentCaptionIndex_ + 1] : null;
+    var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
+        this.x.getSubtitle(this.currentCaptionIndex_ + 1) : null;
     if (nextCaption != null &&
-	nextCaption.isShownAt(playheadTime)) {
+	this.x.isShownAt(nextCaption, playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption);
         return;
     }
     if ((nextCaption == null ||
-         playheadTime < nextCaption.getStartTime()) &&
+         playheadTime < this.x.startTime(nextCaption)) &&
         (curCaption == null ||
-         playheadTime >= curCaption.getStartTime())) {
+         playheadTime >= this.x.startTime(curCaption))) {
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_)
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
@@ -147,7 +149,7 @@ unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
         lastCaptionIndex = -lastCaptionIndex - 2;
     this.currentCaptionIndex_ = lastCaptionIndex;
     if (lastCaptionIndex >= 0 &&
-	this.captions_[lastCaptionIndex].isShownAt(playheadTime)) {
+	this.x.isShownAt(lastCaptionIndex, playheadTime)) {
         this.dispatchCaptionEvent_(this.captions_[lastCaptionIndex]);
     }
     else {

@@ -289,7 +289,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (!subtitle) {
-            throw new Error('DFXP: No subtitle exists with that index.');
+            return null;
         }
 
         return $(subtitle);
@@ -302,6 +302,19 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         return $('div > p', this.$xml);
+    };
+    this.isShownAt = function(indexOrElement, time) {
+        /*
+         * Determine whether the given subtitle should be displayed
+         * at the given time.
+         *
+         * Returns: true || false
+         */
+
+        var subtitle = this.getSubtitle(indexOrElement).get(0);
+
+        return (time >= this.startTime(subtitle) &&
+                time <= this.endTime(subtitle));
     };
     this.needsAnySynced = function() {
         /*
