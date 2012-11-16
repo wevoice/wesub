@@ -88,7 +88,14 @@ unisubs.subtitle.Dialog.END_TIME_PADDING = 4000;
 
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
-    this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
+    var text;
+
+    if (c) {
+        text = this.captionSet_.x.content(c);
+    } else {
+        text = '';
+    }
+    this.getVideoPlayerInternal().showCaptionText(text);
 };
 unisubs.subtitle.Dialog.prototype.createDom = function() {
     unisubs.subtitle.Dialog.superClass_.createDom.call(this);
