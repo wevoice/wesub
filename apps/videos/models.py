@@ -1639,6 +1639,10 @@ class SubtitleVersion(SubtitleCollection):
         """Set the step of the workflow that this version originated in."""
         self._set_metadata('workflow_origin', origin)
 
+    def subtitles(self):
+        # FIXME: remove this method once
+        # https://unisubs.sifterapp.com/issues/1567 is fixed
+        pass
 
 def record_workflow_origin(version, team_video):
     """Figure out and record where the given version started out.
