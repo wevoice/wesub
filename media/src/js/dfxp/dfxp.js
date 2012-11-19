@@ -169,6 +169,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             'begin': '',
             'end': ''
         });
+
+        return true;
     };
     this.content = function(indexOrElement, content) {
         /*
