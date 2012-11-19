@@ -300,7 +300,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             var $subtitles = this.getSubtitles();
 
             for (var i= 0; i < $subtitles.length; i++){
-                if ($subtitles.get(i) == indexOrElement){
+                if ($subtitles.get(i) === indexOrElement){
                     subtitle = $subtitles.get(i);
                     break;
                 }
