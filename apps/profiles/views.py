@@ -21,7 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.views.generic.list_detail import object_list
@@ -176,10 +176,13 @@ def account(request):
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
 
+    third_party_accounts = request.user.third_party_accounts.all()
+
     context = {
         'form': form,
         'user_info': request.user,
-        'edit_profile_page': True
+        'edit_profile_page': True,
+        'third_party': third_party_accounts
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
@@ -219,3 +222,39 @@ def remove_avatar(request):
         request.user.save()
         messages.success(request, _('Your picture has been removed.'))
     return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')
+
+
+@login_required
+def add_third_party(request):
+    account_type = request.GET.get('account_type', None)
+    if not account_type:
+        raise Http404
+
+    if account_type != 'youtube':
+        raise Http404
+
+    from accountlinker.views import _generate_youtube_oauth_request_link
+    state = json.dumps({'user': request.user.pk})
+    url = _generate_youtube_oauth_request_link(state)
+    return redirect(url)
+
+
+@login_required
+def remove_third_party(request, account_id):
+    from accountlinker.models import ThirdPartyAccount
+    account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+
+    if account not in request.user.third_party_accounts.all():
+        raise Http404
+
+    if request.method == 'POST':
+        account.delete()
+        messages.success(request, _('Account deleted.'))
+        return redirect('profiles:account')
+
+    context = {
+        'user_info': request.user,
+        'third_party': account
+    }
+    return direct_to_template(request, 'profiles/remove-third-party.html',
+            context)

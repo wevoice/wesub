@@ -23,9 +23,10 @@ from django.core.exceptions import ImproperlyConfigured
 from accountlinker.models import (
     ThirdPartyAccount, YoutubeSyncRule, check_authorization, can_be_synced
 )
-from videos.models import Video, VideoUrl
+from videos.models import Video, VideoUrl, SubtitleLanguage
 from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
+from tasks import get_youtube_data
 from subtitles.pipeline import add_subtitles
 
 
@@ -145,3 +146,69 @@ class AccountTest(TestCase):
         self.assertTrue(version.is_synced())
 
         self.assertTrue(can_be_synced(version))
+
+    def test_mirror_existing(self):
+        user = User.objects.get(username='admin')
+
+        tpa1 = ThirdPartyAccount.objects.create(username='a1')
+        tpa2 = ThirdPartyAccount.objects.create(username='a2')
+
+        user.third_party_accounts.add(tpa1)
+        user.third_party_accounts.add(tpa2)
+
+        for url in VideoUrl.objects.all():
+            url.owner_username = 'a1'
+            url.type = 'Y'
+            url.save()
+
+        for sl in SubtitleLanguage.objects.all():
+            sl.is_complete = True
+            sl.save()
+
+        data = get_youtube_data(user.pk)
+        self.assertEquals(1, len(data))
+
+        synced_sl = filter(lambda x: x.is_complete_and_synced(),
+                SubtitleLanguage.objects.all())
+        self.assertEquals(len(synced_sl), len(data))
+
+        video, language, version = data[0]
+        self.assertTrue(version.is_public)
+        self.assertTrue(version.is_synced())
+        self.assertTrue(language.is_complete)
+        self.assertTrue(video.get_team_video() is None)
+
+        self.assertTrue(can_be_synced(version))
+
+    def test_individual(self):
+        vurl = VideoUrl.objects.filter(type='Y',
+                video__teamvideo__isnull=True)[0]
+        vurl.owner_username = 'test'
+        vurl.save()
+        video = vurl.video
+        third = ThirdPartyAccount.objects.all().exists()
+        self.assertFalse(third)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+        self.assertFalse(ignore)
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                username=vurl.owner_username)
+
+        team = Team.objects.get(slug='volunteer')
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+
+        team.third_party_accounts.add(account)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+
+        user = User.objects.get(username='admin')
+        team.third_party_accounts.clear()
+        user.third_party_accounts.add(account)
+
+        is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)

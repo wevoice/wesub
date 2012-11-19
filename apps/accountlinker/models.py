@@ -89,16 +89,19 @@ def check_authorization(video):
             # account and they don't want it messed up with strange subs.
             return False, None
     else:
-        # If a video isn't part of a team, and its Youtube username matches
-        # that of any linked Youtube account in Amara---we don't sync to
-        # Youtube.
+        # If a video isn't part of a team but the video's Youtube URL is linked
+        # to a team third party account, we don't sync to Youtube.
         yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
         if yt_url.exists():
             usernames = [url.owner_username for url in yt_url]
             linked_accounts = ThirdPartyAccount.objects.filter(
-                    username__in=usernames).exists()
-            if linked_accounts:
-                return False, None
+                    username__in=usernames)
+
+            if linked_accounts.exists():
+                account = linked_accounts[0]
+
+                if account.is_team_account:
+                    return False, None
 
     return True, ignore_new_syncing_logic
 
@@ -233,6 +236,14 @@ class ThirdPartyAccount(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.get_type_display(), self.username)
+
+    @property
+    def is_team_account(self):
+        return self.teams.exists()
+
+    @property
+    def is_individual_account(self):
+        return self.users.exists()
 
 
 class YoutubeSyncRule(models.Model):
