@@ -503,6 +503,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
     };
+    // FIXME: this is totally wrong changing the paragraph marker
+    // will change the dom structure too, let's fix this later
     this.startOfParagraph = function(indexOrElement, startOfParagraph) {
         /*
          * Either get or set the startofparagraph attr for the subtitle.
@@ -513,12 +515,17 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof startOfParagraph !== 'undefined') {
-            $subtitle.attr('startofparagraph', startOfParagraph);
+
+            // FIXME, if it's a paragraph, must be wrapped inside a div
+            // but... you must be carefull not to keep nesting divs
+            // (say originally, sub 1 and sub 2 were on the same paragraph)
+            // you make both starts of paragraph, each one has it's own div node
+            // with the nested p tag.
         }
 
         // We return a string for 'false' because this is an attr on the actual
         // XML node. It'll always be a string.
-        return $subtitle.attr('startofparagraph') || 'false';
+        return this.subtitle_ && this.subtitle_.tagName == 'div';
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
