@@ -266,7 +266,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.getSubtitle = function(indexOrElement) {
         /*
-         * Returns: jQuery selection of element
+         * Returns: jQuery selection of element.
+         * If you want this to be fast, store the element index, and pass
+         * the index instead of the element
          */
 
         // If an index or an object is not provided, throw an error.
@@ -285,9 +287,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof indexOrElement === 'number') {
             subtitle = this.getSubtitles().get(indexOrElement);
 
-        // Otherwise, just use the element.
+        // Otherwise, make sure the element exists
         } else {
-            subtitle = indexOrElement;
+            var subtitles = this.getSubtitles();
+            var length = subtitles.length;
+            for (var i= 0; i < length; i++){
+                if (subtitles.get(i) == indexOrElement){
+                    subtitle = subtitles.get(i);
+                    break;
+                }
+            }
         }
 
         if (!subtitle) {
