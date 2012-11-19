@@ -227,7 +227,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         /*
          * Retrieve the last subtitle in this set.
          *
-         * Returns: last subtitle element
+         * Returns: subtitle element or empty array
          */
 
         // Cache the selection.
@@ -239,7 +239,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         /*
          * Retrieve the subtitle that follows the given subtitle.
          *
-         * Returns: subtitle element
+         * Returns: subtitle element or empty array
          */
 
         return this.getSubtitle(indexOrElement).next();
