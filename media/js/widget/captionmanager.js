@@ -107,7 +107,7 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 {
     var subs = this.x.getSubtitles();
 
-    if (subs.length == 0)
+    if (subs.length === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
         playheadTime < this.x.startTime(this.x.getSubtitle(0)))
