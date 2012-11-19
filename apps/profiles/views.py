@@ -20,19 +20,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import simplejson as json
-from django.utils.translation import ugettext_lazy as _, ugettext
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.list_detail import object_list
 from django.views.generic.simple import direct_to_template
 from tastypie.models import ApiKey
 
 from auth.models import CustomUser as User
-from profiles.forms import EditUserForm, SendMessageForm, UserLanguageFormset, EditAvatarForm
+from profiles.forms import EditUserForm, SendMessageForm, EditAvatarForm
 from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
-from utils.amazon import S3StorageError
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
 from videos.models import Action, VideoUrl
@@ -73,8 +72,7 @@ def activity(request, user_id=None):
     elif request.user.is_authenticated():
         user = request.user
     else:
-        return HttpResponseRedirect(
-            reverse("auth:login") + "?next=%s" % (request.path))
+        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
 
 
     qs = Action.objects.filter(user=user)
@@ -152,7 +150,7 @@ def edit(request):
         if form.is_valid():
             form.save()
             messages.success(request, _('Your profile has been updated.'))
-            return HttpResponseRedirect(reverse('profiles:edit'))
+            return redirect('profiles:edit')
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
 
@@ -213,7 +211,7 @@ def edit_avatar(request):
         form.save()
     else:
         messages.error(request, _(form.errors['picture']))
-    return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')
+    return redirect('/profiles/profile/' + request.user.username + '/')
 
 @login_required
 def remove_avatar(request):
@@ -221,7 +219,7 @@ def remove_avatar(request):
         request.user.picture = ''
         request.user.save()
         messages.success(request, _('Your picture has been removed.'))
-    return HttpResponseRedirect('/profiles/profile/' + request.user.username + '/')
+    return redirect('/profiles/profile/' + request.user.username + '/')
 
 
 @login_required
