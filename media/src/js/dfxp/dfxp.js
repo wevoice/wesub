@@ -136,7 +136,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $newSubtitle.get(0);
     };
-
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
@@ -266,9 +265,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.getSubtitle = function(indexOrElement) {
         /*
+         * Retrieve the subtitle based on the index given.
+         *
+         * If the given argument is an object, assume it's a DOM node
+         * and check to make sure it exists in the subtitles tree.
+         *
          * Returns: jQuery selection of element.
-         * If you want this to be fast, store the element index, and pass
-         * the index instead of the element
+         *
          */
 
         // If an index or an object is not provided, throw an error.
@@ -284,19 +287,25 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Note: you should only use this approach for checking one-off
         // subtitles. If you're checking more than one subtitle, it's much
         // faster to pass along pre-selected elements instead.
+        //
+        // Note also: if you're performing actions on a larger number of
+        // subtitles, please consider using getSubtitles() and manually
+        // iterating, to avoid performing DOM selection for lots of nodes.
         if (typeof indexOrElement === 'number') {
             subtitle = this.getSubtitles().get(indexOrElement);
 
-        // Otherwise, make sure the element exists
+        // Otherwise, make sure the element exists.
         } else {
-            var subtitles = this.getSubtitles();
-            var length = subtitles.length;
-            for (var i= 0; i < length; i++){
-                if (subtitles.get(i) == indexOrElement){
-                    subtitle = subtitles.get(i);
+
+            var $subtitles = this.getSubtitles();
+
+            for (var i= 0; i < $subtitles.length; i++){
+                if ($subtitles.get(i) == indexOrElement){
+                    subtitle = $subtitles.get(i);
                     break;
                 }
             }
+
         }
 
         if (!subtitle) {
@@ -338,14 +347,25 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitles = this.getSubtitles();
 
         for (var i = 0; i < $subtitles.length; i++) {
+            var $subtitle = $subtitles.eq(i);
 
-            // We're going to pass the actual element instead of an integer. This
-            // means needsSyncing doesn't need to hit the DOM to find the element.
-            if (this.needsSyncing($subtitles.get(i))) {
+            var startTime = $subtitle.attr('begin');
+            var endTime = $subtitle.attr('end');
+
+            // If start time is empty, it always needs to be synced.
+            if (startTime === '') {
                 return true;
             }
+
+            // If the end time is empty and this is not the last subtitle,
+            // it needs to be synced.
+            if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+                return true;
+            }
+
         }
 
+        // Otherwise, we're good.
         return false;
     };
     this.needsAnyTranscribed = function() {
@@ -358,7 +378,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitles = this.getSubtitles();
 
         for (var i = 0; i < $subtitles.length; i++) {
-            if (this.content($subtitles.get(i)) === '') {
+
+            var $subtitle = $subtitles.eq(i);
+            var content = $('<div>').append($subtitle.contents().clone()).remove().html();
+
+            if (content === '') {
                 return true;
             }
         }
@@ -491,12 +515,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         for (var i = 0; i < $subtitles.length; i++) {
 
-            var subtitle = $subtitles.get(i);
+            var $subtitle = $subtitles.eq(i);
+            var content = $('<div>').append($subtitle.contents().clone()).remove().html();
 
-            if (this.content(subtitle) === '') {
-                $(subtitle).remove();
+            if (content === '') {
+                $subtitle.remove();
             } else {
-                $(subtitle).text('').attr({
+                $subtitle.text('').attr({
                     'begin': '',
                     'end': ''
                 });
