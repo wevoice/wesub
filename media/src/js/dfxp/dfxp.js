@@ -303,7 +303,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: jQuery selection of nodes
          */
 
-        return $('div > p', this.$xml);
+        return $('div > *', this.$xml);
     };
     this.isShownAt = function(indexOrElement, time) {
         /*
