@@ -21,7 +21,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import  reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _, ugettext
 from django.views.generic.list_detail import object_list
@@ -234,3 +234,24 @@ def add_third_party(request):
     state = json.dumps({'user': request.user.pk})
     url = _generate_youtube_oauth_request_link(state)
     return redirect(url)
+
+
+@login_required
+def remove_third_party(request, account_id):
+    from accountlinker.models import ThirdPartyAccount
+    account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+
+    if account not in request.user.third_party_accounts.all():
+        raise Http404
+
+    if request.method == 'POST':
+        account.delete()
+        messages.success(request, _('Account deleted.'))
+        return redirect('profiles:account')
+
+    context = {
+        'user_info': request.user,
+        'third_party': account
+    }
+    return direct_to_template(request, 'profiles/remove-third-party.html',
+            context)

@@ -44,7 +44,7 @@
                             <li>
                                 <h3>{{ account.get_type_display }}</h3>
                                 <ul class="actions">
-                                    <li><a href="#" title="Unlink this account">Remove</a></li>
+                                    <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">Remove</a></li>
                                 </ul>
                             </li>
                         {% endfor %}

@@ -33,4 +33,6 @@ urlpatterns = patterns('profiles.views',
     url(r'^profile/(?P<user_id>.+)/$', 'activity', name='profile'),
     url(r'^generate-api-key/$', 'generate_api_key', name='generate-api-key'),
     url(r'^add-third-party/$', 'add_third_party', name='add-third-party'),
+    url(r'^remove-third-party/(?P<account_id>[0-9]+)/$', 'remove_third_party',
+        name='remove-third-party'),
 )
