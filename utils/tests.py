@@ -25,7 +25,6 @@ from videos.models import Video
 from utils.multi_query_set import MultiQuerySet
 from utils.compress import compress, decompress
 from utils.chunkediter import chunkediter
-from utils.unisubsmarkup import html_to_markup, markup_to_html
 
 
 class MultiQuerySetTest(TestCase):
@@ -187,18 +186,4 @@ class ChunkedIterTest(TestCase):
         self.assertEqual(sum, 0)
 
 
-class MarkupHtmlTest(TestCase):
-    def test_markup_to_html(self):
-        t = "there **bold text** there"
-        self.assertEqual(
-            "there <b>bold text</b> there",
-            markup_to_html(t)
-        )
-
-    def test_html_to_markup(self):
-        t = "there <b>bold text</b> there"
-        self.assertEqual(
-            "there **bold text** there",
-            html_to_markup(t)
-        )
 

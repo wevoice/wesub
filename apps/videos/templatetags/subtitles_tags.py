@@ -21,13 +21,17 @@ from django.core.urlresolvers import reverse
 from django.template.defaultfilters import linebreaks
 
 from apps.subtitles.forms import SubtitlesUploadForm
-from apps.videos import format_time
 from apps.videos.forms import CreateVideoUrlForm
-from utils.unisubsmarkup import markup_to_html
 
 
 register = template.Library()
 
+# FIXME: remove when DRM is done
+def format_time(milliseconds):
+    t = int(round(milliseconds / 1000.0))
+    s = t % 60
+    s = s > 9 and s or '0%s' % s
+    return '%s:%s' % (t / 60, s)
 
 @register.inclusion_tag('videos/_upload_subtitles.html', takes_context=True)
 def upload_subtitles(context, video):
@@ -91,7 +95,8 @@ def display_subtitle(text):
     """
     if not text:
         return ""
-    txt = linebreaks(markup_to_html(text))
+    # FIXME: implement from dfxp formatting to html
+    txt = linebreaks(text)
     return txt
 
 @register.filter

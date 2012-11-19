@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import babelsubs
 import chardet
 import re
 from datetime import datetime
@@ -36,7 +37,6 @@ from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
-from utils.subtitles import SubtitleParserError
 
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 KB_SIZELIMIT = 512
@@ -75,17 +75,18 @@ class TranscriptionFileForm(forms.Form, AjaxForm):
             raise forms.ValidationError(_(
                     u'File size should be less {0} kb'.format(KB_SIZELIMIT)))
         parts = subtitles.name.split('.')
-        if len(parts) < 1 or not parts[-1].lower() in ['srt', 'ass', 'ssa', 'xml', 'sbv']:
-            raise forms.ValidationError(_(u'Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)'))
+        extension = parts[-1].lower()
+        if extension not in babelsubs.get_available_formats():
+            raise forms.ValidationError(_(u'Incorrect format. Upload .%s ' % ", ".join(babelsubs.get_available_formats())))
+        text = subtitles.read()
+        encoding = chardet.detect(text)['encoding']
+        if not encoding:
+            raise forms.ValidationError(_(u'Can not detect file encoding'))
         try:
-            text = subtitles.read()
-            encoding = chardet.detect(text)['encoding']
-            if not encoding:
-                raise forms.ValidationError(_(u'Can not detect file encoding'))
-            if not self._get_parser(subtitles.name)(force_unicode(text, encoding)):
-                raise forms.ValidationError(_(u'Incorrect subtitles format'))
-        except SubtitleParserError, e:
-            raise forms.ValidationError(e)
+            parser = babelsubs.parsers.discover(extension)
+            subtitle_set = parser('en', force_unicode(text, encoding))
+        except babelsubs.SubtitleParserError:
+            raise forms.ValidationError(_(u'Incorrect subtitles format'))
         subtitles.seek(0)
         return subtitles
 
