@@ -5,7 +5,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.site_pages import video_page
 
-class WebdriverTestCaseVideoUrl(WebdriverTestCase):
+class TestCaseVideoUrl(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
 
        One can list, update, delete and add video urls to existing videos.

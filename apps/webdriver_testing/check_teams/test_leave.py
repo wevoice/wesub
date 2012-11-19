@@ -7,7 +7,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember
 
 
-class WebdriverTestCaseLeaveTeam(WebdriverTestCase):
+class TestCaseLeaveTeam(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
         self.auth_pg = auth_page.AuthPage(self)

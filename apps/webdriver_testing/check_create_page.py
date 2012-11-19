@@ -17,12 +17,11 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from nose.tools import assert_true
 from apps.webdriver_testing.site_pages import create_page
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 
 
-class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
+class TestCaseVideosCreateVideos(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
         self.create_pg = create_page.CreatePage(self)
@@ -34,7 +33,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
         """
         url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
 
     def test_create__brightcove(self):
@@ -45,7 +44,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
         #https://unisubs.sifterapp.com/issues/1648
         url = 'http://bcove.me/8yxc6sxy'
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__dailymotion(self):
         """Add a dailymotion video.
@@ -55,7 +54,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
         url = ('http://www.dailymotion.com/video/'
                'xlh9h1_fim-syndicat-des-apiculteurs-de-metz-environs_news')
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__vimeo(self):
         """Add a vimeo video.
@@ -64,7 +63,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://vimeo.com/26487510"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__ogg(self):
         """Add an ogg video video.
@@ -73,7 +72,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://qa.pculture.org/amara_tests/Birds_short.oggtheora.ogg"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__mp4(self):
         """Add a an mp4 video.
@@ -82,7 +81,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://qa.pculture.org/amara_tests/Birds_short.mp4"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__blip_flv(self):
         """Add a blip video.
@@ -91,7 +90,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://blip.tv/file/get/Linuxconfau-LightningTalks606.flv"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__webm(self):
         """Add a webM video.
@@ -100,7 +99,7 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://qa.pculture.org/amara_tests/Birds_short.webmsd.webm"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
     def test_create__youtu_be_url(self):
         """Add a youtube video with youtu.be url.
@@ -109,10 +108,10 @@ class WebdriverTestCaseVideosCreateVideos(WebdriverTestCase):
 
         url = "http://youtu.be/BXMPp0TLSEo"
         self.create_pg.submit_video(url)
-        assert_true(self.create_pg.submit_success())
+        self.assertTrue(self.create_pg.submit_success())
 
 
-class WebdriverTestCaseAddFeeds(WebdriverTestCase):
+class TestCaseAddFeeds(WebdriverTestCase):
     """Test Suite for adding video feeds.
 
     """
@@ -128,7 +127,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         youtube_user = 'croatiadivers'
         self.create_pg.submit_youtube_users_videos(youtube_user, save=True)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__youtube_user_url(self):
         """Add a youtube user url feed
@@ -137,7 +136,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         url = "http://www.youtube.com/user/jdragojevic"
         self.create_pg.submit_youtube_user_page(url, save=True)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__vimeo(self):
         """Add a vimeo feed
@@ -146,7 +145,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         url = "http://vimeo.com/jeroenhouben/videos/rss"
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__dailymotion(self):
         """Add a dailymotion feed
@@ -155,7 +154,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         url = "http://www.dailymotion.com/rss/user/WildFilmsIndia/1"
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__dailymotion_large(self):
         """Add a v. large dailymotion feed
@@ -165,7 +164,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
         self.skipTest("This is just too slow, and probably not that necessary")
         url = "http://www.dailymotion.com/rss/user/LocalNews-GrabNetworks/1"
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__blip(self):
         """Add a blip feed
@@ -174,7 +173,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         url = "http://blip.tv/stitchnbitch/rss"
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__blip_workaround(self):
         """Add a individual blip video as feed (blip workaround)
@@ -184,7 +183,7 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
         url = ('http://blip.tv/cord-cutters/'
                'cord-cutters-sync-mobile-media-with-miro-4-5280931?skin=rss')
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__youtube_feed(self):
         """Add a youtube feed
@@ -193,4 +192,4 @@ class WebdriverTestCaseAddFeeds(WebdriverTestCase):
 
         url = "http://gdata.youtube.com/feeds/api/users/janetefinn/uploads"
         self.create_pg.submit_feed_url(url)
-        assert_true(self.create_pg.multi_submit_successful())
+        self.assertTrue(self.create_pg.multi_submit_successful())

@@ -21,7 +21,7 @@ from apps.webdriver_testing.site_pages import js_test_page
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 
 
-class WebdriverTestCaseJavascriptUnittest(WebdriverTestCase):
+class TestCaseJavascriptUnittest(WebdriverTestCase):
     def setUp(self):
         self.skipTest("These tests are old and not maintained.")
         WebdriverTestCase.setUp(self)

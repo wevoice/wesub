@@ -7,11 +7,10 @@ from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
-
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import TaskFactory
 from apps.webdriver_testing.editor_pages import subtitle_editor 
-
+from apps.webdriver_testing.site_pages.teams import tasks_tab
 class TestCaseSubtitlesUpload(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
 
@@ -51,10 +50,11 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, 
             create_url, 
             create_data)
-
-        #Upload the subtitles via api request
+        #Create the url for uploading subtitles of give format and lang.
         upload_url = ('videos/{0}/languages/{1}/subtitles/'.format(
             self.test_video.video_id, test_lang_code))
+
+        #Get the appropriate subtitle data file.
         if test_format == 'ttml':
             sub_data = codecs.open(os.path.join(self.subs_data_dir, 
                 'Timed_text.{0}.{1}'.format(test_lang_code, 'xml')),
@@ -68,6 +68,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         upload_data = {'subtitles': sub_data.read(), 
                        'sub_format': test_format} 
 
+        #Upload the subtitles via api post request
         status, response = data_helpers.post_api_request(self, 
             upload_url, 
             upload_data)
@@ -89,8 +90,8 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         #Upload the subtitles via api request
         upload_url = ( 'videos/%s/languages/en/subtitles/' 
             % self.test_video.video_id )
-        sub_data =  open(os.path.join( self.subs_data_dir, 'Untimed_text.srt'))
-        upload_data = { 'subtitles': sub_data.read(), 'sub_format': 'txt' } 
+        sub_data =  open(os.path.join(self.subs_data_dir, 'Untimed_text.srt'))
+        upload_data = { 'subtitles': sub_data.read(), 'sub_format': 'srt' } 
         status, response = data_helpers.post_api_request( self, 
             upload_url, 
             upload_data )
@@ -101,6 +102,28 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         verification_file, encoding='utf-8')]
         displayed_list = self.video_language_pg.displayed_lines()
         self.assertEqual(expected_list, displayed_list) 
+
+    def test_upload__resource_uri(self):
+        #Create the language for the test video
+        create_url = ( 'videos/%s/languages/'  % self.test_video.video_id  )
+        create_data = { 'language_code': 'en', 'is_original': True }
+        status, response = data_helpers.post_api_request(self, 
+            create_url, 
+            create_data)
+
+        #Upload the subtitles via api request
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+        sub_data =  open(os.path.join(self.subs_data_dir, 'Untimed_text.srt'))
+        upload_data = { 'subtitles': sub_data.read(), 'sub_format': 'srt' } 
+        status, response = data_helpers.post_api_request( self, 
+            upload_url, 
+            upload_data )
+        print response
+        #Compare the returned uri
+        expected_uri = '/api2/partners/videos/%s/languages/en/subtitles/' % self.test_video.video_id
+        self.assertEqual(expected_uri, response['resource_uri'])
+
 
     def test_upload__srt(self):
         test_lang_code = 'en'
@@ -179,7 +202,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         self.video_language_pg.edit_subtitles()
         sub_editor = subtitle_editor.SubtitleEditor(self)
         sub_editor.continue_past_help()
-        editor_sub_list = subtitle_editor.subtitles_list()
+        editor_sub_list = sub_editor.subtitles_list()
 
         #Verify uploaded subs are displayed in the Editor
         self.assertEqual(expected_list, editor_sub_list)
@@ -203,13 +226,18 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
     
     def setUp(self):
         WebdriverTestCase.setUp(self)
+
+        #Create the user and get the api key.
         self.user = UserFactory.create(username = 'user')
-        self.video_language_pg = video_language_page.VideoLanguagePage(self)
         data_helpers.create_user_api_key(self, self.user)
+
+        #Create teh test video and path to the sub data directory.
         self.test_video = data_helpers.create_video_with_subs(self)
-        time.sleep(2)
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
+
+        #Open the video language page for the test video.
+        self.video_language_pg = video_language_page.VideoLanguagePage(self)
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
             'en')
 
@@ -221,38 +249,18 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
         """
         video_id = self.test_video.video_id
         lang_code = 'en'
-        subtitle_lang = self.test_video.subtitle_language(lang_code)
-        print subtitle_lang
 
+        #Set the url for fetching.
         url_part = 'videos/{0}/languages/{1}/'.format(
             video_id, lang_code)
 
-        status, response = data_helpers.api_get_request(self, url_part) 
-        self.assertNotEqual(404, status)
-        
-        print response
+        #Verify we get matching lang code in the response data.
+        status, response = data_helpers.api_get_request(self, url_part)
         self.assertEqual(lang_code, response['language_code'])
-
-
-    def test_fetch__rst(self):
-        """Fetch the subtitle data for the specfied lang and format.
         
-        GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
-            subtitles/?format=srt
-        """
-        video_id = self.test_video.video_id
-        lang_code = 'en'
-        output_format = 'rst'
-
-        url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
-            video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
-        self.assertNotEqual(404, status)
-        self.assertFalse('Needs verification steps added here')
 
     def test_fetch__srt(self):
-        """Fetch the subtitle data for the specfied lang and format.
+        """Fetch the subtitle data in srt format.
         
         GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
             subtitles/?format=srt
@@ -265,14 +273,63 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
 
         url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
-        self.assertNotEqual(404, status)
 
-        self.assertFalse('Needs verification steps added here')
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content') 
+
+        self.assertTrue(response is not None)
+
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'srt' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+
+        #Open the language page on the site.        
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+            'en')
+
+        self.assertEqual(2, response['version_number'])
+
+
+    def test_fetch__dfxp(self):
+        """Fetch the subtitle data in dfxp format.
+        
+        GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
+            subtitles/?format=srt
+        """
+        video_id = self.test_video.video_id
+        lang_code = 'en'
+        output_format = 'dfxp'
+
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
+            video_id, lang_code, output_format)
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content')  
+        self.assertNotEqual(404, status)
+        
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'dfxp' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+
+        #Open the language page on the site.        
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+            'en')
+
+        self.assertEqual(2, response['version_number'])
+
+
 
     def test_fetch__ttml(self):
-        """Fetch the subtitle data for the specfied lang and format.
+        """Fetch the subtitle data in ttml format.
         
         GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
             subtitles/?format=srt
@@ -283,13 +340,59 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
 
         url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content')  
         self.assertNotEqual(404, status)
-        self.assertFalse('Needs verification steps added here')
+        
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'ttml' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+
+        #Open the language page on the site.        
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+            'en')
+
+        self.assertEqual(2, response['version_number'])
+
+    def test_fetch__ssa(self):
+        """Fetch the subtitle data in ssa format.
+        
+        GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
+            subtitles/?format=srt
+        """
+        video_id = self.test_video.video_id
+        lang_code = 'en'
+        output_format = 'ssa'
+
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
+            video_id, lang_code, output_format)
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content') 
+
+        self.assertNotEqual(404, status)
+
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'ssa' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+
+        #Open the language page on the site.        
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+            'en')
+
+        self.assertEqual(2, response['version_number'])
 
     def test_fetch__sbv(self):
-        """Fetch the subtitle data for the specfied lang and format.
+        """Fetch the subtitle data in sbv format'
         
         GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
             subtitles/?format=srt
@@ -300,11 +403,53 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
 
         url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
             video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content') 
+
         self.assertNotEqual(404, status)
 
-        self.assertFalse('Needs verification steps added here')
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'sbv' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+
+        #Open the language page on the site.        
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+            'en')
+
+        self.assertEqual(2, response['version_number'])
+
+
+    def test_fetch__txt(self):
+        """Fetch the subtitle data in txt format.
+        
+        GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
+            subtitles/?format=srt
+        """
+        video_id = self.test_video.video_id
+        lang_code = 'en'
+        output_format = 'txt'
+
+        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
+            video_id, lang_code, output_format)
+        status, response = data_helpers.api_get_request(self, url_part, 
+            output_type = 'content') 
+
+        self.assertNotEqual(404, status)
+
+        #Verify returned subs are valid - by uploading back to system
+        upload_url = ( 'videos/%s/languages/en/subtitles/' 
+            % self.test_video.video_id )
+
+        upload_data = { 'subtitles': response, 'sub_format': 'txt' } 
+        status, response = data_helpers.post_api_request(self, 
+            upload_url, 
+            upload_data)
+        self.assertEqual(2, response['version_number'])
 
 
     def test_fetch__version(self):
@@ -320,7 +465,7 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
         video_id = self.test_video.video_id
         lang_code = 'en'
         version = 2
-        output_format = 'srt'
+        output_format = 'json'
         data = {
             'language_code': lang_code,
             'video_language': lang_code,
@@ -336,24 +481,33 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
                                           output_format, 
                                           version))
         status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
         self.assertNotEqual(404, status)
-        self.assertFalse('Needs verification steps added here')
+        self.assertIs(2, response['version_number'])
 
 
-    def test_fetch__moderated_public(self):
-        """Return public subtitles of a moderated video.
 
-        For videos under moderation only the latest published version is returned. 
-        """
-        # Setup data for the test
-        video_id = self.test_video.video_id
-        lang_code = 'en'
-        output_format = 'srt'
+class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
+    """TestSuite for uploading moderated subtitles via the api.
+
+    """
+
+    def setUp(self):
+        WebdriverTestCase.setUp(self)
+
+        #Create the test user and api key
+        self.user = UserFactory.create(username = 'user')
+        data_helpers.create_user_api_key(self, self.user)
+      
+        #Create some test data and set subtitle data dir
+        self.test_video = data_helpers.create_video(self, 
+            'http://www.example.com/upload_test.mp4')
+        self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
+            'webdriver_testing', 'subtitle_data')
+
 
         # self.team_video already has a set of subtitles.
         # Create a team with moderation settings
-        my_team = TeamMemberFactory.create(
+        self.my_team = TeamMemberFactory.create(
             team__name='Video Test',
             team__slug='video-test',
             user = self.user, 
@@ -362,69 +516,65 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
             ).team
         
         # Set the team workflow to peer review required.
-        workflow = WorkflowFactory(team = my_team)
+        workflow = WorkflowFactory(team = self.my_team)
         workflow.review_allowed = 10
         workflow.save()
 
         #  Add test_video to the team and create a transcription task.
-        tv = TeamVideoFactory.create(
-            team=my_team, 
+        self.lang_code = 'en'
+        self.tv = TeamVideoFactory.create(
+            team=self.my_team, 
             video=self.test_video, 
             added_by=self.user)
-        subtitle_lang = self.test_video.subtitle_language(lang_code)
-        task = TaskFactory(type = 10, team = my_team, team_video = tv, 
-            language = lang_code)
+        subtitle_lang = self.test_video.subtitle_language(self.lang_code)
+        task = TaskFactory(type = 10, team = self.my_team, team_video = self.tv, 
+            language = self.lang_code)
 
+        self.video_language_pg = video_language_page.VideoLanguagePage(self)
+        self.tasks_pg = tasks_tab.TasksTab(self)
+
+
+
+
+    def test_fetch__moderated_public(self):
+        """Return public subtitles of a moderated video.
+
+        For videos under moderation only the latest published version is returned. 
+        """
         #FIXME Perform the task so there is a new set of complete subs that
-        # are unreviewd.
+        # are unreviewed.
         # Probably easiest to upload a draft, then review it.
        
         # Make a get request for the video language.  Version returned should 
         #be 1, the  original uploaded subtitles 
-        url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
-            video_id, lang_code, output_format, 
-            #version
-            )
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
-        self.assertFalse('Needs verification steps added here. '
-                         'Verify the returned version number and '
-                         'the sub content.')
+
+        self.tasks_pg.log_in(self.user.username, 'password')
+        self.tasks_pg.open_tasks_tab(self.my_team.slug)
+        self.assertFalse('Tasks are not done yet')
+        #url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
+        #    self.test_video.video_id, self.lang_code, output_format, 
+        #    #version
+        #    )
+        #status, response = data_helpers.api_get_request(self, url_part) 
+        #print status, response
+        #self.assertFalse('Needs verification steps added here. '
+        #                 'Verify the returned version number and '
+        #                 'the sub content.')
 
 
     def test_fetch__moderated_none(self):
         """Fetch nothing if moderated and no version has been accepted in review.
         """
-        test_video = data_helpers.create_video(self)
-        video_id = test_video.video_id
-        lang_code = 'en'
-        output_format = 'srt'
-        #FIXME  Create a moderated team video with 1 published and 1 unpublished version.
-        ## self.team_video already has a set of subtitles.
-        ## Create a team with moderation settings
-        my_team = TeamMemberFactory.create(
-            team__name='Video Test',
-            team__slug='video-test',
-            user = self.user, 
-            team__is_moderated = True,
-            team__workflow_enabled = True,
-            ).team
-        ## Set the team workflow to peer review required.
-        workflow = WorkflowFactory(team = my_team)
-        workflow.review_allowed = 10
-        workflow.save()
-        ##  Add test_video to the team and create a transcription task.
-        tv = TeamVideoFactory.create(team = my_team, 
-            video = test_video,
-            added_by = self.user)
-        task = TaskFactory(type = 10, team = my_team, team_video = tv, 
-            language = lang_code)
+        self.tasks_pg.log_in(self.user.username, 'password')
+        self.tasks_pg.open_tasks_tab(self.my_team.slug)
+        self.assertFalse('Tasks are not done yet')
+
         #FIXME Perform the task so there is a new set of complete subs that are unreviewed.
        
         # Make a get request for the video language.  Version returned should
         # be None, since there are no approved subs.
         url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
-            video_id, lang_code, output_format) 
+            self.test_video.video_id, lang_code, output_format) 
             
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response

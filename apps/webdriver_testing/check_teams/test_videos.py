@@ -12,28 +12,9 @@ from apps.testhelpers.views import _create_videos
 import json
 import time
 
-class WebdriverTestCaseTeamVideos(WebdriverTestCase):
+class TestCaseTeamVideos(WebdriverTestCase):
     """
-    Main videos tab 
-        Add: a new video
-        Add: a duplicate video
-        Add: a video belonging to another team
-        Search: team videos (title)
-        Search: team videos (subtitle text)
-        Search: non-ascii chars in sub text
-        Search: no results
-        Filter: videos display by language
-        Sort: Sort by parameters
-        Remove: a team video
-        Edit: Move video to another team
-        Edit: change thumb
-
-    Project videos tab
-        Add: a video and assign to a project
-        Search: for a video in a project
-        Filter: project videos by language
-        Remove: a project video
-        Edit: change project
+    Main videos tab tests and Projects tab. 
     """
 
     def setUp(self):
@@ -50,7 +31,6 @@ class WebdriverTestCaseTeamVideos(WebdriverTestCase):
             user = UserFactory.create(username = 'TeamAdmin'),
             role = TeamMember.ROLE_ADMIN).user
 
-        self.videos_tab.log_in(self.manager_user.username, 'password')
         self.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
             '- Brian Bradley')
@@ -70,6 +50,8 @@ class WebdriverTestCaseTeamVideos(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY')
+        self.videos_tab.open_videos_tab(self.team.slug)
+
         self.assertTrue(self.videos_tab.video_present(
             'Video Ranger Message (1950s) - Classic TV PSA'))
 
@@ -122,16 +104,13 @@ class WebdriverTestCaseTeamVideos(WebdriverTestCase):
         """Team video search for non-ascii char strings.
  
         """
-        self.videos_tab.open_videos_tab(self.team.slug)
-        u = self.test_video.get_absolute_url().split('/')
-        lang_url = '/'.join([u[2], u[3], 'en']) 
-        self.videos_tab.open_page(lang_url)
-#        self.videos_tab.search('日本語')
-
-#        print self.videos_tab.current_url()
-#        self.assertTrue(self.videos_tab.video_present(self.video_title))
-        self.assertFalse("Needs bug fixed: " 
-            "https://unisubs.sifterapp.com/issue/1498")
+        #Search for: 日本語, by opening the url with query term.
+        #Using url because webdriver can't type those characters.
+        self.videos_tab.open_page('teams/' + self.team.slug + '/videos' +
+            '/?q=日本語')
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
+        #self.assertFalse("Needs bug fixed: " 
+        #    "https://unisubs.sifterapp.com/issue/1498")
 
     def test_search__no_results(self):
         """Team video search returns no results.
@@ -234,7 +213,7 @@ class WebdriverTestCaseTeamVideos(WebdriverTestCase):
 
 
 
-class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
+class TestCaseTeamProjectVideos(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
@@ -261,16 +240,25 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
             workflow_enabled=True)
 
         self.videos_tab.log_in(self.manager_user.username, 'password')
+        print '***'
+        print self.project2.slug
+        print self.project2.name
+        print self.team.slug
+
 
     def test_add__new(self):
         """Submit a new video for the team and assign to a project.
 
         """
-        project_page = self.team.slug+'/p/team-project-two'
-        self.videos_tab.open_videos_tab(project_page)
+        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
+        self.videos_tab.open_page(project_page)
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
             project = self.project2.name)
+        self.videos_tab.open_page(project_page)
+
+        #Verify the video is present on the videos tab for that project.
         self.assertTrue(self.videos_tab.video_present(
             'Video Ranger Message (1950s) - Classic TV PSA'))    
 
@@ -281,7 +269,8 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
                       '- Brian Bradley')
-        project_page = self.team.slug+'/p/team-project-two'
+        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
+            self.project2.slug)
 
         self.videos_tab.log_in(self.manager_user.username, 'password')
         test_video = data_helpers.create_video_with_subs(self, video_url)
@@ -291,7 +280,7 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
             added_by=self.manager_user, 
             project = self.project2)
         
-        self.videos_tab.open_videos_tab(project_page)
+        self.videos_tab.open_page(project_page)
         self.videos_tab.search('X Factor')
         self.assertTrue(self.videos_tab.video_present(video_title))
 
@@ -299,7 +288,7 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         """Filter on the project page by language.
 
         """
-        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
 
         data = json.load(open('apps/videos/fixtures/teams-list.json'))
@@ -318,7 +307,7 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         """Sort on the project page by most subtitles.
 
         """
-        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
 
         print project_page
@@ -348,7 +337,7 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
         """Remove a video from the team project.
 
         """
-        project_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
 
         self.videos_tab.open_page(project_page)
@@ -367,9 +356,9 @@ class WebdriverTestCaseTeamProjectVideos(WebdriverTestCase):
 
         """
         video_title = 'Video Ranger Message (1950s) - Classic TV PSA'
-        project1_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+        project1_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project1.slug)
-        project2_page = 'teams/{0}/?project={1}'.format(self.team.slug, 
+        project2_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(

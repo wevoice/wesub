@@ -8,37 +8,44 @@ from apps.webdriver_testing.data_factories import UserFactory
  
 from apps.teams.models import TeamMember
 
-class WebdriverTestCaseTeamSettings(WebdriverTestCase):
-    """
-        Projects:
-            add_project.pending
-            edit_project (name / description)
-            delete_project
-        Languages:
-            set preferred languages (auto-task creation)
-            set blacklisted languages 
-                not displayed
-                can't blacklist preferred language
-        Messages:
-            edit_message_admin.pending
-            edit_message_application.pending
-            edit_message_invitation.pending
-            edit_message_manager.pending
-            edit_guidelines_review.pending
-            edit_guidelines_subtitle.pending
-            edit_guidelines_translation.pending
-        Team Details:
-            edit_description
-            edit visibility (public / private)
-            edit logo
-             - too large > 940x235
+class TestCaseTeamTasks(WebdriverTestCase):
+    """Verify tasks creation, modification, assignment.
 
-        Workflows:
-            edit_permissions_join.pending
-            edit_permissions_subtitle.pending
-            edit_permissions_task.pending
-            edit_permissions_translation.pending
-            edit_permissions_video_management.pending
+        Feature: Assign a task
+	As a team member with permission to assign tasks
+	I want to assign an unassigned task
+	So that the task may be completed
+
+	Scenario: Assign a Feature: Filter tasks by language
+	As a visitor or user
+	I want to view tasks for a specific language
+	So that I can find ways to contribute given my skills
+
+	Scenario: 
+		Given I am on the team tasks page
+		And the language filter list contains all languages with active tasks
+		When I select a language in the list
+		Then I see only the tasks for that languageFeature:
+
+        Scenario:  Filter tasks by language - results
+        Scenario: Filter tasks by language - no results
+        Scenario: Perform task
+
+        Filter tasks by type - results
+        Filter tasks by type - no results
+
+
+        Feature: Remove a task from a team
+	As a team member with permission to assign tasks
+	I want to remove a task from the team
+	So that it is no longer shown for the team
+
+	Scenario: Remove a task
+		Given I am on the team tasks page
+		When I click the remove button on a task
+		Then that task is removed from the team and I don't see it listed 
+        Scenario: Create a task manually
+        Scenario: Create tasks automatically
 
     """
 
@@ -72,7 +79,6 @@ class WebdriverTestCaseTeamSettings(WebdriverTestCase):
            Verify the display of the roles in the members tab.
         """
         self.auth_pg.login('team_owner', 'password')
-
 
 
 

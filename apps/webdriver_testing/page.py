@@ -57,12 +57,15 @@ class Page(object):
         """Accept or reject js alert.
 
         """
-        time.sleep(2)
-        a = self.browser.switch_to_alert()
-        if action == "accept":
-            a.accept()
-        elif action == "reject":
-            a.dismiss()
+        try:
+            time.sleep(2)
+            a = self.browser.switch_to_alert()
+            if action == "accept":
+                a.accept()
+            elif action == "reject":
+                a.dismiss()
+        except:
+            self.record_error('failed handling the expected alert')
 
     def check(self, element):
         """Check the box for the element provided by css selector.
@@ -241,7 +244,7 @@ class Page(object):
         except NoSuchElementException():
             return False
         if len(elements_found) > 1:
-            raise Exception(MULTIPLE_ELS % element)
+            self.record_error(MULTIPLE_ELS % element)
         else:
             element_text = self.browser.find_element_by_css_selector(
                 element).text
@@ -271,7 +274,7 @@ class Page(object):
         """
         elements_found = self.browser.find_elements_by_css_selector(element)
         if len(elements_found) > 1:
-            raise Exception(MULTIPLE_ELS % element)
+            self.record_error(MULTIPLE_ELS % element)
         else:
             element_text = elements_found[0].text
             if text == element_text:
@@ -293,8 +296,8 @@ class Page(object):
             except:
                 pass
         else:
-            raise Exception("Element %s is not present." % element)
-
+            self.record_error("Element %s is not present." % element)
+    
     def wait_for_element_not_present(self, element):
         """Wait for element (by css) to disappear on page, within 20 seconds.
 
@@ -308,8 +311,8 @@ class Page(object):
             except:
                 pass
         else:
-            raise Exception("%s is still present" % element)
-
+            self.record_error("Element %s is still present." % element)
+ 
     def wait_for_text_not_present(self, text):
         """Wait for text to disappear on page, within 20 seconds.
 
@@ -368,10 +371,9 @@ class Page(object):
             elements_found = self.browser.find_elements_by_css_selector(
                 element)
         except NoSuchElementException:
-            raise Exception("%s does not exist on the page" % element)
-
+            self.record_error("%s does not exist on the page" % element)
         if len(elements_found) > 1:
-            raise Exception(MULTIPLE_ELS % element)
+            self.record_error(MULTIPLE_ELS % element)
         return elements_found[0].get_attribute(html_attribute)
 
     def open_page(self, url):

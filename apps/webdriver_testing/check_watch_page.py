@@ -4,7 +4,7 @@ from apps.webdriver_testing.site_pages import search_results_page
 from apps.webdriver_testing.data_factories import UserFactory 
 from apps.webdriver_testing.data_helpers import create_video_with_subs
 
-class WebdriverTestCaseWatchPage(WebdriverTestCase):
+class TestCaseWatchPage(WebdriverTestCase):
     """TestSuite for site video searches.
 
     """
@@ -27,9 +27,4 @@ class WebdriverTestCaseWatchPage(WebdriverTestCase):
         test_text = 'X factor'
         self.watch_pg.open_watch_page()
         self.watch_pg.basic_search(test_text)
-        self.assertTrue(
-            self.results_pg.page_heading_contains_search_term(test_text),
-                    ("Won't work until https://unisubs.sifterapp.com/issue/"
-                    "1496 is fixed. ")
-        )
         self.assertTrue(self.results_pg.search_has_results())

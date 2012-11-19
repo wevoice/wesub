@@ -11,7 +11,7 @@ from apps.webdriver_testing.site_pages import video_page
 from apps.webdriver_testing.site_pages import teams_page
 
 
-class WebdriverTestCaseActivity(WebdriverTestCase):
+class TestCaseActivity(WebdriverTestCase):
     """TestSuite for listing things that happened.
 
     GET /api2/partners/activity/
