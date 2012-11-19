@@ -19,7 +19,6 @@
 import logging
 logger = logging.getLogger("videos-models")
 
-import math
 import string
 import random
 from datetime import datetime, date, timedelta
@@ -41,7 +40,6 @@ from django.core.urlresolvers import reverse
 
 
 from auth.models import CustomUser as User, Awards
-from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
 from comments.models import Comment
@@ -996,6 +994,10 @@ class SubtitleLanguage(models.Model):
         We consider a set of subs where the very last has no end time
         to be synced, as that is a convention for 'until end of time'.
         """
+        # FIXME: remove this after DRM is done
+        MAX_SUB_TIME = (60 * 60 * 100 * 1000) - 1000
+        def is_synced_value(v):
+            return v != -1 and v != None and v < MAX_SUB_TIME
         if not self.is_dependent() and not self.is_complete:
             return False
         if self.is_dependent():
@@ -1248,42 +1250,6 @@ class SubtitleCollection(models.Model):
         abstract = True
 
 
-    def subtitles(self, subtitles_to_use=None, public_only=True):
-        """
-        Returns EffectiveSubtitle instances but also fetches timing data
-        from the original sub if this is a translation.
-        It will only match if the subtitile_id matches, else those subs
-        not returned.
-        """
-        ATTR = 'computed_effective_subtitles'
-        if hasattr(self, ATTR):
-            return getattr(self, ATTR)
-        if  self.pk:
-            # if this collection hasn't been saved, then subtitle_set.all will return all subtitles
-            # which will take too long / never return
-            subtitles = subtitles_to_use or self.subtitle_set.all()
-        else:
-            subtitles = subtitles_to_use or []
-        if not self.is_dependent():
-            effective_subtitles = [EffectiveSubtitle.for_subtitle(s)
-                                   for s in subtitles]
-        else:
-            standard_collection = self._get_standard_collection(public_only=public_only)
-            if not standard_collection:
-                effective_subtitles = []
-            else:
-                t_dict = \
-                    dict([(s.subtitle_id, s) for s
-                          in subtitles])
-                filtered_subs = standard_collection.subtitle_set.all()
-                subs = [s for s in filtered_subs
-                        if s.subtitle_id in t_dict]
-                effective_subtitles = \
-                    [EffectiveSubtitle.for_dependent_translation(
-                        s, t_dict[s.subtitle_id]) for s in subs]
-        setattr(self, ATTR, effective_subtitles)
-        return effective_subtitles
-
 
 # SubtitleVersion
 class SubtitleVersionManager(models.Manager):
@@ -1293,8 +1259,6 @@ class SubtitleVersionManager(models.Manager):
     def new_version(self, parser, language, user, translated_from=None,
             note="", timestamp=None, moderation_status=None, title='',
             description=''):
-
-        from utils.unisubsmarkup import html_to_markup
 
         version_no = 0
         last_version = language.version(public_only=False)
@@ -1372,7 +1336,7 @@ class SubtitleVersionManager(models.Manager):
 
             s = Subtitle(subtitle_id=str(id),
                          subtitle_order=order,
-                         subtitle_text=html_to_markup(item['subtitle_text']),
+                         subtitle_text=item['subtitle_text'],
                          start_time=start_time,
                          end_time=end_time,
                          start_of_paragraph=paragraph)
@@ -1611,16 +1575,6 @@ class SubtitleVersion(SubtitleCollection):
             # TODO: Dependent translations.  We'll also need to create tasks for
             # them.
             return last_version
-
-    def is_synced(self):
-        subtitles = self.subtitles()
-        if len(subtitles) == 0:
-            return False
-        if len([s for s in subtitles[:-1] if not s.has_complete_timing()]) > 0:
-            return False
-        if not is_synced_value(subtitles[-1].start_time):
-            return False
-        return True
 
     @property
     def is_public(self):
@@ -1865,9 +1819,6 @@ class Subtitle(models.Model):
         ordering = ['subtitle_order']
         unique_together = (('version', 'subtitle_id'),)
 
-    @property
-    def is_synced(self):
-        return is_synced(self)
 
     def duplicate_for(self, version=None):
         return Subtitle(version=version,
@@ -1909,18 +1860,18 @@ class Subtitle(models.Model):
     def save(self, *args, **kwargs):
         # Normalize start_time and end_time to None (separately) if either is
         # not a valid time.
-        if not is_synced_value(self.start_time):
+        if self.start_time  == -1:
             self.start_time = None
 
-        if not is_synced_value(self.end_time):
+        if  self.start_time == -1:
             self.end_time = None
 
         return super(Subtitle, self).save(*args, **kwargs)
 
     def __unicode__(self):
         if self.pk:
-            return u"(%4s) %s %s -> %s - syc = %s = %s -- Version %s" % (self.subtitle_order, self.subtitle_id,
-                                          self.start_time, self.end_time, self.is_synced, self.subtitle_text, self.version_id)
+            return u"(%4s) %s %s -> %s -  = %s -- Version %s" % (self.subtitle_order, self.subtitle_id,
+                                          self.start_time, self.end_time,  self.subtitle_text, self.version_id)
 
 
 # SubtitleMetadata

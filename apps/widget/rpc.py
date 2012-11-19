@@ -40,7 +40,7 @@ from utils import send_templated_email
 from utils.forms import flatten_errorlists
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
-from videos import models, is_synced_value
+from videos import models
 from videos.models import record_workflow_origin, Subtitle
 from videos.tasks import video_changed_tasks
 from widget import video_cache
@@ -641,6 +641,7 @@ class Rpc(BaseRpc):
 
     def _save_subtitles(self, version, json_subs, forked):
         """Create Subtitle objects into the version from the JSON subtitles."""
+
         subtitles = []
         for s in json_subs:
             if not forked:
@@ -651,9 +652,10 @@ class Rpc(BaseRpc):
                 # doesn't call that.
                 start_time = s['start_time']
                 end_time = s['end_time']
-                if not is_synced_value(start_time):
+                # this will go way in the DRM anyways
+                if not start_time or start_time == -1:
                     start_time = None
-                if not is_synced_value(end_time):
+                if not end_time or end_time == -1:
                     end_time = None
 
                 s = Subtitle(subtitle_id=s['subtitle_id'],

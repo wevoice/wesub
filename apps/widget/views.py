@@ -45,8 +45,6 @@ from teams.permissions import get_member
 from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
 from utils.metrics import Meter
-from utils.html import unescape as unescape_html
-from utils.unisubsmarkup import markup_to_html
 from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc

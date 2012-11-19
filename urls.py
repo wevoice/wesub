@@ -195,8 +195,10 @@ if settings.USE_INTEGRATION:
     from servicesauth import urls
     urlpatterns += patterns('', (r'^unisubservicesauth/',
         include('servicesauth.urls', namespace='servicesauth')),)
-    from api import urls
-    urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
+    # FIXME: api v1 is not being imported until we're sure it needs to be
+    # ported to DRM
+    #from api import urls
+    #urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
 
     from apiv2 import urls as api2urls
     urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
