@@ -2,6 +2,7 @@
 
 {% load i18n messages_tags %}
 
+{% block html_attrs %}id="account"{% endblock %}
 {% block body-class %}account {{ block.super }}{% endblock %}
 {% block title %}{{ user_info }} | Amara{% endblock %}
 
@@ -37,8 +38,19 @@
                             <li><a href="#" title="Unlink this account">Remove</a></li>
                         </ul>
                     </li>
+
+                    {% if third_party %}
+                        {% for account in third_party  %}
+                            <li>
+                                <h3>{{ account.get_type_display }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">Remove</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
                 </ul>
-                <a href="" title="">Add an account</a>
+                <a href="#account-modal" class="open-modal" title="">Add a Youtube account</a>
             </div>
             <div class="grid_4 alpha">
                 <fieldset>
@@ -76,4 +88,50 @@
             </div>
         </form>
     </div>
+
+    <div class="bootstrap">
+        <div class="modal" id="account-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Add Third Party Account' %}</h3>
+            </div>
+
+                <form method="get" action="{% url profiles:add-third-party %}">
+
+                    <div class="modal-body">
+                        <fieldset>
+                            <p>
+                                {% blocktrans %}
+                                Choose an account type to add:
+                                {% endblocktrans %}
+                            </p>
+
+                            <select id="account-type-select" name="account_type">
+                                <option>Select...</option>
+                                <option value="youtube">Youtube</option>
+                            </select>
+                        </fieldset>
+
+                        <fieldset class="account-type-copy" id="youtube-copy">
+                            {% blocktrans %}
+                                <p>
+                                    Sync is one-way only
+                                </p>
+
+                                <p>
+                                    Any existing Amara subs will be sent to Youtube
+                                </p>
+                            {% endblocktrans %}
+                        </fieldset>
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                    </div>
+                </form>
+        </div>
+    </div>
+
 {% endblock %}

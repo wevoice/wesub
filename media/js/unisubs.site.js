@@ -982,6 +982,13 @@ var Site = function(Site) {
                 $('form.auth-form:hidden').show();
                 $(this).parents('form').hide();
             });
+        },
+
+        account: function() {
+            $('#account-type-select').change(function() {
+                $('.account-type-copy').hide();
+                $('#' + this.value + '-copy').show();
+            });
         }
     };
 };
