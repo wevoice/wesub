@@ -155,10 +155,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = function(subtitleJson) {
 
-    var newSub = this.x.addSubtitle(after=null, {
+    var newSub = this.x.addSubtitle(null, {
         'begin': subtitleJson['start_time'],
         'end': subtitleJson['end_time']
-    }, content=null);
+    });
 
     var c = new unisubs.subtitle.EditableCaption(null, newSub);
     c.setParentEventTarget(this);
