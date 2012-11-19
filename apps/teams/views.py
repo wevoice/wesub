@@ -419,7 +419,7 @@ def detail(request, slug, project_slug=None, languages=None):
     if project_slug is None:
         project_slug = request.GET.get('project')
 
-    if project_slug is not None:
+    if project_slug:
         if project_slug == 'any':
             project = None
         else:
