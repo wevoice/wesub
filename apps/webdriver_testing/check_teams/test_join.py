@@ -9,7 +9,7 @@ from apps.webdriver_testing.data_factories import *
 from apps.teams.models import TeamMember
 
 
-class WebdriverTestCaseOpenTeamPage(WebdriverTestCase):
+class TestCaseOpenTeamPage(WebdriverTestCase):
     """TestSuite for Open teams.
 
     """
@@ -53,7 +53,7 @@ class WebdriverTestCaseOpenTeamPage(WebdriverTestCase):
         self.assertEqual(username, team.users.get(username=username).username)
 
 
-class WebdriverTestCaseApplicationTeamPage(WebdriverTestCase):
+class TestCaseApplicationTeamPage(WebdriverTestCase):
     """TestSuite for Application-Only teams.
 
     """
@@ -98,7 +98,7 @@ class WebdriverTestCaseApplicationTeamPage(WebdriverTestCase):
         self.assertEqual(self.members_tab.user_role(), 'Contributor')
 
 
-class WebdriverTestCaseInvitationTeamPage(WebdriverTestCase):
+class TestCaseInvitationTeamPage(WebdriverTestCase):
     """Test Suite for Invitation-only teams.
 
     """

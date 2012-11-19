@@ -10,7 +10,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing import data_helpers
 import time
 
-class WebdriverTestCaseTeamGuidelines(WebdriverTestCase):    
+class TestCaseTeamGuidelines(WebdriverTestCase):    
 
     _TEST_GUIDELINES = {
         'SUBTITLE': ('The are the guidelines for subtitling for this team.'),

@@ -23,15 +23,16 @@ def create_user_api_key(self, user_obj):
     return response
 
 def post_api_request(self, url_part, data):
+    print 'posting new data' 
     url = self.base_url + 'api2/partners/' + url_part
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-apikey': self.user.api_key.key,
                 'X-api-username': self.user.username,
               } 
-    print simplejson.dumps(data)
+    #print simplejson.dumps(data)
     r = requests.post(url, data=simplejson.dumps(data), headers=headers)
-    #print r.request.full_url, r.request.data
+    #print r.request.full_url, r.request.data, r.content
     return r.status_code, r.json
 
 
@@ -56,10 +57,10 @@ def delete_api_request(self, url_part):
               } 
 
     r = requests.delete(url, headers=headers)
-    print r.status_code, r.json, r.request.full_url
+    #print r.status_code, r.json, r.request.full_url
     return r.status_code, r.json
 
-def api_get_request(self, url_part):
+def api_get_request(self, url_part, output_type='json'):
     url = self.base_url + 'api2/partners/' + url_part
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -67,8 +68,10 @@ def api_get_request(self, url_part):
                 'X-api-username': self.user.username,
               }
     r = requests.get(url, headers=headers)
+
     #print r.status_code, r.request.full_url, r.headers
-    return r.status_code, r.json
+
+    return r.status_code, getattr(r, output_type)
 
 
 def create_video(self, video_url=None):
@@ -95,7 +98,7 @@ def create_video_with_subs(self, video_url=None, data=None):
         'is_complete': True
     }
     response = self.client.post(reverse('videos:upload_subtitles'), data)
-    print response
+    #print response
     return video
 
 

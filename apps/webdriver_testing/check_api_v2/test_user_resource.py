@@ -4,7 +4,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.site_pages import profile_edit_page 
 
 
-class WebdriverTestCaseSubtitlesUpload(WebdriverTestCase):
+class TestCaseSubtitlesUpload(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
     """
     

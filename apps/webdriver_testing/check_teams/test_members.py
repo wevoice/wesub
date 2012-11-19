@@ -9,7 +9,7 @@ from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember
 
-class WebdriverTestCaseMembersTab(WebdriverTestCase):
+class TestCaseMembersTab(WebdriverTestCase):
     """Verify edit of member roles and restrictions.
 
        Scenario: Assign another admin with no restrictions

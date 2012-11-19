@@ -10,7 +10,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 import os
 import time
 
-class WebdriverTestCaseTranscribing(WebdriverTestCase):
+class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """

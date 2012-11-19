@@ -9,7 +9,7 @@ from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember
 
-class WebdriverTestCaseTeamMessages(WebdriverTestCase):    
+class TestCaseTeamMessages(WebdriverTestCase):    
 
     _TEST_MESSAGES = {
         'INVITATION': ('I hear you are an awesome translator, please join '

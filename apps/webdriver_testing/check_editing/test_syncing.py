@@ -10,7 +10,7 @@ from apps.webdriver_testing.data_factories import UserFactory
 import os
 import time
 
-class WebdriverTestCaseSubmittable(WebdriverTestCase):
+class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
@@ -27,48 +27,40 @@ class WebdriverTestCaseSubmittable(WebdriverTestCase):
             'http://qa.pculture.org/amara_tests/Birds_short.mp4')
 
         #Open the video page and sync the first 3 subs
+        num_synced_subs = 3
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
         self.create_modal.continue_past_help()
         self.typed_subs = self.sub_editor.type_subs()
         self.sub_editor.continue_to_next_step()
-        self.sub_editor.sync_subs(len(self.typed_subs)+2)
-        self.timing_list = self.sub_editor.sub_timings()
-        #Past Sync
-        self.sub_editor.continue_to_next_step()
-        #Past Description
-        self.sub_editor.continue_to_next_step()
-
-        #All tests start in check step with fully synced subs 
+        self.sub_editor.sync_subs(num_synced_subs)
 
 
-
-    def test_display__checkpage(self):
-        """Manually entered synced subs display in check step.
+    def test_display__normal(self):
+        """Manually entered unsynced subs display in editor.
 
         """
-        #Verify synced subs are increasing in time
-        self.assertGreater(float(self.timing_list[5]), 
-            float(self.timing_list[4]))
-        #Verify last sub is not blank
-        self.assertNotEqual(self.timing_list[-1], '')
+
+        timing_list = self.sub_editor.sub_timings()
+        print timing_list
+        #Verify synced subs are increasing
+        self.assertGreater(float(timing_list[1]), float(timing_list[0]))
+        #Verify last sub is blank
+        self.assertEqual(timing_list[-1], '')
 
        
     def test_save(self):
         """Manually entered unsynced subs are saved upon save and exit.
         
         """
+        timing_list = self.sub_editor.sub_timings()
         curr_url = self.sub_editor.current_url()
         self.sub_editor.save_and_exit()
         self.sub_editor.open_page(curr_url)
-        #self.sub_editor.continue_to_next_step() #to Sync
-        #self.sub_editor.continue_to_next_step() #to Description
-        #self.sub_editor.continue_to_next_step() #to Check
-
+        self.sub_editor.continue_to_next_step()
         #Verify sub timings are same as pre-save timings 
-        self.assertEqual(self.timing_list, 
-            self.sub_editor.sub_timings(check_step=True))
+        self.assertEqual(timing_list, self.sub_editor.sub_timings())
 
 
     def test_close__abruptly(self):
@@ -77,6 +69,7 @@ class WebdriverTestCaseSubmittable(WebdriverTestCase):
         Note: the browser needs to be open for about 80 seconds for saving.
         """
         self.skipTest("bug: https://unisubs.sifterapp.com/issue/1552")
+        timing_list = self.sub_editor.sub_timings()
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
@@ -87,45 +80,27 @@ class WebdriverTestCaseSubmittable(WebdriverTestCase):
             'Resume editing?')
         self.create_modal.click_dialog_continue()
         self.create_modal.click_dialog_continue()
-        self.sub_editor.continue_to_next_step() #to Sync
-        self.sub_editor.continue_to_next_step() #to Description
-        self.sub_editor.continue_to_next_step() #to Check
-
+        self.sub_editor.continue_to_next_step()
         #Verify sub timings are same as pre-save timings 
-        self.assertEqual(self.timing_list, self.sub_editor.sub_timings())
+        self.assertEqual(timing_list, self.sub_editor.sub_timings())
 
     def test_download(self):
-        """Manually entered synced subs can be download from check page.
+        """Manually entered unsynced subs can be download from check page.
 
         """
+        timing_list = self.sub_editor.sub_timings()
+        print timing_list
+        #Past Sync
+        self.sub_editor.continue_to_next_step()
+        #Past Description
+        self.sub_editor.continue_to_next_step()
+        #In Check Step - download subtitles
         saved_subs = self.sub_editor.download_subtitles()
-        #Verify each line is present in the copy-able text. 
-        for line in saved_subs:
-            self.assertIn(line, saved_subs)
-
-
-    def test_submit__complete(self):
-        """Manually entered subs are submitted and marked as complete.
-        """
-
-        self.sub_editor.submit(complete=True)
-        sub_lang = self.test_video.latest_subtitles('en')
-        print sub_lang
-        self.assertEqual(6, sub_lang.subtitle_count)
-        self.assertEqual(True, sub_lang.is_complete)
-
-
-    def test_submit__incomplete(self):
-        """Manually entered are submitted, but not marked complete.
-
-        """
-        self.sub_editor.submit(complete=False)
-        sub_lang = self.test_video.subtitle_language('en')
-        self.assertEqual(False, sub_lang.is_complete)
-        self.assertEqual(6, sub_lang.subtitle_count)
-
-
-
+        print saved_subs
+        #Verify timings are in the saved list
+        time_check = timing_list[1].replace('.', ',')
+        print time_check
+        self.assertIn(time_check, saved_subs)
             
 
         

@@ -58,7 +58,7 @@ def setup_teams():
         user__password='password')
 
 
-class WebdriverTestCaseTeamsPage(WebdriverTestCase):
+class TestCaseTeamsPage(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
         self.COOL_TEAM_NAME = "A1 Waay Cool team"

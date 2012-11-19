@@ -84,7 +84,7 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.upload_and_verify(sub_file)     
 
     def test_version__existing_translation(self):
-        """Uploading a new set of subs is created as a new version.
+        """On upload, create a new version and replace existing translation.
 
         Uploaded subs replace the existing version even if the existing
         version has subs created from it.
@@ -103,9 +103,9 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
 
     def test__version__overwrite_existing(self):
-        """Uploading a new set of subs is created as a new version.
+        """On upload, create a new version and replace original transcription.
 
-        Uploaded subs replace the existing version.
+        Uploaded subs replace the existing version of original lang text.
         """
         test_video4 = data_helpers.create_video(self, 
             'http://www.example.com/4.mp4')
@@ -123,9 +123,9 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
     
     def test_upload__additional_translation(self):
-        """Uploading a new set of subs is created as a new version.
+        """Uploading a set of subs in a new language.
 
-        Uploaded subs replace the existing version.
+        New language is created as a new version.
         """
         test_video4 = data_helpers.create_video(self, 
             'http://www.example.com/4.mp4')
@@ -198,7 +198,7 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.assertIn(expected_list[9], displayed_list)
 
  
-class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
+class TestCaseUploadSubsTimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
     """
 
@@ -228,7 +228,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
 
 
     def test_timed__txt(self):
-        """Upload timed subs in a txt file.
+        """Upload timed subs (en) in a txt file.
 
         """
         test_file = 'Timed_text.en.txt'
@@ -236,7 +236,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         self.upload_and_verify( sub_file, 'English', 'en', 72 )
 
     def test_timed__srt(self):
-        """Upload timed subs in a srt file.
+        """Upload timed subs (sv) in a srt file.
 
         """
         test_file = 'Timed_text.sv.srt'
@@ -245,7 +245,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
        
 
     def test_timed__sbv(self):
-        """Upload timed subs in a sbv file.
+        """Upload timed subs (zh-cn) in a sbv file.
 
         """
         test_file = 'Timed_text.zh-cn.sbv'
@@ -253,7 +253,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         self.upload_and_verify(sub_file, 'Chinese, Simplified', 'zh-cn', 243 )
 
     def test_timed__ssa(self):
-        """Upload timed subs in a ssa file.
+        """Upload timed subs (hu) in a ssa file.
 
         """
         test_file = 'Timed_text.hu.ssa'
@@ -262,7 +262,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
 
 
     def test_timed__ttml(self):
-        """Upload timed subs in a ttml file.
+        """Upload timed subs (ar) in a ttml file.
 
         """
         test_file = 'Timed_text.ar.xml'
@@ -270,7 +270,7 @@ class WebdriverTestCaseUploadSubsTimedText(WebdriverTestCase):
         self.upload_and_verify(sub_file, 'Arabic', 'ar', 243 )
 
     def test_timed__dfxp(self):
-        """Upload timed subs in a dfxp file.
+        """Upload timed subs (sv) in a dfxp file.
 
         """
         test_file = 'Timed_text.sv.dfxp'

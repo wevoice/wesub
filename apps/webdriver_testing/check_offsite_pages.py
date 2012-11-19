@@ -6,7 +6,7 @@ from apps.webdriver_testing.site_pages import auth_page
 from apps.webdriver_testing.data_helpers import create_video_with_subs
 
 
-class WebdriverTestCaseOffsiteWidget(WebdriverTestCase):
+class TestCaseOffsiteWidget(WebdriverTestCase):
     """Test suite for the widget demo pages.
 
     """
@@ -85,7 +85,7 @@ class WebdriverTestCaseOffsiteWidget(WebdriverTestCase):
         self.offsite_pg.displays_subs_in_correct_position()
 
 
-class WebdriverTestCaseOffsiteWidgetizer(WebdriverTestCase):
+class TestCaseOffsiteWidgetizer(WebdriverTestCase):
     """Test suite for the widgetizer demo pages.
 
     """

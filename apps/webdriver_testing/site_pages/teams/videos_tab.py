@@ -6,7 +6,7 @@ class VideosTab(ATeamPage):
     """Actions for the Videos tab of a Team Page.
 
     """
-    _URL = 'teams/%s/'
+    _URL = 'teams/%s/videos/'
     _SEARCH = 'form.search input[name="q"]'
     _SEARCHING_INDICATOR = "img.placeholder"
     _NO_RESULTS = 'p.empty'
