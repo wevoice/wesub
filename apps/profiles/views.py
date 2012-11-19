@@ -149,6 +149,7 @@ def edit(request):
         if form.is_valid():
             form.save()
             messages.success(request, _('Your profile has been updated.'))
+            return HttpResponseRedirect(reverse('profiles:edit'))
     else:
         form = EditUserForm(instance=request.user, label_suffix="")
 

@@ -764,6 +764,11 @@ var Site = function(Site) {
                 return false;
             });
         },
+        team_dashboard: function() {
+            $('.dropdown').click(function(){
+                return false;
+            });
+        },
         team_videos_list: function() {
             $form = $('form', 'div#remove-modal');
 
