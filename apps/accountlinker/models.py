@@ -99,9 +99,7 @@ def check_authorization(video):
                     username__in=usernames)
 
             if linked_accounts.exists():
-                account = linked_accounts[0]
-
-                if account.is_team_account:
+                if any(a.is_team_account for a in linked_accounts):
                     return False, None
 
     return True, ignore_new_syncing_logic
