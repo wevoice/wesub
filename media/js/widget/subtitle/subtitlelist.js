@@ -72,7 +72,7 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
         this.readOnly_ || this.addAddButton_();
         var i;
         for (i = 0; i < this.captionSet_.count(); i++)
-            this.addSubtitle(this.captionSet_.caption(i), false, true);
+            this.addSubtitle(this.captionSet_.x.getSubtitle(i), i, false, true);
         this.setLastSub_();
     }
 };
@@ -150,7 +150,7 @@ unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableC
  * @param {unisubs.subtitle.EditableCaption} subtitle
  *
  */
-unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scrollDown, opt_dontSetLastSub) {
+unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, subtitleIndex, opt_scrollDown, opt_dontSetLastSub) {
     if (this.showingBeginMessage_) {
         goog.dom.removeChildren(this.getElement());
         goog.dom.classes.remove(this.getElement(), 'unisubs-beginTab');
@@ -160,9 +160,9 @@ unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scr
     var dest_offset = this.getChildCount() - (this.readOnly_ ? 0 : 1);
     var subtitleWidget = this.createNewSubWidget_(subtitle);
     this.addChildAt(subtitleWidget, dest_offset, true);
-    this.subtitleMap_[subtitle.getCaptionIndex()] = subtitleWidget;
+    this.subtitleMap_[subtitleIndex] = subtitleWidget;
     if (opt_scrollDown && typeof(opt_scrollDown) == 'boolean')
-        this.scrollToCaption(subtitle.getCaptionIndex());
+        this.scrollToCaption(subtitleIndex);
     if (!opt_dontSetLastSub)
         this.setLastSub_();
 };
