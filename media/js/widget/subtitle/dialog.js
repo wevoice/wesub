@@ -109,7 +109,7 @@ unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
         function() {
-            return that.makeJsonSubs();
+            return that.makeDFXPString();
         });
 };
 unisubs.subtitle.Dialog.prototype.enterDocument = function() {
@@ -657,6 +657,6 @@ unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
-unisubs.subtitle.Dialog.prototype.makeJsonSubs =  function (){
-    return this.captionSet_.makeJsonSubs();
+unisubs.subtitle.Dialog.prototype.makeDFXPString =  function (){
+    return this.captionSet_.makeDFXPString();
 };
