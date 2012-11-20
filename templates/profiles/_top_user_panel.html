@@ -11,7 +11,7 @@
                         {% trans "Dashboard" %}
                     </a>
                 </li>
-                <li {% if user_info == user and not edit_profile_page %}class="active"{% endif %}>
+                <li>
                     <a href="{% url profiles:profile user %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
@@ -20,6 +20,11 @@
                     {% if user.unread_messages_count %}
                         <span class="message_count">{{ user.unread_messages_count }}</span>
                     {% endif %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url profiles:account %}">
+                    {% trans "Account" %}
                     </a>
                 </li>
                 <li>

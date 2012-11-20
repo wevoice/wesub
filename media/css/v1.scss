@@ -780,7 +780,7 @@ div.fix-chosen div.chzn-container {
     }
 }
 .v1 .listing.messages > li {
-    @include opacity(0.5);
+    @include opacity(0.6);
 
     &.unread {
         @include opacity(1.0);
@@ -1324,15 +1324,32 @@ div#language_picker {
     @include border-radius(2px);
 
     h3 {
-        font-size: 10px;
+        position: relative;
+        font-size: 14px;
+        line-height: 1em;
         font-weight: normal;
         text-align: center;
-        text-transform: uppercase;
         color: #999;
         margin: -12px -12px 12px;
-        padding: 6px 12px;
+        padding: 8px 12px;
         border-bottom: 1px solid #EEE;
         background: #FAFAFA;
+
+        a.count {
+            position: absolute;
+            top: .5em;
+            right: .5em;
+            font-size: 11px;
+            padding: .25em .5em;
+            background: #bbb;
+            color: #fff;
+            text-decoration: none;
+            @include border-radius(2px);
+
+            &:hover {
+                background: $normal;
+            }
+        }
     }
 
     p, ul {
