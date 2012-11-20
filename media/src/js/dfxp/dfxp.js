@@ -278,7 +278,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
             throw new Error('DFXP: You must supply either an index or an element.');
         }
-
         var subtitle;
 
         // If indexOrElement is a number, we'll need to query the DOM to
@@ -294,11 +293,17 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof indexOrElement === 'number') {
             subtitle = this.getSubtitles().get(indexOrElement);
 
-        // Otherwise, make sure the element exists.
+        // Otherwise, it's an object.
         } else {
 
-            var $subtitles = this.getSubtitles();
+            // If this is already a jQuery selection, we need to extract the
+            // node first.
+            if (indexOrElement instanceof AmarajQuery) {
+                indexOrElement = indexOrElement.get(0);
+            }
 
+            // Make sure the node exists in the DFXP tree.
+            var $subtitles = this.getSubtitles();
             for (var i= 0; i < $subtitles.length; i++){
                 if ($subtitles.get(i) === indexOrElement){
                     subtitle = $subtitles.get(i);
