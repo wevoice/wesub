@@ -86,9 +86,10 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
-        if(this.subtitle_.getStartTime() > -1){
+        var startTime = this.subtitleSet_.x.startTime(this.subtitle_) ;
+        if( startTime> -1){
             var timeElement = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
-                                unisubs.formatTime(this.subtitle_.getStartTime()));
+                                unisubs.formatTime(startTime));
             this.titleElem_.appendChild(timeElement);
         }
     }
@@ -148,7 +149,7 @@ unisubs.subtitle.SubtitleWidget.prototype.deleteClicked_ = function(e) {
 };
 
 unisubs.subtitle.SubtitleWidget.prototype.updateParagraphMarkerButton_ = function() {
-    if (this.subtitle_.getStartOfParagraph()){
+    if (this.subtitleSet_.x.startOfParagraph(this.subtitle_)){
         goog.dom.classes.add(this.paragraphMarkerButton_, "selected")
     }else{
         
