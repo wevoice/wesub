@@ -32,7 +32,6 @@ from apps.videos.tasks import video_changed_tasks
 from utils.translation import get_language_choices
 
 
-ALL_LANGUAGES = [('', '--Select language--')] + get_language_choices()
 SUBTITLE_FILESIZE_LIMIT_KB = 512
 SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
 
@@ -42,11 +41,9 @@ class SubtitlesUploadForm(forms.Form):
     complete = forms.BooleanField(initial=False, required=False)
 
     language_code = forms.ChoiceField(required=True,
-                                      choices=ALL_LANGUAGES,
-                                      initial='en')
+                                      choices=())
     primary_audio_language_code = forms.ChoiceField(required=False,
-                                                    choices=ALL_LANGUAGES,
-                                                    initial='en')
+                                                    choices=())
     from_language_code = forms.ChoiceField(required=False,
                                            choices=(),
                                            initial='')
@@ -57,6 +54,14 @@ class SubtitlesUploadForm(forms.Form):
         self._sl_created = False
 
         super(SubtitlesUploadForm, self).__init__(*args, **kwargs)
+
+        # This has to be set here.  get_language_choices looks at the language
+        # of the current thread via the magical get_language() Django function,
+        # so if you just set it once at the beginning of the file it's not going
+        # to properly change for the user's UI language.
+        all_languages = get_language_choices(with_empty=True)
+        self.fields['language_code'].choices = all_languages
+        self.fields['primary_audio_language_code'].choices = all_languages
 
         # TODO: Check that the subtitles are synced as well?
         choices = [(sl.language_code, sl.get_language_code_display())
