@@ -86,8 +86,8 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
-        var startTime = this.subtitleSet_.x.startTime(this.subtitle_) ;
-        if( startTime> -1){
+        var startTime = this.subtitleSet_.x.startTime(this.subtitle_.getCaptionIndex());
+        if (parseFloat(startTime) > -1) {
             var timeElement = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
                                 unisubs.formatTime(startTime));
             this.titleElem_.appendChild(timeElement);
@@ -282,7 +282,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
             this.timeSpinner_.setValue(time);
     }
     // FIXME: Sanitize / wrap to the right elements (<em>... etc)
-    this.titleElemInner_.innerHTML  = goog.string.newLineToBr(this.subtitleSet_.x.content(this.subtitle_));
+    this.titleElemInner_.innerHTML  = goog.string.newLineToBr(this.subtitleSet_.x.content(this.subtitle_.getCaptionIndex()));
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {
