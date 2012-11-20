@@ -136,7 +136,11 @@
     <div class="grid_4 omega">
         {% if user_messages %}
             <div class="section">
-                <h3>Messages - {{ user.unread_messages.count }} new</h3>
+                <h3>{% trans "Messages" %}
+                    {% if user.unread_messages.count > 0 %}
+                        <a href="{% url messages:inbox %}" title="{% trans 'Go to your inbox' %}"class="count">{{ user.unread_messages.count }} new</a>
+                    {% endif %}
+                </h3>
                 <ul class="listing">
                     {% for msg in user_messages %}
                         <li{% if not msg.read %} class="unread"{% endif %}>

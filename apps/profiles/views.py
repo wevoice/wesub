@@ -109,8 +109,8 @@ def dashboard(request):
     context = {
         'user_info': user,
         'user_messages': Message.objects.for_user(user)[:5],
-        'team_activity': Action.objects.for_user_team_activity(user)[:10],
-        'video_activity': Action.objects.for_user_video_activity(user)[:10],
+        'team_activity': Action.objects.for_user_team_activity(user)[:5],
+        'video_activity': Action.objects.for_user_video_activity(user)[:5],
         'tasks': tasks,
         'widget_settings': widget_settings,
     }
@@ -211,7 +211,7 @@ def edit_avatar(request):
         form.save()
     else:
         messages.error(request, _(form.errors['picture']))
-    return redirect('/profiles/profile/' + request.user.username + '/')
+    return redirect('profiles:profile', user_id=request.user.username)
 
 @login_required
 def remove_avatar(request):
@@ -219,7 +219,7 @@ def remove_avatar(request):
         request.user.picture = ''
         request.user.save()
         messages.success(request, _('Your picture has been removed.'))
-    return redirect('/profiles/profile/' + request.user.username + '/')
+    return redirect('profiles:profile', user_id=request.user.username)
 
 
 @login_required
