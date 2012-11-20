@@ -281,7 +281,8 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
         if (time != -1)
             this.timeSpinner_.setValue(time);
     }
-    this.titleElemInner_.innerHTML = unisubs.html.markdownToHtml(goog.string.newLineToBr(this.subtitle_.getText()));
+    // FIXME: Sanitize / wrap to the right elements (<em>... etc)
+    this.titleElemInner_.innerHTML  = this.subtitleSet_.x.content(goog.string.newLineToBr(this.subtitle_));
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {
