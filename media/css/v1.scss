@@ -290,6 +290,20 @@ div.fix-chosen div.chzn-container {
     }
 }
 
+#language_modal {
+    select {
+        color: inherit;
+        margin-right: 25px;
+    }
+    button.cancel {
+        float: left;
+    }
+    legend {
+        font-size: 13px;
+        padding: 0 0 1em 0;
+    }
+}
+
 /* Tabs */
 .show-border {
     border-bottom-width: 2px;
