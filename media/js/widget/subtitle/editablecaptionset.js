@@ -298,14 +298,7 @@ unisubs.subtitle.EditableCaptionSet.CaptionEvent = function(type, caption) {
  * except for the last one, whose end time (only) can be undefined.
  */
 unisubs.subtitle.EditableCaptionSet.prototype.needsSync = function() {
-    if(this.captions_.length == 0){
-        return false;
-    } else {
-        return goog.array.some(goog.array.slice(this.captions_, 0, -1), function(x){ 
-            return x.needsSync();
-        }) || this.captions_[this.captions_.length -1].getStartTime() == 
-            unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
-    }
+    return this.x.needsAnySynced();
 };
 
 unisubs.subtitle.EditableCaptionSet.prototype.fork = function(originalSubtitleState) {
