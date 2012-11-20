@@ -33,17 +33,21 @@
                     {% for l in langs %}
                         <li>
                             <span class="language">{{ l.get_language_display }}</span>
-                            {% if l.language == user_info.preferred_language and langs.count > 1 %}
-                                <span class="preferred">
-                                    <span>Preferred</span>
-                                </span>
-                            {% endif %}
+                            {% comment %}
+                                No way to set this anymore and it's not used at all.
+
+                                {% if l.language == user_info.preferred_language and langs.count > 1 %}
+                                    <span class="preferred">
+                                        <span>Preferred</span>
+                                    </span>
+                                {% endif %}
+                            {% endcomment %}
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
                 <em>
-                    {{ user_info|title }} {% trans "hasn't selected languages yet." %}
+                    {{ user_info }} {% trans "hasn't selected languages yet." %}
                 </em>
             {% endif %}
         {% endwith %}
@@ -59,7 +63,7 @@
                 </ul>
             {% else %}
                 <em>
-                    {{ user_info|title }} {% trans "hasn't joined any teams yet." %}
+                    {{ user_info }} {% trans "hasn't joined any teams yet." %}
                 </em>
             {% endif %}
         {% endwith %}
