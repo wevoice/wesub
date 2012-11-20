@@ -5,7 +5,7 @@
 {% block body_attrs %}class="{% block body-class %}profile v1{% endblock %}"{% endblock %}
 
 {% block main_content %}
-    <h2>{{ user_info|title }}</h2>
+    <h2>{{ user_info }}</h2>
     <div class="grid_4 context alpha">
         <img src="{{ user_info|custom_avatar:240 }}" alt="{{ user_info|title }}'s avatar" class="avatar"/>
         <h3>
@@ -53,7 +53,7 @@
                 <ul>
                     {% for t in user_teams %}
                     <li>
-                        <a href="{% url teams:detail slug=t.slug %}">{{ t }}</a>
+                        <a href="{% url teams:dashboard slug=t.slug %}">{{ t }}</a>
                     </li>
                     {% endfor %}
                 </ul>

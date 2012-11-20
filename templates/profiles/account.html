@@ -60,7 +60,7 @@
                     <legend>{% trans "API Access" %}</legend>
                     {% if form.instance.api_key.key %}
                         <label>{% trans "Your API key" %}</label>
-                        <p><span class="api-key-holder">{{form.instance.api_key.key}}</span></p>
+                        <textarea class="api-key-holder">{{form.instance.api_key.key}}</textarea>
                         <p><span class="api-key-status"></span></p>
                     {% else %}
                         <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button reduced">{% trans "Get an API key" %}</a>
