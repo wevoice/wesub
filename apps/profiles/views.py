@@ -141,7 +141,13 @@ def videos(request):
 @login_required
 def edit(request):
     if request.method == 'POST':
-        form = EditUserForm(request.POST,
+        # the form requires username and email
+        # however, letting the user set it here isn't safe
+        # (let the account view handle it)
+        data = request.POST.copy()
+        data['username'] = request.user.username
+        data['email'] = request.user.email
+        form = EditUserForm(data,
                             instance=request.user,
                             files=request.FILES, label_suffix="")
         if form.is_valid():
