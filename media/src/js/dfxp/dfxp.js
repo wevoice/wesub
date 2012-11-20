@@ -537,7 +537,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     // will change the dom structure too, let's fix this later
     this.startOfParagraph = function(indexOrElement, startOfParagraph) {
         /*
-         * Either get or set the startofparagraph attr for the subtitle.
+         * Either get or set the startofparagraph for the subtitle.
          *
          * Returns: current state of startofparagraph (boolean)
          */
