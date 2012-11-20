@@ -86,6 +86,7 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
+        // TODO: Fix this switch.
         var startTime = this.subtitleSet_.x.startTime(this.subtitle_.node || this.subtitle_);
         if (parseFloat(startTime) > -1) {
             var timeElement = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
@@ -123,6 +124,12 @@ unisubs.subtitle.SubtitleWidget.prototype.enterDocument = function() {
     var et = goog.events.EventType;
 
     if (!this.readOnly_) {
+        // TODO: When we are building the dialogs with a resume state from
+        // localStorage, this.subtitle_ is a node. It should *not* be a node. It
+        // should be an instance of EditableCaption.
+        //
+        // When we are buildling the dialogs with a fresh state, they are
+        // EditableCaptions.
         this.getHandler().listen(this.deleteButton_, et.CLICK, this.deleteClicked_)
                          .listen(this.insertButton_, et.CLICK, this.insertClicked_)
                          .listen(this.paragraphMarkerButton_, et.CLICK, this.paragraphMarkerClicked_)
@@ -275,6 +282,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
     if (this.editing_)
         return;
     if (this.displayTimes_) {
+        // TODO: Fix this switch.
         var time = this.subtitleSet_.x.startTime(this.subtitle_.node || this.subtitle_);
         this.contentElement_.style.visibility =
             time == -1 ? 'hidden' : 'visible';
@@ -282,6 +290,7 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
             this.timeSpinner_.setValue(time);
     }
     // FIXME: Sanitize / wrap to the right elements (<em>... etc)
+    // TODO: Fix this switch.
     this.titleElemInner_.innerHTML  = goog.string.newLineToBr(this.subtitleSet_.x.content(this.subtitle_.node || this.subtitle_));
 
 };

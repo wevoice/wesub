@@ -135,6 +135,8 @@ unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
     goog.array.forEach(subtitleWidgets, function(w) { w.clearTimes(); });
 };
 unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableCaption) {
+    // TODO: when we are resuming subtitles, editableCaption is a node here,
+    // instead of an actual EditableCaption. This causes problems.
     return new unisubs.subtitle.SubtitleWidget(
         editableCaption,
         this.captionSet_,
