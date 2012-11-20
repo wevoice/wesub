@@ -1508,6 +1508,11 @@ body.account {
             }
         }
     }
+    .bootstrap li {
+        color: inherit;
+        list-style-type: disc;
+        font-size: 13px;
+    }
 }
 #error {
 
