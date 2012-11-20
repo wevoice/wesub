@@ -61,7 +61,7 @@
                                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
                                             <input type="hidden" name="task" value="{{ task.id }}" />
                                             <input type="hidden" name="assignee" value="" />
-                                            <input type="submit" class="submit" value="Decline Task" name="" />
+                                            <input type="submit" class="submit" value="Decline Task" name="" id="decline-submit" />
                                         </form>
                                     {% endif %}
                                 {% endwith %}
