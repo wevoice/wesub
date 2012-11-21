@@ -42,6 +42,7 @@ rpc_router = RpcRouter('profiles:rpc_router', {
 })
 
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 30)
+LINKABLE_ACCOUNTS = ['youtube', 'twitter', 'facebook']
 
 
 class OptimizedQuerySet(LoadRelatedQuerySet):
@@ -193,12 +194,14 @@ def account(request):
         form = EditUserForm(instance=request.user, label_suffix="")
 
     third_party_accounts = request.user.third_party_accounts.all()
+    twitters = request.user.twitteraccount_set.all()
 
     context = {
         'form': form,
         'user_info': request.user,
         'edit_profile_page': True,
-        'third_party': third_party_accounts
+        'third_party': third_party_accounts,
+        'twitters': twitters
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
@@ -250,22 +253,44 @@ def add_third_party(request):
     if not account_type:
         raise Http404
 
-    if account_type != 'youtube':
+    if account_type not in LINKABLE_ACCOUNTS:
         raise Http404
 
-    from accountlinker.views import _generate_youtube_oauth_request_link
-    state = json.dumps({'user': request.user.pk})
-    url = _generate_youtube_oauth_request_link(state)
+    if account_type == 'youtube':
+        from accountlinker.views import _generate_youtube_oauth_request_link
+        state = json.dumps({'user': request.user.pk})
+        url = _generate_youtube_oauth_request_link(state)
+
+    if account_type == 'twitter':
+        request.session['no-login'] = True
+        url = reverse('thirdpartyaccounts:twitter_login')
+
+    if account_type == 'facebook':
+        raise NotImplementedError("Can't link to Facebook yet")
+
     return redirect(url)
 
 
 @login_required
 def remove_third_party(request, account_id):
     from accountlinker.models import ThirdPartyAccount
-    account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+    from thirdpartyaccounts.models import TwitterAccount
 
-    if account not in request.user.third_party_accounts.all():
-        raise Http404
+    account_type = request.GET.get('type', 'generic')
+
+    if account_type == 'generic':
+        account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+        display_type = account.get_type_display()
+
+        if account not in request.user.third_party_accounts.all():
+            raise Http404
+
+    if account_type == 'twitter':
+        account = get_object_or_404(TwitterAccount, pk=account_id)
+        display_type = 'Twitter'
+
+        if account not in request.user.twitteraccount_set.all():
+            raise Http404
 
     if request.method == 'POST':
         account.delete()
@@ -274,7 +299,8 @@ def remove_third_party(request, account_id):
 
     context = {
         'user_info': request.user,
-        'third_party': account
+        'third_party': account,
+        'type': display_type
     }
     return direct_to_template(request, 'profiles/remove-third-party.html',
             context)
