@@ -37,6 +37,17 @@
                         {% endfor %}
                     {% endif %}
 
+                    {% if facebooks %}
+                        {% for fb in facebooks %}
+                            <li>
+                                <h3>Facebook - {{ fb.uid }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
                     {% if third_party %}
                         {% for account in third_party  %}
                             <li>
