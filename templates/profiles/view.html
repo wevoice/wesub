@@ -14,13 +14,15 @@
         {% include 'profiles/_tabs.html' %}
     {% endwith %}
     {% if user_info.is_active %}
-        <ul class="listing activity">
-            {% for item in action_list %}
-                <li>{{ item.render }}</li>
-            {% empty %}
-                <li class="empty">Sorry, no activity yet.</li>
-            {% endfor %}
-        </ul>
+        {% if action_list %}
+            <ul class="listing activity">
+                {% for item in action_list %}
+                    <li>{{ item.render }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty">{{ user_info }} {% trans "doesn't have any activity yet." %}</p>
+        {% endif %}
     {% else %}
         <p class="empty">{% trans 'Profile deleted by user.' %}</p>
     {% endif %}
