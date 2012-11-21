@@ -83,7 +83,7 @@ class TestViews(TestCase):
         other_user = User.objects.exclude(pk=self.user.pk)[:1].get()
         data['username'] = other_user.username
         response = self.client.post(reverse('profiles:edit'), data=data)
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse('profiles:edit'))
 
     def test_profile_page(self):
         video = Video.objects.all()[0]
