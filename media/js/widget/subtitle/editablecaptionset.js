@@ -92,20 +92,6 @@ unisubs.subtitle.EditableCaptionSet.EventType = {
         //this.captions_, function(c) { return c.getStartTime() != -1; });
 //};
 
-/**
- * Always in ascending order by start time.
- */
-unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
-    return goog.array.filter(
-        this.x.getSubtitles(),
-        function(c) {
-            return this.x.startTime(c) != -1 ||
-                (this.x.getPreviousSubtitle(c).length !== 0 &&
-                 this.x.startTime(this.x.getPreviousSubtitle(c)) != -1) ||
-                (this.x.getPreviousSubtitle(c).length === 0 &&
-                 this.x.startTime(c) == -1);
-        });
-};
 unisubs.subtitle.EditableCaptionSet.prototype.clear = function() {
     this.x.removeSubtitles();
     this.dispatchEvent(

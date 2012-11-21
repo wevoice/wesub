@@ -285,8 +285,9 @@ unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
     this.subtitleList_.clearActiveWidget();
-    if (editableCaption != null)
-        this.subtitleList_.setActiveWidget(editableCaption.getCaptionID());
+    if (editableCaption != null) {
+        this.subtitleList_.setActiveWidget(editableCaption);
+    }
 };
 unisubs.subtitle.SyncPanel.prototype.disposeInternal = function() {
     unisubs.subtitle.SyncPanel.superClass_.disposeInternal.call(this);

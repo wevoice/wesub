@@ -57,10 +57,14 @@ unisubs.timeline.SubtitleSet.prototype.createSubsToDisplay_ = function() {
         this.disposeSubsToDisplay_();
     var that = this;
     this.subsToDisplay_ = goog.array.map(
-        this.editableCaptionSet_.timelineCaptions(),
+        this.editableCaptionSet_.x.getSubtitles(),
         function(c) {
             return new unisubs.timeline.Subtitle(
-                c, that.videoPlayer_);
+                new unisubs.subtitle.EditableCaption(
+                    that.editableCaptionSet_.x.getSubtitle(c).get(0),
+                    that.editableCaptionSet_.x
+                ),
+                that.videoPlayer_);
         });
     var i;
     for (i = 0; i < this.subsToDisplay_.length - 1; i++)

@@ -71,7 +71,7 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
     } else {
         this.readOnly_ || this.addAddButton_();
         var i;
-        for (i = 0; i < this.captionSet_.count(); i++)
+        for (i = 0; i < this.captionSet_.count(); i++) {
             this.addSubtitle(
                 new unisubs.subtitle.EditableCaption(
                     this.captionSet_.x.getSubtitle(i).get(0),
@@ -81,6 +81,7 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
                 false,
                 true
             );
+        }
         this.setLastSub_();
     }
 };
@@ -239,9 +240,8 @@ unisubs.subtitle.SubtitleList.prototype.clearActiveWidget = function() {
 unisubs.subtitle.SubtitleList.prototype.setTaller = function(taller) {
     goog.dom.classes.enable(this.getElement(), 'taller', taller);
 };
-unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(captionID) {
-    if (!this.subtitleMap_[captionID])
-        return;
+unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(node) {
+    // TODO: DFXP integration stuff.
     this.scrollToCaption(captionID);
     this.clearActiveWidget();
     var subtitleWidget = this.subtitleMap_[captionID];
