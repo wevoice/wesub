@@ -12,7 +12,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url profiles:profile user %}">{% trans "Profile" %}</a>
+                    <a href="{% url profiles:profile user.username %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
                     <a href="{% url messages:inbox %}">
