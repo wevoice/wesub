@@ -118,8 +118,20 @@ def dashboard(request):
 
 
 @login_required
-def videos(request):
-    user = request.user
+def videos(request, user_id=None):
+    if user_id:
+        try:
+            user = User.objects.get(username=user_id)
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(id=user_id)
+            except (User.DoesNotExist, ValueError):
+                raise Http404
+    elif request.user.is_authenticated():
+        user = request.user
+    else:
+        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
+
     qs = user.videos.order_by('-edited')
     q = request.REQUEST.get('q')
 
