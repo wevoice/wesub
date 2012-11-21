@@ -143,7 +143,6 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
     function(playheadTime)
 {
-    // TODO: This is borked.
     var lastCaptionIndex = goog.array.binarySearch(this.captions_,
         playheadTime, this.binaryCompare_);
     if (lastCaptionIndex < 0)

@@ -72,7 +72,15 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
         this.readOnly_ || this.addAddButton_();
         var i;
         for (i = 0; i < this.captionSet_.count(); i++)
-            this.addSubtitle(this.captionSet_.x.getSubtitle(i), i, false, true);
+            this.addSubtitle(
+                new unisubs.subtitle.EditableCaption(
+                    this.captionSet_.x.getSubtitle(i).get(0),
+                    this.captionSet_.x
+                ),
+                i,
+                false,
+                true
+            );
         this.setLastSub_();
     }
 };
@@ -135,8 +143,6 @@ unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
     goog.array.forEach(subtitleWidgets, function(w) { w.clearTimes(); });
 };
 unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableCaption) {
-    // TODO: when we are resuming subtitles, editableCaption is a node here,
-    // instead of an actual EditableCaption. This causes problems.
     return new unisubs.subtitle.SubtitleWidget(
         editableCaption,
         this.captionSet_,
