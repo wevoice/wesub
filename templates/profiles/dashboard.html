@@ -126,7 +126,7 @@
                         <li class="empty">{% trans 'Sorry, no activity yet.' %}</li>
                     {% endfor %}
                 </ul>
-                <a href="{% url profiles:videos %}" class="more">{% trans "View your videos" %}</a>
+                <a href="{% url profiles:videos user_info.username %}" class="more">{% trans "View your videos" %}</a>
             {% else %}
                 <p class="prompt">
                     {% with user.videos.all as user_vids %}
