@@ -88,7 +88,6 @@
                                 {% blocktrans %}
                                     All's quiet in your teams so far. 
                                 {% endblocktrans %}
-                                <a href="">Show em how it's done!</a>
                             {% else %}
                                 {% blocktrans %}
                                     You haven't joined any teams yet.
@@ -127,9 +126,23 @@
                         <li class="empty">{% trans 'Sorry, no activity yet.' %}</li>
                     {% endfor %}
                 </ul>
+                <a href="{% url profiles:videos %}" class="more">{% trans "View your videos" %}</a>
             {% else %}
+                <p class="prompt">
+                    {% with user.videos.all as user_vids %}
+                        {% if user_vids %}
+                            {% blocktrans %}
+                                Nothing happening yet.
+                            {% endblocktrans %}
+                        {% else %}
+                            {% blocktrans %}
+                                You haven't shared any videos yet.
+                            {% endblocktrans %}
+                            <a href="{% url videos:create %}">Add one now!</a>
+                        {% endif %}
+                    {% endwith %}
+                </p>
             {% endif %}
-            <a href="{% url profiles:videos %}" class="more">{% trans "View your videos" %}</a>
         </div>
     </div>
 
