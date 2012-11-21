@@ -35,7 +35,9 @@ rpc_router = RpcRouter('search:rpc_router', {
 def index(request):
     if request.GET:
         site = current_site(request)
-
+        query = {}
+        for k,v in request.GET.items():
+            query[k] = v
         # If we're at a URL with query params we just got here from a search
         # form on another page.  If that's the case, we'll redirect to the
         # AJAX-style URL with the params in the hash.  Then that page will take
@@ -46,7 +48,7 @@ def index(request):
             # over HTTPS.  See commit 92de5dd6c4969c4c4a3d5d1422fb9caf5e42f345.
             site['BASE_URL'],
             reverse('search:index'),
-            urlencode({'q': request.GET.get('q')})
+            urlencode(query)
         )
 
         return HttpResponseRedirect(url)
