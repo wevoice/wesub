@@ -62,7 +62,7 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
         self.videos = data_helpers.create_several_team_videos_with_subs(self,
             self.team, 
             self.team_owner,
-            data = 'apps/webdriver_testing/teams/few_vids_with_subs.json')
+            data = 'apps/webdriver_testing/subtitle_data/few_vids_with_subs.json')
 
         
 

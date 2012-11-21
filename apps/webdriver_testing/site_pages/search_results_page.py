@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 import time
-from unisubs_page import UnisubsPage
+from video_listings import VideoListings
 from video_page import VideoPage
 
 
-class SearchResultsPage(UnisubsPage):
+class SearchResultsPage(VideoListings):
     """
      Unisubs page contains common web elements found across
      all Universal Subtitles pages. Every new page class is derived from
@@ -32,7 +32,7 @@ class SearchResultsPage(UnisubsPage):
             return False
 
     def search_has_results(self):
-        time.sleep(2)
+        time.sleep(5)
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
         if self.is_element_present(self._FIRST_SEARCH_RESULT):
             return True
@@ -59,3 +59,5 @@ class SearchResultsPage(UnisubsPage):
         self.wait_for_element_present(self._PAGE_HEADING)
         if search in self.get_text_by_css(self._PAGE_HEADING):
             return True
+
+        

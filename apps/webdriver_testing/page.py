@@ -99,6 +99,26 @@ class Page(object):
         mouse = webdriver.ActionChains(self.browser)
         mouse.move_to_element(element).perform()
 
+    def click_item_from_pulldown(self, menu_el, menu_item_el):
+        """Open a hover pulldown and choose a displayed item.
+
+        """
+        element = self.browser.find_element_by_css_selector(menu_el)
+        mouse = webdriver.ActionChains(self.browser)
+        mouse.click_and_hold(element).perform()
+        self.wait_for_element_visible(menu_item_el)
+        item_el = self.browser.find_element_by_css_selector(menu_item_el)
+        mouse.release().perform()
+        m2 = webdriver.ActionChains(self.browser)
+        m2.move_to_element(item_el)
+        m2.click()
+        m2.perform()
+
+        
+
+
+
+
     def hover_by_element(self, webdriver_object, page_element):
         """Find the css element below the webdriver element object and hover.
 
@@ -107,20 +127,14 @@ class Page(object):
         mouse = webdriver.ActionChains(self.browser)
         mouse.move_to_element(element).perform()
 
-    def click_by_css(self, element, wait_for_element=None, no_wait=False):
+    def click_by_css(self, element, wait_for_element=None):
         """click based on the css given.
 
         kwargs no_wait, then use send keys to no wait for page load.
                wait_for_element, wait for a passed in element to display
         """
-        try:
-            elem = self.browser.find_element_by_css_selector(element)
-        except Exception as e:
-            self.record_error(e)
-        if no_wait:
-            elem.send_keys(Keys.ENTER)
-        else:
-            elem.click()
+        elem = self.wait_for_element_present(element)
+        elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
 
@@ -141,7 +155,7 @@ class Page(object):
         try:
             elem = self.browser.find_element_by_link_text(text)
         except Exception as e:
-            curr_page = self.record_error(e)
+            self.record_error(e)
         elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
@@ -162,10 +176,7 @@ class Page(object):
         """Enter text for provided css selector.
 
         """
-        try:
-            elem = self.browser.find_element_by_css_selector(element)
-        except Exception as e:
-            self.record_error(e)
+        elem = self.wait_for_element_present(element)
         elem.send_keys(text)
 
     def type_special_key(self, key_name, element="body"):
@@ -183,7 +194,8 @@ class Page(object):
         """Get text of given css selector.
 
         """
-        return self.browser.find_element_by_css_selector(element).text
+        elem = self.wait_for_element_present(element)
+        return elem.text
 
     def get_size_by_css(self, element):
         """Return dict of height and width of element by css selector.
@@ -288,11 +300,11 @@ class Page(object):
         """Wait for element (by css) present on page, within 20 seconds.
 
         """
-        for i in range(30):
+        for i in range(20):
             try:
                 time.sleep(1)
                 if self.is_element_present(element):
-                    break
+                    return self.browser.find_element_by_css_selector(element) 
             except:
                 pass
         else:
@@ -376,6 +388,15 @@ class Page(object):
             self.record_error(MULTIPLE_ELS % element)
         return elements_found[0].get_attribute(html_attribute)
 
+    def get_elements_list(self, element):
+        """Return the attribute of an element (by css).
+  
+        """
+        self.wait_for_element_present(element)
+        elements_found = self.browser.find_elements_by_css_selector(element)
+        return elements_found
+
+
     def open_page(self, url):
         """Open a page by the full url.
 
@@ -404,27 +425,46 @@ class Page(object):
         elem.send_keys("PAGE_DOWN")
 
     def select_from_chosen(self, ui_elem, values):
-        """from https://gist.github.com/1768479.
+        """modified from https://gist.github.com/1768479.
         
         Given the id and value, select the option from the chozen-styled menu.
+        This is a total pain in the ass.
         """
+        
+
+        #Find all the chosen parts and pieces.
         chosen_selects = self.browser.find_elements_by_css_selector(ui_elem)
         select = chosen_selects[0]
         select_id = select.get_attribute("id")
         chosen = self.browser.find_element_by_id(select_id + '_chzn')
         results = chosen.find_elements_by_css_selector(".chzn-results li")
+        
+        #Work for either a simple string or a list of options.
+        if isinstance(values, basestring):
+            values = [values]
+
+        #Choose the chosen ones.
         for value in values:
             found = False
-            print value
             for result in results:
-                print '####In Pulldown: %s' %result.text
                 if result.text == value:
                     found = True
-                    print '##### found it!!!'
+                    print '##### found it!!! %s' % value
                     break
+
+            #In some cases (team videos tab) it would choose the option after the 
+            # the one that was specified.  So paging down and not doing the found_el
+            # resolves that issue.  However, sometimes the page down gets a
+            # MoveTargetOutOfBoundsException - but works the other way. So going to 
+            # try one then do the other.
+
             if found:
-                chosen.find_element_by_css_selector("input").click()
-                result.click()
+                result.send_keys("PAGE_DOWN")
+                try:
+                    result.click()
+                except:
+                    found_el = chosen.find_element_by_css_selector("input").click()
+                    result.click()
 
     def record_error(self, e=None):
         """

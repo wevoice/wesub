@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-from unisubs_page import UnisubsPage
+from video_listings import VideoListings
 from search_results_page import SearchResultsPage
 
 
-class WatchPage(UnisubsPage):
+class WatchPage(VideoListings):
     """
      Unisubs page contains common web elements found across
      all Universal Subtitles pages. Every new page class is derived from
@@ -13,23 +13,116 @@ class WatchPage(UnisubsPage):
 
     _URL = "videos/watch"
     _SEARCH = "form.search-form div#watch_search input#id_q"
-    _ADV_SEARCH_PULLDOWN = "form.search-form div#watch_search a#advanced_search"
-    _ADV_SEARCH_ORIG_LANG = "div.menu_item select#id_video_lang"
-    _ADV_SEARCH_TRANS_LANG = "div.menu_item select#id_langs"
+    _SEARCH_PULLDOWN = "a#advanced_search"
+    _SEARCH_ORIG_LANG = "select#id_video_lang"
+    _SEARCH_TRANS_LANG = "select#id_langs"
     _SEARCH_SUBMIT = "div#advanced_menu button"
-    _FEATURED_SECTION = "div#featured_videos"
-    _POPULAR_SECTION = "div#popular_videos"
-    _LATEST_SECTION = "div#latest_videos"
+    _VIDEO_SECTION = "div#%s_videos"
+    _SECTION_VIDEOS = "div#%s_videos ul.video_list li.Video_list_item"  
+    _MORE_VIDEOS = ".btn_more_videos"
+
+    #Popular Sort
+    _POPULAR_SORT = "a#popular_sort"
+    _CURRENT_SORT = "span.current-sort"
 
     def open_watch_page(self):
         self.open_page(self._URL)
 
     def basic_search(self, search_term):
-        #self.clear_text(self._SEARCH)
-        #self.submit_form_text_by_css(self._SEARCH, search_term)
         self.type_by_css(self._SEARCH, search_term + "\n")
-        #self.type_by_css(self._SEARCH, search_term)
+        return SearchResultsPage(self)
 
-    def advanced_search(self, search_term, orig_lang=None, trans_lang=None):
-        pass
-        return SearchResultsPage()
+    def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
+        if search_term:
+            self.type_by_css(self._SEARCH, search_term)
+
+        self.click_by_css(self._SEARCH_PULLDOWN)
+        if orig_lang:
+            self.select_option_by_text(self._SEARCH_ORIG_LANG, orig_lang)
+        if trans_lang:
+            self.select_option_by_text(self._SEARCH_TRANS_LANG, trans_lang)
+        
+        self.click_by_css(self._SEARCH_SUBMIT)
+        
+        return SearchResultsPage(self)
+
+       
+    def _valid_section_name(self, section):
+        sections = ['popular', 'latest', 'featured']
+        if section not in sections:
+            self.raise_error('%s is not a valid section name')
+
+
+    def section_empty(self, section):
+        self._valid_section_name(section)
+        el = (self._VIDEO_SECTION + ' ' + p.empty) % section
+        if self.is_element_present(el):
+            return True
+
+    def _videos_in_section(self, section):
+        self._valid_section_name(section)
+        section_css = self._SECTION_VIDEOS % section
+        video_els = self.get_elements_list(section_css)
+        return video_els
+
+
+    def _video_list_item(self, title, section='latest'):
+        """Return the element of video by title in the given section.
+
+        """
+        video_elements = self._videos_in_section(section)
+        try:
+            for el in video_elements:
+                vid_title = el.find_element_by_css_selector("a").get_attribute(
+                    'title')
+                if title == vid_title:
+                    return el
+                else:
+                    self.record_error("title %s not found on the page" % title)
+        except Exception as e:
+            self.record_error(e)
+
+    def section_has_video(self, title, section='latest'):
+        if self._video_list_item(title, section):
+            return True
+
+    def section_videos(self, section):
+        video_els = self._videos_in_section(section)
+        title_list = []
+        for el in video_els:
+            vid_title = el.find_element_by_css_selector("a").get_attribute(
+                    'title')
+            title_list.append(vid_title)
+        if 'About Amara' in title_list:
+            title_list.remove('About Amara') #Video isn't always present in index.
+        return title_list
+
+    def display_more(self, section):
+        more_css = (self._VIDEO_SECTION + ' ' + self._MORE_VIDEOS) % section
+        self.click_by_css(more_css)
+        self.search_complete()
+
+    def popular_current_sort(self):
+        return self.get_text_by_css(self._CURRENT_SORT)
+
+    def popular_sort(self, sort_param):
+        """Sort the popular videos by date parameter.
+
+        valid values are: today, week, month, year, total.
+        """
+        sort_el_css = "div#sort_menu ul li[val='%s']" % sort_param
+        self.click_item_from_pulldown(self._CURRENT_SORT, sort_el_css)
+
+    def popular_more_link(self):
+        more_css = (self._VIDEO_SECTION + ' ' + self._MORE_VIDEOS) % 'popular'
+        more_link = self.get_element_attribute(more_css, 'href')
+        return more_link
+
+
+
+
+        
+    
+
+        
+        

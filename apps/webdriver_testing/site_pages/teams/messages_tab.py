@@ -29,6 +29,7 @@ class MessagesTab(ATeamPage):
 
         """
         self.open_page(self._URL % team)
+        self.wait_for_element_present(self._INVITATION_MESSAGE)
 
    
     def _customize_messages(self, **messages):

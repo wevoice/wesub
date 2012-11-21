@@ -28,6 +28,7 @@ class UnisubsPage(Page):
 
     _MODAL_DIALOG = "div.modal"
     _MODAL_CLOSE = "div a.close"
+    _SEARCHING_INDICATOR = "img.placeholder"
 
     def error_message_present(self, message):
         if self.is_text_present(self._ERROR_MESSAGE, message):
@@ -92,6 +93,11 @@ class UnisubsPage(Page):
  
     def impersonate(self, username):
         self.open_page('auth/login-trap/')
+        self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
         self.type_by_css(self._SITE_LOGIN_USER_ID, username)
         self.click_by_css(self._SITE_LOGIN_SUBMIT)
+
+    def search_complete(self):
+        time.sleep(2)
+        self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
 

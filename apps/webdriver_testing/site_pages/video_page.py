@@ -128,3 +128,10 @@ class VideoPage(UnisubsPage):
         team_link = "a[href*='/teams/%s/']" % slug
         if self.is_element_present(team_link):
             return True
+
+    def feature_video(self):
+        self.click_link_text('Feature video')
+
+    def unfeature_video(self):
+        self.click_link_text('Unfeature video')
+

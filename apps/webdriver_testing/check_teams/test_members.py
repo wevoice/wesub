@@ -31,16 +31,16 @@ class TestCaseMembersTab(WebdriverTestCase):
         self.team = TeamMemberFactory.create(team__name='Roles Test',
                                              team__slug='roles-test',
                                              user__username='team_owner',
-                                             )
-        self.manager_test_user = TeamMemberFactory.create(team=self.team.team,
+                                             ).team
+        self.manager_test_user = TeamMemberFactory.create(team=self.team,
                                  user=UserFactory.create(username=
                                                          'promotedToManager'),
                                  role=TeamMember.ROLE_CONTRIBUTOR)
-        self.admin_test_user = TeamMemberFactory.create(team=self.team.team,
+        self.admin_test_user = TeamMemberFactory.create(team=self.team,
                                  user=UserFactory.create(username=
                                                          'promotedToAdmin'),
                                  role=TeamMember.ROLE_CONTRIBUTOR)
-        TeamProjectFactory.create(team=self.team.team,
+        TeamProjectFactory.create(team=self.team,
                                   name='my translation project',
                                   workflow_enabled=True,
                                   )
@@ -56,8 +56,10 @@ class TestCaseMembersTab(WebdriverTestCase):
         self.members_tab.invite_user_via_form(username = user.username,
                                               message = 'Join my team',
                                               role = 'Contributor')
+
+        self.auth_pg.login(user.username, 'password')
         self.assertEqual(1, user.team_invitations.count())
-        self.assertEqual(1, self.team.team.invitations.count())
+        self.assertEqual(1, self.team.invitations.count())
 
 
     def test_assign__manager(self):

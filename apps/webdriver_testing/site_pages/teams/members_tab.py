@@ -12,6 +12,7 @@ class MembersTab(ATeamPage):
     _ACTIONS = "ul.members.listing li ul.actions li"
     _INVITE_MEMBERS = "div.tools.group a[href*='members/invite']"
     _EDIT_USER = "a.edit-role"
+    _SORT_FILTER = "a#sort-filter"
 
     #EDIT USER MODAL
     _ROLE_PULLDOWN = "select#roles"
@@ -32,6 +33,7 @@ class MembersTab(ATeamPage):
 
         """
         self.open_page(self._URL % team)
+        self.wait_for_element_present(self._SORT_FILTER)
 
 
     def user_link(self):
@@ -60,6 +62,7 @@ class MembersTab(ATeamPage):
         """Invite a user to a team via the invite form.
 
         """
+        
         self.click_by_css(self._INVITE_MEMBERS)
         self.click_by_css(self._INVITEE_USERNAME_PULLDOWN)
         self.type_by_css('div.chzn-search input', username)
