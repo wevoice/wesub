@@ -26,7 +26,7 @@ class ATeamPage(UnisubsPage):
     _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
 
     #JOIN / APPLY
-    _JOIN_TEAM = ".join a"
+    _JOIN_TEAM = ".join p a"
     _APPLY_TEAM = "a#apply"
     _SIGNIN = "a#signin-join"
     _APPLY_BUTTON = "Apply to Join"

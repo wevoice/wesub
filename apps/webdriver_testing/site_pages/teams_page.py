@@ -44,9 +44,6 @@ class TeamsPage(UnisubsPage):
         assert_true(order in sort_orders,
                     "unknown value for order, expected one of %s" % sort_orders)
 
-        #Hover / click below currently breaks selenium and it's better to just open the url directly
-        #self.hover_by_css(self._SORT)
-        #self.click_by_css(self._SORT_OPTION % order)
         self.open_page("teams/?o=%s" % order)
 
     def first_team(self):

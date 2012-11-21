@@ -122,8 +122,11 @@ def create_several_team_videos_with_subs(self, team, teamowner, data=None):
     return videos
 
 
-def create_videos_with_fake_subs(self):
-    testdata = simplejson.load(open('apps/videos/fixtures/teams-list.json'))
+def create_videos_with_fake_subs(self, testdata=None):
+    if testdata is None:
+        testdata = simplejson.load(open('apps/videos/fixtures/teams-list.json'))
+    else:
+        testdata = simplejson.load(open(testdata))
     videos = _create_videos(testdata, [])
     return videos
 

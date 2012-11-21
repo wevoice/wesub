@@ -17,14 +17,14 @@ class TestCaseLeaveTeam(WebdriverTestCase):
             team__slug='invitation-only',
             team__membership_policy=2,  # manager invite-only
             user__username='invitation_team_owner',
-            )
+            ).team
 
     def test_leave__contributor(self):
         """A contributor can leave a team.
 
         """
         TeamMemberFactory.create(
-            team=self.team.team,
+            team=self.team,
             user=UserFactory.create(username='tester'),
             role=TeamMember.ROLE_CONTRIBUTOR)
 
@@ -37,7 +37,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
 
         """
         TeamMemberFactory.create(
-            team=self.team.team,
+            team=self.team,
             user=UserFactory.create(username='testOwner'),
             role=TeamMember.ROLE_OWNER)
 
@@ -50,7 +50,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
 
         """
         TeamMemberFactory.create(
-            team=self.team.team,
+            team=self.team,
             user=UserFactory.create(username='testAdmin'),
             role=TeamMember.ROLE_ADMIN)
 
@@ -70,5 +70,20 @@ class TestCaseLeaveTeam(WebdriverTestCase):
         """The last owner has no leave button on hover.
         """
         self.auth_pg.login('invitation_team_owner', 'password')
-        self.assertFalse("add a test for the leave button on hover.")
+        self.my_teams_pg.open_my_teams_page()
+        self.assertFalse(self.my_teams_pg.leave_present(self.team.name))
+
+    def test_leave__ui(self):
+        """A contributor can leave a team.
+
+        """
+        TeamMemberFactory.create(
+            team=self.team,
+            user=UserFactory.create(username='tester'),
+            role=TeamMember.ROLE_CONTRIBUTOR)
+
+        self.auth_pg.login('tester', 'password')
+        self.my_teams_pg.open_my_teams_page()
+        self.my_teams_pg.click_leave_link(self.team.name)
+        self.assertTrue(self.my_teams_pg.leave_team_successful())
 

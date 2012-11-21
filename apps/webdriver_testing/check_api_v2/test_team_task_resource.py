@@ -69,7 +69,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         self.videos = data_helpers.create_several_team_videos_with_subs(self,
             self.open_team, 
             self.user,
-            data = 'apps/webdriver_testing/teams/few_vids_with_subs.json') 
+            data = 'apps/webdriver_testing/subtitle_data/few_vids_with_subs.json') 
         TeamVideoFactory.create(
             team=self.open_team, 
             video=self.test_video, 

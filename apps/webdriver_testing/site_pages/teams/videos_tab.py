@@ -73,7 +73,6 @@ class VideosTab(ATeamPage):
         elif self.is_element_present(self._FILTER_OPEN):
             print 'filter is open'
         else:
-            print 'Filter is closed'
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
             self.wait_for_element_visible('div.filter-chunk')
@@ -86,7 +85,7 @@ class VideosTab(ATeamPage):
         """
         self._open_filters()
         self.click_by_css('div#lang-filter_chzn a.chzn-single')
-        self.select_from_chosen(self._LANG_FILTER, [language])
+        self.select_from_chosen(self._LANG_FILTER, language)
 
     def video_sort(self, sort_option):
         """Sort videos via the pulldown.
@@ -109,6 +108,7 @@ class VideosTab(ATeamPage):
         """Return the webdriver object for a video based on the title.
 
         """
+        self.wait_for_element_present(self._VIDEO_TITLE)
         video_els = self.browser.find_elements_by_css_selector(
                       self._VIDEO_TITLE)
         for el in video_els:
@@ -141,7 +141,6 @@ class VideosTab(ATeamPage):
 
         """
         self._click_video_action('Remove', video)
-        self.wait_for_element_present(self._REMOVE)
         self.click_by_css(self._REMOVE)
         time.sleep(2)
         self.handle_js_alert("accept")
@@ -152,7 +151,6 @@ class VideosTab(ATeamPage):
             self.click_by_css('a.chzn-single span')
             self.select_from_chosen(self._EDIT_TEAM, [team])
             self.click_by_css(self._MOVE_VIDEO)
-            self.wait_for_element_present(self._SUBMIT_MOVE_CONFIRM)
             self.click_by_css(self._SUBMIT_MOVE_CONFIRM)
 
         elif project or thumb:

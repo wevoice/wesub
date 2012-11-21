@@ -11,6 +11,7 @@ from apps.teams.models import TeamMember
 from apps.testhelpers.views import _create_videos
 import json
 import time
+from django.core import management
 
 class TestCaseTeamVideos(WebdriverTestCase):
     """
@@ -96,6 +97,8 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """Team video search for subtitle text.
 
         """
+        management.call_command('rebuild_index', interactive=False)
+
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('should be bold')
         self.assertTrue(self.videos_tab.video_present(self.video_title))
@@ -109,7 +112,6 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.videos_tab.open_page('teams/' + self.team.slug + '/videos' +
             '/?q=日本語')
         self.assertTrue(self.videos_tab.video_present(self.video_title))
-        #self.assertFalse("Needs bug fixed: " 
         #    "https://unisubs.sifterapp.com/issue/1498")
 
     def test_search__no_results(self):
@@ -142,7 +144,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
             self.manager_user)
 
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.sub_lang_filter(language = 'Portuguese')
+        self.videos_tab.sub_lang_filter(language = ['Portuguese'])
         self.assertEqual(self.videos_tab.search_no_result(), 
             'Sorry, no videos here ...')
 
@@ -315,7 +317,7 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         data = json.load(open('apps/videos/fixtures/teams-list.json'))
         videos1 = _create_videos(data, [])
         data2 = json.load(open(
-            'apps/webdriver_testing/teams/lots_of_subtitles.json'))
+            'apps/webdriver_testing/check_teams/lots_of_subtitles.json'))
         videos2 = _create_videos(data2, [])
         videos = videos1 + videos2
         for video in videos:
@@ -344,6 +346,7 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
             project = self.project2.name)
+        self.videos_tab.open_page(project_page)
         self.videos_tab.remove_video(
             video = 'Video Ranger Message (1950s) - Classic TV PSA')
         self.videos_tab.search('Video Ranger')

@@ -38,7 +38,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
         self.base_url = 'http://unisubs.example.com:80/'
         self.browser.get(self.base_url)
-        UserFactory.create(username='admin', is_superuser=True)
+        UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
 
 

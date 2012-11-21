@@ -145,6 +145,14 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
+        a_test_video = data_helpers.create_video(self, 
+            'http://www.example.com/Aaa-test-video.mp4')
+        TeamVideoFactory.create(team=self.open_team, 
+                added_by=self.user,
+                project = self.project1,
+                video = a_test_video)
+
+
         url_part = 'videos/?order_by=title' 
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
@@ -152,8 +160,10 @@ class TestCaseVideoResource(WebdriverTestCase):
         for k, v in itertools.groupby(video_objects, 
             operator.itemgetter('title')):
                 videos_list.append(k)
+        if 'About Amara' in videos_list:
+            videos_list.remove('About Amara')
 
-        self.assertEqual('About Amara', videos_list[0])
+        self.assertEqual('Aaa-test-video.mp4', videos_list[0])
 
     def test_video__create(self):
         """Add a new video.

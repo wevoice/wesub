@@ -10,9 +10,10 @@ class MyTeam(TeamsPage):
     _URL = "teams/my/"
     _TEAM_BY_POSITION = "ul.listing li:nth-child(%d)"
     _LEAVE_URL = "teams/leave_team/%s/"
+    _LEAVE = "a#leave"
 
     def _team_elem(self, team):
-        """Given the team's text name, return the element.
+        """Given the team's text name, return the css locator string.
 
         """
         self.wait_for_element_present(self._TEAM + " " + self._TEAM_NAME)
@@ -24,6 +25,9 @@ class MyTeam(TeamsPage):
                 return self._TEAM_BY_POSITION % (teams.index(el) + 1)
 
     def open_my_teams_page(self):
+        """Open the teams/my/ url.
+
+        """
         self.open_page(self._URL)
 
     def open_my_team(self, team=None):
@@ -50,9 +54,32 @@ class MyTeam(TeamsPage):
         self.open_page(self._LEAVE_URL % team_stub)
 
     def leave_team_successful(self):
-        if self.is_text_present(self._SUCCESS_MESSAGE, 'You have left this team.'):
+        self.wait_for_element_present(self._SUCCESS_MESSAGE)
+        if self.is_text_present(self._SUCCESS_MESSAGE, 
+                'You have left this team.'):
             return True
 
     def leave_team_failed(self):
-        if self.is_text_present(self._ERROR_MESSAGE, 'You are the last member of this team.'):
+        if self.is_text_present(self._ERROR_MESSAGE, 
+                'You are the last member of this team.'):
             return True
+
+    def _hover_team(self, team):
+        team_el = self._team_elem(team)
+        self.hover_by_css(team_el)
+
+    def leave_present(self, team):
+        leave_link = False
+        self._hover_team(team)
+        if self.is_element_visible(self._LEAVE):
+            leave_link = True
+        return leave_link
+
+    def click_leave_link(self, team):
+        self._hover_team(team)
+        self.click_link_text('Leave team')
+        self.handle_js_alert('accept')
+
+
+
+
