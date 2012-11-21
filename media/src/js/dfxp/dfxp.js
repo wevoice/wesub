@@ -326,7 +326,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: jQuery selection of nodes
          */
 
-        return $('div > *', this.$xml);
+        return $('div > p', this.$xml);
     };
     this.isShownAt = function(indexOrElement, time) {
         /*
@@ -539,6 +539,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         /*
          * Either get or set the startofparagraph for the subtitle.
          *
+         * A <div> element marks the start of a new paragraph, 
+         * therefore all first subtitles are start of paragraphs.
+         * When we want to set it to true, we wrap that <p> inside
+         * a <div> (checking that we're not already a first paragraph ).
          * Returns: current state of startofparagraph (boolean)
          */
 
@@ -546,16 +550,19 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         if (typeof startOfParagraph !== 'undefined') {
 
-            // FIXME, if it's a paragraph, must be wrapped inside a div
-            // but... you must be carefull not to keep nesting divs
-            // (say originally, sub 1 and sub 2 were on the same paragraph)
-            // you make both starts of paragraph, each one has it's own div node
-            // with the nested p tag.
+            if (startOfParagraph){
+                // you only need to make it a paragraph if it's not
+                // already
+                if (!$subtitle.is(":first-child")){
+                    $subtitle.wrap("<div>");
+                }
+            }else if ($subtitle.is(":first-child") &&
+                      $subtitle.parent().get(0) !== this.$div.get(0)){
+                $subtitle.unwrap();
+            }
         }
 
-        // We return a string for 'false' because this is an attr on the actual
-        // XML node. It'll always be a string.
-        return this.subtitle_ && this.subtitle_.tagName == 'div';
+        return $subtitle.is(":first-child");
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
