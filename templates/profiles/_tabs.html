@@ -7,7 +7,7 @@
         </a>
     </li>
     <li{% if current == "videos" %} class="current" {% endif %}>
-        <a href="{% url profiles:videos %}">
+        <a href="{% url profiles:videos user_info.username %}">
             {% trans "Videos" %}
         </a>
     </li>

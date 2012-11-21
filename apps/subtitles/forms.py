@@ -113,10 +113,10 @@ class SubtitlesUploadForm(forms.Form):
             ))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
-                                                     subtitle_language):
+                                                     language_code):
         tasks = list(
             team_video.task_set.incomplete_subtitle_or_translate().filter(
-                language__in=[subtitle_language.language_code, '']
+                language__in=[language_code, '']
             )
         )[:1]
 
@@ -137,9 +137,9 @@ class SubtitlesUploadForm(forms.Form):
                     u"have permission to claim this language."))
 
     def _verify_no_blocking_review_approve_tasks(self, team_video,
-                                                 subtitle_language):
+                                                 language_code):
         tasks = team_video.task_set.incomplete_review_or_approve().filter(
-            language=subtitle_language.language_code
+            language=language_code
         )
 
         if tasks.exists():
@@ -147,10 +147,9 @@ class SubtitlesUploadForm(forms.Form):
                 u"Sorry, we can't upload your subtitles because a draft for "
                 u"this language is already in moderation."))
 
-    def _verify_team_policies(self, team_video, subtitle_language,
+    def _verify_team_policies(self, team_video, language_code,
                               from_language_code):
         is_transcription = (not from_language_code)
-        language_code = subtitle_language.language_code
 
         if is_transcription:
             allowed = can_create_and_edit_subtitles(self.user, team_video,
@@ -268,16 +267,16 @@ class SubtitlesUploadForm(forms.Form):
             # open if that task is assigned to you, or if it's unassigned and
             # you can assign yourself.
             self._verify_no_blocking_subtitle_translate_tasks(team_video,
-                                                              subtitle_language)
+                                                              language_code)
 
             # You cannot upload at all to a language that has a review or
             # approve task open.
             self._verify_no_blocking_review_approve_tasks(team_video,
-                                                          subtitle_language)
+                                                          language_code)
 
             # Finally ensure that the teams "who can translate/transcribe"
             # settings don't prevent this upload.
-            self._verify_team_policies(team_video, subtitle_language,
+            self._verify_team_policies(team_video, language_code,
                                        from_language_code)
 
         return self.cleaned_data
