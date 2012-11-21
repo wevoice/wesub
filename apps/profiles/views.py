@@ -199,13 +199,15 @@ def account(request):
 
     third_party_accounts = request.user.third_party_accounts.all()
     twitters = request.user.twitteraccount_set.all()
+    facebooks = request.user.facebookaccount_set.all()
 
     context = {
         'form': form,
         'user_info': request.user,
         'edit_profile_page': True,
         'third_party': third_party_accounts,
-        'twitters': twitters
+        'twitters': twitters,
+        'facebooks': facebooks
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
@@ -270,7 +272,8 @@ def add_third_party(request):
         url = reverse('thirdpartyaccounts:twitter_login')
 
     if account_type == 'facebook':
-        raise NotImplementedError("Can't link to Facebook yet")
+        request.session['fb-no-login'] = True
+        url = reverse('thirdpartyaccounts:facebook_login')
 
     return redirect(url)
 
@@ -278,13 +281,14 @@ def add_third_party(request):
 @login_required
 def remove_third_party(request, account_id):
     from accountlinker.models import ThirdPartyAccount
-    from thirdpartyaccounts.models import TwitterAccount
+    from thirdpartyaccounts.models import TwitterAccount, FacebookAccount
 
     account_type = request.GET.get('type', 'generic')
 
     if account_type == 'generic':
         account = get_object_or_404(ThirdPartyAccount, pk=account_id)
         display_type = account.get_type_display()
+        uid = account.username
 
         if account not in request.user.third_party_accounts.all():
             raise Http404
@@ -292,8 +296,17 @@ def remove_third_party(request, account_id):
     if account_type == 'twitter':
         account = get_object_or_404(TwitterAccount, pk=account_id)
         display_type = 'Twitter'
+        uid = account.username
 
         if account not in request.user.twitteraccount_set.all():
+            raise Http404
+
+    if account_type == 'facebook':
+        account = get_object_or_404(FacebookAccount, pk=account_id)
+        display_type = 'Facebook'
+        uid = account.uid
+
+        if account not in request.user.facebookaccount_set.all():
             raise Http404
 
     if request.method == 'POST':
@@ -304,7 +317,8 @@ def remove_third_party(request, account_id):
     context = {
         'user_info': request.user,
         'third_party': account,
-        'type': display_type
+        'type': display_type,
+        'uid': uid
     }
     return direct_to_template(request, 'profiles/remove-third-party.html',
             context)
