@@ -15,15 +15,16 @@
                 <fieldset>
                     <h3>{% trans "Remove third party account" %}</h3>
                     <p>
-                        You are you sure you want to remove the
-                        {{ third_party.get_type_display }} account with
-                        username "{{ third_party.username }}"?
+                        {% blocktrans %}
+                            Are you sure you want to remove the {{ third_party.get_type_display }} account
+                        {% endblocktrans %}
+                        <strong>{{ third_party.username }}</strong>?
                     </p>
                 </fieldset>
             </div>
             <div class="submit">
                 <button class="button delete" type="submit" value="Remove">
-                    {% trans 'Remove third party account' %}
+                    {% trans 'Remove account' %}
                 </button>
             </div>
         </form>
