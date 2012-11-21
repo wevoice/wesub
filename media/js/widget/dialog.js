@@ -123,7 +123,7 @@ unisubs.Dialog.prototype.showIdleWarning_ = function() {
         return;
     }
     var dropLockDialog = new unisubs.widget.DropLockDialog(
-        serverModel, this.makeJsonSubs());
+        serverModel, this.makeDFXPString());
     this.getHandler().listen(
         dropLockDialog,
         goog.ui.Dialog.EventType.AFTER_HIDE,
@@ -327,7 +327,7 @@ unisubs.Dialog.prototype.hideDialogImpl_ = function() {
     unisubs.Dialog.superClass_.setVisible.call(this, false);
 };
 
-unisubs.Dialog.prototype.makeJsonSubs = goog.abstractMethod;
+unisubs.Dialog.prototype.makeDFXPString = goog.abstractMethod;
 
 unisubs.Dialog.prototype.disposeInternal = function() {
     unisubs.Dialog.superClass_.disposeInternal.call(this);

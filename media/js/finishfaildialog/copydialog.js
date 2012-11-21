@@ -118,17 +118,18 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
         log);
     copyDialog.setVisible(true);
 };
-unisubs.finishfaildialog.CopyDialog.showForSubs = function(jsonSubs, languageCode) {
+unisubs.finishfaildialog.CopyDialog.showForSubs = function(dfxpString, languageCode) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
         "Copy/paste these subtitles into a text editor and save. Use the dropdown to choose a format (make sure the file extension matches the format you choose). You'll be able to upload the subtitles to your video later.",
-        unisubs.finishfaildialog.CopyDialog.subsToString_(jsonSubs),
-        jsonSubs,
+        unisubs.finishfaildialog.CopyDialog.subsToString_(dfxpString),
+        dfxpString,
         languageCode);
     copyDialog.setVisible(true);
 };
-unisubs.finishfaildialog.CopyDialog.subsToString_ = function(jsonSubs) {
+unisubs.finishfaildialog.CopyDialog.subsToString_ = function(dfxpString) {
+    // TODO: This doesn't really work now that we're using DFXP.
     var baseString;
-    baseString = unisubs.SRTWriter.toSRT(jsonSubs);
+    baseString = unisubs.SRTWriter.toSRT(dfxpString);
     var serverModel = unisubs.subtitle.MSServerModel.currentInstance;
     return baseString;
 };
