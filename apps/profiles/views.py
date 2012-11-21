@@ -43,6 +43,7 @@ rpc_router = RpcRouter('profiles:rpc_router', {
 })
 
 VIDEOS_ON_PAGE = getattr(settings, 'VIDEOS_ON_PAGE', 30)
+LINKABLE_ACCOUNTS = ['youtube', 'twitter', 'facebook']
 
 
 class OptimizedQuerySet(LoadRelatedQuerySet):
@@ -87,6 +88,7 @@ def activity(request, user_id=None):
                        template_name='profiles/view.html',
                        template_object_name='action',
                        extra_context=extra_context)
+
 
 @login_required
 def dashboard(request):
@@ -153,6 +155,7 @@ def videos(request, user_id=None):
                        extra_context=context,
                        template_object_name='user_video')
 
+
 @login_required
 def edit(request):
     if request.method == 'POST':
@@ -179,6 +182,7 @@ def edit(request):
     }
     return direct_to_template(request, 'profiles/edit.html', context)
 
+
 @login_required
 def account(request):
     if request.method == 'POST':
@@ -193,15 +197,18 @@ def account(request):
         form = EditUserForm(instance=request.user, label_suffix="")
 
     third_party_accounts = request.user.third_party_accounts.all()
+    twitters = request.user.twitteraccount_set.all()
 
     context = {
         'form': form,
         'user_info': request.user,
         'edit_profile_page': True,
-        'third_party': third_party_accounts
+        'third_party': third_party_accounts,
+        'twitters': twitters
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
+
 
 @login_required
 def send_message(request):
@@ -214,6 +221,7 @@ def send_message(request):
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
 
+
 @login_required
 def generate_api_key(request):
     key, created = ApiKey.objects.get_or_create(user=request.user)
@@ -221,6 +229,7 @@ def generate_api_key(request):
         key.key = key.generate_key()
         key.save()
     return HttpResponse(json.dumps({"key":key.key}))
+
 
 @login_required
 def edit_avatar(request):
@@ -230,6 +239,7 @@ def edit_avatar(request):
     else:
         messages.error(request, _(form.errors['picture']))
     return redirect('profiles:profile', user_id=request.user.username)
+
 
 @login_required
 def remove_avatar(request):
@@ -246,22 +256,44 @@ def add_third_party(request):
     if not account_type:
         raise Http404
 
-    if account_type != 'youtube':
+    if account_type not in LINKABLE_ACCOUNTS:
         raise Http404
 
-    from accountlinker.views import _generate_youtube_oauth_request_link
-    state = json.dumps({'user': request.user.pk})
-    url = _generate_youtube_oauth_request_link(state)
+    if account_type == 'youtube':
+        from accountlinker.views import _generate_youtube_oauth_request_link
+        state = json.dumps({'user': request.user.pk})
+        url = _generate_youtube_oauth_request_link(state)
+
+    if account_type == 'twitter':
+        request.session['no-login'] = True
+        url = reverse('thirdpartyaccounts:twitter_login')
+
+    if account_type == 'facebook':
+        raise NotImplementedError("Can't link to Facebook yet")
+
     return redirect(url)
 
 
 @login_required
 def remove_third_party(request, account_id):
     from accountlinker.models import ThirdPartyAccount
-    account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+    from thirdpartyaccounts.models import TwitterAccount
 
-    if account not in request.user.third_party_accounts.all():
-        raise Http404
+    account_type = request.GET.get('type', 'generic')
+
+    if account_type == 'generic':
+        account = get_object_or_404(ThirdPartyAccount, pk=account_id)
+        display_type = account.get_type_display()
+
+        if account not in request.user.third_party_accounts.all():
+            raise Http404
+
+    if account_type == 'twitter':
+        account = get_object_or_404(TwitterAccount, pk=account_id)
+        display_type = 'Twitter'
+
+        if account not in request.user.twitteraccount_set.all():
+            raise Http404
 
     if request.method == 'POST':
         account.delete()
@@ -270,7 +302,8 @@ def remove_third_party(request, account_id):
 
     context = {
         'user_info': request.user,
-        'third_party': account
+        'third_party': account,
+        'type': display_type
     }
     return direct_to_template(request, 'profiles/remove-third-party.html',
             context)

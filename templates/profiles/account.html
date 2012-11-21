@@ -26,6 +26,17 @@
             <div class="grid_8 alpha third-party">
                 <h3>{% trans "Linked Accounts" %}</h3>
                 <ul class="listing">
+                    {% if twitters %}
+                        {% for twitter in twitters %}
+                            <li>
+                                <h3>Twitter - {{ twitter.username }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
                     {% if third_party %}
                         {% for account in third_party  %}
                             <li>
@@ -95,6 +106,8 @@
 
                             <select id="account-type-select" name="account_type">
                                 <option>Select...</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="facebook">Facebook</option>
                                 <option value="youtube">Youtube</option>
                             </select>
                         </fieldset>
@@ -128,6 +141,20 @@
                                     {% endblocktrans %}
                                 </li>
                             </ul>
+                        </fieldset>
+                        <fieldset class="account-type-copy" id="twitter-copy">
+                            <p>
+                                {% blocktrans %}
+                                Twitter copy
+                                {% endblocktrans %}
+                            </p>
+                        </fieldset>
+                        <fieldset class="account-type-copy" id="facebook-copy">
+                            <p>
+                                {% blocktrans %}
+                                Facebook copy
+                                {% endblocktrans %}
+                            </p>
                         </fieldset>
                     </div>
 
