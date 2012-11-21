@@ -87,6 +87,7 @@ def activity(request, user_id=None):
                        template_object_name='action',
                        extra_context=extra_context)
 
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -150,6 +151,7 @@ def videos(request, user_id=None):
                        extra_context=context,
                        template_object_name='user_video')
 
+
 @login_required
 def edit(request):
     if request.method == 'POST':
@@ -176,6 +178,7 @@ def edit(request):
     }
     return direct_to_template(request, 'profiles/edit.html', context)
 
+
 @login_required
 def account(request):
     if request.method == 'POST':
@@ -200,6 +203,7 @@ def account(request):
 
     return direct_to_template(request, 'profiles/account.html', context)
 
+
 @login_required
 def send_message(request):
     output = dict(success=False)
@@ -211,6 +215,7 @@ def send_message(request):
         output['errors'] = form.get_errors()
     return HttpResponse(json.dumps(output), "text/javascript")
 
+
 @login_required
 def generate_api_key(request):
     key, created = ApiKey.objects.get_or_create(user=request.user)
@@ -218,6 +223,7 @@ def generate_api_key(request):
         key.key = key.generate_key()
         key.save()
     return HttpResponse(json.dumps({"key":key.key}))
+
 
 @login_required
 def edit_avatar(request):
@@ -227,6 +233,7 @@ def edit_avatar(request):
     else:
         messages.error(request, _(form.errors['picture']))
     return redirect('/profiles/profile/' + request.user.username + '/')
+
 
 @login_required
 def remove_avatar(request):
