@@ -115,7 +115,6 @@ def twitter_login_done(request):
 
     request.session['access_token'] = access_token.to_string()
     user = authenticate(access_token=access_token)
-    user = authenticate(access_token=access_token)
     
     # if user is authenticated then login user
     if user:
