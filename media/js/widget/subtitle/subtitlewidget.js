@@ -149,7 +149,7 @@ unisubs.subtitle.SubtitleWidget.prototype.deleteClicked_ = function(e) {
 };
 
 unisubs.subtitle.SubtitleWidget.prototype.updateParagraphMarkerButton_ = function() {
-    if (this.subtitleSet_.x.startOfParagraph(this.subtitle_)){
+    if (this.subtitleSet_.x.startOfParagraph(this.subtitle_.node)){
         goog.dom.classes.add(this.paragraphMarkerButton_, "selected")
     }else{
         
