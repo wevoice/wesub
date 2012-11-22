@@ -159,7 +159,8 @@ class TestCaseApplications(WebdriverTestCase):
 
         """  
         data = { 'status': 'Approved' } 
-        url_part = 'teams/{0}/application/{1}/'.format(
+        # TODO: Consider using get_resource_uri when constructing urls
+        url_part = 'teams/{0}/applications/{1}/'.format(
             self.team.slug, 
             self.joiner_app.pk)
 
@@ -185,7 +186,7 @@ class TestCaseApplications(WebdriverTestCase):
 
         DELETE /api2/partners/teams/[team-slug]/application/[application-id]/
         """
-        url_part = 'teams/{0}/application/{1}/'.format(
+        url_part = 'teams/{0}/applications/{1}/'.format(
             self.team.slug, 
             self.joiner_app.pk)
 
