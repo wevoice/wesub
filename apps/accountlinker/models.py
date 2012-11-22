@@ -21,6 +21,7 @@ import logging
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.utils import translation
 
 from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
@@ -35,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
+AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
 
 
 def youtube_sync(video, language):
@@ -122,6 +124,24 @@ def can_be_synced(version):
             return False
 
     return True
+
+
+def translate_string(string, language='en'):
+    """
+    If a translation for the specified language doesn't exist, return the
+    English version.
+    """
+    cur_language = translation.get_language()
+    try:
+        translation.activate(language)
+        text = translation.ugettext(string)
+    finally:
+        translation.activate(cur_language)
+    return text
+
+
+def get_amara_credit_text(language='en'):
+    return translate_string(AMARA_CREDIT, language)
 
 
 class ThirdPartyAccountManager(models.Manager):
