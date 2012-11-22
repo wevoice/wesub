@@ -467,6 +467,16 @@ class SubtitleLanguage(models.Model):
         else:
             return None
 
+    def get_public_tip(self):
+        """ Returns the latest public tip for a particular version
+        This is currently being used on the search templates for videos,
+        since we can't specify parameters when calling get_tip + we don't
+        have template tags (afaik).
+
+        TODO: see if we can remove this somehow.
+        """
+        return self.get_tip(public=True)
+
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
 
@@ -609,7 +619,7 @@ class SubtitleLanguage(models.Model):
         return self.video.description
 
     def get_title(self, public=True):
-        v = self.get_tip(public=True)
+        v = self.get_tip(public=public)
 
         if v:
             return v.title
