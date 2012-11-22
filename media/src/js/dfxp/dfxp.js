@@ -211,7 +211,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
 
-        return $subtitle.attr('end');
+        if (!$subtitle ){
+            return -1;
+        }
+        return $subtitle.attr('end') || -1;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -261,8 +264,18 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element
          */
 
-        return this.getSubtitle(indexOrElement).prev();
+        var el =this.getSubtitle(indexOrElement).prev();
+        return el.length > 0 ? el.eq(0) : null;
     };
+    this.getSubtitleIndex = function(subtitleNode){
+        var $subtitles = this.getSubtitles();
+        for (var i= 0; i < $subtitles.length; i++){
+            if ($subtitles.get(i) === subtitleNode){
+                return i
+            }
+        }
+        return -1;
+    }
     this.getSubtitle = function(indexOrElement) {
         /*
          * Retrieve the subtitle based on the index given.
@@ -581,7 +594,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
 
-        return $subtitle.attr('begin');
+        if (!$subtitle ){
+            return -1;
+        }
+        return $subtitle.attr('begin') || -1;
     };
     this.subtitlesCount = function() {
         /*

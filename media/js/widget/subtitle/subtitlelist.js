@@ -135,8 +135,10 @@ unisubs.subtitle.SubtitleList.prototype.captionsCleared_ = function(event) {
         this.removeChildAt(0, true);
 };
 unisubs.subtitle.SubtitleList.prototype.captionDeleted_ = function(e) {
-    var widget = this.subtitleMap_[e.caption.getCaptionIndex()];
-    delete this.subtitleMap_[e.caption.getCaptionIndex()];
+    // use the event index, because at this time, it's no longer
+    // part of the wrapper, so getCaptionIndex will fail
+    var widget = this.subtitleMap_[e.index];
+    delete this.subtitleMap_[e.index];
     this.removeChild(widget, true);
 };
 unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
@@ -240,11 +242,12 @@ unisubs.subtitle.SubtitleList.prototype.clearActiveWidget = function() {
 unisubs.subtitle.SubtitleList.prototype.setTaller = function(taller) {
     goog.dom.classes.enable(this.getElement(), 'taller', taller);
 };
-unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(node) {
+unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(node, index) {
     // TODO: DFXP integration stuff.
-    this.scrollToCaption(captionID);
+
+    this.scrollToCaption(index);
     this.clearActiveWidget();
-    var subtitleWidget = this.subtitleMap_[captionID];
+    var subtitleWidget = this.subtitleMap_[index];
     subtitleWidget.setActive(true);
     this.currentActiveSubtitle_ = subtitleWidget;
 };

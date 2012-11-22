@@ -115,7 +115,7 @@ unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
         this.getStartOfParagraph() == other.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
-    return this.json['sub_order'];
+    return this.x.getSubtitleIndex(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrack) {
     this.x.content(this.node, text);

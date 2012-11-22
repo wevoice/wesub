@@ -46,12 +46,12 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
     // TODO: For debug only.
     window['x'] = this.x;
 
-    //this.captions_ = goog.array.map(
-        //existingJsonCaptions, function(caption) {
-            //c = new unisubs.subtitle.EditableCaption(null, caption);
-            //c.setParentEventTarget(that);
-            //return c;
-        //});
+    this.captions_ = goog.array.map(
+        this.x.getSubtitles(), function(node) {
+            c = new unisubs.subtitle.EditableCaption(node, this.x);
+            c.setParentEventTarget(that);
+            return c;
+        });
     //goog.array.sort(
         //this.captions_,
         //unisubs.subtitle.EditableCaption.orderCompare);
@@ -206,14 +206,15 @@ unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) 
     var prevSub = sub.getPreviousCaption();
     var nextSub = sub.getNextCaption();
     goog.array.removeAt(this.captions_, index);
-    if (prevSub)
+    this.x.removeSubtitle(index);
+    /*prevSub (prevSub)
         prevSub.setNextCaption(nextSub);
     if (nextSub)
-        nextSub.setPreviousCaption(prevSub);
+        nextSub.setPreviousCaption(prevSub);*/
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaptionSet.CaptionEvent(
             unisubs.subtitle.EditableCaptionSet.EventType.DELETE,
-            sub));
+            sub, index));
 };
 unisubs.subtitle.EditableCaptionSet.prototype.findSubIndex_ = function(order) {
     return goog.array.binarySearch(
@@ -255,13 +256,20 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
 unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var i;
     // TODO: write unit test then get rid of linear search in future.
-    for (i = 0; i < this.captions_.length; i++)
-        if (this.captions_[i].getStartTime() != -1 &&
-            this.captions_[i].getStartTime() <= time &&
-            (i == this.captions_.length - 1 ||
-             this.captions_[i + 1].getStartTime() == -1 ||
-             this.captions_[i + 1].getStartTime() > time))
-            return this.captions_[i];
+    var captions = this.x.getSubtitles();
+    var currentStartTime;
+    var nextStartTime;
+    for (i = 0; i < captions.length; i++)
+        currentStartTime = this.x.startTime(i);
+        if (i < captions.length -1){
+            nextStartTime = this.x.startTime(i+1);
+        }
+        if (currentStartTime != -1 &&
+            currentStartTime <= time &&
+            (i == captions.length - 1 ||
+             nextStartTime == -1 ||
+             nextStartTime > time))
+            return captions[i];
     return null;
 };
 
@@ -271,12 +279,13 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
  * @param {unisubs.subtitle.EditableCaptionSet.EventType} type of event
  * @param {unisubs.subtitle.EditableCaption} Caption the event applies to.
  */
-unisubs.subtitle.EditableCaptionSet.CaptionEvent = function(type, caption) {
+unisubs.subtitle.EditableCaptionSet.CaptionEvent = function(type, caption, index) {
     this.type = type;
     /**
      * @type {unisubs.subtitle.EditableCaption}
      */
     this.caption = caption;
+    this.index = index;
 };
 
 /*

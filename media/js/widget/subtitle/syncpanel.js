@@ -240,7 +240,7 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
             nextSub = this.downSub_.getNextCaption();
         }
         if (nextSub != null) {
-            nextSub.setStartTime(startTime);
+            this.captionManager_.x.startTime(nextSub, startTime);
         }
     } else {
         if (this.downSub_.isShownAt(startTime) &&
@@ -286,7 +286,7 @@ unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
     this.subtitleList_.clearActiveWidget();
     if (editableCaption != null) {
-        this.subtitleList_.setActiveWidget(editableCaption);
+        this.subtitleList_.setActiveWidget(editableCaption, event.index);
     }
 };
 unisubs.subtitle.SyncPanel.prototype.disposeInternal = function() {
