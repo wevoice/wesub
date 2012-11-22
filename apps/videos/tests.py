@@ -64,7 +64,9 @@ from videos.types.flv import FLVVideoType
 from videos.types.htmlfive import HtmlFiveVideoType
 from videos.types.mp3 import Mp3VideoType
 from videos.types.vimeo import VimeoVideoType
-from videos.types.youtube import YoutubeVideoType, save_subtitles_for_lang
+from videos.types.youtube import (
+    YoutubeVideoType, save_subtitles_for_lang, add_credit
+)
 from vidscraper.sites import blip
 from widget import video_cache
 from widget.rpc import Rpc
@@ -2936,3 +2938,35 @@ class TimingChangeTest(TestCase):
     def test_unsynced_ssa(self):
         Subtitle.objects.filter(version__language__video=self.original_video).update(start_time=None, end_time=None)
         self._download_then_upload('ssa', unsynced=True)
+
+
+class CreditTest(TestCase):
+
+    fixtures = ['staging_users.json', 'staging_videos.json']
+
+    srt = """
+1
+99:59:59,000 --> 99:59:59,000
+some subtitle
+
+2
+99:59:59,000 --> 99:59:59,000
+because video will be invisible
+
+3
+00:06:28,000 --> 00:06:30,000
+Subtitles by the Amara.org community
+    """
+
+    def test_empty(self):
+        from widget.srt_subs import GenerateSubtitlesHandler
+
+        sv = SubtitleVersion.objects.all()[0]
+
+        subs = [x.for_generator() for x in sv.ordered_subtitles()]
+        subs = add_credit(sv, subs)
+
+        handler = GenerateSubtitlesHandler.get('srt')
+        content = unicode(handler(subs, sv.language.video )).encode('utf-8')
+
+        self.assertEquals(content.strip().replace('\r', ''), self.srt.strip())

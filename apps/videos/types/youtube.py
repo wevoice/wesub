@@ -141,6 +141,25 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.tasks import video_changed_tasks
     video_changed_tasks.delay(video.pk)
 
+
+def add_credit(subtitle_version, subs):
+    from accountlinker.models import get_amara_credit_text
+
+    language_code = subtitle_version.language.language
+    dur = subtitle_version.language.video.duration
+
+    credit_sub = {
+        'text': get_amara_credit_text(language_code),
+        'start': (dur - 2) * 1000,
+        'end': dur * 1000,
+        'id': '',
+        'start_of_paragraph': ''
+    }
+
+    subs.append(credit_sub)
+    return subs
+
+
 class YoutubeVideoType(VideoType):
 
     _url_patterns = [re.compile(x) for x in [
@@ -372,6 +391,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         handler = GenerateSubtitlesHandler.get('srt')
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
+        subs = add_credit(subtitle_version, subs)
+
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = ""
 
