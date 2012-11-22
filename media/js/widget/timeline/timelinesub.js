@@ -150,6 +150,7 @@ unisubs.timeline.TimelineSub.prototype.setGrabberVisibility_ =
     }
 };
 unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
+    var nextToBeSynced = this.subtitle_.isNextToBeSynced();
     if (this.subtitle_.getEditableCaption().getText() !=
         this.existingSubText_)
     {
@@ -159,33 +160,35 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
     }
     if (this.subtitle_.getEndTime() != this.existingSubEnd_ ||
         this.subtitle_.getStartTime() != this.existingSubStart_) {
-        unisubs.style.setWidth(
-            this.getElement(),
+        var width =
             (this.subtitle_.getEndTime() - this.subtitle_.getStartTime()) *
-                this.pixelsPerMillisecond_);
+                this.pixelsPerMillisecond_;
+        width = Math.max(width,unisubs.timeline.TimelineSub.MIN_LENGTH * this.pixelsPerMillisecond_ )
+
+        unisubs.style.setWidth( this.getElement(), width);
         this.existingSubEnd_ = this.subtitle_.getEndTime();
     }
     if (this.subtitle_.getStartTime() != this.existingSubStart_) {
+        var left  = this.subtitle_.getStartTime() * this.pixelsPerMillisecond_ -
+            this.pixelOffset_;
         unisubs.style.setPosition(
             this.getElement(),
-            this.subtitle_.getStartTime() *
-                this.pixelsPerMillisecond_ -
-                this.pixelOffset_,
-            null);
+            left, null);
         this.existingSubStart_ = this.subtitle_.getStartTime();
     }
-    if (this.subtitle_.isNextToBeSynced() != this.existingSubNextToSync_) {
+    if ( nextToBeSynced != this.existingSubNextToSync_) {
         var c = goog.dom.classes;
         var unsyncedclass = 'unisubs-timeline-sub-unsynced';
-        if (this.subtitle_.isNextToBeSynced()) {
+        if (nextToBeSynced) {
             c.add(this.getElement(), unsyncedclass);
             unisubs.style.showElement(this.rightGrabber_, false);
+            console.log(this.getElement())
         }
         else {
             c.remove(this.getElement(), unsyncedclass);
             unisubs.style.showElement(this.rightGrabber_, true);
         }
-        this.existingSubNextToSync_ = this.subtitle_.isNextToBeSynced();
+        this.existingSubNextToSync_ = nextToBeSynced;
     }
 };
 unisubs.timeline.TimelineSub.prototype.disposeInternal = function() {

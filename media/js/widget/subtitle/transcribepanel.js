@@ -166,7 +166,7 @@ unisubs.subtitle.TranscribePanel.prototype.videoPlaying_ = function(event) {
 };
 unisubs.subtitle.TranscribePanel.prototype.newTitle_ = function(event) {
     var newEditableCaption = this.captionSet_.addNewCaption();
-    this.subtitleList_.addSubtitle(newEditableCaption, true);
+    this.subtitleList_.addSubtitle(newEditableCaption, newEditableCaption.getCaptionIndex());
     newEditableCaption.setText(event.title, true);
 };
 /**

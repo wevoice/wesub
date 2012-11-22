@@ -47,7 +47,8 @@ unisubs.timeline.Timeline.prototype.createDom = function() {
     this.timelineInner_ = new unisubs.timeline.TimelineInner(
         this, this.spacing_, this.subtitleSet_, this.readOnly_);
     this.addChild(this.timelineInner_, true);
-    el.appendChild($d('div', 'marker'));
+    this.markerEl = $d('div', 'marker')
+    el.appendChild(this.markerEl);
 };
 
 /**

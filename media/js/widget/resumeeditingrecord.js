@@ -28,7 +28,7 @@ unisubs.widget.ResumeEditingRecord = function(videoID, sessionPK, openDialogArgs
 };
 
 unisubs.widget.ResumeEditingRecord.STORAGE_KEY_ = "_unisubs_editing";
-unisubs.widget.ResumeEditingRecord.VERSION_ = 1;
+unisubs.widget.ResumeEditingRecord.VERSION_ = 2;
 
 unisubs.widget.ResumeEditingRecord.prototype.getVideoID = function() {
     return this.videoID_;

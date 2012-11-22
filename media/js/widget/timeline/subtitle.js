@@ -126,14 +126,19 @@ unisubs.timeline.Subtitle.prototype.videoTimeUpdate_ = function(e) {
     else {
         if (this.editableCaption_.getPreviousCaption() == null)
             this.bumpUnsyncedTimes(this.videoPlayer_.getPlayheadTime() * 1000);
-        else
+        else{
             var previousEndTime = this.editableCaption_.x.endTime(this.editableCaption_.getPreviousCaption());
-            this.bumpUnsyncedTimes(Math.max(
-                this.videoPlayer_.getPlayheadTime() * 1000, previousEndTime));
+            var bumpTo = Math.max( this.videoPlayer_.getPlayheadTime() * 1000, previousEndTime || 0);
+            this.bumpUnsyncedTimes(bumpTo);
+
+        }
 
     }
 };
 unisubs.timeline.Subtitle.prototype.bumpUnsyncedTimes = function(time) {
+    if (isNaN(time)){
+        debugger;
+    }
     var prevStartTime = this.startTime_;
     this.startTime_ = time +
         unisubs.timeline.Subtitle.UNASSIGNED_SPACING;
@@ -143,10 +148,10 @@ unisubs.timeline.Subtitle.prototype.bumpUnsyncedTimes = function(time) {
         this.dispatchEvent(unisubs.timeline.Subtitle.CHANGE);
 };
 unisubs.timeline.Subtitle.prototype.getStartTime = function() {
-    return this.editableCaption_.getStartTime();
+    return this.startTime_;
 };
 unisubs.timeline.Subtitle.prototype.getEndTime = function() {
-    return this.editableCaption_.getEndTime();
+    return this.endTime_;
 };
 unisubs.timeline.Subtitle.prototype.getEditableCaption = function() {
     return this.editableCaption_

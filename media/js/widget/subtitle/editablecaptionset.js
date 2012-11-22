@@ -201,7 +201,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ = function(
  * @param {unisubs.subtitle.EditableCaption} caption
  */
 unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) {
-    var index = this.findSubIndex_(caption.getSubOrder());
+    var index = this.findSubIndex_(caption)
     var sub = this.captions_[index];
     var prevSub = sub.getPreviousCaption();
     var nextSub = sub.getNextCaption();
@@ -216,12 +216,8 @@ unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) 
             unisubs.subtitle.EditableCaptionSet.EventType.DELETE,
             sub, index));
 };
-unisubs.subtitle.EditableCaptionSet.prototype.findSubIndex_ = function(order) {
-    return goog.array.binarySearch(
-        this.captions_, 42,
-        function(x, caption) {
-            return order - caption.getSubOrder();
-        });
+unisubs.subtitle.EditableCaptionSet.prototype.findSubIndex_ = function(caption) {
+    return this.x.getSubtitleIndex(caption.node);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispatchEvent) {
 
@@ -231,7 +227,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
 
     c.setParentEventTarget(this);
-
+    this.captions_.push(c)
     if (this.x.subtitlesCount().length > 1) {
         //var previousCaption = this.captions_[this.captions_.length - 2];
         //previousCaption.setNextCaption(c);
@@ -269,7 +265,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
             (i == captions.length - 1 ||
              nextStartTime == -1 ||
              nextStartTime > time))
-            return captions[i];
+            return captions_[i];
     return null;
 };
 
