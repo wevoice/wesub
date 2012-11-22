@@ -150,6 +150,7 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
                   unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
+    var previousValue = this.x.startTime(this.node);
     startTime = Math.max(startTime, this.getMinStartTime());
     this.x.startTime(this.node, startTime);
     if (this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
@@ -162,6 +163,10 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
          unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
          this.previousCaption_.getEndTime() > startTime))
          this.previousCaption_.setEndTime(startTime);
+    if (previousValue != startTime){
+        this.changed_(previousValue ==
+            unisubs.subtitle.EditableCaption.TIME_UNDEFINED)
+    }
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
     if (goog.isDefAndNotNull(this.x.startTime(this.node))) {

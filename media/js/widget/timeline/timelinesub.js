@@ -127,7 +127,7 @@ unisubs.timeline.TimelineSub.prototype.onGrabberMousedown_ =
     unisubs.timeline.TimelineSub.currentlyEditing_ = true;
     this.grabberMousedownClientX_ = event.clientX;
     this.grabberMousedownTime_ = left ?
-        this.subtitle_.getStartTime() : this.subtitle_.getEndTime();
+        parseInt(this.subtitle_.getStartTime()) : parseInt(this.subtitle_.getEndTime());
     this.documentEventHandler_.listen(
         document, 'mousemove',
         left ? this.onDocMouseMoveLeft_ : this.onDocMouseMoveRight_);
