@@ -61,17 +61,17 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             var originalTime = timeExpression.split('.');
             var hoursMinutesSeconds = originalTime[0].split(':');
 
-            var hoursInMilliseconds   = hoursMinutesSeconds[0] * (3600 * 1000);
-            var minutesInMilliseconds = hoursMinutesSeconds[1] * (60 * 1000);
-            var secondsInMilliseconds = hoursMinutesSeconds[2] * (1000);
+            var millisecondsInHours   = hoursMinutesSeconds[0] * (3600 * 1000);
+            var millisecondsInMinutes = hoursMinutesSeconds[1] * (60 * 1000);
+            var millisecondsInSeconds = hoursMinutesSeconds[2] * (1000);
             var milliseconds          = originalTime[1];
 
-            var totalSeconds = (hoursInMilliseconds +
-                                minutesInMilliseconds +
-                                secondsInMilliseconds) +
+            var totalSeconds = (millisecondsInHours +
+                                millisecondsInMinutes +
+                                millisecondsInSeconds) +
                                 '.' + milliseconds;
 
-            return totalSeconds;
+            return parseFloat(totalSeconds);
         },
         xmlToString: function(xml) {
             /*
