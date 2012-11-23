@@ -54,35 +54,48 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         convertTimes: function(destination, $subtitles) {
 
             for (var i = 0; i < $subtitles.length; i++) {
+
+                var newStartTime, newEndTime;
+
                 if (destination === 'milliseconds') {
-                    that.utils.timeExpressionToMilliseconds($subtitles.eq(i).attr('begin'));
-                    that.utils.timeExpressionToMilliseconds($subtitles.eq(i).attr('end'));
+                    newStartTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('begin'));
+                    newEndTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('end'));
                 } else {
-                    that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+                    newStartTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+                    newEndTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
                 }
-                break;
+
+                $subtitles.eq(i).attr({
+                    'begin': newStartTime,
+                    'end': newEndTime
+                });
             }
 
         },
-        millisecondsToTimeExpression: function(milliseconds) {
+        secondsToTimeExpression: function(seconds) {
             /*
              * Parses milliseconds into a time expression.
              */
         },
-        timeExpressionToMilliseconds: function(timeExpression) {
+        timeExpressionToSeconds: function(timeExpression) {
             /*
-             * Parses a time expression into milliseconds.
+             * Parses a time expression into seconds, including milliseconds.
              */
 
             var originalTime = timeExpression.split('.');
             var hoursMinutesSeconds = originalTime[0].split(':');
 
-            var hours = hoursMinutesSeconds[0];
-            var minutes = hoursMinutesSeconds[1];
-            var seconds = hoursMinutesSeconds[2];
-            var milliseconds = originalTime[1];
+            var hoursInMilliseconds   = hoursMinutesSeconds[0] * (3600 * 1000);
+            var minutesInMilliseconds = hoursMinutesSeconds[1] * (60 * 1000);
+            var secondsInMilliseconds = hoursMinutesSeconds[2] * (1000);
+            var milliseconds          = originalTime[1];
 
-            return;
+            var totalSeconds = (hoursInMilliseconds +
+                                minutesInMilliseconds +
+                                secondsInMilliseconds) +
+                                '.' + milliseconds;
+
+            return totalSeconds;
         },
         xmlToString: function(xml) {
             /*
