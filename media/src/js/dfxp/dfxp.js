@@ -37,6 +37,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.$xml = $(xml.documentElement).clone();
 
         // Cache the query for the containing div.
+        //
         // TODO: This is broken because there may be multiple containing divs.
         // The only reliable container is a <body> element.
         this.$div = $('div', this.$xml);
@@ -52,6 +53,29 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             /*
              * Parses milliseconds into a time expression.
              */
+
+            var givenSeconds = seconds;
+            var timeExpression;
+
+            givenSeconds = givenSeconds.toString().split('.');
+
+            milliseconds = givenSeconds[1];
+            givenSeconds = parseInt(givenSeconds[0], 10);
+
+            // Mother of God.
+            // TODO: Untangle my brain.
+            //var hours   = ~~  (givenSeconds / 3600);
+            //var minutes = ~~ ((givenSeconds % 3600) / 60);
+            //seconds     = givenSeconds % 60;
+
+            var hours, minutes;
+
+            timeExpression = that.utils.zeroFill(hours, 2) + ':' +
+                             that.utils.zeroFill(minutes, 2) + ':' +
+                             that.utils.zeroFill(seconds, 2) + '.' +
+                             milliseconds;
+
+            return timeExpression;
         },
         timeExpressionToSeconds: function(timeExpression) {
             /*
@@ -61,9 +85,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             var originalTime = timeExpression.split('.');
             var hoursMinutesSeconds = originalTime[0].split(':');
 
-            var millisecondsInHours   = hoursMinutesSeconds[0] * (3600 * 1000);
-            var millisecondsInMinutes = hoursMinutesSeconds[1] * (60 * 1000);
-            var millisecondsInSeconds = hoursMinutesSeconds[2] * (1000);
+            // TODO: Untangle my brain.
+            //var millisecondsInHours   = hoursMinutesSeconds[0] * (3600 * 1000);
+            //var millisecondsInMinutes = hoursMinutesSeconds[1] * (60 * 1000);
+            //var millisecondsInSeconds = hoursMinutesSeconds[2] * (1000);
+            var millisecondsInHours, millisecondsInMinutes, millisecondsInSeconds;
             var milliseconds          = originalTime[1];
 
             var totalSeconds = (millisecondsInHours +
@@ -76,6 +102,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         xmlToString: function(xml) {
             /*
              * Convert an XML document to a string.
+             *
              * Accepts: document object (XML tree)
              * Returns: string
              */
@@ -92,6 +119,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
             
             return xmlString;
+        },
+        zeroFill: function(number, width) {
+            /*
+             * Pad a number to the given width, with zeros.
+             * From: http://stackoverflow.com/a/1267338/22468
+             *
+             * Returns: string
+             */
+
+            width -= number.toString().length;
+
+            if (width > 0) {
+                return new Array(width + (/\./.test(number) ? 2 : 1))
+                                .join('0') + number;
+            }
+            return number.toString();
         }
 
     };
@@ -238,8 +281,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 newStartTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('begin'));
                 newEndTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('end'));
             } else {
-                newStartTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
-                newEndTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+                newStartTime = that.utils.secondsToTimeExpression($subtitles.eq(i));
+                newEndTime = that.utils.secondsToTimeExpression($subtitles.eq(i));
             }
 
             $subtitles.eq(i).attr({
@@ -645,7 +688,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 if (!$subtitle.is(':first-child')) {
                      $subtitle.wrap('<div>');
                 }
-
             } else if ($subtitle.is(':first-child') &&
                        $subtitle.parent().get(0) !== this.$div.get(0)) {
                 $subtitle.unwrap();
@@ -686,7 +728,34 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function() {
-        return this.utils.xmlToString(this.$xml.get(0));
+    this.xmlToString = function(withMilliseconds) {
+        /*
+         * Parse the working XML to a string.
+         *
+         * If `withMilliseconds` is specified, we can just return the existing
+         * state of the XML tree. Otherwise, we need to convert milliseconds to
+         * time expressions.
+         *
+         * Returns: string
+         */
+
+        // If we want to get the DFXP string with milliseconds, we need to
+        // just return the current state of the XML tree, since we always
+        // convert to milliseconds on init (see init() above).
+        if (withMilliseconds) {
+            return this.utils.xmlToString(this.$xml.get(0));
+        }
+
+        // Since our back-end is expecting time expressions, we need to convert
+        // the working XML's times to time expressions. However, if we do that,
+        // we must also convert *back* to milliseconds after we've retrieved the
+        // output string.
+        this.convertTimes('expressions', $('div p', this.$xml));
+
+        var DFXPString = 'hi';
+
+        this.convertTimes('milliseconds', $('div p', this.$xml));
+
+        return DFXPString;
     };
 };
