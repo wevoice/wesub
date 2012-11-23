@@ -72,15 +72,7 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
         this.readOnly_ || this.addAddButton_();
         var i;
         for (i = 0; i < this.captionSet_.count(); i++) {
-            this.addSubtitle(
-                new unisubs.subtitle.EditableCaption(
-                    this.captionSet_.x.getSubtitle(i).get(0),
-                    this.captionSet_.x
-                ),
-                i,
-                false,
-                true
-            );
+            this.addSubtitle( this.captionSet_.captions_[i],  i, false, true );
         }
         this.setLastSub_();
     }
