@@ -269,7 +269,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (!$subtitle ) {
             return -1;
         }
-        return parseInt($subtitle.attr('end'), 10) || -1;
+        return parseFloat($subtitle.attr('end')) || -1;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -674,7 +674,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             return -1;
         }
 
-        return parseInt($subtitle.attr('begin'), 10) || -1;
+        return parseFloat($subtitle.attr('begin')) || -1;
     };
     this.subtitlesCount = function() {
         /*
