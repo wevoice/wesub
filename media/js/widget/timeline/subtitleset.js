@@ -99,7 +99,7 @@ unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
         var nextSub = index < this.subsToDisplay_.length - 1 ?
             this.subsToDisplay_[index + 1] : null;
         goog.array.removeAt(this.subsToDisplay_, index);
-        this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(sub));
+        this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(sub, index));
         if (sub.getEditableCaption().getStartTime() == -1) {
             // we just removed the last unsynced subtitle.
             var nextCaption = caption.getNextCaption();
@@ -136,7 +136,7 @@ unisubs.timeline.SubtitleSet.prototype.insertCaption_ = function(caption) {
     if (nextSub != null) {
         if (caption.getStartTime() == -1) {
             goog.array.removeAt(this.subsToDisplay_, insertionPoint);
-            this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(nextSub));
+            this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(nextSub, insertionPoint));
             nextSub.dispose();
         }
         else
@@ -193,7 +193,8 @@ unisubs.timeline.SubtitleSet.DisplayNewEvent = function(subtitle) {
 * @constructor
 *
 */
-unisubs.timeline.SubtitleSet.RemoveEvent = function(subtitle) {
+unisubs.timeline.SubtitleSet.RemoveEvent = function(subtitle, index) {
     this.type = unisubs.timeline.SubtitleSet.REMOVE;
     this.subtitle = subtitle;
+    this.index = index;
 };
