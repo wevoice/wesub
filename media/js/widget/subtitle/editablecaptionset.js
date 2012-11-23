@@ -87,10 +87,10 @@ unisubs.subtitle.EditableCaptionSet.EventType = {
 /**
  * Always in ascending order by start time.
  */
-//unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
-    //return goog.array.filter(
-        //this.captions_, function(c) { return c.getStartTime() != -1; });
-//};
+unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
+    return goog.array.filter(
+        this.captions_, function(c) { return c.getStartTime() != -1; });
+};
 
 unisubs.subtitle.EditableCaptionSet.prototype.clear = function() {
     this.x.removeSubtitles();
@@ -268,7 +268,20 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
             return captions_[i];
     return null;
 };
-
+/**
+ - * Always in ascending order by start time.
+ - */
+unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
+    return goog.array.filter(
+        this.captions_,
+        function(c) {
+            return this.x.startTime(c.node) != -1 ||
+                (this.x.getPreviousSubtitle(c.node).length !== 0 &&
+                    this.x.startTime(this.x.getPreviousSubtitle(c.node)) != -1) ||
+                (this.x.getPreviousSubtitle(c.node).length === 0 &&
+                    this.x.startTime(c.node) == -1);
+        });
+};
 /**
  * Used for both add and delete.
  * @constructor
