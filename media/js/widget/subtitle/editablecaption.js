@@ -32,19 +32,6 @@ goog.provide('unisubs.subtitle.EditableCaption');
  */
 unisubs.subtitle.EditableCaption = function(node, x) {
     goog.events.EventTarget.call(this);
-    //this.json = opt_jsonCaption ||
-        //{
-            //'subtitle_id' : unisubs.randomString(),
-            //'text' : '',
-            //'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            //'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            //'sub_order' : opt_subOrder,
-            //'start_of_paragraph': false
-        //};
-    //this.json['original_start_time'] = this.json['start_time'];
-    //this.json['original_end_time'] = this.json['end_time'];
-    //this.json['original_text'] = this.json['text'];
-    //this.json['start_of_paragraph'] = this.json['start_of_paragraph'] || false;
     this.previousCaption_ = null;
     this.nextCaption_ = null;
 
@@ -55,12 +42,12 @@ unisubs.subtitle.EditableCaption = function(node, x) {
 
 goog.inherits(unisubs.subtitle.EditableCaption, goog.events.EventTarget);
 
-unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
-    //this.json['sub_order'] = jsonSub['sub_order'];
-    //this.json['start_time'] = jsonSub['start_time'];
-    //this.json['end_time'] = jsonSub['end_time'];
-    //this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
-};
+unisubs.subtitle.EditableCaption.prototype.fork = function(otherSub) {
+    // FIXME:
+    this.setStartTime(otherSub.getStarTime());
+    this.setEndTime(otherSub.getEndTime());
+    this.setText(otherSub.getText());
+}
 unisubs.subtitle.EditableCaption.orderCompare = function(a, b) {
     return a.getSubOrder() - b.getSubOrder();
 };
@@ -89,22 +76,22 @@ unisubs.subtitle.EditableCaption.MIN_LENGTH = 0.5;
  * @param {unisubs.subtitle.EditableCaption} caption Previous caption in list.
  *
  */
-//unisubs.subtitle.EditableCaption.prototype.setPreviousCaption = function(caption) {
-    //this.previousCaption_ = caption;
-//};
+unisubs.subtitle.EditableCaption.prototype.setPreviousCaption = function(caption) {
+    this.previousCaption_ = caption;
+};
 unisubs.subtitle.EditableCaption.prototype.getPreviousCaption = function() {
-    return this.x.getPreviousSubtitle(this.node);
+    return this.previousCaption_;
 };
 
 /**
  * @param {unisubs.subtitle.EditableCaption} caption Next caption in list.
  *
  */
-//unisubs.subtitle.EditableCaption.prototype.setNextCaption = function(caption) {
-    //this.nextCaption_ = caption;
-//};
+unisubs.subtitle.EditableCaption.prototype.setNextCaption = function(caption) {
+    this.nextCaption_ = caption;
+};
 unisubs.subtitle.EditableCaption.prototype.getNextCaption = function() {
-    return this.x.getNextSubtitle(this.node);
+    return this.nextCaption_;
 };
 unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
     return this.getSubOrder() == other.getSubOrder() &&

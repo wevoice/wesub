@@ -52,13 +52,9 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
             c.setParentEventTarget(that);
             return c;
         });
-    //goog.array.sort(
-        //this.captions_,
-        //unisubs.subtitle.EditableCaption.orderCompare);
-
     var i;
 
-    //this.setPreviousAndNextCaptions();
+    this.setPreviousAndNextCaptions();
 
     this.completed = opt_completed;
 
@@ -228,10 +224,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
 
     c.setParentEventTarget(this);
     this.captions_.push(c)
-    if (this.x.subtitlesCount().length > 1) {
-        //var previousCaption = this.captions_[this.captions_.length - 2];
-        //previousCaption.setNextCaption(c);
-        //c.setPreviousCaption(previousCaption);
+    if (this.x.subtitlesCount()> 1) {
+        var previousCaption = this.captions_[this.captions_.length - 2];
+        previousCaption.setNextCaption(c);
+        c.setPreviousCaption(previousCaption);
     }
     if (opt_dispatchEvent) {
         this.dispatchEvent(

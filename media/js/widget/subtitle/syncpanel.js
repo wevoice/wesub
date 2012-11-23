@@ -240,7 +240,7 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
             nextSub = this.downSub_.getNextCaption();
         }
         if (nextSub != null) {
-            this.captionManager_.x.startTime(nextSub, startTime);
+            nextSub.setStartTime(startTime)
         }
     } else {
         if (this.downSub_.isShownAt(startTime) &&
