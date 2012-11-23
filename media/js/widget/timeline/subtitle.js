@@ -100,7 +100,7 @@ unisubs.timeline.Subtitle.prototype.updateTimes_ = function() {
 unisubs.timeline.Subtitle.prototype.isLoneUnsynced_ = function() {
     var previous = this.editableCaption_.getPreviousCaption();
     var isLone =  this.editableCaption_.getStartTime() == -1 &&
-        ( !previous || this.editableCaption_.x.endTime(previous) != -1);
+        ( !previous || previous.getEndTime() != -1);
     return isLone;
 };
 unisubs.timeline.Subtitle.prototype.isNextToBeSynced = function() {
