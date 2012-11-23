@@ -181,7 +181,6 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
         if (nextToBeSynced) {
             c.add(this.getElement(), unsyncedclass);
             unisubs.style.showElement(this.rightGrabber_, false);
-            console.log(this.getElement())
         }
         else {
             c.remove(this.getElement(), unsyncedclass);

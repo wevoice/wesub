@@ -136,9 +136,6 @@ unisubs.timeline.Subtitle.prototype.videoTimeUpdate_ = function(e) {
     }
 };
 unisubs.timeline.Subtitle.prototype.bumpUnsyncedTimes = function(time) {
-    if (isNaN(time)){
-        debugger;
-    }
     var prevStartTime = this.startTime_;
     this.startTime_ = time +
         unisubs.timeline.Subtitle.UNASSIGNED_SPACING;
