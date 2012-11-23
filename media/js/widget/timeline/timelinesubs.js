@@ -61,14 +61,13 @@ unisubs.timeline.TimelineSubs.prototype.displayNewListener_ =
     this.addSub_(event.subtitle);
 };
 unisubs.timeline.TimelineSubs.prototype.removeListener_ = function(event) {
-    var captionID = event.subtitle.getEditableCaption().getCaptionID();
-    var timelineSub = this.subs_[captionID];
+    var timelineSub = this.subs_[event.index];
     this.removeChild(timelineSub, true);
-    delete this.subs_[captionID];
+    delete this.subs_[event.index];
 };
 unisubs.timeline.TimelineSubs.prototype.addSub_ = function(sub) {
     var timelineSub = new unisubs.timeline.TimelineSub(
         sub, this.pixelsPerSecond_, 0, this.readOnly_);
     this.addChild(timelineSub, true);
-    this.subs_[sub.getEditableCaption().getCaptionIndex()] = timelineSub;
+    this.subs_[sub.editableCaption_.x.getSubtitleIndex(sub.editableCaption_.node)] = timelineSub;
 };
