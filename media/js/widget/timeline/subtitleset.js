@@ -154,8 +154,10 @@ unisubs.timeline.SubtitleSet.prototype.isInsertable_ = function(caption) {
 };
 unisubs.timeline.SubtitleSet.prototype.captionChange_ = function(e) {
     if (e.timesFirstAssigned && e.target.getNextCaption() != null) {
+        var editableCaption = this.editableCaptionSet_.captions_[
+            goog.array.indexOf(this.editableCaptionSet_.captions_, e.target)];
         var newSub = new unisubs.timeline.Subtitle(
-            e.target.getNextCaption(), this.videoPlayer_);
+            editableCaption, this.videoPlayer_);
         var lastSub = null;
         if (this.subsToDisplay_.length > 0)
             lastSub = this.subsToDisplay_[this.subsToDisplay_.length - 1];
