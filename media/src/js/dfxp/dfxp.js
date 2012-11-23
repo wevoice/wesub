@@ -37,13 +37,53 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.$xml = $(xml.documentElement).clone();
 
         // Cache the query for the containing div.
+        // TODO: This is broken because there may be multiple containing divs.
+        // The only reliable container is a <body> element.
         this.$div = $('div', this.$xml);
 
+        // Convert both subtitle sets to milliseconds.
+        this.utils.convertTimes('milliseconds', $('div p', this.$originalXml));
+        this.utils.convertTimes('milliseconds', $('div p', this.$xml));
     };
 
-    // Helper methods.
     this.utils = {
 
+        /*
+         * Convert times to either milliseconds or time expressions.
+         */
+        convertTimes: function(destination, $subtitles) {
+
+            for (var i = 0; i < $subtitles.length; i++) {
+                if (destination === 'milliseconds') {
+                    that.utils.timeExpressionToMilliseconds($subtitles.eq(i).attr('begin'));
+                    that.utils.timeExpressionToMilliseconds($subtitles.eq(i).attr('end'));
+                } else {
+                    that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+                }
+                break;
+            }
+
+        },
+        millisecondsToTimeExpression: function(milliseconds) {
+            /*
+             * Parses milliseconds into a time expression.
+             */
+        },
+        timeExpressionToMilliseconds: function(timeExpression) {
+            /*
+             * Parses a time expression into milliseconds.
+             */
+
+            var originalTime = timeExpression.split('.');
+            var hoursMinutesSeconds = originalTime[0].split(':');
+
+            var hours = hoursMinutesSeconds[0];
+            var minutes = hoursMinutesSeconds[1];
+            var seconds = hoursMinutesSeconds[2];
+            var milliseconds = originalTime[1];
+
+            return;
+        },
         xmlToString: function(xml) {
             /*
              * Convert an XML document to a string.
@@ -122,6 +162,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (after === -1) {
 
             // Prepend this new subtitle directly inside of the containing div.
+            // TODO: This is broken because there may be multiple containing
+            // divs.
             this.$div.prepend($newSubtitle);
 
         // Otherwise, place it after the designated subtitle.
@@ -211,10 +253,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
 
-        if (!$subtitle ){
+        if (!$subtitle ) {
             return -1;
         }
-        return parseInt($subtitle.attr('end')) || -1;
+        return parseInt($subtitle.attr('end'), 10) || -1;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -245,7 +287,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var el =this.getSubtitle(indexOrElement);
-        if (!el){
+
+        if (!el) {
             return null;
         }
         return el.next().length > 0 ? el.next().eq(0) : null;
@@ -269,24 +312,33 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var el = this.getSubtitle(indexOrElement);
-        if (!el){
+
+        if (!el) {
             return null;
         }
         return el.prev().length > 0 ? el.prev().eq(0) : null;
     };
-    this.getSubtitleIndex = function(subtitle){
+    this.getSubtitleIndex = function(subtitle) {
+        /*
+         * Retrieve the index of the given subtitle.
+         *
+         * Returns: integer
+         */
+
         if (subtitle instanceof AmarajQuery) {
             subtitle = subtitle.get(0);
         }
 
         var $subtitles = this.getSubtitles();
-        for (var i= 0; i < $subtitles.length; i++){
-            if ($subtitles.get(i) === subtitle){
-                return i
+        for (var i= 0; i < $subtitles.length; i++) {
+            if ($subtitles.get(i) === subtitle) {
+                return i;
             }
         }
+
         return -1;
-    }
+
+    };
     this.getSubtitle = function(indexOrElement) {
         /*
          * Retrieve the subtitle based on the index given.
@@ -328,8 +380,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             // Make sure the node exists in the DFXP tree.
             var $subtitles = this.getSubtitles();
-            for (var i= 0; i < $subtitles.length; i++){
-                if ($subtitles.get(i) === indexOrElement){
+            for (var i= 0; i < $subtitles.length; i++) {
+                if ($subtitles.get(i) === indexOrElement) {
                     subtitle = $subtitles.get(i);
                     break;
                 }
@@ -350,7 +402,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: jQuery selection of nodes
          */
 
-        return $('div > p', this.$xml);
+        return $('div p', this.$xml);
     };
     this.isShownAt = function(indexOrElement, time) {
         /*
@@ -574,14 +626,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         if (typeof startOfParagraph !== 'undefined') {
 
-            if (startOfParagraph){
+            if (startOfParagraph) {
                 // you only need to make it a paragraph if it's not
                 // already
-                if (!$subtitle.is(":first-child")){
+                if (!$subtitle.is(":first-child")) {
                     $subtitle.wrap("<div>");
                 }
             }else if ($subtitle.is(":first-child") &&
-                      $subtitle.parent().get(0) !== this.$div.get(0)){
+                      $subtitle.parent().get(0) !== this.$div.get(0)) {
                 $subtitle.unwrap();
             }
         }
@@ -605,10 +657,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
 
-        if (!$subtitle ){
+        if (!$subtitle ) {
             return -1;
         }
-        return parseInt($subtitle.attr('begin')) || -1;
+
+        return parseInt($subtitle.attr('begin'), 10) || -1;
     };
     this.subtitlesCount = function() {
         /*
