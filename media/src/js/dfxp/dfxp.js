@@ -622,8 +622,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
     };
-    // FIXME: this is totally wrong changing the paragraph marker
-    // will change the dom structure too, let's fix this later
     this.startOfParagraph = function(indexOrElement, startOfParagraph) {
         /*
          * Either get or set the startofparagraph for the subtitle.
@@ -632,6 +630,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * therefore all first subtitles are start of paragraphs.
          * When we want to set it to true, we wrap that <p> inside
          * a <div> (checking that we're not already a first paragraph ).
+         *
          * Returns: current state of startofparagraph (boolean)
          */
 
@@ -640,18 +639,20 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof startOfParagraph !== 'undefined') {
 
             if (startOfParagraph) {
-                // you only need to make it a paragraph if it's not
-                // already
-                if (!$subtitle.is(":first-child")) {
-                    $subtitle.wrap("<div>");
+
+                // If the subtitle is not the first child, then we need to wrap
+                // the subtitle in a div.
+                if (!$subtitle.is(':first-child')) {
+                     $subtitle.wrap('<div>');
                 }
-            }else if ($subtitle.is(":first-child") &&
-                      $subtitle.parent().get(0) !== this.$div.get(0)) {
+
+            } else if ($subtitle.is(':first-child') &&
+                       $subtitle.parent().get(0) !== this.$div.get(0)) {
                 $subtitle.unwrap();
             }
         }
 
-        return $subtitle.is(":first-child");
+        return $subtitle.is(':first-child');
     };
     this.startTime = function(indexOrElement, startTime) {
         /*
