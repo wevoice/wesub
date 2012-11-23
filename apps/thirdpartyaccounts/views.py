@@ -30,6 +30,7 @@ from oauth import oauth
 
 from socialauth.lib import oauthtwitter2 as oauthtwitter
 from socialauth.views import get_url_host
+from thirdpartyaccounts.auth_backends import FacebookAccount
 
 
 # Twitter ---------------------------------------------------------------------
@@ -174,6 +175,26 @@ def facebook_login_done(request, next):
     fb.oauth2_access_token(code, callback_url)
 
     request.facebook = fb
+
+    if request.session.get('fb-no-login', False):
+        # Don't create a new user
+        if not request.user.is_authenticated():
+            messages.error(request, 'You must be logged in.')
+            return redirect('auth:login')
+
+        fb.uid = fb.users.getLoggedInUser()
+        try:
+            account = FacebookAccount.objects.get(uid=fb.uid)
+            if request.user.pk != account.user.pk:
+                messages.error(request, 'Account already linked')
+                return redirect('profiles:account')
+        except FacebookAccount.DoesNotExist:
+            FacebookAccount.objects.create(user=request.user, uid=fb.uid)
+
+        del request.session['fb-no-login']
+        messages.info(request, 'Successfully linked a Facebook account')
+        return redirect('profiles:account')
+
     user = authenticate(facebook=fb, request=request)
 
     if user:
