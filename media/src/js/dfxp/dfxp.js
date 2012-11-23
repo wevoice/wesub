@@ -267,10 +267,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var el =this.getSubtitle(indexOrElement).prev();
         return el.length > 0 ? el.eq(0) : null;
     };
-    this.getSubtitleIndex = function(subtitleNode){
+    this.getSubtitleIndex = function(subtitle){
+        if (subtitle instanceof AmarajQuery) {
+            subtitle = subtitle.get(0);
+        }
+
         var $subtitles = this.getSubtitles();
         for (var i= 0; i < $subtitles.length; i++){
-            if ($subtitles.get(i) === subtitleNode){
+            if ($subtitles.get(i) === subtitle){
                 return i
             }
         }

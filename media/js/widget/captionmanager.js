@@ -125,7 +125,7 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (nextCaption != null &&
 	this.x.isShownAt(nextCaption, playheadTime)) {
         this.currentCaptionIndex_++;
-        this.dispatchCaptionEvent_(nextCaption, this.currentCaptionIndex_ +1);
+        this.dispatchCaptionEvent_(nextCaption, this.x.getSubtitleIndex(nextCaption));
         return;
     }
     if ((nextCaption == null ||
