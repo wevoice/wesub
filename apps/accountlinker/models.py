@@ -144,6 +144,24 @@ def get_amara_credit_text(language='en'):
     return translate_string(AMARA_CREDIT, language)
 
 
+def translate_string(string, language='en'):
+    """
+    If a translation for the specified language doesn't exist, return the
+    English version.
+    """
+    cur_language = translation.get_language()
+    try:
+        translation.activate(language)
+        text = translation.ugettext(string)
+    finally:
+        translation.activate(cur_language)
+    return text
+
+
+def get_amara_credit_text(language='en'):
+    return translate_string(AMARA_CREDIT, language)
+
+
 class ThirdPartyAccountManager(models.Manager):
 
     def always_push_account(self):
