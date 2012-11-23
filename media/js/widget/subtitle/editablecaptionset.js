@@ -269,17 +269,19 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     return null;
 };
 /**
- - * Always in ascending order by start time.
- - */
+ * Always in ascending order by start time.
+ * Returns a list of EditableCaptions that
+ * should be displayed on the timeline. These are
+ * all synced subs + the first unsyced sub
+ */
 unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
     return goog.array.filter(
         this.captions_,
         function(c) {
+            var prev =this.x.getPreviousSubtitle(c.node) ;
             return this.x.startTime(c.node) != -1 ||
-                (this.x.getPreviousSubtitle(c.node).length !== 0 &&
-                    this.x.startTime(this.x.getPreviousSubtitle(c.node)) != -1) ||
-                (this.x.getPreviousSubtitle(c.node).length === 0 &&
-                    this.x.startTime(c.node) == -1);
+                (prev && this.x.startTime(prev) != -1) ||
+                (this.x.startTime(c.node) == -1);
         });
 };
 /**
