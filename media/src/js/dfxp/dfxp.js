@@ -42,36 +42,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.$div = $('div', this.$xml);
 
         // Convert both subtitle sets to milliseconds.
-        this.utils.convertTimes('milliseconds', $('div p', this.$originalXml));
-        this.utils.convertTimes('milliseconds', $('div p', this.$xml));
+        this.convertTimes('milliseconds', $('div p', this.$originalXml));
+        this.convertTimes('milliseconds', $('div p', this.$xml));
     };
 
     this.utils = {
 
-        /*
-         * Convert times to either milliseconds or time expressions.
-         */
-        convertTimes: function(destination, $subtitles) {
-
-            for (var i = 0; i < $subtitles.length; i++) {
-
-                var newStartTime, newEndTime;
-
-                if (destination === 'milliseconds') {
-                    newStartTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('begin'));
-                    newEndTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('end'));
-                } else {
-                    newStartTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
-                    newEndTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
-                }
-
-                $subtitles.eq(i).attr({
-                    'begin': newStartTime,
-                    'end': newEndTime
-                });
-            }
-
-        },
         secondsToTimeExpression: function(seconds) {
             /*
              * Parses milliseconds into a time expression.
@@ -247,6 +223,30 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         //
         // Reference: http://bit.ly/SwbPeR
         return $('<div>').append($subtitle.contents().clone()).remove().html();
+
+    };
+    this.convertTimes = function(destination, $subtitles) {
+        /*
+         * Convert times to either milliseconds or time expressions.
+         */
+
+        for (var i = 0; i < $subtitles.length; i++) {
+
+            var newStartTime, newEndTime;
+
+            if (destination === 'milliseconds') {
+                newStartTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('begin'));
+                newEndTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('end'));
+            } else {
+                newStartTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+                newEndTime = that.utils.millisecondsToTimeExpression($subtitles.eq(i));
+            }
+
+            $subtitles.eq(i).attr({
+                'begin': newStartTime,
+                'end': newEndTime
+            });
+        }
 
     };
     this.endTime = function(indexOrElement, endTime) {
