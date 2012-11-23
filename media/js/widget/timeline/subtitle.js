@@ -56,9 +56,9 @@ unisubs.timeline.Subtitle.prototype.captionChanged_ = function(e) {
 };
 unisubs.timeline.Subtitle.prototype.updateTimes_ = function() {
     if (this.isLoneUnsynced_()) {
-        var prevSubtitleEndTime =
-            this.editableCaption_.getPreviousCaption() == null ?
-            -1 : this.editableCaption_.x.endTime(this.editableCaption_.getPreviousCaption());
+        var previousCaption = this.editableCaption_.getPreviousCaption();
+        var prevSubtitleEndTime = previousCaption == null ? -1 :
+                                  previousCaption.getEndTime();
         this.startTime_ =
             Math.max(prevSubtitleEndTime,
                      this.videoPlayer_.getPlayheadTime() * 1000)  +
@@ -127,7 +127,7 @@ unisubs.timeline.Subtitle.prototype.videoTimeUpdate_ = function(e) {
         if (this.editableCaption_.getPreviousCaption() == null)
             this.bumpUnsyncedTimes(this.videoPlayer_.getPlayheadTime() * 1000);
         else{
-            var previousEndTime = this.editableCaption_.x.endTime(this.editableCaption_.getPreviousCaption());
+            var previousEndTime = this.editableCaption_.getPreviousCaption().getEndTime();
             var bumpTo = Math.max( this.videoPlayer_.getPlayheadTime() * 1000, previousEndTime || 0);
             this.bumpUnsyncedTimes(bumpTo);
 
