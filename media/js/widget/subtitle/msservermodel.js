@@ -141,8 +141,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     var args = { 'session_pk': this.sessionPK_ };
     var atLeastOneThingChanged = false;
     if (!goog.isNull(subtitles)) {
-        args['subtitles'] = goog.array.map(
-            subtitles, function(s) { return s.json; });
+        args['subtitles'] = this.captionSet_.x.xmlToString()
         atLeastOneThingChanged = true;
     }
     if (goog.isDefAndNotNull(this.captionSet_.title) &&
