@@ -163,7 +163,6 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
         var width =
             (this.subtitle_.getEndTime() - this.subtitle_.getStartTime()) *
                 this.pixelsPerMillisecond_;
-        width = Math.max(width,unisubs.timeline.TimelineSub.MIN_LENGTH * this.pixelsPerMillisecond_ )
 
         unisubs.style.setWidth( this.getElement(), width);
         this.existingSubEnd_ = this.subtitle_.getEndTime();
