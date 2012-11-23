@@ -255,17 +255,27 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var captions = this.x.getSubtitles();
     var currentStartTime;
     var nextStartTime;
-    for (i = 0; i < captions.length; i++)
+    var isLast = false;
+    var length = captions.length;
+    for (i = 0; i < length; i++){
         currentStartTime = this.x.startTime(i);
-        if (i < captions.length -1){
+        isLast = i == length -1;
+        if (!isLast){
             nextStartTime = this.x.startTime(i+1);
+        }else{
+            nextStartTime  = undefined;
         }
+        // we want a sub with a start time < play time
+        // that either is the last one, or one where
+        // the next is unsyced or it's start time is
+        // greater then play time
         if (currentStartTime != -1 &&
             currentStartTime <= time &&
-            (i == captions.length - 1 ||
-             nextStartTime == -1 ||
-             nextStartTime > time))
-            return captions_[i];
+            (nextStartTime == -1 ||
+             nextStartTime > time) || isLast ){
+            return this.captions_[i];
+        }
+    }
     return null;
 };
 /**
