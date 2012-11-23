@@ -244,7 +244,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element or empty array
          */
 
-        return this.getSubtitle(indexOrElement).next();
+        var el =this.getSubtitle(indexOrElement);
+        if (!el){
+            return null;
+        }
+        return el.next().length > 0 ? el.next().eq(0) : null;
     };
     this.getNonBlankSubtitles = function() {
         /*
@@ -264,8 +268,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element
          */
 
-        var el =this.getSubtitle(indexOrElement).prev();
-        return el.length > 0 ? el.eq(0) : null;
+        var el = this.getSubtitle(indexOrElement);
+        if (!el){
+            return null;
+        }
+        return el.prev().length > 0 ? el.prev().eq(0) : null;
     };
     this.getSubtitleIndex = function(subtitle){
         if (subtitle instanceof AmarajQuery) {
