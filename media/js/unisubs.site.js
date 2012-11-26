@@ -171,6 +171,12 @@ var Site = function(Site) {
              */
             if (window.TEAM_SLUG == 'ted') {
 
+                // If this is a user's task listing, select the 'any project'
+                // option.
+                if (window.ASSIGNEE !== '') {
+                    return $('option[id="project-opt-any"]');
+                }
+
                 // If this is a video's task listing, select the 'any project'
                 // option.
                 if (window.REQUEST_TEAM_VIDEO && window.REQUEST_TEAM_VIDEO !==  '') {
