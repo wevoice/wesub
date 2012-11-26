@@ -290,10 +290,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.timelineCaptions = function() {
     return goog.array.filter(
         this.captions_,
         function(c) {
-            var prev =this.x.getPreviousSubtitle(c.node) ;
-            return this.x.startTime(c.node) != -1 ||
-                (prev && this.x.startTime(prev) != -1) ||
-                (this.x.startTime(c.node) == -1);
+            var prev = c.getPreviousCaption();
+            return c.getStartTime() != -1 ||
+                (prev && prev.getStartTime() != -1) ||
+                (c.getStartTime() == -1 && !prev );
         });
 };
 /**

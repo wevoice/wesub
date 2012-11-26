@@ -157,7 +157,7 @@ unisubs.timeline.SubtitleSet.prototype.captionChange_ = function(e) {
         var editableCaption = this.editableCaptionSet_.captions_[
             goog.array.indexOf(this.editableCaptionSet_.captions_, e.target)];
         var newSub = new unisubs.timeline.Subtitle(
-            editableCaption, this.videoPlayer_);
+            editableCaption.getNextCaption(), this.videoPlayer_);
         var lastSub = null;
         if (this.subsToDisplay_.length > 0)
             lastSub = this.subsToDisplay_[this.subsToDisplay_.length - 1];
