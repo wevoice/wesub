@@ -866,12 +866,27 @@ var Site = function(Site) {
             });
         },
         user_account: function() {
-            $(".api-key-holder").click(function(){
-                $(this).select();
-            });
             $('#account-type-select').change(function() {
                 $('.account-type-copy').hide();
                 $('#' + this.value + '-copy').show();
+            });
+            $(".api-key-holder").click(function(){
+                $(this).select();
+            });
+            $(".get-new-api-bt").click(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr("href"),
+                    dataType: "json",
+                    type: "POST",
+                    success: function(res){
+                        $(".api-key-holder").text(res.key);
+                        $(".get-new-api-bt").text("Reset your API key");
+                        $(".api-key-status").text("Key generated, enjoy!");
+                    }
+                });
+                $("#api div").show();
+                return false;
             });
         },
 
