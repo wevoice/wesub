@@ -175,7 +175,7 @@ unisubs.subtitle.SubtitleList.prototype.captionInserted_ = function(e) {
     var nextCaption = addedCaption.getNextCaption();
     if (nextCaption != null) {
         var nextWidget = this.subtitleMap_[nextCaption.getCaptionIndex()];
-        this.addChildAt(subtitleWidget, this.indexOfChild(nextWidget), true);
+        this.addChildAt(subtitleWidget, addedCaption.getCaptionIndex(), true);
     }
     else {
         this.addChildAt(subtitleWidget, this.getChildCount() - 1, true);

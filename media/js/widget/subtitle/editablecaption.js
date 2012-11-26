@@ -288,6 +288,9 @@ unisubs.subtitle.EditableCaption.toIDArray = function(editableCaptions) {
         });
 };
 
+unisubs.subtitle.EditableCaption.prototype.toString = function() {
+    return "EditableCaption: "  + this.getText()
+}
 /**
  * @constructor
  */

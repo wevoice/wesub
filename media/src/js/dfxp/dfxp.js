@@ -191,13 +191,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $newSubtitle = $(newSubtitle).attr(newAttrs);
 
-        if (typeof content !== 'undefined') {
-            if (content === null) {
-                this.content($newSubtitle, '');
-            } else {
-                this.content($newSubtitle, content);
-            }
-        }
 
         // Finally, place the new subtitle.
         //
@@ -217,6 +210,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             // Then place it.
             $previousSubtitle.after($newSubtitle);
+        }
+
+        if (typeof content !== 'undefined') {
+            if (content === null) {
+                this.content($newSubtitle, '');
+            } else {
+                this.content($newSubtitle, content);
+            }
         }
 
         return $newSubtitle.get(0);

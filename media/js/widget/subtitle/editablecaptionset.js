@@ -153,18 +153,19 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = funct
 
 /**
  *
- * @param {Number} nextSubOrder The next subtitle's subOrder
+ * @param {Number} atIndex The next subtitle's subOrder
  *     (returned by EditableCaption#getSubOrder())
  */
-unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(nextSubOrder) {
-    var index = this.findSubIndex_(nextSubOrder);
-    var nextSub = this.captions_[index];
-    prevSub = nextSub.getPreviousCaption();
-    var order = ((prevSub ? prevSub.getSubOrder() : 0.0) +
-                 nextSub.getSubOrder()) / 2.0;
-    var c = new unisubs.subtitle.EditableCaption(order);
+unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex) {
+    var prevSub;
+    var nextSub = this.captions_[atIndex];
+    if(atIndex >0){
+        prevSub = nextSub.getPreviousCaption();
+    }
+    var c = new unisubs.subtitle.EditableCaption(this.x.addSubtitle(
+        atIndex >= 1 ? atIndex  -1 : -1, {}, ""), this.x);
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
-    goog.array.insertAt(this.captions_, c, index);
+    goog.array.insertAt(this.captions_, c, atIndex );
     if (prevSub) {
         prevSub.setNextCaption(c);
         c.setPreviousCaption(prevSub);
