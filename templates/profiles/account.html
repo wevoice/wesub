@@ -78,15 +78,20 @@
                     {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
                     <p class="notation">{% trans "Send an email notification for each message received" %}</p>
                 </fieldset>
-                <fieldset>
+                <fieldset id="api">
                     <legend>{% trans "API Access" %}</legend>
-                    {% if form.instance.api_key.key %}
+                    <div{% if not form.instance.api_key.key %} style="display:none"{% endif %}>
                         <label>{% trans "Your API key" %}</label>
                         <textarea class="api-key-holder" readonly="readonly">{{form.instance.api_key.key}}</textarea>
-                        <p><span class="api-key-status"></span></p>
-                    {% else %}
-                        <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button reduced">{% trans "Get an API key" %}</a>
-                    {% endif %}
+                        <p class="api-key-status"></p>
+                    </div>
+                    <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button reduced">
+                        {% if form.instance.api_key.key %}
+                            {% trans "Reset your API key" %}
+                        {% else %}
+                            {% trans "Get an API key" %}
+                        {% endif %}
+                    </a>
                 </fieldset>
             </div>
             <div class="submit">
