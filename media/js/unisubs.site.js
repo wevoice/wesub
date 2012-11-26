@@ -869,6 +869,10 @@ var Site = function(Site) {
             $(".api-key-holder").click(function(){
                 $(this).select();
             });
+            $('#account-type-select').change(function() {
+                $('.account-type-copy').hide();
+                $('#' + this.value + '-copy').show();
+            });
         },
 
         // Messages
@@ -988,13 +992,6 @@ var Site = function(Site) {
                 $(this).parents('form').hide();
             });
         },
-
-        account: function() {
-            $('#account-type-select').change(function() {
-                $('.account-type-copy').hide();
-                $('#' + this.value + '-copy').show();
-            });
-        }
     };
 };
 
