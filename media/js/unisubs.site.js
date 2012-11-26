@@ -865,6 +865,11 @@ var Site = function(Site) {
                 return false;
             });
         },
+        user_account: function() {
+            $(".api-key-holder").click(function(){
+                $(this).select();
+            });
+        },
 
         // Messages
         messages_list: function() {
