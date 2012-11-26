@@ -128,7 +128,7 @@ unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
     return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
 };
 unisubs.subtitle.EditableCaption.prototype.getTrimmedText = function() {
-    return goog.string.trim(this.json['text']);
+    return goog.string.trim(this.x.content(this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
     var previousStartTime = this.getStartTime();

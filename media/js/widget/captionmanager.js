@@ -120,12 +120,14 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 	this.x.isShownAt(curCaption, playheadTime))
         return;
 
+    var nextCaptionIndex =  this.currentCaptionIndex_ < subs.length -1 ?
+        this.currentCaptionIndex_ + 1 : null;
     var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
-        this.x.getSubtitle(this.currentCaptionIndex_ + 1) : null;
+        this.captions_[this.currentCaptionIndex_ + 1] : null;
     if (nextCaption != null &&
-	this.x.isShownAt(nextCaption, playheadTime)) {
+	this.x.isShownAt(this.x.getSubtitle(nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
-        this.dispatchCaptionEvent_(nextCaption, this.x.getSubtitleIndex(nextCaption));
+        this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
     }
     if ((nextCaption == null ||

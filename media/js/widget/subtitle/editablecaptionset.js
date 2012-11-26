@@ -123,7 +123,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     //return goog.array.map(this.captions_, function(c) { return c.json; });
 //};
 unisubs.subtitle.EditableCaptionSet.prototype.nonblankSubtitles = function() {
-    return this.x.getNonBlankSubtitles();
+    var nonBlank = goog.array.filter(this.captions_, function(caption, index){
+       return caption.getTrimmedText()  !== '';
+    })
+    return nonBlank;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptionSet) {
     var myNonblanks = this.nonblankSubtitles();
