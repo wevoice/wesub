@@ -416,7 +416,7 @@ def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
-    if project_slug is None:
+    if project_slug is None or project_slug == '':
         project_slug = request.GET.get('project')
 
     if project_slug:
@@ -1252,7 +1252,7 @@ def team_tasks(request, slug):
     filters = _get_task_filters(request)
     filtered = 0
 
-    if project_slug is not None:
+    if project_slug != '' and project_slug != None:
         if project_slug == 'any':
             project = None
         else:
