@@ -279,29 +279,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $('<div>').append($subtitle.contents().clone()).remove().html();
 
     };
-    this.convertTimes = function(format, $subtitles) {
+    this.convertTimes = function(toFormat, $subtitles) {
         /*
          * Convert times to either milliseconds or time expressions
          * in the 'begin' and 'end' attributes, IN PLACE.
          */
-
         var convertFn = null;
-        if (format === 'milliseconds'){
+        if (toFormat === 'milliseconds'){
             convertFn = that.utils.timeExpressionToMilliseconds;
-        }else if (format=== 'timeExpression'){
+        }else if (toFormat=== 'timeExpression'){
             convertFn = that.utils.millisecondsToTimeExpression;
         }else{
-            throw new Error("Unsoported time convertion " + format);
+            throw new Error("Unsoported time convertion " + toFormat);
         }
-        var newStartTime, newEndTime;
         for (var i = 0; i < $subtitles.length; i++) {
-            newStartTime = convertFn.call(this,$subtitles.eq(i).attr('begin'));
-            newEndTime = convertFn.call(this, $subtitles.eq(i).attr('end'));
-
-            $subtitles.eq(i).attr({
-                'begin': newStartTime,
-                'end': newEndTime
-            });
+            $subtitles.eq(i).attr('begin', convertFn.call(this,$subtitles.eq(i).attr('begin')));
+            $subtitles.eq(i).attr('begin', convertFn.call(this,$subtitles.eq(i).attr('end')));
         }
 
     };
