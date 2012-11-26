@@ -151,7 +151,7 @@
             <div class="section">
                 <h3>{% trans "Messages" %}
                     {% if user.unread_messages.count > 0 %}
-                        <a href="{% url messages:inbox %}" title="{% trans 'Go to your inbox' %}"class="count">{{ user.unread_messages.count }} {% trans "new" %}</a>
+                        <a href="{% url messages:inbox %}" title="{% trans 'Go to your inbox' %}"class="count">{{ user.unread_messages.count }} {% trans "unread" %}</a>
                     {% endif %}
                 </h3>
                 <ul class="listing">
@@ -162,7 +162,7 @@
                         </li>
                     {% endfor %}
                 </ul>
-                <a href="{% url messages:inbox %}" class="more">{% trans "Read your messages" %}</a>
+                <a href="{% url messages:inbox %}" class="more">{% trans "View your messages" %}</a>
             </div>
         {% endif %}
         <div class="section">
