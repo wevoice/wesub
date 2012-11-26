@@ -293,8 +293,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             throw new Error("Unsoported time convertion " + toFormat);
         }
         for (var i = 0; i < $subtitles.length; i++) {
-            $subtitles.eq(i).attr('begin', convertFn.call(this,$subtitles.eq(i).attr('begin')));
-            $subtitles.eq(i).attr('begin', convertFn.call(this,$subtitles.eq(i).attr('end')));
+            var sub, currentStartTime, currentEndTime;
+            sub = $subtitles.eq(i);
+            currentStartTime = sub.attr('begin');
+            currentEndTime = sub.attr('end');
+            if (currentStartTime){
+                sub.attr('begin', convertFn.call(this, currentStartTime));
+            }
+            if (currentEndTime){
+                sub.attr('end', convertFn.call(this, currentEndTime));
+            }
         }
 
     };
