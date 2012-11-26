@@ -201,16 +201,18 @@ unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ = function(
  * @param {unisubs.subtitle.EditableCaption} caption
  */
 unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) {
-    var index = this.findSubIndex_(caption)
+    var index = caption.getCaptionIndex();
     var sub = this.captions_[index];
     var prevSub = sub.getPreviousCaption();
     var nextSub = sub.getNextCaption();
     goog.array.removeAt(this.captions_, index);
     this.x.removeSubtitle(index);
-    /*prevSub (prevSub)
+    if (prevSub){
         prevSub.setNextCaption(nextSub);
-    if (nextSub)
-        nextSub.setPreviousCaption(prevSub);*/
+    }
+    if (nextSub){
+        nextSub.setPreviousCaption(prevSub);
+    }
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaptionSet.CaptionEvent(
             unisubs.subtitle.EditableCaptionSet.EventType.DELETE,
