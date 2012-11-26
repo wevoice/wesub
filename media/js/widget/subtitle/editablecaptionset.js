@@ -117,7 +117,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     //return subMap[id];
 //};
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
-    return this.x.xmlToString();
+    return this.x.xmlToString(true);
 };
 //unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
     //return goog.array.map(this.captions_, function(c) { return c.json; });
