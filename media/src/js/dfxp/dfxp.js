@@ -19,6 +19,9 @@
 var AmaraDFXPParser = function(AmaraDFXPParser) {
     /*
      * A utility for working with DFXP subs.
+     * The front end app needs all timming data to be
+     * stored in milliseconds for processing. On `init` we convert
+     * time expressions to milliseconds
      */
 
     var that = this;
@@ -48,56 +51,45 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
     this.utils = {
-
-        secondsToTimeExpression: function(seconds) {
+        millisecondsToTimeExpression: function(milliseconds) {
             /*
              * Parses milliseconds into a time expression.
              */
-
-            var givenSeconds = seconds;
-            var timeExpression;
-
-            givenSeconds = givenSeconds.toString().split('.');
-
-            milliseconds = givenSeconds[1];
-            givenSeconds = parseInt(givenSeconds[0], 10);
-
-            // Mother of God.
-            // TODO: Untangle my brain.
-            //var hours   = ~~  (givenSeconds / 3600);
-            //var minutes = ~~ ((givenSeconds % 3600) / 60);
-            //seconds     = givenSeconds % 60;
-
-            var hours, minutes;
-
-            timeExpression = that.utils.zeroFill(hours, 2) + ':' +
-                             that.utils.zeroFill(minutes, 2) + ':' +
-                             that.utils.zeroFill(seconds, 2) + '.' +
-                             milliseconds;
-
-            return timeExpression;
+            if (milliseconds === -1 || milliseconds === undefined || milliseconds === null) {
+                throw Error("Invalid milliseconds to be converted" + milliseconds)
+            }
+            var time = Math.floor(milliseconds / 1000);
+            var hours = ~~(time / 3600);
+            var minutes = ~~((time % 3600) / 60);
+            var fraction = milliseconds % 1000;
+            var p = this.utils.leftPad;
+            var seconds = time % 60;
+            return p(hours, 2) + ':' +
+                p(minutes, 2) + ':' +
+                p(seconds, 2) +  ',' +
+                p(fraction, 3);
         },
-        timeExpressionToSeconds: function(timeExpression) {
+        timeExpressionToMilliseconds: function(timeExpression) {
             /*
-             * Parses a time expression into seconds, including milliseconds.
+             * Converts a time expression into milliseconds.
+             * Since we trust the backend has generated this value,
+             * we're not being to defensive about parsing, we
+             * expect this to be in the HH:MM:SS.FFF form.
+             * If number of digits on fraction is less than 3,
+             * we right pad them.
+             * Returns: int
              */
+            var components = timeExpression.match(/([\d]{2}):([\d]{2}):([\d]{2}).([\d]{1,3})/i);
+            var millisecondsInHours   = components[1] * (3600 * 1000);
+            var millisecondsInMinutes = components[2] * (60 * 1000);
+            var millisecondsInSeconds = components[3] * (1000);
+            var millisecondsInFraction = parseInt(this.utils.rightPad(components[4], 3));
 
-            var originalTime = timeExpression.split('.');
-            var hoursMinutesSeconds = originalTime[0].split(':');
-
-            // TODO: Untangle my brain.
-            //var millisecondsInHours   = hoursMinutesSeconds[0] * (3600 * 1000);
-            //var millisecondsInMinutes = hoursMinutesSeconds[1] * (60 * 1000);
-            //var millisecondsInSeconds = hoursMinutesSeconds[2] * (1000);
-            var millisecondsInHours, millisecondsInMinutes, millisecondsInSeconds;
-            var milliseconds          = originalTime[1];
-
-            var totalSeconds = (millisecondsInHours +
+            return parseInt(millisecondsInHours +
                                 millisecondsInMinutes +
-                                millisecondsInSeconds) +
-                                '.' + milliseconds;
+                                millisecondsInSeconds +
+                                 + millisecondsInFraction);
 
-            return parseFloat(totalSeconds);
         },
         xmlToString: function(xml) {
             /*
@@ -120,22 +112,41 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             
             return xmlString;
         },
-        zeroFill: function(number, width) {
+        leftPad: function(number, width, char) {
             /*
-             * Pad a number to the given width, with zeros.
+             * Left Pad a number to the given width, with zeros.
              * From: http://stackoverflow.com/a/1267338/22468
              *
              * Returns: string
              */
 
+            char = char || '0';
             width -= number.toString().length;
 
             if (width > 0) {
                 return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join('0') + number;
+                                .join(char) + number;
+            }
+            return number.toString();
+        },
+        rightPad: function(number, width, char) {
+            /*
+             * Right Pad a number to the given width, with zeros.
+             * From: http://stackoverflow.com/a/1267338/22468
+             *
+             * Returns: string
+             */
+
+            char = char || '0';
+            width -= number.toString().length;
+
+            if (width > 0) {
+                return number + new Array(width + (/\./.test(number) ? 2 : 1))
+                    .join(char);
             }
             return number.toString();
         }
+
 
     };
 
@@ -268,22 +279,24 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $('<div>').append($subtitle.contents().clone()).remove().html();
 
     };
-    this.convertTimes = function(destination, $subtitles) {
+    this.convertTimes = function(format, $subtitles) {
         /*
-         * Convert times to either milliseconds or time expressions.
+         * Convert times to either milliseconds or time expressions
+         * in the 'begin' and 'end' attributes, IN PLACE.
          */
 
+        var convertFn = null;
+        if (format === 'milliseconds'){
+            convertFn = that.utils.timeExpressionToMilliseconds;
+        }else if (format=== 'timeExpression'){
+            convertFn = that.utils.millisecondsToTimeExpression;
+        }else{
+            throw new Error("Unsoported time convertion " + format);
+        }
+        var newStartTime, newEndTime;
         for (var i = 0; i < $subtitles.length; i++) {
-
-            var newStartTime, newEndTime;
-
-            if (destination === 'milliseconds') {
-                newStartTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('begin'));
-                newEndTime = that.utils.timeExpressionToSeconds($subtitles.eq(i).attr('end'));
-            } else {
-                newStartTime = that.utils.secondsToTimeExpression($subtitles.eq(i));
-                newEndTime = that.utils.secondsToTimeExpression($subtitles.eq(i));
-            }
+            newStartTime = convertFn.call(this,$subtitles.eq(i).attr('begin'));
+            newEndTime = convertFn.call(this, $subtitles.eq(i).attr('end'));
 
             $subtitles.eq(i).attr({
                 'begin': newStartTime,
@@ -728,34 +741,27 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function(withMilliseconds) {
+    this.xmlToString = function(converToTimeExpression) {
         /*
          * Parse the working XML to a string.
          *
-         * If `withMilliseconds` is specified, we can just return the existing
-         * state of the XML tree. Otherwise, we need to convert milliseconds to
-         * time expressions.
-         *
+         * If `convertToTimeExpression` is specified, we convert current
+         * `begin` and `end` attrubutes from the working format (milliseconds)
+         * to time expressins, otherwise, output what we've got
          * Returns: string
          */
 
         // If we want to get the DFXP string with milliseconds, we need to
         // just return the current state of the XML tree, since we always
         // convert to milliseconds on init (see init() above).
-        if (withMilliseconds) {
+        if (! converToTimeExpression) {
             return this.utils.xmlToString(this.$xml.get(0));
         }
 
         // Since our back-end is expecting time expressions, we need to convert
-        // the working XML's times to time expressions. However, if we do that,
-        // we must also convert *back* to milliseconds after we've retrieved the
-        // output string.
-        this.convertTimes('expressions', $('div p', this.$xml));
-
-        var DFXPString = 'hi';
-
-        this.convertTimes('milliseconds', $('div p', this.$xml));
-
-        return DFXPString;
+        // the working XML's times to time expressions.
+        var $cloned = this.$xml.clone();
+        this.convertTimes('timeExpression', $('div p', $cloned));
+        return this.utils.xmlToString($cloned.get(0));
     };
 };
