@@ -293,7 +293,7 @@ def _prepare_subtitle_data_for_version(subtitle_version):
         raise KeyError(error)
 
     subs = subtitle_version.get_subtitles()
-    subs = add_credit(subs)
+    subs = add_credit(subtitle_version, subs)
     content = babelsubs.generators.discover('srt').generate(subs)
     content = unicode(content).encode('utf-8')
 
