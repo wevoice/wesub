@@ -105,16 +105,14 @@ def add_credit(subtitle_version, subs):
     language_code = subtitle_version.language_code
     dur = subtitle_version.video.duration
 
-    credit_sub = (
+    subs.append_subtitle(
         (dur - 2) * 1000,
         dur * 1000,
         get_amara_credit_text(language_code),
         {}
     )
 
-    subs.append(credit_sub)
     return subs
-
 
 class YoutubeVideoType(VideoType):
 
@@ -293,7 +291,7 @@ def _prepare_subtitle_data_for_version(subtitle_version):
         raise KeyError(error)
 
     subs = subtitle_version.get_subtitles()
-    subs = add_credit(subs)
+    subs = add_credit(subtitle_version, subs)
     content = babelsubs.generators.discover('srt').generate(subs)
     content = unicode(content).encode('utf-8')
 

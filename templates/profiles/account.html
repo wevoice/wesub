@@ -2,7 +2,7 @@
 
 {% load i18n messages_tags %}
 
-{% block html_attrs %}id="account"{% endblock %}
+{% block html_attrs %}id="user_account"{% endblock %}
 {% block body-class %}account {{ block.super }}{% endblock %}
 {% block title %}{{ user_info }} | Amara{% endblock %}
 
@@ -82,7 +82,7 @@
                     <legend>{% trans "API Access" %}</legend>
                     {% if form.instance.api_key.key %}
                         <label>{% trans "Your API key" %}</label>
-                        <textarea class="api-key-holder" disabled="disabled">{{form.instance.api_key.key}}</textarea>
+                        <textarea class="api-key-holder" readonly="readonly">{{form.instance.api_key.key}}</textarea>
                         <p><span class="api-key-status"></span></p>
                     {% else %}
                         <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button reduced">{% trans "Get an API key" %}</a>
