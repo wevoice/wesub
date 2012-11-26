@@ -110,7 +110,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
     return this.x.subtitlesCount();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
-    return this.x.getSubtitle(index);
+    return this.captions_[index];
 };
 //unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
     //var subMap = this.makeMap();
@@ -274,7 +274,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
         if (currentStartTime != -1 &&
             currentStartTime <= time &&
             (nextStartTime == -1 ||
-             nextStartTime > time) || isLast ){
+             nextStartTime > time || isLast )){
             return this.captions_[i];
         }
     }
