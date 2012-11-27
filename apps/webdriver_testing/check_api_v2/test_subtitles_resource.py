@@ -60,10 +60,15 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
                 'Timed_text.{0}.{1}'.format(test_lang_code, 'xml')),
                 encoding = 'utf-8'
                 )
+            test_format = 'dxfp'
         else:
             sub_data = codecs.open(os.path.join(self.subs_data_dir, 
                 'Timed_text.{0}.{1}'.format(test_lang_code, test_format)),
                 encoding = 'utf-8')
+
+        #Create the url for uploading subtitles of give format and lang.
+        upload_url = ('videos/{0}/languages/{1}/subtitles/'.format(
+            self.test_video.video_id, test_lang_code))
 
         upload_data = {'subtitles': sub_data.read(), 
                        'sub_format': test_format} 
@@ -157,7 +162,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
     def test_upload__ttml(self):
         test_lang_code = 'ar'
         test_format = 'ttml'
-        subtitle_language = self.api_upload_subs( test_format, 
+        subtitle_language = self.api_upload_subs(test_format, 
            test_lang_code)
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
             test_lang_code)
@@ -316,39 +321,6 @@ class TestCaseSubtitlesFetch(WebdriverTestCase):
             % self.test_video.video_id )
 
         upload_data = { 'subtitles': response, 'sub_format': 'dfxp' } 
-        status, response = data_helpers.post_api_request(self, 
-            upload_url, 
-            upload_data)
-
-        #Open the language page on the site.        
-        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
-            'en')
-
-        self.assertEqual(2, response['version_number'])
-
-
-
-    def test_fetch__ttml(self):
-        """Fetch the subtitle data in ttml format.
-        
-        GET /api2/partners/videos/[video-id]/languages/[lang-identifier]/
-            subtitles/?format=srt
-        """
-        video_id = self.test_video.video_id
-        lang_code = 'en'
-        output_format = 'ttml'
-
-        url_part = 'videos/{0}/languages/{1}/subtitles/?format={2}'.format(
-            video_id, lang_code, output_format)
-        status, response = data_helpers.api_get_request(self, url_part, 
-            output_type = 'content')  
-        self.assertNotEqual(404, status)
-        
-        #Verify returned subs are valid - by uploading back to system
-        upload_url = ( 'videos/%s/languages/en/subtitles/' 
-            % self.test_video.video_id )
-
-        upload_data = { 'subtitles': response, 'sub_format': 'ttml' } 
         status, response = data_helpers.post_api_request(self, 
             upload_url, 
             upload_data)
