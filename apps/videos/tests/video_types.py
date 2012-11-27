@@ -120,9 +120,8 @@ class YoutubeVideoTypeTest(TestCase):
         new_sv = pipeline.add_subtitles(video, 'en', subs)
         content, t, code = _prepare_subtitle_data_for_version(new_sv)
 
-        # TODO: Honza will fix when he's done with some mess.
-        # srt = "1\r\n00:00:00,000 --> 00:00:01,000\r\nHi\r\n\r\n2\r\n00:00:02,000 --> 00:00:03,000\r\nHow are you?\r\n"
-        # self.assertEquals(srt, content)
+        srt = "1\r\n00:00:00,000 --> 00:00:01,000\r\nHi\r\n\r\n2\r\n00:00:02,000 --> 00:00:03,000\r\nHow are you?\r\n\r\n3\r\n00:01:52,000 --> 00:01:55,000\r\nSubtitles by the Amara.org community\r\n"
+        self.assertEquals(srt, content)
 
         self.assertEquals('', t)
         self.assertEquals('en', code)
