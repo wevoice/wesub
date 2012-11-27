@@ -21,15 +21,14 @@ goog.provide('unisubs.finishfaildialog.CopyDialog');
 /**
  * @constructor
  */
-unisubs.finishfaildialog.CopyDialog = function(headerText, textToCopy, captions, languageCode) {
+unisubs.finishfaildialog.CopyDialog = function(headerText, dfxpString, languageCode) {
     goog.ui.Dialog.call(this, 'unisubs-modal-lang', true);
     this.setButtonSet(null);
     this.setDisposeOnHide(true);
     this.headerText_ = headerText;
-    this.textToCopy_ = textToCopy;
 
-    if (captions) {
-        this.captions_ = captions;
+    if (dfxpString) {
+        this.dfxpString_ = dfxpString;
     }
     if (languageCode) {
         this.languageCode_ = languageCode;
@@ -41,14 +40,14 @@ goog.inherits(unisubs.finishfaildialog.CopyDialog, goog.ui.Dialog);
 unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
     unisubs.finishfaildialog.CopyDialog.superClass_.createDom.call(this);
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
-    this.textarea_ = $d('textarea', {'class': 'copy-dialog', 'value': this.textToCopy_});
+    this.textarea_ = $d('textarea', {'class': 'copy-dialog', 'value': this.dfxpString_});
 
     this.switcher_ = $d('select', 'copy-dialog-select',
+            $d('option', {value: 'dfxp'}, 'DFXP'),
             $d('option', {value: 'srt'}, 'SRT'),
             $d('option', {value: 'ssa'}, 'SSA'),
             $d('option', {value: 'ttml'}, 'TTML'),
-            $d('option', {value: 'sbv'}, 'SBV'),
-            $d('option', {value: 'dfxp'}, 'DFXP')
+            $d('option', {value: 'sbv'}, 'SBV')
         );
 
     this.getHandler().listen(
@@ -67,8 +66,8 @@ unisubs.finishfaildialog.CopyDialog.prototype.switcherChanged_ = function(e) {
     this.fillTextarea(this.switcher_.value);
 };
 unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
-    if (format === 'srt') {
-        goog.dom.forms.setValue(this.textarea_, this.textToCopy_);
+    if (format === 'dfxp') {
+        goog.dom.forms.setValue(this.textarea_, this.dfxpString_);
     } else {
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
@@ -81,8 +80,8 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                 var output, response;
 
                 if (!event.target.isSuccess()) {
-                    output = 'There was an error processing your request. Below are your subtitles in SRT format. Please copy them (not including this message) and you may upload them later.\n\n';
-                    output += that.textToCopy_;
+                    output = 'There was an error processing your request. Below are your subtitles in DFXP format. Please copy them (not including this message) and you may upload them later.\n\n';
+                    output += that.dfxpString_;
                 }
                 else {
                     output = event.target.getResponseJson()['result'];
@@ -93,7 +92,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
             },
             'POST',
             unisubs.Rpc.encodeKeyValuePairs_({
-                'subtitles': this.captions_,
+                'subtitles': this.dfxpString_,
                 'format': format,
                 'language_code': this.languageCode_}
             ),
@@ -121,15 +120,7 @@ unisubs.finishfaildialog.CopyDialog.showForErrorLog = function(log) {
 unisubs.finishfaildialog.CopyDialog.showForSubs = function(dfxpString, languageCode) {
     var copyDialog = new unisubs.finishfaildialog.CopyDialog(
         "Copy/paste these subtitles into a text editor and save. Use the dropdown to choose a format (make sure the file extension matches the format you choose). You'll be able to upload the subtitles to your video later.",
-        unisubs.finishfaildialog.CopyDialog.subsToString_(dfxpString),
         dfxpString,
         languageCode);
     copyDialog.setVisible(true);
-};
-unisubs.finishfaildialog.CopyDialog.subsToString_ = function(dfxpString) {
-    // TODO: This doesn't really work now that we're using DFXP.
-    var baseString;
-    baseString = unisubs.SRTWriter.toSRT(dfxpString);
-    var serverModel = unisubs.subtitle.MSServerModel.currentInstance;
-    return baseString;
 };
