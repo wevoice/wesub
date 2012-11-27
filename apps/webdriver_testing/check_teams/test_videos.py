@@ -160,10 +160,10 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """Team video search for subtitle text.
 
         """
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('should be bold')
+        self.videos_tab.search('show this text')
         self.assertTrue(self.videos_tab.video_present(self.video_title))
 
     def test_search__nonascii(self):
@@ -671,7 +671,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """With automatic tasks, display number of needed languages for video.
 
         """
-        self.team.workflow_enabled = True
+        self.limited_access_team.workflow_enabled = True
         #Turn on task autocreation for the team.
         WorkflowFactory.create(
             team = self.limited_access_team,
