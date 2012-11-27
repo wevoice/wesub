@@ -2954,7 +2954,7 @@ some subtitle
 because video will be invisible
 
 3
-00:06:28,000 --> 00:06:30,000
+00:06:27,000 --> 00:06:30,000
 Subtitles by the Amara.org community
     """
 
