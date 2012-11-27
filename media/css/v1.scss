@@ -1452,6 +1452,9 @@ div#language_picker {
     padding: 5px;
     background: #fff;
 }
+.profile.v1 .avatar-container img.avatar {
+    max-width: 100px;
+}
 .profile.v1 .context img.avatar {
     margin: 0 17px;
 }
