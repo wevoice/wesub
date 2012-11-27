@@ -14,6 +14,8 @@ class TasksTab(ATeamPage):
     _TASK_TITLE = 'h3' # title is an attribute of a
     _TASK_THUMB = 'ul.tasks li a.thumb'
 
+    _FILTERED_VIDEO = 'p.view-notice strong'
+
    #ERRORS
     _ERROR = '.errorlist li'
  
@@ -50,6 +52,9 @@ class TasksTab(ATeamPage):
         """
         url = self.get_element_attribute('a.perform', 'href')
         print url
+
+    def filtered_video(self):
+        return self.get_text_by_css(self._FILTERED_VIDEO)
 
 
  
