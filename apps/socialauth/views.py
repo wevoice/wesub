@@ -1,4 +1,5 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
+from django.contrib import messages
 from django.template import RequestContext
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse, get_host
@@ -6,10 +7,10 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout
-from django.utils import simplejson as json
 
 from socialauth.models import AuthMeta
 from socialauth.forms import EditProfileForm
+from thirdpartyaccounts.models import TwitterAccount
 
 """
 from socialauth.models import YahooContact, TwitterContact, FacebookContact,\
@@ -25,6 +26,10 @@ from datetime import datetime
 from django.utils.http import urlquote
 from utils.translation import get_user_languages_from_cookie
 from auth.models import UserLanguage
+
+TWITTER_CONSUMER_KEY = getattr(settings, 'TWITTER_CONSUMER_KEY', '')
+TWITTER_CONSUMER_SECRET = getattr(settings, 'TWITTER_CONSUMER_SECRET', '')
+
 
 def get_url_host(request):
 # FIXME: Duplication
@@ -75,6 +80,39 @@ def twitter_login_done(request):
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)  
     access_token = twitter.fetch_access_token(token, oauth_verifier)
     
+    request.session['access_token'] = access_token.to_string()
+
+    if request.session.get('no-login', False):
+        # The user is trying to link a Twitter account to their Amara account.
+        if not request.user.is_authenticated():
+            messages.error(request, 'You must be logged in.')
+            return redirect('auth:login')
+
+        try:
+            from socialauth.lib.oauthtwitter import OAuthApi
+            twitter = OAuthApi(TWITTER_CONSUMER_KEY,
+                                TWITTER_CONSUMER_SECRET, access_token)
+            userinfo = twitter.GetUserInfo()
+        except Exception, e:
+            # TODO: Raise something more useful here
+            raise e
+
+        username = userinfo.screen_name
+
+        try:
+            account = TwitterAccount.objects.get(username=username)
+            if request.user.pk != account.user.pk:
+                messages.error(request, 'Account already linked')
+                return redirect('profiles:account')
+
+        except TwitterAccount.DoesNotExist:
+            TwitterAccount.objects.create(user=request.user,
+                    username=username, access_token=access_token.to_string())
+
+        del request.session['no-login']
+        messages.info(request, 'Successfully linked a Twitter account')
+        return redirect('profiles:account')
+
     request.session['access_token'] = access_token.to_string()
     user = authenticate(access_token=access_token)
     
@@ -152,7 +190,7 @@ def openid_done(request, provider=None):
                 next = request.GET['next']
             if next is not None and len(next.strip()) >  0 :
                 return HttpResponseRedirect(next)    
-            redirect_url = reverse('profiles:my_profile')
+            redirect_url = reverse('profiles:profile', args=(user,))
             return HttpResponseRedirect(redirect_url)
         else:
             return HttpResponseRedirect(settings.LOGIN_URL)

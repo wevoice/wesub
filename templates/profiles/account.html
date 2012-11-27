@@ -1,0 +1,184 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n messages_tags %}
+
+{% block html_attrs %}id="user_account"{% endblock %}
+{% block body-class %}account {{ block.super }}{% endblock %}
+{% block title %}{{ user_info }} | Amara{% endblock %}
+
+{% block view_content %}
+    {% with 'account' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+    <div class="account">
+        <form class="edit_profile" action="." method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <h3>{% trans "User Details" %}</h3>
+            <fieldset>
+                <div class="grid_4 alpha">
+                    {% include "_form_field.html" with field=form.username %}
+                </div>
+                <div class="grid_4 omega">
+                    {% include "_form_field.html" with field=form.email %}
+                </div>
+            </fieldset>
+            <div class="grid_8 alpha third-party">
+                <h3>{% trans "Linked Accounts" %}</h3>
+                <ul class="listing">
+                    {% if twitters %}
+                        {% for twitter in twitters %}
+                            <li>
+                                <h3>Twitter - {{ twitter.username }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if facebooks %}
+                        {% for fb in facebooks %}
+                            <li>
+                                <h3>Facebook - {{ fb.uid }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if third_party %}
+                        {% for account in third_party  %}
+                            <li>
+                                <h3>{{ account.get_type_display }}</h3>
+                                <ul class="actions">
+                                    <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                </ul>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <a href="#account-modal" class="open-modal" title="">{% trans "Add an account" %}</a>
+            </div>
+            <div class="grid_4 alpha">
+                <fieldset>
+                    <h3>{% trans "Change Password" %}</h3>
+                    <!-- fix this, the setting cannot be false for notify_by_message and notify_by_email  -->
+                    {% include "_form_field.html" with field=form.current_password %}
+                    {% include "_form_field.html" with field=form.new_password %}
+                    {% include "_form_field.html" with field=form.new_password_verify %}
+                </fieldset>
+            </div>
+            <div class="grid_4 omega">
+                <fieldset>
+                    <h3>{% trans "Notifications" %}</h3>
+                    {% include "_form_field.html" with field=form.notify_by_message widget_type="checkbox" %}
+                    <p class="notation">{% trans "Send notifications to my UniversalSubtitles.org inbox" %}</p>
+                    {% include "_form_field.html" with field=form.notify_by_email widget_type="checkbox" %}
+                    <p class="notation">{% trans "Send an email notification for each message received" %}</p>
+                </fieldset>
+                <fieldset id="api">
+                    <legend>{% trans "API Access" %}</legend>
+                    <div{% if not form.instance.api_key.key %} style="display:none"{% endif %}>
+                        <label>{% trans "Your API key" %}</label>
+                        <textarea class="api-key-holder" readonly="readonly">{{form.instance.api_key.key}}</textarea>
+                        <p class="api-key-status"></p>
+                    </div>
+                    <a href="{% url profiles:generate-api-key %}" class="get-new-api-bt button reduced">
+                        {% if form.instance.api_key.key %}
+                            {% trans "Reset your API key" %}
+                        {% else %}
+                            {% trans "Get an API key" %}
+                        {% endif %}
+                    </a>
+                </fieldset>
+            </div>
+            <div class="submit">
+                <button class="button save" type="submit" value="Save">
+                    {% trans 'Save Changes' %}
+                </button>
+                <a class="button delete" onclick="return confirm('Are you sure you want to permanently delete your account? This action is irreversible.');" href="{% url auth:delete_user %}">{% trans 'Delete Your Account' %}</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="bootstrap">
+        <div class="modal" id="account-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Add a third-party account' %}</h3>
+            </div>
+
+                <form method="get" action="{% url profiles:add-third-party %}">
+
+                    <div class="modal-body">
+                        <fieldset>
+                            <p>
+                                {% blocktrans %}
+                                Choose an account type to add:
+                                {% endblocktrans %}
+                            </p>
+
+                            <select id="account-type-select" name="account_type">
+                                <option>Select...</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="youtube">Youtube</option>
+                            </select>
+                        </fieldset>
+
+                        <fieldset class="account-type-copy" id="youtube-copy">
+                            <p>
+                                {% blocktrans %}
+                                    Connecting your Youtube account enables Amara-created subtitles to be synced to your Youtube videos.
+                                {% endblocktrans %}
+                            </p>
+
+                            <ul>
+                                <li>
+                                    {% blocktrans %}
+                                        Any existing, completed Amara subtitles will be <strong>sent to Youtube immediately</strong>.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        While the account is linked, <strong>any newly completed subtitles</strong> will be sent to Youtube.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        Amara subtitles <strong>will overwrite</strong> existing Youtube subtitles if both exist.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        Sync is <strong>one-way only</strong>. Changes made on Youtube will not be reflected on Amara.
+                                    {% endblocktrans %}
+                                </li>
+                            </ul>
+                        </fieldset>
+                        <fieldset class="account-type-copy" id="twitter-copy">
+                            <p>
+                                {% blocktrans %}
+                                Twitter copy
+                                {% endblocktrans %}
+                            </p>
+                        </fieldset>
+                        <fieldset class="account-type-copy" id="facebook-copy">
+                            <p>
+                                {% blocktrans %}
+                                Facebook copy
+                                {% endblocktrans %}
+                            </p>
+                        </fieldset>
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                    </div>
+                </form>
+        </div>
+    </div>
+
+{% endblock %}

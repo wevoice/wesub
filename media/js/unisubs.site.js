@@ -171,9 +171,9 @@ var Site = function(Site) {
              */
             if (window.TEAM_SLUG == 'ted') {
 
-                // If this is a task view for an assignee, select the 'any project'
+                // If this is a user's task listing, select the 'any project'
                 // option.
-                if (window.ASSIGNEE) {
+                if (window.ASSIGNEE !== '') {
                     return $('option[id="project-opt-any"]');
                 }
 
@@ -226,6 +226,19 @@ var Site = function(Site) {
                     }
                     e.preventDefault();
                 });
+            });
+        },
+        assignTask: function(task, callback){
+            $.ajax({
+                url: window.ASSIGN_TASK_AJAX_URL,
+                type: 'POST',
+                data: {
+                    task: task,
+                    assignee: window.ASSIGNEE
+                },
+                success: function() {
+                    callback();
+                }
             });
         },
         truncateTextBlocks: function(blocks, maxHeight) {
@@ -671,26 +684,18 @@ var Site = function(Site) {
                 var $target = $(e.target);
                 $target.text('Loading...');
 
-                $.ajax({
-                    url: window.ASSIGN_TASK_AJAX_URL,
-                    type: 'POST',
-                    data: {
-                        task: $target.attr('data-id'),
-                        assignee: window.ASSIGNEE
-                    },
-                    success: function(data, textStatus, jqXHR) {
-                        $target.hide();
+                that.Utils.assignTask($target.attr('data-id'), function(){
+                    $target.hide();
 
-                        $li = $target.parent().siblings('li.hidden-perform-link');
-                        $li.show();
+                    $li = $target.parent().siblings('li.hidden-perform-link');
+                    $li.show();
 
-                        $link = $li.children('a.perform');
-                        $link.text('Loading...');
-                        if ($link.attr('href') !== '') {
-                            window.location = $link.attr('href');
-                        } else {
-                            $link.click();
-                        }
+                    $link = $li.children('a.perform');
+                    $link.text('Loading...');
+                    if ($link.attr('href') !== '') {
+                        window.location = $link.attr('href');
+                    } else {
+                        $link.click();
                     }
                 });
 
@@ -762,6 +767,11 @@ var Site = function(Site) {
 
             $move_modal_form.submit(function() {
                 $move_form.submit();
+                return false;
+            });
+        },
+        team_dashboard: function() {
+            $('.dropdown').click(function(){
                 return false;
             });
         },
@@ -854,10 +864,34 @@ var Site = function(Site) {
         },
 
         // Profile
-        profile_dashboard: function() {
+        user_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             $('a.action-decline').click(function() {
                 $(this).siblings('form').submit();
+                return false;
+            });
+        },
+        user_account: function() {
+            $('#account-type-select').change(function() {
+                $('.account-type-copy').hide();
+                $('#' + this.value + '-copy').show();
+            });
+            $(".api-key-holder").click(function(){
+                $(this).select();
+            });
+            $(".get-new-api-bt").click(function(e){
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr("href"),
+                    dataType: "json",
+                    type: "POST",
+                    success: function(res){
+                        $(".api-key-holder").text(res.key);
+                        $(".get-new-api-bt").text("Reset your API key");
+                        $(".api-key-status").text("Key generated, enjoy!");
+                    }
+                });
+                $("#api div").show();
                 return false;
             });
         },
@@ -908,6 +942,16 @@ var Site = function(Site) {
                     });
                 }
                 set_message_data(data, $('#msg_modal'));
+                return false;
+            });
+            $('.mark-all-read').bind('click', function(event) {
+                MessagesApi.mark_all_read(function(response) {
+                    if (response.error) {
+                        $.jGrowl.error(response.error);
+                    } else {
+                        window.location.reload();
+                    }
+                });
                 return false;
             });
 
@@ -968,7 +1012,7 @@ var Site = function(Site) {
                 $('form.auth-form:hidden').show();
                 $(this).parents('form').hide();
             });
-        }
+        },
     };
 };
 

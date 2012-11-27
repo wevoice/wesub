@@ -1,0 +1,33 @@
+{% extends "profiles/base.html" %}
+
+{% load i18n messages_tags %}
+
+{% block title %}{{ user_info }} | Amara{% endblock %}
+
+{% block view_content %}
+    {% with 'account' as current %}
+        {% include 'profiles/_tabs.html' %}
+    {% endwith %}
+    <div class="account">
+        <form class="edit_profile" method="post">
+            {% csrf_token %}
+            <div class="grid_4 omega">
+                <fieldset>
+                    <h3>{% trans "Remove third party account" %}</h3>
+                    <p>
+                        {% blocktrans %}
+                            Are you sure you want to remove the {{ type }} account
+                        {% endblocktrans %}
+                        <strong>{{ uid }}</strong>?
+                    </p>
+                </fieldset>
+            </div>
+            <div class="submit">
+                <button class="button delete" type="submit" value="Remove">
+                    {% trans 'Remove account' %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

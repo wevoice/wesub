@@ -417,14 +417,17 @@ def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
     filtered = 0
 
-    if project_slug is None:
+    if project_slug is None or project_slug == '':
         project_slug = request.GET.get('project')
 
-    if project_slug is not None:
+    if project_slug:
         if project_slug == 'any':
             project = None
         else:
-            project = get_object_or_404(Project, team=team, slug=project_slug)
+            try:
+                project = Project.objects.get(team=team, slug=project_slug)
+            except Project.DoesNotExist:
+                project = None
     else:
         project = _default_project_for_team(team)
 
@@ -1143,6 +1146,95 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
+def _cache_video_url(tasks):
+    team_video_pks = [t.team_video_id for t in tasks]
+    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+
+    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
+                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+
+    for t in tasks:
+        t.cached_video_url = video_urls.get(t.team_video.video_id)
+
+@timefn
+@render_to('teams/dashboard.html')
+def dashboard(request, slug):
+
+    team = Team.get(slug, request.user)
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
+    if user:
+        user_languages = set([ul.language for ul in user.get_languages()] + [''])
+        user_filter = {'assignee':str(user.id)}
+        user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
+        _cache_video_url(user_tasks)
+    else:
+        user_languages = None
+        user_tasks = None
+
+    filters = {'assignee': 'none'}
+
+    widget_settings = {}
+    from apps.widget.rpc import add_general_settings
+    add_general_settings(request, widget_settings)
+
+    workflow = team.get_workflow()
+
+    videos = {}
+
+    allows_tasks = workflow and workflow.allows_tasks
+
+    if allows_tasks:
+        video_pks = set()
+
+        tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
+        _cache_video_url(tasks)
+
+        for task in tasks:
+            if member and not can_perform_task(user, task):
+                continue
+
+            pk = str(task.team_video.id)
+            
+            if not pk in video_pks:
+                videos[pk] = task.team_video
+                videos[pk].tasks = []
+                video_pks.add(pk)
+
+            video = videos[pk]
+            video.tasks.append(task)
+    else:
+        team_videos = team.videos.select_related("teamvideo")
+
+        if not user_languages:
+            for tv in team_videos:
+                videos[str(tv.teamvideo.id)] = tv.teamvideo 
+        else:
+            for video in team_videos.all():
+                subtitled_languages = (video.subtitlelanguage_set
+                                                 .filter(language__in=user_languages)
+                                                 .values_list("language", flat=True))
+                if len(subtitled_languages) != len(user_languages):
+                    tv = video.teamvideo
+                    tv.languages = [l for l in user_languages if l not in subtitled_languages]
+                    videos[str(tv.id)] = tv
+
+    context = {
+        'team': team,
+        'member': member,
+        'user_tasks': user_tasks,
+        'videos': videos,
+        'allows_tasks': allows_tasks,
+        'can_add_video': can_add_video(team, request.user),
+        'widget_settings': widget_settings
+    }
+
+    return context
+
 @timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug):
@@ -1161,11 +1253,14 @@ def team_tasks(request, slug):
     filters = _get_task_filters(request)
     filtered = 0
 
-    if project_slug is not None:
+    if project_slug != '' and project_slug != None:
         if project_slug == 'any':
             project = None
         else:
-            project = get_object_or_404(Project, team=team, slug=project_slug)
+            try:
+                project = Project.objects.get(team=team, slug=project_slug)
+            except Project.DoesNotExist:
+                project = None
     else:
         # User didn't specify a project to filter on.  We use the default
         # project only if:
@@ -1593,7 +1688,8 @@ def third_party_accounts(request, slug):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    new_youtube_url = _generate_youtube_oauth_request_link(str(team.pk))
+    new_youtube_url = _generate_youtube_oauth_request_link(
+            json.dumps({'team': team.pk}))
     linked_accounts = team.third_party_accounts.all()
     return {
         "team":team,

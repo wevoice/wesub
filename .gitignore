@@ -29,6 +29,7 @@ media/js/mirosubs-extension.js
 media/js/mirosubs-statwidget.js
 media/js/mirosubs-api*.js
 media/js/mirosubs-streamer.js
+media/js/netflix
 media/js/unisubs-widgetizer*.js
 media/js/unisubs-extension.js
 media/js/unisubs-statwidget.js
@@ -37,7 +38,7 @@ media/js/unisubs-streamer.js
 media/js/js-base-dependencies.js
 media/js/js-onsite-dialog.js
 media/js/js-testing-base.js
-media/css/.sass-cache
+.sass-cache
 media/release
 media/static-cache
 media/teams/*

@@ -81,6 +81,10 @@ def user_avatar(context, user_obj):
         'user_obj':user_obj
     }
 
+@register.filter
+def custom_avatar(user, size):
+    return user._get_avatar_by_size(size)
+
 @register.inclusion_tag('profiles/_top_user_panel.html', takes_context=True)
 def top_user_panel(context):
     return context

@@ -74,7 +74,7 @@ class CustomUser(BaseUser):
     # if true, items that end on the user activity stream will also be
     # sent as a message
     notify_by_message = models.BooleanField(default=True)
-    biography = models.TextField('Tell us about yourself', blank=True)
+    biography = models.TextField('Bio', blank=True)
     autoplay_preferences = models.IntegerField(
         choices=AUTOPLAY_CHOICES, default=AUTOPLAY_ON_BROWSER)
     award_points = models.IntegerField(default=0)
@@ -87,6 +87,8 @@ class CustomUser(BaseUser):
     partner = models.ForeignKey('teams.Partner', blank=True, null=True)
     is_partner = models.BooleanField(default=False)
     can_send_messages = models.BooleanField(default=True)
+    third_party_accounts = models.ManyToManyField("accountlinker.ThirdPartyAccount",
+            related_name='users', verbose_name=_('third party accounts'))
 
     objects = UserManager()
 

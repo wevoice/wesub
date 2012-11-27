@@ -21,6 +21,7 @@ import logging
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.utils import translation
 
 from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
@@ -36,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
+AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
 
 
 def youtube_sync(video, language):
@@ -90,16 +92,17 @@ def check_authorization(video):
             # account and they don't want it messed up with strange subs.
             return False, None
     else:
-        # If a video isn't part of a team, and its Youtube username matches
-        # that of any linked Youtube account in Amara---we don't sync to
-        # Youtube.
+        # If a video isn't part of a team but the video's Youtube URL is linked
+        # to a team third party account, we don't sync to Youtube.
         yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
         if yt_url.exists():
             usernames = [url.owner_username for url in yt_url]
             linked_accounts = ThirdPartyAccount.objects.filter(
-                    username__in=usernames).exists()
-            if linked_accounts:
-                return False, None
+                    username__in=usernames)
+
+            if linked_accounts.exists():
+                if any(a.is_team_account for a in linked_accounts):
+                    return False, None
 
     return True, ignore_new_syncing_logic
 
@@ -126,6 +129,24 @@ def can_be_synced(version):
             return False
 
     return True
+
+
+def translate_string(string, language='en'):
+    """
+    If a translation for the specified language doesn't exist, return the
+    English version.
+    """
+    cur_language = translation.get_language()
+    try:
+        translation.activate(language)
+        text = translation.ugettext(string)
+    finally:
+        translation.activate(cur_language)
+    return text
+
+
+def get_amara_credit_text(language='en'):
+    return translate_string(AMARA_CREDIT, language)
 
 
 class ThirdPartyAccountManager(models.Manager):
@@ -238,6 +259,14 @@ class ThirdPartyAccount(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.get_type_display(), self.username)
+
+    @property
+    def is_team_account(self):
+        return self.teams.exists()
+
+    @property
+    def is_individual_account(self):
+        return self.users.exists()
 
 
 class YoutubeSyncRule(models.Model):

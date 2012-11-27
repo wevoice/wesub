@@ -1,8 +1,13 @@
 {% load i18n teams_tags %}
 
 <ul class="tabs">
+    <li{% if current == "dashboard" %} class="current" {% endif %}>
+        <a href="{% url teams:dashboard team.slug %}">
+            {% trans "Dashboard" %}
+        </a>
+    </li>
     <li{% if current == "videos" %} class="current" {% endif %}>
-        <a href="{{ team.get_absolute_url }}">
+        <a href="{% url teams:detail team.slug %}">
             {% trans "Videos" %}
         </a>
     </li>
