@@ -46,7 +46,6 @@ unisubs.finishfaildialog.CopyDialog.prototype.createDom = function() {
             $d('option', {value: 'dfxp'}, 'DFXP'),
             $d('option', {value: 'srt'}, 'SRT'),
             $d('option', {value: 'ssa'}, 'SSA'),
-            $d('option', {value: 'ttml'}, 'TTML'),
             $d('option', {value: 'sbv'}, 'SBV')
         );
 
