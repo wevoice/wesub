@@ -129,7 +129,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
 
     def test_search__updated_description(self):
-        """Team video search for title text after it has been updated.
+        """Team video search for description text after it has been updated.
 
         """
         #Create user and key for api update.
@@ -188,6 +188,9 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
 
     def test_filter__clear(self):
+        """Clear filters.
+
+        """
         videos = data_helpers.create_several_team_videos_with_subs(self, 
             self.team, 
             self.manager_user)
@@ -331,6 +334,9 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
 
     def test_edit__thumbnail(self):
+        """Upload a new thumbnail.
+
+        """
         video_title = 'qs1-not-transback' 
         videos = data_helpers.create_several_team_videos_with_subs(self, 
             self.team, 
@@ -647,7 +653,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertEqual(test_title, tasks_tab.filtered_video())
 
     def test_languages__no_tasks(self):
-        """Display number of completed languages for video.
+        """Without tasks, display number of completed languages for video.
 
         """
         #Add some test videos to the team.
@@ -662,7 +668,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             self.videos_tab.displayed_languages(test_title))
 
     def test_languages__automatic_tasks(self):
-        """Display number of completed languages for video.
+        """With automatic tasks, display number of needed languages for video.
 
         """
         self.team.workflow_enabled = True
@@ -693,7 +699,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             self.videos_tab.displayed_languages(test_title))
 
     def test_pagination__admin(self):
-        """Check number of videos displayed per page for admin user.
+        """Check number of videos displayed per page for team admin.
 
         """
         for x in range(50):
@@ -706,7 +712,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertEqual(8, self.videos_tab.num_videos())
 
     def test_pagination__user(self):
-        """Check number of videos displayed per page for admin user.
+        """Check number of videos displayed per page for team contributor.
 
         """
         contributor = UserFactory(username = 'contributor')
