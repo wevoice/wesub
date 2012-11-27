@@ -87,3 +87,4 @@ class TeamsPage(UnisubsPage):
         descriptor_text = self.get_text_by_css(self._TEAM_DESCRIPTOR)
         if descriptor_text == "Private":
             return True
+

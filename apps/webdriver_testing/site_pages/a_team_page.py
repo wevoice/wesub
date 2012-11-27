@@ -40,6 +40,9 @@ class ATeamPage(UnisubsPage):
     def open_team_page(self, team):
         self.open_page(self._URL %team)
 
+    def open_team_project(self, team_slug, project_slug):
+        url = 'teams/{0}/videos/?project={1}'.format(team_slug, project_slug)
+        self.open_page(url)
 
     def is_team(self, team):
         self.wait_for_element_present(self._TEAM_LINK)
@@ -92,3 +95,6 @@ class ATeamPage(UnisubsPage):
     def settings_tab_visible(self):
         if self.is_element_present(self._SETTINGS_TAB) == True:
             return True
+
+    def has_project(self, project_name):
+        return self.has_link_text(project_name)

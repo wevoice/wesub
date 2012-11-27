@@ -172,6 +172,16 @@ class Page(object):
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
 
+    def has_link_text(self, text, wait_for_element=None):
+        """Return whether or not partial link text is present.
+        """
+        try:
+            elem = self.browser.find_element_by_link_text(text)
+            return True
+        except NoSuchElementException:
+            return False
+
+
     def type_by_css(self, element, text):
         """Enter text for provided css selector.
 
@@ -218,7 +228,7 @@ class Page(object):
         try:
             elements_found = self.browser.find_elements_by_css_selector(
                 element)
-        except NoSuchElementException():
+        except NoSuchElementException:
             return False
         if len(elements_found) > 0:
             return True
@@ -232,7 +242,7 @@ class Page(object):
         try:
             elements_found = self.browser.find_elements_by_css_selector(
                 element)
-        except NoSuchElementException():
+        except NoSuchElementException:
             return 0
         return len(elements_found)
 
@@ -253,7 +263,7 @@ class Page(object):
         try:
             elements_found = self.browser.find_elements_by_css_selector(
                 element)
-        except NoSuchElementException():
+        except NoSuchElementException:
             return False
         if len(elements_found) > 1:
             self.record_error(MULTIPLE_ELS % element)
@@ -272,7 +282,7 @@ class Page(object):
         try:
             elements_found = self.browser.find_elements_by_css_selector(
                 element)
-        except NoSuchElementException():
+        except NoSuchElementException:
             return False
         for elem in elements_found:
             if text == elem.text:
@@ -389,12 +399,32 @@ class Page(object):
         return elements_found[0].get_attribute(html_attribute)
 
     def get_elements_list(self, element):
-        """Return the attribute of an element (by css).
+        """Return the list of elements (webdriver objects).
   
         """
         self.wait_for_element_present(element)
         elements_found = self.browser.find_elements_by_css_selector(element)
         return elements_found
+
+    def get_sub_elements_list(self, parent_el, child_el):
+        """If the parent element exists, return a list of the child elements.
+  
+        """
+        if isinstance(parent_el, basestring):
+            print "passed in css finding the element"
+            if not self.is_element_present(parent):
+                return None
+            else: 
+                parent_el = self.browser.find_element_by_css_selector(parent_el)
+        try:
+            print 'looking for %s under %s' % (child_el, parent_el.tag_name)
+            child_els = parent_el.find_elements_by_css_selector(child_el)
+            print child_els
+        except NoSuchElementException:
+            print 'Did not find any elements'
+            return None
+
+        return child_els
 
 
     def open_page(self, url):

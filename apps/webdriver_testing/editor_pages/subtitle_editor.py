@@ -34,6 +34,7 @@ class SubtitleEditor(EditorDialogs):
     #EXTRA OPTIONS
     _SAVE_AND_EXIT = 'div.unisubs-saveandexit a span'
     _DOWNLOAD_SUBTITLES = 'a.unisubs-download-subs'
+    _DOWNLOAD_FORMAT = 'select.copy-dialog-select'
 
 
     def type_subs(self, subs_file=None):
@@ -113,14 +114,17 @@ class SubtitleEditor(EditorDialogs):
 
 
     def subtitles_list(self):
+        time.sleep(3)
         sub_list = []
         subtitle_els = self.browser.find_elements_by_css_selector(self._SUBS)
         for el in subtitle_els:
             sub_list.append(el.text.strip())
         return sub_list
 
-    def download_subtitles(self):
+    def download_subtitles(self, sub_format='SRT'):
         self.click_by_css(self._DOWNLOAD_SUBTITLES)
+        self.select_option_by_text(self._DOWNLOAD_FORMAT, sub_format)
+        time.sleep(3)
         stored_subs = self.browser.execute_script(
             "return document.getElementsByTagName('textarea')[0].value")
         #self.close_lang_dialog()
