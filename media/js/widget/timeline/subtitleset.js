@@ -80,17 +80,13 @@ unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
         this.insertCaption_(e.caption);
     }
     else if (e.type == et.DELETE) {
-        this.deleteCaption_(e.caption);
+        this.deleteCaption_(e.caption, e.index);
     }else{
         this.dispatchEvent(unisubs.timeline.SubtitleSet.RENDER_NEW);
 
     }
 };
-unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
-    var subOrder = caption.getSubOrder();
-    var index = goog.array.binarySearch(
-        this.subsToDisplay_, 42,
-        function(x, sub) { return subOrder - sub.getEditableCaption().getSubOrder(); });
+unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption, index) {
     if (index >= 0) {
         var sub = this.subsToDisplay_[index];
         var previousSub = index > 0 ?
