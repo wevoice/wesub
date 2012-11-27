@@ -19,12 +19,15 @@ import logging
 import re
 from urlparse import urlparse
 import babelsubs
+import requests
+
 import gdata.youtube.client
 import httplib2
 from celery.task import task
 from django.conf import settings
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.sites.models import Site
 from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
@@ -300,6 +303,8 @@ def _prepare_subtitle_data_for_version(subtitle_version):
 
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
+    upload_uri_base = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
+
     def __init__(self, access_token, refresh_token, youtube_video_id):
         """
         A wrapper around the gdata client, to make life easier.
@@ -307,7 +312,10 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         must be that video's owner on youtube.
         """
         super(YouTubeApiBridge, self).__init__()
-        self.token  = gdata.gauth.OAuth2Token(
+        self.access_token = access_token
+        self.refresh_token = refresh_token
+
+        self.token = gdata.gauth.OAuth2Token(
             client_id=settings.YOUTUBE_CLIENT_ID,
             client_secret=settings.YOUTUBE_CLIENT_SECRET,
             scope='https://gdata.youtube.com',
@@ -317,6 +325,22 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         )
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
+
+    def refresh(self):
+        """
+        Refresh the access token
+        """
+        url = 'https://accounts.google.com/o/oauth2/token'
+
+        data = {
+            'client_id': settings.YOUTUBE_CLIENT_ID,
+            'client_secret': settings.YOUTUBE_CLIENT_SECRET,
+            'refresh_token': self.refresh_token,
+            'grant_type': 'refresh_token'
+        }
+
+        r = requests.post(url, data=data)
+        self.access_token = r.json.get('access_token')
 
     def _get_captions_info(self):
         """
@@ -370,9 +394,74 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         if language_code in self.captions:
             self._delete_track(self.captions[language_code]['track'])
 
+        self.add_credit_to_description(subtitle_version)
+
         return self.create_track(self.youtube_video_id, title, language_code,
                 content, settings.YOUTUBE_CLIENT_ID,
                 settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+
+    def add_credit_to_description(self, subtitle_version):
+        """
+        Get the entry information from Youtube, extract the original
+        description, prepend the description with Amara credits and push it
+        back to Youtube.
+
+        If our update call doesn't succeed on the first try, we refresh the
+        access token and try again.
+
+        If the existing description starts with the credit text, we just
+        return.
+        """
+        from accountlinker.models import add_amara_description_credit
+        uri = self.upload_uri_base % self.youtube_video_id
+
+        entry = self.GetVideoEntry(uri=uri)
+        entry = entry.to_string()
+        entry = gdata.youtube.YouTubeVideoEntryFromString(entry)
+
+        old_description = entry.media.description.text
+
+        video = subtitle_version.language.video
+
+        current_site = Site.objects.get_current()
+        video_url = video.get_absolute_url()
+        video_url = u"http://%s%s" % (unicode(current_site.domain),
+                video_url)
+
+        language_code = video.language
+
+        if not language_code:
+            language_code = 'en'
+
+        new_description = add_amara_description_credit(old_description,
+                video_url, language_code)
+
+        if new_description == old_description:
+            return True
+
+        entry.media.description.text = new_description
+        entry = entry.ToString()
+
+        status_code = self._make_update_request(uri, entry)
+
+        if status_code == 401:
+            self.refresh()
+            status_code = self._make_update_request(uri, entry)
+
+        if status_code == 200:
+            return True
+
+        return False
+
+    def _make_update_request(self, uri, entry):
+        headers = {
+            'Content-Type': 'application/atom+xml',
+            'Authorization': 'Bearer %s' % self.access_token,
+            'GData-Version': '2',
+            'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
+        }
+        r = requests.put(uri, data=entry, headers=headers)
+        return r.status_code
 
     def _delete_track(self, track):
         res = self.delete_track(self.youtube_video_id, track,

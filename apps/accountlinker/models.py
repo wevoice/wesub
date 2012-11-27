@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 # for now, they kind of match
 ACCOUNT_TYPES = VIDEO_TYPE
 AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
+AMARA_DESCRIPTION_CREDIT = translation.ugettext(
+    "Help us caption and translate this video on Amara.org!")
 
 
 def youtube_sync(video, language):
@@ -160,6 +162,22 @@ def translate_string(string, language='en'):
 
 def get_amara_credit_text(language='en'):
     return translate_string(AMARA_CREDIT, language)
+
+
+def add_amara_description_credit(old_description, video_url, language='en'):
+    """
+    Prepend the credit to the existing description.
+    """
+    credit = translate_string(AMARA_DESCRIPTION_CREDIT, language),
+
+    if old_description.startswith(credit):
+        return old_description
+
+    return "%s\n\n%s\n\n%s" % (
+        credit,
+        video_url,
+        old_description or ""
+    )
 
 
 class ThirdPartyAccountManager(models.Manager):
