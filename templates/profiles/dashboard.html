@@ -56,7 +56,7 @@
                                 {% with can_decline=task|can_decline_task:user %}
                                     {% if can_decline %}
                                         <a href="#" class="action-decline">{% trans 'Decline Task' %}</a>
-                                        <form class="hidden" action="{% url teams:assign_task slug=task.team.slug %}" method="post">
+                                        <form id="decline-form" class="hidden" action="{% url teams:assign_task slug=task.team.slug %}" method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
                                             <input type="hidden" name="task" value="{{ task.id }}" />
