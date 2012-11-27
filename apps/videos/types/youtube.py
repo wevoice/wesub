@@ -152,7 +152,7 @@ def add_credit(subtitle_version, subs):
 
     credit_sub = {
         'text': get_amara_credit_text(language_code),
-        'start': (dur - 2) * 1000,
+        'start': (dur - 3) * 1000,
         'end': dur * 1000,
         'id': '',
         'start_of_paragraph': ''
