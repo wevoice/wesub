@@ -1,6 +1,6 @@
 {% extends "profiles/base.html" %}
 
-{% load i18n messages_tags recent_activity %}
+{% load i18n messages_tags recent_activity paginator %}
 
 {% block title %}{{ user_info }} | Amara{% endblock %}
 
@@ -20,6 +20,7 @@
                     <li>{{ item.render }}</li>
                 {% endfor %}
             </ul>
+            {% if is_paginated %}{% paginator %}{% endif %}
         {% else %}
             <p class="empty">{{ user_info }} {% trans "doesn't have any activity yet." %}</p>
         {% endif %}
