@@ -1012,7 +1012,7 @@ var Site = function(Site) {
                 $('form.auth-form:hidden').show();
                 $(this).parents('form').hide();
             });
-        },
+        }
     };
 };
 
