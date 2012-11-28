@@ -120,7 +120,6 @@ class MultiQuerySetTest(TestCase):
                          "MQS[3:7] (out-of-bounds endpoint) failed.")
 
 
-
 class CompressTest(TestCase):
     def test_compression(self):
         # Make sure the empty string is handled.
@@ -186,4 +185,18 @@ class ChunkedIterTest(TestCase):
         self.assertEqual(sum, 0)
 
 
+class BleachSanityTest(TestCase):
 
+    def test_weird_input(self):
+        import bleach
+        html = "<b>hello</b>"
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"hello", value)
+
+        html = "<b></b>"
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"", value)
+
+        html = '<p><iframe frameborder="0" height="315" src="http://www.youtube.com/embed/6ydeY0tTtF4" width="560"></iframe></p>'
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"", value)
