@@ -36,7 +36,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         except:
             pass
         self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
-        self.base_url = 'http://unisubs.example.com:80/'
+        if os.getenv("HOME") == '/home/vagrant':
+            self.base_url = 'http://unisubs.example.com:80/'
+        else:
+            self.base_url = 'http://unisubs.example.com:8000/'
         self.browser.get(self.base_url)
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
