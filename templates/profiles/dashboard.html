@@ -51,12 +51,12 @@
                                 <a href="{{ task.team_video.video.get_absolute_url }}" title="View video"><em>{{ task.team_video|truncatewords:8 }}</em></a>
                                 ({{ task.team }})
                             </p>
-                            <p>
+                            <div>
                                 {% include "teams/_perform_task_link.html" %}
                                 {% with can_decline=task|can_decline_task:user %}
                                     {% if can_decline %}
                                         <a href="#" class="action-decline">{% trans 'Decline Task' %}</a>
-                                        <form id="decline-form" class="hidden" action="{% url teams:assign_task slug=task.team.slug %}" method="post">
+                                        <form class="hidden" action="{% url teams:assign_task slug=task.team.slug %}" method="post">
                                             {% csrf_token %}
                                             <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}" />
                                             <input type="hidden" name="task" value="{{ task.id }}" />
@@ -65,7 +65,7 @@
                                         </form>
                                     {% endif %}
                                 {% endwith %}
-                            </p>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>

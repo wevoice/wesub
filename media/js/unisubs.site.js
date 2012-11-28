@@ -867,7 +867,7 @@ var Site = function(Site) {
         user_dashboard: function() {
             unisubs.widget.WidgetController.makeGeneralSettings(window.WIDGET_SETTINGS);
             $('a.action-decline').click(function() {
-                $('#decline-form').submit();
+                $(this).siblings('form').submit();
                 return false;
             });
         },
