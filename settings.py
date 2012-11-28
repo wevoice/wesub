@@ -854,6 +854,7 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
+        }
     },
 }
 
