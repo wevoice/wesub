@@ -517,7 +517,8 @@ AVATAR_MAX_SIZE = 500*1024
 THUMBNAILS_SIZE = (
     (100, 100),
     (50, 50),
-    (120, 90)
+    (120, 90),
+    (240, 240)
 )
 
 EMAIL_BCC_LIST = []
