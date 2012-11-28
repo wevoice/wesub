@@ -17,7 +17,8 @@ class SubtitleEditor(EditorDialogs):
 
     #SUBS ENTRY AND DISPLAY (LEFT SIDE)
     _TEXT_INPUT = 'textarea.goog-textarea.trans'
-    _SUBS = 'ul.unisubs-titlesList li span.unisubs-title span'
+    _ACTIVE_SUB_EDIT = 'span.unisubs-title textarea'
+    _SUBS = 'ul.unisubs-titlesList li span.unisubs-title span:nth-child(1)'
     _TIMINGS = 'ul.unisubs-titlesList li span.unisubs-timestamp'
     _REVIEW_TIMINGS = 'span.unisubs-timestamp-time'
     _CURRENT_CAPTION = 'span.unisubs-captionSpan'
@@ -46,6 +47,21 @@ class SubtitleEditor(EditorDialogs):
             self.type_by_css(self._TEXT_INPUT, line)
             typed_sub_list.append(line.strip())
         return typed_sub_list
+
+    def edit_subs(self, subs_file=None):
+        typed_sub_list = []
+        if not subs_file:
+            subs_file = os.path.join(os.path.dirname
+                (os.path.abspath(__file__)), 'default_sub_text.txt')
+
+        existing_subs = self.get_elements_list(self._SUBS)
+        for i, line in enumerate(codecs.open(subs_file, encoding='utf-8')):
+            existing_subs[i].click()
+            self.clear_text(self._ACTIVE_SUB_EDIT)
+            self.type_by_css(self._ACTIVE_SUB_EDIT, line + '\n')
+            typed_sub_list.append(line.strip())
+        return typed_sub_list
+
 
     def play(self):
         self.wait_for_element_present(self._VIDEO_PLAYBACK)
@@ -110,6 +126,7 @@ class SubtitleEditor(EditorDialogs):
             
     def save_and_exit(self):
         self.click_by_css(self._SAVE_AND_EXIT)
+        self.mark_subs_complete()
         self.click_saved_ok()
 
 

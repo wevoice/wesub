@@ -7,7 +7,7 @@ from apps.webdriver_testing.editor_pages import subtitle_editor
 import codecs
 import os
 
-class TestCaseUploadSubsUntimedText(WebdriverTestCase):
+class TestCaseUntimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
     """
     
@@ -32,7 +32,7 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         self.video_pg.upload_subtitles('English', sub_file)
         subtitle_lang = self.test_video.subtitle_language('en') 
         self.assertEqual(43, subtitle_lang.get_subtitle_count())
-        self.video_pg.page_refresh()
+        self.video_pg.open_page('videos/' + self.test_video.video_id + '/en/')
 
 
     def test_untimed__txt(self):
@@ -184,21 +184,21 @@ class TestCaseUploadSubsUntimedText(WebdriverTestCase):
         editor_sub_list = sub_editor.subtitles_list()
 
         #Verify uploaded subs are displayed in the Editor
-        self.assertEqual(expected_list, editor_sub_list)
-        typed_subs = sub_editor.type_subs()
+        #self.assertEqual(expected_list, editor_sub_list)
+        typed_subs = sub_editor.edit_subs()
+
         sub_editor.save_and_exit()
         video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         displayed_list = video_language_pg.displayed_lines()
-
         #Verify the edited text is in the sub list
-        self.assertIn("I'd like to be under the sea", displayed_list)
+        self.assertIn("Under the sea", displayed_list)
 
         #Verify the origal unedited text is still present in the sub list.
         self.assertIn(expected_list[9], displayed_list)
 
  
-class TestCaseUploadSubsTimedText(WebdriverTestCase):
+class TestCaseTimedText(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.
     """
 
@@ -224,7 +224,9 @@ class TestCaseUploadSubsTimedText(WebdriverTestCase):
         self.video_pg.upload_subtitles(lang, sub_file)
         subtitle_lang = self.test_video.subtitle_language(lang_code)
         self.assertEqual(expected_count, subtitle_lang.get_subtitle_count())
-        self.video_pg.page_refresh()
+        self.video_pg.open_page('videos/{0}/{1}/'.format(
+            self.test_video.video_id, lang_code))
+
 
 
     def test_timed__txt(self):
