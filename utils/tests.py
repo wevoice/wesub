@@ -114,3 +114,19 @@ class MultiQuerySetTest(TestCase):
                          list(mqs[3:7]),
                          "MQS[3:7] (out-of-bounds endpoint) failed.")
 
+
+class BleachSanityTest(TestCase):
+
+    def test_weird_input(self):
+        import bleach
+        html = "<b>hello</b>"
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"hello", value)
+
+        html = "<b></b>"
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"", value)
+
+        html = '<p><iframe frameborder="0" height="315" src="http://www.youtube.com/embed/6ydeY0tTtF4" width="560"></iframe></p>'
+        value = bleach.clean(html, strip=True, tags=[], attributes=[])
+        self.assertEquals(u"", value)
