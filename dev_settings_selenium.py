@@ -25,21 +25,16 @@ STATIC_URL = "http://unisubs.example.com:80/site_media/"
 MEDIA_URL = "http://unisubs.example.com:80/user-data/"
 #DEFAULT_PROTOCOL  = 'http'
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': "unisubs",
-        'USER': "root",
-        'PASSWORD': "root",
-        'HOST': "localhost",
-        'PORT': '3306',
-        'CHARACTER SET': 'utf8',
-        'TEST_CHARSET': 'utf8',
-        'TEST_COLLATION': 'utf8_unicode_ci'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': "/tmp/django_test_db.sqlite",
+        'USER': "",
+        'PASSWORD': "",
+        'HOST': "",
+        'PORT': ''
         }
     }
-
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 STATIC_URL_BASE = STATIC_URL
@@ -58,4 +53,7 @@ NOSE_ARGS = ['--with-xunit',
              '--logging-filter=-pysolr, -base, remote_connection', 
              #'--verbosity=2'
             ]
-#CELERY_ALWAYS_EAGER = True
+CELERY_ALWAYS_EAGER = True
+import logging
+logging.getLogger('pysolr').setLevel(logging.ERROR)
+

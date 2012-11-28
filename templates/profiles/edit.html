@@ -94,7 +94,7 @@
                 });
             });
             $('.remove-avatar').click(function(){
-                if(confirm('{% trans "Do you really want delete your picture?" %}')){
+                if(confirm('{% trans "Do you really want to delete your photo?" %}')){
                     $.ajax({
                         type: "POST",
                         url: '{% url profiles:remove_avatar %}',

@@ -14,7 +14,7 @@
     {% if user.is_authenticated and user == user_info %}
         <li{% if current == "profile" %} class="current" {% endif %}>
             <a href="{% url profiles:edit %}">
-                {% trans "Profile" %}
+                {% trans "Personal Info" %}
             </a>
         </li>
         <li{% if current == "account" %} class="current" {% endif %}>
