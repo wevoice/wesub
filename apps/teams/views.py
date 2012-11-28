@@ -1206,6 +1206,9 @@ def dashboard(request, slug):
 
             video = videos[pk]
             video.tasks.append(task)
+
+            if len(video_pks) >= VIDEOS_ON_PAGE:
+                break
     else:
         team_videos = team.videos.select_related("teamvideo")[0:VIDEOS_ON_PAGE]
 
