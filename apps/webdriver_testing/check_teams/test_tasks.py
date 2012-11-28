@@ -11,42 +11,15 @@ from apps.teams.models import TeamMember
 class TestCaseTeamTasks(WebdriverTestCase):
     """Verify tasks creation, modification, assignment.
 
-        Feature: Assign a task
-	As a team member with permission to assign tasks
-	I want to assign an unassigned task
-	So that the task may be completed
-
-	Scenario: Assign a Feature: Filter tasks by language
-	As a visitor or user
-	I want to view tasks for a specific language
-	So that I can find ways to contribute given my skills
-
-	Scenario: 
-		Given I am on the team tasks page
-		And the language filter list contains all languages with active tasks
-		When I select a language in the list
-		Then I see only the tasks for that languageFeature:
-
-        Scenario:  Filter tasks by language - results
-        Scenario: Filter tasks by language - no results
-        Scenario: Perform task
-
-        Filter tasks by type - results
-        Filter tasks by type - no results
-
-
-        Feature: Remove a task from a team
-	As a team member with permission to assign tasks
-	I want to remove a task from the team
-	So that it is no longer shown for the team
-
-	Scenario: Remove a task
-		Given I am on the team tasks page
-		When I click the remove button on a task
-		Then that task is removed from the team and I don't see it listed 
-        Scenario: Create a task manually
-        Scenario: Create tasks automatically
-
+        Assign a task
+        Create a manual task
+        Automatic task creation
+        Filter tasks
+        Perform task
+        Remove a task from a team
+Tasks link opens the page with the tasks for the video 
+- Non-members and anon users do not see Tasks links
+- Just added, non-subtitled video has tag "1 language needed" (if a task is created automatically) or "0 languages" (otherwise), the tag has an appropriate link 
     """
 
     def setUp(self):
@@ -73,11 +46,11 @@ class TestCaseTeamTasks(WebdriverTestCase):
 
 
 
-    def test_assign__manager_project_lang_restrictions(self):
-        """Assign a manager with project restrictions.
-
-           Verify the display of the roles in the members tab.
+    def test_create(self):
+        """Create a manual transcription task
+        
         """
+        self.assertFalse('This test needs to be written.')
         self.auth_pg.login('team_owner', 'password')
 
 

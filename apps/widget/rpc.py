@@ -139,7 +139,7 @@ class Rpc(BaseRpc):
         # keeping both forms valid as backwards compatibility layer
         lang_code = base_state and base_state.get("language_code", base_state.get("language", None))
 
-        if bool(base_state) and lang_code is not None:
+        if base_state is not None and lang_code is not None:
             lang_pk = base_state.get('language_pk', None)
 
             if lang_pk is  None:

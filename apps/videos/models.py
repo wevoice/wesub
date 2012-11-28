@@ -1673,7 +1673,7 @@ def record_workflow_origin(version, team_video):
     """
     if team_video and version and not version.get_workflow_origin():
         tasks = team_video.task_set.incomplete()
-        tasks = list(tasks.filter(language=version.language.language)[:1])
+        tasks = list(tasks.filter(language=version.subtitle_language.language_code)[:1])
 
         if tasks:
             open_task_type = tasks[0].get_type_display()
@@ -1746,7 +1746,7 @@ def has_viewable_draft(version, user):
     TODO: Different logic for rejected vs waiting_moderation?
 
     """
-    team_video = version.language.video.get_team_video()
+    team_video = version.subtitle_language.video.get_team_video()
 
     if not team_video:
         return False

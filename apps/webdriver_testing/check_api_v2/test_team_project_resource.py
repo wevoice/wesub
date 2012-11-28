@@ -109,6 +109,10 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         for k, v in project_data.iteritems():
             self.assertEqual(v, response[k])
 
+        #Verify project is listed on the team page 
+        self.assertTrue(self.team_pg.has_project(project_data['name']))
+
+
 
     def test_projects__update(self):
         """Update a projects information.
@@ -123,10 +127,8 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
             } 
         status, response = data_helpers.put_api_request(self, url_part, 
             updated_info) 
-        self.team_pg.open_page('teams/{0}/?project={1}'.format(
-            self.open_team.slug, self.project1.slug))
-        
-        self.assertNotEqual(None, response)
+        print response
+        self.assertEqual(updated_info['description'], response['description'])
 
     def test_projects__delete(self):
         """Delete a team project.
@@ -136,6 +138,11 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         url_part = 'teams/{0}/projects/{1}/'.format(self.open_team.slug,
            self.project1.slug)
         
-        status, response = data_helpers.delete_api_request(self, url_part) 
+        data_helpers.delete_api_request(self, url_part) 
         self.team_pg.open_team_page(self.open_team.slug)
-        self.assertNotEqual(None, response) 
+
+        #Verify project 1 is still present
+        self.assertTrue(self.team_pg.has_project(self.project2.name)) 
+
+        #Verify project2 is deleted
+        self.assertFalse(self.team_pg.has_project(self.project1.name)) 

@@ -83,7 +83,7 @@ def convert_subtitles(request):
     if request.POST:
         if 'subtitles' and 'format' and 'language_code' in request.POST:
 
-            subtitles = json.loads(request.POST['subtitles'])
+            subtitles = request.POST['subtitles']
             format = request.POST['format']
             available_formats = babelsubs.get_available_formats()
             if format not in available_formats:

@@ -1110,7 +1110,7 @@ class TestFormatConvertion(TestCase):
             
     def _retrieve(self, format):
         res = self.client.post(reverse("widget:convert_subtitles"), {
-            'subtitles': json.dumps(self.subs.to_xml()),
+            'subtitles': self.subs.to_xml(),
             'language_code': 'pt-br',
             'format': format,
         })

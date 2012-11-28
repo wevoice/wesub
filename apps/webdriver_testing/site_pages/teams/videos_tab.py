@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from apps.webdriver_testing.site_pages.a_team_page import ATeamPage
+from apps.webdriver_testing.site_pages.teams import tasks_tab
 import time
 
 class VideosTab(ATeamPage):
@@ -10,14 +11,19 @@ class VideosTab(ATeamPage):
     _SEARCH = 'form.search input[name="q"]'
     _SEARCHING_INDICATOR = "img.placeholder"
     _NO_RESULTS = 'p.empty'
+    NO_VIDEOS_TEXT = 'Sorry, no videos here ...'
 
+    _VIDEO = 'ul.videos li'
     _VIDEO_TITLE = 'div.thumb a' # title is an attribute of a
     _VIDEO_THUMB = 'div.thumb a img'
     _VIDEO_LANGS = '.languages'
     _VIDEO_TASK_LINK = '.callout' # href has the url
     _ADD_VIDEO = 'a[href*="add/video"]'
+    _CLEAR_FILTERS = 'a.clear-filters'
     _FILTERS = 'a#sort-filter span'
     _FILTER_OPEN = 'a#sort-filter span.open'
+
+    _ADMIN_LINKS = 'ul.admin-controls li a'
 
     #ADD VIDEO FORM
     _VIDEO_URL = 'input#id_video_url'
@@ -29,6 +35,7 @@ class VideosTab(ATeamPage):
     _ERROR = '.errorlist li'
  
     #REMOVE VIDEO FORM 
+    _REMOVE_OPTION = "input[value='%s']"  # % team-removal or total-destruction
     _REMOVE = "div#remove-modal input[value='Remove']"
 
     #EDIT VIDEO OPTIONS - thumb and project are the same as submit form
@@ -36,10 +43,13 @@ class VideosTab(ATeamPage):
     _MOVE_VIDEO = 'div.submit a#move-video'
     _SUBMIT_MOVE_CONFIRM = 'div.modal-footer input.btn.danger'
 
+    _NEW_THUMB_LINK = "form a[href*='user-data']"
+
     #FILTER and SORT
     #_LANG_FILTER = 'div.filters div.filter-chunk div'
     _LANG_FILTER = 'select#lang-filter'
     _SORT_FILTER = 'select[name="sort"]'
+    _PROJECT_FILTER = 'select#project-filter'
 
     def open_videos_tab(self, team):
         """Open the team with the provided team slug.
@@ -77,6 +87,20 @@ class VideosTab(ATeamPage):
             self.wait_for_element_present(self._FILTER_OPEN)
             self.wait_for_element_visible('div.filter-chunk')
 
+    def clear_filters(self):
+        self.click_by_css(self._CLEAR_FILTERS)
+
+
+    def project_filter(self, project):
+        """Filter the displayed videos by project
+
+        Valid choices are the full project name 
+        """
+        self._open_filters()
+        self.click_by_css('div#project-filter_chzn a.chzn-single')
+        self.select_from_chosen(self._PROJECT_FILTER, project)
+
+
     def sub_lang_filter(self, language):
         """Filter the displayed videos by subtitle language'
 
@@ -108,12 +132,20 @@ class VideosTab(ATeamPage):
         """Return the webdriver object for a video based on the title.
 
         """
-        self.wait_for_element_present(self._VIDEO_TITLE)
+        self.wait_for_element_visible(self._VIDEO_THUMB)
+        time.sleep(2)  #Make sure all the vids have a chance to load.
         video_els = self.browser.find_elements_by_css_selector(
-                      self._VIDEO_TITLE)
+                      self._VIDEO)
+
         for el in video_els:
-            if el.get_attribute('title') == video:
-                return el
+            try:
+                title_el = el.find_element_by_css_selector(self._VIDEO_TITLE)
+                print title_el.get_attribute('title')
+                if title_el.get_attribute('title') == video:
+                    return el
+            except:
+                continue
+
 
 
 
@@ -125,24 +157,51 @@ class VideosTab(ATeamPage):
             self.hover_by_css(self._VIDEO_THUMB)
         else:
             vid_element = self._video_element(video)
-            self.hover_by_element(vid_element, 'img')
+            self.hover_by_element(vid_element, self._VIDEO_THUMB)
 
  
-    def _click_video_action(self, action, video=None):
-        """Hover over the thumbnail and choose the action link.
+    def _click_video_action(self, action, video):
+        """Click the action link for the video title.
 
         Current options are 'Tasks', 'Edit', and 'Remove'
         """
-        self._hover_video(video)
-        self.click_link_text(action)
+        vid_element = self._video_element(video)
+        vid_element.find_element_by_link_text(action).click()
+        
 
-    def remove_video(self, video=None):
-        """Remove the video from the team.
+
+    def _video_actions_present(self, video):
+        """Get the list of actions available for a video.
+
+        Current options are 'Tasks', 'Edit', and 'Remove'
+        """
+        vid_element = self._video_element(video)
+        link_els= self.get_sub_elements_list(vid_element, self._ADMIN_LINKS)
+        link_list = []
+        for el in link_els:
+            link_list.append(el.text)
+        print link_list
+        return link_list
+
+    def video_has_link(self, video, link_text):
+        """Check if link text displayed in the admin-controls links of a video.
+
+        """
+        links = self._video_actions_present(video)
+        if link_text in links:
+            return True 
+
+
+    def remove_video(self, video=None, removal_action=None):
+        """Remove the video from the team or site.
+
+        #
 
         """
         self._click_video_action('Remove', video)
+        if removal_action:
+            self.click_by_css(self._REMOVE_OPTION % removal_action)
         self.click_by_css(self._REMOVE)
-        time.sleep(2)
         self.handle_js_alert("accept")
 
     def edit_video(self, video=None, project=None, team=None, thumb=None):
@@ -169,6 +228,8 @@ class VideosTab(ATeamPage):
 
         """
         self._click_video_action('Tasks', video)
+        return tasks_tab.TasksTab(self)
+
 
     def team_video_id(self, video):
         self._hover_video(video)        
@@ -180,16 +241,16 @@ class VideosTab(ATeamPage):
         """Return the text for the number of tasks displayed on the video.
 
         """
-        video_el = self._video_element(video).parent
+        video_el = self._video_element(video)
         tasks = video_el.find_element_by_css_selector(
                 self._VIDEO_TASK_LINK).text
         return tasks
 
     def displayed_languages(self, video):
-        """Return the text for the number of tasks displayed on the video.
+        """Return number of tasks or languages displayed on the video.
 
         """
-        video_el = self._video_element(video).parent
+        video_el = self._video_element(video)
         langs = video_el.find_element_by_css_selector(
                 self._VIDEO_LANGS).text
         return langs
@@ -223,13 +284,13 @@ class VideosTab(ATeamPage):
     def error_message(self):
         return self.get_text_by_css(self._ERROR)
 
+    def new_thumb_location(self):
+        return self.get_text_by_css(self._NEW_THUMB_LINK)
 
-
-
-
-
-
- 
+    def num_videos(self):
+        video_els = self.browser.find_elements_by_css_selector(self._VIDEO_THUMB)
+        return len(video_els)
 
         
-    
+
+

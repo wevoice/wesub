@@ -26,7 +26,7 @@ class SearchResultsPage(VideoListings):
     def search_has_no_results(self):
         time.sleep(3)
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
-        if self.is_text_present(self._NO_RESULTS, "No video found"):
+        if self.is_text_present(self._NO_RESULTS, "No videos found ..."):
             return True
         else:
             return False
