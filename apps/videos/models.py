@@ -904,6 +904,13 @@ class SubtitleLanguage(models.Model):
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
 
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_language = models.OneToOneField('subtitles.SubtitleLanguage',
+                                                 related_name='old_subtitle_version',
+                                                 null=True, blank=True,
+                                                 editable=False)
+
     subtitles_fetched_counter = RedisSimpleField()
 
     class Meta:
@@ -1375,6 +1382,13 @@ class SubtitleVersion(SubtitleCollection):
 
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True, null=True)
+
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_version = models.OneToOneField('subtitles.SubtitleVersion',
+                                                related_name='old_subtitle_version',
+                                                null=True, blank=True,
+                                                editable=False)
 
     objects = SubtitleVersionManager()
 
