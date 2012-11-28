@@ -53,4 +53,7 @@ NOSE_ARGS = ['--with-xunit',
              '--logging-filter=-pysolr, -base, remote_connection', 
              #'--verbosity=2'
             ]
-#CELERY_ALWAYS_EAGER = True
+CELERY_ALWAYS_EAGER = True
+import logging
+logging.getLogger('pysolr').setLevel(logging.ERROR)
+
