@@ -24,17 +24,6 @@ from dev_settings import *
 
 SITE_ID = 19
 
-if os.getenv("HOME") == '/home/vagrant':
-    STATIC_URL = "http://unisubs.example.com:80/site_media/"
-    MEDIA_URL = "http://unisubs.example.com:80/user-data/"
-#DEFAULT_PROTOCOL  = 'http'
-
-if os.getenv("HOME") == '/home/vagrant':
-    STATIC_URL = "http://unisubs.example.com:80/site_media/"
-    MEDIA_URL = "http://unisubs.example.com:80/user-data/"
-
-#DEFAULT_PROTOCOL  = 'http'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -47,9 +36,13 @@ DATABASES = {
     }
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
-STATIC_URL_BASE = STATIC_URL
-if COMPRESS_MEDIA:
-    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
+
+if os.getenv("HOME") == '/home/vagrant':
+    STATIC_URL = "http://unisubs.example.com:80/site_media/"
+    MEDIA_URL = "http://unisubs.example.com:80/user-data/"
+    STATIC_URL_BASE = STATIC_URL
+    if COMPRESS_MEDIA:
+        STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
 DEBUG = True
 CACHE_PREFIX = "testcache"
