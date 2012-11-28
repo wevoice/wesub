@@ -401,7 +401,13 @@ class Video(models.Model):
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
         assert video_url or vt, 'should be video URL or VideoType'
-        vt = vt or video_type_registrar.video_type_for_url(video_url)
+        from types.base import VideoTypeError
+
+        try:
+            vt = vt or video_type_registrar.video_type_for_url(video_url)
+        except VideoTypeError:
+            return None, False
+
         if not vt:
             return None, False
 
