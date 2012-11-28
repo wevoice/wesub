@@ -210,7 +210,7 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
             fromLanguageContents = goog.array.map(
                 this.model_.fromLanguages(),
                 function(l) {
-                    return [l.PK + '', l.toString(), null, l.DISABLED_FROM];
+                    return [l.LANGUAGE + '', l.toString(), null, l.DISABLED_FROM];
                 });
         }
 
@@ -370,8 +370,7 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
     /**
      * @type {unisubs.startdialog.VideoLanguageLanguage}
      */
-    var fromLanguage = this.model_.findFromForPK(
-        parseInt(this.fromLanguageDropdown_.value, 0));
+    var fromLanguage = this.fromLanguageDropdown_.value;
     if (toLanguage.translationStartsFromScratch(fromLanguage)) {
         var message = "";
         if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
@@ -401,11 +400,11 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
     if (this.okHasBeenClicked_)
         return;
     this.okHasBeenClicked_ = true;
-    var fromLanguageID = null;
+    var fromLanguageCode = null;
     if (this.fromLanguageDropdown_ &&
         this.fromLanguageDropdown_.value !=
             unisubs.startdialog.Dialog.FORK_VALUE)
-        fromLanguageID = parseInt(this.fromLanguageDropdown_.value, 0);
+        fromLanguageCode = this.fromLanguageDropdown_.value;
     var toLanguage = this.model_.toLanguageForKey(
         this.toLanguageDropdown_.value);
     var that = this;
@@ -423,7 +422,7 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
             this.originalLangDropdown_.value : null,
         toLanguage.LANGUAGE,
         toLanguage.VIDEO_LANGUAGE ? toLanguage.VIDEO_LANGUAGE.PK : null,
-        fromLanguageID,
+        fromLanguageCode,
         function() { that.setVisible(false); });
     goog.dom.setTextContent(this.okButton_, "Loading...");
     goog.dom.classes.add(this.okButton_, "unisubs-button-disabled");

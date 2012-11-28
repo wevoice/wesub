@@ -49,8 +49,7 @@ def get_widget_url(subtitle_language, mode=None, task_id=None):
     }
 
     if is_dependent(subtitle_language):
-        source_language = subtitle_language.get_translation_source_language()
-        config['baseLanguagePK'] = source_language and source_language.pk
+        config['baseLanguageCode'] = subtitle_language.get_translation_source_language_code()
 
     return (reverse('onsite_widget') +
             '?config=' + urlquote_plus(json.dumps(config)))

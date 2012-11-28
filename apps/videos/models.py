@@ -1023,23 +1023,6 @@ class SubtitleLanguage(models.Model):
             return False
         return True
 
-    def get_widget_url(self, mode=None, task_id=None):
-        # duplicates unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect_
-        video = self.video
-        video_url = video.get_video_url()
-        config = {
-            "videoID": video.video_id,
-            "videoURL": video_url,
-            "effectiveVideoURL": video_url,
-            "languageCode": self.language,
-            "subLanguagePK": self.pk,
-            "originalLanguageCode": video.language,
-            "mode": mode,
-            "task": task_id, }
-        if self.is_dependent():
-            config['baseLanguagePK'] = self.standard_language and self.standard_language.pk
-        return reverse('onsite_widget')+'?config='+urlquote_plus(json.dumps(config))
-
     @models.permalink
     def get_absolute_url(self):
         return ('videos:translation_history',

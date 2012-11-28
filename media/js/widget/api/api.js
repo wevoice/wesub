@@ -93,7 +93,7 @@ unisubs.api.openUnisubsDialogWithSettings =
                 config['languageCode'], 
                 config['originalLanguageCode'], 
                 config['subLanguagePK'], 
-                config['baseLanguagePK']));
+                config['baseLanguageCode']));
     }
     else
         opener.showStartDialog();
