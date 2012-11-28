@@ -211,7 +211,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         
     def test_update__metatdata(self):
-        """Add a new video.
+        """Update video metadata, title, description.
 
         PUT /api2/partners/videos/[video-id]/
         """
@@ -243,7 +243,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             self.video_pg.description_text())
 
     def test_update__team(self):
-        """Add a new video.
+        """Update the video metadata, add to team and edit video description.
 
         PUT /api2/partners/videos/[video-id]/
         """
@@ -274,7 +274,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertTrue(self.video_pg.team_slug(self.open_team.slug))
 
     def test_update__project(self):
-        """Add a new video.
+        """Edit video, add it to a team and project.
 
         PUT /api2/partners/videos/[video-id]/
         """

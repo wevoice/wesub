@@ -24,6 +24,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_unicode
 from django.views.generic.list_detail import object_list
 from django.views.generic.simple import direct_to_template
 from tastypie.models import ApiKey
@@ -239,9 +240,17 @@ def edit_avatar(request):
     form = EditAvatarForm(request.POST, instance=request.user, files=request.FILES)
     if form.is_valid():
         form.save()
+        result = {
+            'status': 'success',
+            'message': force_unicode(_('Your photo has been updated.'))
+        }
     else:
-        messages.error(request, _(form.errors['picture']))
-    return redirect('profiles:profile', user_id=request.user.username)
+        result = {
+            'status': 'error',
+            'message': force_unicode(_(form.errors['picture']))
+        }
+    result['avatar'] = request.user._get_avatar_by_size(240)
+    return HttpResponse(json.dumps(result))
 
 
 @login_required
@@ -249,8 +258,12 @@ def remove_avatar(request):
     if request.POST.get('remove'):
         request.user.picture = ''
         request.user.save()
-        messages.success(request, _('Your picture has been removed.'))
-    return redirect('profiles:profile', user_id=request.user.username)
+        result = {
+            'status': 'success',
+            'message': force_unicode(_('Your photo has been removed.')),
+            'avatar': request.user._get_avatar_by_size(240)
+        }
+    return HttpResponse(json.dumps(result))
 
 
 @login_required

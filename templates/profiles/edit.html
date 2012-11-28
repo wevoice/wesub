@@ -39,12 +39,13 @@
             <fieldset>
                 <label>{% trans "Photo" %}</label>
                 <div class="avatar-container">
-                    {% if user_info.picture %}
+                    <div class="remove"{% if not user_info.picture %} style="display: none;"{% endif %}>
                         <img class="avatar" src="{{ user_info.avatar }}"/>
                         <div><a class="remove-avatar" href="#">{% trans 'Remove current photo' %}</a></div>
-                    {% else %}
+                    </div>
+                    <div class="add"{% if user_info.picture %} style="display: none;"{% endif %}>
                         <input type="file" id="id_picture" name="picture" size="6"/>      
-                    {% endif %}
+                    </div>
                     <div class="error_list" id="picture-errors">
                     {{ form.picture.errors }}
                     </div>
@@ -66,31 +67,51 @@
     {{ block.super }}
     <script type="text/javascript">
         jQuery(function($){
+            var showMessage = function(msg){
+                $('#messages').remove();
+                $('.content').prepend('<div id="messages"><p>' + msg + '</p><a href="#" id="closeBut" style="display: block; float: right;">x</a></div>');
+            };
             $('#id_picture').change(function(){
                 $('.edit_profile').ajaxSubmit({
                     url: '{% url profiles:edit_avatar %}',
                     dataType: 'json',
                     success: function(response){
-                        if (response.error){
-                            $('#picture-errors').html('<ul class="errorlist"><li>'+response.error.picture+'</li></ul>');
-                        }else{
-                            $('#picture-errors').html('');  
-                            $('.avatar').attr('src', response.url);
+                        if(response.status != 'error'){
+                            $('.avatar').attr('src', response.avatar);
+                            $('.avatar-container .remove').show();
+                            $('.avatar-container .add').hide();
                         }
+                        $('#picture-errors').html('');
+                        showMessage(response.message);
+                    },
+                    error: function(response){
+                        $('#picture-errors').html('');
+                        showMessage(response.error);
                     },
                     beforeSubmit: function(arr, $form, options) { 
-                        $('#picture-errors').html('{% trans "Saving..." %}');            
+                        $('#picture-errors').html('{% trans "Saving..." %}');
                     }                    
                 });
             });
             $('.remove-avatar').click(function(){
-                if (confirm('{% trans "Do you really want delete your picture?" %}')){
-                    $.post('{% url profiles:remove_avatar %}', {remove: true}, function(response){
-                        if ( ! response.errors){
+                if(confirm('{% trans "Do you really want delete your picture?" %}')){
+                    $.ajax({
+                        type: "POST",
+                        url: '{% url profiles:remove_avatar %}',
+                        data: {remove: true},
+                        success: function(response){
+                            console.log(response);
                             $('.avatar').attr('src', response.avatar);
-                            $('.remove-avatar').remove();
-                        }
-                    }, 'json');
+                            $('.avatar-container .remove').hide();
+                            $('.avatar-container .add').show();
+                            $('#id_picture').val('');
+                            showMessage(response.message);
+                        },
+                        error: function(response){
+                            showMessage(response.error);
+                        },
+                        dataType: 'json'
+                    });
                 }
                 return false;
             });

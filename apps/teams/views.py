@@ -1207,7 +1207,7 @@ def dashboard(request, slug):
             video = videos[pk]
             video.tasks.append(task)
     else:
-        team_videos = team.videos.select_related("teamvideo")
+        team_videos = team.videos.select_related("teamvideo")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:

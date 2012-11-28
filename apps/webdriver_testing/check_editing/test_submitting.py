@@ -76,7 +76,7 @@ class TestCaseSubmittable(WebdriverTestCase):
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
-        self.skipTest("bug: https://unisubs.sifterapp.com/issue/1552")
+        #self.skipTest("bug: https://unisubs.sifterapp.com/issue/1552")
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
@@ -109,9 +109,9 @@ class TestCaseSubmittable(WebdriverTestCase):
         """
 
         self.sub_editor.submit(complete=True)
-        sub_lang = self.test_video.latest_subtitles('en')
+        sub_lang = self.test_video.subtitle_language('en')
         print sub_lang
-        self.assertEqual(6, sub_lang.subtitle_count)
+        self.assertEqual(6, sub_lang.get_subtitle_count())
         self.assertEqual(True, sub_lang.is_complete)
 
 
@@ -122,7 +122,7 @@ class TestCaseSubmittable(WebdriverTestCase):
         self.sub_editor.submit(complete=False)
         sub_lang = self.test_video.subtitle_language('en')
         self.assertEqual(False, sub_lang.is_complete)
-        self.assertEqual(6, sub_lang.subtitle_count)
+        self.assertEqual(6, sub_lang.get_subtitle_count())
 
 
 

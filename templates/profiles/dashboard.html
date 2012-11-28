@@ -51,7 +51,7 @@
                                 <a href="{{ task.team_video.video.get_absolute_url }}" title="View video"><em>{{ task.team_video|truncatewords:8 }}</em></a>
                                 ({{ task.team }})
                             </p>
-                            <p>
+                            <div>
                                 {% include "teams/_perform_task_link.html" %}
                                 {% with can_decline=task|can_decline_task:user %}
                                     {% if can_decline %}
@@ -65,7 +65,7 @@
                                         </form>
                                     {% endif %}
                                 {% endwith %}
-                            </p>
+                            </div>
                         </li>
                     {% endfor %}
                 </ul>

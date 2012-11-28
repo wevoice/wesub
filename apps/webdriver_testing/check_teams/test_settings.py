@@ -10,6 +10,11 @@ from apps.teams.models import TeamMember
 
 class TestCaseTeamSettings(WebdriverTestCase):
     """
+
+        Videos:
+            who can edit
+            who can add
+
         Projects:
             add_project.pending
             edit_project (name / description)
@@ -19,14 +24,6 @@ class TestCaseTeamSettings(WebdriverTestCase):
             set blacklisted languages 
                 not displayed
                 can't blacklist preferred language
-        Messages:
-            edit_message_admin.pending
-            edit_message_application.pending
-            edit_message_invitation.pending
-            edit_message_manager.pending
-            edit_guidelines_review.pending
-            edit_guidelines_subtitle.pending
-            edit_guidelines_translation.pending
         Team Details:
             edit_description
             edit visibility (public / private)
@@ -44,19 +41,14 @@ class TestCaseTeamSettings(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.auth_pg = auth_page.AuthPage(self)
         self.my_teams_pg = my_teams.MyTeam(self)
         self.team = TeamMemberFactory.create(team__name='Roles Test',
                                              team__slug='roles-test',
                                              user__username='team_owner',
                                              )
-        self.manager_test_user = TeamMemberFactory.create(team=self.team.team,
+        self.normal_user = TeamMemberFactory.create(team=self.team.team,
                                  user=UserFactory.create(username=
-                                                         'promotedToManager'),
-                                 role=TeamMember.ROLE_CONTRIBUTOR)
-        self.admin_test_user = TeamMemberFactory.create(team=self.team.team,
-                                 user=UserFactory.create(username=
-                                                         'promotedToAdmin'),
+                                                         'normal_user'),
                                  role=TeamMember.ROLE_CONTRIBUTOR)
         TeamProjectFactory.create(team=self.team.team,
                                   name='my translation project',
@@ -66,12 +58,12 @@ class TestCaseTeamSettings(WebdriverTestCase):
 
 
 
-    def test_assign__manager_project_lang_restrictions(self):
-        """Assign a manager with project restrictions.
+    def test_remove__no_link(self):
+        """No remove link for users who can't remove videos.
 
-           Verify the display of the roles in the members tab.
         """
-        self.auth_pg.login('team_owner', 'password')
+
+
 
 
 
