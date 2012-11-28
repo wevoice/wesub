@@ -148,11 +148,8 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     if (this.previousCaption_ &&
         (this.previousCaption_.getEndTime() == 
          unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
-         this.previousCaption_.getEndTime() > startTime))
+         this.previousCaption_.getEndTime() > startTime)){
          this.previousCaption_.setEndTime(startTime);
-    if (previousValue != startTime){
-        this.changed_(previousValue ==
-            unisubs.subtitle.EditableCaption.TIME_UNDEFINED)
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
@@ -260,6 +257,7 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
 unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
         unisubs.SubTracker.getInstance().trackEdit(this.getCaptionIndex());
+    console.log("dispatching change event")
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));
