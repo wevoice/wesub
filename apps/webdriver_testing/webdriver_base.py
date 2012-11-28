@@ -39,7 +39,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
                 'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
             self.base_url = 'http://unisubs.example.com:80/'
         else:
-            self.base_url = 'http://unisubs.example.com:8000/'
+            self.base_url = self.live_server_url + '/'
         self.browser.get(self.base_url)
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
