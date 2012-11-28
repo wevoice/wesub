@@ -56,7 +56,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
              * Parses milliseconds into a time expression.
              */
             if (milliseconds === -1 || milliseconds === undefined || milliseconds === null) {
-                throw Error("Invalid milliseconds to be converted" + milliseconds)
+                throw Error("Invalid milliseconds to be converted" + milliseconds);
             }
             var time = Math.floor(milliseconds / 1000);
             var hours = ~~(time / 3600);
@@ -77,19 +77,19 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
              * expect this to be in the HH:MM:SS.FFF form.
              * If number of digits on fraction is less than 3,
              * we right pad them.
+             *
              * Returns: int
              */
             var components = timeExpression.match(/([\d]{2}):([\d]{2}):([\d]{2}).([\d]{1,3})/i);
-            var millisecondsInHours   = components[1] * (3600 * 1000);
-            var millisecondsInMinutes = components[2] * (60 * 1000);
-            var millisecondsInSeconds = components[3] * (1000);
-            var millisecondsInFraction = parseInt(this.utils.rightPad(components[4], 3));
+            var millisecondsInHours    = components[1] * (3600 * 1000);
+            var millisecondsInMinutes  = components[2] * (60 * 1000);
+            var millisecondsInSeconds  = components[3] * (1000);
+            var millisecondsInFraction = parseInt(this.utils.rightPad(components[4], 3), 10);
 
             return parseInt(millisecondsInHours +
-                                millisecondsInMinutes +
-                                millisecondsInSeconds +
-                                 + millisecondsInFraction);
-
+                            millisecondsInMinutes +
+                            millisecondsInSeconds +
+                            millisecondsInFraction, 10);
         },
         xmlToString: function(xml) {
             /*
