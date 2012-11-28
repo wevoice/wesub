@@ -16,14 +16,13 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
+
 from settings import *
 from dev_settings import *
 
 
 SITE_ID = 19
-STATIC_URL = "http://unisubs.example.com:80/site_media/"
-MEDIA_URL = "http://unisubs.example.com:80/user-data/"
-#DEFAULT_PROTOCOL  = 'http'
 
 DATABASES = {
     'default': {
@@ -37,9 +36,13 @@ DATABASES = {
     }
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
-STATIC_URL_BASE = STATIC_URL
-if COMPRESS_MEDIA:
-    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
+
+if os.getenv("HOME") == '/home/vagrant':
+    STATIC_URL = "http://unisubs.example.com:80/site_media/"
+    MEDIA_URL = "http://unisubs.example.com:80/user-data/"
+    STATIC_URL_BASE = STATIC_URL
+    if COMPRESS_MEDIA:
+        STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
 DEBUG = True
 CACHE_PREFIX = "testcache"
