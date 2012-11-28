@@ -850,6 +850,10 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
         },
+        'bleach': {
+            'level': 'ERROR',
+            'handlers': ['null'],
+            'propagate': False,
     },
 }
 
