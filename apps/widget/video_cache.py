@@ -155,6 +155,9 @@ def _video_visibility_policy_key(video_id):
 
 
 def pk_for_default_language(video_id, language_code):
+    # the widget sends langauge code as an empty dict
+    # don't ask me why
+    language_code = language_code or None
     cache_key = _subtitle_language_pk_key(video_id, language_code)
     value = cache.get(cache_key)
 
