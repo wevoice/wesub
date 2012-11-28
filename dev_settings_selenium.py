@@ -22,6 +22,7 @@ from settings import *
 from dev_settings import *
 
 
+DEBUG = True
 SITE_ID = 19
 
 DATABASES = {
@@ -37,6 +38,8 @@ DATABASES = {
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 
+COMPRESS_MEDIA = False
+
 if os.getenv("HOME") == '/home/vagrant':
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
@@ -44,7 +47,6 @@ if os.getenv("HOME") == '/home/vagrant':
     if COMPRESS_MEDIA:
         STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 
-DEBUG = True
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
