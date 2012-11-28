@@ -22,11 +22,13 @@
         </a>
     </li>
     {% if team|is_team_member:user %}
-        <li{% if current == "tasks" %} class="current" {% endif %}>
-            <a href="{% url teams:team_tasks team.slug %}">
-                {% trans "Tasks" %}
-            </a>
-        </li>
+        {% if team|allows_tasks %}
+            <li{% if current == "tasks" %} class="current" {% endif %}>
+                <a href="{% url teams:team_tasks team.slug %}">
+                    {% trans "Tasks" %}
+                </a>
+            </li>
+        {% endif %}
 
         {% if team|can_view_settings_tab:user %}
             <li{% if current == "settings" %} class="current" {% endif %}>

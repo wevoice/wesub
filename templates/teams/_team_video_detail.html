@@ -33,9 +33,11 @@
         {% with search_record|can_edit_video:request.user as can_edit_this_video %}
             {% if can_edit_this_video %}
                 <ul class="admin-controls">
-                    <li>
-                        <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="Manage tasks">{% trans 'Tasks' %}</a>
-                    </li>
+                    {% if team|allows_tasks %}
+                        <li>
+                            <a href="{% url teams:team_tasks slug=team.slug %}?team_video={{ search_record.team_video_pk }}" title="Manage tasks">{% trans 'Tasks' %}</a>
+                        </li>
+                    {% endif %}
 
                     <li>
                         <a href="{% url teams:team_video team_video_pk=search_record.team_video_pk %}" title="Edit this video">{% trans 'Edit' %}</a>
