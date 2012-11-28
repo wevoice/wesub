@@ -86,6 +86,11 @@ def _get_team_video_from_search_record(search_record):
         return None
 
 @register.filter
+def allows_tasks(team):
+    workflow = team.get_workflow()
+    return workflow and workflow.allows_tasks
+
+@register.filter
 def can_approve_application(team, user):
     return can_invite(team, user)
 

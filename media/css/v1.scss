@@ -2156,6 +2156,14 @@ div#rollback-button {
         a:hover {
             color: #35424A;
         }
+        &.last {
+            border: none;
+        }
+    }
+
+    &.simple li {
+        width: 49.8%;
+
         &:last-child {
             border: none;
         }
