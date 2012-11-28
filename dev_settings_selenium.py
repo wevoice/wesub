@@ -60,3 +60,4 @@ CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
 
+HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
