@@ -27,6 +27,11 @@ SITE_ID = 19
 if os.getenv("HOME") == '/home/vagrant':
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
+#DEFAULT_PROTOCOL  = 'http'
+
+if os.getenv("HOME") == '/home/vagrant':
+    STATIC_URL = "http://unisubs.example.com:80/site_media/"
+    MEDIA_URL = "http://unisubs.example.com:80/user-data/"
 
 #DEFAULT_PROTOCOL  = 'http'
 
