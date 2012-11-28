@@ -89,10 +89,10 @@
                     <h3>{% trans "Helping out is easy!" %}</h3>
                     <p>
                         {% blocktrans %}
-                            In the section below, look for a video that interests you. Beneath the video you'll see what we need help with. Click and you're on your way!
+                            Just find a video that interests you and click the button below it to get started!
                         {% endblocktrans %}
                     <p>
-                    <p><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about subtitling in Amara." %}</p>
+                    <p class="prompt"><a href="http://support.universalsubtitles.org/solution/categories/13504">{% trans "Learn more" %}</a>{% trans " about subtitling in Amara." %}</p>
                 </div>
             {% endif %}
         {% else %} {# user is not a team member #}
@@ -105,11 +105,6 @@
                         {% blocktrans %}
                             We've got lots of great content that we'd love your help with.
                         {% endblocktrans %}
-                        {% if team.is_by_application %}
-                            {% trans " Click the link below to apply!" %}
-                        {% else %}
-                            {% trans " Click the link below to become a member!" %}
-                        {% endif %}
                     </p>
                     {% include "teams/_join.html" %}
                 {% endif %}
