@@ -23,8 +23,6 @@ import os
 import time
 from apps.webdriver_testing.data_factories import UserFactory
 
-os.environ[
-    'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 
 
 class WebdriverTestCase(LiveServerTestCase, TestCase):
@@ -37,6 +35,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             pass
         self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
         if os.getenv("HOME") == '/home/vagrant':
+            os.environ[
+                'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
             self.base_url = 'http://unisubs.example.com:80/'
         else:
             self.base_url = 'http://unisubs.example.com:8000/'
