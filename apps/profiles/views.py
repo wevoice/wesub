@@ -35,7 +35,7 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, VideoUrl
+from videos.models import Action, VideoUrl, Video
 from subtitles.models import SubtitleLanguage
 
 
@@ -71,11 +71,6 @@ def activity(request, user_id=None):
                 user = User.objects.get(id=user_id)
             except (User.DoesNotExist, ValueError):
                 raise Http404
-    elif request.user.is_authenticated():
-        user = request.user
-    else:
-        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
-
 
     qs = Action.objects.filter(user=user)
 
@@ -131,7 +126,7 @@ def videos(request, user_id=None):
             except (User.DoesNotExist, ValueError):
                 raise Http404
 
-    qs = user.videos.order_by('-edited')
+    qs = Video.objects.filter(user=user).order_by('-edited')
     q = request.REQUEST.get('q')
 
     if q:
@@ -139,7 +134,6 @@ def videos(request, user_id=None):
 
     context = {
         'user_info': user,
-        'my_videos': True,
         'query': q
     }
 
