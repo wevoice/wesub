@@ -28,6 +28,8 @@ if os.getenv("HOME") == '/home/vagrant':
 else:
     VAGRANT_VM = False
 
+VAGRANT_VM = False
+
 SITE_ID = 4
 DEBUG = True
 
@@ -46,6 +48,18 @@ INSTALLED_APPS + ('django_nose',
                   'django.contrib.staticfiles',
                   'webdriver_testing', )
 
+TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
+
+STATICFILES_DIRS = (
+    rel('media',))
+
+STATICFILES_FINDERS = (
+   'django.contrib.staticfiles.finders.FileSystemFinder',
+   'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+   'compressor.finders.CompressorFinder',
+   )
+
+
 COMPRESS_MEDIA = False
 
 if VAGRANT_VM:
@@ -55,7 +69,7 @@ if VAGRANT_VM:
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
 else:
     STATIC_URL = '/site_media/'
-    MEDIA_URL = "/user-data/"
+    MEDIA_URL =  '/user-data/'
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
 
 STATIC_URL_BASE = STATIC_URL
