@@ -44,6 +44,8 @@ DATABASES = {
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 
+COMPRESS_MEDIA = False
+
 if VAGRANT_VM:
     SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
