@@ -50,8 +50,7 @@ INSTALLED_APPS + ('django_nose',
 
 TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
 
-STATICFILES_DIRS = (
-    rel('media',))
+STATICFILES_DIRS = (rel('media'),)
 
 STATICFILES_FINDERS = (
    'django.contrib.staticfiles.finders.FileSystemFinder',
