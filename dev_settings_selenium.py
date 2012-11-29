@@ -60,7 +60,7 @@ else:
     MEDIA_URL =  '/user-data/'
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
     INSTALLED_APPS  + ('django.contrib.staticfiles',
-                       'compressor',)
+                       )
     TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
 
     STATICFILES_FINDERS = (
