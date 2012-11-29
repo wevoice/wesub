@@ -56,6 +56,8 @@ if VAGRANT_VM:
     #    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 else:
     STATIC_URL = '/static/'
+    STATIC_URL_BASE = STATIC_URL
+
     
 
 
