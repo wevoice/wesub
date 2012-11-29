@@ -18,7 +18,7 @@
 
 import os
 from settings import *
-#from dev_settings import *
+from dev_settings import *
 
 #There are differences in the configs for selenium testing when running 
 #in vagrant vm.
