@@ -34,7 +34,7 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': "/tmp/django_test_db.sqlite",
+        'NAME': "django_test_db.sqlite",
         'USER': "",
         'PASSWORD': "",
         'HOST': "",
@@ -44,23 +44,17 @@ DATABASES = {
 
 INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 
-COMPRESS_MEDIA = False
-
 if VAGRANT_VM:
     SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
-    STATIC_URL_BASE = STATIC_URL
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
-    #if COMPRESS_MEDIA:
-    #    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
 else:
-    STATIC_ROOT = 'static/'
-    STATIC_URL = '/static/'
-    STATIC_URL_BASE = STATIC_URL
+    STATIC_URL = 'http://unisubs.example.com:8000/site_media/'
+    MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
+    HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
 
-    
-
+STATIC_URL_BASE = STATIC_URL
 
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
@@ -76,8 +70,4 @@ NOSE_ARGS = ['--with-xunit',
 CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
-
-if not VAGRANT_VM:
-    HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
-
 
