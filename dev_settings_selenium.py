@@ -17,13 +17,17 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import os
-
 from settings import *
 from dev_settings import *
 
+#There are differences in the configs for selenium testing when running 
+#in vagrant vm.
+if os.getenv("HOME") == '/home/vagrant':
+    VAGRANT_VM = True  
+    os.environ[ 'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 
-DEBUG = True
 SITE_ID = 19
+DEBUG = True
 
 DATABASES = {
     'default': {
@@ -40,12 +44,15 @@ INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 
 COMPRESS_MEDIA = False
 
-if os.getenv("HOME") == '/home/vagrant':
+if VAGRANT_VM:
+    print 'setting the urls'
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
     STATIC_URL_BASE = STATIC_URL
     if COMPRESS_MEDIA:
         STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
+    
+
 
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
@@ -62,4 +69,7 @@ CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
 
-HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
+if not VAGRANT_VM:
+    HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
+
+
