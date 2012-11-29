@@ -52,8 +52,8 @@ if VAGRANT_VM:
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
 else:
-    STATIC_URL = 'http://unisubs.example.com:8000/site_media/'
-    MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
+    STATIC_URL = '/site_media/'
+    MEDIA_URL = "/user-data/"
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
 
 STATIC_URL_BASE = STATIC_URL
