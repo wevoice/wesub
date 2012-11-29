@@ -210,7 +210,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         // at that time, we don't have access to both subtitle states
         // so we're wastefully creating this now, oh well.
         var dfxpString = subtitles.SUBTITLES;
-        if (result['original_subtitles']){
+        if (result['original_subtitles'] &&
+            new AmaraDFXPParser().init(dfxpString).getSubtitles().length ===0){
             dfxpString = new AmaraDFXPParser().init(result['original_subtitles']['subtitles']).clone().xmlToString(true);
         }
         var captionSet = new unisubs.subtitle.EditableCaptionSet(

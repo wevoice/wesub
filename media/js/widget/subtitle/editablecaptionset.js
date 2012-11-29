@@ -135,8 +135,6 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
     return true;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(node, dfxpWrapper) {
-
-
     var c = new unisubs.subtitle.EditableCaption(node, dfxpWrapper);
     c.setParentEventTarget(this);
 
