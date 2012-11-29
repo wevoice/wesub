@@ -1191,7 +1191,8 @@ def dashboard(request, slug):
     if allows_tasks:
         video_pks = set()
 
-        tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
+        tasks = _order_tasks(request,
+                         _tasks_list(request, team, None, filters, user))
         _cache_video_url(tasks)
 
         for task in tasks:
@@ -1211,7 +1212,7 @@ def dashboard(request, slug):
             if len(video_pks) >= VIDEOS_ON_PAGE:
                 break
     else:
-        team_videos = team.videos.select_related("teamvideo")[0:VIDEOS_ON_PAGE]
+        team_videos = team.videos.select_related("teamvideo").order_by("teamvideo__created")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
