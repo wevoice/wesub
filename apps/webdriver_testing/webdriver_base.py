@@ -16,31 +16,32 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import os
+import time
 from django.test import LiveServerTestCase
 from django.test.testcases import (TestCase)
 from selenium import webdriver
-import os
-import time
+from django.conf import settings
 from apps.webdriver_testing.data_factories import UserFactory
-
 
 
 class WebdriverTestCase(LiveServerTestCase, TestCase):
     def setUp(self):
         super(WebdriverTestCase, self).setUp()
+  
         LiveServerTestCase.setUp(self)
         try:  # Get rid of the previous screenshot
             os.unlink('apps/webdriver_testing/Screenshots/%s.png' % self.id())
         except:
             pass
-        self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
-        if os.getenv("HOME") == '/home/vagrant':
-            os.environ[
-                'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
+        if settings.VAGRANT_VM: #if running in vagrant VM, must use port 80 for headless browser
             self.base_url = 'http://unisubs.example.com:80/'
         else:
             self.base_url = self.live_server_url + '/'
+
+        self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
         self.browser.get(self.base_url)
+
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
 
