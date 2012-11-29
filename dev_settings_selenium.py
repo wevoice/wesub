@@ -45,19 +45,7 @@ DATABASES = {
     }
 
 INSTALLED_APPS + ('django_nose', 
-                  'django.contrib.staticfiles',
                   'webdriver_testing', )
-
-TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
-
-STATIC_ROOT = rel('static/')
-STATICFILES_DIRS = (rel('media'),
-                    rel('media/images'),)
-
-STATICFILES_FINDERS = (
-   'django.contrib.staticfiles.finders.FileSystemFinder',
-   'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-   )
 
 
 COMPRESS_MEDIA = False
@@ -71,6 +59,22 @@ else:
     STATIC_URL = '/site_media/'
     MEDIA_URL =  '/user-data/'
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
+    INSTALLED_APPS  + ('django.contrib.staticfiles',
+                       'compressor',)
+    TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
+
+    STATICFILES_FINDERS = (
+       'django.contrib.staticfiles.finders.FileSystemFinder',
+       'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+       'compressor.finders.CompressorFinder',
+       )
+
+    MEDIA_ROOT = rel('user-data/')
+    STATIC_ROOT = rel('static/')
+    STATICFILES_DIRS = (rel('media'),
+                       )
+
+
 
 STATIC_URL_BASE = STATIC_URL
 
