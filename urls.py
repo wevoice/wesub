@@ -213,8 +213,6 @@ if settings.DEBUG:
         (r'raw_template/(?P<template>.*)',
             'django.views.generic.simple.direct_to_template'),
     )
-    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-    urlpatterns = staticfiles_urlpatterns()
 
 def handler500(request, template_name='500.html'):
     t = loader.get_template(template_name)

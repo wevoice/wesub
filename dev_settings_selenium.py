@@ -42,7 +42,9 @@ DATABASES = {
         }
     }
 
-INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
+INSTALLED_APPS + ('django_nose', 
+                  'django.contrib.staticfiles',
+                  'webdriver_testing', )
 
 COMPRESS_MEDIA = False
 
