@@ -25,6 +25,8 @@ from settings import *
 if os.getenv("HOME") == '/home/vagrant':
     VAGRANT_VM = True  
     os.environ[ 'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
+else:
+    VAGRANT_VM = False
 
 SITE_ID = 4
 DEBUG = True
