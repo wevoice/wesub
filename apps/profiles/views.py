@@ -35,7 +35,7 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, SubtitleLanguage, VideoUrl
+from videos.models import Action, SubtitleLanguage, VideoUrl, Video
 
 
 rpc_router = RpcRouter('profiles:rpc_router', {
@@ -125,7 +125,7 @@ def videos(request, user_id=None):
             except (User.DoesNotExist, ValueError):
                 raise Http404
 
-    qs = user.videos.order_by('-edited')
+    qs = Video.objects.filter(user=user).order_by('-edited')
     q = request.REQUEST.get('q')
 
     if q:
