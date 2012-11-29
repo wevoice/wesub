@@ -28,6 +28,8 @@ if os.getenv("HOME") == '/home/vagrant':
 else:
     VAGRANT_VM = False
 
+VAGRANT_VM = False
+
 SITE_ID = 4
 DEBUG = True
 
@@ -42,19 +44,35 @@ DATABASES = {
         }
     }
 
-INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
+INSTALLED_APPS + ('django_nose', 
+                  'webdriver_testing', )
+
 
 COMPRESS_MEDIA = False
 
-if VAGRANT_VM:
+if VAGRANT_VM == True:
     SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
 else:
-    STATIC_URL = 'http://unisubs.example.com:8000/site_media/'
-    MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
+    STATIC_URL = '/site_media/'
+    MEDIA_URL =  '/user-data/'
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/testing'
+    INSTALLED_APPS  + ('django.contrib.staticfiles',
+                       )
+    TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
+
+    STATICFILES_FINDERS = (
+       'django.contrib.staticfiles.finders.FileSystemFinder',
+       'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+       )
+
+    MEDIA_ROOT = rel('user-data/')
+    STATIC_ROOT = rel('static/')
+    STATICFILES_DIRS = (rel('media/'), rel('user-data/'))
+
+
 
 STATIC_URL_BASE = STATIC_URL
 
