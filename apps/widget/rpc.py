@@ -433,7 +433,7 @@ class Rpc(BaseRpc):
         # - the front end specifically said to translate from (base_language_code)
         # - The language has another source in it's lineage and it is not marked as forking
         translated_from_code = base_language_code or (not language.is_forked and language.get_translation_source_language_code())
-
+        translated_from = None
 
         if translated_from_code:
             translated_from = language.video.subtitle_language(translated_from_code)
