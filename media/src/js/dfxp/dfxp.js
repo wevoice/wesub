@@ -21,7 +21,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      * A utility for working with DFXP subs.
      * The front end app needs all timming data to be
      * stored in milliseconds for processing. On `init` we convert
-     * time expressions to milliseconds
+     * time expressions to milliseconds.
      */
 
     var that = this;
@@ -53,6 +53,31 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
     this.utils = {
+        markdownToHtml: function(text) {
+            /*
+             * Convert text to Markdown-style rendered HTML with bold, italic,
+             * underline, etc.
+             */
+
+            var replacements = [
+                { match: /(\*\*)([^\*]+)(\*\*)/g,
+                  replaceWith: "<b>$2</b>" },
+                { match: /(\*)([^\*]+)(\*{1})/g,
+                  replaceWith: "<i>$2</i>" },
+                { match: /(_)([^_]+)(_{1})/g,
+                  replaceWith: "<u>$2</u>" }
+            ];
+
+            for (var i = 0; i < replacements.length; i++) {
+                var match = replacements[i].match;
+                var replaceWith = replacements[i].replaceWith;
+
+                text = text.replace(match, replaceWith);
+            }
+
+            return text;
+
+        },
         millisecondsToTimeExpression: function(milliseconds) {
             /*
              * Parses milliseconds into a time expression.
@@ -259,6 +284,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return true;
     };
+    this.clone = function(preserveText){
+        var parser =  new this.constructor();
+        parser.init(this.xmlToString(true));
+        if (!preserveText){
+            $("div p", parser.$xml).text("");
+        }
+        return parser;
+    };
     this.content = function(indexOrElement, content) {
         /*
          * Either get or set the HTML content for the subtitle.
@@ -280,36 +313,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         //
         // Reference: http://bit.ly/SwbPeR
         return $('<div>').append($subtitle.contents().clone()).remove().html();
-
-    };
-    this.contentRendered = function(indexOrElement) {
-        /*
-         * Get the rendered version of the content. Use Markdown-esque
-         * compilation to render bold, italics, and underlines.
-         *
-         * This is mostly a JavaScript port of our Python counterpart: http://bit.ly/TrpuRP
-         */
-
-        var $subtitle = this.getSubtitle(indexOrElement);
-        var rawContent = this.content($subtitle);
-
-        var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g,
-              replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g,
-              replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g,
-              replaceWith: "<u>$2</u>" }
-        ];
-
-        for (var i = 0; i < replacements.length; i++) {
-            var match = replacements[i].match;
-            var replaceWith = replacements[i].replaceWith;
-
-            rawContent = rawContent.replace(match, replaceWith);
-        }
-
-        return rawContent;
 
     };
     this.convertTimes = function(toFormat, $subtitles) {
@@ -798,12 +801,4 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.convertTimes('timeExpression', $('div p', $cloned));
         return this.utils.xmlToString($cloned.get(0));
     };
-    this.clone = function(preserveText){
-        var parser =  new this.constructor();
-        parser.init(this.xmlToString(true));
-        if (!preserveText){
-            $("div p", parser.$xml).text("");
-        }
-        return parser;
-    }
 };
