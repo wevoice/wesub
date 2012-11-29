@@ -50,7 +50,7 @@ INSTALLED_APPS + ('django_nose',
 
 COMPRESS_MEDIA = False
 
-if VAGRANT_VM:
+if VAGRANT_VM == True:
     SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
@@ -66,13 +66,11 @@ else:
     STATICFILES_FINDERS = (
        'django.contrib.staticfiles.finders.FileSystemFinder',
        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-       'compressor.finders.CompressorFinder',
        )
 
     MEDIA_ROOT = rel('user-data/')
     STATIC_ROOT = rel('static/')
-    STATICFILES_DIRS = (rel('media'),
-                       )
+    STATICFILES_DIRS = (rel('media/'), rel('user-data/'))
 
 
 
