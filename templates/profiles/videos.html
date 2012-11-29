@@ -3,7 +3,9 @@
 {% load i18n teams_tags paginator profiles_tags widget auth_tags %}
 
 {% block title %}
-    {% trans 'My videos' %} | Amara
+    {% blocktrans %}
+        {{ user_info }}'s videos | Amara
+    {% endblocktrans %}
 {% endblock %}
 
 {% block email_confirmation_block %}
