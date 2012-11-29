@@ -18,7 +18,7 @@
 
 import os
 from settings import *
-from dev_settings import *
+#from dev_settings import *
 
 #There are differences in the configs for selenium testing when running 
 #in vagrant vm.
@@ -26,7 +26,7 @@ if os.getenv("HOME") == '/home/vagrant':
     VAGRANT_VM = True  
     os.environ[ 'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 
-SITE_ID = 19
+SITE_ID = 4
 DEBUG = True
 
 DATABASES = {
@@ -45,12 +45,13 @@ INSTALLED_APPS + ('django_nose', 'webdriver_testing',)
 COMPRESS_MEDIA = False
 
 if VAGRANT_VM:
-    print 'setting the urls'
+    SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
     STATIC_URL_BASE = STATIC_URL
-    if COMPRESS_MEDIA:
-        STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
+    HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
+    #if COMPRESS_MEDIA:
+    #    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
     
 
 
