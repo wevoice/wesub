@@ -315,6 +315,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $('<div>').append($subtitle.contents().clone()).remove().html();
 
     };
+    this.contentRendered = function(indexOrElement) {
+        /*
+         * Return the content of the subtitle, rendered with Markdown styles.
+         */
+
+        var $subtitle = this.getSubtitle(indexOrElement);
+
+        return this.utils.markdownToHtml(this.content($subtitle));
+    };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
          * Convert times to either milliseconds or time expressions

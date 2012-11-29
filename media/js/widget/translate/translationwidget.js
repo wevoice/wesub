@@ -63,12 +63,14 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
            $d('div', null,
               $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
                          unisubs.formatTime(timingToDisplay)),
-              $d('span', 'unisubs-title unisubs-title-notime', this.getOriginalValue()),
+              this.originalTitleWidgetThing_ = $d('span', 'unisubs-title unisubs-title-notime', ''),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
            this.translateInput_ = $d('textarea', 'unisubs-translateField')
         )
     );
+
+    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_.utils.markdownToHtml(this.getOriginalValue());
     
     this.getHandler()
         .listen(
