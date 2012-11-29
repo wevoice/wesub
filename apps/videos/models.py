@@ -2499,9 +2499,13 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        return video_type_registrar[self.type].video_url(self)
+        try:
+            return video_type_registrar[self.type].video_url(self)
+        except KeyError:
+            return None
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        assert self.type != '', "Can't set an empty type"
         if updates_timestamp:
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
