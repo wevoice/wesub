@@ -54,6 +54,8 @@ if VAGRANT_VM:
     HAYSTACK_SOLR_URL = 'http://127.0.0.1:8983/solr/vagrant'
     #if COMPRESS_MEDIA:
     #    STATIC_URL += "%s/%s/" % (COMPRESS_OUTPUT_DIRNAME, LAST_COMMIT_GUID.split("/")[1])
+else:
+    STATIC_URL = '/static/'
     
 
 
