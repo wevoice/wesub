@@ -51,7 +51,8 @@ INSTALLED_APPS + ('django_nose',
 TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
 
 STATIC_ROOT = rel('static/')
-STATICFILES_DIRS = (rel('media'),)
+STATICFILES_DIRS = (rel('media'),
+                    rel('media/images'),)
 
 STATICFILES_FINDERS = (
    'django.contrib.staticfiles.finders.FileSystemFinder',
