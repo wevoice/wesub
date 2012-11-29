@@ -203,8 +203,18 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         }
         var originalSubtitles = unisubs.widget.SubtitleState.fromJSON(
             result['original_subtitles']);
+        // if this is a translation that's beginning, that is
+        // empty, we want the dfxp to be a clone of the original
+        // but with empty texts. Ideally this would be done further down
+        // the processing, when the actual wrappers are created, however
+        // at that time, we don't have access to both subtitle states
+        // so we're wastefully creating this now, oh well.
+        var dfxpString = subtitles.SUBTITLES;
+        if (result['original_subtitles']){
+            dfxpString = new AmaraDFXPParser().init(result['original_subtitles']['subtitles']).clone().xmlToString(true);
+        }
         var captionSet = new unisubs.subtitle.EditableCaptionSet(
-            subtitles.SUBTITLES, subtitles.IS_COMPLETE, 
+            dfxpString, subtitles.IS_COMPLETE,
             subtitles.TITLE,  opt_wasForkedDuringEditing, subtitles.DESCRIPTION,
             subtitles.LANGUAGE_NAME, subtitles.LANGUAGE_IS_RTL, subtitles.IS_MODERATED);
         if (!fromResuming) {
@@ -219,7 +229,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         } else if (unisubs.mode == 'approve') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
                                                       unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL);
-        } else if (subtitles.originalSubtitles) {
+        } else if (result['original_subtitles']) {
             dialog = this.openDependentTranslationDialog_(
                 serverModel, subtitles, originalSubtitles);
         } else {

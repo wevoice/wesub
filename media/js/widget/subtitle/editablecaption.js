@@ -257,7 +257,6 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
 unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
         unisubs.SubTracker.getInstance().trackEdit(this.getCaptionIndex());
-    console.log("dispatching change event")
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));

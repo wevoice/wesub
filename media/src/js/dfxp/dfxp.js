@@ -48,6 +48,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Convert both subtitle sets to milliseconds.
         this.convertTimes('milliseconds', $('div p', this.$originalXml));
         this.convertTimes('milliseconds', $('div p', this.$xml));
+
+        return this;
     };
 
     this.utils = {
@@ -796,4 +798,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.convertTimes('timeExpression', $('div p', $cloned));
         return this.utils.xmlToString($cloned.get(0));
     };
+    this.clone = function(preserveText){
+        var parser =  new this.constructor();
+        parser.init(this.xmlToString(true));
+        if (!preserveText){
+            $("div p", parser.$xml).text("");
+        }
+        return parser;
+    }
 };

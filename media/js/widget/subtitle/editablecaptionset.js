@@ -112,10 +112,6 @@ unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     return this.captions_[index];
 };
-//unisubs.subtitle.EditableCaptionSet.prototype.captionByID = function(id) {
-    //var subMap = this.makeMap();
-    //return subMap[id];
-//};
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
     return this.x.xmlToString(true);
 };
@@ -138,14 +134,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
             return false;
     return true;
 };
-unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentTranslation = function(subtitleJson) {
+unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(node, dfxpWrapper) {
 
-    var newSub = this.x.addSubtitle(null, {
-        'begin': subtitleJson['start_time'],
-        'end': subtitleJson['end_time']
-    });
 
-    var c = new unisubs.subtitle.EditableCaption(null, newSub);
+    var c = new unisubs.subtitle.EditableCaption(node, dfxpWrapper);
     c.setParentEventTarget(this);
 
     return c;

@@ -99,7 +99,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
             }
         } else {
             this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
-                this.dialog_.translationPanel_.translationList_.baseLanguageSubtitles_);
+                this.dialog_.translationPanel_.translationList_.originalWrapper);
         }
 
         if (this.dialog_.translationPanel_) {

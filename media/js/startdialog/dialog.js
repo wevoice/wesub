@@ -387,8 +387,10 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
                 fromLanguage.languageName() + ". ";
         }
         else {
+            // FIXME: this has been  wrong for a while, it's not a language model here
+            // but the language code, this should be rare, though
             message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
-                " from " + fromLanguage.languageName() + ", you'll need to " +
+                " from " + fromLanguage + ", you'll need to " +
                 "start from scratch.";
         }
         return message;
