@@ -121,7 +121,6 @@ def dashboard(request):
     return direct_to_template(request, 'profiles/dashboard.html', context)
 
 
-@login_required
 def videos(request, user_id=None):
     if user_id:
         try:
@@ -131,10 +130,6 @@ def videos(request, user_id=None):
                 user = User.objects.get(id=user_id)
             except (User.DoesNotExist, ValueError):
                 raise Http404
-    elif request.user.is_authenticated():
-        user = request.user
-    else:
-        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
 
     qs = user.videos.order_by('-edited')
     q = request.REQUEST.get('q')
