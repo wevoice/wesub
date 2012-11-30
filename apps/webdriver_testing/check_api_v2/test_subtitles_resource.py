@@ -60,7 +60,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
                 'Timed_text.{0}.{1}'.format(test_lang_code, 'xml')),
                 encoding = 'utf-8'
                 )
-            test_format = 'dxfp'
+            test_format = 'dfxp'
         else:
             sub_data = codecs.open(os.path.join(self.subs_data_dir, 
                 'Timed_text.{0}.{1}'.format(test_lang_code, test_format)),
