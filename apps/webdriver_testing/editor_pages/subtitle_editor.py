@@ -141,9 +141,19 @@ class SubtitleEditor(EditorDialogs):
     def download_subtitles(self, sub_format='SRT'):
         self.click_by_css(self._DOWNLOAD_SUBTITLES)
         self.select_option_by_text(self._DOWNLOAD_FORMAT, sub_format)
-        time.sleep(3)
-        stored_subs = self.browser.execute_script(
+        # don't ever wait more than 15 seconds for this
+        # but keep pooling for a terminating value
+        start_time = time.time()
+        while time.time() - start_time < 15000:
+            time.sleep(2)
+            stored_subs = self.browser.execute_script(
             "return document.getElementsByTagName('textarea')[0].value")
+            # server errored out
+            if stored_subs == "Something went wrong, we're terribly sorry.":
+                raise ValueError("Call to convert formats failed")
+            # server hasn't returned yet
+            elif stored_subs.startwith("Processing.") is False:
+                break
         #self.close_lang_dialog()
         return stored_subs
 

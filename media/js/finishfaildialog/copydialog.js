@@ -68,6 +68,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
     if (format === 'dfxp') {
         goog.dom.forms.setValue(this.textarea_, this.dfxpString_);
     } else {
+        // watchout the selenium test checks for this value, see editor_pages/subtitle_editor.py
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
         var textarea = this.textarea_;
@@ -83,7 +84,9 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                     output += that.dfxpString_;
                 }
                 else {
-                    output = event.target.getResponseJson()['result'];
+                    // watchout the selenium test checks for this value,
+                    // see editor_pages/subtitle_editor.py
+                    output = "Something went wrong, we're terribly sorry."
                 }
 
                 goog.dom.forms.setValue(textarea, output);
