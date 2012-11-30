@@ -97,7 +97,7 @@ Knows where we've been
 99:59:59,000 --> 99:59:59,000
 In his octopus' garden in the shade.
 
-"""        
+"""
         
         self.sub_editor.continue_to_next_step()
         #Past Sync

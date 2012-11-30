@@ -144,7 +144,7 @@ class SubtitleEditor(EditorDialogs):
         # don't ever wait more than 15 seconds for this
         # but keep pooling for a terminating value
         start_time = time.time()
-        while time.time() - start_time < 15000:
+        while time.time() - start_time < 15:
             time.sleep(2)
             stored_subs = self.browser.execute_script(
             "return document.getElementsByTagName('textarea')[0].value")
@@ -152,8 +152,10 @@ class SubtitleEditor(EditorDialogs):
             if stored_subs == "Something went wrong, we're terribly sorry.":
                 raise ValueError("Call to convert formats failed")
             # server hasn't returned yet
-            elif stored_subs.startwith("Processing.") is False:
+            elif stored_subs and stored_subs.startswith("Processing.") is False:
                 break
+        else:
+            raise ValueError("More than 15 seconds passed, and subs weren't converted")
         #self.close_lang_dialog()
         return stored_subs
 
