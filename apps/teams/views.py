@@ -1184,12 +1184,11 @@ def dashboard(request, slug):
 
     workflow = team.get_workflow()
 
-    videos = {}
+    videos = []
 
     allows_tasks = workflow and workflow.allows_tasks
 
     if allows_tasks:
-        video_pks = set()
 
         tasks = _order_tasks(request,
                          _tasks_list(request, team, None, filters, user))
@@ -1198,25 +1197,24 @@ def dashboard(request, slug):
         for task in tasks:
             if member and not can_perform_task(user, task):
                 continue
-
-            pk = str(task.team_video.id)
             
-            if not pk in video_pks:
-                videos[pk] = task.team_video
-                videos[pk].tasks = []
-                video_pks.add(pk)
+            task_vid = task.team_video
 
-            video = videos[pk]
-            video.tasks.append(task)
+            if not task_vid in videos:
+                task_vid.tasks = []
+                videos.append(task_vid)
 
-            if len(video_pks) >= VIDEOS_ON_PAGE:
+            vid_index = videos.index(task_vid)
+            videos[vid_index].tasks.append(task)
+
+            if len(videos) >= VIDEOS_ON_PAGE:
                 break
     else:
-        team_videos = team.videos.select_related("teamvideo").order_by("teamvideo__created")[0:VIDEOS_ON_PAGE]
+        team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
-                videos[str(tv.teamvideo.id)] = tv.teamvideo 
+                videos.append(tv.teamvideo) 
         else:
             for video in team_videos.all():
                 subtitled_languages = (video.subtitlelanguage_set
@@ -1225,7 +1223,7 @@ def dashboard(request, slug):
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
                     tv.languages = [l for l in user_languages if l not in subtitled_languages]
-                    videos[str(tv.id)] = tv
+                    videos.append(tv)
 
     context = {
         'team': team,
