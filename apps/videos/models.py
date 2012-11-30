@@ -2476,7 +2476,10 @@ class VideoUrl(models.Model):
         try:
             return video_type_registrar[self.type].video_url(self)
         except KeyError:
-            return None
+            vt = video_type_registrar.video_type_for_url(self.url)
+            self.type = vt.abbreviation
+            self.save()
+            return video_type_registrar[self.type].video_url(self)
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         assert self.type != '', "Can't set an empty type"
