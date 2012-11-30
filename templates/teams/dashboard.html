@@ -184,7 +184,34 @@
                                         {% if team_video.video.languages_count < 1 %}
                                             <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
                                         {% else %} {# this video already has languages #}
-                                            <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add a new translation' %}</a>
+                                            {% if team_video.languages|length > 1 %}
+                                                <a href="#" class="dropdown">
+                                                    {{ team_video.languages|length }}
+                                                    {% trans " languages needed" %}
+                                                </a>
+                                                <div>
+                                                    <span class="expand">{% trans "View all" %}</span>
+                                                    <ul>
+                                                        {% for lang in team_video.languages %}
+                                                            <li>
+                                                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">
+                                                                    {% trans "Create " %}
+                                                                    {{ lang.get_language_display }}
+                                                                    {% trans " Subtitles" %}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %} {# there is only one language user can work on #}
+                                                {% for lang in team_video.languages %}
+                                                    <a href="#" id="video-{{ team_video.id }}" title="Get started now">
+                                                        {% trans "Create " %}
+                                                        {{ lang.get_language_display }}
+                                                        {% trans " Subtitles" %}
+                                                    </a>
+                                                {% endfor %}
+                                            {% endif %}
                                         {% endif %}
                                         {% with v=team_video.video %}
                                             <script type="text/javascript">
