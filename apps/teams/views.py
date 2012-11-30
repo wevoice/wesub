@@ -1168,7 +1168,7 @@ def dashboard(request, slug):
 
     if user:
         user_languages = set([ul.language for ul in user.get_languages()] + [''])
-        user_filter = {'assignee':str(user.id)}
+        user_filter = {'assignee':str(user.id),'language':'all'}
         user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
         _cache_video_url(user_tasks)
     else:
