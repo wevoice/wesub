@@ -35,7 +35,7 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, SubtitleLanguage, VideoUrl
+from videos.models import Action, SubtitleLanguage, VideoUrl, Video
 
 
 rpc_router = RpcRouter('profiles:rpc_router', {
@@ -70,11 +70,6 @@ def activity(request, user_id=None):
                 user = User.objects.get(id=user_id)
             except (User.DoesNotExist, ValueError):
                 raise Http404
-    elif request.user.is_authenticated():
-        user = request.user
-    else:
-        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
-
 
     qs = Action.objects.filter(user=user)
 
@@ -120,7 +115,6 @@ def dashboard(request):
     return direct_to_template(request, 'profiles/dashboard.html', context)
 
 
-@login_required
 def videos(request, user_id=None):
     if user_id:
         try:
@@ -130,19 +124,14 @@ def videos(request, user_id=None):
                 user = User.objects.get(id=user_id)
             except (User.DoesNotExist, ValueError):
                 raise Http404
-    elif request.user.is_authenticated():
-        user = request.user
-    else:
-        return reverse(reverse("auth:login") + "?next=%s" % (request.path))
 
-    qs = user.videos.order_by('-edited')
+    qs = Video.objects.filter(user=user).order_by('-edited')
     q = request.REQUEST.get('q')
 
     if q:
         qs = qs.filter(Q(title__icontains=q)|Q(description__icontains=q))
     context = {
         'user_info': user,
-        'my_videos': True,
         'query': q
     }
     qs = qs._clone(OptimizedQuerySet)

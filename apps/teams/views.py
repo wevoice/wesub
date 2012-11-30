@@ -1191,7 +1191,8 @@ def dashboard(request, slug):
     if allows_tasks:
         video_pks = set()
 
-        tasks = _tasks_list(request, team, None, filters, user)[0:TASKS_ON_PAGE]
+        tasks = _order_tasks(request,
+                         _tasks_list(request, team, None, filters, user))
         _cache_video_url(tasks)
 
         for task in tasks:
@@ -1211,7 +1212,7 @@ def dashboard(request, slug):
             if len(video_pks) >= VIDEOS_ON_PAGE:
                 break
     else:
-        team_videos = team.videos.select_related("teamvideo")[0:VIDEOS_ON_PAGE]
+        team_videos = team.videos.select_related("teamvideo").order_by("teamvideo__created")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
@@ -1240,14 +1241,15 @@ def dashboard(request, slug):
 
 @timefn
 @render_to('teams/tasks.html')
-def team_tasks(request, slug):
+def team_tasks(request, slug, project_slug=None):
     team = Team.get(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         messages.error(request, _("You cannot view this team's tasks."))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    project_slug = request.GET.get('project')
+    if not project_slug:
+        project_slug = request.GET.get('project')
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None

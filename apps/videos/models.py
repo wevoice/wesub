@@ -401,7 +401,13 @@ class Video(models.Model):
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
         assert video_url or vt, 'should be video URL or VideoType'
-        vt = vt or video_type_registrar.video_type_for_url(video_url)
+        from types.base import VideoTypeError
+
+        try:
+            vt = vt or video_type_registrar.video_type_for_url(video_url)
+        except VideoTypeError:
+            return None, False
+
         if not vt:
             return None, False
 
@@ -2493,9 +2499,16 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        return video_type_registrar[self.type].video_url(self)
+        try:
+            return video_type_registrar[self.type].video_url(self)
+        except KeyError:
+            vt = video_type_registrar.video_type_for_url(self.url)
+            self.type = vt.abbreviation
+            self.save()
+            return video_type_registrar[self.type].video_url(self)
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        assert self.type != '', "Can't set an empty type"
         if updates_timestamp:
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)
