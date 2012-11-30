@@ -133,23 +133,28 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
      */
     var initialSubs = this.fetchInitialSubs_();
     var initialCaptionSet = initialSubs.CAPTION_SET;
-
+    
     var subtitles = null;
-    if (this.anySubtitlingWorkDone())
+
+    if (this.anySubtitlingWorkDone() || this.captionSet_.forkedDuringEdits_) {
         subtitles = this.captionSet_.nonblankSubtitles();
+    }
 
     var args = { 'session_pk': this.sessionPK_ };
     var atLeastOneThingChanged = false;
+
     if (!goog.isNull(subtitles)) {
         args['subtitles'] = goog.array.map(
             subtitles, function(s) { return s.json; });
         atLeastOneThingChanged = true;
     }
+
     if (goog.isDefAndNotNull(this.captionSet_.title) &&
         this.captionSet_.title != initialCaptionSet.title) {
         args['new_title'] = this.captionSet_.title;
         atLeastOneThingChanged = true;
     }
+
     if (goog.isDefAndNotNull(this.captionSet_.description) &&
         this.captionSet_.description != initialCaptionSet.description) {
         args['new_description'] = this.captionSet_.description;
@@ -161,14 +166,18 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
         args['completed'] = this.captionSet_.completed;
         atLeastOneThingChanged = true;
     }
+
     if (this.captionSet_.wasForkedDuringEdits()) {
         args['forked'] = true;
+        atLeastOneThingChanged = true;
         // a fork alone isn't sufficient to trigger a save,
         // so not setting atLeastOneThingChanged.
     }
+
     if (window['UNISUBS_THROW_EXCEPTION']) {
         args['throw_exception'] = true;
     }
+
     // add task arguments, if they are all null, it will be harmless on the 
     // backend
     args['task_id'] = this.taskId;
