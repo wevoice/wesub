@@ -1190,8 +1190,15 @@ def dashboard(request, slug):
 
     if allows_tasks:
 
+        # TED's dashboard should only show TEDTalks tasks
+        # http://i.imgur.com/fjjqx.gif
+        if team.slug == 'ted':
+            project = Project.objects.get(team=team, slug='tedtalks')
+        else:
+            project = None
+
         tasks = _order_tasks(request,
-                         _tasks_list(request, team, None, filters, user))
+                         _tasks_list(request, team, project, filters, user))
         _cache_video_url(tasks)
 
         for task in tasks:
