@@ -1465,29 +1465,6 @@ div#language_picker {
         margin-left: 0;
     }
 
-    ul.listing {
-        > li {
-            margin: 0 0 .5em;
-            padding: 1em;
-            border: none;
-            background: $faintest;
-            @include border-radius;
-
-            h3 {
-                padding: 0;
-            }
-
-            .actions {
-                top: 1em;
-                right: 1em;
-
-                a:after {
-                    content: '';
-                }
-            }
-        }
-    }
-
     .avatar-container {
         background: #f2f2f2;
         padding: 1em;
@@ -1504,9 +1481,6 @@ div#language_picker {
         margin-top: 1em;
     }
 }
-.v1.profile .third-party {
-    padding-bottom: 3.5em;
-}
 .v1.profile .user-languages .preferred {
     float: right;
     font-style: italic;
@@ -1514,6 +1488,9 @@ div#language_picker {
 }
 /* Account */
 body.account {
+    .notation {
+        margin-top: -.75em;
+    }
     form fieldset {
         input[type="text"], input[type="password"] {
             width: 95%;
@@ -1521,6 +1498,70 @@ body.account {
     }
     form .alpha {
         clear: left;
+    }
+    .callout {
+        float: left;
+        width: 100%;
+        background: $faintest;
+        padding: 1em;
+        @include border-radius(3px);
+        @include border-box();
+
+        .button {
+            float: right;
+            display: inline-block;
+            margin: 0;
+
+            * {
+                vertical-align: middle;
+            }
+
+            img {
+                margin-left: 2px;
+            }
+
+        }
+        
+        img {
+            height: 18px;
+        }
+
+        p {
+            clear: none;
+            float: left;
+            width: 400px;
+            font-size: 12px;
+            margin: 0;
+            line-height: 32px;
+
+            * {
+                vertical-align: middle;
+            }
+
+            img {
+                margin-right: 2px;
+            }
+        }
+    }
+    ul.listing {
+
+        > li {
+            margin: 0 0 .5em;
+            padding: 1em;
+            
+            h3 {
+                padding: 0;
+            }
+
+            .actions {
+                top: 1em;
+                right: 1em;
+
+                a:after {
+                    content: '';
+                }
+            }
+        }
     }
     div.api-access {
         fieldset {
@@ -1536,6 +1577,10 @@ body.account {
     }
     textarea.api-key-holder {
         height: 1.5em;
+    }
+    #youtube-modal img {
+        display: block;
+        margin: 0 auto 1em;
     }
 }
 #error {

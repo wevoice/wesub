@@ -24,42 +24,71 @@
                 </div>
             </fieldset>
             <div class="grid_8 alpha third-party">
-                <h3>{% trans "Linked Accounts" %}</h3>
-                <ul class="listing">
-                    {% if twitters %}
-                        {% for twitter in twitters %}
-                            <li>
-                                <h3>Twitter - {{ twitter.username }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
+                <fieldset>
+                    <h3>{% trans "Sync subtitles" %}</h3>
+                    <div class="callout">
+                        {% comment %}
+                            IF A YT account is already connected:
 
-                    {% if facebooks %}
-                        {% for fb in facebooks %}
-                            <li>
-                                <h3>Facebook - {{ fb.uid }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
+                            <a class="button open-modal reduced" href="{% url profiles:remove-third-party account.pk %}">
+                                Disconnect
+                            </a>
+                            <p>
+                                <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
+                                <strong>{% trans "Sync is active" %}</strong>
+                                <span> for {{ account_name }}.</span>
+                            </p>
+                        {% endcomment %}
+                        <a class="button open-modal reduced" href="#youtube-modal">
+                            <span>Connect to</span>
+                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
+                        </a>
+                        <p>{% trans "Send Amara-created subtitles right to your Youtube videos!" %}</p>
+                    </div>
+                </fieldset>
 
-                    {% if third_party %}
-                        {% for account in third_party  %}
-                            <li>
-                                <h3>{{ account.get_type_display }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
-                <a href="#account-modal" class="open-modal" title="">{% trans "Add an account" %}</a>
+                <fieldset>
+                    <h3>{% trans "Linked Accounts" %}</h3>
+                    <div class="callout">
+                        <p>{% trans "Link third-party accounts to Amara" %}</p>
+                        <a href="#account-modal" class="open-modal button reduced">{% trans "Add an account" %}</a>
+                    </div>
+                    <ul class="listing">
+                        {% if twitters %}
+                            {% for twitter in twitters %}
+                                <li>
+                                    <h3>Twitter - {{ twitter.username }}</h3>
+                                    <ul class="actions">
+                                        <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if facebooks %}
+                            {% for fb in facebooks %}
+                                <li>
+                                    <h3>Facebook - {{ fb.uid }}</h3>
+                                    <ul class="actions">
+                                        <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if third_party %}
+                            {% for account in third_party  %}
+                                <li>
+                                    <h3>{{ account.get_type_display }}</h3>
+                                    <ul class="actions">
+                                        <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </fieldset>
+
             </div>
             <div class="grid_4 alpha">
                 <fieldset>
@@ -124,11 +153,41 @@
                                 <option>Select...</option>
                                 <option value="twitter">Twitter</option>
                                 <option value="facebook">Facebook</option>
-                                <option value="youtube">Youtube</option>
                             </select>
                         </fieldset>
+                        <fieldset class="account-type-copy" id="twitter-copy">
+                            <p>
+                                {% blocktrans %}
+                                Twitter copy
+                                {% endblocktrans %}
+                            </p>
+                        </fieldset>
+                        <fieldset class="account-type-copy" id="facebook-copy">
+                            <p>
+                                {% blocktrans %}
+                                Facebook copy
+                                {% endblocktrans %}
+                            </p>
+                        </fieldset>
+                    </div>
 
-                        <fieldset class="account-type-copy" id="youtube-copy">
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                    </div>
+                </form>
+        </div>
+        <div class="modal" id="youtube-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Connect to Youtube' %}</h3>
+            </div>
+
+                <form method="get" action="{% url profiles:add-third-party %}">
+
+                    <div class="modal-body">
+                        <fieldset>
+                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
+                            <input type="hidden" name="account_type" value="youtube"/>
                             <p>
                                 {% blocktrans %}
                                     Connecting your Youtube account enables Amara-created subtitles to be synced to your Youtube videos.
@@ -158,24 +217,10 @@
                                 </li>
                             </ul>
                         </fieldset>
-                        <fieldset class="account-type-copy" id="twitter-copy">
-                            <p>
-                                {% blocktrans %}
-                                Twitter copy
-                                {% endblocktrans %}
-                            </p>
-                        </fieldset>
-                        <fieldset class="account-type-copy" id="facebook-copy">
-                            <p>
-                                {% blocktrans %}
-                                Facebook copy
-                                {% endblocktrans %}
-                            </p>
-                        </fieldset>
                     </div>
 
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
                     </div>
                 </form>
         </div>
