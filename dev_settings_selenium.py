@@ -24,11 +24,9 @@ from dev_settings import *
 #in vagrant vm.
 if os.getenv("HOME") == '/home/vagrant':
     VAGRANT_VM = True  
-    os.environ[ 'DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
+    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
 else:
     VAGRANT_VM = False
-
-VAGRANT_VM = False
 
 SITE_ID = 4
 DEBUG = True
@@ -46,7 +44,6 @@ DATABASES = {
 
 INSTALLED_APPS + ('django_nose', 
                   'webdriver_testing', )
-
 
 COMPRESS_MEDIA = False
 
@@ -71,8 +68,6 @@ else:
     MEDIA_ROOT = rel('user-data/')
     STATIC_ROOT = rel('static/')
     STATICFILES_DIRS = (rel('media/'), rel('user-data/'))
-
-
 
 STATIC_URL_BASE = STATIC_URL
 
