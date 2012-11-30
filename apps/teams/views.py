@@ -1204,7 +1204,8 @@ def dashboard(request, slug):
                 task_vid.tasks = []
                 videos.append(task_vid)
 
-            task_vid.tasks.append(task)
+            vid_index = videos.index(task_vid)
+            videos[vid_index].tasks.append(task)
 
             if len(videos) >= VIDEOS_ON_PAGE:
                 break
