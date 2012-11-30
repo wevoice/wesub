@@ -27,8 +27,12 @@ This is similar to Python's handling of Unicode and byte strings:
 
 """
 
+import logging
 import copy
 import re
+
+
+logger = logging.getLogger(__name__)
 
 
 def _reverse_dict(d):
@@ -1178,7 +1182,10 @@ def to_bcp47(code):
     """
     match = LANG_DIALECT_RE.match(code)
     if not match:
-         raise ValueError("%s code does not seem to be a valid language code.")
+        logger.error("Couldn't parse language code.", extra={'language_code':
+            code})
+        raise ValueError("%s code does not seem to be a valid language code."
+                 % code)
 
     match_dict = match.groupdict()
     return "%s%s%s" % (match_dict['lang_code'],
