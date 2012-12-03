@@ -212,8 +212,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         var dfxpString = subtitles.SUBTITLES;
         var AmaraDFXPParser = window['AmaraDFXPParser'];
         if (result['original_subtitles'] &&
-            new AmaraDFXPParser().init(dfxpString).getSubtitles().length ===0){
-            dfxpString = new AmaraDFXPParser().init(result['original_subtitles']['subtitles']).clone().xmlToString(true);
+            new AmaraDFXPParser()['init'](dfxpString)['getSubtitles']().length ===0){
+            dfxpString = new AmaraDFXPParser()['init'](result['original_subtitles']['subtitles'])['clone']()['xmlToString'](true);
         }
         var captionSet = new unisubs.subtitle.EditableCaptionSet(
             dfxpString, subtitles.IS_COMPLETE,
