@@ -1583,6 +1583,15 @@ body.account {
         margin: 0 auto 1em;
     }
 }
+.profile .submit.remove {
+    .delete {
+        float: none;
+    }
+    .reduced {
+        float: left;
+        margin: 0;
+    }
+}
 #error {
 
     h1 {
