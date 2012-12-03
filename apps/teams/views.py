@@ -1197,7 +1197,10 @@ def dashboard(request, slug):
             project = None
 
         tasks = _order_tasks(request,
-                         _tasks_list(request, team, project, filters, user))
+                             _tasks_list(request, team,
+                                         project, filters,
+                                         user))
+
         _cache_video_url(tasks)
 
         for task in tasks:
@@ -1222,10 +1225,11 @@ def dashboard(request, slug):
             for tv in team_videos:
                 videos.append(tv.teamvideo) 
         else:
+            lang_list = [l.language for l in user_languages]
+
             for video in team_videos.all():
-                langlist = [l.language for l in user_languages]
                 subtitled_languages = (video.subtitlelanguage_set
-                                                 .filter(language__in=langlist)
+                                                 .filter(language__in=lang_list)
                                                  .values_list("language", flat=True))
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
