@@ -184,6 +184,8 @@
                                 {% endblocktrans %}
                             </p>
 
+                            <h5>{% trans "What gets synced" %}</h5>
+
                             <ul>
                                 <li>
                                     {% blocktrans %}
@@ -192,9 +194,18 @@
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        While the account is linked, <strong>any newly completed subtitles</strong> will be sent to YouTube.
+                                        While linked, <strong>any newly edited, complete subtitles</strong> will be sent to YouTube.
                                     {% endblocktrans %}
                                 </li>
+                                <li>
+                                    {% blocktrans %}
+                                        Sync is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
+                                    {% endblocktrans %}
+                                </li>
+                            </ul>
+
+                            <h5>{% trans "Your YouTube data" %}</h5>
+                            <ul>
                                 <li>
                                     {% blocktrans %}
                                         Amara subtitles <strong>will overwrite</strong> existing YouTube subtitles if both exist.
@@ -202,8 +213,9 @@
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        Sync is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
+                                        To invite your viewers to subtitle, Amara will append a final subtitle (if space allows), and will add your video's URL to its YouTube description.
                                     {% endblocktrans %}
+                                    <a href="http://support.universalsubtitles.org/solution/articles/10336-how-do-i-get-subtitles-onto-youtube-">{% trans "See what it looks like" %}</a>.
                                 </li>
                             </ul>
                         </fieldset>

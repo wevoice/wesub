@@ -205,6 +205,9 @@ def create_from_feed(request):
 
 create_from_feed.csrf_exempt = True
 
+def shortlink(request, pk):
+    video = get_object_or_404(Video, pk=pk)
+    return redirect(video, video=video, permanent=True)
 
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
