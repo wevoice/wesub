@@ -69,5 +69,5 @@ unisubs.timeline.TimelineSubs.prototype.addSub_ = function(sub) {
     var timelineSub = new unisubs.timeline.TimelineSub(
         sub, this.pixelsPerSecond_, 0, this.readOnly_);
     this.addChild(timelineSub, true);
-    this.subs_[sub.editableCaption_.x.getSubtitleIndex(sub.editableCaption_.node)] = timelineSub;
+    this.subs_[sub.editableCaption_.x['getSubtitleIndex'](sub.editableCaption_.node)] = timelineSub;
 };

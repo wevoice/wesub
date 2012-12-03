@@ -34,7 +34,7 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
     /**
      * Array of subtitles in json format
      */
-    this.originalWrapper = new AmaraDFXPParser();
+    this.originalWrapper = new window['AmaraDFXPParser']();
     this.originalWrapper.init(baseLanguageSubtitles);
 
     /**

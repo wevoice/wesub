@@ -30,11 +30,13 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
     this.captions_ = captionSet.captionsWithTimes();
     this.x = captionSet.x;
 
+    var that = this;
+
     this.binaryCompare_ = function(time, caption) {
-	return time - this.x.startTime(caption);
+        return time - that.x['startTime'](caption);
     };
     this.binaryCaptionCompare_ = function(c0, c1) {
-        return this.x.startTime(c0) - this.x.startTime(c1);
+        return that.x['startTime'](c0) - that.x['startTime'](c1);
     };
     this.videoPlayer_ = videoPlayer;
     this.eventHandler_ = new goog.events.EventHandler(this);
@@ -105,19 +107,19 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    var subs = this.x.getSubtitles();
+    var subs = this.x['getSubtitles']();
 
     if (subs.length === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
-        playheadTime < this.x.startTime(this.x.getSubtitle(0)))
+        playheadTime < this.x['startTime'](this.x['getSubtitle'](0)))
         return;
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
-        this.x.getSubtitle(this.currentCaptionIndex_) : null;
+        this.x['getSubtitle'](this.currentCaptionIndex_) : null;
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null &&
-	this.x.isShownAt(curCaption, playheadTime))
+	this.x['isShownAt'](curCaption, playheadTime))
         return;
 
     var nextCaptionIndex =  this.currentCaptionIndex_ < subs.length -1 ?
@@ -125,15 +127,15 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
     if (nextCaption != null &&
-	this.x.isShownAt(this.x.getSubtitle(nextCaptionIndex), playheadTime)) {
+	this.x['isShownAt'](this.x['getSubtitle'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
     }
     if ((nextCaption == null ||
-         playheadTime < this.x.startTime(nextCaption)) &&
+         playheadTime < this.x['startTime'](nextCaption)) &&
         (curCaption == null ||
-         playheadTime >= this.x.startTime(curCaption))) {
+         playheadTime >= this.x['startTime'](curCaption))) {
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_)
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
@@ -145,14 +147,14 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
     function(playheadTime)
 {
-    var subs = this.x.getSubtitles();
+    var subs = this.x['getSubtitles']();
     var lastCaptionIndex = goog.array.binarySearch(subs,
         playheadTime, this.binaryCompare_);
     if (lastCaptionIndex < 0)
         lastCaptionIndex = -lastCaptionIndex - subs.length -1;
     this.currentCaptionIndex_ = lastCaptionIndex;
     if (lastCaptionIndex >= 0 &&
-	this.x.isShownAt(lastCaptionIndex, playheadTime)) {
+	this.x['isShownAt'](lastCaptionIndex, playheadTime)) {
         this.dispatchCaptionEvent_(this.captions_[lastCaptionIndex], lastCaptionIndex);
     }
     else {

@@ -40,11 +40,11 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
     var that = this;
     var c;
 
-    this.x = new AmaraDFXPParser();
-    this.x.init(dfxp);
+    this.x = new window['AmaraDFXPParser']();
+    this.x['init'](dfxp);
 
     this.captions_ = goog.array.map(
-        this.x.getSubtitles(), function(node) {
+        this.x['getSubtitles'](), function(node) {
             c = new unisubs.subtitle.EditableCaption(node, this.x);
             c.setParentEventTarget(that);
             return c;
@@ -86,31 +86,31 @@ unisubs.subtitle.EditableCaptionSet.prototype.captionsWithTimes = function() {
 };
 
 unisubs.subtitle.EditableCaptionSet.prototype.clear = function() {
-    this.x.removeSubtitles();
+    this.x['removeSubtitles']();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_ALL);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.clearTimes = function() {
-    this.x.clearAllTimes();
+    this.x['clearAllTimes']();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.CLEAR_TIMES);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
-    return this.x.needsAnyTranscribed();
+    return this.x['needsAnyTranscribed']();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
-    this.x.resetSubtitles();
+    this.x['resetSubtitles']();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.count = function() {
-    return this.x.subtitlesCount();
+    return this.x['subtitlesCount']();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.caption = function(index) {
     return this.captions_[index];
 };
 unisubs.subtitle.EditableCaptionSet.prototype.makeDFXPString = function() {
-    return this.x.xmlToString(true);
+    return this.x['xmlToString'](true);
 };
 //unisubs.subtitle.EditableCaptionSet.prototype.makeJsonSubs = function() {
     //return goog.array.map(this.captions_, function(c) { return c.json; });
@@ -149,7 +149,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex) 
     if(atIndex >0){
         prevSub = nextSub.getPreviousCaption();
     }
-    var c = new unisubs.subtitle.EditableCaption(this.x.addSubtitle(
+    var c = new unisubs.subtitle.EditableCaption(this.x['addSubtitle'](
         atIndex >= 1 ? atIndex  -1 : -1, {}, ""), this.x);
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
     goog.array.insertAt(this.captions_, c, atIndex );
@@ -193,7 +193,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) 
     var prevSub = sub.getPreviousCaption();
     var nextSub = sub.getNextCaption();
     goog.array.removeAt(this.captions_, index);
-    this.x.removeSubtitle(index);
+    this.x['removeSubtitle'](index);
     if (prevSub){
         prevSub.setNextCaption(nextSub);
     }
@@ -206,18 +206,18 @@ unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) 
             sub, index));
 };
 unisubs.subtitle.EditableCaptionSet.prototype.findSubIndex_ = function(caption) {
-    return this.x.getSubtitleIndex(caption.node);
+    return this.x['getSubtitleIndex'](caption.node);
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispatchEvent) {
 
     // Pass the new node and the DFXP parser instance to the new EditableCaption.
-    var c = new unisubs.subtitle.EditableCaption(this.x.addSubtitle(), this.x);
+    var c = new unisubs.subtitle.EditableCaption(this.x['addSubtitle'](), this.x);
 
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
 
     c.setParentEventTarget(this);
     this.captions_.push(c)
-    if (this.x.subtitlesCount()> 1) {
+    if (this.x['subtitlesCount']()> 1) {
         var previousCaption = this.captions_[this.captions_.length - 2];
         previousCaption.setNextCaption(c);
         c.setPreviousCaption(previousCaption);
@@ -241,16 +241,16 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewCaption = function(opt_dispa
 unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var i;
     // TODO: write unit test then get rid of linear search in future.
-    var captions = this.x.getSubtitles();
+    var captions = this.x['getSubtitles']();
     var currentStartTime;
     var nextStartTime;
     var isLast = false;
     var length = captions.length;
     for (i = 0; i < length; i++){
-        currentStartTime = this.x.startTime(i);
+        currentStartTime = this.x['startTime'](i);
         isLast = i == length -1;
         if (!isLast){
-            nextStartTime = this.x.startTime(i+1);
+            nextStartTime = this.x['startTime'](i+1);
         }else{
             nextStartTime  = undefined;
         }
@@ -303,7 +303,7 @@ unisubs.subtitle.EditableCaptionSet.CaptionEvent = function(type, caption, index
  * except for the last one, whose end time (only) can be undefined.
  */
 unisubs.subtitle.EditableCaptionSet.prototype.needsSync = function() {
-    return this.x.needsAnySynced();
+    return this.x['needsAnySynced']();
 };
 
 unisubs.subtitle.EditableCaptionSet.prototype.fork = function(originalSubtitleState) {
