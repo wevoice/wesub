@@ -40,11 +40,8 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
     var that = this;
     var c;
 
-    this.x = new window['AmaraDFXPParser']();
+    this.x = new AmaraDFXPParser();
     this.x.init(dfxp);
-
-    // TODO: For debug only.
-    window['x'] = this.x;
 
     this.captions_ = goog.array.map(
         this.x.getSubtitles(), function(node) {
