@@ -875,6 +875,11 @@ var Site = function(Site) {
             $('#account-type-select').change(function() {
                 $('.account-type-copy').hide();
                 $('#' + this.value + '-copy').show();
+                if(this.value == 'Select...') {
+                    $('#account-modal input[type="submit"]').attr('disabled','disabled');
+                } else {
+                    $('#account-modal input[type="submit"]').removeAttr('disabled');
+                }
             });
             $(".api-key-holder").click(function(){
                 $(this).select();
