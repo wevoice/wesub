@@ -205,9 +205,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
 
-        // Create the new element manually. If you create with jQuery, it'll use
-        // the document's namespace as the default namespace, which is ugly.
-        var newSubtitle = document.createElementNS('', 'p');
+        // Firefox needs the namespace set explicitly
+        var newSubtitle = document.createElementNS('http://www.w3.org/ns/ttml', 'p');
 
         // Init the default attrs and combine them with the defined newAttrs if
         // required.
