@@ -52,5 +52,5 @@ class DFXPTest(TestCase):
         self.assertEqual(start, 100)
         self.assertEqual(end, 200)
         self.assertEqual(content, 'Here we go!')
-        self.assertEqual(meta, {'new_paragraph': 'true'})
+        self.assertEqual(meta, {'new_paragraph': True})
 

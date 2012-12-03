@@ -22,11 +22,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from babelsubs.storage import SubtitleSet, SubtitleLine
+
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.tests.utils import make_video, make_video_2
-from libs.dxfpy import SubtitleSet
 
 
 class TestHelperFunctions(TestCase):
@@ -186,26 +187,26 @@ class TestBasicAdding(TestCase):
         _add([(100, 200, "foo"),
               (300, None, "bar")])
 
-        self.assertEqual(_get_tip_subs(), [(100, 200, "foo"),
-                                           (300, None, "bar")])
+        self.assertEqual(_get_tip_subs(), [SubtitleLine(100, 200, "foo",{'new_paragraph':True} ),
+                                           SubtitleLine(300, None, "bar",{'new_paragraph':False} ),])
 
         # Passing an iterable of tuples.
         _add((s for s in [(101, 200, "foo"),
                           (300, None, "bar")]))
 
-        self.assertEqual(_get_tip_subs(), [(101, 200, "foo"),
-                                           (300, None, "bar")])
+        self.assertEqual(_get_tip_subs(), [SubtitleLine(101, 200, "foo", {'new_paragraph':False} ),
+                                           SubtitleLine(300, None, "bar", {'new_paragraph':False} )])
 
         # Passing a SubtitleSet.
-        subs = SubtitleSet.from_list([(110, 210, "foo"),
-                                      (310, 410, "bar"),
-                                      (None, None, '"baz"')])
+        subs = SubtitleSet.from_list([SubtitleLanguage(110, 210, "foo", {'new_paragraph':False} ),
+                                      SubtitleLine(310, 410, "bar", {'new_paragraph':False} ),
+                                      SubtitleLine(None, None, '"baz"', {'new_paragraph': False} )])
 
         _add(subs)
 
-        self.assertEqual(_get_tip_subs(), [(110, 210, "foo"),
-                                           (310, 410, "bar"),
-                                           (None, None, '"baz"')])
+        self.assertEqual(_get_tip_subs(), [(110, 210, "foo", {'new_paragraph': True} ),
+                                           (310, 410, "bar", {'new_paragraph': False} ),
+                                           (None, None, '"baz"', {'new_paragraph': False} )])
 
         # Passing a hunk of XML.
         subs = SubtitleSet.from_list([(10000, 22000, "boots"),
