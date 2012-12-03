@@ -27,23 +27,24 @@
                 <fieldset>
                     <h3>{% trans "Sync subtitles" %}</h3>
                     <div class="callout">
-                        {% comment %}
-                            IF A YT account is already connected:
-
-                            <a class="button open-modal reduced" href="{% url profiles:remove-third-party account.pk %}">
-                                Disconnect
-                            </a>
-                            <p>
+                        {% if third_party %}
+                            {% for account in third_party  %}
+                                <a class="button open-modal reduced" href="{% url profiles:remove-third-party account.pk %}">
+                                    Disconnect
+                                </a>
+                                <p>
+                                    <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
+                                    <strong>{% trans "Sync is active" %}</strong>
+                                    <span> for {{ account.username }}.</span>
+                                </p>
+                            {% endfor %}
+                        {% else %}
+                            <a class="button open-modal reduced" href="#youtube-modal">
+                                <span>Connect to</span>
                                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
-                                <strong>{% trans "Sync is active" %}</strong>
-                                <span> for {{ account_name }}.</span>
-                            </p>
-                        {% endcomment %}
-                        <a class="button open-modal reduced" href="#youtube-modal">
-                            <span>Connect to</span>
-                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="Youtube"/>
-                        </a>
-                        <p>{% trans "Send Amara-created subtitles right to your Youtube videos!" %}</p>
+                            </a>
+                            <p>{% trans "Send Amara-created subtitles right to your Youtube videos!" %}</p>
+                        {% endif %}
                     </div>
                 </fieldset>
 
@@ -71,17 +72,6 @@
                                     <h3>Facebook - {{ fb.uid }}</h3>
                                     <ul class="actions">
                                         <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                    </ul>
-                                </li>
-                            {% endfor %}
-                        {% endif %}
-
-                        {% if third_party %}
-                            {% for account in third_party  %}
-                                <li>
-                                    <h3>{{ account.get_type_display }}</h3>
-                                    <ul class="actions">
-                                        <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
                                     </ul>
                                 </li>
                             {% endfor %}
