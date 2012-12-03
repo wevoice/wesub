@@ -194,7 +194,7 @@
                                                     <ul>
                                                         {% for lang in team_video.languages %}
                                                             <li>
-                                                                <a href="#" id="video-{{ team_video.id }}" title="Get started now">
+                                                                <a href="#" data-lang="{{ lang.language }}" class="video-{{ team_video.id }}" title="Get started now">
                                                                     {% trans "Create " %}
                                                                     {{ lang.get_language_display }}
                                                                     {% trans " Subtitles" %}
@@ -205,7 +205,7 @@
                                                 </div>
                                             {% else %} {# there is only one language user can work on #}
                                                 {% for lang in team_video.languages %}
-                                                    <a href="#" id="video-{{ team_video.id }}" title="Get started now">
+                                                <a href="#" class="video-{{ team_video.id }}" data-lang="{{ lang.language }}" title="Get started now">
                                                         {% trans "Create " %}
                                                         {{ lang.get_language_display }}
                                                         {% trans " Subtitles" %}
@@ -215,10 +215,11 @@
                                         {% endif %}
                                         {% with v=team_video.video %}
                                             <script type="text/javascript">
-                                                $('#video-{{ team_video.id }}').click(function(){
+                                                $('.video-{{ team_video.id }}').click(function(){
                                                     var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
                                                     var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
-                                                    op.showStartDialog();
+                                                    op.showStartDialog(null, {'LANGUAGE': $(this).data("lang"), 'FORCE': true });
+                                                    return false;
                                                 });
                                             </script>
                                         {% endwith %}
