@@ -49,9 +49,9 @@
                 </fieldset>
 
                 <fieldset>
-                    <h3>{% trans "Linked Accounts" %}</h3>
+                    <h3>{% trans "Link Accounts" %}</h3>
                     <div class="callout">
-                        <p>{% trans "Link third-party accounts to Amara" %}</p>
+                        <p>{% trans "Sign in to Amara with Twitter, Facebook, and other accounts" %}</p>
                         <a href="#account-modal" class="open-modal button reduced">{% trans "Add an account" %}</a>
                     </div>
                     <ul class="listing">
@@ -126,7 +126,7 @@
         <div class="modal" id="account-modal">
             <div class="modal-header">
                 <a href="#" class="close">x</a>
-                <h3>{% trans 'Add a third-party account' %}</h3>
+                <h3>{% trans 'Add a linked account' %}</h3>
             </div>
 
                 <form method="get" action="{% url profiles:add-third-party %}">
@@ -135,7 +135,7 @@
                         <fieldset>
                             <p>
                                 {% blocktrans %}
-                                Choose an account type to add:
+                                What kind of account do you want to add?
                                 {% endblocktrans %}
                             </p>
 
@@ -144,20 +144,6 @@
                                 <option value="twitter">Twitter</option>
                                 <option value="facebook">Facebook</option>
                             </select>
-                        </fieldset>
-                        <fieldset class="account-type-copy" id="twitter-copy">
-                            <p>
-                                {% blocktrans %}
-                                Twitter copy
-                                {% endblocktrans %}
-                            </p>
-                        </fieldset>
-                        <fieldset class="account-type-copy" id="facebook-copy">
-                            <p>
-                                {% blocktrans %}
-                                Facebook copy
-                                {% endblocktrans %}
-                            </p>
                         </fieldset>
                     </div>
 
@@ -215,7 +201,7 @@
                                     {% blocktrans %}
                                         To invite your viewers to subtitle, Amara will append a final subtitle (if space allows), and will add your video's URL to its YouTube description.
                                     {% endblocktrans %}
-                                    <a href="http://support.universalsubtitles.org/solution/articles/10336-how-do-i-get-subtitles-onto-youtube-">{% trans "See what it looks like" %}</a>.
+                                    <a href="http://support.universalsubtitles.org/solution/articles/40227-syncing-to-youtube">{% trans "See what it looks like" %}</a>.
                                 </li>
                             </ul>
                         </fieldset>
