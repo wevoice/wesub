@@ -2228,6 +2228,9 @@ div#rollback-button {
     li:last-child {
         border-right: 1px solid #eaeaea;
     }
+    li.last {
+        border: none;
+    }
 }
 
 /* Debug */
