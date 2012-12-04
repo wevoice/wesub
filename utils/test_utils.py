@@ -77,6 +77,7 @@ class TestCaseMessagesMixin(object):
                 )
 
 save_thumbnail_in_s3 = mock.Mock()
+update_team_video = mock.Mock()
 update_search_index = mock.Mock()
 
 def mock_youtube_get_entry(video_id):
@@ -183,15 +184,24 @@ class UnisubsTestPlugin(Plugin):
         self.enabled = True
 
     def begin(self):
-        self.patches = [
-            mock.patch('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
-            mock.patch('utils.celery_search_index.update_search_index.delay',
-                       update_search_index),
-            mock.patch('videos.types.youtube.YoutubeVideoType._get_entry',
-                       youtube_get_entry),
-            mock.patch('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
-                       youtube_get_subtitled_languages),
+        # list of (function, mock object tuples)
+        patch_info = [
+            ('videos.tasks.save_thumbnail_in_s3.delay', save_thumbnail_in_s3),
+            ('teams.tasks.update_one_team_video.delay', update_team_video),
+            ('utils.celery_search_index.update_search_index.delay',
+             update_search_index),
+            ('videos.types.youtube.YoutubeVideoType._get_entry',
+             youtube_get_entry),
+            ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
+             youtube_get_subtitled_languages),
         ]
+        self.patches = []
+        for func_name, mock_obj in patch_info:
+            self.patches.append(mock.patch(func_name, mock_obj))
+            if not func_name.startswith("utils"):
+                # Ugh have to patch the function twice since some modules use app and
+                # some don't
+                self.patches.append(mock.patch('apps.' + func_name, mock_obj))
         self.mock_objects = []
         for patch in self.patches:
             mock_obj = patch.start()

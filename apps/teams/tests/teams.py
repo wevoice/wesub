@@ -316,11 +316,6 @@ class TeamsTest(TestCase):
 
         tv = TeamVideo.objects.order_by('-id')[0]
 
-        result = tasks.update_one_team_video.delay(tv.id)
-
-        if result.failed():
-            self.fail(result.traceback)
-
         return team, tv
 
     def _make_data(self, video_id, lang):
@@ -332,6 +327,7 @@ class TeamsTest(TestCase):
             }
 
     def _tv_search_record_list(self, team):
+        test_utils.update_team_video.run_original()
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
@@ -821,6 +817,7 @@ class TeamsTest(TestCase):
 
         team_video, _ = TeamVideo.objects.get_or_create(video=video, team=team,
                                                         added_by=self.user)
+        test_utils.update_team_video.run_original()
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url + u"?q=" + title)
         videos = response.context['team_video_md_list']
