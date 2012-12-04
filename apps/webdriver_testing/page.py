@@ -412,7 +412,7 @@ class Page(object):
         """
         if isinstance(parent_el, basestring):
             print "passed in css finding the element"
-            if not self.is_element_present(parent):
+            if not self.is_element_present(parent_el):
                 return None
             else: 
                 parent_el = self.browser.find_element_by_css_selector(parent_el)
@@ -506,7 +506,7 @@ class Page(object):
         print 'Error at ' + self.browser.current_url
         print '-------------------'
         #self.browser.get_screenshot_as_file(filename)
-        self.testcase.tearDown()
-        self.testcase.fail(str(e))
+        #self.testcase.tearDown()
+        raise ValueError(str(e))
 
 

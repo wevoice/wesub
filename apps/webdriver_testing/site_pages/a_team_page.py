@@ -12,6 +12,10 @@ class ATeamPage(UnisubsPage):
     _URL = 'teams/%s/'
     _TEAM_LINK = "h2#team_title a"
     _TEAM_NAME = ".main-title a"
+    _DASHBOARD_WELCOME = "div.get-started p"
+
+    _PROJECTS_SECTION = 'div#projects-list'
+    _LISTED_PROJECTS = 'ul li a'
 
     #TEAM METRICS
     _VIDEO_METRIC = ".metrics li:nth-child(1) > a p"
@@ -92,9 +96,22 @@ class ATeamPage(UnisubsPage):
         leave_url = "teams/leave_team/%s/" % team_stub
         self.open_page(leave_url)
 
+    def dashboard_welcome_message(self):
+        return self.get_text_by_css(self._DASHBOARD_WELCOME)
+
     def settings_tab_visible(self):
         if self.is_element_present(self._SETTINGS_TAB) == True:
             return True
 
-    def has_project(self, project_name):
-        return self.has_link_text(project_name)
+    def has_project(self, project_slug):
+        if not self.is_element_present(self._PROJECTS_SECTION):
+            return False
+        projects = self.get_sub_elements_list(self._PROJECTS_SECTION, 
+                                              self._LISTED_PROJECTS)
+
+        for els in projects:
+            print els.get_attribute('href')
+            if project_slug in els.get_attribute('href'):
+                return True
+        else:
+            return False
