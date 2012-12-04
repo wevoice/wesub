@@ -506,7 +506,7 @@ class Page(object):
         print 'Error at ' + self.browser.current_url
         print '-------------------'
         #self.browser.get_screenshot_as_file(filename)
-        #self.testcase.tearDown()
+        self.testcase.tearDown()
         raise ValueError(str(e))
 
 
