@@ -161,9 +161,9 @@ class TestCaseTeamsResource(WebdriverTestCase):
 
           POST /api2/partners/teams/
         """
-        super_user = UserFactory.create(username = 'team_creator', is_superuser=True, is_staff=True)
-        data_helpers.create_user_api_key(self, super_user)
-        self.user = super_user
+        partner_user = UserFactory.create(username = 'team_creator', is_partner = True)
+        data_helpers.create_user_api_key(self, partner_user)
+        self.user = partner_user
         expected_details = {
             'name': 'API V2 TEAM',
             'description': 'new team created via the api',
@@ -172,6 +172,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
 
         url_part = 'teams/'
         status, response = data_helpers.post_api_request(self, url_part, expected_details) 
+        print status, response
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
         self.teams_pg.open_page('teams/api-created-team/settings/permissions/')

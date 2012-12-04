@@ -1,0 +1,9 @@
+{
+    "test_transcribing.TestCaseTranscribing.test_close__abruptly": ["1552"],
+    "test_submitting.TestCaseSubmitting.test_close__abruptly": ["1552"],
+    "test_videos.TestCaseTeamVideos.test_search__nonascii": ["1747"],
+    "test_videos.TestCaseTeamVideos.test_search__subs": ["1747"],
+    "test_messages.TestCaseTeamMessages.test_messages__promoted_manager": ["1541", "438"],
+    "test_messages.TestCaseTeamMessages.test_messages__promoted_admin": ["1541", "438"],
+    "test_syncing.TestCasePartialSync.test_save": ["1802"]
+}

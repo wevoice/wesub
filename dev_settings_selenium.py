@@ -45,6 +45,7 @@ DATABASES = {
 INSTALLED_APPS + ('django_nose', 
                   'webdriver_testing', )
 
+JS_USE_COMPILED = False
 COMPRESS_MEDIA = False
 
 if VAGRANT_VM == True:
@@ -75,12 +76,12 @@ CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-xunit',
-             '--xunit-file=apps/webdriver_testing/Screenshots/nosetests.xml', 
+             '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
              '--nocapture',
              #'--collect-only',
              '--nologcapture', 
              '--logging-filter=-pysolr, -base, remote_connection', 
-             #'--verbosity=2'
+             '--verbosity=2'
             ]
 CELERY_ALWAYS_EAGER = True
 import logging

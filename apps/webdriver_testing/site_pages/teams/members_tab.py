@@ -10,7 +10,7 @@ class MembersTab(ATeamPage):
     _USER_LANGS = "ul.members.listing li h3 span.descriptor"
     _ROLE = "ul.members.listing li p"
     _ACTIONS = "ul.members.listing li ul.actions li"
-    _INVITE_MEMBERS = "div.tools.group a[href*='members/invite']"
+    _INVITE_MEMBERS = "div.tools a.button[href*='members/invite']"
     _EDIT_USER = "a.edit-role"
     _SORT_FILTER = "a#sort-filter"
 
@@ -64,6 +64,7 @@ class MembersTab(ATeamPage):
         """
         
         self.click_by_css(self._INVITE_MEMBERS)
+        self.wait_for_element_present(self._INVITEE_USERNAME_PULLDOWN)
         self.click_by_css(self._INVITEE_USERNAME_PULLDOWN)
         self.type_by_css('div.chzn-search input', username)
         if len(username.split()) == 1:

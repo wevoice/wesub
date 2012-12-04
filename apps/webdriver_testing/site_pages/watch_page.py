@@ -50,7 +50,7 @@ class WatchPage(VideoListings):
     def _valid_section_name(self, section):
         sections = ['popular', 'latest', 'featured']
         if section not in sections:
-            self.raise_error('%s is not a valid section name')
+            raise ValueError('%s is not a valid section name')
 
 
     def section_empty(self, section):

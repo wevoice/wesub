@@ -4,6 +4,8 @@ from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.site_pages import video_page
+from apps.webdriver_testing.site_pages import watch_page
+
 
 class TestCaseVideoUrl(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
@@ -123,47 +125,46 @@ class TestCaseVideoUrl(WebdriverTestCase):
         """
         video_id = self.test_video.video_id
         video_url = self.test_video.get_video_url()
+        print video_url
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4',
                      'primary': True }
         url_part = 'videos/%s/urls/' % video_id
         status, response = data_helpers.post_api_request(self, url_part, url_data)
-#        print self.test_video.get_video_url()
+        print self.test_video.get_video_url()
         update_url = 'videos/{0}/urls/{1}/'.format(video_id, response['id'])
         status, response = data_helpers.delete_api_request(self, update_url) 
         self.assertEqual(status, 204)
+        print self.test_video.get_video_url()
         self.assertNotEqual(self.test_video.get_video_url(), 'http://unisubs.example.com/newurl.mp4')
 
     def test_url__delete_last(self):
-        """Delete a video by removing the url.
+        """Can not delete the last (only) url.  
 
-        Need to double check that this is the expected behavior - possible documentation update required.
+        If this is the only URL for a video, the request will fail. A video must have at least one URL.  
         """
         video_id = self.test_video.video_id
-
-#        #Post a second url
-#        url_data = { 'url': 'http://unisubs.example.com/newurl.mp4' }
-#        url_part = 'videos/%s/urls/' % video_id
-#        status, response = data_helpers.post_api_request(self, url_part, url_data) 
 
         #Get a list of the current urls
         url_part = 'videos/%s/urls/' % video_id
         status, response = data_helpers.api_get_request(self, url_part) 
+        print response
 
         url_objects = response['objects']
         id_list = []
         for url in url_objects:
             id_list.append(url['id'])
-        response_list = []
         for url_id in sorted(id_list, reverse=True):
             url_part = 'videos/%s/urls/' % url_id 
             update_url = 'videos/{0}/urls/{1}/'.format(video_id, url_id)
             status, response =  data_helpers.delete_api_request(self, update_url) 
-            response_list.append(response)
+        print self.test_video.get_video_url()
+
         #Open the video page on the ui - for the verification screenshot
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
-        status, response = data_helpers.api_get_request(self, url_part) 
-        self.assertFalse("Verify that it should be possible to delete a video by deleting the last url")
+        self.assertEqual('http://www.youtube.com/watch?v=WqJineyEszo', 
+            self.test_video.get_video_url())
+
 
 
 

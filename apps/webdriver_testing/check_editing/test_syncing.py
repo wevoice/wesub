@@ -24,7 +24,7 @@ class TestCasePartialSync(WebdriverTestCase):
         self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
         self.video_pg.log_in(self.user.username, 'password')
         self.test_video = data_helpers.create_video(self, 
-            'http://qa.pculture.org/amara_tests/Birds_short.mp4')
+            'http://www.youtube.com/watch?v=jbgWSF65aE0')
 
         #Open the video page and sync the first 3 subs
         num_synced_subs = 3
@@ -68,6 +68,7 @@ class TestCasePartialSync(WebdriverTestCase):
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
+        print dir(self)
         self.skipTest("bug: https://unisubs.sifterapp.com/issue/1552")
         timing_list = self.sub_editor.sub_timings()
         time.sleep(90)
