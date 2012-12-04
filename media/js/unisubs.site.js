@@ -873,8 +873,6 @@ var Site = function(Site) {
         },
         user_account: function() {
             $('#account-type-select').change(function() {
-                $('.account-type-copy').hide();
-                $('#' + this.value + '-copy').show();
                 if(this.value == 'Select...') {
                     $('#account-modal input[type="submit"]').attr('disabled','disabled');
                 } else {
