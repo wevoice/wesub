@@ -173,7 +173,7 @@ var Site = function(Site) {
 
                 // If this is a user's task listing, select the 'any project'
                 // option.
-                if (window.ASSIGNEE !== '') {
+                if (window.ASSIGNEE !== '' && typeof window.ASSIGNEE !== 'undefined') {
                     return $('option[id="project-opt-any"]');
                 }
 
