@@ -54,6 +54,9 @@ class TestCaseTranscribing(WebdriverTestCase):
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
+
+        self.assertFalse("bug: https://unisubs.sifterapp.com/issue/1552")
+
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
