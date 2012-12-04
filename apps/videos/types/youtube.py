@@ -108,8 +108,19 @@ def add_credit(subtitle_version, subs):
     language_code = subtitle_version.language_code
     dur = subtitle_version.video.duration
 
+    last_sub = subs[-1]
+    time_left_at_the_end = (dur * 1000) - last_sub[1]
+
+    if time_left_at_the_end <= 0:
+        return subs
+
+    if time_left_at_the_end >= 3000:
+        start = (dur - 3) * 1000
+    else:
+        start = (dur * 1000) - time_left_at_the_end
+
     subs.append_subtitle(
-        (dur - 3) * 1000,
+        start,
         dur * 1000,
         get_amara_credit_text(language_code),
         {}

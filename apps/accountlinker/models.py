@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 ACCOUNT_TYPES = VIDEO_TYPE
 AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
 AMARA_DESCRIPTION_CREDIT = translation.ugettext(
-    "Help us caption and translate this video on Amara.org!")
+    "Help us caption and translate this video on Amara.org")
 
 
 def youtube_sync(video, language):
@@ -173,7 +173,7 @@ def add_amara_description_credit(old_description, video_url, language='en'):
     if old_description.startswith(credit):
         return old_description
 
-    return "%s\n%s\n\n%s" % (
+    return "%s: %s\n\n%s" % (
         credit,
         video_url,
         old_description or ""
