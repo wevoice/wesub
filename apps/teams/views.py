@@ -1230,6 +1230,7 @@ def dashboard(request, slug):
             for video in team_videos.all():
                 subtitled_languages = (video.subtitlelanguage_set
                                                  .filter(language__in=lang_list)
+                                                 .filter(is_complete=True)
                                                  .values_list("language", flat=True))
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
