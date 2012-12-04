@@ -36,7 +36,12 @@ def gauge_statistic():
     Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
     Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())
     Gauge('statistic.shares.email').report(EmailShareStatistic.objects.count())
-    Gauge('statistic.views.subtitles').report(int(st_sub_fetch_handler.total_key.get()))
+    total_key = st_sub_fetch_handler.total_key.get()
+    if total_key:
+        total_key = int(total_key)
+    else:
+        total_key = 0
+    Gauge('statistic.views.subtitles').report(total_key)
 
 def graphite_slugify(s):
     for c in ' -.,:':
