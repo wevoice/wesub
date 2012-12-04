@@ -36,8 +36,6 @@ from apps.subtitles.models import (
 from apps.subtitles import pipeline
 
 from apps.videos.tasks import video_changed_tasks, send_change_title_email, send_new_version_notification
-from apps.videos.tests import utils
-
 
 class TestCeleryTasks(TestCase):
     fixtures = ['test.json', 'subtitle_fixtures.json']

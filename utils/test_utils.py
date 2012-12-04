@@ -138,6 +138,16 @@ def mock_youtube_get_entry(video_id):
         'sWgyQjh5k7s': ('Status', 'Fernando Takai', '20'),
         'MJRF8xGzvj4': ('David Bowie/Pat Metheny - This Is Not America '
                         '(Promo Clip)', 'skytrax1', '214'),
+        'po0jY4WvCIc': ('Michael Jackson Pepsi Generation', 'GiraldiMedia',
+                        '92'),
+        'UOtJUmiUZ08': ('The YouTube Interview with Katy Perry',
+                        'KatyPerryMusic', '1892'),
+        'HaAVZ2yXDBo': ("Breakfast at Ginger's- golden retriever dog eats "
+                        "with hands", 'sawith65', '83'),
+        'woobL2yAxD4': ('Goat yelling like a man', 'latestvideoss', '25'),
+        'tKTZoB2Vjuk': ('Google Python Class Day 1 Part 1',
+                        'GoogleDevelopers', '3097'),
+        'osexbB_hX4g': ('DO YOU SEE THAT??!!', 'otherijustine', '90'),
     }
     try:
         title, author, duration = video_id_map[video_id]
@@ -202,10 +212,10 @@ class UnisubsTestPlugin(Plugin):
                 # Ugh have to patch the function twice since some modules use app and
                 # some don't
                 self.patches.append(mock.patch('apps.' + func_name, mock_obj))
-        self.mock_objects = []
+        self.mock_object_initial_data = {}
         for patch in self.patches:
             mock_obj = patch.start()
-            self.mock_objects.append(mock_obj)
+            self.mock_object_initial_data[mock_obj] = mock_obj.__dict__.copy()
             mock_obj.original_func = patch.temp_original
             mock_obj.run_original = functools.partial(self.run_original_func,
                                                       mock_obj)
@@ -219,5 +229,8 @@ class UnisubsTestPlugin(Plugin):
             patch.stop()
 
     def afterTest(self, test):
-        for mock_obj in self.mock_objects:
-            mock_obj.reset_mock()
+        for mock_obj, initial_data in self.mock_object_initial_data.items():
+            # we used to call reset_mock() here, but this works better.  It
+            # also resets the things like return_value and side_effect to
+            # their initial value.
+            mock_obj.__dict__ = initial_data.copy()

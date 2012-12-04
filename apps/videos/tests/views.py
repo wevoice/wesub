@@ -31,7 +31,9 @@ from vidscraper.sites import blip
 from apps.auth.models import CustomUser as User
 from apps.videos.share_utils import _make_email_url
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.utils import WebUseTest, create_langs_and_versions
+from apps.videos.tests.videotestutils import (
+    WebUseTest, create_langs_and_versions
+)
 from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult

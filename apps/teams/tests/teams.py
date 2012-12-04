@@ -393,7 +393,7 @@ class TeamsTest(TestCase):
         tv = test_factories.create_team_video(team, self.user, video)
 
         # create a few languages with subs
-        from videos.tests.utils import create_langs_and_versions
+        from videos.tests.videotestutils import create_langs_and_versions
         video.is_public = False
         video.moderated_by = team
         video.save()

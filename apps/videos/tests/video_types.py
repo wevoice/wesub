@@ -34,6 +34,7 @@ from apps.videos.types.youtube import (
     YoutubeVideoType, save_subtitles_for_lang,
     _prepare_subtitle_data_for_version
 )
+from utils import test_utils
 
 class YoutubeVideoTypeTest(TestCase):
     fixtures = ['test.json']
@@ -92,6 +93,9 @@ class YoutubeVideoTypeTest(TestCase):
     def test_subtitles_saving(self):
         youtube_url = 'http://www.youtube.com/watch?v=L4XpSM87VUk'
 
+        test_utils.youtube_get_subtitled_languages.return_value = [
+            {'lang_code': 'en', 'name': 'My Subtitles'}
+        ]
         vt = self.vt(youtube_url)
         video, created = Video.get_or_create_for_url(youtube_url)
 
