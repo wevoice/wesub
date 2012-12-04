@@ -22,6 +22,13 @@ def create_user_api_key(self, user_obj):
     response =  HttpResponse(simplejson.dumps({"key":key.key}))
     return response
 
+
+def response_data(response):
+    if response.json == None:
+        return response.status_code, response.content
+    else:
+        return response.status_code, response.json
+
 def post_api_request(self, url_part, data):
     print 'posting new data' 
     url = self.base_url + 'api2/partners/' + url_part
@@ -30,10 +37,8 @@ def post_api_request(self, url_part, data):
                 'X-apikey': self.user.api_key.key,
                 'X-api-username': self.user.username,
               } 
-    #print simplejson.dumps(data)
     r = requests.post(url, data=simplejson.dumps(data), headers=headers)
-    #print r.request.full_url, r.request.data, r.content
-    return r.status_code, r.json
+    return response_data(r) 
 
 
 def put_api_request(self, url_part, data):
@@ -45,8 +50,7 @@ def put_api_request(self, url_part, data):
               } 
 
     r = requests.put(url, data=simplejson.dumps(data), headers=headers)
-    #print r.request.full_url, r.status_code, r.json
-    return r.status_code, r.json
+    return response_data(r) 
 
 def delete_api_request(self, url_part):
     url = self.base_url + 'api2/partners/' + url_part
@@ -57,8 +61,7 @@ def delete_api_request(self, url_part):
               } 
 
     r = requests.delete(url, headers=headers)
-    #print r.status_code, r.json, r.request.full_url
-    return r.status_code, r.json
+    return r.status_code, r.content
 
 def api_get_request(self, url_part, output_type='json'):
     url = self.base_url + 'api2/partners/' + url_part
@@ -68,9 +71,6 @@ def api_get_request(self, url_part, output_type='json'):
                 'X-api-username': self.user.username,
               }
     r = requests.get(url, headers=headers)
-
-    #print r.status_code, r.request.full_url, r.headers
-
     return r.status_code, getattr(r, output_type)
 
 

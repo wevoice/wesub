@@ -1,10 +1,10 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.site_pages import profile_edit_page 
+from apps.webdriver_testing.site_pages.profiles import profile_account_page 
 
 
-class TestCaseSubtitlesUpload(WebdriverTestCase):
+class TestCaseUserResource(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
     """
     
@@ -56,9 +56,11 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         api_key = user_data['api_key']
         login_url = user_data['auto_login_url']
         print api_key, login_url
-        profile_edit_pg = profile_edit_page.ProfileEditPage(self)
-        profile_edit_pg.open_page(login_url)
-        self.assertEqual(api_key, profile_edit_pg.api_key())
+        profile_account_pg = profile_account_page.ProfileAccountPage(self)
+        profile_account_pg.open_page(login_url)
+        profile_account_pg.open_account_tab()
+        
+        self.assertEqual(api_key, profile_account_pg.current_api_key())
 
         
 

@@ -105,10 +105,11 @@ class SubtitleEditor(EditorDialogs):
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
-            time.sleep(3)
+            time.sleep(4)
             self.click_by_css(self._SYNC)
         time.sleep(1)
         self.pause()
+        time.sleep(2)
 
     def sub_timings(self, check_step=None):
         if check_step:
@@ -125,8 +126,9 @@ class SubtitleEditor(EditorDialogs):
 
             
     def save_and_exit(self):
+        self.page_down(self._SAVE_AND_EXIT)
         self.click_by_css(self._SAVE_AND_EXIT)
-        self.mark_subs_complete()
+        #self.mark_subs_complete()
         self.click_saved_ok()
 
 
@@ -164,8 +166,7 @@ class SubtitleEditor(EditorDialogs):
         time.sleep(2)
         self.mark_subs_complete(complete)
         time.sleep(2)
-        self.wait_for_element_present(self._SAVED_OK)
-        self.click_by_css(self._SAVED_OK)
+        self.click_saved_ok()
         
 
 

@@ -122,7 +122,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         for x in range(3):
             vid = TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
-                project = self.project1)
+                project = self.project1).video
             team_vid_list.append(vid.title)
             
             time.sleep(1)
@@ -134,10 +134,10 @@ class TestCaseVideoResource(WebdriverTestCase):
             operator.itemgetter('title')):
                 videos_list.append(k)
 
-        self.assertEqual(team_vid_list[0], videos_list[0])
+        self.assertEqual(team_vid_list[-1], videos_list[0])
 
     def test_sort__title(self):
-        """List the available videos.
+        """List the available videos sorted by title (desc)
 
         GET /api2/partners/videos/
         """
@@ -145,25 +145,21 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
-        a_test_video = data_helpers.create_video(self, 
-            'http://www.example.com/Aaa-test-video.mp4')
         TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1,
-                video = a_test_video)
+                video__title = 'Zzz-test-video')
 
 
-        url_part = 'videos/?order_by=title' 
+        url_part = 'videos/?order_by=-title' 
         status, response = data_helpers.api_get_request(self, url_part)
+        print response
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
             operator.itemgetter('title')):
                 videos_list.append(k)
-        if 'About Amara' in videos_list:
-            videos_list.remove('About Amara')
-
-        self.assertEqual('Aaa-test-video.mp4', videos_list[0])
+        self.assertEqual('Zzz-test-video', videos_list[0])
 
     def test_video__create(self):
         """Add a new video.
@@ -278,7 +274,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         PUT /api2/partners/videos/[video-id]/
         """
-
+        #Create the initial video via api and get the id
         url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
                                    'Birds_short.webmsd.webm'),
                      'title': 'Test video created via api',
@@ -288,6 +284,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             url_part, url_data)
         vid_id = response['id']
 
+        #Update the video setting the team and project and new description.
         url_part = 'videos/%s' % vid_id
         new_data = {'team': self.open_team.slug,
                     'project': self.project2.slug,
@@ -301,10 +298,12 @@ class TestCaseVideoResource(WebdriverTestCase):
         #Check response metadata
         for k, v in new_data.iteritems():
             self.assertEqual(v, response[k])
+
+        #Open the projects page on the site and verify video in project.
         team_videos_tab = videos_tab.VideosTab(self)
-        team_videos_tab.open_page('teams/{0}/?project={1}'.format(
-            self.open_team.slug, self.project2.slug))
-        #Check the team is listed on the video page 
+        team_videos_tab.log_in(self.user.username, 'password')
+        team_videos_tab.open_team_project(self.open_team.slug, 
+                                          self.project2.slug)
         self.assertTrue(team_videos_tab.video_present(url_data['title']))
 
 

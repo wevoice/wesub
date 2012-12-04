@@ -291,6 +291,8 @@ class VideosTab(ATeamPage):
         video_els = self.browser.find_elements_by_css_selector(self._VIDEO_THUMB)
         return len(video_els)
 
+    def videos_displayed(self):
+        self.wait_for_element_present(self._VIDEO_THUMB)
         
 
 

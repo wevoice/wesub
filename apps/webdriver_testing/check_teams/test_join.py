@@ -29,7 +29,8 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
 
         """
         self.a_team_pg.open_page('teams/my-team')
-        self.assertTrue(self.a_team_pg.join_exists())
+        self.assertIn('This team is invitation only.', 
+                      self.dashboard_welcome_message())
 
     def test_join__authenticated(self):
         """Logged in user can join an open team.

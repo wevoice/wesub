@@ -105,12 +105,9 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, url_part,
             project_data)
         self.team_pg.open_team_page(self.open_team.slug)
+        print response
 
-        for k, v in project_data.iteritems():
-            self.assertEqual(v, response[k])
-
-        #Verify project is listed on the team page 
-        self.assertTrue(self.team_pg.has_project(project_data['name']))
+        self.assertTrue(self.team_pg.has_project(project_data['slug']))
 
 
 
@@ -142,7 +139,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         self.team_pg.open_team_page(self.open_team.slug)
 
         #Verify project 1 is still present
-        self.assertTrue(self.team_pg.has_project(self.project2.name)) 
+        self.assertTrue(self.team_pg.has_project(self.project2.slug)) 
 
         #Verify project2 is deleted
-        self.assertFalse(self.team_pg.has_project(self.project1.name)) 
+        self.assertFalse(self.team_pg.has_project(self.project1.slug)) 

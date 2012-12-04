@@ -77,6 +77,7 @@ GET /api2/partners/activity/[activity-id]/
         url_part = 'videos/'
         status, response = data_helpers.post_api_request(self, 
             url_part, url_data)
+        print response
         vid_id = response['id']
 
         url_part = 'videos/%s' % vid_id
@@ -86,6 +87,7 @@ GET /api2/partners/activity/[activity-id]/
                    }
         status, response = data_helpers.put_api_request(self, url_part, 
             new_data)
+        print response
 
 
         url_part = 'activity/%d/' % 2

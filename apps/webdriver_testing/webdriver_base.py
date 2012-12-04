@@ -31,7 +31,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
   
         LiveServerTestCase.setUp(self)
         try:  # Get rid of the previous screenshot
-            os.unlink('apps/webdriver_testing/Screenshots/%s.png' % self.id())
+            os.unlink('apps/webdriver_testing/Results/%s.png' % self.id())
         except:
             pass
         if settings.VAGRANT_VM: #if running in vagrant VM, must use port 80 for headless browser
@@ -44,19 +44,29 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
-
-
+        
 
     def tearDown(self):
-        try:
-            self.browser.get_screenshot_as_file('apps/webdriver_testing/'
-                                                'Screenshots/%s.png'
-                                                % self.id())
-        except:  # wait 2 seconds and try again
+        try:  #To get a screenshot of the last page and save to Results.
+            screenshot_file = ('apps/webdriver_testing/' 
+                              'Results/%s.png' % self.id())
+            self.browser.get_screenshot_as_file(screenshot_file)
+        except: #But don't panic if fails, sometimes a timing thing, try again.
             time.sleep(2)
-            self.browser.get_screenshot_as_file('apps/webdriver_testing/'
-                                                'Screenshots/%s.png'
-                                                % self.id())
+            self.browser.get_screenshot_as_file(screenshot_file)
 
-        finally:
+        try: #To quit the browser
             self.browser.quit()
+        except: #But don't worry if you can't it may already be quit.
+            pass
+        print self.existing_bugs_lookup()
+
+
+    def existing_bugs_lookup(self):
+        nameparts = self.id().split('.')
+        tid = '.'.join(nameparts[-3:])
+        print self.failureException()
+        return tid
+
+   
+
