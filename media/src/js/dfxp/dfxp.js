@@ -554,7 +554,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             // If the end time is empty and this is not the last subtitle,
             // it needs to be synced.
-            if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+            if (endTime === '' && ($subtitle.get(0) !== this.getLastSubtitle())) {
                 return true;
             }
 
