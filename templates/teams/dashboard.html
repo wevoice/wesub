@@ -218,7 +218,12 @@
                                                 $('.video-{{ team_video.id }}').click(function(){
                                                     var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
                                                     var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
+
+                                                    {% if v.languages_count < 1 or not user.get_languages %}
+                                                    op.showStartDialog(null);
+                                                    {% else %}
                                                     op.showStartDialog(null, {'LANGUAGE': $(this).data("lang"), 'FORCE': true });
+                                                    {% endif %}
                                                     return false;
                                                 });
                                             </script>
