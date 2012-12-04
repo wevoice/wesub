@@ -201,7 +201,7 @@ class TestBasicAdding(TestCase):
                                            SubtitleLine(300, None, "bar", {'new_paragraph':False} )])
 
         # Passing a SubtitleSet.
-        subs = SubtitleSet.from_list( 'en', [SubtitleLine(110, 210, "foo", {'new_paragraph':False} ),
+        subs = SubtitleSet.from_list( 'en', [SubtitleLine(110, 210, "foo", {'new_paragraph':True} ),
                                       SubtitleLine(310, 410, "bar", {'new_paragraph':False} ),
                                       SubtitleLine(None, None, '"baz"', {'new_paragraph': False} )])
 
