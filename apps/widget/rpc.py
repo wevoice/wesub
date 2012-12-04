@@ -728,7 +728,7 @@ class Rpc(BaseRpc):
                                                                    subtitles=subtitles,
                                                                    session=session)
 
-            incomplete = new_version.is_synced() or save_for_later
+            incomplete = not new_version.is_synced() or save_for_later
 
             # this is really really hackish.
             # TODO: clean all this mess on a friday

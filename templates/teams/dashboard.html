@@ -56,7 +56,7 @@
                     {% for task in user_tasks %}
                         <li>
                             <h3><a href="{{ task.team_video.video.get_absolute_url }}" title="View video">
-                                {{ task.team_video.video.title }}
+                                {{ task.team_video.video.title_display }}
                             </a></h3>
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
