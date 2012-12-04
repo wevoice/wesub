@@ -37,6 +37,7 @@ from django.template.defaultfilters import slugify
 from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
+from django.contrib.sites.models import Site
 
 
 from auth.models import CustomUser as User, Awards
@@ -378,6 +379,19 @@ class Video(models.Model):
         return reverse('videos:video',  kwargs=kwargs)
 
     get_absolute_url = _get_absolute_url
+
+    def get_shortlink(self):
+        """Return a shortlink string for the video.
+
+        The pattern is http://amara.org/v/<pk>
+        """
+        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+        domain = Site.objects.get_current().domain
+        path = reverse('shortlink', args=[self.pk])
+
+        return u"{0}://{1}{2}".format(unicode(protocol),
+                                      unicode(domain), 
+                                      unicode(path))
 
     def get_primary_videourl_obj(self):
         """Return the primary video URL for this video if one exists, otherwise None.
@@ -2473,9 +2487,16 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        return video_type_registrar[self.type].video_url(self)
+        try:
+            return video_type_registrar[self.type].video_url(self)
+        except KeyError:
+            vt = video_type_registrar.video_type_for_url(self.url)
+            self.type = vt.abbreviation
+            self.save()
+            return video_type_registrar[self.type].video_url(self)
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        assert self.type != '', "Can't set an empty type"
         if updates_timestamp:
             self.created = datetime.now()
         super(VideoUrl, self).save(*args, **kwargs)

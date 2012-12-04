@@ -51,13 +51,13 @@ class TestCaseMembersTab(WebdriverTestCase):
 
         """
         user = UserFactory.create()
-        self.auth_pg.login('team_owner', 'password')
+        self.members_tab.log_in('team_owner', 'password')
         self.members_tab.open_members_page('roles-test')
         self.members_tab.invite_user_via_form(username = user.username,
                                               message = 'Join my team',
                                               role = 'Contributor')
 
-        self.auth_pg.login(user.username, 'password')
+        self.members_tab.log_in(user.username, 'password')
         self.assertEqual(1, user.team_invitations.count())
         self.assertEqual(1, self.team.invitations.count())
 

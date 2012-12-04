@@ -3,6 +3,7 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.site_pages import video_page
+from apps.webdriver_testing.site_pages import video_language_page
 from apps.webdriver_testing.editor_pages import dialogs
 from apps.webdriver_testing.editor_pages import unisubs_menu
 from apps.webdriver_testing.editor_pages import subtitle_editor 
@@ -109,11 +110,15 @@ class TestCaseSubmittable(WebdriverTestCase):
         """
 
         self.sub_editor.submit(complete=True)
+        complete_langs = self.test_video.completed_subtitle_languages()
         sub_lang = self.test_video.subtitle_language('en')
-        print sub_lang
+        print dir(sub_lang.version())
+        self.assertTrue(True, sub_lang.subtitles_complete)
+        video_language_pg = video_language_page.VideoLanguagePage(self)
+        video_language_pg.open_video_lang_page(self.test_video.video_id, 'en')
+        print sub_lang.is_complete_and_synced()
         self.assertEqual(6, sub_lang.get_subtitle_count())
-        self.assertEqual(True, sub_lang.is_complete)
-
+       
 
     def test_submit__incomplete(self):
         """Manually entered are submitted, but not marked complete.
@@ -121,7 +126,7 @@ class TestCaseSubmittable(WebdriverTestCase):
         """
         self.sub_editor.submit(complete=False)
         sub_lang = self.test_video.subtitle_language('en')
-        self.assertEqual(False, sub_lang.is_complete)
+        self.assertEqual(False, sub_lang.subtitles_complete)
         self.assertEqual(6, sub_lang.get_subtitle_count())
 
 

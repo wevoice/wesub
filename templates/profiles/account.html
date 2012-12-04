@@ -24,42 +24,61 @@
                 </div>
             </fieldset>
             <div class="grid_8 alpha third-party">
-                <h3>{% trans "Linked Accounts" %}</h3>
-                <ul class="listing">
-                    {% if twitters %}
-                        {% for twitter in twitters %}
-                            <li>
-                                <h3>Twitter - {{ twitter.username }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
+                <fieldset>
+                    <h3>{% trans "Sync subtitles" %}</h3>
+                    <div class="callout">
+                        {% if third_party %}
+                            {% for account in third_party  %}
+                                <a class="button open-modal reduced" href="{% url profiles:remove-third-party account.pk %}">
+                                    Disconnect
+                                </a>
+                                <p>
+                                    <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
+                                    <strong>{% trans "Sync is active" %}</strong>
+                                    <span> for {{ account.username }}.</span>
+                                </p>
+                            {% endfor %}
+                        {% else %}
+                            <a class="button open-modal reduced" href="#youtube-modal">
+                                <span>Connect to</span>
+                                <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
+                            </a>
+                            <p>{% trans "Send Amara-created subtitles right to your YouTube videos!" %}</p>
+                        {% endif %}
+                    </div>
+                </fieldset>
 
-                    {% if facebooks %}
-                        {% for fb in facebooks %}
-                            <li>
-                                <h3>Facebook - {{ fb.uid }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
+                <fieldset>
+                    <h3>{% trans "Linked Accounts" %}</h3>
+                    <div class="callout">
+                        <p>{% trans "Link third-party accounts to Amara" %}</p>
+                        <a href="#account-modal" class="open-modal button reduced">{% trans "Add an account" %}</a>
+                    </div>
+                    <ul class="listing">
+                        {% if twitters %}
+                            {% for twitter in twitters %}
+                                <li>
+                                    <h3>Twitter - {{ twitter.username }}</h3>
+                                    <ul class="actions">
+                                        <li><a href="{% url profiles:remove-third-party twitter.pk %}?type=twitter" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
 
-                    {% if third_party %}
-                        {% for account in third_party  %}
-                            <li>
-                                <h3>{{ account.get_type_display }}</h3>
-                                <ul class="actions">
-                                    <li><a href="{% url profiles:remove-third-party account.pk %}" title="Unlink this account">{% trans "Remove" %}</a></li>
-                                </ul>
-                            </li>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
-                <a href="#account-modal" class="open-modal" title="">{% trans "Add an account" %}</a>
+                        {% if facebooks %}
+                            {% for fb in facebooks %}
+                                <li>
+                                    <h3>Facebook - {{ fb.uid }}</h3>
+                                    <ul class="actions">
+                                        <li><a href="{% url profiles:remove-third-party fb.pk %}?type=facebook" title="Unlink this account">{% trans "Remove" %}</a></li>
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </fieldset>
+
             </div>
             <div class="grid_4 alpha">
                 <fieldset>
@@ -124,39 +143,7 @@
                                 <option>Select...</option>
                                 <option value="twitter">Twitter</option>
                                 <option value="facebook">Facebook</option>
-                                <option value="youtube">Youtube</option>
                             </select>
-                        </fieldset>
-
-                        <fieldset class="account-type-copy" id="youtube-copy">
-                            <p>
-                                {% blocktrans %}
-                                    Connecting your Youtube account enables Amara-created subtitles to be synced to your Youtube videos.
-                                {% endblocktrans %}
-                            </p>
-
-                            <ul>
-                                <li>
-                                    {% blocktrans %}
-                                        Any existing, completed Amara subtitles will be <strong>sent to Youtube immediately</strong>.
-                                    {% endblocktrans %}
-                                </li>
-                                <li>
-                                    {% blocktrans %}
-                                        While the account is linked, <strong>any newly completed subtitles</strong> will be sent to Youtube.
-                                    {% endblocktrans %}
-                                </li>
-                                <li>
-                                    {% blocktrans %}
-                                        Amara subtitles <strong>will overwrite</strong> existing Youtube subtitles if both exist.
-                                    {% endblocktrans %}
-                                </li>
-                                <li>
-                                    {% blocktrans %}
-                                        Sync is <strong>one-way only</strong>. Changes made on Youtube will not be reflected on Amara.
-                                    {% endblocktrans %}
-                                </li>
-                            </ul>
                         </fieldset>
                         <fieldset class="account-type-copy" id="twitter-copy">
                             <p>
@@ -175,7 +162,67 @@
                     </div>
 
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" />
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Link' %}" disabled="disabled" />
+                    </div>
+                </form>
+        </div>
+        <div class="modal" id="youtube-modal">
+            <div class="modal-header">
+                <a href="#" class="close">x</a>
+                <h3>{% trans 'Connect to YouTube' %}</h3>
+            </div>
+
+                <form method="get" action="{% url profiles:add-third-party %}">
+
+                    <div class="modal-body">
+                        <fieldset>
+                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
+                            <input type="hidden" name="account_type" value="youtube"/>
+                            <p>
+                                {% blocktrans %}
+                                    Connecting your YouTube account enables Amara-created subtitles to be synced to your YouTube videos.
+                                {% endblocktrans %}
+                            </p>
+
+                            <h5>{% trans "What gets synced" %}</h5>
+
+                            <ul>
+                                <li>
+                                    {% blocktrans %}
+                                        Any existing, completed Amara subtitles will be <strong>sent to YouTube immediately</strong>.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        While linked, <strong>any newly edited, complete subtitles</strong> will be sent to YouTube.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        Sync is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
+                                    {% endblocktrans %}
+                                </li>
+                            </ul>
+
+                            <h5>{% trans "Your YouTube data" %}</h5>
+                            <ul>
+                                <li>
+                                    {% blocktrans %}
+                                        Amara subtitles <strong>will overwrite</strong> existing YouTube subtitles if both exist.
+                                    {% endblocktrans %}
+                                </li>
+                                <li>
+                                    {% blocktrans %}
+                                        To invite your viewers to subtitle, Amara will append a final subtitle (if space allows), and will add your video's URL to its YouTube description.
+                                    {% endblocktrans %}
+                                    <a href="http://support.universalsubtitles.org/solution/articles/10336-how-do-i-get-subtitles-onto-youtube-">{% trans "See what it looks like" %}</a>.
+                                </li>
+                            </ul>
+                        </fieldset>
+                    </div>
+
+                    <div class="modal-footer">
+                        <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
                     </div>
                 </form>
         </div>

@@ -97,6 +97,8 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        management.call_command('clear_index', interactive=False)
+
         self.watch_pg = watch_page.WatchPage(self)
         data_helpers.create_videos_with_fake_subs(self, 
             'apps/webdriver_testing/subtitle_data/fake_subs.json')
@@ -119,7 +121,9 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         """
         video_list = self.watch_pg.section_videos(section='latest')
-        self.assertEqual(self.expected_videos, sorted(video_list))
+        for vid in self.expected_videos:
+            self.assertIn(vid, video_list)
+
 
     def test_latest__page(self):
         """Latest page opens when 'More' clicked and displays videos.
@@ -128,15 +132,16 @@ class TestCaseWatchPageListings(WebdriverTestCase):
         self.watch_pg.display_more(section='latest')
         self.watch_pg.search_complete()
         video_list = self.watch_pg.section_videos(section='featured')
-        self.assertEqual(self.expected_videos, sorted(video_list))
+        for vid in self.expected_videos:
+            self.assertIn(vid, video_list)
 
     def test_popular__section(self):
         """Popular section displays expected videos.
 
         """
         video_list = self.watch_pg.section_videos(section='popular')
-        self.assertEqual(self.expected_videos, sorted(video_list))
-
+        for vid in self.expected_videos:
+            self.assertIn(vid, video_list)
 
     def test_popular__default_week(self):
         """Sort by week is the default sort value.
@@ -185,8 +190,8 @@ class TestCaseWatchPageListings(WebdriverTestCase):
         """
         self.watch_pg.display_more(section='popular')
         video_list = self.watch_pg.section_videos(section='popular')
-        self.assertEqual(self.expected_videos, sorted(video_list))
-
+        for vid in self.expected_videos:
+            self.assertIn(vid, video_list)
 
 
     def test_featured__section(self):

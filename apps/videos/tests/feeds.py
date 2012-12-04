@@ -96,8 +96,6 @@ class TestFeedParser(TestCase):
     youtube_feed_url_pattern =  'https://gdata.youtube.com/feeds/api/users/%s/uploads'
     youtube_username = 'universalsubtitles'
 
-    mit_feed_url = 'http://ocw.mit.edu/rss/new/ocw_youtube_videos.xml'
-
     vimeo_feed_url = 'http://vimeo.com/blakewhitman/videos/rss'
 
     def setUp(self):
@@ -125,24 +123,6 @@ class TestFeedParser(TestCase):
         vt, info, entry = feed_parser.items().next()
         self.assertTrue(isinstance(vt, YoutubeVideoTypeA)
                         or isinstance(vt, YoutubeVideoTypeB))
-
-        video, created = Video.get_or_create_for_url(vt=vt)
-        self.assertTrue(video)
-
-    def test_mit_feed_parsing(self):
-        """
-        If this test fails - try check few feed entries. Not all entries from
-        MIT feed contain videos, so if sometime they delete some etries - test
-        can fail.
-        """
-        # Python.  What are you doing?  Python.  Stahp.
-        from videos.types.htmlfive import HtmlFiveVideoType as HtmlFiveVideoTypeA
-        from apps.videos.types.htmlfive import HtmlFiveVideoType as HtmlFiveVideoTypeB
-
-        feed_parser = FeedParser(self.mit_feed_url)
-        vt, info, entry = feed_parser.items().next()
-        self.assertTrue(isinstance(vt, HtmlFiveVideoTypeA)
-                        or isinstance(vt, HtmlFiveVideoTypeB))
 
         video, created = Video.get_or_create_for_url(vt=vt)
         self.assertTrue(video)

@@ -107,7 +107,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
     def test_member__safe_invite(self):
         """Use safe-members api to invite user from 1 team to anther.
           
-          POST /api2/partners/teams/[team-slug]/members/safe-members/
+          POST /api2/partners/teams/[team-slug]/safe-members/
         """
         
         #create a second team with 'second_member' as a member.
@@ -120,28 +120,44 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
             ).team
         TeamContributorMemberFactory.create(team=second_team, user = second_user)
         
+        #Create a post the request 
         user_details = {"username": second_user.username,
-                        "role": "admin"
+                        "role": "admin",
+                        "note": "we need you on our team"
                        } 
-        url_part = 'teams/%s/members/safe-members/' % self.open_team.slug
-        status, response = data_helpers.post_api_request(self, url_part, user_details) 
+        url_part = 'teams/%s/safe-members/' % self.open_team.slug
+        status, response = data_helpers.post_api_request(self, 
+            url_part, user_details)
         
-        self.teams_pg.open_page('messages/')
-        self.teams_pg.log_in(second_user.username, 'password')
-        self.assertNotEqual(None, response, "Got a None response")
+        #Login in a verify invitation message is displayed 
+        usr_messages_pg = user_messages_page.UserMessagesPage(self)
+        usr_messages_pg.log_in(second_user.username, 'password')
+        usr_messages_pg.open_messages()
+        invite_subject = ("You've been invited to team %s on Amara" 
+                          % self.open_team.name)
+        self.assertEqual(invite_subject, usr_messages_pg.message_subject())
 
 
     def test_member__safe_create(self):
         """Use the safe-members api to create a new user to invite.
           
-          POST /api2/partners/teams/[team-slug]/members/safe-members/
+          POST /api2/partners/teams/[team-slug]/safe-members/
         """
         user_details = {"username": 'MakeMe',
+                        "email": 'makeme@example.com',
                         "role": "contributor"
                        } 
-        url_part = 'teams/%s/members/safe-members/' % self.open_team.slug
-        status, response = data_helpers.post_api_request(self, url_part, user_details) 
-        self.assertNotEqual(None, response, "Got a None response")
+        url_part = 'teams/%s/safe-members/' % self.open_team.slug
+        status, response = data_helpers.post_api_request(self, 
+            url_part, user_details) 
+        print status, response
+        status, response = data_helpers.api_get_request(self, 'users/') 
+        users_objects =  response['objects']
+        users_list = []
+        for k, v in itertools.groupby(users_objects, 
+                                      operator.itemgetter('username')):
+            users_list.append(k)
+        self.assertIn(user_details['username'], users_list)
 
        
 

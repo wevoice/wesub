@@ -1125,16 +1125,16 @@ class TestFormatConvertion(TestCase):
 
     def test_srt(self):
         raw, parsed = self._retrieve('srt')
-        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))
 
     def test_ssa(self):
         raw, parsed = self._retrieve('ssa')
-        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))
 
     def test_dfxp(self):
         raw, parsed = self._retrieve('dfxp')
-        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))
 
     def test_sbv(self):
         raw, parsed = self._retrieve('sbv')
-        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': 'false'}))
+        self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))

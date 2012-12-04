@@ -72,7 +72,7 @@ media/static-cache
 /tags.bak
 history.png
 history.dot
-apps/webdriver_testing/Screenshots/*.png
-apps/webdriver_testing/Screenshots/nosetests.xml
-apps/webdriver_testing/Screenshots/results.html
+apps/webdriver_testing/Results/*.png
+apps/webdriver_testing/Results/nosetests.xml
+apps/webdriver_testing/Results/results.html
 unisubsdevemails/

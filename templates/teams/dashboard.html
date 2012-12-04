@@ -129,7 +129,7 @@
             {% if not member.has_max_tasks %}
 
                 <ul class="listing videos">
-                    {% for id, team_video in videos.items %}
+                    {% for team_video in videos %}
                         <li>
                             <div class="thumb">
                                 <a href="{{ team_video.video.get_absolute_url }}">
@@ -181,17 +181,45 @@
                                             {% endwith %}
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
-                                        {% if team_video.video.languages_count < 1 %}
+                                        {% if team_video.video.languages_count < 1 or not user.get_languages %}
                                             <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
                                         {% else %} {# this video already has languages #}
-                                            <a href="#" id="video-{{ team_video.id }}" title="Get started now">{% trans 'Add a new translation' %}</a>
+                                            {% if team_video.languages|length > 1 %}
+                                                <a href="#" class="dropdown">
+                                                    {{ team_video.languages|length }}
+                                                    {% trans " languages needed" %}
+                                                </a>
+                                                <div>
+                                                    <span class="expand">{% trans "View all" %}</span>
+                                                    <ul>
+                                                        {% for lang in team_video.languages %}
+                                                            <li>
+                                                                <a href="#" data-lang="{{ lang.language }}" class="video-{{ team_video.id }}" title="Get started now">
+                                                                    {% trans "Create " %}
+                                                                    {{ lang.get_language_display }}
+                                                                    {% trans " Subtitles" %}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% else %} {# there is only one language user can work on #}
+                                                {% for lang in team_video.languages %}
+                                                <a href="#" class="video-{{ team_video.id }}" data-lang="{{ lang.language }}" title="Get started now">
+                                                        {% trans "Create " %}
+                                                        {{ lang.get_language_display }}
+                                                        {% trans " Subtitles" %}
+                                                    </a>
+                                                {% endfor %}
+                                            {% endif %}
                                         {% endif %}
                                         {% with v=team_video.video %}
                                             <script type="text/javascript">
-                                                $('#video-{{ team_video.id }}').click(function(){
+                                                $('.video-{{ team_video.id }}').click(function(){
                                                     var vs = unisubs.player.MediaSource.videoSourceForURL('{{ v.get_video_url|safe }}');
                                                     var op = new unisubs.widget.SubtitleDialogOpener('{{ v.video_id }}', '{{ v.get_video_url|safe }}');
-                                                    op.showStartDialog();
+                                                    op.showStartDialog(null, {'LANGUAGE': $(this).data("lang"), 'FORCE': true });
+                                                    return false;
                                                 });
                                             </script>
                                         {% endwith %}

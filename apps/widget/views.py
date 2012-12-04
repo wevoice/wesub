@@ -95,21 +95,21 @@ def convert_subtitles(request):
             # into this object. This object is what gets dumped into the textarea on the
             # front-end. If there are errors, also dump to result (the error would be displayed
             # to the user in the textarea.
-            data['result'] = babelsubs.to(subs, request.POST.get('format'))
+            converted = babelsubs.to(subs, format)
+
+            data['result'] = converted
         else:
             errors = {
                 "errors":{
                     'subtitles': 'You need to send subtitles back',
                     'format': 'You must pass a suitable format',
                 },
-                'result': 'Something is wrong'
+                'result': "Something went wrong, we're terribly sorry."
             }
     else:
         errors = {'result': "Must be a POST request"}
     res = json.dumps(errors or data)
-    if errors:
-        return HttpResponseServerError(res, mimetype='application/javascript')
-    return HttpResponse(json.dumps(data), mimetype='application/javascript')
+    return HttpResponse(res, mimetype='application/javascript')
 
 def widgetizerbootloader(request):
     context = {

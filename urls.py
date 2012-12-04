@@ -184,6 +184,8 @@ urlpatterns = patterns('',
         {'template': 'enterprise/film-tv.html'}, 'enterprise_film_tv'),
     url(r'^enterprise/non-profits/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'enterprise/non-profits.html'}, 'enterprise_non_profits'),
+    ## Video shortlinks
+    url(r'^v/(?P<pk>\d+)/$', 'videos.views.shortlink', name='shortlink')
 )
 
 if settings.USE_INTEGRATION:

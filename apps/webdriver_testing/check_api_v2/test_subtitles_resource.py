@@ -60,7 +60,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
                 'Timed_text.{0}.{1}'.format(test_lang_code, 'xml')),
                 encoding = 'utf-8'
                 )
-            test_format = 'dxfp'
+            test_format = 'dfxp'
         else:
             sub_data = codecs.open(os.path.join(self.subs_data_dir, 
                 'Timed_text.{0}.{1}'.format(test_lang_code, test_format)),
@@ -179,6 +179,9 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         self.assertEqual(72, subtitle_language.get_subtitle_count())
 
     def test_upload__edit(self):
+        """Subs uploaded via api are editable in the subtitle editor.
+
+        """
         #Create the language for the test video
         create_url = ('videos/%s/languages/'  % self.test_video.video_id)
         create_data = { 'language_code': 'en', 'is_original': True }
@@ -190,7 +193,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         upload_url = ( 'videos/%s/languages/en/subtitles/' 
             % self.test_video.video_id )
         sub_data =  open(os.path.join(self.subs_data_dir, 'Untimed_text.srt'))
-        upload_data = { 'subtitles': sub_data.read(), 'sub_format': 'txt' } 
+        upload_data = { 'subtitles': sub_data.read(), 'sub_format': 'srt' } 
         status, response = data_helpers.post_api_request(self, 
             upload_url, 
             upload_data)

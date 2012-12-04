@@ -105,10 +105,11 @@ class SubtitleEditor(EditorDialogs):
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
-            time.sleep(3)
+            time.sleep(4)
             self.click_by_css(self._SYNC)
         time.sleep(1)
         self.pause()
+        time.sleep(2)
 
     def sub_timings(self, check_step=None):
         if check_step:
@@ -125,8 +126,9 @@ class SubtitleEditor(EditorDialogs):
 
             
     def save_and_exit(self):
+        self.page_down(self._SAVE_AND_EXIT)
         self.click_by_css(self._SAVE_AND_EXIT)
-        self.mark_subs_complete()
+        #self.mark_subs_complete()
         self.click_saved_ok()
 
 
@@ -141,9 +143,21 @@ class SubtitleEditor(EditorDialogs):
     def download_subtitles(self, sub_format='SRT'):
         self.click_by_css(self._DOWNLOAD_SUBTITLES)
         self.select_option_by_text(self._DOWNLOAD_FORMAT, sub_format)
-        time.sleep(3)
-        stored_subs = self.browser.execute_script(
+        # don't ever wait more than 15 seconds for this
+        # but keep pooling for a terminating value
+        start_time = time.time()
+        while time.time() - start_time < 15:
+            time.sleep(2)
+            stored_subs = self.browser.execute_script(
             "return document.getElementsByTagName('textarea')[0].value")
+            # server errored out
+            if stored_subs == "Something went wrong, we're terribly sorry.":
+                raise ValueError("Call to convert formats failed")
+            # server hasn't returned yet
+            elif stored_subs and stored_subs.startswith("Processing.") is False:
+                break
+        else:
+            raise ValueError("More than 15 seconds passed, and subs weren't converted")
         #self.close_lang_dialog()
         return stored_subs
 
@@ -152,8 +166,7 @@ class SubtitleEditor(EditorDialogs):
         time.sleep(2)
         self.mark_subs_complete(complete)
         time.sleep(2)
-        self.wait_for_element_present(self._SAVED_OK)
-        self.click_by_css(self._SAVED_OK)
+        self.click_saved_ok()
         
 
 

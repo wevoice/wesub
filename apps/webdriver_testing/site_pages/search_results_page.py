@@ -13,7 +13,7 @@ class SearchResultsPage(VideoListings):
     """
 
     _PAGE_HEADING = "h2.search-header"
-    _NO_RESULTS = "ul.video_list h3"
+    _NO_RESULTS = "ul.video_list p"
     _SEARCHING_INDICATOR = "img.placeholder"
     _SORT_HEADING = "div#sidebar h2"
     _LANGUAGES_SORT = "div#sidebar ul li a[value=languages_count]"

@@ -102,24 +102,24 @@ unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
         this.getStartOfParagraph() == other.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
-    return this.x.getSubtitleIndex(this.node);
+    return this.x['getSubtitleIndex'](this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrack) {
-    this.x.content(this.node, text);
+    this.x['content'](this.node, text);
     this.changed_(false, opt_dontTrack);
 };
 unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
     return this.json['original_text'];
 };
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
-    return this.x.content(this.node);
+    return this.x['content'](this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
-    return Boolean(this.x.startOfParagraph(this.node));
+    return Boolean(this.x['startOfParagraph'](this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, opt_dontTrack){
     if (this.getStartOfParagraph() != Boolean(val)){
-        this.x.startOfParagraph(this.node, Boolean(val));
+        this.x['startOfParagraph'](this.node, Boolean(val));
         this.changed_(false, opt_dontTrack);
     }
     return this.getStartOfParagraph();
@@ -128,7 +128,7 @@ unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
     return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
 };
 unisubs.subtitle.EditableCaption.prototype.getTrimmedText = function() {
-    return goog.string.trim(this.x.content(this.node));
+    return goog.string.trim(this.x['content'](this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
     var previousStartTime = this.getStartTime();
@@ -137,9 +137,9 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
                   unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
-    var previousValue = this.x.startTime(this.node);
+    var previousValue = this.x['startTime'](this.node);
     startTime = Math.max(startTime, this.getMinStartTime());
-    this.x.startTime(this.node, startTime);
+    this.x['startTime'](this.node, startTime);
     if (this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
         this.getEndTime() < startTime +
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
@@ -153,8 +153,8 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
-    if (goog.isDefAndNotNull(this.x.startTime(this.node))) {
-        return this.x.startTime(this.node);
+    if (goog.isDefAndNotNull(this.x['startTime'](this.node))) {
+        return this.x['startTime'](this.node);
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -165,7 +165,7 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime = function(endTime) {
     this.changed_(false);
 };
 unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
-    this.x.endTime(this.node, endTime);
+    this.x['endTime'](this.node, endTime);
     if (this.getStartTime() > endTime -
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
         this.setStartTime_(
@@ -183,30 +183,30 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
 unisubs.subtitle.EditableCaption.prototype.clearTimes = function() {
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
-        this.x.startTime(this.node, '');
-        this.x.endTime(this.node, '');
+        this.x['startTime'](this.node, '');
+        this.x['endTime'](this.node, '');
     }
 };
 
 unisubs.subtitle.EditableCaption.prototype.resetSub = function() {
 
-    this.x.content(this.node, this.x.originalContent(this.node));
+    this.x['content'](this.node, this.x['originalContent'](this.node));
 
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
 
-        var previousStartTime = this.x.startTime(this.node);
-        this.setStartTime_(this.x.originalStartTime(this.node));
+        var previousStartTime = this.x['startTime'](this.node);
+        this.setStartTime_(this.x['originalStartTime'](this.node));
         this.changed_(previousStartTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 
-        var previousEndTime = this.x.endTime(this.node);
-        this.setEndTime_(this.x.originalEndTime(this.node));
+        var previousEndTime = this.x['endTime'](this.node);
+        this.setEndTime_(this.x['originalEndTime'](this.node));
         this.changed_(previousEndTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {
-    if (goog.isDefAndNotNull(this.x.endTime(this.node))) {
-        return this.x.endTime(this.node);
+    if (goog.isDefAndNotNull(this.x['endTime'](this.node))) {
+        return this.x['endTime'](this.node);
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -234,7 +234,7 @@ unisubs.subtitle.EditableCaption.prototype.getMaxEndTime = function() {
          unisubs.subtitle.EditableCaption.MIN_LENGTH) : 99999;
 };
 unisubs.subtitle.EditableCaption.prototype.getCaptionIndex = function() {
-    return this.x.getSubtitles().index(this.node);
+    return this.x['getSubtitles']().index(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.isShownAt = function(time) {
     return this.getStartTime() <= time &&
@@ -257,7 +257,6 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
 unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
         unisubs.SubTracker.getInstance().trackEdit(this.getCaptionIndex());
-    console.log("dispatching change event")
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));

@@ -54,6 +54,9 @@ class TestCaseTranscribing(WebdriverTestCase):
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
+
+        self.assertFalse("bug: https://unisubs.sifterapp.com/issue/1552")
+
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
@@ -72,32 +75,30 @@ class TestCaseTranscribing(WebdriverTestCase):
         """Manually entered unsynced subs can be download from check page.
 
         """
-        EXPECTED_UNSYNCED_TEXT = """
-1
-99:59:59,000 --> 99:59:59,000
-I'd like to be 
+        EXPECTED_UNSYNCED_TEXT = u"""1
+99:59:59,999 --> 99:59:59,999
+I'd like to be
 
 2
-99:59:59,000 --> 99:59:59,000
+99:59:59,999 --> 99:59:59,999
 Under the sea
 
 3
-99:59:59,000 --> 99:59:59,000
+99:59:59,999 --> 99:59:59,999
 In an octopus' garden in the shade.
 
 4
-99:59:59,000 --> 99:59:59,000
+99:59:59,999 --> 99:59:59,999
 He'd let me in
 
 5
-99:59:59,000 --> 99:59:59,000
+99:59:59,999 --> 99:59:59,999
 Knows where we've been
 
 6
-99:59:59,000 --> 99:59:59,000
+99:59:59,999 --> 99:59:59,999
 In his octopus' garden in the shade.
-
-"""        
+"""
         
         self.sub_editor.continue_to_next_step()
         #Past Sync
@@ -106,7 +107,7 @@ In his octopus' garden in the shade.
         self.sub_editor.continue_to_next_step()
         #In Check Step - download subtitles
         saved_subs = self.sub_editor.download_subtitles()
-        self.assertEqual (saved_subs.strip(), EXPECTED_UNSYNCED_TEXT.strip())
+        self.assertEqual (saved_subs, EXPECTED_UNSYNCED_TEXT)
 
 
 

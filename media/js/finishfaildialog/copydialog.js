@@ -68,6 +68,7 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
     if (format === 'dfxp') {
         goog.dom.forms.setValue(this.textarea_, this.dfxpString_);
     } else {
+        // watchout the selenium test checks for this value, see editor_pages/subtitle_editor.py
         goog.dom.forms.setValue(this.textarea_, 'Processing...');
 
         var textarea = this.textarea_;
@@ -82,7 +83,11 @@ unisubs.finishfaildialog.CopyDialog.prototype.fillTextarea = function(format) {
                     output = 'There was an error processing your request. Below are your subtitles in DFXP format. Please copy them (not including this message) and you may upload them later.\n\n';
                     output += that.dfxpString_;
                 }
-                else {
+                else if (event.target.getResponseJson()['errors']){
+                    // watchout the selenium test checks for this value,
+                    // see editor_pages/subtitle_editor.py
+                    output = "Something went wrong, we're terribly sorry."
+                }else{
                     output = event.target.getResponseJson()['result'];
                 }
 

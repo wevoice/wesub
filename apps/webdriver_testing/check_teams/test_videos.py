@@ -240,6 +240,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
             self.manager_user)
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.video_sort(sort_option = 'name, z-a')
+        self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'qs1-not-transback')
 
@@ -252,6 +253,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
             self.manager_user)
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.video_sort(sort_option = 'time, oldest')
+        self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'X Factor Audition - Stop Looking At My Mom Rap - Brian Bradley')
 
@@ -511,6 +513,7 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
 
         self.videos_tab.open_page(project_page)
         self.videos_tab.video_sort(sort_option = 'most subtitles')
+        self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'lots of translations')
 
@@ -573,6 +576,22 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             ).team
 
 
+    def turn_on_automatic_tasks(self):
+        #Turn on task autocreation for the team.
+        WorkflowFactory.create(
+            team = self.limited_access_team,
+            autocreate_subtitle = True,
+            autocreate_translate = True,
+            review_allowed = 10)
+
+        #Add some preferred languages to the team.
+        lang_list = ['en', 'ru', 'pt-br']
+        for language in lang_list:
+            TeamLangPrefFactory(
+                team = self.limited_access_team,
+                language_code = language,
+                preferred = True)
+
     def test_edit__no_permission(self):
         """A contributor can't see edit links without edit permission.
 
@@ -594,7 +613,8 @@ class TestCaseVideosDisplay(WebdriverTestCase):
     def test_tasks__non_member(self):
         """Non-members of the team do not see the task links.
         """
-
+        
+        self.turn_on_automatic_tasks()
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
@@ -610,6 +630,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """Anonymous users do not see the task links. 
 
         """
+        self.turn_on_automatic_tasks()
 
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
@@ -641,6 +662,10 @@ class TestCaseVideosDisplay(WebdriverTestCase):
     def test_task_link(self):
         """A task link opens the task page for the video.
         """
+
+        #Turn on task autocreation for the team.
+        self.turn_on_automatic_tasks()
+
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
@@ -671,21 +696,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """With automatic tasks, display number of needed languages for video.
 
         """
-        self.limited_access_team.workflow_enabled = True
-        #Turn on task autocreation for the team.
-        WorkflowFactory.create(
-            team = self.limited_access_team,
-            autocreate_subtitle = True,
-            autocreate_translate = True,
-            review_allowed = 10)
-
-        #Add some preferred languages to the team.
-        lang_list = ['en', 'ru', 'pt-br']
-        for language in lang_list:
-            TeamLangPrefFactory(
-                team = self.limited_access_team,
-                language_code = language,
-                preferred = True)
+        self.turn_on_automatic_tasks()
 
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
