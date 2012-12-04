@@ -45,7 +45,7 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
 
     this.captions_ = goog.array.map(
         this.x['getSubtitles'](), function(node) {
-            c = new unisubs.subtitle.EditableCaption(node, this.x);
+            c = new unisubs.subtitle.EditableCaption(node, that.x);
             c.setParentEventTarget(that);
             return c;
         });
