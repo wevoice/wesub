@@ -70,8 +70,15 @@ def twitter_login_done(request):
     #   means something bad happened to tokens
     if token.key != request.GET.get('oauth_token', 'no-token'):
         del request.session['request_token']
+
+        if request.GET.get('denied', None) is not None:
+            messages.info(request, "Twitter authorization cancelled.")
+            return redirect('profiles:account')
+
+        messages.error(request, "Something wrong! Tokens do not match...")
+
         # Redirect the user to the login page
-        return HttpResponse("Something wrong! Tokens do not match...")
+        return redirect('auth:login')
 
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     try:
