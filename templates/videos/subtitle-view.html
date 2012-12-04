@@ -208,7 +208,7 @@
                                 {{ last_version.description|urlize|linebreaks }}
                             </div>
                         </li>
-                        {% for item in last_version.get_subtitles %}
+                        {% for item in subtitle_lines %}
                         <li>
                             {% if item.0 != None %}
                             <div class="timing">

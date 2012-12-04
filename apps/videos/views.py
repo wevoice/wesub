@@ -22,6 +22,7 @@ import urllib, urllib2
 import simplejson as json
 from babelsubs import get_available_formats
 from babelsubs.storage import diff as diff_subs
+from babelsubs.generators import HTMLGenerator
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -458,6 +459,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
 
     context['rollback_allowed'] = version and not version.video.is_moderated
     context['last_version'] = version
+    context['subtitle_lines'] = version.get_subtitles().subtitle_items(HTMLGenerator.MAPPINGS)
     context['next_version'] = version.next_version() if version else None
     context['can_edit'] = False
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS
