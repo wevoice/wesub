@@ -51,7 +51,7 @@
             <h4>{% trans "Video" %}{{ team.videos_count|pluralize }}</h4>
         </a>
     </li>
-    <li>
+    <li{% if not team|allows_tasks and not projects|length > 0 %} class="last"{% endif %}>
         <a href="{% url teams:detail_members team.slug %}">
             <p>{{team.member_count|simplify_number}}</p>
             <h4>{% trans "Member" %}{{ team.member_count|pluralize }}</h4>
