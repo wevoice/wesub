@@ -130,6 +130,7 @@ class Page(object):
                        #.click(menu_item_element)
                        .perform())
         menu_item_element = self._safe_find(menu_item_el)
+        self.wait_for_element_visible(menu_item_el)
         mouseAction = (webdriver.ActionChains(self.browser)
                        .move_to_element(menu_item_element)
                        .click(menu_item_element)
