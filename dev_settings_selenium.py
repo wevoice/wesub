@@ -79,8 +79,8 @@ NOSE_ARGS = ['--with-xunit',
              '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
              '--nocapture',
              #'--collect-only',
-             '--nologcapture', 
-             '--logging-filter=-pysolr, -base, remote_connection', 
+             #'--nologcapture', 
+             #'--logging-filter=-pysolr, -base, remote_connection', 
              '--verbosity=2'
             ]
 CELERY_ALWAYS_EAGER = True
