@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
+from gdata.client import Unauthorized
 
 from auth.models import CustomUser as User
 
@@ -128,7 +129,13 @@ def youtube_oauth_callback(request):
                     
     content = json.loads(response.content)
     bridge = YouTubeApiBridge(content['access_token'], content['refresh_token'], None) 
-    feed = bridge.GetUserFeed(username='default')
+
+    try:
+        feed = bridge.GetUserFeed(username='default')
+    except Unauthorized:
+        messages.error(request, _("Please create a YouTube channel first."))
+        return redirect(reverse("profiles:account"))
+
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
     
     # make sure we don't store multiple auth tokes for the same account
