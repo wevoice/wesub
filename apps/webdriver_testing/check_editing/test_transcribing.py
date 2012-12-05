@@ -8,6 +8,7 @@ from apps.webdriver_testing.editor_pages import unisubs_menu
 from apps.webdriver_testing.editor_pages import subtitle_editor 
 from apps.webdriver_testing.data_factories import UserFactory
 import os
+import sys
 import time
 
 class TestCaseTranscribing(WebdriverTestCase):
@@ -55,8 +56,7 @@ class TestCaseTranscribing(WebdriverTestCase):
         Note: the browser needs to be open for about 80 seconds for saving.
         """
 
-        self.assertFalse("bug: https://unisubs.sifterapp.com/issue/1552")
-
+        print 'sleeping for 90 seconds to trigger the save'
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
@@ -65,11 +65,14 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.unisubs_menu.open_menu()
         self.assertEqual(self.create_modal.warning_dialog_title(), 
             'Resume editing?')
-        self.create_modal.click_dialog_continue()
-        self.create_modal.click_dialog_continue()
+
+        # Resume dialog - click OK
+        self.create_modal.resume_dialog_ok()
+ 
+        # Helper videos click continue
+        self.create_modal.continue_past_help()
         time.sleep(5)
-        self.assertEqual(self.typed_subs, self.sub_editor.subtitles_list(),
-            'Existing bug: https://unisubs.sifterapp.com/issue/1552')
+        self.assertEqual(self.typed_subs, self.sub_editor.subtitles_list())
 
     def test_download(self):
         """Manually entered unsynced subs can be download from check page.

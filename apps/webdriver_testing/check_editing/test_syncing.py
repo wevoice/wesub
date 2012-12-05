@@ -68,20 +68,27 @@ class TestCasePartialSync(WebdriverTestCase):
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
-        print dir(self)
-        self.skipTest("bug: https://unisubs.sifterapp.com/issue/1552")
         timing_list = self.sub_editor.sub_timings()
+        print 'sleeping for 90 seconds to initiate automatic save'
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
         time.sleep(5)
         self.video_pg.open_video_page(self.test_video.video_id)
         self.unisubs_menu.open_menu()
+
         self.assertEqual(self.create_modal.warning_dialog_title(), 
             'Resume editing?')
-        self.create_modal.click_dialog_continue()
-        self.create_modal.click_dialog_continue()
+
+        # Resume dialog - click OK
+        self.create_modal.resume_dialog_ok()
+ 
+        # Helper videos if exists click continue
+        self.create_modal.continue_past_help()
+
+        #Move to the syncing screen
         self.sub_editor.continue_to_next_step()
+
         #Verify sub timings are same as pre-save timings 
         self.assertEqual(timing_list, self.sub_editor.sub_timings())
 

@@ -57,6 +57,13 @@ class EditorDialogs(Page):
         self.wait_for_element_present(self._SAVED_OK)
         self.click_by_css(self._SAVED_OK)
 
+    def resume_dialog_ok(self):
+        self.wait_for_element_present(self._CONTINUE)
+        elements_found = self.get_elements_list(self._CONTINUE)
+        for el in elements_found:
+            if el.text == 'OK':
+                el.click()
+
     def click_dialog_continue(self):
         self.wait_for_element_present(self._CONTINUE)
         self.click_by_css(self._CONTINUE)
