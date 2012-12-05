@@ -9,6 +9,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException
 from selenium.webdriver.common.keys import Keys
 
 
@@ -110,6 +111,7 @@ class Page(object):
         """Open a hover pulldown and choose a displayed item.
 
         """
+        self.browser.implicitly_wait(5)        
         menu_element = self._safe_find(menu_el)
         menu_item_element = self._safe_find(menu_item_el)
         mouseAction = (webdriver.ActionChains(self.browser)

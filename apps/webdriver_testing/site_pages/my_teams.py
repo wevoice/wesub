@@ -76,7 +76,7 @@ class MyTeam(TeamsPage):
         return leave_link
 
     def click_leave_link(self, team):
-        self.click_item_after_hover(self._team_elem(team), self._LEAVE)
+        self.click_item_from_pulldown(self._team_elem(team), self._LEAVE)
         self.handle_js_alert('accept')
 
 
