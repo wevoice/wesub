@@ -63,6 +63,7 @@ class Page(object):
         """Accept or reject js alert.
 
         """
+        self.browser.implicitly_wait(5)        
         try:
             print 'Got an alert dialog'
             time.sleep(2)
@@ -130,8 +131,10 @@ class Page(object):
                        #.click(menu_item_element)
                        .perform())
         menu_item_element = self._safe_find(menu_item_el)
-        menu_item_element.click()
-
+        mouseAction = (webdriver.ActionChains(self.browser)
+                       .move_to_element(menu_item_element)
+                       .click(menu_item_element)
+                       .perform())
 
 
     def hover_by_element(self, webdriver_object, page_element):
