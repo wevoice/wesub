@@ -63,7 +63,6 @@ class Page(object):
         """Accept or reject js alert.
 
         """
-        self.browser.implicitly_wait(5)        
         try:
             print 'Got an alert dialog'
             time.sleep(2)
