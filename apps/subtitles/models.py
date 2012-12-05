@@ -32,6 +32,7 @@ from apps.auth.models import CustomUser as User
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import diff as diff_subtitles
+from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 
 from utils.compress import compress, decompress
@@ -1050,7 +1051,7 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles())
+        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(), HTMLGenerator.MAPPINGS)
 
 
 
