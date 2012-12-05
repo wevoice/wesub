@@ -144,6 +144,7 @@ class Page(object):
         elem = self._safe_find(element)
         elem.clear()
 
+
     def click_link_text(self, text, wait_for_element=None):
         """Click link text of the element exists, or fail.
 
