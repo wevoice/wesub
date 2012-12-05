@@ -162,20 +162,14 @@
 
                     <div class="modal-body">
                         <fieldset>
-                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
+                            <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube" height="65"/>
                             <input type="hidden" name="account_type" value="youtube"/>
-                            <p>
-                                {% blocktrans %}
-                                    Connecting your YouTube account enables Amara-created subtitles to be synced to your YouTube videos.
-                                {% endblocktrans %}
-                            </p>
 
                             <h5>{% trans "What gets synced" %}</h5>
-
                             <ul>
                                 <li>
                                     {% blocktrans %}
-                                        Any existing, completed Amara subtitles will be <strong>sent to YouTube immediately</strong>.
+                                        Existing, completed Amara subtitles will be <strong>sent to YouTube immediately</strong>.
                                     {% endblocktrans %}
                                 </li>
                                 <li>
@@ -199,16 +193,18 @@
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        To invite your viewers to subtitle, Amara will append a final subtitle (if space allows), and will add your video's URL to its YouTube description.
+                                        Amara <strong>invites your viewers to subtitle</strong> by adding your video's URL to its YouTube description and appending a final subtitle (if space allows).
                                     {% endblocktrans %}
                                     <a href="http://support.universalsubtitles.org/solution/articles/40227-syncing-to-youtube">{% trans "See what it looks like" %}</a>.
                                 </li>
                             </ul>
-                        </fieldset>
-                    </div>
 
-                    <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
+                            <h5>{% trans "Step 1: Enable your YouTube account by creating a channel" %}</h5>
+                            <p><a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank" class="btn">{% trans "Create a channel" %}</a> (opens in a new window)</p>
+
+                            <h5>{% trans "Step 2: Link accounts" %}</h5>
+                            <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
+                        </fieldset>
                     </div>
                 </form>
         </div>
