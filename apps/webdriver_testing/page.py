@@ -58,7 +58,8 @@ class Page(object):
 
         """
         try:
-            time.sleep(2)
+            print 'Got an alert dialog'
+            time.sleep(3)
             a = self.browser.switch_to_alert()
             if action == "accept":
                 a.accept()
