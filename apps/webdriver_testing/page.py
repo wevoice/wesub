@@ -26,6 +26,11 @@ class Page(object):
         self.base_url = testsetup.base_url
         self.testcase = testsetup
 
+    def _safe_find(self, element):
+        self.wait_for_element_present(element)
+        elem = self.browser.find_element_by_css_selector(element)
+        return elem
+
     def quit(self):
         """Quit the browser.
 
@@ -59,7 +64,7 @@ class Page(object):
         """
         try:
             print 'Got an alert dialog'
-            time.sleep(3)
+            time.sleep(2)
             a = self.browser.switch_to_alert()
             if action == "accept":
                 a.accept()
@@ -72,7 +77,7 @@ class Page(object):
         """Check the box for the element provided by css selector.
 
         """
-        el = self.browser.find_element_by_css_selector(element)
+        el = self._safe_find(element)
         if not el.is_selected():
             el.click()
 
@@ -81,7 +86,7 @@ class Page(object):
 
         """
 
-        el = self.browser.find_element_by_css_selector(element)
+        el = self._safe_find(element)
         if el.is_selected():
             el.click()
 
@@ -89,35 +94,28 @@ class Page(object):
         """Select an option based on text of the css selector.
 
         """
-        select = Select(self.browser.find_element_by_css_selector(element))
+        select = Select(self._safe_find(element))
         select.select_by_visible_text(text)
 
     def hover_by_css(self, page_element):
         """Hover over element of provided css selector.
 
         """
-        element = self.browser.find_element_by_css_selector(page_element)
-        mouse = webdriver.ActionChains(self.browser)
-        mouse.move_to_element(element).perform()
+        element = self._safe_find(page_element)
+        mouseAction = webdriver.ActionChains(self.browser)
+        mouseAction.move_to_element(element).perform()
+
 
     def click_item_from_pulldown(self, menu_el, menu_item_el):
         """Open a hover pulldown and choose a displayed item.
 
         """
-        element = self.browser.find_element_by_css_selector(menu_el)
-        mouse = webdriver.ActionChains(self.browser)
-        mouse.click_and_hold(element).perform()
-        self.wait_for_element_visible(menu_item_el)
-        item_el = self.browser.find_element_by_css_selector(menu_item_el)
-        mouse.release().perform()
-        m2 = webdriver.ActionChains(self.browser)
-        m2.move_to_element(item_el)
-        m2.click()
-        m2.perform()
-
-        
-
-
+        menu_element = self._safe_find(menu_el)
+        menu_item_element = self._safe_find(menu_item_el)
+        mouseAction = (webdriver.ActionChains(self.browser)
+                       .move_to_element(menu_element)
+                       .click(menu_item_element)
+                       .perform())
 
 
     def hover_by_element(self, webdriver_object, page_element):
@@ -143,10 +141,7 @@ class Page(object):
         """Clear text of css element in form.
 
         """
-        try:
-            elem = self.browser.find_element_by_css_selector(element)
-        except Exception as e:
-            self.record_error(e)
+        elem = self._safe_find(element)
         elem.clear()
 
     def click_link_text(self, text, wait_for_element=None):
@@ -168,7 +163,7 @@ class Page(object):
         try:
             elem = self.browser.find_element_by_partial_link_text(text)
         except Exception as e:
-            curr_page = self.record_error(e)
+            self.record_error(e)
         elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
@@ -196,10 +191,9 @@ class Page(object):
         ex: ARROR_DOWN, TAB, ENTER, SPACE, DOWN... 
         If no element is specified, just send the key press to the body.
         """
-        elem = self.browser.find_element_by_css_selector(element)
+        elem = self._safe_find(element)
         elem.send_keys(key_name)
 
-        
 
     def get_text_by_css(self, element):
         """Get text of given css selector.
@@ -212,13 +206,14 @@ class Page(object):
         """Return dict of height and width of element by css selector.
 
         """
-        return self.browser.find_element_by_css_selector(element).size
+        elem = self._safe_find(element)
+        return elem.size
 
     def submit_form_text_by_css(self, element, text):
         """Submit form using css selector for form element.
  
         """
-        elem = self.browser.find_element_by_css_selector(element)
+        elem = self._safe_find(element)
         elem.send_keys(text)
         elem.submit()
 
