@@ -1201,6 +1201,8 @@ def dashboard(request, slug):
                                          project, filters,
                                          user))
 
+        tasks = tasks.select_related('team_video', 'team_video__team', 'team_video__project', 'team_video__video')
+
         _cache_video_url(tasks)
 
         for task in tasks:
