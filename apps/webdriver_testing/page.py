@@ -117,6 +117,20 @@ class Page(object):
                        .click(menu_item_element)
                        .perform())
 
+    def click_item_after_hover(self, menu_el, menu_item_el):
+        """Open a hover pulldown and choose a displayed item.
+
+        """
+        self.browser.implicitly_wait(5)        
+        menu_element = self._safe_find(menu_el)
+        mouseAction = (webdriver.ActionChains(self.browser)
+                       .move_to_element(menu_element)
+                       #.click(menu_item_element)
+                       .perform())
+        menu_item_element = self._safe_find(menu_item_el)
+        menu_item_element.click()
+
+
 
     def hover_by_element(self, webdriver_object, page_element):
         """Find the css element below the webdriver element object and hover.
@@ -143,6 +157,7 @@ class Page(object):
         """
         elem = self._safe_find(element)
         elem.clear()
+
 
 
     def click_link_text(self, text, wait_for_element=None):
