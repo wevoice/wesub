@@ -133,7 +133,10 @@ def youtube_oauth_callback(request):
     try:
         feed = bridge.GetUserFeed(username='default')
     except Unauthorized:
-        messages.error(request, _("Please create a YouTube channel first."))
+        messages.error(request,
+            _("We couldn't link your account. Have you <a href="
+            "'https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'"
+            ">set up a channel</a>?"))
         return redirect(reverse("profiles:account"))
 
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
