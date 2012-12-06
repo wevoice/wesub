@@ -170,7 +170,7 @@ def add_amara_description_credit(old_description, video_url, language='en'):
     """
     credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
 
-    if old_description.startswith(credit):
+    if old_description and old_description.startswith(credit):
         return old_description
 
     return "%s: %s\n\n%s" % (
