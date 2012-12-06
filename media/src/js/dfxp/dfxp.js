@@ -809,4 +809,54 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         this.convertTimes('timeExpression', $('div p', $cloned));
         return this.utils.xmlToString($cloned.get(0));
     };
+
+    MARKUP_REPLACE_SEQ = [
+        // order matters, need to apply double markers first
+        [/(\*\*)([^\*]+)(\*\*)/g, "<span fontWeight='bold'>$2</span>"],
+        [/(\*)([^\*]+)(\*{1})/g, "<span fontStyle='italic'>$2</span>"],
+        [/(_)([^_]+)(_{1})/g, "<span textDecoratin='underline'>$2</span>"]
+    ];
+    DFXP_REPLACE_SEQ = [
+        ["span[fontWeight='bold']", "**"],
+        ["span[fontStyle='italic']", "*"]
+    ]
+
+    /**
+     * This is *not* a parser. Just a quick hack to convert
+     * or markdowny syntax emphasys and strong syntax to
+     * the correct dfxp span elements.
+     */
+    this.markupToDFXP = function (input) {
+        if (input === undefined){
+            return input;
+        }
+        for (var i = 0; i < MARKUP_REPLACE_SEQ.length; i ++){
+            input = input.replace(MARKUP_REPLACE_SEQ[i][0],
+                MARKUP_REPLACE_SEQ[i][1]);
+        }
+        return input;
+    };
+    /**
+     *  Coverts the dfxp spans to our markdowny syntax
+     *  in the node's children.
+     * @param node
+     * @return The node, modified in place
+     */
+    this.dfxpToMarkup = function (node) {
+        if (node === undefined){
+            return node;
+        }
+        var marker, selector, targets;
+        for (var i = 0; i < DFXP_REPLACE_SEQ.length; i ++){
+            selector = DFXP_REPLACE_SEQ[i][0];
+            marker = DFXP_REPLACE_SEQ[i][1];
+            targets = $(selector, node);
+            targets.replaceWith(function(i,x){
+                return marker + $(this).text() + marker;
+            });
+        }
+        return node;
+    };
 };
+
+
