@@ -254,14 +254,16 @@ unisubs.startdialog.Dialog.prototype.addToLanguageSection_ = function($d) {
            $d('span', null, 'Subtitle into: '),
            this.toLanguageDropdown_));
 
-    // Select the first non-disabled language by default.  If they're all
-    // disabled you're out of luck and things are gonna break, sorry.
     var renderedToLanguages = goog.dom.getElementByClass('to-language');
     var selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
     while (selected && selected.disabled) {
         var next = goog.dom.getNextElementSibling(selected);
-        goog.dom.forms.setValue(renderedToLanguages, next.value);
-        selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
+        // let's not break if there's just a language. please.
+        // thanks.
+        if(next){
+            goog.dom.forms.setValue(renderedToLanguages, next.value);
+            selected = goog.dom.getChildren(renderedToLanguages)[renderedToLanguages.selectedIndex];
+        }
     }
 
     // If this is a first-time translate task, set the to-language to the

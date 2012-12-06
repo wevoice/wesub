@@ -1260,7 +1260,7 @@ def language_summary(language, team_video=-1, user=None):
             task = tasks[0]
             summary['disabled_to'] = user and user != task.assignee
 
-    if language.latest_version() and 'disabled_to' not in summary:
+    if language.latest_version() and language.is_complete_and_synced() and 'disabled_to' not in summary:
         # Languages with existing subtitles cannot be selected as a "to"
         # language in the "add new translation" dialog.  If you want to work on
         # that language, select it and hit "Improve these Subtitles" instead.
