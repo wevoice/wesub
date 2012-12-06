@@ -18,16 +18,14 @@
 import logging
 import random
 
-import teams.moderation_const as MODERATION
-import widget
-from accountlinker.models import ThirdPartyAccount
+import babelsubs
+from django.db import transaction
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.db import transaction
 from django.db.models import Q, Count
 from django.http import (
     Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
@@ -36,19 +34,28 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
-from django.utils.encoding import iri_to_uri, force_unicode
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
+
+import teams.moderation_const as MODERATION
+import widget
+from apps.auth.models import UserLanguage, CustomUser as User
+from apps.videos.templatetags.paginator import paginate
 from messages import tasks as notifier
-from raven.contrib.django.models import client
+from accountlinker.models import ThirdPartyAccount
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
+    UnpublishForm, MoveTeamVideoForm, TaskUploadForm, ChooseTeamForm
 )
-from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow, Setting, TeamLanguagePreference, InviteExpiredException, BillingReport, ApplicationInvalidException
+from teams.models import (
+    Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
+    Setting, TeamLanguagePreference, InviteExpiredException, BillingReport,
+    ApplicationInvalidException
+)
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
@@ -63,27 +70,24 @@ from teams.tasks import (
     update_video_moderation, update_one_team_video, update_video_public_field,
     invalidate_video_visibility_caches, process_billing_report
 )
-from videos import metadata_manager
-from videos.models import Action, VideoUrl, SubtitleLanguage, Video
-from videos.tasks import (
-    upload_subtitles_to_original_service, delete_captions_in_original_service,
-    delete_captions_in_original_service_by_code
-)
-from videos.types import UPDATE_VERSION_ACTION
-from widget.rpc import add_general_settings
-from widget.srt_subs import GenerateSubtitlesHandler
-from widget.views import base_widget_params
-
-from apps.auth.models import UserLanguage, CustomUser as User
 from apps.videos.tasks import video_changed_tasks
-from apps.videos.templatetags.paginator import paginate
 from utils import render_to, render_to_json, DEFAULT_PROTOCOL
-from utils.chunkediter import chunkediter
 from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
+from utils.chunkediter import chunkediter
+from videos.types import UPDATE_VERSION_ACTION
+from videos import metadata_manager
+from videos.tasks import (
+    upload_subtitles_to_original_service, delete_captions_in_original_service,
+    delete_captions_in_original_service_by_code
+)
+from videos.models import Action, VideoUrl, SubtitleLanguage, Video
+from widget.rpc import add_general_settings
+from widget.views import base_widget_params
+from raven.contrib.django.models import client
 
 
 logger = logging.getLogger("teams.views")
@@ -404,6 +408,8 @@ def _default_project_for_team(team):
             return None
     else:
         return None
+
+
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
@@ -694,7 +700,7 @@ def activity(request, slug):
     action_ids = list(action_ids)
 
     activity_list = list(Action.objects.filter(id__in=action_ids).select_related(
-            'video', 'user', 'language', 'language__video'
+            'video', 'user', 'new_language', 'new_language__video'
     ).order_by())
     activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
@@ -953,7 +959,7 @@ def leave_team(request, slug):
         member.delete()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-            
+
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
@@ -1195,8 +1201,10 @@ def dashboard(request, slug):
                              _tasks_list(request, team,
                                          project, filters,
                                          user))
+
         tasks = tasks.select_related('team_video', 'team_video__team',
                                      'team_video__project', 'team_video__video')
+
 
         for task in chunkediter(tasks, 100):
             if member and not can_perform_task(user, task):
@@ -1215,13 +1223,13 @@ def dashboard(request, slug):
                 break
 
         for video in videos:
-            _cache_video_url(video.tasks)
+            _cache_video_url(videos.tasks)
     else:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
-                videos.append(tv.teamvideo) 
+                videos.append(tv.teamvideo)
         else:
             lang_list = [l.language for l in user_languages]
 
@@ -1303,8 +1311,8 @@ def team_tasks(request, slug, project_slug=None):
             'team_video__project',
             'assignee',
             'team',
-            'subtitle_version__language__standard_language',
-            'subtitle_version__user'))
+            'new_subtitle_version__subtitle_language',
+            'new_subtitle_version__author'))
     tasks.sort(key=lambda t: task_ids.index(t.pk))
 
     if filters.get('team_video'):
@@ -1336,10 +1344,12 @@ def team_tasks(request, slug, project_slug=None):
     add_general_settings(request, widget_settings)
 
     team_video_pks = [t.team_video_id for t in tasks]
-    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+    video_pks = (Video.objects.filter(teamvideo__in=team_video_pks)
+                              .values_list('id', flat=True))
 
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
-                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
+                       VideoUrl.objects.filter(video__in=video_pks,
+                                               primary=True)])
 
     for t in tasks:
         t.cached_video_url = video_urls.get(t.team_video.video_id)
@@ -1356,7 +1366,6 @@ def team_tasks(request, slug, project_slug=None):
         'widget_settings': widget_settings,
         'filtered': filtered,
         'member': member,
-        'upload_draft_form': UploadDraftForm(user=request.user),
         'project_choices': team.project_set.exclude(name='_root'),
     }
 
@@ -1382,12 +1391,24 @@ def create_task(request, slug, team_video_pk):
             task.set_expiration()
 
             if task.type == Task.TYPE_IDS['Subtitle']:
-                task.language = ''
+                languages_with_versions = list(
+                    task.team_video.video.newsubtitlelanguage_set
+                                         .having_versions())
 
-            # TODO: Remove this?
+                if not languages_with_versions:
+                    task.language = ''
+                else:
+                    # There should never be more than one language with
+                    # subtitles for a video eligible for a transcribe task.  If
+                    # for some reason there is, we'll just take the first one
+                    # the DB decides to give us.
+                    sl = languages_with_versions[0]
+                    task.language = sl.language_code
+                    task.new_subtitle_version = sl.get_tip()
+
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
-                task.subtitle_version = task.team_video.video.latest_version(language_code=task.language)
+                task.new_subtitle_version = task.team_video.video.latest_version(language_code=task.language)
 
             task.save()
             notifier.team_task_assigned.delay(task.pk)
@@ -1428,21 +1449,22 @@ def perform_task(request, slug=None, task_pk=None):
     return HttpResponseRedirect(task.get_perform_url())
 
 def _delete_subtitle_version(version):
-    sl = version.language
-    n = version.version_no
+    sl = version.subtitle_language
+    n = version.version_number
 
-    # Delete this specific version...
-    version.delete()
+    # "Delete" this specific version...
+    version.visibility_override = 'private'
+    version.save()
 
-    # We also want to delete all draft subs leading up to this version.
-    for v in sl.subtitleversion_set.filter(version_no__lt=n).order_by('-version_no'):
-        if v.is_public:
+    # We also want to "delete" all draft subs leading up to this version.
+    previous_versions = (sl.subtitleversion_set.filter(version_number__lt=n)
+                                               .order_by('-version_number'))
+    for v in previous_versions:
+        if v.is_public():
             break
-        v.delete()
+        v.visibility_override = 'private'
+        v.save()
 
-    # And if we've deleted everything in the language, we can delete the language as well.
-    if not sl.subtitleversion_set.exists():
-        sl.delete()
 
 def delete_task(request, slug):
     '''Mark a task as deleted.
@@ -1452,7 +1474,8 @@ def delete_task(request, slug):
 
     '''
     team = get_object_or_404(Team, slug=slug)
-    next = request.POST.get('next', reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+    next = request.POST.get('next', reverse('teams:team_tasks', args=[],
+                                            kwargs={'slug': slug}))
 
     form = TaskDeleteForm(team, request.user, data=request.POST)
     if form.is_valid():
@@ -1468,8 +1491,8 @@ def delete_task(request, slug):
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
                 if not form.cleaned_data['discard_subs'] and task.subtitle_version:
-                    task.subtitle_version.moderation_status = MODERATION.APPROVED
-                    task.subtitle_version.save()
+                    task.new_subtitle_version.visibility_override = 'public'
+                    task.new_subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)
 
         task.save()
@@ -1530,40 +1553,21 @@ def assign_task_ajax(request, slug):
         return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
 
 @login_required
-@transaction.commit_manually
-def upload_draft(request, slug):
-
+def upload_draft(request, slug, video_id):
     if request.POST:
-        form = UploadDraftForm(request.user, request.POST, request.FILES)
+        video = Video.objects.get(video_id=video_id)
+        form = TaskUploadForm(request.POST, request.FILES,
+                              user=request.user, video=video)
 
-        try:
-            is_valid = form.is_valid()
-        except Exception, e:
-            client.create_from_exception()
-            messages.error(u"Sorry, there was a problem while uploading your draft. Care to try again?")
-            transaction.rollback()
-            is_valid = False
-
-        if is_valid:
-            try:
-                form.save()
-            except Exception, e:
-                messages.error(request, unicode(e))
-                transaction.rollback()
-                client.create_from_exception()
-            else:
-                messages.success(request, _(u"Draft uploaded successfully."))
-                transaction.commit()
+        if form.is_valid():
+            form.save()
+            messages.success(request, _(u"Draft uploaded successfully."))
         else:
             for key, value in form.errors.items():
-                messages.error(request, _('/n'.join([force_unicode(i) for i in value])))
+                messages.error(request, '\n'.join([force_unicode(i) for i in value]))
 
-            transaction.rollback()
-
-        if transaction.is_dirty():
-            transaction.rollback()
-
-        return HttpResponseRedirect(reverse('teams:team_tasks', args=[], kwargs={'slug': slug}))
+        return HttpResponseRedirect(reverse('teams:team_tasks', args=[],
+                                            kwargs={'slug': slug}))
     else:
         return HttpResponseBadRequest()
 
@@ -1576,14 +1580,14 @@ def download_draft(request, slug, task_pk, type="srt"):
     if task.team != team:
         return HttpResponseForbidden(_(u'You are not allowed to download this transcript.'))
 
-    if type not in GenerateSubtitlesHandler:
+    if type not in babelsubs.get_available_formats():
         raise Http404
 
     subtitle_version = task.get_subtitle_version()
 
-    subtitle = GenerateSubtitlesHandler[type].create(subtitle_version)
-    response = HttpResponse(unicode(subtitle), mimetype="text/plain")
-    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), subtitle.file_type)
+    subtitles = babelsubs.to(subtitle_version.get_subtitles(), type)
+    response = HttpResponse(unicode(subtitles), mimetype="text/plain")
+    original_filename = '%s.%s' % (subtitle_version.video.lang_filename(task.language), type)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
@@ -1592,7 +1596,7 @@ def download_draft(request, slug, task_pk, type="srt"):
         try:
             original_filename.encode('ascii')
         except UnicodeEncodeError:
-            original_filename = 'subtitles.' + subtitle.file_type
+            original_filename = 'subtitles.%s' % type
 
         filename_header = 'filename=%s' % original_filename
     else:
