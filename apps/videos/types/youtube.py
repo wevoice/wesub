@@ -145,6 +145,12 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
 
 
 def add_credit(subtitle_version, subs):
+    # If there are no subtitles, don't add any credits.  This shouldn't really
+    # happen since only completed subtitle versions can be synced to Youtube.
+    # But a little precaution never hurt anyone.
+    if len(subs) == 0:
+        return subs
+
     from accountlinker.models import get_amara_credit_text
 
     language_code = subtitle_version.language.language
