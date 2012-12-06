@@ -17,15 +17,17 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
 import random
-import csv
 
-from django.db import transaction
+import teams.moderation_const as MODERATION
+import widget
+from accountlinker.models import ThirdPartyAccount
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.db.models import Q, Count
 from django.http import (
     Http404, HttpResponseForbidden, HttpResponseRedirect, HttpResponse,
@@ -34,16 +36,11 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils import simplejson as json
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic.list_detail import object_list
-
-import teams.moderation_const as MODERATION
-import widget
-from apps.auth.models import UserLanguage, CustomUser as User
-from apps.videos.templatetags.paginator import paginate
 from messages import tasks as notifier
-from accountlinker.models import ThirdPartyAccount
+from raven.contrib.django.models import client
 from teams.forms import (
     CreateTeamForm, AddTeamVideoForm, EditTeamVideoForm,
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
@@ -51,11 +48,7 @@ from teams.forms import (
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     UnpublishForm, MoveTeamVideoForm, UploadDraftForm, ChooseTeamForm
 )
-from teams.models import (
-    Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
-    Setting, TeamLanguagePreference, SubtitleVersion, InviteExpiredException,
-    BillingReport, ApplicationInvalidException
-)
+from teams.models import Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow, Setting, TeamLanguagePreference, InviteExpiredException, BillingReport, ApplicationInvalidException
 from teams.permissions import (
     can_add_video, can_assign_role, can_assign_tasks, can_create_task_subtitle,
     can_create_task_translate, can_view_tasks_tab, can_invite,
@@ -64,32 +57,33 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_review, can_approve,
     can_delete_video, can_remove_video
 )
-from teams.moderation_const import APPROVED
-from teams.search_indexes import TeamVideoLanguagesIndex
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video, update_video_public_field,
     invalidate_video_visibility_caches, process_billing_report
 )
-from apps.videos.tasks import video_changed_tasks
-from utils import render_to, render_to_json, DEFAULT_PROTOCOL
-from utils.forms import flatten_errorlists
-from utils.metrics import time as timefn, Timer
-from utils.panslugify import pan_slugify
-from utils.searching import get_terms
-from utils.translation import get_language_choices, languages_with_labels
-from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
+from videos.models import Action, VideoUrl, SubtitleLanguage, Video
 from videos.tasks import (
     upload_subtitles_to_original_service, delete_captions_in_original_service,
     delete_captions_in_original_service_by_code
 )
-from videos.models import Action, VideoUrl, SubtitleLanguage, Video
+from videos.types import UPDATE_VERSION_ACTION
 from widget.rpc import add_general_settings
-from widget.views import base_widget_params
 from widget.srt_subs import GenerateSubtitlesHandler
-from raven.contrib.django.models import client
+from widget.views import base_widget_params
+
+from apps.auth.models import UserLanguage, CustomUser as User
+from apps.videos.tasks import video_changed_tasks
+from apps.videos.templatetags.paginator import paginate
+from utils import render_to, render_to_json, DEFAULT_PROTOCOL
+from utils.chunkediter import chunkediter
+from utils.forms import flatten_errorlists
+from utils.metrics import time as timefn
+from utils.panslugify import pan_slugify
+from utils.searching import get_terms
+from utils.translation import get_language_choices, languages_with_labels
 
 
 logger = logging.getLogger("teams.views")
@@ -1201,13 +1195,13 @@ def dashboard(request, slug):
                              _tasks_list(request, team,
                                          project, filters,
                                          user))
+        tasks = tasks.select_related('team_video', 'team_video__team',
+                                     'team_video__project', 'team_video__video')
 
-        _cache_video_url(tasks)
-
-        for task in tasks:
+        for task in chunkediter(tasks, 100):
             if member and not can_perform_task(user, task):
                 continue
-            
+
             task_vid = task.team_video
 
             if not task_vid in videos:
@@ -1219,6 +1213,9 @@ def dashboard(request, slug):
 
             if len(videos) >= VIDEOS_ON_PAGE:
                 break
+
+        for video in videos:
+            _cache_video_url(video.tasks)
     else:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
 
@@ -1720,7 +1717,7 @@ def sync_third_party_account(request, slug, account_id):
         messages.error(request, _(u'You do not have permission to edit this team.'))
         return HttpResponseRedirect(team.get_absolute_url())
 
-    account = team.third_party_accounts.get(pk=account_id)
+    team.third_party_accounts.get(pk=account_id)
     for video in team.videos.all():
         version = video.latest_version()
         if version is not None:
@@ -1730,6 +1727,7 @@ def sync_third_party_account(request, slug, account_id):
     messages.success(request, _(u'Successfully synced subtitles.'))
     return HttpResponseRedirect(reverse('teams:third-party-accounts',
         kwargs={'slug': team.slug}))
+
 
 # Unpublishing
 def _create_task_after_unpublishing(subtitle_version):
