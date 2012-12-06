@@ -31,25 +31,6 @@
                 <label for="id_video_policy">{% trans 'Who can add/remove videos?' %}</label>
                 {{ form.video_policy }}
             </fieldset>
-        
-            <fieldset>
-                <legend>{% trans 'Tasks' %}</legend>
-                <p class="notation">{% trans 'Manage subtitling and translation work for your videos' %}</p>
-
-                <label for="id_task_assign_policy">{% trans 'Who can create and assign tasks?' %}</label>
-                {{ form.task_assign_policy }}
-                <p class="notation">{% trans 'Specified members will only be able to create/assign tasks they are permitted to complete themselves' %}</p>
-
-                <label for="id_max_tasks_per_member">{% trans 'How many tasks can a user have at once?' %}</label>
-                {{ form.errors.max_tasks_per_member }}
-                {{ form.max_tasks_per_member }}
-                <p class="notation">{% trans 'If left blank there will be no limit.' %}</p>
-
-                <label for="id_task_expiration">{% trans 'How many days should an assignee get to complete a task?' %}</label>
-                {{ form.errors.task_expiration }}
-                {{ form.task_expiration }}
-                <p class="notation">{% trans 'If left blank tasks will not expire.' %}</p>
-            </fieldset>
 
             <fieldset>
                 <legend>{% trans 'Subtitling' %}</legend>
@@ -89,13 +70,31 @@
             </div>
             
             <fieldset>
-                <legend>{% trans 'Workflows' %}</legend>
-                <p class="notation">{% trans 'Workflows enable you to add moderation steps and automate tasks' %}</p>
-                <label for="id_workflow_enabled">{{ form.workflow_enabled }} {% trans 'Enable workflows' %}</label>
+                <legend>{% trans 'Tasks' %}</legend>
+                <p class="notation">{% trans 'Tasks enable you to manage and assign subtitling and translation work for your videos' %}</p>
+                <label for="id_workflow_enabled">{{ form.workflow_enabled }} {% trans 'Enable tasks' %}</label>
             </fieldset>
 
             <div class="workflow">
+                <fieldset>
+                    <legend>{% trans 'Permissions and Limits' %}</legend>
+
+                    <label for="id_task_assign_policy">{% trans 'Who can create and assign tasks?' %}</label>
+                    {{ form.task_assign_policy }}
+                    <p class="notation">{% trans 'Specified members will only be able to create/assign tasks they are permitted to complete themselves' %}</p>
+
+                    <label for="id_max_tasks_per_member">{% trans 'How many tasks can a user have at once?' %}</label>
+                    {{ form.errors.max_tasks_per_member }}
+                    {{ form.max_tasks_per_member }}
+                    <p class="notation">{% trans 'If left blank there will be no limit.' %}</p>
+
+                    <label for="id_task_expiration">{% trans 'How many days should an assignee get to complete a task?' %}</label>
+                    {{ form.errors.task_expiration }}
+                    {{ form.task_expiration }}
+                    <p class="notation">{% trans 'If left blank tasks will not expire.' %}</p>
+                </fieldset>
                 <fieldset id="workflow">
+                    <legend>{% trans 'Workflow' %}</legend>
                     <label for="id_autocreate_subtitle">
                         {{ workflow_form.autocreate_subtitle }}
                         {% trans 'Automatically create transcription tasks' %}
