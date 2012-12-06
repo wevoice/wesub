@@ -1183,7 +1183,7 @@ def dashboard(request, slug):
 
     allows_tasks = workflow and workflow.allows_tasks
 
-    if allows_tasks:
+    if member and allows_tasks:
 
         # TED's dashboard should only show TEDTalks tasks
         # http://i.imgur.com/fjjqx.gif
@@ -1200,7 +1200,7 @@ def dashboard(request, slug):
                                      'team_video__project', 'team_video__video')
         
         for task in chunkediter(tasks, 100):
-            if member and not can_perform_task(user, task):
+            if not can_perform_task(user, task):
                 continue
 
             task_vid = task.team_video
