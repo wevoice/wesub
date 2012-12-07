@@ -35,7 +35,7 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
      * Array of subtitles in json format
      */
     this.originalWrapper = new window['AmaraDFXPParser']();
-    this.originalWrapper.init(baseLanguageSubtitles);
+    this.originalWrapper['init'](baseLanguageSubtitles);
 
     /**
      * @type {Array.<unisubs.translate.TranslationWidget>}
@@ -53,7 +53,7 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
 
     var map = this.captionSet_.makeMap();
     goog.array.forEach(
-        this.originalWrapper.getSubtitles(),
+        this.originalWrapper['getSubtitles'](),
         function(originalNode, i) {
             var editableCaption = map[i];
             if (!editableCaption)
