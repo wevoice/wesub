@@ -1439,7 +1439,7 @@ class Workflow(models.Model):
     @property
     def allows_tasks(self):
         """Return wheter we can create tasks for a given workflow."""
-        return self.approve_enabled or self.review_enabled
+        return self.team.workflow_enabled
 
 
 # Tasks

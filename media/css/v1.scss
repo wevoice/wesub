@@ -1185,15 +1185,31 @@ div.upload-draft-modal {
     background: $fainter;
     display: none;
     margin-top: -2em;
-    padding: 0 1em;
+    padding: 2em;
     @include border-radius(4px);
 
     fieldset {
-        padding-bottom: 1.5em;
+        padding-bottom: 1em;
+
+        legend {
+            margin-bottom: -.5em;
+        }
+
+        label {
+            clear: both;
+        }
+
+        input {
+            @include border-box();
+        }
 
         .button {
             float: right;
         }
+    }
+
+    .notation {
+        color: $dark;
     }
 }
 .v1 .alpha .omega {

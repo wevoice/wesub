@@ -77,6 +77,7 @@ from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import get_language_choices, languages_with_labels
+from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.tasks import (
@@ -958,7 +959,7 @@ def leave_team(request, slug):
         member.delete()
         [application.on_member_leave(request.user, "web UI") for application in \
          member.team.applications.filter(status=Application.STATUS_APPROVED)]
-            
+
         notifier.team_member_leave(team_pk, tm_user_pk)
 
         messages.success(request, _(u'You have left this team.'))
@@ -1147,7 +1148,7 @@ def _get_task_filters(request):
 
 def _cache_video_url(tasks):
     team_video_pks = [t.team_video_id for t in tasks]
-    video_pks = Video.objects.filter(teamvideo__in=team_video_pks).values_list('id', flat=True)
+    video_pks = [t.team_video.video_id for t in tasks]
 
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
                        VideoUrl.objects.filter(video__in=video_pks, primary=True)])
@@ -1170,6 +1171,7 @@ def dashboard(request, slug):
         user_languages = set([ul for ul in user.get_languages()])
         user_filter = {'assignee':str(user.id),'language':'all'}
         user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
+        user_tasks = user_tasks.select_related('team_video')
         _cache_video_url(user_tasks)
     else:
         user_languages = None
@@ -1180,14 +1182,14 @@ def dashboard(request, slug):
     widget_settings = {}
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
-
+    
     workflow = team.get_workflow()
 
     videos = []
 
     allows_tasks = workflow and workflow.allows_tasks
 
-    if allows_tasks:
+    if member and allows_tasks:
 
         # TED's dashboard should only show TEDTalks tasks
         # http://i.imgur.com/fjjqx.gif
@@ -1201,14 +1203,13 @@ def dashboard(request, slug):
                                          project, filters,
                                          user))
 
-        tasks = tasks.select_related('team_video', 'team_video__team', 'team_video__project', 'team_video__video')
+        tasks = tasks.select_related('team_video', 'team_video__team',
+                                     'team_video__project', 'team_video__video')
 
-        _cache_video_url(tasks)
-
-        for task in tasks:
-            if member and not can_perform_task(user, task):
+        for task in chunkediter(tasks, 100):
+            if not can_perform_task(user, task):
                 continue
-            
+
             task_vid = task.team_video
 
             if not task_vid in videos:
@@ -1220,12 +1221,15 @@ def dashboard(request, slug):
 
             if len(videos) >= VIDEOS_ON_PAGE:
                 break
+        
+        for video in videos:
+            _cache_video_url(videos.tasks)
     else:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
-                videos.append(tv.teamvideo) 
+                videos.append(tv.teamvideo)
         else:
             lang_list = [l.language for l in user_languages]
 
@@ -1248,7 +1252,7 @@ def dashboard(request, slug):
         'can_add_video': can_add_video(team, request.user),
         'widget_settings': widget_settings
     }
-
+    
     return context
 
 @timefn
