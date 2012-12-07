@@ -76,14 +76,16 @@ def youtube_oauth_callback(request):
     """
     import atom
     code = request.GET.get("code", None)
-
-    if code is None:
-        raise Exception("No code in youtube oauth callback")
-
+    error = request.GET.get("error", None)
     state = request.GET.get("state", None)
 
-    if state is None:
-        raise Exception("No state in youtube oauth callback")
+    if error is not None:
+        messages.error(request, 'Youtube said: "%s"' % error)
+        return redirect('profiles:account')
+
+    if code is None or state is None:
+        messages.error(request, 'Error while linking.  Please try again.')
+        return redirect('profiles:account')
 
     state = json.loads(state)
 
