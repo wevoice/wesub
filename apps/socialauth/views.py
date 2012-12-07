@@ -48,9 +48,9 @@ def twitter_login(request, next=None):
     callback_url = None
     if next is not None:
         callback_url = '%s%s?next=%s' % \
-	 	    (get_url_host(request),
-			 reverse("socialauth_twitter_login_done"), 
-		     urlquote(next))
+            (get_url_host(request),
+             reverse("socialauth_twitter_login_done"),
+             urlquote(next))
     twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     request_token = twitter.fetch_request_token(callback_url)
     request.session['request_token'] = request_token.to_string()
@@ -64,22 +64,28 @@ def twitter_login_done(request):
     # If there is no request_token for session,
     # Means we didn't redirect user to twitter
     if not request_token:
-            # Redirect the user to the login page,
-            # So the user can click on the sign-in with twitter button
-            return HttpResponse("We didn't redirect you to twitter...")
-    
+        # Redirect the user to the login page,
+        # So the user can click on the sign-in with twitter button
+        return HttpResponse("We didn't redirect you to twitter...")
+
     token = oauth.OAuthToken.from_string(request_token)
-    
+
     # If the token from session and token from twitter does not match
     #   means something bad happened to tokens
     if token.key != request.GET.get('oauth_token', 'no-token'):
-            del request.session['request_token']
-            # Redirect the user to the login page
-            return HttpResponse("Something wrong! Tokens do not match...")
-    
-    twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)  
+        del request.session['request_token']
+
+        if request.GET.get('denied', None) is not None:
+            messages.info(request, "Twitter authorization cancelled.")
+            return redirect('profiles:account')
+
+        messages.error(request, "Something wrong! Tokens do not match...")
+        # Redirect the user to the login page
+        return redirect('auth:login')
+
+    twitter = oauthtwitter.TwitterOAuthClient(settings.TWITTER_CONSUMER_KEY, settings.TWITTER_CONSUMER_SECRET)
     access_token = twitter.fetch_access_token(token, oauth_verifier)
-    
+
     request.session['access_token'] = access_token.to_string()
 
     if request.session.get('no-login', False):
@@ -115,13 +121,13 @@ def twitter_login_done(request):
 
     request.session['access_token'] = access_token.to_string()
     user = authenticate(access_token=access_token)
-    
+
     # if user is authenticated then login user
     if user:
         if not user.userlanguage_set.exists():
             langs = get_user_languages_from_cookie(request)
             for l in langs:
-                UserLanguage.objects.get_or_create(user=user, language=l)        
+                UserLanguage.objects.get_or_create(user=user, language=l)
         login(request, user)
     else:
         # We were not able to authenticate user
@@ -181,7 +187,7 @@ def openid_done(request, provider=None):
                 langs = get_user_languages_from_cookie(request)
                 for l in langs:
                     UserLanguage.objects.get_or_create(user=user, language=l)
-                    
+
             login(request, user)
             next = None
             if 'openid_next' in request.session:
@@ -189,21 +195,21 @@ def openid_done(request, provider=None):
             if 'next' in request.GET:
                 next = request.GET['next']
             if next is not None and len(next.strip()) >  0 :
-                return HttpResponseRedirect(next)    
+                return HttpResponseRedirect(next)
             redirect_url = reverse('profiles:profile', args=(user,))
             return HttpResponseRedirect(redirect_url)
         else:
             return HttpResponseRedirect(settings.LOGIN_URL)
     else:
         return HttpResponseRedirect(settings.LOGIN_URL)
-    
+
 def facebook_login_done(request):
     API_KEY = settings.FACEBOOK_API_KEY
-    API_SECRET = settings.FACEBOOK_SECRET_KEY   
+    API_SECRET = settings.FACEBOOK_SECRET_KEY
     REST_SERVER = 'http://api.facebook.com/restserver.php'
     # FB Connect will set a cookie with a key == FB App API Key if the user has been authenticated
     if API_KEY in request.COOKIES:
-        signature_hash = get_facebook_signature(API_KEY, API_SECRET, request.COOKIES, True)                
+        signature_hash = get_facebook_signature(API_KEY, API_SECRET, request.COOKIES, True)
         # The hash of the values in the cookie to make sure they're not forged
         # AND If session hasn't expired
         if(signature_hash == request.COOKIES[API_KEY]) and (datetime.fromtimestamp(float(request.COOKIES[API_KEY+'_expires'])) > datetime.now()):
@@ -222,7 +228,7 @@ def facebook_login_done(request):
 
 def openid_login_page(request):
     return render_to_response('openid/index.html', {}, RequestContext(request))
-    
+
 def signin_complete(request):
     payload = {}
     return render_to_response('socialauth/signin_complete.html', payload, RequestContext(request))
@@ -253,21 +259,21 @@ def editprofile(request):
             return HttpResponseRedirect('.')
     if request.method == 'GET':
         edit_form = EditProfileForm(user = request.user)
-        
+
     payload = {'edit_form':edit_form}
     return render_to_response('socialauth/editprofile.html', payload, RequestContext(request))
 
 def social_logout(request):
     # Todo
     # still need to handle FB cookies, session etc.
-    
+
     # let the openid_consumer app handle openid-related cleanup
     from openid_consumer.views import signout as oid_signout
     oid_signout(request)
-    
+
     # normal logout
     logout_response = logout(request)
-    
+
     if getattr(settings, 'LOGOUT_REDIRECT_URL', None):
         return HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL)
     else:
