@@ -64,9 +64,9 @@ def twitter_login_done(request):
     # If there is no request_token for session,
     # Means we didn't redirect user to twitter
     if not request_token:
-            # Redirect the user to the login page,
-            # So the user can click on the sign-in with twitter button
-            return HttpResponse("We didn't redirect you to twitter...")
+        # Redirect the user to the login page,
+        # So the user can click on the sign-in with twitter button
+        return HttpResponse("We didn't redirect you to twitter...")
 
     token = oauth.OAuthToken.from_string(request_token)
 
