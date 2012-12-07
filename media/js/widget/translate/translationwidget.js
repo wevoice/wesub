@@ -42,7 +42,7 @@ unisubs.translate.TranslationWidget.prototype.getSubtitle = function(){
     return this.originalNode_;
 };
 unisubs.translate.TranslationWidget.prototype.getOriginalValue = function(){
-    return this.dfxpWrapper_.content(this.originalNode_);
+    return this.dfxpWrapper_['content'](this.originalNode_);
 };
 
 unisubs.translate.TranslationWidget.prototype.createDom = function() {
@@ -55,7 +55,7 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
     if (this.dialog_.reviewOrApprovalType_) {
         timingToDisplay = this.translationCaption_.getStartTime();
     } else {
-        timingToDisplay = this.dfxpWrapper_.startTime(this.originalNode_);
+        timingToDisplay = this.dfxpWrapper_['startTime'](this.originalNode_);
     }
 
     this.setElementInternal(
@@ -70,7 +70,7 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
         )
     );
 
-    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_.utils.markdownToHtml(this.getOriginalValue());
+    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_['utils']['markdownToHtml'](this.getOriginalValue());
     
     this.getHandler()
         .listen(
@@ -112,7 +112,7 @@ unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
         this.translateInput_.value = '';
 };
 unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
-    return this.dfxpWrapper_.getSubtitleIndex(this.originalNode_);
+    return this.dfxpWrapper_['getSubtitleIndex'](this.originalNode_);
 };
 
 /**
