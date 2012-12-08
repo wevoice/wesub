@@ -15,6 +15,11 @@
                     <a href="{% url profiles:profile user.username %}">{% trans "Profile" %}</a>
                 </li>
                 <li>
+                    <a href="{% url profiles:videos user.username %}">
+                    {% trans "Videos" %}
+                    </a>
+                </li>
+                <li>
                     <a href="{% url messages:inbox %}">
                     {% trans "Messages" %}
                     {% if user.unread_messages_count %}
