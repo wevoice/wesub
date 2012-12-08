@@ -723,9 +723,11 @@ def video_debug(request, video_id):
     lang_info = debug_video(video)
     vid = video.video_id
     get_subtitles_dict = {}
-    for l in video.subtitlelanguage_set.all():
+
+    for l in video.newsubtitlelanguage_set.all():
         cache_key = vc._subtitles_dict_key(vid, l.pk, None)
-        get_subtitles_dict[l.language] = cache.get(cache_key)
+        get_subtitles_dict[l.language_code] = cache.get(cache_key)
+
     cache = {
         "get_video_urls": cache.get(vc._video_urls_key(vid)),
         "get_subtitles_dict": get_subtitles_dict,
@@ -734,6 +736,7 @@ def video_debug(request, video_id):
         "get_video_languages_verbose": cache.get(vc._video_languages_verbose_key(vid)),
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }
+
     tasks = Task.objects.filter(team_video=video)
 
     is_youtube = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE).count() != 0
