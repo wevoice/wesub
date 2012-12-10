@@ -42,23 +42,25 @@ class UnisubsPage(Page):
         self.browser.get(self.base_url)
 
     def _current_user(self):
-        return self.get_text_by_css(self._CURRENT_USER)
+        if self.is_element_present(self._CURRENT_USER):
+            return self.get_text_by_css(self._CURRENT_USER)
     
     def logged_in(self):
-        if self.is_element_present(self._USER_MENU):
+        if self.is_element_present(self._CURRENT_USER):
             return True
 
     def log_out(self):
         if self.logged_in() == True:
             self.open_page('logout/?next=/auth/login/')
+
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
 
         """
         curr_page = self.browser.current_url
-        if self.logged_in() and self._current_user() == username:
+        if self._current_user() == username:
             return
-        if self.logged_in() and self._current_user() != username:
+        if self._current_user() is not None:
             self.log_out()
         if "login" not in curr_page: 
             self.click_by_css(self._LOGIN)
@@ -70,7 +72,8 @@ class UnisubsPage(Page):
         time.sleep(2)
 
     def current_teams(self):
-        """Returns the href value of any teams that use logged in user is currently a memeber.
+        """Returns the href value of any teams that use logged in user is 
+           currently a memeber.
 
         """
         user_teams = []

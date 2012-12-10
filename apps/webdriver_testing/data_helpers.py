@@ -80,25 +80,24 @@ def create_video(self, video_url=None):
     video, _ = Video.get_or_create_for_url(video_url)
     return video
 
+def upload_subs(self, video, data):
+    self.client.login(**self.auth)
+    response = self.client.post(reverse('videos:upload_subtitles'), data)
+    print response
 
 def create_video_with_subs(self, video_url=None, data=None):
     """Create a video and subtitles.
 
     """
-    self.client.login(**self.auth)
-    if not video_url:
-        video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-    video, _ = Video.get_or_create_for_url(video_url)
+    video = create_video(self, video_url)
     if not data:
-        data = {
-        'language_code': 'en',
-        'video_language': 'en',
-        'video': video.pk,
-        'draft': open('apps/videos/fixtures/test.srt'),
-        'is_complete': True
-    }
-    response = self.client.post(reverse('videos:upload_subtitles'), data)
-    #print response
+        data = {'language_code': 'en',
+                'video_language': 'en',
+                'video': video.pk,
+                'draft': open('apps/videos/fixtures/test.srt'),
+                'is_complete': True
+               }
+    upload_subs(self, video, data)
     return video
 
 

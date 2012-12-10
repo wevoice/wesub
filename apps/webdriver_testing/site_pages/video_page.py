@@ -23,6 +23,13 @@ class VideoPage(UnisubsPage):
     _EMBED_CODE = ("div#embed-modal.modal div.modal-body form fieldset "
         "textarea")
 
+    #TOP TABS
+    _URLS_TAB = 'a[href="#urls-tab"]'
+    _VIDEO_TAB = 'a[href="#video-tab"]'
+    _COMMENTS_TAB = 'a[href="#comments-tab"]'
+    _ACTIVITY_TAB = 'a[href="#activity-tab"]'
+
+
     _ADD_SUBTITLES = "a.add_subtitles"
 
     #VIDEO SIDE SECTION

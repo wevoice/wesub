@@ -1,6 +1,7 @@
 import datetime
 import factory
 from apps.videos.models import Video 
+from apps.videos.models import VideoUrl
 from apps.videos.models import SubtitleLanguage
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
@@ -16,6 +17,12 @@ from apps.messages.models import Message
 from apps.subtitles.models import SubtitleLanguage
 
 
+
+
+
+
+
+
 class VideoFactory(factory.Factory):
     """Creates a video using a sequence.
 
@@ -25,6 +32,14 @@ class VideoFactory(factory.Factory):
     description = "Greatest Video ever made"
     created = datetime.datetime.now()
 
+class VideoUrlFactory(factory.Factory):
+    """Create a video url to use in creating a video.
+
+    """
+    FACTORY_FOR = VideoUrl
+    type = 'HTML5'
+    url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
+    video = factory.SubFactory(VideoFactory)
 
 class UserFactory(factory.Factory):
     FACTORY_FOR = User

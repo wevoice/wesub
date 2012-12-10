@@ -428,7 +428,6 @@ class Page(object):
   
         """
         if isinstance(parent_el, basestring):
-            print "passed in css finding the element"
             if not self.is_element_present(parent_el):
                 return None
             else: 
@@ -436,12 +435,11 @@ class Page(object):
         try:
             print 'looking for %s under %s' % (child_el, parent_el.tag_name)
             child_els = parent_el.find_elements_by_css_selector(child_el)
-            print child_els
+            return child_els
         except NoSuchElementException:
             print 'Did not find any elements'
             return None
 
-        return child_els
 
 
     def open_page(self, url):
