@@ -83,7 +83,9 @@ from utils.forms import flatten_errorlists
 from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from utils.translation import get_language_choices, languages_with_labels
+from utils.translation import (
+    get_language_choices, languages_with_labels, get_user_languages_from_request
+)
 
 
 logger = logging.getLogger("teams.views")
@@ -1191,6 +1193,10 @@ def dashboard(request, slug):
             project = Project.objects.get(team=team, slug='tedtalks')
         else:
             project = None
+
+        if not user_languages:
+            user_languages = get_user_languages_from_request(request)
+            filters['language'] = user_languages[0]
 
         tasks = _order_tasks(request,
                              _tasks_list(request, team,
