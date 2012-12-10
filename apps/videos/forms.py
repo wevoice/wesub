@@ -430,7 +430,7 @@ class SubtitlesUploadForm(forms.Form):
 
         workflow = Workflow.get_for_team_video(team_video)
 
-        if not workflow.allows_tasks:
+        if not workflow.requires_review_or_approval:
             return new_version
 
         record_workflow_origin(new_version, team_video)
