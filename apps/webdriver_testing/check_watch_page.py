@@ -1,7 +1,11 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.site_pages import watch_page
 from apps.webdriver_testing.site_pages import video_page
+from apps.webdriver_testing.site_pages import search_results_page
 from apps.webdriver_testing.data_factories import UserFactory 
+from apps.webdriver_testing.data_factories import VideoFactory 
 from apps.webdriver_testing import data_helpers
 from django.core import management
 import datetime
@@ -36,6 +40,43 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         test_text = 'X factor'
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_results())
+
+    def test_search__subs_nonascii(self):
+        """Search for sub content with non-ascii char strings.
+ 
+        """
+        video = VideoFactory(title = "my test vid")
+        data = {
+                'language_code': 'zh-cn',
+                'video_language': 'zh-cn',
+                'video': video.pk,
+                'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.zh-cn.sbv'),
+                'is_complete': True
+               }
+
+        test_video = data_helpers.create_video_with_subs(self, 
+            video_url = "http://unisubs.example.com/test_nonascii.mp4", data = data)
+        management.call_command('rebuild_index', interactive=False)
+
+        #Search for: chinese chars by opening entering the text via javascript
+        #because webdriver can't type those characters.
+        self.browser.execute_script("document.getElementsByName('q')[1].value='不过这四个问题，事实上'")
+        results_pg = self.watch_pg.advanced_search()
+        self.assertTrue(results_pg.search_has_results())
+
+    def test_search__title_nonascii(self):
+        """Search title content with non-ascii char strings.
+ 
+        """
+        video = VideoFactory(title = u'不过这四个问题')
+        management.call_command('rebuild_index', interactive=False)
+
+        #Search for: chinese chars by opening entering the text via javascript
+        #because webdriver can't type those characters.
+        self.browser.execute_script("document.getElementsByName('q')[1].value='不过这四个问题'")
+        results_pg = self.watch_pg.advanced_search()
+        self.assertTrue(results_pg.search_has_results())
+        
 
     def test_search__sub_content(self):
         """Search contents in subtitle text.
