@@ -53,10 +53,10 @@ def upload_subtitles(context, video):
 
 @register.simple_tag
 def complete_color(language):
-    if not language.subtitles_complete:
-        return 'eighty'
+    if language.subtitles_complete:
+        return 'full language-is-complete'
     else:
-        return 'full'
+        return 'twenty language-is-not-complete'
 
 @register.inclusion_tag('videos/_video_url_panel.html', takes_context=True)
 def video_url_panel(context):
