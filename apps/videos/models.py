@@ -1121,7 +1121,7 @@ class SubtitleLanguage(models.Model):
         return qs
 
     def translations(self):
-        return SubtitleLanguage.objects.filter(video=self.video, is_original=False, is_forked=False)
+        return SubtitleLanguage.objects.filter(video=self.video, languge_code=self.video.primary_audio_language_code)
 
     def fork(self, from_version=None, user=None, result_of_rollback=False,
              attach_to_language=None, bypass_writelock=False):

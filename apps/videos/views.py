@@ -764,7 +764,7 @@ def reset_metadata(request, video_id):
 
 def _get_translations(video):
     original = video.subtitle_language()
-    translations = video.translations
+    translations = sub_models.SubtitleLanguage.objects.having_versions().filter(video=video)
     if original:
         translations = translations.exclude(pk=original.pk)
     translations = list(translations)
