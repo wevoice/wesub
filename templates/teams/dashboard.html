@@ -1,6 +1,6 @@
 {% extends "teams/base.html" %}
 
-{% load i18n to_json utils_tags teams_tags paginator markup media_compressor profiles_tags %}
+{% load i18n to_json utils_tags teams_tags paginator markup media_compressor profiles_tags videos_tags %}
 
 {% block title %}
     {% trans 'Dashboard' %} - {{ team }} | Amara
@@ -136,7 +136,12 @@
                                     <img src="{{ team_video.get_thumbnail }}" alt="{{ video.title }}">
                                 </a>
                                 <h4>
-                                    <a href="{{ team_video.video.get_absolute_url }}">{{ team_video.video.title_display|truncatewords:15 }}</a>
+                                    <a href="{{ team_video.video.get_absolute_url }}">
+                                        {{ team_video.video.title_display|truncatewords:15 }}
+                                        {% if team_video.video.duration %}
+                                            <span class="duration">{{ team_video.video.duration|format_duration }}</span>
+                                        {% endif %}
+                                    </a>
                                 </h4>
                             </div>
                             {% if team|is_team_member:user %}

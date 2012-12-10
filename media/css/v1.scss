@@ -712,10 +712,18 @@ div.fix-chosen div.chzn-container {
         position: absolute;
         @include border-box();
         bottom: 0; left: 1em;
-        padding: 1em;
+        padding: 1em 3em 1em 1em;
         width: 290px;
         background: rgba(0,0,0,.65);
         color: #fff;
+
+        span.duration {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-weight: normal;
+            font-size: 10px;
+        }
     }
 
     &:hover h4 a {
