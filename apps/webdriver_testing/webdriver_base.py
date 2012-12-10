@@ -39,7 +39,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         else:
             self.base_url = self.live_server_url + '/'
 
-        self.browser = webdriver.Firefox()  # BROWSER TO USE FOR TESTING
+        # BROWSER TO USE FOR TESTING - you can set TEST_BROWSER via os env to use 
+        # Chrome in place of the Firefox default.
+        test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
+        self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url)
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
