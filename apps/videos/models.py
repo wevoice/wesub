@@ -751,10 +751,9 @@ class Video(models.Model):
         l = self.subtitle_language()
         return l.get_description_display() if l else self.description
 
-
     @property
     def is_moderated(self):
-        return bool(self.moderated_by_id)
+        return not self.is_public
 
     def metadata(self):
         '''Return a dict of metadata for this video.
