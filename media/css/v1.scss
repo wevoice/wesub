@@ -712,7 +712,7 @@ div.fix-chosen div.chzn-container {
         position: absolute;
         @include border-box();
         bottom: 0; left: 1em;
-        padding: 1em 3em 1em 1em;
+        padding: 1em;
         width: 290px;
         background: rgba(0,0,0,.65);
         color: #fff;
@@ -2619,6 +2619,10 @@ a.truncated-expand {
 
     .listing.videos {
         li {
+
+            h4 a {
+                padding-right: 3em;
+            }
 
             .langs {
                 position: relative;
