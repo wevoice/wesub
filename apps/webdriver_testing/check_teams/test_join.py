@@ -29,8 +29,8 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
 
         """
         self.a_team_pg.open_page('teams/my-team')
-        self.assertIn('This team is invitation only.', 
-                      self.dashboard_welcome_message())
+        self.assertIn("We've got lots of great content that we'd love your ", 
+                      self.a_team_pg.dashboard_welcome_message())
 
     def test_join__authenticated(self):
         """Logged in user can join an open team.
@@ -120,7 +120,8 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
 
         """
         self.a_team_pg.open_page('teams/invitation-only/')
-        self.assertTrue(self.a_team_pg.join_exists())
+        self.assertIn('This team is invitation only.', 
+                      self.a_team_pg.dashboard_welcome_message())
 
     def test_join__authenticated(self):
         """Authenticated user can't join application-only team.

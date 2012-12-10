@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import auth_page
 from apps.webdriver_testing.site_pages import my_teams
+from apps.webdriver_testing.site_pages.teams import tasks_tab
+from apps.webdriver_testing.site_pages.teams import videos_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
+from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
+from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import UserFactory
- 
-from apps.teams.models import TeamMember
+from apps.webdriver_testing.data_factories import VideoFactory
+from apps.webdriver_testing.data_factories import WorkflowFactory
 
 class TestCaseTeamTasks(WebdriverTestCase):
     """Verify tasks creation, modification, assignment.
@@ -24,35 +27,57 @@ Tasks link opens the page with the tasks for the video
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.auth_pg = auth_page.AuthPage(self)
-        self.my_teams_pg = my_teams.MyTeam(self)
-        self.team = TeamMemberFactory.create(team__name='Roles Test',
-                                             team__slug='roles-test',
-                                             user__username='team_owner',
-                                             )
-        self.manager_test_user = TeamMemberFactory.create(team=self.team.team,
-                                 user=UserFactory.create(username=
-                                                         'promotedToManager'),
-                                 role=TeamMember.ROLE_CONTRIBUTOR)
-        self.admin_test_user = TeamMemberFactory.create(team=self.team.team,
-                                 user=UserFactory.create(username=
-                                                         'promotedToAdmin'),
-                                 role=TeamMember.ROLE_CONTRIBUTOR)
-        TeamProjectFactory.create(team=self.team.team,
-                                  name='my translation project',
-                                  workflow_enabled=True,
-                                  )
+        self.tasks_tab = tasks_tab.TasksTab(self)
+        self.videos_tab = videos_tab.VideosTab(self)
 
 
+        #Create a partner user to own the team.
+        self.user = UserFactory.create(
+            username='TestUser',
+            is_superuser = True,
+            is_partner = True)
+
+
+        #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
+        self.open_team = TeamMemberFactory.create(
+            team__name='Literal Video Version',
+            team__slug='literal-video-version',
+            team__workflow_enabled = True,
+            user = self.user,
+            ).team
+
+        #Create a member of the team
+        self.contributor = TeamContributorMemberFactory.create(
+            team = self.open_team,
+            user = UserFactory.create()
+            ).user
+
+
+        #Create a test video and add it to the team
+        self.test_video = VideoFactory.create()
+
+        TeamVideoFactory.create(
+            team=self.open_team, 
+            video=self.test_video,
+            added_by=self.user)
 
 
     def test_create(self):
         """Create a manual transcription task
         
         """
-        self.assertFalse('This test needs to be written.')
-        self.auth_pg.login('team_owner', 'password')
+        #Configure workflow with autocreate tasks set to False 
+        WorkflowFactory.create(
+            team = self.open_team,
+            autocreate_subtitle = False,
+            autocreate_translate = False,
+            review_allowed = 10)
 
-
+        self.videos_tab.log_in(self.user.username, 'password')
+        self.videos_tab.open_videos_tab(self.open_team.slug)
+        self.videos_tab.open_video_tasks(self.test_video.title)
+        self.tasks_tab.add_task(task_type = 'Transcribe')
+        self.assertTrue(self.tasks_tab.task_present('Transcribe', 
+            self.test_video.title))
 
 

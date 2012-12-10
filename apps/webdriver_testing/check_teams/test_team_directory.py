@@ -17,7 +17,7 @@ def setup_teams():
     print "creating some teams for testing"
     #create 5 open teams
     for x in range(5):
-        team = TeamMemberFactory.create(
+        TeamMemberFactory.create(
             team__name='my team ' + str(x),
             team__slug='my-team-' + str(x),
             user__username='open team owner' + str(x),
@@ -31,9 +31,9 @@ def setup_teams():
         team__description='this is the coolest, most creative team ever',
         user__username='cool guy',
         user__password='password'
-        )
-    TeamMemberFactory.create(team=team.team, user=cool_user)
-    TeamVideoFactory.create(team=team.team, added_by=cool_user)
+        ).team
+    TeamMemberFactory.create(team=team, user=cool_user)
+    TeamVideoFactory.create(team=team, added_by=cool_user)
 
     #create an application team with 3 members and 5 videos
     app_team = TeamMemberFactory.create(
@@ -42,11 +42,11 @@ def setup_teams():
         team__membership_policy=1,
         user__username='application owner',
         user__password='password'
-        )
-    TeamMemberFactory.create(team=app_team.team, user=UserFactory.create())
-    TeamMemberFactory.create(team=app_team.team, user=cool_user)
+        ).team
+    TeamMemberFactory.create(team=app_team, user=UserFactory.create())
+    TeamMemberFactory.create(team=app_team, user=cool_user)
     for x in range(5):
-        TeamVideoFactory.create(team=app_team.team, added_by=cool_user)
+        TeamVideoFactory.create(team=app_team, added_by=cool_user)
 
     #create 1 private team
     priv_team = TeamMemberFactory.create(
@@ -55,7 +55,9 @@ def setup_teams():
         team__membership_policy=1,
         team__is_visible=False,
         user__username='Id A Read',
-        user__password='password')
+        user__password='password').team
+
+    return team, app_team, priv_team
 
 
 class TestCaseTeamsPage(WebdriverTestCase):
@@ -63,7 +65,7 @@ class TestCaseTeamsPage(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.COOL_TEAM_NAME = "A1 Waay Cool team"
 
-        setup_teams()  # ADD TEST DATA
+        self.team, self.app_team, self.priv_team = setup_teams()  # ADD TEST DATA
         self.teams_pg = teams_page.TeamsPage(self)
         self.a_team_pg = a_team_page.ATeamPage(self)
         self.teams_pg.open_teams_page()
@@ -107,7 +109,8 @@ class TestCaseTeamsPage(WebdriverTestCase):
         """open a team page from the directory.
 
         """
-        self.teams_pg.click_link_text(self.COOL_TEAM_NAME)
+        cool_team_pg = self.teams_pg.open_team_with_link(self.team.slug)
+        self.assertTrue(cool_team_pg.is_team(self.team.name))
 
     def test_directory__sort_by_members_default(self):
         """Sort by number of members.

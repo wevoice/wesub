@@ -170,12 +170,11 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """Team video search for non-ascii char strings.
  
         """
-        #Search for: 日本語, by opening the url with query term.
-        #Using url because webdriver can't type those characters.
-        self.videos_tab.open_page('teams/' + self.team.slug + '/videos' +
-            '/?q=日本語')
+        #Search for: 日本語, by opening entering the text via javascript
+        #because webdriver can't type those characters.
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.browser.execute_script("document.getElementsByName('q')[1].value='日本語'")
         self.assertTrue(self.videos_tab.video_present(self.video_title))
-        #    "https://unisubs.sifterapp.com/issue/1498")
 
     def test_search__no_results(self):
         """Team video search returns no results.
@@ -622,6 +621,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         #Create a user who is not a member 
         non_member = UserFactory(username = 'non_member')
+        self.videos_tab.log_out()
         self.videos_tab.log_in(non_member.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))

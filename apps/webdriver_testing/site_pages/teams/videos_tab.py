@@ -63,7 +63,6 @@ class VideosTab(ATeamPage):
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
 
 
-
     def add_video(self, url, thumb=None, project=None):
         """Submits a video for the team via url.
 
@@ -164,10 +163,17 @@ class VideosTab(ATeamPage):
         """Click the action link for the video title.
 
         Current options are 'Tasks', 'Edit', and 'Remove'
+        Have to find the element, then click as clicking by link text
+        hangs on jenkins.
         """
         vid_element = self._video_element(video)
-        vid_element.find_element_by_link_text(action).click()
-        
+        link_els = self.get_sub_elements_list(vid_element, self._ADMIN_LINKS)
+        for el in link_els:
+            if el.text == action:
+                el.click()
+                break
+        else:
+            self.record_error("Can not find the requested action link")
 
 
     def _video_actions_present(self, video):
@@ -224,11 +230,10 @@ class VideosTab(ATeamPage):
 
 
     def open_video_tasks(self, video=None):
-        """Open the task page for a video.
+        """Open the task page for a video given the title.
 
         """
         self._click_video_action('Tasks', video)
-        return tasks_tab.TasksTab(self)
 
 
     def team_video_id(self, video):

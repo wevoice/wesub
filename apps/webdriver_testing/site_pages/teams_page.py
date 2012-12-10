@@ -2,7 +2,7 @@
 import time
 from nose.tools import assert_true, assert_false
 from unisubs_page import UnisubsPage
-
+from a_team_page import ATeamPage
 
 class TeamsPage(UnisubsPage):
     """
@@ -14,6 +14,7 @@ class TeamsPage(UnisubsPage):
     _SORT = "span.sort_label"
     _SORT_OPTION = "div.sort_button ul li a[href*='%s']"
     _TEAM = "ul.listing li"
+    _TEAM_LINK = 'h3 a[href*=%s]'
     _TEAM_NAME = 'a'
     _TEAM_MEMBERS = 'ul.actions h4'
     _TEAM_VIDEOS = 'ul.actions li:nth-child(2)'
@@ -87,4 +88,10 @@ class TeamsPage(UnisubsPage):
         descriptor_text = self.get_text_by_css(self._TEAM_DESCRIPTOR)
         if descriptor_text == "Private":
             return True
+
+    def open_team_with_link(self, team_slug):
+        self.click_by_css(self._TEAM_LINK % team_slug)
+        return ATeamPage(self)
+
+
 

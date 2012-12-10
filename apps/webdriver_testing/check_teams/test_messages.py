@@ -89,8 +89,6 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.a_team_pg.application_custom_message())
 
     def test_messages__promoted_admin(self):
-        self.skipTest("This test fails due to bug #1541, related to bug "
-            "#438 https://unisubs.sifterapp.com/projects/12298/issues/743000")
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)
         self.members_tab.edit_user(role="Admin")
@@ -99,12 +97,9 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.user_message_pg.impersonate(self.team_member.username)
         self.user_message_pg.open_messages()
         self.assertTrue(self._TEST_MESSAGES['NEW_ADMIN'] in 
-            self.user_message_pg.message_text(),
-            "#1541 messages not sent when user promoted to admin or manager")
+            self.user_message_pg.message_text())
 
     def test_messages__promoted_manager(self):
-        self.skipTest("This test fails due to bug #1541, related to bug "
-            "#438 https://unisubs.sifterapp.com/projects/12298/issues/743000")
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)
         self.members_tab.edit_user(role="Manager")
@@ -113,8 +108,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.user_message_pg.impersonate(self.team_member.username)
         self.user_message_pg.open_messages()
         self.assertTrue(self._TEST_MESSAGES['NEW_MANAGER'] in 
-            self.user_message_pg.message_text(),
-            "#1541 messages not sent when user promoted to admin or manager")
+            self.user_message_pg.message_text())
  
         
 
