@@ -41,5 +41,5 @@ class ShortUrlTest(TestCase):
         response = self.client.get(short_url)
         regular_url = reverse("videos:video", args=(self.video.video_id,))
         # short urls have no language path on the url, so take that out
-        regular_url = '/'.join(regular_url.split('/')[2:])
-        self.assertTrue(response['Location'].endswith(regular_url))
+        regular_url = regular_url[regular_url.find('/videos'):]
+        self.assertIn(regular_url , response['Location'])
