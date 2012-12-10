@@ -1437,9 +1437,9 @@ class Workflow(models.Model):
         return True if self.approve_allowed else False
 
     @property
-    def allows_tasks(self):
+    def requires_review_or_approval(self):
         """Return wheter we can create tasks for a given workflow."""
-        return self.team.workflow_enabled
+        return self.approve_enabled or self.review_enabled
 
 
 # Tasks
@@ -1818,7 +1818,8 @@ class Task(models.Model):
         sv = self.get_subtitle_version()
 
         # TL;DR take a look at #1206 to know why i did this
-        if self.workflow.allows_tasks and not self._can_publish_directly(sv):
+        if self.workflow.requires_review_or_approval and not self._can_publish_directly(sv):
+
             if self.workflow.review_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
                             new_subtitle_version=sv,
@@ -1855,7 +1856,8 @@ class Task(models.Model):
         sv = self.get_subtitle_version()
 
         # TL;DR take a look at #1206 to know why i did this
-        if self.workflow.allows_tasks and not self._can_publish_directly(sv):
+        if self.workflow.requires_review_or_approval and not self._can_publish_directly(sv):
+            
             if self.workflow.review_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
                             new_subtitle_version=sv,

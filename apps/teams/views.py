@@ -1185,13 +1185,9 @@ def dashboard(request, slug):
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
     
-    workflow = team.get_workflow()
-
     videos = []
 
-    allows_tasks = workflow and workflow.allows_tasks
-
-    if member and allows_tasks:
+    if member and team.workflow_enabled:
 
         # TED's dashboard should only show TEDTalks tasks
         # http://i.imgur.com/fjjqx.gif
@@ -1254,7 +1250,6 @@ def dashboard(request, slug):
         'member': member,
         'user_tasks': user_tasks,
         'videos': videos,
-        'allows_tasks': allows_tasks,
         'can_add_video': can_add_video(team, request.user),
         'widget_settings': widget_settings
     }

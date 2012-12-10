@@ -963,7 +963,7 @@ class Rpc(BaseRpc):
 
             return ('public', False) if not workflow.allows_tasks else ('private', False)
 
-        if not workflow.allows_tasks:
+        if not workflow.requires_review_or_approval:
             return 'public', False
         elif language.has_version:
             # If there are already active subtitles for this language, we're
