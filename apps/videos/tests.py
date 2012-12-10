@@ -2955,3 +2955,17 @@ Subtitles by the Amara.org community
         content = unicode(handler(subs, sv.language.video )).encode('utf-8')
 
         self.assertEquals(content.strip().replace('\r', ''), self.srt.strip())
+
+
+class ShortUrlTest(TestCase):
+    def setUp(self):
+        self.video = Video.get_or_create_for_url("http://example.com/hey.mp4")[0]
+
+    def test_short_url(self):
+        from videos.templatetags.videos_tags import shortlink_for_video
+        short_url = shortlink_for_video(self.video)
+        response = self.client.get(short_url)
+        regular_url = reverse("videos:video", args=(self.video.video_id,))
+        # short urls have no language path on the url, so take that out
+        regular_url = '/'.join(regular_url.split('/')[2:])
+        self.assertTrue(response['Location'].endswith(regular_url))

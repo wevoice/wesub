@@ -51,6 +51,7 @@ from django.core.urlresolvers import reverse
 from django.core.cache import cache
 from videos.rpc import VideosApiClass
 from utils.rpc import RpcRouter
+from utils.basexconverter import base62
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
@@ -194,7 +195,8 @@ def create_from_feed(request):
 
 create_from_feed.csrf_exempt = True
 
-def shortlink(request, pk):
+def shortlink(request, encoded_pk):
+    pk = base62.to_decimal(encoded_pk)
     video = get_object_or_404(Video, pk=pk)
     return redirect(video, video=video, permanent=True)
 

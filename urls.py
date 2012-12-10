@@ -178,7 +178,7 @@ urlpatterns = patterns('',
     url(r'^enterprise/non-profits/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'enterprise/non-profits.html'}, 'enterprise_non_profits'),
     ## Video shortlinks
-    url(r'^v/(?P<pk>\d+)/$', 'videos.views.shortlink', name='shortlink')
+    url(r'^v/(?P<encoded_pk>\w+)/$', 'videos.views.shortlink', name='shortlink')
 )
 
 try:

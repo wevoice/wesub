@@ -16,12 +16,17 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django import template
 
 register = template.Library()
 
+from django.contrib.sites.models import Site
+
 from videos.types import video_type_registrar, VideoTypeError
 from videos import permissions
+
+from utils.basexconverter import base62
 
 @register.inclusion_tag('videos/_video.html', takes_context=True)
 def render_video(context, video, display_views='total'):
@@ -180,3 +185,18 @@ def format_duration(value):
 
         # Provide 'No duration' message
         return 'No duration'
+
+
+def shortlink_for_video( video):
+    """Return a shortlink string for the video.
+
+    The pattern is http://amara.org/v/<pk>
+    """
+    protocol = getattr(settings, 'DEFAULT_PROTOCOL')
+    domain = Site.objects.get_current().domain
+    encoded_pk = base62.from_decimal(video.pk)
+    path = reverse('shortlink', args=[encoded_pk])
+
+    return u"{0}://{1}{2}".format(unicode(protocol),
+                                  unicode(domain), 
+                                  unicode(path))
