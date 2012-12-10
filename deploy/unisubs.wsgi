@@ -34,6 +34,8 @@ disabled_file_path = rel('unisubs', 'disabled')
 # instrumenting for tracelytics
 try:
     import oboeware.djangoware
+    from oboeware import OboeMiddleware
+    handler = OboeMiddleware(application, {'oboe.tracing_mode': 'always'}, layer="wsgi")
 except ImportError:
     # production, dev and local installs shouldn have that
     pass
