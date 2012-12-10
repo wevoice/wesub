@@ -392,7 +392,7 @@
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">
             <li>
-                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
+                <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
             </li>
         </ul>
     {% endif %}

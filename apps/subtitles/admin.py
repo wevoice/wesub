@@ -23,6 +23,10 @@ from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
                                    SubtitleVersion)
 
 
+class SubtitleVersionInline(admin.TabularInline):
+    model = SubtitleVersion
+    fields = ['version_number']
+    max_num = 0
 
 class SubtitleLanguageAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'language_code', 'version_count', 'tip',
@@ -33,6 +37,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
                     'unexpired_pending_collaborators',
                     'is_forked']
     list_filter = ['created', 'language_code']
+    
+    inlines = [SubtitleVersionInline]
     search_fields = ['video__title', 'video__video_id', 'language_code']
     raw_id_fields = ['video']
 
