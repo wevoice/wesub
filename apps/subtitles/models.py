@@ -781,6 +781,26 @@ class SubtitleLanguage(models.Model):
             qs = qs.exclude(pk__in=[u.pk for u in exclude if u])
         return qs
 
+    def in_progress(self):
+        """
+        Moderated teams:
+
+            It's in progress if it has an unapproved draft
+
+        Unmoderated teams:
+
+            It's in progress if it has subs but not marked as complete
+        """
+        if self.video.is_moderated:
+            if self.get_tip().is_private():
+                return True
+        else:
+            if not self.subtitles_complete and \
+                    self.get_tip().get_subtitle_count() > 0:
+                return True
+
+        return False
+
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -1026,6 +1046,7 @@ class SubtitleVersion(models.Model):
         return set(mapcat(_ancestors, self.parents.all()))
 
     def get_subtitle_count(self):
+        # TODO: babelsubs now supports len() on SubtitleSet instances
         return len([s for s in self.get_subtitles().subtitle_items()])
 
     def get_changes(self):
