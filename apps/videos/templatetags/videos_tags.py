@@ -179,7 +179,10 @@ def format_duration(value):
         # If number of seconds is greater than 0
         if seconds > 0 or minutes > 0 or days > 0 or hours > 0:
 
-            durationString += '%02d' % (seconds,)
+            if minutes == 0 and days == 0 and hours == 0:
+                durationString += '0:%02d' % (seconds,)
+            else:
+                durationString += '%02d' % (seconds,)
 
         # Return duration string
         return durationString.strip()
