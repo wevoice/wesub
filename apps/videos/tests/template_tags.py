@@ -17,10 +17,13 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from apps.videos.templatetags.subtitles_tags import language_url
+from apps.videos.templatetags.videos_tags import shortlink_for_video
 from apps.videos.tests.data import get_video, make_subtitle_language
+
 
 
 class TestTemplateTags(TestCase):
@@ -29,3 +32,14 @@ class TestTemplateTags(TestCase):
         sl = make_subtitle_language(v, 'en')
         self.assertIsNotNone(language_url(None, sl))
 
+class ShortUrlTest(TestCase):
+    def setUp(self):
+        self.video = get_video(1)
+
+    def test_short_url(self):
+        short_url = shortlink_for_video(self.video)
+        response = self.client.get(short_url)
+        regular_url = reverse("videos:video", args=(self.video.video_id,))
+        # short urls have no language path on the url, so take that out
+        regular_url = '/'.join(regular_url.split('/')[2:])
+        self.assertTrue(response['Location'].endswith(regular_url))

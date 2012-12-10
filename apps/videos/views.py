@@ -66,6 +66,7 @@ from apps.videos.share_utils import _add_share_panel_context_for_video, _add_sha
 from apps.videos.tasks import video_changed_tasks
 from apps.widget.views import base_widget_params
 from utils import send_templated_email
+from utils.basexconverter import base62
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
 from utils.rpc import RpcRouter
@@ -206,7 +207,8 @@ def create_from_feed(request):
 
 create_from_feed.csrf_exempt = True
 
-def shortlink(request, pk):
+def shortlink(request, encoded_pk):
+    pk = base62.to_decimal(encoded_pk)
     video = get_object_or_404(Video, pk=pk)
     return redirect(video, video=video, permanent=True)
 
