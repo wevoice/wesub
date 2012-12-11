@@ -708,6 +708,7 @@ MEDIA_BUNDLES = {
               "js/escape.js",
               "js/libs/chosen.jquery.min.js",
               "js/libs/chosen.ajax.jquery.js",
+              "js/libs/jquery.cookie.js",
               "js/unisubs.site.js",
             ],
         "closure_deps": "",

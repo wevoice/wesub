@@ -33,3 +33,30 @@ def email_confirmation_notification(context, force=False):
 
     context['notification_content'] = content
     return context
+
+@register.filter
+def show_youtube_prompt(request):
+    """
+    Returns a boolean for whether to show the Youtube syncing prompt.
+
+    Current logic is that we show it for:
+        * unauthenticated visitors
+        * authenticated users who haven't synced a YT account and haven't
+          dismissed the prompt
+    """
+
+    user = request.user if request.user.is_authenticated() else None
+
+    if not user:
+        return True
+
+    if request.COOKIES.get('hide-yt-prompt') == 'yes':
+        return False
+
+    accounts = user.third_party_accounts.all()
+    types = [a.get_type_display() for a in accounts]
+
+    if 'Youtube' not in types:
+        return True
+    else:
+        return False

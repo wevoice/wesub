@@ -1438,8 +1438,14 @@ class Workflow(models.Model):
 
     @property
     def requires_review_or_approval(self):
-        """Return wheter we can create tasks for a given workflow."""
+        """Return whether a given workflow requires review or approval."""
         return self.approve_enabled or self.review_enabled
+
+    @property
+    def requires_tasks(self):
+        """Return whether a given workflow requires the use of tasks."""
+        return (self.requires_review_or_approval or self.autocreate_subtitle
+                or self.autocreate_translate)
 
 
 # Tasks
