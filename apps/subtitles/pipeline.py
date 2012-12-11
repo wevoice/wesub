@@ -249,13 +249,15 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
     enough.
 
     """
-    workflow = team_video.get_workflow()
+    team = team_video.team
 
     # If the team does not use tasks, all versions are just public and we're
     # done here.  God help you if you have a team that has some existing tasks
     # and switches to "no tasks allowed".
-    if not workflow.allows_tasks:
+    if not team.workflow_enabled:
         return
+
+    workflow = team.get_workflow()
 
     # We know the workflow uses tasks.  However, the user may be able to bypass
     # the moderation system in some cases.
