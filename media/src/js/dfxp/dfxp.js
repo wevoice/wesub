@@ -40,6 +40,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     this.init = function(xml) {
 
+        if (typeof xml === 'undefined') {
+            return;
+        }
+
         if (typeof xml === 'string') {
             xml = $.parseXML(xml);
         }
