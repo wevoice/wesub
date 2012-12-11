@@ -945,7 +945,8 @@ class Rpc(BaseRpc):
         if not team_video:
             return 'public', False
 
-        workflow = Workflow.get_for_team_video(team_video)
+        team = team_video.team
+        workflow = team.get_workflow()
 
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
@@ -961,7 +962,7 @@ class Rpc(BaseRpc):
                         task.language = language.language_code
                         task.save()
 
-            return ('public', False) if not workflow.allows_tasks else ('private', False)
+            return ('public', False) if not team.workflow_enabled else ('private', False)
 
         if not workflow.requires_review_or_approval:
             return 'public', False

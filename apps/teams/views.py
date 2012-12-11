@@ -1544,6 +1544,9 @@ def assign_task_ajax(request, slug):
         task = form.cleaned_data['task']
         assignee = form.cleaned_data['assignee']
 
+        if not assignee:
+            return HttpResponseForbidden(_(u'Invalid assignment attempt - assignee is empty (%s).' % assignee))
+
         task.assignee = assignee
         task.set_expiration()
         task.save()
