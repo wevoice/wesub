@@ -227,11 +227,12 @@ class ThirdPartyAccountManager(models.Manager):
                     vt.update_subtitles(version, always_push_account)
                     already_updated = True
                     Meter('youtube.push.success').inc()
-                except:
+                except Exception, e:
                     Meter('youtube.push.fail').inc()
                     logger.error('Pushing to youtoube has failed.', extra={
                         'video': video.video_id,
-                        'vurl': vurl.pk
+                        'vurl': vurl.pk,
+                        'gdata_exception': str(e)
                     })
                 finally:
                     Meter('youtube.push.request').inc()
