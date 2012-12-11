@@ -500,6 +500,12 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
+
+            $('#youtube-prompt a.hide').click(function() {
+                $('#youtube-prompt').hide();
+                $.cookie('hide-yt-prompt', 'yes', { expires: 365 });
+                return false;
+            });
         },
 
         // Public
