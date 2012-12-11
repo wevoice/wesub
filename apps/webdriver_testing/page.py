@@ -467,7 +467,10 @@ class Page(object):
         else:
             if self.is_element_present(elements):
                 elem = self.browser.find_element_by_css_selector(elements)
-        elem.send_keys("PAGE_DOWN")
+        try:
+            elem.send_keys("PAGE_DOWN")
+        except: 
+            pass #Stupid but Chrome has page down issues.
 
     def select_from_chosen(self, ui_elem, values):
         """modified from https://gist.github.com/1768479.
@@ -504,7 +507,10 @@ class Page(object):
             # try one then do the other.
 
             if found:
-                result.send_keys("PAGE_DOWN")
+                try:
+                    result.send_keys("PAGE_DOWN")
+                except:
+                    pass #this is stupid but Chrome won't page down.
                 try:
                     result.click()
                 except:
