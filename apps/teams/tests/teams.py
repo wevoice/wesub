@@ -30,7 +30,7 @@ from widget.tests import create_two_sub_session, RequestMockup
 
 from subtitles.pipeline import add_subtitles
 
-from utils.test_utils import TestCaseMessagesMixin
+from utils import test_utils, test_factories
 from haystack.query import SearchQuerySet
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
@@ -44,29 +44,14 @@ def fix_teams_roles(teams=None):
 
 class TestNotification(TestCase):
 
-    fixtures = ["test.json"]
-
     def setUp(self):
         fix_teams_roles()
-        self.team = Team(name='test', slug='test')
-        self.team.save()
-
-        self.user = User.objects.all()[:1].get()
-        self.user.is_active = True
-        self.user.notify_by_email = True
-        self.user.email = 'test@test.com'
-        self.user.save()
-
+        self.team = test_factories.create_team()
+        self.user = test_factories.create_user()
         self.tm = TeamMember(team=self.team, user=self.user)
         self.tm.save()
-
-        v1 = Video.objects.all()[:1].get()
-        self.tv1 = TeamVideo(team=self.team, video=v1, added_by=self.user)
-        self.tv1.save()
-
-        v2 = Video.objects.exclude(pk=v1.pk)[:1].get()
-        self.tv2 = TeamVideo(team=self.team, video=v2, added_by=self.user)
-        self.tv2.save()
+        self.tv1 = test_factories.create_team_video(self.team, self.user)
+        self.tv2 = test_factories.create_team_video(self.team, self.user)
 
     def test_new_team_video_notification(self):
         #check initial data
@@ -94,7 +79,7 @@ class TestNotification(TestCase):
         self.user.save()
         tasks.add_videos_notification.delay()
         self.team = Team.objects.get(pk=self.team.pk)
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
         self.assertIn(self.user.email, mail.outbox[0].to[0] )
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 2)
@@ -159,21 +144,7 @@ class TestNotification(TestCase):
         TeamNotificationSetting.objects.notify_team(t3.pk, 'x')
 
 
-class TestTasks(TestCase):
-
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json", 'subtitle_fixtures.json']
-
-    def setUp(self):
-        self.tv = TeamVideo.objects.all()[0]
-        self.sl = SubtitleLanguage.objects.exclude(language='')[0]
-        self.team = Team.objects.all()[0]
-        tv = TeamVideo(team=self.team, video=self.sl.video, added_by=self.team.users.all()[:1].get())
-        tv.save()
-
-
 class TeamVideoTest(TestCase):
-
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json", 'subtitle_fixtures.json']
 
     def setUp(self):
         self.auth = {
@@ -181,14 +152,11 @@ class TeamVideoTest(TestCase):
             "password": u"admin"
         }
 
-        self.user = User.objects.get(username=self.auth["username"])
-        self.team = Team.objects.get(id=1)
+        self.user = test_factories.create_user(**self.auth)
+        self.team = test_factories.create_team()
 
-
-        tm = TeamMember.objects.get(user=self.user, team=self.team)
-        tm.role = TeamMember.ROLE_ADMIN
-        tm.save()
-
+        test_factories.create_team_member(self.team, self.user,
+                                          role=TeamMember.ROLE_ADMIN)
         reset_solr()
 
     def _get_team_videos(self):
@@ -224,6 +192,7 @@ class TeamVideoTest(TestCase):
         }
 
         response = self.client.post(url, data, follow=True)
+        test_utils.update_search_index.run_original()
         self.failUnlessEqual(response.status_code, 200)
         self.assertFalse(Team.objects.get(id=1).is_visible)
 
@@ -236,6 +205,7 @@ class TeamVideoTest(TestCase):
         data['is_visible'] = u'1'
 
         response = self.client.post(url, data, follow=True)
+        test_utils.update_search_index.run_original()
         self.failUnlessEqual(response.status_code, 200)
         self.assertTrue(Team.objects.get(id=1).is_visible)
 
@@ -246,15 +216,16 @@ class TeamVideoTest(TestCase):
             self.assertTrue(self._search_for_video(video))
 
     def test_wrong_project_team_fails(self):
-        video = Video.objects.filter(teamvideo__isnull=True)[0]
-        project = Project.objects.create(slug="one-project", team=self.team)
+        project = test_factories.create_project(self.team,
+                                                name="One Project")
+        team_video = test_factories.create_team_video(self.team, self.user,
+                                 description="", project=project)
 
-        team_video = TeamVideo.objects.create(video=video, team=self.team, description="",
-                                 added_by=self.user, project=project)
+        other_team = test_factories.create_team()
+        other_project = test_factories.create_project(other_team,
+                                                      name="Other Project")
 
-        self.assertTrue(team_video)
-
-        team_video.project = Project.objects.filter(~Q(team=self.team))[0]
+        team_video.project = other_project
 
         self.assertNotEquals(team_video.project, project)
         self.assertNotEquals(team_video.project.team, self.team)
@@ -268,15 +239,16 @@ class TeamVideoTest(TestCase):
 
 class TeamsTest(TestCase):
 
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def setUp(self):
         fix_teams_roles()
         self.auth = {
             "username": u"admin",
             "password": u"admin"
         }
-        self.user = User.objects.get(username=self.auth["username"])
+        self.user = test_factories.create_user(username=u'admin',
+                                               password=u'admin',
+                                               is_staff=True,
+                                               is_superuser=True)
         reset_solr()
 
     def _add_team_video(self, team, language, video_url):
@@ -344,11 +316,6 @@ class TeamsTest(TestCase):
 
         tv = TeamVideo.objects.order_by('-id')[0]
 
-        result = tasks.update_one_team_video.delay(tv.id)
-
-        if result.failed():
-            self.fail(result.traceback)
-
         return team, tv
 
     def _make_data(self, video_id, lang):
@@ -360,6 +327,7 @@ class TeamsTest(TestCase):
             }
 
     def _tv_search_record_list(self, team):
+        test_utils.update_team_video.run_original()
         url = reverse("teams:detail", kwargs={"slug": team.slug})
         response = self.client.get(url)
         return response.context['team_video_md_list']
@@ -370,7 +338,10 @@ class TeamsTest(TestCase):
         return response.context['team_video_md_list']
 
     def test_team_join_leave(self):
-        team = Team.objects.get(pk=1)
+        team = test_factories.create_team()
+        manager = test_factories.create_user()
+        test_factories.create_team_member(team, manager)
+
         join_url = reverse('teams:join_team', args=[team.slug])
         leave_url = reverse('teams:leave_team', args=[team.slug])
 
@@ -378,6 +349,7 @@ class TeamsTest(TestCase):
 
         #---------------------------------------
         self.assertTrue(team.is_open())
+        self.assertFalse(team.is_member(self.user))
         TeamMember.objects.filter(team=team, user=self.user).delete()
         self.assertFalse(team.is_member(self.user))
         response = self.client.get(join_url)
@@ -400,10 +372,10 @@ class TeamsTest(TestCase):
     def test_add_video(self):
         self.client.login(**self.auth)
 
-        team = Team.objects.get(pk=1)
-        TeamMember.objects.get_or_create(user=self.user, team=team)
-
-        self.assertTrue(team.users.count() > 1)
+        team = test_factories.create_team()
+        self.assertEqual(team.users.count(), 0)
+        test_factories.create_team_member(team, self.user)
+        self.assertEqual(team.users.count(), 1)
 
         for tm in team.members.all():
             tm.notify_by_email = True
@@ -416,11 +388,12 @@ class TeamsTest(TestCase):
 
     def test_team_video_delete(self):
         #this test can fail only on MySQL
-        team = Team.objects.get(pk=1)
-        tv = team.teamvideo_set.exclude(video__subtitlelanguage__language='')[:1].get()
+        team = test_factories.create_team()
+        video = test_factories.create_video()
+        tv = test_factories.create_team_video(team, self.user, video)
+
         # create a few languages with subs
-        from videos.tests.utils import create_langs_and_versions
-        video = tv.video
+        from videos.tests.videotestutils import create_langs_and_versions
         video.is_public = False
         video.moderated_by = team
         video.save()
@@ -443,7 +416,8 @@ class TeamsTest(TestCase):
         self.assertEqual(video.moderated_by, None)
 
     def test_complete_contents(self):
-        request = RequestMockup(User.objects.all()[0])
+        #request = RequestMockup(User.objects.all()[0])
+        request = RequestMockup(self.user)
         create_two_sub_session(request, completed=True)
 
         team, new_team_video = self._create_new_team_video()
@@ -464,11 +438,10 @@ class TeamsTest(TestCase):
     def test_detail_contents_after_edit(self):
         # make sure edits show up in search result from solr
         self.client.login(**self.auth)
-        team = Team.objects.get(pk=1)
-        tv = team.teamvideo_set.get(pk=1)
-        tv.title = ''
-        tv.description = ''
-        tv.save()
+        team = test_factories.create_team()
+        test_factories.create_team_member(team, self.user)
+        tv = test_factories.create_team_video(team, self.user,
+                                              description='')
         data = {
             "languages-MAX_NUM_FORMS": u"",
             "languages-INITIAL_FORMS": u"0",
@@ -497,10 +470,11 @@ class TeamsTest(TestCase):
     def test_detail_contents_after_remove(self):
         # make sure removals show up in search result from solr
         self.client.login(**self.auth)
-        team = Team.objects.get(pk=1)
+        team = test_factories.create_team()
+        test_factories.create_team_member(team, self.user)
+        tv = test_factories.create_team_video(team, self.user)
         num_team_videos = len(self._tv_search_record_list(team))
 
-        tv = team.teamvideo_set.get(pk=1)
         url = reverse("teams:remove_video", kwargs={"team_video_pk": tv.pk})
         self.client.post(url)
 
@@ -751,8 +725,7 @@ class TeamsTest(TestCase):
             pass
 
         #----------inviting to team-----------
-        user2 = User.objects.get(username="alerion")
-        TeamMember.objects.filter(user=user2, team=team).delete()
+        user2 = test_factories.create_user(password='alerion')
 
         member = TeamMember.objects.get(user=self.user, team=team)
         member.role = TeamMember.ROLE_OWNER
@@ -833,23 +806,27 @@ class TeamsTest(TestCase):
         self.assertNotIn(hidden.pk, teams_pks)
 
     def test_search_with_utf8(self):
-        team = Team.objects.get(pk=1)
-        video = Video.objects.get(pk=4)
+        title = (u'\u041f\u0435\u0442\u0443\u0445 '
+                 u'\u043e\u0442\u0436\u0438\u0433\u0430\u0435\u0442!!!')
+        # "Петух отжигает!!!"
+        team = test_factories.create_team()
+        test_factories.create_team_member(team, self.user)
+        video = test_factories.create_video(title=title)
 
         self.assertTrue(video.get_team_video() is None)
 
         team_video, _ = TeamVideo.objects.get_or_create(video=video, team=team,
                                                         added_by=self.user)
+        test_utils.update_team_video.run_original()
         url = reverse("teams:detail", kwargs={"slug": team.slug})
-        response = self.client.get(url + u"?q=Петух отжигает!!!")
+        response = self.client.get(url + u"?q=" + title)
         videos = response.context['team_video_md_list']
 
         self.assertEquals(len(videos), 1)
 
         video = videos[0]
 
-        self.assertEquals(video.title, u'\u041f\u0435\u0442\u0443\u0445 \u043e\u0442\u0436\u0438\u0433\u0430\u0435\u0442!!!')
-
+        self.assertEquals(video.title, title)
 
 from apps.teams.rpc import TeamsApiClass
 from utils.rpc import Error, Msg
@@ -957,15 +934,13 @@ class TestJqueryRpc(TestCase):
 
 class TeamsDetailQueryTest(TestCase):
 
-    fixtures = ["staging_users.json"]
-
     def setUp(self):
         fix_teams_roles()
         self.auth = {
             "username": u"admin",
             "password": u"admin"
         }
-        self.user = User.objects.get(username=self.auth["username"])
+        self.user = test_factories.create_user(**self.auth)
 
         self.client.login(**self.auth)
         from apps.testhelpers.views import _create_videos, _create_team_videos
@@ -1006,19 +981,12 @@ class TeamsDetailQueryTest(TestCase):
 
 
 class TestLanguagePreference(TestCase):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def setUp(self):
         fix_teams_roles()
-        self.auth = {
-            "username": u"admin",
-            "password": u"admin"
-        }
-        self.team = Team.objects.all()[0]
+        self.team = test_factories.create_team()
         self.langs_set = set([x[0] for x in settings.ALL_LANGUAGES])
         from apps.teams.cache import invalidate_lang_preferences
         invalidate_lang_preferences(self.team)
-
 
     def test_readable_lang(self):
         # no tlp, should be all languages
@@ -1248,7 +1216,7 @@ class TestInvites(TestCase):
         self.assertTrue(self.team.members.filter(user=self.user, team=self.team).exists())
 
 
-class TestApplication(TestCase, TestCaseMessagesMixin):
+class TestApplication(TestCase, test_utils.TestCaseMessagesMixin):
     def setUp(self):
         self.team, c = Team.objects.get_or_create(name='test', slug='test',membership_policy=Team.APPLICATION )
         self.owner = User.objects.create(username='test-owner')
@@ -1422,28 +1390,24 @@ class PartnerTest(TestCase):
 
 class BillingTest(TestCase):
 
-    fixtures = [
-        "staging_users.json",
-        "staging_videos.json",
-        "staging_teams.json"
-    ]
-
     def test_approved(self):
         from apps.teams.models import Workflow, BillingReport
         # from apps.teams.moderation_const import APPROVED
 
         self.assertEquals(0, Workflow.objects.count())
 
-        team = Team.objects.all()[0]
-        team.workflow_enabled = True
-        team.save()
+        team = test_factories.create_team(workflow_enabled=True)
+        user = test_factories.create_user()
+        team_member = test_factories.create_team_member(team, user)
+        video = test_factories.create_video()
+        team_video = test_factories.create_team_video(team, user, video)
 
         Workflow.objects.create(team=team, approve_allowed=20)
 
         self.assertEquals(1, Workflow.objects.count())
         self.assertTrue(team.get_workflow().approve_enabled)
 
-        language = SubtitleLanguage.objects.all()[0]
+        language = SubtitleLanguage.objects.create(video=video, language="en")
 
         subs = [
             (0, 1000, 'hello', {}),
