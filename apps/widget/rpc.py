@@ -941,7 +941,7 @@ class Rpc(BaseRpc):
 
             return (UNMODERATED, False) if not team.workflow_enabled else (WAITING_MODERATION, False)
 
-        if not workflow.requires_review_or_approval:
+        if not workflow.requires_tasks:
             return UNMODERATED, False
         elif sl.has_version:
             # If there are already active subtitles for this language, we're
