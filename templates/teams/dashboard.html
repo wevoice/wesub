@@ -146,7 +146,7 @@
                             </div>
                             {% if team|is_team_member:user %}
                                 <div class="langs">
-                                    {% if team|allows_tasks %}
+                                    {% if team.workflow_enabled %}
                                         {% if team_video.tasks|length > 1 %}
                                             <a href="#" class="dropdown">
                                                 {{ team_video.tasks|length }}
