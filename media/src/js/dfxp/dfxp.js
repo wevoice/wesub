@@ -40,7 +40,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     this.init = function(xml) {
 
-        if (typeof xml === 'undefined') {
+        // This second check for xml === null is for a specific IE9 bug.
+        if (typeof xml === 'undefined' || xml === null) {
             return;
         }
 
