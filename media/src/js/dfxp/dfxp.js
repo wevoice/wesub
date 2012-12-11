@@ -836,7 +836,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function(converToTimeExpression) {
+    this.xmlToString = function(convertToTimeExpression) {
         /*
          * Parse the working XML to a string.
          *
@@ -849,7 +849,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // If we want to get the DFXP string with milliseconds, we need to
         // just return the current state of the XML tree, since we always
         // convert to milliseconds on init (see init() above).
-        if (! converToTimeExpression) {
+        if (! convertToTimeExpression) {
             return this.utils.xmlToString(this.$xml.get(0));
         }
 
@@ -861,5 +861,3 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
 };
-
-
