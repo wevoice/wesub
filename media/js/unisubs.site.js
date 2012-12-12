@@ -500,6 +500,12 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
+
+            $('#youtube-prompt a.hide').click(function() {
+                $('#youtube-prompt').hide();
+                $.cookie('hide-yt-prompt', 'yes', { expires: 365 });
+                return false;
+            });
         },
 
         // Public
@@ -576,6 +582,14 @@ var Site = function(Site) {
             }
 
             that.Utils.truncateTextBlocks($('div.description'), 90);
+
+            // Display rendered subtitles instead of raw Markdown.
+            var dfxpInstance = new window.AmaraDFXPParser();
+            var $subtitles = $('ol.subtitles li.subtitle-item div.translation-text p');
+            for (var i = 0; i < $subtitles.length; i++) {
+                var subtitleText = $subtitles.eq(i);
+                subtitleText.html(dfxpInstance.utils.markdownToHtml(subtitleText.text()));
+            }
         },
         video_view: function() {
             $('.add_subtitles').click(function() {

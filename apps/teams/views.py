@@ -1225,7 +1225,7 @@ def dashboard(request, slug):
                 break
         
         for video in videos:
-            _cache_video_url(videos.tasks)
+            _cache_video_url(video.tasks)
     else:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
 

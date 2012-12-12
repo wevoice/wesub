@@ -30,7 +30,9 @@ from apps.videos.tasks import video_changed_tasks
 from apps.videos.tests.data import (
     get_video, get_user, make_subtitle_language
 )
-from apps.videos.tests.utils import WebUseTest, refresh_obj, _create_trans
+from apps.videos.tests.videotestutils import (
+    WebUseTest, refresh_obj, _create_trans
+)
 from apps.widget.rpc import Rpc
 from apps.widget.tests import (
     create_two_sub_dependent_session, create_two_sub_session, RequestMockup,

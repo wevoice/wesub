@@ -48,6 +48,7 @@ unisubs.timeline.TimelineSub.prototype.createDom = function() {
     unisubs.timeline.TimelineSub.superClass_.createDom.call(this);
     this.getElement().className = 'unisubs-timeline-sub';
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
+    this.$d = $d;
     var el = this.getElement();
     el.appendChild(this.textElem_ = $d('div', 'unisubs-subtext'));
     el.appendChild(
@@ -154,8 +155,11 @@ unisubs.timeline.TimelineSub.prototype.updateValues_ = function() {
     if (this.subtitle_.getEditableCaption().getText() !=
         this.existingSubText_)
     {
-        goog.dom.setTextContent(
-            this.textElem_, this.subtitle_.getEditableCaption().getText());
+        var frag = goog.dom.htmlToDocumentFragment(this.subtitle_.getEditableCaption().getHTML());
+        var newTextElem = this.$d('div', 'unisubs-subtext', frag);
+
+        goog.dom.replaceNode(newTextElem, this.textElem_);
+
         this.existingSubText_ = this.subtitle_.getEditableCaption().getText();
     }
     if (this.subtitle_.getEndTime() != this.existingSubEnd_ ||

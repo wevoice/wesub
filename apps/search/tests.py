@@ -27,6 +27,7 @@ from utils.rpc import RpcMultiValueDict
 from django.core.urlresolvers import reverse
 from videos.tasks import video_changed_tasks
 from videos.search_indexes import VideoIndex
+from utils import test_utils
 def reset_solr():
     # cause the default site to load
     from haystack import site
@@ -84,6 +85,7 @@ class TestSearch(TestCase):
             video.title = title
             video.save()
             video.update_search_index()
+            test_utils.update_search_index.run_original()
 
             result = rpc.search(rdata, self.user, testing=True)['sqs']
             self.assertTrue(video in [item.object for item in result], title)

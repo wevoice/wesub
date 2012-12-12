@@ -69,6 +69,23 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
     this.utils = {
+        leftPad: function(number, width, char) {
+            /*
+             * Left Pad a number to the given width, with zeros.
+             * From: http://stackoverflow.com/a/1267338/22468
+             *
+             * Returns: string
+             */
+
+            char = char || '0';
+            width -= number.toString().length;
+
+            if (width > 0) {
+                return new Array(width + (/\./.test(number) ? 2 : 1))
+                                .join(char) + number;
+            }
+            return number.toString();
+        },
         markdownToHtml: function(text) {
             /*
              * Convert text to Markdown-style rendered HTML with bold, italic,
@@ -112,6 +129,23 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 p(seconds, 2) +  ',' +
                 p(fraction, 3);
         },
+        rightPad: function(number, width, char) {
+            /*
+             * Right Pad a number to the given width, with zeros.
+             * From: http://stackoverflow.com/a/1267338/22468
+             *
+             * Returns: string
+             */
+
+            char = char || '0';
+            width -= number.toString().length;
+
+            if (width > 0) {
+                return number + new Array(width + (/\./.test(number) ? 2 : 1))
+                    .join(char);
+            }
+            return number.toString();
+        },
         timeExpressionToMilliseconds: function(timeExpression) {
             /*
              * Converts a time expression into milliseconds.
@@ -154,42 +188,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
             
             return xmlString;
-        },
-        leftPad: function(number, width, char) {
-            /*
-             * Left Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            char = char || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join(char) + number;
-            }
-            return number.toString();
-        },
-        rightPad: function(number, width, char) {
-            /*
-             * Right Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            char = char || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return number + new Array(width + (/\./.test(number) ? 2 : 1))
-                    .join(char);
-            }
-            return number.toString();
         }
-
 
     };
 
@@ -854,7 +853,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // If we want to get the DFXP string with milliseconds, we need to
         // just return the current state of the XML tree, since we always
         // convert to milliseconds on init (see init() above).
-        if (! convertToTimeExpression) {
+        if (!convertToTimeExpression) {
             return this.utils.xmlToString(this.$xml.get(0));
         }
 
