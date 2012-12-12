@@ -70,7 +70,7 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
         )
     );
 
-    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_['utils']['markdownToHtml'](this.getOriginalValue());
+    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_['markdownToHTML'](this.getOriginalValue());
     
     this.getHandler()
         .listen(

@@ -144,7 +144,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     var atLeastOneThingChanged = false;
 
     if (!goog.isNull(subtitles)) {
-        args['subtitles'] = this.captionSet_.x['xmlToString'](true);
+        args['subtitles'] = this.captionSet_.x['xmlToString'](true, true);
         atLeastOneThingChanged = true;
     }
 

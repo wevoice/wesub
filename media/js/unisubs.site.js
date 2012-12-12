@@ -588,7 +588,7 @@ var Site = function(Site) {
             var $subtitles = $('ol.subtitles li.subtitle-item div.translation-text p');
             for (var i = 0; i < $subtitles.length; i++) {
                 var subtitleText = $subtitles.eq(i);
-                subtitleText.html(dfxpInstance.utils.markdownToHtml(subtitleText.text()));
+                subtitleText.html(dfxpInstance.markdownToHTML(subtitleText.text()));
             }
         },
         video_view: function() {

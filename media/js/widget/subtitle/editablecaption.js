@@ -113,7 +113,7 @@ unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
 };
 unisubs.subtitle.EditableCaption.prototype.getHTML = function() {
     var rawText = this.x['content'](this.node);
-    return this.x['utils']['markdownToHtml'](rawText);
+    return this.x['markdownToHTML'](rawText);
 };
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
     return this.x['content'](this.node);

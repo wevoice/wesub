@@ -25,10 +25,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      */
 
     MARKUP_REPLACE_SEQ = [
-        // order matters, need to apply double markers first
-        [/(\*\*)([^\*]+)(\*\*)/g, "<span fontWeight='bold'>$2</span>"],
-        [/(\*)([^\*]+)(\*{1})/g, "<span fontStyle='italic'>$2</span>"],
-        [/(_)([^_]+)(_{1})/g, "<span textDecoratin='underline'>$2</span>"]
+        // Order matters, need to apply double markers first.
+        [/(\*\*)([^\*]+)(\*\*)/g, '<span fontWeight="bold">$2</span>'],
+        [/(\*)([^\*]+)(\*{1})/g, '<span fontStyle="italic">$2</span>'],
+        [/(_)([^_]+)(_{1})/g, '<span textDecoratin="underline">$2</span>']
     ];
     DFXP_REPLACE_SEQ = [
         ["span[fontWeight='bold']", "**"],
@@ -48,6 +48,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof xml === 'string') {
             xml = $.parseXML(xml);
         }
+
+        // TODO: We need to convert HTML inside of subtitles to Markdown text.
 
         // Store the original XML for comparison later.
         this.$originalXml = $(xml.documentElement).clone();
@@ -85,31 +87,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                                 .join(char) + number;
             }
             return number.toString();
-        },
-        markdownToHtml: function(text) {
-            /*
-             * Convert text to Markdown-style rendered HTML with bold, italic,
-             * underline, etc.
-             */
-
-            var replacements = [
-                { match: /(\*\*)([^\*]+)(\*\*)/g,
-                  replaceWith: "<b>$2</b>" },
-                { match: /(\*)([^\*]+)(\*{1})/g,
-                  replaceWith: "<i>$2</i>" },
-                { match: /(_)([^_]+)(_{1})/g,
-                  replaceWith: "<u>$2</u>" }
-            ];
-
-            for (var i = 0; i < replacements.length; i++) {
-                var match = replacements[i].match;
-                var replaceWith = replacements[i].replaceWith;
-
-                text = text.replace(match, replaceWith);
-            }
-
-            return text;
-
         },
         millisecondsToTimeExpression: function(milliseconds) {
             /*
@@ -336,7 +313,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
-        return this.utils.markdownToHtml(this.content($subtitle));
+        return this.markdownToHTML(this.content($subtitle));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
@@ -365,7 +342,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
     };
-    this.dfxpToMarkup = function(node) {
+    this.htmlToMarkdown = function(node) {
         /**
          * Coverts the dfxp spans to our markdowny syntax
          * in the node's children.
@@ -570,7 +547,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return (time >= this.startTime(subtitle) &&
                 time <= this.endTime(subtitle));
     };
-    this.markupToDFXP = function (input) {
+    this.markdownToHTML = function(input) {
         /**
          * This is *not* a parser. Just a quick hack to convert
          * or markdowny syntax emphasys and strong syntax to
@@ -840,27 +817,41 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function(convertToTimeExpression) {
+    this.xmlToString = function(convertToTimeExpression, convertMarkdownToHTML) {
         /*
          * Parse the working XML to a string.
          *
          * If `convertToTimeExpression` is specified, we convert current
          * `begin` and `end` attrubutes from the working format (milliseconds)
          * to time expressins, otherwise, output what we've got
+         *
+         * If `convertMarkdownToHTML` is specified, we convert each subtitle
+         * text from markdown-type strings to parsed HTML.
+         *
          * Returns: string
          */
 
-        // If we want to get the DFXP string with milliseconds, we need to
-        // just return the current state of the XML tree, since we always
-        // convert to milliseconds on init (see init() above).
-        if (!convertToTimeExpression) {
-            return this.utils.xmlToString(this.$xml.get(0));
+        // Create a cloned set of XML, so we don't modify the original.
+        var $cloned = this.$xml.clone();
+
+        // If we need to convert Markdown to HTML, do it here.
+        if (convertMarkdownToHTML) {
+            var $subtitles = $('div p', $cloned);
+
+            for (var i = 0; i < $subtitles.length; i++) {
+                var $subtitle = $subtitles.eq(i);
+                var convertedText = this.markdownToHTML($subtitle.text());
+
+                $subtitle.text(convertedText);
+            }
         }
 
-        // Since our back-end is expecting time expressions, we need to convert
+        // Since our back-end is expecting time expressions, we may need to convert
         // the working XML's times to time expressions.
-        var $cloned = this.$xml.clone();
-        this.convertTimes('timeExpression', $('div p', $cloned));
+        if (convertToTimeExpression) {
+            this.convertTimes('timeExpression', $('div p', $cloned));
+        }
+
         return this.utils.xmlToString($cloned.get(0));
     };
 
