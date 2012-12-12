@@ -44,7 +44,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url)
-        self.browser.implicitly_wait(3)
+        self.browser.implicitly_wait(1)
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')

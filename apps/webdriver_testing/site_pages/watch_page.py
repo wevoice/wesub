@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from video_listings import VideoListings
 from search_results_page import SearchResultsPage
-
+import time
 
 class WatchPage(VideoListings):
     """
@@ -33,17 +33,21 @@ class WatchPage(VideoListings):
         return SearchResultsPage(self)
 
     def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
-        if search_term:
-            self.type_by_css(self._SEARCH, search_term)
-
         self.click_by_css(self._SEARCH_PULLDOWN)
         if orig_lang:
+            print 'specifying the orig lang to search'
             self.select_option_by_text(self._SEARCH_ORIG_LANG, orig_lang)
         if trans_lang:
+            print 'specifying the translated language to search'
             self.select_option_by_text(self._SEARCH_TRANS_LANG, trans_lang)
-        
+               
+        if search_term:
+            print 'entering the search term'
+            self.type_by_css(self._SEARCH, search_term)
+            time.sleep(2)
+
         self.click_by_css(self._SEARCH_SUBMIT)
-        
+    
         return SearchResultsPage(self)
 
        
