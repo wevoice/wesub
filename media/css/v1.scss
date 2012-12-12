@@ -2742,3 +2742,58 @@ a.truncated-expand {
 .account-type-copy {
     display: none;
 }
+
+#youtube-prompt {
+    position: relative;
+    margin: 2em 0 3em;
+    padding: 2em 200px 2em 185px;
+    background: #f2f2f2;
+    @include border-radius(2px);
+
+    img {
+        position: absolute;
+        top: 50%;
+        left: 2em;
+        height: 50px;
+        margin-top: -25px;
+    }
+
+    h2 {
+        margin: 0;
+    }
+
+    p {
+        font-size: 14px;
+        color: #AF2B26;
+    }
+
+    ul {
+        position: absolute;
+        top: 2em;
+        right: 2em;
+
+        li {
+            padding-bottom: .5em;
+        }
+
+        a.proceed, a.proceed:visited, a.proceed:hover {
+            display: block;
+            background-color: $usblue;
+            border: 1px solid #0c4a70;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            padding: .5em;
+            text-align: center;
+            text-decoration: none;
+            text-shadow: 1px 1px 1px #0c4a70;
+            @include border-radius(3px);
+            @include vertical-gradient(#136aa1, $usblue);
+        }
+
+        a.hide {
+            display: block;
+            text-align: right;
+        }
+    }
+}

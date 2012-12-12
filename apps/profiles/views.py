@@ -194,7 +194,8 @@ def account(request):
         'edit_profile_page': True,
         'third_party': third_party_accounts,
         'twitters': twitters,
-        'facebooks': facebooks
+        'facebooks': facebooks,
+        'hide_prompt': True
     }
 
     return direct_to_template(request, 'profiles/account.html', context)
