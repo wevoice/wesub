@@ -32,7 +32,7 @@ if INSTALLATION == DEV:
     ADMINS = (
         ('Evan', 'ehazlett@pculture.org'),
     )
-    SITE_ID = 13
+    SITE_ID = 16
     SITE_NAME = 'unisubsdev'
     REDIS_DB = "3"
     EMAIL_SUBJECT_PREFIX = '[usubs-dev]'
@@ -40,7 +40,7 @@ if INSTALLATION == DEV:
     SOLR_ROOT = '/usr/share/'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == STAGING:
-    SITE_ID = 14
+    SITE_ID = 17
     SITE_NAME = 'unisubsstaging'
     REDIS_DB = "2"
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
