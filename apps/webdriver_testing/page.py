@@ -107,6 +107,9 @@ class Page(object):
         mouseAction.move_to_element(element).perform()
 
 
+
+
+
     def click_item_from_pulldown(self, menu_el, menu_item_el):
         """Open a hover pulldown and choose a displayed item.
 
@@ -236,6 +239,7 @@ class Page(object):
         """
         elem = self._safe_find(element)
         elem.send_keys(text)
+        time.sleep(1)
         elem.submit()
 
     def is_element_present(self, element):
@@ -523,10 +527,6 @@ class Page(object):
         print '-------------------'
         print 'Error at ' + self.browser.current_url
         print '-------------------'
-        screenshot_file = ('apps/webdriver_testing/' 
-                           'Results/%s.png' % self.id())
-        self.browser.get_screenshot_as_file(screenshot_file)
-        self.testcase.tearDown()
         raise ValueError(str(e))
 
 
