@@ -234,6 +234,7 @@ class VideosTab(ATeamPage):
 
         """
         self._click_video_action('Tasks', video)
+        return tasks_tab.TasksTab(self)
 
 
     def team_video_id(self, video):

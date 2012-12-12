@@ -247,10 +247,7 @@ class Page(object):
                 element)
         except NoSuchElementException:
             return False
-        if len(elements_found) > 0:
-            return True
-        else:
-            return False
+        return True
 
     def count_elements_present(self, element):
         """Return the number of elements (css) found on page.
@@ -526,8 +523,10 @@ class Page(object):
         print '-------------------'
         print 'Error at ' + self.browser.current_url
         print '-------------------'
-        #self.browser.get_screenshot_as_file(filename)
-        #self.testcase.tearDown()
+        screenshot_file = ('apps/webdriver_testing/' 
+                           'Results/%s.png' % self.id())
+        self.browser.get_screenshot_as_file(screenshot_file)
+        self.testcase.tearDown()
         raise ValueError(str(e))
 
 
