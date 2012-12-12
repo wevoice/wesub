@@ -42,7 +42,7 @@ class UnisubsPage(Page):
         self.browser.get(self.base_url)
 
     def _current_user(self):
-        if self.is_element_present(self._CURRENT_USER):
+        if self.is_element_visible(self._CURRENT_USER):
             return self.get_text_by_css(self._CURRENT_USER)
     
     def logged_in(self):

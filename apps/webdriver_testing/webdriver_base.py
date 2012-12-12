@@ -44,6 +44,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url)
+        self.browser.implicitly_wait(3)
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
@@ -62,14 +63,4 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.browser.quit()
         except: #But don't worry if you can't it may already be quit.
             pass
-        print self.existing_bugs_lookup()
-
-
-    def existing_bugs_lookup(self):
-        nameparts = self.id().split('.')
-        tid = '.'.join(nameparts[-3:])
-        print self.failureException()
-        return tid
-
-   
 

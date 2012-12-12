@@ -107,6 +107,9 @@ class Page(object):
         mouseAction.move_to_element(element).perform()
 
 
+
+
+
     def click_item_from_pulldown(self, menu_el, menu_item_el):
         """Open a hover pulldown and choose a displayed item.
 
@@ -236,6 +239,7 @@ class Page(object):
         """
         elem = self._safe_find(element)
         elem.send_keys(text)
+        time.sleep(1)
         elem.submit()
 
     def is_element_present(self, element):
@@ -247,10 +251,7 @@ class Page(object):
                 element)
         except NoSuchElementException:
             return False
-        if len(elements_found) > 0:
-            return True
-        else:
-            return False
+        return True
 
     def count_elements_present(self, element):
         """Return the number of elements (css) found on page.
@@ -526,8 +527,6 @@ class Page(object):
         print '-------------------'
         print 'Error at ' + self.browser.current_url
         print '-------------------'
-        #self.browser.get_screenshot_as_file(filename)
-        #self.testcase.tearDown()
         raise ValueError(str(e))
 
 

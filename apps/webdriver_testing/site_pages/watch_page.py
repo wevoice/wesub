@@ -29,7 +29,7 @@ class WatchPage(VideoListings):
         self.open_page(self._URL)
 
     def basic_search(self, search_term):
-        self.type_by_css(self._SEARCH, search_term + "\n")
+        self.submit_form_text_by_css(self._SEARCH, search_term)
         return SearchResultsPage(self)
 
     def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
