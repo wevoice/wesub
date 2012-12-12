@@ -32,7 +32,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     ];
     DFXP_REPLACE_SEQ = [
         ["span[fontWeight='bold']", "**"],
-        ["span[fontStyle='italic']", "*"]
+        ["span[fontStyle='italic']", "*"],
+        ["span[textDecoration='underline']", "_"]
     ];
 
     var that = this;
@@ -49,13 +50,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xml = $.parseXML(xml);
         }
 
-        // TODO: We need to convert HTML inside of subtitles to Markdown text.
+        // When we get subtitles from the server, they will contain DFXP-style
+        // formatting for bold, italic, etc. Convert them back to Markdown.
+        var $preXml = $(xml.documentElement);
+        var $preSubtitles = $('div p', $preXml);
+
+        for (var i = 0; i < $preSubtitles.length; i++) {
+            var $preSubtitle = $preSubtitles.eq(i);
+            this.dfxpToMarkdown($preSubtitle.get(0));
+        }
 
         // Store the original XML for comparison later.
-        this.$originalXml = $(xml.documentElement).clone();
+        this.$originalXml = $preXml.clone();
 
         // Store the working XML for local edits.
-        this.$xml = $(xml.documentElement).clone();
+        this.$xml = $preXml.clone();
 
         // Cache the query for the containing div.
         //
@@ -164,6 +173,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 xmlString = (new XMLSerializer()).serializeToString(xml);
             }
 
+            // Shield your eyes for the next 20 lines or so.
+            //
             // A hacky way of removing the default namespaces that get thrown in
             // from creating elements with jQuery. We can get around this by
             // using document.createElementNS, but when we convert subtitles
@@ -172,6 +183,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             //
             // TODO: Do something that makes more sense.
             xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
+
+            // Hey look, more hacks. For some reason, when the XML is spit to a
+            // string, the attributes are all lower-cased. Fix them here.
+            xmlString = xmlString.replace(/textdecoration/g, 'textDecoration');
+            xmlString = xmlString.replace(/fontweight/g, 'fontWeight');
+            xmlString = xmlString.replace(/fontstyle/g, 'fontStyle');
             
             return xmlString;
         }
@@ -353,7 +370,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.dfxpToMarkdown = function(node) {
         /**
-         * Coverts the dfxp spans to our markdowny syntax
+         * Coverts the DFXP spans to our markdowny syntax
          * in the node's children.
          * @param node
          * @return The node, modified in place
@@ -369,10 +386,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             selector = DFXP_REPLACE_SEQ[i][0];
             marker = DFXP_REPLACE_SEQ[i][1];
             targets = $(selector, node);
+
             targets.replaceWith(function(i, x) {
                 return marker + $(this).text() + marker;
             });
         }
+
         return node;
     };
     this.endTime = function(indexOrElement, endTime) {
