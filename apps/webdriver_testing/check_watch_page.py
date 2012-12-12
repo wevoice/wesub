@@ -121,8 +121,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for videos by text, video lang and translation.
  
         """
+        self.browser.execute_script("document.getElementsByName('q')[1].value='subs'")
         results_pg = self.watch_pg.advanced_search(
-            search_term = 'subs',
             orig_lang = 'Arabic', 
             trans_lang='English')
         self.assertTrue(results_pg.search_has_results())
