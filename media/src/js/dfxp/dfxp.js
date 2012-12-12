@@ -28,7 +28,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Order matters, need to apply double markers first.
         [/(\*\*)([^\*]+)(\*\*)/g, '<span fontWeight="bold">$2</span>'],
         [/(\*)([^\*]+)(\*{1})/g, '<span fontStyle="italic">$2</span>'],
-        [/(_)([^_]+)(_{1})/g, '<span textDecoratin="underline">$2</span>']
+        [/(_)([^_]+)(_{1})/g, '<span textDecoration="underline">$2</span>']
     ];
     DFXP_REPLACE_SEQ = [
         ["span[fontWeight='bold']", "**"],
@@ -163,6 +163,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             } else {
                 xmlString = (new XMLSerializer()).serializeToString(xml);
             }
+
+            // A hacky way of removing the default namespaces that get thrown in
+            // from creating elements with jQuery. We can get around this by
+            // using document.createElementNS, but when we convert subtitles
+            // from Markdown to HTML, we use jQuery to create multiple elements
+            // on the fly from a string.
+            //
+            // TODO: Do something that makes more sense.
+            xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
             
             return xmlString;
         }
@@ -842,7 +851,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 var $subtitle = $subtitles.eq(i);
                 var convertedText = this.markdownToHTML($subtitle.text());
 
-                $subtitle.text(convertedText);
+                // If the converted text is different from the subtitle text, it
+                // means we were able to convert some Markdown to HTML.
+                if (convertedText != $subtitle.text()) {
+
+                    // First, empty out the subtitle's text.
+                    $subtitle.text('');
+                    
+                    // Append the new node structure to the subtitle node.
+                    $subtitle.append($(convertedText));
+                }
             }
         }
 
