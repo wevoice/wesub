@@ -35,6 +35,7 @@ class WatchPage(VideoListings):
     def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
         if search_term:
             self.type_by_css(self._SEARCH, search_term)
+            time.sleep(1)
 
         self.click_by_css(self._SEARCH_PULLDOWN)
         if orig_lang:
