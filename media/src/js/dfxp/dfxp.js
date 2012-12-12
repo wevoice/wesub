@@ -32,7 +32,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     ];
     DFXP_REPLACE_SEQ = [
         ["span[fontWeight='bold']", "**"],
-        ["span[fontStyle='italic']", "*"]
+        ["span[fontStyle='italic']", "*"],
+        ["span[textDecoration='underline']", "_"]
     ];
 
     var that = this;
@@ -49,13 +50,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xml = $.parseXML(xml);
         }
 
-        // TODO: We need to convert HTML inside of subtitles to Markdown text.
+        // When we get subtitles from the server, they will contain DFXP-style
+        // formatting for bold, italic, etc. Convert them back to Markdown.
+        var $preXml = $(xml.documentElement);
+        var $preSubtitles = $('div p', $preXml);
+
+        for (var i = 0; i < $preSubtitles.length; i++) {
+            var $preSubtitle = $preSubtitles.eq(i);
+            this.dfxpToMarkdown($preSubtitle.get(0));
+        }
 
         // Store the original XML for comparison later.
-        this.$originalXml = $(xml.documentElement).clone();
+        this.$originalXml = $preXml.clone();
 
         // Store the working XML for local edits.
-        this.$xml = $(xml.documentElement).clone();
+        this.$xml = $preXml.clone();
 
         // Cache the query for the containing div.
         //
@@ -164,6 +173,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 xmlString = (new XMLSerializer()).serializeToString(xml);
             }
 
+            // Shield your eyes for the next 20 lines or so.
+            //
             // A hacky way of removing the default namespaces that get thrown in
             // from creating elements with jQuery. We can get around this by
             // using document.createElementNS, but when we convert subtitles
@@ -172,6 +183,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             //
             // TODO: Do something that makes more sense.
             xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
+
+            // Hey look, more hacks. For some reason, when the XML is spit to a
+            // string, the attributes are all lower-cased. Fix them here.
+            xmlString = xmlString.replace(/textdecoration/g, 'textDecoration');
+            xmlString = xmlString.replace(/fontweight/g, 'fontWeight');
+            xmlString = xmlString.replace(/fontstyle/g, 'fontStyle');
             
             return xmlString;
         }
@@ -351,9 +368,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
     };
-    this.htmlToMarkdown = function(node) {
+    this.dfxpToMarkdown = function(node) {
         /**
-         * Coverts the dfxp spans to our markdowny syntax
+         * Coverts the DFXP spans to our markdowny syntax
          * in the node's children.
          * @param node
          * @return The node, modified in place
@@ -369,10 +386,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             selector = DFXP_REPLACE_SEQ[i][0];
             marker = DFXP_REPLACE_SEQ[i][1];
             targets = $(selector, node);
+
             targets.replaceWith(function(i, x) {
                 return marker + $(this).text() + marker;
             });
         }
+
         return node;
     };
     this.endTime = function(indexOrElement, endTime) {
@@ -556,7 +575,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return (time >= this.startTime(subtitle) &&
                 time <= this.endTime(subtitle));
     };
-    this.markdownToHTML = function(input) {
+    this.markdownToDFXP = function(input) {
         /**
          * This is *not* a parser. Just a quick hack to convert
          * or markdowny syntax emphasys and strong syntax to
@@ -570,6 +589,31 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 MARKUP_REPLACE_SEQ[i][1]);
         }
         return input;
+    };
+    this.markdownToHTML = function(text) {
+        /*
+         * Convert text to Markdown-style rendered HTML with bold, italic,
+         * underline, etc.
+         */
+
+        var replacements = [
+            { match: /(\*\*)([^\*]+)(\*\*)/g,
+              replaceWith: "<b>$2</b>" },
+            { match: /(\*)([^\*]+)(\*{1})/g,
+              replaceWith: "<i>$2</i>" },
+            { match: /(_)([^_]+)(_{1})/g,
+              replaceWith: "<u>$2</u>" }
+        ];
+
+        for (var i = 0; i < replacements.length; i++) {
+            var match = replacements[i].match;
+            var replaceWith = replacements[i].replaceWith;
+
+            text = text.replace(match, replaceWith);
+        }
+
+        return text;
+
     };
     this.needsAnySynced = function() {
         /*
@@ -826,7 +870,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function(convertToTimeExpression, convertMarkdownToHTML) {
+    this.xmlToString = function(convertToTimeExpression, convertMarkdownToDFXP) {
         /*
          * Parse the working XML to a string.
          *
@@ -834,8 +878,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * `begin` and `end` attrubutes from the working format (milliseconds)
          * to time expressins, otherwise, output what we've got
          *
-         * If `convertMarkdownToHTML` is specified, we convert each subtitle
-         * text from markdown-type strings to parsed HTML.
+         * If `convertMarkdownToDFXP` is specified, we convert each subtitle
+         * text from markdown-type strings to parsed DFXP.
          *
          * Returns: string
          */
@@ -843,16 +887,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Create a cloned set of XML, so we don't modify the original.
         var $cloned = this.$xml.clone();
 
-        // If we need to convert Markdown to HTML, do it here.
-        if (convertMarkdownToHTML) {
+        // If we need to convert Markdown to DFXP, do it here.
+        if (convertMarkdownToDFXP) {
             var $subtitles = $('div p', $cloned);
 
             for (var i = 0; i < $subtitles.length; i++) {
                 var $subtitle = $subtitles.eq(i);
-                var convertedText = this.markdownToHTML($subtitle.text());
+                var convertedText = this.markdownToDFXP($subtitle.text());
 
                 // If the converted text is different from the subtitle text, it
-                // means we were able to convert some Markdown to HTML.
+                // means we were able to convert some Markdown to DFXP.
                 if (convertedText != $subtitle.text()) {
 
                     // First, empty out the subtitle's text.
