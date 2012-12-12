@@ -21,7 +21,7 @@ from subtitles.models import SubtitleLanguage
 from django.template import RequestContext
 from django.shortcuts import render_to_response, get_object_or_404
 
-def edit_subtitles(request, video_id, language_code, task_id=None):
+def subtitle_editor(request, video_id, language_code, task_id=None):
     # FIXME permissions the motherf
     video = get_object_or_404(Video, video_id=video_id)
     # FIXME: validate language code
