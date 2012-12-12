@@ -351,7 +351,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
     };
-    this.htmlToMarkdown = function(node) {
+    this.dfxpToMarkdown = function(node) {
         /**
          * Coverts the dfxp spans to our markdowny syntax
          * in the node's children.
@@ -556,7 +556,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return (time >= this.startTime(subtitle) &&
                 time <= this.endTime(subtitle));
     };
-    this.markdownToHTML = function(input) {
+    this.markdownToDFXP = function(input) {
         /**
          * This is *not* a parser. Just a quick hack to convert
          * or markdowny syntax emphasys and strong syntax to
@@ -570,6 +570,31 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 MARKUP_REPLACE_SEQ[i][1]);
         }
         return input;
+    };
+    this.markdownToHTML = function(text) {
+        /*
+         * Convert text to Markdown-style rendered HTML with bold, italic,
+         * underline, etc.
+         */
+
+        var replacements = [
+            { match: /(\*\*)([^\*]+)(\*\*)/g,
+              replaceWith: "<b>$2</b>" },
+            { match: /(\*)([^\*]+)(\*{1})/g,
+              replaceWith: "<i>$2</i>" },
+            { match: /(_)([^_]+)(_{1})/g,
+              replaceWith: "<u>$2</u>" }
+        ];
+
+        for (var i = 0; i < replacements.length; i++) {
+            var match = replacements[i].match;
+            var replaceWith = replacements[i].replaceWith;
+
+            text = text.replace(match, replaceWith);
+        }
+
+        return text;
+
     };
     this.needsAnySynced = function() {
         /*
@@ -826,7 +851,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().length;
     };
-    this.xmlToString = function(convertToTimeExpression, convertMarkdownToHTML) {
+    this.xmlToString = function(convertToTimeExpression, convertMarkdownToDFXP) {
         /*
          * Parse the working XML to a string.
          *
@@ -834,8 +859,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * `begin` and `end` attrubutes from the working format (milliseconds)
          * to time expressins, otherwise, output what we've got
          *
-         * If `convertMarkdownToHTML` is specified, we convert each subtitle
-         * text from markdown-type strings to parsed HTML.
+         * If `convertMarkdownToDFXP` is specified, we convert each subtitle
+         * text from markdown-type strings to parsed DFXP.
          *
          * Returns: string
          */
@@ -843,16 +868,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Create a cloned set of XML, so we don't modify the original.
         var $cloned = this.$xml.clone();
 
-        // If we need to convert Markdown to HTML, do it here.
-        if (convertMarkdownToHTML) {
+        // If we need to convert Markdown to DFXP, do it here.
+        if (convertMarkdownToDFXP) {
             var $subtitles = $('div p', $cloned);
 
             for (var i = 0; i < $subtitles.length; i++) {
                 var $subtitle = $subtitles.eq(i);
-                var convertedText = this.markdownToHTML($subtitle.text());
+                var convertedText = this.markdownToDFXP($subtitle.text());
 
                 // If the converted text is different from the subtitle text, it
-                // means we were able to convert some Markdown to HTML.
+                // means we were able to convert some Markdown to DFXP.
                 if (convertedText != $subtitle.text()) {
 
                     // First, empty out the subtitle's text.

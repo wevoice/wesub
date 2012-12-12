@@ -587,8 +587,12 @@ var Site = function(Site) {
             var dfxpInstance = new window.AmaraDFXPParser();
             var $subtitles = $('ol.subtitles li.subtitle-item div.translation-text p');
             for (var i = 0; i < $subtitles.length; i++) {
-                var subtitleText = $subtitles.eq(i);
-                subtitleText.html(dfxpInstance.markdownToHTML(subtitleText.text()));
+
+                var $subtitle = $subtitles.eq(i);
+                dfxpInstance.dfxpToMarkdown($subtitle.get(0));
+                var html = dfxpInstance.markdownToHTML($subtitle.text());
+
+                $subtitle.html(html);
             }
         },
         video_view: function() {
