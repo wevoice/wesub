@@ -105,7 +105,7 @@ class SubtitleEditor(EditorDialogs):
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
-            time.sleep(4)
+            time.sleep(3)
             self.click_by_css(self._SYNC)
         time.sleep(1)
         self.pause()

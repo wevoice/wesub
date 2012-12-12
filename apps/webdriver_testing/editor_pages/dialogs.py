@@ -47,7 +47,7 @@ class EditorDialogs(Page):
         self.click_by_css(self._DONE)
 
     def continue_past_help(self, skip=True):
-        time.sleep(3)
+        time.sleep(5)
         if self.is_element_present(self._HOW_TO):
             if skip:
                 self.click_by_css(self._CHECKBOX)
