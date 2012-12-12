@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from video_listings import VideoListings
 from search_results_page import SearchResultsPage
-
+import time
 
 class WatchPage(VideoListings):
     """
