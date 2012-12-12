@@ -843,7 +843,6 @@ class Rpc(BaseRpc):
             forked, new_description, task_id, task_notes, task_approved,
             task_type, save_for_later)
 
-
     def _create_review_or_approve_task(self, subtitle_version):
         team_video = subtitle_version.video.get_team_video()
         lang = subtitle_version.subtitle_language.language
@@ -1085,7 +1084,7 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.subtitle_version = new_version
+                task.newsubtitle_version = new_version
 
             task.save()
 
@@ -1093,8 +1092,8 @@ class Rpc(BaseRpc):
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.subtitle_version.subtitle_language.release_writelock()
-            task.subtitle_version.subtitle_language.followers.add(request.user)
+            task.newsubtitle_version.subtitle_language.release_writelock()
+            task.newsubtitle_version.subtitle_language.followers.add(request.user)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
@@ -1123,19 +1122,20 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.subtitle_version = new_version
+                task.newsubtitle_version = new_version
+
             task.save()
 
             if not save_for_later:
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.subtitle_version.subtitle_language.release_writelock()
+            task.newsubtitle_version.subtitle_language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                api_subtitles_approved.send(task.subtitle_version)
+                api_subtitles_approved.send(task.newsubtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                api_subtitles_rejected.send(task.subtitle_version)
+                api_subtitles_rejected.send(task.newsubtitle_version)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
