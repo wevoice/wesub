@@ -101,6 +101,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             /*
              * Parses milliseconds into a time expression.
              */
+
             if (milliseconds === -1 || milliseconds === undefined || milliseconds === null) {
                 throw Error("Invalid milliseconds to be converted" + milliseconds);
             }
@@ -347,11 +348,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * in the 'begin' and 'end' attributes, IN PLACE.
          */
         var convertFn = null;
-        if (toFormat === 'milliseconds'){
+        if (toFormat === 'milliseconds') {
             convertFn = that.utils.timeExpressionToMilliseconds;
-        }else if (toFormat=== 'timeExpression'){
+        } else if (toFormat === 'timeExpression') {
             convertFn = that.utils.millisecondsToTimeExpression;
-        }else{
+        } else {
             throw new Error("Unsoported time convertion " + toFormat);
         }
         for (var i = 0; i < $subtitles.length; i++) {
