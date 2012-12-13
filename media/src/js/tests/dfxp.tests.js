@@ -13,10 +13,8 @@ describe('DFXP', function() {
 
         });
         it('should convert DFXP-style formatting to Markdown', function() {
-            /*
-             * The very last subtitle has DFXP-style formatting that should've
-             * been converted to Markdown.
-             */
+            // The very last subtitle has DFXP-style formatting that should've
+            // been converted to Markdown.
 
             var lastSubtitle = parser.getLastSubtitle();
             var content = parser.content(lastSubtitle);
@@ -25,19 +23,15 @@ describe('DFXP', function() {
 
         });
         it('should store two separate instances of XML', function() {
-            /*
-             * The original XML and the working XML should not be the same
-             * object.
-             */
+            // The original XML and the working XML should not be the same
+            // object.
 
             expect(parser.$originalXml === parser.$xml).toBe(false);
 
         });
         it('should convert time expressions to milliseconds', function() {
-            /*
-             * If the parser is working correctly, it would have converted
-             * '00:00::01.15' to '1150'.
-             */
+            // If the parser is working correctly, it would have converted
+            // '00:00::01.15' to '1150'.
 
             var firstSubtitle = parser.getFirstSubtitle();
             var startTime = parser.startTime(firstSubtitle);
@@ -148,10 +142,8 @@ describe('DFXP', function() {
     });
     describe('#changesMade()', function() {
         it('should indicate that changes have been made', function() {
-            /*
-             * We've made changes previously, so changesMade() should reflect that,
-             * now.
-             */
+            // We've made changes previously, so changesMade() should reflect that,
+            // now.
 
             expect(parser.changesMade()).toBe(true);
 
