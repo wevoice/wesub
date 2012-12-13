@@ -16,6 +16,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import bleach
+
 from django import template
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import linebreaks
@@ -89,15 +91,13 @@ def format_sub_time(t):
 @register.filter
 def display_subtitle(text):
     """
-    Transforms our internal markup to html friendly diplay:
-    use the default subtitle formatiing tags (i, b, u)
-    and replace \n with <br>
+    We already have html content, but we should
+    sanitize output
     """
     if not text:
         return ""
     # FIXME: implement from dfxp formatting to html
-    txt = linebreaks(text)
-    return txt
+    return bleach.clean(text, tags=['em', 'strong', 'span', 'p'])
 
 @register.filter
 def is_synced_value(val):
