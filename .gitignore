@@ -76,3 +76,4 @@ apps/webdriver_testing/Results/*.png
 apps/webdriver_testing/Results/nosetests.xml
 apps/webdriver_testing/Results/results.html
 unisubsdevemails/
+testacular-test-results.xml
