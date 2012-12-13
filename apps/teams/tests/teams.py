@@ -24,7 +24,7 @@ from apps.teams.models import (
 from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
-from apps.videos.models import Video, SubtitleLanguage
+from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
@@ -1421,7 +1421,6 @@ class PartnerTest(TestCase):
         self.assertTrue(partner.is_admin(user))
 
 
-
 class BillingTest(TestCase):
 
     fixtures = [
@@ -1433,7 +1432,6 @@ class BillingTest(TestCase):
     def test_approved(self):
         from apps.teams.models import Workflow, BillingReport
         from apps.teams.moderation_const import APPROVED
-        from videos.models import SubtitleVersion
 
         self.assertEquals(0, Workflow.objects.count())
 
@@ -1465,17 +1463,41 @@ class BillingTest(TestCase):
                 start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
 
         langs = language.video.subtitlelanguage_set.all()
-        data, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
+        created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
 
-        self.assertEquals(1, len(data))
+        self.assertEquals(1, len(created))
 
-        v = data[0][1]
+        v = created[0][1]
         self.assertEquals(v.version_no, 3)
 
         team.workflow_enabled = False
         team.save()
 
-        data, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
-        self.assertEquals(1, len(data))
-        v = data[0][1]
+        created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
+        self.assertEquals(1, len(created))
+        v = created[0][1]
         self.assertEquals(v.version_no, 9)
+
+    def test_get_imported(self):
+        from apps.teams.models import BillingReport
+        team = Team.objects.all()[0]
+
+        b = BillingReport.objects.create(team=team,
+                start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+
+        v = SubtitleVersion.objects.filter(version_no=0)[0]
+        v.note = 'From youtube'
+        v.language.language = 'cs'
+        v.language.save()
+        v.datetime_started = team.created + timedelta(days=1)
+        v.save()
+
+        languages = SubtitleLanguage.objects.all()
+        imported, crowd_created = b._separate_languages(languages)
+
+        self.assertEquals(len(imported), 1)
+        self.assertNotEquals(len(languages), len(imported))
+        self.assertEquals(len(languages), len(imported) + len(crowd_created))
+        self.assertEquals(len(set([l.pk for l in languages])),
+                len(set([i.pk for i in imported] +
+                        [c.pk for c in crowd_created])))
