@@ -306,7 +306,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var parser =  new this.constructor();
         parser.init(this.xmlToString(true));
         if (!preserveText){
-            $("div p", parser.$xml).text("");
+            $('div p', parser.$xml).text('');
         }
         return parser;
     };
@@ -353,7 +353,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         } else if (toFormat === 'timeExpression') {
             convertFn = that.utils.millisecondsToTimeExpression;
         } else {
-            throw new Error("Unsoported time convertion " + toFormat);
+            throw new Error("Unsupported time conversion " + toFormat);
         }
         for (var i = 0; i < $subtitles.length; i++) {
             var sub, currentStartTime, currentEndTime;

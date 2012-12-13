@@ -146,4 +146,134 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#changesMade()', function() {
+        it('should indicate that changes have been made', function() {
+            /*
+             * We've made changes previously, so changesMade() should reflect that,
+             * now.
+             */
+
+            expect(parser.changesMade()).toBe(true);
+
+        });
+    });
+    describe('#clearAllContent()', function() {
+        it('should clear text content from every subtitle', function() {
+
+            // Wipe 'em out.
+            parser.clearAllContent();
+
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // Every subtitle's text() value should be an empty string.
+            for (var i = 0; i < $subtitles.length; i++) {
+                expect($subtitles.eq(i).text()).toBe('');
+            }
+
+        });
+        it('should not affect subtitle attributes', function() {
+
+            var firstSubtitle = parser.getFirstSubtitle();
+            expect(parser.startTime(firstSubtitle)).toNotBe(-1);
+
+        });
+    });
+    describe('#clearAllTimes()', function() {
+        it('should clear timing data from every subtitle', function() {
+
+            // Wipe 'em out.
+            parser.clearAllTimes();
+
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // Every subtitle's timing data should be empty.
+            for (var i = 0; i < $subtitles.length; i++) {
+                var $subtitle = $subtitles.eq(i);
+                var startTime = $subtitle.attr('begin');
+                var endTime = $subtitle.attr('end');
+
+                // Verify that they've been emptied.
+                expect(startTime).toBe('');
+                expect(endTime).toBe('');
+            }
+
+        });
+    });
+    describe('#clone()', function() {
+        it('should clone this parser and preserve subtitle text', function() {
+
+            // Add a new subtitle with text, since we blew it all away
+            // in a previous test.
+            parser.addSubtitle(null, null, 'Some text.');
+
+            // Get the last subtitle of the old parser.
+            var lastSubtitleOfOldParser = parser.getLastSubtitle();
+
+            // Expect the content to be what we just set it as.
+            expect(parser.content(lastSubtitleOfOldParser)).toBe('Some text.');
+
+            // Clone the parser.
+            var newParser = parser.clone(true);
+
+            // Get the last subtitle of the cloned parser.
+            var lastSubtitleOfNewParser = newParser.getLastSubtitle();
+
+            // Expect the last subtitle of the cloned parser to have the same
+            // content as the last subtitle of the old parser.
+            expect(newParser.content(lastSubtitleOfNewParser)).toBe('Some text.');
+
+        });
+        it('should clone this parser and discard subtitle text', function() {
+
+            // Get the last subtitle of the old parser.
+            var lastSubtitleOfOldParser = parser.getLastSubtitle();
+
+            // Expect the content to be what we just set it as.
+            expect(parser.content(lastSubtitleOfOldParser)).toBe('Some text.');
+
+            // Clone the parser, this time discarding text.
+            var newParser = parser.clone();
+
+            // Get the last subtitle of the cloned parser.
+            var lastSubtitleOfNewParser = newParser.getLastSubtitle();
+
+            // Expect the last subtitle of the cloned parser to have the same
+            // content as the last subtitle of the old parser.
+            expect(newParser.content(lastSubtitleOfNewParser)).toBe('');
+
+        });
+    });
+    describe('#content()', function() {
+        it('should set text content of a subtitle', function() {
+
+            // Get the last subtitle in the list.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            parser.content(lastSubtitle, 'Some new text.');
+
+            expect(parser.content(lastSubtitle)).toBe('Some new text.');
+        });
+        it('should retrieve text content of a subtitle', function() {
+
+            // Get the last subtitle. In the previous test, we changed the
+            // content of the last subtitle.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            expect(parser.content(lastSubtitle)).toBe('Some new text.');
+        });
+    });
+    describe('#contentRendered()', function() {
+        it('should return the rendered HTML content of the subtitle', function() {
+
+            // First, create a subtitle with Markdown formatting.
+            var newSubtitle = parser.addSubtitle(null, null, 'Hey **guys!**');
+
+            // The rendered content of this new subtitle should be converted to
+            // HTML.
+            expect(parser.contentRendered(newSubtitle)).toBe('Hey <b>guys!</b>');
+
+        });
+    });
 });
