@@ -82,10 +82,68 @@ describe('DFXP', function() {
         describe('.xmlToString()', function() {
             it('should convert an XML document to a string', function() {
 
-                var xml = AmarajQuery.parseXML("<rss><channel></channel></rss>");
+                var xml = AmarajQuery.parseXML('<rss><channel></channel></rss>');
                 expect(parser.utils.xmlToString(xml)).toBe('<rss><channel/></rss>');
 
             });
+        });
+    });
+
+    describe('#addSubtitle()', function() {
+        it('should add a subtitle to the end of the list', function() {
+
+            // Add a new subtitle.
+            parser.addSubtitle(null, null, 'A new subtitle at the end.');
+
+            // Get the last subtitle in the list.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            expect(parser.content(lastSubtitle)).toBe('A new subtitle at the end.');
+
+            // Expect that changes have now been made to the working copy;
+            expect(parser.changesMade()).toBe(true);
+
+        });
+        it('should add a subtitle with a begin and end pre-set', function() {
+
+            // Add a new subtitle with a begin and end pre-set.
+            parser.addSubtitle(null, {'begin': 1150, 'end': 1160}, 'New subtitle with timing.');
+
+            // Get the last subtitle in the list.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            expect(parser.startTime(lastSubtitle)).toBe(1150);
+            expect(parser.endTime(lastSubtitle)).toBe(1160);
+            expect(parser.content(lastSubtitle)).toBe('New subtitle with timing.');
+
+        });
+        it('should add a subtitle after a given subtitle', function() {
+
+            // Add a new subtitle after the first subtitle, with content and
+            // begin/end attrs pre-set.
+            var newSubtitle = parser.addSubtitle(0,
+                {'begin': 1160, 'end': 1170},
+                'New subtitle with timing, after the first subtitle.');
+
+            // Get the second subtitle in the list.
+            var secondSubtitle = parser.getSubtitle(1).get(0);
+
+            expect(secondSubtitle).toBe(newSubtitle);
+            expect(parser.startTime(secondSubtitle)).toBe(1160);
+            expect(parser.endTime(secondSubtitle)).toBe(1170);
+            expect(parser.content(secondSubtitle)).toBe('New subtitle with timing, after the first subtitle.');
+
+        });
+        it('should add a subtitle with blank content if we pass null', function() {
+
+            // Add a new subtitle with 'null' content.
+            var newSubtitle = parser.addSubtitle(null, null, null);
+
+            // Get the last subtitle in the list.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            expect(parser.content(lastSubtitle)).toBe('');
+
         });
     });
 });
