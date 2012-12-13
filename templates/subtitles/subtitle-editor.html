@@ -3,13 +3,50 @@
 <head>
     <title>Editing {{ language.language_code }} for {{ video }}</title>
     <script src='{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js'></script>
+    <script src='{{ STATIC_URL }}src/js/third-party/underscore.min.js'></script>
+    <script src='{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js'></script>
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/directives.js'></script>
-    <script src='{{ STATIC_URL }}src/js/subtitle-editor/services.js'></script>
+    <script src='{{ STATIC_URL }}src/js/subtitle-editor/services/services.js'></script>
+    <script src='{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js'></script>
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/controllers.js'></script>
 </head>
 <body>
 
 <h1>Editing {{ language.language_code }} for {{ video }} </h1>
+<script type="text/javascript">
+    var editorData = {{ editor_data|safe }}
+</script>
+{#Angular app#}
+<div ng-app='amara.SubtitleEditor'>
+<div class='topbar'>
 
+</div>
+    <div class='help-area'>
+        Help translating
+    </div>
+    <div class='video-player'>
+        
+    </div>
+    <div class='additional-info'>
+        <select name="info-type" id="info-type">
+            <option value="subtitles">Existing Subtitles</option>
+        </select>
+        <select name="alternate-language" id="alternate-language">
+            <option value="{{ alternateLanguage.code }}">{{ alternateLanguage.name }}</option>
+        </select>
+        <select name="alternate-version" id="alternate-version">
+            <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
+        </select>
+    <ul data-subtitle-list="">
+        <li ng-repeat="subtitle in alternateVersion.subtitles"> </li>
+    </ul>
+    </div>
+    <div class='subtitling-area'>
+        <ul data-subtitle-list="">
+            <li ng-repeat="subtitle in alternateVersion.subtitles"> </li>
+        </ul>
+
+    </div>
+</div>
 </body>
 </html>
