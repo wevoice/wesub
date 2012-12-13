@@ -1,7 +1,7 @@
 # patched version of lib, fix for socket errors on rabbitmq
 # from http://code.google.com/p/py-amqplib/issues/detail?id=38
 vendor/amqplib-1.0.2-patched.tar.gz
-Django==1.3.5
+Django==1.4.3
 Fabric==1.4.0
 PIL==1.1.7
 PyRSS2Gen==1.0.0
