@@ -387,7 +387,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             marker = DFXP_REPLACE_SEQ[i][1];
             targets = $(selector, node);
 
-            // TODO: This breaks everything.
             targets.replaceWith(function(i, x) {
                 return marker + $(this).text() + marker;
             });

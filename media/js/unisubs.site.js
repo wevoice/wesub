@@ -234,7 +234,7 @@ var Site = function(Site) {
                 type: 'POST',
                 data: {
                     task: task,
-                    assignee: window.ASSIGNEE
+                    assignee: window.CURRENT_USER_ID
                 },
                 success: function() {
                     callback();
