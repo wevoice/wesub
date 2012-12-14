@@ -2447,25 +2447,64 @@ class BillingReport(models.Model):
         # TODO:
         # These do the same for now.  If a workflow is enabled, we should get
         # the first approved version.  Not sure how to do that yet.
+        imported, crowd_created = self._separate_languages(languages)
+
         if workflow.approve_enabled:
-            lang_data = [(language, language.get_tip()) for
-                                                language in languages]
+            imported_data = [(language, language.get_tip())
+                                    for language in imported]
+            crowd_created_data = [(language, language.get_tip())
+                                    for language in crowd_created]
         else:
-            lang_data = [(language, language.get_tip()) for
-                                                language in languages]
+            imported_data = [(language, language.get_tip()) for
+                                                language in imported]
+            crowd_created_data = [(language, language.get_tip()) for
+                                                language in crowd_created]
 
         old_version_counter = 1
 
-        result = []
+        created_result = []
 
-        for lang, ver in lang_data:
+        for lang, ver in crowd_created_data:
             if ver and ver.created < start_date:
                 old_version_counter += 1
                 continue
 
-            result.append((lang, ver))
+            created_result.append((lang, ver))
 
-        return result, old_version_counter
+        return created_result, imported_data, old_version_counter
+
+    def _separate_languages(self, languages):
+        """
+        * has note from youtube
+        * finished before team start date (when is that? team.created)
+        * is not english
+        """
+        imported = []
+        crowd_created = []
+
+        for lang in languages:
+
+            if lang.language_code == 'en':
+                crowd_created.append(lang)
+                continue
+
+            try:
+                version_zero = lang.subtitleversion_set.filter(version_number=0)[0]
+            except IndexError:
+                crowd_created.append(lang)
+                continue
+
+            if version_zero.note != 'From youtube':
+                crowd_created.append(lang)
+                continue
+
+            if version_zero.datetime_started < self.team.created:
+                crowd_created.append(lang)
+                continue
+
+            imported.append(lang)
+
+        return imported, crowd_created
 
     def _get_row_data(self, host, header=None):
         if not header:
@@ -2481,49 +2520,72 @@ class BillingReport(models.Model):
         for tv in tvs:
             languages = tv.video.newsubtitlelanguage_set.all()
 
-            lang_data, old_version_counter = self._get_lang_data(languages,
-                    start_date)
+            created_data, imported_data, old_version_counter = \
+                    self._get_lang_data(languages, start_date)
 
-            for language, v in lang_data:
+            created_rows = self._loop(created_data, 'created', start_date,
+                    end_date, tv, host, old_version_counter)
 
-                if not self._should_bill(language, v, start_date, end_date):
-                    continue
+            imported_rows = self._loop(imported_data, 'imported', start_date,
+                    end_date, tv, host)
 
-                subs = v.ordered_subtitles()
-
-                if len(subs) == 0:
-                    continue
-
-                start = subs[0].start_time
-                end = subs[-1].end_time
-
-                # The -1 value for the end_time isn't allowed anymore but some
-                # legacy data will still have it.
-                if end == -1:
-                    end = subs[-1].start_time
-
-                if not end:
-                    end = subs[-1].start_time
-
-                rows.append([
-                    tv.video.title_display_unabridged().encode('utf-8'),
-                    host + tv.video.get_absolute_url(),
-                    language.language,
-                    round((float(end) - float(start)) / (60 * 1000), 2),
-                    v.datetime_started.strftime("%Y-%m-%d %H:%M:%S"),
-                    old_version_counter,
-                ])
-
-                old_version_counter += 1
+            rows = rows + created_rows + imported_rows
 
         return rows
+
+    def _loop(self, iterable, source, start, end, tv, host, counter=None):
+        rows = []
+
+        for language, v in iterable:
+
+            if not self._should_bill(language, v, start, end):
+                continue
+
+            row = self._prepare_row(tv, language, v, source, counter, host)
+
+            if not row:
+                continue
+
+            rows.append(row)
+
+            if counter is not None:
+                counter += 1
+
+        return rows
+
+    def _prepare_row(self, tv, language, version, source, counter, host):
+        subs = version.ordered_subtitles()
+
+        if len(subs) == 0:
+            return None
+
+        start = subs[0].start_time
+        end = subs[-1].end_time
+
+        # The -1 value for the end_time isn't allowed anymore but some
+        # legacy data will still have it.
+        if end == -1:
+            end = subs[-1].start_time
+
+        if not end:
+            end = subs[-1].start_time
+
+        return [
+            tv.video.title_display_unabridged().encode('utf-8'),
+            host + tv.video.get_absolute_url(),
+            language.language,
+            source,
+            round((float(end) - float(start)) / (60 * 1000), 2),
+            version.datetime_started.strftime("%Y-%m-%d %H:%M:%S"),
+            counter or ''
+        ]
 
     def process(self):
         domain = Site.objects.get_current().domain
         protocol = getattr(settings, 'DEFAULT_PROTOCOL')
         host = '%s://%s' % (protocol, domain)
 
-        header = ['Video title', 'Video URL', 'Video language',
+        header = ['Video title', 'Video URL', 'Video language', 'Source',
                 'Billable minutes', 'Version created', 'Language number']
 
         rows = self._get_row_data(host, header)
