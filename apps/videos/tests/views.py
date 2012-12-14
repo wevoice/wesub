@@ -377,9 +377,10 @@ class TestViews(WebUseTest):
         self.assertEqual(len(response.context['diff_data']['subtitle_data']), len(subs_data))
 
         html = BeautifulSoup(response.content)
+        from ipdb import set_trace; set_trace()
         # this is the unsynced sub:
         unsynced = html.findAll("span", attrs={"class":'time-span'})
-        self.assertEqual(unsynced[0].parent.findAll('p')[0].text, 'no sync')
+        self.assertEqual(unsynced[0].parent.findAll("span", "no-sync")[0].text, 'Not Synced')
         self.assertEqual(len(unsynced), 1)
         # this are synced subs
         synced  = html.findAll("span", attrs={"class":'time-span time-link'})
