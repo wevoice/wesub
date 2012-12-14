@@ -1294,7 +1294,7 @@ def language_summary(language, team_video=-1, user=None):
             task = tasks[0]
             summary['disabled_to'] = user and user != task.assignee
 
-    latest_version = language.latest_version()
+    latest_version = language.get_tip()
 
     if latest_version and language.is_complete_and_synced() and 'disabled_to' not in summary:
         # Languages with existing subtitles cannot be selected as a "to"
