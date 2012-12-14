@@ -90,7 +90,7 @@ class CreatePage(UnisubsPage):
             return True
 
     def submit_success(self, expected_error=False):
-        if expected_error == False and self.is_element_present(self._SUBMIT_ERROR):
+        if expected_error == False and self.is_element_visible(self._SUBMIT_ERROR):
             error_msg = self.get_text_by_css(self._SUBMIT_ERROR)
             raise ValueError("Submit failed: site says %s" % error_msg)
         elif expected_error == True and self.is_element_present(self._SUBMIT_ERROR):
