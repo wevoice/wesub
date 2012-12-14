@@ -1,6 +1,7 @@
 describe('DFXP', function() {
 
     var parser = new AmaraDFXPParser();
+    var $ = AmarajQuery;
 
     describe('#init()', function() {
         it('should initialize a set of mock subtitles', function() {
@@ -76,7 +77,7 @@ describe('DFXP', function() {
         describe('.xmlToString()', function() {
             it('should convert an XML document to a string', function() {
 
-                var xml = AmarajQuery.parseXML('<rss><channel></channel></rss>');
+                var xml = $.parseXML('<rss><channel></channel></rss>');
                 expect(parser.utils.xmlToString(xml)).toBe('<rss><channel/></rss>');
 
             });
@@ -274,7 +275,7 @@ describe('DFXP', function() {
             // Get the first subtitle.
             var firstSubtitle = parser.getFirstSubtitle();
 
-            // Set the first subtitle's time to 1150
+            // Set the first subtitle's time to 1150.
             parser.startTime(firstSubtitle, 1150);
 
             // Verify that the new start time is correct.
@@ -283,8 +284,14 @@ describe('DFXP', function() {
             // Convert all subtitles to time expressions.
             parser.convertTimes('timeExpression', parser.getSubtitles());
 
-            // New start time should be 
-            expect(AmarajQuery(parser.getFirstSubtitle()).attr('begin')).toBe('00:00:01,150');
+            // New start time should be '00:00:01,150'.
+            expect($(parser.getFirstSubtitle()).attr('begin')).toBe('00:00:01,150');
+
+        });
+        it('should convert times from time expressions to milliseconds', function() {
+
+            // Get the first subtitle.
+            var firstSubtitle = parser.getFirstSubtitle();
 
             // Convert times back to milliseconds.
             parser.convertTimes('milliseconds', parser.getSubtitles());
@@ -292,6 +299,18 @@ describe('DFXP', function() {
             // Verify that the new start time is correct.
             expect(parser.startTime(firstSubtitle)).toBe(1150);
 
+        });
+    });
+    describe('#markdownToDFXP()', function() {
+        it('should convert DFXP-style formatting to Markdown syntax', function() {
+
+            // Create a new node with Markdown-style formatting.
+            var newSubtitle = parser.addSubtitle(null, null, '**I be bold.**');
+
+            // Convert the Markdown to DFXP.
+            var dfxpText = parser.markdownToDFXP($(newSubtitle).text());
+
+            expect(dfxpText).toBe('<span fontWeight="bold">I be bold.</span>');
         });
     });
 });
