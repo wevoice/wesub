@@ -268,4 +268,30 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#convertTimes()', function() {
+        it('should convert times from milliseconds to time expressions', function() {
+
+            // Get the first subtitle.
+            var firstSubtitle = parser.getFirstSubtitle();
+
+            // Set the first subtitle's time to 1150
+            parser.startTime(firstSubtitle, 1150);
+
+            // Verify that the new start time is correct.
+            expect(parser.startTime(firstSubtitle)).toBe(1150);
+
+            // Convert all subtitles to time expressions.
+            parser.convertTimes('timeExpression', parser.getSubtitles());
+
+            // New start time should be 
+            expect(AmarajQuery(parser.getFirstSubtitle()).attr('begin')).toBe('00:00:01,150');
+
+            // Convert times back to milliseconds.
+            parser.convertTimes('milliseconds', parser.getSubtitles());
+
+            // Verify that the new start time is correct.
+            expect(parser.startTime(firstSubtitle)).toBe(1150);
+
+        });
+    });
 });
