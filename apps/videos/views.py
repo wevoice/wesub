@@ -26,7 +26,7 @@ from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
     VideoUrl, AlreadyEditingException, restrict_versions
 from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
     SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm, \
-    AddFromFeedForm
+    AddFromFeedForm, ChangeVideoOriginalLanguageForm
 import widget
 from django.contrib.sites.models import Site
 from django.conf import settings
@@ -62,6 +62,7 @@ from videos.search_indexes import VideoIndex
 import datetime
 from videos.decorators import get_video_revision, get_video_from_code
 from apps.teams.models import Task
+from teams.permissions import  can_edit_video
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -788,3 +789,24 @@ def _get_translations(video):
     translations = list(translations)
     translations.sort(key=lambda f: f.get_language_display())
     return translations
+
+def set_original_language(request, video_id):
+    """
+    We only allow if a video is own a team, or the video owner is the
+    logged in user
+    """
+    video = get_object_or_404(Video, video_id=video_id)
+    if not (can_edit_video(video.get_team_video(), request.user) or video.user == request.user):
+        return HttpResponseForbidden("Can't touch this.")
+    form = ChangeVideoOriginalLanguageForm(request.POST or None, initial={
+        'language_code': video._original_subtitle_language()
+    })
+    if request.method == "POST" and form.is_valid():
+        video.set_original_language(form.cleaned_data['language_code'])
+        messages.success(request, _(u'The language for %s has been changed' % (video)))
+        return HttpResponseRedirect(reverse("videos:set_original_language", args=(video_id,)))
+    return render_to_response("videos/set-original-language.html", {
+        "video": video,
+        'form': form
+    }, context_instance=RequestContext(request)
+    )

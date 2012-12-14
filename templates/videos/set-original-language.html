@@ -1,0 +1,15 @@
+{% include 'base.html' %}
+{% block main_content %}
+    <div class="clearfix">
+        <h2>Change original language</h2>
+
+        <p>For video {{ video }}</p>
+
+        <p> Current Original Language: {{ video.language }}</p>
+
+        <form method="POST" action="./">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit">Change</button>
+        </form>
+{% endblock %}
