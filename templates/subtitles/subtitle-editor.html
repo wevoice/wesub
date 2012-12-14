@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="amara.SubtitleEditor">
 <head>
     <title>Editing {{ language.language_code }} for {{ video }}</title>
     <script src='{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js'></script>
@@ -47,6 +47,12 @@
         </ul>
 
     </div>
+</div>
+
+<div ng-controller="TestController">
+    <ul>
+        <li ng-repeat="item in items">[[item]]</li>
+    </ul>
 </div>
 </body>
 </html>

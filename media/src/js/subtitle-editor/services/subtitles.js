@@ -16,7 +16,6 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-angular.module('amara.SubtitleEditor.services.SubtitlesFetcher', []);
 /**
  * We store a local cache of language data + subtitles in the following format:
  * [
@@ -51,30 +50,21 @@ angular.module('amara.SubtitleEditor.services.SubtitlesFetcher', []);
  },
  When you request a set of subtitles the api is hit if data is not yet on the cache.
  */
-angular.module('amara.SubtitleEditor.services').factory("SubtitlesFetcher", function(){
-    var initialData= window.editorData;
-    return {
-        getSubtitles: function(languageCode, versionNumber){
-            var subtitlesXML = undefined;
-            // will trigger a subtitlesFetched event when ready
-            for (var i=0; i < initialData.languages.length ; i++){
-                var langObj = initialDatalanguages[i];
-                if (langObj.code == languageCode){
-                    for (var j = 0; j < langObj.versions.length; j++){
-                        if (langObj.versions[j] == versionNumber){
-                            subtitlesXML = langObj.versions[j].subtitlesXML;
-                            break;
-                        }
-                    }
-                    break;
-                }
+
+(function() {
+
+    var root, module;
+
+    root = this;
+    module = angular.module('amara.SubtitleEditor.services', []);
+
+    module.factory("SubtitleFetcher", function() {
+        var initialData = window.editorData || {};
+        return {
+            getSubtitles: function(languageCode, versionNumber) {
+                return ['one', 'two', 'three'];
             }
-            if (subtitlesXML !== undefined){
-                // set data and trigger change
-            }else{
-                // fetch data
-            }
-            return;
-        }
-    };
-});
+        };
+    });
+
+}).call(this);

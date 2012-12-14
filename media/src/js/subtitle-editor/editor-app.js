@@ -15,6 +15,21 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
-angular.module('amara.SubtitleEditor', [
-    'amara.SubtitleEditor.services'
-]);
+
+(function() {
+
+    var root, module;
+
+    root = this;
+
+    module = angular.module('amara.SubtitleEditor', [
+        'amara.SubtitleEditor.services'
+    ]);
+
+    // instead of using {{ }} for variables, use [[ ]]
+    module.config(function($interpolateProvider) {
+        $interpolateProvider.startSymbol('[[');
+        $interpolateProvider.endSymbol(']]');
+    });
+
+}).call(this);
