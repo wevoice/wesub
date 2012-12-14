@@ -324,11 +324,15 @@ class Page(object):
                                 'but was expecting: ' + text)
                 return False
 
-    def wait_for_element_present(self, element):
-        """Wait for element (by css) present on page, within 20 seconds.
+    def wait_for_element_present(self, element, wait_time=5):
+        """Wait for element (by css) present on page, within x seconds.
+
+           Settings the default to 5 since we shouldn't have to wait long for 
+           most things.  Using implicit_wait in webdriver_base so this
+           is a multiplied by the implicit wait value.
 
         """
-        for i in range(20):
+        for i in range(wait_time):
             try:
                 time.sleep(1)
                 if self.is_element_present(element):
@@ -338,12 +342,16 @@ class Page(object):
         else:
             self.record_error("Element %s is not present." % element)
     
-    def wait_for_element_not_present(self, element):
-        """Wait for element (by css) to disappear on page, within 20 seconds.
+    def wait_for_element_not_present(self, element, wait_time=10):
+        """Wait for element (by css) to disappear on page, within 10 seconds.
+
+           Settings the default to 10 since we shouldn't have to wait long for 
+           most things.  Using implicit_wait in webdriver_base so this
+           is a multiplied by the implicit wait value.
 
         """
 
-        for i in range(20):
+        for i in range(wait_time):
             try:
                 time.sleep(1)
                 if self.is_element_present(element) is False:
