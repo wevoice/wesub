@@ -2813,3 +2813,61 @@ a.truncated-expand {
         }
     }
 }
+
+#video_set_language {
+    label, h5 {
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: .5em;
+        padding-top: 0;
+    }
+
+    .notation {
+        margin: -.5em 0 1.5em;
+    }
+
+    form {
+        padding: 0;
+    }
+
+    fieldset {
+        padding-bottom: 1.5em;
+    }
+}
+
+.video-item {
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    top: 0;
+
+    h4 a {
+        display: block;
+        position: absolute;
+        @include border-box();
+        bottom: 0; left: 0;
+        padding: 1em;
+        width: 290px;
+        background: rgba(0,0,0,.65);
+        color: #fff;
+        text-decoration: none;
+
+        span.duration {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-weight: normal;
+            font-size: 10px;
+        }
+    }
+
+    &:hover h4 a {
+        background: rgba(0,0,0,.75);
+    }
+
+    a img {
+        width: 290px;
+        height: 180px;
+        border: none;
+    }
+}
