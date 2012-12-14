@@ -42,7 +42,7 @@ except ImportError:
     
 def application(environ, start_response):
     if os.path.exists(disabled_file_path):
-        start_response('200 OK', [('Content-type', 'text/html; charset=utf-8')])
+        start_response('503 Service Unavailable', [('Content-type', 'text/html; charset=utf-8')])
         
         langs = environ.get('HTTP_ACCEPT_LANGUAGE', 'en').split(',')
         langs.append(DEFAULT_LANGUAGE)
