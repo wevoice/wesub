@@ -1301,7 +1301,7 @@ def language_summary(language, team_video=-1, user=None):
         # language in the "add new translation" dialog.  If you want to work on
         # that language, select it and hit "Improve these Subtitles" instead.
         summary['disabled_to'] = True
-    elif not latest_version or not latest_version.subtitles():
+    elif not latest_version or not latest_version.has_subtitles:
         # Languages with *no* existing subtitles cannot be selected as a "from"
         # language in the "add new translation" dialog.  There's nothing to work
         # from!
