@@ -79,7 +79,7 @@ class VideosTab(ATeamPage):
         curr_url = self.current_url()
         if 'project=' in curr_url:
             print 'filter should already be open'
-        elif self.is_element_present(self._FILTER_OPEN):
+        elif self.is_element_visible(self._FILTER_OPEN):
             print 'filter is open'
         else:
             self.click_by_css(self._FILTERS)
@@ -125,7 +125,7 @@ class VideosTab(ATeamPage):
         filter_chunks = self.browser.find_elements_by_css_selector('div.filter-chunk')
         span_chunk = filter_chunks[-1].find_element_by_css_selector('div a.chzn-single span')
         span_chunk.click()
-        self.select_from_chosen(self._SORT_FILTER, [sort_option])
+        self.select_from_chosen(self._SORT_FILTER, sort_option)
 
     def _video_element(self, video):
         """Return the webdriver object for a video based on the title.
