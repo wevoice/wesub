@@ -20,7 +20,6 @@
 from apps.webdriver_testing.site_pages import create_page
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 
-
 class TestCaseVideosCreateVideos(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
@@ -160,8 +159,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a v. large dailymotion feed
 
         """
-
-        self.skipTest("This is just too slow, and probably not that necessary")
         url = "http://www.dailymotion.com/rss/user/LocalNews-GrabNetworks/1"
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
