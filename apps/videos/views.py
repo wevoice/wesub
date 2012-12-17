@@ -802,7 +802,7 @@ def set_original_language(request, video_id):
         'language_code': video._original_subtitle_language()
     })
     if request.method == "POST" and form.is_valid():
-        video.set_original_language(form.cleaned_data['language_code'])
+        video.set_original_language(form.cleaned_data['language_code'], user=request.user)
         messages.success(request, _(u'The language for %s has been changed' % (video)))
         return HttpResponseRedirect(reverse("videos:set_original_language", args=(video_id,)))
     return render_to_response("videos/set-original-language.html", {
