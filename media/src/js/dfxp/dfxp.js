@@ -172,13 +172,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             var xmlString;
 
-            // For Internet Explorer.
-            if (window.ActiveXObject) {
+            if (window.XMLSerializer()) {
+                xmlString = (new XMLSerializer()).serializeToString(xml);
+            } else {
+
+                // For older versions of Internet Explorer.
                 xmlString = xml.xml;
 
-            // Everyone else.
-            } else {
-                xmlString = (new XMLSerializer()).serializeToString(xml);
             }
 
             // Shield your eyes for the next 20 lines or so.
