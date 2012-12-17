@@ -106,10 +106,6 @@ class Page(object):
         mouseAction = webdriver.ActionChains(self.browser)
         mouseAction.move_to_element(element).perform()
 
-
-
-
-
     def click_item_from_pulldown(self, menu_el, menu_item_el):
         """Open a hover pulldown and choose a displayed item.
 
