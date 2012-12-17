@@ -1398,23 +1398,23 @@ div#language_picker {
 
     .listing.tasks > li {
         position: relative;
-        min-height: 5.5em;
+        min-height: 6em;
         font-size: 13px;
-        padding: .75em;
-        margin-bottom: .5em;
+        padding: 1em;
+        margin-bottom: 1em;
         background: #f8f8f8;
         border: 1px solid #f1f1f1;
 
         img {
             float: left;
             height: 4em;
-            margin-right: .75em;
+            margin-right: 1em;
         }
 
         ul {
             position: absolute;
-            top: .75em;
-            right: .75em;
+            top: 1em;
+            right: 1em;
 
             li {
                 padding-bottom: .5em;
