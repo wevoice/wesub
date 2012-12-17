@@ -484,7 +484,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (!el) {
             return null;
         }
-        return el.prev().length > 0 ? el.prev().eq(0) : null;
+        return el.prev().length > 0 ? el.prev().eq(0).get(0) : null;
     };
     this.getSubtitleIndex = function(subtitle) {
         /*

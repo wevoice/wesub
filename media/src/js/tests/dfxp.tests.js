@@ -401,6 +401,22 @@ describe('DFXP', function() {
             expect(nextSubtitleFromParser).toBe(nextSubtitle);
         });
     });
+    describe('#getPreviousSubtitle()', function() {
+        it('should retrieve the previous subtitle in the list', function() {
+
+            // Get the first subtitle.
+            var firstSubtitle = parser.getFirstSubtitle();
+
+            // Get the second subtitle.
+            var secondSubtitle = parser.getNextSubtitle(firstSubtitle);
+
+            // Get the previous subtitle for the first subtitle.
+            var previousSubtitle = parser.getPreviousSubtitle(secondSubtitle);
+
+            // Verify.
+            expect(previousSubtitle).toBe(firstSubtitle);
+        });
+    });
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
 
