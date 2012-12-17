@@ -2480,9 +2480,16 @@ class BillingReport(models.Model):
 
     def _separate_languages(self, languages):
         """
-        * has note from youtube
-        * finished before team start date (when is that? team.created)
-        * is not english
+        Return two lists;  a list of imported languages and a list of crowd
+        created languages.
+
+        Imported language is a language
+        * Whose version 0 contains a note of "From youtube"
+        * that was completed before team.created
+        * that is not English
+
+        Crowd created language is a language
+        * that is not imported
         """
         imported = []
         crowd_created = []
@@ -2503,7 +2510,7 @@ class BillingReport(models.Model):
                 crowd_created.append(lang)
                 continue
 
-            if version_zero.datetime_started < self.team.created:
+            if version_zero.datetime_started > self.team.created:
                 crowd_created.append(lang)
                 continue
 

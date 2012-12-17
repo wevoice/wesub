@@ -1489,7 +1489,7 @@ class BillingTest(TestCase):
         v.note = 'From youtube'
         v.language.language = 'cs'
         v.language.save()
-        v.datetime_started = team.created + timedelta(days=1)
+        v.datetime_started = team.created - timedelta(days=1)
         v.save()
 
         languages = SubtitleLanguage.objects.all()
