@@ -76,13 +76,13 @@ class TestCaseTeamMessages(WebdriverTestCase):
             role = 'Contributor')
 
         #Verify the user gets the message displayed.
-        self.user_message_pg.impersonate(self.non_member.username)
+        self.user_message_pg.log_in(self.non_member.username, 'password')
         self.user_message_pg.open_messages()
         self.assertTrue(self._TEST_MESSAGES['INVITATION'] in 
             self.user_message_pg.message_text())
 
     def test_messages__application(self):
-        self.user_message_pg.impersonate(self.non_member.username)
+        self.user_message_pg.log_in(self.non_member.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
         self.assertTrue(self._TEST_MESSAGES['APPLICATION'] in 
@@ -94,7 +94,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.members_tab.edit_user(role="Admin")
 
         #Verify the user gets the message displayed.
-        self.user_message_pg.impersonate(self.team_member.username)
+        self.user_message_pg.log_in(self.non_member.username, 'password')
         self.user_message_pg.open_messages()
         self.assertTrue(self._TEST_MESSAGES['NEW_ADMIN'] in 
             self.user_message_pg.message_text())
@@ -105,7 +105,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.members_tab.edit_user(role="Manager")
 
         #Verify the user gets the message displayed.
-        self.user_message_pg.impersonate(self.team_member.username)
+        self.user_message_pg.log_in(self.non_member.username, 'password')
         self.user_message_pg.open_messages()
         self.assertTrue(self._TEST_MESSAGES['NEW_MANAGER'] in 
             self.user_message_pg.message_text())

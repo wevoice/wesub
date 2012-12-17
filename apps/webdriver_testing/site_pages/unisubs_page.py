@@ -11,7 +11,7 @@ class UnisubsPage(Page):
      elements and methods that pertain to those elements.
     """
 
-    _LOGIN = "a[href*=login]"
+    _LOGIN = "a[href*='/auth/login']"
     _USER_MENU = "li#me_menu"
     _CREATE_NAV = "li#nav_submit a"
     _FEEDBACK_BUTTON = ".feedback_tab"
@@ -46,12 +46,14 @@ class UnisubsPage(Page):
             return self.get_text_by_css(self._CURRENT_USER)
     
     def logged_in(self):
-        if self.is_element_present(self._CURRENT_USER):
+        if self.is_element_visible(self._CURRENT_USER):
             return True
 
     def log_out(self):
-        if self.logged_in() == True:
-            self.open_page('logout/?next=/auth/login/')
+        if self.logged_in():
+            u = self.browser.current_url
+            page_part = u.split(self.base_url)[-1]
+            self.open_page('logout/?next=%s' % page_part)
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
