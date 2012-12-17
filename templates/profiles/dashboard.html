@@ -47,26 +47,50 @@
                         <li>
                             <a href="{{ task.team_video.video.get_absolute_url }}" title="{{ task.team_video.video.title }}"><img src="{{ task.team_video.video.get_small_thumbnail }}" alt="{{ task.team_video.video.title }}"></a>
                             <h4>
-                                {% if task.get_type_display == "Subtitle" %}
-                                    {% trans 'Transcribe' %}
-                                {% else %}
-                                    {{ task.get_type_display }}
-                                {% endif %}
-                                {% if task.get_type_display == "Translate" %}
-                                    {% trans 'Subtitles into' %} {{ task.get_language_display }}
-                                {% else %}
-                                    {% if task.get_language_display %}
-                                        {{ task.get_language_display }}
-                                    {% endif %}
-                                    {% trans 'Subtitles' %}
-                                {% endif %}
+                                {{ task.team_video.video.title }}
                             </h4>
                             <p>
                                 <a href="{{ task.team.get_absolute_url }}">{{ task.team }}</a>
                             </p>
                             <ul>
                                 <li>
-                                    {% include "teams/_perform_task_link.html" %}
+                                    {% if task.get_type_display == "Subtitle" or task.get_type_display == "Translate"%}
+                                        <a class="perform perform-task-{{ task.pk }}" href="">
+                                            {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+                                                {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
+                                            {% else %}
+                                                {{ task.get_type_display }}
+                                                {{ task.get_language_display }} {% trans "subtitles" %}
+                                            {% endif %}
+                                        </a>
+
+                                        <script type="text/javascript">
+                                            $('.perform-task-{{ task.pk }}').click(function() {
+                                                var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.cached_video_url }}');
+                                                var opener = new unisubs.widget.SubtitleDialogOpener(
+                                                    '{{ task.team_video.video.video_id }}',
+                                                    '{{ task.cached_video_url|safe }}',
+                                                    videoSource, null, null, 'fr'
+                                                );
+                                                {% if task.language %}
+                                                    opener.showStartDialog(null, {'LANGUAGE': '{{ task.language }}', 'FORCE': true});
+                                                {% else %}
+                                                    opener.showStartDialog();
+                                                {% endif %}
+
+                                                return false;
+                                            });
+                                        </script>
+                                    {% else %}
+                                        <a class="perform" href="{{ task.get_widget_url }}">
+                                            {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+                                                {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
+                                            {% else %}
+                                                {{ task.get_type_display }}
+                                                {{ task.get_language_display }} {% trans "subtitles" %}
+                                            {% endif %}
+                                        </a>
+                                    {% endif %}
                                 </li>
                                 {% with can_decline=task|can_decline_task:user %}
                                     {% if can_decline %}

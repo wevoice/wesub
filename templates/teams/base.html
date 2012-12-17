@@ -10,8 +10,6 @@
             <a class="logo-image" href="{{ team.get_absolute_url }}">
                 <img class="logo" alt="{{ team }} logo" src="{{ MEDIA_URL }}{{ team.logo }}"/>
             </a>
-        {% else %}
-            <h2 id="team_title"><a href="{{ team.get_absolute_url }}">{{ team }}</a></h2>
         {% endif %}
     </div>
 
