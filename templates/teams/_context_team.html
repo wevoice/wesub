@@ -74,7 +74,7 @@
         </li>
     {% endif %}
 </ul>
-{% if team|is_team_member:user and team.workflow_enabled %}
+{% if team|is_team_member:user %}
     <h3>Member Tools</h3>
     {% if team.max_tasks_per_member or team.task_expiration %}
         <p class="notation policy">
@@ -88,12 +88,25 @@
     {% endif %}
     <ul>
         <li>
-            <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">{% trans 'Your tasks' %}</a>
-            ({{ team|user_tasks_count:user }})
+            {% trans "Your role:" %}
+            {{ team|user_role:user|capfirst }}
+            {% if member.language_narrowings_fast or member.project_narrowings_fast %}
+                {% if member.project_narrowings_fast %}{% trans 'for' %} {% for narrowing in member.project_narrowings_fast %}{% if forloop.last and not forloop.first %}{% trans 'and' %} {% endif %}<em>{{ narrowing.project.name }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "project" %}{{ member.project_narrowings_fast|length|pluralize }}{% if member.language_narrowings_fast %} {% trans 'and' %} {% endif %}{% endif %}
+                {% if member.language_narrowings_fast %}{% trans 'for' %} {% for narrowing in member.language_narrowings_fast %}{% if forloop.last and not forloop.first %}{% trans 'and' %} {% endif %}<em>{{ narrowing.get_language_display }}</em>{% if not forloop.last %}, {% endif %}{% endfor %} {% trans "language" %}{{ member.language_narrowings_fast|length|pluralize }}{% endif %}
+            {% endif %}
         </li>
-        <li>
-            <a href="{% url teams:team_tasks team.slug %}?assignee=none">{% trans 'All available tasks' %}</a>
-        </li>
+        {% if team.workflow_enabled %}
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">{% trans 'Your tasks' %}</a>
+                ({{ team|user_tasks_count:user }})
+            </li>
+            <li>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=none">{% trans 'All available tasks' %}</a>
+            </li>
+        {% endif %}
+        {% if team|can_leave_team:user %}
+            <li><a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team team.slug %}">{% trans "Leave team" %}</a></li>
+        {% endif %}
     </ul>
 {% endif %}
 
