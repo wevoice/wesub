@@ -172,7 +172,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             var xmlString;
 
-            if (window.XMLSerializer()) {
+            if (window.XMLSerializer) {
                 xmlString = (new XMLSerializer()).serializeToString(xml);
             } else {
 
