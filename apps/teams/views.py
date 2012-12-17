@@ -1552,7 +1552,7 @@ def assign_task_ajax(request, slug):
         assignee = form.cleaned_data['assignee']
 
         if not assignee:
-            return HttpResponseForbidden(_(u'Invalid assignment attempt - assignee is empty (%s).' % assignee))
+            return HttpResponseForbidden(u'Invalid assignment attempt - assignee is empty (%s).' % assignee)
 
         task.assignee = assignee
         task.set_expiration()
@@ -1561,7 +1561,7 @@ def assign_task_ajax(request, slug):
 
         return { 'success': True }
     else:
-        return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
+        return HttpResponseForbidden(u'Invalid assignment attempt.')
 
 @login_required
 def upload_draft(request, slug, video_id):
