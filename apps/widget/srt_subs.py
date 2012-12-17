@@ -352,7 +352,7 @@ class TTMLSubtitles(BaseSubtitles):
         hours, minutes, seconds, milliseconds = milliseconds_to_time_components(milliseconds)
         if hours < 0:
             hours = 99
-        return u'%02i:%02i:%02i.%02i' % (hours, minutes, seconds, milliseconds)
+        return u'%02i:%02i:%02i.%03i' % (hours, minutes, seconds, milliseconds)
 
 GenerateSubtitlesHandler.register(TTMLSubtitles, 'ttml')
 
