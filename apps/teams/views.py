@@ -1220,7 +1220,14 @@ def dashboard(request, slug):
         for video in videos:
             _cache_video_url(video.tasks)
     else:
-        team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
+        team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")
+        # TED's dashboard should only show TEDTalks videos
+        # http://i.imgur.com/fjjqx.gif
+        if team.slug == 'ted':
+            project = Project.objects.get(team=team, slug='tedtalks')
+            team_videos = team_videos.filter(teamvideo__project=project)
+
+        team_videos = team_videos[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:

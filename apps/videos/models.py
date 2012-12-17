@@ -544,6 +544,24 @@ class Video(models.Model):
         if original_language:
             return original_language.language != ''
 
+    def set_original_language(self, new_language_code, user=None):
+        """
+        Get the first existing language  with the new_language_code, or
+        create one if that doesn't exist.
+        Set that one as is_original, and unset any other ones.
+        """
+        try:
+            # is there a language with this language code that's a good target?
+            ideal_original_language = self.subtitlelanguage_set.filter(language=new_language_code).order_by('-subtitle_count')[0]
+            ideal_original_language.is_original = True
+        except IndexError:
+            ideal_original_language = SubtitleLanguage(video=self, is_original=True, is_forked=False, language=new_language_code)
+        ideal_original_language.fork(user=user)
+        ideal_original_language.save()
+        # right now we have *the* correct original language (sort of ), so let's unset everyone else
+        other_originals = self.subtitlelanguage_set.filter(is_original=True).exclude(pk=ideal_original_language.pk)
+        other_originals.update(is_original=False)
+
     def subtitle_language(self, language_code=None):
         """Return the SubtitleLanguage for this video with the given language code, or None.
 

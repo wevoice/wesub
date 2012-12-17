@@ -631,6 +631,9 @@ var Site = function(Site) {
             $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
+        video_set_language: function() {
+            that.Utils.chosenify();
+        },
         diffing: function() {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },

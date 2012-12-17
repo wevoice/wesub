@@ -105,9 +105,8 @@ def dashboard(request):
 
     context = {
         'user_info': user,
-        'user_messages': Message.objects.for_user(user)[:5],
-        'team_activity': Action.objects.for_user_team_activity(user)[:5],
-        'video_activity': Action.objects.for_user_video_activity(user)[:5],
+        'team_activity': Action.objects.for_user_team_activity(user)[:8],
+        'video_activity': Action.objects.for_user_video_activity(user)[:8],
         'tasks': tasks,
         'widget_settings': widget_settings,
     }
