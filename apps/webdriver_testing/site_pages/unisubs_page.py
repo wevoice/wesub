@@ -62,8 +62,7 @@ class UnisubsPage(Page):
             return
         if self._current_user() is not None:
             self.log_out()
-        if "login" not in curr_page: 
-            self.click_by_css(self._LOGIN)
+        self.click_by_css(self._LOGIN)
         self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
         self.type_by_css(self._SITE_LOGIN_USER_ID, username)
         self.type_by_css(self._SITE_LOGIN_USER_PW, passw)
