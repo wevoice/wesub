@@ -301,40 +301,24 @@ describe('DFXP', function() {
 
         });
     });
-    describe('#markdownToDFXP()', function() {
+    describe('#dfxpToMarkdown()', function() {
         it('should convert DFXP-style formatting to Markdown syntax', function() {
 
-            // Create a new node with Markdown-style formatting.
-            var newSubtitle = parser.addSubtitle(null, null, '**I be bold.**');
+            // Create a new node with blank text (we have to set it later).
+            var newSubtitle = parser.addSubtitle(null, null, '');
             var $newSubtitle = $(newSubtitle);
 
-            // Convert the Markdown to DFXP.
-            var dfxpText = parser.markdownToDFXP($newSubtitle.text());
-
-            // Empty out the subtitle's text.
-            $newSubtitle.text('');
-
-            // Replace the node's text with the DFXP node.
-            $newSubtitle.append($(dfxpText));
-
-            // Verify that the text was replaced properly.
-            expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
-        });
-    });
-    describe('#dfxpToMarkdown()', function() {
-        it('should convert Markdown syntax formatting to DFXP-style formatting', function() {
-
-            // Get the last subtitle.
-            var lastSubtitle = parser.getLastSubtitle();
+            // Replace the node's text with a DFXP-style formatted node.
+            $newSubtitle.append($('<span fontweight="bold">I be bold.</span>'));
 
             // Verify that we have DFXP-style formatting to convert.
-            expect(parser.content(lastSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
+            expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
 
             // Replace the subtitle's content in-place with Markdown.
-            parser.dfxpToMarkdown(lastSubtitle);
+            parser.dfxpToMarkdown(newSubtitle);
 
             // Verify.
-            expect(parser.content(lastSubtitle)).toBe('**I be bold.**');
+            expect(parser.content(newSubtitle)).toBe('**I be bold.**');
         });
     });
     describe('#endTime()', function() {
@@ -401,6 +385,21 @@ describe('DFXP', function() {
             expect(nextSubtitleFromParser).toBe(nextSubtitle);
         });
     });
+    describe('#getNonBlankSubtitles()', function() {
+        it('should return all subtitles that have content', function() {
+
+            // Get all non-blank subtitles.
+            var $nonBlankSubtitles = parser.getNonBlankSubtitles();
+
+            for (var i = 0; i < $nonBlankSubtitles.length; i++) {
+
+                var $nonBlankSubtitle = $nonBlankSubtitles.eq(i);
+
+                // Verify that this subtitle is not blank.
+                expect($nonBlankSubtitle.text()).toNotBe('');
+            }
+        });
+    });
     describe('#getPreviousSubtitle()', function() {
         it('should retrieve the previous subtitle in the list', function() {
 
@@ -415,6 +414,66 @@ describe('DFXP', function() {
 
             // Verify.
             expect(previousSubtitle).toBe(firstSubtitle);
+        });
+    });
+    describe('#getSubtitleIndex()', function() {
+        it('should retrieve the index of the given subtitle', function() {
+            
+            // The first subtitle's index should be '0'.
+            expect(parser.getSubtitleIndex(parser.getFirstSubtitle())).toBe(0);
+
+        });
+    });
+    describe('#getSubtitle()', function() {
+        it('should retrieve the subtitle based on the index given', function() {
+
+            var firstSubtitle = parser.getSubtitle(0);
+            var $subtitles = parser.getSubtitles();
+
+            // It should be the first subtitle in the node list.
+            expect($subtitles.get(0)).toBe(firstSubtitle.get(0));
+
+        });
+        it('should retrieve the subtitle based on a given node', function() {
+            // This helps us streamline the process by which we retrieve
+            // subtitles. If you pass along a node, we'll simply return the
+            // jQuery selection of that node.
+
+            var $subtitles = parser.getSubtitles();
+            var firstSubtitleNode = $subtitles.eq(0).get(0);
+            var retrievedSubtitleNode = parser.getSubtitle(firstSubtitleNode).get(0);
+
+            // The retrieved subtitle's node should be the same as the first
+            // subtitle's node.
+            expect(retrievedSubtitleNode).toBe(firstSubtitleNode);
+        });
+    });
+    describe('#getSubtitles()', function() {
+        it('should retrieve the current set of subtitles', function() {
+
+            // Just make sure that the subtitles count matches up.
+            expect(parser.getSubtitles().length).toBe(parser.subtitlesCount());
+        });
+    });
+
+    describe('#markdownToDFXP()', function() {
+        it('should convert Markdown syntax to DFXP-style formatting', function() {
+
+            // Create a new node with Markdown syntax.
+            var newSubtitle = parser.addSubtitle(null, null, '**I be bold.**');
+            var $newSubtitle = $(newSubtitle);
+
+            // Convert the Markdown to DFXP.
+            var dfxpText = parser.markdownToDFXP($newSubtitle.text());
+
+            // Empty out the subtitle's text.
+            $newSubtitle.text('');
+
+            // Replace the node's text with the DFXP node.
+            $newSubtitle.append($(dfxpText));
+
+            // Verify that the text was replaced properly.
+            expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
         });
     });
     describe('#startTime()', function() {
