@@ -1452,9 +1452,15 @@ class BillingTest(TestCase):
                 start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
 
         langs = language.video.newsubtitlelanguage_set.all()
+        c = langs[0]
+        d = team.created - timedelta(days=5)
+        SubtitleVersion.objects.create(subtitle_language=c, version_number=0,
+                note='From youtube', created=d)
+
+        self.assertTrue(len(langs) > 0)
         created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
 
-        self.assertEquals(1, len(created))
+        self.assertTrue(len(created) > 0)
 
         v = created[0][1]
         self.assertEquals(v.version_number, 3)
@@ -1472,23 +1478,49 @@ class BillingTest(TestCase):
         return
         from apps.teams.models import BillingReport
         team = Team.objects.all()[0]
+        video = Video.objects.all()[0]
+
+        team_created = team.created
 
         b = BillingReport.objects.create(team=team,
                 start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
 
-        v = sub_models.SubtitleVersion.objects.filter(version_number=0)[0]
-        v.note = 'From youtube'
-        v.language.language_code = 'cs'
-        v.language.save()
-        v.datetime_started = team.created - timedelta(days=1)
-        v.save()
+        SubtitleLanguage.objects.all().delete()
+
+        sl_en = SubtitleLanguage.objects.create(video=video, language_code='en')
+        sl_cs = SubtitleLanguage.objects.create(video=video, language_code='cs')
+        sl_fr = SubtitleLanguage.objects.create(video=video, language_code='fr')
+        sl_es = SubtitleLanguage.objects.create(video=video, language_code='es')
+        SubtitleLanguage.objects.create(video=video, language_code='ru')
+
+        before_team_created = team_created - timedelta(days=10)
+        after_team_created = team_created + timedelta(days=10)
+
+        SubtitleVersion.objects.create(subtitle_language=sl_fr,
+                created=before_team_created, note='From youtube',
+                version_number=0)
+
+        SubtitleVersion.objects.create(subtitle_language=sl_fr,
+                created=after_team_created,
+                version_number=1)
+
+        SubtitleVersion.objects.create(subtitle_language=sl_en,
+                created=before_team_created, note='From youtube',
+                version_number=0)
+
+        SubtitleVersion.objects.create(subtitle_language=sl_es,
+                created=before_team_created,
+                version_number=0)
+
+        SubtitleVersion.objects.create(subtitle_language=sl_cs,
+                created=after_team_created, note='From youtube',
+                version_number=0)
+
+        # Done with setup, let's test things
 
         languages = sub_models.SubtitleLanguage.objects.all()
         imported, crowd_created = b._separate_languages(languages)
 
         self.assertEquals(len(imported), 1)
-        self.assertNotEquals(len(languages), len(imported))
-        self.assertEquals(len(languages), len(imported) + len(crowd_created))
-        self.assertEquals(len(set([l.pk for l in languages])),
-                len(set([i.pk for i in imported] +
-                        [c.pk for c in crowd_created])))
+        imported_pks = [i.pk for i in imported]
+        self.assertTrue(sl_fr.pk in imported_pks)
