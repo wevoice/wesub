@@ -566,6 +566,46 @@ class UploadSubtitlesTest(WebUseTest):
         self.assertTrue(language.is_dependent())
         self.assertEquals(language.standard_language.language, "en")
 
+
+    def test_upload_translation_is_original(self):
+        self._login()
+        video = Video.objects.get(pk=self.video.pk)
+        import pdb;pdb.set_trace()
+        # this is the use case
+        # original language is english, and it's empty
+        # video is subtitled into Espanish
+        # English translated from spanish is uploaded
+        # English is still original and must have spanish as the standard language
+        english = SubtitleLanguage.objects.create(video=video, is_original=True, language='en')
+        data = self._make_data(lang='es')
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(2, video.subtitlelanguage_set.count())
+        language = video.subtitle_language()
+        self.assertEqual('en', language.language)
+        self.assertTrue(language.is_original)
+        self.assertFalse(language.has_version)
+
+        data = self._make_data(lang='en')
+        data['translated_from'] = 'es'
+
+        response = self.client.post(reverse('videos:upload_subtitles'), data)
+        self.assertEqual(response.status_code, 200)
+
+        # now, English, the original is translated from Spanish
+        # but it shouldn't loose it's is_original, nor is it forked
+        video = Video.objects.get(pk=self.video.pk)
+        self.assertEqual(2, video.subtitlelanguage_set.count())
+        english = refresh_obj(english)
+        self.assertEqual('en', english.language)
+        self.assertTrue(english.standard_language)
+        self.assertEquals(english.standard_language.language, "es")
+        self.assertTrue(english.is_original)
+        self.assertTrue(english.has_version)
+        self.assertTrue(video.is_subtitled)
+
     def test_upload_twice(self):
         self._login()
         data = self._make_data()
