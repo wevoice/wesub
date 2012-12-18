@@ -570,7 +570,6 @@ class UploadSubtitlesTest(WebUseTest):
     def test_upload_translation_is_original(self):
         self._login()
         video = Video.objects.get(pk=self.video.pk)
-        import pdb;pdb.set_trace()
         # this is the use case
         # original language is english, and it's empty
         # video is subtitled into Espanish
