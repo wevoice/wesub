@@ -117,7 +117,7 @@ unisubs.editmetadata.RightPanel.prototype.finish = function(e, approvalCode, sav
         }
     };
 
-    var onCompletedCallback = function( isComplete){
+    var onCompletedCallback = function(isComplete){
         this.serverModel_.setComplete(isComplete);
         this.serverModel_.finish(successCallback, failureCallback, null, saveForLater);
     };
