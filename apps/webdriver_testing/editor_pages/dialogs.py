@@ -69,10 +69,10 @@ class EditorDialogs(Page):
         self.click_by_css(self._CONTINUE)
 
     def mark_subs_complete(self, complete=True):
-        self.wait_for_element_present(self._COMPLETED_DIALOG)
-        if complete == True:
-            self.click_by_css(self._CHECKBOX)
-        self.click_by_css(self._SAVED_OK)
+        if self.is_element_present(self._COMPLETED_DIALOG):
+            if complete == True:
+                self.click_by_css(self._CHECKBOX)
+            self.click_by_css(self._SAVED_OK)
         
 
     def incomplete_alert_text(self):
