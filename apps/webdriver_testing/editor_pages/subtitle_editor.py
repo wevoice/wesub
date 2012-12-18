@@ -128,9 +128,7 @@ class SubtitleEditor(EditorDialogs):
     def save_and_exit(self):
         self.page_down(self._SAVE_AND_EXIT)
         self.click_by_css(self._SAVE_AND_EXIT)
-        time.sleep(2)
         self.mark_subs_complete()
-        time.sleep(2)
         self.click_saved_ok()
 
 
