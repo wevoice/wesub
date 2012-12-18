@@ -42,12 +42,12 @@ class WatchPage(VideoListings):
             self.select_option_by_text(self._SEARCH_TRANS_LANG, trans_lang)
                
         if search_term:
-            print 'entering the search term'
-            self.type_by_css(self._SEARCH, search_term)
-            time.sleep(2)
+            self.submit_form_text_by_css(self._SEARCH, search_term)
+        else:
+            elem = self.wait_for_element_present(self._SEARCH)
+            elem.submit()
 
-        self.click_by_css(self._SEARCH_SUBMIT)
-    
+        time.sleep(2)
         return SearchResultsPage(self)
 
        
