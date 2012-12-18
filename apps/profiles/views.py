@@ -30,7 +30,8 @@ from django.views.generic.simple import direct_to_template
 from tastypie.models import ApiKey
 
 from auth.models import CustomUser as User
-from profiles.forms import EditUserForm, SendMessageForm, EditAvatarForm
+from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
+                            EditAvatarForm)
 from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
@@ -175,7 +176,7 @@ def edit(request):
 @login_required
 def account(request):
     if request.method == 'POST':
-        form = EditUserForm(request.POST,
+        form = EditAccountForm(request.POST,
                             instance=request.user,
                             files=request.FILES, label_suffix="")
         if form.is_valid():
@@ -184,7 +185,7 @@ def account(request):
             return redirect('profiles:account')
 
     else:
-        form = EditUserForm(instance=request.user, label_suffix="")
+        form = EditAccountForm(instance=request.user, label_suffix="")
 
     third_party_accounts = request.user.third_party_accounts.all()
     twitters = request.user.twitteraccount_set.all()

@@ -1779,7 +1779,7 @@ class Task(models.Model):
                                                     self.language) and
                 subtitle_version and
                 subtitle_version.previous_version() and
-                subtitle_version.language.is_complete_and_synced())
+                subtitle_version.subtitle_language.is_complete_and_synced())
 
     def _find_previous_assignee(self, type):
         """Find the previous assignee for a new review/approve task for this video.
@@ -2052,7 +2052,7 @@ class Task(models.Model):
         if not sv:
             return False
 
-        source_language = sv.get_translation_source_language()
+        source_language = sv.subtitle_language.get_translation_source_language()
 
         complete = (source_language and
                     source_language.subtitles_complete and

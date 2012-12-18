@@ -141,6 +141,16 @@ class EditUserEmailForm(forms.ModelForm):
         fields = ('email',)
 
 class EditUserForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(EditUserForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'homepage', 'biography')
+
+
+class EditAccountForm(forms.ModelForm):
     current_password = forms.CharField(widget=forms.PasswordInput, required=False)
     new_password = forms.CharField(widget=forms.PasswordInput, required=False)
     new_password_verify = forms.CharField(widget=forms.PasswordInput,
@@ -148,17 +158,15 @@ class EditUserForm(forms.ModelForm):
                                           label=_(u'Confirm new password:'))
 
     def __init__(self, *args, **kwargs):
-        super(EditUserForm, self).__init__(*args, **kwargs)
+        super(EditAccountForm, self).__init__(*args, **kwargs)
         self.fields['email'].required = True
-        self.fields['preferred_language'].choices = get_language_choices(True)
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'homepage', 'preferred_language',
-                  'notify_by_email', 'biography', 'notify_by_message')
+        fields = ('username', 'email', 'notify_by_email', 'notify_by_message')
 
     def clean(self):
-        self.cleaned_data = super(EditUserForm, self).clean()
+        self.cleaned_data = super(EditAccountForm, self).clean()
         current, new, verify = map(self.cleaned_data.get,
                     ('current_password', 'new_password', 'new_password_verify'))
         if current and not self.instance.check_password(current):
@@ -175,5 +183,4 @@ class EditUserForm(forms.ModelForm):
         if email:
             self.instance.email = email
             self.instance.save()
-        return super(EditUserForm, self).save(commit)
-
+        return super(EditAccountForm, self).save(commit)

@@ -417,6 +417,13 @@ def _default_project_for_team(team):
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
+
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
     filtered = 0
 
     if project_slug is None or project_slug == '':
@@ -454,6 +461,7 @@ def detail(request, slug, project_slug=None, languages=None):
 
     extra_context.update({
         'team': team,
+        'member': member,
         'project':project,
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
@@ -684,11 +692,11 @@ def remove_video(request, team_video_pk):
 def activity(request, slug):
     team = Team.get(slug, request.user)
 
+    user = request.user if request.user.is_authenticated() else None
     try:
-        user = request.user if request.user.is_authenticated() else None
-        member = team.members.get(user=user) if user else None
+        member = team.members.get(user=user)
     except TeamMember.DoesNotExist:
-        member = False
+        member = None
 
     public_only = False if member else True
 
@@ -706,7 +714,11 @@ def activity(request, slug):
     ).order_by())
     activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
-    context = { 'activity_list': activity_list, 'team': team }
+    context = {
+        'activity_list': activity_list,
+        'team': team,
+        'member': member
+    }
     context.update(pagination_info)
 
     return context
@@ -721,6 +733,13 @@ def detail_members(request, slug, role=None):
     filtered = False
 
     team = Team.get(slug, request.user)
+
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
     qs = team.members.select_related('user').filter(user__is_active=True)
 
     if q:
@@ -765,6 +784,7 @@ def detail_members(request, slug, role=None):
 
     extra_context.update({
         'team': team,
+        'member': member,
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,

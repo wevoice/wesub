@@ -113,6 +113,8 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
         if (halt === true) {
             alert('You have untranslated captions. You must translate all captions in order to submit.');
             return false;
+        } else {
+            this.translationPanel_.captionSet_.completed = true;
         }
 
         this.saveWork(true, false);

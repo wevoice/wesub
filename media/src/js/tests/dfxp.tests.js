@@ -453,9 +453,19 @@ describe('DFXP', function() {
 
             // Just make sure that the subtitles count matches up.
             expect(parser.getSubtitles().length).toBe(parser.subtitlesCount());
+
         });
     });
+    describe('#isShownAt()', function() {
+        it('should determine whether the given subtitle should be displayed at the given time', function() {
 
+            // Create a new subtitle with a given start and end time.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 1499, 'end': 1501}, null);
+
+            expect(parser.isShownAt(newSubtitle, 1500)).toBe(true);
+
+        });
+    });
     describe('#markdownToDFXP()', function() {
         it('should convert Markdown syntax to DFXP-style formatting', function() {
 
@@ -476,6 +486,51 @@ describe('DFXP', function() {
             expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
         });
     });
+    describe('#needsAnySynced()', function() {
+        it('should confirm all subtitles are synced', function() {
+
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // Set the begin and end attrs for all subtitles.
+            $subtitles.attr({'begin': 100, 'end': 150});
+
+            // No subtitles should need syncing.
+            expect(parser.needsAnySynced()).toBe(false);
+
+        });
+        it('should tell us when subtitles need syncing', function() {
+
+            // Add a new subtitle without timing information.
+            parser.addSubtitle(null, null, null);
+
+            // We now need syncing.
+            expect(parser.needsAnySynced()).toBe(true);
+        });
+    });
+    describe('#needsAnyTranscribed()', function() {
+        it('should confirm no subtitles need transcription', function() {
+
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // Set the begin and end attrs for all subtitles.
+            $subtitles.text('Mock content');
+
+            // No subtitles should need transcription.
+            expect(parser.needsAnyTranscribed()).toBe(false);
+
+        });
+        it('should tell us when subtitles need transcription', function() {
+
+            // Create a new subtitle with no content.
+            parser.addSubtitle(null, null, null);
+
+            // We need transcription, now.
+            expect(parser.needsAnyTranscribed()).toBe(true);
+        });
+    });
+
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
 

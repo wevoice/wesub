@@ -154,6 +154,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
         atLeastOneThingChanged = true;
     }
 
+
     if (goog.isDefAndNotNull(this.captionSet_.description) &&
         this.captionSet_.description != initialCaptionSet.description) {
         args['new_description'] = this.captionSet_.description;
@@ -209,6 +210,7 @@ unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, fail
         successCallback("Saved"); // TODO: is this the right ux?
         return;
     }
+
     unisubs.Rpc.call(
         'finished_subtitles',
         args,
