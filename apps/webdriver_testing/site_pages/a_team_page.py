@@ -10,7 +10,6 @@ class ATeamPage(UnisubsPage):
     """
 
     _URL = 'teams/%s/'
-    _TEAM_LINK = "h2#team_title a"
     _TEAM_NAME = ".main-title a"
     _DASHBOARD_WELCOME = "div.get-started p"
 
@@ -49,15 +48,15 @@ class ATeamPage(UnisubsPage):
         self.open_page(url)
 
     def is_team(self, team):
-        self.wait_for_element_present(self._TEAM_LINK)
-        if self.get_text_by_css(self._TEAM_LINK) == team:
+        self.wait_for_element_present(self._TEAM_NAME)
+        if self.get_text_by_css(self._TEAM_NAME) == team:
             return True
 
     def team_search(self, team):
         pass
 
     def join_exists(self):
-        if self.is_element_present(self._JOIN_TEAM):
+        if self.is_element_visible(self._JOIN_TEAM):
             return True
 
     def apply_exists(self):
@@ -86,6 +85,10 @@ class ATeamPage(UnisubsPage):
         if logged_in == True:
             self.handle_js_alert(action='accept')
 
+    def join_text(self):
+        return self.get_text_by_css(self._JOIN_TEAM)
+
+
     def signin(self):
         self.click_by_css(self._SIGNIN)
 
@@ -100,7 +103,7 @@ class ATeamPage(UnisubsPage):
         return self.get_text_by_css(self._DASHBOARD_WELCOME)
 
     def settings_tab_visible(self):
-        if self.is_element_present(self._SETTINGS_TAB) == True:
+        if self.is_element_visible(self._SETTINGS_TAB) == True:
             return True
 
     def has_project(self, project_slug):

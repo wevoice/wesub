@@ -51,9 +51,7 @@ class UnisubsPage(Page):
 
     def log_out(self):
         if self.logged_in():
-            u = self.browser.current_url
-            page_part = u.split(self.base_url)[-1]
-            self.open_page('logout/?next=%s' % page_part)
+            self.open_page('logout/?next=/')
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
