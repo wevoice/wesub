@@ -2490,26 +2490,17 @@ class BillingReport(models.Model):
         crowd_created = []
 
         for lang in languages:
-
-            if lang.language_code == 'en':
-                crowd_created.append(lang)
-                continue
-
             try:
-                version_zero = lang.subtitleversion_set.filter(version_number=0)[0]
+                v = lang.subtitleversion_set.filter(version_no=0)[0]
             except IndexError:
-                crowd_created.append(lang)
+                # Throw away languages that don't have a zero version.
                 continue
 
-            if version_zero.note != 'From youtube':
+            if (lang.language != 'en' and v.note == 'From youtube' and
+                    v.datetime_started < self.team.created):
+                imported.append(lang)
+            else:
                 crowd_created.append(lang)
-                continue
-
-            if version_zero.datetime_started > self.team.created:
-                crowd_created.append(lang)
-                continue
-
-            imported.append(lang)
 
         return imported, crowd_created
 
