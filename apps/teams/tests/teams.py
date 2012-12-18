@@ -1506,10 +1506,12 @@ class BillingTest(TestCase):
         before_team_created = team_created - timedelta(days=10)
         after_team_created = team_created + timedelta(days=10)
 
+        # Imported
         SubtitleVersion.objects.create(language=sl_fr,
                 datetime_started=before_team_created, note='From youtube',
                 version_no=0)
 
+        # Created
         SubtitleVersion.objects.create(language=sl_fr,
                 datetime_started=after_team_created,
                 version_no=1)
@@ -1518,10 +1520,12 @@ class BillingTest(TestCase):
                 datetime_started=before_team_created, note='From youtube',
                 version_no=0)
 
+        # Imported
         SubtitleVersion.objects.create(language=sl_es,
                 datetime_started=before_team_created,
                 version_no=0)
 
+        # Imported
         SubtitleVersion.objects.create(language=sl_cs,
                 datetime_started=after_team_created, note='From youtube',
                 version_no=0)
@@ -1531,6 +1535,8 @@ class BillingTest(TestCase):
         languages = SubtitleLanguage.objects.all()
         imported, crowd_created = b._separate_languages(languages)
 
-        self.assertEquals(len(imported), 1)
+        self.assertEquals(len(imported), 3)
         imported_pks = [i.pk for i in imported]
         self.assertTrue(sl_fr.pk in imported_pks)
+        self.assertTrue(sl_es.pk in imported_pks)
+        self.assertTrue(sl_cs.pk in imported_pks)

@@ -410,6 +410,13 @@ class SubtitlesUploadForm(forms.Form):
                 self._sl_created = True
             else:
                 language = video.subtitle_language(draft_language)
+                if translated_from:
+                    if translated_from.standard_language:
+                        translated_from = translated_from.standard_language
+
+                    language.standard_language = translated_from
+                    language.save()
+
                 self._sl_created = False
 
         if is_version_same(language.version(public_only=False), self._parser):
