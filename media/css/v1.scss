@@ -1400,7 +1400,7 @@ div#language_picker {
         position: relative;
         min-height: 6em;
         font-size: 13px;
-        padding: 1em;
+        padding: 1em 200px 1em 1em;
         margin-bottom: 1em;
         background: #f8f8f8;
         border: 1px solid #f1f1f1;
@@ -1444,6 +1444,7 @@ div#language_picker {
             text-shadow: 1px 1px 1px #0c4a70;
             @include border-radius(3px);
             @include vertical-gradient(#136aa1, $usblue);
+            max-width: 160px;
         }
     }
 
