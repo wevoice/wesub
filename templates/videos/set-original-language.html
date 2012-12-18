@@ -30,7 +30,7 @@
                             {% trans "Current language is" %}
                             <strong>
                                 {% if video.language %}
-                                     {{ video.language }}
+                                     {{ video.subtitle_language.language_display  }}
                                 {% else %}
                                     {% trans "not set" %}
                                 {% endif %}
