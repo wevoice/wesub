@@ -550,6 +550,7 @@ class Video(models.Model):
         create one if that doesn't exist.
         Set that one as is_original, and unset any other ones.
         """
+        from videos.tasks import video_changed_tasks
         try:
             # is there a language with this language code that's a good target?
             ideal_original_language = self.subtitlelanguage_set.filter(language=new_language_code).order_by('-subtitle_count')[0]
@@ -561,6 +562,7 @@ class Video(models.Model):
         # right now we have *the* correct original language (sort of ), so let's unset everyone else
         other_originals = self.subtitlelanguage_set.filter(is_original=True).exclude(pk=ideal_original_language.pk)
         other_originals.update(is_original=False)
+        video_changed_tasks.delay(self.pk)
 
     def subtitle_language(self, language_code=None):
         """Return the SubtitleLanguage for this video with the given language code, or None.
