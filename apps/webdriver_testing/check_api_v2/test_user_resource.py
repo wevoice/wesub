@@ -63,9 +63,11 @@ class TestCaseUserResource(WebdriverTestCase):
         login_url = user_data['auto_login_url']
         print api_key, login_url
         profile_account_pg = profile_account_page.ProfileAccountPage(self)
-        profile_account_pg.open_page(login_url)
+        self.browser.execute_script(
+            "var url = arguments[0] ; window.open(url, '_self')", login_url)
+        #profile_account_pg.open_page(login_url)
+        time.sleep(3)
         profile_account_pg.open_profile_account()
-        
         self.assertEqual(api_key, profile_account_pg.current_api_key())
 
         
