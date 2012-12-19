@@ -569,6 +569,60 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#originalContent()', function() {
+        it('should set and get the original HTML content for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, null, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set some mock original content.
+            $newSubtitle.attr('originalcontent', 'Mock original content.');
+
+            // The original content should be set.
+            expect(parser.originalContent(newSubtitle)).toBe('Mock original content.');
+
+            // The real content should not have been modified.
+            expect(parser.originalContent(newSubtitle)).toNotBe(parser.content(newSubtitle));
+
+        });
+    });
+    describe('#originalEndTime()', function() {
+        it('should set and get the original end time for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, {'end': 333}, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set a mock original end time.
+            $newSubtitle.attr('originalend', 100);
+
+            // The original end time should be set.
+            expect(parser.originalEndTime(newSubtitle)).toBe('100');
+
+            // The real end time should not have been modified.
+            expect(parser.originalEndTime(newSubtitle)).toNotBe(parser.endTime(newSubtitle));
+
+        });
+    });
+    describe('#originalStartTime()', function() {
+        it('should set and get the original start time for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 333}, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set a mock original start time.
+            $newSubtitle.attr('originalbegin', 100);
+
+            // The original start time should be set.
+            expect(parser.originalStartTime(newSubtitle)).toBe('100');
+
+            // The real start time should not have been modified.
+            expect(parser.originalStartTime(newSubtitle)).toNotBe(parser.startTime(newSubtitle));
+
+        });
+    });
 
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
