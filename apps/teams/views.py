@@ -417,6 +417,13 @@ def _default_project_for_team(team):
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
+
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
     filtered = 0
 
     if project_slug is None or project_slug == '':
@@ -454,6 +461,7 @@ def detail(request, slug, project_slug=None, languages=None):
 
     extra_context.update({
         'team': team,
+        'member': member,
         'project':project,
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
@@ -684,11 +692,11 @@ def remove_video(request, team_video_pk):
 def activity(request, slug):
     team = Team.get(slug, request.user)
 
+    user = request.user if request.user.is_authenticated() else None
     try:
-        user = request.user if request.user.is_authenticated() else None
-        member = team.members.get(user=user) if user else None
+        member = team.members.get(user=user)
     except TeamMember.DoesNotExist:
-        member = False
+        member = None
 
     public_only = False if member else True
 
@@ -706,7 +714,11 @@ def activity(request, slug):
     ).order_by())
     activity_list.sort(key=lambda a: action_ids.index(a.pk))
 
-    context = { 'activity_list': activity_list, 'team': team }
+    context = {
+        'activity_list': activity_list,
+        'team': team,
+        'member': member
+    }
     context.update(pagination_info)
 
     return context
@@ -721,6 +733,13 @@ def detail_members(request, slug, role=None):
     filtered = False
 
     team = Team.get(slug, request.user)
+
+    user = request.user if request.user.is_authenticated() else None
+    try:
+        member = team.members.get(user=user)
+    except TeamMember.DoesNotExist:
+        member = None
+
     qs = team.members.select_related('user').filter(user__is_active=True)
 
     if q:
@@ -765,6 +784,7 @@ def detail_members(request, slug, role=None):
 
     extra_context.update({
         'team': team,
+        'member': member,
         'query': q,
         'role': role,
         'assignable_roles': assignable_roles,
@@ -1227,7 +1247,14 @@ def dashboard(request, slug):
         for video in videos:
             _cache_video_url(video.tasks)
     else:
-        team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")[0:VIDEOS_ON_PAGE]
+        team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")
+        # TED's dashboard should only show TEDTalks videos
+        # http://i.imgur.com/fjjqx.gif
+        if team.slug == 'ted':
+            project = Project.objects.get(team=team, slug='tedtalks')
+            team_videos = team_videos.filter(teamvideo__project=project)
+
+        team_videos = team_videos[0:VIDEOS_ON_PAGE]
 
         if not user_languages:
             for tv in team_videos:
@@ -1545,7 +1572,7 @@ def assign_task_ajax(request, slug):
         assignee = form.cleaned_data['assignee']
 
         if not assignee:
-            return HttpResponseForbidden(_(u'Invalid assignment attempt - assignee is empty (%s).' % assignee))
+            return HttpResponseForbidden(u'Invalid assignment attempt - assignee is empty (%s).' % assignee)
 
         task.assignee = assignee
         task.set_expiration()
@@ -1554,7 +1581,7 @@ def assign_task_ajax(request, slug):
 
         return { 'success': True }
     else:
-        return HttpResponseForbidden(_(u'Invalid assignment attempt.'))
+        return HttpResponseForbidden(u'Invalid assignment attempt.')
 
 @login_required
 def upload_draft(request, slug, video_id):

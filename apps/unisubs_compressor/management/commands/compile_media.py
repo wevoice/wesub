@@ -21,6 +21,7 @@ import re
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
@@ -359,6 +360,20 @@ class Command(BaseCommand):
                          dest,
                          ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
 
+    def _copy_admin_media_to_cache_dir(self):
+        # temporary until we switch to staticfiles
+        # find admin media
+        admin_media_dir = os.path.join(os.path.dirname(admin.__file__), 'static')
+        for dirname in os.listdir(admin_media_dir):
+            original_path = os.path.join(admin_media_dir, dirname)
+            if os.path.isdir(original_path) and dirname not in SKIP_COPING_ON :
+                dest =  os.path.join(self.temp_dir, dirname)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                shutil.copytree(original_path,
+                         dest,
+                         ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
+
     def _copy_integration_root_to_temp_dir(self):
         """
         We 'merge' whatever is on unisubs-integration/media to
@@ -524,6 +539,7 @@ class Command(BaseCommand):
             self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
+        self._copy_admin_media_to_cache_dir()
 
         if not self.keeps_previous:
             self._remove_cache_dirs_before(1)

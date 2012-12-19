@@ -54,6 +54,7 @@ class EditorDialogs(Page):
             self.continue_to_next_step()
 
     def click_saved_ok(self):
+        print 'clicking the subtitles saved confirmation box'
         self.wait_for_element_present(self._SAVED_OK)
         self.click_by_css(self._SAVED_OK)
 
@@ -69,10 +70,12 @@ class EditorDialogs(Page):
         self.click_by_css(self._CONTINUE)
 
     def mark_subs_complete(self, complete=True):
-        self.wait_for_element_present(self._COMPLETED_DIALOG)
-        if complete == True:
-            self.click_by_css(self._CHECKBOX)
-        self.click_by_css(self._SAVED_OK)
+        print 'checking for the mark subs complete dialog'
+        time.sleep(3)
+        if self.is_element_visible(self._CHECKBOX):
+            if complete == True:
+                self.click_by_css(self._CHECKBOX)
+            self.click_by_css(self._SAVED_OK)
         
 
     def incomplete_alert_text(self):

@@ -335,3 +335,11 @@ class EmailFriendForm(MathCaptchaForm):
         from_email = self.cleaned_data['from_email']
         to_emails = self.cleaned_data['to_emails']
         send_mail(subject, message, from_email, to_emails)
+
+class ChangeVideoOriginalLanguageForm(forms.Form):
+    language_code = forms.ChoiceField(choices=ALL_LANGUAGES)
+
+    def __init__(self, *args, **kwargs):
+        super(ChangeVideoOriginalLanguageForm, self).__init__(*args, **kwargs)
+
+        self.fields['language_code'].choices = [('', '--Select language--')] + get_language_choices()

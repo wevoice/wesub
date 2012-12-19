@@ -15,12 +15,12 @@
                     url: '/site_media/src/js/dfxp/sample.dfxp.xml',
                     dataType: 'xml',
                     success: function(resp) {
-                        x = new AmaraDFXPParser();
-                        x.init(resp);
+                        parser = new AmaraDFXPParser();
+                        parser.init(resp);
                     }
                 });
             });
         </script>
-        <p>Open your console, and type "x". That's your instance.</p>
+        <p>Open your console, and type "parser". That's your instance.</p>
     </body>
 </html>

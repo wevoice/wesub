@@ -11,7 +11,7 @@ class VideoLanguagePage(VideoPage):
     _URL = "videos/{0}/{1}/"  # format(video id, language code) 
     _VIDEO_TITLE = "li.title"
     _VIDEO_DESCRIPTION  = "li.description"
-    _SUB_LINES = "div.translation-text p"
+    _SUB_LINES = "div.translation-text"
 
     #SUBTITLES TAB
     _EDIT_SUBTITLES = "a#edit_subtitles_button"

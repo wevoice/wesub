@@ -33,7 +33,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     DFXP_REPLACE_SEQ = [
         ["span[fontWeight='bold']", "**"],
         ["span[fontStyle='italic']", "*"],
-        ["span[textDecoration='underline']", "_"]
+        ["span[textDecoration='underline']", "_"],
+
+        // When jQuery creates elements, it lowercases all attributes. We fix
+        // this when sending back to the server in xmlToString, but for unit
+        // testing we need to match manually created elements, too.
+        ["span[fontweight='bold']", "**"],
+        ["span[fontstyle='italic']", "*"],
+        ["span[textdecoration='underline']", "_"]
     ];
 
     var that = this;
@@ -165,13 +172,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             var xmlString;
 
-            // For Internet Explorer.
-            if (window.ActiveXObject) {
+            if (window.XMLSerializer) {
+                xmlString = (new XMLSerializer()).serializeToString(xml);
+            } else {
+
+                // For older versions of Internet Explorer.
                 xmlString = xml.xml;
 
-            // Everyone else.
-            } else {
-                xmlString = (new XMLSerializer()).serializeToString(xml);
             }
 
             // Shield your eyes for the next 20 lines or so.
@@ -443,15 +450,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         /*
          * Retrieve the subtitle that follows the given subtitle.
          *
-         * Returns: subtitle element or empty array
+         * Returns: subtitle element or null
          */
 
-        var el =this.getSubtitle(indexOrElement);
+        var $subtitle = this.getSubtitle(indexOrElement);
 
-        if (!el) {
+        if (!$subtitle) {
             return null;
         }
-        return el.next().length > 0 ? el.next().eq(0) : null;
+
+        return $subtitle.next().length > 0 ? $subtitle.next().eq(0).get(0) : null;
     };
     this.getNonBlankSubtitles = function() {
         /*
@@ -476,7 +484,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (!el) {
             return null;
         }
-        return el.prev().length > 0 ? el.prev().eq(0) : null;
+        return el.prev().length > 0 ? el.prev().eq(0).get(0) : null;
     };
     this.getSubtitleIndex = function(subtitle) {
         /*
@@ -582,6 +590,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * This is *not* a parser. Just a quick hack to convert
          * or markdowny syntax emphasys and strong syntax to
          * the correct dfxp span elements.
+         *
+         * Please note that when you use jQuery to create elements on the fly,
+         * with attributes, jQuery flattens the casing of attributes so that all
+         * attributes (such as fontWeight) get lower-cased (fontweight). This
+         * sucks.
          */
         if (input === undefined){
             return input;

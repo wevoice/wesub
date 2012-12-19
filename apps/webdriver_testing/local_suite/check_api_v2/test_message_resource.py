@@ -55,8 +55,8 @@ class TestCaseMessages(WebdriverTestCase):
                             "content": "The message content" } 
         url_part = 'message/' 
         data_helpers.post_api_request(self, url_part, message_details)
-        self.messages_pg.open_messages() 
         self.messages_pg.log_in(self.second_user.username, 'password')
+        self.messages_pg.open_messages() 
         self.assertEqual(message_details['content'], 
             self.messages_pg.message_text())
         self.assertEqual(message_details['subject'], 
@@ -74,8 +74,9 @@ class TestCaseMessages(WebdriverTestCase):
                             "content": "The team message content" } 
         url_part = 'message/' 
         data_helpers.post_api_request(self, url_part, message_details)
-        self.messages_pg.open_messages() 
         self.messages_pg.log_in(self.team_member.username, 'password')
+        self.messages_pg.open_messages() 
+
         self.assertEqual(message_details['content'], 
             self.messages_pg.message_text())
         self.assertEqual(message_details['subject'], 
@@ -93,8 +94,8 @@ class TestCaseMessages(WebdriverTestCase):
                             "content": "The team message content" } 
         url_part = 'message/' 
         data_helpers.post_api_request(self, url_part, message_details)
-        self.messages_pg.open_messages() 
         self.messages_pg.log_in(self.second_user.username, 'password')
+        self.messages_pg.open_messages() 
         self.assertEqual('You have no messages.', 
             self.messages_pg.no_messages())
 
@@ -109,8 +110,9 @@ class TestCaseMessages(WebdriverTestCase):
                             "content": "The team message content" } 
         url_part = 'message/' 
         data_helpers.post_api_request(self, url_part, message_details)
-        self.messages_pg.open_sent_messages() 
         self.messages_pg.log_in(self.user.username, 'password')
+        self.messages_pg.open_sent_messages() 
+
         self.assertEqual(message_details['content'], 
             self.messages_pg.message_text())
         self.assertEqual(message_details['subject'], 

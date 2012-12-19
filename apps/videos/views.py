@@ -54,7 +54,8 @@ from apps.videos import permissions
 from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
-    CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm
+    CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm,
+    ChangeVideoOriginalLanguageForm
 )
 from apps.videos.models import (
     Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException,
@@ -74,6 +75,7 @@ from utils.translation import get_user_languages_from_request
 
 
 AVAILABLE_SUBTITLE_FORMATS = get_available_formats()
+from teams.permissions import  can_edit_video
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -770,3 +772,25 @@ def _get_translations(video):
     translations = list(translations)
     translations.sort(key=lambda f: f.get_language_code_display())
     return translations
+
+def set_original_language(request, video_id):
+    """
+    We only allow if a video is own a team, or the video owner is the
+    logged in user
+    """
+    video = get_object_or_404(Video, video_id=video_id)
+    if not (can_edit_video(video.get_team_video(), request.user) or video.user == request.user):
+        return HttpResponseForbidden("Can't touch this.")
+    form = ChangeVideoOriginalLanguageForm(request.POST or None, initial={
+        'language_code': video.primary_audio_language_code
+    })
+    if request.method == "POST" and form.is_valid():
+        video.primary_audio_language_code = form.cleaned_data['language_code']
+        video.save()
+        messages.success(request, _(u'The language for %s has been changed' % (video)))
+        return HttpResponseRedirect(reverse("videos:set_original_language", args=(video_id,)))
+    return render_to_response("videos/set-original-language.html", {
+        "video": video,
+        'form': form
+    }, context_instance=RequestContext(request)
+    )

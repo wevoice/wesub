@@ -67,13 +67,22 @@
                             <span class="descriptor">{% trans 'Private' %}</span>
                         {% endif %}
                     </h3>
-                    <p>
-                        {% if team.description %}
+                    {% if team.description %}
+                        <p>
                             {{ team.description|truncatewords:20|urlize }}
-                        {% else %}
-                            {% trans 'No description...' %}
-                        {% endif %}
-                    </p>
+                        </p>
+                    {% endif %}
+                    {% if my_teams %}
+                        <p>
+                            <strong>
+                                {% trans "Role:" %}
+                            </strong>
+                            {{ team|user_role:user }}
+                            {% if team|can_leave_team:user %}
+                                (<a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team team.slug %}">{% trans "leave team" %}</a>)
+                            {% endif %}
+                        </p>
+                    {% endif %}
                     <ul class="actions">
                         <li>
                             <h4>
@@ -100,14 +109,6 @@
                             {% endblocktrans %}
                         </li>
                     </ul>
-
-                    {% if my_teams and team|can_leave_team:user %}
-                        <ul class="admin-controls">
-                            <li>
-                                <a id="leave" onclick="return confirm('{% trans "Do you really wish to leave this team?" %}')" href="{% url teams:leave_team team.slug %}">{% trans "Leave team" %}</a>
-                            </li>
-                        </ul>
-                    {% endif %}
 
                 </li>
                 {% empty %}

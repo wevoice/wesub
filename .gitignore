@@ -75,5 +75,7 @@ history.dot
 apps/webdriver_testing/Results/*.png
 apps/webdriver_testing/Results/nosetests.xml
 apps/webdriver_testing/Results/results.html
+apps/webdriver_testing/Screenshots/
 unisubsdevemails/
 testacular-test-results.xml
+.idea/

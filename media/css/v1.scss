@@ -1354,42 +1354,17 @@ div#language_picker {
     padding: 0;
 }
 #user_dashboard .section {
-    clear: none;
-    margin: 1em 0;
-    border: 1px solid #eee;
-    padding: 1em;
+    clear: both;
+    margin: 1em 0 2em;
     @include border-box();
-    @include border-radius(2px);
 
-    h3 {
-        position: relative;
-        font-size: 14px;
-        line-height: 1em;
-        font-weight: normal;
-        text-align: center;
-        color: #999;
-        margin: -12px -12px 12px;
-        padding: 8px 12px;
-        border-bottom: 1px solid #EEE;
-        background: #FAFAFA;
-
-        a.count {
-            position: absolute;
-            top: .5em;
-            right: .5em;
-            font-size: 11px;
-            padding: .25em .5em;
-            background: #bbb;
-            color: #fff;
-            text-decoration: none;
-            @include border-radius(2px);
-
-            &:hover {
-                background: $normal;
-            }
-        }
+    &.messages {
+        font-size: 13px;
+        margin-top: -1em;
+        padding-top: 0;
+        color: #777;
     }
-
+    
     p, ul {
         margin: 0;
     }
@@ -1404,18 +1379,8 @@ div#language_picker {
 
     .listing > li {
         min-height: 0;
-        padding: .75em 0;
-        border-style: solid;
-        border-color: #eee;
-
-        .timestamp {
-            display: block;
-            position: static;
-            text-align: left;
-            color: #999;
-            width: auto;
-            font-weight: normal;
-        }
+        padding: 1em 0;
+        @include border-box();
 
         &:last-child {
             border: none;
@@ -1424,16 +1389,67 @@ div#language_picker {
         &.unread {
             font-weight: bold;
         }
+
+        .timestamp {
+            top: 1em;
+            width: 150px;
+        }
     }
 
-    .action-decline {
-        margin-left: .5em;
+    .listing.tasks > li {
+        position: relative;
+        min-height: 6em;
+        font-size: 13px;
+        padding: 1em;
+        margin-bottom: 1em;
+        background: #f8f8f8;
+        border: 1px solid #f1f1f1;
+
+        img {
+            float: left;
+            height: 4em;
+            margin-right: 1em;
+        }
+
+        ul {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+
+            li {
+                padding-bottom: .5em;
+            }
+        }
+
+        p, p a, .action-decline {
+            font-size: 11px;
+            color: #777;
+        }
+
+        .action-decline {
+            display: block;
+            text-align: right;
+            text-decoration: none;
+        }
+
+        .perform {
+            display: block;
+            background-color: $usblue;
+            border: 1px solid #0c4a70;
+            color: #fff;
+            cursor: pointer;
+            padding: .5em;
+            text-align: center;
+            text-decoration: none;
+            text-shadow: 1px 1px 1px #0c4a70;
+            @include border-radius(3px);
+            @include vertical-gradient(#136aa1, $usblue);
+        }
     }
 
     .prompt {
-        text-align: center;
-        font-size: 14px;
-        line-height: 175%;
+        font-size: 13px;
+        padding: 0;
 
         a {
             display: block;
@@ -2795,5 +2811,63 @@ a.truncated-expand {
             display: block;
             text-align: right;
         }
+    }
+}
+
+#video_set_language {
+    label, h5 {
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: .5em;
+        padding-top: 0;
+    }
+
+    .notation {
+        margin: -.5em 0 1.5em;
+    }
+
+    form {
+        padding: 0;
+    }
+
+    fieldset {
+        padding-bottom: 1.5em;
+    }
+}
+
+.video-item {
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    top: 0;
+
+    h4 a {
+        display: block;
+        position: absolute;
+        @include border-box();
+        bottom: 0; left: 0;
+        padding: 1em;
+        width: 290px;
+        background: rgba(0,0,0,.65);
+        color: #fff;
+        text-decoration: none;
+
+        span.duration {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-weight: normal;
+            font-size: 10px;
+        }
+    }
+
+    &:hover h4 a {
+        background: rgba(0,0,0,.75);
+    }
+
+    a img {
+        width: 290px;
+        height: 180px;
+        border: none;
     }
 }

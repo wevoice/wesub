@@ -379,7 +379,7 @@ class TestViews(WebUseTest):
         html = BeautifulSoup(response.content)
         # this is the unsynced sub:
         unsynced = html.findAll("span", attrs={"class":'time-span'})
-        self.assertEqual(unsynced[0].parent.findAll('p')[0].text, 'no sync')
+        self.assertEqual(unsynced[0].parent.findAll("span", "no-sync")[0].text, 'Not Synced')
         self.assertEqual(len(unsynced), 1)
         # this are synced subs
         synced  = html.findAll("span", attrs={"class":'time-span time-link'})
