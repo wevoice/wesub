@@ -36,6 +36,9 @@ class TestCaseUserResource(WebdriverTestCase):
 
 
     def test_create(self):
+        """Create a user via the api.
+
+        """
         new_user = {'username': 'newuser',
                     'email': 'newuser@example.com',
                     'first_name': 'New', 
@@ -46,6 +49,9 @@ class TestCaseUserResource(WebdriverTestCase):
         self.assertEqual('newuser', user_data['username'])
 
     def test_create__login_token(self):
+        """Create a user and login token, verify login.
+
+        """
         new_user = {'username': 'newuser',
                     'email': 'newuser@example.com',
                     'first_name': 'New', 
@@ -58,7 +64,7 @@ class TestCaseUserResource(WebdriverTestCase):
         print api_key, login_url
         profile_account_pg = profile_account_page.ProfileAccountPage(self)
         profile_account_pg.open_page(login_url)
-        profile_account_pg.open_account_tab()
+        profile_account_pg.open_profile_account()
         
         self.assertEqual(api_key, profile_account_pg.current_api_key())
 
