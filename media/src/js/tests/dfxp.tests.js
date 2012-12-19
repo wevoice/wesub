@@ -530,6 +530,45 @@ describe('DFXP', function() {
             expect(parser.needsAnyTranscribed()).toBe(true);
         });
     });
+    describe('#needsSyncing()', function() {
+        it('should tell us a subtitle needs syncing without a begin time', function() {
+
+            // Create a new subtitle with start time set.
+            var newSubtitle = parser.addSubtitle(null, {'end': 1500});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(true);
+
+        });
+        it('should tell us a subtitle needs syncing without an end time', function() {
+
+            // Create a new subtitle with start time set.
+            //
+            // We have to put this subtitle at the beginning, because subtitles at
+            // the end are allowed to not have an end time.
+            var newSubtitle = parser.addSubtitle(1, {'begin': 1500});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(true);
+
+        });
+        it('should tell us a subtitle does not need syncing with timing set', function() {
+
+            // Create a new subtitle with start and end times set.
+            var newSubtitle = parser.addSubtitle(1, {'begin': 1500, 'end': 1700});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(false);
+
+        });
+        it('should tell us an end subtitle does not need syncing without an end time', function() {
+
+            // Create a new subtitle with start time set.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 1500});
+
+            // Subtitles at the end of the subtitle list are not required to have an end
+            // time.
+            expect(parser.needsSyncing(newSubtitle)).toBe(false);
+
+        });
+    });
 
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
