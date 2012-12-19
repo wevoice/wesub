@@ -93,8 +93,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """
         results_pg = self.watch_pg.advanced_search(orig_lang='English')
         #WORKAROUND for testing on jenkins, where submitting search give err page.
-        time.sleep(2)
-        results_pg.page_refresh()
+        results_pg.open_page(results_pg.current_url())
 
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
@@ -107,8 +106,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.advanced_search(trans_lang='Portuguese')
 
         #WORKAROUND for testing on jenkins, where submitting search give err page.
-        time.sleep(2)
-        results_pg.page_refresh()
+        results_pg.open_page(results_pg.current_url())
 
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
@@ -122,8 +120,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
             trans_lang='Portuguese')
 
         #WORKAROUND for testing on jenkins, where submitting search give err page.
-        time.sleep(2)
-        results_pg.page_refresh()
+        results_pg.open_page(results_pg.current_url())
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -138,9 +135,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
             trans_lang='English')
 
         #WORKAROUND for testing on jenkins, where submitting search give err page.
-        time.sleep(2)
-        results_pg.page_refresh()
-
+        results_pg.open_page(results_pg.current_url())
+ 
         self.assertTrue(results_pg.page_has_video(
             'original ar with en complete subs'))
         self.assertEqual(1, len(results_pg.page_videos()))
