@@ -101,7 +101,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
  
         """
         results_pg = self.watch_pg.advanced_search(trans_lang='Portuguese')
-        self.assertTrue(results_pg.search_has_results())
+        if not results_pg.search_has_results():
+            results_pg.page_refresh()
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -112,7 +113,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """
         results_pg = self.watch_pg.advanced_search(orig_lang = 'English', 
             trans_lang='Portuguese')
-        self.assertTrue(results_pg.search_has_results())
+        if not results_pg.search_has_results():
+            results_pg.page_refresh()
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -125,7 +127,9 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.advanced_search(
             orig_lang = 'Arabic', 
             trans_lang='English')
-        self.assertTrue(results_pg.search_has_results())
+        if not results_pg.search_has_results():
+            results_pg.page_refresh()
+
         self.assertTrue(results_pg.page_has_video(
             'original ar with en complete subs'))
         self.assertEqual(1, len(results_pg.page_videos()))
