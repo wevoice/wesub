@@ -774,8 +774,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.removeSubtitle = function(indexOrElement) {
         /*
-         * Given the zero-index of the subtitle to be removed,
-         * remove it from the node tree.
+         * Remove a subtitle.
          *
          * Returns: true
          */

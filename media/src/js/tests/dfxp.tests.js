@@ -623,6 +623,51 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#originalXmlToString()', function() {
+        it('should return a string representation of the original XML tree', function() {
+
+            // It should be a string.
+            expect(typeof parser.originalXmlToString()).toBe('string');
+
+            // The original XML and working XML should be different by now.
+            expect(parser.originalXmlToString()).toNotBe(parser.xmlToString());
+
+        });
+    });
+    describe('#removeSubtitle()', function() {
+        it('should remove a subtitle from the list', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, null, 'Life is so short.');
+
+            // Subtitle should exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toNotBe(-1);
+
+            // Remove that subtitle.
+            parser.removeSubtitle(newSubtitle);
+
+            // Subtitle should no longer exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toBe(-1);
+
+        });
+    });
+    describe('#removeSubtitles()', function() {
+        it('should remove all subtitles from the working XML', function() {
+            
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // There should be more than zero subtitles.
+            expect(parser.subtitlesCount()).toNotBe(0);
+
+            // Destroy them all.
+            parser.removeSubtitles();
+
+            // There should be no subtitles.
+            expect(parser.subtitlesCount()).toBe(0);
+
+        });
+    });
 
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
@@ -632,6 +677,7 @@ describe('DFXP', function() {
 
             // Verify.
             expect(parser.startTime(newSubtitle)).toBe(1234);
+
         });
         it('should set the start time for a subtitle', function() {
 
@@ -646,6 +692,7 @@ describe('DFXP', function() {
 
             // Verify the new start time.
             expect(parser.startTime(newSubtitle)).toBe(2345);
+
         });
     });
 });
