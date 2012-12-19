@@ -45,9 +45,9 @@ class WatchPage(VideoListings):
             self.submit_form_text_by_css(self._SEARCH, search_term)
         else:
             elem = self.wait_for_element_present(self._SEARCH)
+            time.sleep(2)
             elem.submit()
 
-        time.sleep(2)
         return SearchResultsPage(self)
 
        

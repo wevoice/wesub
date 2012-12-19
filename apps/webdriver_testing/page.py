@@ -150,7 +150,7 @@ class Page(object):
         kwargs no_wait, then use send keys to no wait for page load.
                wait_for_element, wait for a passed in element to display
         """
-        elem = self.wait_for_element_present(element)
+        elem = self._safe_find(element)
         elem.click()
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)

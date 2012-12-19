@@ -34,7 +34,9 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             os.unlink('apps/webdriver_testing/Results/%s.png' % self.id())
         except:
             pass
-        if settings.VAGRANT_VM: #if running in vagrant VM, must use port 80 for headless browser
+
+        #if running in vagrant VM, must use port 80 for headless browser
+        if settings.VAGRANT_VM:             
             self.base_url = 'http://unisubs.example.com:80/'
         else:
             self.base_url = self.live_server_url + '/'
