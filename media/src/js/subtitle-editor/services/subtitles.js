@@ -52,11 +52,30 @@
     module = angular.module('amara.SubtitleEditor.services', []);
 
     module.factory("SubtitleFetcher", function($http) {
-        console.log($http);
         var initialData = window.editorData || {};
         return {
-            getSubtitles: function(languageCode, versionNumber) {
-                return ['one', 'two', 'three'];
+
+            getSubtitles: function(languageCode, versionNumber, callback){
+                var subtitlesXML = undefined;
+                // will trigger a subtitlesFetched event when ready
+                for (var i=0; i < initialData.languages.length ; i++){
+                    var langObj = initialData.languages[i];
+                    if (langObj.code == languageCode){
+                        for (var j = 1; j < langObj.versions.length + 1; j++){
+                            if (langObj.versions[j].number == versionNumber){
+                                subtitlesXML = langObj.versions[j].subtitlesXML;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (subtitlesXML !== undefined){
+                   callback(subtitlesXML);
+                }else{
+                    // fetch data
+                }
+                return;
             }
         };
     });
