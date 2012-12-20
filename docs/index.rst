@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    running-amara
+   development
    static-files
    deployment-guide
    permissions
