@@ -771,7 +771,7 @@ describe('DFXP', function() {
 
         });
     });
-    describe('#xmlToString', function() {
+    describe('#xmlToString()', function() {
         it('should return an XML string with timing converted to time expressions', function() {
 
             // Remove all subtitles.
