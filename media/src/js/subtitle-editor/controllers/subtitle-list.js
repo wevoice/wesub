@@ -80,10 +80,11 @@
 
         }
         $scope.startEditingMode = function (){
-
         }
         $scope.finishEditingMode = function(){
 
+        }
+        $scope.setEditable = function(isEditable){
         }
     }
     // exports

@@ -40,26 +40,21 @@
         <select name="alternate-version" id="alternate-version">
             <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
         </select>
-    <ul data-subtitle-list="" ng-controller='SubtitleListController'>
-        <li ng-repeat="subtitle in alternateVersion.subtitles"> </li>
-    </ul>
     </div>
     <div class='subtitling-area'>
         <ul subtitle-list="" ng-controller="SubtitleListController"
+            editable='true'
             version-number='{{ version.version_number }}'
             language-code='{{ language.language_code }}'>
 
                 [[ subtitlesData.length ]] subs
 
-            <li ng-repeat="subtitle in subtitlesData" ng-controller="SubtitleListItemController">
+            <li ng-repeat="subtitle in subtitlesData"
+                ng-controller="SubtitleListItemController"
+                    subtitle-list-item>
                 [[subtitle.text]]
             </li>
         </ul>
-
-<div ng-controller="TestController">
-    <ul>
-        <li ng-repeat="item in items">[[item]]</li>
-    </ul>
-</div>
+    </div>
 </body>
 </html>
