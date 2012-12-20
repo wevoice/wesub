@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import time
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
@@ -65,7 +65,7 @@ GET /api2/partners/activity/[activity-id]/
         TeamVideoFactory.create(team=self.open_team, added_by=self.user)
 
     def test_list__video_update(self):
-        """Verify 
+        """Verify video update activity.
         GET /api2/partners/activity/[activity-id]/
 
         """
@@ -99,7 +99,8 @@ GET /api2/partners/activity/[activity-id]/
 
 
     def test_team__video_added(self):
-        """Verify 
+        """Verify team video added activity.
+
         GET /api2/partners/activity/[activity-id]/
 
         """

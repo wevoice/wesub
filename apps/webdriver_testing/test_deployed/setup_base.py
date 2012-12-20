@@ -20,7 +20,10 @@ import os
 import time
 from selenium import webdriver
 import nose
-import unittest
+try:
+    import unittest2 as unittest
+except:
+    import unittest
 
 class WebdriverRemote(unittest.TestCase):
 
@@ -47,36 +50,47 @@ class WebdriverRemote(unittest.TestCase):
         We are going to look for a USE_SAUCE = True if we are using sauce, 
         and a default browser TEST_BROWSER if not using sauce.
         """
-        use_sauce = os.environ.get('USE_SAUCE', False)
+        self.use_sauce = os.environ.get('USE_SAUCE', False)
         self.base_url = os.environ.get('TEST_URL', 'http://dev.universalsubtitles.org/')
 
-        if use_sauce:
+
+        #If we are using sauce - check if we are running on jenkins.
+        if self.use_sauce:
             sauce_key = os.environ.get('SAUCE_API_KEY')
-        else:    
-            test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
-            
-        if use_sauce:
             jenkins_ws = os.environ.get('WORKSPACE', False)
+               
+            #Using sauce, but not jenkins, specify the setups
+            #Jenkins sets thes via the env vars (I think)    
             if not jenkins_ws: 
-                test_browser = os.environ.get('SELENIUM_BROWSER', 'FIREFOX')
+                test_browser = os.environ.get('SELENIUM_BROWSER', 'CHROME')
                 dc = getattr(webdriver.DesiredCapabilities, test_browser) 
                 dc['version'] = os.environ.get('SELENIUM_VERSION', '')
-                dc['platform'] = os.environ.get('SELENIUM_PLAFORM', 'MAC 10.8')
+                dc['platform'] = os.environ.get('SELENIUM_PLAFORM', 'WINDOWS 2008')
                 dc['name'] = self.shortDescription()
 
-                self.browser = webdriver.Remote(
-                    desired_capabilities = dc,
-                    command_executor=("http://jed-pcf:%s@ondemand.saucelabs.com:80"
-                                      "/wd/hub" % sauce_key) 
-                                      )
-                self.browser.implicitly_wait(5)
+            #Setup the remote browser capabilities
+            self.browser = webdriver.Remote(
+                desired_capabilities = dc,
+                command_executor=("http://jed-pcf:%s@ondemand.saucelabs.com:80"
+                                  "/wd/hub" % sauce_key) 
+                                  )
+            self.browser.implicitly_wait(2)
+
+        #Otherwise just running locally - setup the browser to use.
         else:
+            test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
             self.browser = getattr(webdriver, test_browser)()
             self.browser.implicitly_wait(1)
 
         
     def tearDown(self):
-        print("Link to your job: https://saucelabs.com/jobs/%s" % self.browser.session_id)
+        if self.use_sauce:
+            print("\nLink to your job: https://saucelabs.com/jobs/%s" % self.browser.session_id)
+        else:
+            screenshot_file = ('apps/webdriver_testing/' 
+                               'Results/%s.png' % self.id())
+            self.browser.get_screenshot_as_file(screenshot_file)
+
         self.browser.quit()
 
         

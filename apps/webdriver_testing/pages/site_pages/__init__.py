@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import time
 from apps.webdriver_testing.pages import Page
 

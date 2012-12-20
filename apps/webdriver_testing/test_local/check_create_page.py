@@ -18,7 +18,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from apps.webdriver_testing.pages.site_pages import create_page
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
 
 class TestCaseVideosCreateVideos(WebdriverTestCase):
     def setUp(self):

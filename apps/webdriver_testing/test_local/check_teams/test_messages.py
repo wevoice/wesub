@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
 from apps.webdriver_testing.pages.site_pages.teams import messages_tab
 from apps.webdriver_testing.pages.site_pages.teams import members_tab

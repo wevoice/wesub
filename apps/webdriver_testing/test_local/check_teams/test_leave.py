@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.page.site_pages.teams_dir_page import TeamDirPage
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.data_factories import TeamMemberFactory 
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember

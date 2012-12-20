@@ -1,7 +1,7 @@
 import time
 import itertools
 import operator
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory

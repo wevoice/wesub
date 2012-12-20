@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from profile_page import ProfilePage
+from apps.webdriver_testing.pages.site_pages.profiles import ProfilePage
 
 class ProfilePersonalPage(ProfilePage):
     """

@@ -1,5 +1,5 @@
 from setup_base import WebdriverRemote
-from ..site_pages.unisubs_page import UnisubsPage
+from apps.webdriver_testing.pages.site_pages import UnisubsPage
 
 
 class TestLogin(WebdriverRemote):

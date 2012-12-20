@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.check_local.webdriver_base import WebdriverTestCase
+from apps.webdriver_testing.test_local.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.pages.site_pages import search_results_page
