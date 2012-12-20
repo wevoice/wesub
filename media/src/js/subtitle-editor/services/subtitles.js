@@ -46,13 +46,26 @@
 
 (function() {
 
-    var root, module;
+    var root, module, getAPIUrl;
 
     root = this;
     module = angular.module('amara.SubtitleEditor.services', []);
 
+    getAPIUrl = function(videoId, languageCode, versionNumber) {
+        var url = '/api2/partners/videos/' + videoId +
+            '/languages/' + languageCode + '/subtitles/?format=dfxp';
+
+        if (versionNumber) {
+            url = url + '&version=' + versionNumber;
+        }
+
+        return url;
+
+    };
+
     module.factory("SubtitleFetcher", function($http) {
-        var cachedData = window.editorData ;
+        var cachedData = window.editorData;
+
         return {
 
             /**
@@ -64,7 +77,10 @@
              * once it's ready.
              */
             getSubtitles: function(languageCode, versionNumber, callback){
-                var subtitlesXML = undefined;
+                if (!languageCode) {
+                    throw Error("You have to give me a languageCode");
+                }
+                var subtitlesXML;
                 // will trigger a subtitlesFetched event when ready
                 for (var i=0; i < cachedData.languages.length ; i++){
                     var langObj = cachedData.languages[i];
@@ -80,10 +96,15 @@
                 }
                 if (subtitlesXML !== undefined){
                    callback(subtitlesXML);
-                }else{
+                } else {
                     // fetch data
+                    var url = getAPIUrl(cachedData.video.id, languageCode,
+                                        versionNumber);
+
+                    $http.get(url).success(function(response) {
+                        callback(response);
+                    });
                 }
-                return;
             }
         };
     });
