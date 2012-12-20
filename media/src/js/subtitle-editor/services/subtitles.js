@@ -55,6 +55,14 @@
         var cachedData = window.editorData ;
         return {
 
+            /**
+             * Tries to find the data in an in memory, if it's not there
+             * fetch from the server side.
+             * @param languageCode
+             * @param versionNumber
+             * @param callback Function to be called with the dfxp xlm
+             * once it's ready.
+             */
             getSubtitles: function(languageCode, versionNumber, callback){
                 var subtitlesXML = undefined;
                 // will trigger a subtitlesFetched event when ready
