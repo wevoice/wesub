@@ -832,7 +832,7 @@ describe('DFXP', function() {
             var $firstSubtitle = $('div p', newXML).eq(0);
             var firstSubtitleContent = $('<div>').append($firstSubtitle.contents().clone()).remove().html();
 
-            // Verify that the content has been converted to DFXP;
+            // Verify that the content has been converted to DFXP.
             expect(firstSubtitleContent).toBe('<span fontWeight="bold">Test</span>');
 
         });
