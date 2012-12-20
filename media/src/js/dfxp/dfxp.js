@@ -708,7 +708,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         // If the end time is empty and this is not the last subtitle,
         // it needs to be synced.
-        if (endTime === '' && (subtitle !== this.getLastSubtitle())) {
+        if (endTime === '' && ($subtitle.get(0) !== this.getLastSubtitle())) {
             return true;
         }
 
@@ -774,8 +774,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.removeSubtitle = function(indexOrElement) {
         /*
-         * Given the zero-index of the subtitle to be removed,
-         * remove it from the node tree.
+         * Remove a subtitle.
          *
          * Returns: true
          */

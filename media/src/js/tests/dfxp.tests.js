@@ -530,6 +530,144 @@ describe('DFXP', function() {
             expect(parser.needsAnyTranscribed()).toBe(true);
         });
     });
+    describe('#needsSyncing()', function() {
+        it('should tell us a subtitle needs syncing without a begin time', function() {
+
+            // Create a new subtitle with start time set.
+            var newSubtitle = parser.addSubtitle(null, {'end': 1500});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(true);
+
+        });
+        it('should tell us a subtitle needs syncing without an end time', function() {
+
+            // Create a new subtitle with start time set.
+            //
+            // We have to put this subtitle at the beginning, because subtitles at
+            // the end are allowed to not have an end time.
+            var newSubtitle = parser.addSubtitle(1, {'begin': 1500});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(true);
+
+        });
+        it('should tell us a subtitle does not need syncing with timing set', function() {
+
+            // Create a new subtitle with start and end times set.
+            var newSubtitle = parser.addSubtitle(1, {'begin': 1500, 'end': 1700});
+
+            expect(parser.needsSyncing(newSubtitle)).toBe(false);
+
+        });
+        it('should tell us an end subtitle does not need syncing without an end time', function() {
+
+            // Create a new subtitle with start time set.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 1500});
+
+            // Subtitles at the end of the subtitle list are not required to have an end
+            // time.
+            expect(parser.needsSyncing(newSubtitle)).toBe(false);
+
+        });
+    });
+    describe('#originalContent()', function() {
+        it('should set and get the original HTML content for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, null, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set some mock original content.
+            $newSubtitle.attr('originalcontent', 'Mock original content.');
+
+            // The original content should be set.
+            expect(parser.originalContent(newSubtitle)).toBe('Mock original content.');
+
+            // The real content should not have been modified.
+            expect(parser.originalContent(newSubtitle)).toNotBe(parser.content(newSubtitle));
+
+        });
+    });
+    describe('#originalEndTime()', function() {
+        it('should set and get the original end time for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, {'end': 333}, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set a mock original end time.
+            $newSubtitle.attr('originalend', 100);
+
+            // The original end time should be set.
+            expect(parser.originalEndTime(newSubtitle)).toBe('100');
+
+            // The real end time should not have been modified.
+            expect(parser.originalEndTime(newSubtitle)).toNotBe(parser.endTime(newSubtitle));
+
+        });
+    });
+    describe('#originalStartTime()', function() {
+        it('should set and get the original start time for the subtitle', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 333}, 'New content.');
+            var $newSubtitle = $(newSubtitle);
+
+            // Set a mock original start time.
+            $newSubtitle.attr('originalbegin', 100);
+
+            // The original start time should be set.
+            expect(parser.originalStartTime(newSubtitle)).toBe('100');
+
+            // The real start time should not have been modified.
+            expect(parser.originalStartTime(newSubtitle)).toNotBe(parser.startTime(newSubtitle));
+
+        });
+    });
+    describe('#originalXmlToString()', function() {
+        it('should return a string representation of the original XML tree', function() {
+
+            // It should be a string.
+            expect(typeof parser.originalXmlToString()).toBe('string');
+
+            // The original XML and working XML should be different by now.
+            expect(parser.originalXmlToString()).toNotBe(parser.xmlToString());
+
+        });
+    });
+    describe('#removeSubtitle()', function() {
+        it('should remove a subtitle from the list', function() {
+
+            // Create a new subtitle.
+            var newSubtitle = parser.addSubtitle(null, null, 'Life is so short.');
+
+            // Subtitle should exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toNotBe(-1);
+
+            // Remove that subtitle.
+            parser.removeSubtitle(newSubtitle);
+
+            // Subtitle should no longer exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toBe(-1);
+
+        });
+    });
+    describe('#removeSubtitles()', function() {
+        it('should remove all subtitles from the working XML', function() {
+            
+            // Get all of the subtitles.
+            var $subtitles = parser.getSubtitles();
+
+            // There should be more than zero subtitles.
+            expect(parser.subtitlesCount()).toNotBe(0);
+
+            // Destroy them all.
+            parser.removeSubtitles();
+
+            // There should be no subtitles.
+            expect(parser.subtitlesCount()).toBe(0);
+
+        });
+    });
 
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
@@ -539,6 +677,7 @@ describe('DFXP', function() {
 
             // Verify.
             expect(parser.startTime(newSubtitle)).toBe(1234);
+
         });
         it('should set the start time for a subtitle', function() {
 
@@ -553,6 +692,7 @@ describe('DFXP', function() {
 
             // Verify the new start time.
             expect(parser.startTime(newSubtitle)).toBe(2345);
+
         });
     });
 });
