@@ -52,11 +52,38 @@
     module = angular.module('amara.SubtitleEditor.services', []);
 
     module.factory("SubtitleFetcher", function($http) {
-        console.log($http);
-        var initialData = window.editorData || {};
+        var cachedData = window.editorData ;
         return {
-            getSubtitles: function(languageCode, versionNumber) {
-                return ['one', 'two', 'three'];
+
+            /**
+             * Tries to find the data in an in memory, if it's not there
+             * fetch from the server side.
+             * @param languageCode
+             * @param versionNumber
+             * @param callback Function to be called with the dfxp xlm
+             * once it's ready.
+             */
+            getSubtitles: function(languageCode, versionNumber, callback){
+                var subtitlesXML = undefined;
+                // will trigger a subtitlesFetched event when ready
+                for (var i=0; i < cachedData.languages.length ; i++){
+                    var langObj = cachedData.languages[i];
+                    if (langObj.code == languageCode){
+                        for (var j = 1; j < langObj.versions.length + 1; j++){
+                            if (langObj.versions[j].number == versionNumber){
+                                subtitlesXML = langObj.versions[j].subtitlesXML;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (subtitlesXML !== undefined){
+                   callback(subtitlesXML);
+                }else{
+                    // fetch data
+                }
+                return;
             }
         };
     });

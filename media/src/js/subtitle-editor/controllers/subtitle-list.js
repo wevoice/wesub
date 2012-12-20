@@ -1,0 +1,95 @@
+// Amara, universalsubtitles.org
+//
+// Copyright (C) 2012 Participatory Culture Foundation
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as
+// published by the Free Software Foundation, either version 3 of the
+// License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see
+// http://www.gnu.org/licenses/agpl-3.0.html.
+
+(function() {
+
+    var root, SubtitleListController, SubtitleListItemController;
+
+    root = this;
+
+    /**
+     * Responsible for everything that touches subtitles as a group,
+     * souch as populating the list with actual data, removing subs,
+     * adding subs.
+     * @param $scope
+     * @param SubtitleFetcher
+     * @constructor
+     */
+    SubtitleListController = function($scope, SubtitleFetcher) {
+        $scope.getSubtitles = function(languageCode, versionNumber){
+            $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML){
+                $scope.onSubtitlesFetched(subtitlesXML);
+            });
+        }
+        /**
+         * Once we have the dfxp from the server,
+         * massage the data as a simpler object and set it on the
+         * template. Angular will pick up the change (from the broadcast)
+         * and will re-render the UI.
+         * @param dfxpXML
+         */
+        $scope.onSubtitlesFetched = function (dfxpXML){
+
+            this.dfxpWrapper = new AmaraDFXPParser();
+            this.dfxpWrapper.init(dfxpXML);
+            // now populate the subtitles scope var
+            // and let angular build the UI
+            var subtitlesData = _.map(this.dfxpWrapper.getSubtitles(), function(sub,i){
+                    return {
+                        index: i,
+                        startTime: this.dfxpWrapper.startTime(i),
+                        endTime: this.dfxpWrapper.endTime(i),
+                        text: this.dfxpWrapper.content(i)
+
+                    }
+                }, this);
+            $scope.subtitlesData = subtitlesData;
+            // only let the descendant scope know of this, no need to propagate
+            // upwards
+            $scope.$broadcast("onSubtitlesFetched");
+
+
+        }
+    };
+
+    /**
+     * Responsible for actions on one subtitle: editing, selecting.
+     * @param $scope
+     * @constructor
+     */
+    SubtitleListItemController  = function($scope){
+        // we expect to have on the scope the object that
+        // SubtitleListController.onSubtitlesFetched
+        // has created from the dfxp
+        $scope.toHTML = function  (markupLikeText) {
+
+        }
+        $scope.startEditingMode = function (){
+
+        }
+        $scope.finishEditingMode = function(){
+
+        }
+    }
+    // exports
+    root.SubtitleListController = SubtitleListController;
+    root.SubtitleListItemController = SubtitleListItemController;
+
+
+
+}).call(this);

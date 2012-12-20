@@ -23,10 +23,12 @@
     root = this;
 
     module = angular.module('amara.SubtitleEditor', [
-        'amara.SubtitleEditor.services'
+        'amara.SubtitleEditor.services',
+        'amara.SubtitleEditor.directives'
     ]);
 
     // instead of using {{ }} for variables, use [[ ]]
+    // so as to avoid conflict with django templating
     module.config(function($interpolateProvider) {
         $interpolateProvider.startSymbol('[[');
         $interpolateProvider.endSymbol(']]');

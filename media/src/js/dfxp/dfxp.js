@@ -44,7 +44,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     ];
 
     var that = this;
-    var $ = window.AmarajQuery.noConflict();
+    var $ = window.AmarajQuery? window.AmarajQuery.noConflict(): window.$;
 
     this.init = function(xml) {
 
