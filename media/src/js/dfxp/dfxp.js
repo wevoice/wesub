@@ -837,10 +837,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         if (typeof startOfParagraph !== 'undefined') {
 
+            // If the subtitle is not the first child, then we need to wrap
+            // the subtitle in a div.
             if (startOfParagraph) {
-
-                // If the subtitle is not the first child, then we need to wrap
-                // the subtitle in a div.
                 if (!$subtitle.is(':first-child')) {
                      $subtitle.wrap('<div>');
                 }
