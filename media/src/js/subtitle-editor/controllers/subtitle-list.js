@@ -22,12 +22,27 @@
 
     root = this;
 
+    /**
+     * Responsible for everything that touches subtitles as a group,
+     * souch as populating the list with actual data, removing subs,
+     * adding subs.
+     * @param $scope
+     * @param SubtitleFetcher
+     * @constructor
+     */
     SubtitleListController = function($scope, SubtitleFetcher) {
         $scope.getSubtitles = function(languageCode, versionNumber){
             $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML){
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
         }
+        /**
+         * Once we have the dfxp from the server,
+         * massage the data as a simpler object and set it on the
+         * template. Angular will pick up the change (from the broadcast)
+         * and will re-render the UI.
+         * @param dfxpXML
+         */
         $scope.onSubtitlesFetched = function (dfxpXML){
 
             this.dfxpWrapper = new AmaraDFXPParser();
@@ -44,16 +59,23 @@
                     }
                 }, this);
             $scope.subtitlesData = subtitlesData;
+            // only let the descendant scope know of this, no need to propagate
+            // upwards
             $scope.$broadcast("onSubtitlesFetched");
 
 
         }
     };
 
-    SubtitleListItemController  = function($scope, SubtitleFetcher){
-        // we expect to have on the scope:
-        // listController : SubtitleListController
-        // index: my index
+    /**
+     * Responsible for actions on one subtitle: editing, selecting.
+     * @param $scope
+     * @constructor
+     */
+    SubtitleListItemController  = function($scope){
+        // we expect to have on the scope the object that
+        // SubtitleListController.onSubtitlesFetched
+        // has created from the dfxp
         $scope.toHTML = function  (markupLikeText) {
 
         }
