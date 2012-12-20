@@ -91,7 +91,10 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     lineage = editing_version and editing_version.get_lineage()
     if editing_version and lineage:
         translated_from_version = SubtitleVersion.objects.get(
-            subtitle_language__language_code=lineage.keys()[0], version_number=lineage.values()[0])
+            subtitle_language__video=video,
+            subtitle_language__language_code=lineage.keys()[0],
+            version_number=lineage.values()[0]
+        )
     languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
         num_versions=Count('subtitleversion'))
     editor_data = {
