@@ -3,6 +3,8 @@ Development Guide
 
 This guide describes the development workflow for Amara.
 
+.. contents::
+
 Git Setup
 ---------
 
