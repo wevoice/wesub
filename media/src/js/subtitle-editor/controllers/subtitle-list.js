@@ -87,7 +87,8 @@
         }
         $scope.finishEditingMode = function(newValue){
             $scope.isEditing  = false;
-            this.dfxpWrapper.content($scope.getSubtitleNode(), this.dfxpWrapper.markdownToDFXP(newValue));
+            this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
+            $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
         };
         $scope.getSubtitleNode = function(){
             return this.dfxpWrapper.getSubtitle($scope.subtitle.index);

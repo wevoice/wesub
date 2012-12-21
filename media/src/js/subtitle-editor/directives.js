@@ -3,7 +3,7 @@
     var directives = angular.module("amara.SubtitleEditor.directives", []);
     directives.directive("subtitleList", function (SubtitleFetcher) {
         var isEditable;
-        var selectedScope, selectedController;
+        var selectedScope, selectedController, activeTextArea;
 
         /**
          * Triggered with a key is up on a text area for editing subtitles.
@@ -34,19 +34,22 @@
         function onSubtitleItemSelected(elm) {
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
+            if (scope == selectedScope){
+                return;
+            }
             // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
-                var textarea = $("textarea", $(elm).parent(".subtitle-list-item"));
                 if (selectedScope) {
                     // if there were an active item, deactivate it
-                    selectedScope.finishEditingMode(textarea.text());
+                    selectedScope.finishEditingMode(activeTextArea.val());
                     // trigger updates
                     selectedScope.$digest();
                 }
+                activeTextArea = $("textarea", $(elm).parents(".subtitle-list-item"));
                 selectedScope = scope;
                 var editableText = selectedScope.startEditingMode();
 
-                textarea.text(editableText);
+                activeTextArea.val(editableText);
                 selectedScope.$digest();
             }
         }
