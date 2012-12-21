@@ -2316,15 +2316,16 @@ class TeamNotificationSettingManager(models.Manager):
                     extra={"team_pk": team_pk, "event_name": event_name})
             return
 
-        if team.partner:
-            notification_settings = self.get(partner=team.partner)
-        else:
-            try:
+        try:
+            if team.partner:
+                notification_settings = self.get(partner=team.partner)
+            else:
                 notification_settings = self.get(team=team)
-            except TeamNotificationSetting.DoesNotExist:
-                return
+        except TeamNotificationSetting.DoesNotExist:
+            return
 
         notification_settings.notify(event_name, **kwargs)
+
 
 class TeamNotificationSetting(models.Model):
     """Info on how a team should be notified of changes to its videos.
@@ -2478,7 +2479,7 @@ class BillingReport(models.Model):
         Return two lists;  a list of imported languages and a list of crowd
         created languages.
 
-        Imported language is a language
+        Imported language is a language either
         * Whose version 0 contains a note of "From youtube"
         * that was completed before team.created
         * that is not English
@@ -2496,11 +2497,19 @@ class BillingReport(models.Model):
                 # Throw away languages that don't have a zero version.
                 continue
 
-            if (lang.language != 'en' and v.note == 'From youtube' and
-                    v.datetime_started < self.team.created):
-                imported.append(lang)
-            else:
+            if lang.language == 'en':
                 crowd_created.append(lang)
+                continue
+
+            if v.note == 'From youtube':
+                imported.append(lang)
+                continue
+
+            if v.datetime_started < self.team.created:
+                imported.append(lang)
+                continue
+
+            crowd_created.append(lang)
 
         return imported, crowd_created
 

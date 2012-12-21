@@ -65,7 +65,7 @@ class BaseNotification(object):
         to gather the video from this public id
         """
         return Video.objects.get(video_id=api_pk).video_id
-        
+
     def from_internal_video_id(self, video_id, video=None):
         """
         Coverts the internal video id representation (the actual )
@@ -139,7 +139,7 @@ class BaseNotification(object):
         h = Http()
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
-            
+
         project = self.video.get_team_video().project.slug if self.video else None
         data = {
             'event': self.event_name,
@@ -159,12 +159,12 @@ class BaseNotification(object):
             data.update({"language_code":self.language_code} )
         data_sent = data
         data = urlencode(data)
-        url = "%s?%s"  % (url , data)
+        url = "%s?%s" % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data)
-            success =  200<= resp.status <400
+            success = 200 <= resp.status < 400
             if success is False:
-                logger.error("Failed to notify team %s " %( self.team),
+                logger.error("Failed to notify team %s " % (self.team),
                      extra={
                         'team': self.team or self.partner,
                         'url': url,
@@ -190,6 +190,7 @@ class BaseNotification(object):
                     "video": self.video,
                     "event-name": self.event_name,
                     "team": self.team,
-                    "laguage":self.language, 
+                    "laguage":self.language,
                 }
             )
+
