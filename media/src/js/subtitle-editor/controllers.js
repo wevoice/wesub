@@ -23,7 +23,6 @@
     root = this;
 
     TestController = function($scope, SubtitleFetcher) {
-        $scope.items = SubtitleFetcher.getSubtitles();
     };
 
     // exports

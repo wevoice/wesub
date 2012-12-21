@@ -668,7 +668,66 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#resetSubtitles()', function() {
+        it('should reset the text, start times, and end times for subtitles that have content', function() {
 
+            // We have a blank slate to work with due to the last test,
+            // so let's create some test subtitles.
+            var sub1 = parser.addSubtitle(null, {'begin': 100, 'end': 150}, 'Hey');
+            var sub2 = parser.addSubtitle(null, {'begin': 150, 'end': 200}, 'Yep');
+
+            expect(parser.subtitlesCount()).toBe(2);
+
+            parser.resetSubtitles();
+
+            expect(parser.content(sub1)).toBe('');
+            expect(parser.startTime(sub1)).toBe(-1);
+            expect(parser.endTime(sub1)).toBe(-1);
+
+            expect(parser.content(sub2)).toBe('');
+            expect(parser.startTime(sub2)).toBe(-1);
+            expect(parser.endTime(sub2)).toBe(-1);
+
+        });
+        it('should delete subtitles that have no content', function() {
+
+            // Create a new subtitle with no content.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 200, 'end': 250}, null);
+
+            // Subtitle should exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toNotBe(-1);
+
+            parser.resetSubtitles();
+
+            // Subtitle should no longer exist in the subtitles list.
+            expect($.inArray(newSubtitle, parser.getSubtitles())).toBe(-1);
+
+            // The two subtitles added in the previous test had their contents removed
+            // when we used resetSubtitles(), so they'll be deleted when we call
+            // resetSubtitles() for the second time.
+            expect(parser.subtitlesCount()).toBe(0);
+
+        });
+    });
+    describe('#startOfParagraph()', function() {
+        it('should get the startofparagraph setting for a subtitle', function() {
+
+            var firstSubtitle = parser.addSubtitle(null, null, null);
+            var secondSubtitle = parser.addSubtitle(null, null, null);
+
+            // The first subtitle is always a startOfParagraph.
+            expect(parser.startOfParagraph(firstSubtitle)).toBe(true);
+
+            // The second subtitle shouldn't be.
+            expect(parser.startOfParagraph(secondSubtitle)).toBe(false);
+
+            // Make the second subtitle a startOfParagraph.
+            parser.startOfParagraph(secondSubtitle, true);
+
+            // Verify.
+            expect(parser.startOfParagraph(secondSubtitle)).toBe(true);
+        });
+    });
     describe('#startTime()', function() {
         it('should get the current start time for a subtitle', function() {
 
@@ -692,6 +751,89 @@ describe('DFXP', function() {
 
             // Verify the new start time.
             expect(parser.startTime(newSubtitle)).toBe(2345);
+
+        });
+    });
+    describe('#subtitlesCount()', function() {
+        it('should return the current number of subtitles', function() {
+
+            // Remove all subtitles.
+            parser.removeSubtitles();
+
+            // Create three subtitles.
+            parser.addSubtitle(null, null, null);
+            parser.addSubtitle(null, null, null);
+            parser.addSubtitle(null, null, null);
+
+            // Verify.
+            expect(parser.subtitlesCount()).toBe(3);
+            expect(parser.subtitlesCount()).toBe(parser.getSubtitles().length);
+
+        });
+    });
+    describe('#xmlToString()', function() {
+        it('should return an XML string with timing converted to time expressions', function() {
+
+            // Remove all subtitles.
+            parser.removeSubtitles();
+            
+            // Add a mock subtitle.
+            parser.addSubtitle(null, {'begin': 50, 'end': 100}, 'Test');
+
+            // Get the XML string.
+            var xmlString = parser.xmlToString(true);
+
+            // Parse the XML.
+            var newXML = $.parseXML(xmlString);
+
+            // Grab the first subtitle's start time.
+            var startTime = $('div p', newXML).eq(0).attr('begin');
+
+            // Verify that the start time is a time expression.
+            expect(startTime).toBe('00:00:00,050');
+
+        });
+        it('should return an XML string with timing as milliseconds', function() {
+
+            // Remove all subtitles.
+            parser.removeSubtitles();
+            
+            // Add a mock subtitle.
+            parser.addSubtitle(null, {'begin': 50, 'end': 100}, 'Test');
+
+            // Get the XML string.
+            var xmlString = parser.xmlToString(false);
+
+            // Parse the XML.
+            var newXML = $.parseXML(xmlString);
+
+            // Grab the first subtitle's start time.
+            var startTime = $('div p', newXML).eq(0).attr('begin');
+
+            // Verify that the start time is in milliseconds.
+            expect(startTime).toBe('50');
+
+        });
+        it('should return an XML string with Markdown converted to DFXP', function() {
+
+            // Remove all subtitles.
+            parser.removeSubtitles();
+            
+            // Add a mock subtitle with some Markdown styles.
+            parser.addSubtitle(null, null, '**Test**');
+
+            // Get the XML string.
+            var xmlString = parser.xmlToString(true, true);
+
+            // Parse the XML.
+            var newXML = $.parseXML(xmlString);
+
+            // Grab the first subtitle's content.
+            var $firstSubtitle = $('div p', newXML).eq(0);
+            var firstSubtitleContent = $('<div>').append($firstSubtitle.contents().clone()).remove().html();
+
+            // Verify that the content has been converted to DFXP.
+            expect(firstSubtitleContent).toBe('<span fontWeight="bold">Test</span>');
 
         });
     });

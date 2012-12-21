@@ -2,6 +2,7 @@
 <html ng-app="amara.SubtitleEditor">
 <head>
     <title>Editing {{ language.language_code }} for {{ video }}</title>
+    <script src='{{ STATIC_URL }}src/js/third-party/amara-jquery-1.8.2.min.js'></script>
     <script src='{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js'></script>
     <script src='{{ STATIC_URL }}src/js/third-party/underscore.min.js'></script>
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js'></script>
@@ -9,6 +10,8 @@
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/services/services.js'></script>
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js'></script>
     <script src='{{ STATIC_URL }}src/js/subtitle-editor/controllers.js'></script>
+    <script src='{{ STATIC_URL }}src/js/dfxp/dfxp.js'></script>
+    <script src='{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js'></script>
 </head>
 <body>
 
@@ -37,22 +40,21 @@
         <select name="alternate-version" id="alternate-version">
             <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
         </select>
-    <ul data-subtitle-list="">
-        <li ng-repeat="subtitle in alternateVersion.subtitles"> </li>
-    </ul>
     </div>
     <div class='subtitling-area'>
-        <ul data-subtitle-list="">
-            <li ng-repeat="subtitle in alternateVersion.subtitles"> </li>
+        <ul subtitle-list="" ng-controller="SubtitleListController"
+            editable='true'
+            version-number='{{ version.version_number }}'
+            language-code='{{ language.language_code }}'>
+
+                [[ subtitlesData.length ]] subs
+
+            <li ng-repeat="subtitle in subtitlesData"
+                ng-controller="SubtitleListItemController"
+                    subtitle-list-item>
+                [[subtitle.text]]
+            </li>
         </ul>
-
     </div>
-</div>
-
-<div ng-controller="TestController">
-    <ul>
-        <li ng-repeat="item in items">[[item]]</li>
-    </ul>
-</div>
 </body>
 </html>

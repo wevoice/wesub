@@ -46,17 +46,65 @@
 
 (function() {
 
-    var root, module;
+    var root, module, getAPIUrl;
 
     root = this;
     module = angular.module('amara.SubtitleEditor.services', []);
 
+    getAPIUrl = function(videoId, languageCode, versionNumber) {
+        var url = '/api2/partners/videos/' + videoId +
+            '/languages/' + languageCode + '/subtitles/?format=dfxp';
+
+        if (versionNumber) {
+            url = url + '&version=' + versionNumber;
+        }
+
+        return url;
+
+    };
+
     module.factory("SubtitleFetcher", function($http) {
-        console.log($http);
-        var initialData = window.editorData || {};
+        var cachedData = window.editorData;
+
         return {
-            getSubtitles: function(languageCode, versionNumber) {
-                return ['one', 'two', 'three'];
+
+            /**
+             * Tries to find the data in an in memory, if it's not there
+             * fetch from the server side.
+             * @param languageCode
+             * @param versionNumber
+             * @param callback Function to be called with the dfxp xlm
+             * once it's ready.
+             */
+            getSubtitles: function(languageCode, versionNumber, callback){
+                if (!languageCode) {
+                    throw Error("You have to give me a languageCode");
+                }
+                var subtitlesXML;
+                // will trigger a subtitlesFetched event when ready
+                for (var i=0; i < cachedData.languages.length ; i++){
+                    var langObj = cachedData.languages[i];
+                    if (langObj.code == languageCode){
+                        for (var j = 1; j < langObj.versions.length + 1; j++){
+                            if (langObj.versions[j].number == versionNumber){
+                                subtitlesXML = langObj.versions[j].subtitlesXML;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                if (subtitlesXML !== undefined){
+                   callback(subtitlesXML);
+                } else {
+                    // fetch data
+                    var url = getAPIUrl(cachedData.video.id, languageCode,
+                                        versionNumber);
+
+                    $http.get(url).success(function(response) {
+                        callback(response);
+                    });
+                }
             }
         };
     });
