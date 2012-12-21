@@ -34,8 +34,12 @@
         <select name="info-type" id="info-type">
             <option value="subtitles">Existing Subtitles</option>
         </select>
-        <select name="alternate-language" id="alternate-language">
-            <option value="{{ alternateLanguage.code }}">{{ alternateLanguage.name }}</option>
+        <select name="alternate-language" id="alternate-language"
+            ng-controller="HelperSelectorController">
+            <option
+                language-value=""
+                ng-repeat="item in languageValue"
+                value="">[[ item ]]</option>
         </select>
         <select name="alternate-version" id="alternate-version">
             <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>

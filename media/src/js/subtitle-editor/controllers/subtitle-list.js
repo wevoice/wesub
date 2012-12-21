@@ -18,7 +18,8 @@
 
 (function() {
 
-    var root, SubtitleListController, SubtitleListItemController;
+    var root, SubtitleListController, SubtitleListItemController,
+        HelperSelectorController;
 
     root = this;
 
@@ -107,8 +108,13 @@
         };
     };
 
+    HelperSelectorController = function($scope, SubtitleFetcher) {
+        $scope.languageValue = ['en', 'fr', 'cs'];
+    };
+
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
+    root.HelperSelectorController = HelperSelectorController;
 
 }).call(this);
