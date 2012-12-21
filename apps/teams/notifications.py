@@ -159,12 +159,12 @@ class BaseNotification(object):
             data.update({"language_code":self.language_code} )
         data_sent = data
         data = urlencode(data)
-        url = "%s?%s"  % (url , data)
+        url = "%s?%s" % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data)
-            success =  200<= resp.status <400
+            success = 200 <= resp.status < 400
             if success is False:
-                logger.error("Failed to notify team %s " %( self.team),
+                logger.error("Failed to notify team %s " % (self.team),
                      extra={
                         'team': self.team or self.partner,
                         'url': url,
@@ -193,3 +193,4 @@ class BaseNotification(object):
                     "laguage":self.language,
                 }
             )
+
