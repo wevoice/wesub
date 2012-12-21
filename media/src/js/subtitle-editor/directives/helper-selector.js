@@ -21,4 +21,9 @@
     
     directives = angular.module("amara.SubtitleEditor.directives.helperSelector", []);
 
+    directives.directive('languageValue', function() {
+        return {
+        };
+    });
+
 })(window.AmarajQuery);

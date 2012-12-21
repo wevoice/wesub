@@ -102,6 +102,7 @@
                                         versionNumber);
 
                     $http.get(url).success(function(response) {
+                        // TODO: Cache this
                         callback(response);
                     });
                 }
