@@ -24,7 +24,7 @@
 
     module = angular.module('amara.SubtitleEditor', [
         'amara.SubtitleEditor.services',
-        'amara.SubtitleEditor.directives'
+        'amara.SubtitleEditor.directives',
     ]);
 
     // instead of using {{ }} for variables, use [[ ]]

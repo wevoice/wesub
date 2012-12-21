@@ -54,7 +54,7 @@
                         index: i,
                         startTime: this.dfxpWrapper.startTime(i),
                         endTime: this.dfxpWrapper.endTime(i),
-                        text: this.dfxpWrapper.content(i)
+                        text: this.dfxpWrapper.contentRendered(i)
 
                     }
                 }, this);
@@ -76,15 +76,26 @@
         // we expect to have on the scope the object that
         // SubtitleListController.onSubtitlesFetched
         // has created from the dfxp
+        $scope.isEditing = false;
         $scope.toHTML = function  (markupLikeText) {
 
         }
         $scope.startEditingMode = function (){
+            $scope.isEditing  = true;
+            // fix me, this should return the markdown text
+            return this.dfxpWrapper.content($scope.subtitle.index)
         }
-        $scope.finishEditingMode = function(){
-
+        $scope.finishEditingMode = function(newValue){
+            $scope.isEditing  = false;
+            this.dfxpWrapper.content($scope.getSubtitleNode(), this.dfxpWrapper.markdownToDFXP(newValue));
+        };
+        $scope.getSubtitleNode = function(){
+            return this.dfxpWrapper.getSubtitle($scope.subtitle.index);
         }
         $scope.setEditable = function(isEditable){
+        }
+        $scope.textChanged = function(newText){
+            $scope.subtitle.text = newText;
         }
     }
     // exports
