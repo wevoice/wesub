@@ -65,7 +65,7 @@ class BaseNotification(object):
         to gather the video from this public id
         """
         return Video.objects.get(video_id=api_pk).video_id
-        
+
     def from_internal_video_id(self, video_id, video=None):
         """
         Coverts the internal video id representation (the actual )
@@ -139,7 +139,7 @@ class BaseNotification(object):
         h = Http()
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
-            
+
         project = self.video.get_team_video().project.slug if self.video else None
         data = {
             'event': self.event_name,
@@ -190,6 +190,6 @@ class BaseNotification(object):
                     "video": self.video,
                     "event-name": self.event_name,
                     "team": self.team,
-                    "laguage":self.language, 
+                    "laguage":self.language,
                 }
             )
