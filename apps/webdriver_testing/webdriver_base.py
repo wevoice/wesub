@@ -68,6 +68,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.base_url = 'http://unisubs.example.com:80/'
         else:
             self.base_url = self.live_server_url + '/'
+            self.base_url.replace('localhost', 'dev.universalsubtitles.org'
 
         #If we are using sauce need to use DesiredCapabilities for browser config.
         #The env variables can be set via the jenkins plugin if we are using it.
