@@ -25,10 +25,10 @@
             rootEl;
 
         /**
-         * Triggered with a key is up on a text area for editing subtitles.
+         * Triggered with a key is down on a text area for editing subtitles.
          * If it's regular text just do the default thing.
          * If we pressed an enter / return, finish editing this sub and
-         * focus o the next one. Same for tab
+         * focus o the next one. Same for tab.
          * @param e The jQuery key event
          */
         function onSubtitleTextKeyDown(e) {
@@ -88,6 +88,7 @@
                 var editableText = selectedScope.startEditingMode();
 
                 activeTextArea.val(editableText);
+                angular.element(rootEl).scope().setSelectedIndex(selectedScope.subtitle.index);
                 selectedScope.$digest();
             }
         }
