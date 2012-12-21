@@ -21,7 +21,8 @@
     var directives = angular.module("amara.SubtitleEditor.directives", []);
     directives.directive("subtitleList", function (SubtitleFetcher) {
         var isEditable;
-        var selectedScope, selectedController, activeTextArea;
+        var selectedScope, selectedController, activeTextArea,
+            rootEl;
 
         /**
          * Triggered with a key is up on a text area for editing subtitles.
@@ -30,16 +31,30 @@
          * focus o the next one. Same for tab
          * @param e The jQuery key event
          */
-        function onSubtitleTextKeyUp(e) {
+        function onSubtitleTextKeyDown(e) {
 
             var keyCode = e.keyCode;
-
-
-            if (event.keyCode == 13 && !event.shiftKey) {
+            // return or tab WITHOUT shift
+            var elementToSelect;
+            if (keyCode == 13 && !event.shiftKey ||
+                keyCode == 9 && !event.shiftKey ) {
                 // enter with shift means new line
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
+
+                // what is the next element?
+                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
+
                 selectedScope.$digest();
+            }else if (keyCode == 9 && event.shiftKey){
+                // tab with shift, move backwards
+                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
+                e.preventDefault();
+
+            }
+            if (elementToSelect){
+                onSubtitleItemSelected(elementToSelect);
+                activeTextArea.select();
             }
         }
 
@@ -50,6 +65,11 @@
          * editing.
          */
         function onSubtitleItemSelected(elm) {
+            // make sure this works if the event was trigger in the
+            // originating li or any descendants
+            var elm = $(elm).hasClass(".subtitle-list-item") ?
+                elm :
+                $(elm).parents(".subtitle-list-item");
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
             if (scope == selectedScope){
@@ -63,7 +83,7 @@
                     // trigger updates
                     selectedScope.$digest();
                 }
-                activeTextArea = $("textarea", $(elm).parents(".subtitle-list-item"));
+                activeTextArea = $("textarea", elm);
                 selectedScope = scope;
                 var editableText = selectedScope.startEditingMode();
 
@@ -72,11 +92,13 @@
             }
         }
 
+
         return {
 
             compile:function compile(elm, attrs, transclude) {
                 // should be on post link so to give a chance for the
                 // nested directive (subtitleListItem) to run
+                rootEl = elm;
                 return {
                     post:function post(scope, elm, attrs) {
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
@@ -87,7 +109,7 @@
                             $(elm).click(function (e) {
                                 onSubtitleItemSelected(e.srcElement);
                             });
-                            $(elm).on("keyup", "textarea", onSubtitleTextKeyUp);
+                            $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
                     }
                 };
