@@ -64,6 +64,10 @@
             $scope.$broadcast("onSubtitlesFetched");
 
         };
+        $scope.setSelectedIndex = function(index){
+            $scope.selectedIndex = index;
+            $scope.$digest()
+        }
     };
 
     /**
