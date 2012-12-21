@@ -108,7 +108,21 @@ Create an Instance
 To test changes non-locally an instance will need to be created for the feature
 branch.
 
-TODO: Have Evan fill in this section.
+Create the "demo" instance using either Launchpad (https://launchpad.amara.org)
+or Fabric.
+
+Using Launchpad, login and select the "Create Demo from Branch"
+workflow.  Select the branch from the dropdown and an optional url.  You will
+need to enter the full url name: (i.e. ``mybranch.demo.amara.org``). If you
+don't specify a custom url, the branch name will be used.
+
+If you use fabric, use the following:
+
+``fab demo:<username>,<branch_name> create_demo``
+
+Or to use a custom url:
+
+``fab demo:<username>,<branch_name> create_demo:url_prefix=mybranch.demo.amara.org``
 
 QA Tests
 ~~~~~~~~
