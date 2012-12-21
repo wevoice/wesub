@@ -1845,7 +1845,7 @@ class Task(models.Model):
         else:
             # Subtitle task is done, and there is no approval or review
             # required, so we mark the version as approved.
-            self._publicize(self.assignee, sv)
+            publicize_version(sv, self.assignee)
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
@@ -1882,7 +1882,7 @@ class Task(models.Model):
                 task.set_expiration()
                 task.save()
         else:
-            self._publicize(self.assignee, sv)
+            publicize_version(sv, self.assignee)
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
