@@ -44,6 +44,29 @@ Create a Feature Branch
 A Git branch for the issue is created from the current head of ``master``, and
 it is named ``i-1234``.
 
+Create an Instance
+~~~~~~~~~~~~~~~~~~
+
+To test changes non-locally an instance will need to be created for the feature
+branch.  You should do this as soon as you create the branch, so that test data
+will be populated (and later migrated) correctly.
+
+Create the "demo" instance using either Launchpad (https://launchpad.amara.org)
+or Fabric.
+
+Using Launchpad, login and select the "Create Demo from Branch"
+workflow.  Select the branch from the dropdown and an optional url.  You will
+need to enter the full url name: (i.e. ``mybranch.demo.amara.org``). If you
+don't specify a custom url, the branch name will be used.
+
+If you use fabric, use the following:
+
+``fab demo:<username>,<branch_name> create_demo``
+
+Or to use a custom url:
+
+``fab demo:<username>,<branch_name> create_demo:url_prefix=mybranch.demo.amara.org``
+
 Make Changes on the Feature Branch
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -64,6 +87,13 @@ this::
     1234: Remove the foo from the bar
 
 This makes it easy to grep the Git log for changes related to a specific issue.
+
+If at all possible, the developer should add a test case that covers the
+feature/bug as a separate commit first.
+
+They can then push that to the branch on GitHub, watch it fail, then add the
+code that fixes the problem and watch it start passing.  This is a good sanity
+check that their code (and test) does what they think it does.
 
 Keep the Feature Branch Up To Date
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -102,21 +132,22 @@ feature branch to keep it up to date::
                          O
                          |
 
-Create an Instance
-~~~~~~~~~~~~~~~~~~
+Run the Full Test Suite
+~~~~~~~~~~~~~~~~~~~~~~~
 
-To test changes non-locally an instance will need to be created for the feature
-branch.
+The small set of tests should be run automatically after every commit.  Once the
+programmer thinks they've solved the issue they should kick off the full suite
+of Selenium tests and wait for the results (by email).
 
-TODO: Have Evan fill in this section.
+TODO: Describe how to do this.
 
-QA Tests
-~~~~~~~~
+Resolve the Ticket for QA
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Along with the automated test suite which should be run automatically, QA will
-need to test the changes.  Once the developer is done they should resolve the
-Sifter ticket.  QA will then test the instance running from the ``i-1234``
-branch.
+need to test the changes.  Once the developer has received the full tests
+results (and they're passing) they should resolve the Sifter ticket.  QA will
+then test the instance running from the ``i-1234`` branch.
 
 If there's a problem, they'll reopen the ticket and the developer can make some
 more changes on the feature branch.  Otherwise they'll comment on the ticket and

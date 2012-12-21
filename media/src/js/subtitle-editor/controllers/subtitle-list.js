@@ -31,11 +31,11 @@
      * @constructor
      */
     SubtitleListController = function($scope, SubtitleFetcher) {
-        $scope.getSubtitles = function(languageCode, versionNumber){
-            $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML){
+        $scope.getSubtitles = function(languageCode, versionNumber) {
+            $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
-        }
+        };
         /**
          * Once we have the dfxp from the server,
          * massage the data as a simpler object and set it on the
@@ -43,28 +43,27 @@
          * and will re-render the UI.
          * @param dfxpXML
          */
-        $scope.onSubtitlesFetched = function (dfxpXML){
+        $scope.onSubtitlesFetched = function (dfxpXML) {
 
             this.dfxpWrapper = new AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
             // now populate the subtitles scope var
             // and let angular build the UI
-            var subtitlesData = _.map(this.dfxpWrapper.getSubtitles(), function(sub,i){
+            var subtitlesData = _.map(this.dfxpWrapper.getSubtitles(), function(sub,i) {
                     return {
                         index: i,
                         startTime: this.dfxpWrapper.startTime(i),
                         endTime: this.dfxpWrapper.endTime(i),
                         text: this.dfxpWrapper.contentRendered(i)
 
-                    }
+                    };
                 }, this);
             $scope.subtitlesData = subtitlesData;
             // only let the descendant scope know of this, no need to propagate
             // upwards
             $scope.$broadcast("onSubtitlesFetched");
 
-
-        }
+        };
     };
 
     /**
@@ -72,37 +71,40 @@
      * @param $scope
      * @constructor
      */
-    SubtitleListItemController  = function($scope){
+    SubtitleListItemController = function($scope) {
         // we expect to have on the scope the object that
         // SubtitleListController.onSubtitlesFetched
         // has created from the dfxp
-        $scope.isEditing = false;
-        $scope.toHTML = function  (markupLikeText) {
 
-        }
-        $scope.startEditingMode = function (){
+        $scope.isEditing = false;
+        $scope.toHTML = function(markupLikeText) {
+        };
+
+        $scope.startEditingMode = function() {
             $scope.isEditing  = true;
             // fix me, this should return the markdown text
             return this.dfxpWrapper.content($scope.subtitle.index)
-        }
+        };
         $scope.finishEditingMode = function(newValue){
             $scope.isEditing  = false;
             this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
             $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
         };
-        $scope.getSubtitleNode = function(){
+
+        $scope.getSubtitleNode = function() {
             return this.dfxpWrapper.getSubtitle($scope.subtitle.index);
-        }
-        $scope.setEditable = function(isEditable){
-        }
-        $scope.textChanged = function(newText){
+        };
+
+        $scope.setEditable = function(isEditable) {
+        };
+
+        $scope.textChanged = function(newText) {
             $scope.subtitle.text = newText;
-        }
-    }
+        };
+    };
+
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
-
-
 
 }).call(this);
