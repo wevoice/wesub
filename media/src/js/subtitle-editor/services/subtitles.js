@@ -85,7 +85,7 @@
                 for (var i=0; i < cachedData.languages.length ; i++){
                     var langObj = cachedData.languages[i];
                     if (langObj.code == languageCode){
-                        for (var j = 1; j < langObj.versions.length + 1; j++){
+                        for (var j = 0; j < langObj.versions.length ; j++){
                             if (langObj.versions[j].number == versionNumber){
                                 subtitlesXML = langObj.versions[j].subtitlesXML;
                                 break;
