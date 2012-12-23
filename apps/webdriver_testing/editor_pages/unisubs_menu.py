@@ -78,7 +78,7 @@ class UnisubsMenu(Page):
         """Click the Subs menu to open it.
 
         """
-        self.wait_for_element_present(self._MENU)
+        self.wait_for_element_visible(self._MENU)
         self.click_by_css(self._MENU)
 
     def improve_subtitles(self):

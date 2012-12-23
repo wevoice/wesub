@@ -46,7 +46,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url)
-        self.browser.implicitly_wait(1)
+        #self.browser.implicitly_wait(1)
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
@@ -54,15 +54,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     def tearDown(self):
         try:  #To get a screenshot of the last page and save to Results.
+            time.sleep(2) #sometimes needs some extra time.
             screenshot_file = ('apps/webdriver_testing/' 
                               'Results/%s.png' % self.id())
             self.browser.get_screenshot_as_file(screenshot_file)
-        except: #But don't panic if fails, sometimes a timing thing, try again.
-            time.sleep(2)
-            self.browser.get_screenshot_as_file(screenshot_file)
-
-        try: #To quit the browser
+        finally: #But don't panic if fails
             self.browser.quit()
-        except: #But don't worry if you can't it may already be quit.
-            pass
 
