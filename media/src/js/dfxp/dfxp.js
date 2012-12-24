@@ -87,7 +87,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
     this.utils = {
-        leftPad: function(number, width, char) {
+        leftPad: function(number, width, character) {
             /*
              * Left Pad a number to the given width, with zeros.
              * From: http://stackoverflow.com/a/1267338/22468
@@ -95,12 +95,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
              * Returns: string
              */
 
-            char = char || '0';
+            character = character || '0';
             width -= number.toString().length;
 
             if (width > 0) {
                 return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join(char) + number;
+                                .join(character) + number;
             }
             return number.toString();
         },
@@ -123,7 +123,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 p(seconds, 2) +  ',' +
                 p(fraction, 3);
         },
-        rightPad: function(number, width, char) {
+        rightPad: function(number, width, character) {
             /*
              * Right Pad a number to the given width, with zeros.
              * From: http://stackoverflow.com/a/1267338/22468
@@ -131,12 +131,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
              * Returns: string
              */
 
-            char = char || '0';
+            character = character || '0';
             width -= number.toString().length;
 
             if (width > 0) {
                 return number + new Array(width + (/\./.test(number) ? 2 : 1))
-                    .join(char);
+                    .join(character);
             }
             return number.toString();
         },
