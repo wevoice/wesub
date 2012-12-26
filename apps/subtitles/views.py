@@ -89,7 +89,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     editing_version = editing_language.get_tip(public=False)
     translated_from_version = None
     lineage = editing_version and editing_version.get_lineage()
-    if editing_version and lineage:
+    if editing_version and lineage and editing_language.get_translation_source_language():
         translated_from_version = SubtitleVersion.objects.get(
             subtitle_language__video=video,
             subtitle_language__language_code=lineage.keys()[0],
