@@ -63,7 +63,7 @@
 
     };
 
-    module.factory("SubtitleFetcher", function($http) {
+    module.factory("SubtitleStorage", function($http) {
         var cachedData = window.editorData;
 
         return {

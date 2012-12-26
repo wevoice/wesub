@@ -28,12 +28,12 @@
      * souch as populating the list with actual data, removing subs,
      * adding subs.
      * @param $scope
-     * @param SubtitleFetcher
+     * @param SubtitleStorage
      * @constructor
      */
-    SubtitleListController = function($scope, SubtitleFetcher) {
+    SubtitleListController = function($scope, SubtitleStorage) {
         $scope.getSubtitles = function(languageCode, versionNumber) {
-            $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
+            $scope.items = SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
         };
@@ -111,7 +111,7 @@
         };
     };
 
-    HelperSelectorController = function($scope, SubtitleFetcher) {
+    HelperSelectorController = function($scope, SubtitleStorage) {
         $scope.languageValue = ['en', 'fr', 'cs'];
     };
 
