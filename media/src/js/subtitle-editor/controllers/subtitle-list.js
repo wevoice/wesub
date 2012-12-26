@@ -33,6 +33,7 @@
      */
     SubtitleListController = function($scope, SubtitleStorage) {
         $scope.getSubtitles = function(languageCode, versionNumber) {
+            $scope.status = 'loading';
             $scope.items = SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
@@ -65,6 +66,7 @@
             $scope.subtitlesData = subtitlesData;
             // only let the descendant scope know of this, no need to propagate
             // upwards
+            $scope.status = 'ready';
             $scope.$broadcast("onSubtitlesFetched");
 
         };
@@ -76,6 +78,14 @@
         $scope.setVideoID = function(videoID){
             $scope.videoID = videoID;
         };
+
+        $scope.setLanguageCode = function(languageCode){
+            $scope.languageCode = languageCode;
+        };
+        $scope.saveSubtitles = function(){
+            SubtitleStorage.saveSubtitles(scope.videoID, scope.languageCode, this.dfxpWrapper.xmlToString(true, true));
+            $scope.status = 'saving';
+        }
     };
 
     /**
@@ -83,7 +93,7 @@
      * @param $scope
      * @constructor
      */
-    SubtitleListItemController = function($scope) {
+    SubtitleListItemController = function($scope, SubtitleStorage) {
         // we expect to have on the scope the object that
         // SubtitleListController.onSubtitlesFetched
         // has created from the dfxp

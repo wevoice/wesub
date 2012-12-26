@@ -69,8 +69,13 @@
     </div>
     {# This is the actual editable subtitle list#}
     <div class='subtitling-area'>
+        <ng-switch on='status'>
+            <p ng-switch-when='loading'>Loading subtitles</p>
+            <p ng-switch-when='saving'>Saving subtitles</p>
+
         <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
             editable='true'
+            ng-switch-when='ready'
             version-number='{{ version.version_number }}'
             language-code='{{ language.language_code }}'
             video-id='{{ video.video_id }}'>
@@ -86,6 +91,8 @@
                 <textarea ng-show='isEditing'></textarea>
             </li>
         </ul>
+            </ng-switch>
+        <button ng-click='saveSubtitles'>Save</button>
     </div>
 </body>
 </html>
