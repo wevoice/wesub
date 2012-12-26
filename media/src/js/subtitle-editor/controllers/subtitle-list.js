@@ -55,12 +55,11 @@
             // on ie / safari
             var subtitlesData = new Array(subtitles.length);
             for (var i=0; i < subtitles.length; i++){
-                this.dfxpWrapper.getSubtitle(i);
                 subtitlesData[i] =  {
                     index: i,
-                    startTime: this.dfxpWrapper.startTime(i),
-                    endTime: this.dfxpWrapper.endTime(i),
-                    text: this.dfxpWrapper.contentRendered(i)
+                    startTime: this.dfxpWrapper.startTime(subtitles.eq(i).get(0)),
+                    endTime: this.dfxpWrapper.endTime(subtitles.eq(i).get(0)),
+                    text: this.dfxpWrapper.contentRendered(subtitles.eq(i).get(0))
                 };
             }
             $scope.subtitlesData = subtitlesData;
@@ -71,8 +70,8 @@
         };
         $scope.setSelectedIndex = function(index){
             $scope.selectedIndex = index;
-            $scope.$digest()
-        }
+            $scope.$digest();
+        };
     };
 
     /**
