@@ -50,15 +50,19 @@
             this.dfxpWrapper.init(dfxpXML);
             // now populate the subtitles scope var
             // and let angular build the UI
-            var subtitlesData = _.map(this.dfxpWrapper.getSubtitles(), function(sub,i) {
-                    return {
-                        index: i,
-                        startTime: this.dfxpWrapper.startTime(i),
-                        endTime: this.dfxpWrapper.endTime(i),
-                        text: this.dfxpWrapper.contentRendered(i)
-
-                    };
-                }, this);
+            var subtitles = this.dfxpWrapper.getSubtitles();
+            // preallocate array, gives us a small perf gain
+            // on ie / safari
+            var subtitlesData = new Array(subtitles.length);
+            for (var i=0; i < subtitles.length; i++){
+                this.dfxpWrapper.getSubtitle(i);
+                subtitlesData[i] =  {
+                    index: i,
+                    startTime: this.dfxpWrapper.startTime(i),
+                    endTime: this.dfxpWrapper.endTime(i),
+                    text: this.dfxpWrapper.contentRendered(i)
+                };
+            }
             $scope.subtitlesData = subtitlesData;
             // only let the descendant scope know of this, no need to propagate
             // upwards
