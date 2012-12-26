@@ -112,7 +112,7 @@
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
-                        SubtitleListFinder.register(attrs.subtitleList);
+                        SubtitleListFinder.register(attrs.subtitleList, elm, angular.element(elm).controller(), scope);
                     }
                 };
             }
