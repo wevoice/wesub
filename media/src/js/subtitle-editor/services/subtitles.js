@@ -110,4 +110,45 @@
         };
     });
 
+    /**
+     * Since we might have more than one subtitle list components on the
+     * page (e.g. one for editing, the other is the reference one), we
+     * need a way to identify / find them. For example, when changing the
+     * reference language, the selector must know how which of the components
+     * to update.
+     */
+    module.factory("SubtitleListFinder", function($http) {
+        var registry = {};
+
+        return {
+
+            /**
+             * Add to the registry what subtitle list should be found
+             * when refered by this name.  Registring the same name more
+             * than once will throw an error
+             * @param name  String to identify this subtitle list by, this is taken from the
+             * value of the 'subtitle-list' attribute on the SubtitleList directive
+             * @param elm The wrapped element for the subtitle list.
+             * @param controller Controller for the the subtitle list
+             * @param scope The scope for the list
+             */
+            register: function(name, elm, controller, scope){
+                if(registry[name]) {
+                    // not sure we want to error on this, but let's be cautious until
+                    // we are sure
+                   throw new Error("Already registred a subtitle list component with name'" + name + "'") ;
+                }
+                registry[name] = {
+                    name: name,
+                    elm: elm,
+                    controller: controller,
+                    scope: scope
+                };
+                return this;
+            },
+            get: function(name){
+                return registry[name];
+            }
+        };
+    });
 }).call(this);

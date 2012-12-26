@@ -109,6 +109,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         'language': editing_language,
         'other_languages': languages,
         'version': editing_version,
+        'translated_from_version': translated_from_version,
         'editor_data': json.dumps(editor_data, indent=4)
     }, context_instance=RequestContext(request))
 

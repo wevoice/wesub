@@ -19,7 +19,7 @@
 (function ($) {
 
     var directives = angular.module("amara.SubtitleEditor.directives", []);
-    directives.directive("subtitleList", function (SubtitleFetcher) {
+    directives.directive("subtitleList", function (SubtitleFetcher, SubtitleListFinder) {
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
             rootEl;
@@ -112,6 +112,7 @@
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
+                        SubtitleListFinder.register(attrs.subtitleList);
                     }
                 };
             }
