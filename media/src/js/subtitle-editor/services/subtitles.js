@@ -106,6 +106,10 @@
                         callback(response);
                     });
                 }
+            },
+            saveSubtitles: function(videoID, languageCode, dfxpString){
+                // first we should save those subs locally
+                //
             }
         };
     });

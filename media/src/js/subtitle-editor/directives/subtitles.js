@@ -112,6 +112,7 @@
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
+                        scope.setVideoID (attrs['videoId'])
                         SubtitleListFinder.register(attrs.subtitleList, elm, angular.element(elm).controller(), scope);
                     }
                 };

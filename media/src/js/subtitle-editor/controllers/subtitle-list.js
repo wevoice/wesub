@@ -72,6 +72,10 @@
             $scope.selectedIndex = index;
             $scope.$digest();
         };
+
+        $scope.setVideoID = function(videoID){
+            $scope.videoID = videoID;
+        };
     };
 
     /**

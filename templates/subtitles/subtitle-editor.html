@@ -52,7 +52,8 @@
         <ul subtitle-list="reference-subtitle-set" ng-controller="SubtitleListController"
             editable='false'
             version-number='{{ translated_from_version.version_number }}'
-            language-code='{{ translated_from_version.subtitle_language.language_code }}'>
+            language-code='{{ translated_from_version.subtitle_language.language_code }}'
+            video-id='{{ video.video_id }}'>
 
                 [[ subtitlesData.length ]] subs
 
@@ -71,7 +72,8 @@
         <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
             editable='true'
             version-number='{{ version.version_number }}'
-            language-code='{{ language.language_code }}'>
+            language-code='{{ language.language_code }}'
+            video-id='{{ video.video_id }}'>
 
                 [[ subtitlesData.length ]] subs
 
