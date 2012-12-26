@@ -55,7 +55,6 @@
             // on ie / safari
             var subtitlesData = new Array(subtitles.length);
             for (var i=0; i < subtitles.length; i++){
-                //this.dfxpWrapper.getSubtitle(i);
                 subtitlesData[i] =  {
                     index: i,
                     startTime: this.dfxpWrapper.startTime(subtitles.eq(i).get(0)),
