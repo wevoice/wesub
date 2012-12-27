@@ -100,6 +100,12 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
         num_versions=Count('subtitleversion'))
     editor_data = {
+        # front end needs this to be able to set the correct
+        # api headers for saving subs
+        'authHeaders': {
+            'x-api-username': request.user.username,
+            'x-apikey': request.user.get_api_key()
+        },
         'video': {
             'id': video.video_id,
             'videoURL': video.get_video_url()

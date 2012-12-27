@@ -41,6 +41,7 @@ from random import random
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 
+from tastypie.models import ApiKey
 
 # I'm not sure this is the best way do do this, but this models.py is executed
 # before all other and before url.py
@@ -313,6 +314,9 @@ class CustomUser(BaseUser):
     @property
     def is_anonymous(self):
         return self.pk == settings.ANONYMOUS_USER_ID
+
+    def get_api_key(self):
+        return ApiKey.objects.get_or_create(user=self)[0].key
 
 def create_custom_user(sender, instance, created, **kwargs):
     if created:
