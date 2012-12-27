@@ -46,7 +46,8 @@
 
 (function() {
 
-    var root, module, getSubtitleFetchAPIUrl, API_BASE_PATH;
+    var root, module, API_BASE_PATH;
+    var getSubtitleFetchAPIUrl, getSubtitleSaveAPIUrl;
 
     API_BASE_PATH = '/api2/partners/videos/';
     root = this;
