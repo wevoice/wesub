@@ -94,7 +94,7 @@
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
             $scope.status = 'saving';
-        }
+        };
     };
 
     /**
@@ -150,12 +150,12 @@
         // we need the service to find out which set we're saving.
         $scope.saveSession = function(){
             SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles();
-        }
+        };
         $scope.$root.$on("onWorkDone", function(){
             $scope.canSave = '';
             $scope.$digest();
-        })
-    }
+        });
+    };
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
