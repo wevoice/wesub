@@ -56,6 +56,7 @@ html, body {
 body {
     color: #565758;
     font: normal 11px/14px $OpenSans;
+    margin: 0;
 }
 
 // Utils
@@ -72,10 +73,14 @@ body {
 
 // Global
 header.main {
+    background: #212223;
+
     h1 {
         color: #949596;
         font: normal 18px $CodePro;
+        letter-spacing: -1px;
         margin: 0;
+        padding: 6px 12px 8px 12px;
         text-transform: lowercase;
     }
 }
