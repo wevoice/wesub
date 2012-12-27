@@ -83,13 +83,13 @@ body {
     float: left;
 
     &.left {
-        width: 30%;
+        width: 34%;
     }
     &.center {
-        width: 45%;
+        width: 39%;
     }
     &.right {
-        width: 25%;
+        width: 27%;
     }
 }
 
@@ -131,12 +131,24 @@ header.main {
             float: left;
             font: normal 11px $OpenSans;
             display: block;
-            padding: 10px 12px;
+            padding: 10px 12px 10px 12px;
             text-decoration: none;
             width: 50%;
 
+            img {
+                float: right;
+                margin-top: 2px;
+                @include opacity(.5);
+                -webkit-transition: opacity 0.03s linear;
+                -moz-transition: opacity 0.03s linear;
+                transition: opacity 0.03s linear;
+            }
             &:hover {
                 color: #FFF;
+
+                img {
+                    @include opacity(1);
+                }
             }
         }
         div.exit {
