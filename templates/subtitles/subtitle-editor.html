@@ -16,83 +16,91 @@
 
 </head>
 <body>
-    <header class="main">
-        <h1>Amara</h1>
+    <header class="top group">
+        <section class="site left column">
+            <h1>Amara</h1>
+        </section>
+        <section class="video center column">
+            Center
+        </section>
+        <section class="status right column">
+            Right
+        </section>
     </header>
+    <section class="main group">
+        <section class="left column">
+            <div class="additional-info">
+                <select name="info-type" id="info-type">
+                    <option value="subtitles">Existing Subtitles</option>
+                </select>
+                <select name="alternate-language" id="alternate-language"
+                    ng-controller="HelperSelectorController">
+                    <option
+                        language-value=""
+                        ng-repeat="item in languageValue"
+                        value="[[item.code ]]">[[ item.name ]]</option>
+                </select>
+                <select name="alternate-version" id="alternate-version">
+                    <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
+                </select>
+            </div>
+            {# This is the reference subtitle list #}
+            <div class="subtitling-area">
+                {{ translated_from_version.subtitle_language.language_code }} {{ translated_from_version.version_number }}
+                {#  the value for subtitle-list attribute is what allows the subtitleListWidgetFinder #}
+                {#  to identify which list should be updated when we change the reference version #}
+                <ul subtitle-list="reference-subtitle-set" ng-controller="SubtitleListController"
+                    editable="false"
+                    version-number="{{ translated_from_version.version_number }}"
+                    language-code="{{ translated_from_version.subtitle_language.language_code }}"
+                    video-id="{{ video.video_id }}">
+                        [[ subtitlesData.length ]] subs
+                    <li ng-repeat="subtitle in subtitlesData"
+                        ng-controller="SubtitleListItemController"
+                        ng-class="{selected : subtitle.index == selectedIndex}"
+                        class="subtitle-list-item"
+                            subtitle-list-item>
+                        <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                        <textarea ng-show="isEditing"></textarea>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section class="center column">
+            {# This is the actual editable subtitle list#}
+            <div class="subtitling-area">
+                <ng-switch on="status">
+                    <p ng-switch-when="loading">Loading subtitles</p>
+                    <p ng-switch-when="saving">Saving subtitles</p>
+                    <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
+                        editable="true"
+                        version-number="{{ version.version_number }}"
+                        language-code="{{ language.language_code }}"
+                        video-id="{{ video.video_id }}">
+                        [[ subtitlesData.length ]] subs
+                        <li ng-repeat="subtitle in subtitlesData"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{selected : subtitle.index == selectedIndex}"
+                            class="subtitle-list-item"
+                            subtitle-list-item>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <textarea ng-show="isEditing"></textarea>
+                        </li>
+                    </ul>
+                </ng-switch>
+                <button save-session-button
+                        ng-controller="SaveSessionButtonController"
+                        disabled="[[canSave]]"
+                        ng-click="saveSession()">
+                    Save
+                </button>
+            </div>
+        </section>
+        <section class="right column">
+            Right
+        </section>
+    </section>
 
-    <div class="help-area">
-        Help translating
-    </div>
-    <div class="video-player">
-        
-    </div>
-    <div class="additional-info">
-        <select name="info-type" id="info-type">
-            <option value="subtitles">Existing Subtitles</option>
-        </select>
-        <select name="alternate-language" id="alternate-language"
-            ng-controller="HelperSelectorController">
-            <option
-                language-value=""
-                ng-repeat="item in languageValue"
-                value="[[item.code ]]">[[ item.name ]]</option>
-        </select>
-        <select name="alternate-version" id="alternate-version">
-            <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
-        </select>
-    </div>
-    {# This is the reference subtitle list #}
-    <div class="subtitling-area">
-        {{ translated_from_version.subtitle_language.language_code }} {{ translated_from_version.version_number }}
-        {#  the value for subtitle-list attribute is what allows the subtitleListWidgetFinder #}
-        {#  to identify which list should be updated when we change the reference version #}
-        <ul subtitle-list="reference-subtitle-set" ng-controller="SubtitleListController"
-            editable="false"
-            version-number="{{ translated_from_version.version_number }}"
-            language-code="{{ translated_from_version.subtitle_language.language_code }}"
-            video-id="{{ video.video_id }}">
-
-                [[ subtitlesData.length ]] subs
-
-            <li ng-repeat="subtitle in subtitlesData"
-                ng-controller="SubtitleListItemController"
-                ng-class="{selected : subtitle.index == selectedIndex}"
-                class="subtitle-list-item"
-                    subtitle-list-item>
-                <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                <textarea ng-show="isEditing"></textarea>
-            </li>
-        </ul>
-    </div>
-    {# This is the actual editable subtitle list#}
-    <div class="subtitling-area">
-        <ng-switch on="status">
-            <p ng-switch-when="loading">Loading subtitles</p>
-            <p ng-switch-when="saving">Saving subtitles</p>
-            <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
-                editable="true"
-                version-number="{{ version.version_number }}"
-                language-code="{{ language.language_code }}"
-                video-id="{{ video.video_id }}">
-
-                [[ subtitlesData.length ]] subs
-
-                <li ng-repeat="subtitle in subtitlesData"
-                    ng-controller="SubtitleListItemController"
-                    ng-class="{selected : subtitle.index == selectedIndex}"
-                    class="subtitle-list-item"
-                    subtitle-list-item>
-                    <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                    <textarea ng-show="isEditing"></textarea>
-                </li>
-
-            </ul>
-        </ng-switch>
-        <button save-session-button
-                ng-controller="SaveSessionButtonController"
-                disabled="[[canSave]]"
-                ng-click="saveSession()">Save</button>
-    </div>
     {% if DEBUG %}
         <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
     {% endif %}

@@ -3,6 +3,7 @@ $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, san
 $OpenSans: 'Open Sans', $Helvetica;
 $CodePro: 'CodeProLC', $OpenSans;
 
+// Custom fonts
 @font-face {
     font-family: 'CodeProLC';
     src: url('../../../fonts/CodeProLC.eot');
@@ -59,6 +60,13 @@ body {
     margin: 0;
 }
 
+// border-box all the things
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
 // Utils
 .group:after {
     content: ".";
@@ -71,16 +79,36 @@ body {
     display: none;
 }
 
-// Global
-header.main {
+.column {
+    float: left;
+
+    &.left {
+        width: 450px;
+    }
+    &.center {
+        width: 510px;
+    }
+    &.right {
+        width: 64px;
+    }
+}
+header.top {
     background: #212223;
 
-    h1 {
-        color: #949596;
-        font: normal 18px $CodePro;
-        letter-spacing: -1px;
-        margin: 0;
-        padding: 6px 12px 8px 12px;
-        text-transform: lowercase;
+    section.site {
+        h1 {
+            color: #949596;
+            font: normal 18px $CodePro;
+            letter-spacing: -1px;
+            margin: 0;
+            padding: 7px 12px 8px 12px;
+            text-transform: lowercase;
+        }
+    }
+    section.video {
+        border-left: 1px solid #2B2C2D;
+    }
+    section.status {
+        
     }
 }
