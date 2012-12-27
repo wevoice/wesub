@@ -142,7 +142,9 @@
     };
 
     HelperSelectorController = function($scope, SubtitleStorage) {
-        $scope.languageValue = SubtitleStorage.getLanguages();
+        SubtitleStorage.getLanguages(function(languages) {
+            $scope.languageValue = languages;
+        });
     };
 
     SaveSessionButtonController = function($scope, SubtitleListFinder){
