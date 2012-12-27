@@ -47,6 +47,7 @@
     </div>
     {# This is the reference subtitle list #}
     <div class='subtitling-area'>
+        {{ translated_from_version.subtitle_language.language_code }} {{ translated_from_version.version_number }}
         {#  the value for subtitle-list attribute is what allows the subtitleListWidgetFinder #}
         {#  to identify which list should be updated when we change the reference version #}
         <ul subtitle-list="reference-subtitle-set" ng-controller="SubtitleListController"
@@ -73,26 +74,29 @@
             <p ng-switch-when='loading'>Loading subtitles</p>
             <p ng-switch-when='saving'>Saving subtitles</p>
 
-        <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
-            editable='true'
-            ng-switch-when='ready'
-            version-number='{{ version.version_number }}'
-            language-code='{{ language.language_code }}'
-            video-id='{{ video.video_id }}'>
+            <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
+                editable='true'
+                version-number='{{ version.version_number }}'
+                language-code='{{ language.language_code }}'
+                video-id='{{ video.video_id }}'>
 
                 [[ subtitlesData.length ]] subs
 
-            <li ng-repeat="subtitle in subtitlesData"
-                ng-controller="SubtitleListItemController"
-                ng-class="{selected : subtitle.index == selectedIndex}"
-                class='subtitle-list-item'
+                <li ng-repeat="subtitle in subtitlesData"
+                    ng-controller="SubtitleListItemController"
+                    ng-class="{selected : subtitle.index == selectedIndex}"
+                    class='subtitle-list-item'
                     subtitle-list-item>
-                <span ng-show='!isEditing' class='subtitle-text' ng-bind-html-unsafe='subtitle.text'></span>
-                <textarea ng-show='isEditing'></textarea>
-            </li>
-        </ul>
-            </ng-switch>
-        <button ng-click='saveSubtitles'>Save</button>
+                    <span ng-show='!isEditing' class='subtitle-text' ng-bind-html-unsafe='subtitle.text'></span>
+                    <textarea ng-show='isEditing'></textarea>
+                </li>
+
+            </ul>
+        </ng-switch>
+        <button save-session-button
+                ng-controller='SaveSessionButtonController'
+                disabled='[[canSave]]'
+                ng-click='saveSession()'>Save</button>
     </div>
 </body>
 </html>

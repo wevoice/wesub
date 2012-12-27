@@ -80,6 +80,7 @@
                 if (!languageCode) {
                     throw Error("You have to give me a languageCode");
                 }
+
                 var subtitlesXML;
                 // will trigger a subtitlesFetched event when ready
                 for (var i=0; i < cachedData.languages.length ; i++){

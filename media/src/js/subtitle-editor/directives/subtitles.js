@@ -112,9 +112,10 @@
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
-                        scope.setVideoID (attrs['videoId'])
-                        scope.setVideoID (attrs['languageCode'])
-                        SubtitleListFinder.register(attrs.subtitleList, elm, angular.element(elm).controller(), scope);
+                        scope.setVideoID (attrs['videoId']);
+                        scope.setLanguageCode(attrs['languageCode']);
+                        SubtitleListFinder.register(attrs.subtitleList, elm,
+                            angular.element(elm).controller(), scope);
                     }
                 };
             }
@@ -129,4 +130,12 @@
 
     });
 
-})(window.AmarajQuery);
+    directives.directive("saveSessionButton", function (SubtitleStorage) {
+        return {
+            link:function link(scope, elm, attrs) {
+                scope.canSave = 'enabled';
+
+            }
+        };
+
+    });})(window.AmarajQuery);

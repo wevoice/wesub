@@ -90,7 +90,9 @@
             $scope.languageCode = languageCode;
         };
         $scope.saveSubtitles = function(){
-            SubtitleStorage.saveSubtitles(scope.videoID, scope.languageCode, this.dfxpWrapper.xmlToString(true, true));
+            SubtitleStorage.saveSubtitles($scope.videoID,
+                                          $scope.languageCode,
+                                          this.dfxpWrapper.xmlToString(true, true));
             $scope.status = 'saving';
         }
     };
@@ -105,19 +107,25 @@
         // SubtitleListController.onSubtitlesFetched
         // has created from the dfxp
 
+        var initialText;
         $scope.isEditing = false;
         $scope.toHTML = function(markupLikeText) {
         };
 
         $scope.startEditingMode = function() {
+            initialText =  this.dfxpWrapper.content($scope.subtitle.index)
             $scope.isEditing  = true;
             // fix me, this should return the markdown text
-            return this.dfxpWrapper.content($scope.subtitle.index)
+            return initialText;
         };
         $scope.finishEditingMode = function(newValue){
             $scope.isEditing  = false;
             this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
             $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
+            if ($scope.subtitle.text != initialText){
+                // mark dirty variable on root scope so we can allow
+                // saving the session
+            }
         };
 
         $scope.getSubtitleNode = function() {
@@ -136,6 +144,13 @@
         $scope.languageValue = ['en', 'fr', 'cs'];
     };
 
+    SaveSessionButtonController = function($scope, SubtitleListFinder){
+        // since the button can be outside of the subtitle list directive
+        // we need the service to find out which set we're saving.
+        $scope.saveSession = function(){
+            SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles()
+        }
+    }
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
