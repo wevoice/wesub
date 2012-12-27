@@ -135,6 +135,13 @@ header.main {
             text-decoration: none;
             width: 50%;
 
+            span {
+                display: inline-block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 80%;
+            }
             img {
                 float: right;
                 margin-top: 2px;
