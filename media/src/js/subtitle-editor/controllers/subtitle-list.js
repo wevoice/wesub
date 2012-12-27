@@ -125,6 +125,7 @@
             if ($scope.subtitle.text != initialText){
                 // mark dirty variable on root scope so we can allow
                 // saving the session
+                $scope.$root.$emit("onWorkDone");
             }
         };
 
@@ -150,6 +151,10 @@
         $scope.saveSession = function(){
             SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles()
         }
+        $scope.$root.$on("onWorkDone", function(){
+            $scope.canSave = '';
+            $scope.$digest();
+        })
     }
     // exports
     root.SubtitleListController = SubtitleListController;
