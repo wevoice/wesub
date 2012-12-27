@@ -3,7 +3,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Editing {{ language.language_code }} for {{ video }}</title>
+    <title>Editing {{ language.get_language_code_display }} subtitles for &ldquo;{{ video }}&rdquo; - Amara</title>
 
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
@@ -21,14 +21,16 @@
 
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
 
-</head>
-<body>
-    <h1>Editing {{ language.language_code }} for {{ video }} </h1>
     <script type="text/javascript">
         var editorData = {{ editor_data|safe }}
     </script>
-    {#Angular app#}
-    <div class="topbar"></div>
+
+</head>
+<body>
+    <header class="main">
+        <h1>Amara</h1>
+    </header>
+
     <div class="help-area">
         Help translating
     </div>

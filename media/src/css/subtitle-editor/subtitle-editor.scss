@@ -1,6 +1,17 @@
 // Fonts
 $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
 $OpenSans: 'Open Sans', $Helvetica;
+$CodePro: 'CodeProLC', $OpenSans;
+
+@font-face {
+    font-family: 'CodeProLC';
+    src: url('../../../fonts/CodeProLC.eot');
+    src: url('../../../fonts/CodeProLC.eot?#iefix') format('embedded-opentype'),
+         url('../../../fonts/CodeProLC.woff') format('woff'),
+         url('../../../fonts/CodeProLC.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
 
 // Mixins
 @mixin border-radius($radius: 5px) {
@@ -60,3 +71,11 @@ body {
 }
 
 // Global
+header.main {
+    h1 {
+        color: #949596;
+        font: normal 18px $CodePro;
+        margin: 0;
+        text-transform: lowercase;
+    }
+}
