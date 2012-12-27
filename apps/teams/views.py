@@ -87,6 +87,7 @@ from videos.tasks import (
     delete_captions_in_original_service_by_code
 )
 from videos.models import Action, VideoUrl, SubtitleLanguage, Video
+from apps.subtitles import models as sub_models
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from raven.contrib.django.models import client
@@ -1766,8 +1767,8 @@ def sync_third_party_account(request, slug, account_id):
 
 # Unpublishing
 def _create_task_after_unpublishing(subtitle_version):
-    team_video = subtitle_version.language.video.get_team_video()
-    lang = subtitle_version.language.language
+    team_video = subtitle_version.video.get_team_video()
+    lang = subtitle_version.language_code
 
     # If there's already an open task for this language we don't need another.
     open_task_exists = team_video.task_set.incomplete().filter(language=lang).exists()
@@ -1795,7 +1796,7 @@ def _create_task_after_unpublishing(subtitle_version):
 
     task = Task(team=team_video.team, team_video=team_video,
                 assignee=assignee, language=lang, type=type,
-                subtitle_version=subtitle_version)
+                new_subtitle_version=subtitle_version)
     task.set_expiration()
     task.save()
 
@@ -1867,23 +1868,20 @@ def unpublish(request, slug):
         return HttpResponseRedirect(request.POST.get('next', team.get_absolute_url()))
 
     version = form.cleaned_data['subtitle_version']
-    team_video = version.language.video.get_team_video()
-    video = version.language.video
+    team_video = version.video.get_team_video()
+    video = version.video
     scope = form.cleaned_data['scope']
-    should_delete = form.cleaned_data['should_delete']
-    language = version.language
+    language = version.subtitle_language
 
     results = []
     if scope == 'version':
-        results.append([version.language.pk, version.language.language,
-                        version.unpublish(delete=should_delete)])
+        results.append([version.subtitle_language.pk, version.language_code,
+                        version.unpublish()])
     elif scope == 'dependents':
-        translations = list(SubtitleLanguage.objects.filter(video=language.video,
-                                                            standard_language=language,
-                                                            is_forked=False))
+        translations = list(language.get_dependent_subtitle_languages())
+
         for l in [language] + translations:
-            results.append([l.pk, l.language,
-                            l.unpublish(delete=should_delete)])
+            results.append([l.pk, l.language_code, l.unpublish()])
     else:
         assert False, 'Invalid scope.'
 
