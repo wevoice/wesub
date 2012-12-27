@@ -33,6 +33,13 @@
      */
     SubtitleListController = function($scope, SubtitleStorage) {
         $scope.getSubtitles = function(languageCode, versionNumber) {
+            // if this version has no default source translation language
+            // it will be empty, in which case we want to wait for user
+            // interaction to request a reference subtitle set.
+            if (!languageCode || !versionNumber){
+                $scope.status = 'idle';
+                return;
+            }
             $scope.status = 'loading';
             $scope.items = SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
