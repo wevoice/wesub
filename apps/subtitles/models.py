@@ -801,6 +801,10 @@ class SubtitleLanguage(models.Model):
 
         return False
 
+    def unpublish(self):
+        """ Unpublishes the last public version for this Subtitle Language """
+        tip = self.get_tip(public=True)
+        return tip.unpublish() if tip else None
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -1231,6 +1235,22 @@ class SubtitleVersion(models.Model):
 
     def is_synced(self):
         return self.get_subtitles().fully_synced
+
+    def unpublish(self):
+        """ Unpublishes this version """
+
+        team_video = self.video.get_team_video()
+
+        assert team_video, \
+               "Cannot unpublish for a video not moderated by a team."
+
+        assert team_video.team.unpublishing_enabled(), \
+               "Cannot unpublish for a team without unpublishing enabled."
+
+        self.visibility_override = 'private'
+        self.save()
+
+        return self
 
 
 class SubtitleVersionMetadata(models.Model):

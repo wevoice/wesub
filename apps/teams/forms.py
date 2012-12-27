@@ -38,6 +38,7 @@ from apps.videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
 )
 from apps.videos.search_indexes import VideoIndex
+from apps.subtitles import models
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
@@ -554,7 +555,7 @@ class ProjectForm(forms.ModelForm):
         fields = ('name', 'description', 'workflow_enabled')
 
 class UnpublishForm(forms.Form):
-    subtitle_version = forms.ModelChoiceField(queryset=SubtitleVersion.objects.all())
+    subtitle_version = forms.ModelChoiceField(queryset=models.SubtitleVersion.objects.all())
 
     should_delete = forms.BooleanField(
             label=_(u'Would you like to delete these subtitles completely?'),
@@ -578,13 +579,13 @@ class UnpublishForm(forms.Form):
         if not subtitle_version:
             return self.cleaned_data
 
-        team_video = subtitle_version.language.video.get_team_video()
+        team_video = subtitle_version.video.get_team_video()
 
         if not team_video:
             raise forms.ValidationError(_(
                 u"These subtitles are not under a team's control."))
 
-        if not can_unpublish_subs(team_video, self.user, subtitle_version.language.language):
+        if not can_unpublish_subs(team_video, self.user, subtitle_version.language_code):
             raise forms.ValidationError(_(
                 u'You do not have permission to unpublish these subtitles.'))
 
