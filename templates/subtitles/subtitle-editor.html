@@ -39,7 +39,7 @@
             <option
                 language-value=""
                 ng-repeat="item in languageValue"
-                value="">[[ item ]]</option>
+                value="[[item.code ]]">[[ item.name ]]</option>
         </select>
         <select name="alternate-version" id="alternate-version">
             <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>

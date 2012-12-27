@@ -133,6 +133,10 @@
                 }, function onError(response){
 
                 });
+            },
+
+            getLanguages: function() {
+                return cachedData.languages;
             }
         };
     });
