@@ -89,15 +89,23 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     editing_version = editing_language.get_tip(public=False)
     translated_from_version = None
     lineage = editing_version and editing_version.get_lineage()
-    if editing_version and lineage and editing_language.get_translation_source_language():
+    translated_from_language_code = editing_language.get_translation_source_language()
+    if editing_version and translated_from_language_code and \
+        translated_from_language_code != editing_language.language_code :
         translated_from_version = SubtitleVersion.objects.get(
             subtitle_language__video=video,
-            subtitle_language__language_code=lineage.keys()[0],
+            subtitle_language__language_code=translated_from_language_code,
             version_number=lineage.values()[0]
         )
     languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
         num_versions=Count('subtitleversion'))
     editor_data = {
+        # front end needs this to be able to set the correct
+        # api headers for saving subs
+        'authHeaders': {
+            'x-api-username': request.user.username,
+            'x-apikey': request.user.get_api_key()
+        },
         'video': {
             'id': video.video_id,
             'videoURL': video.get_video_url()

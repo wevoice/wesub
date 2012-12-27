@@ -46,26 +46,31 @@
 
 (function() {
 
-    var root, module, getAPIUrl;
+    var root, module, getSubtitleFetchAPIUrl, API_BASE_PATH;
 
+    API_BASE_PATH = '/api2/partners/videos/';
     root = this;
     module = angular.module('amara.SubtitleEditor.services', []);
 
-    getAPIUrl = function(videoId, languageCode, versionNumber) {
-        var url = '/api2/partners/videos/' + videoId +
+    getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
+        var url = API_BASE_PATH + videoId +
             '/languages/' + languageCode + '/subtitles/?format=dfxp';
 
         if (versionNumber) {
             url = url + '&version=' + versionNumber;
         }
-
         return url;
-
     };
+    getSubtitleSaveAPIUrl = function(videoId, languageCode) {
+        var url = API_BASE_PATH + videoId +
+            '/languages/' + languageCode + '/subtitles/';
+        return url;
+    };
+
 
     module.factory("SubtitleStorage", function($http) {
         var cachedData = window.editorData;
-
+        var authHeaders = cachedData.authHeaders;
         return {
 
             /**
@@ -80,6 +85,7 @@
                 if (!languageCode) {
                     throw Error("You have to give me a languageCode");
                 }
+
                 var subtitlesXML;
                 // will trigger a subtitlesFetched event when ready
                 for (var i=0; i < cachedData.languages.length ; i++){
@@ -98,7 +104,7 @@
                    callback(subtitlesXML);
                 } else {
                     // fetch data
-                    var url = getAPIUrl(cachedData.video.id, languageCode,
+                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode,
                                         versionNumber);
 
                     $http.get(url).success(function(response) {
@@ -110,6 +116,27 @@
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally
                 //
+                var url = getSubtitleSaveAPIUrl(videoID, languageCode);
+                var promise = $http({
+                    method: 'POST',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        video: videoID,
+                        language: languageCode,
+                        subtitles: dfxpString,
+                        sub_format: 'dfxp'
+                    }
+                });
+                promise.then( function onSuccess(response){
+
+                }, function onError(response){
+
+                });
+            },
+
+            getLanguages: function() {
+                return cachedData.languages;
             }
         };
     });
