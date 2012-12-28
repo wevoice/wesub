@@ -33,29 +33,25 @@
     </header>
     <section class="main group">
         <section class="left column">
-            <div class="additional-info">
+            <div class="language-selections">
                 <select name="alternate-language" id="alternate-language"
                     ng-controller="HelperSelectorController">
                     <option
                         language-value=""
                         ng-repeat="item in languageValue"
-                        value="[[item.code ]]">[[ item.name ]]</option>
+                        value="[[ item.code ]]">[[ item.name ]]</option>
                 </select>
                 <select name="alternate-version" id="alternate-version">
                     <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
                 </select>
             </div>
-            {# This is the reference subtitle list #}
-            <div class="subtitling-area">
-                {{ translated_from_version.subtitle_language.language_code }} {{ translated_from_version.version_number }}
-                {#  the value for subtitle-list attribute is what allows the subtitleListWidgetFinder #}
-                {#  to identify which list should be updated when we change the reference version #}
-                <ul subtitle-list="reference-subtitle-set" ng-controller="SubtitleListController"
+            <div class="reference-subtitles" ng-controller="SubtitleListController">
+                [[ subtitlesData.length || 0 ]] subtitles
+                <ul subtitle-list="reference-subtitle-set"
                     editable="false"
                     version-number="{{ translated_from_version.version_number }}"
                     language-code="{{ translated_from_version.subtitle_language.language_code }}"
                     video-id="{{ video.video_id }}">
-                        [[ subtitlesData.length ]] subs
                     <li ng-repeat="subtitle in subtitlesData"
                         ng-controller="SubtitleListItemController"
                         ng-class="{selected : subtitle.index == selectedIndex}"
@@ -68,17 +64,16 @@
             </div>
         </section>
         <section class="center column">
-            {# This is the actual editable subtitle list#}
-            <div class="subtitling-area">
+            <div class="working-subtitles" ng-controller="SubtitleListController">
+                [[ subtitlesData.length ]] subtitles
                 <ng-switch on="status">
                     <p ng-switch-when="loading">Loading subtitles</p>
                     <p ng-switch-when="saving">Saving subtitles</p>
-                    <ul subtitle-list="editing-subtitle-set" ng-controller="SubtitleListController"
+                    <ul subtitle-list="working-subtitle-set"
                         editable="true"
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
                         video-id="{{ video.video_id }}">
-                        [[ subtitlesData.length ]] subs
                         <li ng-repeat="subtitle in subtitlesData"
                             ng-controller="SubtitleListItemController"
                             ng-class="{selected : subtitle.index == selectedIndex}"
@@ -91,7 +86,7 @@
                 </ng-switch>
                 <button save-session-button
                         ng-controller="SaveSessionButtonController"
-                        disabled="[[canSave]]"
+                        disabled="[[ canSave ]]"
                         ng-click="saveSession()">
                     Save
                 </button>
