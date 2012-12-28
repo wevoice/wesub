@@ -42,7 +42,7 @@ class EditorViewTest(TestCase):
     def _get_boostrapped_data(self, response):
         '''
         Get the data that is passed to the angular app as a json object
-        writeen on a page <script> tag, as a python dict
+        writen on a page <script> tag, as a python dict
         '''
         return json.loads(response.context['editor_data'])
 
