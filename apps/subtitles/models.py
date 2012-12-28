@@ -41,6 +41,7 @@ from utils.translation import is_rtl
 
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
+VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
 
 WRITELOCK_EXPIRATION = 30 # 30 seconds
@@ -439,6 +440,9 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        assert self.language_code in VALID_LANGUAGE_CODES,\
+        "Subtitle Language %s should be a valid code." % self.language_code
+
         creating = not self.pk
 
         if creating and not self.created:

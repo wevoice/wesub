@@ -53,5 +53,4 @@ class EditorViewTest(TestCase):
         video = make_video()
         self._login()
         url = reverse("subtitles:subtitle-editor", args=(video.video_id,'xxxxx'))
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 500)
+        self.assertRaises(AssertionError, self.client.get, url)
