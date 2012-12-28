@@ -47,7 +47,6 @@
                 </select>
             </div>
             <div class="reference-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
-                <span ng-show="subtitlesData.length">[[ subtitlesData.length ]] subtitles</span>
                 <ul subtitle-list="reference-subtitle-set"
                     editable="false"
                     version-number="{{ translated_from_version.version_number }}"
@@ -67,7 +66,6 @@
         <section class="center column">
             <div class="video ng-cloak" id="video" ng-cloak ng-controller="VideoController"></div>
             <div class="working-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
-                <span ng-show="subtitlesData.length">[[ subtitlesData.length ]] subtitles</span>
                 <ng-switch on="status">
                     <p ng-switch-when="loading">Loading subtitles</p>
                     <p ng-switch-when="saving">Saving subtitles</p>

@@ -121,10 +121,9 @@ header.main {
     }
     section.video {
         border-left: 1px solid #2B2C2D;
+        border-right: 1px solid #2B2C2D;
     }
     section.status {
-        border-left: 1px solid #2B2C2D;
-
         > * {
             height: 37px;
         }
@@ -188,6 +187,8 @@ header.main {
 section.main {
     section.center {
         div.video {
+            border-left: 1px solid #88898B;
+            border-right: 1px solid #88898B;
             height: 320px;
         }
     }

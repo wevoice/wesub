@@ -34,7 +34,5 @@
 
     // exports
     root.VideoController = VideoController;
-    root.SubtitleListItemController = SubtitleListItemController;
-    root.HelperSelectorController = HelperSelectorController;
 
 }).call(this);
