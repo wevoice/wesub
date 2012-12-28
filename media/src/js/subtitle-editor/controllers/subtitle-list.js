@@ -151,7 +151,7 @@
         // since the button can be outside of the subtitle list directive
         // we need the service to find out which set we're saving.
         $scope.saveSession = function(){
-            SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles();
+            SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
         };
         $scope.$root.$on("onWorkDone", function(){
             $scope.canSave = '';
