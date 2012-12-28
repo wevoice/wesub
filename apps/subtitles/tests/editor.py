@@ -17,6 +17,9 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
+import json
+from unittest2 import skip
+
 from django.core.urlresolvers import  reverse
 from django.test import TestCase
 
@@ -36,6 +39,13 @@ class EditorViewTest(TestCase):
         user = user or self.user
         self.client.login(username=user.username, password='admin')
 
+    def _get_boostrapped_data(self, response):
+        '''
+        Get the data that is passed to the angular app as a json object
+        writeen on a page <script> tag, as a python dict
+        '''
+        return json.loads(response.context['editor_data'])
+
     def test_login_required(self):
         video = make_video()
         url = reverse("subtitles:subtitle-editor", args=(video.video_id,'en'))
@@ -54,3 +64,42 @@ class EditorViewTest(TestCase):
         self._login()
         url = reverse("subtitles:subtitle-editor", args=(video.video_id,'xxxxx'))
         self.assertRaises(AssertionError, self.client.get, url)
+
+
+    def test_apikey_present(self):
+        video = make_video()
+        self._login()
+        url = reverse("subtitles:subtitle-editor", args=(video.video_id,'en'))
+        response =  self.client.get(url)
+        data = self._get_boostrapped_data(response)
+        print data
+        self.assertEqual(self.user.get_api_key(), data['authHeaders']['x-apikey'])
+        self.assertEqual(self.user.username, data['authHeaders']['x-api-username'])
+
+
+    @skip
+    def test_permission(self):
+        # test public video is ok
+        # test video on hidden team to non members is not ok
+        # test video on public team with memebership requirements
+        pass
+
+    @skip
+    def test_writelock(self):
+        # test two users can't access the same langauge at the same time
+        # expire the first write lock
+        # test second user can aquire it
+        pass
+
+    @skip
+    def test_translated_language_present(self):
+        # make sure if the subtitle version to be edited
+        # is a translation, that we bootstrap the data correctly on
+        # the editor data
+        pass
+
+    @skip
+    def test_stand_alone_langauge_loads(self):
+        # make sure the view doesn't blow up if there is
+        # no translation to be showed
+        pass
