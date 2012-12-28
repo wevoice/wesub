@@ -150,6 +150,10 @@
                 } else {
                     callback(cachedData.languages);
                 }
+            },
+
+            getVideoURL: function() {
+                return cachedData.video.videoURL;
             }
         };
     });

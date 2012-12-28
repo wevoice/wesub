@@ -67,9 +67,8 @@
         function onSubtitleItemSelected(elm) {
             // make sure this works if the event was trigger in the
             // originating li or any descendants
-            var elm = $(elm).hasClass(".subtitle-list-item") ?
-                elm :
-                $(elm).parents(".subtitle-list-item");
+            elm = $(elm).hasClass(".subtitle-list-item") ?
+                      elm : $(elm).parents(".subtitle-list-item");
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
             if (scope == selectedScope){
@@ -93,15 +92,14 @@
             }
         }
 
-
         return {
 
-            compile:function compile(elm, attrs, transclude) {
+            compile: function compile(elm, attrs, transclude) {
                 // should be on post link so to give a chance for the
                 // nested directive (subtitleListItem) to run
                 rootEl = elm;
                 return {
-                    post:function post(scope, elm, attrs) {
+                    post: function post(scope, elm, attrs) {
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
 
                         isEditable = attrs.editable === 'true';
@@ -112,7 +110,7 @@
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
-                        scope.setVideoID (attrs['videoId']);
+                        scope.setVideoID(attrs['videoId']);
                         scope.setLanguageCode(attrs['languageCode']);
                         SubtitleListFinder.register(attrs.subtitleList, elm,
                             angular.element(elm).controller(), scope);
@@ -123,7 +121,7 @@
     });
     directives.directive("subtitleListItem", function (SubtitleStorage) {
         return {
-            link:function link(scope, elm, attrs) {
+            link: function link(scope, elm, attrs) {
 
             }
         };
@@ -132,7 +130,7 @@
 
     directives.directive("saveSessionButton", function (SubtitleStorage) {
         return {
-            link:function link(scope, elm, attrs) {
+            link: function link(scope, elm, attrs) {
                 scope.canSave = 'enabled';
 
             }
