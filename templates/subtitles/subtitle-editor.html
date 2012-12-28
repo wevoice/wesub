@@ -36,7 +36,7 @@
             <div class="help-panel" ng-cloak ng-controller="HelpController">
                 <h1>[[ heading ]]</h1>
                 <p>[[ paragraph ]]</p>
-                <ul>
+                <ul ng-show="commands">
                     <li ng-repeat="command in commands" class="group">
                         <span class="key">
                             <span>
