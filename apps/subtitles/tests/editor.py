@@ -72,7 +72,6 @@ class EditorViewTest(TestCase):
         url = reverse("subtitles:subtitle-editor", args=(video.video_id,'en'))
         response =  self.client.get(url)
         data = self._get_boostrapped_data(response)
-        print data
         self.assertEqual(self.user.get_api_key(), data['authHeaders']['x-apikey'])
         self.assertEqual(self.user.username, data['authHeaders']['x-api-username'])
 
