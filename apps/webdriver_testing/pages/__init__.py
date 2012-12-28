@@ -3,7 +3,7 @@
 """Basic webdriver commands used in all pages.
 
 """
-
+import sys
 import time
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
@@ -530,6 +530,8 @@ class Page(object):
         print '-------------------'
         print 'Error at ' + self.browser.current_url
         print '-------------------'
-        raise ValueError(str(e))
+        sys.stdout.write(e + self.browser.current_url)
+        self.testcase.tearDown()
+        raise ValueError(e)
 
 

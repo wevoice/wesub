@@ -1,0 +1,181 @@
+// Fonts
+$Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
+$OpenSans: 'Open Sans', $Helvetica;
+$CodePro: 'CodeProLC', $OpenSans;
+
+// Custom fonts
+@font-face {
+    font-family: 'CodeProLC';
+    src: url('../../../fonts/CodeProLC.eot');
+    src: url('../../../fonts/CodeProLC.eot?#iefix') format('embedded-opentype'),
+         url('../../../fonts/CodeProLC.woff') format('woff'),
+         url('../../../fonts/CodeProLC.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+// Mixins
+@mixin border-radius($radius: 5px) {
+    -webkit-background-clip: padding-box;
+    -webkit-border-radius: $radius;
+    -moz-background-clip: padding-box;
+    -moz-border-radius: $radius;
+    border-radius: $radius;
+    background-clip: padding-box;
+}
+@mixin box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
+  -webkit-box-shadow: $horizontal $vertical $blur $color;
+  -moz-box-shadow: $horizontal $vertical $blur $color;
+  box-shadow: $horizontal $vertical $blur $color;
+}
+@mixin inset-box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
+  -webkit-box-shadow: inset $horizontal $vertical $blur $color;
+  -moz-box-shadow: inset $horizontal $vertical $blur $color;
+  box-shadow: inset $horizontal $vertical $blur $color;
+}
+@mixin vertical-gradient($start: #000, $stop: #FFF) { background: ($start + $stop) / 2;
+    background: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background: -moz-linear-gradient(center top, $start 0%, $stop 100%);
+    background: -moz-gradient(center top, $start 0%, $stop 100%);
+}
+@mixin vertical-gradient-with-image($image, $start: #000, $stop: #FFF) {
+    background: ($start + $stop) / 2 $image;
+    background: $image, -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
+    background: $image, -moz-linear-gradient(center top, $start 0%, $stop 100%);
+    background: $image, -moz-gradient(center top, $start 0%, $stop 100%);
+}
+@mixin opacity($op) {
+    -khtml-opacity: $op;
+    -moz-opacity: $op;
+    opacity: $op;
+}
+
+// Page
+html, body {
+    background: #F3F4F5;
+}
+body {
+    color: #565758;
+    font: normal 11px/14px $OpenSans;
+    margin: 0;
+}
+
+// border-box all the things
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+// Utils
+.group:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.hidden {
+    display: none;
+}
+
+.column {
+    float: left;
+
+    &.left {
+        width: 34%;
+    }
+    &.center {
+        width: 39%;
+    }
+    &.right {
+        width: 27%;
+    }
+}
+
+.main {
+}
+header.main {
+    background: #212223;
+
+    section.column {
+        height: 37px;
+    }
+    section.site {
+        h1 {
+            color: #949596;
+            font: normal 18px $CodePro;
+            letter-spacing: -1px;
+            margin: 0;
+            padding: 7px 12px 8px 12px;
+            text-transform: lowercase;
+        }
+    }
+    section.video {
+        border-left: 1px solid #2B2C2D;
+    }
+    section.status {
+        border-left: 1px solid #2B2C2D;
+
+        > * {
+            height: 37px;
+        }
+        a {
+            -webkit-transition: color 0.03s linear;
+            -moz-transition: color 0.03s linear;
+            transition: color 0.03s linear;
+        }
+        a.dropdown {
+            border-right: 1px solid #2B2C2D;
+            color: #999999;
+            float: left;
+            font: normal 11px $OpenSans;
+            display: block;
+            padding: 10px 12px 10px 12px;
+            text-decoration: none;
+            width: 50%;
+
+            span {
+                display: inline-block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 80%;
+            }
+            img {
+                float: right;
+                margin-top: 2px;
+                @include opacity(.5);
+                -webkit-transition: opacity 0.03s linear;
+                -moz-transition: opacity 0.03s linear;
+                transition: opacity 0.03s linear;
+            }
+            &:hover {
+                color: #FFF;
+
+                img {
+                    @include opacity(1);
+                }
+            }
+        }
+        div.exit {
+            float: right;
+            text-align: right;
+            width: 50%;
+
+            a {
+                color: #999999;
+                display: inline-block;
+                font: normal 11px $OpenSans;
+                padding: 10px 12px;
+                text-decoration: none;
+
+                &:hover {
+                    color: #FFF;
+                }
+            }
+        }
+    }
+}
+section.main {
+}

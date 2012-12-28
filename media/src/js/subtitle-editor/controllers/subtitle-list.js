@@ -18,7 +18,8 @@
 
 (function() {
 
-    var root, SubtitleListController, SubtitleListItemController;
+    var root, SubtitleListController, SubtitleListItemController,
+        HelperSelectorController;
 
     root = this;
 
@@ -27,15 +28,23 @@
      * souch as populating the list with actual data, removing subs,
      * adding subs.
      * @param $scope
-     * @param SubtitleFetcher
+     * @param SubtitleStorage
      * @constructor
      */
-    SubtitleListController = function($scope, SubtitleFetcher) {
-        $scope.getSubtitles = function(languageCode, versionNumber){
-            $scope.items = SubtitleFetcher.getSubtitles(languageCode, versionNumber, function(subtitlesXML){
+    SubtitleListController = function($scope, SubtitleStorage) {
+        $scope.getSubtitles = function(languageCode, versionNumber) {
+            // if this version has no default source translation language
+            // it will be empty, in which case we want to wait for user
+            // interaction to request a reference subtitle set.
+            if (!languageCode || !versionNumber){
+                $scope.status = 'idle';
+                return;
+            }
+            $scope.status = 'loading';
+            $scope.items = SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
-        }
+        };
         /**
          * Once we have the dfxp from the server,
          * massage the data as a simpler object and set it on the
@@ -43,28 +52,49 @@
          * and will re-render the UI.
          * @param dfxpXML
          */
-        $scope.onSubtitlesFetched = function (dfxpXML){
+        $scope.onSubtitlesFetched = function (dfxpXML) {
 
             this.dfxpWrapper = new AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
             // now populate the subtitles scope var
             // and let angular build the UI
-            var subtitlesData = _.map(this.dfxpWrapper.getSubtitles(), function(sub,i){
-                    return {
-                        index: i,
-                        startTime: this.dfxpWrapper.startTime(i),
-                        endTime: this.dfxpWrapper.endTime(i),
-                        text: this.dfxpWrapper.content(i)
-
-                    }
-                }, this);
+            var subtitles = this.dfxpWrapper.getSubtitles();
+            // preallocate array, gives us a small perf gain
+            // on ie / safari
+            var subtitlesData = new Array(subtitles.length);
+            for (var i=0; i < subtitles.length; i++){
+                subtitlesData[i] =  {
+                    index: i,
+                    startTime: this.dfxpWrapper.startTime(subtitles.eq(i).get(0)),
+                    endTime: this.dfxpWrapper.endTime(subtitles.eq(i).get(0)),
+                    text: this.dfxpWrapper.contentRendered(subtitles.eq(i).get(0))
+                };
+            }
             $scope.subtitlesData = subtitlesData;
             // only let the descendant scope know of this, no need to propagate
             // upwards
+            $scope.status = 'ready';
             $scope.$broadcast("onSubtitlesFetched");
 
+        };
+        $scope.setSelectedIndex = function(index){
+            $scope.selectedIndex = index;
+            $scope.$digest();
+        };
 
-        }
+        $scope.setVideoID = function(videoID){
+            $scope.videoID = videoID;
+        };
+
+        $scope.setLanguageCode = function(languageCode){
+            $scope.languageCode = languageCode;
+        };
+        $scope.saveSubtitles = function(){
+            SubtitleStorage.saveSubtitles($scope.videoID,
+                                          $scope.languageCode,
+                                          this.dfxpWrapper.xmlToString(true, true));
+            $scope.status = 'saving';
+        };
     };
 
     /**
@@ -72,25 +102,65 @@
      * @param $scope
      * @constructor
      */
-    SubtitleListItemController  = function($scope){
+    SubtitleListItemController = function($scope, SubtitleStorage) {
         // we expect to have on the scope the object that
         // SubtitleListController.onSubtitlesFetched
         // has created from the dfxp
-        $scope.toHTML = function  (markupLikeText) {
 
-        }
-        $scope.startEditingMode = function (){
-        }
-        $scope.finishEditingMode = function(){
+        var initialText;
+        $scope.isEditing = false;
+        $scope.toHTML = function(markupLikeText) {
+        };
 
-        }
-        $scope.setEditable = function(isEditable){
-        }
-    }
+        $scope.startEditingMode = function() {
+            initialText =  this.dfxpWrapper.content($scope.subtitle.index);
+            $scope.isEditing  = true;
+            // fix me, this should return the markdown text
+            return initialText;
+        };
+        $scope.finishEditingMode = function(newValue){
+            $scope.isEditing  = false;
+            this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
+            $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
+            if ($scope.subtitle.text != initialText){
+                // mark dirty variable on root scope so we can allow
+                // saving the session
+                $scope.$root.$emit("onWorkDone");
+            }
+        };
+
+        $scope.getSubtitleNode = function() {
+            return this.dfxpWrapper.getSubtitle($scope.subtitle.index);
+        };
+
+        $scope.setEditable = function(isEditable) {
+        };
+
+        $scope.textChanged = function(newText) {
+            $scope.subtitle.text = newText;
+        };
+    };
+
+    HelperSelectorController = function($scope, SubtitleStorage) {
+        SubtitleStorage.getLanguages(function(languages) {
+            $scope.languageValue = languages;
+        });
+    };
+
+    SaveSessionButtonController = function($scope, SubtitleListFinder){
+        // since the button can be outside of the subtitle list directive
+        // we need the service to find out which set we're saving.
+        $scope.saveSession = function(){
+            SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles();
+        };
+        $scope.$root.$on("onWorkDone", function(){
+            $scope.canSave = '';
+            $scope.$digest();
+        });
+    };
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
-
-
+    root.HelperSelectorController = HelperSelectorController;
 
 }).call(this);

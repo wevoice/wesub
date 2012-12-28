@@ -16,16 +16,14 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-(function() {
+(function ($) {
+    var directives;
+    
+    directives = angular.module("amara.SubtitleEditor.directives.helperSelector", []);
 
-    var root, TestController;
+    directives.directive('languageValue', function() {
+        return {
+        };
+    });
 
-    root = this;
-
-    TestController = function($scope, SubtitleFetcher) {
-    };
-
-    // exports
-    root.TestController = TestController;
-
-}).call(this);
+})(window.AmarajQuery);

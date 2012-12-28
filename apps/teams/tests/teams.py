@@ -1521,6 +1521,8 @@ class BillingTest(TestCase):
         languages = sub_models.SubtitleLanguage.objects.all()
         imported, crowd_created = b._separate_languages(languages)
 
-        self.assertEquals(len(imported), 1)
+        self.assertEquals(len(imported), 3)
         imported_pks = [i.pk for i in imported]
         self.assertTrue(sl_fr.pk in imported_pks)
+        self.assertTrue(sl_es.pk in imported_pks)
+        self.assertTrue(sl_cs.pk in imported_pks)
