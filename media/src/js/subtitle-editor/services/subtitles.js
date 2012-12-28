@@ -70,7 +70,7 @@
     };
 
     getVideoLangAPIUrl = function(videoId) {
-        return API_BASE_PATH + videoId;
+        return API_BASE_PATH + videoId + '/languages/';
     };
 
     module.factory("SubtitleStorage", function($http) {
@@ -144,8 +144,8 @@
                 if (cachedData.languages && cachedData.languages.length === 0) {
                     var url = getVideoLangAPIUrl(cachedData.video.id);
                     $http.get(url).success(function(response) {
-                        cachedData.languages = response.languages;
-                        callback(response.languages);
+                        cachedData.languages = response.objects;
+                        callback(response.objects);
                     });
                 } else {
                     callback(cachedData.languages);

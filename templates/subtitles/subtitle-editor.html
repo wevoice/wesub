@@ -47,17 +47,17 @@
                     </li>
                 </ul>
             </div>
-            <div class="language-selections">
-                <select class="ng-cloak" name="alternate-language" id="alternate-language"
-                    ng-controller="HelperSelectorController"
-                    ng-cloak>
+            <div class="language-selections" ng-controller="HelperSelectorController">
+                <select class="ng-cloak" name="alternate-language" id="alternate-language" ng-cloak>
                     <option
                         language-value=""
                         ng-repeat="item in languageValue"
                         value="[[ item.code ]]">[[ item.name ]]</option>
                 </select>
                 <select name="alternate-version" id="alternate-version">
-                    <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
+                    <option
+                        ng-repeat="version in versionValue"
+                        value="">[[ version.number ]]</option>
                 </select>
             </div>
             <div class="reference-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
