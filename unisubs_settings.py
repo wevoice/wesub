@@ -47,7 +47,7 @@ elif INSTALLATION == STAGING:
     EMAIL_SUBJECT_PREFIX = '[usubs-staging]'
     CELERY_TASK_RESULT_EXPIRES = timedelta(days=7)
 elif INSTALLATION == PRODUCTION:
-    SITE_ID = 8
+    SITE_ID = 18
     SITE_NAME = 'unisubs'
     REDIS_DB = "1"
     SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
