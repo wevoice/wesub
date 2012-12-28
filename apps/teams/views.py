@@ -1264,10 +1264,10 @@ def dashboard(request, slug):
             lang_list = [l.language for l in user_languages]
 
             for video in team_videos.all():
-                subtitled_languages = (video.subtitlelanguage_set
-                                                 .filter(language__in=lang_list)
-                                                 .filter(is_complete=True)
-                                                 .values_list("language", flat=True))
+                subtitled_languages = (video.newsubtitlelanguage_set
+                                                 .filter(language_code__in=lang_list)
+                                                 .filter(subtitles_complete=True)
+                                                 .values_list("language_code", flat=True))
                 if len(subtitled_languages) != len(user_languages):
                     tv = video.teamvideo
                     tv.languages = [l for l in user_languages if l.language not in subtitled_languages]
