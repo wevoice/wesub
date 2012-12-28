@@ -79,7 +79,6 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     '''
     # FIXME: permissions
     video = get_object_or_404(Video, video_id=video_id)
-    # FIXME: validate language code
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
     except SubtitleLanguage.DoesNotExist:
