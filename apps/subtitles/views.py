@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 import json
+from django.contrib.auth.decorators import login_required
 
 from videos.models import Video
 from subtitles.models import SubtitleLanguage, SubtitleVersion
@@ -67,6 +68,7 @@ def _language_data(language, editing_version, translated_from_version):
         'versions': versions_data,
     }
 
+@login_required
 def subtitle_editor(request, video_id, language_code, task_id=None):
     '''
     Renders the subtitle-editor page, with all data neeeded for the UI
