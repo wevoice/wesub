@@ -33,6 +33,11 @@ $CodePro: 'CodeProLC', $OpenSans;
   -moz-box-shadow: inset $horizontal $vertical $blur $color;
   box-shadow: inset $horizontal $vertical $blur $color;
 }
+@mixin multi-box-shadow($horizontalIn: 0px, $verticalIn: 1px, $blurIn: 2px, $colorIn: #CCC, $horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
+  -webkit-box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
+  -moz-box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
+  box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
+}
 @mixin vertical-gradient($start: #000, $stop: #FFF) { background: ($start + $stop) / 2;
     background: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
     background: -moz-linear-gradient(center top, $start 0%, $stop 100%);
@@ -60,7 +65,7 @@ body {
     margin: 0;
 }
 
-// border-box all the things
+// border-box all the things.
 * {
     box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -93,10 +98,10 @@ body {
     }
 }
 
-.main {
-}
 header.main {
     background: #212223;
+    border-bottom: 1px solid #474849;
+    @include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
     section.column {
         height: 37px;
