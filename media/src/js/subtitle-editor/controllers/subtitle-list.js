@@ -94,7 +94,7 @@
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
             $scope.status = 'saving';
-        }
+        };
     };
 
     /**
@@ -113,7 +113,7 @@
         };
 
         $scope.startEditingMode = function() {
-            initialText =  this.dfxpWrapper.content($scope.subtitle.index)
+            initialText =  this.dfxpWrapper.content($scope.subtitle.index);
             $scope.isEditing  = true;
             // fix me, this should return the markdown text
             return initialText;
@@ -142,20 +142,22 @@
     };
 
     HelperSelectorController = function($scope, SubtitleStorage) {
-        $scope.languageValue = SubtitleStorage.getLanguages();
+        SubtitleStorage.getLanguages(function(languages) {
+            $scope.languageValue = languages;
+        });
     };
 
     SaveSessionButtonController = function($scope, SubtitleListFinder){
         // since the button can be outside of the subtitle list directive
         // we need the service to find out which set we're saving.
         $scope.saveSession = function(){
-            SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles()
-        }
+            SubtitleListFinder.get('editing-subtitle-set').scope.saveSubtitles();
+        };
         $scope.$root.$on("onWorkDone", function(){
             $scope.canSave = '';
             $scope.$digest();
-        })
-    }
+        });
+    };
     // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;

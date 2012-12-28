@@ -46,7 +46,8 @@
 
 (function() {
 
-    var root, module, getSubtitleFetchAPIUrl, API_BASE_PATH;
+    var root, module, API_BASE_PATH;
+    var getSubtitleFetchAPIUrl, getSubtitleSaveAPIUrl, getVideoLangAPIUrl;
 
     API_BASE_PATH = '/api2/partners/videos/';
     root = this;
@@ -61,12 +62,16 @@
         }
         return url;
     };
+
     getSubtitleSaveAPIUrl = function(videoId, languageCode) {
         var url = API_BASE_PATH + videoId +
             '/languages/' + languageCode + '/subtitles/';
         return url;
     };
 
+    getVideoLangAPIUrl = function(videoId) {
+        return API_BASE_PATH + videoId;
+    };
 
     module.factory("SubtitleStorage", function($http) {
         var cachedData = window.editorData;
@@ -135,8 +140,16 @@
                 });
             },
 
-            getLanguages: function() {
-                return cachedData.languages;
+            getLanguages: function(callback) {
+                if (cachedData.languages && cachedData.languages.length === 0) {
+                    var url = getVideoLangAPIUrl(cachedData.video.id);
+                    $http.get(url).success(function(response) {
+                        cachedData.languages = response.languages;
+                        callback(response.languages);
+                    });
+                } else {
+                    callback(cachedData.languages);
+                }
             }
         };
     });
