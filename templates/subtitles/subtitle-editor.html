@@ -33,20 +33,33 @@
     </header>
     <section class="main group">
         <section class="left column">
-            <div class="language-selections">
-                <select name="alternate-language" id="alternate-language"
-                    ng-controller="HelperSelectorController">
-                    <option
-                        language-value=""
-                        ng-repeat="item in languageValue"
-                        value="[[ item.code ]]">[[ item.name ]]</option>
+            <div class="help-panel" ng-cloak ng-controller="HelpController">
+                <h1>[[ heading ]]</h1>
+                <p>[[ paragraph ]]</p>
+                <ul ng-show="commands">
+                    <li ng-repeat="command in commands" class="group">
+                        <span class="key">
+                            <span>
+                                [[ command.key ]]
+                            </span>
+                        </span>
+                        <span class="description" ng-bind-html-unsafe="command.description">[[ command.description ]]</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="language-selections" ng-controller="HelperSelectorController">
+                <select class="ng-cloak" name="alternate-language" id="alternate-language" ng-cloak
+                        ng-model="language"
+                        ng-change="selectChange()"
+                        ng-options="item.name for item in languageValue">
                 </select>
                 <select name="alternate-version" id="alternate-version">
-                    <option value="{{ alternateVersion.number }}">{{ alternateVersion.number }}</option>
+                    <option
+                        ng-repeat="version in versionValue"
+                        value="">[[ version.number ]]</option>
                 </select>
             </div>
-            <div class="reference-subtitles" ng-controller="SubtitleListController">
-                [[ subtitlesData.length || 0 ]] subtitles
+            <div class="reference-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
                 <ul subtitle-list="reference-subtitle-set"
                     editable="false"
                     version-number="{{ translated_from_version.version_number }}"
@@ -56,16 +69,16 @@
                         ng-controller="SubtitleListItemController"
                         ng-class="{selected : subtitle.index == selectedIndex}"
                         class="subtitle-list-item"
-                            subtitle-list-item>
+                        subtitle-list-item>
                         <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                        <textarea ng-show="isEditing"></textarea>
+                        <textarea style="display: none;" ng-show="isEditing"></textarea>
                     </li>
                 </ul>
             </div>
         </section>
         <section class="center column">
-            <div class="working-subtitles" ng-controller="SubtitleListController">
-                [[ subtitlesData.length ]] subtitles
+            <div class="video ng-cloak" id="video" ng-cloak ng-controller="VideoController"></div>
+            <div class="working-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
                 <ng-switch on="status">
                     <p ng-switch-when="loading">Loading subtitles</p>
                     <p ng-switch-when="saving">Saving subtitles</p>
@@ -80,7 +93,7 @@
                             class="subtitle-list-item"
                             subtitle-list-item>
                             <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                            <textarea ng-show="isEditing"></textarea>
+                            <textarea style="display: none;" ng-show="isEditing"></textarea>
                         </li>
                     </ul>
                 </ng-switch>
@@ -93,7 +106,7 @@
             </div>
         </section>
         <section class="right column">
-            Right
+
         </section>
     </section>
 
@@ -104,6 +117,7 @@
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/helper-selector.js"></script>
@@ -111,7 +125,8 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/dfxp/dfxp.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
 
 </body>
 </html>

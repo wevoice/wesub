@@ -142,6 +142,17 @@
     };
 
     HelperSelectorController = function($scope, SubtitleStorage) {
+
+        $scope.getPrimaryAudioLanguage = function(languages) {
+            return _.find(languages, function(language) {
+                return language.is_primary_audio_language;
+            });
+        };
+
+        $scope.selectChange = function() {
+            $scope.versionValue = $scope.language.versions.reverse();
+        };
+
         SubtitleStorage.getLanguages(function(languages) {
             $scope.languageValue = languages;
         });

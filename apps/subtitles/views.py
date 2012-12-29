@@ -66,6 +66,7 @@ def _language_data(language, editing_version, translated_from_version):
         'pk': language.pk,
         'numVersions': language.num_versions,
         'versions': versions_data,
+        'is_primary_audio_language': language.is_primary_audio_language()
     }
 
 @login_required
@@ -79,7 +80,6 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     '''
     # FIXME: permissions
     video = get_object_or_404(Video, video_id=video_id)
-    # FIXME: validate language code
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
     except SubtitleLanguage.DoesNotExist:

@@ -63,6 +63,7 @@ body {
     color: #565758;
     font: normal 11px/14px $OpenSans;
     margin: 0;
+    text-rendering: optimizeLegibility;
 }
 
 // border-box all the things.
@@ -82,6 +83,12 @@ body {
 }
 .hidden {
     display: none;
+}
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+strong {
+    font-weight: bold;
 }
 
 .column {
@@ -104,7 +111,7 @@ header.main {
     @include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
     section.column {
-        height: 37px;
+        height: 38px;
     }
     section.site {
         h1 {
@@ -112,18 +119,17 @@ header.main {
             font: normal 18px $CodePro;
             letter-spacing: -1px;
             margin: 0;
-            padding: 7px 12px 8px 12px;
+            padding: 8px 12px;
             text-transform: lowercase;
         }
     }
     section.video {
         border-left: 1px solid #2B2C2D;
+        border-right: 1px solid #2B2C2D;
     }
     section.status {
-        border-left: 1px solid #2B2C2D;
-
         > * {
-            height: 37px;
+            height: 38px;
         }
         a {
             -webkit-transition: color 0.03s linear;
@@ -156,7 +162,7 @@ header.main {
                 transition: opacity 0.03s linear;
             }
             &:hover {
-                color: #FFF;
+                color: white;
 
                 img {
                     @include opacity(1);
@@ -176,11 +182,69 @@ header.main {
                 text-decoration: none;
 
                 &:hover {
-                    color: #FFF;
+                    color: white;
                 }
             }
         }
     }
 }
 section.main {
+    section.left {
+        div.help-panel {
+            background: #666666;
+            color: white;
+            font-size: 12px;
+            margin: 20px;
+            padding: 20px;
+            @include border-radius(3px);
+
+            h1 {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+            p {
+                line-height: 18px;
+            }
+            ul {
+                margin: 20px 0 0 10px;
+
+                li {
+                    margin: 20px 0;
+
+                    span.key {
+                        background: white;
+                        display: block;
+                        height: 32px;
+                        float: left;
+                        margin-right: 10px;
+                        position: relative;
+                        width: 54px;
+                        @include border-radius(3px);
+
+                        span {
+                            bottom: 2px;
+                            color: #5A5758;
+                            diplay: block;
+                            font-size: 8px;
+                            font-weight: bold;
+                            left: 4px;
+                            position: absolute;
+                        }
+                    }
+                    span.description {
+                        display: block;
+                        float: left;
+                        margin-top: 7px;
+                    }
+                }
+            }
+        }
+    }
+    section.center {
+        div.video {
+            border-left: 1px solid #88898B;
+            border-right: 1px solid #88898B;
+            height: 320px;
+        }
+    }
 }
