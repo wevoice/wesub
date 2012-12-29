@@ -49,10 +49,9 @@
             </div>
             <div class="language-selections" ng-controller="HelperSelectorController">
                 <select class="ng-cloak" name="alternate-language" id="alternate-language" ng-cloak>
-                    <option
-                        language-value=""
-                        ng-repeat="item in languageValue"
-                        value="[[ item.code ]]">[[ item.name ]]</option>
+                        ng-model="language"
+                        ng-change="selectChange()"
+                        ng-options="item.name for item in languageValue">
                 </select>
                 <select name="alternate-version" id="alternate-version">
                     <option
