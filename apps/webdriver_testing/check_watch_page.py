@@ -122,8 +122,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for videos by video lang and translations language.
  
         """
-        if 'jenkins' in os.getcwd():
-            self.skipTest('skipping... test always fails on jenkins')
+        #if 'jenkins' in os.getcwd():
+        #    self.skipTest('skipping... test always fails on jenkins')
 
         results_pg = self.watch_pg.advanced_search(orig_lang = 'English', 
             trans_lang='Portuguese')
