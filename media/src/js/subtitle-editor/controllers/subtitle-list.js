@@ -150,7 +150,11 @@
         };
 
         $scope.selectChange = function() {
-            $scope.versionValue = $scope.language.versions.reverse();
+            var vers;
+            vers =_.sortBy($scope.language.versions, function(item) {
+                return item.number;
+            });
+            $scope.versionValue = vers.reverse();
         };
 
         SubtitleStorage.getLanguages(function(languages) {
