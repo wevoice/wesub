@@ -59,5 +59,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
                               'Results/%s.png' % self.id())
             self.browser.get_screenshot_as_file(screenshot_file)
         finally: #But don't panic if fails
-            self.browser.quit()
+            try:
+                self.browser.quit()
+            except:
+                pass
 

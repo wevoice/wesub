@@ -89,6 +89,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.a_team_pg.application_custom_message())
 
     def test_messages__promoted_admin(self):
+        self.skipTest('needs bugs fixed: i1541 and i438')
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)
         self.members_tab.edit_user(role="Admin")
@@ -100,6 +101,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.user_message_pg.message_text())
 
     def test_messages__promoted_manager(self):
+        self.skipTest('needs bugs fixed: i1541 and i438')
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)
         self.members_tab.edit_user(role="Manager")

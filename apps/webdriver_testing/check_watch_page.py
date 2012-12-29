@@ -10,7 +10,7 @@ from apps.webdriver_testing import data_helpers
 from django.core import management
 import datetime
 import time
-
+import os
 
 class TestCaseWatchPageSearch(WebdriverTestCase):
     """TestSuite for site video searches.
