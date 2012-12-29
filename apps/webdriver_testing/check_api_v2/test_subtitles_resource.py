@@ -516,6 +516,7 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
 
         For videos under moderation only the latest published version is returned. 
         """
+        self.skipTest('test is not complete')
         #FIXME Perform the task so there is a new set of complete subs that
         # are unreviewed.
         # Probably easiest to upload a draft, then review it.
@@ -525,7 +526,6 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
 
         self.tasks_pg.log_in(self.user.username, 'password')
         self.tasks_pg.open_tasks_tab(self.my_team.slug)
-        self.assertFalse('Tasks are not done yet')
         #url_part = 'videos/{0}/languages/{1}/?format={2}'.format(
         #    self.test_video.video_id, self.lang_code, output_format, 
         #    #version
@@ -540,9 +540,10 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
     def test_fetch__moderated_none(self):
         """Fetch nothing if moderated and no version has been accepted in review.
         """
+        self.skipTest('test is not complete')
+
         self.tasks_pg.log_in(self.user.username, 'password')
         self.tasks_pg.open_tasks_tab(self.my_team.slug)
-        self.assertFalse('Tasks are not done yet')
 
         #FIXME Perform the task so there is a new set of complete subs that are unreviewed.
        
@@ -553,7 +554,5 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
             
         status, response = data_helpers.api_get_request(self, url_part) 
         print status, response
-        self.assertFalse('Needs verification steps added here. '
-                         'Verify nothing is returned.')
 
 
