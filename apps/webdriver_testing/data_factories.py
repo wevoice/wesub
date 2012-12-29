@@ -13,6 +13,7 @@ from apps.teams.models import Project
 from apps.teams.models import TeamLanguagePreference
 from apps.teams.models import Workflow 
 from apps.auth.models import CustomUser as User
+from apps.auth.models import UserLanguage
 from apps.messages.models import Message
 from apps.subtitles.models import SubtitleLanguage
 
@@ -40,6 +41,10 @@ class VideoUrlFactory(factory.Factory):
     type = 'HTML5'
     url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
     video = factory.SubFactory(VideoFactory)
+
+
+class UserLangFactory(factory.Factory):
+    FACTORY_FOR = UserLanguage
 
 class UserFactory(factory.Factory):
     FACTORY_FOR = User

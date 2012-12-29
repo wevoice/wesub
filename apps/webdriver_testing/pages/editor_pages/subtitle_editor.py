@@ -86,9 +86,11 @@ class SubtitleEditor(EditorDialogs):
         time.sleep(4)
         if self.is_element_present(self._BUFFERED):
             sys.stdout.write('buffering.')
-            while buffered < 50:
+            count = 0
+            while buffered < 50 or count < 25:
                 buffered = self.get_size_by_css(self._BUFFERED)['width']
-                time.sleep(2)
+                time.sleep(1)
+                count += 1
                 sys.stdout.write('.')
         else:
             time.sleep(10) #If no buffer, give it 10 secs to load a bit.

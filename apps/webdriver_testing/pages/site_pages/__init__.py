@@ -15,7 +15,7 @@ class UnisubsPage(Page):
     _CREATE_NAV = "li#nav_submit a"
     _FEEDBACK_BUTTON = ".feedback_tab"
 
-    _CURRENT_USER = "div#menu_name a"
+    _CURRENT_USER = "li#me_menu div#user_menu div#menu_name a"
 
     _USER_TEAMS = "li#me_menu  div#user_menu div#menu ul#dropdown li[id^=team] a"
     _SITE_LOGIN_USER_ID = "input#id_username"
@@ -41,7 +41,7 @@ class UnisubsPage(Page):
         self.browser.get(self.base_url)
 
     def _current_user(self):
-        if self.is_element_visible(self._CURRENT_USER):
+        if self.is_element_present(self._CURRENT_USER):
             return self.get_text_by_css(self._CURRENT_USER)
     
     def logged_in(self):
@@ -49,17 +49,15 @@ class UnisubsPage(Page):
             return True
 
     def log_out(self):
-        if self.logged_in():
-            self.open_page('logout/?next=/')
+        self.open_page('logout/?next=/')
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
 
         """
-        curr_page = self.browser.current_url
         if self._current_user() == username:
             return
-        if self._current_user() is not None:
+        else:
             self.log_out()
         self.click_by_css(self._LOGIN)
         self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
