@@ -107,18 +107,20 @@ class TestCaseTeamVideos(WebdriverTestCase):
         #Create user and key for api update.
         self.user = TeamAdminMemberFactory(
             team = self.team,
-            user = UserFactory(username = 'user')).user
+            user = UserFactory(username = 'user', 
+                               is_partner = True)
+            ).user
 
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
         url_part = 'videos/%s' % self.test_video.video_id
-        print url_part
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
-        data_helpers.put_api_request(self, url_part, new_data)
-
+        response, status = data_helpers.put_api_request(self, url_part, new_data)
+        print response, status
+        time.sleep(2)
         #Update the solr index
         management.call_command('update_index', interactive=False)
 
@@ -135,17 +137,19 @@ class TestCaseTeamVideos(WebdriverTestCase):
         #Create user and key for api update.
         self.user = TeamAdminMemberFactory(
             team = self.team,
-            user = UserFactory(username = 'user')).user
+            user = UserFactory(username = 'user',
+                               is_partner = True)
+            ).user
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
         url_part = 'videos/%s' % self.test_video.video_id
-        print url_part
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
-        data_helpers.put_api_request(self, url_part, new_data)
-
+        response, status = data_helpers.put_api_request(self, url_part, new_data)
+        print response, status
+        time.sleep(2)
         #Update the solr index
         management.call_command('update_index', interactive=False)
 
