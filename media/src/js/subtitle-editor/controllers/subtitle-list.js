@@ -149,16 +149,16 @@
             });
         };
 
-        $scope.selectChange = function() {
+        $scope.languageSelectChanged = function() {
             var vers;
             vers =_.sortBy($scope.language.versions, function(item) {
                 return item.number;
             });
-            $scope.versionValue = vers.reverse();
+            $scope.versions = vers.reverse();
         };
 
         SubtitleStorage.getLanguages(function(languages) {
-            $scope.languageValue = languages;
+            $scope.languages = languages;
         });
     };
 
