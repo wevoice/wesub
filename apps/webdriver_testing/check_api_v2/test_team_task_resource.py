@@ -12,8 +12,8 @@ from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import VideoFactory
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import teams_page
-from apps.webdriver_testing.site_pages.teams import tasks_tab
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
 
 class TestCaseTeamTaskResource(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
@@ -137,32 +137,6 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         self.assertEqual(self.test_video.video_id, task_objects[0]['video_id'])
 
  
-    def test_sort__newest(self):
-        """Query for a subset of tasks.
-       
-        GET /api2/partners/teams/[team-slug]/tasks/
-        """
-        #Create a task assigned to a user
-        url_part = 'teams/%s/tasks/' % self.open_team.slug
-        task_data = {   "type": "Translate",
-                        "video_id": self.test_video.video_id,
-                        "language": "en",
-                        "assignee": self.user.username,
-                        "priority": 3
-                    }
-        
-        status, response = data_helpers.post_api_request(self, url_part,
-            task_data)
-        print status, response
-
-        url_part = 'teams/%s/tasks/?order_by=-priority' % self.open_team.slug
-
-        status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
-        task_objects =  response['objects']
-        self.assertEqual(self.test_video.video_id, task_objects[0]['video_id'],
-            'Is this a valid testcase?') 
-
     def test_tasks__details(self):
         """Get the details of a taks.
 

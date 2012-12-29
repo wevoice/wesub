@@ -5,8 +5,8 @@ import time
 import os
 import filecmp
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages.teams import videos_tab
-from apps.webdriver_testing.site_pages import watch_page
+from apps.webdriver_testing.pages.site_pages.teams import videos_tab
+from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamAdminMemberFactory

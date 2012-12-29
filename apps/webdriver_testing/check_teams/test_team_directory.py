@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import teams_page
-from apps.webdriver_testing.site_pages import a_team_page
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
 
 from apps.webdriver_testing.data_factories import TeamMemberFactory, TeamVideoFactory, UserFactory
 
@@ -66,58 +66,58 @@ class TestCaseTeamsPage(WebdriverTestCase):
         self.COOL_TEAM_NAME = "A1 Waay Cool team"
 
         self.team, self.app_team, self.priv_team = setup_teams()  # ADD TEST DATA
-        self.teams_pg = teams_page.TeamsPage(self)
-        self.a_team_pg = a_team_page.ATeamPage(self)
-        self.teams_pg.open_teams_page()
+        self.teams_dir_pg = TeamsDirPage(self)
+        self.a_team_pg = ATeamPage(self)
+        self.teams_dir_pg.open_teams_page()
 
     def test_directory__search_name(self):
         """Search for a team by parital name text, has results.
 
         """
-        self.teams_pg.team_search('waay cool')
-        self.assertTrue(self.COOL_TEAM_NAME in self.teams_pg.teams_on_page())
+        self.teams_dir_pg.team_search('waay cool')
+        self.assertTrue(self.COOL_TEAM_NAME in self.teams_dir_pg.teams_on_page())
 
     def test_directory__num_members(self):
         """Verify the number of videos displayed for a team is correct.
 
         """
-        self.teams_pg.team_search('waay cool')
-        self.assertEqual(2, self.teams_pg.members(self.COOL_TEAM_NAME))
+        self.teams_dir_pg.team_search('waay cool')
+        self.assertEqual(2, self.teams_dir_pg.members(self.COOL_TEAM_NAME))
 
     def test_directory__num_videos(self):
         """Verify the number of videos displayed for a team is correct.
 
         """
-        self.teams_pg.team_search('waay cool')
-        self.assertEqual(1, self.teams_pg.videos(self.COOL_TEAM_NAME))
+        self.teams_dir_pg.team_search('waay cool')
+        self.assertEqual(1, self.teams_dir_pg.videos(self.COOL_TEAM_NAME))
 
     def test_directory__search_description(self):
         """Search for team description text has results.
 
         """
-        self.teams_pg.team_search('creative')
-        self.assertTrue(self.COOL_TEAM_NAME in self.teams_pg.teams_on_page())
+        self.teams_dir_pg.team_search('creative')
+        self.assertTrue(self.COOL_TEAM_NAME in self.teams_dir_pg.teams_on_page())
 
     def test_directory__search_private_non_member(self):
         """Non-member search for a private team, get's no results.
 
         """
-        self.teams_pg.team_search('private idaho')
-        self.assertTrue(self.teams_pg.search_has_no_matches())
+        self.teams_dir_pg.team_search('private idaho')
+        self.assertTrue(self.teams_dir_pg.search_has_no_matches())
 
     def test_directory__open_team_page(self):
         """open a team page from the directory.
 
         """
-        cool_team_pg = self.teams_pg.open_team_with_link(self.team.slug)
-        self.assertTrue(cool_team_pg.is_team(self.team.name))
+        self.teams_dir_pg.open_team_with_link(self.team.slug)
+        self.assertTrue(self.a_team_pg.is_team(self.team.name))
 
     def test_directory__sort_by_members_default(self):
         """Sort by number of members.
 
         """
         self.assertEqual('the application-only team', 
-            self.teams_pg.first_team())
+            self.teams_dir_pg.first_team())
 
     def test_directory__sort_by_newest(self):
         """sort teams list by newest.
@@ -127,12 +127,12 @@ class TestCaseTeamsPage(WebdriverTestCase):
                                  team__slug='new-team',
                                  user=UserFactory.create()
                                  )
-        self.teams_pg.sort("date")
-        self.assertEqual('new team', self.teams_pg.first_team())
+        self.teams_dir_pg.sort("date")
+        self.assertEqual('new team', self.teams_dir_pg.first_team())
 
     def test_directory__sort_by_name(self):
         """Sort by team names.
 
         """
-        self.teams_pg.sort("name")
-        self.assertEqual(self.COOL_TEAM_NAME, self.teams_pg.first_team())
+        self.teams_dir_pg.sort("name")
+        self.assertEqual(self.COOL_TEAM_NAME, self.teams_dir_pg.first_team())

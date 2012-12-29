@@ -8,9 +8,9 @@ from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import teams_page
-from apps.webdriver_testing.site_pages.teams import members_tab
-from apps.webdriver_testing.site_pages import user_messages_page
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from apps.webdriver_testing.pages.site_pages.teams import members_tab
+from apps.webdriver_testing.pages.site_pages import user_messages_page
 
 class TestCaseTeamMemberResource(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
@@ -37,8 +37,8 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
             user = UserFactory.create(username = 'member'))
 
         #Open to the teams page so you can see what's there.
-        self.teams_pg = teams_page.TeamsPage(self)
-        self.teams_pg.open_teams_page()
+        self.teams_dir_pg = TeamsDirPage(self)
+        self.teams_dir_pg.open_teams_page()
 
     def test_members__list(self):
         """List off the existing team members.
@@ -68,8 +68,8 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         url_part = 'teams/%s/members/member' % self.open_team.slug
         status, response = data_helpers.put_api_request(self, url_part, updated_info) 
         
-        self.teams_pg.open_page('teams/%s/members/' % self.open_team.slug)
-        self.teams_pg.log_in(self.user.username, 'password')
+        self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
+        self.teams_dir_pg.log_in(self.user.username, 'password')
         members_tb = members_tab.MembersTab(self)
         members_tb.member_search(self.open_team.slug, 'member')
         self.assertEqual(members_tb.user_role(), 'Admin')
@@ -96,8 +96,8 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         url_part = 'teams/%s/members/' % self.open_team.slug
         status, response = data_helpers.post_api_request(self, url_part, user_details) 
         
-        self.teams_pg.open_page('teams/%s/members/' % self.open_team.slug)
-        self.teams_pg.log_in(self.user.username, 'password')
+        self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
+        self.teams_dir_pg.log_in(self.user.username, 'password')
        
         url_part = 'teams/%s/members/' % self.open_team.slug
         status, response = data_helpers.api_get_request(self, url_part) 
@@ -176,8 +176,8 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
 
         member_objects =  response['objects']
 
-        self.teams_pg.open_page('teams/%s/members/' % self.open_team.slug)
-        self.teams_pg.log_in(self.user.username, 'password')
+        self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
+        self.teams_dir_pg.log_in(self.user.username, 'password')
         members_list = []
         for k, v in itertools.groupby(member_objects, operator.itemgetter('username')):
             members_list.append(k)

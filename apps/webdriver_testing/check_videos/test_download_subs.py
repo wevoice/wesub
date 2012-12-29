@@ -1,10 +1,10 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import video_page
-from apps.webdriver_testing.site_pages import video_language_page
+from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.editor_pages import subtitle_editor 
+from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
 import codecs
 import os
 

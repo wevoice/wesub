@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import my_teams
-from apps.webdriver_testing.site_pages.teams import tasks_tab
-from apps.webdriver_testing.site_pages.teams import videos_tab
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
+from apps.webdriver_testing.pages.site_pages.teams import videos_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory

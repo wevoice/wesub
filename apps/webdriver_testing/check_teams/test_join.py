@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import a_team_page 
-from apps.webdriver_testing.site_pages import my_teams
-from apps.webdriver_testing.site_pages.teams import members_tab
-from apps.webdriver_testing.site_pages import auth_page
+from apps.webdriver_testing.pages.site_pages.teams import ATeamPage 
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from apps.webdriver_testing.pages.site_pages.teams import members_tab
+from apps.webdriver_testing.pages.site_pages import auth_page
 from apps.webdriver_testing.data_factories import *
 from apps.teams.models import TeamMember
 
@@ -20,7 +20,7 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
             team__slug='my-team',
             user__username='open team owner',
             )
-        self.a_team_pg = a_team_page.ATeamPage(self)
+        self.a_team_pg = ATeamPage(self)
         self.auth_pg = auth_page.AuthPage(self)
         self.team_slug = self.team.team.get_absolute_url()
 
@@ -67,7 +67,7 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
                                              team__membership_policy=1,
                                              user__username='application_team_owner',
                                              ).team
-        self.a_team_pg = a_team_page.ATeamPage(self)
+        self.a_team_pg = ATeamPage(self)
         self.members_tab = members_tab.MembersTab(self)
 
     def test_join__guest(self):
@@ -105,8 +105,8 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
     """
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.my_team_pg = my_teams.MyTeam(self)
-        self.a_team_pg = a_team_page.ATeamPage(self)
+        self.team_dir_pg = TeamsDirPage(self)
+        self.a_team_pg = ATeamPage(self)
         self.members_tab = members_tab.MembersTab(self)
         self.team_owner = UserFactory.create(username='invitation_team_owner')
         self.team = TeamMemberFactory.create(team__name='manage invitation team',
@@ -147,8 +147,8 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
             )
         invitation.accept()
         self.auth_pg.login('InvitedUser', 'password')
-        self.my_team_pg.open_my_teams_page()
-        self.assertTrue(self.my_team_pg.team_displayed(
+        self.team_dir_pg.open_my_teams_page()
+        self.assertTrue(self.team_dir_pg.team_displayed(
             'manage invitation team'))
 
     def test_join__admin_invitation(self):

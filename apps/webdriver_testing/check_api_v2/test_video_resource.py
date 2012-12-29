@@ -7,8 +7,8 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.site_pages import video_page 
-from apps.webdriver_testing.site_pages.teams import videos_tab
+from apps.webdriver_testing.pages.site_pages import video_page 
+from apps.webdriver_testing.pages.site_pages.teams import videos_tab
 
 class TestCaseVideoResource(WebdriverTestCase):
     """TestSuite for videos via the api

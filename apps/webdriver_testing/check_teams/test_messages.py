@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import a_team_page
-from apps.webdriver_testing.site_pages.teams import messages_tab
-from apps.webdriver_testing.site_pages.teams import members_tab
-from apps.webdriver_testing.site_pages import user_messages_page
+from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from apps.webdriver_testing.pages.site_pages.teams import messages_tab
+from apps.webdriver_testing.pages.site_pages.teams import members_tab
+from apps.webdriver_testing.pages.site_pages import user_messages_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
@@ -25,7 +25,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.a_team_pg = a_team_page.ATeamPage(self)
+        self.a_team_pg = ATeamPage(self)
         self.members_tab = members_tab.MembersTab(self)
         self.messages_tab = messages_tab.MessagesTab(self)
         self.user_message_pg = user_messages_page.UserMessagesPage(self)

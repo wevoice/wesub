@@ -7,8 +7,8 @@ from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import ApplicationFactory
-from apps.webdriver_testing.site_pages import a_team_page 
-from apps.webdriver_testing.site_pages import auth_page
+from apps.webdriver_testing.pages.site_pages.teams import ATeamPage 
+from apps.webdriver_testing.pages.site_pages import auth_page
 
 
 
@@ -54,7 +54,7 @@ class TestCaseApplications(WebdriverTestCase):
             status = x, 
             note = 'let me in, too')
 
-        self.a_team_pg = a_team_page.ATeamPage(self)
+        self.a_team_pg = ATeamPage(self)
         self.auth_pg = auth_page.AuthPage(self)
 
     def test_list__applications(self):

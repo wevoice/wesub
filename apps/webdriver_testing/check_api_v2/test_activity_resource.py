@@ -7,8 +7,8 @@ from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import video_page
-from apps.webdriver_testing.site_pages import teams_page
+from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 
 
 class TestCaseActivity(WebdriverTestCase):
@@ -65,7 +65,7 @@ GET /api2/partners/activity/[activity-id]/
         TeamVideoFactory.create(team=self.open_team, added_by=self.user)
 
     def test_list__video_update(self):
-        """Verify 
+        """Verify video update activity.
         GET /api2/partners/activity/[activity-id]/
 
         """
@@ -99,7 +99,8 @@ GET /api2/partners/activity/[activity-id]/
 
 
     def test_team__video_added(self):
-        """Verify 
+        """Verify team video added activity.
+
         GET /api2/partners/activity/[activity-id]/
 
         """

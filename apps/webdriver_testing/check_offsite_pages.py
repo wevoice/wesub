@@ -1,8 +1,8 @@
 import time
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import offsite_page
+from apps.webdriver_testing.pages.site_pages import offsite_page
 from apps.webdriver_testing.data_factories import UserFactory 
-from apps.webdriver_testing.site_pages import auth_page
+from apps.webdriver_testing.pages.site_pages import unisubs_page
 from apps.webdriver_testing.data_helpers import create_video_with_subs
 
 
@@ -12,19 +12,16 @@ class TestCaseOffsiteWidget(WebdriverTestCase):
     """
 
     def setUp(self):
-        self.skipTest("Skipping these until widget work is done")
         WebdriverTestCase.setUp(self)
         self.offsite_pg = offsite_page.OffsitePage(self)
         self.user = UserFactory.create()
-        self.auth_pg = auth_page.AuthPage(self)
-        self.auth_pg.login(username=self.user.username, passw='password')
+        self.unisubs_pg = unisubs_page.UnisubsPage(self)
+        self.unisubs_pg.log_in(username=self.user.username, passw='password')
 
     def test_widget__nytimes(self):
         """Verify subs display on ny times demo page.
 
         """
-        self.skipTest('The videos and widget do not load when ' 
-                      'loading the site in vagrant vm')
         url = "pagedemo/nytimes_youtube_embed"
         self.offsite_pg.open_page(url)
         time.sleep(5)
@@ -77,7 +74,6 @@ class TestCaseOffsiteWidget(WebdriverTestCase):
         """Verify subs display on boing boing page.
 
         """
-        self.skipTest("Boing-Boing pages don't load. ")
         url = "pagedemo/boingboing_embed"
         self.offsite_pg.open_page(url)
         time.sleep(5)
@@ -92,7 +88,6 @@ class TestCaseOffsiteWidgetizer(WebdriverTestCase):
     """
 
     def setUp(self):
-        self.skipTest("Skipping these until widget work is done")
         WebdriverTestCase.setUp(self)
         self.offsite_pg = offsite_page.OffsitePage(self)
         self.auth = dict(username='tester', password='password')

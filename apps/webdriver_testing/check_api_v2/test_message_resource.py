@@ -4,7 +4,7 @@ from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.site_pages import user_messages_page
+from apps.webdriver_testing.pages.site_pages import user_messages_page
 
 
 class TestCaseMessages(WebdriverTestCase):

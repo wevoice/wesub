@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages import auth_page
-from apps.webdriver_testing.site_pages import my_teams
+from apps.webdriver_testing.pages.site_pages import auth_page
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
@@ -41,7 +41,7 @@ class TestCaseTeamSettings(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.my_teams_pg = my_teams.MyTeam(self)
+        self.team_dir_pg = TeamsDirPage(self)
         self.team = TeamMemberFactory.create(team__name='Roles Test',
                                              team__slug='roles-test',
                                              user__username='team_owner',

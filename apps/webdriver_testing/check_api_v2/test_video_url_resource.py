@@ -3,8 +3,8 @@ import time
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import video_page
-from apps.webdriver_testing.site_pages import watch_page
+from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages import watch_page
 
 
 class TestCaseVideoUrl(WebdriverTestCase):

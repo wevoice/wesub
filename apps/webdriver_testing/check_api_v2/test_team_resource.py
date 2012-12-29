@@ -8,7 +8,7 @@ from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import teams_page
+from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 
 class TestCaseTeamsResource(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
@@ -63,8 +63,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
             user = self.private_user).team
 
         #Open to the teams page so you can see what's there.
-        self.teams_pg = teams_page.TeamsPage(self)
-        self.teams_pg.open_teams_page()
+        self.teams_dir_pg = TeamsDirPage(self)
+        self.teams_dir_pg.open_teams_page()
 
     def test_list(self):
         """List off the existing teams.
@@ -151,8 +151,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
         status, response = data_helpers.put_api_request(self, url_part, expected_details)
         print response
         status, response = data_helpers.api_get_request(self, url_part) 
-        self.teams_pg.open_page('teams/%s/settings/permissions/' % self.open_team.slug)
-        self.teams_pg.log_in('open_team_owner', 'password')
+        self.teams_dir_pg.open_page('teams/%s/settings/permissions/' % self.open_team.slug)
+        self.teams_dir_pg.log_in('open_team_owner', 'password')
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
 
@@ -175,8 +175,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
         print status, response
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
-        self.teams_pg.open_page('teams/api-created-team/settings/permissions/')
-        self.teams_pg.log_in(self.user.username, 'password')
+        self.teams_dir_pg.open_page('teams/api-created-team/settings/permissions/')
+        self.teams_dir_pg.log_in(self.user.username, 'password')
 
 
     def test_delete(self):

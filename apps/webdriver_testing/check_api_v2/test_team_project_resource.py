@@ -10,7 +10,7 @@ from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import a_team_page
+from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
 
 class TestCaseTeamProjectResource(WebdriverTestCase):
     """TestSuite for getting and modifying video urls via api_v2.
@@ -48,7 +48,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
             name='team project two',
             workflow_enabled=True)
 
-        self.team_pg = a_team_page.ATeamPage(self)
+        self.team_pg = ATeamPage(self)
         self.team_pg.open_team_page(self.open_team.slug)
 
     def test_projects__list(self):

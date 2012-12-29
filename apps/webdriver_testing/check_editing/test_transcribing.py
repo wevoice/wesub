@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.site_pages import video_page
-from apps.webdriver_testing.editor_pages import dialogs
-from apps.webdriver_testing.editor_pages import unisubs_menu
-from apps.webdriver_testing.editor_pages import subtitle_editor 
+from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.editor_pages import dialogs
+from apps.webdriver_testing.pages.editor_pages import unisubs_menu
+from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
 from apps.webdriver_testing.data_factories import UserFactory
 import os
 import sys

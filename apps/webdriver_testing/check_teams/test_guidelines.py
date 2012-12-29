@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.site_pages.teams import messages_tab
-from apps.webdriver_testing.site_pages.teams import tasks_tab
+from apps.webdriver_testing.pages.site_pages.teams import messages_tab
+from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
