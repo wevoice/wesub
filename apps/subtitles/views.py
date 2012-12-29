@@ -66,6 +66,7 @@ def _language_data(language, editing_version, translated_from_version):
         'pk': language.pk,
         'numVersions': language.num_versions,
         'versions': versions_data,
+        'is_primary_audio_language': language.is_primary_audio_language()
     }
 
 @login_required
