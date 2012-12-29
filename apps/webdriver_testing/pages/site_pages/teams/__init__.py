@@ -23,7 +23,8 @@ class ATeamPage(UnisubsPage):
     _PROJECT_METRIC = ".metrics li:nth-child(4) > a p"
 
     #TABS
-    _VIDEO_TAB = "ul.tabs li a"
+    _DASHBOARD_TAB = "ul.tabs li a"
+    _VIDEOS_TAB = "ul.tabs li a[href*='videos']"
     _MEMBERS_TAB = "ul.tabs li a[href*='members']"
     _ACTIVITY_TAB = "ul.tabs li a[href*='activity']"
     _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
@@ -46,6 +47,11 @@ class ATeamPage(UnisubsPage):
     def open_team_project(self, team_slug, project_slug):
         url = 'teams/{0}/videos/?project={1}'.format(team_slug, project_slug)
         self.open_page(url)
+
+    def open_tab(self, tab):
+        tab_css = "_".join(['', tab.upper(), 'TAB'])
+        self.click_by_css(getattr(self, tab_css))
+
 
     def is_team(self, team):
         self.wait_for_element_present(self._TEAM_NAME)

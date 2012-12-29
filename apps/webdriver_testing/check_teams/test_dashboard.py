@@ -1,30 +1,124 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import auth_page
+from django.core import management
+from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages.teams import dashboard_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamProjectFactory
+from apps.webdriver_testing.data_factories import TeamVideoFactory
+from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import UserFactory
+from apps.webdriver_testing.data_factories import UserLangFactory
+
 from apps.teams.models import TeamMember
 
-class TestCaseTeamDashboard(WebdriverTestCase):
+class TestCaseDashboard(WebdriverTestCase):
     """Verify team dashboard displays the videos and needs.
 
     """
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.auth_pg = auth_page.AuthPage(self)
-        self.team = TeamMemberFactory.create(team__name='Roles Test',
-                                             team__slug='roles-test',
-                                             user__username='team_owner',
-                                             )
-    def test_assign__manager_project_lang_restrictions(self):
-        """Assign a manager with project restrictions.
+        self.dashboard_tab = dashboard_tab.DashboardTab(self)
+        self.team_owner = UserFactory(username = 'team_owner')
+        self.team = TeamMemberFactory.create(team__name='Dashboard Test',
+                                             team__slug='dash-test',
+                                             user = self.team_owner,
+                                             ).team
+        #Add some videos with various languages required.
+        test_videos = [('jaws.mp4', 'fr', 'fr'),
+                       ('Birds_short.oggtheora.ogg', None, None),
+                       ('fireplace.mp4', 'en', 'en')
+                       ]
+        for vid in test_videos:
+            video = data_helpers.create_video(self, 
+                    'http://qa.pculture.org/amara_tests/%s' % vid[0])
+            if vid[1] is not None:
+                video_data = {'language_code': vid[1],
+                              'video_language': vid[2],
+                              'video': video.pk,
+                              'draft': open('apps/videos/fixtures/test.srt'),
+                              'is_complete': True
+                              }
+            
+                data_helpers.upload_subs(self, video, video_data)
+            TeamVideoFactory(video = video,
+                             team = self.team,
+                             added_by = self.team_owner)
 
-           Verify the display of the roles in the members tab.
+
+    def test_members__generic_create_subs(self):
+        """Dashboard displays generic create subs message when no orig lang specified.
+
         """
-        self.auth_pg.login('team_owner', 'password')
+        #Create a user that's a member of a team with language preferences set.
+        team_member = TeamContributorMemberFactory.create(
+                team = self.team,
+                user = UserFactory(username =  'PollyGlott')
+                ).user
+        polly_speaks = ['en', 'cs', 'ru', 'ar']
+        for lang in polly_speaks:
+            UserLangFactory(user = team_member,
+                            language = lang)
+
+
+
+        #Login user and go to team dashboard page
+        self.dashboard_tab.log_in(team_member.username, 'password')
+
+        #Verify expected videos are displayed.
+        self.dashboard_tab.open_team_page(self.team.slug)
+        langs = self.dashboard_tab.languages_needed('Birds_short')
+        self.assertEqual(['Create Subtitles'], langs)
+
+    def test_members__no_languages(self):
+        """Dashboard displays Create Subtitles when member has no langs specified.
+
+        """
+        #Create a user that's a member of a team with language preferences set.
+        team_member = TeamContributorMemberFactory.create(
+                team = self.team,
+                user = UserFactory(username =  'MonoGlott')
+                ).user
+        #Login user and go to team dashboard page
+        self.dashboard_tab.log_in(team_member.username, 'password')
+
+        #Verify expected videos are displayed.
+        self.dashboard_tab.open_team_page(self.team.slug)
+        langs = self.dashboard_tab.languages_needed('jaws')
+        self.assertEqual(['Create Subtitles'], langs)
+
+
+
+    def test_members__specific_langs_neded(self):
+        """Dashboard displays videos matching members language preferences.     
+
+        """
+        #Create a user that's a member of a team with language preferences set.
+        team_member = TeamContributorMemberFactory.create(
+                team = self.team,
+                user = UserFactory(username =  'PollyGlott')
+                ).user
+        polly_speaks = ['en', 'cs', 'ru', 'ar']
+        for lang in polly_speaks:
+            UserLangFactory(user = team_member,
+                            language = lang)
+
+
+
+        #Login user and go to team dashboard page
+        self.dashboard_tab.log_in(team_member.username, 'password')
+
+        #Verify expected videos are displayed.
+        expected_lang_list = ['Create English Subtitles', 
+                              'Create Czech Subtitles',
+                              'Create Russian Subtitles',
+                              'Create Arabic Subtitles']
+        self.dashboard_tab.open_team_page(self.team.slug)
+        langs = self.dashboard_tab.languages_needed('fireplace.mp4')
+        self.assertEqual(sorted(langs), sorted(expected_lang_list))
+ 
+
+
 
 
 
