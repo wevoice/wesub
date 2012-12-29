@@ -23,11 +23,16 @@ def create_user_api_key(self, user_obj):
     return response
 
 
-def response_data(response):
-    if response.json == None:
-        return response.status_code, response.content
+def response_data(r):
+    status = r.status_code
+    json_resp = r.json
+    content_resp = r.content
+    print status, json_resp, content_resp
+
+    if json_resp == None:
+        return status, content_resp
     else:
-        return response.status_code, response.json
+        return status, json_resp
 
 def post_api_request(self, url_part, data):
     print 'posting new data' 

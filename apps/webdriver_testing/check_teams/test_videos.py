@@ -106,10 +106,10 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """
         #Create user and key for api update.
         self.user = TeamAdminMemberFactory(
-            team = self.team,
-            user = UserFactory(username = 'user', 
-                               is_partner = True)
-            ).user
+                team = self.team,
+                user = UserFactory(username = 'user', 
+                                   is_partner = True)
+                ).user
 
         data_helpers.create_user_api_key(self, self.user)
 
@@ -118,8 +118,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
-        response, status = data_helpers.put_api_request(self, url_part, new_data)
-        print response, status
+        data_helpers.put_api_request(self, url_part, new_data)
         time.sleep(2)
         #Update the solr index
         management.call_command('update_index', interactive=False)
@@ -136,10 +135,10 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """
         #Create user and key for api update.
         self.user = TeamAdminMemberFactory(
-            team = self.team,
-            user = UserFactory(username = 'user',
-                               is_partner = True)
-            ).user
+                team = self.team,
+                user = UserFactory(username = 'user',
+                                   is_partner = True)
+                ).user
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
@@ -147,8 +146,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
-        response, status = data_helpers.put_api_request(self, url_part, new_data)
-        print response, status
+        data_helpers.put_api_request(self, url_part, new_data)
         time.sleep(2)
         #Update the solr index
         management.call_command('update_index', interactive=False)
@@ -295,6 +293,10 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.videos_tab.remove_video(video = tv.title, 
             removal_action='total-destruction')
 
+
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
         #Verify video no longer in teams
         self.videos_tab.search(tv.title)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
@@ -325,6 +327,9 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.videos_tab.search(tv.title)
         self.videos_tab.remove_video(video = tv.title, 
             removal_action='team-removal')
+
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
 
         #Verify video no longer in teams
         self.videos_tab.search(tv.title)
