@@ -80,7 +80,7 @@ NOSE_ARGS = ['--with-xunit',
              '--nocapture',
              #'--collect-only',
              '--nologcapture', 
-             '--logging-filter=-pysolr, -base, remote_connection', 
+             '--logging-filter=remote_connection', 
              '--verbosity=2'
             ]
 

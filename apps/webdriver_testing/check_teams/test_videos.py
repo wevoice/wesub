@@ -120,7 +120,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.put_api_request(self, url_part, new_data)
 
         #Update the solr index
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         #Open team videos page and search for updated title text.
         self.videos_tab.open_videos_tab(self.team.slug)
@@ -147,7 +147,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.put_api_request(self, url_part, new_data)
 
         #Update the solr index
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         #Open team videos page and search for updated title text.
         self.videos_tab.open_videos_tab(self.team.slug)

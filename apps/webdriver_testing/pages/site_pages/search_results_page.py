@@ -24,7 +24,7 @@ class SearchResultsPage(VideoListings):
     _FIRST_SEARCH_RESULT = "ul.video_list li a"
 
     def search_has_no_results(self):
-        time.sleep(3)
+        time.sleep(5)
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
         if self.is_text_present(self._NO_RESULTS, "No videos found ..."):
             return True

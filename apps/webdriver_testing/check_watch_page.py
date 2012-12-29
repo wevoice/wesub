@@ -30,7 +30,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
             video_url = "http://www.youtube.com/watch?v=WqJineyEszo")
         data_helpers.create_videos_with_fake_subs(self, 
             'apps/webdriver_testing/subtitle_data/fake_subs.json')
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
 
 
@@ -57,7 +57,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
 
         test_video = data_helpers.create_video_with_subs(self, 
             video_url = "http://unisubs.example.com/test_nonascii.mp4", data = data)
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         #Search for: chinese chars by opening entering the text via javascript
         #because webdriver can't type those characters.
@@ -70,7 +70,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
  
         """
         video = VideoFactory(title = u'不过这四个问题')
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         #Search for: chinese chars by opening entering the text via javascript
         #because webdriver can't type those characters.
@@ -167,7 +167,7 @@ class TestCaseWatchPageListings(WebdriverTestCase):
             'apps/webdriver_testing/subtitle_data/fake_subs.json')
 
         #Make sure the search cache is clear of old junk.
-        management.call_command('rebuild_index', interactive=False)
+        management.call_command('update_index', interactive=False)
 
         self.expected_videos = [ 'original ar with en complete subs',
                                  'original english with incomplete pt', 
