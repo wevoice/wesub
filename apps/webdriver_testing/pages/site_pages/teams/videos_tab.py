@@ -208,6 +208,7 @@ class VideosTab(ATeamPage):
         if removal_action:
             self.click_by_css(self._REMOVE_OPTION % removal_action)
         self.click_by_css(self._REMOVE)
+        time.sleep(3)
         self.handle_js_alert("accept")
 
     def edit_video(self, video=None, project=None, team=None, thumb=None):
