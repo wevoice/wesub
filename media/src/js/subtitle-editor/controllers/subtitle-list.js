@@ -150,19 +150,33 @@
             });
         };
 
-        $scope.languageSelectChanged = function() {
-            var vers;
-            vers =_.sortBy($scope.language.versions, function(item) {
+        $scope.languageSelectChanged = function(lang) {
+            var vers, language;
+
+            if (lang) {
+                language = lang;
+            } else {
+                language = $scope.language;
+            }
+
+            vers =_.sortBy(language.versions, function(item) {
                 return item.number;
             });
             $scope.versions = vers.reverse();
+            if (vers.length && vers.length > 0) {
+                $scope.version = $scope.versions[0];
+            }
         };
 
         SubtitleStorage.getLanguages(function(languages) {
             $scope.languages = languages;
+            $scope.language = _.find(languages, function(item) {
+                return item.editingLanguage;
+            });
+            $scope.languageSelectChanged($scope.language);
         });
 
-        $scope.versionChanged = function(newVersion) {
+        $scope.versionChanged = function(newVersion, oldVersion) {
             if (!newVersion) {
                 return;
             }
