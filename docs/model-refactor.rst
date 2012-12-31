@@ -415,7 +415,7 @@ bring the site down completely for a few days to do it.  There are going to be
 three main steps to the migration.
 
 Initial Schema Migration
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 The first step will be to run migrations that do not conflict with the current
 operation of the site.  This will include:
@@ -435,7 +435,7 @@ After this step is complete nothing should have changed except for the extra
 fields and tables.
 
 Background Data Migration
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The next step is to migrate ``SubtitleLanguage`` and ``SubtitleVersion`` objects
 into the new data model.
@@ -465,7 +465,7 @@ this which should cover most of the cases, but if we ever use something like
 need to manually set this field.
 
 Final Schema Migration
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 After Tern has finished migrating all the old models into the new ones, it's
 time for the final migration.  We should bring the site down at this point to
