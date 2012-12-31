@@ -167,6 +167,10 @@
                 return;
             }
             var subtitles = newVersion.subtitlesXML;
+
+            if (!subtitles) {
+                throw Error("Version doesn't contain subs.");
+            }
             var refSubList = SubtitleListFinder.get('reference-subtitle-set');
             refSubList.scope.onSubtitlesFetched(subtitles);
         };
