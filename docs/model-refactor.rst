@@ -1,6 +1,6 @@
-=========================
-Data model refactor notes
-=========================
+===================
+Data Model Refactor
+===================
 
 Some useful information about the data model refactor.
 
@@ -406,3 +406,83 @@ Get the SubtitleSet for the SubtitleVersion you want to generate, then::
           serialized_subs = unicode(generator(subtitle_set))
      except KeyError:
           pass # no generator for this format found
+
+Migration Plan
+==============
+
+Migrating the data to the new data model is going to be tricky, because we can't
+bring the site down completely for a few days to do it.  There are going to be
+three main steps to the migration.
+
+Initial Schema Migration
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The first step will be to run migrations that do not conflict with the current
+operation of the site.  This will include:
+
+* The migrations that add the new subtitles app and all of its models.
+* The migrations that add the syncing fields (``needs_sync`` and
+  ``new_subtitle_*``) to the old models.
+
+*TODO*: We may need to reorder migrations on the dev branch first, which is
+going to be a painful mess.  But otherwise bad things will happen in step three.
+sjl will probably be in charge of this.
+
+We'll also need to cherry-pick over the code that updates ``needs_sync`` in the
+old models.
+
+After this step is complete nothing should have changed except for the extra
+fields and tables.
+
+Background Data Migration
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The next step is to migrate ``SubtitleLanguage`` and ``SubtitleVersion`` objects
+into the new data model.
+
+The ``apps/subtitles/tern.py`` script handles this.  It's a command line script
+with various options, use ``tern.py --help`` to see the full usage syntax.
+
+Tern will look in the database and choose a ``SubtitleLanguage`` or
+``SubtitleVersion`` that needs to be ported and create/update the corresponding
+new model.  It uses the ``needs_sync`` and ``new_subtitle_*`` fields to track
+this.  It chooses ``SubtitleLanguage`` objects to port in a random order (except
+that bases are always chosen before translations).  It should handle filling in
+the ``parent`` fields and such correctly.
+
+Tern should be able to be run in the background without any problems.  It
+migrates one language at a time, and doesn't touch the old one except to mark
+``needs_sync`` as ``False``.  It should also be safe to run multiple times on
+the same language, in case it has changed.
+
+*TODO*: Determine where the Tern data will be logged, and who'll be in charge of
+reviewing it for any errors (probably sjl).
+
+*TODO*: Determine all the places where ``needs_sync`` needs to be set back to
+``True`` when some data changes.  I've already got the ``save()`` methods doing
+this which should cover most of the cases, but if we ever use something like
+``.update()`` for ``SubtitleLanguage`` or ``SubtitleVersion`` models then we'll
+need to manually set this field.
+
+Final Schema Migration
+~~~~~~~~~~~~~~~~~~~~~~
+
+After Tern has finished migrating all the old models into the new ones, it's
+time for the final migration.  We should bring the site down at this point to
+ensure that no data sneaks by us.
+
+Once the site is down, we'll run Tern one more time to catch any stray data that
+got in after the last run.
+
+Taking a DB snapshot at this point is probably a good idea.
+
+Then we'll merge over all the new DMR code, and run all remaining migrations.
+These should be (comparatively) fast.
+
+*TODO*: Review what the remaining migrations are to make sure they'll actually
+be fast.
+
+Finally, we switch the site back on and the DMR is live!  We should refrain from
+deleting the old data for a while, just in case we need to refer to it to
+restore something.
+
