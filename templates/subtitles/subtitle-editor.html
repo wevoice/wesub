@@ -53,10 +53,9 @@
                         ng-change="languageSelectChanged()"
                         ng-options="item.name for item in languages">
                 </select>
-                <select name="alternate-version" id="alternate-version">
-                    <option
-                        ng-repeat="version in versions"
-                        value="">[[ version.number ]]</option>
+                <select name="alternate-version" id="alternate-version"
+                    ng-options="version.number for version in versions"
+                    ng-model="version">
                 </select>
             </div>
             <div class="reference-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">

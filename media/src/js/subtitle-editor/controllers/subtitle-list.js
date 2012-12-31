@@ -141,7 +141,8 @@
         };
     };
 
-    HelperSelectorController = function($scope, SubtitleStorage) {
+    HelperSelectorController = function($scope, SubtitleStorage,
+                                        SubtitleListFinder) {
 
         $scope.getPrimaryAudioLanguage = function(languages) {
             return _.find(languages, function(language) {
@@ -160,6 +161,17 @@
         SubtitleStorage.getLanguages(function(languages) {
             $scope.languages = languages;
         });
+
+        $scope.versionChanged = function(newVersion) {
+            if (!newVersion) {
+                return;
+            }
+            var subtitles = newVersion.subtitlesXML;
+            var refSubList = SubtitleListFinder.get('reference-subtitle-set');
+            refSubList.scope.onSubtitlesFetched(subtitles);
+        };
+
+        $scope.$watch('version', $scope.versionChanged);
     };
 
     SaveSessionButtonController = function($scope, SubtitleListFinder){
