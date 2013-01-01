@@ -123,7 +123,7 @@
             $scope.isEditing  = false;
             this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
             $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
-            if ($scope.subtitle.text != initialText){
+            if ($scope.subtitle.text !== initialText){
                 // mark dirty variable on root scope so we can allow
                 // saving the session
                 $scope.$root.$emit("onWorkDone");
@@ -178,16 +178,30 @@
         });
 
         $scope.versionChanged = function(newVersion, oldVersion) {
+            var subtitlesXML, refSubList;
+
             if (!newVersion) {
                 return;
             }
-            var subtitles = newVersion.subtitlesXML;
+            subtitlesXML = newVersion.subtitlesXML;
 
-            if (!subtitles) {
-                throw Error("Version doesn't contain subs.");
+            if (!subtitlesXML) {
+                SubtitleStorage.getSubtitles($scope.language.code,
+                                             newVersion.number,
+                                             function(subtitlesXML) {
+                    $scope.version.subtitlesXML = subtitlesXML;
+                    $scope.setReferenceSubs(subtitlesXML);
+                });
+            } else {
+                $scope.setReferenceSubs(subtitlesXML);
             }
-            var refSubList = SubtitleListFinder.get('reference-subtitle-set');
-            refSubList.scope.onSubtitlesFetched(subtitles);
+        };
+
+        $scope.setReferenceSubs = function(subtitlesXML) {
+            if (!$scope.refSubList) {
+                $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
+            }
+            $scope.refSubList.scope.onSubtitlesFetched(subtitlesXML);
         };
 
         $scope.$watch('version', $scope.versionChanged);
