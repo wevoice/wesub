@@ -18,10 +18,11 @@
 
 (function() {
 
-    var root, SubtitleListController, SubtitleListItemController,
+    var _, root, SubtitleListController, SubtitleListItemController,
         HelperSelectorController, SaveSessionButtonController;
 
     root = this;
+    _ = root._.noConflict();
 
     /**
      * Responsible for everything that touches subtitles as a group,
@@ -54,7 +55,7 @@
          */
         $scope.onSubtitlesFetched = function (dfxpXML) {
 
-            this.dfxpWrapper = new AmaraDFXPParser();
+            this.dfxpWrapper = new root.AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
             // now populate the subtitles scope var
             // and let angular build the UI
@@ -207,5 +208,6 @@
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
     root.HelperSelectorController = HelperSelectorController;
+    root.SaveSessionButtonController = SaveSessionButtonController;
 
 }).call(this);
