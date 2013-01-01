@@ -19,7 +19,7 @@
 (function() {
 
     var root, SubtitleListController, SubtitleListItemController,
-        HelperSelectorController;
+        HelperSelectorController, SaveSessionButtonController;
 
     root = this;
 
