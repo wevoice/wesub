@@ -142,14 +142,22 @@
         };
     };
 
+    /**
+     * This controller is responsible for the language and version selector
+     * widget.  The widget allows the user to select a reference language and
+     * version when translating subtitles into another language.
+     *
+     * The $scope contains "languages" and "versions".  Each list is
+     * represented in the UI as a <select> element.  The selected language or
+     * version is stored on the $scope as a "language" and "version" model.
+     *
+     * Whenever the language selection is changed, we update the list of
+     * versions.  When a new version is selected, we retrieve the subtitles
+     * (either from memory or from the API via ajax) and display them in the
+     * side panel.
+     */
     HelperSelectorController = function($scope, SubtitleStorage,
-                                        SubtitleListFinder) {
-
-        $scope.getPrimaryAudioLanguage = function(languages) {
-            return _.find(languages, function(language) {
-                return language.is_primary_audio_language;
-            });
-        };
+            SubtitleListFinder) {
 
         $scope.languageSelectChanged = function(lang) {
             var vers, language;
