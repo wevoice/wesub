@@ -108,6 +108,17 @@
         window.onresize = function() {
             $scope.$apply();
         };
+        $scope.addSubtitle = function(subtitle, index) {
+            if (subtitle.index !== index) {
+                throw Error("Indexes don't match.");
+            }
+
+            $scope.subtitlesData.splice(index, 0, subtitle);
+        };
+
+        $scope.removeSubtitle = function(index) {
+            $scope.subtitlesData.splice(index, 1);
+        };
     };
 
     /**
