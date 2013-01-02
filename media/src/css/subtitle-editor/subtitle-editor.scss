@@ -91,6 +91,7 @@ strong {
     font-weight: bold;
 }
 
+// Modules
 .column {
     float: left;
 
@@ -245,6 +246,11 @@ section.main {
             border-left: 1px solid #88898B;
             border-right: 1px solid #88898B;
             height: 320px;
+
+            iframe {
+                height: 320px;
+                width: 100%;
+            }
         }
     }
 }

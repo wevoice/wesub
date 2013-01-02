@@ -29,7 +29,7 @@
      * @constructor
      */
     VideoController = function($scope, SubtitleStorage) {
-        $scope.pop = Popcorn.smart('#video', SubtitleStorage.getVideoURL());
+        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL());
     };
 
     // exports
