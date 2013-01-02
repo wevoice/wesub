@@ -244,6 +244,19 @@ section.main {
                 }
             }
         }
+        div.language-selections {
+            background: #ECECEC;
+            border-bottom: 1px solid #DADBDC;
+            border-top: 1px solid #DADBDC;
+            padding: 5px 20px;
+
+            select {
+                display: block;
+                float: left;
+                margin: 0;
+                width: 33%;
+            }
+        }
     }
     section.center {
         div.video {

@@ -31,9 +31,9 @@
             </div>
         </section>
     </header>
-    <section class="main group">
+    <section class="main group ng-cloak" ng-cloak>
         <section class="left column">
-            <div class="help-panel" ng-cloak ng-controller="HelpController">
+            <div class="help-panel" ng-controller="HelpController">
                 <h1>[[ heading ]]</h1>
                 <p>[[ paragraph ]]</p>
                 <ul ng-show="commands">
@@ -47,8 +47,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="language-selections" ng-controller="HelperSelectorController">
-                <select class="ng-cloak" name="alternate-language" id="alternate-language" ng-cloak
+            <div class="language-selections group" ng-controller="HelperSelectorController">
+                <select name="alternate-language" id="alternate-language"
                         ng-model="language"
                         ng-change="languageSelectChanged()"
                         ng-options="item.name for item in languages">
@@ -58,7 +58,7 @@
                     ng-model="version">
                 </select>
             </div>
-            <div class="reference-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
+            <div class="reference-subtitles" ng-controller="SubtitleListController">
                 <ul subtitle-list="reference-subtitle-set"
                     editable="false"
                     version-number="{{ translated_from_version.version_number }}"
@@ -76,8 +76,8 @@
             </div>
         </section>
         <section class="center column">
-            <div class="video ng-cloak" id="video" ng-cloak ng-controller="VideoController"></div>
-            <div class="working-subtitles ng-cloak" ng-cloak ng-controller="SubtitleListController">
+            <div class="video" id="video" ng-controller="VideoController"></div>
+            <div class="working-subtitles" ng-controller="SubtitleListController">
                 <ng-switch on="status">
                     <p ng-switch-when="loading">Loading subtitles</p>
                     <p ng-switch-when="saving">Saving subtitles</p>
