@@ -43,6 +43,7 @@ media/release
 media/static-cache
 media/teams/*
 media/videos/*
+media/src/css/subtitle-editor/subtitle-editor-dev.css
 deploy/fabric.log
 amara-fabric/
 disabled
