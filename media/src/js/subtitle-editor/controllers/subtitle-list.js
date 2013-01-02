@@ -46,6 +46,9 @@
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
         };
+        $scope.getSubtitleListHeight = function() {
+            return window.AmarajQuery(window).height() - 373;
+        };
         /**
          * Once we have the dfxp from the server,
          * massage the data as a simpler object and set it on the
@@ -95,6 +98,15 @@
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
             $scope.status = 'saving';
+        };
+
+        // Watch the window for resize events so we may update the subtitle list
+        // heights appropriately.
+        $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
+            window.AmarajQuery(window.AmarajQuery('div.subtitles').height(newHeight));
+        });
+        window.onresize = function() {
+            $scope.$apply();
         };
     };
 

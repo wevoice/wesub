@@ -190,11 +190,33 @@ header.main {
     }
 }
 section.main {
+    div.subtitles {
+        overflow: scroll;
+
+        ul {
+            margin-top: 20px;
+            overflow: scroll;
+
+            li {
+                color: #3C3C3D;
+                font-size: 12px;
+                line-height: 25px;
+                padding: 5px 40px;
+            }
+        }
+        &.reference {
+            
+        }
+        &.working {
+            
+        }
+    }
     section.left {
         div.help-panel {
             background: #666666;
             color: white;
             font-size: 12px;
+            height: 250px;
             margin: 20px;
             padding: 20px;
             @include border-radius(3px);

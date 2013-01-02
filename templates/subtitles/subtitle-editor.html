@@ -54,11 +54,11 @@
                         ng-options="item.name for item in languages">
                 </select>
                 <select name="alternate-version" id="alternate-version"
-                    ng-options="version.number for version in versions"
+                    ng-options="'Version ' + version.number for version in versions"
                     ng-model="version">
                 </select>
             </div>
-            <div class="reference-subtitles" ng-controller="SubtitleListController">
+            <div class="reference subtitles" ng-controller="SubtitleListController">
                 <ul subtitle-list="reference-subtitle-set"
                     editable="false"
                     version-number="{{ translated_from_version.version_number }}"
@@ -77,7 +77,7 @@
         </section>
         <section class="center column">
             <div class="video" id="video" ng-controller="VideoController"></div>
-            <div class="working-subtitles" ng-controller="SubtitleListController">
+            <div class="working subtitles" ng-controller="SubtitleListController">
                 <ng-switch on="status">
                     <p ng-switch-when="loading">Loading subtitles</p>
                     <p ng-switch-when="saving">Saving subtitles</p>
