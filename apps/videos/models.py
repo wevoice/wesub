@@ -1182,6 +1182,7 @@ class SubtitleLanguage(models.Model):
         self.save()
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        self.needs_sync = True
         if updates_timestamp:
             self.created = datetime.now()
         if self.language:
@@ -1390,6 +1391,7 @@ class SubtitleVersion(SubtitleCollection):
         return u'%s #%s' % (self.language, self.version_no)
 
     def save(self,  *args, **kwargs):
+        self.needs_sync = True
         created = not self.pk
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:

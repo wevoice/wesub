@@ -63,7 +63,8 @@ def die(msg):
 def get_unsynced_subtitle_language():
     """Return a SubtitleLanguage that needs to be synced.
 
-    SubtitleLanguages will be returned in a random order.  Forcing the syncing
+    SubtitleLanguages will be returned in a random order (except that "base"
+    languages will always come before their translations).  Forcing the syncing
     code to deal with this will make it robust against different data in
     dev/staging/prod.
 
@@ -71,9 +72,48 @@ def get_unsynced_subtitle_language():
     from apps.videos.models import SubtitleLanguage
 
     try:
-        return SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
+        sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
     except SubtitleLanguage.DoesNotExist:
         return None
+
+    if sl.standard_language and sl.standard_language.needs_sync:
+        return sl.standard_language
+    else:
+        return sl
+
+def get_unsynced_subtitle_version_language():
+    """Return a SubtitleLanguage with one or more unsynced versions.
+
+    This will let us sync SubtitleVersions in "chunks" of a language at a time.
+
+    The SubtitleLanguage itself must have already been synced on its own.
+
+    Languages will be returned in a random order (but "base" languages will come
+    before translations).  Forcing the syncing code to deal with this will make
+    it robust against different data in dev/staging/prod.
+
+    """
+    from apps.videos.models import SubtitleVersion
+
+    try:
+        sv = SubtitleVersion.objects.filter(
+            needs_sync=True, subtitle_language__needs_sync=False
+        ).order_by('?')[0]
+    except SubtitleVersion.DoesNotExist:
+        return None
+
+    sl = sv.language
+    base = sl.standard_language
+
+    if base:
+        # If the version we picked is from a translation, and the source version
+        # has unsynced versions, we should sync *that* one first.
+        unsynced_base = (base.subtitleversion_set.filter(needs_sync=True)
+                                                 .exists())
+        if unsynced_base:
+            return base
+
+    return sl
 
 
 # Commands
@@ -113,9 +153,61 @@ def count():
     print "%10d broken" % broken
     print
 
+
+def _create_subtitle_language(sl):
+    """Sync the given subtitle language, creating a new one."""
+    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
+
+    nsl = NewSubtitleLanguage(
+        video=sl.video,
+        language_code=sl.language,
+        subtitles_complete=sl.is_complete,
+        writelock_time=sl.writelock_time,
+        writelock_session_key=sl.writelock_session_key,
+        writelock_owner=sl.writelock_owner,
+        is_forked=sl.is_forked,
+    )
+    nsl.save()
+
+    # Has to be saved separately because it's a magic Redis field.  Sigh.
+    nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+    nsl.save()
+
+    # TODO: is this right, or does it need to be save()'ed?
+    nsl.followers = sl.followers.all()
+
+    sl.new_subtitle_language = nsl
+    sl.needs_sync = False
+    sl.save()
+
+    log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
+
+def _update_subtitle_language(sl):
+    """Sync the given subtitle language, updating the existing new SL."""
+
+    nsl = sl.new_subtitle_language
+
+    nsl.video = sl.video
+    nsl.language_code = sl.language
+    nsl.subtitles_complete = sl.is_complete
+    nsl.writelock_time = sl.writelock_time
+    nsl.writelock_session_key = sl.writelock_session_key
+    nsl.writelock_owner = sl.writelock_owner
+    nsl.is_forked = sl.is_forked
+    nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+    nsl.save()
+
+    # TODO: is this right, or does it need to be save()'ed?
+    nsl.followers = sl.followers.all()
+
+    sl.needs_sync = False
+    sl.save()
+
+    log('SubtitleLanguage', 'update', sl.pk, nsl.pk)
+
 def _sync_language():
     """Try to sync one SubtitleLanguage.
-    
+
     Returns True if a language was synced, False if there were no more left.
 
     """
@@ -124,7 +216,10 @@ def _sync_language():
     if not sl:
         return False
 
-    log('SubtitleLanguage', 'create', sl.pk, '0')
+    if sl.new_subtitle_language:
+        _update_subtitle_language(sl)
+    else:
+        _create_subtitle_language(sl)
 
     return True
 
@@ -133,6 +228,135 @@ def sync_languages():
     if not single:
         while result:
             result = _sync_language()
+
+
+def _get_subtitles(sv):
+    """Return a generator of subtitle tuples for the given (old) version."""
+
+    subtitle_objects = sv.subtitle_set.all()
+
+    if not sv.is_dependent():
+        # If this version is not dependent on another its subtitle set should be
+        # self-contained.  We can just iterate through it and yield the
+        # appropriate fields.
+        for s in subtitle_objects:
+            yield (
+                s.start_time,
+                s.end_time,
+                s.subtitle_text,
+                {'new_paragraph': s.start_of_paragraph},
+            )
+    else:
+        # Otherwise this is a translation and we need to look at the translation
+        # source to get the timing data.  Kill me now.
+        source_subtitles = sv._get_standard_collection(public_only=True)
+
+        if source_subtitles:
+            source_subtitles = dict((s.subtitle_id, s)
+                                    for s in source_subtitles)
+        else:
+            # If we can't get the source subtitles for some reason then we'll do
+            # the best we can (basically: the subs in the target version will be
+            # marked as unsynced).
+            source_subtitles = {}
+
+        for s in subtitle_objects:
+            source = source_subtitles.get(s.subtitle_id)
+
+            if source:
+                start = source.start_time
+                end = source.end_time
+                paragraph = source.start_of_paragraph
+            else:
+                start = None
+                end = None
+                paragraph = s.start_of_paragraph
+
+            yield (
+                start,
+                end,
+                s.subtitle_text,
+                {'new_paragraph': paragraph},
+            )
+
+def _create_subtitle_version(sv, last_version):
+    """Sync the old SubtitleVersion by creating a new SubtitleVersion.
+
+    If this language is a translation, and we're creating the final version in
+    the chain, the parents of the new version will set to the tip of the source:
+
+    """
+    from apps.subtitles import pipeline
+
+    sl = sv.language
+    nsl = sl.new_subtitle_language
+
+    visibility = 'public' if sv.is_public else 'private'
+
+    subtitles = _get_subtitles(sv)
+
+    parents = []
+    if last_version and sl.is_dependent():
+        tip = sl.standard_language.new_subtitle_language.get_tip()
+        if tip:
+            parents = [tip]
+
+    pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
+                           title=sv.title, description=sv.description,
+                           parents=parents, visibility=visibility,
+                           author=sv.user)
+
+def _update_subtitle_version(sv):
+    """Update a previously-synced SubtitleVersion.
+
+    The new SubtitleVersion *should* be immutable in the new data model, but for
+    now there may be a few changes.
+
+    """
+    nsv = sv.new_subtitle_version
+
+    nsv.title = sv.title
+    nsv.description = sv.description
+    nsv.note = sv.note
+    nsv.visibility = 'public' if sv.is_public else 'private'
+    nsv.save()
+
+def _sync_versions():
+    """Sync a single language worth of SubtitleVersions."""
+
+    sl = get_unsynced_subtitle_version_language()
+
+    if not sl:
+        return False
+
+    # First update any versions that have been synced but have changed since.
+    versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                             new_subtitle_version__isnull=False)
+
+    for version in versions.order_by('version_no'):
+        _update_subtitle_version(version)
+
+    # Then sync any new versions.
+    versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                             new_subtitle_version=None)
+
+    # This is ugly, but we (may) need to do something special on the last
+    # version we sync.
+    new_versions = list(versions.order_by('version_no'))
+
+    for version in new_versions[:-1]:
+        _create_subtitle_version(version, False)
+
+    for version in new_versions[-1:]:
+        _create_subtitle_version(version, True)
+
+    return True
+
+def sync_versions():
+    result = _sync_versions()
+    if not single:
+        while result:
+            result = _sync_versions()
 
 
 # Setup
@@ -178,6 +402,10 @@ def build_option_parser():
                  action='store_const', const='languages',
                  help='sync SubtitleLanguage objects')
 
+    g.add_option('-V', '--versions', dest='command',
+                 action='store_const', const='versions',
+                 help='sync SubtitleVersion objects')
+
     g.add_option('-H', '--header', dest='command',
                  action='store_const', const='header',
                  help='output the header for the CSV output')
@@ -204,6 +432,8 @@ def main():
         count()
     elif options.command == 'languages':
         sync_languages()
+    elif options.command == 'versions':
+        sync_versions()
     elif options.command == 'header':
         header()
 
