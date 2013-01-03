@@ -43,18 +43,24 @@
                 e.preventDefault();
 
                 // what is the next element?
-                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
+                if(selectedScope.subtitlesData[selectedScope.subtitle.index + 1]){
+                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
+                }
 
                 selectedScope.$digest();
             } else if (keyCode == 9 && e.shiftKey){
                 // tab with shift, move backwards
-                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
+                if(selectedScope.subtitlesData[selectedScope.subtitle.index - 1]){
+                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
+                }
                 e.preventDefault();
-
             }
+
             if (elementToSelect){
                 onSubtitleItemSelected(elementToSelect);
-                activeTextArea.select();
+                activeTextArea.select()
+            } else {
+                selectedScope.finishEditingMode(activeTextArea.val());
             }
         }
 
