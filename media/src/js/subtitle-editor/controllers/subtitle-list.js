@@ -18,13 +18,12 @@
 
 (function() {
 
-    var _, root, SubtitleListController, SubtitleListItemController,
+    var _, $, root, SubtitleListController, SubtitleListItemController,
         HelperSelectorController, SaveSessionButtonController;
-
-    var $ = window.AmarajQuery;
 
     root = this;
     _ = root._.noConflict();
+    $ = root.AmarajQuery;
 
     /**
      * Responsible for everything that touches subtitles as a group,
