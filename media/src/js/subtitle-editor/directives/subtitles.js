@@ -58,6 +58,7 @@
 
             if (elementToSelect){
                 onSubtitleItemSelected(elementToSelect);
+                activeTextArea.select()
             } else {
                 selectedScope.finishEditingMode(activeTextArea.val());
             }
