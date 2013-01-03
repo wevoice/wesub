@@ -75,40 +75,44 @@
                     ng-model="version">
                 </select>
             </div>
-            <div class="reference subtitles" ng-controller="SubtitleListController">
-                <ul subtitle-list="reference-subtitle-set"
-                    editable="false"
-                    version-number="{{ translated_from_version.version_number }}"
-                    language-code="{{ translated_from_version.subtitle_language.language_code }}"
-                    video-id="{{ video.video_id }}">
-                    <li ng-repeat="subtitle in subtitlesData"
-                        ng-controller="SubtitleListItemController"
-                        ng-class="{selected: subtitle.index == selectedIndex}"
-                        class="subtitle-list-item"
-                        subtitle-list-item>
-                        <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                        <textarea style="display: none;" ng-show="isEditing"></textarea>
-                    </li>
-                </ul>
+            <div class="subtitles-wrapper">
+                <div class="reference subtitles" ng-controller="SubtitleListController">
+                    <ul subtitle-list="reference-subtitle-set"
+                        editable="false"
+                        version-number="{{ translated_from_version.version_number }}"
+                        language-code="{{ translated_from_version.subtitle_language.language_code }}"
+                        video-id="{{ video.video_id }}">
+                        <li ng-repeat="subtitle in subtitlesData"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{selected: subtitle.index == selectedIndex}"
+                            class="subtitle-list-item"
+                            subtitle-list-item>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <textarea style="display: none;" ng-show="isEditing"></textarea>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
         <section class="center column">
             <div class="video" id="video" ng-controller="VideoController"></div>
-            <div class="working subtitles" ng-controller="SubtitleListController">
-                <ul subtitle-list="working-subtitle-set"
-                    editable="true"
-                    version-number="{{ version.version_number }}"
-                    language-code="{{ language.language_code }}"
-                    video-id="{{ video.video_id }}">
-                    <li ng-repeat="subtitle in subtitlesData"
-                        ng-controller="SubtitleListItemController"
-                        ng-class="{selected: subtitle.index == selectedIndex, editing: isEditing}"
-                        class="subtitle-list-item"
-                        subtitle-list-item>
-                        <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                        <textarea style="display: none;" ng-show="isEditing"></textarea>
-                    </li>
-                </ul>
+            <div class="subtitles-wrapper">
+                <div class="working subtitles" ng-controller="SubtitleListController">
+                    <ul subtitle-list="working-subtitle-set"
+                        editable="true"
+                        version-number="{{ version.version_number }}"
+                        language-code="{{ language.language_code }}"
+                        video-id="{{ video.video_id }}">
+                        <li ng-repeat="subtitle in subtitlesData"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{selected: subtitle.index == selectedIndex, editing: isEditing}"
+                            class="subtitle-list-item"
+                            subtitle-list-item>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <textarea style="display: none;" ng-show="isEditing"></textarea>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
         <section class="right column">

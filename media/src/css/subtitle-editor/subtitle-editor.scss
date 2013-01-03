@@ -147,7 +147,8 @@ header.main {
                 color: #999999;
                 font: normal 11px $OpenSans;
                 display: block;
-                padding: 11px 12px 12px 12px;
+                height: 38px;
+                padding: 11px 12px 0 12px;
                 text-decoration: none;
 
                 span {
@@ -244,12 +245,15 @@ section.main {
         float: none;
         vertical-align: top;
     }
+    div.subtitles-wrapper {
+        overflow: hidden;
+    }
     div.subtitles {
-        overflow: scroll;
+        overflow: auto;
 
         ul {
-            margin-top: 20px;
-            overflow: scroll;
+            margin-top: 25px;
+            overflow: hidden;
 
             li {
                 color: #3C3C3D;
@@ -266,7 +270,8 @@ section.main {
 
                     textarea {
                         border: 0;
-                        font: normal 12px/25px $OpenSans;
+                        font: normal 12px $OpenSans;
+                        line-height: 25px;
                         display: block;
                         height: 45px;
                         margin: 0;
