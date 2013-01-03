@@ -190,6 +190,24 @@ header.main {
     }
 }
 section.main {
+
+    /*
+     * Don't ask.
+     *
+     * Actually, do.
+     * Do ask.
+     *
+     */
+    word-spacing: -3px;
+    * {
+        word-spacing: normal;
+    }
+
+    .column {
+        display: inline-block;
+        float: none;
+        vertical-align: top;
+    }
     div.subtitles {
         overflow: scroll;
 
@@ -207,40 +225,34 @@ section.main {
                     padding: 10px 40px;
                 }
             }
-        }
-        ul[editable="true"] {
-            li {
+            &[editable="true"] {
+                li {
 
-                textarea {
-                    border: 0;
-                    font: normal 12px/25px $OpenSans;
-                    display: block;
-                    height: 45px;
-                    margin: 0;
-                    padding: 10px 40px;
-                    width: 100%;
+                    textarea {
+                        border: 0;
+                        font: normal 12px/25px $OpenSans;
+                        display: block;
+                        height: 45px;
+                        margin: 0;
+                        padding: 10px 40px;
+                        width: 100%;
 
-                    &:focus {
-                        outline: none;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                    span {
+                        cursor: text;
+                    }
+                    &.editing {
+                        background: white;
+                        padding: 0;
+                    }
+                    &:hover {
+                        background: #EBECED;
                     }
                 }
-                span {
-                    cursor: text;
-                }
-                &.editing {
-                    background: white;
-                    padding: 0;
-                }
-                &:hover {
-                    background: #EBECED;
-                }
             }
-        }
-        &.reference {
-            
-        }
-        &.working {
-            
         }
     }
     section.left {

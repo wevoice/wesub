@@ -49,7 +49,7 @@
             });
         };
         $scope.getSubtitleListHeight = function() {
-            return $(window).height() - 373;
+            return $(window).height() - 359;
         };
         /**
          * Once we have the dfxp from the server,
