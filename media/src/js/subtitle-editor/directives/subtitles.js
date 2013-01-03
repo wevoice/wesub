@@ -103,6 +103,7 @@
                 selectedScope.$digest();
 
                 activeTextArea.focus();
+                activeTextArea.autosize();
             }
         }
 

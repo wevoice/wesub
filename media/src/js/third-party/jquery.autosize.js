@@ -178,4 +178,4 @@
             adjust();
         });
     };
-}(window.jQuery || window.Zepto));
+}(window.AmarajQuery || window.Zepto));
