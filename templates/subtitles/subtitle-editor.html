@@ -76,7 +76,7 @@
                     video-id="{{ video.video_id }}">
                     <li ng-repeat="subtitle in subtitlesData"
                         ng-controller="SubtitleListItemController"
-                        ng-class="{selected : subtitle.index == selectedIndex}"
+                        ng-class="{selected: subtitle.index == selectedIndex}"
                         class="subtitle-list-item"
                         subtitle-list-item>
                         <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
@@ -95,7 +95,7 @@
                     video-id="{{ video.video_id }}">
                     <li ng-repeat="subtitle in subtitlesData"
                         ng-controller="SubtitleListItemController"
-                        ng-class="{selected : subtitle.index == selectedIndex}"
+                        ng-class="{selected: subtitle.index == selectedIndex, editing: isEditing}"
                         class="subtitle-list-item"
                         subtitle-list-item>
                         <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>

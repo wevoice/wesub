@@ -202,6 +202,15 @@ section.main {
                 font-size: 12px;
                 line-height: 25px;
                 padding: 5px 40px;
+
+                textarea {
+                    border: 0;
+                    font: normal 12px $OpenSans;
+                }
+                &.editing {
+                    background: white;
+
+                }
             }
         }
         &.reference {
