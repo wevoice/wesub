@@ -202,6 +202,15 @@ section.main {
                 font-size: 12px;
                 line-height: 25px;
 
+                span {
+                    display: block;
+                    padding: 10px 40px;
+                }
+            }
+        }
+        ul[editable="true"] {
+            li {
+
                 textarea {
                     border: 0;
                     font: normal 12px/25px $OpenSans;
@@ -217,8 +226,6 @@ section.main {
                 }
                 span {
                     cursor: text;
-                    display: block;
-                    padding: 10px 40px;
                 }
                 &.editing {
                     background: white;
