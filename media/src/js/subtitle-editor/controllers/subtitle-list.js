@@ -21,6 +21,8 @@
     var _, root, SubtitleListController, SubtitleListItemController,
         HelperSelectorController, SaveSessionButtonController;
 
+    var $ = window.AmarajQuery;
+
     root = this;
     _ = root._.noConflict();
 
@@ -47,7 +49,7 @@
             });
         };
         $scope.getSubtitleListHeight = function() {
-            return window.AmarajQuery(window).height() - 373;
+            return $(window).height() - 373;
         };
         /**
          * Once we have the dfxp from the server,
@@ -104,7 +106,7 @@
         // Watch the window for resize events so we may update the subtitle list
         // heights appropriately.
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
-            window.AmarajQuery(window.AmarajQuery('div.subtitles').height(newHeight));
+            $($('div.subtitles').height(newHeight));
         });
         window.onresize = function() {
             $scope.$apply();
@@ -134,8 +136,7 @@
 
         var initialText;
         $scope.isEditing = false;
-        $scope.toHTML = function(markupLikeText) {
-        };
+        $scope.toHTML = function(markupLikeText) {};
 
         $scope.startEditingMode = function() {
             initialText =  this.dfxpWrapper.content($scope.subtitle.index);
