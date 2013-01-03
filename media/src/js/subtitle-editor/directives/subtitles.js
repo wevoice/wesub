@@ -36,32 +36,36 @@
             var keyCode = e.keyCode;
             // return or tab WITHOUT shift
             var elementToSelect;
-            if (keyCode == 13 && !e.shiftKey ||
-                keyCode == 9 && !e.shiftKey ) {
+
+            if (keyCode === 13 && !e.shiftKey ||
+                keyCode === 9 && !e.shiftKey ) {
                 // enter with shift means new line
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
 
                 // what is the next element?
-                if(selectedScope.subtitlesData[selectedScope.subtitle.index + 1]){
-                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
+                if (selectedScope.subtitlesData[selectedScope.subtitle.index + 1]) {
+                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item",
+                                        rootEl)[selectedScope.subtitle.index + 1]);
                 }
 
                 selectedScope.$digest();
-            } else if (keyCode == 9 && e.shiftKey){
+            } else if (keyCode === 9 && e.shiftKey) {
                 // tab with shift, move backwards
-                if(selectedScope.subtitlesData[selectedScope.subtitle.index - 1]){
-                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
+                if (selectedScope.subtitlesData[selectedScope.subtitle.index - 1]) {
+                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item",
+                                        rootEl)[selectedScope.subtitle.index - 1]);
                 }
                 e.preventDefault();
             }
 
-            if (elementToSelect){
+            if (elementToSelect) {
                 onSubtitleItemSelected(elementToSelect);
-                activeTextArea.select()
+                activeTextArea.focus();
             } else {
                 selectedScope.finishEditingMode(activeTextArea.val());
             }
+
         }
 
         /**
@@ -78,7 +82,7 @@
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
-            if (scope == selectedScope){
+            if (scope === selectedScope) {
                 return;
             }
 
@@ -97,6 +101,8 @@
                 activeTextArea.val(editableText);
                 angular.element(rootEl).scope().setSelectedIndex(selectedScope.subtitle.index);
                 selectedScope.$digest();
+
+                activeTextArea.focus();
             }
         }
 
