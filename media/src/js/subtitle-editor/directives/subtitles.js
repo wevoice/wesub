@@ -36,8 +36,8 @@
             var keyCode = e.keyCode;
             // return or tab WITHOUT shift
             var elementToSelect;
-            if (keyCode == 13 && !event.shiftKey ||
-                keyCode == 9 && !event.shiftKey ) {
+            if (keyCode == 13 && !e.shiftKey ||
+                keyCode == 9 && !e.shiftKey ) {
                 // enter with shift means new line
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
@@ -46,7 +46,7 @@
                 elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
 
                 selectedScope.$digest();
-            }else if (keyCode == 9 && event.shiftKey){
+            } else if (keyCode == 9 && e.shiftKey){
                 // tab with shift, move backwards
                 elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
                 e.preventDefault();
