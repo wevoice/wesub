@@ -224,6 +224,9 @@ section.main {
                     background: white;
                     padding: 0;
                 }
+                &:hover {
+                    background: #EBECED;
+                }
             }
         }
         &.reference {
