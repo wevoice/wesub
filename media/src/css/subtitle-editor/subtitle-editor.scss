@@ -137,36 +137,72 @@ header.main {
             -moz-transition: color 0.03s linear;
             transition: color 0.03s linear;
         }
-        a.dropdown {
+        div.dropdown {
             border-right: 1px solid #2B2C2D;
-            color: #999999;
             float: left;
-            font: normal 11px $OpenSans;
-            display: block;
-            padding: 10px 12px 10px 12px;
-            text-decoration: none;
+            position: relative;
             width: 50%;
 
-            span {
-                display: inline-block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                width: 80%;
-            }
-            img {
-                float: right;
-                margin-top: 2px;
-                @include opacity(.5);
-                -webkit-transition: opacity 0.03s linear;
-                -moz-transition: opacity 0.03s linear;
-                transition: opacity 0.03s linear;
-            }
-            &:hover {
-                color: white;
+            a {
+                color: #999999;
+                font: normal 11px $OpenSans;
+                display: block;
+                padding: 11px 12px 12px 12px;
+                text-decoration: none;
 
+                span {
+                    display: inline-block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    width: 80%;
+                }
                 img {
-                    @include opacity(1);
+                    float: right;
+                    margin-top: 2px;
+                    @include opacity(.5);
+                    -webkit-transition: opacity 0.03s linear;
+                    -moz-transition: opacity 0.03s linear;
+                    transition: opacity 0.03s linear;
+                }
+                &:hover {
+                    color: white;
+
+                    img {
+                        @include opacity(1);
+                    }
+                }
+            }
+            ul {
+                background: #212223;
+                left: 20px;
+                padding: 7px 15px;
+                position: absolute;
+                top: 58px;
+                width: 100%;
+                @include border-radius(3px);
+
+                &:before {
+                    border-bottom: 12px solid #212223;
+                    border-left: 12px solid transparent;
+                    border-right: 12px solid transparent;
+                    content: "";
+                    display: block;
+                    height: 0px;
+                    position: absolute;
+                    right: 26px;
+                    top: -12px;
+                    width: 0px;
+                }
+                li {
+                    a {
+                        color: #8D8E8E;
+                        padding: 7px 0;
+
+                        &:hover {
+                            color: white;
+                        }
+                    }
                 }
             }
         }
@@ -179,7 +215,7 @@ header.main {
                 color: #999999;
                 display: inline-block;
                 font: normal 11px $OpenSans;
-                padding: 10px 12px;
+                padding: 11px 12px 12px 12px;
                 text-decoration: none;
 
                 &:hover {

@@ -22,19 +22,26 @@
         </section>
         <section class="video center column"></section>
         <section class="status right column group">
-            <div ng-controller="SaveSessionButtonController">
-                <a href="#" class="dropdown">
-                    <ng-switch on="status">
-                        <span ng-switch-when="saving">Saving subtitles</span>
-                        <span ng-switch-when="saved">Saved</span>
-                    </ng-switch>
-                    <img src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
-                </a>
-                <ul>
-                    <li><a save-session-button ng-click="saveSession()" href="#">Save Now</a></li>
-                    <li><a href="#">Download current draft</a></li>
-                    <li><a href="#">Upload a draft</a></li>
-                </ul>
+            <div ng-cloak class="ng-cloak" ng-controller="SaveSessionButtonController">
+                <div class="dropdown">
+                    <a href="#" ng-click="toggleSaveDropdown()">
+                        <ng-switch on="status">
+                            <span ng-switch-when="saving">Saving subtitles&hellip;</span>
+                            <span ng-switch-when="saved">Saved.</span>
+                            <span ng-switch-when="error">There was an error.</span>
+                            <span ng-switch-when="idle">Idle.</span>
+                            <span ng-switch-when="loading">Loading&hellip;</span>
+                            <span ng-switch-when="ready">Ready.</span>
+                        </ng-switch>
+                        <span>What goes here?</span>
+                        <img src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
+                    </a>
+                    <ul ng-show="dropdownOpen">
+                        <li><a save-session-button ng-click="saveSession()" href="#">Save Now</a></li>
+                        <li><a href="#">Download current draft</a></li>
+                        <li><a href="#">Upload a draft</a></li>
+                    </ul>
+                </div>
                 <div class="exit">
                     <a href="#">Exit</a>
                 </div>

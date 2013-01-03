@@ -39,7 +39,7 @@
             // if this version has no default source translation language
             // it will be empty, in which case we want to wait for user
             // interaction to request a reference subtitle set.
-            if (!languageCode || !versionNumber){
+            if (!languageCode || !versionNumber) {
                 $scope.status = 'idle';
                 return;
             }
@@ -68,7 +68,7 @@
             // preallocate array, gives us a small perf gain
             // on ie / safari
             var subtitlesData = new Array(subtitles.length);
-            for (var i=0; i < subtitles.length; i++){
+            for (var i=0; i < subtitles.length; i++) {
                 subtitlesData[i] =  {
                     index: i,
                     startTime: this.dfxpWrapper.startTime(subtitles.eq(i).get(0)),
@@ -83,24 +83,24 @@
             $scope.$broadcast("onSubtitlesFetched");
 
         };
-        $scope.setSelectedIndex = function(index){
+        $scope.setSelectedIndex = function(index) {
             $scope.selectedIndex = index;
             $scope.$digest();
         };
 
-        $scope.setVideoID = function(videoID){
+        $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };
 
-        $scope.setLanguageCode = function(languageCode){
+        $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
         };
 
-        $scope.saveSubtitles = function(){
+        $scope.saveSubtitles = function() {
+            $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
-            $scope.status = 'saving';
         };
 
         // Watch the window for resize events so we may update the subtitle list
@@ -144,11 +144,11 @@
             // fix me, this should return the markdown text
             return initialText;
         };
-        $scope.finishEditingMode = function(newValue){
+        $scope.finishEditingMode = function(newValue) {
             $scope.isEditing  = false;
             this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
             $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
-            if ($scope.subtitle.text !== initialText){
+            if ($scope.subtitle.text !== initialText) {
                 // mark dirty variable on root scope so we can allow
                 // saving the session
                 $scope.$root.$emit("onWorkDone");
@@ -240,25 +240,30 @@
         $scope.$watch('version', $scope.versionChanged);
     };
 
-    SaveSessionButtonController = function($scope, SubtitleListFinder){
+    SaveSessionButtonController = function($scope, SubtitleListFinder) {
         // since the button can be outside of the subtitle list directive
         // we need the service to find out which set we're saving.
-        $scope.saveSession = function(){
-            if($scope.status !== 'saving'){
+        $scope.saveSession = function() {
+            if($scope.status !== 'saving') {
                 $scope.status = 'saving';
 
                 var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
 
-                promise.then(function onSuccess(){
+                promise.then(function onSuccess() {
                     $scope.status = 'saved';
-                }, function onError(){
+                }, function onError() {
                     $scope.status = 'error';
-                    alert('sorry, there was an error...');
+                    window.alert('sorry, there was an error...');
                 });
             }
         };
 
-        $scope.$root.$on("onWorkDone", function(){
+        $scope.toggleSaveDropdown = function() {
+            $scope.dropdownOpen = !$scope.dropdownOpen;
+            return false;
+        };
+
+        $scope.$root.$on("onWorkDone", function() {
             $scope.canSave = '';
             $scope.$digest();
         });
