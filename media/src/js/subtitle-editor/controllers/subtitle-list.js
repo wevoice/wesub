@@ -208,8 +208,8 @@
             $scope.languageSelectChanged($scope.language);
         });
 
-        $scope.versionChanged = function(newVersion, oldVersion) {
-            var subtitlesXML, refSubList;
+        $scope.versionChanged = function(newVersion) {
+            var subtitlesXML;
 
             if (!newVersion) {
                 return;
