@@ -131,8 +131,7 @@
     directives.directive("saveSessionButton", function (SubtitleStorage) {
         return {
             link: function link(scope, elm, attrs) {
-                scope.canSave = 'enabled';
-
+                scope.canSave = '';
             }
         };
 

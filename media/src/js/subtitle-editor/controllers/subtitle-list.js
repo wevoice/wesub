@@ -93,8 +93,9 @@
         $scope.setLanguageCode = function(languageCode){
             $scope.languageCode = languageCode;
         };
+
         $scope.saveSubtitles = function(){
-            SubtitleStorage.saveSubtitles($scope.videoID,
+            return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
             $scope.status = 'saving';
@@ -242,8 +243,20 @@
         // since the button can be outside of the subtitle list directive
         // we need the service to find out which set we're saving.
         $scope.saveSession = function(){
-            SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
+            if($scope.status !== 'saving'){
+                $scope.status = 'saving';
+
+                var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
+
+                promise.then(function onSuccess(){
+                    $scope.status = 'saved';
+                }, function onError(){
+                    $scope.status = 'error';
+                    alert('sorry, there was an error...');
+                });
+            }
         };
+
         $scope.$root.$on("onWorkDone", function(){
             $scope.canSave = '';
             $scope.$digest();

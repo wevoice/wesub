@@ -133,11 +133,8 @@
                         sub_format: 'dfxp'
                     }
                 });
-                promise.then( function onSuccess(response){
 
-                }, function onError(response){
-
-                });
+                return promise;
             },
 
             getLanguages: function(callback) {
