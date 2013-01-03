@@ -71,9 +71,11 @@
                       elm : $(elm).parents(".subtitle-list-item");
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
+
             if (scope == selectedScope){
                 return;
             }
+
             // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
@@ -106,7 +108,7 @@
                         // if is editable, hook up event listeners
                         if (isEditable) {
                             $(elm).click(function (e) {
-                                onSubtitleItemSelected(e.srcElement);
+                                onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
