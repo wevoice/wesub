@@ -264,6 +264,7 @@ section.main {
                     display: block;
                     padding: 10px 40px;
                 }
+
             }
             &[editable="true"] {
                 li {
@@ -289,9 +290,22 @@ section.main {
                         background: white;
                         padding: 0;
                     }
+
+                    a {
+                        color: transparent;
+                        float: right;
+                    }
+
                     &:hover {
                         background: #EBECED;
+
+                        a {
+                            color: #000;
+                        }
                     }
+
+
+
                 }
             }
         }
