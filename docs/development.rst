@@ -177,12 +177,19 @@ through the commit logs for ``1234:``, thanks to the commit message format.
 
 The git command to delete a branch both locally and remotely is:
 
+::
+
     git push origing --delete i-1234
 
 Delete the Instance
 ~~~~~~~~~~~~~~~~~~~
 
-From the launchpad, choose `Delete Demo` and remove it.
+From the launchpad, choose `Delete Demo` and remove it.  If you use fabric, use
+the following:
+
+::
+
+    fab demo:<username>,<branch_name> remove_demo
 
 Deploy to Production
 ~~~~~~~~~~~~~~~~~~~~
