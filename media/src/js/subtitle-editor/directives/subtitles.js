@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -34,28 +34,51 @@
         function onSubtitleTextKeyDown(e) {
 
             var keyCode = e.keyCode;
-            // return or tab WITHOUT shift
             var elementToSelect;
-            if (keyCode == 13 && !e.shiftKey ||
-                keyCode == 9 && !e.shiftKey ) {
+
+            // return or tab WITHOUT shift
+            if (keyCode === 13 && !e.shiftKey ||
+                keyCode === 9 && !e.shiftKey ) {
+
                 // enter with shift means new line
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
 
-                // what is the next element?
-                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index + 1]);
+                var index = selectedScope.subtitle.index + 1;
 
-                selectedScope.$digest();
-            } else if (keyCode == 9 && e.shiftKey){
+                // if it's the last subtitle of the set and the user pressed enter without shift,
+                // add a new empty subtitle and select it to edit
+                if (selectedScope.subtitlesData[index] === undefined) {
+                    var subtitle = {'index': index, 'startTime':0, 'endTime':0, 'text':''};
+                    selectedScope.addSubtitle(subtitle, index);
+                    selectedScope.finishEditingMode(activeTextArea.val());
+                }
+
+                selectedScope.$apply();
+
+                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[index]);
+
+            } else if (keyCode === 9 && e.shiftKey) {
                 // tab with shift, move backwards
-                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[selectedScope.subtitle.index - 1]);
+                if (selectedScope.subtitlesData[selectedScope.subtitle.index - 1]) {
+                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item",
+                                        rootEl)[selectedScope.subtitle.index - 1]);
+                }
                 e.preventDefault();
 
+            } else if (keyCode == 27){
+                // if it's an esc on the textarea, finish editing
+                selectedScope.finishEditingMode(activeTextArea.val());
+                selectedScope.$apply();
             }
-            if (elementToSelect){
+
+            if (elementToSelect) {
                 onSubtitleItemSelected(elementToSelect);
-                activeTextArea.select();
+                activeTextArea.focus();
+            } else {
+                selectedScope.finishEditingMode(activeTextArea.val());
             }
+
         }
 
         /**
@@ -72,7 +95,7 @@
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
-            if (scope == selectedScope){
+            if (scope === selectedScope) {
                 return;
             }
 
@@ -91,6 +114,9 @@
                 activeTextArea.val(editableText);
                 angular.element(rootEl).scope().setSelectedIndex(selectedScope.subtitle.index);
                 selectedScope.$digest();
+
+                activeTextArea.focus();
+                activeTextArea.autosize();
             }
         }
 
@@ -110,6 +136,7 @@
                             $(elm).click(function (e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
+
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
                         scope.setVideoID(attrs['videoId']);

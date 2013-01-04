@@ -137,36 +137,73 @@ header.main {
             -moz-transition: color 0.03s linear;
             transition: color 0.03s linear;
         }
-        a.dropdown {
+        div.dropdown {
             border-right: 1px solid #2B2C2D;
-            color: #999999;
             float: left;
-            font: normal 11px $OpenSans;
-            display: block;
-            padding: 10px 12px 10px 12px;
-            text-decoration: none;
+            position: relative;
             width: 50%;
 
-            span {
-                display: inline-block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                width: 80%;
-            }
-            img {
-                float: right;
-                margin-top: 2px;
-                @include opacity(.5);
-                -webkit-transition: opacity 0.03s linear;
-                -moz-transition: opacity 0.03s linear;
-                transition: opacity 0.03s linear;
-            }
-            &:hover {
-                color: white;
+            a {
+                color: #999999;
+                font: normal 11px $OpenSans;
+                display: block;
+                height: 38px;
+                padding: 11px 12px 0 12px;
+                text-decoration: none;
 
+                span {
+                    display: inline-block;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    width: 80%;
+                }
                 img {
-                    @include opacity(1);
+                    float: right;
+                    margin-top: 2px;
+                    @include opacity(.5);
+                    -webkit-transition: opacity 0.03s linear;
+                    -moz-transition: opacity 0.03s linear;
+                    transition: opacity 0.03s linear;
+                }
+                &:hover {
+                    color: white;
+
+                    img {
+                        @include opacity(1);
+                    }
+                }
+            }
+            ul {
+                background: #212223;
+                left: 20px;
+                padding: 7px 15px;
+                position: absolute;
+                top: 58px;
+                width: 100%;
+                @include border-radius(3px);
+
+                &:before {
+                    border-bottom: 12px solid #212223;
+                    border-left: 12px solid transparent;
+                    border-right: 12px solid transparent;
+                    content: "";
+                    display: block;
+                    height: 0px;
+                    position: absolute;
+                    right: 26px;
+                    top: -12px;
+                    width: 0px;
+                }
+                li {
+                    a {
+                        color: #8D8E8E;
+                        padding: 7px 0;
+
+                        &:hover {
+                            color: white;
+                        }
+                    }
                 }
             }
         }
@@ -179,7 +216,7 @@ header.main {
                 color: #999999;
                 display: inline-block;
                 font: normal 11px $OpenSans;
-                padding: 10px 12px;
+                padding: 11px 12px 12px 12px;
                 text-decoration: none;
 
                 &:hover {
@@ -190,25 +227,87 @@ header.main {
     }
 }
 section.main {
+
+    /*
+     * Don't ask.
+     *
+     * Actually, do.
+     * Do ask.
+     *
+     */
+    word-spacing: -3px;
+    * {
+        word-spacing: normal;
+    }
+
+    .column {
+        display: inline-block;
+        float: none;
+        vertical-align: top;
+    }
+    div.subtitles-wrapper {
+        overflow: hidden;
+    }
     div.subtitles {
-        overflow: scroll;
+        overflow: auto;
 
         ul {
-            margin-top: 20px;
-            overflow: scroll;
+            margin-top: 25px;
+            overflow: hidden;
 
             li {
                 color: #3C3C3D;
                 font-size: 12px;
                 line-height: 25px;
-                padding: 5px 40px;
+
+                span {
+                    display: block;
+                    padding: 10px 40px;
+                }
+
             }
-        }
-        &.reference {
-            
-        }
-        &.working {
-            
+            &[editable="true"] {
+                li {
+
+                    textarea {
+                        border: 0;
+                        font: normal 12px $OpenSans;
+                        line-height: 25px;
+                        display: block;
+                        height: 45px;
+                        margin: 0;
+                        padding: 10px 40px;
+                        width: 100%;
+
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                    span {
+                        cursor: text;
+                    }
+                    &.editing {
+                        background: white;
+                        padding: 0;
+                    }
+
+                    a {
+                        color: transparent;
+                        float: right;
+                    }
+
+                    &:hover {
+                        background: #EBECED;
+
+                        a {
+                            color: #000;
+                        }
+                    }
+
+
+
+                }
+            }
         }
     }
     section.left {
@@ -281,6 +380,8 @@ section.main {
         }
     }
     section.center {
+        @include box-shadow(0, 0, 18px, rgba(0, 0, 0, 0.23));
+
         div.video {
             border-left: 1px solid #88898B;
             border-right: 1px solid #88898B;

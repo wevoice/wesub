@@ -22,26 +22,32 @@
         </section>
         <section class="video center column"></section>
         <section class="status right column group">
-            <div ng-controller="SaveSessionButtonController">
-                <a href="#" class="dropdown">
-                    <ng-switch on="status">
-                        <span ng-switch-when="saving">Saving subtitles</span>
-                        <span ng-switch-when="saved">Saved</span>
-                    </ng-switch>
-                    <img src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
-                </a>
-                <ul>
-                    <li><a save-session-button ng-click="saveSession()" href="#">Save Now</a></li>
-                    <li><a href="#">Download current draft</a></li>
-                    <li><a href="#">Upload a draft</a></li>
-                </ul>
+            <div ng-cloak class="ng-cloak" ng-controller="SaveSessionButtonController">
+                <div class="dropdown">
+                    <a href="#" ng-click="toggleSaveDropdown()">
+                        <ng-switch on="status">
+                            <span ng-switch-when="saving">Saving subtitles&hellip;</span>
+                            <span ng-switch-when="saved">Saved.</span>
+                            <span ng-switch-when="error">There was an error.</span>
+                            <span ng-switch-when="idle">Idle.</span>
+                            <span ng-switch-when="loading">Loading&hellip;</span>
+                            <span ng-switch-when="ready">Ready.</span>
+                        </ng-switch>
+                        <img src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
+                    </a>
+                    <ul ng-show="dropdownOpen">
+                        <li><a save-session-button ng-click="saveSession()" href="#">Save Now</a></li>
+                        <li><a href="#">Download current draft</a></li>
+                        <li><a href="#">Upload a draft</a></li>
+                    </ul>
+                </div>
                 <div class="exit">
                     <a href="#">Exit</a>
                 </div>
             </div>
         </section>
     </header>
-    <section class="main group ng-cloak" ng-cloak>
+    <section class="main ng-cloak" ng-cloak>
         <section class="left column">
             <div class="help-panel" ng-controller="HelpController">
                 <h1>[[ heading ]]</h1>
@@ -68,40 +74,45 @@
                     ng-model="version">
                 </select>
             </div>
-            <div class="reference subtitles" ng-controller="SubtitleListController">
-                <ul subtitle-list="reference-subtitle-set"
-                    editable="false"
-                    version-number="{{ translated_from_version.version_number }}"
-                    language-code="{{ translated_from_version.subtitle_language.language_code }}"
-                    video-id="{{ video.video_id }}">
-                    <li ng-repeat="subtitle in subtitlesData"
-                        ng-controller="SubtitleListItemController"
-                        ng-class="{selected : subtitle.index == selectedIndex}"
-                        class="subtitle-list-item"
-                        subtitle-list-item>
-                        <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                        <textarea style="display: none;" ng-show="isEditing"></textarea>
-                    </li>
-                </ul>
+            <div class="subtitles-wrapper">
+                <div class="reference subtitles" ng-controller="SubtitleListController">
+                    <ul subtitle-list="reference-subtitle-set"
+                        editable="false"
+                        version-number="{{ translated_from_version.version_number }}"
+                        language-code="{{ translated_from_version.subtitle_language.language_code }}"
+                        video-id="{{ video.video_id }}">
+                        <li ng-repeat="subtitle in subtitlesData"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{selected: subtitle.index == selectedIndex}"
+                            class="subtitle-list-item"
+                            subtitle-list-item>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <textarea style="display: none;" ng-show="isEditing"></textarea>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
         <section class="center column">
             <div class="video" id="video" ng-controller="VideoController"></div>
-            <div class="working subtitles" ng-controller="SubtitleListController">
-                <ul subtitle-list="working-subtitle-set"
-                    editable="true"
-                    version-number="{{ version.version_number }}"
-                    language-code="{{ language.language_code }}"
-                    video-id="{{ video.video_id }}">
-                    <li ng-repeat="subtitle in subtitlesData"
-                        ng-controller="SubtitleListItemController"
-                        ng-class="{selected : subtitle.index == selectedIndex}"
-                        class="subtitle-list-item"
-                        subtitle-list-item>
-                        <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
-                        <textarea style="display: none;" ng-show="isEditing"></textarea>
-                    </li>
-                </ul>
+            <div class="subtitles-wrapper">
+                <div class="working subtitles" ng-controller="SubtitleListController">
+                    <ul subtitle-list="working-subtitle-set"
+                        editable="true"
+                        version-number="{{ version.version_number }}"
+                        language-code="{{ language.language_code }}"
+                        video-id="{{ video.video_id }}">
+                        <li ng-repeat="subtitle in subtitlesData"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{selected: subtitle.index == selectedIndex, editing: isEditing}"
+                            class="subtitle-list-item"
+                            subtitle-list-item>
+                            <a ng-click="removeSubtitle(subtitle.index)">Remove</a>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <textarea style="display: none;" ng-show="isEditing"></textarea>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
         <section class="right column">
@@ -114,6 +125,7 @@
     {% endif %}
 
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery-1.8.2.min.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/jquery.autosize.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -839,8 +839,11 @@ def autocreate_tasks(team_video):
     # We may need to create a transcribe task, if there are no existing subs.
     if workflow.autocreate_subtitle and not existing_subtitles:
         if not team_video.task_set.not_deleted().exists():
-            Task(team=team_video.team, team_video=team_video,
-                 subtitle_version=None, language='',
+            original_language = team_video.video.primary_audio_language_code
+            Task(team=team_video.team,
+                 team_video=team_video,
+                 subtitle_version=None,
+                 language= original_language or '',
                  type=Task.TYPE_IDS['Subtitle']
             ).save()
 
