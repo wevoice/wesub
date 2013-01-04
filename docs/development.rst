@@ -175,6 +175,15 @@ Once the feature branch (``i-1234``) has been merged back into the base branch
 You can find commits made on a particular feature branch later by grepping
 through the commit logs for ``1234:``, thanks to the commit message format.
 
+The git command to delete a branch both locally and remotely is:
+
+    git push origing --delete i-1234
+
+Delete the Instance
+~~~~~~~~~~~~~~~~~~~
+
+From the launchpad, choose `Delete Demo` and remove it.
+
 Deploy to Production
 ~~~~~~~~~~~~~~~~~~~~
 
