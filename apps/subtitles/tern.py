@@ -115,42 +115,70 @@ def get_unsynced_subtitle_version_language():
 
     return sl
 
+def get_counts():
+    from apps.videos.models import SubtitleLanguage, SubtitleVersion
+
+    slo = SubtitleLanguage.objects
+    sl_total = slo.count()
+    sl_unsynced = slo.filter(new_subtitle_language=None, needs_sync=True).count()
+    sl_broken   = slo.filter(new_subtitle_language=None, needs_sync=False).count()
+    sl_outdated = slo.filter(new_subtitle_language__isnull=False, needs_sync=True).count()
+    sl_done     = slo.filter(new_subtitle_language__isnull=False, needs_sync=False).count()
+
+    svo = SubtitleVersion.objects
+    sv_total = svo.count()
+    sv_unsynced = svo.filter(new_subtitle_version=None, needs_sync=True).count()
+    sv_broken   = svo.filter(new_subtitle_version=None, needs_sync=False).count()
+    sv_outdated = svo.filter(new_subtitle_version__isnull=False, needs_sync=True).count()
+    sv_done     = svo.filter(new_subtitle_version__isnull=False, needs_sync=False).count()
+
+    return (sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done,
+            sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
+
+# Metrics
+def send_counts():
+    from utils.metrics import Gauge
+
+    sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done, \
+    sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done = get_counts()
+
+    Gauge('data-model-refactor.subtitle-language.total').report(sl_total)
+    Gauge('data-model-refactor.subtitle-language.unsynced').report(sl_unsynced)
+    Gauge('data-model-refactor.subtitle-language.broken').report(sl_broken)
+    Gauge('data-model-refactor.subtitle-language.outdated').report(sl_outdated)
+    Gauge('data-model-refactor.subtitle-language.done').report(sl_done)
+
+    Gauge('data-model-refactor.subtitle-version.total').report(sv_total)
+    Gauge('data-model-refactor.subtitle-version.unsynced').report(sv_unsynced)
+    Gauge('data-model-refactor.subtitle-version.broken').report(sv_broken)
+    Gauge('data-model-refactor.subtitle-version.outdated').report(sv_outdated)
+    Gauge('data-model-refactor.subtitle-version.done').report(sv_done)
+
 
 # Commands
 def header():
     print 'Time,Model,Action,Original PK,New PK'
 
 def count():
-    from apps.videos.models import SubtitleLanguage, SubtitleVersion
+    sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done, \
+    sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done = get_counts()
 
-    slo = SubtitleLanguage.objects
-    total = slo.count()
-    unsynced = slo.filter(new_subtitle_language=None, needs_sync=True).count()
-    broken   = slo.filter(new_subtitle_language=None, needs_sync=False).count()
-    outdated = slo.filter(new_subtitle_language__isnull=False, needs_sync=True).count()
-    done     = slo.filter(new_subtitle_language__isnull=False, needs_sync=False).count()
     print "SubtitleLanguage"
     print "-" * 40
-    print "%10d total" % total
-    print "%10d never synced" % unsynced
-    print "%10d synced but out of date" % outdated
-    print "%10d synced and up to date" % done
-    print "%10d broken" % broken
+    print "%10d total" % sl_total
+    print "%10d never synced" % sl_unsynced
+    print "%10d synced but out of date" % sl_outdated
+    print "%10d synced and up to date" % sl_done
+    print "%10d broken" % sl_broken
     print
 
-    svo = SubtitleVersion.objects
-    total = svo.count()
-    unsynced = svo.filter(new_subtitle_version=None, needs_sync=True).count()
-    broken   = svo.filter(new_subtitle_version=None, needs_sync=False).count()
-    outdated = svo.filter(new_subtitle_version__isnull=False, needs_sync=True).count()
-    done     = svo.filter(new_subtitle_version__isnull=False, needs_sync=False).count()
     print "SubtitleVersion"
     print "-" * 40
-    print "%10d total" % total
-    print "%10d never synced" % unsynced
-    print "%10d synced but out of date" % outdated
-    print "%10d synced and up to date" % done
-    print "%10d broken" % broken
+    print "%10d total" % sv_total
+    print "%10d never synced" % sv_unsynced
+    print "%10d synced but out of date" % sv_outdated
+    print "%10d synced and up to date" % sv_done
+    print "%10d broken" % sv_broken
     print
 
 
@@ -220,6 +248,9 @@ def _sync_language():
         _update_subtitle_language(sl)
     else:
         _create_subtitle_language(sl)
+
+    from utils.metrics import Meter
+    Meter('data-model-refactor.language-syncs').inc()
 
     return True
 
@@ -349,6 +380,9 @@ def _sync_versions():
 
     for version in new_versions[-1:]:
         _create_subtitle_version(version, True)
+
+    from utils.metrics import Meter
+    Meter('data-model-refactor.version-syncs').inc()
 
     return True
 
