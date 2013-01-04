@@ -264,7 +264,6 @@ section.main {
                     display: block;
                     padding: 10px 40px;
                 }
-
             }
             &[editable="true"] {
                 li {
@@ -276,6 +275,7 @@ section.main {
                         display: block;
                         height: 45px;
                         margin: 0;
+                        resize: none;
                         padding: 10px 40px;
                         width: 100%;
 
@@ -290,12 +290,10 @@ section.main {
                         background: white;
                         padding: 0;
                     }
-
                     a {
                         color: transparent;
                         float: right;
                     }
-
                     &:hover {
                         background: #EBECED;
 
@@ -303,9 +301,6 @@ section.main {
                             color: #000;
                         }
                     }
-
-
-
                 }
             }
         }
