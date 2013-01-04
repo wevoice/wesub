@@ -228,10 +228,10 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj):
-        video_obj.title = self.entry.media.title.text or ''
+    def set_values(self, video_obj, async=True):
+        video_obj.title =  self.entry.media.title.text or ''
         if self.entry.media.description:
-            video_obj.description = self.entry.media.description.text or ''
+            video_obj.description =  self.entry.media.description.text
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
@@ -242,7 +242,7 @@ class YoutubeVideoType(VideoType):
         video_obj.save()
 
         try:
-            self.get_subtitles(video_obj)
+            self.get_subtitles(video_obj, async=async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
@@ -311,11 +311,15 @@ class YoutubeVideoType(VideoType):
 
         return output
 
-    def get_subtitles(self, video_obj):
+    def get_subtitles(self, video_obj, async=True):
         langs = self.get_subtitled_languages()
 
+        if async:
+            func = save_subtitles_for_lang.delay
+        else:
+            func = save_subtitles_for_lang.run
         for item in langs:
-            save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
 
