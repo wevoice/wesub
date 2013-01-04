@@ -68,6 +68,7 @@
             // preallocate array, gives us a small perf gain
             // on ie / safari
             var subtitlesData = new Array(subtitles.length);
+
             for (var i=0; i < subtitles.length; i++) {
                 subtitlesData[i] =  {
                     index: i,
@@ -76,6 +77,7 @@
                     text: this.dfxpWrapper.contentRendered(subtitles.eq(i).get(0))
                 };
             }
+
             $scope.subtitlesData = subtitlesData;
             // only let the descendant scope know of this, no need to propagate
             // upwards
@@ -111,16 +113,19 @@
         window.onresize = function() {
             $scope.$apply();
         };
+
         $scope.addSubtitle = function(subtitle, index) {
             if (subtitle.index !== index) {
                 throw Error("Indexes don't match.");
             }
 
             $scope.subtitlesData.splice(index, 0, subtitle);
+            this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
         };
 
         $scope.removeSubtitle = function(index) {
             $scope.subtitlesData.splice(index, 1);
+            this.dfxpWrapper.addSubtitle(index);
         };
     };
 
@@ -144,6 +149,7 @@
             // fix me, this should return the markdown text
             return initialText;
         };
+
         $scope.finishEditingMode = function(newValue) {
             $scope.isEditing  = false;
             this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
