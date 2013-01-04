@@ -34,22 +34,30 @@
         function onSubtitleTextKeyDown(e) {
 
             var keyCode = e.keyCode;
-            // return or tab WITHOUT shift
             var elementToSelect;
 
+            // return or tab WITHOUT shift
             if (keyCode === 13 && !e.shiftKey ||
                 keyCode === 9 && !e.shiftKey ) {
+
                 // enter with shift means new line
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
 
-                // what is the next element?
-                if (selectedScope.subtitlesData[selectedScope.subtitle.index + 1]) {
-                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item",
-                                        rootEl)[selectedScope.subtitle.index + 1]);
+                var index = selectedScope.subtitle.index + 1;
+
+                // if it's the last subtitle of the set and the user pressed enter without shift,
+                // add a new empty subtitle and select it to edit
+                if (selectedScope.subtitlesData[index] === undefined) {
+                    var subtitle = {'index': index, 'startTime':0, 'endTime':0, 'text':''};
+                    selectedScope.addSubtitle(subtitle, index);
+                    selectedScope.finishEditingMode(activeTextArea.val());
                 }
 
-                selectedScope.$digest();
+                selectedScope.$apply();
+
+                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[index]);
+
             } else if (keyCode === 9 && e.shiftKey) {
                 // tab with shift, move backwards
                 if (selectedScope.subtitlesData[selectedScope.subtitle.index - 1]) {
@@ -57,6 +65,11 @@
                                         rootEl)[selectedScope.subtitle.index - 1]);
                 }
                 e.preventDefault();
+
+            } else if (keyCode == 27){
+                // if it's an esc on the textarea, finish editing
+                selectedScope.finishEditingMode(activeTextArea.val());
+                selectedScope.$apply();
             }
 
             if (elementToSelect) {
@@ -123,6 +136,7 @@
                             $(elm).click(function (e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
+
                             $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
                         }
                         scope.setVideoID(attrs['videoId']);
