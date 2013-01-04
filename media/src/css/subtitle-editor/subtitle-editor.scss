@@ -38,7 +38,7 @@ $CodePro: 'CodeProLC', $OpenSans;
   -moz-box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
   box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
 }
-@mixin vertical-gradient($start: #000, $stop: #FFF) { background: ($start + $stop) / 2;
+@mixin vertical-gradient($start: #000, $stop: #FFF) { background: $start;
     background: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
     background: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background: -moz-gradient(center top, $start 0%, $stop 100%);
@@ -53,6 +53,17 @@ $CodePro: 'CodeProLC', $OpenSans;
     -khtml-opacity: $op;
     -moz-opacity: $op;
     opacity: $op;
+}
+@mixin shadow {
+    bottom: -40px;
+    content: "";
+    display: block;
+    height: 40px;
+    left: 0;
+    position: absolute;
+    width: 97%;
+    z-index: 51;
+    @include vertical-gradient(rgba(#F3F4F5, 1), rgba(white, 0));
 }
 
 // Page
@@ -250,6 +261,7 @@ section.main {
     }
     div.subtitles {
         overflow: auto;
+        position: relative;
 
         ul {
             margin-top: 25px;
@@ -302,7 +314,7 @@ section.main {
                             @include opacity(.5);
                         }
                         &:active {
-                            
+                            background: transparent url('../../../images/subtitle-editor/hourglass.png') center center no-repeat;
                         }
                     }
                     &.editing {
@@ -380,7 +392,11 @@ section.main {
             border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
             padding: 5px 20px;
+            position: relative;
 
+            &:before {
+                @include shadow;
+            }
             select {
                 display: block;
                 float: left;
@@ -396,10 +412,14 @@ section.main {
             border-left: 1px solid #88898B;
             border-right: 1px solid #88898B;
             height: 320px;
+            position: relative;
 
             iframe {
                 height: 320px;
                 width: 100%;
+            }
+            &:before {
+                @include shadow;
             }
         }
     }
