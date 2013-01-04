@@ -135,25 +135,6 @@ def get_counts():
     return (sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done,
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
 
-# Metrics
-def send_counts():
-    from utils.metrics import Gauge
-
-    sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done, \
-    sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done = get_counts()
-
-    Gauge('data-model-refactor.subtitle-language.total').report(sl_total)
-    Gauge('data-model-refactor.subtitle-language.unsynced').report(sl_unsynced)
-    Gauge('data-model-refactor.subtitle-language.broken').report(sl_broken)
-    Gauge('data-model-refactor.subtitle-language.outdated').report(sl_outdated)
-    Gauge('data-model-refactor.subtitle-language.done').report(sl_done)
-
-    Gauge('data-model-refactor.subtitle-version.total').report(sv_total)
-    Gauge('data-model-refactor.subtitle-version.unsynced').report(sv_unsynced)
-    Gauge('data-model-refactor.subtitle-version.broken').report(sv_broken)
-    Gauge('data-model-refactor.subtitle-version.outdated').report(sv_outdated)
-    Gauge('data-model-refactor.subtitle-version.done').report(sv_done)
-
 
 # Commands
 def header():
@@ -180,6 +161,24 @@ def count():
     print "%10d synced and up to date" % sv_done
     print "%10d broken" % sv_broken
     print
+
+def report_metrics():
+    from utils.metrics import Gauge
+
+    sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done, \
+    sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done = get_counts()
+
+    Gauge('data-model-refactor.subtitle-language.total').report(sl_total)
+    Gauge('data-model-refactor.subtitle-language.unsynced').report(sl_unsynced)
+    Gauge('data-model-refactor.subtitle-language.broken').report(sl_broken)
+    Gauge('data-model-refactor.subtitle-language.outdated').report(sl_outdated)
+    Gauge('data-model-refactor.subtitle-language.done').report(sl_done)
+
+    Gauge('data-model-refactor.subtitle-version.total').report(sv_total)
+    Gauge('data-model-refactor.subtitle-version.unsynced').report(sv_unsynced)
+    Gauge('data-model-refactor.subtitle-version.broken').report(sv_broken)
+    Gauge('data-model-refactor.subtitle-version.outdated').report(sv_outdated)
+    Gauge('data-model-refactor.subtitle-version.done').report(sv_done)
 
 
 def _create_subtitle_language(sl):
@@ -432,6 +431,10 @@ def build_option_parser():
                  action='store_const', const='count',
                  help='output the number of unsynced items remaining')
 
+    g.add_option('-M', '--report-metrics', dest='command', default=None,
+                 action='store_const', const='report_metrics',
+                 help='report the counts to the metrics server')
+
     g.add_option('-L', '--languages', dest='command',
                  action='store_const', const='languages',
                  help='sync SubtitleLanguage objects')
@@ -470,6 +473,8 @@ def main():
         sync_versions()
     elif options.command == 'header':
         header()
+    elif options.command == 'report_metrics':
+        report_metrics()
 
 if __name__ == '__main__':
     with warnings.catch_warnings():
