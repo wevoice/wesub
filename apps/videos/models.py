@@ -399,7 +399,7 @@ class Video(models.Model):
         return vurl.effective_url if vurl else None
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, async=True):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
         from videos.tasks import (
@@ -431,7 +431,7 @@ class Video(models.Model):
                 return video_url_obj.video, False
             except VideoUrl.DoesNotExist:
                 obj = Video()
-                obj = vt.set_values(obj)
+                obj = vt.set_values(obj, async=async)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
