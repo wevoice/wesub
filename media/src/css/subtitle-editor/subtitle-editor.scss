@@ -267,6 +267,7 @@ section.main {
             }
             &[editable="true"] {
                 li {
+                    position: relative;
 
                     textarea {
                         border: 0;
@@ -286,19 +287,33 @@ section.main {
                     span {
                         cursor: text;
                     }
+                    a.remove {
+                        background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
+                        color: transparent;
+                        display: none;
+                        height: 100%;
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        width: 40px;
+                        @include opacity(.2);
+
+                        &:hover {
+                            @include opacity(.5);
+                        }
+                        &:active {
+                            
+                        }
+                    }
                     &.editing {
                         background: white;
                         padding: 0;
                     }
-                    a {
-                        color: transparent;
-                        float: right;
-                    }
                     &:hover {
                         background: #EBECED;
 
-                        a {
-                            color: #000;
+                        a.remove {
+                            display: block;
                         }
                     }
                 }
