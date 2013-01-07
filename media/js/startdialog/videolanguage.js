@@ -35,8 +35,7 @@ unisubs.startdialog.VideoLanguage = function(json) {
 };
 
 unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
-    return this.LANGUAGE ?
-        unisubs.languageNameForCode(this.LANGUAGE) : "Original";
+    return unisubs.languageNameForCode(this.LANGUAGE);
 };
 
 unisubs.startdialog.VideoLanguage.prototype.toString = function() {
