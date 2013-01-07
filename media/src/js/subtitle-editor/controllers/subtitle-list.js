@@ -18,22 +18,125 @@
 
 (function() {
 
-    var _, $, root, SubtitleListController, SubtitleListItemController,
-        HelperSelectorController, SaveSessionButtonController;
+    var root = this;
+    var _ = root._.noConflict();
+    var $ = root.AmarajQuery;
 
-    root = this;
-    _ = root._.noConflict();
-    $ = root.AmarajQuery;
+    var LanguageSelectorController = function($scope, SubtitleStorage, SubtitleListFinder) {
+        /**
+         * This controller is responsible for the language and version selector
+         * widget.  The widget allows the user to select a reference language and
+         * version when translating subtitles into another language.
+         *
+         * The $scope contains "languages" and "versions".  Each list is
+         * represented in the UI as a <select> element.  The selected language or
+         * version is stored on the $scope as a "language" and "version" model.
+         *
+         * Whenever the language selection is changed, we update the list of
+         * versions.  When a new version is selected, we retrieve the subtitles
+         * (either from memory or from the API via ajax) and display them in the
+         * side panel.
+         */
 
-    /**
-     * Responsible for everything that touches subtitles as a group,
-     * souch as populating the list with actual data, removing subs,
-     * adding subs.
-     * @param $scope
-     * @param SubtitleStorage
-     * @constructor
-     */
-    SubtitleListController = function($scope, SubtitleStorage) {
+        SubtitleStorage.getLanguages(function(languages) {
+            $scope.languages = languages;
+            $scope.language = _.find(languages, function(item) {
+                return item.editingLanguage;
+            });
+            $scope.languageSelectChanged($scope.language);
+        });
+
+        $scope.languageSelectChanged = function(lang) {
+            var vers, language;
+
+            if (lang) {
+                language = lang;
+            } else {
+                language = $scope.language;
+            }
+
+            vers =_.sortBy(language.versions, function(item) {
+                return item.number;
+            });
+            $scope.versions = vers.reverse();
+            if (vers.length && vers.length > 0) {
+                $scope.version = $scope.versions[0];
+            }
+        };
+        $scope.setReferenceSubs = function(subtitlesXML) {
+            if (!$scope.refSubList) {
+                $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
+            }
+            $scope.refSubList.scope.onSubtitlesFetched(subtitlesXML);
+        };
+        $scope.versionChanged = function(newVersion) {
+            var subtitlesXML;
+
+            if (!newVersion) {
+                return;
+            }
+            subtitlesXML = newVersion.subtitlesXML;
+
+            if (!subtitlesXML) {
+                SubtitleStorage.getSubtitles($scope.language.code,
+                                             newVersion.number,
+                                             function(subtitlesXML) {
+                    $scope.version.subtitlesXML = subtitlesXML;
+                    $scope.setReferenceSubs(subtitlesXML);
+                });
+            } else {
+                $scope.setReferenceSubs(subtitlesXML);
+            }
+        };
+
+        $scope.$watch('version', $scope.versionChanged);
+    };
+    var SaveSessionButtonController = function($scope, SubtitleListFinder) {
+
+        $scope.saveSession = function() {
+            if ($scope.status !== 'saving') {
+                $scope.status = 'saving';
+
+                var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
+
+                promise.then(function onSuccess() {
+                    $scope.status = 'saved';
+                }, function onError() {
+                    $scope.status = 'error';
+                    window.alert('Sorry, there was an error...');
+                });
+            }
+        };
+        $scope.toggleSaveDropdown = function() {
+            $scope.dropdownOpen = !$scope.dropdownOpen;
+        };
+        $scope.$root.$on('onWorkDone', function() {
+            $scope.canSave = '';
+            $scope.$digest();
+        });
+
+    };
+    var SubtitleListController = function($scope, SubtitleStorage) {
+        /**
+         * Responsible for everything that touches subtitles as a group,
+         * souch as populating the list with actual data, removing subs,
+         * adding subs.
+         * @param $scope
+         * @param SubtitleStorage
+         * @constructor
+         */
+
+        $scope.addSubtitle = function(subtitle, index) {
+            if (subtitle.index !== index) {
+                throw Error('Indexes don\'t match.');
+            }
+
+            $scope.subtitlesData.splice(index, 0, subtitle);
+            this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
+        };
+        $scope.getSubtitleListHeight = function() {
+            return $(window).height() - 359;
+        };
         $scope.getSubtitles = function(languageCode, versionNumber) {
             // if this version has no default source translation language
             // it will be empty, in which case we want to wait for user
@@ -47,17 +150,14 @@
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
         };
-        $scope.getSubtitleListHeight = function() {
-            return $(window).height() - 359;
-        };
-        /**
-         * Once we have the dfxp from the server,
-         * massage the data as a simpler object and set it on the
-         * template. Angular will pick up the change (from the broadcast)
-         * and will re-render the UI.
-         * @param dfxpXML
-         */
         $scope.onSubtitlesFetched = function (dfxpXML) {
+            /**
+             * Once we have the dfxp from the server,
+             * massage the data as a simpler object and set it on the
+             * template. Angular will pick up the change (from the broadcast)
+             * and will re-render the UI.
+             * @param dfxpXML
+             */
 
             this.dfxpWrapper = new root.AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
@@ -81,74 +181,48 @@
             // only let the descendant scope know of this, no need to propagate
             // upwards
             $scope.status = 'ready';
-            $scope.$broadcast("onSubtitlesFetched");
+            $scope.$broadcast('onSubtitlesFetched');
 
         };
-        $scope.setSelectedIndex = function(index) {
-            $scope.selectedIndex = index;
-            $scope.$digest();
+        $scope.removeSubtitle = function(index) {
+            $scope.subtitlesData.splice(index, 1);
+            this.dfxpWrapper.removeSubtitle(index);
         };
-
-        $scope.setVideoID = function(videoID) {
-            $scope.videoID = videoID;
-        };
-
-        $scope.setLanguageCode = function(languageCode) {
-            $scope.languageCode = languageCode;
-        };
-
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
                                           this.dfxpWrapper.xmlToString(true, true));
         };
-
-        // Watch the window for resize events so we may update the subtitle list
-        // heights appropriately.
+        $scope.setLanguageCode = function(languageCode) {
+            $scope.languageCode = languageCode;
+        };
+        $scope.setSelectedIndex = function(index) {
+            $scope.selectedIndex = index;
+            $scope.$digest();
+        };
+        $scope.setVideoID = function(videoID) {
+            $scope.videoID = videoID;
+        };
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));
         });
+
         window.onresize = function() {
             $scope.$apply();
         };
 
-        $scope.addSubtitle = function(subtitle, index) {
-            if (subtitle.index !== index) {
-                throw Error("Indexes don't match.");
-            }
-
-            $scope.subtitlesData.splice(index, 0, subtitle);
-            this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
-        };
-
-        $scope.removeSubtitle = function(index) {
-            $scope.subtitlesData.splice(index, 1);
-            this.dfxpWrapper.removeSubtitle(index);
-        };
     };
-
-    /**
-     * Responsible for actions on one subtitle: editing, selecting.
-     * @param $scope
-     * @constructor
-     */
-    SubtitleListItemController = function($scope, SubtitleStorage) {
-        // we expect to have on the scope the object that
-        // SubtitleListController.onSubtitlesFetched
-        // has created from the dfxp
+    var SubtitleListItemController = function($scope, SubtitleStorage) {
+        /**
+         * Responsible for actions on one subtitle: editing, selecting.
+         * @param $scope
+         * @constructor
+         */
 
         var initialText;
         $scope.isEditing = false;
         $scope.toHTML = function(markupLikeText) {};
-
-        $scope.startEditingMode = function() {
-
-            initialText =  this.dfxpWrapper.content($scope.subtitle.index);
-
-            $scope.isEditing  = true;
-            return initialText;
-        };
 
         $scope.finishEditingMode = function(newValue) {
             $scope.isEditing  = false;
@@ -157,127 +231,30 @@
             if ($scope.subtitle.text !== initialText) {
                 // mark dirty variable on root scope so we can allow
                 // saving the session
-                $scope.$root.$emit("onWorkDone");
+                $scope.$root.$emit('onWorkDone');
             }
         };
-
         $scope.getSubtitleNode = function() {
             return this.dfxpWrapper.getSubtitle($scope.subtitle.index);
         };
-
         $scope.setEditable = function(isEditable) {
         };
+        $scope.startEditingMode = function() {
 
+            initialText =  this.dfxpWrapper.content($scope.subtitle.index);
+
+            $scope.isEditing  = true;
+            return initialText;
+        };
         $scope.textChanged = function(newText) {
             $scope.subtitle.text = newText;
         };
+
     };
 
-    /**
-     * This controller is responsible for the language and version selector
-     * widget.  The widget allows the user to select a reference language and
-     * version when translating subtitles into another language.
-     *
-     * The $scope contains "languages" and "versions".  Each list is
-     * represented in the UI as a <select> element.  The selected language or
-     * version is stored on the $scope as a "language" and "version" model.
-     *
-     * Whenever the language selection is changed, we update the list of
-     * versions.  When a new version is selected, we retrieve the subtitles
-     * (either from memory or from the API via ajax) and display them in the
-     * side panel.
-     */
-    HelperSelectorController = function($scope, SubtitleStorage,
-            SubtitleListFinder) {
-
-        $scope.languageSelectChanged = function(lang) {
-            var vers, language;
-
-            if (lang) {
-                language = lang;
-            } else {
-                language = $scope.language;
-            }
-
-            vers =_.sortBy(language.versions, function(item) {
-                return item.number;
-            });
-            $scope.versions = vers.reverse();
-            if (vers.length && vers.length > 0) {
-                $scope.version = $scope.versions[0];
-            }
-        };
-
-        SubtitleStorage.getLanguages(function(languages) {
-            $scope.languages = languages;
-            $scope.language = _.find(languages, function(item) {
-                return item.editingLanguage;
-            });
-            $scope.languageSelectChanged($scope.language);
-        });
-
-        $scope.versionChanged = function(newVersion) {
-            var subtitlesXML;
-
-            if (!newVersion) {
-                return;
-            }
-            subtitlesXML = newVersion.subtitlesXML;
-
-            if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.code,
-                                             newVersion.number,
-                                             function(subtitlesXML) {
-                    $scope.version.subtitlesXML = subtitlesXML;
-                    $scope.setReferenceSubs(subtitlesXML);
-                });
-            } else {
-                $scope.setReferenceSubs(subtitlesXML);
-            }
-        };
-
-        $scope.setReferenceSubs = function(subtitlesXML) {
-            if (!$scope.refSubList) {
-                $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
-            }
-            $scope.refSubList.scope.onSubtitlesFetched(subtitlesXML);
-        };
-
-        $scope.$watch('version', $scope.versionChanged);
-    };
-
-    SaveSessionButtonController = function($scope, SubtitleListFinder) {
-        // since the button can be outside of the subtitle list directive
-        // we need the service to find out which set we're saving.
-        $scope.saveSession = function() {
-            if($scope.status !== 'saving') {
-                $scope.status = 'saving';
-
-                var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
-
-                promise.then(function onSuccess() {
-                    $scope.status = 'saved';
-                }, function onError() {
-                    $scope.status = 'error';
-                    window.alert('sorry, there was an error...');
-                });
-            }
-        };
-
-        $scope.toggleSaveDropdown = function() {
-            $scope.dropdownOpen = !$scope.dropdownOpen;
-            return false;
-        };
-
-        $scope.$root.$on("onWorkDone", function() {
-            $scope.canSave = '';
-            $scope.$digest();
-        });
-    };
-    // exports
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListItemController = SubtitleListItemController;
-    root.HelperSelectorController = HelperSelectorController;
+    root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionButtonController = SaveSessionButtonController;
 
 }).call(this);
