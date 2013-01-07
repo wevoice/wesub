@@ -88,7 +88,7 @@ def get_unsynced_subtitle_language():
 
     try:
         sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
-    except SubtitleLanguage.DoesNotExist:
+    except IndexError:
         return None
 
     if sl.standard_language and sl.standard_language.needs_sync:
@@ -114,7 +114,7 @@ def get_unsynced_subtitle_version_language():
         sv = SubtitleVersion.objects.filter(
             needs_sync=True, subtitle_language__needs_sync=False
         ).order_by('?')[0]
-    except SubtitleVersion.DoesNotExist:
+    except IndexError:
         return None
 
     sl = sv.language
