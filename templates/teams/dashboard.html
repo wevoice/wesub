@@ -62,10 +62,11 @@
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
                                 <li>
-                                    <a href="{{ task.get_widget_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                         {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+                                            <a href="" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                             {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% else %}
+                                            <a href="{{ task.get_perform_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                             {{ task.get_type_display }}
                                             {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% endif %}
