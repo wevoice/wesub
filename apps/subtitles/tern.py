@@ -42,6 +42,8 @@ from optparse import OptionGroup, OptionParser
 
 csv = csv_module.writer(sys.stdout)
 single = False
+language_pk = None
+dry = False
 
 
 # Output
@@ -60,6 +62,20 @@ def die(msg):
 
 
 # Utilities
+def get_specific_language(pk):
+    from apps.videos.models import SubtitleLanguage
+
+    try:
+        sl = SubtitleLanguage.objects.get(pk=int(language_pk))
+    except SubtitleLanguage.DoesNotExist:
+        die("No SubtitleLanguage exists with primary key %s!" % language_pk)
+
+    if sl.standard_language and sl.standard_language.needs_sync:
+        die("SubtitleLanguage %s is a translation of %s, which must be synced first!"
+            % (language_pk, sl.standard_language.pk))
+
+    return sl
+
 def get_unsynced_subtitle_language():
     """Return a SubtitleLanguage that needs to be synced.
 
@@ -73,7 +89,7 @@ def get_unsynced_subtitle_language():
 
     try:
         sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
-    except SubtitleLanguage.DoesNotExist:
+    except IndexError:
         return None
 
     if sl.standard_language and sl.standard_language.needs_sync:
@@ -99,7 +115,7 @@ def get_unsynced_subtitle_version_language():
         sv = SubtitleVersion.objects.filter(
             needs_sync=True, subtitle_language__needs_sync=False
         ).order_by('?')[0]
-    except SubtitleVersion.DoesNotExist:
+    except IndexError:
         return None
 
     sl = sv.language
@@ -194,18 +210,20 @@ def _create_subtitle_language(sl):
         writelock_owner=sl.writelock_owner,
         is_forked=sl.is_forked,
     )
-    nsl.save()
 
-    # Has to be saved separately because it's a magic Redis field.  Sigh.
-    nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
-    nsl.save()
+    if not dry:
+        nsl.save()
 
-    # TODO: is this right, or does it need to be save()'ed?
-    nsl.followers = sl.followers.all()
+        # Has to be saved separately because it's a magic Redis field.  Sigh.
+        nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+        nsl.save()
 
-    sl.new_subtitle_language = nsl
-    sl.needs_sync = False
-    sl.save()
+        # TODO: is this right, or does it need to be save()'ed?
+        nsl.followers = sl.followers.all()
+
+        sl.new_subtitle_language = nsl
+        sl.needs_sync = False
+        sl.save()
 
     log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
 
@@ -222,23 +240,28 @@ def _update_subtitle_language(sl):
     nsl.writelock_owner = sl.writelock_owner
     nsl.is_forked = sl.is_forked
     nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
-    nsl.save()
 
-    # TODO: is this right, or does it need to be save()'ed?
-    nsl.followers = sl.followers.all()
+    if not dry:
+        nsl.save()
 
-    sl.needs_sync = False
-    sl.save()
+        # TODO: is this right, or does it need to be save()'ed?
+        nsl.followers = sl.followers.all()
+
+        sl.needs_sync = False
+        sl.save()
 
     log('SubtitleLanguage', 'update', sl.pk, nsl.pk)
 
-def _sync_language():
+def _sync_language(language_pk=None):
     """Try to sync one SubtitleLanguage.
 
     Returns True if a language was synced, False if there were no more left.
 
     """
-    sl = get_unsynced_subtitle_language()
+
+    sl = (get_specific_language(language_pk)
+          if language_pk
+          else get_unsynced_subtitle_language())
 
     if not sl:
         return False
@@ -248,16 +271,20 @@ def _sync_language():
     else:
         _create_subtitle_language(sl)
 
-    from utils.metrics import Meter
-    Meter('data-model-refactor.language-syncs').inc()
+    if not dry:
+        from utils.metrics import Meter
+        Meter('data-model-refactor.language-syncs').inc()
 
     return True
 
 def sync_languages():
-    result = _sync_language()
-    if not single:
-        while result:
-            result = _sync_language()
+    if language_pk:
+        result = _sync_language(language_pk)
+    else:
+        result = _sync_language()
+        if not single:
+            while result:
+                result = _sync_language()
 
 
 def _get_subtitles(sv):
@@ -331,10 +358,18 @@ def _create_subtitle_version(sv, last_version):
         if tip:
             parents = [tip]
 
-    pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
-                           title=sv.title, description=sv.description,
-                           parents=parents, visibility=visibility,
-                           author=sv.user)
+    if not dry:
+        nsv = pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
+                                     title=sv.title, description=sv.description,
+                                     parents=parents, visibility=visibility,
+                                     author=sv.user)
+
+        sv.new_subtitle_version = nsv
+        sv.needs_sync = False
+
+        sv.save()
+
+        log('SubtitleVersion', 'create', sv.pk, nsv.pk)
 
 def _update_subtitle_version(sv):
     """Update a previously-synced SubtitleVersion.
@@ -349,9 +384,13 @@ def _update_subtitle_version(sv):
     nsv.description = sv.description
     nsv.note = sv.note
     nsv.visibility = 'public' if sv.is_public else 'private'
-    nsv.save()
 
-def _sync_versions():
+    if not dry:
+        nsv.save()
+
+    log('SubtitleVersion', 'update', sv.pk, nsv.pk)
+
+def _sync_versions(language_pk=None):
     """Sync a single language worth of SubtitleVersions."""
 
     sl = get_unsynced_subtitle_version_language()
@@ -380,16 +419,20 @@ def _sync_versions():
     for version in new_versions[-1:]:
         _create_subtitle_version(version, True)
 
-    from utils.metrics import Meter
-    Meter('data-model-refactor.version-syncs').inc()
+    if not dry:
+        from utils.metrics import Meter
+        Meter('data-model-refactor.version-syncs').inc()
 
     return True
 
 def sync_versions():
-    result = _sync_versions()
-    if not single:
-        while result:
-            result = _sync_versions()
+    if language_pk:
+        _sync_versions(language_pk)
+    else:
+        result = _sync_versions()
+        if not single:
+            while result:
+                result = _sync_versions()
 
 
 # Setup
@@ -417,13 +460,21 @@ def setup_settings(options):
 def build_option_parser():
     p = OptionParser('usage: %prog [options]')
 
-    p.add_option('-s', '--settings', default=None,
-                 help='django settings module to use',
-                 metavar='MODULE_NAME')
+    p.add_option('-d', '--dry-run', default=False,
+                 dest='dry', action='store_true',
+                 help='don\'t actually write the the DB')
 
     p.add_option('-o', '--one', default=False,
                  dest='single', action='store_true',
                  help='only sync one object instead of all of them')
+
+    p.add_option('-l', '--language-pk', default=None,
+                 help='primary key of a specific language to sync (implies --one)',
+                 metavar='PRIMARY_KEY')
+
+    p.add_option('-s', '--settings', default=None,
+                 help='django settings module to use',
+                 metavar='MODULE_NAME')
 
     g = OptionGroup(p, "Commands")
 
@@ -452,7 +503,7 @@ def build_option_parser():
     return p
 
 def main():
-    global single
+    global dry, single, language_pk
 
     parser = build_option_parser()
     (options, args) = parser.parse_args()
@@ -461,6 +512,8 @@ def main():
         die('no command given!')
 
     single = options.single
+    language_pk = options.language_pk
+    dry = options.dry
 
     setup_path()
     setup_settings(options)

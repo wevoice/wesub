@@ -275,6 +275,13 @@ section.main {
                 span {
                     display: block;
                     padding: 10px 40px;
+
+                    b {
+                        font-weight: bold;
+                    }
+                    i {
+                        font-style: italic;
+                    }
                 }
             }
             &[editable="true"] {

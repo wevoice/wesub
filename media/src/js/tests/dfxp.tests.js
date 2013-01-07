@@ -309,10 +309,10 @@ describe('DFXP', function() {
             var $newSubtitle = $(newSubtitle);
 
             // Replace the node's text with a DFXP-style formatted node.
-            $newSubtitle.append($('<span fontweight="bold">I be bold.</span>'));
+            $newSubtitle.append($('<span tts:fontweight="bold">I be bold.</span>'));
 
             // Verify that we have DFXP-style formatting to convert.
-            expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
+            expect(parser.content(newSubtitle)).toBe('<span tts:fontweight="bold">I be bold.</span>');
 
             // Replace the subtitle's content in-place with Markdown.
             parser.dfxpToMarkdown(newSubtitle);
@@ -483,7 +483,7 @@ describe('DFXP', function() {
             $newSubtitle.append($(dfxpText));
 
             // Verify that the text was replaced properly.
-            expect(parser.content(newSubtitle)).toBe('<span fontweight="bold">I be bold.</span>');
+            expect(parser.content(newSubtitle)).toBe('<span tts:fontweight="bold">I be bold.</span>');
         });
     });
     describe('#needsAnySynced()', function() {
@@ -825,15 +825,7 @@ describe('DFXP', function() {
             // Get the XML string.
             var xmlString = parser.xmlToString(true, true);
 
-            // Parse the XML.
-            var newXML = $.parseXML(xmlString);
-
-            // Grab the first subtitle's content.
-            var $firstSubtitle = $('div p', newXML).eq(0);
-            var firstSubtitleContent = $('<div>').append($firstSubtitle.contents().clone()).remove().html();
-
-            // Verify that the content has been converted to DFXP.
-            expect(firstSubtitleContent).toBe('<span fontWeight="bold">Test</span>');
+            expect(xmlString).toBe('<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace"> <head> <metadata/> <styling xmlns:tts="http://www.w3.org/2006/10/ttaf1#styling"><style tts:textStyle="italic" xml:id="emphasis"/><style tts:fontWeight="bold" xml:id="strong"/><style tts:textDecoration="underline" xml:id="underlined"/></styling> <layout/> </head> <body region="subtitleArea"> <div><p begin="" end=""><span tts:fontWeight="bold">Test</span></p><div/> </div> </body> </tt>');
 
         });
     });
