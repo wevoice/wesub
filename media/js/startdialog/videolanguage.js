@@ -54,9 +54,7 @@ unisubs.startdialog.VideoLanguage.prototype.toString = function() {
 };
 
 unisubs.startdialog.VideoLanguage.prototype.completionStatus = function() {
-    return "(" +
-        (this.DEPENDENT ? (this.PERCENT_DONE + "%") :
-         (this.SUBTITLE_COUNT + " lines")) + ")";
+    return "(" + (this.SUBTITLE_COUNT + " lines") + ")";
 };
 
 unisubs.startdialog.VideoLanguage.prototype.setAll = function(all) {
