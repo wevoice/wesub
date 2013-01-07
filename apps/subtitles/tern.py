@@ -42,6 +42,7 @@ from optparse import OptionGroup, OptionParser
 
 csv = csv_module.writer(sys.stdout)
 single = False
+language_pk = None
 
 
 # Output
@@ -60,6 +61,20 @@ def die(msg):
 
 
 # Utilities
+def get_specific_language(pk):
+    from apps.videos.models import SubtitleLanguage
+
+    try:
+        sl = SubtitleLanguage.objects.get(pk=int(language_pk))
+    except SubtitleLanguage.DoesNotExist:
+        die("No SubtitleLanguage exists with primary key %s!" % language_pk)
+
+    if sl.standard_language and sl.standard_language.needs_sync:
+        die("SubtitleLanguage %s is a translation of %s, which must be synced first!"
+            % (language_pk, sl.standard_language.pk))
+
+    return sl
+
 def get_unsynced_subtitle_language():
     """Return a SubtitleLanguage that needs to be synced.
 
@@ -232,13 +247,16 @@ def _update_subtitle_language(sl):
 
     log('SubtitleLanguage', 'update', sl.pk, nsl.pk)
 
-def _sync_language():
+def _sync_language(language_pk=None):
     """Try to sync one SubtitleLanguage.
 
     Returns True if a language was synced, False if there were no more left.
 
     """
-    sl = get_unsynced_subtitle_language()
+
+    sl = (get_specific_language(language_pk)
+          if language_pk
+          else get_unsynced_subtitle_language())
 
     if not sl:
         return False
@@ -254,10 +272,13 @@ def _sync_language():
     return True
 
 def sync_languages():
-    result = _sync_language()
-    if not single:
-        while result:
-            result = _sync_language()
+    if language_pk:
+        result = _sync_language(language_pk)
+    else:
+        result = _sync_language()
+        if not single:
+            while result:
+                result = _sync_language()
 
 
 def _get_subtitles(sv):
@@ -351,7 +372,7 @@ def _update_subtitle_version(sv):
     nsv.visibility = 'public' if sv.is_public else 'private'
     nsv.save()
 
-def _sync_versions():
+def _sync_versions(language_pk=None):
     """Sync a single language worth of SubtitleVersions."""
 
     sl = get_unsynced_subtitle_version_language()
@@ -386,10 +407,13 @@ def _sync_versions():
     return True
 
 def sync_versions():
-    result = _sync_versions()
-    if not single:
-        while result:
-            result = _sync_versions()
+    if language_pk:
+        _sync_versions(language_pk)
+    else:
+        result = _sync_versions()
+        if not single:
+            while result:
+                result = _sync_versions()
 
 
 # Setup
@@ -417,13 +441,17 @@ def setup_settings(options):
 def build_option_parser():
     p = OptionParser('usage: %prog [options]')
 
-    p.add_option('-s', '--settings', default=None,
-                 help='django settings module to use',
-                 metavar='MODULE_NAME')
-
     p.add_option('-o', '--one', default=False,
                  dest='single', action='store_true',
                  help='only sync one object instead of all of them')
+
+    p.add_option('-l', '--language-pk', default=None,
+                 help='primary key of a specific language to sync (implies --one)',
+                 metavar='PRIMARY_KEY')
+
+    p.add_option('-s', '--settings', default=None,
+                 help='django settings module to use',
+                 metavar='MODULE_NAME')
 
     g = OptionGroup(p, "Commands")
 
@@ -452,7 +480,7 @@ def build_option_parser():
     return p
 
 def main():
-    global single
+    global single, language_pk
 
     parser = build_option_parser()
     (options, args) = parser.parse_args()
@@ -461,6 +489,7 @@ def main():
         die('no command given!')
 
     single = options.single
+    language_pk = options.language_pk
 
     setup_path()
     setup_settings(options)
