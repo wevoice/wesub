@@ -30,7 +30,7 @@ class WatchPage(VideoListings):
 
     def basic_search(self, search_term):
         self.submit_form_text_by_css(self._SEARCH, search_term)
-        return SearchResultsPage(self)
+        return SearchResultsPage(self.testcase)
 
     def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
         self.click_by_css(self._SEARCH_PULLDOWN)
@@ -48,7 +48,7 @@ class WatchPage(VideoListings):
             time.sleep(2)
             elem.submit()
 
-        return SearchResultsPage(self)
+        return SearchResultsPage(self.testcase)
 
        
     def _valid_section_name(self, section):
