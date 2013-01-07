@@ -1182,7 +1182,11 @@ class SubtitleLanguage(models.Model):
         self.save()
 
     def save(self, updates_timestamp=True, *args, **kwargs):
-        self.needs_sync = True
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         if updates_timestamp:
             self.created = datetime.now()
         if self.language:
@@ -1390,8 +1394,12 @@ class SubtitleVersion(SubtitleCollection):
     def __unicode__(self):
         return u'%s #%s' % (self.language, self.version_no)
 
-    def save(self,  *args, **kwargs):
-        self.needs_sync = True
+    def save(self, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         created = not self.pk
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:

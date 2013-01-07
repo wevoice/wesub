@@ -223,7 +223,7 @@ def _create_subtitle_language(sl):
 
         sl.new_subtitle_language = nsl
         sl.needs_sync = False
-        sl.save()
+        sl.save(tern_sync=True)
 
     log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
 
@@ -248,7 +248,7 @@ def _update_subtitle_language(sl):
         nsl.followers = sl.followers.all()
 
         sl.needs_sync = False
-        sl.save()
+        sl.save(tern_sync=True)
 
     log('SubtitleLanguage', 'update', sl.pk, nsl.pk)
 
@@ -367,7 +367,7 @@ def _create_subtitle_version(sv, last_version):
         sv.new_subtitle_version = nsv
         sv.needs_sync = False
 
-        sv.save()
+        sv.save(tern_sync=True)
 
         log('SubtitleVersion', 'create', sv.pk, nsv.pk)
 
@@ -385,8 +385,11 @@ def _update_subtitle_version(sv):
     nsv.note = sv.note
     nsv.visibility = 'public' if sv.is_public else 'private'
 
+    sv.needs_sync = False
+
     if not dry:
         nsv.save()
+        sv.save(tern_sync=True)
 
     log('SubtitleVersion', 'update', sv.pk, nsv.pk)
 
