@@ -18,21 +18,18 @@
 
 (function() {
 
-    var root, HelpController;
+    var root = this;
 
-    root = this;
+    var HelpController = function($scope, SubtitleStorage) {
+        /**
+         * Responsible for handling the various states of the help panel.
+         * @param $scope
+         * @param SubtitleStorage
+         * @constructor
+         */
 
-    /**
-     * Responsible for handling the various states of the help panel.
-     * @param $scope
-     * @param SubtitleStorage
-     * @constructor
-     */
-    HelpController = function($scope, SubtitleStorage) {
-
-        // TODO: Switch these based on the current state of the editor.
         $scope.heading = 'Thanks for making subtitles!';
-        $scope.paragraph = "It's easy as pie. Just watch the video and type everything you hear (and any important text that appears on the screen).";
+        $scope.paragraph = 'It\'s easy as pie. Just watch the video and type everything you hear (and any important text that appears on the screen).';
         $scope.commands = [
             { key: 'tab', description: 'plays the <strong>next 4 seconds</strong> of the video' },
             { key: 'shift + tab', description: 'replays the <strong>previous 4 seconds</strong>' }
@@ -40,7 +37,6 @@
 
     };
 
-    // exports
     root.HelpController = HelpController;
 
 }).call(this);

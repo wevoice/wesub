@@ -28,23 +28,15 @@
          * widget.  The widget allows the user to select a reference language and
          * version when translating subtitles into another language.
          *
-         * The $scope contains "languages" and "versions".  Each list is
+         * The $scope contains 'languages' and 'versions'.  Each list is
          * represented in the UI as a <select> element.  The selected language or
-         * version is stored on the $scope as a "language" and "version" model.
+         * version is stored on the $scope as a 'language' and 'version' model.
          *
          * Whenever the language selection is changed, we update the list of
          * versions.  When a new version is selected, we retrieve the subtitles
          * (either from memory or from the API via ajax) and display them in the
          * side panel.
          */
-
-        SubtitleStorage.getLanguages(function(languages) {
-            $scope.languages = languages;
-            $scope.language = _.find(languages, function(item) {
-                return item.editingLanguage;
-            });
-            $scope.languageSelectChanged($scope.language);
-        });
 
         $scope.languageSelectChanged = function(lang) {
             var vers, language;
@@ -88,6 +80,14 @@
                 $scope.setReferenceSubs(subtitlesXML);
             }
         };
+
+        SubtitleStorage.getLanguages(function(languages) {
+            $scope.languages = languages;
+            $scope.language = _.find(languages, function(item) {
+                return item.editingLanguage;
+            });
+            $scope.languageSelectChanged($scope.language);
+        });
 
         $scope.$watch('version', $scope.versionChanged);
     };

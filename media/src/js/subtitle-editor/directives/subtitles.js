@@ -16,10 +16,19 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-(function ($) {
+(function($) {
 
-    var directives = angular.module("amara.SubtitleEditor.directives", []);
-    directives.directive("subtitleList", function (SubtitleStorage, SubtitleListFinder) {
+    var directives = angular.module('amara.SubtitleEditor.directives', []);
+
+    directives.directive('saveSessionButton', function (SubtitleStorage) {
+        return {
+            link: function link(scope, elm, attrs) {
+                scope.canSave = '';
+            }
+        };
+    });
+    directives.directive('subtitleList', function (SubtitleStorage, SubtitleListFinder) {
+
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
             rootEl;
@@ -56,17 +65,17 @@
 
                 selectedScope.$apply();
 
-                elementToSelect = $("span.subtitle-text", $(".subtitle-list-item", rootEl)[index]);
+                elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
 
             } else if (keyCode === 9 && e.shiftKey) {
                 // tab with shift, move backwards
                 if (selectedScope.subtitlesData[selectedScope.subtitle.index - 1]) {
-                    elementToSelect = $("span.subtitle-text", $(".subtitle-list-item",
+                    elementToSelect = $('span.subtitle-text', $('.subtitle-list-item',
                                         rootEl)[selectedScope.subtitle.index - 1]);
                 }
                 e.preventDefault();
 
-            } else if (keyCode == 27){
+            } else if (keyCode === 27){
                 // if it's an esc on the textarea, finish editing
                 selectedScope.finishEditingMode(activeTextArea.val());
                 selectedScope.$apply();
@@ -90,8 +99,9 @@
         function onSubtitleItemSelected(elm) {
             // make sure this works if the event was trigger in the
             // originating li or any descendants
-            elm = $(elm).hasClass(".subtitle-list-item") ?
-                      elm : $(elm).parents(".subtitle-list-item");
+            elm = $(elm).hasClass('.subtitle-list-item') ?
+                      elm : $(elm).parents('.subtitle-list-item');
+
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
@@ -107,7 +117,7 @@
                     // trigger updates
                     selectedScope.$digest();
                 }
-                activeTextArea = $("textarea", elm);
+                activeTextArea = $('textarea', elm);
                 selectedScope = scope;
                 var editableText = selectedScope.startEditingMode();
 
@@ -137,7 +147,7 @@
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
 
-                            $(elm).on("keydown", "textarea", onSubtitleTextKeyDown);
+                            $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
                         }
                         scope.setVideoID(attrs['videoId']);
                         scope.setLanguageCode(attrs['languageCode']);
@@ -148,20 +158,10 @@
             }
         };
     });
-    directives.directive("subtitleListItem", function (SubtitleStorage) {
+    directives.directive('subtitleListItem', function (SubtitleStorage) {
         return {
-            link: function link(scope, elm, attrs) {
-
-            }
+            link: function link(scope, elm, attrs) {}
         };
-
     });
 
-    directives.directive("saveSessionButton", function (SubtitleStorage) {
-        return {
-            link: function link(scope, elm, attrs) {
-                scope.canSave = '';
-            }
-        };
-
-    });})(window.AmarajQuery);
+})(window.AmarajQuery);
