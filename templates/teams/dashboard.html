@@ -188,7 +188,7 @@
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
                                         {% if team_video.video.languages_count < 1 or not user.get_languages %}
-                                            <a href="#" class="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
+                                            <a href="#" class="video-{{ team_video.id }}" title="Get started now">{% trans 'Create Subtitles' %}</a>
                                         {% else %} {# this video already has languages #}
                                             {% if team_video.languages|length > 1 %}
                                                 <a href="#" class="dropdown">
