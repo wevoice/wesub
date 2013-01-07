@@ -71,6 +71,13 @@ def youtube_sync(video, language):
             Meter('youtube.push.request').inc()
 
 
+def get_linked_youtube_accounts(video):
+    yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
+    usernames = [url.owner_username for url in yt_url]
+    return ThirdPartyAccount.objects.filter(
+            username__in=usernames)
+
+
 def check_authorization(video):
     """
     Make sure that a video can have its subtitles synced to Youtube.  This
@@ -85,26 +92,30 @@ def check_authorization(video):
         team = team_video.team
         has_linked_youtube_account = team.third_party_accounts.filter(
                 type=VIDEO_TYPE_YOUTUBE).exists()
+
         if has_linked_youtube_account:
             # Ignore the new syncing logic.  Use the linked Youtube account
             # to publish subtitles to Youtube.
             ignore_new_syncing_logic = True
         else:
+            # If the linked account is an individual account, we allow the
+            # sync.
+            linked_accounts = get_linked_youtube_accounts(video)
+
+            if any(a.is_individual_account for a in linked_accounts):
+                return True, ignore_new_syncing_logic
+
             # The assumption is that it's the partner's official Youtube
             # account and they don't want it messed up with strange subs.
             return False, None
     else:
         # If a video isn't part of a team but the video's Youtube URL is linked
         # to a team third party account, we don't sync to Youtube.
-        yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
-        if yt_url.exists():
-            usernames = [url.owner_username for url in yt_url]
-            linked_accounts = ThirdPartyAccount.objects.filter(
-                    username__in=usernames)
+        linked_accounts = get_linked_youtube_accounts(video)
 
-            if linked_accounts.exists():
-                if any(a.is_team_account for a in linked_accounts):
-                    return False, None
+        if linked_accounts.exists():
+            if any(a.is_team_account for a in linked_accounts):
+                return False, None
 
     return True, ignore_new_syncing_logic
 

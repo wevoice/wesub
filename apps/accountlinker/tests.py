@@ -239,3 +239,44 @@ class AccountTest(TestCase):
 
         is_authorized, ignore = check_authorization(video)
         self.assertTrue(is_authorized)
+
+    def test_individual_user_then_submitted_to_team(self):
+        """
+        If a video from a YT account linked to an individual Amara user gets
+        submitted to a task-enabled team and undergoes review and moderation,
+        the subtitles do not get pushed to YT upon approval.
+
+        Expected: open subtitles should be pushed when completed, and moderated
+        ones - when published.
+
+        The assumption is that if an individual amara user enables sync for
+        their Youtube account, they allow anything from Amara to enter their
+        Youtube account.  This means that any community edits will be synced.
+        Including if the video is added to a team.
+        """
+        # Prep stuff
+        vurl = VideoUrl.objects.filter(type='Y')[0]
+        vurl.owner_username = 'admin'
+        vurl.save()
+
+        video = vurl.video
+        user = User.objects.get(username='admin')
+
+        team = Team.objects.all()[0]
+        TeamVideo.objects.create(video=video, team=team, added_by=user)
+
+        third = ThirdPartyAccount.objects.all().exists()
+        self.assertFalse(third)
+
+        # Start testing
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+        self.assertEquals(None, ignore)
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                username=vurl.owner_username)
+
+        user.third_party_accounts.add(account)
+
+        is_authorized, _ = check_authorization(video)
+        self.assertTrue(is_authorized)
