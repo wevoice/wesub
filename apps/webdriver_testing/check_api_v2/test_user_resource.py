@@ -52,8 +52,8 @@ class TestCaseUserResource(WebdriverTestCase):
         """Create a user and login token, verify login.
 
         """
-        if 'jenkins' in os.getcwd():
-            self.skipTest('skipping... weird behavior on jenkins')
+        #if 'jenkins' in os.getcwd():
+        #    self.skipTest('skipping... weird behavior on jenkins')
         new_user = {'username': 'newuser',
                     'email': 'newuser@example.com',
                     'first_name': 'New', 
