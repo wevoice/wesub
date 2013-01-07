@@ -41,10 +41,8 @@ unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
 unisubs.startdialog.VideoLanguage.prototype.toString = function() {
     var name = this.languageName();
 
-    if (!this.DEPENDENT && this.SUBTITLE_COUNT > 0) {
+    if (this.SUBTITLE_COUNT > 0) {
         name += (this.IS_COMPLETE ? " (100%)" : " (incomplete)");
-    } else if (this.DEPENDENT && this.PERCENT_DONE > 0) {
-        name += " (" + this.PERCENT_DONE + "%)";
     }
 
     name += (this.IN_PROGRESS ? " (in progress)" : "");
