@@ -34,6 +34,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         ["span[fontWeight='bold']", "**"],
         ["span[fontStyle='italic']", "*"],
         ["span[textDecoration='underline']", "_"],
+        ["br", "\n"],
 
         // When jQuery creates elements, it lowercases all attributes. We fix
         // this when sending back to the server in xmlToString, but for unit
@@ -62,9 +63,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $preXml = $(xml.documentElement);
         var $preSubtitles = $('div p', $preXml);
 
+        // Convert subtitles from DFXP to Markdown.
         for (var i = 0; i < $preSubtitles.length; i++) {
-            var $preSubtitle = $preSubtitles.eq(i);
-            this.dfxpToMarkdown($preSubtitle.get(0));
+            var $subtitle = $preSubtitles.eq(i);
+            this.dfxpToMarkdown($subtitle.get(0));
         }
 
         // Store the original XML for comparison later.
@@ -610,7 +612,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             { match: /(\*)([^\*]+)(\*{1})/g,
               replaceWith: "<i>$2</i>" },
             { match: /(_)([^_]+)(_{1})/g,
-              replaceWith: "<u>$2</u>" }
+              replaceWith: "<u>$2</u>" },
+            { match: /(\r\n|\n|\r)/gm,
+              replaceWith: "<br />" }
         ];
 
         for (var i = 0; i < replacements.length; i++) {

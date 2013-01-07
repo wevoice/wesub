@@ -143,9 +143,10 @@
         $scope.toHTML = function(markupLikeText) {};
 
         $scope.startEditingMode = function() {
+
             initialText =  this.dfxpWrapper.content($scope.subtitle.index);
+
             $scope.isEditing  = true;
-            // fix me, this should return the markdown text
             return initialText;
         };
 
