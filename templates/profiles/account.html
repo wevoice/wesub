@@ -25,7 +25,7 @@
             </fieldset>
             <div class="grid_8 alpha third-party">
                 <fieldset>
-                    <h3>{% trans "Sync subtitles" %}</h3>
+                    <h3>{% trans "Publish to YouTube" %}</h3>
                     <div class="callout">
                         {% if third_party %}
                             {% for account in third_party  %}
@@ -43,13 +43,13 @@
                                 <span>Connect to</span>
                                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
                             </a>
-                            <p>{% trans "Send Amara-created subtitles right to your YouTube videos!" %}</p>
+                            <p>{% trans "Add Amara subtitles to your personal YouTube channel!" %}</p>
                         {% endif %}
                     </div>
                 </fieldset>
 
                 <fieldset>
-                    <h3>{% trans "Link Accounts" %}</h3>
+                    <h3>{% trans "Linked Accounts" %}</h3>
                     <div class="callout">
                         <p>{% trans "Sign in to Amara with Twitter, Facebook, and other accounts" %}</p>
                         <a href="#account-modal" class="open-modal button reduced">{% trans "Add an account" %}</a>
@@ -155,7 +155,7 @@
         <div class="modal" id="youtube-modal">
             <div class="modal-header">
                 <a href="#" class="close">x</a>
-                <h3>{% trans 'Connect to YouTube' %}</h3>
+                <h3>{% trans 'Enable Crowdsubtitles on your YouTube Channel' %}</h3>
             </div>
 
                 <form method="get" action="{% url profiles:add-third-party %}">
@@ -165,7 +165,7 @@
                             <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube" height="65"/>
                             <input type="hidden" name="account_type" value="youtube"/>
 
-                            <h5>{% trans "What gets synced" %}</h5>
+                            <h5>{% trans "What gets published" %}</h5>
                             <ul>
                                 <li>
                                     {% blocktrans %}
@@ -179,7 +179,7 @@
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        Sync is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
+                                        Publishing is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
                                     {% endblocktrans %}
                                 </li>
                             </ul>
@@ -199,12 +199,16 @@
                                 </li>
                             </ul>
 
-                            <h5>{% trans "Step 1: Enable your YouTube account by creating a channel" %}</h5>
-                            <p><a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank" class="btn">{% trans "Create a channel" %}</a> (opens in a new window)</p>
+                            <h5>{% trans "Step 1: Enable your YouTube account" %}</h5>
+                            <p><a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank" class="btn">{% trans "Create or confirm your YouTube channel" %}</a> (opens in a new window)</p>
 
-                            <h5>{% trans "Step 2: Link accounts" %}</h5>
-                            <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
+                            <h5>{% trans "Step 2: Authorize" %}</h5>
+                            <input type="submit" class="btn btn-primary" value="{% trans 'Link accounts' %}" />
                         </fieldset>
+                        <p>
+                            {% trans "Organizations and companies: interested in YouTube sync and crowd subtitling? " %}
+                            <a href="mailto:enterprise@amara.org">{% trans "Contact us" %}</a>.
+                        </p>
                     </div>
                 </form>
         </div>
