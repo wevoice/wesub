@@ -95,8 +95,8 @@ class AccountTest(TestCase):
                 username=vurl.owner_username)
 
         is_authorized, ignore = check_authorization(video)
-        self.assertFalse(is_authorized)
-        self.assertEquals(None, ignore)
+        self.assertTrue(is_authorized)
+        self.assertFalse(ignore)
 
     def test_part_of_team(self):
         # Prep stuff
