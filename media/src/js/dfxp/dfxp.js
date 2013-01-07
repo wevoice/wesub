@@ -26,22 +26,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     MARKUP_REPLACE_SEQ = [
         // Order matters, need to apply double markers first.
-        [/(\*\*)([^\*]+)(\*\*)/g, '<span fontWeight="bold">$2</span>'],
-        [/(\*)([^\*]+)(\*{1})/g, '<span fontStyle="italic">$2</span>'],
-        [/(_)([^_]+)(_{1})/g, '<span textDecoration="underline">$2</span>']
+        [/(\*\*)([^\*]+)(\*\*)/g, '<span tts:fontWeight="bold">$2</span>'],
+        [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>'],
+        [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
     DFXP_REPLACE_SEQ = [
-        ["span[fontWeight='bold']", "**"],
-        ["span[fontStyle='italic']", "*"],
-        ["span[textDecoration='underline']", "_"],
+        ["span[tts\\:fontWeight='bold']", "**"],
+        ["span[tts\\:fontStyle='italic']", "*"],
+        ["span[tts\\:textDecoration='underline']", "_"],
         ["br", "\n"],
 
         // When jQuery creates elements, it lowercases all attributes. We fix
         // this when sending back to the server in xmlToString, but for unit
         // testing we need to match manually created elements, too.
-        ["span[fontweight='bold']", "**"],
-        ["span[fontstyle='italic']", "*"],
-        ["span[textdecoration='underline']", "_"]
+        ["span[tts\\:fontweight='bold']", "**"],
+        ["span[tts\\:fontstyle='italic']", "*"],
+        ["span[tts\\:textdecoration='underline']", "_"]
     ];
 
     var that = this;
@@ -614,7 +614,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             { match: /(_)([^_]+)(_{1})/g,
               replaceWith: "<u>$2</u>" },
             { match: /(\r\n|\n|\r)/gm,
-              replaceWith: "<br />" }
+              replaceWith: "<br />" },
+            { match: / {2}/g,
+              replaceWith: "&nbsp;&nbsp;" }
         ];
 
         for (var i = 0; i < replacements.length; i++) {
