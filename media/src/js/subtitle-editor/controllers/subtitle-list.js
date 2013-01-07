@@ -124,7 +124,7 @@
 
         $scope.removeSubtitle = function(index) {
             $scope.subtitlesData.splice(index, 1);
-            this.dfxpWrapper.addSubtitle(index);
+            this.dfxpWrapper.removeSubtitle(index);
         };
     };
 

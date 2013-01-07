@@ -38,7 +38,7 @@ $CodePro: 'CodeProLC', $OpenSans;
   -moz-box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
   box-shadow: inset $horizontalIn $verticalIn $blurIn $colorIn, $horizontal $vertical $blur $color;
 }
-@mixin vertical-gradient($start: #000, $stop: #FFF) { background: ($start + $stop) / 2;
+@mixin vertical-gradient($start: #000, $stop: #FFF) { background: $start;
     background: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
     background: -moz-linear-gradient(center top, $start 0%, $stop 100%);
     background: -moz-gradient(center top, $start 0%, $stop 100%);
@@ -53,6 +53,17 @@ $CodePro: 'CodeProLC', $OpenSans;
     -khtml-opacity: $op;
     -moz-opacity: $op;
     opacity: $op;
+}
+@mixin shadow {
+    bottom: -40px;
+    content: "";
+    display: block;
+    height: 40px;
+    left: 0;
+    position: absolute;
+    width: 97%;
+    z-index: 51;
+    @include vertical-gradient(rgba(#F3F4F5, 1), rgba(white, 0));
 }
 
 // Page
@@ -250,6 +261,7 @@ section.main {
     }
     div.subtitles {
         overflow: auto;
+        position: relative;
 
         ul {
             margin-top: 25px;
@@ -264,10 +276,10 @@ section.main {
                     display: block;
                     padding: 10px 40px;
                 }
-
             }
             &[editable="true"] {
                 li {
+                    position: relative;
 
                     textarea {
                         border: 0;
@@ -276,6 +288,7 @@ section.main {
                         display: block;
                         height: 45px;
                         margin: 0;
+                        resize: none;
                         padding: 10px 40px;
                         width: 100%;
 
@@ -286,26 +299,35 @@ section.main {
                     span {
                         cursor: text;
                     }
+                    a.remove {
+                        background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
+                        color: transparent;
+                        display: none;
+                        height: 100%;
+                        position: absolute;
+                        right: 0;
+                        top: 0;
+                        width: 40px;
+                        @include opacity(.2);
+
+                        &:hover {
+                            @include opacity(.5);
+                        }
+                        &:active {
+                            background: transparent url('../../../images/subtitle-editor/hourglass.png') center center no-repeat;
+                        }
+                    }
                     &.editing {
                         background: white;
                         padding: 0;
                     }
-
-                    a {
-                        color: transparent;
-                        float: right;
-                    }
-
                     &:hover {
                         background: #EBECED;
 
-                        a {
-                            color: #000;
+                        a.remove {
+                            display: block;
                         }
                     }
-
-
-
                 }
             }
         }
@@ -370,7 +392,11 @@ section.main {
             border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
             padding: 5px 20px;
+            position: relative;
 
+            &:before {
+                @include shadow;
+            }
             select {
                 display: block;
                 float: left;
@@ -386,11 +412,26 @@ section.main {
             border-left: 1px solid #88898B;
             border-right: 1px solid #88898B;
             height: 320px;
+            position: relative;
 
             iframe {
                 height: 320px;
                 width: 100%;
             }
+            &:before {
+                @include shadow;
+            }
         }
+    }
+    ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 12px;
+    }
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1); 
+    }
+    ::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4); 
     }
 }
