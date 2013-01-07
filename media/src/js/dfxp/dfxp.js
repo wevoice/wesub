@@ -199,7 +199,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xmlString = xmlString.replace(/textdecoration/g, 'textDecoration');
             xmlString = xmlString.replace(/fontweight/g, 'fontWeight');
             xmlString = xmlString.replace(/fontstyle/g, 'fontStyle');
-            
+
             return xmlString;
         }
 
