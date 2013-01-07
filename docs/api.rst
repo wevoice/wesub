@@ -542,6 +542,32 @@ Creating a team:
 
 .. http:post:: /api2/partners/teams/
 
+    :form name: (required) Name of the team
+    :form slug: (required) A unique slug (used in URLs)
+    :form description:
+    :form is_visible: Should this team be publicly visible?
+    :form membership_policy: See below for possible values
+    :form video_policy: See below for possible values
+    :form task_assign_policy: See below for possible values
+    :form max_tasks_per_member: Maximum tasks per member
+    :form task_expiration: Task expiration in days
+
+Example payload:
+
+.. code-block:: json
+
+    {
+        "name": "Full Team",
+        "slug": "full-team",
+        "description": "One full team",
+        "is_visible": false,
+        "membership_policy": "Invitation by any team member",
+        "video_policy": "Admins only",
+        "task_assign_policy": "Managers and admins",
+        "max_tasks_per_member": 3,
+        "task_expiration": 14
+    }
+
 Updating a team:
 
 .. http:put:: /api2/partners/teams/[team-slug]/
@@ -572,10 +598,9 @@ Video policy:
 
 Task assign policy:
 
-* ``Anyone``
 * ``Any team member``
-* ``Only managers and admins``
-* ``Only admins``
+* ``Managers and admins``
+* ``Admins only``
 
 Example response
 
