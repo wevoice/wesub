@@ -49,7 +49,7 @@ class VideoListings(UnisubsPage):
         video_el =  self._video_list_item(title)
         thumb_el = video_el.find_element_by_css_selector(self._VIDEO_THUMB)
         thumb_el.click()
-        return VideoPage(self)
+        return VideoPage(self.testcase)
 
 
     def num_views(self, title):
