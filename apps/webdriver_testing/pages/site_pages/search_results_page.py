@@ -39,11 +39,11 @@ class SearchResultsPage(VideoListings):
 
     def click_search_result(self, result_element):
         self.click_by_css(result_element)
-        return VideoPage()
+        return VideoPage(self.testcase)
 
     def click_first_search_result(self):
         self.click_by_css(self._FIRST_SEARCH_RESULT)
-        return VideoPage()
+        return VideoPage(self.testcase)
 
     def sort_results(self, sort_by):
         pass

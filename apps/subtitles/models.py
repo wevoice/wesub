@@ -810,6 +810,7 @@ class SubtitleLanguage(models.Model):
         tip = self.get_tip(public=True)
         return tip.unpublish() if tip else None
 
+
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
     def public(self):

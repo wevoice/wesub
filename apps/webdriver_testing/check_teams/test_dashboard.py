@@ -44,6 +44,16 @@ class TestCaseDashboard(WebdriverTestCase):
             TeamVideoFactory(video = video,
                              team = self.team,
                              added_by = self.team_owner)
+        self.polly_glott = TeamContributorMemberFactory.create(
+                team = self.team,
+                user = UserFactory(username =  'PollyGlott')
+                ).user
+
+        self.mono_glot = TeamContributorMemberFactory.create(
+                team = self.team,
+                user = UserFactory(username =  'MonoGlot')
+                ).user
+
 
 
     def test_members__generic_create_subs(self):
@@ -51,19 +61,16 @@ class TestCaseDashboard(WebdriverTestCase):
 
         """
         #Create a user that's a member of a team with language preferences set.
-        team_member = TeamContributorMemberFactory.create(
-                team = self.team,
-                user = UserFactory(username =  'PollyGlott')
-                ).user
+
         polly_speaks = ['en', 'cs', 'ru', 'ar']
         for lang in polly_speaks:
-            UserLangFactory(user = team_member,
+            UserLangFactory(user = self.polly_glott,
                             language = lang)
 
 
 
         #Login user and go to team dashboard page
-        self.dashboard_tab.log_in(team_member.username, 'password')
+        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 
         #Verify expected videos are displayed.
         self.dashboard_tab.open_team_page(self.team.slug)
@@ -75,12 +82,8 @@ class TestCaseDashboard(WebdriverTestCase):
 
         """
         #Create a user that's a member of a team with language preferences set.
-        team_member = TeamContributorMemberFactory.create(
-                team = self.team,
-                user = UserFactory(username =  'MonoGlott')
-                ).user
         #Login user and go to team dashboard page
-        self.dashboard_tab.log_in(team_member.username, 'password')
+        self.dashboard_tab.log_in(self.mono_glot.username, 'password')
 
         #Verify expected videos are displayed.
         self.dashboard_tab.open_team_page(self.team.slug)
@@ -94,19 +97,15 @@ class TestCaseDashboard(WebdriverTestCase):
 
         """
         #Create a user that's a member of a team with language preferences set.
-        team_member = TeamContributorMemberFactory.create(
-                team = self.team,
-                user = UserFactory(username =  'PollyGlott')
-                ).user
         polly_speaks = ['en', 'cs', 'ru', 'ar']
         for lang in polly_speaks:
-            UserLangFactory(user = team_member,
+            UserLangFactory(user = self.polly_glott,
                             language = lang)
 
 
 
         #Login user and go to team dashboard page
-        self.dashboard_tab.log_in(team_member.username, 'password')
+        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 
         #Verify expected videos are displayed.
         expected_lang_list = ['Create English Subtitles', 
