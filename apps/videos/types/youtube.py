@@ -233,7 +233,9 @@ class YoutubeVideoType(VideoType):
 
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
-    
+
+    CAN_IMPORT_SUBTITLES = False
+
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -267,7 +269,7 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj, async=True):
+    def set_values(self, video_obj, fetch_subs_async=True):
         video_obj.title =  self.entry.media.title.text or ''
         if self.entry.media.description:
             video_obj.description =  self.entry.media.description.text
@@ -283,7 +285,7 @@ class YoutubeVideoType(VideoType):
         Meter('youtube.video_imported').inc()
 
         try:
-            self.get_subtitles(video_obj, async=async)
+            self.get_subtitles(video_obj, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
