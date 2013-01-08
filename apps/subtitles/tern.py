@@ -55,6 +55,7 @@ def log(model, event_type, original_pk, new_pk):
         str(original_pk),
         str(new_pk),
     ])
+    sys.stdout.flush()
 
 def die(msg):
     sys.stderr.write('ERROR: %s\n' % msg)
