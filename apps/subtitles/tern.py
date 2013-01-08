@@ -202,7 +202,10 @@ def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
     from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 
-    if NewSubtitleLanguage.objects.filter(video=sl.video).exists():
+    exists = (NewSubtitleLanguage.objects.filter(video=sl.video,
+                                                 language_code=sl.language)
+                                         .exists())
+    if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
         return
 
