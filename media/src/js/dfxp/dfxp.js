@@ -521,25 +521,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         return el.prev().length > 0 ? el.prev().eq(0).get(0) : null;
     };
-    this.getSubtitleIndex = function(subtitle) {
+    this.getSubtitleIndex = function(subtitle, subtitles) {
         /*
-         * Retrieve the index of the given subtitle.
+         * Retrieve the index of the given subtitle within the given subtitle set.
          *
          * Returns: integer
          */
 
-        if (subtitle instanceof AmarajQuery) {
-            subtitle = subtitle.get(0);
-        }
-
-        var $subtitles = this.getSubtitles();
-        for (var i= 0; i < $subtitles.length; i++) {
-            if ($subtitles.get(i) === subtitle) {
-                return i;
-            }
-        }
-
-        return -1;
+        return $(subtitles).index(subtitle);
 
     };
     this.getSubtitle = function(indexOrElement) {
