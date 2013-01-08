@@ -431,7 +431,11 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         handler = GenerateSubtitlesHandler.get('srt')
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
-        subs = add_credit(subtitle_version, subs)
+
+        video = subtitle_version.language.video
+        if not video.get_team_video():
+            subs = add_credit(subtitle_version, subs)
+            self.add_credit_to_description(subtitle_version)
 
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = ""
@@ -442,8 +446,6 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         # we cant just update, we need to check if it already exists... if so, we delete it
         if lang in self.captions:
             self._delete_track(self.captions[lang]['track'])
-
-        self.add_credit_to_description(subtitle_version)
 
         return self.create_track(self.youtube_video_id, title, lang, content,
                 settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
