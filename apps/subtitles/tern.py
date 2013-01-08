@@ -266,6 +266,10 @@ def _sync_language(language_pk=None):
     if not sl:
         return False
 
+    if sl.language == '':
+        log('SubtitleLanguage', 'BAD_LANGUAGE', sl.pk, None)
+        return True
+
     if sl.new_subtitle_language:
         _update_subtitle_language(sl)
     else:
