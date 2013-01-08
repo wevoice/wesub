@@ -102,11 +102,20 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     video_changed_tasks.delay(video.pk)
 
 
+def should_add_credit(subtitle_version):
+    # Only add credit to non-team videos
+    video = subtitle_version.subtitle_language.video
+    return not video.get_team_video()
+
+
 def add_credit(subtitle_version, subs):
     # If there are no subtitles, don't add any credits.  This shouldn't really
     # happen since only completed subtitle versions can be synced to Youtube.
     # But a little precaution never hurt anyone.
     if len(subs) == 0:
+        return subs
+
+    if not should_add_credit(subtitle_version):
         return subs
 
     from accountlinker.models import get_amara_credit_text
@@ -402,6 +411,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         # to bcp47.
         content, title, language_code = \
                 self._prepare_subtitle_data_for_version(subtitle_version)
+        self.add_credit_to_description(subtitle_version)
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
@@ -410,8 +420,6 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         # the old one and upload a new one.
         if language_code in self.captions:
             self._delete_track(self.captions[language_code]['track'])
-
-        self.add_credit_to_description(subtitle_version)
 
         return self.create_track(self.youtube_video_id, title, language_code,
                 content, settings.YOUTUBE_CLIENT_ID,
@@ -429,6 +437,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
+        if not should_add_credit(subtitle_version):
+            return False
+
         from accountlinker.models import add_amara_description_credit
         uri = self.upload_uri_base % self.youtube_video_id
 
