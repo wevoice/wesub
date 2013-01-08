@@ -131,10 +131,9 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
             return false;
     return true;
 };
-unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(node, dfxpWrapper) {
-    var c = new unisubs.subtitle.EditableCaption(node, dfxpWrapper);
-    c.setParentEventTarget(this);
-
+unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(originalNode, dfxpWrapper, atIndex) {
+    var newNode = dfxpWrapper['cloneSubtitle'](originalNode,false);
+    var c = this.insertCaption(atIndex, newNode)
     return c;
 };
 
@@ -143,14 +142,24 @@ unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function
  * @param {Number} atIndex The next subtitle's subOrder
  *     (returned by EditableCaption#getSubOrder())
  */
-unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex) {
+unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex, newNode) {
     var prevSub;
-    var nextSub = this.captions_[atIndex];
+    var nextSub = this.captions_[atIndex] || this.captions_[this.captions_.length -1];
     if(atIndex >0){
         prevSub = nextSub.getPreviousCaption();
     }
-    var c = new unisubs.subtitle.EditableCaption(this.x['addSubtitle'](
-        atIndex >= 1 ? atIndex  -1 : -1, {}, ""), this.x);
+    var c;
+    if (newNode){
+        // if you are adding subs that are in the source language
+        // but not the translated one, you want to keep the node
+        // as it can have other content
+        this.x['addSubtitleNode'](newNode, atIndex);
+        c = new unisubs.subtitle.EditableCaption(newNode, this.x);
+    }else{
+        // no node, you just want to add an 'empty' subtitle
+        c = new unisubs.subtitle.EditableCaption(this.x['addSubtitle'](
+            atIndex >= 1 ? atIndex  -1 : -1, {}, ""), this.x);
+    }
     unisubs.SubTracker.getInstance().trackAdd(c.getCaptionIndex());
     goog.array.insertAt(this.captions_, c, atIndex );
     if (prevSub) {

@@ -16,35 +16,34 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-/*
- * We store a local cache of language data + subtitles in the following format:
- * [
- *   {
- *      "code": "en",
- *      "editingLanguage": true,
- *      "versions": [
- *        {
- *          "title": "About Amara",
- *          "number": 4,
- *          "subtitlesXML": "<dfxp subs>",
- *          "description": "<some description>"
- *        }
- *      ],
- *      "numVersions": 1,
- *      "translatedFrom": {
- *        "version_number": 3,
- *        "language_code": "en"
- *      },
- *      "pk": 1,
- *      "name": "English"
- *   }
- * ]
- *
- * When you request a set of subtitles the api is hit if data is not yet on
- * the cache.
- */
-
 (function() {
+    /*
+     * We store a local cache of language data + subtitles in the following format:
+     * [
+     *   {
+     *      "code": "en",
+     *      "editingLanguage": true,
+     *      "versions": [
+     *        {
+     *          "title": "About Amara",
+     *          "number": 4,
+     *          "subtitlesXML": "<dfxp subs>",
+     *          "description": "<some description>"
+     *        }
+     *      ],
+     *      "numVersions": 1,
+     *      "translatedFrom": {
+     *        "version_number": 3,
+     *        "language_code": "en"
+     *      },
+     *      "pk": 1,
+     *      "name": "English"
+     *   }
+     * ]
+     *
+     * When you request a set of subtitles the api is hit if data is not yet on
+     * the cache.
+     */
 
     var root, module, API_BASE_PATH;
     var getSubtitleFetchAPIUrl, getSubtitleSaveAPIUrl, getVideoLangAPIUrl;
@@ -62,18 +61,16 @@
         }
         return url;
     };
-
     getSubtitleSaveAPIUrl = function(videoId, languageCode) {
         var url = API_BASE_PATH + videoId +
             '/languages/' + languageCode + '/subtitles/';
         return url;
     };
-
     getVideoLangAPIUrl = function(videoId) {
         return API_BASE_PATH + videoId + '/languages/';
     };
 
-    module.factory("SubtitleStorage", function($http) {
+    module.factory('SubtitleStorage', function($http) {
         var cachedData = window.editorData;
         var authHeaders = cachedData.authHeaders;
         return {
@@ -88,16 +85,16 @@
              */
             getSubtitles: function(languageCode, versionNumber, callback){
                 if (!languageCode) {
-                    throw Error("You have to give me a languageCode");
+                    throw Error('You have to give me a languageCode');
                 }
 
                 var subtitlesXML;
                 // will trigger a subtitlesFetched event when ready
                 for (var i=0; i < cachedData.languages.length ; i++){
                     var langObj = cachedData.languages[i];
-                    if (langObj.code == languageCode){
+                    if (langObj.code === languageCode){
                         for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].number == versionNumber){
+                            if (langObj.versions[j].number === parseInt(versionNumber)){
                                 subtitlesXML = langObj.versions[j].subtitlesXML;
                                 break;
                             }
@@ -162,7 +159,7 @@
      * reference language, the selector must know how which of the components
      * to update.
      */
-    module.factory("SubtitleListFinder", function($http) {
+    module.factory('SubtitleListFinder', function($http) {
         var registry = {};
 
         return {

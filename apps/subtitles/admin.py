@@ -24,6 +24,11 @@ from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
 
 
 class SubtitleVersionInline(admin.TabularInline):
+
+    def has_delete_permission(self, request, obj=None):
+        # subtitle versions should be immutable, don't allow deletion
+        return False
+
     model = SubtitleVersion
     fields = ['version_number']
     max_num = 0
@@ -88,6 +93,13 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
                    'language_code']
     search_fields = ['video__video_id', 'video__title', 'title',
                      'language_code', 'description', 'note']
+
+    # don't allow deletion
+    actions = []
+
+    def has_delete_permission(self, request, obj=None):
+        # subtitle versions should be immutable, don't allow deletion
+        return False
 
     def version_num(self, sv):
         return '#' + str(sv.version_number)

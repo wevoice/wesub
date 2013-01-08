@@ -18,21 +18,19 @@
 
 (function() {
 
-    var root, VideoController;
+    var root = this;
 
-    root = this;
+    var VideoController = function($scope, SubtitleStorage) {
+        /**
+         * Responsible for initializing the video.
+         * @param $scope
+         * @param SubtitleStorage
+         * @constructor
+         */
 
-    /**
-     * Responsible for initializing the video.
-     * @param $scope
-     * @param SubtitleStorage
-     * @constructor
-     */
-    VideoController = function($scope, SubtitleStorage) {
         $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL());
     };
 
-    // exports
     root.VideoController = VideoController;
 
 }).call(this);

@@ -16,14 +16,12 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-(function ($) {
-    var directives;
+(function() {
     
-    directives = angular.module("amara.SubtitleEditor.directives.helperSelector", []);
+    var directives = angular.module('amara.SubtitleEditor.directives.helperSelector', []);
 
     directives.directive('languageValue', function() {
-        return {
-        };
+        return {};
     });
 
-})(window.AmarajQuery);
+})();
