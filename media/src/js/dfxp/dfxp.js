@@ -276,6 +276,32 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $newSubtitle.get(0);
     };
+    this.addSubtitleNode = function (newSubtitle, after){
+        if (typeof after != 'number') {
+
+            // If we have subtitles, default placement should be at the end.
+            if (this.subtitlesCount()) {
+                after = this.getLastSubtitle();
+
+                // Otherwise, place the first subtitle at the beginning.
+            } else {
+                after = -1;
+            }
+        }
+        if (after === -1) {
+
+            this.$div.prepend(newSubtitle);
+
+            // Otherwise, place it after the designated subtitle.
+        } else {
+
+            // First just make sure that the previous subtitle exists.
+            var $previousSubtitle = this.getSubtitle(after) || $(this.getLastSubtitle());
+
+            // Then place it.
+            $previousSubtitle.after(newSubtitle);
+        }
+    }
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
@@ -319,6 +345,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         return parser;
     };
+    this.cloneSubtitle = function (indexOrElement, preserveText){
+        var $subtitle = this.getSubtitle(indexOrElement).clone()
+        if (!preserveText){
+            $subtitle.text('');
+        }
+        return $subtitle;
+    }
     this.content = function(indexOrElement, content) {
         /*
          * Either get or set the HTML content for the subtitle.
