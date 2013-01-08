@@ -1619,9 +1619,13 @@ body.account {
     textarea.api-key-holder {
         height: 1.5em;
     }
-    #youtube-modal img {
-        display: block;
-        margin: 0 auto 1em;
+    #youtube-modal {
+        margin-top: -300px;
+
+        img {
+            display: block;
+            margin: 0 auto 1em;
+        }
     }
 }
 .profile .submit.remove {
