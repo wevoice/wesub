@@ -45,6 +45,10 @@
             var keyCode = e.keyCode;
             var elementToSelect;
 
+            var parser = selectedScope.parser;
+            var subtitle = selectedScope.subtitle;
+            var subtitles = selectedScope.subtitles;
+
             // return or tab WITHOUT shift
             if (keyCode === 13 && !e.shiftKey ||
                 keyCode === 9 && !e.shiftKey ) {
@@ -53,32 +57,35 @@
                 selectedScope.textChanged($(e.currentTarget).text());
                 e.preventDefault();
 
-                var index = selectedScope.subtitle.index + 1;
+                var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
 
                 // if it's the last subtitle of the set and the user pressed enter without shift,
                 // add a new empty subtitle and select it to edit
-                if (selectedScope.subtitlesData[index] === undefined) {
-                    var subtitle = {'index': index, 'startTime':0, 'endTime':0, 'text':''};
-                    selectedScope.addSubtitle(subtitle, index);
+                if (selectedScope.subtitles[index] === undefined) {
+                    selectedScope.addSubtitle({'text': ''}, index);
                     selectedScope.finishEditingMode(activeTextArea.val());
                 }
 
                 selectedScope.$apply();
+                // TODO: Render the subtitle list, again.
 
                 elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
 
             } else if (keyCode === 9 && e.shiftKey) {
                 // tab with shift, move backwards
-                if (selectedScope.subtitlesData[selectedScope.subtitle.index - 1]) {
+                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
+                var lastSubtitle = parser.getSubtitle(lastIndex);
+                if (lastSubtitle) {
                     elementToSelect = $('span.subtitle-text', $('.subtitle-list-item',
-                                        rootEl)[selectedScope.subtitle.index - 1]);
+                                        rootEl)[lastIndex]);
                 }
                 e.preventDefault();
 
             } else if (keyCode === 27){
                 // if it's an esc on the textarea, finish editing
+                // TODO: This won't work unless we bind to keyup instead of keydown.
                 selectedScope.finishEditingMode(activeTextArea.val());
-                selectedScope.$apply();
+                selectedScope.$digest();
             }
 
             if (elementToSelect) {
@@ -121,8 +128,13 @@
                 selectedScope = scope;
                 var editableText = selectedScope.startEditingMode();
 
+                var parser = selectedScope.parser;
+                var subtitle = selectedScope.subtitle;
+                var subtitles = selectedScope.subtitles;
+                var subtitleIndex = parser.getSubtitleIndex(subtitle, subtitles);
+
                 activeTextArea.val(editableText);
-                angular.element(rootEl).scope().setSelectedIndex(selectedScope.subtitle.index);
+                angular.element(rootEl).scope().setSelectedIndex(subtitleIndex);
                 selectedScope.$digest();
 
                 activeTextArea.focus();
@@ -131,7 +143,6 @@
         }
 
         return {
-
             compile: function compile(elm, attrs, transclude) {
                 // should be on post link so to give a chance for the
                 // nested directive (subtitleListItem) to run
@@ -146,7 +157,6 @@
                             $(elm).click(function (e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
-
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
                         }
                         scope.setVideoID(attrs['videoId']);

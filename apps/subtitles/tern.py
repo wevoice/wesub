@@ -55,6 +55,7 @@ def log(model, event_type, original_pk, new_pk):
         str(original_pk),
         str(new_pk),
     ])
+    sys.stdout.flush()
 
 def die(msg):
     sys.stderr.write('ERROR: %s\n' % msg)
@@ -201,6 +202,13 @@ def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
     from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 
+    exists = (NewSubtitleLanguage.objects.filter(video=sl.video,
+                                                 language_code=sl.language)
+                                         .exists())
+    if exists:
+        log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
+        return
+
     nsl = NewSubtitleLanguage(
         video=sl.video,
         language_code=sl.language,
@@ -267,7 +275,7 @@ def _sync_language(language_pk=None):
         return False
 
     if sl.language == '':
-        log('SubtitleLanguage', 'BAD_LANGUAGE', sl.pk, None)
+        log('SubtitleLanguage', 'ERROR_EMPTY_LANGUAGE', sl.pk, None)
         return True
 
     if sl.new_subtitle_language:

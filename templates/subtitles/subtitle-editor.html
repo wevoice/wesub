@@ -81,12 +81,12 @@
                         version-number="{{ translated_from_version.version_number }}"
                         language-code="{{ translated_from_version.subtitle_language.language_code }}"
                         video-id="{{ video.video_id }}">
-                        <li ng-repeat="subtitle in subtitlesData"
+                        <li ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
-                            ng-class="{selected: subtitle.index == selectedIndex}"
+                            ng-class="{selected: parser.getSubtitleIndex(subtitle, subtitles) == selectedIndex}"
                             class="subtitle-list-item"
                             subtitle-list-item>
-                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRendered(subtitle)"></span>
                             <textarea style="display: none;" ng-show="isEditing"></textarea>
                         </li>
                     </ul>
@@ -102,14 +102,14 @@
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
                         video-id="{{ video.video_id }}">
-                        <li ng-repeat="subtitle in subtitlesData"
+                        <li ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
-                            ng-class="{selected: subtitle.index == selectedIndex, editing: isEditing}"
+                            ng-class="{selected: parser.getSubtitleIndex(subtitle, subtitles) == selectedIndex, editing: isEditing}"
                             class="subtitle-list-item"
                             subtitle-list-item>
-                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="subtitle.text"></span>
+                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRendered(subtitle)"></span>
                             <textarea ng-show="isEditing" style="display: none;"></textarea>
-                            <a class="remove" ng-click="removeSubtitle(subtitle.index)">Remove</a>
+                            <a class="remove" ng-click="parser.removeSubtitle(subtitle)">Remove</a>
                         </li>
                     </ul>
                 </div>

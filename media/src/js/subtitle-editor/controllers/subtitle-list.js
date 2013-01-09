@@ -127,11 +127,6 @@
          */
 
         $scope.addSubtitle = function(subtitle, index) {
-            if (subtitle.index !== index) {
-                throw Error('Indexes don\'t match.');
-            }
-
-            $scope.subtitlesData.splice(index, 0, subtitle);
             this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
         };
         $scope.getSubtitleListHeight = function() {
@@ -161,32 +156,13 @@
 
             this.dfxpWrapper = new root.AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
-            // now populate the subtitles scope var
-            // and let angular build the UI
-            var subtitles = this.dfxpWrapper.getSubtitles();
-            // preallocate array, gives us a small perf gain
-            // on ie / safari
-            var subtitlesData = new Array(subtitles.length);
 
-            for (var i=0; i < subtitles.length; i++) {
-                subtitlesData[i] =  {
-                    index: i,
-                    startTime: this.dfxpWrapper.startTime(subtitles.eq(i).get(0)),
-                    endTime: this.dfxpWrapper.endTime(subtitles.eq(i).get(0)),
-                    text: this.dfxpWrapper.contentRendered(subtitles.eq(i).get(0))
-                };
-            }
+            $scope.subtitles = this.dfxpWrapper.getSubtitles().get();
+            $scope.parser = this.dfxpWrapper;
 
-            $scope.subtitlesData = subtitlesData;
-            // only let the descendant scope know of this, no need to propagate
-            // upwards
             $scope.status = 'ready';
             $scope.$broadcast('onSubtitlesFetched');
 
-        };
-        $scope.removeSubtitle = function(index) {
-            $scope.subtitlesData.splice(index, 1);
-            this.dfxpWrapper.removeSubtitle(index);
         };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
@@ -225,29 +201,25 @@
         $scope.toHTML = function(markupLikeText) {};
 
         $scope.finishEditingMode = function(newValue) {
-            $scope.isEditing  = false;
-            this.dfxpWrapper.content($scope.getSubtitleNode(), newValue);
-            $scope.subtitle.text = this.dfxpWrapper.contentRendered($scope.getSubtitleNode());
-            if ($scope.subtitle.text !== initialText) {
+            $scope.isEditing = false;
+            var content = this.dfxpWrapper.content($scope.subtitle, newValue);
+            if (content !== initialText) {
                 // mark dirty variable on root scope so we can allow
                 // saving the session
                 $scope.$root.$emit('onWorkDone');
             }
         };
-        $scope.getSubtitleNode = function() {
-            return this.dfxpWrapper.getSubtitle($scope.subtitle.index);
-        };
         $scope.setEditable = function(isEditable) {
         };
         $scope.startEditingMode = function() {
 
-            initialText =  this.dfxpWrapper.content($scope.subtitle.index);
+            initialText =  this.dfxpWrapper.content($scope.subtitle);
 
             $scope.isEditing  = true;
             return initialText;
         };
         $scope.textChanged = function(newText) {
-            $scope.subtitle.text = newText;
+            this.dfxpWrapper.content($scope.subtitle, newText);
         };
 
     };
