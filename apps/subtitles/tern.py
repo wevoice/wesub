@@ -292,7 +292,7 @@ def _sync_language(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.language-syncs').inc()
 
-        if random() < 0.1:
+        if random() < 0.01:
             report_metrics()
 
     return True
@@ -446,7 +446,7 @@ def _sync_versions(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.version-syncs').inc()
 
-        if random() < 0.1:
+        if random() < 0.01:
             report_metrics()
 
     return True
