@@ -201,12 +201,16 @@ def report_metrics():
 def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
     from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
+    from apps.subtitles.models import VALID_LANGUAGE_CODES
 
     exists = (NewSubtitleLanguage.objects.filter(video=sl.video,
                                                  language_code=sl.language)
                                          .exists())
     if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
+        return
+    elif sl.language not in VALID_LANGUAGE_CODES:
+        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
         return
 
     nsl = NewSubtitleLanguage(

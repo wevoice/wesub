@@ -440,8 +440,8 @@ class SubtitleLanguage(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        assert self.language_code in VALID_LANGUAGE_CODES,\
-        "Subtitle Language %s should be a valid code." % self.language_code
+        assert self.language_code in VALID_LANGUAGE_CODES, \
+            "Subtitle Language %s should be a valid code." % self.language_code
 
         creating = not self.pk
 
