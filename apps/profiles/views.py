@@ -310,6 +310,10 @@ def remove_third_party(request, account_id):
             raise Http404
 
     if request.method == 'POST':
+        # TODO: Delete VideoFeed instance
+        # if account.type == VIDEO_TYPE_YOUTUBE:
+        #     pass
+
         account.delete()
         messages.success(request, _('Account deleted.'))
         return redirect('profiles:account')
