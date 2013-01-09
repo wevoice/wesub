@@ -209,7 +209,7 @@ def _create_subtitle_language(sl):
     if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
         return
-    elif sl.language_code not in VALID_LANGUAGE_CODES:
+    elif sl.language not in VALID_LANGUAGE_CODES:
         log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
         return
 
