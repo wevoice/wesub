@@ -20,27 +20,71 @@
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
 
-    directives.directive('saveSessionButton', function (SubtitleStorage) {
+    directives.directive('saveSessionButton', function(SubtitleStorage) {
         return {
             link: function link(scope, elm, attrs) {
                 scope.canSave = '';
             }
         };
     });
-    directives.directive('subtitleList', function (SubtitleStorage, SubtitleListFinder) {
+    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder) {
 
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
             rootEl;
 
-        /**
-         * Triggered with a key is down on a text area for editing subtitles.
-         * If it's regular text just do the default thing.
-         * If we pressed an enter / return, finish editing this sub and
-         * focus o the next one. Same for tab.
-         * @param e The jQuery key event
-         */
+        function onSubtitleItemSelected(elm) {
+            /**
+             * Receives the li.subtitle-list-item to be edited.
+             * Will put any previously edited ones in display mode,
+             * mark this one as being edited, creating the textarea for
+             * editing.
+             */
+            // make sure this works if the event was trigger in the
+            // originating li or any descendants
+            elm = $(elm).hasClass('.subtitle-list-item') ?
+                      elm : $(elm).parents('.subtitle-list-item');
+
+            var controller = angular.element(elm).controller();
+            var scope = angular.element(elm).scope();
+
+            if (scope === selectedScope) {
+                return;
+            }
+
+            // make sure the user clicked on the list item
+            if (controller instanceof SubtitleListItemController) {
+                if (selectedScope) {
+                    // if there were an active item, deactivate it
+                    selectedScope.finishEditingMode(activeTextArea.val());
+                    // trigger updates
+                    selectedScope.$digest();
+                }
+                activeTextArea = $('textarea', elm);
+                selectedScope = scope;
+                var editableText = selectedScope.startEditingMode();
+
+                var parser = selectedScope.parser;
+                var subtitle = selectedScope.subtitle;
+                var subtitles = selectedScope.subtitles;
+                var subtitleIndex = parser.getSubtitleIndex(subtitle, subtitles);
+
+                activeTextArea.val(editableText);
+                angular.element(rootEl).scope().setSelectedIndex(subtitleIndex);
+                selectedScope.$digest();
+
+                activeTextArea.focus();
+                activeTextArea.autosize();
+            }
+        }
         function onSubtitleTextKeyDown(e) {
+            /**
+             * Triggered with a key is down on a text area for editing subtitles.
+             * If it's regular text just do the default thing.
+             * If we pressed an enter / return, finish editing this sub and
+             * focus o the next one. Same for tab.
+             * @param e The jQuery key event
+             */
 
             var keyCode = e.keyCode;
             var elementToSelect;
@@ -96,64 +140,15 @@
 
         }
 
-        /**
-         * Receives the li.subtitle-list-item to be edited.
-         * Will put any previously edited ones in display mode,
-         * mark this one as being edited, creating the textarea for
-         * editing.
-         */
-        function onSubtitleItemSelected(elm) {
-            // make sure this works if the event was trigger in the
-            // originating li or any descendants
-            elm = $(elm).hasClass('.subtitle-list-item') ?
-                      elm : $(elm).parents('.subtitle-list-item');
-
-            var controller = angular.element(elm).controller();
-            var scope = angular.element(elm).scope();
-
-            if (scope === selectedScope) {
-                return;
-            }
-
-            // make sure the user clicked on the list item
-            if (controller instanceof SubtitleListItemController) {
-                if (selectedScope) {
-                    // if there were an active item, deactivate it
-                    selectedScope.finishEditingMode(activeTextArea.val());
-                    // trigger updates
-                    selectedScope.$digest();
-                }
-                activeTextArea = $('textarea', elm);
-                selectedScope = scope;
-                var editableText = selectedScope.startEditingMode();
-
-                var parser = selectedScope.parser;
-                var subtitle = selectedScope.subtitle;
-                var subtitles = selectedScope.subtitles;
-                var subtitleIndex = parser.getSubtitleIndex(subtitle, subtitles);
-
-                activeTextArea.val(editableText);
-                angular.element(rootEl).scope().setSelectedIndex(subtitleIndex);
-                selectedScope.$digest();
-
-                activeTextArea.focus();
-                activeTextArea.autosize();
-            }
-        }
-
         return {
             compile: function compile(elm, attrs, transclude) {
-                // should be on post link so to give a chance for the
-                // nested directive (subtitleListItem) to run
                 rootEl = elm;
                 return {
                     post: function post(scope, elm, attrs) {
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-
                         isEditable = attrs.editable === 'true';
-                        // if is editable, hook up event listeners
                         if (isEditable) {
-                            $(elm).click(function (e) {
+                            $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
