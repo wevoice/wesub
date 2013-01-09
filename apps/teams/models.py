@@ -744,6 +744,7 @@ class TeamVideo(models.Model):
     def subtitles_finished(self):
         """Return whether at least one set of subtitles has been finished for this video."""
         return (self.subtitles_started() and
+                self.video.subtitle_language() and
                 self.video.subtitle_language().is_complete_and_synced())
 
     def get_workflow(self):
