@@ -67,7 +67,6 @@
                 }
 
                 selectedScope.$apply();
-                // TODO: Render the subtitle list, again.
 
                 elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
 

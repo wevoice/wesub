@@ -128,6 +128,10 @@
 
         $scope.addSubtitle = function(subtitle, index) {
             this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
+
+            // TODO: Should we be watching this in a more intelligent way?
+            $scope.subtitles = this.dfxpWrapper.getSubtitles().get();
+            $scope.$apply();
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
