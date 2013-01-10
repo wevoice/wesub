@@ -42,6 +42,7 @@ video_id.
 """
 
 from optparse import make_option
+from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -63,18 +64,23 @@ class Command(BaseCommand):
             default=None),
     )
 
+    def log(self, msg):
+        now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        self.stdout.write(now + ' ' + str(msg) + '\n')
+        self.stdout.flush()
+
     def _resync_subs_for_video(self, video):
         from apps.accountlinker.models import ThirdPartyAccount
         languages = video.subtitlelanguage_set.all()
-        print video
+        self.log(video)
 
         for language in languages:
             latest_version = language.latest_version(public_only=True)
 
             if latest_version:
-                print ' ', language
+                self.log(' ' + str(language))
             else:
-                print '  no version for:', language
+                self.log('  no version for:' + str(language))
                 continue
 
             ThirdPartyAccount.objects.mirror_on_third_party(video,
@@ -119,7 +125,7 @@ class Command(BaseCommand):
         credits = (amara_supposed_credit, unisubs_supposed_credit,)
 
         if not current_description.startswith(credits):
-            print "%s doesn't have desc credit" % vurl.url
+            self.log("%s doesn't have desc credit" % vurl.url)
             return
 
         if current_description.startswith(amara_supposed_credit):
@@ -140,10 +146,10 @@ class Command(BaseCommand):
             status_code = bridge._make_update_request(uri, entry)
 
         if status_code == 200:
-            print '%s success' % vurl.url
+            self.log('%s success' % vurl.url)
             return
 
-        print 'FAIL %s' % vurl.url
+        self.log('FAIL %s' % vurl.url)
 
     def _get_supposed_credit(self, vurl, language='en'):
         # Sometimes I hate Python :(
@@ -177,7 +183,7 @@ class Command(BaseCommand):
         urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
                 video__in=videos)
 
-        print '%s video descriptions to process' % len(urls)
+        self.log('%s video descriptions to process' % len(urls))
 
         for vurl in urls:
             self._fix_video(vurl)
@@ -185,7 +191,7 @@ class Command(BaseCommand):
         # Now, sync all completed languages to Youtube to remove the last sub
         # credit.
 
-        print '%s videos to resync' % len(videos)
+        self.log('%s videos to resync' % len(videos))
 
         for video in videos:
             self._resync_subs_for_video(video)
