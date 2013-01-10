@@ -154,6 +154,25 @@ def get_counts():
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
 
 
+def fix_blank_original(video):
+    # Copied from the widget RPC code in production.
+    # Note that this doesn't necessarily fix all blank languages.  The ones that
+    # are marked as "is_original=False" won't be touched.
+    originals = video.subtitlelanguage_set.filter(is_original=True, language='')
+    to_delete = []
+    if len(originals) > 0:
+        for original in originals:
+            if not original.latest_version():
+                # result of weird practice of saving SL with is_original=True
+                # and blank language code on Video creation.
+                to_delete.append(original)
+            else:
+                # decided to mark authentic blank originals as English.
+                original.language = 'en'
+                original.save()
+    for sl in to_delete:
+        sl.delete()
+
 # Commands
 def header():
     print 'Time,Model,Action,Original PK,New PK'
@@ -280,6 +299,11 @@ def _sync_language(language_pk=None):
         return False
 
     if sl.language == '':
+        fix_blank_original(sl.video)
+
+        # For now, we'll actually bail on this language and come back to it
+        # later.  Hopefully it will have been fixed by the above call, but
+        # there's a chance that it's is_original=False and so is still borked.
         log('SubtitleLanguage', 'ERROR_EMPTY_LANGUAGE', sl.pk, None)
         return True
 
