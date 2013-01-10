@@ -20,6 +20,9 @@ import datetime
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
+from django.utils.translation import (
+    ugettext_lazy as _, get_language
+)
 
 from videos.types import video_type_registrar
 from videos.types.base import VideoTypeError
@@ -139,7 +142,7 @@ def _video_languages_verbose_key(video_id):
     return "widget_video_languages_verbose_{0}".format(video_id)
 
 def _video_completed_languages(video_id):
-    return "video_completed_verbose_{0}".format(video_id)
+    return "video_completed_verbose_{0}_{1}".format(video_id, get_language())
 
 def _video_writelocked_langs_key(video_id):
     return "writelocked_langs_{0}".format(video_id)
@@ -230,11 +233,14 @@ def get_video_completed_languages(team_video_id):
 
     if not languages:
         from videos.models import SubtitleLanguage
-        languages = [(sl.language, sl.language_display()) for sl in list(SubtitleLanguage.objects.filter(video__teamvideo__id=team_video_id).all())]
+        languages = [sl.language for sl in list(SubtitleLanguage.objects.filter(video__teamvideo__id=team_video_id).all())]
 
         cache.set(cache_key, languages, TIMEOUT)
 
-    return languages
+    # i18n is a pain in the ass
+    all_languages = dict(settings.ALL_LANGUAGES)
+
+    return [(lang, _(all_languages[lang])) for lang in languages]
 
 def get_video_languages_verbose(video_id, max_items=6):
     # FIXME: we should probably merge a better method with get_video_languages
