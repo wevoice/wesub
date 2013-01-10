@@ -28,6 +28,8 @@ class ATeamPage(UnisubsPage):
     _MEMBERS_TAB = "ul.tabs li a[href*='members']"
     _ACTIVITY_TAB = "ul.tabs li a[href*='activity']"
     _SETTINGS_TAB = "ul.tabs li a[href*='settings']"
+    _TASKS_TAB = "ul.tabs li a[href*='tasks']"
+
 
     #JOIN / APPLY
     _JOIN_TEAM = ".join p a"
@@ -42,19 +44,33 @@ class ATeamPage(UnisubsPage):
    #FILTER AND SORT
 
     def open_team_page(self, team):
+        self.logger.info('opening the page for the team %s' %team)
         self.open_page(self._URL %team)
 
     def open_team_project(self, team_slug, project_slug):
+        """Open the team project page by constucting the url.
+
+        """
+        self.logger.info('opening the {0} project for team {1}'.format(
+                         project_slug, team_slug))
         url = 'teams/{0}/videos/?project={1}'.format(team_slug, project_slug)
         self.open_page(url)
 
     def open_tab(self, tab):
+        """Open a tab on the current team page.
+
+        """
+        self.logger.info('opening %s tab on the current team page' % tab)
         tab_css = "_".join(['', tab.upper(), 'TAB'])
         self.click_by_css(getattr(self, tab_css))
 
 
     def is_team(self, team):
+        """Get the name of the team on the current page.
+
+        """
         self.wait_for_element_present(self._TEAM_NAME)
+        self.logger.info('Check it is the %s team page.' % team)
         if self.get_text_by_css(self._TEAM_NAME) == team:
             return True
 

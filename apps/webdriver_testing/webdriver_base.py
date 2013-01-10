@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import os
+import logging
 import time
 from django.test import LiveServerTestCase
 from django.test.testcases import (TestCase)
@@ -46,10 +47,13 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url)
-        #self.browser.implicitly_wait(1)
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
+        self.logger = logging.getLogger('test_steps')
+        logging.getLogger('test_steps').setLevel(logging.INFO)
+        self.logger.info('testcase: %s' % self.id())
+        self.logger.info('description: %s' % self.shortDescription())
         
 
     def tearDown(self):
@@ -60,9 +64,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.browser.get_screenshot_as_file(screenshot_file)
         except:
             pass
-        finally: #But don't panic if fails
-            try:
-                self.browser.quit()
-            except:
-                pass
+        try:
+            self.browser.quit()
+        except:
+            pass
 
