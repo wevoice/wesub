@@ -51,6 +51,7 @@ import gdata
 from apps.videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
 from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
 from apps.videos.types.youtube import YouTubeApiBridge
+from apps.videos.types.base import VideoTypeError
 
 
 UPLOAD_URI_BASE = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
@@ -95,10 +96,19 @@ class Command(BaseCommand):
         if not language_code:
             language_code = 'en'
 
-        vt = video_type_registrar.video_type_for_url(vurl.url)
+        try:
+            vt = video_type_registrar.video_type_for_url(vurl.url)
+        except VideoTypeError, e:
+            self.log(e)
+            return
+
         username = vurl.owner_username
-        account = ThirdPartyAccount.objects.get(type=vurl.type,
-                username=username)
+        try:
+            account = ThirdPartyAccount.objects.get(type=vurl.type,
+                    username=username)
+        except ThirdPartyAccount.DoesNotExist:
+            self.log("Can't find a third party account for %s" % username)
+            return
         bridge = YouTubeApiBridge(account.oauth_access_token,
                                 account.oauth_refresh_token,
                                 vt.videoid)
@@ -124,17 +134,21 @@ class Command(BaseCommand):
 
         credits = (amara_supposed_credit, unisubs_supposed_credit,)
 
-        if not current_description.startswith(credits):
-            self.log("%s doesn't have desc credit" % vurl.url)
+        try:
+            if not current_description.startswith(credits):
+                self.log("%s doesn't have desc credit" % vurl.url)
+                return
+
+            if current_description.startswith(amara_supposed_credit):
+                new_description = current_description.replace(
+                        amara_supposed_credit, '')
+
+            if current_description.startswith(unisubs_supposed_credit):
+                new_description = current_description.replace(
+                        unisubs_supposed_credit, '')
+        except:
+            self.log("unicode fail")
             return
-
-        if current_description.startswith(amara_supposed_credit):
-            new_description = current_description.replace(
-                    amara_supposed_credit, '')
-
-        if current_description.startswith(unisubs_supposed_credit):
-            new_description = current_description.replace(
-                    unisubs_supposed_credit, '')
 
         entry.media.description.text = new_description
         entry = entry.ToString()
