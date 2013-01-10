@@ -514,7 +514,8 @@ def rollback(request, version):
         messages.success(request, message=u'Rollback successful')
         version = rollback_to(version.video,
                 version.subtitle_language.language_code,
-                version_number=version.version_number)
+                version_number=version.version_number,
+                rollback_author=request.user)
         video_changed_tasks.delay(version.video.id, version.id)
         return redirect(version.subtitle_language.get_absolute_url()+'#revisions')
     return redirect(version)
