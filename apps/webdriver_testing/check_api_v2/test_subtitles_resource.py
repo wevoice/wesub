@@ -224,7 +224,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         self.assertIn("I'd like to be", displayed_list)
 
         #Verify the origal unedited text is still present in the sub list.
-        self.assertIn(expected_list[9], displayed_list)
+        self.assertIn(expected_list[-1], displayed_list)
 
 
 class TestCaseSubtitlesFetch(WebdriverTestCase):

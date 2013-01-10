@@ -101,43 +101,11 @@ td {
         width: 15%
         }
 
-tr#verify #screenshot a img#thumb
-    { 
-      width: 90px;
-      height: 120px;
-      border: 1px solid silver;      
-      }
-
-#screenshot a img#thumb-bg { 
-      width: 120px;
-      height: 90px;
-      border: 1px solid silver;      
-      }
-
-
-#screenshot a img#thumb { 
-       display: none;     
-      }
-
-#screenshot a img#hover-only { 
-      display: none;
-      }
-
-#screenshot a:hover img#hover-only {
-      display: block;
-      width: 640px;
-      height: 480px;
-      padding:1px;
-      border: 1px solid silver;
-      position: absolute; left: 200px;
-      z-index: 100;
-      }
- 
 div#err_message a span {display: none;}
 
 div#err_message a:hover span {display: block;
    width: 640px; 
-   height: 800px; 
+   height: 1200px; 
    padding:1px; 
    border: 1px solid silver;
    position: absolute; left: 35px; 

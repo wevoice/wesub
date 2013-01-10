@@ -34,31 +34,43 @@ def response_data(r):
     else:
         return status, json_resp
 
+def api_url(base_url, url_part):
+    if 'api2/partners' in url_part:
+        url = base_url + url_part[1:]
+    else:
+        url = base_url + 'api2/partners/' + url_part
+    return url
+
+
 def post_api_request(self, url_part, data):
+    r = requests.session()
+    r.config['keep_alive'] = False
     print 'posting new data' 
-    url = self.base_url + 'api2/partners/' + url_part
+    url = api_url(self.base_url, url_part)
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-apikey': self.user.api_key.key,
                 'X-api-username': self.user.username,
               } 
-    r = requests.post(url, data=simplejson.dumps(data), headers=headers)
-    return response_data(r) 
+    req = r.post(url, data=simplejson.dumps(data), headers=headers)
+    return response_data(req) 
 
 
 def put_api_request(self, url_part, data):
-    url = self.base_url + 'api2/partners/' + url_part
+    r = requests.session()
+    r.config['keep_alive'] = False
+    url = api_url(self.base_url, url_part)
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-apikey': self.user.api_key.key,
                 'X-api-username': self.user.username,
               } 
 
-    r = requests.put(url, data=simplejson.dumps(data), headers=headers)
-    return response_data(r) 
+    req = r.put(url, data=simplejson.dumps(data), headers=headers)
+    return response_data(req) 
 
 def delete_api_request(self, url_part):
-    url = self.base_url + 'api2/partners/' + url_part
+    url = api_url(self.base_url, url_part)
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-apikey': self.user.api_key.key,
@@ -69,7 +81,7 @@ def delete_api_request(self, url_part):
     return r.status_code, r.content
 
 def api_get_request(self, url_part, output_type='json'):
-    url = self.base_url + 'api2/partners/' + url_part
+    url = api_url(self.base_url, url_part)
     headers = { 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-apikey': self.user.api_key.key,
