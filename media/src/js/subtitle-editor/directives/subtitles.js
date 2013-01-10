@@ -124,11 +124,6 @@
                 }
                 e.preventDefault();
 
-            } else if (keyCode === 27){
-                // if it's an esc on the textarea, finish editing
-                // TODO: This won't work unless we bind to keyup instead of keydown.
-                selectedScope.finishEditingMode(activeTextArea.val());
-                selectedScope.$digest();
             }
 
             if (elementToSelect) {
@@ -152,6 +147,16 @@
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
+
+                            // In order to catch an <esc> key sequence, we need to catch
+                            // the keycode on the document, not the list. Also, keyup must
+                            // be used instead of keydown.
+                            $(document).on('keyup', function(e) {
+                                if (e.keyCode === 27) {
+                                    selectedScope.finishEditingMode(activeTextArea.val());
+                                    selectedScope.$digest();
+                                }
+                            });
                         }
                         scope.setVideoID(attrs['videoId']);
                         scope.setLanguageCode(attrs['languageCode']);
@@ -160,11 +165,6 @@
                     }
                 };
             }
-        };
-    });
-    directives.directive('subtitleListItem', function (SubtitleStorage) {
-        return {
-            link: function link(scope, elm, attrs) {}
         };
     });
 
