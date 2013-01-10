@@ -280,9 +280,9 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = data_helpers.post_api_request(self, 
+        s, r = data_helpers.post_api_request(self, 
             url_part, url_data)
-        vid_id = response['id']
+        vid_id = r['id']
 
         #Update the video setting the team and project and new description.
         url_part = 'videos/%s' % vid_id
