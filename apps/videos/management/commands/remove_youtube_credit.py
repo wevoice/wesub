@@ -69,8 +69,14 @@ class Command(BaseCommand):
         print video
 
         for language in languages:
-            print ' ', language
             latest_version = language.latest_version(public_only=True)
+
+            if latest_version:
+                print ' ', language
+            else:
+                print '  no version for:', language
+                continue
+
             ThirdPartyAccount.objects.mirror_on_third_party(video,
                     language, UPDATE_VERSION_ACTION,
                     version=latest_version)
