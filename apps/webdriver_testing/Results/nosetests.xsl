@@ -116,9 +116,6 @@
              <a>
                 <xsl:attribute name="href"><xsl:value-of select="$screenshot_name"/></xsl:attribute>
              <span><xsl:value-of select="$status"/></span>
-             <img id="hover-only">
-                <xsl:attribute name="src"><xsl:value-of select="$screenshot_name"/></xsl:attribute>
-             </img>
             </a>
         </xsl:otherwise>
       </xsl:choose>
