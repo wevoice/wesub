@@ -2255,7 +2255,7 @@ div#rollback-button {
         a:hover {
             color: #35424A;
         }
-        &.last, &:last-child {
+        &.last {
             border: none;
         }
     }
@@ -2266,15 +2266,6 @@ div#rollback-button {
         &:last-child {
             border: none;
         }
-    }
-}
-
-#teams .context .metrics {
-    li:last-child {
-        border-right: 1px solid #eaeaea;
-    }
-    li.last {
-        border: none;
     }
 }
 
