@@ -257,6 +257,15 @@ describe('DFXP', function() {
             expect(parser.content(lastSubtitle)).toBe('Some new text.');
         });
     });
+    describe('#contentRenderedFromRaw()', function() {
+        it('should retrieve the rendered HTML content of a subtitle when passed a node', function() {
+
+            // Get the last subtitle.
+            var lastSubtitle = parser.getLastSubtitle();
+
+            expect(parser.contentRenderedFromRaw(lastSubtitle)).toBe('Some new text.');
+        });
+    });
     describe('#contentRendered()', function() {
         it('should return the rendered HTML content of the subtitle', function() {
 
@@ -420,7 +429,7 @@ describe('DFXP', function() {
         it('should retrieve the index of the given subtitle', function() {
             
             // The first subtitle's index should be '0'.
-            expect(parser.getSubtitleIndex(parser.getFirstSubtitle())).toBe(0);
+            expect(parser.getSubtitleIndex(parser.getFirstSubtitle(), parser.getSubtitles())).toBe(0);
 
         });
     });
@@ -829,4 +838,5 @@ describe('DFXP', function() {
 
         });
     });
+
 });

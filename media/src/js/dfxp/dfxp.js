@@ -375,6 +375,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $('<div>').append($subtitle.contents().clone()).remove().html();
 
     };
+    this.contentRenderedFromRaw = function(node) {
+        /*
+         * Pass the actual subtitle node, and get the raw nodeValue parsed
+         * into Markdown-style HTML. Useful when you know you're getting
+         * raw Markdown-style text and you don't want to do the
+         * content -> HTML shakedown as we do in content();
+         */
+
+        var text = '';
+        for (var i = 0; i < node.childNodes.length; i++) {
+            text += node.childNodes[i].nodeValue;
+        }
+
+        return this.markdownToHTML(text);
+    };
     this.contentRendered = function(indexOrElement) {
         /*
          * Return the content of the subtitle, rendered with Markdown styles.
@@ -382,7 +397,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
-        return this.markdownToHTML(this.content($subtitle));
+        return this.markdownToHTML(this.content(indexOrElement));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*

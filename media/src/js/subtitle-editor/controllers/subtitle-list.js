@@ -213,8 +213,6 @@
                 $scope.$root.$emit('onWorkDone');
             }
         };
-        $scope.setEditable = function(isEditable) {
-        };
         $scope.startEditingMode = function() {
 
             initialText =  this.dfxpWrapper.content($scope.subtitle);
