@@ -173,6 +173,21 @@ def fix_blank_original(video):
     for sl in to_delete:
         sl.delete()
 
+
+# These mock request/user classes are for writelocking the old languages.
+class FakeUser(object):
+    def is_authenticated(self):
+        return False
+
+class FakeRequest(object):
+    def __init__(self):
+        self.browser_id = 'tern_sync'
+        self.user = FakeUser()
+
+
+TERN_REQUEST = FakeRequest()
+
+
 # Commands
 def header():
     print 'Time,Model,Action,Original PK,New PK'
@@ -287,7 +302,8 @@ def _update_subtitle_language(sl):
 def _sync_language(language_pk=None):
     """Try to sync one SubtitleLanguage.
 
-    Returns True if a language was synced, False if there were no more left.
+    Returns True if a language was synced (or skipped, but we should try it
+    again later), False if there were no more left.
 
     """
 
@@ -298,19 +314,30 @@ def _sync_language(language_pk=None):
     if not sl:
         return False
 
-    if sl.language == '':
-        fix_blank_original(sl.video)
-
-        # For now, we'll actually bail on this language and come back to it
-        # later.  Hopefully it will have been fixed by the above call, but
-        # there's a chance that it's is_original=False and so is still borked.
-        log('SubtitleLanguage', 'ERROR_EMPTY_LANGUAGE', sl.pk, None)
+    if sl.can_writelock(TERN_REQUEST):
+        sl.writelock(TERN_REQUEST)
+    else:
+        # If we picked a writelocked language, bail for now, but come back to it
+        # later.
+        log('SubtitleLanguage', 'ERROR_WRITELOCKED', sl.pk, None)
         return True
 
-    if sl.new_subtitle_language:
-        _update_subtitle_language(sl)
-    else:
-        _create_subtitle_language(sl)
+    try:
+        if sl.language == '':
+            fix_blank_original(sl.video)
+
+            # For now, we'll actually bail on this language and come back to it
+            # later.  Hopefully it will have been fixed by the above call, but
+            # there's a chance that it's is_original=False and so is still borked.
+            log('SubtitleLanguage', 'ERROR_EMPTY_LANGUAGE', sl.pk, None)
+            return True
+
+        if sl.new_subtitle_language:
+            _update_subtitle_language(sl)
+        else:
+            _create_subtitle_language(sl)
+    finally:
+        sl.release_writelock()
 
     if not dry:
         from utils.metrics import Meter
