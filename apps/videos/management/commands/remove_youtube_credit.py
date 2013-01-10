@@ -44,7 +44,6 @@ video_id.
 from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.sites.models import Site
 from django.conf import settings
 import gdata
 
@@ -63,13 +62,6 @@ class Command(BaseCommand):
         make_option('--video', '-d', dest='video_id', type="str",
             default=None),
     )
-
-    _current_site = None
-
-    def _get_site(self):
-        if not self._current_site:
-            self._current_site = Site.objects.get_current()
-        return self._current_site
 
     def _resync_subs_for_video(self, video):
         from apps.accountlinker.models import ThirdPartyAccount
@@ -100,10 +92,6 @@ class Command(BaseCommand):
                                 vt.videoid)
 
         video_url = video.get_absolute_url()
-        video_url = u"http://%s%s" % (unicode(self._get_site().domain),
-                video_url)
-
-        supposed_credit = self._get_supposed_credit(video_url, language_code)
 
         uri = UPLOAD_URI_BASE % bridge.youtube_video_id
         entry = bridge.GetVideoEntry(uri=uri)
@@ -112,11 +100,29 @@ class Command(BaseCommand):
 
         current_description = entry.media.description.text
 
-        if not current_description.startswith(supposed_credit):
-            print '%s seems ok' % vurl.url
+        # For some reason the above video.get_absolute_url() call didn't
+        # include the /en/ prefix.
+        unisubs_video_url = "http://www.universalsubtitles.org/en%s" % video_url
+        amara_video_url = "http://www.amara.org/en%s" % video_url
+
+        unisubs_supposed_credit = self._get_supposed_credit(unisubs_video_url,
+                language_code)
+        amara_supposed_credit = self._get_supposed_credit(amara_video_url,
+                language_code)
+
+        credits = (amara_supposed_credit, unisubs_supposed_credit,)
+
+        if not current_description.startswith(credits):
+            print "%s doesn't have desc credit" % vurl.url
             return
 
-        new_description = current_description.replace(supposed_credit, '')
+        if current_description.startswith(amara_supposed_credit):
+            new_description = current_description.replace(
+                    amara_supposed_credit, '')
+
+        if current_description.startswith(unisubs_supposed_credit):
+            new_description = current_description.replace(
+                    unisubs_supposed_credit, '')
 
         entry.media.description.text = new_description
         entry = entry.ToString()
@@ -129,6 +135,9 @@ class Command(BaseCommand):
 
         if status_code == 200:
             print '%s success' % vurl.url
+            return
+
+        print 'FAIL %s' % vurl.url
 
     def _get_supposed_credit(self, vurl, language='en'):
         # Sometimes I hate Python :(
