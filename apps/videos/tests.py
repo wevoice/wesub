@@ -65,7 +65,7 @@ from videos.types.htmlfive import HtmlFiveVideoType
 from videos.types.mp3 import Mp3VideoType
 from videos.types.vimeo import VimeoVideoType
 from videos.types.youtube import (
-    YoutubeVideoType, save_subtitles_for_lang, add_credit
+    YoutubeVideoType, save_subtitles_for_lang, add_credit, should_add_credit
 )
 from vidscraper.sites import blip
 from widget import video_cache
@@ -2966,7 +2966,7 @@ class TimingChangeTest(TestCase):
 
 class CreditTest(TestCase):
 
-    fixtures = ['staging_users.json', 'staging_videos.json']
+    fixtures = ['staging_users.json', 'staging_videos.json', 'staging_teams.json']
 
     srt = """
 1
@@ -2994,6 +2994,23 @@ Subtitles by the Amara.org community
         content = unicode(handler(subs, sv.language.video )).encode('utf-8')
 
         self.assertEquals(content.strip().replace('\r', ''), self.srt.strip())
+
+    def test_should_add_credit(self):
+        sv = SubtitleVersion.objects.filter(
+                language__video__teamvideo__isnull=True)[0]
+
+        self.assertTrue(should_add_credit(sv))
+
+        video = sv.language.video
+        team = Team.objects.all()[0]
+        user = User.objects.all()[0]
+
+        TeamVideo.objects.create(video=video, team=team, added_by=user)
+
+        sv = SubtitleVersion.objects.filter(
+                language__video__teamvideo__isnull=False)[0]
+
+        self.assertFalse(should_add_credit(sv))
 
 
 class ShortUrlTest(TestCase):
