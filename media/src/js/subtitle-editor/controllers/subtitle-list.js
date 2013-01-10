@@ -178,10 +178,6 @@
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
         };
-        $scope.setSelectedIndex = function(index) {
-            $scope.selectedIndex = index;
-            $scope.$digest();
-        };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };

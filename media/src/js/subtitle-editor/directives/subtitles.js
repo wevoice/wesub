@@ -64,13 +64,7 @@
                 selectedScope = scope;
                 var editableText = selectedScope.startEditingMode();
 
-                var parser = selectedScope.parser;
-                var subtitle = selectedScope.subtitle;
-                var subtitles = selectedScope.subtitles;
-                var subtitleIndex = parser.getSubtitleIndex(subtitle, subtitles);
-
                 activeTextArea.val(editableText);
-                angular.element(rootEl).scope().setSelectedIndex(subtitleIndex);
                 selectedScope.$digest();
 
                 activeTextArea.focus();
