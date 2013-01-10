@@ -49,7 +49,7 @@ from django.conf import settings
 import gdata
 
 from apps.videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
-from apps.videos.types import video_type_registrar
+from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
 from apps.videos.types.youtube import YouTubeApiBridge
 
 
@@ -70,6 +70,18 @@ class Command(BaseCommand):
         if not self._current_site:
             self._current_site = Site.objects.get_current()
         return self._current_site
+
+    def _resync_subs_for_video(self, video):
+        from apps.accountlinker.models import ThirdPartyAccount
+        languages = video.subtitlelanguage_set.all()
+        print video
+
+        for language in languages:
+            print ' ', language
+            latest_version = language.latest_version(public_only=True)
+            ThirdPartyAccount.objects.mirror_on_third_party(video,
+                    language, UPDATE_VERSION_ACTION,
+                    version=latest_version)
 
     def _fix_video(self, vurl):
         from apps.accountlinker.models import ThirdPartyAccount
@@ -141,6 +153,8 @@ class Command(BaseCommand):
             for vurl in yt_urls:
                 self._fix_video(vurl)
 
+            self._resync_subs_for_video(video)
+
             return
 
         videos = Video.objects.filter(teamvideo__isnull=False)
@@ -148,7 +162,15 @@ class Command(BaseCommand):
         urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
                 video__in=videos)
 
-        print '%s videos to process' % len(urls)
+        print '%s video descriptions to process' % len(urls)
 
         for vurl in urls:
             self._fix_video(vurl)
+
+        # Now, sync all completed languages to Youtube to remove the last sub
+        # credit.
+
+        print '%s videos to resync' % len(videos)
+
+        for video in videos:
+            self._resync_subs_for_video(video)
