@@ -96,6 +96,11 @@ class CreateLanguageSelection(EditorDialogs):
         if self._DIALOG_NAME in self.get_text_by_css(self._HEADING):
             return True
 
+    def lang_selection_dialog_present(self):
+        self.wait_for_element_present(self._HEADING)
+        if self._DIALOG_NAME in self.get_text_by_css(self._HEADING):
+            return True
+
     def _set_video_language(self, language):
         """Choose the videos original language.
 

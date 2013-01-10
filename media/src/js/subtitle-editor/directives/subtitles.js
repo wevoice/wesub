@@ -20,90 +20,26 @@
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
 
-    directives.directive('saveSessionButton', function (SubtitleStorage) {
+    directives.directive('saveSessionButton', function(SubtitleStorage) {
         return {
             link: function link(scope, elm, attrs) {
                 scope.canSave = '';
             }
         };
     });
-    directives.directive('subtitleList', function (SubtitleStorage, SubtitleListFinder) {
+    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder) {
 
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
             rootEl;
 
-        /**
-         * Triggered with a key is down on a text area for editing subtitles.
-         * If it's regular text just do the default thing.
-         * If we pressed an enter / return, finish editing this sub and
-         * focus o the next one. Same for tab.
-         * @param e The jQuery key event
-         */
-        function onSubtitleTextKeyDown(e) {
-
-            var keyCode = e.keyCode;
-            var elementToSelect;
-
-            var parser = selectedScope.parser;
-            var subtitle = selectedScope.subtitle;
-            var subtitles = selectedScope.subtitles;
-
-            // return or tab WITHOUT shift
-            if (keyCode === 13 && !e.shiftKey ||
-                keyCode === 9 && !e.shiftKey ) {
-
-                // enter with shift means new line
-                selectedScope.textChanged($(e.currentTarget).text());
-                e.preventDefault();
-
-                var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
-
-                // if it's the last subtitle of the set and the user pressed enter without shift,
-                // add a new empty subtitle and select it to edit
-                if (selectedScope.subtitles[index] === undefined) {
-                    selectedScope.addSubtitle({'text': ''}, index);
-                    selectedScope.finishEditingMode(activeTextArea.val());
-                }
-
-                selectedScope.$apply();
-                // TODO: Render the subtitle list, again.
-
-                elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
-
-            } else if (keyCode === 9 && e.shiftKey) {
-                // tab with shift, move backwards
-                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
-                var lastSubtitle = parser.getSubtitle(lastIndex);
-                if (lastSubtitle) {
-                    elementToSelect = $('span.subtitle-text', $('.subtitle-list-item',
-                                        rootEl)[lastIndex]);
-                }
-                e.preventDefault();
-
-            } else if (keyCode === 27){
-                // if it's an esc on the textarea, finish editing
-                // TODO: This won't work unless we bind to keyup instead of keydown.
-                selectedScope.finishEditingMode(activeTextArea.val());
-                selectedScope.$digest();
-            }
-
-            if (elementToSelect) {
-                onSubtitleItemSelected(elementToSelect);
-                activeTextArea.focus();
-            } else {
-                selectedScope.finishEditingMode(activeTextArea.val());
-            }
-
-        }
-
-        /**
-         * Receives the li.subtitle-list-item to be edited.
-         * Will put any previously edited ones in display mode,
-         * mark this one as being edited, creating the textarea for
-         * editing.
-         */
         function onSubtitleItemSelected(elm) {
+            /**
+             * Receives the li.subtitle-list-item to be edited.
+             * Will put any previously edited ones in display mode,
+             * mark this one as being edited, creating the textarea for
+             * editing.
+             */
             // make sure this works if the event was trigger in the
             // originating li or any descendants
             elm = $(elm).hasClass('.subtitle-list-item') ?
@@ -141,20 +77,78 @@
                 activeTextArea.autosize();
             }
         }
+        function onSubtitleTextKeyDown(e) {
+            /**
+             * Triggered with a key is down on a text area for editing subtitles.
+             * If it's regular text just do the default thing.
+             * If we pressed an enter / return, finish editing this sub and
+             * focus o the next one. Same for tab.
+             * @param e The jQuery key event
+             */
+
+            var keyCode = e.keyCode;
+            var elementToSelect;
+
+            var parser = selectedScope.parser;
+            var subtitle = selectedScope.subtitle;
+            var subtitles = selectedScope.subtitles;
+
+            // return or tab WITHOUT shift
+            if (keyCode === 13 && !e.shiftKey ||
+                keyCode === 9 && !e.shiftKey ) {
+
+                // enter with shift means new line
+                selectedScope.textChanged($(e.currentTarget).text());
+                e.preventDefault();
+
+                var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
+
+                // if it's the last subtitle of the set and the user pressed enter without shift,
+                // add a new empty subtitle and select it to edit
+                if (selectedScope.subtitles[index] === undefined) {
+                    selectedScope.addSubtitle({'text': ''}, index);
+                    selectedScope.finishEditingMode(activeTextArea.val());
+                }
+
+                selectedScope.$apply();
+
+                elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
+
+            } else if (keyCode === 9 && e.shiftKey) {
+                // tab with shift, move backwards
+                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
+                var lastSubtitle = parser.getSubtitle(lastIndex);
+                if (lastSubtitle) {
+                    elementToSelect = $('span.subtitle-text', $('.subtitle-list-item',
+                                        rootEl)[lastIndex]);
+                }
+                e.preventDefault();
+
+            } else if (keyCode === 27){
+                // if it's an esc on the textarea, finish editing
+                // TODO: This won't work unless we bind to keyup instead of keydown.
+                selectedScope.finishEditingMode(activeTextArea.val());
+                selectedScope.$digest();
+            }
+
+            if (elementToSelect) {
+                onSubtitleItemSelected(elementToSelect);
+                activeTextArea.focus();
+            } else {
+                selectedScope.finishEditingMode(activeTextArea.val());
+            }
+
+        }
 
         return {
             compile: function compile(elm, attrs, transclude) {
-                // should be on post link so to give a chance for the
-                // nested directive (subtitleListItem) to run
                 rootEl = elm;
                 return {
                     post: function post(scope, elm, attrs) {
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-
                         isEditable = attrs.editable === 'true';
-                        // if is editable, hook up event listeners
                         if (isEditable) {
-                            $(elm).click(function (e) {
+                            $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);

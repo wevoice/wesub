@@ -10,6 +10,8 @@ from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
+from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
+from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import VideoFactory
@@ -30,6 +32,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.videos_tab = videos_tab.VideosTab(self)
         self.team_owner = UserFactory.create(username = 'team_owner')
+
         self.team = TeamMemberFactory.create(
             team__name='Video Test',
             team__slug='video-test',
@@ -175,7 +178,8 @@ class TestCaseTeamVideos(WebdriverTestCase):
         #Search for: 日本語, by opening entering the text via javascript
         #because webdriver can't type those characters.
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.browser.execute_script("document.getElementsByName('q')[1].value='日本語'")
+        self.browser.execute_script("document.getElementsByName"
+                                    "('q')[1].value='日本語'")
         self.assertTrue(self.videos_tab.video_present(self.video_title))
 
     def test_search__no_results(self):
@@ -185,7 +189,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('TextThatShouldNOTExistOnTheVideoOrSubs')
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
+                         self.videos_tab.search_no_result())
 
 
     def test_filter__clear(self):
@@ -332,9 +336,11 @@ class TestCaseTeamVideos(WebdriverTestCase):
         management.call_command('update_index', interactive=False)
 
         #Verify video no longer in teams
+        self.assertEqual(tv.get_team_video(), None)
+
         self.videos_tab.search(tv.title)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
+        self.videos_tab.search_no_result())
 
         #Verify video is present on the site
         watch_pg = watch_page.WatchPage(self)
@@ -395,6 +401,7 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.videos_tab = videos_tab.VideosTab(self)
         self.team_owner = UserFactory.create(username = 'team_owner')
+        self.logger.info('setup: Creating team Video Test')
         self.team = TeamMemberFactory.create(
             team__name='Video Test', 
             team__slug='video-test', 
@@ -404,6 +411,8 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
             team=self.team,
             user = UserFactory(username = 'TeamAdmin')).user
 
+        self.logger.info('setup: Adding project one and project two with '
+                         'workflows enabled')
         self.project1 = TeamProjectFactory.create(
             team=self.team,
             name='team project one',
@@ -415,11 +424,6 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
             workflow_enabled=True)
 
         self.videos_tab.log_in(self.manager_user.username, 'password')
-        print '***'
-        print self.project2.slug
-        print self.project2.name
-        print self.team.slug
-
 
     def test_add__new(self):
         """Submit a new video for the team and assign to a project.
@@ -574,17 +578,24 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.videos_tab = videos_tab.VideosTab(self)
         self.team_owner = UserFactory.create(username = 'team_owner')
+
+        self.logger.info('Creating team limited access: workflows enabled, '
+                         'video policy set to manager and admin, '
+                         'task assign policy set to manager and admin, '
+                         'membership policy open.')
         self.limited_access_team = TeamMemberFactory.create(
             team__name='limited access open team',
             team__slug='limited-access-open-team',
             team__membership_policy = 4, #open
             team__video_policy = 2, #manager and admin
+            team__task_assign_policy = 20, #manager and admin
             team__workflow_enabled = True,
             user = self.team_owner,
             ).team
 
 
     def turn_on_automatic_tasks(self):
+        self.logger.info('Turning on automatic task creation')
         #Turn on task autocreation for the team.
         WorkflowFactory.create(
             team = self.limited_access_team,
@@ -600,29 +611,241 @@ class TestCaseVideosDisplay(WebdriverTestCase):
                 language_code = language,
                 preferred = True)
 
-    def test_edit__no_permission(self):
-        """A contributor can't see edit links without edit permission.
-
-        """
-
-        #Add some test videos to the team.
+    def add_some_team_videos(self):
+        self.logger.info('Adding some videos to the limited access team')
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
             teamowner = self.team_owner)
+        return vids
 
+    def test_contributor__no_edit(self):
+        """Video policy: manager and admin; contributor sees no edit link.
+
+        """
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding user contributor to the team and logging in')
         #Create a user who is a contributor to the team.
         contributor = TeamContributorMemberFactory(
             team = self.limited_access_team,
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
+
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_tasks__non_member(self):
-        """Non-members of the team do not see the task links.
+    def test_contributor__edit_permission(self):
+        """Video policy: all team members; contributor sees the edit link.
+
         """
+        self.logger.info('setup: Setting video policy to all team members')
+        self.limited_access_team.video_policy=1
+        self.limited_access_team.save()
+
+
+        vids = self.add_some_team_videos()
+        #Create a user who is a contributor to the team.
+        self.logger.info('Adding user contributor to the team and logging in')
+        contributor = TeamContributorMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'contributor')).user
+        self.videos_tab.log_in(contributor.username, 'password')
+
+        self.logger.info('Setting video policy to all team members')
+        self.limited_access_team.video_policy=1 
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+    def test_contributor__no_tasks(self):
+        """Task policy: manager and admin; contributor sees no task link.
+
+        """
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding user contributor to the team and logging in')
+        #Create a user who is a contributor to the team.
+        contributor = TeamContributorMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'contributor')).user
+        self.videos_tab.log_in(contributor.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 
+                         'Tasks'))
+
+    def test_contributor__tasks_permission(self):
+        """Task policy: all team members; contributor sees the task link.
+
+        """
+        self.logger.info('setup: Setting task policy to all team members')
+        self.limited_access_team.task_assign_policy=20
+        self.limited_access_team.save()
+
+
+        vids = self.add_some_team_videos()
+        #Create a user who is a contributor to the team.
+        self.logger.info('Adding user contributor to the team and logging in')
+        contributor = TeamContributorMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'contributor')).user
+        self.videos_tab.log_in(contributor.username, 'password')
+
+        self.logger.info('Setting video policy to all team members')
+        self.limited_access_team.video_policy=1 
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
+
+
+    def test_manager__no_edit(self):
+        """Video policy: admin-only; manager sees no edit link.
+
+        """
+        self.logger.info('setup: Setting task policy to Admin only')
+        self.limited_access_team.video_policy=3
+        self.limited_access_team.save()
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding manager user to the team and logging in')
+        #Create a user who is a manager to the team.
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'manager')).user
+        self.videos_tab.log_in(manager.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+    def test_manager__edit_permission(self):
+        """Video policy: admin and manager; manager sees the edit link.
+
+        """
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding manager user to the team and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'manager')).user
+        self.videos_tab.log_in(manager.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+    def test_manager__no_tasks(self):
+        """Task policy: admin-only; manager sees no task link.
+
+        """
+        self.logger.info('setup: Setting task policy to Admin only')
+        self.limited_access_team.taks_assign_policy=3
+        self.limited_access_team.save()
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding manager user to the team and logging in')
+        #Create a user who is a manager to the team.
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'manager')).user
+        self.videos_tab.log_in(manager.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
+
+    def test_manager__tasks_permission(self):
+        """Task policy: admin and manager; manager sees the task link.
+
+        """
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding manager user to the team and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'manager')).user
+        self.videos_tab.log_in(manager.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
+
+    def test_restricted_manager__no_tasks(self):
+        """Task policy: admin; language manager sees no task link.
+
+        """
+        self.logger.info('setup: Setting task policy to Admin only')
+        self.limited_access_team.taks_assign_policy=3
+        self.limited_access_team.save()
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding English language manager and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'EnglishManager'))
+        TeamManagerLanguageFactory(member = manager,
+                                   language = 'en')
+        self.videos_tab.log_in(manager.user.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
+
+    def test_restricted_manager__tasks(self):
+        """Task policy: manager and admin; language manager sees task link.
+
+        """
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding English language manager and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'EnglishManager'))
+        TeamManagerLanguageFactory(member = manager,
+                                   language = 'en')
+        self.videos_tab.log_in(manager.user.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
+
+    def test_restricted_manager__no_edit(self):
+        """Video policy: manager and admin; language manager sees no edit link.
+
+        """
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding English language manager and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'EnglishManager'))
+        TeamManagerLanguageFactory(member = manager,
+                                   language = 'en')
+        self.videos_tab.log_in(manager.user.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+
+    def test_restricted_manager__edit(self):
+        """Video policy: all team members; language manager sees edit link.
+
+        """
+        self.logger.info('setup: Setting video policy to all team members')
+        self.limited_access_team.video_policy=1
+        self.limited_access_team.save()
+
+        vids = self.add_some_team_videos()
+        self.logger.info('Adding English language manager and logging in')
+        manager = TeamManagerMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'EnglishManager'))
+        TeamManagerLanguageFactory(member = manager,
+                                   language = 'en')
+        self.videos_tab.log_in(manager.user.username, 'password')
+
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+
+
+    def test_nonmember__no_tasks(self):
+        """Task policy: all team members; non-member sees no tasks. 
+
+        """
+        self.logger.info('setup: Setting task policy to all team members')
+        self.limited_access_team.task_assign_policy=10
+        self.limited_access_team.save()
         
-        self.turn_on_automatic_tasks()
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
@@ -635,12 +858,35 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_tasks__anonymous(self):
-        """Anonymous users do not see the task links. 
+    def test_nonmember__no_edit(self):
+        """Video policy: all team members; non-memeber sees no edit.
 
         """
-        self.turn_on_automatic_tasks()
+        self.logger.info('setup: Setting video policy to all team members')
+        self.limited_access_team.video_policy=1
+        self.limited_access_team.save()
+        
+        #Add some test videos to the team.
+        vids = data_helpers.create_several_team_videos_with_subs(self, 
+            team = self.limited_access_team,
+            teamowner = self.team_owner)
 
+        #Create a user who is not a member 
+        non_member = UserFactory(username = 'non_member')
+        self.videos_tab.log_out()
+        self.videos_tab.log_in(non_member.username, 'password')
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+
+    def test_guest__no_tasks(self):
+        """Task policy: all team members; guest sees no tasks. 
+
+        """
+        self.logger.info('setup: Setting task policy to all team members')
+        self.limited_access_team.task_assign_policy=10
+        self.limited_access_team.save()
+        
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
@@ -649,24 +895,66 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-
-
-    def test_edit__admin_permission(self):
-        """A admin has the Edit link for videos.
+    def test_guest__no_edit(self):
+        """Video policy: all team members; guest sees no edit.
 
         """
+        self.logger.info('setup: Setting video policy to all team members')
+        self.limited_access_team.video_policy=1
+        self.limited_access_team.save()
+        
         #Add some test videos to the team.
         vids = data_helpers.create_several_team_videos_with_subs(self, 
             team = self.limited_access_team,
             teamowner = self.team_owner)
 
-        #Create a user who is a contributor to the team.
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+
+    def test_admin__edit_link(self):
+        """Video policy: Admin only; admin sees edit link.
+
+        """
+        self.logger.info('setup: Setting video policy to Admin only')
+        self.limited_access_team.video_policy=3
+        self.limited_access_team.save()
+
+        #Add some test videos to the team.
+        vids = data_helpers.create_several_team_videos_with_subs(self, 
+            team = self.limited_access_team,
+            teamowner = self.team_owner)
+
+        #Create a user who is a team admin.
+        self.logger.info('Create a team admin and log in as that user')
         admin_member = TeamAdminMemberFactory(
             team = self.limited_access_team,
             user = UserFactory(username = 'admin_member')).user
         self.videos_tab.log_in(admin_member.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
+
+    def test_admin__task_link(self):
+        """Task policy: Admin only; admin sees task link.
+
+        """
+        self.logger.info('setup: Setting task policy to Admin only')
+        self.limited_access_team.taks_assign_policy=3
+        self.limited_access_team.save()
+
+        #Add some test videos to the team.
+        vids = data_helpers.create_several_team_videos_with_subs(self, 
+            team = self.limited_access_team,
+            teamowner = self.team_owner)
+
+        #Create a user who is a team admin.
+        self.logger.info('Create a team admin and log in as that user')
+        admin_member = TeamAdminMemberFactory(
+            team = self.limited_access_team,
+            user = UserFactory(username = 'admin_member')).user
+        self.videos_tab.log_in(admin_member.username, 'password')
+        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
     def test_task_link(self):
         """A task link opens the task page for the video.

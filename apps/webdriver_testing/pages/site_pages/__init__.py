@@ -30,35 +30,40 @@ class UnisubsPage(Page):
     _SEARCHING_INDICATOR = "img.placeholder"
 
     def error_message_present(self, message):
+        self.logger.info('Check if error message is present')
         if self.is_text_present(self._ERROR_MESSAGE, message):
             return True
 
     def success_message_present(self, message):
+        self.logger.info('Check if success message present')
         if self.is_text_present(self._SUCCESS_MESSAGE, message):
             return True
 
     def open_amara(self):
+        self.logger.info('Open amara home page')
         self.browser.get(self.base_url)
 
     def _current_user(self):
+        self.logger.info('Get the username of currently logged in user')
+
         if self.is_element_present(self._CURRENT_USER):
             return self.get_text_by_css(self._CURRENT_USER)
     
     def logged_in(self):
+        self.logger.info('Check if user logged in')
+
         if self.is_element_visible(self._CURRENT_USER):
             return True
 
     def log_out(self):
+        self.logger.info('Log out of site')
         self.open_page('logout/?next=/')
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
 
         """
-        if self._current_user() == username:
-            return
-        else:
-            self.log_out()
+        self.log_out()
         self.click_by_css(self._LOGIN)
         self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
         self.type_by_css(self._SITE_LOGIN_USER_ID, username)
@@ -72,6 +77,7 @@ class UnisubsPage(Page):
            currently a memeber.
 
         """
+        self.logger.info('Get a list of teams for the current user')
         user_teams = []
         if self.logged_in() == True:
             elements = self.browser.find_elements_by_css_selector(
@@ -83,20 +89,25 @@ class UnisubsPage(Page):
     def close_modal(self):
         try:
             if not self.is_element_visible(self._MODAL_DIALOG) == False:
+                self.logger.info('Close the modal dialog')
                 self.click_by_css(self._MODAL_CLOSE)
         except:
             pass
 
     def click_feeback(self):
+        self.logger.info('Click the feedback button')
+
         self.click_by_css(self._FEEDBACK_BUTTON)
  
     def impersonate(self, username):
+        self.logger.info('Impersonating the user %s' % username)
         self.open_page('auth/login-trap/')
         self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
         self.type_by_css(self._SITE_LOGIN_USER_ID, username)
         self.click_by_css(self._SITE_LOGIN_SUBMIT)
 
     def search_complete(self):
+        self.logger.info('Waiting for the search indicator to disappear.')
         time.sleep(2)
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
 

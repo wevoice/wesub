@@ -128,6 +128,7 @@
 
         $scope.addSubtitle = function(subtitle, index) {
             this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
+            $scope.updateParserSubtitles();
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -164,6 +165,10 @@
             $scope.$broadcast('onSubtitlesFetched');
 
         };
+        $scope.removeSubtitle = function(subtitle) {
+            $scope.parser.removeSubtitle(subtitle);
+            $scope.updateParserSubtitles();
+        };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
@@ -179,6 +184,9 @@
         };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
+        };
+        $scope.updateParserSubtitles = function() {
+            $scope.subtitles = $scope.parser.getSubtitles().get();
         };
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));

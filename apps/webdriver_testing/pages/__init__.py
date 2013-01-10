@@ -25,6 +25,7 @@ class Page(object):
         self.browser = testsetup.browser  # BROWSER TO USE FOR TESTING
         self.base_url = testsetup.base_url
         self.testcase = testsetup
+        self.logger = testsetup.logger
 
     def _safe_find(self, element):
         self.wait_for_element_present(element)

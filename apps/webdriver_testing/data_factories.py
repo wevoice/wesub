@@ -5,6 +5,7 @@ from apps.videos.models import VideoUrl
 from apps.videos.models import SubtitleLanguage
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
+from apps.teams.models import MembershipNarrowing
 from apps.teams.models import Task
 from apps.teams.models import TeamVideo
 from apps.teams.models import Invite
@@ -22,6 +23,8 @@ from apps.subtitles.models import SubtitleLanguage
 
 
 
+class TeamManagerLanguageFactory(factory.Factory):
+    FACTORY_FOR = MembershipNarrowing
 
 
 class VideoFactory(factory.Factory):
@@ -71,6 +74,10 @@ class TeamContributorMemberFactory(factory.Factory):
 class TeamAdminMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_ADMIN
+
+class TeamManagerMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_MANAGER
 
 class TeamVideoFactory(factory.Factory):
     FACTORY_FOR = TeamVideo

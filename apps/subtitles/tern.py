@@ -38,6 +38,7 @@ import csv as csv_module
 import os, sys
 import warnings
 from optparse import OptionGroup, OptionParser
+from random import random
 
 
 csv = csv_module.writer(sys.stdout)
@@ -291,6 +292,9 @@ def _sync_language(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.language-syncs').inc()
 
+        if random() < 0.01:
+            report_metrics()
+
     return True
 
 def sync_languages():
@@ -441,6 +445,9 @@ def _sync_versions(language_pk=None):
     if not dry:
         from utils.metrics import Meter
         Meter('data-model-refactor.version-syncs').inc()
+
+        if random() < 0.01:
+            report_metrics()
 
     return True
 
