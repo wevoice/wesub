@@ -1499,6 +1499,11 @@ div#language_picker {
 .profile.v1 .context img.avatar {
     margin: 0 17px;
 }
+.profile.v1 .context a.button {
+    display: block;
+    width: 60%;
+    margin: 1em auto;
+}
 .profile.v1 form {
     padding-top: 3em;
 
