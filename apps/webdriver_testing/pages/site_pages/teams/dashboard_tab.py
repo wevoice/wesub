@@ -14,8 +14,15 @@ class DashboardTab(ATeamPage):
     _LANG_LIST = 'div.langs div ul li a'
 
 
+    #Visible when workflows enabled for users with assigned tasks.
+    _TASK_VIDEO = 'ul.tasks li'
+    _TASK_VIDEO_TITLE = 'h3 a'
+    _TASK_VIDEO_ACTION = 'ul.actions li a'
+
+
+
     _NO_VIDEOS_TEXT = "Sorry, we couldn't find any videos for you." 
-    _LANGUAGE_SUGGESTION = 'ul.suggestions li a#lang_select_btn'
+    _LANGUAGE_SUGGESTION = 'ul.suggestions li a[data-modal="language_modal"]'
     _BROWSE_SUGGESTION = 'ul.suggestions li a[href*="/videos/"]'
     _ADD_SUGGESTION = 'ul.suggestions li a[href*="/add/video/"]'
 
@@ -24,14 +31,19 @@ class DashboardTab(ATeamPage):
     # Suggestion helpers when no videos are present
     def suggestion_present(self, suggestion_type):
         suggest_css = '_'.join(['', suggestion_type.upper(), 'SUGGESTION'])
-        if self.is_element_visible(suggest_css):
+        self.logger.info('Check if the %s suggestion is present' 
+                         % suggestion_type.upper())
+        if self.is_element_visible(getattr(self, suggest_css)):
             return True
 
     def click_suggestion(self, suggestion_type):
         suggest_css = '_'.join(['', suggestion_type.upper(), 'SUGGESTION'])
+
+        self.logger.info('Click the %s suggestion link' % suggestion_type)
         self.click_by_css(suggest_css)
     
     def no_videos_found(self):
+        self.logger.info('Check if no videos are found on dashboard')
         if self.is_text_visible(self._NO_VIDEOS_TEXT):
             return True
 
@@ -46,28 +58,68 @@ class DashboardTab(ATeamPage):
         for el in video_els:
             try:
                 title_el = el.find_element_by_css_selector(self._VIDEO_TITLE)
-                print title_el.text
                 if video in title_el.text:
                     return el
             except:
                 continue
 
-    def languages_needed(self, video):
+
+    def languages_needed(self, video, click_lang=None):
+        """Return a list of languages displayed as needed on a particular video.
+
+        """
         langs_needed = []
         video_el = self._video_element(video)
-        lang_el = video_el.find_element_by_css_selector(
-                self._VIDEO_LANGS)
+        try:
+            lang_el = video_el.find_element_by_css_selector(
+                    self._VIDEO_LANGS)
+        except:
+            self.logger.info('No create subtitles links found for the video ' 
+                             '%s' %video)
+            return None
         if 'languages need your help' in lang_el.text:
             show_el = video_el.find_element_by_css_selector(self._SHOW_LANGS)
             show_el.click()
             lang_list = video_el.find_elements_by_css_selector(
                 self._LANG_LIST)
             for el in lang_list:
+                if el.text == click_lang:
+                    self.logger.info('Clicking the %s text: ' % click_lang)
+                    el.click()
+                    return
                 langs_needed.append(el.text)
         else:
+            if lang_el.text == click_lang:
+                self.logger.info('Clicking the %s text: ' % click_lang)
+                lang_el.click()
+                return
             langs_needed.append(lang_el.text)
+
+        self.logger.info('Returning the list of languages needed %s' % langs_needed)
         return langs_needed
 
+
+
+    def _dash_task_info(self):
+        task_els = self.get_elements_list(self._TASK_VIDEO)
+        print len(task_els)
+
+        task_list = []
+        for el in task_els:
+            try:
+                task = dict(
+                    title =  el.find_element_by_css_selector(self._TASK_VIDEO_TITLE).text,
+                    action = el.find_element_by_css_selector(self._TASK_VIDEO_ACTION).text)
+                task_list.append(task)
+            except:
+                pass
+        return task_list
+
+    def dash_task_present(self, task_type, title):
+        all_tasks = self._dash_task_info()
+        for task in all_tasks:
+            if task_type in task['action'] and title in task['title']:
+                return True
 
 
 
