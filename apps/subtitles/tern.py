@@ -68,7 +68,7 @@ def get_specific_language(pk):
     from apps.videos.models import SubtitleLanguage
 
     try:
-        sl = SubtitleLanguage.objects.select_related('video', 'standard_language', 'new_subtitle_language').get(pk=int(language_pk))
+        sl = SubtitleLanguage.objects.get(pk=int(language_pk))
     except SubtitleLanguage.DoesNotExist:
         die("No SubtitleLanguage exists with primary key %s!" % language_pk)
 
@@ -90,7 +90,7 @@ def get_unsynced_subtitle_language():
     from apps.videos.models import SubtitleLanguage
 
     try:
-        sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?').select_related('video', 'standard_language', 'new_subtitle_language')[0]
+        sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
     except IndexError:
         return None
 
