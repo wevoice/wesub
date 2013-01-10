@@ -78,13 +78,13 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = ['--with-xunit',
              '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
              '--nocapture',
-             #'--collect-only',
-             '--nologcapture', 
-             '--logging-filter=remote_connection', 
-             '--verbosity=2'
+             #'--collect-only', '--verbosity=2',
+             '--logging-filter=test_steps, -remote_connection, '
+                 '-selenium.webdriver.remote.remote_connection', 
             ]
 
 CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
+
 
