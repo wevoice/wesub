@@ -41,6 +41,8 @@ You can also fix an individual video by using the --video flag.  It takes a
 video_id.
 """
 
+import os
+import json
 from optparse import make_option
 from datetime import datetime
 
@@ -51,7 +53,6 @@ import gdata
 from apps.videos.models import VideoUrl, Video, VIDEO_TYPE_YOUTUBE
 from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
 from apps.videos.types.youtube import YouTubeApiBridge
-from apps.videos.types.base import VideoTypeError
 
 
 UPLOAD_URI_BASE = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
@@ -64,6 +65,8 @@ class Command(BaseCommand):
         make_option('--video', '-d', dest='video_id', type="str",
             default=None),
     )
+
+    CACHE_PATH = os.path.join(getattr(settings, 'PROJECT_ROOT'), 'yt-cache')
 
     def log(self, msg):
         now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
@@ -87,6 +90,7 @@ class Command(BaseCommand):
             ThirdPartyAccount.objects.mirror_on_third_party(video,
                     language, UPDATE_VERSION_ACTION,
                     version=latest_version)
+        return video.video_id
 
     def _fix_video(self, vurl):
         from apps.accountlinker.models import ThirdPartyAccount
@@ -96,11 +100,7 @@ class Command(BaseCommand):
         if not language_code:
             language_code = 'en'
 
-        try:
-            vt = video_type_registrar.video_type_for_url(vurl.url)
-        except VideoTypeError, e:
-            self.log(e)
-            return
+        vt = video_type_registrar.video_type_for_url(vurl.url)
 
         username = vurl.owner_username
         account = ThirdPartyAccount.objects.get(type=vurl.type,
@@ -154,7 +154,7 @@ class Command(BaseCommand):
 
         if status_code == 200:
             self.log('%s success' % vurl.url)
-            return
+            return video.video_id
 
         self.log('FAIL %s' % vurl.url)
 
@@ -165,6 +165,15 @@ class Command(BaseCommand):
         )
         credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
         return "%s: %s\n\n" % (credit, vurl)
+
+    def _load_cache_file(self):
+        if os.path.exists(self.CACHE_PATH):
+            return json.loads(open(self.CACHE_PATH).read())
+        return {'desc': [], 'sub': []}
+
+    def _save_cache_file(self, data):
+        with open(self.CACHE_PATH, 'w') as f:
+            f.write(json.dumps(data))
 
     def handle(self, video_id, *args, **kwargs):
         if video_id:
@@ -188,7 +197,10 @@ class Command(BaseCommand):
 
             return
 
-        videos = Video.objects.filter(teamvideo__isnull=False)
+        self.cache = self._load_cache_file()
+
+        all_team_videos = Video.objects.filter(teamvideo__isnull=False)
+        videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
 
         urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
                 video__in=videos)
@@ -198,7 +210,9 @@ class Command(BaseCommand):
         for vurl in urls:
             self.log('Starting to process video %s' % vurl.video.video_id)
             try:
-                self._fix_video(vurl)
+                video_id = self._fix_video(vurl)
+                if video_id:
+                    self.cache['desc'].append(video_id)
                 self.log('Done processing video')
             except Exception, e:
                 self.log(e)
@@ -207,12 +221,17 @@ class Command(BaseCommand):
         # Now, sync all completed languages to Youtube to remove the last sub
         # credit.
 
+        videos = all_team_videos.exclude(video_id__in=self.cache['sub'])
         self.log('%s videos to resync' % len(videos))
 
         for video in videos:
             self.log('Start resync for %s' % video.video_id)
             try:
-                self._resync_subs_for_video(video)
+                video_id = self._resync_subs_for_video(video)
+                if video_id:
+                    self.cache['sub'].append(video_id)
             except Exception, e:
                 self.log(e)
             self.log('End resync')
+
+        self._save_cache_file(self.cache)
