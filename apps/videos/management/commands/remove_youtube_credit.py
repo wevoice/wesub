@@ -64,6 +64,8 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('--video', '-d', dest='video_id', type="str",
             default=None),
+        make_option('--team', '-t', dest='team', type="str",
+            default=None),
     )
 
     CACHE_PATH = os.path.join(getattr(settings, 'PROJECT_ROOT'), 'yt-cache')
@@ -175,7 +177,10 @@ class Command(BaseCommand):
         with open(self.CACHE_PATH, 'w') as f:
             f.write(json.dumps(data))
 
-    def handle(self, video_id, *args, **kwargs):
+    def handle(self, video_id, team, *args, **kwargs):
+        if video_id and team:
+            raise CommandError("You can specify either a video or a team.")
+
         if video_id:
             try:
                 video = Video.objects.get(video_id=video_id)
@@ -200,6 +205,12 @@ class Command(BaseCommand):
         self.cache = self._load_cache_file()
 
         all_team_videos = Video.objects.filter(teamvideo__isnull=False)
+
+        if team:
+            self.log('Only processing videos for %s' % team)
+            all_team_videos = all_team_videos.filter(
+                    teamvideo__team__slug=team)
+
         videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
 
         urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
