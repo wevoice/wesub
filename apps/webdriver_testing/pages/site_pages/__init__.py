@@ -57,7 +57,7 @@ class UnisubsPage(Page):
 
     def log_out(self):
         self.logger.info('Log out of site')
-        self.open_page('logout/?next=/')
+        self.open_page('logout/?next=/videos/create')
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.

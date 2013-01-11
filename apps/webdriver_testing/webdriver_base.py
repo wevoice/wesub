@@ -46,7 +46,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         # Chrome in place of the Firefox default.
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
-        self.browser.get(self.base_url)
+        self.browser.get(self.base_url + 'videos/create/')
 
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
