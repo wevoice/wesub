@@ -115,7 +115,7 @@ def get_unsynced_subtitle_version_language():
 
     try:
         sv = SubtitleVersion.objects.filter(
-            needs_sync=True, subtitle_language__needs_sync=False
+            needs_sync=True, language__needs_sync=False
         ).order_by('?')[0]
     except IndexError:
         return None
