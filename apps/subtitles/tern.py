@@ -48,6 +48,11 @@ dry = False
 
 
 # Output
+def err(m):
+    sys.stderr.write(m)
+    sys.stderr.write("\n")
+    sys.stderr.flush()
+
 def log(model, event_type, original_pk, new_pk):
     csv.writerow([
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -430,10 +435,25 @@ def _create_subtitle_version(sv, last_version):
             parents = [tip]
 
     if not dry:
-        nsv = pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
-                                     title=sv.title, description=sv.description,
-                                     parents=parents, visibility=visibility,
-                                     author=sv.user)
+        try:
+            subtitles = list(subtitles)
+            nsv = pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
+                                        title=sv.title, description=sv.description,
+                                        parents=parents, visibility=visibility,
+                                        author=sv.user)
+        except:
+            # Log the subtitles when an error happens.
+            err("=" * 60)
+            err("Error occured for version: %s" % sv.pk)
+            err("=" * 60)
+            err("Subtitles:")
+            err("-" * 60)
+            from pprint import pprint
+            pprint(subtitles, stream=sys.stderr)
+            err("=" * 60)
+
+            # And reraise so we get the traceback too.
+            raise
 
         sv.new_subtitle_version = nsv
         sv.needs_sync = False
