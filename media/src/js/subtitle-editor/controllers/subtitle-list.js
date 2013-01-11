@@ -132,6 +132,11 @@
         };
         $scope.addNewBlankSubtitleAndSelect = function() {
             $scope.addSubtitle({ text: '' });
+
+            var lastSubtitleIndex = $scope.subtitles.length - 1;
+
+            // TODO: How to get the last subtitle controller and select it?
+
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
