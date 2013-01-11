@@ -110,7 +110,7 @@
         $scope.toggleSaveDropdown = function() {
             $scope.dropdownOpen = !$scope.dropdownOpen;
         };
-        $scope.$root.$on('onWorkDone', function() {
+        $scope.$root.$on('workDone', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
@@ -127,8 +127,11 @@
          */
 
         $scope.addSubtitle = function(subtitle, index) {
-            this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
+            this.dfxpWrapper.addSubtitle((index - 1) || null, {}, subtitle.text);
             $scope.updateParserSubtitles();
+        };
+        $scope.addNewBlankSubtitleAndSelect = function() {
+            $scope.addSubtitle({ text: '' });
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -184,16 +187,31 @@
         $scope.updateParserSubtitles = function() {
             $scope.subtitles = $scope.parser.getSubtitles().get();
         };
+
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));
         });
 
         window.onresize = function() {
-            $scope.$apply();
+            $scope.$digest();
         };
 
     };
-    var SubtitleListItemController = function($scope, SubtitleStorage) {
+    var SubtitleListHelperController = function($scope) {
+
+        $scope.isEditingAny = false;
+
+        $scope.$root.$on('editing', function() {
+            $scope.isEditingAny = true;
+            $scope.$digest();
+        });
+        $scope.$root.$on('editingDone', function() {
+            $scope.isEditingAny = false;
+            $scope.$digest();
+        });
+
+    };
+    var SubtitleListItemController = function($scope) {
         /**
          * Responsible for actions on one subtitle: editing, selecting.
          * @param $scope
@@ -201,16 +219,22 @@
          */
 
         var initialText;
+
         $scope.isEditing = false;
-        $scope.toHTML = function(markupLikeText) {};
 
         $scope.finishEditingMode = function(newValue) {
+
             $scope.isEditing = false;
+
+            // Tell the root scope that we're no longer editing, now.
+            $scope.$root.$emit('editingDone');
+
             var content = this.dfxpWrapper.content($scope.subtitle, newValue);
+
             if (content !== initialText) {
                 // mark dirty variable on root scope so we can allow
                 // saving the session
-                $scope.$root.$emit('onWorkDone');
+                $scope.$root.$emit('workDone');
             }
         };
         $scope.startEditingMode = function() {
@@ -218,6 +242,10 @@
             initialText =  this.dfxpWrapper.content($scope.subtitle);
 
             $scope.isEditing  = true;
+
+            // Tell the root scope that we're editing, now.
+            $scope.$root.$emit('editing');
+
             return initialText;
         };
         $scope.textChanged = function(newText) {
@@ -226,9 +254,10 @@
 
     };
 
-    root.SubtitleListController = SubtitleListController;
-    root.SubtitleListItemController = SubtitleListItemController;
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionButtonController = SaveSessionButtonController;
+    root.SubtitleListController = SubtitleListController;
+    root.SubtitleListHelperController = SubtitleListHelperController;
+    root.SubtitleListItemController = SubtitleListItemController;
 
 }).call(this);

@@ -109,6 +109,15 @@
                             <a class="remove" ng-click="removeSubtitle(subtitle)">Remove</a>
                         </li>
                     </ul>
+                    <a class="end"
+                       ng-controller="SubtitleListHelperController"
+                       ng-click="addNewBlankSubtitleAndSelect()">
+                        <span ng-show="!isEditingAny">+ New subtitle</span>
+                        <span ng-show="isEditingAny">
+                            Press ENTER or TAB to save subtitle and move to next.<br />
+                            Press SHIFT+TAB to save subtitle and move to previous.
+                        </span>
+                    </a>
                 </div>
             </div>
         </section>

@@ -339,6 +339,18 @@ section.main {
                 }
             }
         }
+        a.end {
+            color: #3C3C3D;
+            display: block;
+            line-height: 20px;
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+
+            &:hover {
+                background: #EBECED;
+            }
+        }
     }
     section.left {
         div.help-panel {

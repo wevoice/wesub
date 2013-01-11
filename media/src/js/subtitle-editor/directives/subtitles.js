@@ -48,10 +48,6 @@
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
-            if (scope === selectedScope) {
-                return;
-            }
-
             // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
@@ -100,8 +96,8 @@
                 // if it's the last subtitle of the set and the user pressed enter without shift,
                 // add a new empty subtitle and select it to edit
                 if (selectedScope.subtitles[index] === undefined) {
-                    selectedScope.addSubtitle({'text': ''}, index);
                     selectedScope.finishEditingMode(activeTextArea.val());
+                    selectedScope.addSubtitle({'text': ''}, index);
                 }
 
                 selectedScope.$apply();
@@ -117,14 +113,13 @@
                                         rootEl)[lastIndex]);
                 }
                 e.preventDefault();
-
             }
 
             if (elementToSelect) {
                 onSubtitleItemSelected(elementToSelect);
                 activeTextArea.focus();
             } else {
-                selectedScope.finishEditingMode(activeTextArea.val());
+                selectedScope.textChanged(activeTextArea.val());
             }
 
         }
