@@ -103,12 +103,9 @@ class Command(BaseCommand):
             return
 
         username = vurl.owner_username
-        try:
-            account = ThirdPartyAccount.objects.get(type=vurl.type,
-                    username=username)
-        except ThirdPartyAccount.DoesNotExist:
-            self.log("Can't find a third party account for %s" % username)
-            return
+        account = ThirdPartyAccount.objects.get(type=vurl.type,
+                username=username)
+
         bridge = YouTubeApiBridge(account.oauth_access_token,
                                 account.oauth_refresh_token,
                                 vt.videoid)
@@ -134,21 +131,17 @@ class Command(BaseCommand):
 
         credits = (amara_supposed_credit, unisubs_supposed_credit,)
 
-        try:
-            if not current_description.startswith(credits):
-                self.log("%s doesn't have desc credit" % vurl.url)
-                return
-
-            if current_description.startswith(amara_supposed_credit):
-                new_description = current_description.replace(
-                        amara_supposed_credit, '')
-
-            if current_description.startswith(unisubs_supposed_credit):
-                new_description = current_description.replace(
-                        unisubs_supposed_credit, '')
-        except:
-            self.log("unicode fail")
+        if not current_description.startswith(credits):
+            self.log("%s doesn't have desc credit" % vurl.url)
             return
+
+        if current_description.startswith(amara_supposed_credit):
+            new_description = current_description.replace(
+                    amara_supposed_credit, '')
+
+        if current_description.startswith(unisubs_supposed_credit):
+            new_description = current_description.replace(
+                    unisubs_supposed_credit, '')
 
         entry.media.description.text = new_description
         entry = entry.ToString()
@@ -186,7 +179,10 @@ class Command(BaseCommand):
                 raise CommandError("Not a Youtube video.")
 
             for vurl in yt_urls:
-                self._fix_video(vurl)
+                try:
+                    self._fix_video(vurl)
+                except Exception, e:
+                    self.log(e)
 
             self._resync_subs_for_video(video)
 
@@ -200,7 +196,13 @@ class Command(BaseCommand):
         self.log('%s video descriptions to process' % len(urls))
 
         for vurl in urls:
-            self._fix_video(vurl)
+            self.log('Starting to process video %s' % vurl.video.video_id)
+            try:
+                self._fix_video(vurl)
+                self.log('Done processing video')
+            except Exception, e:
+                self.log(e)
+            self.log('Done processing video')
 
         # Now, sync all completed languages to Youtube to remove the last sub
         # credit.
@@ -208,4 +210,9 @@ class Command(BaseCommand):
         self.log('%s videos to resync' % len(videos))
 
         for video in videos:
-            self._resync_subs_for_video(video)
+            self.log('Start resync for %s' % video.video_id)
+            try:
+                self._resync_subs_for_video(video)
+            except Exception, e:
+                self.log(e)
+            self.log('End resync')
