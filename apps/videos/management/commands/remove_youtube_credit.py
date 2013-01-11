@@ -17,11 +17,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 """
-Fix all the Youtube descriptions!
-=================================
+Fix all the Youtube videos!
+===========================
 
 This command will attempt to fix all team Youtube videos.  These videos had
-their Youtube descriptions changed by accident by an earlier sync.
+their Youtube descriptions changed and a credit sub added by accident by an
+earlier sync.
 
 The new descriptions were produced by adding
 
@@ -37,8 +38,13 @@ description addition and checks (via the Youtube API) if the Youtube video
 description starts with it.  If it does, it replaces it with nothing and
 updates the description on Youtube.
 
+Then it resyncs all public versions to Youtube to remove the subtitle credit
+which was added as the last subtitle.
+
 You can also fix an individual video by using the --video flag.  It takes a
 video_id.
+
+You can process a single team by using the --team flag.  It takes a team slug.
 """
 
 import os
