@@ -141,7 +141,7 @@ class Command(BaseCommand):
 
         if not current_description.startswith(credits):
             self.log("%s doesn't have desc credit" % vurl.url)
-            return
+            return video.video_id
 
         if current_description.startswith(amara_supposed_credit):
             new_description = current_description.replace(
