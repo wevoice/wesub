@@ -49,6 +49,7 @@ You can process a single team by using the --team flag.  It takes a team slug.
 
 import os
 import json
+from time import sleep
 from optparse import make_option
 from datetime import datetime
 
@@ -183,6 +184,10 @@ class Command(BaseCommand):
         with open(self.CACHE_PATH, 'w') as f:
             f.write(json.dumps(data))
 
+    def _sleep(self):
+        self.log('Pausing')
+        sleep(3)
+
     def handle(self, video_id, team, *args, **kwargs):
         if video_id and team:
             raise CommandError("You can specify either a video or a team.")
@@ -210,45 +215,52 @@ class Command(BaseCommand):
 
         self.cache = self._load_cache_file()
 
-        all_team_videos = Video.objects.filter(teamvideo__isnull=False)
+        try:
 
-        if team:
-            self.log('Only processing videos for %s' % team)
-            all_team_videos = all_team_videos.filter(
-                    teamvideo__team__slug=team)
+            all_team_videos = Video.objects.filter(teamvideo__isnull=False)
 
-        videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
+            if team:
+                self.log('Only processing videos for %s' % team)
+                all_team_videos = all_team_videos.filter(
+                        teamvideo__team__slug=team)
 
-        urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
-                video__in=videos)
+            videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
 
-        self.log('%s video descriptions to process' % len(urls))
+            urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
+                    video__in=videos)
 
-        for vurl in urls:
-            self.log('Starting to process video %s' % vurl.video.video_id)
-            try:
-                video_id = self._fix_video(vurl)
-                if video_id:
-                    self.cache['desc'].append(video_id)
+            self.log('%s video descriptions to process' % len(urls))
+
+            for vurl in urls:
+                self.log('Starting to process video %s' % vurl.video.video_id)
+                try:
+                    video_id = self._fix_video(vurl)
+                    if video_id:
+                        self.cache['desc'].append(video_id)
+                    self.log('Done processing video')
+                except Exception, e:
+                    self.log(e)
                 self.log('Done processing video')
-            except Exception, e:
-                self.log(e)
-            self.log('Done processing video')
+                self._sleep()
 
-        # Now, sync all completed languages to Youtube to remove the last sub
-        # credit.
+            # Now, sync all completed languages to Youtube to remove the last
+            # sub credit.
 
-        videos = all_team_videos.exclude(video_id__in=self.cache['sub'])
-        self.log('%s videos to resync' % len(videos))
+            videos = all_team_videos.exclude(video_id__in=self.cache['sub'])
+            self.log('%s videos to resync' % len(videos))
 
-        for video in videos:
-            self.log('Start resync for %s' % video.video_id)
-            try:
-                video_id = self._resync_subs_for_video(video)
-                if video_id:
-                    self.cache['sub'].append(video_id)
-            except Exception, e:
-                self.log(e)
-            self.log('End resync')
+            for video in videos:
+                self.log('Start resync for %s' % video.video_id)
+                try:
+                    video_id = self._resync_subs_for_video(video)
+                    if video_id:
+                        self.cache['sub'].append(video_id)
+                except Exception, e:
+                    self.log(e)
+                self.log('End resync')
+                self._sleep()
 
-        self._save_cache_file(self.cache)
+        except Exception, e:
+            self.log(e)
+        finally:
+            self._save_cache_file(self.cache)
