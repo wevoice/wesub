@@ -96,8 +96,10 @@
                 // if it's the last subtitle of the set and the user pressed enter without shift,
                 // add a new empty subtitle and select it to edit
                 if (selectedScope.subtitles[index] === undefined) {
+
                     selectedScope.finishEditingMode(activeTextArea.val());
-                    selectedScope.addSubtitle({'text': ''}, index);
+
+                    selectedScope.addSubtitle(index - 1, {}, '');
                 }
 
                 selectedScope.$apply();
@@ -151,6 +153,24 @@
                         scope.setLanguageCode(attrs['languageCode']);
                         SubtitleListFinder.register(attrs.subtitleList, elm,
                             angular.element(elm).controller(), scope);
+                    }
+                };
+            }
+        };
+    });
+    directives.directive('subtitleListItem', function() {
+        return {
+            compile: function compile(elm, attrs, transclude) {
+                return {
+                    post: function post(scope, elm, attrs) {
+
+                        // If we need to focus this subtitle.
+                        if (scope.getSubtitleIndex() === scope.$parent.focusIndex) {
+
+                            // How do we call onSubtitleItemSelected in the other directive?
+
+                        }
+
                     }
                 };
             }
