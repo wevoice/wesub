@@ -42,23 +42,24 @@
              */
             // make sure this works if the event was trigger in the
             // originating li or any descendants
-            elm = $(elm).hasClass('.subtitle-list-item') ?
-                      elm : $(elm).parents('.subtitle-list-item');
 
+            elm = $(elm).hasClass('subtitle-list-item') ?
+                      elm : $(elm).parents('.subtitle-list-item');
+            
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
             // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
-                    // if there were an active item, deactivate it
                     selectedScope.finishEditingMode(activeTextArea.val());
-                    // trigger updates
                     selectedScope.$digest();
                 }
                 activeTextArea = $('textarea', elm);
                 selectedScope = scope;
+
                 var editableText = selectedScope.startEditingMode();
+                return;
 
                 activeTextArea.val(editableText);
                 selectedScope.$digest();
@@ -99,7 +100,7 @@
 
                     selectedScope.finishEditingMode(activeTextArea.val());
 
-                    selectedScope.addSubtitle(index - 1, {}, '');
+                    selectedScope.addSubtitle(index - 1, {}, '', true);
                 }
 
                 selectedScope.$apply();
@@ -131,8 +132,10 @@
                 rootEl = elm;
                 return {
                     post: function post(scope, elm, attrs) {
+
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
                         isEditable = attrs.editable === 'true';
+
                         if (isEditable) {
                             $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
@@ -147,6 +150,21 @@
                                     selectedScope.finishEditingMode(activeTextArea.val());
                                     selectedScope.$digest();
                                 }
+                            });
+
+                            // Create a custom event handler to select a subtitle.
+                            //
+                            // See the subtitleListItem directive below. This gets called
+                            // if a subtitleListItem is created and its index matches the
+                            // focus index that is set when adding the new subtitle from the
+                            // controller.
+                            $(elm).on('selectFocusedSubtitle', function() {
+
+                                var $subtitle = $('li', elm).eq(scope.focusIndex);
+
+                                // Select the subtitle.
+                                onSubtitleItemSelected($subtitle.get(0));
+
                             });
                         }
                         scope.setVideoID(attrs['videoId']);
@@ -167,7 +185,9 @@
                         // If we need to focus this subtitle.
                         if (scope.getSubtitleIndex() === scope.$parent.focusIndex) {
 
-                            // How do we call onSubtitleItemSelected in the other directive?
+                            // Trigger the custom event selectFocusedSubtitle on the UL,
+                            // which was bound in the subtitleList directive above.
+                            $(elm).parent().trigger('selectFocusedSubtitle');
 
                         }
 
