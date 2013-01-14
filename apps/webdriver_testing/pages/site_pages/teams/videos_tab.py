@@ -80,10 +80,7 @@ class VideosTab(ATeamPage):
 
     def _open_filters(self):
         curr_url = self.current_url()
-        if 'project=' in curr_url:
-            self.logger.info('shoud find filter open')
-        elif self.is_element_visible(self._FILTER_OPEN):
-        else:
+        if not self.is_element_visible(self._FILTER_OPEN):
             self.logger.info('Opening the filter options')
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
@@ -91,7 +88,6 @@ class VideosTab(ATeamPage):
 
     def clear_filters(self):
         self.logger.info('Clearing out current filters')
-
         self.click_by_css(self._CLEAR_FILTERS)
 
 
@@ -151,9 +147,6 @@ class VideosTab(ATeamPage):
                     return el
             except:
                 continue
-
-
-
 
     def _hover_video(self, video=None): 
         """Hover over a video with the given title, or the first one.
@@ -327,6 +320,3 @@ class VideosTab(ATeamPage):
     def videos_displayed(self):
         self.logger.info('Waiting for videos to display on page.')
         self.wait_for_element_present(self._VIDEO_THUMB)
-        
-
-
