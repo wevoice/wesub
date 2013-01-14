@@ -19,19 +19,19 @@
 
 """Long-running data migration script for the Data Model Refactor."""
 
-#      __     __------
-#   __/o `\ ,~   _~~  . .. pb. ..
-#  ~ -.   ,'   _~-----
-#      `\     ~~~--_'__
-#        `~-==-~~~~~---'
-#
-# The [Arctic Tern] is strongly migratory, seeing two summers each year as it
-# migrates from its northern breeding grounds along a winding route to the
-# oceans around Antarctica and back, a round trip of about 70,900 km (c. 44,300
-# miles) each year.  This is by far the longest regular migration by any known
-# animal.
-#
-# https://en.wikipedia.org/wiki/Arctic_Tern
+# #      __     __------
+# #   __/o `\ ,~   _~~  . .. pb. ..
+# #  ~ -.   ,'   _~-----
+# #      `\     ~~~--_'__
+# #        `~-==-~~~~~---'
+# #
+# # The [Arctic Tern] is strongly migratory, seeing two summers each year as it
+# # migrates from its northern breeding grounds along a winding route to the
+# # oceans around Antarctica and back, a round trip of about 70,900 km (44,300
+# # miles) each year.  This is by far the longest regular migration by any known
+# # animal.
+# #
+# # https://en.wikipedia.org/wiki/Arctic_Tern
 
 import datetime
 import csv as csv_module
@@ -515,26 +515,37 @@ def _sync_versions(language_pk=None):
     if not sl:
         return False
 
-    # First update any versions that have been synced but have changed since.
-    versions = sl.subtitleversion_set.filter(needs_sync=True,
-                                             new_subtitle_version__isnull=False)
+    if sl.can_writelock(TERN_REQUEST):
+        sl.writelock(TERN_REQUEST)
+    else:
+        # If we picked a writelocked language, bail for now, but come back to it
+        # later.
+        log('SubtitleLanguage', 'ERROR_WRITELOCKED', sl.pk, None)
+        return True
 
-    for version in versions.order_by('version_no'):
-        _update_subtitle_version(version)
+    try:
+        # First update any versions that have been synced but have changed since.
+        versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                                 new_subtitle_version__isnull=False)
 
-    # Then sync any new versions.
-    versions = sl.subtitleversion_set.filter(needs_sync=True,
-                                             new_subtitle_version=None)
+        for version in versions.order_by('version_no'):
+            _update_subtitle_version(version)
 
-    # This is ugly, but we (may) need to do something special on the last
-    # version we sync.
-    new_versions = list(versions.order_by('version_no'))
+        # Then sync any new versions.
+        versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                                 new_subtitle_version=None)
 
-    for version in new_versions[:-1]:
-        _create_subtitle_version(version, False)
+        # This is ugly, but we (may) need to do something special on the last
+        # version we sync.
+        new_versions = list(versions.order_by('version_no'))
 
-    for version in new_versions[-1:]:
-        _create_subtitle_version(version, True)
+        for version in new_versions[:-1]:
+            _create_subtitle_version(version, False)
+
+        for version in new_versions[-1:]:
+            _create_subtitle_version(version, True)
+    finally:
+        sl.release_writelock()
 
     if not dry:
         from utils.metrics import Meter
