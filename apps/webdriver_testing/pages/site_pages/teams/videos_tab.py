@@ -81,10 +81,10 @@ class VideosTab(ATeamPage):
     def _open_filters(self):
         curr_url = self.current_url()
         if 'project=' in curr_url:
-            print 'filter should already be open'
+            self.logger.info('shoud find filter open')
         elif self.is_element_visible(self._FILTER_OPEN):
-            print 'filter is open'
         else:
+            self.logger.info('Opening the filter options')
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
             self.wait_for_element_visible('div.filter-chunk')
@@ -147,7 +147,6 @@ class VideosTab(ATeamPage):
         for el in video_els:
             try:
                 title_el = el.find_element_by_css_selector(self._VIDEO_TITLE)
-                print title_el.get_attribute('title')
                 if title_el.get_attribute('title') == video:
                     return el
             except:

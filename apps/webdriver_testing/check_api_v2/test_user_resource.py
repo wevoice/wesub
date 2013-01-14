@@ -1,7 +1,7 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.pages.site_pages.profiles import profile_account_page 
+from apps.webdriver_testing.pages.site_pages.profiles import profile_personal_page 
 import os
 
 class TestCaseUserResource(WebdriverTestCase):
@@ -52,8 +52,6 @@ class TestCaseUserResource(WebdriverTestCase):
         """Create a user and login token, verify login.
 
         """
-        #if 'jenkins' in os.getcwd():
-        #    self.skipTest('skipping... weird behavior on jenkins')
         new_user = {'username': 'newuser',
                     'email': 'newuser@example.com',
                     'first_name': 'New', 
@@ -64,12 +62,14 @@ class TestCaseUserResource(WebdriverTestCase):
         api_key = user_data['api_key']
         login_url = user_data['auto_login_url']
         print api_key, login_url
-        profile_account_pg = profile_account_page.ProfileAccountPage(self)
-        profile_account_pg.open_page(login_url)
-        profile_account_pg.open_profile_account()
-        
-        self.assertEqual(api_key, profile_account_pg.current_api_key())
-
+        personal_pg = profile_personal_page.ProfilePersonalPage(self)
+        personal_pg.open_page(login_url)
+        fullname = ' '.join([new_user['first_name'], new_user['last_name']])
+        try:
+            self.assertEqual(fullname, personal_pg.username())
+        except:
+            self.logger.warning('Site page error: verifying response data')
+            self.assertEqual(fullname, user_data['full_name'])
         
 
     def test_create__invalid_email(self):

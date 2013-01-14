@@ -24,7 +24,7 @@ from django.test.testcases import (TestCase)
 from selenium import webdriver
 from django.conf import settings
 from apps.webdriver_testing.data_factories import UserFactory
-
+from django.contrib.sites.models import Site
 
 class WebdriverTestCase(LiveServerTestCase, TestCase):
     def setUp(self):
@@ -47,7 +47,13 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
         self.browser = getattr(webdriver, test_browser)()
         self.browser.get(self.base_url + 'videos/create/')
-
+        #set the skiphowto cookie so those dialogs don't affect test cases.
+        self.browser.add_cookie({ u'name': u'skiphowto', 
+                                  u'value': u'1', 
+                                  #u'path': u'/en/onsite_widget/', 
+                                  #u'secure': False
+                                 })
+        
         UserFactory.create(username='admin', is_staff=True, is_superuser=True)
         self.auth = dict(username='admin', password='password')
         self.logger = logging.getLogger('test_steps')

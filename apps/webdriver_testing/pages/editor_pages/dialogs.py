@@ -38,15 +38,19 @@ class EditorDialogs(Page):
         return title
 
     def close_dialog(self):
+        self.logger.info('closing the dialog')
         self.click_by_css(self._CLOSE)
 
     def close_lang_dialog(self):
+        self.logger.info('closing the language dialog')
         self.click_by_css(self._CLOSE_LANG_MODAL)
     
     def continue_to_next_step(self):
+        self.logger.info('clicking done to continue to the next step')
         self.click_by_css(self._DONE)
 
     def continue_past_help(self, skip=True):
+        self.logger.info('Checking for help video, and continuing past')
         time.sleep(5)
         if self.is_element_present(self._HOW_TO):
             if skip:
@@ -54,11 +58,12 @@ class EditorDialogs(Page):
             self.continue_to_next_step()
 
     def click_saved_ok(self):
-        print 'clicking the subtitles saved confirmation box'
+        self.logger.info('clicking the subtitles saved confirmation box')
         self.wait_for_element_present(self._SAVED_OK)
         self.click_by_css(self._SAVED_OK)
 
     def resume_dialog_ok(self):
+        self.logger.info('clicking OK in the resume dialog')
         self.wait_for_element_present(self._CONTINUE)
         elements_found = self.get_elements_list(self._CONTINUE)
         for el in elements_found:
@@ -66,19 +71,23 @@ class EditorDialogs(Page):
                 el.click()
 
     def click_dialog_continue(self):
+        self.logger.info('clicking Continue in the dialog')
         self.wait_for_element_present(self._CONTINUE)
         self.click_by_css(self._CONTINUE)
 
     def mark_subs_complete(self, complete=True):
-        print 'checking for the mark subs complete dialog'
+        self.logger.info('checking for the mark subs complete dialog')
         time.sleep(3)
         if self.is_element_visible(self._CHECKBOX):
             if complete == True:
+                self.logger.info('Marking subs as complete')
                 self.click_by_css(self._CHECKBOX)
+            self.logger.info('Click OK in the subs complete diaplog')
             self.click_by_css(self._SAVED_OK)
         
 
     def incomplete_alert_text(self):
+        self.logger.info('Accepting the subs incomplete dialog')
         a = self.browser.switch_to_alert()
         alert_text = a.text
         a.accept()
@@ -97,6 +106,7 @@ class CreateLanguageSelection(EditorDialogs):
             return True
 
     def lang_selection_dialog_present(self):
+        self.logger.info('checking for lang selection dialog')
         self.wait_for_element_present(self._HEADING)
         if self._DIALOG_NAME in self.get_text_by_css(self._HEADING):
             return True
@@ -107,6 +117,7 @@ class CreateLanguageSelection(EditorDialogs):
         Language should be the fully written language'
         ex: French, Canadian 
         """
+        self.logger.info('setting the primary audio language: %s' % language) 
         self.select_option_by_text(self._ORIGINAL_LANG, language)
         
     def _set_new_language(self, language):
@@ -115,6 +126,7 @@ class CreateLanguageSelection(EditorDialogs):
         Language should be the fully written language'
         ex: French, Canadian 
         """
+        self.logger.info('setting transcribe lang: %s' % language)
         self.select_option_by_text(self._TRANSCRIBE_LANG, language)
    
     def _set_translation_source(self, language):
@@ -123,9 +135,11 @@ class CreateLanguageSelection(EditorDialogs):
         Language should be the fully written language'
         ex: French, Canadian 
         """
+        self.logger.info('setting from lang: %s' % language)
         self.select_option_by_text(self._SOURCE_LANG, language)
 
     def _submit_choices(self):
+        self.logger.info('submitting dialog choices')
         self.click_by_css(self._CONTINUE)
 
     def create_original_subs(self, video_language, new_language):

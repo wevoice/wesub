@@ -93,7 +93,7 @@ class TestCaseVideoUrl(WebdriverTestCase):
         put_data = { 'url': 'http://unisubs.example.com/newerurl.mp4', 
                       'primary': True }
         status, response = data_helpers.put_api_request(self, put_url, put_data) 
-        print response
+        
         self.assertEqual('http://unisubs.example.com/newerurl.mp4', response['url'])
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
@@ -147,7 +147,7 @@ class TestCaseVideoUrl(WebdriverTestCase):
         #Get a list of the current urls
         url_part = 'videos/%s/urls/' % video_id
         status, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
 
         url_objects = response['objects']
         id_list = []

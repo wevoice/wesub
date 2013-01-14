@@ -63,8 +63,8 @@ class Page(object):
         """Accept or reject js alert.
 
         """
+        self.logger.info('Handling alter dialog with: %s' % action)
         try:
-            print 'Got an alert dialog'
             time.sleep(2)
             a = self.browser.switch_to_alert()
             if action == "accept":
@@ -438,11 +438,9 @@ class Page(object):
             else: 
                 parent_el = self.browser.find_element_by_css_selector(parent_el)
         try:
-            print 'looking for %s under %s' % (child_el, parent_el.tag_name)
             child_els = parent_el.find_elements_by_css_selector(child_el)
             return child_els
         except NoSuchElementException:
-            print 'Did not find any elements'
             return None
 
 
@@ -502,7 +500,6 @@ class Page(object):
             for result in results:
                 if result.text == value:
                     found = True
-                    print '##### found it!!! %s' % value
                     break
 
             #In some cases (team videos tab) it would choose the option after the 
@@ -527,11 +524,8 @@ class Page(object):
             Records an error.
         """
         if not e:
-            e = 'webdriver error' + self.browser.current_url
-        print '-------------------'
-        print 'Error at ' + self.browser.current_url
-        print '-------------------'
-        sys.stdout.write(e + self.browser.current_url)
+            e = 'webdriver error: ' + self.browser.current_url
+        self.logger.error(e + self.browser.current_url)
         self.testcase.tearDown()
         raise ValueError(e)
 
