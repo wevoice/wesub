@@ -169,10 +169,29 @@ def get_counts():
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
 
 def markup_to_dfxp(text):
+    from django.template.defaultfilters import escape
+
+    # Escape the HTML entities in the text first.  So something like:
+    #
+    #     x < _10_
+    #
+    # gets escaped to:
+    #
+    #     x &lt; _10_
+    text = escape(text)
+
+    # Now we substitute in the DFXP formatting tags for our custom Markdown-like
+    # thing:
+    #
+    #     x &lt; _10_
+    #
+    # gets turned into:
+    #
+    #     x &lt; <span tts:textDecoration="underline">10</span>
     text = BOLD_MARKER_START_RE.sub('<span tts:fontWeight="bold">', text)
     text = BOLD_MARKER_END_RE.sub('</span>', text)
 
-    # order matters, substitute doubles first
+    # Order matters, substitute double *'s first, then single *'s.
     text = ITALIC_MARKER_START_RE.sub('<span tts:fontStyle="italic">', text)
     text = ITALIC_MARKER_END_RE.sub('</span>', text)
 
