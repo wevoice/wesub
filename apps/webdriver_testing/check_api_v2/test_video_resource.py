@@ -86,7 +86,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
-        url_part = 'videos/?project=%s' %self.project1.slug
+        url_part = 'videos/?project=%s/' %self.project1.slug
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -104,7 +104,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
-        url_part = 'videos/?team=%s' %self.open_team.slug
+        url_part = 'videos/?team=%s/' %self.open_team.slug
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -126,7 +126,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             team_vid_list.append(vid.title)
             
             time.sleep(1)
-        url_part = 'videos/?order_by=-created' 
+        url_part = 'videos/?order_by=-created/' 
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -151,7 +151,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 video__title = 'Zzz-test-video')
 
 
-        url_part = 'videos/?order_by=-title' 
+        url_part = 'videos/?order_by=-title/' 
         status, response = data_helpers.api_get_request(self, url_part)
         
         video_objects =  response['objects']
@@ -199,7 +199,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             }
         
         test_video = data_helpers.create_video(self)
-        url_part = 'videos/%s' % test_video.video_id
+        url_part = 'videos/%s/' % test_video.video_id
         status, response = data_helpers.api_get_request(self, url_part)
         self.video_pg.open_video_page(response['id'])
         for k, v in expected_data.iteritems():
@@ -221,7 +221,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             url_part, url_data)
         vid_id = response['id']
 
-        url_part = 'videos/%s' % vid_id
+        url_part = 'videos/%s/' % vid_id
         new_data = {'title': 'MVC webM output sample',
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
@@ -253,7 +253,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             url_part, url_data)
         vid_id = response['id']
 
-        url_part = 'videos/%s' % vid_id
+        url_part = 'videos/%s/' % vid_id
         new_data = {'team': self.open_team.slug,
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
@@ -285,7 +285,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         vid_id = r['id']
 
         #Update the video setting the team and project and new description.
-        url_part = 'videos/%s' % vid_id
+        url_part = 'videos/%s/' % vid_id
         new_data = {'team': self.open_team.slug,
                     'project': self.project2.slug,
                     'description': ('This is a sample vid converted to webM '
