@@ -36,6 +36,7 @@
 import datetime
 import csv as csv_module
 import os, sys
+import re
 import warnings
 from optparse import OptionGroup, OptionParser
 from random import random
@@ -45,6 +46,15 @@ csv = csv_module.writer(sys.stdout)
 single = False
 language_pk = None
 dry = False
+
+BOLD_MARKER_START_RE = re.compile(r"\*\*(?=\w)", re.IGNORECASE)
+BOLD_MARKER_END_RE = re.compile(r"(?!\w)\*\*", re.IGNORECASE)
+
+ITALIC_MARKER_START_RE = re.compile(r"\*(?=[^\s])", re.IGNORECASE)
+ITALIC_MARKER_END_RE = re.compile(r"(?!\w)\*", re.IGNORECASE)
+
+UNDERLINE_MARKER_START_RE = re.compile(r"_(?=[^\s])", re.IGNORECASE)
+UNDERLINE_MARKER_END_RE = re.compile(r"(?![^_]\w)_", re.IGNORECASE)
 
 
 # Output
@@ -157,6 +167,19 @@ def get_counts():
 
     return (sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done,
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
+
+def markup_to_dfxp(text):
+    text = BOLD_MARKER_START_RE.sub('<span tts:fontWeight="bold">', text)
+    text = BOLD_MARKER_END_RE.sub('</span>', text)
+
+    # order matters, substitute doubles first
+    text = ITALIC_MARKER_START_RE.sub('<span tts:fontStyle="italic">', text)
+    text = ITALIC_MARKER_END_RE.sub('</span>', text)
+
+    text = UNDERLINE_MARKER_START_RE.sub('<span tts:textDecoration="underline">', text)
+    text = UNDERLINE_MARKER_END_RE.sub('</span>', text)
+
+    return text
 
 
 def fix_blank_original(video):
@@ -376,7 +399,7 @@ def _get_subtitles(sv):
             yield (
                 s.start_time,
                 s.end_time,
-                s.subtitle_text,
+                markup_to_dfxp(s.subtitle_text),
                 {'new_paragraph': s.start_of_paragraph},
             )
     else:
@@ -408,7 +431,7 @@ def _get_subtitles(sv):
             yield (
                 start,
                 end,
-                s.subtitle_text,
+                markup_to_dfxp(s.subtitle_text),
                 {'new_paragraph': paragraph},
             )
 
