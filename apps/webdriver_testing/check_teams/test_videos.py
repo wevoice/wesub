@@ -118,7 +118,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
-        url_part = 'videos/%s' % self.test_video.video_id
+        url_part = 'videos/%s/' % self.test_video.video_id
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
@@ -146,7 +146,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
-        url_part = 'videos/%s' % self.test_video.video_id
+        url_part = 'videos/%s/' % self.test_video.video_id
         new_data = {
                     'description': 'description update for grammar and politeness.'
                    }
