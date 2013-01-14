@@ -105,7 +105,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, url_part,
             project_data)
         self.team_pg.open_team_page(self.open_team.slug)
-        print response
+        
 
         self.assertTrue(self.team_pg.has_project(project_data['slug']))
 
@@ -124,7 +124,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
             } 
         status, response = data_helpers.put_api_request(self, url_part, 
             updated_info) 
-        print response
+        
         self.assertEqual(updated_info['description'], response['description'])
 
     def test_projects__delete(self):

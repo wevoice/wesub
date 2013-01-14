@@ -124,7 +124,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request( self, 
             upload_url, 
             upload_data )
-        print response
+        
         #Compare the returned uri
         expected_uri = '/api2/partners/videos/%s/languages/en/subtitles/' % self.test_video.video_id
         self.assertEqual(expected_uri, response['resource_uri'])
@@ -531,7 +531,7 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
         #    #version
         #    )
         #status, response = data_helpers.api_get_request(self, url_part) 
-        #print status, response
+        
         #self.assertFalse('Needs verification steps added here. '
         #                 'Verify the returned version number and '
         #                 'the sub content.')
@@ -553,6 +553,6 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
             self.test_video.video_id, lang_code, output_format) 
             
         status, response = data_helpers.api_get_request(self, url_part) 
-        print status, response
+        
 
 

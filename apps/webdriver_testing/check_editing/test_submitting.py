@@ -18,6 +18,7 @@ class TestCaseSubmittable(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        self.browser.add_cookie({'skiphowto': 1,})
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)
@@ -37,8 +38,8 @@ class TestCaseSubmittable(WebdriverTestCase):
         print 'going through the dialogs for language specification'
         self.create_modal.create_original_subs('English', 'English')
 
-        print 'skipping past the help screens, settings skip to true.'
-        self.create_modal.continue_past_help()
+        #print 'skipping past the help screens, settings skip to true.'
+        #self.create_modal.continue_past_help()
 
         print 'typing subs'
         self.typed_subs = self.sub_editor.type_subs()

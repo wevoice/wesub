@@ -131,7 +131,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         test_team = TeamMemberFactory.create(team__name='Admin Manager Video Policy',
                                              team__slug='video-policy-2',
                                              user = self.team_owner,
-                                             video_policy=2, 
+                                             team__video_policy=2, 
                                              ).team
         self.dashboard_tab.log_in(self.team_owner.username, 'password')
         self.dashboard_tab.open_team_page(test_team.slug)
@@ -145,10 +145,9 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         
         test_team = TeamMemberFactory.create(team__name='Admin Manager Video Policy',
                                              team__slug='video-policy-2',
+                                             team__video_policy=2,
                                              user=self.team_owner,
                                              ).team
-        test_team.video_policy = 2
-
         team_member = TeamContributorMemberFactory.create(
                 team = test_team,
                 user = UserFactory(username='NoAddEd')
@@ -221,8 +220,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.logger.info('setup: Create a team with tasks enabled, '
-                         'review and approval workflow process.') 
+        self.logger.info('setup: Create a team with tasks enabled')
         self.dashboard_tab = dashboard_tab.DashboardTab(self)
         self.user = UserFactory(username = 'user', is_partner=True)
         data_helpers.create_user_api_key(self, self.user)
@@ -276,6 +274,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                     'http://qa.pculture.org/amara_tests/%s' % vid[0])
             if vid[1] is not None:
                 video.primary_audio_language_code = vid[1]
+                video.save()
             self.vid_obj_list.append(video)
             team_video = TeamVideoFactory(video = video,
                              team = self.team,
@@ -401,6 +400,84 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                 click_lang='Create French subtitles')
         self.assertTrue(create_modal.lang_selection_dialog_present())
 
+    def test_member__start_translation(self):
+        """Member starts translation from any task in “Videos that need your help”.
+
+        """
+        self.auth = dict(username=self.user.username, password='password')
+
+        self.logger.info('setup: Setting task policy to all team members')
+        self.team.task_assign_policy=20
+        self.team.video_policy=1
+        self.team.save()
+        video = self.vid_obj_list[2]  #fireplace vid see setUp for data details.
+        video_data = {'language_code': 'en',
+                      'video': video.pk,
+                      'primary_audio_language_code': 'en',
+                      'draft': open('apps/videos/fixtures/test.srt'),
+                      'is_complete': True,
+                      'complete': 1
+                      }
+            
+        data_helpers.upload_subs(self, video, video_data)
+        
+        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+            self.team.slug, video.video_id)
+        status, response = data_helpers.api_get_request(self, url_part) 
+        task_objects = response['objects']
+        print task_objects
+
+        create_modal = dialogs.CreateLanguageSelection(self)
+        #Login user and go to team dashboard page
+        self.logger.info('Polly Glott logs in and goes to team dashboard page.')
+        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
+
+        self.dashboard_tab.open_team_page(self.team.slug)
+
+        #self.dashboard_tab.languages_needed('fireplace', 
+        #        click_lang='Create French subtitles')
+        #self.assertTrue(create_modal.lang_selection_dialog_present())
+
+    def test_member__start_review(self):
+        """Member starts review from any task in “Videos that need your help”.
+
+        """
+        self.skipTest('Clicking Review link makes selenium loopy')
+        self.auth = dict(username=self.user.username, password='password')
+        self.team_workflow.review_allowed = 10
+        self.team_workflow.save()
+
+        self.logger.info('setup: Setting task policy to all team members')
+        self.team.task_assign_policy=20
+        self.team.video_policy=1
+        self.team.save()
+        video = self.vid_obj_list[2]  #fireplace vid see setUp for data details.
+        video_data = {'language_code': 'en',
+                      'video': video.pk,
+                      'primary_audio_language_code': 'en',
+                      'draft': open('apps/videos/fixtures/test.srt'),
+                      'is_complete': True,
+                      'complete': 1
+                      }
+            
+        data_helpers.upload_subs(self, video, video_data)
+        
+        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+            self.team.slug, video.video_id)
+        status, response = data_helpers.api_get_request(self, url_part) 
+        task_objects = response['objects']
+        print task_objects
+
+        create_modal = dialogs.CreateLanguageSelection(self)
+        #Login user and go to team dashboard page
+        self.logger.info('Polly Glott logs in and goes to team dashboard page.')
+        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
+
+        self.dashboard_tab.open_team_page(self.team.slug)
+
+        self.dashboard_tab.languages_needed('fireplace', 
+                click_lang='Review English subtitles')
+        #self.assertTrue(create_modal.lang_selection_dialog_present())
 
 
 

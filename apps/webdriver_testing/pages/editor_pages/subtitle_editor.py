@@ -39,6 +39,7 @@ class SubtitleEditor(EditorDialogs):
 
 
     def type_subs(self, subs_file=None):
+        self.logger.info('typing in subtitles')
         typed_sub_list = []
         if not subs_file:
             subs_file = os.path.join(os.path.dirname
@@ -49,6 +50,7 @@ class SubtitleEditor(EditorDialogs):
         return typed_sub_list
 
     def edit_subs(self, subs_file=None):
+        self.logger.info('editing subtitles')
         typed_sub_list = []
         if not subs_file:
             subs_file = os.path.join(os.path.dirname
@@ -64,21 +66,22 @@ class SubtitleEditor(EditorDialogs):
 
 
     def play(self):
+        self.logger.info('starting playback')
         self.wait_for_element_present(self._VIDEO_PLAYBACK)
         if self.is_element_present(self._PLAY):
-            print 'starting playback'
             self.click_by_css(self._PLAY)
 
     def pause(self):
+        self.logger.info('pausing playback')
         self.wait_for_element_present(self._VIDEO_PLAYBACK)
         if self.is_element_present(self._PAUSE):
-            print 'pausing playback'
             self.click_by_css(self._PAUSE)
 
     def buffer_video(self):
         """Start and Stop playback to get the video buffered up to about 30%'
      
         """
+        self.logger.info('buffering up the video')
         self.play()
         time.sleep(4)
         self.pause()
@@ -100,7 +103,7 @@ class SubtitleEditor(EditorDialogs):
         """Syncs the given number of subtitles.
 
         """
-        print '## SYNCING SUBS'
+        self.logger.info('syncing subtitles') 
         self.buffer_video()
         self.play()
         time.sleep(2)
@@ -114,6 +117,7 @@ class SubtitleEditor(EditorDialogs):
         time.sleep(2)
 
     def sub_timings(self, check_step=None):
+        self.logger.info('getting the list of subtitle times')
         if check_step:
             timing_element = self._REVIEW_TIMINGS
         else:
@@ -128,6 +132,7 @@ class SubtitleEditor(EditorDialogs):
 
             
     def save_and_exit(self):
+        self.logger.info('clicking save and exit from the dialog')
         self.page_down(self._SAVE_AND_EXIT)
         self.click_by_css(self._SAVE_AND_EXIT)
         self.mark_subs_complete()
@@ -135,6 +140,7 @@ class SubtitleEditor(EditorDialogs):
 
 
     def subtitles_list(self):
+        self.logger.info('getting the list of current subtitles')
         time.sleep(3)
         sub_list = []
         subtitle_els = self.browser.find_elements_by_css_selector(self._SUBS)
@@ -143,6 +149,7 @@ class SubtitleEditor(EditorDialogs):
         return sub_list
 
     def download_subtitles(self, sub_format='SRT'):
+        self.logger.info('downloading %s subtitles ' % sub_format)
         self.click_by_css(self._DOWNLOAD_SUBTITLES)
         self.select_option_by_text(self._DOWNLOAD_FORMAT, sub_format)
         # don't ever wait more than 15 seconds for this
@@ -154,16 +161,17 @@ class SubtitleEditor(EditorDialogs):
             "return document.getElementsByTagName('textarea')[0].value")
             # server errored out
             if stored_subs == "Something went wrong, we're terribly sorry.":
-                raise ValueError("Call to convert formats failed")
+                self.record_error('Call to convert formats failed')
             # server hasn't returned yet
             elif stored_subs and stored_subs.startswith("Processing.") is False:
                 break
         else:
-            raise ValueError("More than 15 seconds passed, and subs weren't converted")
+            self.record_error("> 15 seconds passed, and subs weren't converted")
         #self.close_lang_dialog()
         return stored_subs
 
     def submit(self, complete=True):
+        self.logger.info('submitting subtitles')
         self.continue_to_next_step()
         time.sleep(2)
         self.mark_subs_complete(complete)

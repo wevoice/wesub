@@ -107,7 +107,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         url_part = 'teams/{0}/tasks/?video_id={1}'.format(
             self.open_team.slug, self.test_video.video_id)
         status, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
         task_objects =  response['objects']
         self.assertEqual(1, len(task_objects)) 
 
@@ -132,7 +132,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         url_part = 'teams/%s/tasks/?assignee=TestUser' % self.open_team.slug
 
         status, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
         task_objects =  response['objects']
         self.assertEqual(self.test_video.video_id, task_objects[0]['video_id'])
 
@@ -154,7 +154,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
 
         del task_data['language']
         status, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
         for k, v in task_data.iteritems():
             self.assertEqual(v, response[k])
 
