@@ -424,11 +424,13 @@ def _get_subtitles(sv):
     else:
         # Otherwise this is a translation and we need to look at the translation
         # source to get the timing data.  Kill me now.
-        source_subtitles = sv._get_standard_collection(public_only=True)
+        source_version = sv._get_standard_collection(public_only=True)
 
-        if source_subtitles:
-            source_subtitles = dict((s.subtitle_id, s)
-                                    for s in source_subtitles)
+        if source_version:
+            source_subtitles = dict(
+                (s.subtitle_id, s)
+                for s in source_version.subtitle_set.all()
+            )
         else:
             # If we can't get the source subtitles for some reason then we'll do
             # the best we can (basically: the subs in the target version will be
