@@ -71,8 +71,10 @@
     };
 
     module.factory('SubtitleStorage', function($http) {
+
         var cachedData = window.editorData;
         var authHeaders = cachedData.authHeaders;
+
         return {
 
             /**
@@ -83,6 +85,17 @@
              * @param callback Function to be called with the dfxp xlm
              * once it's ready.
              */
+            getLanguages: function(callback) {
+                if (cachedData.languages && cachedData.languages.length === 0) {
+                    var url = getVideoLangAPIUrl(cachedData.video.id);
+                    $http.get(url).success(function(response) {
+                        cachedData.languages = response.objects;
+                        callback(response.objects);
+                    });
+                } else {
+                    callback(cachedData.languages);
+                }
+            },
             getSubtitles: function(languageCode, versionNumber, callback){
                 if (!languageCode) {
                     throw Error('You have to give me a languageCode');
@@ -115,6 +128,9 @@
                     });
                 }
             },
+            getVideoURL: function() {
+                return cachedData.video.videoURL;
+            },
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally
                 //
@@ -132,23 +148,8 @@
                 });
 
                 return promise;
-            },
-
-            getLanguages: function(callback) {
-                if (cachedData.languages && cachedData.languages.length === 0) {
-                    var url = getVideoLangAPIUrl(cachedData.video.id);
-                    $http.get(url).success(function(response) {
-                        cachedData.languages = response.objects;
-                        callback(response.objects);
-                    });
-                } else {
-                    callback(cachedData.languages);
-                }
-            },
-
-            getVideoURL: function() {
-                return cachedData.video.videoURL;
             }
+
         };
     });
 
