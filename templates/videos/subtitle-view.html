@@ -3,7 +3,7 @@
 {% block body_attrs %}id="video" class="v1 video_view"{% endblock %}
 {% block html_attrs %}id="subtitle_view"{% endblock %}
 
-{% load paginator widget comments i18n subtitles_tags teams_tags media_compressor videos_tags utils_tags %}
+{% load paginator widget comments i18n subtitles_tags teams_tags media_compressor videos_tags utils_tags i18n_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -182,10 +182,10 @@
                 {% if last_version.has_subtitles %}
                     <p class="view-notice{% if not last_version.is_public %} draft{% endif %}">
                         {% if not last_version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
-                        {% if language.is_dependent %}
+                        {% if language.get_translation_source_language_code %}
                             {% trans "Subtitles" %}
                             {% trans 'translated from' %}
-                            {{ language.standard_language }}.
+                            {{  language.get_translation_source_language_code|to_localized_display }}.
                         {% endif %}
                         {% trans "Showing" %}
                         <strong>{% trans "Revision" %} {{ last_version.version_number }}</strong>,

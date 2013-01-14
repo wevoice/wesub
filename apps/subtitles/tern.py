@@ -19,23 +19,24 @@
 
 """Long-running data migration script for the Data Model Refactor."""
 
-#      __     __------
-#   __/o `\ ,~   _~~  . .. pb. ..
-#  ~ -.   ,'   _~-----
-#      `\     ~~~--_'__
-#        `~-==-~~~~~---'
-#
-# The [Arctic Tern] is strongly migratory, seeing two summers each year as it
-# migrates from its northern breeding grounds along a winding route to the
-# oceans around Antarctica and back, a round trip of about 70,900 km (c. 44,300
-# miles) each year.  This is by far the longest regular migration by any known
-# animal.
-#
-# https://en.wikipedia.org/wiki/Arctic_Tern
+# #      __     __------
+# #   __/o `\ ,~   _~~  . .. pb. ..
+# #  ~ -.   ,'   _~-----
+# #      `\     ~~~--_'__
+# #        `~-==-~~~~~---'
+# #
+# # The [Arctic Tern] is strongly migratory, seeing two summers each year as it
+# # migrates from its northern breeding grounds along a winding route to the
+# # oceans around Antarctica and back, a round trip of about 70,900 km (44,300
+# # miles) each year.  This is by far the longest regular migration by any known
+# # animal.
+# #
+# # https://en.wikipedia.org/wiki/Arctic_Tern
 
 import datetime
 import csv as csv_module
 import os, sys
+import re
 import warnings
 from optparse import OptionGroup, OptionParser
 from random import random
@@ -45,6 +46,15 @@ csv = csv_module.writer(sys.stdout)
 single = False
 language_pk = None
 dry = False
+
+BOLD_MARKER_START_RE = re.compile(r"\*\*(?=\w)", re.IGNORECASE)
+BOLD_MARKER_END_RE = re.compile(r"(?!\w)\*\*", re.IGNORECASE)
+
+ITALIC_MARKER_START_RE = re.compile(r"\*(?=[^\s])", re.IGNORECASE)
+ITALIC_MARKER_END_RE = re.compile(r"(?!\w)\*", re.IGNORECASE)
+
+UNDERLINE_MARKER_START_RE = re.compile(r"_(?=[^\s])", re.IGNORECASE)
+UNDERLINE_MARKER_END_RE = re.compile(r"(?![^_]\w)_", re.IGNORECASE)
 
 
 # Output
@@ -157,6 +167,38 @@ def get_counts():
 
     return (sl_total, sl_unsynced, sl_broken, sl_outdated, sl_done,
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
+
+def markup_to_dfxp(text):
+    from django.template.defaultfilters import escape
+
+    # Escape the HTML entities in the text first.  So something like:
+    #
+    #     x < _10_
+    #
+    # gets escaped to:
+    #
+    #     x &lt; _10_
+    text = escape(text)
+
+    # Now we substitute in the DFXP formatting tags for our custom Markdown-like
+    # thing:
+    #
+    #     x &lt; _10_
+    #
+    # gets turned into:
+    #
+    #     x &lt; <span tts:textDecoration="underline">10</span>
+    text = BOLD_MARKER_START_RE.sub('<span tts:fontWeight="bold">', text)
+    text = BOLD_MARKER_END_RE.sub('</span>', text)
+
+    # Order matters, substitute double *'s first, then single *'s.
+    text = ITALIC_MARKER_START_RE.sub('<span tts:fontStyle="italic">', text)
+    text = ITALIC_MARKER_END_RE.sub('</span>', text)
+
+    text = UNDERLINE_MARKER_START_RE.sub('<span tts:textDecoration="underline">', text)
+    text = UNDERLINE_MARKER_END_RE.sub('</span>', text)
+
+    return text
 
 
 def fix_blank_original(video):
@@ -376,17 +418,19 @@ def _get_subtitles(sv):
             yield (
                 s.start_time,
                 s.end_time,
-                s.subtitle_text,
+                markup_to_dfxp(s.subtitle_text),
                 {'new_paragraph': s.start_of_paragraph},
             )
     else:
         # Otherwise this is a translation and we need to look at the translation
         # source to get the timing data.  Kill me now.
-        source_subtitles = sv._get_standard_collection(public_only=True)
+        source_version = sv._get_standard_collection(public_only=True)
 
-        if source_subtitles:
-            source_subtitles = dict((s.subtitle_id, s)
-                                    for s in source_subtitles)
+        if source_version:
+            source_subtitles = dict(
+                (s.subtitle_id, s)
+                for s in source_version.subtitle_set.all()
+            )
         else:
             # If we can't get the source subtitles for some reason then we'll do
             # the best we can (basically: the subs in the target version will be
@@ -408,7 +452,7 @@ def _get_subtitles(sv):
             yield (
                 start,
                 end,
-                s.subtitle_text,
+                markup_to_dfxp(s.subtitle_text),
                 {'new_paragraph': paragraph},
             )
 
@@ -492,26 +536,37 @@ def _sync_versions(language_pk=None):
     if not sl:
         return False
 
-    # First update any versions that have been synced but have changed since.
-    versions = sl.subtitleversion_set.filter(needs_sync=True,
-                                             new_subtitle_version__isnull=False)
+    if sl.can_writelock(TERN_REQUEST):
+        sl.writelock(TERN_REQUEST)
+    else:
+        # If we picked a writelocked language, bail for now, but come back to it
+        # later.
+        log('SubtitleLanguage', 'ERROR_WRITELOCKED', sl.pk, None)
+        return True
 
-    for version in versions.order_by('version_no'):
-        _update_subtitle_version(version)
+    try:
+        # First update any versions that have been synced but have changed since.
+        versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                                 new_subtitle_version__isnull=False)
 
-    # Then sync any new versions.
-    versions = sl.subtitleversion_set.filter(needs_sync=True,
-                                             new_subtitle_version=None)
+        for version in versions.order_by('version_no'):
+            _update_subtitle_version(version)
 
-    # This is ugly, but we (may) need to do something special on the last
-    # version we sync.
-    new_versions = list(versions.order_by('version_no'))
+        # Then sync any new versions.
+        versions = sl.subtitleversion_set.filter(needs_sync=True,
+                                                 new_subtitle_version=None)
 
-    for version in new_versions[:-1]:
-        _create_subtitle_version(version, False)
+        # This is ugly, but we (may) need to do something special on the last
+        # version we sync.
+        new_versions = list(versions.order_by('version_no'))
 
-    for version in new_versions[-1:]:
-        _create_subtitle_version(version, True)
+        for version in new_versions[:-1]:
+            _create_subtitle_version(version, False)
+
+        for version in new_versions[-1:]:
+            _create_subtitle_version(version, True)
+    finally:
+        sl.release_writelock()
 
     if not dry:
         from utils.metrics import Meter
