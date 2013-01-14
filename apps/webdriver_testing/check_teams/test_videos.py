@@ -30,7 +30,8 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.videos_tab = videos_tab.VideosTab(self)
+        self.logger.info("Create team 'video-test' and add 1 video")
+
         self.team_owner = UserFactory.create(username = 'team_owner')
 
         self.team = TeamMemberFactory.create(
@@ -146,8 +147,8 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
         #Update the video title and description (via api)
         url_part = 'videos/%s' % self.test_video.video_id
-        new_data = {'title': 'Please do not glance at my mother.',
-                    'description': 'Title update for grammar and politeness.'
+        new_data = {
+                    'description': 'description update for grammar and politeness.'
                    }
         data_helpers.put_api_request(self, url_part, new_data)
         time.sleep(2)
@@ -677,7 +678,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         """
         self.logger.info('setup: Setting task policy to all team members')
-        self.limited_access_team.task_assign_policy=20
+        self.limited_access_team.task_assign_policy=10
         self.limited_access_team.save()
 
 
@@ -689,17 +690,15 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
 
-        self.logger.info('Setting video policy to all team members')
-        self.limited_access_team.video_policy=1 
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
 
     def test_manager__no_edit(self):
-        """Video policy: admin-only; manager sees no edit link.
+        """Video policy: admin only; manager sees no edit link.
 
         """
-        self.logger.info('setup: Setting task policy to Admin only')
+        self.logger.info('setup: Setting task policy to admin only')
         self.limited_access_team.video_policy=3
         self.limited_access_team.save()
 
@@ -715,7 +714,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
     def test_manager__edit_permission(self):
-        """Video policy: admin and manager; manager sees the edit link.
+        """Video policy: manager and admin; manager sees the edit link.
 
         """
 
@@ -730,13 +729,13 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
     def test_manager__no_tasks(self):
-        """Task policy: admin-only; manager sees no task link.
+        """Task policy: admin only; manager sees no task link.
 
         """
-        self.logger.info('setup: Setting task policy to Admin only')
-        self.limited_access_team.taks_assign_policy=3
+        self.browser.delete_all_cookies()
+        self.logger.info('setup: Setting task policy to admin only')
+        self.limited_access_team.task_assign_policy=30
         self.limited_access_team.save()
-
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
         #Create a user who is a manager to the team.
@@ -744,12 +743,11 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             team = self.limited_access_team,
             user = UserFactory(username = 'manager')).user
         self.videos_tab.log_in(manager.username, 'password')
-
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
     def test_manager__tasks_permission(self):
-        """Task policy: admin and manager; manager sees the task link.
+        """Task policy: manager and admin; manager sees the task link.
 
         """
 
@@ -764,13 +762,9 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
     def test_restricted_manager__no_tasks(self):
-        """Task policy: admin; language manager sees no task link.
+        """Task policy: manager and admin; language manager sees no task link.
 
         """
-        self.logger.info('setup: Setting task policy to Admin only')
-        self.limited_access_team.taks_assign_policy=3
-        self.limited_access_team.save()
-
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
         manager = TeamManagerMemberFactory(
@@ -784,9 +778,13 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
     def test_restricted_manager__tasks(self):
-        """Task policy: manager and admin; language manager sees task link.
+        """Task policy: all team members; language manager sees task link.
 
         """
+        self.logger.info('setup: Setting task policy to all team members')
+        self.limited_access_team.task_assign_policy=10
+        self.limited_access_team.save()
+
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
         manager = TeamManagerMemberFactory(
@@ -913,10 +911,10 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
 
     def test_admin__edit_link(self):
-        """Video policy: Admin only; admin sees edit link.
+        """Video policy: admin only; admin sees edit link.
 
         """
-        self.logger.info('setup: Setting video policy to Admin only')
+        self.logger.info('setup: Setting video policy to admin only')
         self.limited_access_team.video_policy=3
         self.limited_access_team.save()
 
@@ -935,11 +933,11 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
     def test_admin__task_link(self):
-        """Task policy: Admin only; admin sees task link.
+        """Task policy: admin only; admin sees task link.
 
         """
-        self.logger.info('setup: Setting task policy to Admin only')
-        self.limited_access_team.taks_assign_policy=3
+        self.logger.info('setup: Setting task policy to admin only')
+        self.limited_access_team.task_assign_policy=30
         self.limited_access_team.save()
 
         #Add some test videos to the team.

@@ -28,7 +28,7 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
-        self.create_modal.continue_past_help()
+        #self.create_modal.continue_past_help()
         self.typed_subs = self.sub_editor.type_subs()
 
 

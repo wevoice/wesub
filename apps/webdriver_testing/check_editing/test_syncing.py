@@ -17,6 +17,8 @@ class TestCasePartialSync(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        self.browser.add_cookie({'skiphowto': 1,})
+
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)
@@ -31,7 +33,7 @@ class TestCasePartialSync(WebdriverTestCase):
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
-        self.create_modal.continue_past_help()
+        #self.create_modal.continue_past_help()
         self.typed_subs = self.sub_editor.type_subs()
         self.sub_editor.continue_to_next_step()
         self.sub_editor.sync_subs(num_synced_subs)

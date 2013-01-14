@@ -22,7 +22,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
         self.user = UserFactory.create(username = 'TestUser', is_partner=True)
         self.private_user = UserFactory.create(username = 'IdaRed')
         data_helpers.create_user_api_key(self, self.user)
-        print "creating some teams for testing"
+        self.logger.info('setup: creating team data')
         #create 3 open teams
         for x in range(3):
             TeamMemberFactory.create(
@@ -149,7 +149,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
             'video_policy': 'Any team member', 
             } 
         status, response = data_helpers.put_api_request(self, url_part, expected_details)
-        print response
+        
         status, response = data_helpers.api_get_request(self, url_part) 
         self.teams_dir_pg.open_page('teams/%s/settings/permissions/' % self.open_team.slug)
         self.teams_dir_pg.log_in('open_team_owner', 'password')
@@ -172,7 +172,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
 
         url_part = 'teams/'
         status, response = data_helpers.post_api_request(self, url_part, expected_details) 
-        print status, response
+        
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
         self.teams_dir_pg.open_page('teams/api-created-team/settings/permissions/')
@@ -186,14 +186,12 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         url_part = 'teams/%s/' %self.open_team.slug
         
-        status, response = data_helpers.delete_api_request(self, url_part) 
-        status, response = data_helpers.api_get_request(self, 'teams/') 
+        _, _ = data_helpers.delete_api_request(self, url_part) 
+        _, response = data_helpers.api_get_request(self, 'teams/') 
         team_objects =  response['objects']
         teams_list = []
         for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
             teams_list.append(k)
-        print teams_list
-        print self.open_team.name
         self.assertNotIn(self.open_team.name, teams_list)
 
     def test_delete__nonmember(self):
@@ -203,17 +201,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         url_part = 'teams/%s/' % self.priv_team.slug
         url_part2 = 'teams/%s/' % 'my-team-2' 
-        data_helpers.delete_api_request(self, url_part) 
-        data_helpers.delete_api_request(self, url_part2) 
-        TeamMemberFactory.create(team=self.priv_team, user=self.user)
-        status, response = data_helpers.api_get_request(self, 'teams/') 
-        team_objects =  response['objects']
-        teams_list = []
-        for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
-            teams_list.append(k)
-        print teams_list
-
-#        self.assertEqual(expected_teams, teams_list)
+        s, _ = data_helpers.delete_api_request(self, url_part)
+        self.assertEqual(s, 403)
 
     def test_delete__contributor(self):
         """A Contributor can not delete the team.
@@ -222,13 +211,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         TeamContributorMemberFactory.create(team=self.priv_team, user=self.user)
         url_part = 'teams/%s/' % self.priv_team.slug
-        data_helpers.delete_api_request(self, url_part) 
-        status, response = data_helpers.api_get_request(self, 'teams/') 
-        team_objects =  response['objects']
-        teams_list = []
-        for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
-            teams_list.append(k)
-        self.assertIn('my own private idaho', teams_list) 
+        s, _ = data_helpers.delete_api_request(self, url_part)
+        self.assertEqual(s, 403)
 
         
         

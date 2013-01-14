@@ -110,7 +110,7 @@
         $scope.toggleSaveDropdown = function() {
             $scope.dropdownOpen = !$scope.dropdownOpen;
         };
-        $scope.$root.$on('onWorkDone', function() {
+        $scope.$root.$on('workDone', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
@@ -126,9 +126,24 @@
          * @constructor
          */
 
-        $scope.addSubtitle = function(subtitle, index) {
-            this.dfxpWrapper.addSubtitle(index - 1, {}, subtitle.text);
+        $scope.addSubtitle = function(index, attrs, content, focus) {
+
+            // Add the subtitle directly to the DFXP instance.
+            var newSubtitle = $scope.parser.addSubtitle(index, attrs, content);
+
+            // If we want to focus the subtitle after it's been added, set
+            // the index here.
+            if (focus) {
+                $scope.focusIndex = $scope.parser.getSubtitleIndex(newSubtitle, $scope.parser.getSubtitles().get());
+
+            // Otherwise, reset the focusIndex.
+            } else {
+                $scope.focusIndex = null;
+            }
+
+            // Update the subtitles on the list scope.
             $scope.updateParserSubtitles();
+
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -158,8 +173,8 @@
             this.dfxpWrapper = new root.AmaraDFXPParser();
             this.dfxpWrapper.init(dfxpXML);
 
-            $scope.subtitles = this.dfxpWrapper.getSubtitles().get();
             $scope.parser = this.dfxpWrapper;
+            $scope.subtitles = $scope.parser.getSubtitles().get();
 
             $scope.status = 'ready';
             $scope.$broadcast('onSubtitlesFetched');
@@ -173,7 +188,7 @@
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
-                                          this.dfxpWrapper.xmlToString(true, true));
+                                          $scope.parser.xmlToString(true, true));
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
@@ -184,16 +199,31 @@
         $scope.updateParserSubtitles = function() {
             $scope.subtitles = $scope.parser.getSubtitles().get();
         };
+
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));
         });
 
         window.onresize = function() {
-            $scope.$apply();
+            $scope.$digest();
         };
 
     };
-    var SubtitleListItemController = function($scope, SubtitleStorage) {
+    var SubtitleListHelperController = function($scope) {
+
+        $scope.isEditingAny = false;
+
+        $scope.$root.$on('editing', function() {
+            $scope.isEditingAny = true;
+            $scope.$digest();
+        });
+        $scope.$root.$on('editingDone', function() {
+            $scope.isEditingAny = false;
+            $scope.$digest();
+        });
+
+    };
+    var SubtitleListItemController = function($scope) {
         /**
          * Responsible for actions on one subtitle: editing, selecting.
          * @param $scope
@@ -201,34 +231,48 @@
          */
 
         var initialText;
+
         $scope.isEditing = false;
-        $scope.toHTML = function(markupLikeText) {};
 
         $scope.finishEditingMode = function(newValue) {
+
             $scope.isEditing = false;
-            var content = this.dfxpWrapper.content($scope.subtitle, newValue);
+
+            // Tell the root scope that we're no longer editing, now.
+            $scope.$root.$emit('editingDone');
+
+            var content = $scope.parser.content($scope.subtitle, newValue);
+
             if (content !== initialText) {
                 // mark dirty variable on root scope so we can allow
                 // saving the session
-                $scope.$root.$emit('onWorkDone');
+                $scope.$root.$emit('workDone');
             }
+        };
+        $scope.getSubtitleIndex = function() {
+            return $scope.parser.getSubtitleIndex($scope.subtitle, $scope.subtitles);
         };
         $scope.startEditingMode = function() {
 
-            initialText =  this.dfxpWrapper.content($scope.subtitle);
+            initialText =  $scope.parser.content($scope.subtitle);
 
             $scope.isEditing  = true;
+
+            // Tell the root scope that we're editing, now.
+            $scope.$root.$emit('editing');
+
             return initialText;
         };
         $scope.textChanged = function(newText) {
-            this.dfxpWrapper.content($scope.subtitle, newText);
+            $scope.parser.content($scope.subtitle, newText);
         };
 
     };
 
-    root.SubtitleListController = SubtitleListController;
-    root.SubtitleListItemController = SubtitleListItemController;
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionButtonController = SaveSessionButtonController;
+    root.SubtitleListController = SubtitleListController;
+    root.SubtitleListHelperController = SubtitleListHelperController;
+    root.SubtitleListItemController = SubtitleListItemController;
 
 }).call(this);

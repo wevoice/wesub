@@ -153,7 +153,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         url_part = 'videos/?order_by=-title' 
         status, response = data_helpers.api_get_request(self, url_part)
-        print response
+        
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 

@@ -195,7 +195,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         self.assertIn("Under the sea", displayed_list)
 
         #Verify the origal unedited text is still present in the sub list.
-        self.assertIn(expected_list[9], displayed_list)
+        self.assertIn(expected_list[-1], displayed_list)
 
  
 class TestCaseTimedText(WebdriverTestCase):

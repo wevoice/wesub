@@ -82,6 +82,9 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.user_message_pg.message_text())
 
     def test_messages__application(self):
+        """Custom message for user application.
+
+        """
         self.user_message_pg.log_in(self.non_member.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
@@ -89,6 +92,9 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.a_team_pg.application_custom_message())
 
     def test_messages__promoted_admin(self):
+        """Message for user promoted to admin.
+
+        """
         self.skipTest('needs bugs fixed: i1541 and i438')
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)
@@ -101,6 +107,9 @@ class TestCaseTeamMessages(WebdriverTestCase):
             self.user_message_pg.message_text())
 
     def test_messages__promoted_manager(self):
+        """Message for user promoted to manager.
+
+        """
         self.skipTest('needs bugs fixed: i1541 and i438')
         self.members_tab.member_search(self.team.slug,
             self.team_member.username)

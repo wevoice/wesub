@@ -141,13 +141,13 @@ class TestCaseApplications(WebdriverTestCase):
             query_time)
 
         _, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
         applicants_objects =  response['objects']
         applicants_list = []
         for k, v in itertools.groupby(applicants_objects, 
             operator.itemgetter('user')):
                 applicants_list.append(k)
-                print k
+                
         self.a_team_pg.open_page('teams/%s/members/' % self.team.slug)
         self.assertEqual('late_joiner', applicants_list)
 

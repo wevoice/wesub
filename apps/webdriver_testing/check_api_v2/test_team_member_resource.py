@@ -101,7 +101,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
        
         url_part = 'teams/%s/members/' % self.open_team.slug
         status, response = data_helpers.api_get_request(self, url_part) 
-        print response
+        
         self.assertNotEqual(None, response, "Got a None response")
 
     def test_member__safe_invite(self):
@@ -150,7 +150,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         url_part = 'teams/%s/safe-members/' % self.open_team.slug
         status, response = data_helpers.post_api_request(self, 
             url_part, user_details) 
-        print status, response
+        
         status, response = data_helpers.api_get_request(self, 'users/') 
         users_objects =  response['objects']
         users_list = []
@@ -169,7 +169,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         url_part = 'teams/%s/members/member' % self.open_team.slug
         
         status, response = data_helpers.delete_api_request(self, url_part) 
-        print response
+        
         url_part = 'teams/%s/members/' % self.open_team.slug
         status, response = data_helpers.api_get_request(self, url_part)
         self.assertNotEqual(None, response, "Got a None response")

@@ -57,20 +57,19 @@ class UnisubsPage(Page):
 
     def log_out(self):
         self.logger.info('Log out of site')
-        self.open_page('logout/?next=/')
+        self.open_page('logout/?next=/videos/create')
 
     def log_in(self, username, passw):
         """Log in with the specified account type - default as a no-priv user.
 
         """
-        self.log_out()
-        self.click_by_css(self._LOGIN)
-        self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
+        self.open_page('auth/login/?next=/videos/create/')
+        #self.click_by_css(self._LOGIN)
+        #self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
         self.type_by_css(self._SITE_LOGIN_USER_ID, username)
         self.type_by_css(self._SITE_LOGIN_USER_PW, passw)
         self.click_by_css(self._SITE_LOGIN_SUBMIT)
         self.wait_for_element_present(self._USER_MENU)
-        time.sleep(2)
 
     def current_teams(self):
         """Returns the href value of any teams that use logged in user is 

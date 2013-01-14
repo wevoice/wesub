@@ -103,12 +103,22 @@
                         <li ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
                             ng-class="{editing: isEditing}"
-                            class="subtitle-list-item">
+                            class="subtitle-list-item"
+                            subtitle-list-item>
                             <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRenderedFromRaw(subtitle)"></span>
                             <textarea ng-show="isEditing" style="display: none;"></textarea>
                             <a class="remove" ng-click="removeSubtitle(subtitle)">Remove</a>
                         </li>
                     </ul>
+                    <a class="end"
+                       ng-controller="SubtitleListHelperController"
+                       ng-click="addSubtitle(null, {}, '', true)">
+                        <span ng-show="!isEditingAny">+ New subtitle</span>
+                        <span ng-show="isEditingAny">
+                            Press ENTER or TAB to save subtitle and move to next.<br />
+                            Press SHIFT+TAB to save subtitle and move to previous.
+                        </span>
+                    </a>
                 </div>
             </div>
         </section>
