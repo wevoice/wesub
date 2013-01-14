@@ -80,10 +80,7 @@ class VideosTab(ATeamPage):
 
     def _open_filters(self):
         curr_url = self.current_url()
-        if 'project=' in curr_url:
-            self.logger.info('shoud find filter open')
-        elif self.is_element_visible(self._FILTER_OPEN):
-        else:
+        if not self.is_element_visible(self._FILTER_OPEN):
             self.logger.info('Opening the filter options')
             self.click_by_css(self._FILTERS)
             self.wait_for_element_present(self._FILTER_OPEN)
