@@ -50,6 +50,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, 
             create_url, 
             create_data)
+        self.assertEqual(201, status)
         #Create the url for uploading subtitles of give format and lang.
         upload_url = ('videos/{0}/languages/{1}/subtitles/'.format(
             self.test_video.video_id, test_lang_code))
@@ -77,7 +78,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         status, response = data_helpers.post_api_request(self, 
             upload_url, 
             upload_data)
-        self.assertNotEqual(500, status)
+        self.assertEqual(202, status)
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
             test_lang_code)
         subtitle_lang = self.test_video.subtitle_language(test_lang_code) 

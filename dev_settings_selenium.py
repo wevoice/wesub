@@ -20,6 +20,10 @@ import os
 from settings import *
 from dev_settings import *
 
+# We need unisubs-integration for the tests to pass
+if not USE_INTEGRATION:
+    raise AssertionError("unisubs-integration not present at %s" %
+                         INTEGRATION_PATH)
 #There are differences in the configs for selenium testing when running 
 #in vagrant vm.
 
