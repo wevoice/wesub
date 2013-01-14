@@ -165,12 +165,7 @@ def youtube_oauth_callback(request):
 
     if user:
         user.third_party_accounts.add(account)
-        uri = None
-        for e in feed.get_elements():
-            if type(e) == atom.data.Link:
-                if e.rel == 'related':
-                    uri = e.href
-                    break
+        uri = author.uri.text + '/uploads'
         video_feed = VideoFeed.objects.create(url=uri, user=user)
         update_video_feed.delay(video_feed.pk)
         mirror_existing_youtube_videos.delay(user.pk)
