@@ -27,7 +27,7 @@
             }
         };
     });
-    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder) {
+    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
@@ -42,7 +42,8 @@
              */
             // make sure this works if the event was trigger in the
             // originating li or any descendants
-            elm = $(elm).hasClass('.subtitle-list-item') ?
+
+            elm = $(elm).hasClass('subtitle-list-item') ?
                       elm : $(elm).parents('.subtitle-list-item');
 
             var controller = angular.element(elm).controller();
@@ -51,13 +52,12 @@
             // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
-                    // if there were an active item, deactivate it
                     selectedScope.finishEditingMode(activeTextArea.val());
-                    // trigger updates
                     selectedScope.$digest();
                 }
                 activeTextArea = $('textarea', elm);
                 selectedScope = scope;
+
                 var editableText = selectedScope.startEditingMode();
 
                 activeTextArea.val(editableText);
@@ -99,7 +99,7 @@
 
                     selectedScope.finishEditingMode(activeTextArea.val());
 
-                    selectedScope.addSubtitle(index - 1, {}, '');
+                    selectedScope.addSubtitle(index - 1, {}, '', true);
                 }
 
                 selectedScope.$apply();
@@ -131,8 +131,10 @@
                 rootEl = elm;
                 return {
                     post: function post(scope, elm, attrs) {
+
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
                         isEditable = attrs.editable === 'true';
+
                         if (isEditable) {
                             $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
@@ -147,6 +149,26 @@
                                     selectedScope.finishEditingMode(activeTextArea.val());
                                     selectedScope.$digest();
                                 }
+                            });
+
+                            // Create a custom event handler to select a subtitle.
+                            //
+                            // See the subtitleListItem directive below. This gets called
+                            // if a subtitleListItem is created and its index matches the
+                            // focus index that is set when adding the new subtitle from the
+                            // controller.
+                            $(elm).on('selectFocusedSubtitle', function() {
+
+                                var $subtitle = $('li', elm).eq(scope.focusIndex);
+
+                                // Select the subtitle.
+                                //
+                                // We have to timeout here, otherwise we'll try to select
+                                // the new subtitle before it's been added to DOM.
+                                $timeout(function() {
+                                    onSubtitleItemSelected($subtitle.get(0));
+                                });
+
                             });
                         }
                         scope.setVideoID(attrs['videoId']);
@@ -167,7 +189,9 @@
                         // If we need to focus this subtitle.
                         if (scope.getSubtitleIndex() === scope.$parent.focusIndex) {
 
-                            // How do we call onSubtitleItemSelected in the other directive?
+                            // Trigger the custom event selectFocusedSubtitle on the UL,
+                            // which was bound in the subtitleList directive above.
+                            $(elm).parent().trigger('selectFocusedSubtitle');
 
                         }
 

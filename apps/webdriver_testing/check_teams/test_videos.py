@@ -42,7 +42,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.manager_user = TeamAdminMemberFactory(
             team = self.team,
             user = UserFactory(username = 'TeamAdmin')).user
-
+        self.videos_tab = videos_tab.VideosTab(self)
         self.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
             '- Brian Bradley')
@@ -118,7 +118,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
-        url_part = 'videos/%s' % self.test_video.video_id
+        url_part = 'videos/%s/' % self.test_video.video_id
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
@@ -146,7 +146,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         data_helpers.create_user_api_key(self, self.user)
 
         #Update the video title and description (via api)
-        url_part = 'videos/%s' % self.test_video.video_id
+        url_part = 'videos/%s/' % self.test_video.video_id
         new_data = {
                     'description': 'description update for grammar and politeness.'
                    }
@@ -158,7 +158,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
         #Open team videos page and search for updated title text.
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('grammar and politeness')
-        self.assertTrue(self.videos_tab.video_present(new_data['title']))
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
 
 
 

@@ -142,6 +142,7 @@ class SubtitleEditor(EditorDialogs):
     def subtitles_list(self):
         self.logger.info('getting the list of current subtitles')
         time.sleep(3)
+        self.wait_for_element_present(self._SUBS)
         sub_list = []
         subtitle_els = self.browser.find_elements_by_css_selector(self._SUBS)
         for el in subtitle_els:
