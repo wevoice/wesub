@@ -27,7 +27,7 @@
             }
         };
     });
-    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder) {
+    directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var isEditable;
         var selectedScope, selectedController, activeTextArea,
@@ -45,7 +45,7 @@
 
             elm = $(elm).hasClass('subtitle-list-item') ?
                       elm : $(elm).parents('.subtitle-list-item');
-            
+
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
@@ -59,7 +59,6 @@
                 selectedScope = scope;
 
                 var editableText = selectedScope.startEditingMode();
-                return;
 
                 activeTextArea.val(editableText);
                 selectedScope.$digest();
@@ -163,7 +162,12 @@
                                 var $subtitle = $('li', elm).eq(scope.focusIndex);
 
                                 // Select the subtitle.
-                                onSubtitleItemSelected($subtitle.get(0));
+                                //
+                                // We have to timeout here, otherwise we'll try to select
+                                // the new subtitle before it's been added to DOM.
+                                $timeout(function() {
+                                    onSubtitleItemSelected($subtitle.get(0));
+                                });
 
                             });
                         }
