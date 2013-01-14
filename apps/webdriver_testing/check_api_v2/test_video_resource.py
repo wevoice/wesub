@@ -86,7 +86,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
-        url_part = 'videos/?project=%s/' %self.project1.slug
+        url_part = 'videos/?project=%s' %self.project1.slug
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -104,7 +104,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
                 project = self.project1)
-        url_part = 'videos/?team=%s/' %self.open_team.slug
+        url_part = 'videos/?team=%s' %self.open_team.slug
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -126,7 +126,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             team_vid_list.append(vid.title)
             
             time.sleep(1)
-        url_part = 'videos/?order_by=-created/' 
+        url_part = 'videos/?order_by=-created' 
         status, response = data_helpers.api_get_request(self, url_part)
         video_objects =  response['objects']
         videos_list = []
@@ -151,7 +151,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 video__title = 'Zzz-test-video')
 
 
-        url_part = 'videos/?order_by=-title/' 
+        url_part = 'videos/?order_by=-title' 
         status, response = data_helpers.api_get_request(self, url_part)
         
         video_objects =  response['objects']
