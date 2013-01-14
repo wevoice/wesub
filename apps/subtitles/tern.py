@@ -47,14 +47,12 @@ single = False
 language_pk = None
 dry = False
 
-BOLD_MARKER_START_RE = re.compile(r"\*\*(?=\w)", re.IGNORECASE)
-BOLD_MARKER_END_RE = re.compile(r"(?!\w)\*\*", re.IGNORECASE)
-
-ITALIC_MARKER_START_RE = re.compile(r"\*(?=[^\s])", re.IGNORECASE)
-ITALIC_MARKER_END_RE = re.compile(r"(?!\w)\*", re.IGNORECASE)
-
-UNDERLINE_MARKER_START_RE = re.compile(r"_(?=[^\s])", re.IGNORECASE)
-UNDERLINE_MARKER_END_RE = re.compile(r"(?![^_]\w)_", re.IGNORECASE)
+BOLD_RE_INNER = re.compile(r'\*\*(\S+?)\*\*')
+BOLD_RE_OUTER = re.compile(r'\b\*\*(.+?)\*\*\b')
+ITALIC_RE_INNER = re.compile(r'\*(\S+?)\*')
+ITALIC_RE_OUTER = re.compile(r'\b\*(.+?)\*\b')
+UNDER_RE_INNER = re.compile(r'_(\S+?)_')
+UNDER_RE_OUTER = re.compile(r'\b_(.+?)_\b')
 
 
 # Output
@@ -188,15 +186,12 @@ def markup_to_dfxp(text):
     # gets turned into:
     #
     #     x &lt; <span tts:textDecoration="underline">10</span>
-    text = BOLD_MARKER_START_RE.sub('<span tts:fontWeight="bold">', text)
-    text = BOLD_MARKER_END_RE.sub('</span>', text)
-
-    # Order matters, substitute double *'s first, then single *'s.
-    text = ITALIC_MARKER_START_RE.sub('<span tts:fontStyle="italic">', text)
-    text = ITALIC_MARKER_END_RE.sub('</span>', text)
-
-    text = UNDERLINE_MARKER_START_RE.sub('<span tts:textDecoration="underline">', text)
-    text = UNDERLINE_MARKER_END_RE.sub('</span>', text)
+    text = BOLD_RE_INNER.sub(r'<span tts:fontWeight="bold">\1</span>', text)
+    text = BOLD_RE_OUTER.sub(r'<span tts:fontWeight="bold">\1</span>', text)
+    text = ITALIC_RE_INNER.sub(r'<span tts:fontStyle="italic">\1</span>', text)
+    text = ITALIC_RE_OUTER.sub(r'<span tts:fontStyle="italic">\1</span>', text)
+    text = UNDER_RE_INNER.sub(r'<span tts:textDecoration="underline">\1</span>', text)
+    text = UNDER_RE_OUTER.sub(r'<span tts:textDecoration="underline">\1</span>', text)
 
     return text
 
