@@ -323,6 +323,20 @@ class Page(object):
                                 'but was expecting: ' + text)
                 return False
 
+    def _poll_for_condition(self, condition, wait_time, error_message):
+        """Poll until an arbitrary condition is met """
+        start_time = time.time()
+        while time.time() - start_time < wait_time:
+            if condition():
+                return True
+            else:
+                time.sleep(0.1)
+        if condition():
+            return True
+        else:
+            self.record_error(error_message)
+            return False
+
     def wait_for_element_present(self, element, wait_time=5):
         """Wait for element (by css) present on page, within x seconds.
 
@@ -331,16 +345,12 @@ class Page(object):
            is a multiplied by the implicit wait value.
 
         """
-        for i in range(wait_time):
-            try:
-                time.sleep(1)
-                if self.is_element_present(element):
-                    return self.browser.find_element_by_css_selector(element) 
-            except:
-                pass
-        else:
-            self.record_error("Element %s is not present." % element)
-    
+        self._poll_for_condition(
+            lambda: self.is_element_present(element),
+            wait_time,
+            "Element %s is not present." % element)
+        return self.browser.find_element_by_css_selector(element)
+
     def wait_for_element_not_present(self, element, wait_time=10):
         """Wait for element (by css) to disappear on page, within 10 seconds.
 
@@ -350,55 +360,44 @@ class Page(object):
 
         """
 
-        for i in range(wait_time):
-            try:
-                time.sleep(1)
-                if self.is_element_present(element) is False:
-                    break
-            except:
-                pass
-        else:
-            self.record_error("Element %s is still present." % element)
+        self._poll_for_condition(
+            lambda: self.is_element_present(element) is False,
+            wait_time,
+            "Element %s is still present." % element)
  
     def wait_for_text_not_present(self, text):
         """Wait for text to disappear on page, within 20 seconds.
 
         """
-        for i in range(20):
-            try:
-                time.sleep(1)
-                if self.is_text_present(text) is False:
-                    break
-            except:
-                pass
-        else:
-            self.record_error('The text: %s is still present after 20 seconds' % text)
+        self._poll_for_condition(
+            lambda: self.is_text_present(text) is False,
+            20,
+            'The text: %s is still present after 20 seconds' % text)
 
     def wait_for_element_visible(self, element):
         """Wait for element (by css) visible on page, within 20 seconds.
 
         """
-
-        for i in range(20):
-            time.sleep(1)
-            if self.is_element_visible(element):
-                break
-        else:
-            self.record_error('The element %s is not visible after 20 seconds' % element)
+        self._poll_for_condition(
+            lambda: self.is_element_visible(element),
+            20,
+            'The element %s is not visible after 20 seconds' % element)
 
     def wait_for_element_not_visible(self, element):
         """Wait for element (by css) to be hidden on page, within 20 seconds.
 
         """
-        for i in range(20):
+
+        def check_not_visible():
             try:
-                time.sleep(1)
                 self.browser.find_elements_by_css_selector(
                     element).is_displayed()
             except:
-                break
-        else:
-            self.record_error('The element: %s is still visible after 20 seconds' % element)
+                return True
+            else:
+                return False
+        msg = 'The element: %s is still visible after 20 seconds' % element
+        return self._poll_for_condition(check_not_visible, 20, msg)
 
     def get_absolute_url(self, url):
         """Return the full url.
