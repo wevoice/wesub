@@ -47,10 +47,16 @@
                 language = $scope.language;
             }
 
+            if (!language) {
+                return;
+            }
+
             vers =_.sortBy(language.versions, function(item) {
                 return item.number;
             });
+
             $scope.versions = vers.reverse();
+
             if (vers.length && vers.length > 0) {
                 $scope.version = $scope.versions[0];
             }
@@ -70,8 +76,8 @@
             subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.code,
-                                             newVersion.number,
+                SubtitleStorage.getSubtitles($scope.language.language_code,
+                                             newVersion.version_no,
                                              function(subtitlesXML) {
                     $scope.version.subtitlesXML = subtitlesXML;
                     $scope.setReferenceSubs(subtitlesXML);
