@@ -100,9 +100,10 @@ def api_get_request(self, url_part, output_type='json'):
 
 
 def create_video(self, video_url=None):
-    self.logger.info('Create video url using get_or_create_for_url')
     if not video_url:
         video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+    self.logger.info('Add video: %s, using get_or_create_for_url' %video_url)
+
     video, _ = Video.get_or_create_for_url(video_url)
     return video
 

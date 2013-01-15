@@ -243,8 +243,7 @@ class Page(object):
 
         """
         try:
-            elem = self.browser.find_element_by_css_selector(
-                element)
+            elem = self.browser.find_element_by_css_selector(element)
         except NoSuchElementException:
             return False
         return True
