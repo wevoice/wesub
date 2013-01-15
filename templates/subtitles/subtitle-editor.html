@@ -24,7 +24,7 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionButtonController">
                 <div class="dropdown">
-                    <a href="#" ng-click="toggleSaveDropdown()">
+                    <a href="#" ng-click="toggleSaveDropdown($event)">
                         <ng-switch on="status">
                             <span ng-switch-when="saving">Saving subtitles&hellip;</span>
                             <span ng-switch-when="saved">Saved.</span>

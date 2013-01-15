@@ -107,8 +107,9 @@
                 });
             }
         };
-        $scope.toggleSaveDropdown = function() {
+        $scope.toggleSaveDropdown = function($event) {
             $scope.dropdownOpen = !$scope.dropdownOpen;
+            $event.preventDefault();
         };
         $scope.$root.$on('workDone', function() {
             $scope.canSave = '';
