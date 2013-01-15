@@ -68,12 +68,14 @@
             }
         }
         function onSubtitleTextKeyDown(e) {
-            /**
-             * Triggered with a key is down on a text area for editing subtitles.
-             * If it's regular text just do the default thing.
-             * If we pressed an enter / return, finish editing this sub and
-             * focus o the next one. Same for tab.
-             * @param e The jQuery key event
+            /*
+             * When a key is down, check to see if we need to do something:
+             *
+             * Enter / return: finish editing current sub and focus on the next one.
+             * Shift + Enter / return: enter a newline in the current subtitle.
+             * Tab: send the event to the video controller for playback control.
+             * Shift + Tab: send the event to the video controller for playback control.
+             * Any other key: do nothing.
              */
 
             var keyCode = e.keyCode;
@@ -83,38 +85,38 @@
             var subtitle = selectedScope.subtitle;
             var subtitles = selectedScope.subtitles;
 
-            // return or tab WITHOUT shift
-            if (keyCode === 13 && !e.shiftKey ||
-                keyCode === 9 && !e.shiftKey ) {
+            // Enter / return without shift.
+            if (keyCode === 13 && !e.shiftKey) {
 
-                // enter with shift means new line
-                selectedScope.textChanged($(e.currentTarget).text());
+                var $currentSubtitleTextarea = $(e.currentTarget);
+                var $currentSubtitle = $currentSubtitleTextarea.parent();
+
+                // Save the current subtitle's text.
+                selectedScope.textChanged($currentSubtitle.text());
+
                 e.preventDefault();
 
                 var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
 
-                // if it's the last subtitle of the set and the user pressed enter without shift,
-                // add a new empty subtitle and select it to edit
+                // If this is the last subtitle in the set, save the current subtitle,
+                // and create a new subtitle at the end.
                 if (selectedScope.subtitles[index] === undefined) {
 
+                    // Save the current subtitle.
                     selectedScope.finishEditingMode(activeTextArea.val());
 
+                    // Passing true as the last argument indicates that we want
+                    // to select this subtitle after it is created.
                     selectedScope.addSubtitle(index - 1, {}, '', true);
+
                 }
 
+                // Apply the current scope.
                 selectedScope.$apply();
 
-                elementToSelect = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[index]);
+                // Set the element to select.
+                elementToSelect = $currentSubtitle.next().get(0);
 
-            } else if (keyCode === 9 && e.shiftKey) {
-                // tab with shift, move backwards
-                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
-                var lastSubtitle = parser.getSubtitle(lastIndex);
-                if (lastSubtitle) {
-                    elementToSelect = $('span.subtitle-text', $('.subtitle-list-item',
-                                        rootEl)[lastIndex]);
-                }
-                e.preventDefault();
             }
 
             if (elementToSelect) {
