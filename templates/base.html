@@ -6,7 +6,7 @@
 <html {% if LANGUAGE_BIDI %}dir="rtl"{% endif %} xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml" xml:lang="en" lang="en" {% block html_attrs %}{% endblock %} class="base">
 
 <head>
-    <title>{% block title %}Amara - {% trans 'Universal subtitling: caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
+    <title>{% block title %}Amara - {% trans 'Caption, translate, subtitle and transcribe video.' %}{% endblock %}</title>
 
     <meta name="description" content="The easiest way to caption and translate any video, with crowdsourcing, volunteers, and professional services." />
 
@@ -117,11 +117,12 @@
         <div class="floatright">
             <a href="/about">{% trans 'About' %}</a>
             <a href="http://www.pculture.org/pcf/jobs/">{% trans 'Jobs' %}</a>
-            <a href="http://www.facebook.com/pages/Universal-Subtitles/112574762094219">Facebook</a> 
+            <a href="http://www.facebook.com/Amara.Community/">Facebook</a> 
             <a href="http://twitter.com/amarasubs">Twitter</a>
             <a href="http://support.universalsubtitles.org/solution/categories/13504/folders/40766/articles/35517--i-have-a-non-technical-question-about-amara">{% trans 'Contact Us' %}</a>
             <a href="http://www.pculture.org/pcf/websites-privacy/">{% trans 'Privacy Policy' %}</a>
             <a href="{% url terms_page %}">{% trans 'Terms of Service' %}</a>
+            <a href="{% url security_page %}">{% trans 'Security' %}</a>
         </div>
     </div>
     {% if user.is_staff or user|can_translate %}
@@ -153,7 +154,7 @@
         <script type="text/javascript">
             var _gaq = _gaq || [];
             _gaq.push(['_setAccount', '{{ GOOGLE_ANALYTICS_NUMBER }}']);
-            _gaq.push(['_setDomainName', '.universalsubtitles.org']);    
+            _gaq.push(['_setDomainName', '.amara.org']);
             _gaq.push(['_trackPageview']);
             {% if not RUN_LOCALLY %}
                 {% block analytics %}{% endblock %}
