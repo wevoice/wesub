@@ -24,7 +24,7 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionButtonController">
                 <div class="dropdown">
-                    <a href="#" ng-click="toggleSaveDropdown()">
+                    <a href="#" ng-click="toggleSaveDropdown($event)">
                         <ng-switch on="status">
                             <span ng-switch-when="saving">Saving subtitles&hellip;</span>
                             <span ng-switch-when="saved">Saved.</span>
@@ -70,7 +70,7 @@
                         ng-options="item.name for item in languages">
                 </select>
                 <select name="alternate-version" id="alternate-version"
-                    ng-options="'Version ' + version.number for version in versions"
+                    ng-options="'Version ' + version.version_no for version in versions"
                     ng-model="version">
                 </select>
             </div>
@@ -115,8 +115,7 @@
                        ng-click="addSubtitle(null, {}, '', true)">
                         <span ng-show="!isEditingAny">+ New subtitle</span>
                         <span ng-show="isEditingAny">
-                            Press ENTER or TAB to save subtitle and move to next.<br />
-                            Press SHIFT+TAB to save subtitle and move to previous.
+                            Press ENTER to save subtitle and move to next.<br />
                         </span>
                     </a>
                 </div>
