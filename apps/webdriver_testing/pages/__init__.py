@@ -155,6 +155,17 @@ class Page(object):
         if wait_for_element:
             self.wait_for_element_present(wait_for_element)
 
+    def submit_by_css(self, element):
+        """Submit a form based on the css given.
+
+        kwargs no_wait, then use send keys to no wait for page load.
+               wait_for_element, wait for a passed in element to display
+        """
+        elem = self._safe_find(element)
+        self.logger.info( 'submit')
+        elem.submit()
+        self.logger.info( '** done')
+
     def clear_text(self, element):
         """Clear text of css element in form.
 
