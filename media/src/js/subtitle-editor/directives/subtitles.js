@@ -84,6 +84,8 @@
             var subtitle = selectedScope.subtitle;
             var subtitles = selectedScope.subtitles;
 
+            var nextSubtitle;
+
             // Enter / return without shift.
             if (keyCode === 13 && !e.shiftKey) {
 
@@ -111,7 +113,7 @@
                 selectedScope.$apply();
 
                 // Set the element to select.
-                var nextSubtitle = $currentSubtitle.next().get(0);
+                nextSubtitle = $currentSubtitle.next().get(0);
 
             }
 
