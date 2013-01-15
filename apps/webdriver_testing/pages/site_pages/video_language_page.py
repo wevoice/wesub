@@ -37,6 +37,7 @@ class VideoLanguagePage(VideoPage):
 
         """
         self.click_by_css(self._DOWNLOAD_SUBS)
+        self.wait_for_element_visible(self._DOWNLOAD_OPTION)
         format_els = self.get_elements_list(self._DOWNLOAD_OPTION)
         for el in format_els:
             print el.text
