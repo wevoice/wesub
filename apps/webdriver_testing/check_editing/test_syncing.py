@@ -17,8 +17,9 @@ class TestCasePartialSync(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.browser.add_cookie({'skiphowto': 1,})
-
+        self.browser.add_cookie({ u'name': u'skiphowto', 
+                                  u'value': u'1', 
+                                 })
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)

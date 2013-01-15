@@ -18,6 +18,10 @@ class TestCaseTranscribing(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        #set the skiphowto cookie so those dialogs don't affect test cases.
+        self.browser.add_cookie({ u'name': u'skiphowto', 
+                                  u'value': u'1', 
+                                 })
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)

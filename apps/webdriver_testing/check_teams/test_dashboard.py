@@ -220,6 +220,9 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        self.browser.add_cookie({ u'name': u'skiphowto', 
+                                  u'value': u'1', 
+                                 })
         self.logger.info('setup: Create a team with tasks enabled')
         self.dashboard_tab = dashboard_tab.DashboardTab(self)
         self.user = UserFactory(username = 'user', is_partner=True)
