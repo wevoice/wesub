@@ -22,11 +22,6 @@ from dev_settings import *
 
 #There are differences in the configs for selenium testing when running 
 #in vagrant vm.
-if os.getenv("HOME") == '/home/vagrant':
-    VAGRANT_VM = True  
-    os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = 'unisubs.example.com:8000'
-else:
-    VAGRANT_VM = False
 
 SITE_ID = 4
 DEBUG = True
@@ -48,7 +43,7 @@ INSTALLED_APPS + ('django_nose',
 JS_USE_COMPILED = False
 COMPRESS_MEDIA = False
 
-if VAGRANT_VM == True:
+if os.getenv("HOME") == '/home/vagrant':
     SITE_ID = 19
     STATIC_URL = "http://unisubs.example.com:80/site_media/"
     MEDIA_URL = "http://unisubs.example.com:80/user-data/"
@@ -75,13 +70,13 @@ STATIC_URL_BASE = STATIC_URL
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = ['--with-xunit',
-             '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
-             '--nocapture',
-             #'--collect-only', '--verbosity=2',
-             '--logging-filter=test_steps, -remote_connection, '
-                 '-selenium.webdriver.remote.remote_connection', 
-            ]
+#NOSE_ARGS = ['--with-xunit',
+#             '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
+#             '--nocapture',
+#             #'--collect-only', '--verbosity=2',
+#             '--logging-filter=test_steps, -remote_connection, '
+#                 '-selenium.webdriver.remote.remote_connection', 
+#            ]
 
 CELERY_ALWAYS_EAGER = True
 import logging
