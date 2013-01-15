@@ -19,12 +19,16 @@ class VideoLanguagePage(VideoPage):
     _DOWNLOAD_OPTION = "div.sort_button ul li" 
 
     def open_video_lang_page(self, video_id, lang_code):
+        self.logger.info('Opening {0} page for video: {1}'.format(
+                         lang_code, video_id)
         self.open_page(self._URL.format(video_id, lang_code))
 
     def edit_subtitles(self):
+        self.logger.info('Clicking edit subtitles')
         self.click_by_css(self._EDIT_SUBTITLES)
 
     def displayed_lines(self):
+        self.logger.info('Getting display lines of sub text')
         displayed_subtitles = []
         line_elements = self.get_elements_list(self._SUB_LINES)
         for el in line_elements:
@@ -36,11 +40,11 @@ class VideoLanguagePage(VideoPage):
         """Return the download link for specified format.
 
         """
+        self.logger.info('Locating the download link element for the format')
         self.click_by_css(self._DOWNLOAD_SUBS)
-        self.wait_for_element_visible(self._DOWNLOAD_OPTION)
+        self.wait_for_element_present(self._DOWNLOAD_OPTION)
         format_els = self.get_elements_list(self._DOWNLOAD_OPTION)
         for el in format_els:
-            print el.text
             if el.text == output_format:
                 return el.find_element_by_css_selector('a').get_attribute('href')
                 break
@@ -48,8 +52,9 @@ class VideoLanguagePage(VideoPage):
             raise ValueError('Did not find the link for %s format' % output_format)
 
     def check_download_link(self, link):
+        self.logger.info('Getting content and headers of dl link')
         r = requests.get(link)
-        print r.content
+        self.logger.info(r.content)
         return r.headers
 
 
