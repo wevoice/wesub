@@ -385,7 +385,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
         self.dashboard_tab.open_team_page(self.team.slug)
         self.assertTrue(self.dashboard_tab.suggestion_present(
-                             suggestion_type='language'))
+                             suggestion_type='authed_language'))
 
     def test_member__start_subtitles(self):
         """Member starts subtitling from any task in “Videos that need your help”.

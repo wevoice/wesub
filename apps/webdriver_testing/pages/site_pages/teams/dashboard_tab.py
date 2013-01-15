@@ -23,6 +23,9 @@ class DashboardTab(ATeamPage):
 
     _NO_VIDEOS_TEXT = "Sorry, we couldn't find any videos for you." 
     _LANGUAGE_SUGGESTION = 'ul.suggestions li a[data-modal="language_modal"]'
+    #User is authenticated and has no languages specified.
+    _AUTHED_LANGUAGE_SUGGESTION = 'p.prompt a[data-modal="language_modal"]'
+
     _BROWSE_SUGGESTION = 'ul.suggestions li a[href*="/videos/"]'
     _ADD_SUGGESTION = 'ul.suggestions li a[href*="/add/video/"]'
 
