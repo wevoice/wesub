@@ -43,7 +43,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
         #Get config values from env vars (set via jenkins plugin)
         if self.use_sauce: 
-            
+            self.base_url = self.live_server_url + '/' 
             self.sauce_key = os.environ.get('SAUCE_API_KEY')
             self.sauce_user = os.environ.get('SAUCE_USER_NAME')
             dc['browser'] = os.environ.get('SELENIUM_BROWSER', 'CHROME').upper()
