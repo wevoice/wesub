@@ -28,7 +28,6 @@ from celery.task import task
 from django.conf import settings
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
 from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
@@ -479,6 +478,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             return False
 
         from accountlinker.models import add_amara_description_credit
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
@@ -487,10 +487,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         old_description = entry.media.description.text
 
-        current_site = Site.objects.get_current()
-        video_url = video.get_absolute_url()
-        video_url = u"http://%s%s" % (unicode(current_site.domain),
-                video_url)
+        video_url = shortlink_for_video(video)
 
         language_code = video.language
 
