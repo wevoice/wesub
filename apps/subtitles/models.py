@@ -1257,6 +1257,11 @@ class SubtitleVersion(models.Model):
 
         return self
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('videos:subtitleversion_detail',
+                [self.video.video_id, self.language_code, self.subtitle_language.pk,
+                 self.pk])
 
 class SubtitleVersionMetadata(models.Model):
     """This model is used to add extra metadata to SubtitleVersions.
