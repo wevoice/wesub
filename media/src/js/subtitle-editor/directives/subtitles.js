@@ -79,7 +79,6 @@
              */
 
             var keyCode = e.keyCode;
-            var elementToSelect;
 
             var parser = selectedScope.parser;
             var subtitle = selectedScope.subtitle;
@@ -88,12 +87,9 @@
             // Enter / return without shift.
             if (keyCode === 13 && !e.shiftKey) {
 
-                var $currentSubtitleTextarea = $(e.currentTarget);
-                var $currentSubtitle = $currentSubtitleTextarea.parent();
+                var $currentSubtitle = $(e.currentTarget).parent();
 
-                // Save the current subtitle's text.
-                selectedScope.textChanged($currentSubtitle.text());
-
+                // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
 
                 var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
@@ -115,15 +111,23 @@
                 selectedScope.$apply();
 
                 // Set the element to select.
-                elementToSelect = $currentSubtitle.next().get(0);
+                var nextSubtitle = $currentSubtitle.next().get(0);
 
             }
 
-            if (elementToSelect) {
-                onSubtitleItemSelected(elementToSelect);
+            if (nextSubtitle) {
+
+                // Select the next element.
+                onSubtitleItemSelected(nextSubtitle);
+
+                // Focus on the active textarea.
                 activeTextArea.focus();
+
             } else {
+
+                // Otherwise, just save the current subtitle.
                 selectedScope.textChanged(activeTextArea.val());
+
             }
 
         }
