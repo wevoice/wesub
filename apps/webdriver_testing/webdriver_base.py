@@ -60,6 +60,9 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
                 command_executor=("http://{0}:{1}@ondemand.saucelabs.com:80/"
                                   "wd/hub".format(self.sauce_user, self.sauce_key)))
             self.browser.get(self.base_url + 'videos/create/')
+            self.logger.info("SauceOnDemandSessionID={0} job-name={1}".format(
+                              self.browser.session_id, self.shortDescription()))
+
 
 
         #Otherwise just running locally - setup the browser to use.
