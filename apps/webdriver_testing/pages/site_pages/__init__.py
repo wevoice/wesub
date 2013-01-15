@@ -1,6 +1,10 @@
 import time
-from apps.webdriver_testing.pages import Page
 
+from django.conf import settings
+from django.utils.importlib import import_module
+from django.contrib.auth import authenticate
+
+from apps.webdriver_testing.pages import Page
 
 class UnisubsPage(Page):
     """
@@ -59,17 +63,35 @@ class UnisubsPage(Page):
         self.logger.info('Log out of site')
         self.open_page('logout/?next=/videos/create')
 
-    def log_in(self, username, passw):
+    def log_in(self, username, password):
         """Log in with the specified account type - default as a no-priv user.
 
         """
-        self.open_page('auth/login/?next=/videos/create/')
-        #self.click_by_css(self._LOGIN)
-        #self.wait_for_element_present(self._SITE_LOGIN_USER_ID)
-        self.type_by_css(self._SITE_LOGIN_USER_ID, username)
-        self.type_by_css(self._SITE_LOGIN_USER_PW, passw)
-        self.click_by_css(self._SITE_LOGIN_SUBMIT)
-        self.wait_for_element_present(self._USER_MENU)
+        self.logger.info("LOG IN")
+        engine = import_module(settings.SESSION_ENGINE)
+        session = engine.SessionStore(self._get_session_id())
+        user = authenticate(username=username, password=password)
+        if user is None:
+            raise ValueError("Invalid auth credentials: %r/%r" %
+                             (username, password))
+        session['_auth_user_id'] = unicode(user.pk)
+        session['_auth_user_backend'] = u'auth.backends.CustomUserBackend'
+        session.save()
+        self.logger.info("session saved: %s", session.session_key)
+        self.browser.add_cookie({ u'domain': u'unisubs.example.com',
+                                 u'name': u'sessionid',
+                                  u'value': session.session_key,
+                                  u'path': u'/',
+                                 })
+        self.logger.info("cookie saved")
+        self.logger.info("cookies: %s", self.browser.get_cookies())
+
+    def _get_session_id(self):
+        for cookie in self.browser.get_cookies():
+            if (cookie['domain'] == 'unisubs.example.com' and 
+                cookie['name'] == 'sessionid'):
+                return cookie['value']
+        return None
 
     def current_teams(self):
         """Returns the href value of any teams that use logged in user is 
