@@ -46,9 +46,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             
             self.sauce_key = os.environ.get('SAUCE_API_KEY')
             self.sauce_user = os.environ.get('SAUCE_USER_NAME')
-            test_browser = os.environ.get('SELENIUM_BROWSER', 'CHROME')
-            dc = getattr(webdriver.DesiredCapabilities,
-                         test_browser.upper().replace(" ", ""))
+            dc['browser'] = os.environ.get('SELENIUM_BROWSER', 'CHROME').upper()
             dc['version'] = os.environ.get('SELENIUM_VERSION', '')
             dc['platform'] = os.environ.get('SELENIUM_PLATFORM', 'WINDOWS 2008')
             dc['name'] = self.shortDescription()
