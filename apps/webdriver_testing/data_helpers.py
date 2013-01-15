@@ -120,11 +120,12 @@ def create_video_with_subs(self, video_url=None, data=None):
     video = create_video(self, video_url)
     if not data:
         data = {'language_code': 'en',
-                'video_language': 'en',
                 'video': video.pk,
-                'draft': open('apps/videos/fixtures/test.srt'),
-                'is_complete': True
-               }
+                'primary_audio_language_code': 'en',
+                'draft':  open('apps/videos/fixtures/test.srt'),
+                'is_complete': True,
+                'complete': 1
+                }
     upload_subs(self, video, data)
     return video
 
