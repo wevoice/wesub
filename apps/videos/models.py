@@ -433,8 +433,16 @@ class Video(models.Model):
                 obj.user = user
                 obj.save()
 
-                from videos.tasks import save_thumbnail_in_s3
+                from videos.tasks import (
+                    save_thumbnail_in_s3,
+                    add_amara_description_credit_to_youtube_video
+                )
+
                 save_thumbnail_in_s3.delay(obj.pk)
+
+                if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+                    add_amara_description_credit_to_youtube_video.delay(
+                            obj.video_id)
 
                 Action.create_video_handler(obj, user)
 
