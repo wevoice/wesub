@@ -62,20 +62,14 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
                 desired_capabilities=dc,
                 command_executor=("http://{0}:{1}@ondemand.saucelabs.com:80/"
                                   "wd/hub".format(self.sauce_user, self.sauce_key)))
-            self.browser.get(self.base_url + 'videos/create/')
-            #Log session and description for sauce results matching.
-            self.logger.info("SauceOnDemandSessionID={0} job-name={1}".format(
-                              self.browser.session_id, self.shortDescription()))
-
-
 
         #Otherwise just running locally - setup the browser to use.
         else:
             test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
             self.browser = getattr(webdriver, test_browser)()
-            self.browser.get(self.base_url + 'videos/create/')
-            #Opening the create page as the starting point because it loads faster than the home page.
-            self.browser.get(self.base_url + 'videos/create/')
+
+        #Opening the create page as the starting point because it loads faster than the home page.
+        self.browser.get(self.base_url + 'videos/create/')
 
         
     def tearDown(self):
