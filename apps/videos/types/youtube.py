@@ -36,6 +36,7 @@ from auth.models import CustomUser as User
 from base import VideoType, VideoTypeError
 from utils.subtitles import YoutubeXMLParser
 from utils.translation import SUPPORTED_LANGUAGE_CODES
+from utils.metrics import Meter, Occurrence
 
 from libs.unilangs.unilangs import LanguageCode
 
@@ -53,7 +54,10 @@ class TooManyRecentCallsException(Exception):
     """
     Raised when the Youtube API responds with yt:quota too_many_recent_calls.
     """
-    pass
+
+    def __init__(self, *args, **kwargs):
+        super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
+        Occurrence('youtube_api_too_many_calls').mark()
 
 
 def get_youtube_service():
@@ -270,6 +274,7 @@ class YoutubeVideoType(VideoType):
         return video_obj
 
     def _get_entry(self, video_id):
+        Meter('youtube_api_request').inc()
         try:
             return yt_service.GetYouTubeVideoEntry(video_id=str(video_id))
         except RequestError, e:
@@ -389,6 +394,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         Override the very low-level request method to catch possible
         too_many_recent_calls errors.
         """
+        Meter('youtube_api_request').inc()
         try:
             return super(YouTubeApiBridge, self).request(*args, **kwargs)
         except gdata.client.RequestError, e:
@@ -536,6 +542,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         return False
 
     def _make_update_request(self, uri, entry):
+        Meter('youtube_api_request').inc()
         headers = {
             'Content-Type': 'application/atom+xml',
             'Authorization': 'Bearer %s' % self.access_token,
