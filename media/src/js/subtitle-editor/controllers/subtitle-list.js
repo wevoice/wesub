@@ -47,10 +47,16 @@
                 language = $scope.language;
             }
 
+            if (!language) {
+                return;
+            }
+
             vers =_.sortBy(language.versions, function(item) {
-                return item.number;
+                return item.version_no;
             });
+
             $scope.versions = vers.reverse();
+
             if (vers.length && vers.length > 0) {
                 $scope.version = $scope.versions[0];
             }
@@ -71,7 +77,7 @@
 
             if (!subtitlesXML) {
                 SubtitleStorage.getSubtitles($scope.language.code,
-                                             newVersion.number,
+                                             newVersion.version_no,
                                              function(subtitlesXML) {
                     $scope.version.subtitlesXML = subtitlesXML;
                     $scope.setReferenceSubs(subtitlesXML);
@@ -107,8 +113,9 @@
                 });
             }
         };
-        $scope.toggleSaveDropdown = function() {
+        $scope.toggleSaveDropdown = function($event) {
             $scope.dropdownOpen = !$scope.dropdownOpen;
+            $event.preventDefault();
         };
         $scope.$root.$on('workDone', function() {
             $scope.canSave = '';
