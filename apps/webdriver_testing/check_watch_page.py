@@ -18,6 +18,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
     """
 
     def setUp(self):
+        _multiprocess_can_split_ = True
+
         WebdriverTestCase.setUp(self)
         management.call_command('clear_index', interactive=False)
 
