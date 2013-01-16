@@ -52,7 +52,7 @@
             }
 
             vers =_.sortBy(language.versions, function(item) {
-                return item.number;
+                return item.version_no;
             });
 
             $scope.versions = vers.reverse();
@@ -76,7 +76,7 @@
             subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.language_code,
+                SubtitleStorage.getSubtitles($scope.language.code,
                                              newVersion.version_no,
                                              function(subtitlesXML) {
                     $scope.version.subtitlesXML = subtitlesXML;

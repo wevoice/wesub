@@ -46,7 +46,7 @@ def _language_data(language, editing_version, translated_from_version):
     '''
     versions_data = []
     for version_number in range(1, language.num_versions +1):
-        version_data = {'number':version_number}
+        version_data = {'version_no':version_number}
         if editing_version and editing_version.version_number == version_number and \
             editing_version.subtitle_language == language:
             version_data.update(_version_data(editing_version))

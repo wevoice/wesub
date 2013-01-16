@@ -18,29 +18,6 @@
 
 (function() {
     /*
-     * We store a local cache of language data + subtitles in the following format:
-     * [
-     *   {
-     *      "code": "en",
-     *      "editingLanguage": true,
-     *      "versions": [
-     *        {
-     *          "title": "About Amara",
-     *          "number": 4,
-     *          "subtitlesXML": "<dfxp subs>",
-     *          "description": "<some description>"
-     *        }
-     *      ],
-     *      "numVersions": 1,
-     *      "translatedFrom": {
-     *        "version_number": 3,
-     *        "language_code": "en"
-     *      },
-     *      "pk": 1,
-     *      "name": "English"
-     *   }
-     * ]
-     *
      * When you request a set of subtitles the api is hit if data is not yet on
      * the cache.
      */
@@ -107,7 +84,7 @@
                     var langObj = cachedData.languages[i];
                     if (langObj.code === languageCode){
                         for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].number === parseInt(versionNumber)){
+                            if (langObj.versions[j].version_no === parseInt(versionNumber)){
                                 subtitlesXML = langObj.versions[j].subtitlesXML;
                                 break;
                             }
