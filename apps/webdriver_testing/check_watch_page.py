@@ -237,7 +237,6 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         """
         video_pg = video_page.VideoPage(self)
-        video_pg.log_in('admin', 'password')
         feature_vid = data_helpers.create_video_with_subs(self, 
             video_url = "http://vimeo.com/903633 ")
         video_pg.open_video_page(feature_vid.video_id)
@@ -252,7 +251,6 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         """
         video_pg = video_page.VideoPage(self)
-        video_pg.log_in('admin', 'password')
         feature_vid = data_helpers.create_video_with_subs(self, 
             video_url = "http://vimeo.com/903633 ")
         video_pg.open_video_page(feature_vid.video_id)
