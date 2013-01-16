@@ -48,6 +48,14 @@ YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 _('Private video')
 _('Undefined error')
 
+
+class TooManyRecentCallsException(Exception):
+    """
+    Raised when the Youtube API responds with yt:quota too_many_recent_calls.
+    """
+    pass
+
+
 def get_youtube_service():
     """
     Gets instance of youtube service with the proper developer key
@@ -376,6 +384,19 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
 
+    def request(self, *args, **kwargs):
+        """
+        Override the very low-level request method to catch possible
+        too_many_recent_calls errors.
+        """
+        try:
+            return super(YouTubeApiBridge, self).request(*args, **kwargs)
+        except gdata.client.RequestError, e:
+            if 'too_many_recent_calls' in str(e):
+                raise TooManyRecentCallsException
+            else:
+                raise e
+
     def refresh(self):
         """
         Refresh the access token
@@ -522,6 +543,10 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
         }
         r = requests.put(uri, data=entry, headers=headers)
+
+        if r.status_code == 403 and 'too_many_recent_calls' in r.content:
+            raise TooManyRecentCallsException
+
         return r.status_code
 
     def _delete_track(self, track):
