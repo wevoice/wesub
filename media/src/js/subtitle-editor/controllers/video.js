@@ -29,7 +29,9 @@
          */
 
         // The Popcorn instance.
-        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL());
+        //
+        // For now, make sure we force controls.
+        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL() + '&controls=1');
 
         $scope.playChunk = function(start, duration) {
             // Play a specified amount of time in a video, beginning at 'start',
