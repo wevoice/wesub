@@ -20,7 +20,7 @@ class VideoLanguagePage(VideoPage):
 
     def open_video_lang_page(self, video_id, lang_code):
         self.logger.info('Opening {0} page for video: {1}'.format(
-                         lang_code, video_id)
+                         lang_code, video_id))
         self.open_page(self._URL.format(video_id, lang_code))
 
     def edit_subtitles(self):
