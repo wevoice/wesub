@@ -16,6 +16,9 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+var SubtitleListItemController = SubtitleListItemController || null;
+
 (function($) {
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
@@ -238,8 +241,8 @@
 
                             });
                         }
-                        scope.setVideoID(attrs['videoId']);
-                        scope.setLanguageCode(attrs['languageCode']);
+                        scope.setVideoID(attrs.videoId);
+                        scope.setLanguageCode(attrs.languageCode);
                         SubtitleListFinder.register(attrs.subtitleList, elm,
                             angular.element(elm).controller(), scope);
                     }
