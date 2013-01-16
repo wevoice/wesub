@@ -19,7 +19,6 @@
 (function() {
 
     var root = this;
-    var $ = root.AmarajQuery;
 
     var VideoController = function($scope, SubtitleStorage) {
         /**
