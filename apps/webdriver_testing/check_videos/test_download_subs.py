@@ -8,17 +8,18 @@ from apps.webdriver_testing.pages.editor_pages import subtitle_editor
 import codecs
 import os
 
- 
 class TestCaseDownloadSubs(WebdriverTestCase):
     """TestSuite for download subtitles from the video's lanugage page   """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'user')
-        self.auth = dict(username=self.user.username, password='password')
-        self.video_language_pg = video_language_page.VideoLanguagePage(self)
-        self.video_language_pg.log_in(self.user.username, 'password')
-        self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseDownloadSubs, cls).setUpClass()
+        cls.user = UserFactory.create(username = 'user')
+        cls.auth = dict(username=cls.user.username, password='password')
+        cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_language_pg.log_in(cls.user.username, 'password')
+        cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
     def _add_video_and_subs(self, sub_file, lang_code, title):
