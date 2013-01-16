@@ -37,6 +37,9 @@
             // Play a specified amount of time in a video, beginning at 'start',
             // and then pause.
 
+            // Pause the video, first.
+            $scope.pop.play();
+
             // Remove any existing cues that may interfere.
             var trackEvents = $scope.pop.getTrackEvents();
             for (var i = 0; i < trackEvents.length; i++) {
