@@ -19,16 +19,41 @@
 (function() {
 
     var root = this;
+    var $ = root.AmarajQuery;
 
     var VideoController = function($scope, SubtitleStorage) {
         /**
-         * Responsible for initializing the video.
+         * Responsible for initializing the video and all video controls.
          * @param $scope
          * @param SubtitleStorage
          * @constructor
          */
 
+        // The Popcorn instance.
         $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL());
+
+        $scope.playChunk = function(start, duration) {
+            // Play a specified amount of time in a video, beginning at 'start',
+            // and then pause.
+
+            // Remove any existing cues that may interfere.
+            var trackEvents = $scope.pop.getTrackEvents();
+            for (var i = 0; i < trackEvents.length; i++) {
+                $scope.pop.removeTrackEvent(trackEvents[i].id);
+            }
+
+            // Set the new start time.
+            $scope.pop.currentTime(start);
+
+            // Set a new cue to pause the video at the end of the chunk.
+            $scope.pop.cue(start + duration, function() {
+                $scope.pop.pause();
+            });
+
+            // Play the video.
+            $scope.pop.play();
+
+        };
     };
 
     root.VideoController = VideoController;

@@ -84,6 +84,8 @@
             var subtitle = selectedScope.subtitle;
             var subtitles = selectedScope.subtitles;
 
+            var video = angular.element($('#video').get(0)).scope();
+
             var nextSubtitle;
 
             // Enter / return without shift.
@@ -114,6 +116,36 @@
 
                 // Set the element to select.
                 nextSubtitle = $currentSubtitle.next().get(0);
+
+            }
+
+            // Tab without shift.
+            if (keyCode === 9 && !e.shiftKey) {
+
+                // TODO: This needs to bubble up so we can handle tab
+                // and shift + tab on the document level, not only when
+                // you're selected into a subtitle.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
+                
+                // Move the video forward four seconds.
+                video.playChunk(video.pop.currentTime(), 4);
+
+            }
+            
+            // Tab with shift.
+            if (keyCode === 9 && e.shiftKey) {
+
+                // TODO: This needs to bubble up so we can handle tab
+                // and shift + tab on the document level, not only when
+                // you're selected into a subtitle.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
+
+                // Move the video backwards four seconds.
+                video.playChunk(video.pop.currentTime() - 4, 4);
 
             }
 
