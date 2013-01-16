@@ -220,9 +220,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.browser.add_cookie({ u'name': u'skiphowto', 
-                                  u'value': u'1', 
-                                 })
+        data_helpers.set_skip_howto(self.browser)
         self.logger.info('setup: Create a team with tasks enabled')
         self.dashboard_tab = dashboard_tab.DashboardTab(self)
         self.user = UserFactory(username = 'user', is_partner=True)
@@ -407,8 +405,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Member starts translation from any task in “Videos that need your help”.
 
         """
-        self.auth = dict(username=self.user.username, password='password')
-
         self.logger.info('setup: Setting task policy to all team members')
         self.team.task_assign_policy=20
         self.team.video_policy=1
@@ -446,7 +442,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
         """
         self.skipTest('Clicking Review link makes selenium loopy')
-        self.auth = dict(username=self.user.username, password='password')
         self.team_workflow.review_allowed = 10
         self.team_workflow.save()
 
@@ -469,7 +464,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
             self.team.slug, video.video_id)
         status, response = data_helpers.api_get_request(self, url_part) 
         task_objects = response['objects']
-        print task_objects
 
         create_modal = dialogs.CreateLanguageSelection(self)
         #Login user and go to team dashboard page
