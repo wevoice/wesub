@@ -46,6 +46,10 @@
                 $scope.pop.removeTrackEvent(trackEvents[i].id);
             }
 
+            if (start < 0) {
+                start = 0;
+            }
+
             // Set the new start time.
             $scope.pop.currentTime(start);
 
