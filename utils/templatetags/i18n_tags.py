@@ -25,7 +25,7 @@ def to_localized_display(language_code):
     will return a '?'.
     '''
     try:
-        return _(get_language_info(unicode(language_code))['name_local' ])
+        return _(get_language_info(unicode(language_code))['name_local'].encode('utf-8'))
     except KeyError:
         logger.error('Uknown language code to be translated', extra={
             'language_code': unicode(language_code),
