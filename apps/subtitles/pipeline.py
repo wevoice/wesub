@@ -351,7 +351,7 @@ def _get_language(video, language_code):
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
-                   rollback_of_version_number, committer, complete):
+                   rollback_of_version_number, committer, complete, created):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -370,7 +370,8 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
     data = {'title': title, 'description': description, 'author': author,
             'visibility': visibility, 'visibility_override': visibility_override,
             'parents': [_get_version(video, p) for p in (parents or [])],
-            'rollback_of_version_number': rollback_of_version_number}
+            'rollback_of_version_number': rollback_of_version_number,
+            'created': created}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
@@ -397,6 +398,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'visibility_override': None,
         'complete': None,
         'committer': None,
+        'created': None,
     }
 
     # If any version in the history is public, then rollbacks should also result
@@ -430,7 +432,8 @@ def _rollback_to(video, language_code, version_number, rollback_author):
 def unsafe_add_subtitles(video, language_code, subtitles,
                          title=None, description=None, author=None,
                          visibility=None, visibility_override=None,
-                         parents=None, committer=None, complete=None):
+                         parents=None, committer=None, complete=None,
+                         created=None):
     """Add subtitles in the language to the video without a transaction.
 
     You probably want to use add_subtitles instead, but if you're already inside
@@ -443,12 +446,13 @@ def unsafe_add_subtitles(video, language_code, subtitles,
     """
     return _add_subtitles(video, language_code, subtitles, title, description,
                           author, visibility, visibility_override, parents,
-                          None, committer, complete)
+                          None, committer, complete, created)
 
 def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
-                  parents=None, committer=None, complete=None):
+                  parents=None, committer=None, complete=None,
+                  created=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -491,12 +495,15 @@ def add_subtitles(video, language_code, subtitles,
     subtitles_complete attribute will be set appropriately.  If omitted, it will
     not be adjusted.
 
+    Created should be a datetime that will set the "created" date for the
+    resulting version.  If not given it will default to today.
+
     """
     with transaction.commit_on_success():
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
                               visibility_override, parents, None, committer,
-                              complete)
+                              complete, created)
 
 
 def unsafe_rollback_to(video, language_code, version_number,

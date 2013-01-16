@@ -92,7 +92,8 @@ class TasksTab(ATeamPage):
             self.select_option_by_text(self._TASK_TYPE, task_type)
         if task_assignee:
             self.select_from_chosen(self._TASK_ASSIGNEE, task_assignee)
-        self.click_by_css(self._TASK_SAVE)
+        
+        self.submit_by_css(self._TASK_SAVE)
 
  
 
