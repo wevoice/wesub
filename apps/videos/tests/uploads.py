@@ -300,10 +300,12 @@ class UploadSubtitlesTest(WebUseTest):
         self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
         self._assertVersionCount(video, 3)
 
-        # You can't upload a translation from A to X, when a translation
-        # from B to X already exists (assuming A ≠ B).
+        # Now fr is  translated from de
         self._upload(video, 'fr', 'en', 'de', True, 'test.srt')
-        self._assertVersionCount(video, 3)
+        self._assertVersionCount(video, 4)
+        language = video.newsubtitlelanguage_set.get(language_code='fr')
+        self.assertEqual(language.get_translation_source_language_code(), 'de')
+
 
     def test_upload_to_language_with_dependents(self):
         video = get_video()

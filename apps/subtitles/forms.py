@@ -95,13 +95,6 @@ class SubtitlesUploadForm(forms.Form):
                 raise forms.ValidationError(_(
                     u"The language already exists and is not a translation."))
 
-        # If the target language already exists and is a translation, the user's
-        # "translated from" language must match the existing one.
-        if existing_from_language_code != from_language_code:
-            raise forms.ValidationError(_(
-                "The language already exists as a translation from %s."
-                % subtitle_language.get_language_code_display()))
-
     def _verify_no_dependents(self, subtitle_language):
         # You cannot upload to a language with dependents.
         dependents = subtitle_language.get_dependent_subtitle_languages()
