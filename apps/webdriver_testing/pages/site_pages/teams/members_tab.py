@@ -101,7 +101,7 @@ class MembersTab(ATeamPage):
             self._language_restrictions(languages)
         if not projects == []:
             self._project_restrictions(projects)
-        self.submit_by_css(self._SAVE_EDITS)
+        self.click_by_css(self._SAVE_EDITS)
         time.sleep(2)
 
     def _language_restrictions(self, languages):
