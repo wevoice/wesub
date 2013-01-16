@@ -28,7 +28,6 @@ from celery.task import task
 from django.conf import settings
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
 from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
@@ -144,9 +143,14 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     video_changed_tasks.delay(video.pk)
 
 
-def should_add_credit(subtitle_version):
+def should_add_credit(subtitle_version=None, video=None):
     # Only add credit to non-team videos
-    video = subtitle_version.language.video
+    if not video and not subtitle_version:
+        raise Exception("You need to pass in at least one argument")
+
+    if not video:
+        video = subtitle_version.language.video
+
     return not video.get_team_video()
 
 
@@ -157,7 +161,7 @@ def add_credit(subtitle_version, subs):
     if len(subs) == 0:
         return subs
 
-    if not should_add_credit(subtitle_version):
+    if not should_add_credit(subtitle_version=subtitle_version):
         return subs
 
     from accountlinker.models import get_amara_credit_text
@@ -442,7 +446,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
 
         subs = add_credit(subtitle_version, subs)
-        self.add_credit_to_description(subtitle_version)
+        self.add_credit_to_description(subtitle_version.language.video)
 
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = ""
@@ -458,7 +462,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
                 settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
                 self.token, {'fmt':'srt'})
 
-    def add_credit_to_description(self, subtitle_version):
+    def add_credit_to_description(self, video):
         """
         Get the entry information from Youtube, extract the original
         description, prepend the description with Amara credits and push it
@@ -470,10 +474,11 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
-        if not should_add_credit(subtitle_version):
+        if not should_add_credit(video=video):
             return False
 
         from accountlinker.models import add_amara_description_credit
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
@@ -482,12 +487,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         old_description = entry.media.description.text
 
-        video = subtitle_version.language.video
-
-        current_site = Site.objects.get_current()
-        video_url = video.get_absolute_url()
-        video_url = u"http://%s%s" % (unicode(current_site.domain),
-                video_url)
+        video_url = shortlink_for_video(video)
 
         language_code = video.language
 
