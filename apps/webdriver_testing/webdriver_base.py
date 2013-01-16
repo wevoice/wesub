@@ -77,14 +77,6 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.logger.info("Link to the job: https://saucelabs.com/jobs/%s" % self.browser.session_id)
             self.logger.info("SauceOnDemandSessionID={0} job-name={1}".format(
                                self.browser.session_id, self.shortDescription()))
-        else:
-            try:  #To get a screenshot of the last page and save to Results.
-                time.sleep(2) #sometimes needs some extra time.
-                screenshot_file = ('apps/webdriver_testing/' 
-                              'Results/%s.png' % self.id())
-                self.browser.get_screenshot_as_file(screenshot_file)
-            except:
-                pass
         try:
             self.browser.quit()
         except:
