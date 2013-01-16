@@ -107,9 +107,22 @@ def create_video(self, video_url=None):
     video, _ = Video.get_or_create_for_url(video_url)
     return video
 
+def super_user():
+    superuser = UserFactory(is_partner=True, 
+                             is_staff=True, 
+                             is_superuser=True) 
+    auth = dict(username=superuser.username, password='password')
+    return auth
+
+
+def set_skip_howto(browser):
+    browser.add_cookie({ u'name': u'skiphowto', 
+                      u'value': u'1', 
+                      u'secure': False,
+                    })
 def upload_subs(self, video, data):
     self.logger.info('Uploading subs via client.post')
-    self.client.login(**self.auth)
+    self.client.login(**super_user())
     response = self.client.post(reverse('videos:upload_subtitles'), data)
     self.logger.info('Uploading subs via client: %s' % response)
 
@@ -159,7 +172,4 @@ def create_videos_with_fake_subs(self, testdata=None):
     self.logger.info('Adding video with fake sub data: %s' % testdata)
     videos = _create_videos(testdata, [])
     return videos
-
-
-    
 
