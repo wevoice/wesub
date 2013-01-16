@@ -238,6 +238,10 @@ class Page(object):
         time.sleep(1)
         elem.submit()
 
+    def submit_by_css(self, element):
+        elem = self._safe_find(element)
+        elem.submit()
+
     def is_element_present(self, element):
         """Return when an element is found on the page.
 

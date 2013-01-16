@@ -18,6 +18,8 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
     """
 
     def setUp(self):
+        _multiprocess_can_split_ = True
+
         WebdriverTestCase.setUp(self)
         management.call_command('clear_index', interactive=False)
 
@@ -92,22 +94,15 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
  
         """
         results_pg = self.watch_pg.advanced_search(orig_lang='English')
-        #WORKAROUND for testing on jenkins, where submitting search give err page.
-        results_pg.open_page(results_pg.current_url())
-
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
-        self.assertEqual(1, len(results_pg.page_videos()))
+        self.assertEqual(2, len(results_pg.page_videos()))
 
     def test_search__trans_lang(self):
         """Search for videos by translations language.
  
         """
         results_pg = self.watch_pg.advanced_search(trans_lang='Portuguese')
-
-        #WORKAROUND for testing on jenkins, where submitting search give err page.
-        results_pg.open_page(results_pg.current_url())
-
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -118,9 +113,6 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """
         results_pg = self.watch_pg.advanced_search(orig_lang = 'English', 
             trans_lang='Portuguese')
-
-        #WORKAROUND for testing on jenkins, where submitting search give err page.
-        results_pg.open_page(results_pg.current_url())
         self.assertTrue(results_pg.page_has_video(
             'original english with incomplete pt'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -133,10 +125,6 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.advanced_search(
             orig_lang = 'Arabic', 
             trans_lang='English')
-
-        #WORKAROUND for testing on jenkins, where submitting search give err page.
-        results_pg.open_page(results_pg.current_url())
- 
         self.assertTrue(results_pg.page_has_video(
             'original ar with en complete subs'))
         self.assertEqual(1, len(results_pg.page_videos()))
@@ -251,7 +239,6 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         """
         video_pg = video_page.VideoPage(self)
-        video_pg.log_in('admin', 'password')
         feature_vid = data_helpers.create_video_with_subs(self, 
             video_url = "http://vimeo.com/903633 ")
         video_pg.open_video_page(feature_vid.video_id)
@@ -266,7 +253,6 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         """
         video_pg = video_page.VideoPage(self)
-        video_pg.log_in('admin', 'password')
         feature_vid = data_helpers.create_video_with_subs(self, 
             video_url = "http://vimeo.com/903633 ")
         video_pg.open_video_page(feature_vid.video_id)

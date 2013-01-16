@@ -18,6 +18,7 @@ class TestCaseTranscribing(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        data_helpers.set_skip_howto(self.browser)
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)

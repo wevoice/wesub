@@ -33,7 +33,6 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.logger.info("Create team 'video-test' and add 1 video")
 
         self.team_owner = UserFactory.create(username = 'team_owner')
-
         self.team = TeamMemberFactory.create(
             team__name='Video Test',
             team__slug='video-test',
