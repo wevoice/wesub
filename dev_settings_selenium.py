@@ -37,8 +37,7 @@ DATABASES = {
         }
     }
 
-INSTALLED_APPS + ('django_nose', 
-                  'webdriver_testing', )
+INSTALLED_APPS + ('webdriver_testing',)
 
 JS_USE_COMPILED = False
 COMPRESS_MEDIA = False
@@ -70,14 +69,6 @@ STATIC_URL_BASE = STATIC_URL
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-#NOSE_ARGS = ['--with-xunit',
-#             '--xunit-file=apps/webdriver_testing/Results/nosetests.xml', 
-#             '--nocapture',
-#             #'--collect-only', '--verbosity=2',
-#             '--logging-filter=test_steps, -remote_connection, '
-#                 '-selenium.webdriver.remote.remote_connection', 
-#            ]
-
 CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
