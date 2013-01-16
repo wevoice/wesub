@@ -115,6 +115,9 @@ def can_be_synced(version):
 
     A version must be public, synced and complete; it must also be either
     "approved" or "unmoderated".
+
+    We can't sync a version if it's the only version in that language and it
+    has the "From youtube" note.
     """
     if version:
         if not version.is_public or not version.is_synced():
@@ -128,6 +131,9 @@ def can_be_synced(version):
         status = version.moderation_status
 
         if (status != APPROVED) and (status != UNMODERATED):
+            return False
+
+        if version.language.is_imported_from_youtube_and_not_worked_on:
             return False
 
     return True
