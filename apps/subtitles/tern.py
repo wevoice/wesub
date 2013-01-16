@@ -476,10 +476,11 @@ def _create_subtitle_version(sv, last_version):
     if not dry:
         try:
             subtitles = list(subtitles)
-            nsv = pipeline.add_subtitles(nsl.video, nsl.language_code, subtitles,
-                                        title=sv.title, description=sv.description,
-                                        parents=parents, visibility=visibility,
-                                        author=sv.user)
+            nsv = pipeline.add_subtitles(
+                nsl.video, nsl.language_code, subtitles,
+                title=sv.title, description=sv.description, parents=parents,
+                visibility=visibility, author=sv.user,
+                created=sv.datetime_started)
         except:
             # Log the subtitles when an error happens.
             err("=" * 60)
