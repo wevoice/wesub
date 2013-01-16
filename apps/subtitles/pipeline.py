@@ -398,6 +398,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'visibility_override': None,
         'complete': None,
         'committer': None,
+        'created': None,
     }
 
     # If any version in the history is public, then rollbacks should also result
