@@ -27,6 +27,43 @@
             }
         };
     });
+    directives.directive('subtitleEditor', function(SubtitleStorage) {
+        return {
+            compile: function compile(elm, attrs, transclude) {
+                return {
+                    post: function post(scope, elm, attrs) {
+
+                        $(elm).on('keydown', function(e) {
+
+                            var video = angular.element($('#video').get(0)).scope();
+
+                            // Tab without shift.
+                            if (e.keyCode === 9 && !e.shiftKey) {
+
+                                e.preventDefault();
+
+                                // Rewind the video four seconds and play for four seconds.
+                                video.playChunk(video.pop.currentTime(), 4);
+
+                            }
+
+                            // Tab with shift.
+                            if (e.keyCode === 9 && e.shiftKey) {
+
+                                e.preventDefault();
+
+                                // Rewind the video four seconds and play for four seconds.
+                                video.playChunk(video.pop.currentTime() - 4, 4);
+
+                            }
+
+                        });
+
+                    }
+                };
+            }
+        };
+    });
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var isEditable;
@@ -84,8 +121,6 @@
             var subtitle = selectedScope.subtitle;
             var subtitles = selectedScope.subtitles;
 
-            var video = angular.element($('#video').get(0)).scope();
-
             var nextSubtitle;
 
             // Enter / return without shift.
@@ -122,30 +157,22 @@
             // Tab without shift.
             if (keyCode === 9 && !e.shiftKey) {
 
-                // TODO: This needs to bubble up so we can handle tab
-                // and shift + tab on the document level, not only when
-                // you're selected into a subtitle.
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
 
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
-                
-                // Move the video forward four seconds.
-                video.playChunk(video.pop.currentTime(), 4);
 
             }
             
             // Tab with shift.
             if (keyCode === 9 && e.shiftKey) {
 
-                // TODO: This needs to bubble up so we can handle tab
-                // and shift + tab on the document level, not only when
-                // you're selected into a subtitle.
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
 
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
-
-                // Move the video backwards four seconds.
-                video.playChunk(video.pop.currentTime() - 4, 4);
 
             }
 
