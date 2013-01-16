@@ -20,7 +20,7 @@ class MembersTab(ATeamPage):
     _SAVE_EDITS = "a.action-save"
     _CANCEL_EDITS = ".modal-footer .action-close"
 
-    #INVITATION FORM (NEARLY IMPOSSIBLE TO DEAL With USERNAME via UI
+    #INVITATION FORM 
     _INVITEE_USERNAME_PULLDOWN = "div.ajaxChosen"
     _INVITEE_USERNAME = 'select[name="user_id"]'
     _INVITEE_MESSAGE = "textarea#id_message"
@@ -72,7 +72,7 @@ class MembersTab(ATeamPage):
                                 [username])
         self.type_by_css(self._INVITEE_MESSAGE, message)
         self.select_option_by_text(self._INVITEE_ROLE, role)
-        self.click_by_css(self._INVITATION_SEND)
+        self.submit_by_css(self._INVITATION_SEND)
 
 
     def member_search(self, team_slug, query):

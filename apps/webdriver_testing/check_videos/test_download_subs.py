@@ -15,6 +15,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
         self.user = UserFactory.create(username = 'user')
+        self.auth = dict(username=self.user.username, password='password')
         self.video_language_pg = video_language_page.VideoLanguagePage(self)
         self.video_language_pg.log_in(self.user.username, 'password')
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
@@ -29,13 +30,14 @@ class TestCaseDownloadSubs(WebdriverTestCase):
             video__title = title
             ).video
         print video.video_id
-
         data = {'language_code': lang_code,
-               'video_language': lang_code,
-               'video': video.pk,
-               'draft': open(sub_file),
-               'is_complete': True
-               }
+                      'video': video.pk,
+                      'primary_audio_language_code': lang_code,
+                      'draft': open(sub_file),
+                      'is_complete': True,
+                      'complete': 1
+                      }
+
         data_helpers.upload_subs(self, video, data)
         print video.video_id
         return video

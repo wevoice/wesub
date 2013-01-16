@@ -398,6 +398,7 @@ INSTALLED_APPS = (
     'videos',
     'widget',
     'subtitles',
+    'django_nose', 
 )
 
 # Celery settings

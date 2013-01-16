@@ -29,23 +29,26 @@ class WatchPage(VideoListings):
         self.open_page(self._URL)
 
     def basic_search(self, search_term):
+        self.logger.info('Searching for %s' %search_term)
         self.submit_form_text_by_css(self._SEARCH, search_term)
         return SearchResultsPage(self.testcase)
 
     def advanced_search(self, search_term=None, orig_lang=None, trans_lang=None):
+        self.logger.info('Opening advanced search')
         self.click_by_css(self._SEARCH_PULLDOWN)
         if orig_lang:
-            print 'specifying the orig lang to search'
+            self.logger.info('specifying the orig lang to search')
             self.select_option_by_text(self._SEARCH_ORIG_LANG, orig_lang)
         if trans_lang:
-            print 'specifying the translated language to search'
+            self.logger.info('specifying the translated language to search')
             self.select_option_by_text(self._SEARCH_TRANS_LANG, trans_lang)
                
         if search_term:
+            self.logger.info('entering the search term %s' % search_term)
             self.submit_form_text_by_css(self._SEARCH, search_term)
         else:
+            self.logger.info('submitting the search')
             elem = self.wait_for_element_present(self._SEARCH)
-            time.sleep(2)
             elem.submit()
 
         return SearchResultsPage(self.testcase)
@@ -58,6 +61,7 @@ class WatchPage(VideoListings):
 
 
     def section_empty(self, section):
+        self.logger.info('Checking if %s section is empty' % section)
         self._valid_section_name(section)
         el = (self._VIDEO_SECTION + ' ' + p.empty) % section
         if self.is_element_present(el):
@@ -87,10 +91,12 @@ class WatchPage(VideoListings):
             self.record_error(e)
 
     def section_has_video(self, title, section='latest'):
+        self.logger.info('Checking if %s section has videos' % section)
         if self._video_list_item(title, section):
             return True
 
     def section_videos(self, section):
+        self.logger.info('Getting the titles from the %s section' % section)
         video_els = self._videos_in_section(section)
         title_list = []
         for el in video_els:
@@ -102,6 +108,7 @@ class WatchPage(VideoListings):
         return title_list
 
     def display_more(self, section):
+        self.logger.info('Clicking More for the %s section' % section)
         more_css = (self._VIDEO_SECTION + ' ' + self._MORE_VIDEOS) % section
         self.click_by_css(more_css)
         self.search_complete()
@@ -114,10 +121,12 @@ class WatchPage(VideoListings):
 
         valid values are: today, week, month, year, total.
         """
+        self.logger.info('Sorting by %s' % sort_param)
         sort_el_css = "div#sort_menu ul li[val='%s']" % sort_param
         self.click_item_from_pulldown(self._CURRENT_SORT, sort_el_css)
 
     def popular_more_link(self):
+        self.logger.info('Getting the url for the popular section More link')
         more_css = (self._VIDEO_SECTION + ' ' + self._MORE_VIDEOS) % 'popular'
         more_link = self.get_element_attribute(more_css, 'href')
         return more_link
