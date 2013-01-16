@@ -57,7 +57,7 @@ class TooManyRecentCallsException(Exception):
 
     def __init__(self, *args, **kwargs):
         super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
-        Occurrence('youtube_api_too_many_calls').mark()
+        Occurrence('youtube.api_too_many_calls').mark()
 
 
 def get_youtube_service():
@@ -69,7 +69,9 @@ def get_youtube_service():
     yt_service.ssl = False
     return yt_service
 
+
 yt_service = get_youtube_service()
+
 
 @task
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
@@ -153,6 +155,8 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
 
     from videos.tasks import video_changed_tasks
     video_changed_tasks.delay(video.pk)
+
+    Meter('youtube.lang_imported').inc()
 
 
 def should_add_credit(subtitle_version=None, video=None):
@@ -266,6 +270,8 @@ class YoutubeVideoType(VideoType):
         video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
         video_obj.save()
 
+        Meter('youtube.video_imported').inc()
+
         try:
             self.get_subtitles(video_obj)
         except :
@@ -274,7 +280,7 @@ class YoutubeVideoType(VideoType):
         return video_obj
 
     def _get_entry(self, video_id):
-        Meter('youtube_api_request').inc()
+        Meter('youtube.api_request').inc()
         try:
             return yt_service.GetYouTubeVideoEntry(video_id=str(video_id))
         except RequestError, e:
@@ -394,7 +400,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         Override the very low-level request method to catch possible
         too_many_recent_calls errors.
         """
-        Meter('youtube_api_request').inc()
+        Meter('youtube.api_request').inc()
         try:
             return super(YouTubeApiBridge, self).request(*args, **kwargs)
         except gdata.client.RequestError, e:
@@ -485,9 +491,11 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         if lang in self.captions:
             self._delete_track(self.captions[lang]['track'])
 
-        return self.create_track(self.youtube_video_id, title, lang, content,
+        res = self.create_track(self.youtube_video_id, title, lang, content,
                 settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
                 self.token, {'fmt':'srt'})
+        Meter('youtube.subs_pushed').inc()
+        return res
 
     def add_credit_to_description(self, video):
         """
@@ -537,12 +545,13 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             status_code = self._make_update_request(uri, entry)
 
         if status_code == 200:
+            Meter('youtube.description_changed').inc()
             return True
 
         return False
 
     def _make_update_request(self, uri, entry):
-        Meter('youtube_api_request').inc()
+        Meter('youtube.api_request').inc()
         headers = {
             'Content-Type': 'application/atom+xml',
             'Authorization': 'Bearer %s' % self.access_token,
