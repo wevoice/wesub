@@ -5,25 +5,25 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Changing field 'SubtitleLanguage.new_subtitle_language'
         db.alter_column('videos_subtitlelanguage', 'new_subtitle_language_id', self.gf('django.db.models.fields.related.OneToOneField')(blank=True, unique=True, null=True, to=orm['subtitles.SubtitleLanguage']))
 
         # Adding unique constraint on 'SubtitleLanguage', fields ['new_subtitle_language']
         db.create_unique('videos_subtitlelanguage', ['new_subtitle_language_id'])
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Changing field 'SubtitleLanguage.new_subtitle_language'
         db.alter_column('videos_subtitlelanguage', 'new_subtitle_language_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleLanguage'], null=True, blank=True))
 
         # Removing unique constraint on 'SubtitleLanguage', fields ['new_subtitle_language']
         db.delete_unique('videos_subtitlelanguage', ['new_subtitle_language_id'])
-    
-    
+
+
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -382,5 +382,5 @@ class Migration(SchemaMigration):
             'videoid': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
         }
     }
-    
+
     complete_apps = ['videos']
