@@ -22,13 +22,46 @@
 
     var VideoController = function($scope, SubtitleStorage) {
         /**
-         * Responsible for initializing the video.
+         * Responsible for initializing the video and all video controls.
          * @param $scope
          * @param SubtitleStorage
          * @constructor
          */
 
-        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL());
+        // The Popcorn instance.
+        //
+        // For now, make sure we force controls.
+        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL() + '&controls=1');
+
+        $scope.playChunk = function(start, duration) {
+            // Play a specified amount of time in a video, beginning at 'start',
+            // and then pause.
+
+            // Pause the video, first.
+            $scope.pop.play();
+
+            // Remove any existing cues that may interfere.
+            var trackEvents = $scope.pop.getTrackEvents();
+            for (var i = 0; i < trackEvents.length; i++) {
+                $scope.pop.removeTrackEvent(trackEvents[i].id);
+            }
+
+            if (start < 0) {
+                start = 0;
+            }
+
+            // Set the new start time.
+            $scope.pop.currentTime(start);
+
+            // Set a new cue to pause the video at the end of the chunk.
+            $scope.pop.cue(start + duration, function() {
+                $scope.pop.pause();
+            });
+
+            // Play the video.
+            $scope.pop.play();
+
+        };
     };
 
     root.VideoController = VideoController;

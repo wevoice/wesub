@@ -16,6 +16,9 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+var SubtitleListItemController = SubtitleListItemController || null;
+
 (function($) {
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
@@ -24,6 +27,43 @@
         return {
             link: function link(scope, elm, attrs) {
                 scope.canSave = '';
+            }
+        };
+    });
+    directives.directive('subtitleEditor', function(SubtitleStorage) {
+        return {
+            compile: function compile(elm, attrs, transclude) {
+                return {
+                    post: function post(scope, elm, attrs) {
+
+                        $(elm).on('keydown', function(e) {
+
+                            var video = angular.element($('#video').get(0)).scope();
+
+                            // Tab without shift.
+                            if (e.keyCode === 9 && !e.shiftKey) {
+
+                                e.preventDefault();
+
+                                // Rewind the video four seconds and play for four seconds.
+                                video.playChunk(video.pop.currentTime(), 4);
+
+                            }
+
+                            // Tab with shift.
+                            if (e.keyCode === 9 && e.shiftKey) {
+
+                                e.preventDefault();
+
+                                // Rewind the video four seconds and play for four seconds.
+                                video.playChunk(video.pop.currentTime() - 4, 4);
+
+                            }
+
+                        });
+
+                    }
+                };
             }
         };
     });
@@ -117,6 +157,28 @@
 
             }
 
+            // Tab without shift.
+            if (keyCode === 9 && !e.shiftKey) {
+
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
+
+            }
+            
+            // Tab with shift.
+            if (keyCode === 9 && e.shiftKey) {
+
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
+
+            }
+
             if (nextSubtitle) {
 
                 // Select the next element.
@@ -179,8 +241,8 @@
 
                             });
                         }
-                        scope.setVideoID(attrs['videoId']);
-                        scope.setLanguageCode(attrs['languageCode']);
+                        scope.setVideoID(attrs.videoId);
+                        scope.setLanguageCode(attrs.languageCode);
                         SubtitleListFinder.register(attrs.subtitleList, elm,
                             angular.element(elm).controller(), scope);
                     }
