@@ -2573,6 +2573,8 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
+    YOUTUBE_PAGE_SIZE = 25
+
     def __unicode__(self):
         return self.url
 
@@ -2588,6 +2590,40 @@ class VideoFeed(models.Model):
         except (IndexError, KeyError):
             pass
 
+        if not last_link and 'youtube' in self.url:
+            # This is a newly added Youtube feed.  Let's make sure that we get
+            # all the videos even if we have to page the results.
+            video_count = feed_parser.feed.feed.opensearch_totalresults
+
+            if video_count > self.YOUTUBE_PAGE_SIZE:
+                pages = self._get_pages(video_count)
+
+                for x in range(1, pages + 1):
+                    start = (x - 1) * self.YOUTUBE_PAGE_SIZE + 1
+                    url = '{0}?start-index={1}&max-results={2}'.format(
+                            self.url, start, self.YOUTUBE_PAGE_SIZE)
+                    feed_parser = FeedParser(url)
+                    checked_entries += self._create_videos(feed_parser,
+                            last_link)
+
+        else:
+            checked_entries += self._create_videos(feed_parser, last_link)
+
+        return checked_entries
+
+    def _get_pages(self, total):
+        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
+
+        if pages > int(pages):
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+
+        return pages
+
+    def _create_videos(self, feed_parser, last_link):
+        checked_entries = 0
+
         _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
@@ -2595,4 +2631,3 @@ class VideoFeed(models.Model):
             checked_entries += 1
 
         return checked_entries
-
