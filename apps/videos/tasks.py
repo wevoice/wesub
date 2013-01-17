@@ -556,7 +556,7 @@ def add_amara_description_credit_to_youtube_video(video_id):
             'video_id': video_id})
         return
 
-    if not video.get_team_video():
+    if video.get_team_video():
         celery_logger.info('team video, skipping', extra={
             'video_id': video_id})
         return
