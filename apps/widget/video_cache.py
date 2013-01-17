@@ -21,11 +21,12 @@ from django.conf import settings
 from django.core.cache import cache
 from django.utils.hashcompat import sha_constructor
 from django.utils.translation import (
-    ugettext_lazy as _, get_language
+    ugettext_lazy as _
 )
 
 from videos.types import video_type_registrar
 from videos.types.base import VideoTypeError
+from libs.unilangs import unilangs
 
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
@@ -142,7 +143,7 @@ def _video_languages_verbose_key(video_id):
     return "widget_video_languages_verbose_{0}".format(video_id)
 
 def _video_completed_languages(video_id):
-    return "video_completed_verbose_{0}_{1}".format(video_id, get_language())
+    return "video_completed_verbose_{0}".format(video_id)
 
 def _video_writelocked_langs_key(video_id):
     return "writelocked_langs_{0}".format(video_id)
@@ -238,9 +239,7 @@ def get_video_completed_languages(team_video_id):
         cache.set(cache_key, languages, TIMEOUT)
 
     # i18n is a pain in the ass
-    all_languages = dict(settings.ALL_LANGUAGES)
-
-    return [(lang, _(all_languages[lang])) for lang in languages]
+    return [(lang, _(unilangs.INTERNAL_NAMES[lang][0])) for lang in languages]
 
 def get_video_languages_verbose(video_id, max_items=6):
     # FIXME: we should probably merge a better method with get_video_languages
