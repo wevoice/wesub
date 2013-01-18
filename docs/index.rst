@@ -25,6 +25,7 @@ Contents:
    subtitle-storage
    subtitle-formats
    model-refactor
+   youtube-syncing
 
 Contributing
 ------------
