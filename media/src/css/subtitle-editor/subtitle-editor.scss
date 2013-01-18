@@ -367,6 +367,7 @@ section.main {
                 margin-bottom: 20px;
             }
             p {
+                font-size: 11px;
                 line-height: 18px;
             }
             ul {
@@ -382,7 +383,7 @@ section.main {
                         float: left;
                         margin-right: 10px;
                         position: relative;
-                        width: 54px;
+                        width: 20%;
                         @include border-radius(3px);
 
                         span {

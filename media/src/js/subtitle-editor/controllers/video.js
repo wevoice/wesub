@@ -69,7 +69,7 @@
         };
         $scope.togglePlay = function() {
 
-            // If the video is paused or has not yet been played, play it.
+            // If the video is paused, play it.
             if ($scope.pop.paused()) {
                 $scope.pop.play();
 
