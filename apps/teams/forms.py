@@ -626,9 +626,12 @@ class TaskUploadForm(SubtitlesUploadForm):
             current_source_lc = current_sl.get_translation_source_language_code()
             if current_source_lc and current_source_lc != from_language_code:
                 raise forms.ValidationError(_(
-                    "The selected source language (%s) does not match the "
-                    "existing source language (%s) for that task."
-                    % (from_language_code, current_source_lc)
+                    "The selected source language %(from_code)s does not match the "
+                    "existing source language %(cur_code)s for that task."
+                    % {
+                      'from_code': from_language_code,
+                      'cur_code': current_source_lc
+                      }
                 ))
 
         return self.cleaned_data
