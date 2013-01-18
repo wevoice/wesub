@@ -439,11 +439,6 @@ class Video(models.Model):
                 )
 
                 save_thumbnail_in_s3.delay(obj.pk)
-
-                if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
-                    add_amara_description_credit_to_youtube_video.delay(
-                            obj.video_id)
-
                 Action.create_video_handler(obj, user)
 
                 #Save video url
@@ -475,6 +470,12 @@ class Video(models.Model):
             if hasattr(vt, 'username'):
                 video_url_obj.owner_username = vt.username
                 video_url_obj.save()
+
+        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+            # Only try to update the Youtube description once we have made sure
+            # that we have set the owner_username.
+            add_amara_description_credit_to_youtube_video.delay(video.video_id)
+
         return video, created
 
     @property
