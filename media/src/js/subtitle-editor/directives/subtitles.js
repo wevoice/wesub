@@ -40,24 +40,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                             var video = angular.element($('#video').get(0)).scope();
 
-                            // Tab without shift.
+                            // Tab without shift, toggle play / pause.
                             if (e.keyCode === 9 && !e.shiftKey) {
-
                                 e.preventDefault();
-
-                                // Rewind the video four seconds and play for four seconds.
-                                video.playChunk(video.pop.currentTime(), 4);
-
-                            }
-
-                            // Tab with shift.
-                            if (e.keyCode === 9 && e.shiftKey) {
-
-                                e.preventDefault();
-
-                                // Rewind the video four seconds and play for four seconds.
-                                video.playChunk(video.pop.currentTime() - 4, 4);
-
+                                video.togglePlay();
                             }
 
                         });
@@ -171,11 +157,16 @@ var SubtitleListItemController = SubtitleListItemController || null;
             // Tab with shift.
             if (keyCode === 9 && e.shiftKey) {
 
-                // We're letting this event bubble up to the subtitleEditor directive
-                // where it will trigger the appropriate video method.
-
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
+
+                // Tab with shift, move to the previous subtitle.
+
+                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
+                var lastSubtitle = parser.getSubtitle(lastIndex);
+                if (lastSubtitle) {
+                    nextSubtitle = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[lastIndex]);
+                }
 
             }
 
