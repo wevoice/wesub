@@ -541,7 +541,12 @@ def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
         return
 
     vt = video_type_registrar.video_type_for_url(vurl.url)
-    account = ThirdPartyAccount.objects.get(username=vurl.owner_username)
+    try:
+        account = ThirdPartyAccount.objects.get(username=vurl.owner_username)
+    except ThirdPartyAccount.DoesNotExist:
+        celery_logger.info("TPA not found for {0}".format(vurl.owner_username))
+        return
+
     bridge = vt._get_bridge(account)
 
     return bridge.add_credit_to_description(vurl.video)
