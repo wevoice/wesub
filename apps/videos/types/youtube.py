@@ -45,7 +45,7 @@ logger = logging.getLogger("youtube")
 
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
-    'YOUTUBE_ALWAYS_PUSH_USERNAME')
+    'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
 
 _('Private video')
