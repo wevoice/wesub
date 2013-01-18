@@ -46,6 +46,8 @@ class VideoUrlFactory(factory.Factory):
     primary=True
     original=True
     video = factory.SubFactory(VideoFactory)
+    video__title = factory.Sequence(lambda n: ('Test Video %s' % n))
+
 
 
 class UserLangFactory(factory.Factory):

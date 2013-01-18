@@ -31,6 +31,8 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        management.call_command('flush', interactive=False)
+
         self.data_utils = data_helpers.DataHelpers()
         self.logger.info("Create team and add 1 video")
 
@@ -229,6 +231,8 @@ class TestCaseSearch(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseSearch, cls).setUpClass()
+        management.call_command('flush', interactive=False)
+
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info("Create team 'video-test' and add 1 video")
 
@@ -339,6 +343,8 @@ class TestCaseFilterSort(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseFilterSort, cls).setUpClass()
+        management.call_command('flush', interactive=False)
+
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info("Create team 'video-test' and add 1 video")
 
@@ -427,6 +433,7 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseProjectsAddEdit, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -513,6 +520,7 @@ class TestCaseProjectsFilterSort(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseProjectsFilterSort, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -600,6 +608,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseVideosDisplay, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -617,19 +626,6 @@ class TestCaseVideosDisplay(WebdriverTestCase):
             ).team
 
         cls.videos_tab.open_page(cls.limited_access_team.slug)
-
-#    def setUp(self):
-#
-#        #Reset team video and task policy values to defaults, 
-#        #manager and admin.
-#
-#        self.limited_access_team.video_policy=2
-#        self.limited_access_team.task_assign_policy=20
-#        self.limited_access_team.save()
-#        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
-
-
-
 
     def turn_on_automatic_tasks(self):
         self.logger.info('Turning on automatic task creation')

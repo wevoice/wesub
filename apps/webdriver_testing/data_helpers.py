@@ -99,11 +99,12 @@ class DataHelpers(object):
 
 
     def create_video(self, video_url=None):
-        if not video_url:
+        if video_url is None:
             video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-
-        video, _ = Video.get_or_create_for_url(video_url)
-        return video
+        
+        v = VideoUrlFactory(url=video_url, type='Youtube').video
+        return v
+           
 
     def super_user(self):
         superuser = UserFactory(is_partner=True, 
@@ -160,7 +161,6 @@ class DataHelpers(object):
         else:
             testdata = simplejson.load(open(testdata))
         videos = _create_videos(testdata, [])
-        print videos
         return videos
         
 

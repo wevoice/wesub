@@ -3,6 +3,7 @@ from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
+from apps.webdriver_testing.data_factories import VideoUrlFactory
 from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
 import codecs
 import os
@@ -14,17 +15,17 @@ class TestCaseUntimedText(WebdriverTestCase):
     @classmethod 
     def setUpClass(cls):
         super(TestCaseUntimedText, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(username = 'user')
         cls.video_pg = video_page.VideoPage(cls)
-        cls.video_pg.log_in(cls.user.username, 'password')
-        cls.test_video = data_helpers.create_video(cls, 
-            'http://www.example.com/upload_test.mp4')
+        cls.test_video = VideoUrlFactory().video
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
+        cls.video_pg.open_video_page(cls.test_video.video_id)
+        cls.video_pg.log_in(cls.user.username, 'password')
 
     def setUp(self):
         self.video_pg.open_video_page(self.test_video.video_id)
-
 
     def _upload_and_verify(self, sub_file):
         """Upload the subtitle file and confirm subs are stored.
@@ -93,17 +94,16 @@ class TestCaseUntimedText(WebdriverTestCase):
         Uploaded subs replace the existing version even if the existing
         version has subs created from it.
         """
-        test_video3 = data_helpers.create_video(self, 
-            'http://www.example.com/3.mp4')
+        tv = VideoUrlFactory(url='http://www.example.com/3.mp4').video
 
-        video_list = data_helpers.create_videos_with_fake_subs(self)
+        video_list = self.data_utils.create_videos_with_fake_subs()
         test_file = 'Untimed_text.srt'
         sub_file = os.path.join(self.subs_data_dir, test_file)
-        self.video_pg.open_video_page(test_video3.video_id)
+        self.video_pg.open_video_page(tv.video_id)
      
         message = self.video_pg.upload_subtitles('Russian', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
-        subtitle_lang = test_video3.subtitle_language('ru') 
+        subtitle_lang = tv.subtitle_language('ru') 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
 
     def test__version__overwrite_existing(self):
@@ -111,19 +111,18 @@ class TestCaseUntimedText(WebdriverTestCase):
 
         Uploaded subs replace the existing version of original lang text.
         """
-        test_video4 = data_helpers.create_video(self, 
-            'http://www.example.com/4.mp4')
 
-        video_list = data_helpers.create_videos_with_fake_subs(self)
+        tv = VideoUrlFactory(url='http://www.example.com/4.mp4').video
+        video_list = self.data_utils.create_videos_with_fake_subs()
         test_file = 'Untimed_text.srt'
         sub_file = os.path.join(self.subs_data_dir, test_file) 
-        self.video_pg.open_video_page(test_video4.video_id)
+        self.video_pg.open_video_page(tv.video_id)
       
         message = self.video_pg.upload_subtitles('Arabic', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
-        sub_lang = test_video4.subtitle_language('ar')
+        sub_lang = tv.subtitle_language('ar')
         self.video_pg.page_refresh()
-        subtitle_lang = test_video4.subtitle_language('ar') 
+        subtitle_lang = tv.subtitle_language('ar') 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
     
     def test_upload__additional_translation(self):
@@ -131,18 +130,16 @@ class TestCaseUntimedText(WebdriverTestCase):
 
         New language is created as a new version.
         """
-        test_video4 = data_helpers.create_video(self, 
-            'http://www.example.com/4.mp4')
-
-        video_list = data_helpers.create_videos_with_fake_subs(self)
+        tv = VideoUrlFactory().video
+        video_list = self.data_utils.create_videos_with_fake_subs()
         test_file = 'Untimed_text.srt'
         sub_file = os.path.join(self.subs_data_dir, test_file) 
-        self.video_pg.open_video_page(test_video4.video_id)
+        self.video_pg.open_video_page(tv.video_id)
       
         message = self.video_pg.upload_subtitles('Swedish', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
         self.video_pg.page_refresh()
-        subtitle_lang = test_video4.subtitle_language('sv') 
+        subtitle_lang = tv.subtitle_language('sv') 
         self.assertEqual(1, subtitle_lang.get_tip().version_number)
 
         self.assertEqual(43, subtitle_lang.get_subtitle_count() )
@@ -211,11 +208,12 @@ class TestCaseTimedText(WebdriverTestCase):
         super(TestCaseTimedText, cls).setUpClass()
         cls.user = UserFactory.create(username = 'user')
         cls.video_pg = video_page.VideoPage(cls)
-        cls.video_pg.log_in(cls.user.username, 'password')
-        cls.test_video = data_helpers.create_video(cls, 
-            'http://www.example.com/upload_test.mp4')
+        cls.test_video = VideoUrlFactory().video
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
+        cls.video_pg.open_video_page(cls.test_video.video_id)
+        cls.video_pg.log_in(cls.user.username, 'password')
+
 
     def setUp(self):
         self.video_pg.open_video_page(self.test_video.video_id)

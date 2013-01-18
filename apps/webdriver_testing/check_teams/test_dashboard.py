@@ -20,6 +20,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTaskFreeDashboard, cls).setUpClass()
+        management.call_command('flush', interactive=False)
+
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info('setup: Create a team and team owner, add some videos')
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
@@ -214,6 +216,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTasksEnabledDashboard, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
