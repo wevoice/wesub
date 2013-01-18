@@ -136,9 +136,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                 var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
 
-                // If this is the last subtitle in the set, save the current subtitle,
-                // and create a new subtitle at the end.
-                if (selectedScope.subtitles[index] === undefined) {
+                // If canAddAndRemove is true and this is the last subtitle in the set,
+                // save the current subtitle and create a new subtitle at the end.
+                if (selectedScope.subtitles[index] === undefined && selectedScope.canAddAndRemove) {
 
                     // Save the current subtitle.
                     selectedScope.finishEditingMode(activeTextArea.val());
@@ -203,7 +203,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
                     post: function post(scope, elm, attrs) {
 
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+
                         isEditable = attrs.editable === 'true';
+                        scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
 
                         if (isEditable) {
                             $(elm).click(function(e) {

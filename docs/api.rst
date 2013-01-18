@@ -893,7 +893,7 @@ You can only send the ``user`` parameter or the ``team`` parameter at once.
 
 
 Application resource
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 For teams with membership by application only.
 

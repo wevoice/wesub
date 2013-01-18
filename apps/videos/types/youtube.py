@@ -27,13 +27,13 @@ from celery.task import task
 from django.conf import settings
 from django.utils.http import urlquote
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.sites.models import Site
 from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
 
 from base import VideoType, VideoTypeError
 from utils.translation import SUPPORTED_LANGUAGE_CODES
+from utils.metrics import Meter, Occurrence
 
 from unilangs.unilangs import LanguageCode
 
@@ -45,6 +45,16 @@ YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 
 _('Private video')
 _('Undefined error')
+
+
+class TooManyRecentCallsException(Exception):
+    """
+    Raised when the Youtube API responds with yt:quota too_many_recent_calls.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
+        Occurrence('youtube.api_too_many_calls').mark()
 
 
 def get_youtube_service():
@@ -101,10 +111,17 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
 
     video_changed_tasks.delay(video.pk)
 
+    Meter('youtube.lang_imported').inc()
 
-def should_add_credit(subtitle_version):
+
+def should_add_credit(subtitle_version=None, video=None):
     # Only add credit to non-team videos
-    video = subtitle_version.subtitle_language.video
+    if not video and not subtitle_version:
+        raise Exception("You need to pass in at least one argument")
+
+    if not video:
+        video = subtitle_version.language.video
+
     return not video.get_team_video()
 
 
@@ -115,7 +132,7 @@ def add_credit(subtitle_version, subs):
     if len(subs) == 0:
         return subs
 
-    if not should_add_credit(subtitle_version):
+    if not should_add_credit(subtitle_version=subtitle_version):
         return subs
 
     from accountlinker.models import get_amara_credit_text
@@ -205,6 +222,8 @@ class YoutubeVideoType(VideoType):
         video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
         video_obj.save()
 
+        Meter('youtube.video_imported').inc()
+
         try:
             self.get_subtitles(video_obj)
         except :
@@ -213,6 +232,7 @@ class YoutubeVideoType(VideoType):
         return video_obj
 
     def _get_entry(self, video_id):
+        Meter('youtube.api_request').inc()
         try:
             return yt_service.GetYouTubeVideoEntry(video_id=str(video_id))
         except RequestError, e:
@@ -352,6 +372,20 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
 
+    def request(self, *args, **kwargs):
+        """
+        Override the very low-level request method to catch possible
+        too_many_recent_calls errors.
+        """
+        Meter('youtube.api_request').inc()
+        try:
+            return super(YouTubeApiBridge, self).request(*args, **kwargs)
+        except gdata.client.RequestError, e:
+            if 'too_many_recent_calls' in str(e):
+                raise TooManyRecentCallsException
+            else:
+                raise e
+
     def refresh(self):
         """
         Refresh the access token
@@ -421,11 +455,13 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         if language_code in self.captions:
             self._delete_track(self.captions[language_code]['track'])
 
-        return self.create_track(self.youtube_video_id, title, language_code,
+        res = self.create_track(self.youtube_video_id, title, language_code,
                 content, settings.YOUTUBE_CLIENT_ID,
                 settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
+        Meter('youtube.subs_pushed').inc()
+        return res
 
-    def add_credit_to_description(self, subtitle_version):
+    def add_credit_to_description(self, video):
         """
         Get the entry information from Youtube, extract the original
         description, prepend the description with Amara credits and push it
@@ -437,10 +473,11 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
-        if not should_add_credit(subtitle_version):
+        if not should_add_credit(video=video):
             return False
 
         from accountlinker.models import add_amara_description_credit
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
@@ -449,12 +486,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         old_description = entry.media.description.text
 
-        video = subtitle_version.language.video
-
-        current_site = Site.objects.get_current()
-        video_url = video.get_absolute_url()
-        video_url = u"http://%s%s" % (unicode(current_site.domain),
-                video_url)
+        video_url = shortlink_for_video(video)
 
         language_code = video.language
 
@@ -477,11 +509,13 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             status_code = self._make_update_request(uri, entry)
 
         if status_code == 200:
+            Meter('youtube.description_changed').inc()
             return True
 
         return False
 
     def _make_update_request(self, uri, entry):
+        Meter('youtube.api_request').inc()
         headers = {
             'Content-Type': 'application/atom+xml',
             'Authorization': 'Bearer %s' % self.access_token,
@@ -489,6 +523,10 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
         }
         r = requests.put(uri, data=entry, headers=headers)
+
+        if r.status_code == 403 and 'too_many_recent_calls' in r.content:
+            raise TooManyRecentCallsException
+
         return r.status_code
 
     def _delete_track(self, track):

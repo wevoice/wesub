@@ -41,6 +41,10 @@ class FeedParser(object):
     """
     
     def __init__(self, feed_url):
+        # The Youtube feed includes an "openSearch" namespace that contains the
+        # number of videos in the feed.  This is a hack to make feedparser
+        # recognize this namespace and allow us to access it.
+        feedparser._FeedParserMixin.namespaces['http://a9.com/-/spec/opensearchrss/1.0/'] = 'opensearch'
         self.feed_url = feed_url
         self.feed = feedparser.parse(feed_url)
         self.parser = None
