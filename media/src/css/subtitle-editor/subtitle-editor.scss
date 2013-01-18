@@ -342,6 +342,11 @@ section.main {
                     }
                 }
             }
+            &[editable="false"] {
+                li {
+                    margin-right: 6px;
+                }
+            }
         }
         a.end {
             color: #3C3C3D;
