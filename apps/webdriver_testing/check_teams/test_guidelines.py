@@ -37,6 +37,8 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
 
 
         #ADD THE TEST MESSAGES TO THE TEST TEAM
+        self.messages_tab.open_messages_tab(self.team.slug)
+
         self.messages_tab.log_in(self.team_owner.username, 'password')
         self.messages_tab.open_messages_tab(self.team.slug)
         self.messages_tab.edit_guidelines(self._TEST_GUIDELINES)
