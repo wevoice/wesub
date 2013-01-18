@@ -175,6 +175,9 @@ class Video(models.Model):
     # directely
     is_public = models.BooleanField(default=True)
 
+    primary_audio_language_code = models.CharField(max_length=16, blank=True,
+                                                   default='',
+                                                   choices=ALL_LANGUAGES)
 
     objects = models.Manager()
     public  = PublicVideoManager()
@@ -913,6 +916,13 @@ class SubtitleLanguage(models.Model):
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
 
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_language = models.OneToOneField('subtitles.SubtitleLanguage',
+                                                 related_name='old_subtitle_version',
+                                                 null=True, blank=True,
+                                                 editable=False)
+
     subtitles_fetched_counter = RedisSimpleField()
 
     class Meta:
@@ -1185,6 +1195,11 @@ class SubtitleLanguage(models.Model):
         self.save()
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         if updates_timestamp:
             self.created = datetime.now()
         if self.language:
@@ -1413,6 +1428,13 @@ class SubtitleVersion(SubtitleCollection):
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True, null=True)
 
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_version = models.OneToOneField('subtitles.SubtitleVersion',
+                                                related_name='old_subtitle_version',
+                                                null=True, blank=True,
+                                                editable=False)
+
     objects = SubtitleVersionManager()
 
     class Meta:
@@ -1423,7 +1445,12 @@ class SubtitleVersion(SubtitleCollection):
     def __unicode__(self):
         return u'%s #%s' % (self.language, self.version_no)
 
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         created = not self.pk
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:
@@ -2242,6 +2269,7 @@ class Action(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     video = models.ForeignKey(Video, null=True, blank=True)
     language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    new_language = models.ForeignKey('subtitles.SubtitleLanguage', blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
     member = models.ForeignKey("teams.TeamMember", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
