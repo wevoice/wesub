@@ -402,6 +402,10 @@ class Video(models.Model):
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
+        from videos.tasks import (
+            save_thumbnail_in_s3,
+            add_amara_description_credit_to_youtube_video
+        )
 
         try:
             vt = vt or video_type_registrar.video_type_for_url(video_url)
@@ -432,11 +436,6 @@ class Video(models.Model):
                     obj.slug = slugify(obj.title)
                 obj.user = user
                 obj.save()
-
-                from videos.tasks import (
-                    save_thumbnail_in_s3,
-                    add_amara_description_credit_to_youtube_video
-                )
 
                 save_thumbnail_in_s3.delay(obj.pk)
                 Action.create_video_handler(obj, user)
