@@ -21,10 +21,10 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.data_utils = data_helpers.DataHelpers()
         self.test_video = self.data_utils.create_video()
         self.video_pg = video_page.VideoPage(self)
+        self.user = UserFactory.create()
         self.video_pg.open_video_page(self.test_video.video_id)
+        self.video_pg.log_in(self.user.username, 'password')
         self.video_pg.set_skiphowto()
-
-        self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
         self.unisubs_menu = unisubs_menu.UnisubsMenu(self)

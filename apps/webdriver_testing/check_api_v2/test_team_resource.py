@@ -18,7 +18,6 @@ class TestCaseTeamsResource(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseTeamsResource, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-
         cls.user = UserFactory.create(is_partner=True)
         cls.private_user = UserFactory.create(username = 'IdaRed')
         cls.data_utils.create_user_api_key(cls.user)
