@@ -32,9 +32,8 @@ class SearchResultsPage(VideoListings):
             return False
 
     def search_has_results(self):
-        time.sleep(5)
         self.wait_for_element_not_visible(self._SEARCHING_INDICATOR)
-        if self.is_element_present(self._FIRST_SEARCH_RESULT):
+        if self.wait_for_element_present(self._FIRST_SEARCH_RESULT, wait_time=10):
             return True
 
     def click_search_result(self, result_element):

@@ -15,10 +15,12 @@ class TestCaseUploadSubs(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        self.data_utils = data_helpers.DataHelpers()
+
         self.user = UserFactory.create(username = 'user')
         self.video_pg = video_page.VideoPage(self)
         self.video_pg.log_in(self.user.username, 'password')
-        self.test_video = data_helpers.create_video(self, 
+        self.test_video = self.data_utils.create_video( 
             'http://www.example.com/upload_test.mp4')
         self.team = TeamMemberFactory.create(
             team__name='Video Test',

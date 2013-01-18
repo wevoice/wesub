@@ -15,6 +15,7 @@ from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import VideoFactory
+from apps.webdriver_testing.data_factories import VideoUrlFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
@@ -23,19 +24,18 @@ from apps.testhelpers.views import _create_videos
 from django.core import management
 
 
-class TestCaseTeamVideos(WebdriverTestCase):
+class TestCaseAddRemoveEdit(WebdriverTestCase):
     """
     Main videos tab tests and Projects tab. 
     """
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        self.logger.info("Create team 'video-test' and add 1 video")
+        self.data_utils = data_helpers.DataHelpers()
+        self.logger.info("Create team and add 1 video")
 
-        self.team_owner = UserFactory.create(username = 'team_owner')
+        self.team_owner = UserFactory.create()
         self.team = TeamMemberFactory.create(
-            team__name='Video Test',
-            team__slug='video-test',
             user = self.team_owner).team
         
         self.manager_user = TeamAdminMemberFactory(
@@ -45,19 +45,20 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
             '- Brian Bradley')
-        self.videos_tab.log_in(self.manager_user.username, 'password')
-        self.test_video = data_helpers.create_video_with_subs(self, 
+        self.test_video = self.data_utils.create_video_with_subs(
             self.video_url)
         TeamVideoFactory.create(
             team=self.team, 
             video=self.test_video, 
             added_by=self.manager_user)
 
+        self.videos_tab.open_videos_tab(self.team.slug)
 
     def test_add__new(self):
         """Submit a new video for the team.
 
         """
+        self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY')
@@ -72,6 +73,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
         """
         dup_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+        self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
@@ -86,189 +88,19 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
         #Create a second team.
         team2 = TeamMemberFactory.create(
-            team__name = 'Second Test Team',
-            team__slug = 'second-test-team',
             user = self.manager_user).team
         #Open the new team and try to submit the video 
+        self.videos_tab.log_in(self.manager_user.username, 'password')
         self.videos_tab.open_videos_tab(team2.slug)
         self.videos_tab.add_video(dup_url)
         self.assertEqual(self.videos_tab.error_message(), 
                          'This video already belongs to a team.')
 
-    def test_search__title(self):
-        """Team video search for title text.
-
-        """
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('X Factor')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
-
-    def test_search__updated_title(self):
-        """Team video search for title text after it has been updated.
-
-        """
-        #Create user and key for api update.
-        self.user = TeamAdminMemberFactory(
-                team = self.team,
-                user = UserFactory(username = 'user', 
-                                   is_partner = True)
-                ).user
-
-        data_helpers.create_user_api_key(self, self.user)
-
-        #Update the video title and description (via api)
-        url_part = 'videos/%s/' % self.test_video.video_id
-        new_data = {'title': 'Please do not glance at my mother.',
-                    'description': 'Title update for grammar and politeness.'
-                   }
-        data_helpers.put_api_request(self, url_part, new_data)
-        time.sleep(2)
-        #Update the solr index
-        management.call_command('update_index', interactive=False)
-
-        #Open team videos page and search for updated title text.
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('mother')
-        self.assertTrue(self.videos_tab.video_present(new_data['title']))
-
-
-    def test_search__updated_description(self):
-        """Team video search for description text after it has been updated.
-
-        """
-        #Create user and key for api update.
-        self.user = TeamAdminMemberFactory(
-                team = self.team,
-                user = UserFactory(username = 'user',
-                                   is_partner = True)
-                ).user
-        data_helpers.create_user_api_key(self, self.user)
-
-        #Update the video title and description (via api)
-        url_part = 'videos/%s/' % self.test_video.video_id
-        new_data = {
-                    'description': 'description update for grammar and politeness.'
-                   }
-        data_helpers.put_api_request(self, url_part, new_data)
-        time.sleep(2)
-        #Update the solr index
-        management.call_command('update_index', interactive=False)
-
-        #Open team videos page and search for updated title text.
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('grammar and politeness')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
-
-
-
-    def test_search__subs(self):
-        """Team video search for subtitle text.
-
-        """
-        management.call_command('update_index', interactive=False)
-
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('show this text')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
-
-    def test_search__nonascii(self):
-        """Team video search for non-ascii char strings.
- 
-        """
-        #Search for: 日本語, by opening entering the text via javascript
-        #because webdriver can't type those characters.
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.browser.execute_script("document.getElementsByName"
-                                    "('q')[1].value='日本語'")
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
-
-    def test_search__no_results(self):
-        """Team video search returns no results.
-
-        """
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('TextThatShouldNOTExistOnTheVideoOrSubs')
-        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-                         self.videos_tab.search_no_result())
-
-
-    def test_filter__clear(self):
-        """Clear filters.
-
-        """
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
-            self.team, 
-            self.manager_user)
-        self.videos_tab.open_videos_tab(self.team.slug)
-
-        #Filter so that no videos are present
-        self.videos_tab.sub_lang_filter(language = 'French')
-        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
-
-        #Clear filters and verify videos are displayed.
-        self.videos_tab.clear_filters()
-        self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
-
-
-    def test_filter__languages(self):
-        """Filter team videos by language.
-
-        """
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
-            self.team, 
-            self.manager_user)
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.sub_lang_filter(language = 'Russian')
-        self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
-
-    def test_filter__no_incomplete(self):
-        """Filter by language, incomplete subs are not in results. 
-
-        """
-        videos = data_helpers.create_several_team_videos_with_subs(self,
-            self.team, 
-            self.manager_user)
-
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.sub_lang_filter(language = ['Portuguese'])
-        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
-
-
-    def test_sort__name_ztoa(self):
-        """Sort videos on team page reverse alphabet.
-
-        """
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
-            self.team, 
-            self.manager_user)
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.video_sort(sort_option = 'name, z-a')
-        self.videos_tab.videos_displayed()
-        self.assertEqual(self.videos_tab.first_video_listed(), 
-            'qs1-not-transback')
-
-    def test_sort__time_oldest(self):
-        """Sort videos on team page by oldest.
-
-        """
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
-            self.team, 
-            self.manager_user)
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.video_sort(sort_option = 'time, oldest')
-        self.videos_tab.videos_displayed()
-        self.assertEqual(self.videos_tab.first_video_listed(), 
-            'X Factor Audition - Stop Looking At My Mom Rap - Brian Bradley')
-
     def test_remove(self):
         """Remove video from team, video stays on site.
 
         """
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
-            self.team, 
-            self.manager_user)
+        self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(self.video_title)
         self.videos_tab.remove_video(video=self.video_title)
@@ -276,21 +108,17 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
-        self.videos_tab.open_videos_tab(self.team.slug)
 
     def test_remove__site(self):
         """Remove video from team and site, total destruction!
 
         Must be the team owner to get the team vs. site dialog.
         """
-
         self.videos_tab.log_in(self.team_owner.username, 'password')
-
         #Create a team video for removal.
         tv = TeamVideoFactory.create(
             team=self.team, 
             added_by=self.manager_user).video
-
         #Search for the video in team videos and remove it.
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(tv.title)
@@ -299,12 +127,13 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
 
         #Update the solr index
-        management.call_command('update_index', interactive=False)
+        #management.call_command('update_index', interactive=False)
 
         #Verify video no longer in teams
         self.videos_tab.search(tv.title)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
+        self.videos_tab.open_videos_tab(self.team.slug)
 
         #Verify video no longer on site
         watch_pg = watch_page.WatchPage(self)
@@ -354,7 +183,7 @@ class TestCaseTeamVideos(WebdriverTestCase):
 
         """
         video_title = 'qs1-not-transback' 
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
+        videos = self.data_utils.create_several_team_videos_with_subs(
             self.team, 
             self.manager_user)
 
@@ -376,10 +205,8 @@ class TestCaseTeamVideos(WebdriverTestCase):
         """
         video_title = 'qs1-not-transback'
         team2 = TeamMemberFactory.create(
-            team__name='Team 2',
-            team__slug='team-2',
             user = self.team_owner).team
-        videos = data_helpers.create_several_team_videos_with_subs(self, 
+        videos = self.data_utils.create_several_team_videos_with_subs(
             self.team, 
             self.manager_user)
 
@@ -394,36 +221,239 @@ class TestCaseTeamVideos(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_present(video_title))
 
 
+class TestCaseSearch(WebdriverTestCase):
+    """TestSuite for searching team videos
+    """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-class TestCaseTeamProjectVideos(WebdriverTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseSearch, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.logger.info("Create team 'video-test' and add 1 video")
 
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.videos_tab = videos_tab.VideosTab(self)
-        self.team_owner = UserFactory.create(username = 'team_owner')
-        self.logger.info('setup: Creating team Video Test')
-        self.team = TeamMemberFactory.create(
-            team__name='Video Test', 
-            team__slug='video-test', 
-            user = self.team_owner).team
- 
-        self.manager_user = TeamAdminMemberFactory(
-            team=self.team,
-            user = UserFactory(username = 'TeamAdmin')).user
+        cls.team_owner = UserFactory.create(is_partner=True)
+        cls.team = TeamMemberFactory.create(
+            user = cls.team_owner).team
+        cls.manager_user = TeamAdminMemberFactory(
+            team = cls.team,
+            user = UserFactory()).user
+        cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+        cls.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
+            '- Brian Bradley')
+        cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
+        TeamVideoFactory.create(
+            team=cls.team, 
+            video=cls.test_video, 
+            added_by=cls.manager_user)
 
-        self.logger.info('setup: Adding project one and project two with '
-                         'workflows enabled')
-        self.project1 = TeamProjectFactory.create(
-            team=self.team,
-            name='team project one',
-            workflow_enabled=True,)
+        cls.data_utils.create_user_api_key(cls.team_owner) 
+        management.call_command('update_index', interactive=False)
+
+
+
+
+    def test_search__title(self):
+        """Team video search for title text.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('X Factor')
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
+
+    def test_search__updated_title(self):
+        """Team video search for title text after it has been updated.
+
+        """
+
+        #Update the video title and description (via api)
+        url_part = 'videos/%s/' % self.test_video.video_id
+        new_data = {'title': 'Please do not glance at my mother.',
+                    'description': 'Title update for grammar and politeness.'
+                   }
+        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
+        time.sleep(2)
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
+        #Open team videos page and search for updated title text.
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('mother')
+        self.assertTrue(self.videos_tab.video_present(new_data['title']))
+
+
+    def test_search__updated_description(self):
+        """Team video search for description text after it has been updated.
+
+        """
+        #Update the video title and description (via api)
+        url_part = 'videos/%s/' % self.test_video.video_id
+        new_data = { 'description': 'description update for grammar and politeness.'
+                   }
+        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
+        time.sleep(2)
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
+        #Open team videos page and search for updated title text.
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('grammar and politeness')
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
+
+
+    def test_search__subs(self):
+        """Team video search for subtitle text.
+
+        """
         
-        self.project2 = TeamProjectFactory.create(
-            team=self.team,
-            name='team project two',
-            workflow_enabled=True)
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('show this text')
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
 
-        self.videos_tab.log_in(self.manager_user.username, 'password')
+    def test_search__nonascii(self):
+        """Team video search for non-ascii char strings.
+ 
+        """
+        #Search for: 日本語, by opening entering the text via javascript
+        #because webdriver can't type those characters.
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.browser.execute_script("document.getElementsByName"
+                                    "('q')[1].value='日本語'")
+        self.assertTrue(self.videos_tab.video_present(self.video_title))
+
+    def test_search__no_results(self):
+        """Team video search returns no results.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('TextThatShouldNOTExistOnTheVideoOrSubs')
+        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
+                         self.videos_tab.search_no_result())
+
+class TestCaseFilterSort(WebdriverTestCase):
+    """TestSuite for searching team videos
+    """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseFilterSort, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.logger.info("Create team 'video-test' and add 1 video")
+
+        cls.team_owner = UserFactory.create(is_partner=True)
+        cls.team = TeamMemberFactory.create(
+            user = cls.team_owner).team
+        cls.manager_user = TeamAdminMemberFactory(
+            team = cls.team,
+            user = UserFactory()).user
+        cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+        cls.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
+            '- Brian Bradley')
+        cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
+        TeamVideoFactory.create(
+            team=cls.team, 
+            video=cls.test_video, 
+            added_by=cls.manager_user)
+
+        cls.data_utils.create_user_api_key(cls.team_owner) 
+        videos = cls.data_utils.create_several_team_videos_with_subs(
+            cls.team, 
+            cls.manager_user)
+        management.call_command('update_index', interactive=False)
+
+    def test_filter__clear(self):
+        """Clear filters.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+
+        #Filter so that no videos are present
+        self.videos_tab.sub_lang_filter(language = 'French')
+        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
+            self.videos_tab.search_no_result())
+
+        #Clear filters and verify videos are displayed.
+        self.videos_tab.clear_filters()
+        self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
+
+
+    def test_filter__languages(self):
+        """Filter team videos by language.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.sub_lang_filter(language = 'Russian')
+        self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
+
+    def test_filter__no_incomplete(self):
+        """Filter by language, incomplete subs are not in results. 
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.sub_lang_filter(language = ['Portuguese'])
+        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
+            self.videos_tab.search_no_result())
+
+
+    def test_sort__name_ztoa(self):
+        """Sort videos on team page reverse alphabet.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.video_sort(sort_option = 'name, z-a')
+        self.videos_tab.videos_displayed()
+        self.assertEqual(self.videos_tab.first_video_listed(), 
+            'qs1-not-transback')
+
+    def test_sort__time_oldest(self):
+        """Sort videos on team page by oldest.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.video_sort(sort_option = 'time, oldest')
+        self.videos_tab.videos_displayed()
+        self.assertEqual(self.videos_tab.first_video_listed(), 
+            'X Factor Audition - Stop Looking At My Mom Rap - Brian Bradley')
+
+
+
+
+class TestCaseProjectsAddEdit(WebdriverTestCase):
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseProjectsAddEdit, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.team_owner = UserFactory.create()
+        cls.logger.info('setup: Creating team Video Test')
+        cls.team = TeamMemberFactory.create(user = cls.team_owner).team
+ 
+        cls.logger.info('setup: Adding a team with 2 projects.')
+        cls.project1 = TeamProjectFactory.create(team=cls.team)
+        cls.project2 = TeamProjectFactory.create(team=cls.team)
+
+        test_videos = ['jaws.mp4', 'Birds_short.oggtheora.ogg', 'fireplace.mp4']
+        cls.videos_list = []
+        for vid in test_videos:
+            video_url = 'http://qa.pculture.org/amara_tests/%s' % vid[0]
+            tv = VideoUrlFactory(url=video_url).video
+            v = TeamVideoFactory(video = tv, 
+                                 team = cls.team,
+                                 added_by = cls.team_owner,
+                                 project = cls.project2).video
+            cls.videos_list.append(v)
+        cls.videos_tab.open_videos_tab(cls.team.slug)
+        cls.videos_tab.log_in(cls.team_owner.username, 'password')
+
+        cls.project1_page = ('teams/{0}/videos/?project={1}'
+                        .format(cls.team.slug, cls.project1.slug))
+        cls.project2_page = ('teams/{0}/videos/?project={1}'
+                        .format(cls.team.slug, cls.project2.slug))
 
     def test_add__new(self):
         """Submit a new video for the team and assign to a project.
@@ -445,37 +475,83 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         """Peform a basic search on the project page for videos.
 
         """
-        video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
-                      '- Brian Bradley')
-        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project2.slug)
+        tv = self.videos_list[0]
 
-        self.videos_tab.log_in(self.manager_user.username, 'password')
-        test_video = data_helpers.create_video_with_subs(self, video_url)
-        TeamVideoFactory.create(
-            team=self.team, 
-            video=test_video, 
-            added_by=self.manager_user, 
-            project = self.project2)
+        self.videos_tab.open_page(self.project2_page)
+        self.videos_tab.search(tv.title)
+        self.assertTrue(self.videos_tab.video_present(tv.title))
+
+    def test_remove(self):
+        """Remove a video from the team project.
+
+        """
+        tv = self.videos_list[1]
+
+        self.videos_tab.open_page(self.project2_page)
+        self.videos_tab.remove_video(video = tv.title)
+        self.videos_tab.search(tv.title)
+        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
+            self.videos_tab.search_no_result())
+
+
+    def test_edit__change_project(self):
+        """Move a video from project2 to project 1.
+
+        """
+        tv = self.videos_list[2]
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.open_page(self.project2_page)
+        self.videos_tab.edit_video(video=tv.title,
+                                   project = self.project1.name)
+        self.videos_tab.open_page(self.project1_page)
+        self.assertTrue(self.videos_tab.video_present(tv.title))
+
+
+class TestCaseProjectsFilterSort(WebdriverTestCase):
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseProjectsFilterSort, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.team_owner = UserFactory.create()
+        cls.logger.info('setup: Creating team Video Test')
+        cls.team = TeamMemberFactory.create(user = cls.team_owner).team
+ 
+        cls.manager_user = TeamAdminMemberFactory(
+            team=cls.team,
+            user = UserFactory()).user
+
+        cls.logger.info('setup: Adding project one and project two with '
+                         'workflows enabled')
+        cls.project1 = TeamProjectFactory.create(
+            team=cls.team,
+            workflow_enabled=True,)
         
-        self.videos_tab.open_page(project_page)
-        self.videos_tab.search('X Factor')
-        self.assertTrue(self.videos_tab.video_present(video_title))
+        cls.project2 = TeamProjectFactory.create(
+            team=cls.team,
+            workflow_enabled=True)
+
+        data = json.load(open('apps/videos/fixtures/teams-list.json'))
+        videos = _create_videos(data, [])
+        for video in videos:
+            TeamVideoFactory.create(
+                team=cls.team, 
+                video=video, 
+                added_by=cls.manager_user,
+                project = cls.project2)
+
+        cls.videos_tab.open_videos_tab(cls.team.slug)
+        cls.videos_tab.log_in(cls.manager_user.username, 'password')
+
+
 
     def test_filter__projects(self):
         """Filter video view by project.
 
         """
-        data = json.load(open('apps/videos/fixtures/teams-list.json'))
-        videos = _create_videos(data, [])
-        for video in videos:
-            TeamVideoFactory.create(
-                team=self.team, 
-                video=video, 
-                added_by=self.manager_user,
-                project = self.project2)
-
+        
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.project_filter(project = self.project1.name)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
@@ -488,15 +564,6 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         """
         project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
-
-        data = json.load(open('apps/videos/fixtures/teams-list.json'))
-        videos = _create_videos(data, [])
-        for video in videos[::2]:
-            TeamVideoFactory.create(
-                team=self.team, 
-                video=video, 
-                added_by=self.manager_user,
-                project = self.project2)
         self.videos_tab.open_page(project_page)
         self.videos_tab.sub_lang_filter(language = 'English')
         self.assertTrue(self.videos_tab.video_present('c'))
@@ -507,16 +574,10 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         """
         project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
             self.project2.slug)
-
-        print project_page
-
-        data = json.load(open('apps/videos/fixtures/teams-list.json'))
-        videos1 = _create_videos(data, [])
         data2 = json.load(open(
             'apps/webdriver_testing/check_teams/lots_of_subtitles.json'))
         videos2 = _create_videos(data2, [])
-        videos = videos1 + videos2
-        for video in videos:
+        for video in videos2:
             TeamVideoFactory.create(
                 team=self.team, 
                 video=video, 
@@ -529,69 +590,45 @@ class TestCaseTeamProjectVideos(WebdriverTestCase):
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'lots of translations')
 
-    def test_remove(self):
-        """Remove a video from the team project.
-
-        """
-        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project2.slug)
-
-        self.videos_tab.open_page(project_page)
-        self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
-            project = self.project2.name)
-        self.videos_tab.open_page(project_page)
-        self.videos_tab.remove_video(
-            video = 'Video Ranger Message (1950s) - Classic TV PSA')
-        self.videos_tab.search('Video Ranger')
-        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
-
-
-    def test_edit__change_project(self):
-        """Move a video from project2 to project 1.
-
-        """
-        video_title = 'Video Ranger Message (1950s) - Classic TV PSA'
-        project1_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project1.slug)
-        project2_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project2.slug)
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
-            project = self.project2.name)
-        self.videos_tab.open_page(project2_page)
-
-        self.videos_tab.edit_video(
-            video=video_title,
-            project = self.project1.name, 
-            )
-        self.videos_tab.open_page(project1_page)
-        self.assertTrue(self.videos_tab.video_present(video_title))
 
 class TestCaseVideosDisplay(WebdriverTestCase):
     """Check actions on team videos tab that are specific to user roles.
 
     """
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.videos_tab = videos_tab.VideosTab(self)
-        self.team_owner = UserFactory.create(username = 'team_owner')
+    NEW_BROWSER_PER_TEST_CASE = False
 
-        self.logger.info('Creating team limited access: workflows enabled, '
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseVideosDisplay, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.team_owner = UserFactory.create()
+
+        cls.logger.info('Creating team limited access: workflows enabled, '
                          'video policy set to manager and admin, '
                          'task assign policy set to manager and admin, '
                          'membership policy open.')
-        self.limited_access_team = TeamMemberFactory.create(
-            team__name='limited access open team',
-            team__slug='limited-access-open-team',
+        cls.limited_access_team = TeamMemberFactory.create(
             team__membership_policy = 4, #open
             team__video_policy = 2, #manager and admin
             team__task_assign_policy = 20, #manager and admin
             team__workflow_enabled = True,
-            user = self.team_owner,
+            user = cls.team_owner,
             ).team
+
+        cls.videos_tab.open_page(cls.limited_access_team.slug)
+
+#    def setUp(self):
+#
+#        #Reset team video and task policy values to defaults, 
+#        #manager and admin.
+#
+#        self.limited_access_team.video_policy=2
+#        self.limited_access_team.task_assign_policy=20
+#        self.limited_access_team.save()
+#        self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+
+
 
 
     def turn_on_automatic_tasks(self):
@@ -613,7 +650,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
     def add_some_team_videos(self):
         self.logger.info('Adding some videos to the limited access team')
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
+        vids = self.data_utils.create_several_team_videos_with_subs(
             team = self.limited_access_team,
             teamowner = self.team_owner)
         return vids
@@ -716,7 +753,6 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """Video policy: manager and admin; manager sees the edit link.
 
         """
-
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
         manager = TeamManagerMemberFactory(
@@ -844,13 +880,9 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.limited_access_team.save()
         
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
-
+        vids = self.add_some_team_videos()
         #Create a user who is not a member 
         non_member = UserFactory(username = 'non_member')
-        self.videos_tab.log_out()
         self.videos_tab.log_in(non_member.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
@@ -864,13 +896,10 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.limited_access_team.save()
         
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
 
         #Create a user who is not a member 
         non_member = UserFactory(username = 'non_member')
-        self.videos_tab.log_out()
         self.videos_tab.log_in(non_member.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
@@ -885,9 +914,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.limited_access_team.save()
         
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
 
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
@@ -900,10 +927,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.limited_access_team.video_policy=1
         self.limited_access_team.save()
         
-        #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
 
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
@@ -916,11 +940,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.logger.info('setup: Setting video policy to admin only')
         self.limited_access_team.video_policy=3
         self.limited_access_team.save()
-
-        #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
 
         #Create a user who is a team admin.
         self.logger.info('Create a team admin and log in as that user')
@@ -939,10 +959,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.limited_access_team.task_assign_policy=30
         self.limited_access_team.save()
 
-        #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
 
         #Create a user who is a team admin.
         self.logger.info('Create a team admin and log in as that user')
@@ -961,9 +978,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.turn_on_automatic_tasks()
 
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
         test_title = vids[0].title
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
@@ -976,9 +991,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         """
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
         test_title = 'c'
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
@@ -993,9 +1006,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.turn_on_automatic_tasks()
 
         #Add some test videos to the team.
-        vids = data_helpers.create_several_team_videos_with_subs(self, 
-            team = self.limited_access_team,
-            teamowner = self.team_owner)
+        vids = self.add_some_team_videos()
         test_title = 'c'
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
