@@ -336,6 +336,16 @@ section.main {
                             display: block;
                         }
                     }
+                    &.empty {
+                        background: #F2DEDE;
+
+                        textarea, span {
+                            background: #F2DEDE;
+                            border: 1px solid #EED3D7;
+                            border-left: 0;
+                            border-right: 0;
+                        }
+                    }
                 }
             }
         }

@@ -112,6 +112,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             var nextSubtitle;
 
+            // Save the current subtitle.
+            selectedScope.textChanged(activeTextArea.val());
+
             // Enter / return without shift.
             if (keyCode === 13 && !e.shiftKey) {
 
@@ -178,12 +181,16 @@ var SubtitleListItemController = SubtitleListItemController || null;
                 // Focus on the active textarea.
                 activeTextArea.focus();
 
-            } else {
-
-                // Otherwise, just save the current subtitle.
-                selectedScope.textChanged(activeTextArea.val());
-
             }
+        }
+        function onSubtitleTextKeyUp(e) {
+
+            var $textarea = $(e.currentTarget);
+            var $subtitle = $textarea.parent();
+            var subtitleScope = angular.element($subtitle.get(0)).scope();
+
+            subtitleScope.empty = $textarea.val() === '';
+            subtitleScope.$digest();
 
         }
 
@@ -203,6 +210,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
+                            $(elm).on('keyup', 'textarea', onSubtitleTextKeyUp);
 
                             // In order to catch an <esc> key sequence, we need to catch
                             // the keycode on the document, not the list. Also, keyup must
