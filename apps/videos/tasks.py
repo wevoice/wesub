@@ -35,7 +35,11 @@ from raven.contrib.django.models import client
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
-from videos.models import VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion
+from videos.models import (
+    VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion,
+    VIDEO_TYPE_YOUTUBE, VideoUrl
+)
+from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
@@ -524,3 +528,50 @@ def gauge_videos():
 def gauge_videos_long():
     Gauge('videos.Subtitle').report(Subtitle.objects.count())
 
+
+@task
+def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
+    from accountlinker.models import ThirdPartyAccount
+
+    try:
+        vurl = VideoUrl.objects.get(pk=vurl_pk)
+    except VideoUrl.DoesNotExist:
+        celery_logger.error("vurl not found", extra={
+            'vurl_pk': vurl_pk})
+        return
+
+    vt = video_type_registrar.video_type_for_url(vurl.url)
+    try:
+        account = ThirdPartyAccount.objects.get(username=vurl.owner_username)
+    except ThirdPartyAccount.DoesNotExist:
+        celery_logger.info("TPA not found for {0}".format(vurl.owner_username))
+        return
+
+    bridge = vt._get_bridge(account)
+
+    return bridge.add_credit_to_description(vurl.video)
+
+
+@task
+def add_amara_description_credit_to_youtube_video(video_id):
+    try:
+        video = Video.objects.get(video_id=video_id)
+    except Video.DoesNotExist:
+        celery_logger.error("video_id not found", extra={
+            'video_id': video_id})
+        return
+
+    if video.get_team_video():
+        celery_logger.info('team video, skipping', extra={
+            'video_id': video_id})
+        return
+
+    youtube_urls = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
+
+    if not youtube_urls.exists():
+        celery_logger.warning("Not a youtube video", extra={
+            'video_id': video_id})
+        return
+
+    for vurl in youtube_urls:
+        _add_amara_description_credit_to_youtube_vurl.delay(vurl.pk)
