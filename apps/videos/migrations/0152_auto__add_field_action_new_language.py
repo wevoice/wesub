@@ -5,19 +5,23 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
+    depends_on = (
+        ("subtitles", "0015_auto__chg_field_subtitleversion_serialized_subtitles"),
+    )
+
     def forwards(self, orm):
-        
+
         # Adding field 'Action.new_language'
         db.add_column('videos_action', 'new_language', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleLanguage'], null=True, blank=True), keep_default=False)
-    
-    
+
+
     def backwards(self, orm):
-        
+
         # Deleting field 'Action.new_language'
         db.delete_column('videos_action', 'new_language_id')
-    
-    
+
+
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -351,5 +355,5 @@ class Migration(SchemaMigration):
             'videoid': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
         }
     }
-    
+
     complete_apps = ['videos']

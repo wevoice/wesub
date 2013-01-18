@@ -6,6 +6,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
     
+    depends_on = (
+        ("videos", "0151_rename_pal_to_palc"),
+    )
+
     def forwards(self, orm):
         
         # Adding field 'SubtitleVersion.note'
