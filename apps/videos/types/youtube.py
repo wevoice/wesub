@@ -352,10 +352,12 @@ class YoutubeVideoType(VideoType):
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
+        # Because somehow Django's ORM is case insensitive on CharFields.
+        is_always = third_party_account.username.lower() == \
+                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
-            third_party_account.oauth_refresh_token, self.videoid,
-            third_party_account.username == YOUTUBE_ALWAYS_PUSH_USERNAME)
+            third_party_account.oauth_refresh_token, self.videoid, is_always)
 
     def update_subtitles(self, subtitle_version, third_party_account):
         """
