@@ -602,6 +602,7 @@ def setup_settings(options):
 
     from django.conf import settings
     assert settings
+    settings.TERN_IMPORT = True
 
 
 # Main
