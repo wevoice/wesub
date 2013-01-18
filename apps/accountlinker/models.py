@@ -115,6 +115,9 @@ def can_be_synced(version):
     A version must be public, synced and complete.
 
     TODO: take visibility into account
+
+    We can't sync a version if it's the only version in that language and it
+    has the "From youtube" note.
     """
     if version:
         if not version.is_public() or not version.is_synced():
@@ -125,25 +128,10 @@ def can_be_synced(version):
             # Don't sync incomplete languages
             return False
 
+        if version.subtitle_language.is_imported_from_youtube_and_not_worked_on:
+            return False
+
     return True
-
-
-def translate_string(string, language='en'):
-    """
-    If a translation for the specified language doesn't exist, return the
-    English version.
-    """
-    cur_language = translation.get_language()
-    try:
-        translation.activate(language)
-        text = translation.ugettext(string)
-    finally:
-        translation.activate(cur_language)
-    return text
-
-
-def get_amara_credit_text(language='en'):
-    return translate_string(AMARA_CREDIT, language)
 
 
 def translate_string(string, language='en'):

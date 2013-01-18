@@ -503,7 +503,7 @@ var Site = function(Site) {
 
             $('#youtube-prompt a.hide').click(function() {
                 $('#youtube-prompt').hide();
-                $.cookie('hide-yt-prompt', 'yes', { expires: 365 });
+                $.cookie('hide-yt-prompt', 'yes', { path: '/', expires: 365 });
                 return false;
             });
         },

@@ -41,10 +41,7 @@
             $scope.pop.play();
 
             // Remove any existing cues that may interfere.
-            var trackEvents = $scope.pop.getTrackEvents();
-            for (var i = 0; i < trackEvents.length; i++) {
-                $scope.pop.removeTrackEvent(trackEvents[i].id);
-            }
+            $scope.removeAllTrackEvents();
 
             if (start < 0) {
                 start = 0;
@@ -60,6 +57,26 @@
 
             // Play the video.
             $scope.pop.play();
+
+        };
+        $scope.removeAllTrackEvents = function() {
+
+            var trackEvents = $scope.pop.getTrackEvents();
+            for (var i = 0; i < trackEvents.length; i++) {
+                $scope.pop.removeTrackEvent(trackEvents[i].id);
+            }
+
+        };
+        $scope.togglePlay = function() {
+
+            // If the video is paused or has not yet been played, play it.
+            if ($scope.pop.paused()) {
+                $scope.pop.play();
+
+            // Otherwise, pause it.
+            } else {
+                $scope.pop.pause();
+            }
 
         };
     };

@@ -40,24 +40,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                             var video = angular.element($('#video').get(0)).scope();
 
-                            // Tab without shift.
+                            // Tab without shift, toggle play / pause.
                             if (e.keyCode === 9 && !e.shiftKey) {
-
                                 e.preventDefault();
-
-                                // Rewind the video four seconds and play for four seconds.
-                                video.playChunk(video.pop.currentTime(), 4);
-
-                            }
-
-                            // Tab with shift.
-                            if (e.keyCode === 9 && e.shiftKey) {
-
-                                e.preventDefault();
-
-                                // Rewind the video four seconds and play for four seconds.
-                                video.playChunk(video.pop.currentTime() - 4, 4);
-
+                                video.togglePlay();
                             }
 
                         });
@@ -136,9 +122,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                 var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
 
-                // If this is the last subtitle in the set, save the current subtitle,
-                // and create a new subtitle at the end.
-                if (selectedScope.subtitles[index] === undefined) {
+                // If canAddAndRemove is true and this is the last subtitle in the set,
+                // save the current subtitle and create a new subtitle at the end.
+                if (selectedScope.subtitles[index] === undefined && selectedScope.canAddAndRemove) {
 
                     // Save the current subtitle.
                     selectedScope.finishEditingMode(activeTextArea.val());
@@ -171,11 +157,16 @@ var SubtitleListItemController = SubtitleListItemController || null;
             // Tab with shift.
             if (keyCode === 9 && e.shiftKey) {
 
-                // We're letting this event bubble up to the subtitleEditor directive
-                // where it will trigger the appropriate video method.
-
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
+
+                // Tab with shift, move to the previous subtitle.
+
+                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
+                var lastSubtitle = parser.getSubtitle(lastIndex);
+                if (lastSubtitle) {
+                    nextSubtitle = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[lastIndex]);
+                }
 
             }
 
@@ -203,7 +194,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
                     post: function post(scope, elm, attrs) {
 
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+
                         isEditable = attrs.editable === 'true';
+                        scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
 
                         if (isEditable) {
                             $(elm).click(function(e) {
