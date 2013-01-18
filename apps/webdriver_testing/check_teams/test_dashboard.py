@@ -20,6 +20,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTaskFreeDashboard, cls).setUpClass()
+        management.call_command('flush', interactive=False)
+
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info('setup: Create a team and team owner, add some videos')
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
@@ -197,6 +199,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         """Guests see dashboard videos without the option to create subtitles.
 
         """
+        self.dashboard_tab.log_out()
         self.dashboard_tab.open_team_page(self.team.slug)
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
         self.assertEqual(langs, None)
@@ -212,7 +215,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseTaskEnabledDashboard, cls).setUpClass()
+        super(TestCaseTasksEnabledDashboard, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)

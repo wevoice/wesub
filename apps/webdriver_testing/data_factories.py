@@ -43,7 +43,11 @@ class VideoUrlFactory(factory.Factory):
     FACTORY_FOR = VideoUrl
     type = 'HTML5'
     url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
+    primary=True
+    original=True
     video = factory.SubFactory(VideoFactory)
+    video__title = factory.Sequence(lambda n: ('Test Video %s' % n))
+
 
 
 class UserLangFactory(factory.Factory):

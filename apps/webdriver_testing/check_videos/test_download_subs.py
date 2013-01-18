@@ -15,10 +15,9 @@ class TestCaseDownloadSubs(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseDownloadSubs, cls).setUpClass()
-        cls.user = UserFactory.create(username = 'user')
-#        cls.auth = dict(username=cls.user.username, password='password')
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create()
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
-        cls.video_language_pg.log_in(cls.user.username, 'password')
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
@@ -38,7 +37,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
                 'complete': 1
                 }
 
-        data_helpers.upload_subs(self, video, data)
+        self.data_utils.upload_subs(video, data)
         return video
 
     def _download_filename(self, title, lang_code, output):
@@ -223,8 +222,5 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         #Open the video's language page, and verify the download link is valid 
         #and outputs the expected data and file format.
         self._check_download_subtitles(test_video, lang_code, download_format)
-
-
-
 
 

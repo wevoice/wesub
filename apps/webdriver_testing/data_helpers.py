@@ -2,6 +2,8 @@ from apps.videos.models import Video
 from django.core.urlresolvers import reverse
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
+from apps.webdriver_testing.data_factories import VideoFactory
+from apps.webdriver_testing.data_factories import VideoUrlFactory
 from apps.teams.models import TeamMember
 import simplejson
 import requests
@@ -96,15 +98,13 @@ class DataHelpers(object):
         return r.status_code, getattr(r, output_type)
 
 
-
     def create_video(self, video_url=None):
-        if not video_url:
+        if video_url is None:
             video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-
-        video, _ = Video.get_or_create_for_url(video_url)
-        print video
-        print video.title
-        return video
+        
+        v = VideoUrlFactory(url=video_url, type='Youtube').video
+        return v
+           
 
     def super_user(self):
         superuser = UserFactory(is_partner=True, 
@@ -161,7 +161,6 @@ class DataHelpers(object):
         else:
             testdata = simplejson.load(open(testdata))
         videos = _create_videos(testdata, [])
-        print videos
         return videos
         
 
