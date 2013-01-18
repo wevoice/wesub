@@ -13,28 +13,38 @@ import time
 import os
 
 class TestCaseWatchPageSearch(WebdriverTestCase):
-    """TestSuite for site video searches.
+    """TestSuite for site video searches.  """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    """
-
-    def setUp(self):
-        _multiprocess_can_split_ = True
-
-        WebdriverTestCase.setUp(self)
-        management.call_command('clear_index', interactive=False)
-
-        self.watch_pg = watch_page.WatchPage(self)
-        self.watch_pg.open_watch_page()
-        self.user = UserFactory.create(username='tester')
-        self.auth = dict(username='tester', password='password')
-        self.client.login(**self.auth)
-        data_helpers.create_video_with_subs(self, 
-            video_url = "http://www.youtube.com/watch?v=WqJineyEszo")
-        data_helpers.create_videos_with_fake_subs(self, 
-            'apps/webdriver_testing/subtitle_data/fake_subs.json')
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseWatchPageSearch, cls).setUpClass()
+        management.call_command('update_index', interactive=False)
+        cls.watch_pg = watch_page.WatchPage(cls)
+        cls.data = data_helpers.DataHelpers()
+        cls.data.create_video_with_subs('http://www.youtube.com/watch?'
+                                        'v=WqJineyEszo')
+        cls.data.create_videos_with_fake_subs('apps/webdriver_testing/'
+                                         'subtitle_data/fake_subs.json')
+        VideoFactory.create(title = u'不过这四个问题')
+        video = VideoFactory.create(title = "my test vid")
+        data = {
+                'language_code': 'zh-cn',
+                'video_language': 'zh-cn',
+                'video': video.pk,
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.zh-cn.sbv'),
+                'is_complete': True
+               }
+        test_video = cls.data.create_video_with_subs(video_url = 
+                       "http://unisubs.example.com/test_nonascii.mp4",
+                       data = data)
         management.call_command('update_index', interactive=False)
 
 
+
+    def setUp(self):
+        self.watch_pg.open_watch_page()
 
     def test_search__simple(self):
         """Search for text contained in video title.
@@ -48,22 +58,11 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search for sub content with non-ascii char strings.
  
         """
-        video = VideoFactory(title = "my test vid")
-        data = {
-                'language_code': 'zh-cn',
-                'video_language': 'zh-cn',
-                'video': video.pk,
-                'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.zh-cn.sbv'),
-                'is_complete': True
-               }
-
-        test_video = data_helpers.create_video_with_subs(self, 
-            video_url = "http://unisubs.example.com/test_nonascii.mp4", data = data)
-        management.call_command('update_index', interactive=False)
-
+        
         #Search for: chinese chars by opening entering the text via javascript
         #because webdriver can't type those characters.
-        self.browser.execute_script("document.getElementsByName('q')[1].value='不过这四个问题，事实上'")
+        self.browser.execute_script("document.getElementsByName"
+                      "('q')[1].value='不过这四个问题，事实上'")
         results_pg = self.watch_pg.advanced_search()
         self.assertTrue(results_pg.search_has_results())
 
@@ -71,12 +70,11 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search title content with non-ascii char strings.
  
         """
-        video = VideoFactory(title = u'不过这四个问题')
-        management.call_command('update_index', interactive=False)
-
-        #Search for: chinese chars by opening entering the text via javascript
-        #because webdriver can't type those characters.
-        self.browser.execute_script("document.getElementsByName('q')[1].value='不过这四个问题'")
+        
+        #Search for: chinese chars by opening entering the text 
+        #via javascript because webdriver can't type those characters.
+        self.browser.execute_script("document.getElementsByName"
+                               "('q')[1].value='不过这四个问题'")
         results_pg = self.watch_pg.advanced_search()
         self.assertTrue(results_pg.search_has_results())
         
@@ -131,27 +129,34 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
 
 
 class TestCaseWatchPageListings(WebdriverTestCase):
-    """TestSuite for watch page latest videos section.
+    """TestSuite for watch page latest videos section.  """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    """
-
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseWatchPageListings, cls).setUpClass()
         management.call_command('clear_index', interactive=False)
 
-        self.watch_pg = watch_page.WatchPage(self)
-        data_helpers.create_videos_with_fake_subs(self, 
-            'apps/webdriver_testing/subtitle_data/fake_subs.json')
+        cls.watch_pg = watch_page.WatchPage(cls)
+        cls.data = data_helpers.DataHelpers()
+        cls.data.create_videos_with_fake_subs('apps/webdriver_testing/subtitle_data/fake_subs.json')
 
-        #Make sure the search cache is clear of old junk.
+        #create a video and mark as featured.
+        cls.feature_vid = cls.data.create_video_with_subs(video_url = 
+                                        "http://vimeo.com/903633")
+        cls.feature_vid.featured=datetime.datetime.now()
+        cls.feature_vid.save()
+       
+        #update solr index
         management.call_command('update_index', interactive=False)
 
-        self.expected_videos = [ 'original ar with en complete subs',
+        cls.expected_videos = [ 'original ar with en complete subs',
                                  'original english with incomplete pt', 
                                  'original pt-br incomplete 4 lines', 
                                  'original russian with pt-br subs',
                                  'original swa incomplete 2 lines' ]
 
+    def setUp(self):
         #Open the watch page as a test starting point.
         self.watch_pg.open_watch_page()
 
@@ -238,27 +243,13 @@ class TestCaseWatchPageListings(WebdriverTestCase):
         """Featured section only displays featured videos.
 
         """
-        video_pg = video_page.VideoPage(self)
-        feature_vid = data_helpers.create_video_with_subs(self, 
-            video_url = "http://vimeo.com/903633 ")
-        video_pg.open_video_page(feature_vid.video_id)
-        video_pg.feature_video()
-        self.watch_pg.open_watch_page()
-
         video_list = self.watch_pg.section_videos(section='featured')
-        self.assertEqual(['5x5 Unusual Movements'], video_list)
+        self.assertEqual([self.feature_vid.title], video_list)
 
     def test_featured__page(self):
         """Featured page opens when 'More' clicked and displays videos.
 
         """
-        video_pg = video_page.VideoPage(self)
-        feature_vid = data_helpers.create_video_with_subs(self, 
-            video_url = "http://vimeo.com/903633 ")
-        video_pg.open_video_page(feature_vid.video_id)
-        video_pg.feature_video()
-        self.watch_pg.open_watch_page()
-
         self.watch_pg.display_more(section='featured')
         video_list = self.watch_pg.section_videos(section='featured')
-        self.assertEqual(['5x5 Unusual Movements'], video_list)
+        self.assertEqual([self.feature_vid.title], video_list)

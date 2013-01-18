@@ -7,11 +7,14 @@ import os
 class TestCaseUserResource(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
     """
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'user')
-        data_helpers.create_user_api_key(self, self.user)
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseUserResource, cls).setUpClass()
+        cls.user = UserFactory.create(username = 'user')
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.data_utils.create_user_api_key(cls.user)
 
     def api_create_user(self, **kwargs):
         """Create a user via the api.
@@ -28,10 +31,9 @@ class TestCaseUserResource(WebdriverTestCase):
                        'create_login_token': None
                        }
         create_data.update(kwargs)
-        status, response = data_helpers.post_api_request(self, 
-            create_url, 
-            create_data)
-        print status
+        status, response = self.data_utils.post_api_request(self.user, 
+                                                            create_url, 
+                                                            create_data)
         return response 
 
 
@@ -45,7 +47,6 @@ class TestCaseUserResource(WebdriverTestCase):
                     'last_name': 'User_1',
                     }
         user_data = self.api_create_user(**new_user)
-        print user_data
         self.assertEqual('newuser', user_data['username'])
 
     def test_create__login_token(self):
@@ -61,7 +62,6 @@ class TestCaseUserResource(WebdriverTestCase):
         user_data = self.api_create_user(**new_user)
         api_key = user_data['api_key']
         login_url = user_data['auto_login_url']
-        print api_key, login_url
         personal_pg = profile_personal_page.ProfilePersonalPage(self)
         personal_pg.open_page(login_url)
         fullname = ' '.join([new_user['first_name'], new_user['last_name']])
@@ -88,7 +88,7 @@ class TestCaseUserResource(WebdriverTestCase):
                     'last_name': 'User_1',
                     }
         user_data = self.api_create_user(**new_user)
-        self.assertEqual('This value may contain only letters, numbers and @/./+/-/_ characters.', 
+        self.assertEqual('This value may contain only letters, '
+                         'numbers and @/./+/-/_ characters.', 
                          user_data['username'][0])
 
-    

@@ -14,25 +14,24 @@ class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
-
     def setUp(self):
         WebdriverTestCase.setUp(self)
-        data_helpers.set_skip_howto(self.browser)
-        self.video_pg = video_page.VideoPage(self)
+        self.data_utils = data_helpers.DataHelpers()
         self.user = UserFactory.create(username = 'user')
         self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
         self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
-        self.video_pg.log_in(self.user.username, 'password')
-        self.test_video = data_helpers.create_video(self, 
-            'http://www.youtube.com/watch?v=jbgWSF65aE0')
+        self.video_pg = video_page.VideoPage(self)
 
+        self.test_video = self.data_utils.create_video( 
+            'http://www.youtube.com/watch?v=jbgWSF65aE0')
+        self.video_pg.open_video_page(self.test_video.video_id)
+        self.video_pg.log_in(self.user.username, 'password')
+        self.video_pg.set_skiphowto()
         #Open the video page and sync the first 3 subs
         num_synced_subs = 3
-        self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
-        #self.create_modal.continue_past_help()
         self.typed_subs = self.sub_editor.type_subs()
         self.sub_editor.continue_to_next_step()
         self.sub_editor.sync_subs(num_synced_subs)
@@ -44,7 +43,7 @@ class TestCasePartialSync(WebdriverTestCase):
         """
 
         timing_list = self.sub_editor.sub_timings()
-        print timing_list
+        self.logger.info( timing_list)
         #Verify synced subs are increasing
         self.assertGreater(float(timing_list[1]), float(timing_list[0]))
         #Verify last sub is blank
@@ -70,7 +69,7 @@ class TestCasePartialSync(WebdriverTestCase):
         Note: the browser needs to be open for about 80 seconds for saving.
         """
         timing_list = self.sub_editor.sub_timings()
-        print 'sleeping for 90 seconds to initiate automatic save'
+        self.logger.info( 'sleeping for 90 seconds to initiate automatic save')
         time.sleep(90)
         self.sub_editor.open_page("")
         self.sub_editor.handle_js_alert('accept')
@@ -84,9 +83,6 @@ class TestCasePartialSync(WebdriverTestCase):
         # Resume dialog - click OK
         self.create_modal.resume_dialog_ok()
  
-        # Helper videos if exists click continue
-        self.create_modal.continue_past_help()
-
         #Move to the syncing screen
         self.sub_editor.continue_to_next_step()
 
@@ -98,17 +94,17 @@ class TestCasePartialSync(WebdriverTestCase):
 
         """
         timing_list = self.sub_editor.sub_timings()
-        print timing_list
+        self.logger.info( timing_list)
         #Past Sync
         self.sub_editor.continue_to_next_step()
         #Past Description
         self.sub_editor.continue_to_next_step()
         #In Check Step - download subtitles
         saved_subs = self.sub_editor.download_subtitles()
-        print saved_subs
+        self.logger.info( saved_subs)
         #Verify timings are in the saved list
         time_check = timing_list[1].replace('.', ',')
-        print time_check
+        self.logger.info( time_check)
         self.assertIn(time_check, saved_subs)
             
 

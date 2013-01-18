@@ -17,39 +17,42 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
 
        One can list, update, delete and add video urls to existing videos.
     """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'TestUser', is_partner=True)
-        self.team_owner = UserFactory.create(username = 'team_owner')
-        data_helpers.create_user_api_key(self, self.user)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseTeamProjectResource, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+
+        cls.user = UserFactory.create(username = 'TestUser', is_partner=True)
+        cls.team_owner = UserFactory.create(username = 'team_owner')
+        cls.data_utils.create_user_api_key(cls.user)
 
         #create an open team with description text and 2 members
-        self.open_team = TeamMemberFactory.create(
+        cls.open_team = TeamMemberFactory.create(
             team__name="Cool team",
             team__slug='team-with-projects',
             team__description='this is the coolest, most creative team ever',
-            user = self.team_owner,
+            user = cls.team_owner,
             ).team
-        TeamAdminMemberFactory(team=self.open_team, 
-            user = self.user)
+        TeamAdminMemberFactory(team=cls.open_team, 
+            user = cls.user)
         #Open to the teams page so you can see what's there.
-        self.project1 = TeamProjectFactory(
-            team=self.open_team,
+        cls.project1 = TeamProjectFactory(
+            team=cls.open_team,
             name='team project one',
             slug = 'team-project-one',
             description = 'subtitle project number 1',
             guidelines = 'do a good job',
             workflow_enabled=False)
         
-        self.project2 = TeamProjectFactory(
-            team=self.open_team,
+        cls.project2 = TeamProjectFactory(
+            team=cls.open_team,
             name='team project two',
             workflow_enabled=True)
 
-        self.team_pg = ATeamPage(self)
-        self.team_pg.open_team_page(self.open_team.slug)
+        cls.team_pg = ATeamPage(cls)
+        cls.team_pg.open_team_page(cls.open_team.slug)
 
     def test_projects__list(self):
         """List off the teams projects.
@@ -58,7 +61,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         """
         expected_projects = ['team project one', 'team project two'] 
         url_part = 'teams/%s/projects/' % self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         self.assertNotEqual(None, response)
         project_objects = response['objects']
         projects_list = []
@@ -83,7 +86,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
 
         url_part = 'teams/{0}/projects/{1}/'.format(self.open_team.slug,
             self.project1.slug)
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user, url_part) 
 
         for k, v in expected_data.iteritems():
             self.assertEqual(v, response[k])
@@ -102,7 +105,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
                      "description": "This is an example project.",
                      "guidelines": "Only post family-friendly videos."
                     }
-        status, response = data_helpers.post_api_request(self, url_part,
+        status, response = self.data_utils.post_api_request(self.user, url_part,
             project_data)
         self.team_pg.open_team_page(self.open_team.slug)
         
@@ -122,7 +125,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         updated_info = {
             'description': 'this a an updated test description' 
             } 
-        status, response = data_helpers.put_api_request(self, url_part, 
+        status, response = self.data_utils.put_api_request(self.user, url_part, 
             updated_info) 
         
         self.assertEqual(updated_info['description'], response['description'])
@@ -135,7 +138,7 @@ class TestCaseTeamProjectResource(WebdriverTestCase):
         url_part = 'teams/{0}/projects/{1}/'.format(self.open_team.slug,
            self.project1.slug)
         
-        data_helpers.delete_api_request(self, url_part) 
+        self.data_utils.delete_api_request(self.user, url_part) 
         self.team_pg.open_team_page(self.open_team.slug)
 
         #Verify project 1 is still present

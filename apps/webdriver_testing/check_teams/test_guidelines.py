@@ -20,20 +20,14 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
+        self.data_utils = data_helpers.DataHelpers()
         self.messages_tab = messages_tab.MessagesTab(self)
         self.tasks_tab = tasks_tab.TasksTab(self)
-        self.team_owner = UserFactory.create(
-            username='TeamOwner',
-            is_superuser = True,
-            is_staff = True)
+        self.team_owner = UserFactory.create()
 
         #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
-        self.team = TeamMemberFactory.create(
-            team__name='Literal Video Version',
-            team__slug='literal-video-version',
-            team__workflow_enabled = True,
-            user = self.team_owner,
-            ).team
+        self.team = TeamMemberFactory.create(team__workflow_enabled = True,
+                                             user = self.team_owner).team
         #Turn on Task Autocreation
         WorkflowFactory.create(
             team = self.team,
@@ -41,30 +35,12 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
             autocreate_translate = True,
             review_allowed = 10)
 
-        #ADD SOME PREFERRED LANGUAGES TO THE TEAM
-        lang_list = ['en', 'ru', 'pt-br']
-        for language in lang_list:
-            TeamLangPrefFactory.create(
-                team = self.team,
-                language_code = language,
-                preferred = True)
-
-        self.team_member = TeamContributorMemberFactory.create(
-            team=self.team,
-            user=UserFactory.create(username='TeamMember')).user
 
         #ADD THE TEST MESSAGES TO THE TEST TEAM
         self.messages_tab.log_in(self.team_owner.username, 'password')
         self.messages_tab.open_messages_tab(self.team.slug)
         self.messages_tab.edit_guidelines(self._TEST_GUIDELINES)
  
-        #ADD SOME VIDEOS TO THE TEAM
-        self.videos = data_helpers.create_several_team_videos_with_subs(self,
-            self.team, 
-            self.team_owner,
-            data = 'apps/webdriver_testing/subtitle_data/few_vids_with_subs.json')
-
-        
 
 
     def test_guidelines__edit(self):
@@ -73,20 +49,4 @@ class TestCaseTeamGuidelines(WebdriverTestCase):
         """
         self.assertEqual(self._TEST_GUIDELINES, 
             self.messages_tab.stored_guidelines())
-
-
-
-
-
- 
-        
-
-
-       
-     
-
-         
-
-
-
 
