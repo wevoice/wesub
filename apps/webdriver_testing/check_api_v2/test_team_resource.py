@@ -11,18 +11,18 @@ from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 
 class TestCaseTeamsResource(WebdriverTestCase):
-    """TestSuite for getting and modifying video urls via api_v2.
+    """TestSuite for getting and modifying video urls via api_v2.  """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-       One can list, update, delete and add video urls to existing videos.
-    """
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseTeamsResource, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
 
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'TestUser', is_partner=True)
-        self.private_user = UserFactory.create(username = 'IdaRed')
-        data_helpers.create_user_api_key(self, self.user)
-        self.logger.info('setup: creating team data')
+        cls.user = UserFactory.create(is_partner=True)
+        cls.private_user = UserFactory.create(username = 'IdaRed')
+        cls.data_utils.create_user_api_key(cls.user)
+        cls.logger.info('setup: creating team data')
         #create 3 open teams
         for x in range(3):
             TeamMemberFactory.create(
@@ -32,15 +32,15 @@ class TestCaseTeamsResource(WebdriverTestCase):
                 )
 
         #create an open team with description text and 2 members
-        self.open_team = TeamMemberFactory.create(
+        cls.open_team = TeamMemberFactory.create(
             team__name="A1 Waay Cool team",
             team__slug='a1-waay-cool-team',
             team__description='this is the coolest, most creative team ever',
             user__username='open_team_owner',
             ).team
 
-        TeamMemberFactory.create(team=self.open_team, user=self.user)
-        TeamVideoFactory.create(team=self.open_team, added_by=self.user)
+        TeamMemberFactory.create(team=cls.open_team, user=cls.user)
+        TeamVideoFactory.create(team=cls.open_team, added_by=cls.user)
 
         #create an application team with 3 members and 5 videos
         app_team = TeamMemberFactory.create(
@@ -50,21 +50,21 @@ class TestCaseTeamsResource(WebdriverTestCase):
             user__username='application_team_owner',
             ).team
         TeamMemberFactory.create(team=app_team, user=UserFactory.create())
-        TeamMemberFactory.create(team=app_team, user=self.user)
+        TeamMemberFactory.create(team=app_team, user=cls.user)
         for x in range(5):
-            TeamVideoFactory.create(team=app_team, added_by=self.user)
+            TeamVideoFactory.create(team=app_team, added_by=cls.user)
 
         #create 1 private team
-        self.priv_team = TeamMemberFactory.create(
+        cls.priv_team = TeamMemberFactory.create(
             team__name='my own private idaho',
             team__slug='private-idaho',
             team__membership_policy=1,
             team__is_visible=False,
-            user = self.private_user).team
+            user = cls.private_user).team
 
         #Open to the teams page so you can see what's there.
-        self.teams_dir_pg = TeamsDirPage(self)
-        self.teams_dir_pg.open_teams_page()
+        cls.teams_dir_pg = TeamsDirPage(cls)
+        cls.teams_dir_pg.open_teams_page()
 
     def test_list(self):
         """List off the existing teams.
@@ -77,7 +77,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
                           'my team 2',
                           'the application-only team']
         url_part = 'teams/'
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         team_objects =  response['objects']
         teams_list = []
         for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
@@ -97,7 +97,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
 
         TeamMemberFactory.create(team=self.priv_team, user=self.user)
         url_part = 'teams/'
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         team_objects =  response['objects']
         teams_list = []
         for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
@@ -132,7 +132,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
             } 
 
         url_part = 'teams/%s/' %self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
 
@@ -148,9 +148,9 @@ class TestCaseTeamsResource(WebdriverTestCase):
             'membership_policy': 'Invitation by any team member', 
             'video_policy': 'Any team member', 
             } 
-        status, response = data_helpers.put_api_request(self, url_part, expected_details)
+        status, response = self.data_utils.put_api_request(self.user, url_part, expected_details)
         
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         self.teams_dir_pg.open_page('teams/%s/settings/permissions/' % self.open_team.slug)
         self.teams_dir_pg.log_in('open_team_owner', 'password')
         for k, v in expected_details.iteritems():
@@ -162,7 +162,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
           POST /api2/partners/teams/
         """
         partner_user = UserFactory.create(username = 'team_creator', is_partner = True)
-        data_helpers.create_user_api_key(self, partner_user)
+        self.data_utils.create_user_api_key(partner_user)
         self.user = partner_user
         expected_details = {
             'name': 'API V2 TEAM',
@@ -171,7 +171,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
             } 
 
         url_part = 'teams/'
-        status, response = data_helpers.post_api_request(self, url_part, expected_details) 
+        status, response = self.data_utils.post_api_request(self.user, url_part, expected_details) 
         
         for k, v in expected_details.iteritems():
             self.assertEqual(v, response[k])
@@ -186,8 +186,8 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         url_part = 'teams/%s/' %self.open_team.slug
         
-        _, _ = data_helpers.delete_api_request(self, url_part) 
-        _, response = data_helpers.api_get_request(self, 'teams/') 
+        _, _ = self.data_utils.delete_api_request(self.user, url_part) 
+        _, response = self.data_utils.api_get_request(self.user, 'teams/') 
         team_objects =  response['objects']
         teams_list = []
         for k, v in itertools.groupby(team_objects, operator.itemgetter('name')):
@@ -201,7 +201,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         url_part = 'teams/%s/' % self.priv_team.slug
         url_part2 = 'teams/%s/' % 'my-team-2' 
-        s, _ = data_helpers.delete_api_request(self, url_part)
+        s, _ = self.data_utils.delete_api_request(self.user, url_part)
         self.assertEqual(s, 403)
 
     def test_delete__contributor(self):
@@ -211,7 +211,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
         """
         TeamContributorMemberFactory.create(team=self.priv_team, user=self.user)
         url_part = 'teams/%s/' % self.priv_team.slug
-        s, _ = data_helpers.delete_api_request(self, url_part)
+        s, _ = self.data_utils.delete_api_request(self.user, url_part)
         self.assertEqual(s, 403)
 
         

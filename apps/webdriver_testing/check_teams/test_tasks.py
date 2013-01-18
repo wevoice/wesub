@@ -12,18 +12,7 @@ from apps.webdriver_testing.data_factories import VideoFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 
 class TestCaseTeamTasks(WebdriverTestCase):
-    """Verify tasks creation, modification, assignment.
-
-        Assign a task
-        Create a manual task
-        Automatic task creation
-        Filter tasks
-        Perform task
-        Remove a task from a team
-Tasks link opens the page with the tasks for the video 
-- Non-members and anon users do not see Tasks links
-- Just added, non-subtitled video has tag "1 language needed" (if a task is created automatically) or "0 languages" (otherwise), the tag has an appropriate link 
-    """
+    """Test suite for tasks creation, modification, assignment. """
 
     def setUp(self):
         WebdriverTestCase.setUp(self)

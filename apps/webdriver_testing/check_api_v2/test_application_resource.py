@@ -8,7 +8,6 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import ApplicationFactory
 from apps.webdriver_testing.pages.site_pages.teams import ATeamPage 
-from apps.webdriver_testing.pages.site_pages import auth_page
 
 
 
@@ -16,69 +15,57 @@ class TestCaseApplications(WebdriverTestCase):
     """TestSuite for managing applications via the api.
 
     GET /api2/partners/teams/[team-slug]/applications
-
-    Query Parameters
-    status: Denied, Approved, Pending, Member Removed, Member Left
-    before: A unix timestamp in seconds
-    after: A unix timestamp in seconds
-    user: The username applying for the team
-       
     """
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'user', is_partner=True)
-        data_helpers.create_user_api_key(self, self.user)
-        self.joiner = UserFactory.create(username='teamjoiner')
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseApplications, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create(
+            is_partner = True)
+        cls.data_utils.create_user_api_key(cls.user)
+        cls.joiner = UserFactory.create(username='teamjoiner')
 
         #Create the application only team
-        self.team = TeamMemberFactory.create(
+        cls.team = TeamMemberFactory.create(
             team__name='my application-only team',
             team__slug='application-only',
             team__membership_policy=1,
-            user = self.user).team
+            user = cls.user).team
 
         #Create a user who has a pending application
-        self.joiner_app = ApplicationFactory.create(
-            team = self.team,
-            user = self.joiner,
+        cls.joiner_app = ApplicationFactory.create(
+            team = cls.team,
+            user = cls.joiner,
             status = 0, 
             note = 'let me in')
 
         # Create some additional applications the various status
+        cls.joiners_list = []
         for x in range(0,5):
-            test_username = 'TestUser'+str(x)
-            ApplicationFactory.create(
-            team = self.team,
-            user = UserFactory.create(username = test_username),
-            status = x, 
-            note = 'let me in, too')
+            team_joiner = ApplicationFactory.create(team = cls.team,
+                                               user = UserFactory.create(),
+                                               status = x, 
+                                               note = 'let me in, too').user
+            cls.joiners_list.append(team_joiner.username)
+        cls.joiners_list.append(cls.joiner.username)
 
-        self.a_team_pg = ATeamPage(self)
-        self.auth_pg = auth_page.AuthPage(self)
+        cls.a_team_pg = ATeamPage(cls)
 
     def test_list__applications(self):
         """List all applications for a team.
 
-           GET /api2/partners/teams/[team-slug]/applications
         """
-        
-        expected_applicants = [self.joiner.username,
-                               'TestUser0',
-                               'TestUser1',
-                               'TestUser2',
-                               'TestUser3',
-                               'TestUser4']
-
         url_part = 'teams/%s/applications/' % self.team.slug
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user,  url_part) 
         applicants_objects =  response['objects']
         applicants_list = []
         for k, v in itertools.groupby(applicants_objects, 
             operator.itemgetter('user')):
                 applicants_list.append(k)
         self.a_team_pg.open_page('teams/%s/applications/' % self.team.slug)
-        self.assertEqual(expected_applicants, applicants_list)
+        self.assertEqual(sorted(self.joiners_list), sorted(applicants_list))
 
 
     def test_application__details(self):
@@ -91,7 +78,7 @@ class TestCaseApplications(WebdriverTestCase):
  
         url_part = 'teams/{0}/applications/{1}'.format(self.team.slug, 
             self.joiner_app.pk)
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user,  url_part) 
         self.a_team_pg.open_page('teams/%s/applications/' % self.team.slug)
 
         for k, v in expected_details.iteritems():
@@ -110,14 +97,15 @@ class TestCaseApplications(WebdriverTestCase):
  
         query = '?status=Pending'
         url_part = 'teams/{0}/applications/{1}'.format(self.team.slug, query)
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user,  url_part) 
         applicants_objects =  response['objects']
         applicants_list = []
         for k, v in itertools.groupby(applicants_objects, 
             operator.itemgetter('user')):
                 applicants_list.append(k)
         self.a_team_pg.open_page('teams/%s/applications/' % self.team.slug)
-        self.assertEqual(pending_applicants, applicants_list)
+        self.assertEqual(2, len(applicants_list))
+        self.assertIn(self.joiner.username, applicants_list)
 
     def test_query__time(self):
         """List applications created after a timestamp
@@ -140,7 +128,7 @@ class TestCaseApplications(WebdriverTestCase):
             self.team.slug, 
             query_time)
 
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user,  url_part) 
         
         applicants_objects =  response['objects']
         applicants_list = []
@@ -164,13 +152,13 @@ class TestCaseApplications(WebdriverTestCase):
             self.team.slug, 
             self.joiner_app.pk)
 
-        _, response = data_helpers.put_api_request(self, url_part, data)
+        _, response = self.data_utils.put_api_request(self.user,  url_part, data)
  
         #Query for approved applicants.
  
         query = '?status=Approved'
         url_part = 'teams/{0}/applications/{1}'.format(self.team.slug, query)
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user,  url_part) 
         applicants_objects =  response['objects']
         approved_list = []
         for k, v in itertools.groupby(applicants_objects, 
@@ -190,11 +178,11 @@ class TestCaseApplications(WebdriverTestCase):
             self.team.slug, 
             self.joiner_app.pk)
 
-        data_helpers.delete_api_request(self, url_part)
+        self.data_utils.delete_api_request(self.user,  url_part)
        
         #Get the list and verify application is deleted.
         url_part = 'teams/%s/applications/' % self.team.slug
-        _, response = data_helpers.api_get_request(self, url_part) 
+        _, response = self.data_utils.api_get_request(self.user,  url_part) 
         applicants_objects =  response['objects']
         applicants_list = []
         for k, v in itertools.groupby(applicants_objects, 
