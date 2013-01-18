@@ -63,7 +63,7 @@ class Page(object):
         """Accept or reject js alert.
 
         """
-        self.logger.info('Handling alter dialog with: %s' % action)
+        self.logger.info('Handling alert dialog with: %s' % action)
         try:
             time.sleep(2)
             a = self.browser.switch_to_alert()
@@ -110,7 +110,6 @@ class Page(object):
         """Open a hover pulldown and choose a displayed item.
 
         """
-        self.browser.implicitly_wait(5)        
         menu_element = self._safe_find(menu_el)
         menu_item_element = self._safe_find(menu_item_el)
         mouseAction = (webdriver.ActionChains(self.browser)
@@ -536,10 +535,11 @@ class Page(object):
         """
             Records an error.
         """
+        self.browser.get_screenshot_as_file('error.png')
+
         if not e:
             e = 'webdriver error: ' + self.browser.current_url
-        self.logger.error(e + self.browser.current_url)
-        self.testcase.tearDown()
+        self.logger.error(str(e) + self.browser.current_url)
         raise ValueError(e)
 
 

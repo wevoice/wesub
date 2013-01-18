@@ -25,6 +25,7 @@ from selenium import webdriver
 from django.conf import settings
 from django.contrib.sites.models import Site
 from urlparse import urlparse
+from django.core import management
 
 class WebdriverTestCase(LiveServerTestCase, TestCase):
 
@@ -38,6 +39,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
     @classmethod
     def setUpClass(cls):
         super(WebdriverTestCase, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.logger = logging.getLogger('test_steps')
         cls.logger.setLevel(logging.INFO)
         if not cls.NEW_BROWSER_PER_TEST_CASE:
@@ -45,9 +47,12 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(WebdriverTestCase, cls).tearDownClass()
         if not cls.NEW_BROWSER_PER_TEST_CASE:
             cls.destroy_browser()
+        #destroy the selenium browser before teardown to avoid liveserver
+        #shutdown errors.  See https://code.djangoproject.com/ticket/19051
+        super(WebdriverTestCase, cls).tearDownClass()
+ 
 
     def setUp(self):
         super(WebdriverTestCase, self).setUp()
@@ -57,9 +62,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         
 
         #Match the Site port with the liveserver port so search redirects work.
-        o = urlparse(self.live_server_url)
         Site.objects.get_current().domain = ('unisubs.example.com:%d' 
-                                             % o.port)
+                                             % self.server_thread.port)
         Site.objects.get_current().save()
 
         if self.NEW_BROWSER_PER_TEST_CASE:
@@ -67,9 +71,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         
     def tearDown(self):
         if self.use_sauce:
-            self.logger.info("Link to the job: https://saucelabs.com/jobs/%s" % self.browser.session_id)
+            self.logger.info("Link to the job: https://saucelabs.com/jobs/%s"
+                             % self.browser.session_id)
             self.logger.info("SauceOnDemandSessionID={0} job-name={1}".format(
-                               self.browser.session_id, self.shortDescription()))
+                             self.browser.session_id, self.id()))
         if self.NEW_BROWSER_PER_TEST_CASE:
             self.__class__.destroy_browser()
 
@@ -98,11 +103,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         else:
             test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
             cls.browser = getattr(webdriver, test_browser)()
-        #Opening the create page as the starting point because it loads faster than the home page.
-        cls.base_url = ('http://unisubs.example.com:%s/' %
-                        cls.server_thread.port)
-        cls.browser.get(cls.base_url + 'videos/create/')
-
+            cls.base_url = ('http://unisubs.example.com:%s/' % cls.server_thread.port)
+            
     @classmethod
     def destroy_browser(cls):
         if cls.browser is not None:

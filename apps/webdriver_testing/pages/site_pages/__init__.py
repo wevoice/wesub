@@ -79,12 +79,19 @@ class UnisubsPage(Page):
         session.save()
         self.logger.info("session saved: %s", session.session_key)
         self.browser.add_cookie({ u'domain': u'unisubs.example.com',
-                                 u'name': u'sessionid',
+                                  u'name': u'sessionid',
                                   u'value': session.session_key,
                                   u'path': u'/',
                                  })
         self.logger.info("cookie saved")
         self.logger.info("cookies: %s", self.browser.get_cookies())
+
+    def set_skiphowto(self):
+        self.browser.add_cookie({ u'name': u'skiphowto', 
+                          u'value': u'1', 
+                          u'secure': False,
+                        })
+
 
     def _get_session_id(self):
         for cookie in self.browser.get_cookies():

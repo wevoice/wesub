@@ -16,7 +16,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseDownloadSubs, cls).setUpClass()
         cls.user = UserFactory.create(username = 'user')
-        cls.auth = dict(username=cls.user.username, password='password')
+#        cls.auth = dict(username=cls.user.username, password='password')
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.video_language_pg.log_in(cls.user.username, 'password')
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
@@ -30,17 +30,15 @@ class TestCaseDownloadSubs(WebdriverTestCase):
             url = 'http://example.unisubs.com/download-test.mp4',
             video__title = title
             ).video
-        print video.video_id
         data = {'language_code': lang_code,
-                      'video': video.pk,
-                      'primary_audio_language_code': lang_code,
-                      'draft': open(sub_file),
-                      'is_complete': True,
-                      'complete': 1
-                      }
+                'video': video.pk,
+                'primary_audio_language_code': lang_code,
+                'draft': open(sub_file),
+                'is_complete': True,
+                'complete': 1
+                }
 
         data_helpers.upload_subs(self, video, data)
-        print video.video_id
         return video
 
     def _download_filename(self, title, lang_code, output):
