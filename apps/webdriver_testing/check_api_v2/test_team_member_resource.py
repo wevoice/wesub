@@ -67,7 +67,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
             'role': 'admin' 
             } 
 
-        url_part = 'teams/%s/members/member' % self.open_team.slug
+        url_part = 'teams/%s/members/member/' % self.open_team.slug
         status, response = self.data_utils.put_api_request(self.user, url_part, updated_info) 
         
         self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
