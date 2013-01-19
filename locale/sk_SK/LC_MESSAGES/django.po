@@ -3,23 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-#   <nani1only@gmail.com>, 2011.
-# Veeven  <veeven@gmail.com>, 2011.
-# ప్రవీణ్ యిళ్ళ <mail2ipn@gmail.com>, 2011.
-# వీవెన్  <veeven@gmail.com>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-01-19 00:22-0600\n"
-"PO-Revision-Date: 2013-01-19 06:37+0000\n"
+"PO-Revision-Date: 2013-01-19 06:38+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Telugu (http://www.transifex.com/projects/p/universalsubtitles/language/te/)\n"
+"Language-Team: Slovak (Slovakia) (http://www.transifex.com/projects/p/universalsubtitles/language/sk_SK/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: te\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: sk_SK\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #: apps/accountlinker/models.py:39
 msgid "Subtitles by the Amara.org community"
@@ -48,34 +44,34 @@ msgstr ""
 #: templates/teams/invite_members.html:25
 #: unisubs-integration/apiv2/forms.py:118
 msgid "Username"
-msgstr "వాడుకరిపేరు"
+msgstr ""
 
 #: apps/auth/admin.py:34
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
-msgstr "తప్పనిసరి. 30 లేదా అంతకంటే తక్కువ అక్షరాలు. అక్షరాలు మరియు అంకెలు మాత్రమే (వర్ణాలు, అంకెలు మరియు అండర్‌స్కోరులు)"
+msgstr ""
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
-msgstr "ఈ విలువలో కేవలం వర్ణాలు, అంకెలు మరియు అండర్‌స్కోరులు మాత్రమే ఉండాలి."
+msgstr ""
 
 #: apps/auth/admin.py:36 unisubs-integration/apiv2/forms.py:121
 msgid "Password"
-msgstr "సంకేతపదం"
+msgstr ""
 
 #: apps/auth/admin.py:37
 msgid "Password confirmation"
-msgstr "సంకేతపదం నిర్ధారణ"
+msgstr ""
 
 #: apps/auth/admin.py:38
 msgid "Email"
-msgstr "ఈమెయిలు"
+msgstr ""
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8 templates/videos/create.html:63
 msgid "Hide"
-msgstr "దాచు"
+msgstr ""
 
 #: apps/auth/models.py:92 apps/teams/models.py:151
 msgid "third party accounts"
@@ -87,7 +83,7 @@ msgstr ""
 
 #: apps/auth/models.py:339
 msgid "Add comment"
-msgstr "వ్యాఖ్యని చేర్చండి"
+msgstr ""
 
 #: apps/auth/models.py:340
 msgid "Start subtitles"
@@ -95,7 +91,7 @@ msgstr ""
 
 #: apps/auth/models.py:341
 msgid "Start translation"
-msgstr "అనువాదాన్ని మొదలుపెట్టండి"
+msgstr ""
 
 #: apps/auth/models.py:342
 msgid "Edit subtitles"
@@ -103,7 +99,7 @@ msgstr ""
 
 #: apps/auth/models.py:343
 msgid "Edit translation"
-msgstr "అనువాదాన్ని సవరించు"
+msgstr ""
 
 #: apps/auth/models.py:400
 msgid "understand enough"
@@ -111,11 +107,11 @@ msgstr ""
 
 #: apps/auth/models.py:401
 msgid "understand 99%"
-msgstr "99% అర్ధమవుతుంది"
+msgstr ""
 
 #: apps/auth/models.py:402
 msgid "write like a native"
-msgstr "మాతృభాషగా వ్రాయగలరు"
+msgstr ""
 
 #: apps/auth/models.py:407
 msgid "follow requests in language"
@@ -153,7 +149,7 @@ msgstr ""
 
 #: apps/auth/views.py:107
 msgid "Your account was deleted."
-msgstr "మీ ఖాతా తొలగించబడింది."
+msgstr ""
 
 #: apps/auth/templatetags/auth_tags.py:30
 msgid "Fill email field, please."
@@ -177,7 +173,7 @@ msgstr ""
 
 #: apps/messages/forms.py:95
 msgid "You cannot send a message to a user and a team at the same time."
-msgstr "ఒకేసారి ఒక వాడుకరికి మరియు జట్టుకి సందేశాన్ని పంపించలేరు."
+msgstr ""
 
 #: apps/messages/forms.py:98
 msgid "You must choose a recipient."
@@ -189,7 +185,7 @@ msgstr ""
 
 #: apps/messages/models.py:70
 msgid "[no subject]"
-msgstr "[విషయం లేదు]"
+msgstr ""
 
 #: apps/messages/models.py:119
 msgid "You should enter subject or message."
@@ -203,7 +199,7 @@ msgstr ""
 
 #: apps/messages/rpc.py:36
 msgid "Message does not exist."
-msgstr "సందేశం లేనే లేదు."
+msgstr ""
 
 #: apps/messages/tasks.py:75
 #, python-format
@@ -310,39 +306,39 @@ msgstr ""
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
 #: templates/openid_consumer/signin.html:17
 msgid "Sign in with your OpenID"
-msgstr "మీ ఓపెన్ఐడీతో ప్రవేశించండి"
+msgstr ""
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
 #: templates/teams/_join.html:61
 msgid "Sign in"
-msgstr "ప్రవేశించండి"
+msgstr ""
 
 #: apps/profiles/forms.py:98
 msgid "This user has not email"
-msgstr "ఈ వాడుకరికి ఈమెయిలు లేదు"
+msgstr ""
 
 #: apps/profiles/forms.py:103
 msgid "You are not authenticated."
-msgstr "మీకు అధీకరణ లేదు."
+msgstr ""
 
 #: apps/profiles/forms.py:110
 #, python-format
 msgid "Personal message from %(sender)s on universalsubtitles.org"
-msgstr " universalsubtitles.org %(sender)s "
+msgstr ""
 
 #: apps/profiles/forms.py:158
 msgid "Confirm new password:"
-msgstr "కొత్త సంకేతపదం నిర్ధారణ:"
+msgstr ""
 
 #: apps/profiles/forms.py:173
 msgid "Invalid password."
-msgstr "తప్పు సంకేతపదం."
+msgstr ""
 
 #: apps/profiles/forms.py:175
 msgid "The two passwords did not match."
-msgstr "రెండు సంకేతపదాలు సరిపోలలేదు."
+msgstr ""
 
 #: apps/profiles/rpc.py:50
 msgid "Your email was updated."
@@ -378,23 +374,23 @@ msgstr ""
 
 #: apps/search/forms.py:28
 msgid "Most languages"
-msgstr "ఎక్కువ భాషలు"
+msgstr ""
 
 #: apps/search/forms.py:29
 msgid "Views Today"
-msgstr "నేటి వీక్షణలు"
+msgstr ""
 
 #: apps/search/forms.py:30
 msgid "Views This Week"
-msgstr "ఈ వారం వీక్షణలు"
+msgstr ""
 
 #: apps/search/forms.py:31
 msgid "Views This Month"
-msgstr "ఈ నెల వీక్షణలు"
+msgstr ""
 
 #: apps/search/forms.py:32
 msgid "Total Views"
-msgstr "మొత్తం వీక్షణలు"
+msgstr ""
 
 #: apps/search/forms.py:34
 msgid "query"
@@ -418,7 +414,7 @@ msgstr ""
 
 #: apps/search/forms.py:62 apps/search/forms.py:97
 msgid "All Languages"
-msgstr "అన్ని భాషలు"
+msgstr ""
 
 #: apps/statistic/models.py:47 apps/statistic/models.py:48
 msgid "Subtitle fetch statistic"
@@ -529,11 +525,11 @@ msgstr ""
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:201
 #: apps/teams/models.py:201
 msgid "Team"
-msgstr "జట్టు"
+msgstr ""
 
 #: apps/teams/admin.py:87 apps/teams/admin.py:207
 msgid "User"
-msgstr "వాడుకరి"
+msgstr ""
 
 #: apps/teams/forms.py:54 apps/teams/forms.py:162
 #: libs/rosetta/templates/rosetta/languages.html:12
@@ -557,7 +553,7 @@ msgstr ""
 
 #: apps/teams/forms.py:157
 msgid "Video language"
-msgstr "వీడియో భాష"
+msgstr ""
 
 #: apps/teams/forms.py:159
 msgid "It will be saved only if video does not exist in our database."
@@ -596,7 +592,7 @@ msgstr ""
 
 #: apps/teams/forms.py:323
 msgid "This language already has a complete set of subtitles."
-msgstr "ఈ భాషలో ఇప్పటికే పూర్తి ఉపశీర్షికలు ఉన్నాయి."
+msgstr ""
 
 #: apps/teams/forms.py:336
 msgid "This language for this video does not exist or doesn't have a version."
@@ -633,11 +629,11 @@ msgstr ""
 
 #: apps/teams/forms.py:523 apps/teams/forms.py:525
 msgid "User does not exist!"
-msgstr "వాడుకరి లేనే లేరు!"
+msgstr ""
 
 #: apps/teams/forms.py:532
 msgid "User is already a member of this team!"
-msgstr "వాడుకరి ఇప్పటికే ఈ జట్టులో సభ్యులు!"
+msgstr ""
 
 #: apps/teams/forms.py:537
 msgid "User has already been invited and has not replied yet."
@@ -708,7 +704,7 @@ msgstr ""
 
 #: apps/teams/models.py:119
 msgid "Any team member"
-msgstr "జట్టు సభ్యులు ఏవరైనా"
+msgstr ""
 
 #: apps/teams/models.py:120
 msgid "Managers and admins"
@@ -720,7 +716,7 @@ msgstr ""
 
 #: apps/teams/models.py:141 apps/teams/models.py:2625
 msgid "name"
-msgstr "పేరు"
+msgstr ""
 
 #: apps/teams/models.py:142 apps/teams/models.py:2626
 msgid "slug"
@@ -728,7 +724,7 @@ msgstr ""
 
 #: apps/teams/models.py:143
 msgid "description"
-msgstr "వివరణ"
+msgstr ""
 
 #: apps/teams/models.py:143
 msgid ""
@@ -737,7 +733,7 @@ msgstr ""
 
 #: apps/teams/models.py:145
 msgid "logo"
-msgstr "చిహ్నం"
+msgstr ""
 
 #: apps/teams/models.py:146
 msgid "publicly Visible?"
@@ -748,11 +744,11 @@ msgstr ""
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
-msgstr "వీడియోలు"
+msgstr ""
 
 #: apps/teams/models.py:148
 msgid "users"
-msgstr "వాడుకరులు"
+msgstr ""
 
 #: apps/teams/models.py:154
 msgid "applicants"
@@ -780,11 +776,11 @@ msgstr ""
 
 #: apps/teams/models.py:172
 msgid "membership policy"
-msgstr "సభ్యత్వ విధానం"
+msgstr ""
 
 #: apps/teams/models.py:175
 msgid "video policy"
-msgstr "వీడియో విధానం"
+msgstr ""
 
 #: apps/teams/models.py:178
 msgid "task assignment policy"
@@ -796,7 +792,7 @@ msgstr ""
 
 #: apps/teams/models.py:184
 msgid "translation policy"
-msgstr "అనువాద విధానం"
+msgstr ""
 
 #: apps/teams/models.py:187
 msgid "maximum tasks per member"
@@ -809,7 +805,7 @@ msgstr ""
 #: apps/teams/models.py:202 templates/profiles/base.html:56
 #: templates/teams/teams-list.html:6
 msgid "Teams"
-msgstr "జట్లు"
+msgstr ""
 
 #: apps/teams/models.py:650
 msgid ""
@@ -831,7 +827,7 @@ msgstr ""
 
 #: apps/teams/models.py:944 apps/teams/permissions_const.py:45
 msgid "Owner"
-msgstr "యజమాని"
+msgstr ""
 
 #: apps/teams/models.py:945 apps/teams/permissions_const.py:46
 msgid "Manager"
@@ -840,7 +836,7 @@ msgstr ""
 #: apps/teams/models.py:946 apps/teams/permissions_const.py:44
 #: templates/base.html:130
 msgid "Admin"
-msgstr "నిర్వహణ"
+msgstr ""
 
 #: apps/teams/models.py:947 apps/teams/permissions_const.py:47
 msgid "Contributor"
@@ -852,15 +848,15 @@ msgstr ""
 
 #: apps/teams/rpc.py:40
 msgid "Team does not exist"
-msgstr "జట్టు లేనే లేదు"
+msgstr ""
 
 #: apps/teams/rpc.py:44
 msgid "You are already a member of this team."
-msgstr "మీరు ఇప్పటికీ ఈ జట్టులో సభ్యులు."
+msgstr ""
 
 #: apps/teams/rpc.py:50 apps/teams/views.py:938
 msgid "You are now a member of this team."
-msgstr "మీరు ఇప్పుడు ఈ జట్టులో సభ్యులు."
+msgstr ""
 
 #: apps/teams/rpc.py:54
 msgid "The \"About you\" field is required in order to apply."
@@ -894,7 +890,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:84
 msgid "Team does not exist."
-msgstr "అటువంటి జట్టు లేదు."
+msgstr ""
 
 #: apps/teams/rpc.py:87
 msgid "You are not manager of this team."
@@ -918,7 +914,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:176
 msgid "You cannot assign that role to that member."
-msgstr "ఆ పాత్రని ఆ సభ్యునికి అప్పగించలేము."
+msgstr ""
 
 #: apps/teams/tasks.py:99
 #, python-format
@@ -930,15 +926,15 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
-msgstr "పేరు"
+msgstr ""
 
 #: apps/teams/views.py:134 templates/teams/teams-list.html:47
 msgid "Newest"
-msgstr "కొత్తవి"
+msgstr ""
 
 #: apps/teams/views.py:135 templates/teams/teams-list.html:44
 msgid "Most Members"
-msgstr "ఎక్కువ సభ్యులు"
+msgstr ""
 
 #: apps/teams/views.py:178
 #, python-format
@@ -957,17 +953,17 @@ msgstr ""
 
 #: apps/teams/views.py:204
 msgid "You do not have permission to delete this team."
-msgstr "ఈ జట్టుని తొలగించే అధికారం మీకు లేదు."
+msgstr ""
 
 #: apps/teams/views.py:218 apps/teams/views.py:260 apps/teams/views.py:288
 #: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1737
 #: apps/teams/views.py:1753
 msgid "You do not have permission to edit this team."
-msgstr "ఈ జట్టుని మార్చే అధికారం మీకు లేదు."
+msgstr ""
 
 #: apps/teams/views.py:247 apps/teams/views.py:307 apps/teams/views.py:392
 msgid "Settings saved."
-msgstr "అమరికలు భద్రమయ్యాయి."
+msgstr ""
 
 #: apps/teams/views.py:273
 msgid "Guidelines and messages updated."
@@ -999,7 +995,7 @@ msgstr ""
 
 #: apps/teams/views.py:664
 msgid "You can't delete that video."
-msgstr "ఆ వీడియోను మీరు తొలగించలేరు."
+msgstr ""
 
 #: apps/teams/views.py:668
 msgid "You can't remove that video."
@@ -1055,7 +1051,7 @@ msgstr ""
 
 #: apps/teams/views.py:925
 msgid "This invite is no longer valid"
-msgstr "ఈ ఆహ్వానం చెల్లదు"
+msgstr ""
 
 #: apps/teams/views.py:934
 msgid "You cannot join this team."
@@ -1200,7 +1196,7 @@ msgstr ""
 
 #: apps/videos/forms.py:214
 msgid "Youtube usernames"
-msgstr "యూట్యూబ్ వాడుకరుల పేర్లు"
+msgstr ""
 
 #: apps/videos/forms.py:214
 msgid "Enter usernames separated by comma."
@@ -1208,7 +1204,7 @@ msgstr ""
 
 #: apps/videos/forms.py:215
 msgid "Youtube page link."
-msgstr "యూట్యూబ్ పేజీ లంకె."
+msgstr ""
 
 #: apps/videos/forms.py:216
 msgid "For example: http://www.youtube.com/user/username"
@@ -1258,7 +1254,7 @@ msgstr ""
 
 #: apps/videos/models.py:165
 msgid "Views"
-msgstr "వీక్షణలు"
+msgstr ""
 
 #: apps/videos/models.py:1153
 msgid ""
@@ -1420,7 +1416,7 @@ msgstr ""
 
 #: apps/videos/models.py:2206
 msgid "comment"
-msgstr "వ్యాఖ్య"
+msgstr ""
 
 #: apps/videos/models.py:2207
 msgid "add version"
@@ -1495,7 +1491,7 @@ msgstr ""
 
 #: apps/videos/rpc.py:58 apps/videos/rpc.py:74 apps/videos/rpc.py:328
 msgid "Video does not exist"
-msgstr "వీడియో లేనే లేదు"
+msgstr ""
 
 #: apps/videos/rpc.py:312 apps/videos/rpc.py:337
 msgid "Title can't be empty"
@@ -1621,7 +1617,7 @@ msgstr ""
 
 #: apps/videos/types/dailymotion.py:85
 msgid "Video is unavailable"
-msgstr "వీడియో అందుబాటులో లేదు"
+msgstr ""
 
 #: apps/videos/types/forms.py:18
 #, python-format
@@ -1661,7 +1657,7 @@ msgstr ""
 
 #: apps/widget/rpc.py:1100 apps/widget/rpc.py:1142
 msgid "\n"
-msgstr "\n"
+msgstr ""
 
 #: apps/widget/views.py:143
 msgid "That task has already been completed."
@@ -1670,7 +1666,7 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:4
 #: libs/rosetta/templates/rosetta/languages.html:6
 msgid "Language selection"
-msgstr "భాష ఎంపిక"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:6
 #: libs/rosetta/templates/rosetta/pofile.html:18
@@ -1682,7 +1678,7 @@ msgstr "భాష ఎంపిక"
 #: templates/statistic/logger_model_admin.html:18
 #: templates/statistic/log_methods/changelist_view.html:18
 msgid "Home"
-msgstr "ముంగిలి"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:11
 #: templates/statistic/log_methods/changelist_view.html:37
@@ -1696,39 +1692,39 @@ msgstr ""
 #: libs/rosetta/templates/rosetta/languages.html:15
 #: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:61
 msgid "All"
-msgstr "అన్ని"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:29
 msgid "Progress"
-msgstr "ప్రగతి"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:30
 #: templates/profiles/_top_user_panel.html:24
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
-msgstr "సందేశాలు"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:31
 #: templates/teams/settings-permissions.html:53
 msgid "Translated"
-msgstr "అనువాదితం"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:32
 #: libs/rosetta/templates/rosetta/pofile.html:57
 msgid "Fuzzy"
-msgstr "సందేహాత్మకం"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
-msgstr "పాతబడినవి"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
-msgstr "దస్త్రం"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:55
 msgid "Nothing to translate!"
-msgstr "అనువదించాల్సినవి ఏవీ లేవు!"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:56
 msgid ""
@@ -1778,30 +1774,30 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:32
 msgid "Untranslated only"
-msgstr "అనువాదం కానివి మాత్రమే"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:33
 msgid "Translated only"
-msgstr "అనువాదమైనవి మాత్రమే"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:34
 msgid "Fuzzy only"
-msgstr "సందేహాత్మకం మాత్రమే"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:42
 #: templates/search/_search_form.html:31
 msgid "Search"
-msgstr "వెతుకు"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:44
 msgid "Go"
-msgstr "వెళ్ళు"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:212 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
-msgstr "అసలు"
+msgstr ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
@@ -1825,8 +1821,9 @@ msgstr ""
 #, python-format
 msgid "%(more_count)s more"
 msgid_plural "%(more_count)s more"
-msgstr[0] "ఇంకా %(more_count)s"
-msgstr[1] "ఇంకా %(more_count)s "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: libs/rosetta/templates/rosetta/pofile.html:123
 msgid "Save and translate next block"
@@ -1844,16 +1841,17 @@ msgstr ""
 #, python-format
 msgid "%(hits)s/%(message_number)s message"
 msgid_plural "%(hits)s/%(message_number)s messages"
-msgstr[0] "%(hits)s/%(message_number)s సందేశం"
-msgstr[1] "%(hits)s/%(message_number)s సందేశాలు"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr "గత"
+msgstr ""
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr "తదుపరి"
+msgstr ""
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
@@ -1871,19 +1869,19 @@ msgstr ""
 #: templates/teams/_context_project.html:62
 #: templates/teams/_context_team.html:116
 msgid "Post to Facebook"
-msgstr "ఫేస్బుక్ లో ప్రచురింchaMdi"
+msgstr ""
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:63
 #: templates/teams/_context_team.html:117
 msgid "Post to Twitter"
-msgstr "ట్విట్టర్లో ప్రచురించండి"
+msgstr ""
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:64
 #: templates/teams/_context_team.html:118
 msgid "Email to friends"
-msgstr "స్నేహితులకి ఈమెయిలు పంపించండి"
+msgstr ""
 
 #: templates/_share_widget.html:16
 msgid "Embed Code"
@@ -1891,7 +1889,7 @@ msgstr ""
 
 #: templates/_share_widget.html:24
 msgid "Permalink"
-msgstr "స్థిరలంకె"
+msgstr ""
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
 #: templates/teams/_context_team.html:114
@@ -1990,11 +1988,11 @@ msgstr ""
 
 #: templates/base.html:71
 msgid "Watch"
-msgstr "చూడండి"
+msgstr ""
 
 #: templates/base.html:72
 msgid "Volunteer"
-msgstr "తోడ్పాటుదారు "
+msgstr ""
 
 #: templates/base.html:73
 msgid "Enterprise"
@@ -2002,7 +2000,7 @@ msgstr ""
 
 #: templates/base.html:74
 msgid "Help"
-msgstr "సహాయం"
+msgstr ""
 
 #: templates/base.html:78
 msgid "Sign in / Sign up"
@@ -2033,23 +2031,23 @@ msgstr ""
 
 #: templates/base.html:116 templates/profiles/base.html:12
 msgid "About"
-msgstr "గురించి"
+msgstr ""
 
 #: templates/base.html:117
 msgid "Jobs"
-msgstr "ఉద్యోగాలు"
+msgstr ""
 
 #: templates/base.html:120
 msgid "Contact Us"
-msgstr "మమ్మల్ని సంప్రదించండి"
+msgstr ""
 
 #: templates/base.html:121
 msgid "Privacy Policy"
-msgstr "గోప్యతా విధానం"
+msgstr ""
 
 #: templates/base.html:122
 msgid "Terms of Service"
-msgstr "సేవా నియమాలు"
+msgstr ""
 
 #: templates/base.html:123
 msgid "Security"
@@ -2216,7 +2214,7 @@ msgstr ""
 
 #: templates/dmca.html:141
 msgid "What happens next?"
-msgstr "ఆ తర్వాత ఏం జరుగుతుంది?"
+msgstr ""
 
 #: templates/dmca.html:143
 msgid ""
@@ -2312,19 +2310,19 @@ msgstr ""
 
 #: templates/faq.html:16
 msgid "Frequently Asked Questions"
-msgstr "తరచూ అడిగే ప్రశ్నలు"
+msgstr ""
 
 #: templates/faq.html:19 templates/faq.html.py:43
 msgid "What is Amara?"
-msgstr "అమర అంటే ఏమిటి?"
+msgstr ""
 
 #: templates/faq.html:20 templates/faq.html.py:54
 msgid "How can I use Amara?"
-msgstr "నేను అమరను ఎలా ఉపయోగించుకోగలను?"
+msgstr ""
 
 #: templates/faq.html:21 templates/faq.html.py:65
 msgid "What are the benefits of subtitles?"
-msgstr "ఉపశీర్షికల వల్ల ప్రయోజనాలు ఏమిటి?"
+msgstr ""
 
 #: templates/faq.html:22 templates/faq.html.py:74
 msgid ""
@@ -2345,7 +2343,7 @@ msgstr ""
 
 #: templates/faq.html:26 templates/faq.html.py:97
 msgid "How can I add subtitles to my video?"
-msgstr "నా వీడియోకి సబ్‌టైటిల్స్ జతచేయడం ఎలా?"
+msgstr ""
 
 #: templates/faq.html:27 templates/faq.html.py:107
 msgid "What open source license do you use?"
@@ -2353,7 +2351,7 @@ msgstr ""
 
 #: templates/faq.html:28 templates/faq.html.py:111
 msgid "I'm a developer, can I help out?"
-msgstr "నేను డెవలపర్ని, ఎలా తోడ్పడగలను?"
+msgstr ""
 
 #: templates/faq.html:29 templates/faq.html.py:115
 msgid "Can non-technical people get involved with the project?"
@@ -2365,7 +2363,7 @@ msgstr ""
 
 #: templates/faq.html:31 templates/faq.html.py:134
 msgid "What is your relationship with Mozilla Drumbeat?"
-msgstr "మొజిల్లా డ్రమ్‌బీట్‌తో మీకు సంబంధం ఏమిటి?"
+msgstr ""
 
 #: templates/faq.html:32 templates/faq.html.py:138
 msgid "Where can I download subtitles in .SRT or other formats?"
@@ -2379,7 +2377,7 @@ msgstr ""
 
 #: templates/faq.html:34 templates/faq.html.py:159
 msgid "Why can't I change the timing on a translation?"
-msgstr "అనువాదంలో సమయాన్ని నేనెందుకు మార్చలేను?"
+msgstr ""
 
 #: templates/faq.html:35 templates/faq.html.py:170
 msgid ""
@@ -2604,7 +2602,7 @@ msgstr ""
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
-msgstr "క్షమించండి!"
+msgstr ""
 
 #: templates/generic-error.html:8
 msgid "If you need assistance, please visit our support site at "
@@ -2616,7 +2614,7 @@ msgstr ""
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
-msgstr "ఏ వీడియోకైనా ఉపశీర్షికలు చేర్చడానికి మరియు అనువదించడానికి అత్యంత సులభమైన మార్గం."
+msgstr ""
 
 #: templates/index.html:19
 msgid "Subtitles make videos more powerful, more global, and more searchable."
@@ -2636,7 +2634,7 @@ msgstr ""
 
 #: templates/index.html:30
 msgid "Features"
-msgstr "విశేషాలు"
+msgstr ""
 
 #: templates/index.html:32
 msgid "Embed the video anywhere"
@@ -2652,7 +2650,7 @@ msgstr ""
 
 #: templates/index.html:39
 msgid "Volunteers Needed"
-msgstr "ఔత్సాహికులు కావలెను"
+msgstr ""
 
 #: templates/index.html:41
 msgid ""
@@ -2667,7 +2665,7 @@ msgstr ""
 
 #: templates/index.html:48
 msgid "Complete Subtitling Solutions"
-msgstr "పూర్తి ఉపశీర్షికల పరిష్కారం"
+msgstr ""
 
 #: templates/index.html:50
 msgid ""
@@ -2687,7 +2685,7 @@ msgstr ""
 #: templates/index.html:78
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
-msgstr "ప్రపంచంలోనే అతి పెద్ద, శక్తివంతమైన ఉపశీర్షికల మరియు వాటి అనువాద వేదిక."
+msgstr ""
 
 #: templates/index.html:84
 msgid "TED"
@@ -2695,7 +2693,7 @@ msgstr ""
 
 #: templates/index.html:89
 msgid "Mozilla"
-msgstr "మొజిల్లా"
+msgstr ""
 
 #: templates/index.html:94
 msgid "Netflix"
@@ -2711,7 +2709,7 @@ msgstr ""
 
 #: templates/index.html:110
 msgid "More Popular"
-msgstr "మరిన్ని ప్రసిద్ధమైనవి"
+msgstr ""
 
 #: templates/index.html:111
 msgid "Most Popular Today"
@@ -2727,12 +2725,12 @@ msgstr ""
 
 #: templates/index.html:121
 msgid "More Featured"
-msgstr "మరిన్ని విశేషమైనవి"
+msgstr ""
 
 #: templates/index.html:122 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
-msgstr "విశేష వీడియోలు"
+msgstr ""
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -2869,7 +2867,7 @@ msgstr ""
 
 #: templates/index_old.html:142
 msgid "How it works"
-msgstr "ఇది ఎలా పనిచేస్తుంది"
+msgstr ""
 
 #: templates/index_old.html:144
 msgid ""
@@ -2928,7 +2926,7 @@ msgstr ""
 
 #: templates/index_old.html:170 templates/jsdemo/home.html:112
 msgid "Mozilla will double your donation!"
-msgstr "మీ విరాళాకి రెట్టింపు మొత్తాన్ని మొజిల్లా  ఇస్తుంది!"
+msgstr ""
 
 #: templates/index_old.html:171 templates/jsdemo/home.html:113
 msgid "We're a featured Mozilla Drumbeat project!"
@@ -2936,7 +2934,7 @@ msgstr ""
 
 #: templates/index_old.html:172 templates/jsdemo/home.html:113
 msgid "Donate Now"
-msgstr "ఇప్పుడే విరాళమివ్వండి"
+msgstr ""
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
 msgid "Open Subtitles Design Summit"
@@ -2994,7 +2992,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
-msgstr "ఎప్పుడు"
+msgstr ""
 
 #: templates/opensubtitles2010.html:63
 msgid "September 29th and 30th, beginning at 9am on both days."
@@ -3002,7 +3000,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:67
 msgid "Where"
-msgstr "ఎక్కడ"
+msgstr ""
 
 #: templates/opensubtitles2010.html:68
 msgid ""
@@ -3013,7 +3011,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
-msgstr "ఎందుకు"
+msgstr ""
 
 #: templates/opensubtitles2010.html:75
 msgid ""
@@ -3058,7 +3056,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
-msgstr "ప్రాయోజకులు"
+msgstr ""
 
 #: templates/opensubtitles2010.html:104
 msgid ""
@@ -3074,15 +3072,15 @@ msgstr ""
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
-msgstr "అమర"
+msgstr ""
 
 #: templates/admin/base_site.html:12
 msgid "View site"
-msgstr "సైటుని చూడండి"
+msgstr ""
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
-msgstr "పంపించు"
+msgstr ""
 
 #: templates/auth/_email_confirmation_notification.html:6
 msgid "Resend confirmation email"
@@ -3095,7 +3093,7 @@ msgstr ""
 #: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
 #: templates/messages/sent.html:49 templates/teams/tasks.html:455
 msgid "Delete"
-msgstr "తొలగించు"
+msgstr ""
 
 #: templates/auth/delete_user.html:14
 #: templates/profiles/_select_language_dialog.html:33
@@ -3104,7 +3102,7 @@ msgstr "తొలగించు"
 #: templates/teams/tasks.html:509 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:369
 msgid "Cancel"
-msgstr "రద్దుచేయి"
+msgstr ""
 
 #: templates/auth/login.html:25
 msgid "Or use your Amara account"
@@ -3116,7 +3114,7 @@ msgstr ""
 
 #: templates/auth/login.html:29
 msgid "Forgot your password?"
-msgstr "మీ సంకేతపదాన్ని మర్చిపోయారా?"
+msgstr ""
 
 #: templates/auth/login.html:30 templates/auth/login_trap.html:15
 #: templates/openid_consumer/signin.html:22
@@ -3133,11 +3131,11 @@ msgstr ""
 
 #: templates/auth/login.html:38
 msgid "Create Account"
-msgstr "ఖాతాని సృష్టించు"
+msgstr ""
 
 #: templates/auth/login_trap.html:10
 msgid "Sign in as a different user"
-msgstr "మరో వాడుకరి వలే ప్రవేశించండి"
+msgstr ""
 
 #: templates/comments/_item.html:3 templates/messages/inbox.html:59
 #: templates/messages/sent.html:46 templates/videos/_action_tpl.html:9
@@ -3145,7 +3143,7 @@ msgstr "మరో వాడుకరి వలే ప్రవేశించం
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
 #: templates/videos/diffing.html.py:147
 msgid "ago"
-msgstr "క్రితం"
+msgstr ""
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
@@ -3153,7 +3151,7 @@ msgstr ""
 
 #: templates/jsdemo/home.html:19
 msgid "The Problem"
-msgstr "సమస్య"
+msgstr ""
 
 #: templates/jsdemo/home.html:19
 msgid ""
@@ -3163,7 +3161,7 @@ msgstr ""
 
 #: templates/jsdemo/home.html:21
 msgid "Our Mission"
-msgstr "మా ఆశయం"
+msgstr ""
 
 #: templates/jsdemo/home.html:21
 msgid ""
@@ -3173,11 +3171,11 @@ msgstr ""
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
-msgstr "మరింత తెలుసుకోండి"
+msgstr ""
 
 #: templates/jsdemo/home.html:24
 msgid "Right now"
-msgstr "ఇప్పుడే"
+msgstr ""
 
 #: templates/jsdemo/home.html:24
 msgid "we're in an alpha stage, building and testing. You can help!"
@@ -3231,11 +3229,11 @@ msgstr ""
 
 #: templates/jsdemo/home.html:60
 msgid "Please enter a valid email address"
-msgstr "దయచేసి సరైన ఈమెయిలు చిరునామాని ఇవ్వండి"
+msgstr ""
 
 #: templates/jsdemo/home.html:93
 msgid "Please enter your email address."
-msgstr "దయచేసి మీ ఈమెయిలు చిరునామాని ఇవ్వండి."
+msgstr ""
 
 #: templates/jsdemo/home.html:121
 msgid "Check out the widget"
@@ -3261,7 +3259,7 @@ msgstr ""
 #: templates/teams/dashboard.html.py:200
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
-msgstr "అన్నీ చూడండి"
+msgstr ""
 
 #: templates/messages/base.html:10
 msgid "New message"
@@ -3281,7 +3279,7 @@ msgstr ""
 
 #: templates/messages/inbox.html:20 templates/messages/sent.html:17
 msgid "Do you really wish to delete this message?"
-msgstr "మీరు నిజంగానే ఈ సందేశాన్ని తొలగించాలనుకుంటున్నారా?"
+msgstr ""
 
 #: templates/messages/inbox.html:21
 msgid "The message has been successfully sent."
@@ -3297,7 +3295,7 @@ msgstr ""
 
 #: templates/messages/inbox.html:82
 msgid "You have no messages."
-msgstr "మీకు సందేశాలు లేవు."
+msgstr ""
 
 #: templates/messages/inbox.html:105
 msgid "Send Message"
@@ -3313,11 +3311,11 @@ msgstr ""
 
 #: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
-msgstr "అవతారం"
+msgstr ""
 
 #: templates/messages/sent.html:58
 msgid "You have no sent messages."
-msgstr "మీరు పంపించిన సందేశాలు ఏమీ లేవు."
+msgstr ""
 
 #: templates/messages/email/comment-notification.html:28
 #: templates/videos/email_notification.html:29
@@ -3355,7 +3353,7 @@ msgstr ""
 
 #: templates/messages/email/team-you-have-been-invited.html:14
 msgid "Join"
-msgstr "చేరండి"
+msgstr ""
 
 #: templates/messages/email/team-you-have-been-invited.html:16
 msgid "Reject"
@@ -3403,7 +3401,7 @@ msgstr ""
 
 #: templates/profiles/_select_language_dialog.html:5
 msgid "Select your Languages"
-msgstr "మీ భాషలను ఎంచుకోండి"
+msgstr ""
 
 #: templates/profiles/_select_language_dialog.html:10
 msgid "Select at least one language."
@@ -3415,27 +3413,27 @@ msgstr ""
 
 #: templates/profiles/_select_language_dialog.html:17
 msgid "What languages do you speak?"
-msgstr "మీరు ఏయో భాషలను మాట్లాడతారు?"
+msgstr ""
 
 #: templates/profiles/_select_language_dialog.html:32
 #: templates/teams/billing/choose.html:18
 msgid "Submit"
-msgstr "దాఖలుచెయ్యి"
+msgstr ""
 
 #: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
 #: templates/videos/video-view.html:168
 msgid "Activity"
-msgstr "కార్యకలాపం"
+msgstr ""
 
 #: templates/profiles/_tabs.html:11 templates/profiles/_top_user_panel.html:19
 #: templates/teams/_tabs.html:11 templates/teams/_tabs_projects.html:6
 #: templates/teams/videos-list.html:6
 msgid "Videos"
-msgstr "వీడియోలు"
+msgstr ""
 
 #: templates/profiles/_tabs.html:17
 msgid "Personal Info"
-msgstr "వ్యక్తిగత సమాచారం"
+msgstr ""
 
 #: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
 msgid "Account"
@@ -3453,12 +3451,12 @@ msgstr ""
 
 #: templates/profiles/_top_user_panel.html:36
 msgid "Logout"
-msgstr "నిష్క్రమించండి"
+msgstr ""
 
 #: templates/profiles/_top_user_panel.html:42
 #: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
 msgid "Your Teams"
-msgstr "మీ జట్లు"
+msgstr ""
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -3471,7 +3469,7 @@ msgstr ""
 #: templates/profiles/_video_detail.html:8
 #: templates/teams/_context_team.html:95 templates/teams/members-list.html:102
 msgid "language"
-msgstr "భాష"
+msgstr ""
 
 #: templates/profiles/_video_detail.html:10
 msgid "No subtitles yet"
@@ -3479,7 +3477,7 @@ msgstr ""
 
 #: templates/profiles/account.html:17
 msgid "User Details"
-msgstr "వాడుకరి వివరాలు"
+msgstr ""
 
 #: templates/profiles/account.html:28
 msgid "YouTube Account"
@@ -3547,7 +3545,7 @@ msgstr ""
 #: templates/profiles/account.html:118 templates/profiles/edit.html:59
 #: templates/teams/settings-permissions.html:117
 msgid "Save Changes"
-msgstr "మార్పులను భద్రపరచు"
+msgstr ""
 
 #: templates/profiles/account.html:120
 msgid "Delete Your Account"
@@ -3618,7 +3616,7 @@ msgstr ""
 #: templates/profiles/account.html:201 templates/teams/dashboard.html:97
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
-msgstr "మరింత తెలుసుకోండి"
+msgstr ""
 
 #: templates/profiles/account.html:201
 msgid " about Crowd Subtitles and YouTube"
@@ -3651,7 +3649,7 @@ msgstr ""
 
 #: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
 msgid "Languages"
-msgstr "భాషలు"
+msgstr ""
 
 #: templates/profiles/base.html:51
 msgid "hasn't selected languages yet."
@@ -3737,7 +3735,7 @@ msgstr ""
 
 #: templates/profiles/edit.html:30 templates/teams/_application_form.html:36
 msgid "About you"
-msgstr "మీ గురించి"
+msgstr ""
 
 #: templates/profiles/edit.html:40
 msgid "Photo"
@@ -3821,25 +3819,25 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:15
 msgid "Enter new password"
-msgstr "కొత్త సంకేతపదాన్ని ఇవ్వండి"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "మీ కొత్త సంకేతపదాన్ని సరిగా ఇచ్చారని నిర్ధారించుకునేందుకు దాన్ని రెండుసార్లు టైపు చెయ్యండి."
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
-msgstr "కొత్త సంకేతపదం:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
-msgstr "సంకేతపదాన్ని నిర్ధారించండి:"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
-msgstr "నా సంకేతపదాన్ని మార్చు"
+msgstr ""
 
 #: templates/registration/password_reset_confirm.html:33
 msgid "Password reset unsuccessful"
@@ -3873,30 +3871,30 @@ msgstr ""
 
 #: templates/registration/password_reset_email.html:5
 msgid "Please go to the following page and choose a new password:"
-msgstr "దయచేసి ఈ పుటకి వెళ్ళి కొత్త సంకేతపదాన్ని ఎంచుకోండి:"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:9
 msgid "Your username, in case you've forgotten:"
-msgstr "మీ వాడుకరి పేరు, ఒకవేళ మీరు మర్చిపోయివుంటే:"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr "మా సైటుని ఉపయోగించినందుకు ధన్యవాదాలు!"
+msgstr ""
 
 #: templates/registration/password_reset_email.html:13
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "%(site_name)s జట్టు"
+msgstr ""
 
 #: templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "మీ సంకేతపదాన్ని మర్చిపోయారా? ఇక్కడ మీ ఈమెయిలు చిరునామాని ఇవ్వండి, కొత్త సంకేతపదం అమర్చుకోడానికి సూచనలని మీకు పంపిస్తాం."
+msgstr ""
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
-msgstr "ఈమెయిలు చిరునామా:"
+msgstr ""
 
 #: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
@@ -3925,12 +3923,13 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] "\n              %(number)s భాష\n          "
-msgstr[1] "\n              %(number)s భాషలు\n          "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/search/_video_item.html:24
 msgid "lines"
-msgstr "పంక్తులు"
+msgstr ""
 
 #: templates/search/_video_item.html:34
 msgid "Plays (this week)"
@@ -3977,7 +3976,7 @@ msgstr ""
 #: templates/statistic/log_entry_model_admin.html:37
 #: templates/statistic/logger_model_admin.html:37
 msgid "Date"
-msgstr "తేదీ"
+msgstr ""
 
 #: templates/statistic/log_entry_model_admin.html:38
 #: templates/statistic/logger_model_admin.html:38
@@ -4001,22 +4000,22 @@ msgstr ""
 #: templates/statistic/users_statistic.html:13
 #: templates/statistic/videos_statistic.html:13
 msgid "Day"
-msgstr "రోజు"
+msgstr ""
 
 #: templates/statistic/users_statistic.html:14
 #: templates/statistic/videos_statistic.html:14
 msgid "Week"
-msgstr "వారం"
+msgstr ""
 
 #: templates/statistic/users_statistic.html:15
 #: templates/statistic/videos_statistic.html:15
 msgid "Month"
-msgstr "నెల"
+msgstr ""
 
 #: templates/statistic/users_statistic.html:16
 #: templates/statistic/videos_statistic.html:16
 msgid "TOTAL"
-msgstr "మొత్తం"
+msgstr ""
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
@@ -4025,7 +4024,7 @@ msgstr "మొత్తం"
 #: templates/videos/set-original-language.html:13
 #: templates/videos/video-view.html:166
 msgid "Video"
-msgstr "వీడియో"
+msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:39
 msgid "By logger"
@@ -4033,7 +4032,7 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:41
 msgid "all"
-msgstr "అన్నీ"
+msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:55
 msgid "Class"
@@ -4045,7 +4044,7 @@ msgstr ""
 
 #: templates/statistic/log_methods/changelist_view.html:57
 msgid "Value"
-msgstr "విలువ"
+msgstr ""
 
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
@@ -4057,7 +4056,7 @@ msgstr ""
 
 #: templates/teams/_application_form.html:19
 msgid "Language skill"
-msgstr "భాష నైపుణ్యం"
+msgstr ""
 
 #: templates/teams/_application_form.html:21
 #, python-format
@@ -4088,11 +4087,11 @@ msgstr ""
 
 #: templates/teams/_complete_team_video_detail.html:8
 msgid "Completed Languages"
-msgstr "పూర్తయిన బాషలు"
+msgstr ""
 
 #: templates/teams/_complete_team_video_detail.html:14
 msgid "Video Page"
-msgstr "వీడియో పేజీ"
+msgstr ""
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
@@ -4115,12 +4114,12 @@ msgstr ""
 #: templates/teams/_context_team.html:21
 #: templates/teams/_subnav_settings.html:21
 msgid "Projects"
-msgstr "ప్రాజెక్టులు"
+msgstr ""
 
 #: templates/teams/_context_team.html:33
 #: templates/videos/test_form_page.html:24
 msgid "video"
-msgstr "వీడియో"
+msgstr ""
 
 #: templates/teams/_context_team.html:40
 #: templates/teams/_context_team.html:135
@@ -4147,7 +4146,7 @@ msgstr ""
 #: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
-msgstr "మరియు"
+msgstr ""
 
 #: templates/teams/_context_team.html:94 templates/teams/members-list.html:101
 msgid "project"
@@ -4155,7 +4154,7 @@ msgstr ""
 
 #: templates/teams/_context_team.html:100
 msgid "Your tasks"
-msgstr "మీ పనులు"
+msgstr ""
 
 #: templates/teams/_context_team.html:104
 msgid "All available tasks"
@@ -4183,7 +4182,7 @@ msgstr ""
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "language choices"
-msgstr "భాషా ఎంపికలు"
+msgstr ""
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "there don't appear to be videos you can translate."
@@ -4253,7 +4252,7 @@ msgstr ""
 
 #: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
-msgstr "సభ్యులు"
+msgstr ""
 
 #: templates/teams/_tabs.html:28 templates/teams/_tabs_projects.html:12
 #: templates/teams/_team_video_detail.html:41
@@ -4269,7 +4268,7 @@ msgstr ""
 #: templates/teams/settings-projects-edit.html:5
 #: templates/teams/settings-projects.html:5 templates/teams/settings.html:5
 msgid "Settings"
-msgstr "అమరికలు"
+msgstr ""
 
 #: templates/teams/_team_add_video_select.html:4
 msgid "Add this video to one of your teams"
@@ -4323,6 +4322,7 @@ msgid_plural ""
 "                    "
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: templates/teams/_team_video_detail.html:20
 #, python-format
@@ -4334,14 +4334,15 @@ msgid_plural ""
 "\n"
 "                        %(num)s languages\n"
 "                    "
-msgstr[0] "\n                        %(num)s భాష\n                    "
-msgstr[1] "\n                        %(num)s భాషలు\n                    "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/teams/_team_video_detail.html:46
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
-msgstr "మార్చు"
+msgstr ""
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -4362,7 +4363,7 @@ msgstr ""
 #: templates/teams/add_video.html:35 templates/teams/add_videos.html:31
 #: templates/teams/create_task.html:91 templates/teams/team_video.html:44
 msgid "Save"
-msgstr "భద్రపరచు"
+msgstr ""
 
 #: templates/teams/add_videos.html:21
 msgid "Add multiple videos"
@@ -4374,11 +4375,11 @@ msgstr ""
 
 #: templates/teams/applications.html:49 templates/teams/tasks.html:68
 msgid "Approve"
-msgstr "అంగీకరించు"
+msgstr ""
 
 #: templates/teams/applications.html:52
 msgid "Deny"
-msgstr "తిరస్కరించండి"
+msgstr ""
 
 #: templates/teams/applications.html:56
 msgid "Send a message"
@@ -4402,11 +4403,11 @@ msgstr ""
 
 #: templates/teams/create.html:28 templates/teams/teams-list.html:23
 msgid "All Teams"
-msgstr "అన్ని జట్లు"
+msgstr ""
 
 #: templates/teams/create.html:33
 msgid "My Teams"
-msgstr "నా జట్లు"
+msgstr ""
 
 #: templates/teams/create.html:51
 msgid "Display Settings"
@@ -4526,7 +4527,7 @@ msgstr ""
 
 #: templates/teams/dashboard.html:127 templates/teams/tasks.html:159
 msgid "Tell us what languages you speak"
-msgstr "మీరు మాట్లాడే భాషలేమిటో మాకు చెప్పండి"
+msgstr ""
 
 #: templates/teams/dashboard.html:127
 msgid "and we'll personalize this list for you"
@@ -4591,7 +4592,7 @@ msgstr ""
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
-msgstr "కృతజ్ఞతలు!"
+msgstr ""
 
 #: templates/teams/invite_members.html:6 templates/teams/members-list.html:45
 msgid "Invite Members"
@@ -4641,7 +4642,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:55
 msgid "all members"
-msgstr "అందరు సభ్యులు"
+msgstr ""
 
 #: templates/teams/members-list.html:56
 msgid "admins"
@@ -4661,7 +4662,7 @@ msgstr ""
 
 #: templates/teams/members-list.html:64 templates/teams/tasks.html:88
 msgid "all languages"
-msgstr "అన్ని భాషలు"
+msgstr ""
 
 #: templates/teams/members-list.html:72 templates/teams/tasks.html:133
 #: templates/teams/tasks.html.py:140 templates/teams/tasks.html:147
@@ -4679,11 +4680,11 @@ msgstr ""
 
 #: templates/teams/members-list.html:82
 msgid "Sorry, no members found."
-msgstr "క్షమించండి, సభ్యులు ఏవరూ లేరు."
+msgstr ""
 
 #: templates/teams/members-list.html:92
 msgid "Me"
-msgstr "నేను"
+msgstr ""
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -4742,7 +4743,7 @@ msgstr ""
 
 #: templates/teams/settings-languages.html:27
 msgid "Preferred Languages"
-msgstr "ఫ్రాధాన్య భాషలు"
+msgstr ""
 
 #: templates/teams/settings-languages.html:28
 msgid "Translation tasks will be auto-created for these languages"
@@ -4798,7 +4799,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:52
 msgid "or ..."
-msgstr "లేదా ..."
+msgstr ""
 
 #: templates/teams/settings-permissions.html:58
 msgid "Reviewed"
@@ -4893,7 +4894,7 @@ msgstr ""
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
-msgstr "వివరణ"
+msgstr ""
 
 #: templates/teams/settings-projects-add.html:40
 msgid ""
@@ -4944,7 +4945,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:86
 msgid "my languages"
-msgstr "నా భాషలు"
+msgstr ""
 
 #: templates/teams/tasks.html:100
 msgid "assigned to"
@@ -4989,7 +4990,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:145
 msgid "NOTE:"
-msgstr "గమనిక:"
+msgstr ""
 
 #: templates/teams/tasks.html:146
 msgid ""
@@ -5014,7 +5015,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:168
 msgid "your tasks"
-msgstr "మీ పనులు"
+msgstr ""
 
 #: templates/teams/tasks.html:169
 msgid " instead?"
@@ -5032,7 +5033,7 @@ msgstr ""
 #: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:152
 #: templates/videos/subtitle-view.html:186
 msgid "Subtitles"
-msgstr "ఉపశీర్షికలు"
+msgstr ""
 
 #: templates/teams/tasks.html:239
 msgid "latest draft"
@@ -5085,7 +5086,7 @@ msgstr ""
 
 #: templates/teams/tasks.html:343 templates/videos/_upload_subtitles.html:32
 msgid "Video Language"
-msgstr "వీడియో భాష"
+msgstr ""
 
 #: templates/teams/tasks.html:347 templates/videos/_upload_subtitles.html:37
 msgid ""
@@ -5110,7 +5111,7 @@ msgstr ""
 #: templates/teams/tasks.html:368 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
-msgstr "భాష"
+msgstr ""
 
 #: templates/teams/tasks.html:376
 msgid "File:"
@@ -5188,11 +5189,11 @@ msgstr ""
 
 #: templates/teams/teams-list.html:64
 msgid "Your team"
-msgstr "మీ జట్టు"
+msgstr ""
 
 #: templates/teams/teams-list.html:67
 msgid "Private"
-msgstr "అంతరంగికం"
+msgstr ""
 
 #: templates/teams/teams-list.html:78
 msgid "Role:"
@@ -5212,8 +5213,9 @@ msgid_plural ""
 "\n"
 "                                        %(count)s members\n"
 "                                    "
-msgstr[0] "\n                                        %(count)s సభ్యుడు\n                                    "
-msgstr[1] "\n                                        %(count)s సభ్యులు\n                                    "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/teams/teams-list.html:105
 #, python-format
@@ -5227,6 +5229,7 @@ msgid_plural ""
 "                            "
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
@@ -5266,7 +5269,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:62
 msgid "no"
-msgstr "కాదు"
+msgstr ""
 
 #: templates/teams/videos-list.html:73
 msgid "name, a-z"
@@ -5286,11 +5289,11 @@ msgstr ""
 
 #: templates/teams/videos-list.html:85
 msgid "most subtitles"
-msgstr "ఎక్కువ ఉపశీర్షికలు"
+msgstr ""
 
 #: templates/teams/videos-list.html:88
 msgid "least subtitles"
-msgstr "తక్కువ ఉపశీర్షికలు"
+msgstr ""
 
 #: templates/teams/videos-list.html:110
 msgid "Rebuilding video index. Please try again in a few minutes"
@@ -5298,7 +5301,7 @@ msgstr ""
 
 #: templates/teams/videos-list.html:112
 msgid "Sorry, no videos here"
-msgstr "క్షమించండి, ఇక్కడ వీడియోలు ఏమీ లేవు"
+msgstr ""
 
 #: templates/teams/videos-list.html:123
 msgid "Remove video"
@@ -5350,7 +5353,7 @@ msgstr ""
 
 #: templates/videos/_error_feedback_form.html:9
 msgid "Sorry, the page you requested was not found."
-msgstr "క్షమించండి, మీ అభ్యర్థించిన పుట దొరకలేదు."
+msgstr ""
 
 #: templates/videos/_feature_video.html:12
 msgid "Unfeature video"
@@ -5367,7 +5370,7 @@ msgstr ""
 #: templates/videos/_feedback_form.html:8
 msgid ""
 "Please let us know if you have any comments, questions, or suggestions!"
-msgstr "మీ సూచనలనూ, సలహాలనూ, లేదా సందేహాలనూ దయచేసి మాకు తెలియజేయండి!"
+msgstr ""
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
@@ -5377,11 +5380,11 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
-msgstr "మీ ఈమెయిలు:"
+msgstr ""
 
 #: templates/videos/_feedback_form.html:16
 msgid "Your Feedback"
-msgstr "మీ ప్రతిస్పందన"
+msgstr ""
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send feedback"
@@ -5397,11 +5400,11 @@ msgstr ""
 #: templates/videos/_video_url_panel.html:43
 #: templates/videos/video-view.html:69
 msgid "Close"
-msgstr "మూసివేయి"
+msgstr ""
 
 #: templates/videos/_feedback_form.html:37
 msgid "Thank you for your feedback."
-msgstr "మీ ప్రతిస్పందనకు ధన్యవాదాలు."
+msgstr ""
 
 #: templates/videos/_feedback_form.html:38
 msgid "If you would like to perform some additional testing"
@@ -5478,7 +5481,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
-msgstr "అనుసరించు"
+msgstr ""
 
 #: templates/videos/_follow_video_button.html:149
 msgid ""
@@ -5488,7 +5491,7 @@ msgstr ""
 
 #: templates/videos/_follow_video_button.html:150
 msgid "Follow this video"
-msgstr "ఈ వీడియోను అనుసరించు"
+msgstr ""
 
 #: templates/videos/_follow_video_button.html:158
 msgid "Follow all languages"
@@ -5586,7 +5589,7 @@ msgstr ""
 #: templates/videos/_upload_subtitles.html:55
 #: templates/videos/_upload_subtitles.html:71
 msgid "Upload"
-msgstr "ఎక్కించు"
+msgstr ""
 
 #: templates/videos/_upload_subtitles.html:70
 msgid ""
@@ -5601,8 +5604,9 @@ msgstr ""
 #: templates/videos/_video.html:23
 msgid "view"
 msgid_plural "views"
-msgstr[0] "వీక్షణ"
-msgstr[1] "వీక్షణలు"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/videos/_video.html:26
 msgid "Added"
@@ -5618,8 +5622,9 @@ msgid_plural ""
 "\n"
 "                    %(number)s Languages\n"
 "                "
-msgstr[0] "\n                    %(number)s భాష\n                "
-msgstr[1] "\n                    %(number)s భాషలు\n                "
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: templates/videos/_video_url_panel.html:6
 msgid "Add new URL"
@@ -5678,7 +5683,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:74
 msgid "Add"
-msgstr "చేర్చు"
+msgstr ""
 
 #: templates/videos/_video_url_panel.html:84
 msgid "You must be logged in to add a URL"
@@ -5686,7 +5691,7 @@ msgstr ""
 
 #: templates/videos/_video_url_panel.html:88
 msgid "Login"
-msgstr "ప్రవేశం"
+msgstr ""
 
 #: templates/videos/_video_url_panel.html:121
 #: templates/videos/_video_url_panel.html:141
@@ -5709,7 +5714,7 @@ msgstr ""
 
 #: templates/videos/actions_list.html:21
 msgid "There are no activities."
-msgstr "కార్యకలాపాలేమీ లేవు."
+msgstr ""
 
 #: templates/videos/create.html:10
 msgid ""
@@ -5728,7 +5733,7 @@ msgstr ""
 
 #: templates/videos/create.html:25
 msgid "Begin"
-msgstr "ప్రారంభించు"
+msgstr ""
 
 #: templates/videos/create.html:28
 msgid ""
@@ -5742,7 +5747,7 @@ msgstr ""
 
 #: templates/videos/create.html:37
 msgid "for example"
-msgstr "ఉదాహరణకు"
+msgstr ""
 
 #: templates/videos/create.html:45
 msgid "Automatically submit videos"
@@ -5766,7 +5771,7 @@ msgstr ""
 
 #: templates/videos/diffing.html:88
 msgid "Revision History"
-msgstr "కూర్పుల చరిత్ర"
+msgstr ""
 
 #: templates/videos/diffing.html:92
 msgid "Comparing Revision"
@@ -5779,12 +5784,12 @@ msgstr ""
 #: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
-msgstr "శీర్షిక:"
+msgstr ""
 
 #: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
-msgstr "వివరణ:"
+msgstr ""
 
 #: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
@@ -5798,15 +5803,15 @@ msgstr ""
 
 #: templates/videos/email_base.html:106
 msgid "My profile / preferences"
-msgstr "నా ప్రవర / అభిరుచులు"
+msgstr ""
 
 #: templates/videos/email_friend.html:6
 msgid "Email this to a friend"
-msgstr "దీన్ని మీ మిత్రులకి ఈమెయిలు చెయ్యండి\n"
+msgstr ""
 
 #: templates/videos/email_friend.html:10
 msgid "Send to Friend!"
-msgstr "స్నేహితులకి పంపండి!"
+msgstr ""
 
 #: templates/videos/email_notification.html:9
 #, python-format
@@ -5847,7 +5852,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:60
 #: templates/videos/email_notification_non_editors.html:88
 msgid "Old Text"
-msgstr "పాత పాఠ్యం"
+msgstr ""
 
 #: templates/videos/email_notification.html:41
 #: templates/videos/email_notification_non_editors.html:35
@@ -5861,7 +5866,7 @@ msgstr ""
 #: templates/videos/email_notification_non_editors.html:66
 #: templates/videos/email_notification_non_editors.html:94
 msgid "New Text"
-msgstr "కొత్త పాఠ్యం"
+msgstr ""
 
 #: templates/videos/email_notification.html:69
 #: templates/videos/email_notification_non_editors.html:63
@@ -5895,7 +5900,7 @@ msgstr ""
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
-msgstr "ప్రియమైన"
+msgstr ""
 
 #: templates/videos/email_start_notification.html:8
 #, python-format
@@ -5914,7 +5919,7 @@ msgstr ""
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
-msgstr "అనువాదపు ముంగిలి"
+msgstr ""
 
 #: templates/videos/email_start_notification.html:17
 msgid "Thanks for your great work,"
@@ -5922,7 +5927,7 @@ msgstr ""
 
 #: templates/videos/email_start_notification.html:19
 msgid "Sincerely"
-msgstr "మీ విధేయులు"
+msgstr ""
 
 #: templates/videos/email_start_notification.html:20
 msgid "The Amara Community"
@@ -5969,7 +5974,7 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
-msgstr "అజ్ఞాత"
+msgstr ""
 
 #: templates/videos/email_video_url_add.html:15
 msgid ""
@@ -5993,39 +5998,39 @@ msgstr ""
 #: templates/videos/latest_videos.html:20 templates/videos/volunteer.html:114
 #: templates/videos/volunteer_latest.html:21 templates/videos/watch.html:107
 msgid "Latest Videos"
-msgstr "కొత్త వీడియోలు"
+msgstr ""
 
 #: templates/videos/popular_videos.html:59 templates/videos/volunteer.html:59
 #: templates/videos/watch.html:41
 msgid "Popular Videos"
-msgstr "ప్రసిద్ధమైన వీడియోలు"
+msgstr ""
 
 #: templates/videos/popular_videos.html:61
 #: templates/videos/popular_videos.html:65 templates/videos/volunteer.html:61
 #: templates/videos/volunteer.html.py:65 templates/videos/watch.html:43
 #: templates/videos/watch.html.py:47
 msgid "This Week"
-msgstr "ఈ వారం"
+msgstr ""
 
 #: templates/videos/popular_videos.html:64 templates/videos/volunteer.html:64
 #: templates/videos/watch.html:46
 msgid "Today"
-msgstr "ఈరోజు"
+msgstr ""
 
 #: templates/videos/popular_videos.html:66 templates/videos/volunteer.html:66
 #: templates/videos/watch.html:48
 msgid "This Month"
-msgstr "ఈ నెల"
+msgstr ""
 
 #: templates/videos/popular_videos.html:67 templates/videos/volunteer.html:67
 #: templates/videos/watch.html:49
 msgid "This Year"
-msgstr "సంవత్సరం"
+msgstr ""
 
 #: templates/videos/popular_videos.html:68 templates/videos/volunteer.html:68
 #: templates/videos/watch.html:50
 msgid "All Time"
-msgstr "ఎప్పుడైనా"
+msgstr ""
 
 #: templates/videos/set-original-language.html:10
 msgid "Change video language"
@@ -6063,7 +6068,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:113
 #: templates/videos/video-view.html:103
 msgid "Comment"
-msgstr "వ్యాఖ్య"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:119
 msgid "Line"
@@ -6078,11 +6083,11 @@ msgstr ""
 #: templates/videos/subtitle-view.html:277
 #: templates/videos/video-view.html:167 templates/videos/video-view.html:219
 msgid "Comments"
-msgstr "వ్యాఖ్యలు"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:154
 msgid "Revisions"
-msgstr "కూర్పులు"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:159
 #: templates/videos/subtitle-view.html:370
@@ -6096,7 +6101,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:169
 msgid "Download"
-msgstr "దింపుకోలు"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:184
 msgid "Draft only"
@@ -6110,7 +6115,7 @@ msgstr ""
 #: templates/videos/subtitle-view.html:300
 #: templates/videos/subtitle-view.html:302
 msgid "Revision"
-msgstr "కూర్పు"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:192
 msgid "created"
@@ -6173,11 +6178,11 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:317
 msgid "Text"
-msgstr "పాఠ్యం"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:323
 msgid "No subtitles for this language."
-msgstr "ఈ భాషలో ఉపశీర్షికలు లేవు."
+msgstr ""
 
 #: templates/videos/subtitle-view.html:332
 msgid "Roll back to this version"
@@ -6189,7 +6194,7 @@ msgstr ""
 
 #: templates/videos/subtitle-view.html:353
 msgid "This version only"
-msgstr "ఈ సంచిక మాత్రమే"
+msgstr ""
 
 #: templates/videos/subtitle-view.html:357
 msgid "This entire language and all dependent languages"
@@ -6203,11 +6208,11 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
-msgstr "మీ ఈమెయిలు"
+msgstr ""
 
 #: templates/videos/test_form_page.html:23
 msgid "Task 1"
-msgstr "పని 1"
+msgstr ""
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
@@ -6222,7 +6227,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
-msgstr "పని 2"
+msgstr ""
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
@@ -6230,7 +6235,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"
-msgstr "పని 3"
+msgstr ""
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
@@ -6242,11 +6247,11 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:45
 msgid "Submit!"
-msgstr "దాఖలుచెయ్యండి!"
+msgstr ""
 
 #: templates/videos/test_form_page.html:67
 msgid "Simple Instructions"
-msgstr "తేలికైన సూచనలు"
+msgstr ""
 
 #: templates/videos/test_form_page.html:73
 msgid "All tasks 2 & 3 are optional (but we recommend trying them all)."
@@ -6254,7 +6259,7 @@ msgstr ""
 
 #: templates/videos/test_form_page.html:74
 msgid "That’s it!"
-msgstr "అంతే!"
+msgstr ""
 
 #: templates/videos/video-view.html:22
 msgid "Enter non-empty title"
@@ -6308,7 +6313,7 @@ msgstr ""
 
 #: templates/videos/video-view.html:188
 msgid "Start a new translation"
-msgstr "కొత్త అనువాదాన్ని మొదలుపెట్టండి"
+msgstr ""
 
 #: templates/videos/video-view.html:194
 msgid ""
@@ -6330,16 +6335,16 @@ msgstr ""
 
 #: templates/videos/volunteer.html:23 templates/videos/watch.html:23
 msgid "More Featured Videos"
-msgstr "మరిన్ని విశేషమైన వీడియోలు"
+msgstr ""
 
 #: templates/videos/volunteer.html:38
 msgid "More Requested Videos"
-msgstr "మరిన్ని కోరిన వీడియోలు"
+msgstr ""
 
 #: templates/videos/volunteer.html:40
 #: templates/videos/volunteer_requested.html:22
 msgid "Requested Videos"
-msgstr "కోరుతున్న వీడియోలు"
+msgstr ""
 
 #: templates/videos/volunteer.html:56 templates/videos/watch.html:38
 msgid "More Popular Videos"
@@ -6347,7 +6352,7 @@ msgstr ""
 
 #: templates/videos/volunteer.html:112 templates/videos/watch.html:105
 msgid "More Recent Videos"
-msgstr "మరిన్ని ఇటీవలి వీడియోలు"
+msgstr ""
 
 #: templates/videos/volunteer_requested.html:20
 msgid "Help Subtitle Videos"
@@ -6471,7 +6476,7 @@ msgstr ""
 
 #: utils/ajaxmiddleware.py:70
 msgid "Internal error"
-msgstr "అంతర్గత పొరపాటు"
+msgstr ""
 
 #: utils/validators.py:13
 #, python-format
@@ -6482,7 +6487,7 @@ msgstr ""
 
 #: utils/forms/__init__.py:75
 msgid "Enter valid e-mail addresses separated by commas."
-msgstr "సరైన ఈమెయిలు చిరునామాలను కామాలతో వేరుపరచి ఇవ్వండి."
+msgstr ""
 
 #: utils/forms/__init__.py:83
 msgid ""
@@ -6496,7 +6501,7 @@ msgstr ""
 
 #: utils/forms/unisub_video_form.py:67
 msgid "Videos does not exist."
-msgstr "వీడియో లేనే లేదు."
+msgstr ""
 
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
@@ -6508,4 +6513,4 @@ msgstr ""
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."
-msgstr "మరిన్ని..."
+msgstr ""
