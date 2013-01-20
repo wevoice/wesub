@@ -2,7 +2,7 @@ import time
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import offsite_page
 from apps.webdriver_testing.data_factories import UserFactory 
-from apps.webdriver_testing.pages.site_pages import unisubs_page
+from apps.webdriver_testing.pages.site_pages import UnisubsPage
 from apps.webdriver_testing.data_helpers import create_video_with_subs
 
 
@@ -15,7 +15,7 @@ class TestCaseOffsiteWidget(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.offsite_pg = offsite_page.OffsitePage(self)
         self.user = UserFactory.create()
-        self.unisubs_pg = unisubs_page.UnisubsPage(self)
+        self.unisubs_pg = UnisubsPage(self)
         self.unisubs_pg.log_in(username=self.user.username, passw='password')
 
     def test_widget__nytimes(self):

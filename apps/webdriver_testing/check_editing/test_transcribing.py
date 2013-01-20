@@ -19,7 +19,10 @@ class TestCaseTranscribing(WebdriverTestCase):
     def setUp(self):
         WebdriverTestCase.setUp(self)
         self.data_utils = data_helpers.DataHelpers()
-        self.test_video = self.data_utils.create_video()
+        td = {'url': ('http://qa.pculture.org/amara_tests/'
+                   'Birds_short.webmsd.webm')
+             }
+        self.test_video = self.data_utils.create_video(**td)
         self.video_pg = video_page.VideoPage(self)
         self.user = UserFactory.create()
         self.video_pg.open_video_page(self.test_video.video_id)

@@ -22,8 +22,15 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         management.call_command('update_index', interactive=False)
         cls.watch_pg = watch_page.WatchPage(cls)
         cls.data = data_helpers.DataHelpers()
-        cls.data.create_video_with_subs('http://www.youtube.com/watch?'
-                                        'v=WqJineyEszo')
+        testdata = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                    'video__title': ('X Factor Audition - Stop Looking At My '
+                                    'Mom Rap - Brian Bradley'),
+                    'type': 'Youtube'
+                   }
+
+        video = cls.data.create_video(**testdata)
+        cls.data.upload_subs(video)
+        
         cls.data.create_videos_with_fake_subs('apps/webdriver_testing/'
                                          'subtitle_data/fake_subs.json')
         VideoFactory.create(title = u'不过这四个问题')

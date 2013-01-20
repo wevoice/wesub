@@ -34,8 +34,11 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                        ('fireplace.mp4', 'en', 'en')
                        ]
         for vid in test_videos:
-            video = cls.data_utils.create_video('http://qa.pculture.org/amara_tests/'
+            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
                                                 '%s' % vid[0])
+            video.title = vid[0]
+            video.save()
+
             if vid[1] is not None:
                 video_data = {'language_code': vid[1],
                               'video_language': vid[2],
@@ -263,8 +266,10 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         cls.vid_obj_list = []
         for vid in test_videos:
             
-            video = self.data_utils.create_video('http://qa.pculture.org/amara_tests/'
+            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
                                                  '%s' % vid[0])
+            video.title = vid[0]
+            video.save()
             if vid[1] is not None:
                 video.primary_audio_language_code = vid[1]
                 video.save()
@@ -279,6 +284,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                 team = cls.team,
                 user = UserFactory(username =  'MonoGlot')
                 ).user
+
+    def setUp(self):
         self.dashboard_tab.open_team_page(self.team.slug)
         
 

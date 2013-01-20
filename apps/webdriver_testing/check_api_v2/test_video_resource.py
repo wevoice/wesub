@@ -22,8 +22,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         cls.user = UserFactory.create(username = 'user')
         cls.data_utils = data_helpers.DataHelpers()
         cls.data_utils.create_user_api_key(cls.user)
-        cls.test_video = cls.data_utils.create_video( 
-                'http://www.example.com/upload_test.mp4')
+        cls.test_video = cls.data_utils.create_video()
         cls.open_team = TeamMemberFactory.create(
             team__name="Cool team",
             team__slug='team-with-projects',

@@ -98,13 +98,18 @@ class DataHelpers(object):
         return r.status_code, getattr(r, output_type)
 
 
-    def create_video(self, video_url=None):
-        if video_url is None:
-            video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
+    def create_video(self, **kwargs):
+        #if 'url' not in kwargs:
+        #    data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+        #            'video__title': ('X Factor Audition - Stop Looking At My '
+        #                            'Mom Rap - Brian Bradley'),
+        #            'type': 'Youtube'
+        #           }
+        #    kwargs.update(data)
         try:         
-            v = VideoUrlFactory(url=video_url, type='Youtube').video
+            v = VideoUrlFactory(**kwargs).video
         except IntegrityError:
-            v, _ = Video.get_or_create_for_url(video_url = video_url)
+            v, _ = Video.get_or_create_for_url(video_url = kwargs['url'])
         return v
            
 
@@ -116,16 +121,7 @@ class DataHelpers(object):
         return auth
 
 
-    def upload_subs(self, video, data):
-        c = Client()
-        c.login(**self.super_user())
-        response = c.post(reverse('videos:upload_subtitles'), data)
-
-    def create_video_with_subs(self, video_url=None, data=None):
-        """Create a video and subtitles.
-    
-        """
-        video = self.create_video(video_url)
+    def upload_subs(self, video, data=None):
         if not data:
             data = {'language_code': 'en',
                     'video': video.pk,
@@ -134,6 +130,17 @@ class DataHelpers(object):
                     'is_complete': True,
                     'complete': 1
                     }
+        c = Client()
+        c.login(**self.super_user())
+        response = c.post(reverse('videos:upload_subtitles'), data)
+
+    def create_video_with_subs(self, video_url=None, data=None):
+        """Create a video and subtitles.
+    
+        """
+        if video_url is None:
+            video_url = 'http://qa.pculture.org/amara_tests/Birds_short.webmsd.webm'
+        video = self.create_video(url=video_url)
         self.upload_subs(video, data)
         return video
 

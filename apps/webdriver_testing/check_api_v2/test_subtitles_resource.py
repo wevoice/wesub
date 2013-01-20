@@ -25,8 +25,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         cls.data_utils.create_user_api_key(cls.user)
       
         #Create some test data and set subtitle data dir
-        cls.test_video = cls.data_utils.create_video(
-                'http://www.example.com/upload_test.mp4')
+        cls.test_video = cls.data_utils.create_video()
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
@@ -498,8 +497,7 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
         cls.data_utils.create_user_api_key(cls.user)
     
         #Create some test data and set subtitle data dir
-        cls.test_video = cls.data_utils.create_video(
-                'http://www.example.com/upload_test.mp4')
+        cls.test_video = cls.data_utils.create_video()
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 

@@ -24,7 +24,10 @@ class TestCaseSubmittable(WebdriverTestCase):
         self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
         self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
-        self.test_video = self.data_utils.create_video()
+                td = {'url': ('http://qa.pculture.org/amara_tests/'
+                   'Birds_short.webmsd.webm')
+             }
+        self.test_video = self.data_utils.create_video(**td)
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
         self.video_pg.set_skiphowto()

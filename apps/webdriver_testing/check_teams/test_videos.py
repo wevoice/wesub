@@ -44,11 +44,13 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
             team = self.team,
             user = UserFactory(username = 'TeamAdmin')).user
         self.videos_tab = videos_tab.VideosTab(self)
-        self.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        self.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
-            '- Brian Bradley')
-        self.test_video = self.data_utils.create_video_with_subs(
-            self.video_url)
+        data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                'video__title': ('X Factor Audition - Stop Looking At My '
+                                'Mom Rap - Brian Bradley'),
+                'type': 'Youtube'
+               }
+        self.test_video = self.data_utils.create_video(**data)
+        self.data_utils.upload_subs(self.test_video)
         TeamVideoFactory.create(
             team=self.team, 
             video=self.test_video, 
@@ -104,8 +106,8 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         """
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search(self.video_title)
-        self.videos_tab.remove_video(video=self.video_title)
+        self.videos_tab.search(self.test_video.title)
+        self.videos_tab.remove_video(video=self.test_video.title)
         self.videos_tab.search('X Factor Audition')
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
