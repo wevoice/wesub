@@ -49,7 +49,7 @@ class TestCaseTeamTasks(WebdriverTestCase):
             team=self.open_team, 
             video=self.test_video,
             added_by=self.user)
-        cls.videos_tab.open_videos_tab(cls.open_team.slug)
+        self.videos_tab.open_videos_tab(self.open_team.slug)
 
 
     def test_create(self):
