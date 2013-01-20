@@ -12,7 +12,7 @@ from tastypie.models import ApiKey
 from django.http import HttpResponse
 from django.test.client import RequestFactory, Client
 from django.contrib.sites.models import Site
-
+from django.db import IntegrityError
 
 
 class DataHelpers(object):
@@ -101,8 +101,10 @@ class DataHelpers(object):
     def create_video(self, video_url=None):
         if video_url is None:
             video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        
-        v = VideoUrlFactory(url=video_url, type='Youtube').video
+        try:         
+            v = VideoUrlFactory(url=video_url, type='Youtube').video
+        except IntegrityError:
+            v, _ = Video.get_or_create_for_url(video_url = video_url)
         return v
            
 
