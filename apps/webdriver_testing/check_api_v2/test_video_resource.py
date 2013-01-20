@@ -190,21 +190,16 @@ class TestCaseVideoResource(WebdriverTestCase):
         GET /api2/partners/videos/[video-id]/
         """
 
-        expected_data = {
-            'all_urls': ['http://www.youtube.com/watch?v=WqJineyEszo'], 
-            'title': ('X Factor Audition - Stop Looking At My Mom Rap -'
-                      ' Brian Bradley'),
-            'languages': [], 
-            'thumbnail': 'http://i.ytimg.com/vi/WqJineyEszo/0.jpg', 
-            'duration': 121, 
-            }
-        
         test_video = self.data_utils.create_video()
         url_part = 'videos/%s/' % test_video.video_id
-        status, response = self.data_utils.api_get_request(self.user, url_part)
-        self.video_pg.open_video_page(response['id'])
-        for k, v in expected_data.iteritems():
-            self.assertEqual(v, response[k])
+        s, r = self.data_utils.api_get_request(self.user, url_part)
+        self.assertEqual(r['title'], test_video.title)
+        self.assertIn(test_video.get_primary_videourl_obj().url, 
+                      r['all_urls'])
+        self.video_pg.open_page(r['site_url'])
+        self.assertEqual(self.video_pg.video_id(), r['id'])
+
+
 
         
     def test_update__metatdata(self):
