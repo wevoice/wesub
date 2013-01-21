@@ -34,10 +34,10 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                        ('fireplace.mp4', 'en', 'en')
                        ]
         for vid in test_videos:
-            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
-                                                '%s' % vid[0])
-            video.title = vid[0]
-            video.save()
+            vidurl_data = {'url': 'http://qa.pculture.org/amara_tests/%s' % vid[0],
+                           'video__title': vid[0]}
+
+            video = cls.data_utils.create_video(**vidurl_data)
 
             if vid[1] is not None:
                 video_data = {'language_code': vid[1],
@@ -265,11 +265,10 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                        ]
         cls.vid_obj_list = []
         for vid in test_videos:
-            
-            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
-                                                 '%s' % vid[0])
-            video.title = vid[0]
-            video.save()
+            vidurl_data = {'url': 'http://qa.pculture.org/amara_tests/%s' % vid[0],
+                           'video__title': vid[0]}
+
+            video = cls.data_utils.create_video(**vidurl_data)
             if vid[1] is not None:
                 video.primary_audio_language_code = vid[1]
                 video.save()
