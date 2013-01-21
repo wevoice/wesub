@@ -147,7 +147,7 @@ class TestCaseVideoUrl(WebdriverTestCase):
         A video must have at least one URL.  
         """
         video_id = self.test_video.video_id
-        url = self.test_video.get_video_url())
+        url = self.test_video.get_video_url()
         #Get a list of the current urls
         url_part = 'videos/%s/urls/' % video_id
         status, response = self.data_utils.api_get_request(self.user,url_part) 

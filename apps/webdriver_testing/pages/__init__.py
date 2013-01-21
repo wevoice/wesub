@@ -536,7 +536,7 @@ class Page(object):
             Records an error.
         """
         self.browser.get_screenshot_as_file('error.png')
-
+        self.browser.close()
         if not e:
             e = 'webdriver error: ' + self.browser.current_url
         self.logger.error(str(e) + self.browser.current_url)
