@@ -66,6 +66,43 @@ we hit the quota error.
 We are working with someone from the Youtube API support team to resolve this
 issue.
 
+Working around quota issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are a few things we can do based on our understanding of the problem.
+
+*  Create a dedicated celery queue for Youtube-related tasks
+*  Create a second celery worker machine to spread all tasks over 2 IP
+   addresses
+*  Rate limit the queue to one task execution per second (`Celery
+   documentation on rate limiting`_)
+*  Set a ``yt:quota_exceeded`` key in Redis if we're over limit
+*  Retry task in 90 seconds if we are over limit (`Retrying example`_)
+
+It would also help if we alterned users on whose behalf we make the API
+request.  Instead of doing 5 requests as user A and then 5 requests as user B,
+it would be better to alternate: A1, B1, A2, B2, etc.  Looking for suggestions
+on how to do implement that.
+
+.. _Celery documentation on rate limiting: http://docs.celeryproject.org/en/latest/userguide/tasks.html#Task.rate_limit
+.. _Retrying example: http://docs.celeryproject.org/en/latest/userguide/tasks.html#retrying>
+
+Alternating users architecture
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.  All Youtube API celery tasks will be packaged into a dict and sent to a
+    ``waiting`` queue.  The dict will contain the task name, arguments and user
+    information.
+
+2.  At the end of the ``waiting`` queue is a single concurrency worker that
+    will pop off a batch of tasks and sort them into lists by user.  It will
+    then take those lists and round robbin sort them.  Once sorted, it will
+    queue those tasks on the ``youtube`` queue.
+
+3.  At the end of the ``youtube`` queue is one or more single concurrency
+    workers making requests to the Youtube API.  Each of these workers should
+    be on a separate machine with a different IP.
+
 Metrics
 -------
 
