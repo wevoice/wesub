@@ -87,6 +87,22 @@ on how to do implement that.
 .. _Celery documentation on rate limiting: http://docs.celeryproject.org/en/latest/userguide/tasks.html#Task.rate_limit
 .. _Retrying example: http://docs.celeryproject.org/en/latest/userguide/tasks.html#retrying>
 
+Alternating users architecture
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1.  All Youtube API celery tasks will be packaged into a dict and sent to a
+    ``waiting`` queue.  The dict will contain the task name, arguments and user
+    information.
+
+2.  At the end of the ``waiting`` queue is a single concurrency worker that
+    will pop off a batch of tasks and sort them into lists by user.  It will
+    then take those lists and round robbin sort them.  Once sorted, it will
+    queue those tasks on the ``youtube`` queue.
+
+3.  At the end of the ``youtube`` queue is one or more single concurrency
+    workers making requests to the Youtube API.  Each of these workers should
+    be on a separate machine with a different IP.
+
 Metrics
 -------
 
