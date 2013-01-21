@@ -99,6 +99,26 @@
     };
     var SaveSessionButtonController = function($scope, SubtitleListFinder) {
 
+        $scope.cancel = function($event) {
+
+            $event.preventDefault();
+
+            // TODO: Need a redirect URL.
+
+        };
+        $scope.saveAndExit = function($event) { 
+
+            $event.preventDefault();
+
+            $scope.saveSession().then(function() {
+                if ($scope.status === 'saved') {
+
+                    // TODO: Need a redirect URL.
+
+                }
+            });
+
+        };
         $scope.saveSession = function() {
             if ($scope.status !== 'saving') {
                 $scope.status = 'saving';
@@ -111,12 +131,15 @@
                     $scope.status = 'error';
                     window.alert('Sorry, there was an error...');
                 });
+
+                return promise;
             }
         };
         $scope.toggleSaveDropdown = function($event) {
             $scope.dropdownOpen = !$scope.dropdownOpen;
             $event.preventDefault();
         };
+
         $scope.$root.$on('workDone', function() {
             $scope.canSave = '';
             $scope.$digest();

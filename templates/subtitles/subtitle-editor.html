@@ -23,26 +23,27 @@
         <section class="video center column"></section>
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionButtonController">
-                <div ng-show="false" class="dropdown">
+                <div class="dropdown">
                     <a href="#" ng-click="toggleSaveDropdown($event)">
                         <ng-switch on="status">
-                            <span ng-switch-when="saving">Saving subtitles&hellip;</span>
+                            <span ng-switch-when="saving">Saving&hellip;</span>
                             <span ng-switch-when="saved">Saved.</span>
                             <span ng-switch-when="error">There was an error.</span>
                             <span ng-switch-when="idle">Idle.</span>
                             <span ng-switch-when="loading">Loading&hellip;</span>
                             <span ng-switch-when="ready">Ready.</span>
                         </ng-switch>
-                        <img src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
+                        <img ng-show="false" src="{{ STATIC_URL }}images/subtitle-editor/cog.png" alt="" />
                     </a>
-                    <ul ng-show="dropdownOpen">
+                    <ul ng-show="false">
                         <li><a save-session-button ng-click="saveSession()" href="#">Save Now</a></li>
                         <li><a href="#">Download current draft</a></li>
                         <li><a href="#">Upload a draft</a></li>
                     </ul>
                 </div>
                 <div class="exit">
-                    <a href="#">Exit</a>
+                    <a ng-click="cancel($event)" href="#">Cancel</a>
+                    <a ng-click="saveAndExit($event)" href="#">Save and Exit</a>
                 </div>
             </div>
         </section>
@@ -103,11 +104,14 @@
                         video-id="{{ video.video_id }}">
                         <li ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
-                            ng-class="{editing: isEditing}"
+                            ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item"
                             subtitle-list-item>
                             <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRenderedFromRaw(subtitle)"></span>
-                            <textarea ng-show="isEditing" style="display: none;"></textarea>
+                            <textarea
+                                ng-show="isEditing"
+                                style="display: none;">
+                            </textarea>
                             <a ng-show="canAddAndRemove" class="remove" ng-click="removeSubtitle(subtitle)">Remove</a>
                         </li>
                     </ul>

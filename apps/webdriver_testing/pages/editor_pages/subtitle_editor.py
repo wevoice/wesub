@@ -81,23 +81,18 @@ class SubtitleEditor(EditorDialogs):
         """Start and Stop playback to get the video buffered up to about 30%'
      
         """
-        self.logger.info('buffering up the video')
+        self.logger.info('buffering up the video...')
         self.play()
-        time.sleep(4)
+        self.wait_for_element_present(self._PAUSE)
+        time.sleep(2)
         self.pause()
-        buffered = 0
-        time.sleep(4)
-        if self.is_element_present(self._BUFFERED):
-            sys.stdout.write('buffering.')
-            count = 0
-            while buffered < 50 or count < 25:
-                buffered = self.get_size_by_css(self._BUFFERED)['width']
-                time.sleep(1)
-                count += 1
-                sys.stdout.write('.')
-        else:
-            time.sleep(10) #If no buffer, give it 10 secs to load a bit.
-      
+        start_time = time.time()
+        while time.time() - start_time < 20:
+            if (self.is_element_present and 
+                    self.get_size_by_css(self._BUFFERED)['width'] > 70):
+                break 
+            else:
+                time.sleep(0.1)
 
     def sync_subs(self, num_subs):
         """Syncs the given number of subtitles.
@@ -128,6 +123,7 @@ class SubtitleEditor(EditorDialogs):
             timing_element)
         for el in timing_els:
             timing_list.append(el.text.strip())
+        self.logger.info(timing_list)
         return timing_list
 
             
@@ -174,9 +170,7 @@ class SubtitleEditor(EditorDialogs):
     def submit(self, complete=True):
         self.logger.info('submitting subtitles')
         self.continue_to_next_step()
-        time.sleep(2)
         self.mark_subs_complete(complete)
-        time.sleep(2)
         self.click_saved_ok()
         
 

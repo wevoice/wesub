@@ -12,12 +12,15 @@ class TestCaseVideoUrl(WebdriverTestCase):
 
        One can list, update, delete and add video urls to existing videos.
     """
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'user')
-        data_helpers.create_user_api_key(self, self.user)
-        self.test_video = data_helpers.create_video(self)
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseVideoUrl, cls).setUpClass()
+        cls.user = UserFactory.create(username = 'user')
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.data_utils.create_user_api_key(cls.user)
+        cls.test_video = cls.data_utils.create_video()
 
 
     def test_list(self):
@@ -28,7 +31,7 @@ class TestCaseVideoUrl(WebdriverTestCase):
         video_id = self.test_video.video_id
         video_url = self.test_video.get_video_url() 
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user,url_part) 
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
 
@@ -43,11 +46,11 @@ class TestCaseVideoUrl(WebdriverTestCase):
         video_url = self.test_video.get_video_url()
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4' }
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.post_api_request(self, url_part, 
+        status, response = self.data_utils.post_api_request(self.user,url_part, 
             url_data) 
 
         vid_url = 'videos/%s' % video_id
-        status, response = data_helpers.api_get_request(self, vid_url) 
+        status, response = self.data_utils.api_get_request(self.user,vid_url) 
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
 
@@ -65,12 +68,12 @@ class TestCaseVideoUrl(WebdriverTestCase):
         video_url = self.test_video.get_video_url()
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4' }
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.post_api_request(self, url_part, url_data)
+        status, response = self.data_utils.post_api_request(self.user,url_part, url_data)
 
         #Put an updated url on the video and set it as primary 
         put_url = 'videos/{0}/urls/{1}/'.format(video_id, response['id'])
         put_data = { 'url': 'http://unisubs.example.com/newerurl.mp4'}
-        status, response = data_helpers.put_api_request(self, put_url, put_data) 
+        status, response = self.data_utils.put_api_request(self.user,put_url, put_data) 
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
 
@@ -86,13 +89,13 @@ class TestCaseVideoUrl(WebdriverTestCase):
         video_url = self.test_video.get_video_url()
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4' }
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.post_api_request(self, url_part, url_data)
+        status, response = self.data_utils.post_api_request(self.user,url_part, url_data)
 
         #Put an updated url on the video and set it as primary 
         put_url = 'videos/{0}/urls/{1}/'.format(video_id, response['id'])
         put_data = { 'url': 'http://unisubs.example.com/newerurl.mp4', 
                       'primary': True }
-        status, response = data_helpers.put_api_request(self, put_url, put_data) 
+        status, response = self.data_utils.put_api_request(self.user,put_url, put_data) 
         
         self.assertEqual('http://unisubs.example.com/newerurl.mp4', response['url'])
         video_pg = video_page.VideoPage(self)
@@ -110,10 +113,10 @@ class TestCaseVideoUrl(WebdriverTestCase):
         video_url = self.test_video.get_video_url()
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4'}
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.post_api_request(self, url_part, url_data)
-        print self.test_video.get_video_url()
+        status, response = self.data_utils.post_api_request(self.user,url_part, url_data)
+        self.logger.info( self.test_video.get_video_url())
         update_url = 'videos/{0}/urls/{1}/'.format(video_id, response['id'])
-        status, response = data_helpers.delete_api_request(self, update_url) 
+        status, response = self.data_utils.delete_api_request(self.user, update_url) 
         self.assertEqual(status, 204)
         self.assertNotEqual(self.test_video.get_video_url(), 'http://unisubs.example.com/newurl.mp4')
 
@@ -125,28 +128,29 @@ class TestCaseVideoUrl(WebdriverTestCase):
         """
         video_id = self.test_video.video_id
         video_url = self.test_video.get_video_url()
-        print video_url
+        self.logger.info( video_url)
         url_data = { 'url': 'http://unisubs.example.com/newurl.mp4',
                      'primary': True }
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.post_api_request(self, url_part, url_data)
-        print self.test_video.get_video_url()
+        status, response = self.data_utils.post_api_request(self.user,url_part, url_data)
+        self.logger.info( self.test_video.get_video_url())
         update_url = 'videos/{0}/urls/{1}/'.format(video_id, response['id'])
-        status, response = data_helpers.delete_api_request(self, update_url) 
+        status, response = self.data_utils.delete_api_request(self.user, update_url) 
         self.assertEqual(status, 204)
-        print self.test_video.get_video_url()
+        self.logger.info( self.test_video.get_video_url())
         self.assertNotEqual(self.test_video.get_video_url(), 'http://unisubs.example.com/newurl.mp4')
 
     def test_url__delete_last(self):
         """Can not delete the last (only) url.  
 
-        If this is the only URL for a video, the request will fail. A video must have at least one URL.  
+        If this is the only URL for a video, the request will fail. 
+        A video must have at least one URL.  
         """
         video_id = self.test_video.video_id
-
+        expected_url = self.test_video.get_video_url()
         #Get a list of the current urls
         url_part = 'videos/%s/urls/' % video_id
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user,url_part) 
         
 
         url_objects = response['objects']
@@ -156,14 +160,12 @@ class TestCaseVideoUrl(WebdriverTestCase):
         for url_id in sorted(id_list, reverse=True):
             url_part = 'videos/%s/urls/' % url_id 
             update_url = 'videos/{0}/urls/{1}/'.format(video_id, url_id)
-            status, response =  data_helpers.delete_api_request(self, update_url) 
-        print self.test_video.get_video_url()
+            status, response =  self.data_utils.delete_api_request(self.user, update_url) 
 
         #Open the video page on the ui - for the verification screenshot
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
-        self.assertEqual('http://www.youtube.com/watch?v=WqJineyEszo', 
-            self.test_video.get_video_url())
+        self.assertEqual(expected_url, self.test_video.get_video_url())
 
 
 

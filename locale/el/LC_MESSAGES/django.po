@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Translators:
-#   <kvisitor@gnugr.org>, 2011, 2012.
+#   <kvisitor@gnugr.org>, 2011-2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-12 00:18-0600\n"
-"PO-Revision-Date: 2012-11-09 07:55+0000\n"
+"POT-Creation-Date: 2013-01-20 00:17-0600\n"
+"PO-Revision-Date: 2013-01-19 06:38+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/el_GR/)\n"
@@ -19,8 +19,30 @@ msgstr ""
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/auth/admin.py:33 templates/profiles/view_profile.html:53
-#: templates/statistic/users_statistic.html:12
+#: apps/accountlinker/models.py:39
+msgid "Subtitles by the Amara.org community"
+msgstr ""
+
+#: apps/accountlinker/models.py:41
+msgid "Help us caption and translate this video on Amara.org"
+msgstr ""
+
+#: apps/accountlinker/views.py:103
+msgid "The user who requested this action doesn't match the current user."
+msgstr ""
+
+#: apps/accountlinker/views.py:140
+msgid ""
+"We couldn't link your account. Have you <a href='https://accounts.google.com/"
+"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
+"create_channel'>set up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:158
+msgid "Account already linked."
+msgstr ""
+
+#: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
 #: unisubs-integration/apiv2/forms.py:118
 msgid "Username"
@@ -55,47 +77,51 @@ msgstr "E-mail"
 msgid "Hide"
 msgstr "Απόκρυψη"
 
-#: apps/auth/models.py:98
+#: apps/auth/models.py:92 apps/teams/models.py:151
+msgid "third party accounts"
+msgstr "Λογαριασμοί Τρίτων"
+
+#: apps/auth/models.py:101
 msgid "Retired user"
 msgstr "Ο χρήστης αυτός έχει αποσυρθεί"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:339
 msgid "Add comment"
 msgstr "Προσθήκη σχολίου"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:340
 msgid "Start subtitles"
 msgstr "Έναρξη υποτίτλων"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:341
 msgid "Start translation"
 msgstr "Έναρξη μετάφρασης"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:342
 msgid "Edit subtitles"
 msgstr "Επεξεργασία υπότιτλων"
 
-#: apps/auth/models.py:337
+#: apps/auth/models.py:343
 msgid "Edit translation"
 msgstr "Επεξεργασία μετάφρασης"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:400
 msgid "understand enough"
 msgstr "καταλαβαίνει αρκετά"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:401
 msgid "understand 99%"
 msgstr "καταλαβαίνει το 99%"
 
-#: apps/auth/models.py:396
+#: apps/auth/models.py:402
 msgid "write like a native"
 msgstr "γράφει σαν γηγενής"
 
-#: apps/auth/models.py:401
+#: apps/auth/models.py:407
 msgid "follow requests in language"
 msgstr "Παρακολουθείστε τα αιτήματα στη γλώσσα"
 
-#: apps/auth/models.py:416
+#: apps/auth/models.py:422
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -103,11 +129,11 @@ msgstr ""
 "Αυτή είναι η ημερομηνία κατά την οποία θα αρχίσει η προβολή της αναγγελίας. "
 "Θα προβάλλεται μόνον η τελευταία."
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:521
 msgid "e-mail confirmation"
 msgstr "Επιβεβαίωση e-mail"
 
-#: apps/auth/models.py:516
+#: apps/auth/models.py:522
 msgid "e-mail confirmations"
 msgstr "Επβεβαιώσεις e-mail"
 
@@ -174,7 +200,8 @@ msgid "You should enter subject or message."
 msgstr "Πρέπει να βάλετε ένα θέμα ή ένα μήνυμα"
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
-#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:39
+#: apps/messages/rpc.py:60 apps/profiles/rpc.py:45 apps/teams/rpc.py:33
+#: apps/videos/rpc.py:39
 msgid "You should be authenticated."
 msgstr "Πρέπει πρώτα να πιστοποιηθείτε."
 
@@ -292,6 +319,7 @@ msgstr "Συνδεθείτε με τον Κωδικό σας OpenID "
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
+#: templates/teams/_join.html:61
 msgid "Sign in"
 msgstr "Συνδεθείτε"
 
@@ -309,15 +337,15 @@ msgid "Personal message from %(sender)s on universalsubtitles.org"
 msgstr ""
 "Ένα προσωπικό μήνυμα από τον/την  %(sender)s στο universalsubtitles.org"
 
-#: apps/profiles/forms.py:148
+#: apps/profiles/forms.py:158
 msgid "Confirm new password:"
 msgstr "Επιβεβαίωση νέου κωδικού πρόσβασης:"
 
-#: apps/profiles/forms.py:165
+#: apps/profiles/forms.py:173
 msgid "Invalid password."
 msgstr "Άκυρος Κωδικός πρόσβασης."
 
-#: apps/profiles/forms.py:167
+#: apps/profiles/forms.py:175
 msgid "The two passwords did not match."
 msgstr "Οι δύο Κωδικοί δεν ταίριαξαν."
 
@@ -325,17 +353,29 @@ msgstr "Οι δύο Κωδικοί δεν ταίριαξαν."
 msgid "Your email was updated."
 msgstr "Το email σας ενημερώθηκε."
 
-#: apps/profiles/views.py:62
-msgid ""
-"File server unavailable. Try later. You can edit some other information "
-"without any problem."
-msgstr ""
-"Διακομιστής Αρχείων μη διαθέσιμος. Δοκιμάστε αργότερα. Μπορείτε να "
-"επεξεργατείτε κάποιες άλλες πληροφορίες χωρίς κανένα πρόβλημα."
-
-#: apps/profiles/views.py:147
+#: apps/profiles/views.py:170
 msgid "Your profile has been updated."
 msgstr "Το προφίλ σας ενημερώθηκε."
+
+#: apps/profiles/views.py:191
+msgid "Your account has been updated."
+msgstr ""
+
+#: apps/profiles/views.py:242
+msgid "Your photo has been updated."
+msgstr ""
+
+#: apps/profiles/views.py:247
+msgid "picture"
+msgstr ""
+
+#: apps/profiles/views.py:260
+msgid "Your photo has been removed."
+msgstr ""
+
+#: apps/profiles/views.py:336
+msgid "Account deleted."
+msgstr ""
 
 #: apps/search/forms.py:27
 msgid "Relevance"
@@ -397,7 +437,7 @@ msgstr "Προβολή στατιστικών Βίντεο"
 msgid "Widget view statistic"
 msgstr "Στατιστική προβολής widget"
 
-#: apps/subtitles/forms.py:78 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
@@ -406,35 +446,30 @@ msgstr ""
 "Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι, σε αυτή τη "
 "γλώσσα, υπάρχει, ήδη, σε εξέλιξη, κάποια δουλειά ."
 
-#: apps/subtitles/forms.py:92
+#: apps/subtitles/forms.py:96
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:98
-#, python-format
-msgid "The language already exists as a translation from %s."
-msgstr ""
-
-#: apps/subtitles/forms.py:106
+#: apps/subtitles/forms.py:103
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:125
+#: apps/subtitles/forms.py:122
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:132
+#: apps/subtitles/forms.py:129
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:143 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:140 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
@@ -443,19 +478,19 @@ msgstr ""
 "προσχέδιο/ draft, για τη γλώσσα αυτή, βρίσκεται, ήδη, υπό επιτήρηση/ "
 "moderation."
 
-#: apps/subtitles/forms.py:156
+#: apps/subtitles/forms.py:152
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:164
+#: apps/subtitles/forms.py:160
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:177 apps/teams/forms.py:740
+#: apps/subtitles/forms.py:173
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -464,22 +499,22 @@ msgstr ""
 "αριθμός γραμμών στη μετάφρασή σας ({0}) δεν αντιστοιχεί με εκείνες στο "
 "πρωτότυπο ({1})."
 
-#: apps/subtitles/forms.py:188
+#: apps/subtitles/forms.py:184
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:196
+#: apps/subtitles/forms.py:192
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:203 apps/teams/forms.py:648 apps/videos/forms.py:63
-#: apps/videos/forms.py:84 unisubs-integration/api/1_0/forms.py:325
+#: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Δεν εντοπίζεται η κωδικοποίηση του αρχείου"
 
-#: apps/subtitles/forms.py:226 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Κάποιος υποτιτλίζει το βίντεο ακριβώς τώρα. Προσπαθείστε αργότερα."
 
@@ -513,21 +548,21 @@ msgstr "Ομάδα"
 msgid "User"
 msgstr "Χρήστης"
 
-#: apps/teams/forms.py:57 apps/teams/forms.py:165
+#: apps/teams/forms.py:54 apps/teams/forms.py:162
 #: libs/rosetta/templates/rosetta/languages.html:12
-#: templates/teams/_context_team.html:65
+#: templates/teams/_context_team.html:72
 msgid "Project"
 msgstr "Έργο/ project"
 
-#: apps/teams/forms.py:61 apps/teams/forms.py:169
+#: apps/teams/forms.py:58 apps/teams/forms.py:166
 msgid "Let's keep things tidy, shall we?"
 msgstr "Ας κρατήσουμε τα πράγματα τακτοποιημένα, εντάξει;"
 
-#: apps/teams/forms.py:151
+#: apps/teams/forms.py:148
 msgid "Video URL"
 msgstr "Video URL"
 
-#: apps/teams/forms.py:152
+#: apps/teams/forms.py:149
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also "
 "browse the site and use the 'Add Video to Team' menu."
@@ -536,28 +571,28 @@ msgstr ""
 "μας ιστότοπο. Μπορείτε επίσης να εξερευνήσετε τον ιστότοπο και να "
 "χρησιμοποιήσετε το μενού 'Προσθήκη Βίντεο στην Ομάδα'"
 
-#: apps/teams/forms.py:160
+#: apps/teams/forms.py:157
 msgid "Video language"
 msgstr "Γλώσσα του Βίντεο"
 
-#: apps/teams/forms.py:162
+#: apps/teams/forms.py:159
 msgid "It will be saved only if video does not exist in our database."
 msgstr ""
 "Θα αποθηκευθεί μόνον αν το βίντεο δεν υπάρχει στη δικιά μας βάση δεδομένων."
 
-#: apps/teams/forms.py:216
+#: apps/teams/forms.py:213
 msgid "This video already belongs to a team."
 msgstr "Αυτό το βίντεο ανήκει, ήδη, σε μία ομάδα."
 
-#: apps/teams/forms.py:222
+#: apps/teams/forms.py:219
 msgid "Set original language for this video."
 msgstr "Ρυθμίστε την αρχική γλώσσα για το Βίντεο"
 
-#: apps/teams/forms.py:261
+#: apps/teams/forms.py:258
 msgid "Team intro video URL"
 msgstr "URL για το εισαγωγικό βίντεο σχετικά με την ομάδα"
 
-#: apps/teams/forms.py:263
+#: apps/teams/forms.py:260
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -570,133 +605,116 @@ msgstr ""
 "Βάλτε έναν σύνδεσμο προς οποιοδήποτε συμβατό βίντεο, ή προς οποιαδήποτε "
 "σελίδα βίντεο του ιστοτόπου μας."
 
-#: apps/teams/forms.py:268
+#: apps/teams/forms.py:265
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "Ομάδα URL: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:313
+#: apps/teams/forms.py:310
 msgid "This video has already been transcribed."
 msgstr "Αυτό το βίντεο έχει ήδη μεταφρασθεί."
 
-#: apps/teams/forms.py:318
-msgid "Subtitling of this video is already in progress."
-msgstr "Ο υποτιτλισμός αυτού του βίντεο βρίσκεται ήδη σε εξέλιξη."
-
-#: apps/teams/forms.py:323
+#: apps/teams/forms.py:316
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 "Κανείς δεν έχει ακόμη κάνει την αποδελτίωση αυτού του βίντεο, οπότε δεν "
 "μπορεί ούτε και να μεταφρασθεί."
 
-#: apps/teams/forms.py:330
+#: apps/teams/forms.py:323
 msgid "This language already has a complete set of subtitles."
 msgstr "Αυτή η γλώσσα έχει, ήδη, ένα πλήρες σύνολο υποτίτλων."
 
-#: apps/teams/forms.py:342
+#: apps/teams/forms.py:336
 msgid "This language for this video does not exist or doesn't have a version."
 msgstr ""
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:353
 msgid "There is already a task in progress for that video/language."
 msgstr ""
 "Υπάρχει ήδη μία εργασία σε εξέλιξη για αυτό το βίντεο/ για αυτή τη γλώσσα."
 
-#: apps/teams/forms.py:365
+#: apps/teams/forms.py:359
 #, python-format
 msgid "You must select a language for a %s task."
 msgstr ""
 
-#: apps/teams/forms.py:400
+#: apps/teams/forms.py:394
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr ""
 "Σε αυτό τον χρήστη ανατέθηκε, ήδη, ο μέγιστος δυνατός αριθμός εργασιών."
 
-#: apps/teams/forms.py:422
+#: apps/teams/forms.py:416
 msgid "You do not have permission to assign this task."
 msgstr "Δεν έχετε εξουσιοδότηση να αναθέσετε αυτή την εργασία."
 
-#: apps/teams/forms.py:429
+#: apps/teams/forms.py:423
 msgid "This user cannot perform that task."
 msgstr "Αυτός ο χρήστης δεν μπορεί να εκτελέσει αυτή την εργασία."
 
-#: apps/teams/forms.py:450
+#: apps/teams/forms.py:444
 msgid "You do not have permission to delete this task."
 msgstr "Δεν έχετε την άδεια να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/forms.py:507
+#: apps/teams/forms.py:501
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 "Δεν μπορείτε να βάλετε σε μαύρη λίστα μία από τις προτιμώμενες γλώσσες."
 
-#: apps/teams/forms.py:529 apps/teams/forms.py:531
+#: apps/teams/forms.py:523 apps/teams/forms.py:525
 msgid "User does not exist!"
 msgstr "Αυτός ο χρήστης δεν υπάρχει!"
 
-#: apps/teams/forms.py:538
+#: apps/teams/forms.py:532
 msgid "User is already a member of this team!"
 msgstr "Ο χρήστης είναι, ήδη, μέλος αυτής της ομάδας!"
 
-#: apps/teams/forms.py:543
+#: apps/teams/forms.py:537
 msgid "User has already been invited and has not replied yet."
-msgstr ""
+msgstr "Ο χρήστης έχει ήδη προσκληθεί αλλά δεν απήντησε ακόμη."
 
-#: apps/teams/forms.py:567 templates/videos/subtitle-view.html:365
+#: apps/teams/forms.py:561
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Μήπως επιθυμείτε να διαγράψετε εντελώς αυτούς τους υπότιτλους;"
 
-#: apps/teams/forms.py:571 templates/videos/subtitle-view.html:350
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:350
 msgid "What would you like to unpublish?"
 msgstr "Τι θα θέλατε να δημοσιεύσετε;"
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:567
 msgid "This version (and any later version) for this language."
 msgstr ""
 "Αυτή η έκδοση (και οποιαδήποτε μεταγενέστερη έκδοση) για τη γλώσσα αυτή."
 
-#: apps/teams/forms.py:574
+#: apps/teams/forms.py:568
 msgid "All versions for this language and any dependent languages."
 msgstr ""
 "Όλες οι εκδόσεις για τη γλώσσα αυτή και για οποιεσδήποτε εξαρτώμενες γλώσσες."
 
-#: apps/teams/forms.py:592
+#: apps/teams/forms.py:586
 msgid "These subtitles are not under a team's control."
 msgstr "Αυτοί οι υπότιτλοι δεν είναι υπό τον έλεγχο μίας ομάδος."
 
-#: apps/teams/forms.py:596
+#: apps/teams/forms.py:590
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "Δεν έχετε το δικαίωμα να απο-δημοσιεύσετε αυτούς τους υποότιτλους."
 
-#: apps/teams/forms.py:615
+#: apps/teams/forms.py:607
 msgid "You cannot perform that task."
 msgstr "Δεν μπορείτε να κάνετε αυτή την εργασία."
 
-#: apps/teams/forms.py:627
-msgid "Invalid language to translate from."
-msgstr "Μη έγκυρη γλώσσα για μετάφραση."
-
-#: apps/teams/forms.py:636 apps/videos/forms.py:58 apps/videos/forms.py:76
-msgid "File size should be less {0} kb"
-msgstr "To μέγεθος αρχείων πρέπει να είναι λιγώτερο από {0}kb"
-
-#: apps/teams/forms.py:641
-#, python-format
-msgid "Incorrect format. Upload %s"
-msgstr "Εσφαλμένη μορφή αρχείου. Μεταφορτώστε %s"
-
-#: apps/teams/forms.py:661 apps/videos/forms.py:86
-#: unisubs-integration/api/1_0/forms.py:316
-#: unisubs-integration/api/1_0/forms.py:328
-msgid "Incorrect subtitles format"
-msgstr "Εσφαλμένη μορφή αρχείου υποτίτλων"
-
-#: apps/teams/forms.py:734
-msgid ""
-"Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
-"the previous version ({1})."
+#: apps/teams/forms.py:610
+msgid "Mismatched video and task!"
 msgstr ""
-"Συγγνώμη, δεν μπορούσαμε να ανεβάσουμε/ upload το αρχείο σας, διότι περιέχει "
-"λιγότερες γραμμές ({0}) από εκείνες που υπήρχαν στην προηγούμενη έκδοση "
-"({1})."
+
+#: apps/teams/forms.py:621
+msgid "The selected language does not match the task."
+msgstr ""
+
+#: apps/teams/forms.py:629
+#, python-format
+msgid ""
+"The selected source language %(from_code)s does not match the existing "
+"source language %(cur_code)s for that task."
+msgstr ""
 
 #: apps/teams/models.py:108
 msgid "Open"
@@ -730,11 +748,11 @@ msgstr "Διευθυντές και Διαχειριστές"
 msgid "Admins only"
 msgstr "Μόνο για διαχειριστές"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2563
+#: apps/teams/models.py:141 apps/teams/models.py:2625
 msgid "name"
 msgstr "όνομα"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2564
+#: apps/teams/models.py:142 apps/teams/models.py:2626
 msgid "slug"
 msgstr ""
 
@@ -767,10 +785,6 @@ msgstr "Βίντεο"
 #: apps/teams/models.py:148
 msgid "users"
 msgstr "Χρήστες"
-
-#: apps/teams/models.py:151
-msgid "third party accounts"
-msgstr "Λογαριασμοί Τρίτων"
 
 #: apps/teams/models.py:154
 msgid "applicants"
@@ -825,8 +839,8 @@ msgstr "Μέγιστος αριθμός επιτρεπόμενων εργασι�
 msgid "task expiration (days)"
 msgstr "Λήξη εργασίας (ημέρες)"
 
-#: apps/teams/models.py:202 templates/profiles/_top_user_panel.html:32
-#: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
+#: apps/teams/models.py:202 templates/profiles/base.html:56
+#: templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Ομάδες"
 
@@ -854,20 +868,20 @@ msgstr "Χρειάζεται βοήθεια για όλες τις γλώσσε�
 msgid "If you check this, other languages will not be displayed."
 msgstr "Αν τσεκάρετε εδώ, τότε δεν θα εμφανίζονται άλλες γλώσσες."
 
-#: apps/teams/models.py:940 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:944 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Ιδιοκτήτης"
 
-#: apps/teams/models.py:941 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:945 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:942 apps/teams/permissions_const.py:44
-#: templates/base.html:118
+#: apps/teams/models.py:946 apps/teams/permissions_const.py:44
+#: templates/base.html:130
 msgid "Admin"
 msgstr "Διαχειριστής"
 
-#: apps/teams/models.py:943 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:947 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Συνεισφέρων"
 
@@ -883,7 +897,7 @@ msgstr "Αυτή η Ομάδα δεν υπάρχει"
 msgid "You are already a member of this team."
 msgstr "Είστε, ήδη, μέλος αυτής της ομάδσς."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:911
+#: apps/teams/rpc.py:50 apps/teams/views.py:938
 msgid "You are now a member of this team."
 msgstr "Τώρα είστε μέλος αυτής της ομάδας."
 
@@ -894,7 +908,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:58
 msgid "You have already applied to this team."
-msgstr ""
+msgstr "Έχετε ήδη υποβάλει αίτηση εγγραφής σε αυτή την ομάδα."
 
 #: apps/teams/rpc.py:60
 msgid "Your application has been denied."
@@ -902,7 +916,7 @@ msgstr ""
 
 #: apps/teams/rpc.py:62
 msgid "You have been removed from this team."
-msgstr ""
+msgstr "Έχετε διαγραφεί από αυτή την ομάδα."
 
 #: apps/teams/rpc.py:67
 msgid "Your application has been approved. You are now a member of this team"
@@ -953,21 +967,22 @@ msgstr "Δεν μπορείτε να αναθέσετε αυτό τον ρόλο
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Νέα %(team)s Βίντεο έτοιμα για υποτιτλισμό!"
 
-#: apps/teams/views.py:129 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:133 templates/profiles/edit.html:20
+#: templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Όνομα"
 
-#: apps/teams/views.py:130 templates/teams/teams-list.html:47
+#: apps/teams/views.py:134 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Το πιο πρόσφατο"
 
-#: apps/teams/views.py:131 templates/teams/teams-list.html:44
+#: apps/teams/views.py:135 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Τα περισσότερα Μέλη"
 
-#: apps/teams/views.py:174
+#: apps/teams/views.py:178
 #, python-format
 msgid ""
 "\n"
@@ -1003,204 +1018,196 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:200
+#: apps/teams/views.py:204
 msgid "You do not have permission to delete this team."
 msgstr "Δεν έχετε δικαίωμα να διαγράψετε αυτή την ομάδα."
 
-#: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
-#: apps/teams/views.py:1607
+#: apps/teams/views.py:218 apps/teams/views.py:260 apps/teams/views.py:288
+#: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1737
+#: apps/teams/views.py:1753
 msgid "You do not have permission to edit this team."
 msgstr "Δεν έχετε δικαίωμα να τροποποιήσετε αυτή την ομάδα."
 
-#: apps/teams/views.py:243 apps/teams/views.py:303 apps/teams/views.py:388
+#: apps/teams/views.py:247 apps/teams/views.py:307 apps/teams/views.py:392
 msgid "Settings saved."
 msgstr "Οι ρυθμίσεις αποθηκεύθηκαν."
 
-#: apps/teams/views.py:269
+#: apps/teams/views.py:273
 msgid "Guidelines and messages updated."
 msgstr "Οι Κατευθυντήριες οδηγίες και τα Μηνύματα ενημερώθηκαν."
 
-#: apps/teams/views.py:536
+#: apps/teams/views.py:551
 msgid "You can't add that video to this team/project."
 msgstr ""
 "Δεν μπορείτε να προσθέσετε αυτό το Βίντεο σε αυτή την ομάδα ή σε αυτό το "
 "project."
 
-#: apps/teams/views.py:573
+#: apps/teams/views.py:588
 msgid "The video has been moved to the new team."
 msgstr "Το βίντεο αυτό μετακινήθηκε στη νέα ομάδα."
 
-#: apps/teams/views.py:586
+#: apps/teams/views.py:601
 msgid "You can't add videos to this team/project."
 msgstr ""
 "Δεν μπορείτε να προσθέσετε Βίντεο σε αυτή την ομάδα ή σε αυτό το project."
 
-#: apps/teams/views.py:604
+#: apps/teams/views.py:619
 msgid "You can't edit this video."
 msgstr "Δεν μπορείτε να επεξεργασθείτε αυτό το βίντεο"
 
-#: apps/teams/views.py:613
+#: apps/teams/views.py:628
 msgid "Video has been updated."
 msgstr "Το Βίντεο ενημερώθηκε."
 
-#: apps/teams/views.py:641
+#: apps/teams/views.py:656
 msgid "Request must be a POST request."
 msgstr "Το αίτημα πρέπει να είναι ένα αίτημα POST."
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:664
 msgid "You can't delete that video."
 msgstr "Δεν μπορείτε να διαγράψετε αυτό το βίντεο."
 
-#: apps/teams/views.py:653
+#: apps/teams/views.py:668
 msgid "You can't remove that video."
 msgstr "Δεν μπορείτε να απομακρύνετε αυτό το βίντεο"
 
-#: apps/teams/views.py:665
+#: apps/teams/views.py:680
 msgid "Video has been deleted from Amara."
 msgstr "Αυτό το Βίντεο διεγράφη από το Amara."
 
-#: apps/teams/views.py:668
+#: apps/teams/views.py:683
 msgid "Video has been removed from the team."
 msgstr "Το Βίντεο διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:817
 msgid "Member has been removed from the team."
 msgstr "Το Μέλος διεγράφη από την ομάδα."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:820
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Χρησιμοποιείστε το κουμπί \"Εγακταλείψτε αυτή την ομάδα\" για να φύγετε "
 "εσείς ο ίδιος/α από αυτή την αμάδα."
 
-#: apps/teams/views.py:796
+#: apps/teams/views.py:823
 msgid "You don't have permission to remove this member from the team."
 msgstr "Δεν έχετε το δικαίωμα να διαγράψετε αυτό το μέλος από την ομάδα."
 
-#: apps/teams/views.py:830
+#: apps/teams/views.py:857
 msgid "Application approved."
 msgstr "Η Εφαρμογή εγκρίθηκε."
 
-#: apps/teams/views.py:832 apps/teams/views.py:853
+#: apps/teams/views.py:859 apps/teams/views.py:880
 msgid "Application does not exist."
 msgstr "Η Εφαρμογή δεν υπάρχει."
 
-#: apps/teams/views.py:834 apps/teams/views.py:855
+#: apps/teams/views.py:861 apps/teams/views.py:882
 msgid "Application already processed."
 msgstr ""
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:863
 msgid "You can't approve applications."
 msgstr "Δεν μπορείτε να εγκρίνετε εφαρμογές."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:878
 msgid "Application denied."
 msgstr "Απαγορευμένη εφαρμογή."
 
-#: apps/teams/views.py:857
+#: apps/teams/views.py:884
 msgid "You can't deny applications."
 msgstr "Δεν μπορείτε να αρνηθείτε τις εφαρμογές."
 
-#: apps/teams/views.py:867
+#: apps/teams/views.py:894
 msgid "You cannot invite people to this team."
 msgstr "Δεν μπορείτε να προσκαλείτ κόσμο σε αυτή την ομάδα."
 
-#: apps/teams/views.py:898
+#: apps/teams/views.py:925
 msgid "This invite is no longer valid"
 msgstr "Αυτή η πρόσκληση δεν ισχύει πλέον"
 
-#: apps/teams/views.py:907
+#: apps/teams/views.py:934
 msgid "You cannot join this team."
 msgstr "Δεν μπορείτε να εγγραφείτε σε αυτή την ομάδα."
 
-#: apps/teams/views.py:961
+#: apps/teams/views.py:988
 msgid "You have left this team."
 msgstr "Έχετε εγκαταλείψει αυτή την ομάδα."
 
-#: apps/teams/views.py:1017
+#: apps/teams/views.py:1044
 msgid "Member saved."
 msgstr "Το Μέλος έχει αποθηκευθεί."
 
-#: apps/teams/views.py:1151
+#: apps/teams/views.py:1293
 msgid "You cannot view this team's tasks."
 msgstr "Δεν μπορείτε να δείτε τις εργασίες αυτής της ομάδας."
 
-#: apps/teams/views.py:1310 apps/teams/views.py:1313
+#: apps/teams/views.py:1469 apps/teams/views.py:1472
 msgid "You are not allowed to perform this task."
 msgstr "Δεν είστε εξουσιοδοτημένοι να κάνετε αυτή την εργασία."
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1529
 msgid "Task deleted."
 msgstr "Η εργασία διεγράφη."
 
-#: apps/teams/views.py:1370
+#: apps/teams/views.py:1531
 msgid "You cannot delete this task."
 msgstr "Δεν μπορείτε να διαγράψετε αυτή την εργασία."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1556
 msgid "Task declined."
 msgstr "Απόρριψη εργασίας."
 
-#: apps/teams/views.py:1397
+#: apps/teams/views.py:1558
 msgid "Task assigned."
 msgstr "Έγινε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1560
 msgid "You cannot assign this task."
 msgstr "Δεν μπορείτε να κάνετε ανάθεση εργασίας."
 
-#: apps/teams/views.py:1421
-msgid "Invalid assignment attempt."
-msgstr "Άκυρη προσπάθεια ανάθεσης."
-
-#: apps/teams/views.py:1446
+#: apps/teams/views.py:1596
 msgid "Draft uploaded successfully."
 msgstr "Το προσχέδιο/draft φορτώθηκε με επιτυχία."
 
-#: apps/teams/views.py:1450
-msgid "/n"
-msgstr "/n"
-
-#: apps/teams/views.py:1468
+#: apps/teams/views.py:1613
 msgid "You are not allowed to download this transcript."
 msgstr "Δεν σας επιτρέπεται να μεταφορτώσετε αυτή τη μεταγραφή/ transcript"
 
-#: apps/teams/views.py:1519
+#: apps/teams/views.py:1664
 msgid "There's already a project with this name"
 msgstr "Υπάρχει ήδη ένα project με αυτό το όνομα"
 
-#: apps/teams/views.py:1531
+#: apps/teams/views.py:1676
 msgid "Project added."
 msgstr "Το project προστέθηκε."
 
-#: apps/teams/views.py:1548
+#: apps/teams/views.py:1693
 msgid "You cannot edit that project."
 msgstr "Δεν μπορείτε να τροποποιήσετε αυτό το project."
 
-#: apps/teams/views.py:1559
+#: apps/teams/views.py:1704
 msgid "Project deleted."
 msgstr "Το project διεγράφη."
 
-#: apps/teams/views.py:1577
+#: apps/teams/views.py:1722
 msgid "Project saved."
 msgstr "Το project αποθηκεύθηκε."
 
-#: apps/teams/views.py:1617
+#: apps/teams/views.py:1763
 msgid "Successfully synced subtitles."
 msgstr ""
 
-#: apps/teams/views.py:1721
+#: apps/teams/views.py:1867
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1755
+#: apps/teams/views.py:1898
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
-#: apps/teams/templatetags/teams_tags.py:260
+#: apps/teams/templatetags/teams_tags.py:261
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr ""
@@ -1210,20 +1217,30 @@ msgstr ""
 msgid "File should have txt format"
 msgstr "Τα αρχεία πρέπει να έχουν μορφή txt "
 
+#: apps/videos/forms.py:58 apps/videos/forms.py:76
+msgid "File size should be less {0} kb"
+msgstr "To μέγεθος αρχείων πρέπει να είναι λιγώτερο από {0}kb"
+
 #: apps/videos/forms.py:67
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr ""
 "Δεν είναι εφικτή η κωδικοποίηση του βίντεο. Πρέπει να έχει κωδικοποίηση UTF8."
 
-#: apps/videos/forms.py:79
-msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
-msgstr "Λάθος μορφή αρχείου. Ανεβάστε .srt, .ssa, .sbv ή .xml (TTML format)"
+#: apps/videos/forms.py:80
+#, python-format
+msgid "Incorrect format. Upload .%s "
+msgstr ""
 
-#: apps/videos/forms.py:112 apps/videos/forms.py:196 utils/validators.py:38
+#: apps/videos/forms.py:89 unisubs-integration/api/1_0/forms.py:316
+#: unisubs-integration/api/1_0/forms.py:328
+msgid "Incorrect subtitles format"
+msgstr "Εσφαλμένη μορφή αρχείου υποτίτλων"
+
+#: apps/videos/forms.py:113 apps/videos/forms.py:198 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Αυτό το URL φαίνεται να είναι ένας σπασμένος σύνδεσμος."
 
-#: apps/videos/forms.py:118 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:119 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1237,11 +1254,11 @@ msgstr ""
 "πιστεύετε πως έγινε κάποιο λάθος, τότε <a\n"
 "href=\"mailto:%s\">ελάτε σε επαφή μαζί μας</a>!"
 
-#: apps/videos/forms.py:129
+#: apps/videos/forms.py:130
 msgid "You have not permission add video URL for this video"
 msgstr "Δεν έχετε εξουσιοδότηση να προσθέσετε ένα Video URL για το βίντεο αυτό"
 
-#: apps/videos/forms.py:181
+#: apps/videos/forms.py:183
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1252,7 +1269,7 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Πάρτε επαφή μαζί μας</a> αν "
 "υπάρχει κάποιο πρόβλημα."
 
-#: apps/videos/forms.py:184 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:186 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1270,33 +1287,33 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Ελάτε σε επαφή μαζί μας</a> αν "
 "υπάρχει πρόβλημα."
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Youtube usernames"
 msgstr "Ονόματα χρηστών του Youtube"
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Enter usernames separated by comma."
 msgstr "Εισάγετε ονόματα χρηστών χωρισμένα με ένα κόμα."
 
-#: apps/videos/forms.py:213
+#: apps/videos/forms.py:215
 msgid "Youtube page link."
 msgstr "Link με τη σελίδα του Youtube."
 
-#: apps/videos/forms.py:214
+#: apps/videos/forms.py:216
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Για παράδειγμα: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:215
+#: apps/videos/forms.py:217
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Υποστηρίζονται: Youtube, Vimeo, ή Dailymotion. Προστίθενται μόνον "
 "υποστηριζόμενοι ιστότοποι."
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid "Save feed"
 msgstr "Αποθήκευση ροής"
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1304,7 +1321,7 @@ msgstr ""
 "Επιλέξτε αυτό αν επιθυμείτε να προσθέσετε βίντεο από αυτή τη ροή, στο "
 "μέλλον. Μόνο οι έγκυρες ροές RSS θα αποθηκεύονται."
 
-#: apps/videos/forms.py:259
+#: apps/videos/forms.py:261
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1312,7 +1329,7 @@ msgstr ""
 "Συγγνώμη, δεν μπορέσαμε να βρούμε μία έγκυρη Ροή από το URL που μας δώσατε. "
 "Παρακαλώ ελέγξτε αυτό το URL ξανά."
 
-#: apps/videos/forms.py:264
+#: apps/videos/forms.py:266
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
@@ -1320,27 +1337,27 @@ msgstr ""
 "Γίνεται προσθήκη αυτών των βίντεο  στο υπόβαθρο. Αν είστε συνδεδεμένοι, θα "
 "λάβετε ένα μήνυμα, όταν θα έχει ολοκληρωθεί."
 
-#: apps/videos/forms.py:276
+#: apps/videos/forms.py:278
 msgid "captcha"
 msgstr "captcha"
 
-#: apps/videos/models.py:139
+#: apps/videos/models.py:137
 msgid "in seconds"
 msgstr "σε δευτερόλεπτα"
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:161
 msgid "Sub.fetched"
 msgstr "Ελήφθησαν.Υπότιτλοι"
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:163
 msgid "Widget views"
 msgstr "Προβολή Βίντεο"
 
-#: apps/videos/models.py:167
+#: apps/videos/models.py:165
 msgid "Views"
 msgstr "Αριθμός προβολών"
 
-#: apps/videos/models.py:1147
+#: apps/videos/models.py:1153
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1349,7 +1366,7 @@ msgstr ""
 "κάποιος άλλος επεξεργάζεται την γλώσσα που εσείς φορτώνετε ή κάποια "
 "μετάφρασή της"
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:2006
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1358,7 +1375,7 @@ msgstr ""
 "  έγινε αναθεώρηση <a href=\"%(language_url)s\">%(language)s</a> υποτίτλων "
 "για τα <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:2011
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1367,7 +1384,7 @@ msgstr ""
 "  έγιναν αποδεκτοί <a href=\"%(language_url)s\">%(language)s</a> υπότιτλοι "
 "για το βίντεο <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:2016
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1376,7 +1393,7 @@ msgstr ""
 "  απερρίφθησαν οι υπότιτλοι στα <a href=\"%(language_url)s\">%(language)s</"
 "a> για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1385,7 +1402,7 @@ msgstr ""
 "  εγκρίθηκαν οι υπότιτλοι στα <a href=\"%(language_url)s\">%(language)s</a> "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2026
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1394,32 +1411,33 @@ msgstr ""
 "  απερρίφθησαν <a href=\"%(language_url)s\">%(language)s</a> υπότιτλοι για "
 "το βίντεο <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2043
+#: apps/videos/models.py:2032
 #, python-format
-msgid "  deleted video \"%(title)s\""
-msgstr "  Διεγράφη το βίντεο \"%(title)s\""
+msgid "  deleted a video: \"%(title)s\""
+msgstr ""
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2037
 #, python-format
-msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "προσετέθη video <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgid ""
+"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgstr ""
 
-#: apps/videos/models.py:2050
+#: apps/videos/models.py:2039
 #, python-format
-msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
-msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> προσετέθη video"
+msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
+msgstr ""
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2045
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "άλλαξε ο τίτλος για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2058
+#: apps/videos/models.py:2047
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Ο τίτλος άλλαξε για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2061
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1428,7 +1446,7 @@ msgstr ""
 "έγιναν σχόλια για τους <a href=\"%(comments_url)s\">%(language)s υπότιτλους</"
 "a> σχετικά με το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2075
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1437,18 +1455,18 @@ msgstr ""
 "Προσετέθη ένα Σχόλιο για το <a href=\"%(comments_url)s\">%(language)s "
 "subtitles</a> for <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2066
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "έγιναν σχόλια για τα <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2080
+#: apps/videos/models.py:2068
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Προσετέθη ένα Σχόλιο για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1457,7 +1475,7 @@ msgstr ""
 "αρχίσαν <a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> για το <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2090
+#: apps/videos/models.py:2078
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1466,7 +1484,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> άρχισαν για το <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2086
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1475,7 +1493,7 @@ msgstr ""
 "τροποποιήθηκαν <a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2103
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1484,109 +1502,109 @@ msgstr ""
 "<a href=\"%(language_url)s\">%(language)s οι υπότιτλοι</a> τροποποιήθηκαν "
 "για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2094
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "προσετέθη ένα νέο URL για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2111
+#: apps/videos/models.py:2096
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Ένα νέο URL προσετέθη για το <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2116
+#: apps/videos/models.py:2101
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "εγγραφήκατε στην ομάδα %(team)s με την ιδιότητα του %(role)s"
 
-#: apps/videos/models.py:2121
+#: apps/videos/models.py:2106
 #, python-format
 msgid "left the %s team"
 msgstr "εγκαταλείψατε την ομάδα %s"
 
-#: apps/videos/models.py:2135
+#: apps/videos/models.py:2120
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2141
+#: apps/videos/models.py:2126
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2204
 msgid "add video"
 msgstr "προσθήκη βίντεο"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2205
 msgid "change title"
 msgstr "αλλαγή τίτλου"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2206
 msgid "comment"
 msgstr "σχόλιο"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2207
 msgid "add version"
 msgstr "προσθήκη έκδοσης"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2208
 msgid "add translation"
 msgstr "προσθήκη μετάφρασης"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2209
 msgid "add video url"
 msgstr "προσθήκη video url"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2210
 msgid "request subtitles"
 msgstr "ζητήστε τους υπότιτλους"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2211
 msgid "approve version"
 msgstr "έγκριση εκδόσεως"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2212
 msgid "add contributor"
 msgstr "προσθήκη Συνεισφέροντος"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2213
 msgid "remove contributor"
 msgstr "Διαγραφή ατόμου που συνεισέφερε"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2214
 msgid "reject version"
 msgstr "Απόρριψη έκδοσης"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2215
 msgid "review version"
 msgstr "Αναθεώρηση έκδοσης"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2216
 msgid "accept version"
 msgstr "Αποδοχή έκδοσης"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2217
 msgid "decline version"
 msgstr "Απόορριψη έκδοσης"
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2218
 msgid "delete video"
 msgstr "Διαγραφή βίντεο"
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2219
 msgid "edit url"
-msgstr ""
+msgstr "επεξεργασία του url"
 
-#: apps/videos/models.py:2229
+#: apps/videos/models.py:2220
 msgid "delete url"
-msgstr ""
+msgstr "διαγραφή του url"
 
-#: apps/videos/models.py:2487
+#: apps/videos/models.py:2478
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1684,7 +1702,7 @@ msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 "Μόλις βρέθηκε μία έκδοση αυτού του video με %(language_name)s υπότιτλους"
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:176
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1698,7 +1716,7 @@ msgstr ""
 "βελτιώσετε τους υπότιτλους, κάντε κλικ στο κουμπί που βρίσκεται κάτω από το "
 "video."
 
-#: apps/videos/views.py:179
+#: apps/videos/views.py:184
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1709,33 +1727,38 @@ msgstr ""
 "εμφανίσει προειδοποιήσεις ανάμικτου\n"
 "                περιεχομένου."
 
-#: apps/videos/views.py:184
+#: apps/videos/views.py:189
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Οι υπάρχοντες υπότιτλοιο θα εισαχθούν σε λίγα λεπτά."
 
-#: apps/videos/views.py:288
+#: apps/videos/views.py:297
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 
-#: apps/videos/views.py:595
+#: apps/videos/views.py:613
 msgid "You have not permission change this URL"
 msgstr "Δεν έχετε εξουσιοδότηση να αλλάξετε αυτό το URL"
 
-#: apps/videos/views.py:600 apps/videos/views.py:631
+#: apps/videos/views.py:618 apps/videos/views.py:649
 msgid "Object does not exist"
 msgstr "Το Αντικείμενο δεν υπάρχει"
 
-#: apps/videos/views.py:615
+#: apps/videos/views.py:633
 msgid "You have not permission delete this URL"
 msgstr "Δεν έχετε εξουσιοδότηση να διαγράψετε αυτό το URL"
 
-#: apps/videos/views.py:619
+#: apps/videos/views.py:637
 msgid "You can't remove primary URL"
+msgstr "Δεν μπορείτε να διαγράψετε το πρωτογενές URL"
+
+#: apps/videos/views.py:791
+#, python-format
+msgid "The language for %s has been changed"
 msgstr ""
 
-#: apps/videos/feed_parser/__init__.py:107
+#: apps/videos/feed_parser/__init__.py:111
 msgid "Feed is unavailable now."
 msgstr "Η ροή δεν είναι διαθέσιμη τώρα"
 
@@ -1754,11 +1777,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Ελάτε σε επαφή μαζί μας</a> αν "
 "υπάρχει πρόβλημα."
 
-#: apps/videos/types/youtube.py:43
+#: apps/videos/types/youtube.py:46
 msgid "Private video"
 msgstr "Ιδιωτικό Βίντεο"
 
-#: apps/videos/types/youtube.py:44
+#: apps/videos/types/youtube.py:47
 msgid "Undefined error"
 msgstr "Απροσδιόριστο σφάλμα"
 
@@ -1785,11 +1808,11 @@ msgid ""
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1094 apps/widget/rpc.py:1135
+#: apps/widget/rpc.py:1100 apps/widget/rpc.py:1142
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:145
+#: apps/widget/views.py:143
 msgid "That task has already been completed."
 msgstr "Η εργασία έχει, ήδη, ολοκληρωθεί."
 
@@ -1820,7 +1843,7 @@ msgid "Third party"
 msgstr "Τρίτα Μέρη"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:56
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:61
 msgid "All"
 msgstr "Όλα"
 
@@ -1829,14 +1852,13 @@ msgid "Progress"
 msgstr "Πρόοδος"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
-#: templates/messages/new.html:14 templates/messages/sent.html:24
-#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
+#: templates/profiles/_top_user_panel.html:24
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
 msgstr "Μηνύματα"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
-#: templates/teams/settings-permissions.html:72
+#: templates/teams/settings-permissions.html:53
 msgid "Translated"
 msgstr "Μεταφράσθηκε"
 
@@ -1934,7 +1956,7 @@ msgid "Go"
 msgstr "Εμπρός"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:207 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:212 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
 msgstr "Πρωτότυπο"
@@ -2008,19 +2030,19 @@ msgstr ""
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_project.html:62
-#: templates/teams/_context_team.html:95
+#: templates/teams/_context_team.html:116
 msgid "Post to Facebook"
 msgstr "Κάντετο post στο Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:63
-#: templates/teams/_context_team.html:96
+#: templates/teams/_context_team.html:117
 msgid "Post to Twitter"
 msgstr "Κάντετο post στο Tweetter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:64
-#: templates/teams/_context_team.html:97
+#: templates/teams/_context_team.html:118
 msgid "Email to friends"
 msgstr "Στείλτε το με e-mail στους φίλους σας"
 
@@ -2033,7 +2055,7 @@ msgid "Permalink"
 msgstr "Permalink"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
+#: templates/teams/_context_team.html:114
 msgid "Share"
 msgstr "Μοιραστείτε το"
 
@@ -2230,11 +2252,8 @@ msgstr ""
 "        "
 
 #: templates/base.html:9
-msgid ""
-"Universal subtitling: caption, translate, subtitle and transcribe video."
+msgid "Caption, translate, subtitle and transcribe video."
 msgstr ""
-"Παγκόσμιος υποτιτλισμός: μεταγραφή διαλόγων, μετάφραση, υποτιτλισμός και "
-"συγχρονισμός βίντεο."
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
@@ -2260,48 +2279,69 @@ msgstr "Βοήθεια"
 msgid "Sign in / Sign up"
 msgstr "Είσοδος / Σύνδεση"
 
-#: templates/base.html:102
+#: templates/base.html:93
+msgid "Got a YouTube account?<"
+msgstr ""
+
+#: templates/base.html:94
+msgid ""
+"New: enable viewer-created translations and captions on your YouTube channel!"
+msgstr ""
+
+#: templates/base.html:96
+msgid "Connect to YouTube"
+msgstr ""
+
+#: templates/base.html:97
+msgid "No thanks"
+msgstr ""
+
+#: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
 "Το Amara είναι ένα έργο/ project του <a href=\"http://participatoryculture."
 "org/\">PCF</a>."
 
-#: templates/base.html:105 templates/profiles/view_profile.html:68
+#: templates/base.html:116 templates/profiles/base.html:12
 msgid "About"
 msgstr "Περί"
 
-#: templates/base.html:106
+#: templates/base.html:117
 msgid "Jobs"
 msgstr ""
 
-#: templates/base.html:109
+#: templates/base.html:120
 msgid "Contact Us"
 msgstr "Πάρτε επαφή μαζί μας"
 
-#: templates/base.html:110
+#: templates/base.html:121
 msgid "Privacy Policy"
 msgstr "Πολιτική περί ιδιωτικότητας"
 
-#: templates/base.html:111
+#: templates/base.html:122
 msgid "Terms of Service"
 msgstr "Όροι Παροχής Υπηρεσιών"
 
-#: templates/base.html:121
+#: templates/base.html:123
+msgid "Security"
+msgstr ""
+
+#: templates/base.html:133
 msgid "Sentry"
 msgstr ""
 
-#: templates/base.html:124
+#: templates/base.html:136
 msgid "Rosetta"
 msgstr "Rosetta"
 
-#: templates/base.html:127
+#: templates/base.html:139
 msgid "Impersonate"
 msgstr ""
 
-#: templates/base.html:130 templates/teams/billing/choose.html:11
+#: templates/base.html:142 templates/teams/billing/choose.html:11
 msgid "Billing"
-msgstr ""
+msgstr "Χρέωση /billing"
 
 #: templates/demo.html:23
 msgid "Amara Editor Demo"
@@ -3341,23 +3381,23 @@ msgstr ""
 
 #: templates/index.html:84
 msgid "TED"
-msgstr ""
+msgstr "TED"
 
 #: templates/index.html:89
 msgid "Mozilla"
-msgstr ""
+msgstr "Mozilla"
 
 #: templates/index.html:94
 msgid "Netflix"
-msgstr ""
+msgstr "Netflix"
 
 #: templates/index.html:99
 msgid "Coursera"
-msgstr ""
+msgstr "Coursera"
 
 #: templates/index.html:104
 msgid "PBS Newshour"
-msgstr ""
+msgstr "PBS Newshour"
 
 #: templates/index.html:110
 msgid "More Popular"
@@ -3885,16 +3925,17 @@ msgstr "Ξαναστείλτε ένα e-mail επιβεβαίωσης"
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Είστε σίγουροι πως θέλετε να διαγράψετε μονίμως το προφίλ σας;"
 
-#: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:56 templates/teams/tasks.html:427
+#: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
+#: templates/messages/sent.html:49 templates/teams/tasks.html:455
 msgid "Delete"
 msgstr "Διαγραφή"
 
 #: templates/auth/delete_user.html:14
-#: templates/profiles/_select_language_dialog.html:30
+#: templates/profiles/_select_language_dialog.html:33
+#: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:481 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:379
+#: templates/teams/tasks.html:509 templates/videos/_feedback_form.html:25
+#: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr "Ακύρωση"
 
@@ -3931,622 +3972,13 @@ msgstr "Δημιουργία Λογαριασμού"
 msgid "Sign in as a different user"
 msgstr "Συνδεθείτε ως ένας διαφορετικός χρήστης"
 
-#: templates/comments/_item.html:3 templates/messages/list.html:70
-#: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
+#: templates/comments/_item.html:3 templates/messages/inbox.html:59
+#: templates/messages/sent.html:46 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
-#: templates/videos/diffing.html.py:164
+#: templates/videos/diffing.html.py:147
 msgid "ago"
 msgstr "πριν"
-
-#: templates/enterprise/advanced-security.html:6
-msgid "A Revolutionary Video Security Model"
-msgstr "Ένα επαναστατικό μοντέλο ασφάλειας βίντεο"
-
-#: templates/enterprise/advanced-security.html:8
-msgid ""
-"\n"
-"        You always maintain control of your video, because it never leaves "
-"your server.  Amara doesn’t require any video uploading, so your existing "
-"security policy is always in full effect. We support OAuth, which means your "
-"users never need to log in twice—they can see your video and authenticate "
-"with both organizations at the same time. Amara makes your subtitles "
-"available from the cloud, so you can: deploy just in time via our API; cache "
-"on your server and get pinged when there are updates; or use our embeddable "
-"subtitle widget.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:6
-#: templates/enterprise/base.html:33
-msgid "API Integration"
-msgstr "Ενσωμάτωση API"
-
-#: templates/enterprise/api-integration.html:8
-msgid ""
-"\n"
-"        Amara’s powerful API allows flexible integration with your existing "
-"publishing workflow.  By connecting your backend system directly to Amara, "
-"you can import and export subtitles, manage processing, and import completed "
-"subtitles directly back into your own system.  If you use a custom video "
-"player, importing subtitles via API lets your company fully control subtitle "
-"display and use of the transcript on your website.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:12
-msgid "Amara API Documentation"
-msgstr "Τεκμηρίωση για το API του Amara"
-
-#: templates/enterprise/automated-workflows.html:6
-#: templates/enterprise/base.html:24
-msgid "Automated Workflows"
-msgstr "Αυτοματοποιημένη ροή εργασίας"
-
-#: templates/enterprise/automated-workflows.html:10
-msgid ""
-"\n"
-"        Workflows enable automating the flow of content through different "
-"authoring groups, including: volunteers, private crowds (staff, employees, "
-"students, etc), and professionals. They can be used for both first pass "
-"(authoring), as well as subsequent review passes for Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:14
-msgid ""
-"\n"
-"        Different workflows can be chained together to create an unlimited "
-"number of highly flexible configurations. The Amara team can help you "
-"determine the best workflow for your subtitle processes and integrate it "
-"with your existing publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:18
-msgid "Contractors with Staff Review"
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:19
-msgid ""
-"\n"
-"        Use captioning and transcription contractors to create your "
-"subtitles, then require staff review and approval before they are published "
-"back to your server. Remember, no one sees your subtitles until YOU publish "
-"it.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:23
-msgid "Crowdsourced subtitles, followed by staff review"
-msgstr ""
-"Υπότιτλοι με εξωτερική ανάθεση σε μεγάλες κοινότητες εθελοντών/ "
-"crowdsourced, και μετά, ανασκόπηση από το έμμισθο πρσωπικό."
-
-#: templates/enterprise/automated-workflows.html:24
-msgid ""
-"\n"
-"        In many cases, organizations want to leverage the power of the "
-"crowd, but don’t want to leave any chance for poor quality captions or "
-"subtitles to appear on their content. This workflow keeps videos private "
-"until a staff member has approved the subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:30
-msgid "Professionally created English captions, crowd translation"
-msgstr ""
-"Επγγελματικά φτιαγμένες μεταγραφές διαλόγων/ captioning στα Αγγλικά, "
-"συνεργατική μετάφραση από πολλούς ανθρώπους/ crowd translation"
-
-#: templates/enterprise/automated-workflows.html:31
-msgid ""
-"\n"
-"        Amara offers professional- quality captions at very low cost with "
-"quick turn-around times. English can often be done in less than a day.  Once "
-"English is completed, it’s a snap to request translations from volunteers or "
-"staff. We have seen videos translated into multiple languages in just days—"
-"through a volunteer crowd.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:35
-msgid "Crowd translations, with professional quality-control"
-msgstr ""
-"Συνεργατική μετάφραση από πολλούς ανθρώπους/ crowd translation, αλλά με "
-"επαγγελματικό έλεγχο ποιότητας"
-
-#: templates/enterprise/automated-workflows.html:36
-#, python-format
-msgid ""
-"\n"
-"        Amara is, quite simply, the most cost-effective way to get "
-"professional-level quality for foreign language video subtitles. By "
-"leveraging professional quality review, you can expect to pay roughly 75%% "
-"less than the market price for traditional professional subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/base.html:12
-msgid "Features & Benefits"
-msgstr "Χαρακτηριστικά & Οφέλη"
-
-#: templates/enterprise/base.html:15
-msgid "Amara Platform"
-msgstr "Η πλατφόρμα Amara"
-
-#: templates/enterprise/base.html:18
-msgid "Global Reach"
-msgstr "Παγκόσμια εμβέλεια"
-
-#: templates/enterprise/base.html:21
-#: templates/enterprise/quality-control.html:6
-msgid "Quality Control"
-msgstr "Ποιοτικός έλεγχος"
-
-#: templates/enterprise/base.html:27
-#: templates/enterprise/subtitle-management.html:6
-msgid "Subtitle Management"
-msgstr "Διαχείριση υποτίτλων"
-
-#: templates/enterprise/base.html:30
-msgid "Advanced Security"
-msgstr "Προηγμένη Ασφάλεια"
-
-#: templates/enterprise/base.html:36
-#: templates/enterprise/transcript-viewer.html:20
-msgid "Transcript Viewer"
-msgstr ""
-
-#: templates/enterprise/base.html:40
-msgid "Customers"
-msgstr "Πελάτες"
-
-#: templates/enterprise/base.html:43 templates/enterprise/film-tv.html:6
-msgid "Film and Television"
-msgstr ""
-
-#: templates/enterprise/base.html:46
-msgid "Education"
-msgstr ""
-
-#: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
-msgid "Companies"
-msgstr "Εταιρείες"
-
-#: templates/enterprise/base.html:52 templates/enterprise/publishers.html:6
-msgid "Publishers"
-msgstr "Εκδότες/ Publishers"
-
-#: templates/enterprise/base.html:55 templates/enterprise/government.html:6
-msgid "Government"
-msgstr "Κυβέρνηση"
-
-#: templates/enterprise/base.html:58
-msgid "Non-Profits"
-msgstr ""
-
-#: templates/enterprise/base.html:66
-msgid "Get started with Amara"
-msgstr "Αρχίστε με το Amara"
-
-#: templates/enterprise/base.html:67
-msgid "Be in touch at"
-msgstr "Μείνετε σε επαφή με το"
-
-#: templates/enterprise/companies.html:7
-msgid ""
-"\n"
-"        Corporations need to communicate with their staff and their "
-"customers around the world, and video is becoming a major part of that "
-"process. With Amara, companies make it possible for staff, customers, and "
-"contractors to caption and translate videos, make them searchable, and share "
-"them publicly or privately.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/education.html:6
-msgid "Universities and Online Education"
-msgstr ""
-
-#: templates/enterprise/education.html:16
-msgid ""
-"\n"
-"            Most of the leading online education companies and organizations "
-"use Amara to caption and translate video, including Coursera, Udacity, Khan "
-"Academy, TED Ed, as well as individual colleges and universities.  As online "
-"education explodes in popularity, subtitles are essential to making courses "
-"accessible and international. Colleges and universities are using Amara to "
-"make their rapidly growing video resources readily available to everyone.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/education.html:21
-msgid "Learn more about our work in education:"
-msgstr ""
-
-#: templates/enterprise/film-tv.html:15
-msgid ""
-"\n"
-"        Producers, publishers, and distributors of film and television use "
-"Amara to make captioning and translation simpler and less expensive. Amara "
-"makes it possible to caption and translate for global viewing audiences much "
-"more cost effectively than traditional approaches.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/film-tv.html:19
-msgid ""
-"\n"
-"            Easily manage workflows between distributed teams, whether they "
-"are staff, contractors, or viewers.  Publish completed subtitles directly "
-"through the Amara API.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:6
-msgid "Build a Global Reach"
-msgstr "Για να πετύχετε μία παγκόσμια εμβέλεια"
-
-#: templates/enterprise/global-reach.html:10
-msgid ""
-"\n"
-"        Amara is the premiere platform for taking video content global. "
-"Whether you’re working with volunteer translators, engaging your own staff, "
-"or hiring professionals, you can easily manage the end-to-end process.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:14
-msgid "Volunteer Subtitle Creation"
-msgstr "Εθελοντική δημιουργία υποτίτλων"
-
-#: templates/enterprise/global-reach.html:15
-msgid ""
-"\n"
-"        Amara currently supports some of the largest volunteer video "
-"translation efforts on the planet. Our technology makes captioning, "
-"subtitling, and translating very easy, fun, and engaging which enables "
-"ongoing, massive, collaborations.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:19
-msgid "Private Crowd Subtitle Creation"
-msgstr "Δημιουργία υπότιτλων από ιδιωτική ομάδα/ private crowd"
-
-#: templates/enterprise/global-reach.html:20
-msgid ""
-"\n"
-"        If you have a workforce, student group, or any other non-public "
-"crowd, you can limit access for captioning, translating, and subtitling OR "
-"reviewing the work of peers, volunteers, or professionals.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:24
-msgid "Professional Captioning and Translation Services"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:25
-msgid ""
-"\n"
-"        Use professional services for captioning or subtitling into nearly "
-"any language, or even to help with quality control. All completed work is "
-"centralized on Amara, ready for incremental quality control, integration, "
-"and deployment.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:29
-msgid "Hybrid Approach"
-msgstr "Υβριδική προσέγγιση"
-
-#: templates/enterprise/global-reach.html:30
-msgid ""
-"\n"
-"        Many of our customers use a mix of these different approaches on the "
-"initial (subtitle authoring) pass, as well as subsequent review passes (for "
-"quality control). This is an advantage that you only get with Amara, a fully "
-"featured solution that manages the process end to end and integrates more "
-"easily than any other platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/government.html:12
-msgid ""
-"\n"
-"        In governments around the world, making video accessible is often a "
-"legal requirement, not an option.  Amara makes it much easier to coordinate "
-"captioning and translation efforts, so that every citizen gains access.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:6
-msgid "The Most Efficient and Cost Effective Subtitling Platform in the World"
-msgstr ""
-
-#: templates/enterprise/index.html:9
-msgid ""
-"\n"
-"            Amara Enterprise offers unmatched capabilities to create, edit, "
-"and manage production ready subtitles at remarkably low costs. You have "
-"total flexibility: order captions and translations from professional "
-"services, build a volunteer community, manage internal staff or external "
-"contractors, and integrate your publishing platform through our powerful "
-"API. We can make everything you do with subtitles easier, faster, and "
-"cheaper. \n"
-"        "
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "Contact us"
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "for more information and pricing."
-msgstr ""
-
-#: templates/enterprise/index.html:17
-msgid "World-class Users"
-msgstr "Χρήστες παγκόσμιας κλάσης"
-
-#: templates/enterprise/index.html:25
-msgid "Award-Winning Technology"
-msgstr "Βραβευμένη Τεχνολογία"
-
-#: templates/enterprise/index.html:32
-msgid "Unmatched Functionality and Control"
-msgstr "Ασλυγκριτη λειτουργικότητα και έλεγχος"
-
-#: templates/enterprise/index.html:36
-msgid "Build a Translation Team"
-msgstr "Να χτίσουν μία Ομάδα Μετάφρασης"
-
-#: templates/enterprise/index.html:38
-msgid ""
-"\n"
-"        For years, companies like Mozilla, Twitter, and Facebook have built "
-"volunteer communities to translate their websites.  Amara makes this "
-"possible for captions and subtitles.  With Amara, you can accomplish the "
-"seemingly impossible task of translating your videos into dozens of "
-"languages.  Quickly build a powerful, high-quality volunteer translation and "
-"captioning team that makes your content truly global. \n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:43
-msgid ""
-"See how TED uses Amara to build a global volunteer community and create "
-"extremely high quality subtitles: "
-msgstr ""
-
-#: templates/enterprise/index.html:43
-msgid "TED Team on Amara"
-msgstr ""
-
-#: templates/enterprise/index.html:43
-msgid ""
-"Other companies like Netflix have completely private collaboration teams."
-msgstr ""
-
-#: templates/enterprise/index.html:46
-msgid "Security and Managed Workflows"
-msgstr "Ασφάλεια και Διαχείριση ροής εργασίας"
-
-#: templates/enterprise/index.html:48
-msgid ""
-"\n"
-"        Create the right workflows for your content and coordinate your "
-"efforts—whether your video is completely private, restricted to premium "
-"subscribers, or public on the web.  You always control who has access to "
-"your subtitles and when to involve staff, contractors, or volunteers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:52
-msgid "Powerful API and Publishing Integration"
-msgstr "Ισχυρό API και ενσωμάτωση εκδοτικής δυνατότητας / publishing"
-
-#: templates/enterprise/index.html:54
-msgid ""
-"\n"
-"        Our API helps companies tightly integrate Amara with their existing "
-"publishing and distribution workflow.  By making subtitles key part of your "
-"process, you build a global audience.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:58
-msgid "Professional Services"
-msgstr "Εγγελματικές υπηρεσίες"
-
-#: templates/enterprise/index.html:60
-msgid ""
-"\n"
-"        Access professional services including paid captions, translations, "
-"and quality control.  Or use your own staff and contractors and use Amara to "
-"coordinate their work remotely.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:64
-msgid "Crowdsource with Professional Review"
-msgstr "Crowdsource με επαγγελματική ανασκόπηση"
-
-#: templates/enterprise/index.html:66
-msgid ""
-"\n"
-"        Engage a crowd and use professional quality assurance. This balances "
-"amazingly low cost with professional level quality assurance.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:72
-msgid "Work with Any Video Platform"
-msgstr "Δουλέψτε με οποιαδήποτε πλατφόρμα"
-
-#: templates/enterprise/index.html:74
-msgid ""
-"\n"
-"        Amara works with all the most popular video hosting services and "
-"video players, and adapts easily to your own custom player. Integrate and "
-"embed videos with subtitles without changing your current publishing "
-"workflow.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:78
-msgid "Subtitles Improve SEO"
-msgstr ""
-"Η παρουσία υποτίτλων βελτιώνει την κατάταξη στις μηχανές αναζήτησης / SEO"
-
-#: templates/enterprise/index.html:80
-msgid ""
-"\n"
-"        Rank higher in Google and other search engines by helping them index "
-"full transcripts for all of your videos. Searchable videos are found more "
-"often.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:6
-msgid "Non-profits"
-msgstr ""
-
-#: templates/enterprise/non-profits.html:18
-msgid ""
-"\n"
-"        Non-profit organizations use Amara to share their mission, their "
-"work, and their media around the world.  Non-profits are ideally positioned "
-"to build volunteer subtitling communities—your existing supporters will be "
-"delighted to find a new way to help support your organization.  Creating a "
-"volunteer team helps deepen engagement with your organization and lets you "
-"caption and translate videos that would be unaffordable to subtitle with a "
-"traditional approach.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:21
-msgid ""
-"\n"
-"        Did you know that Amara is a non-profit organization itself?  Our "
-"mission is to help make video accessible for everyone around the world.  We "
-"offer discounts for other non-profit organizations—we are always delighted "
-"to support work with a social mission.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/publishers.html:10
-msgid ""
-"\n"
-"        Any organization that creates video can reach more people with "
-"subtitles, and Amara provides the most options and flexibility to caption "
-"and translate your videos. Many video publishers use Amara to create "
-"volunteer communities—engaging the people who watch their videos to caption "
-"and translate them for the world, ultimately reaching more viewers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:10
-msgid ""
-"\n"
-"        Amara’s Flexible Workflows offer several ways to ensure outstanding "
-"quality for your subtitles.  Whether you use internal staff, outside "
-"contractors, professional services, or a volunteer community—you’ll be able "
-"to create, review, and approve workflows that meet your needs.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:14
-msgid "Examples of QC processes:"
-msgstr "Παραδείγματα διαδικασιών για τον έλεγχο ποιότητας"
-
-#: templates/enterprise/quality-control.html:16
-msgid ""
-"\n"
-"            Have your contractors work inside your Amara account and then "
-"require staff review before subtitles go live.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:19
-msgid ""
-"\n"
-"            Some universities use paid captioning services to quickly "
-"caption lecture videos and then invite experts in the university community "
-"to fix any mistakes with proper names or technical terms.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:22
-msgid ""
-"\n"
-"            Volunteer teams can self-manage and reach very high quality by "
-"requiring peer review of subtitles before they are published.  More senior "
-"members of the community can be promoted to a moderator role.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:8
-msgid ""
-"\n"
-"        At its core, Amara is the definitive platform for managing captions "
-"and subtitles. Whether you are creating, revising, or translating subtitles—"
-"you can choose to centralize the management—or divide up your content, and "
-"delegate responsibilities and control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:12
-msgid "Import"
-msgstr "Εισαγωγή"
-
-#: templates/enterprise/subtitle-management.html:13
-msgid ""
-"\n"
-"        Your videos are never uploaded to our server (learn more about our "
-"Security Model), so you actually import pointers to existing video files—"
-"whether you’re hosting on your own server, YouTube, Vimeo, other video "
-"hosting service, or combination thereof. Import these video pointers via "
-"graphical interface or API, plus we can import a wide variety of subtitle "
-"and transcript formats in case you have pre-existing data.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:17
-msgid "Process > Author > QC"
-msgstr "Διαδικασία> Δημιουργός> Έλεγχος ποιότητας / QC"
-
-#: templates/enterprise/subtitle-management.html:18
-msgid ""
-"\n"
-"        Flexible workflows make creating Global Content simple; your "
-"organization can harness the power of volunteers, private crowds, and/or "
-"professional service providers for content creation and Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:22
-msgid "Deploy"
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:23
-msgid ""
-"\n"
-"        Use the Amara API to bring completed subtitle data and metadata into "
-"your own backend or publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/transcript-viewer.html:23
-msgid ""
-"\n"
-"            Amara’s beautiful interactive transcript viewer lets you read "
-"the text of any video and jump to and share specific moments.  Take a look "
-"at the example below and try turning the transcript display on and off.\n"
-"        "
-msgstr ""
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
@@ -4677,66 +4109,65 @@ msgstr ""
 "        Έχετε %(msg_count)s νέα μηνύματα.\n"
 "    "
 
-#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
+#: templates/messages/_messages.html:7 templates/teams/dashboard.html:158
+#: templates/teams/dashboard.html.py:200
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "Εμφάνιση όλων"
 
-#: templates/messages/list.html:6
-msgid "My Messages"
-msgstr "Τα μηνύματά μου"
+#: templates/messages/base.html:10
+msgid "New message"
+msgstr ""
 
-#: templates/messages/list.html:20 templates/messages/sent.html:17
-msgid "Do you really wish to delete this message?"
-msgstr "Θέλετε πραγματικά να διαγράψετε αυτό το μήνυμα;"
-
-#: templates/messages/list.html:21
-msgid "The message has been successfully sent."
-msgstr "Αυτό το μήνυμα στάλθηκε επιτυχώς."
-
-#: templates/messages/list.html:38 templates/messages/sent.html:31
-msgid "Compose"
-msgstr "Σύνθεση"
-
-#: templates/messages/list.html:74
-msgid "Mark Read"
-msgstr "Σημείωση ως αναγνωρισμένο"
-
-#: templates/messages/list.html:79
-msgid "Reply"
-msgstr "Απάντηση"
-
-#: templates/messages/list.html:93
-msgid "You have no messages."
-msgstr "Δεν έχετε καθόλου μηνύματα."
-
-#: templates/messages/list.html:100 templates/messages/new.html:74
-#: templates/messages/sent.html:71
+#: templates/messages/base.html:15
 msgid "Inbox"
 msgstr "Εισερχόμενα"
 
-#: templates/messages/list.html:101 templates/messages/new.html:75
-#: templates/messages/sent.html:72
+#: templates/messages/base.html:20
 msgid "Sent"
 msgstr "Απεσταλμένα"
 
-#: templates/messages/list.html:124
+#: templates/messages/inbox.html:6
+msgid "Messages - Inbox"
+msgstr ""
+
+#: templates/messages/inbox.html:20 templates/messages/sent.html:17
+msgid "Do you really wish to delete this message?"
+msgstr "Θέλετε πραγματικά να διαγράψετε αυτό το μήνυμα;"
+
+#: templates/messages/inbox.html:21
+msgid "The message has been successfully sent."
+msgstr "Αυτό το μήνυμα στάλθηκε επιτυχώς."
+
+#: templates/messages/inbox.html:63
+msgid "Mark Read"
+msgstr "Σημείωση ως αναγνωρισμένο"
+
+#: templates/messages/inbox.html:68
+msgid "Reply"
+msgstr "Απάντηση"
+
+#: templates/messages/inbox.html:82
+msgid "You have no messages."
+msgstr "Δεν έχετε καθόλου μηνύματα."
+
+#: templates/messages/inbox.html:105
 msgid "Send Message"
 msgstr "Αποστολή μηνύματος"
 
-#: templates/messages/new.html:6
-msgid "Compose a Message"
-msgstr "Σύνθεση ενός μηνύματος"
+#: templates/messages/new.html:9
+msgid "Messages - New"
+msgstr ""
 
 #: templates/messages/sent.html:6
-msgid "Sent Messages"
-msgstr "Αποστολή μηνυμάτων"
+msgid "Messages - Sent"
+msgstr ""
 
-#: templates/messages/sent.html:47 templates/messages/sent.html.py:49
+#: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
 msgstr "Avatar"
 
-#: templates/messages/sent.html:65
+#: templates/messages/sent.html:58
 msgid "You have no sent messages."
 msgstr "Δεν στείλατε μηνύματα."
 
@@ -4840,23 +4271,6 @@ msgstr ""
 msgid "Back to Sign In"
 msgstr "Επιστροφή στην Είσοδο/ Σύνδεση"
 
-#: templates/profiles/_filters.html:5
-msgid "User Details"
-msgstr "Λεπτομέρειες Χρήστη"
-
-#: templates/profiles/_filters_dashboard.html:5
-msgid "Overview"
-msgstr "Επισκόπηση"
-
-#: templates/profiles/_filters_dashboard.html:8
-#: templates/profiles/dashboard.html:85
-msgid "Recent Activity"
-msgstr "Πρόσφατη δραστηριότητα"
-
-#: templates/profiles/_filters_dashboard.html:11
-msgid "My Videos"
-msgstr "Τα δικά μου βίντεο"
-
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
@@ -4892,31 +4306,52 @@ msgstr "Επιλέξτε τουλάχιστον μία γλώσσα"
 msgid "Saving your language settings..."
 msgstr "Αποθήκευση των ρυθμίσεών σας για τη γλώσσα"
 
-#: templates/profiles/_select_language_dialog.html:15
-msgid "We really need your help!"
-msgstr "Χρειαζόμαστε πραγματικά τη βοήθειά σας!"
-
-#: templates/profiles/_select_language_dialog.html:16
+#: templates/profiles/_select_language_dialog.html:17
 msgid "What languages do you speak?"
 msgstr "Τι γλώσσες μιλάτε;"
 
-#: templates/profiles/_select_language_dialog.html:29
+#: templates/profiles/_select_language_dialog.html:32
 #: templates/teams/billing/choose.html:18
 msgid "Submit"
 msgstr "Υποβολή"
 
-#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
-msgid "Profile"
-msgstr "Προφίλ"
+#: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
+#: templates/videos/video-view.html:168
+msgid "Activity"
+msgstr "Δραστηριότητα"
 
-#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
-#: templates/profiles/dashboard.html:13
+#: templates/profiles/_tabs.html:11 templates/profiles/_top_user_panel.html:19
+#: templates/teams/_tabs.html:11 templates/teams/_tabs_projects.html:6
+#: templates/teams/videos-list.html:6
+msgid "Videos"
+msgstr "Βίντεο"
+
+#: templates/profiles/_tabs.html:17
+msgid "Personal Info"
+msgstr "Προσωπικές πληροφορίες"
+
+#: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
+msgid "Account"
+msgstr ""
+
+#: templates/profiles/_top_user_panel.html:11
+#: templates/profiles/dashboard.html:13 templates/teams/_tabs.html:6
+#: templates/teams/dashboard.html:6
 msgid "Dashboard"
 msgstr "Πίνακας ελέγχου"
 
-#: templates/profiles/_top_user_panel.html:26
+#: templates/profiles/_top_user_panel.html:15
+msgid "Profile"
+msgstr "Προφίλ"
+
+#: templates/profiles/_top_user_panel.html:36
 msgid "Logout"
 msgstr "Αποσύνδεση"
+
+#: templates/profiles/_top_user_panel.html:42
+#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
+msgid "Your Teams"
+msgstr "Οι ομάδες σας"
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -4927,177 +4362,338 @@ msgid "No Activity"
 msgstr "Καμία δραστηριότητα"
 
 #: templates/profiles/_video_detail.html:8
-#: templates/teams/members-list.html:102
+#: templates/teams/_context_team.html:95 templates/teams/members-list.html:102
 msgid "language"
 msgstr "Γλώσσα"
 
 #: templates/profiles/_video_detail.html:10
-#: templates/teams/_team_video_detail.html:28
 msgid "No subtitles yet"
 msgstr "Δεν υπάρχουν ακόμη υπότιτλοι"
 
-#: templates/profiles/dashboard.html:38
-msgid "Open Tasks"
-msgstr "Ανοικτές εργασίες"
+#: templates/profiles/account.html:17
+msgid "User Details"
+msgstr "Λεπτομέρειες Χρήστη"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:57
-#: templates/teams/tasks.html.py:202
-msgid "Transcribe"
-msgstr "Μεταγραφή διαλόγων/ Transcribe"
+#: templates/profiles/account.html:28
+msgid "YouTube Account"
+msgstr ""
 
-#: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:212
-msgid "Subtitles into"
-msgstr "Υπότιτλοι μέσα στο"
+#: templates/profiles/account.html:37
+msgid "Link is active"
+msgstr ""
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:217
-#: templates/teams/tasks.html.py:233 templates/videos/diffing.html:83
-#: templates/videos/subtitle-view.html:152
-#: templates/videos/subtitle-view.html:186
-msgid "Subtitles"
-msgstr "Υπότιτλοι"
+#: templates/profiles/account.html:46
+msgid "Enable Amara crowd subtitles on your personal YouTube channel"
+msgstr ""
 
-#: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
-#: templates/teams/members-list.html:102 templates/teams/tasks.html:76
-#: unisubs-integration/services/templates/services/translation_request.html:8
-msgid "for"
-msgstr "για"
+#: templates/profiles/account.html:52
+msgid "Other Accounts"
+msgstr ""
 
-#: templates/profiles/dashboard.html:67
-msgid "Decline Task"
-msgstr "Απόρριψη εργασίας"
+#: templates/profiles/account.html:54
+msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
+msgstr ""
 
-#: templates/profiles/dashboard.html:80
-msgid "You have no open tasks assigned to you."
-msgstr "Δεν έχετε ανοικτές εργασίες που να σας ανατέθηκαν."
+#: templates/profiles/account.html:55
+msgid "Add an account"
+msgstr ""
 
-#: templates/profiles/dashboard.html:91
-msgid "Sorry, no activity yet."
-msgstr "Λυπούμαστε, δεν υπάρχει ακόμη καμιά δραστηριότητα."
+#: templates/profiles/account.html:63 templates/profiles/account.html.py:74
+#: templates/teams/_team_video_detail.html:54
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
+#: templates/videos/_video_url_panel.html:34
+msgid "Remove"
+msgstr "Διαγραφή"
+
+#: templates/profiles/account.html:85
+msgid "Change Password"
+msgstr ""
+
+#: templates/profiles/account.html:94
+msgid "Notifications"
+msgstr "Ειδοποιήσεις"
+
+#: templates/profiles/account.html:96
+msgid "Send notifications to my UniversalSubtitles.org inbox"
+msgstr ""
+
+#: templates/profiles/account.html:98
+msgid "Send an email notification for each message received"
+msgstr "Αποστολή μία ειδοποίησης μέσω e-mail για κάθε παραλαβή μηνύματος"
+
+#: templates/profiles/account.html:101
+msgid "API Access"
+msgstr ""
+
+#: templates/profiles/account.html:103
+msgid "Your API key"
+msgstr ""
+
+#: templates/profiles/account.html:109
+msgid "Reset your API key"
+msgstr ""
+
+#: templates/profiles/account.html:111
+msgid "Get an API key"
+msgstr ""
+
+#: templates/profiles/account.html:118 templates/profiles/edit.html:59
+#: templates/teams/settings-permissions.html:117
+msgid "Save Changes"
+msgstr "Αποθήκευση αλλαγών"
+
+#: templates/profiles/account.html:120
+msgid "Delete Your Account"
+msgstr ""
+
+#: templates/profiles/account.html:129
+msgid "Add a linked account"
+msgstr ""
+
+#: templates/profiles/account.html:137
+msgid ""
+"\n"
+"                                What kind of account do you want to add?\n"
+"                                "
+msgstr ""
+
+#: templates/profiles/account.html:151
+msgid "Link"
+msgstr ""
+
+#: templates/profiles/account.html:158
+msgid "Enable Crowd Subtitles on your YouTube Channel"
+msgstr ""
+
+#: templates/profiles/account.html:168
+msgid "How We Enable Crowd Subtitles"
+msgstr ""
+
+#: templates/profiles/account.html:171
+msgid ""
+"\n"
+"                                        We automatically <strong>add your "
+"YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:176
+msgid ""
+"\n"
+"                                        We <strong>invite your viewers to "
+"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:181
+msgid ""
+"\n"
+"                                        We <strong>send subtitles to "
+"YouTube</strong> whenever they're completed on Amara.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:187
+msgid "When We Send Subtitles to YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:190
+msgid ""
+"\n"
+"                                        The link is <strong>one-way only</"
+"strong>. Changes made on YouTube won't be reflected on Amara and may be "
+"overwritten. Use Amara to edit subtitles.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:195
+msgid ""
+"\n"
+"                                        Amara will <strong>append a credit</"
+"strong> to the subtitles if space allows.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:201 templates/teams/dashboard.html:97
+#: templates/videos/_video_url_panel.html:44
+msgid "Learn more"
+msgstr "Μάθετε περισσότερα"
+
+#: templates/profiles/account.html:201
+msgid " about Crowd Subtitles and YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:203
+msgid "Step 1: Create/Confirm your YouTube Channel"
+msgstr ""
+
+#: templates/profiles/account.html:204
+msgid "Enable Channel"
+msgstr ""
+
+#: templates/profiles/account.html:206
+msgid "Step 2: Authorize"
+msgstr ""
+
+#: templates/profiles/account.html:207
+msgid "Link accounts"
+msgstr ""
+
+#: templates/profiles/account.html:210
+msgid ""
+"Organizations/companies: interested in YouTube sync and crowd subtitling? "
+msgstr ""
+
+#: templates/profiles/account.html:211
+msgid "Contact us"
+msgstr ""
+
+#: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
+msgid "Languages"
+msgstr "Γλώσσες"
+
+#: templates/profiles/base.html:51
+msgid "hasn't selected languages yet."
+msgstr ""
+
+#: templates/profiles/base.html:67
+msgid "hasn't joined any teams yet."
+msgstr ""
+
+#: templates/profiles/dashboard.html:34
+msgid "You have "
+msgstr ""
+
+#: templates/profiles/dashboard.html:35
+msgid "Go to your inbox"
+msgstr ""
+
+#: templates/profiles/dashboard.html:37
+msgid "unread message"
+msgstr ""
+
+#: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:52
+msgid "Videos you're working on"
+msgstr ""
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:87
+#: templates/teams/dashboard.html:67
+msgid "Create"
+msgstr ""
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:63
+#: templates/profiles/dashboard.html:87 templates/profiles/dashboard.html:90
+#: templates/teams/dashboard.html:67 templates/teams/dashboard.html.py:71
+#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
+#: templates/videos/subtitle-view.html:48
+#: templates/videos/subtitle-view.html:75
+msgid "subtitles"
+msgstr "υπότιτλους"
 
 #: templates/profiles/dashboard.html:98
-msgid "Alerts"
-msgstr "Προειδοποιήσεις"
+msgid "I can't do this"
+msgstr ""
 
-#: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
-msgid "Do you really wish to leave this team?"
-msgstr "Θέλετε πραγματικά να εγκαταλείψετε αυτή την ομάδα;"
+#: templates/profiles/dashboard.html:117
+msgid "Activity on your videos"
+msgstr ""
 
-#: templates/profiles/dashboard.html:115
-msgid "leave team"
-msgstr "Εγκατάλειψη ομάδας"
+#: templates/profiles/dashboard.html:128
+msgid ""
+"\n"
+"                                Nothing happening yet.\n"
+"                            "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:5
-msgid "Edit My Profile"
-msgstr "Επεξεργασία του Προφίλ μου"
+#: templates/profiles/dashboard.html:132
+msgid ""
+"\n"
+"                                You haven't shared any videos yet.\n"
+"                            "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:16
-msgid "Do you really want delete your picture?"
-msgstr "Θέλετε πραγματικά να διαγράψετε την εικόνα σας;"
+#: templates/profiles/dashboard.html:143
+msgid "Activity in your teams"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:40
+#: templates/profiles/dashboard.html:154
+msgid ""
+"\n"
+"                                All's quiet in your teams so far. \n"
+"                            "
+msgstr ""
+
+#: templates/profiles/dashboard.html:158
+msgid ""
+"\n"
+"                                You haven't joined any teams yet.\n"
+"                            "
+msgstr ""
+
+#: templates/profiles/edit.html:5
+msgid "Edit Profile"
+msgstr ""
+
+#: templates/profiles/edit.html:30 templates/teams/_application_form.html:36
+msgid "About you"
+msgstr "Σχετικά με εσάς"
+
+#: templates/profiles/edit.html:40
+msgid "Photo"
+msgstr ""
+
+#: templates/profiles/edit.html:44
+msgid "Remove current photo"
+msgstr ""
+
+#: templates/profiles/edit.html:92
 #: templates/videos/_paste_transcription.html:106
 #: templates/videos/_video_url_panel.html:77
 msgid "Saving..."
 msgstr "Αποθήκευση..."
 
-#: templates/profiles/edit_profile.html:51
-msgid "Edit Your Profile"
-msgstr "Επεξεργασθείτε το Προφίλ σας"
-
-#: templates/profiles/edit_profile.html:64
-msgid "Personal Info"
-msgstr "Προσωπικές πληροφορίες"
-
-#: templates/profiles/edit_profile.html:65
-msgid "Will be displayed publicly"
-msgstr "Θα εμφανίζεται δημοσίως"
-
-#: templates/profiles/edit_profile.html:83
-msgid "remove picture"
-msgstr "Απομάκρυσνη εικόνας"
-
-#: templates/profiles/edit_profile.html:88
-msgid "Upload picture"
-msgstr "Ανεβάστε εικόνα"
-
-#: templates/profiles/edit_profile.html:92
-msgid "Account Details"
-msgstr "Λεπτομέρειες Λογαριασμού"
-
-#: templates/profiles/edit_profile.html:107
-msgid "Notifications"
-msgstr "Ειδοποιήσεις"
-
-#: templates/profiles/edit_profile.html:110
-msgid "Send notifications to my UniversalSubtitles.org message inbox"
+#: templates/profiles/edit.html:97
+msgid "Do you really want to delete your photo?"
 msgstr ""
-"Αποστολή ειδοποιήσεων προς τα Εισερχόμενα μου στο UniversalSubtitles.org"
 
-#: templates/profiles/edit_profile.html:113
-msgid "Send an email notification for each message received"
-msgstr "Αποστολή μία ειδοποίησης μέσω e-mail για κάθε παραλαβή μηνύματος"
+#: templates/profiles/remove-third-party.html:16
+msgid "Remove a third party account"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:116
-msgid "Language Info"
-msgstr "Πληροφ. Γλώσσας"
+#: templates/profiles/remove-third-party.html:18
+#, python-format
+msgid ""
+"\n"
+"                            Are you sure you want to remove the %(type)s "
+"account\n"
+"                        "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:133
-msgid "Languages I Know"
-msgstr "Γλώσσες που γνωρίζω"
+#: templates/profiles/remove-third-party.html:28
+msgid "Remove account"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:138
-#: templates/profiles/edit_profile.html:155
-msgid "Remove Language"
-msgstr "Αφαίρεση Γλώσσας"
+#: templates/profiles/videos.html:6
+#, python-format
+msgid ""
+"\n"
+"        %(user_info)s's videos | Amara\n"
+"    "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:169
-msgid "Add Language"
-msgstr "Προσθήκη Γλώσσας"
+#: templates/profiles/videos.html:29
+msgid "hasn't shared any videos on Amara."
+msgstr ""
 
-#: templates/profiles/edit_profile.html:173
-msgid "Developer Info"
-msgstr "Πληροφορίες για developers"
+#: templates/profiles/view.html:25
+msgid "doesn't have any activity yet."
+msgstr ""
 
-#: templates/profiles/edit_profile.html:183
-#: templates/teams/settings-permissions.html:118
-msgid "Save Changes"
-msgstr "Αποθήκευση αλλαγών"
-
-#: templates/profiles/edit_profile.html:186
-msgid "Permanently Delete Your Profile"
-msgstr "Μόνιμη διαγραφή του Προφίλ σας"
-
-#: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
-msgid "My videos"
-msgstr "Τα βίντεο μου"
-
-#: templates/profiles/view_profile.html:56
-msgid "Member since"
-msgstr "Μέλος από"
-
-#: templates/profiles/view_profile.html:62
-msgid "Homepage"
-msgstr "Αρχική Σελίδα"
-
-#: templates/profiles/view_profile.html:70
-msgid "<i>User has not submitted a bio.</i>"
-msgstr "<i>Ο χρήστης δεν υπέβαλλε Βιογραφικό.</i>"
-
-#: templates/profiles/view_profile.html:82
-#: templates/teams/_subnav_settings.html:17
-msgid "Languages"
-msgstr "Γλώσσες"
-
-#: templates/profiles/view_profile.html:98
-msgid "Memberships"
-msgstr "Εγγραφές με την ιδιότητα Μέλους"
-
-#: templates/profiles/view_profile.html:121
+#: templates/profiles/view.html:28
 msgid "Profile deleted by user."
 msgstr "Το προφίλ έχει διαγραφεί από τον χρήστη."
 
-#: templates/profiles/view_profile.html:130
+#: templates/profiles/view.html:36
 msgid "Edit user"
 msgstr "Επεξεργασία χρήστη"
 
@@ -5228,6 +4824,10 @@ msgstr "Αναζήτηση Βίντεο"
 msgid "Videos In"
 msgstr ""
 
+#: templates/search/_search_form.html:28 templates/teams/tasks.html:217
+msgid "Subtitles into"
+msgstr "Υπότιτλοι μέσα στο"
+
 #: templates/search/_video_item.html:14
 #: templates/videos/_video_languages.html:8
 #, python-format
@@ -5343,8 +4943,10 @@ msgstr "ΣΥΝΟΛΟ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:134
-#: templates/teams/tasks.html.py:221 templates/videos/video-view.html:166
+#: templates/teams/_context_team.html:51 templates/teams/tasks.html:139
+#: templates/teams/tasks.html.py:226
+#: templates/videos/set-original-language.html:13
+#: templates/videos/video-view.html:166
 msgid "Video"
 msgstr "Βίντεο"
 
@@ -5368,43 +4970,6 @@ msgstr "Μέθοδος"
 msgid "Value"
 msgstr "Τιμή"
 
-#: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
-msgid "Join via"
-msgstr "Εγγραφείτε μέσω"
-
-#: templates/teams/_actions.html:17 templates/teams/_actions.html.py:36
-msgid "You will be logged out and new account will be created via"
-msgstr "Θα αποσυνεδεθείτε και θα δημιουργηθεί ένας νέος λογαριασμός μέσω"
-
-#: templates/teams/_actions.html:21
-msgid "Do you really wish to join this team?"
-msgstr "Θέλετε πραγματικά να εγγραφείτε σε αυτή την ομάδα;"
-
-#: templates/teams/_actions.html:21
-msgid "Join this team now!"
-msgstr "Εγγραφείτε σε αυτή την ομάδα τώρα!"
-
-#: templates/teams/_actions.html:27
-msgid "Login via"
-msgstr "Σύνδεση μέσω"
-
-#: templates/teams/_actions.html:33
-msgid "to apply"
-msgstr "για να υποβάλλετε αίτηση"
-
-#: templates/teams/_actions.html:43
-msgid "Your application is pending"
-msgstr "Η αίτησή σας είναι σε εκκρεμότητα"
-
-#: templates/teams/_actions.html:58
-msgid "Join Team"
-msgstr "Εγγραφή στην ομάδα"
-
-#: templates/teams/_actions.html:64
-msgid "Want to create your own subtitling team? Contact "
-msgstr ""
-"Θέλετε να δημιουργήσετε τη δική σας ομάδα υποτιτλισμού; Ελάτε σε επαφή με το"
-
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
 msgstr "Κάντε αίτηση εγγραφής"
@@ -5423,26 +4988,12 @@ msgid ""
 "\n"
 "                                No formal language training is required to "
 "translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your profile has your "
-"language\n"
+"their translation abilities. Please make sure your language selections are "
+"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
-"\n"
-"                                Δεν απαιτείται επίσημη γλωσσική εκπαίδευση "
-"για την μετάφραση με την ομάδα %(team)s. Ζητάμε, όμως, από όλους τους "
-"μεταφραστές να είναι σίγουροι για τις ικανότητές τους στη μετάφραση. "
-"Παρακαλούμε να βεβαιωθείτε πως το δικό σας προφίλ υπάρχει η γλώσσα σας\n"
-"                            "
 
-#: templates/teams/_application_form.html:24
-msgid "proficiency"
-msgstr "Βαθμός ικανότητας"
-
-#: templates/teams/_application_form.html:24
-msgid "specified"
-msgstr "ορίσθηκε"
-
-#: templates/teams/_application_form.html:29
+#: templates/teams/_application_form.html:28
 msgid ""
 "\n"
 "                                We request that each new applicant does at "
@@ -5456,11 +5007,7 @@ msgstr ""
 "τη στιγμή της εγγραφής του. Πέρα αυτού, τα υπόλοιπα εξαρτώνται από εσάς!\n"
 "                            "
 
-#: templates/teams/_application_form.html:37
-msgid "About you"
-msgstr "Σχετικά με εσάς"
-
-#: templates/teams/_application_form.html:39
+#: templates/teams/_application_form.html:38
 #, python-format
 msgid ""
 "\n"
@@ -5475,7 +5022,7 @@ msgstr ""
 "ξεπερνά τις 3-5 προτάσεις, όχι παραπάνω!\n"
 "                    "
 
-#: templates/teams/_application_form.html:47
+#: templates/teams/_application_form.html:46
 msgid "Submit Application"
 msgstr "Υποβολή αιτήματος"
 
@@ -5488,15 +5035,15 @@ msgid "Video Page"
 msgstr "Σελίδα Βίντεο"
 
 #: templates/teams/_context_project.html:17
-#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:118
+#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:139
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show all"
 msgstr "Εμφάνιση όλων"
 
 #: templates/teams/_context_project.html:31
-#: templates/teams/_context_team.html:59
+#: templates/teams/_context_team.html:64
 msgid "Task"
 msgstr "Εργασία"
 
@@ -5510,29 +5057,62 @@ msgstr "Άλλα"
 msgid "Projects"
 msgstr "Projects"
 
-#: templates/teams/_context_team.html:29
+#: templates/teams/_context_team.html:33
 #: templates/videos/test_form_page.html:24
 msgid "video"
 msgstr "Βίντεο"
 
-#: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:114
+#: templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:135
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show less"
 msgstr "Εμφάνιση λιγότερων στοιχείων"
 
-#: templates/teams/_context_team.html:53
+#: templates/teams/_context_team.html:57
 msgid "Member"
 msgstr "Μέλος"
 
-#: templates/teams/_context_team.html:83
-msgid "Your tasks"
+#: templates/teams/_context_team.html:91
+msgid "Your role:"
 msgstr ""
 
-#: templates/teams/_context_team.html:87
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+#: templates/teams/tasks.html:81
+#: unisubs-integration/services/templates/services/translation_request.html:8
+msgid "for"
+msgstr "για"
+
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+msgid "and"
+msgstr "και"
+
+#: templates/teams/_context_team.html:94 templates/teams/members-list.html:101
+msgid "project"
+msgstr "project"
+
+#: templates/teams/_context_team.html:100
+msgid "Your tasks"
+msgstr "Οι εργασίες σας"
+
+#: templates/teams/_context_team.html:104
 msgid "All available tasks"
 msgstr "Όλες οι διαθέσιμες εργασίες"
+
+#: templates/teams/_context_team.html:108 templates/teams/teams-list.html:82
+msgid "Do you really wish to leave this team?"
+msgstr "Θέλετε πραγματικά να εγκαταλείψετε αυτή την ομάδα;"
+
+#: templates/teams/_context_team.html:108
+msgid "Leave team"
+msgstr "Εγκατάλειψη της ομάδας"
+
+#: templates/teams/_context_team.html:145
+msgid "Want to create your own subtitling team? Contact "
+msgstr ""
+"Θέλετε να δημιουργήσετε τη δική σας ομάδα υποτιτλισμού; Ελάτε σε επαφή με το"
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
@@ -5562,13 +5142,49 @@ msgstr ""
 "Μπορείτε, επίσης, να προσκαλέσετε φίλους που μιλούν άλλες γλώσσες, για να "
 "βοηθήσουν."
 
+#: templates/teams/_join.html:9 templates/teams/_join.html.py:50
+msgid "Join via"
+msgstr "Εγγραφείτε μέσω"
+
+#: templates/teams/_join.html:17 templates/teams/_join.html.py:36
+msgid "You will be logged out and new account will be created via"
+msgstr "Θα αποσυνεδεθείτε και θα δημιουργηθεί ένας νέος λογαριασμός μέσω"
+
+#: templates/teams/_join.html:21
+msgid "Do you really wish to join this team?"
+msgstr "Θέλετε πραγματικά να εγγραφείτε σε αυτή την ομάδα;"
+
+#: templates/teams/_join.html:21
+msgid "Join our team now!"
+msgstr ""
+
+#: templates/teams/_join.html:27
+msgid "Login via"
+msgstr "Σύνδεση μέσω"
+
+#: templates/teams/_join.html:33
+msgid "to apply"
+msgstr "για να υποβάλλετε αίτηση"
+
+#: templates/teams/_join.html:43
+msgid "Your application is pending"
+msgstr "Η αίτησή σας είναι σε εκκρεμότητα"
+
+#: templates/teams/_join.html:59
+msgid "Join our team"
+msgstr ""
+
+#: templates/teams/_join.html:61
+msgid "to join our team"
+msgstr ""
+
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:304
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:307
 msgid "Resume"
 msgstr "Ανάκτηση"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:306
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:309
 msgid "Start now"
 msgstr "Έναρξη τώρα"
 
@@ -5577,30 +5193,20 @@ msgid "Team Details"
 msgstr "Λεπτομέρειες ομάδας"
 
 #: templates/teams/_subnav_settings.html:13
-#: templates/teams/settings-permissions.html:92
 msgid "Workflows"
 msgstr "Ροή εργασίας"
 
-#: templates/teams/_tabs.html:6 templates/teams/_tabs_projects.html:6
-#: templates/teams/videos-list.html:6
-msgid "Videos"
-msgstr "Βίντεο"
-
-#: templates/teams/_tabs.html:11 templates/teams/members-list.html:6
+#: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
 msgstr "Μέλη"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
-msgid "Activity"
-msgstr "Δραστηριότητα"
-
-#: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
-#: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:29
+#: templates/teams/_tabs.html:28 templates/teams/_tabs_projects.html:12
+#: templates/teams/_team_video_detail.html:41
+#: templates/teams/settings-permissions.html:73 templates/teams/tasks.html:34
 msgid "Tasks"
 msgstr "Εργασίες"
 
-#: templates/teams/_tabs.html:29 templates/teams/_tabs_projects.html:19
+#: templates/teams/_tabs.html:36 templates/teams/_tabs_projects.html:19
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-languages.html:5
 #: templates/teams/settings-permissions.html:5
@@ -5660,6 +5266,19 @@ msgstr "Προσθήκη νέας ομάδας"
 #, python-format
 msgid ""
 "\n"
+"                        %(num)s language needed\n"
+"                    "
+msgid_plural ""
+"\n"
+"                        %(num)s languages needed\n"
+"                    "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/teams/_team_video_detail.html:20
+#, python-format
+msgid ""
+"\n"
 "                        %(num)s language\n"
 "                    "
 msgid_plural ""
@@ -5675,55 +5294,11 @@ msgstr[1] ""
 "                        %(num)s Γλώσσες\n"
 "                    "
 
-#: templates/teams/_team_video_detail.html:19
-#, python-format
-msgid ""
-"\n"
-"                            (%(num)s completed)\n"
-"                            "
-msgid_plural ""
-"\n"
-"                            (%(num)s completed)\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            (%(num)s Ολοκληρώθηκε)\n"
-"                            "
-msgstr[1] ""
-"\n"
-"                            (%(num)s Ολοκληρώθηκε)\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:35
-#, python-format
-msgid ""
-"\n"
-"                            1 task\n"
-"                        "
-msgid_plural ""
-"\n"
-"                            %(counter)s tasks\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            1 εργασία\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                            %(counter)s εργασίες\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:52
+#: templates/teams/_team_video_detail.html:46
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
 msgstr "Τροποποίηση"
-
-#: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
-#: templates/videos/_video_url_panel.html:34
-msgid "Remove"
-msgstr "Διαγραφή"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5754,7 +5329,7 @@ msgstr "Προσθέστε πολλαπλά βίντεο"
 msgid "Team Aplications"
 msgstr "Εφαρμογές ομάδας"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:63
+#: templates/teams/applications.html:49 templates/teams/tasks.html:68
 msgid "Approve"
 msgstr "Αποδοχή"
 
@@ -5770,7 +5345,7 @@ msgstr "Αποστολή μηνύματος"
 msgid "There are no applications right now"
 msgstr "Δεν υπάρχουν εφαρμογές αυτή τη στιγμή"
 
-#: templates/teams/base.html:39
+#: templates/teams/base.html:37
 msgid "Edit team"
 msgstr "Τροποποίηση ομάδας"
 
@@ -5845,7 +5420,7 @@ msgstr "Τι γλώσσα χρειάζεται;"
 msgid "Who should do it?"
 msgstr "Ποιος πρέπει να το κάνει;"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:485
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:513
 msgid "Begin typing to search"
 msgstr "Αρχίστε να πληκτρολογείτε για την αναζήτηση"
 
@@ -5874,6 +5449,90 @@ msgstr "Νέα φόρμα εργασίας"
 #: templates/teams/create_task.html:103
 msgid "Back to tasks list"
 msgstr "Πίσω στον Κατάλογο Εργασιών"
+
+#: templates/teams/dashboard.html:79
+msgid "Due in"
+msgstr ""
+
+#: templates/teams/dashboard.html:81
+msgid "Overdue by"
+msgstr ""
+
+#: templates/teams/dashboard.html:91
+msgid "Helping out is easy!"
+msgstr ""
+
+#: templates/teams/dashboard.html:93
+msgid ""
+"\n"
+"                            Just find a video that interests you and click "
+"the button below it to get started!\n"
+"                        "
+msgstr ""
+
+#: templates/teams/dashboard.html:97
+msgid " about subtitling in Amara."
+msgstr ""
+
+#: templates/teams/dashboard.html:102
+msgid "Welcome!"
+msgstr ""
+
+#: templates/teams/dashboard.html:107
+msgid ""
+"\n"
+"                            We've got lots of great content that we'd love "
+"your help with.\n"
+"                        "
+msgstr ""
+
+#: templates/teams/dashboard.html:119 templates/teams/dashboard.html.py:256
+msgid "Videos that need your help"
+msgstr ""
+
+#: templates/teams/dashboard.html:121
+msgid "Some of the videos we're working on now"
+msgstr ""
+
+#: templates/teams/dashboard.html:127 templates/teams/tasks.html:159
+msgid "Tell us what languages you speak"
+msgstr "Πείτε μας τι γλώσσες μιλάτε"
+
+#: templates/teams/dashboard.html:127
+msgid "and we'll personalize this list for you"
+msgstr ""
+
+#: templates/teams/dashboard.html:155 templates/teams/dashboard.html.py:197
+msgid " languages need your help"
+msgstr ""
+
+#: templates/teams/dashboard.html:164 templates/teams/dashboard.html.py:192
+msgid "Create Subtitles"
+msgstr ""
+
+#: templates/teams/dashboard.html:205 templates/teams/dashboard.html.py:216
+msgid "Create "
+msgstr ""
+
+#: templates/teams/dashboard.html:207 templates/teams/dashboard.html.py:218
+msgid " Subtitles"
+msgstr ""
+
+#: templates/teams/dashboard.html:246
+msgid "Sorry, you've reached the maximum number of tasks for this team."
+msgstr ""
+
+#: templates/teams/dashboard.html:258
+msgid "Sorry, we couldn't find any videos for you."
+msgstr ""
+
+#: templates/teams/dashboard.html:262
+msgid "Update your language preferences"
+msgstr ""
+
+#: templates/teams/dashboard.html:268
+msgid "Add videos to the team"
+msgstr ""
 
 #: templates/teams/email_new_video.html:7
 #, python-format
@@ -5954,7 +5613,7 @@ msgstr ""
 msgid "Send Invites"
 msgstr "Αποστολή προσκλήσεων"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:47
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:52
 #: templates/teams/videos-list.html:45
 msgid "Filter and Sort"
 msgstr "Φιλτράρισμα και Κατάταξη"
@@ -5984,12 +5643,12 @@ msgstr "Άτομα που συνεισφέρουν "
 msgid "speaking"
 msgstr "που μιλούν"
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:83
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:88
 msgid "all languages"
 msgstr "όλες τις γλώσσες"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:128
-#: templates/teams/tasks.html.py:135 templates/teams/tasks.html:142
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:133
+#: templates/teams/tasks.html.py:140 templates/teams/tasks.html:147
 #: templates/teams/videos-list.html:94
 msgid "Clear"
 msgstr "Καθαρισμός"
@@ -6009,14 +5668,6 @@ msgstr "Λυπόμαστε, δεν βρέθηκαν Μέλη"
 #: templates/teams/members-list.html:92
 msgid "Me"
 msgstr "Εγώ"
-
-#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
-msgid "and"
-msgstr "και"
-
-#: templates/teams/members-list.html:101
-msgid "project"
-msgstr "project"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -6105,15 +5756,72 @@ msgstr "Πως μπορούν οι χρήστες να γραφούν στην �
 msgid "Who can add/remove videos?"
 msgstr "Ποιος μπορεί να προσθέτει/ διαγράφει βίντεο;"
 
-#: templates/teams/settings-permissions.html:37
-msgid "Manage subtitling and translation work for your videos"
-msgstr "Διαχείριση υποτιτλισμού και εργασιών μετάφρασης για τα Βίντεο σας"
+#: templates/teams/settings-permissions.html:36
+msgid "Subtitling"
+msgstr "Υποτιτλισμός"
+
+#: templates/teams/settings-permissions.html:38
+msgid "Who can transcribe subtitles?"
+msgstr ""
+"Πoιος μπορεί να συγχρονίζει /transcribing τους διαλόγους των υπότιτλων; "
 
 #: templates/teams/settings-permissions.html:39
+msgid "i.e. transcribe from video and perform time-alignment"
+msgstr "δηλ. να μεταγράφει από το Βίντεο κα να κάνει τον συγχρονισμό."
+
+#: templates/teams/settings-permissions.html:42
+msgid "Who can translate subtitles?"
+msgstr "Ποιος μπορεί να μεταφράζει τους υπότιτλους;"
+
+#: templates/teams/settings-permissions.html:43
+msgid "i.e. translate text from an original subtitle into a new language"
+msgstr ""
+"δηλ. να μεταφράζει το κείμενο, από τους πρωτότυπους υπότιτλους, σε μία νέα "
+"γλώσσα;"
+
+#: templates/teams/settings-permissions.html:48
+msgid "How your subtitles will get published <em>(configure below)</em>"
+msgstr "Πως θα δημοσιεύονται οι υπότιτλοί σας  <em>(configure below)</em>"
+
+#: templates/teams/settings-permissions.html:50
+msgid "Transcribed"
+msgstr "Συγχρονίσθηκαν"
+
+#: templates/teams/settings-permissions.html:52
+msgid "or ..."
+msgstr "ή..."
+
+#: templates/teams/settings-permissions.html:58
+msgid "Reviewed"
+msgstr "Αναθεωρήθηκαν"
+
+#: templates/teams/settings-permissions.html:63
+msgid "Approved"
+msgstr "Εγκρίθηκαν"
+
+#: templates/teams/settings-permissions.html:68
+msgid "Published"
+msgstr "Δημοσιεύθηκαν"
+
+#: templates/teams/settings-permissions.html:74
+msgid ""
+"Tasks enable you to manage and assign subtitling and translation work for "
+"your videos"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:75
+msgid "Enable tasks"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:80
+msgid "Permissions and Limits"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:82
 msgid "Who can create and assign tasks?"
 msgstr "Ποιος μπορεί να δημιουργεί και να αναθέτει εργασίες;"
 
-#: templates/teams/settings-permissions.html:41
+#: templates/teams/settings-permissions.html:84
 msgid ""
 "Specified members will only be able to create/assign tasks they are "
 "permitted to complete themselves"
@@ -6121,102 +5829,48 @@ msgstr ""
 "Συγκεκριμμένα μέλη θα μπορούν μόνο δημιουργούν/ αναθέτουν εργασίες για τις "
 "οποίες έχουν άδεια να τις ολοκληρώνουν μόνοι τους."
 
-#: templates/teams/settings-permissions.html:43
+#: templates/teams/settings-permissions.html:86
 msgid "How many tasks can a user have at once?"
 msgstr "Πόσες εργασίες μπορεί να έχει συγχρόνως ένας χρήστης;"
 
-#: templates/teams/settings-permissions.html:46
+#: templates/teams/settings-permissions.html:89
 msgid "If left blank there will be no limit."
 msgstr "Αν αυτό το αφήσετε κενό, δεν θα υπάρχει κανένα όριο."
 
-#: templates/teams/settings-permissions.html:48
+#: templates/teams/settings-permissions.html:91
 msgid "How many days should an assignee get to complete a task?"
 msgstr ""
 "Πόσες μέρες πρέπει να επιτρέπονται για να τελειώσει κάποιος μία εργασία;"
 
-#: templates/teams/settings-permissions.html:51
+#: templates/teams/settings-permissions.html:94
 msgid "If left blank tasks will not expire."
 msgstr "Αν αυτό το αφήσετε κενό, τότε δεν θα υπάρχει λήξη για τις εργασίες."
 
-#: templates/teams/settings-permissions.html:55
-msgid "Subtitling"
-msgstr "Υποτιτλισμός"
-
-#: templates/teams/settings-permissions.html:57
-msgid "Who can transcribe subtitles?"
+#: templates/teams/settings-permissions.html:97
+msgid "Workflow"
 msgstr ""
-"Πoιος μπορεί να συγχρονίζει /transcribing τους διαλόγους των υπότιτλων; "
 
-#: templates/teams/settings-permissions.html:58
-msgid "i.e. transcribe from video and perform time-alignment"
-msgstr "δηλ. να μεταγράφει από το Βίντεο κα να κάνει τον συγχρονισμό."
-
-#: templates/teams/settings-permissions.html:61
-msgid "Who can translate subtitles?"
-msgstr "Ποιος μπορεί να μεταφράζει τους υπότιτλους;"
-
-#: templates/teams/settings-permissions.html:62
-msgid "i.e. translate text from an original subtitle into a new language"
-msgstr ""
-"δηλ. να μεταφράζει το κείμενο, από τους πρωτότυπους υπότιτλους, σε μία νέα "
-"γλώσσα;"
-
-#: templates/teams/settings-permissions.html:67
-msgid "How your subtitles will get published <em>(configure below)</em>"
-msgstr "Πως θα δημοσιεύονται οι υπότιτλοί σας  <em>(configure below)</em>"
-
-#: templates/teams/settings-permissions.html:69
-msgid "Transcribed"
-msgstr "Συγχρονίσθηκαν"
-
-#: templates/teams/settings-permissions.html:71
-msgid "or ..."
-msgstr "ή..."
-
-#: templates/teams/settings-permissions.html:77
-msgid "Reviewed"
-msgstr "Αναθεωρήθηκαν"
-
-#: templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr "Εγκρίθηκαν"
-
-#: templates/teams/settings-permissions.html:87
-msgid "Published"
-msgstr "Δημοσιεύθηκαν"
-
-#: templates/teams/settings-permissions.html:93
-msgid "Workflows enable you to add moderation steps and automate tasks"
-msgstr ""
-"Οι ροές εργασίας σας επιτρέπουν να δημιουργείτε βήματα εποπτείας/ moderation "
-"και αυτόματες εργασίες"
-
-#: templates/teams/settings-permissions.html:94
-#: templates/teams/settings-projects-add.html:42
-msgid "Enable workflows"
-msgstr "Ενεργοποίηση Ροών Εργασίας"
-
-#: templates/teams/settings-permissions.html:101
+#: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
 msgstr ""
 "Αυτόματη δημιουργία εργασιών συγχρονισμού και μεταγραφής/ transcription"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "Automatically create translation tasks for preferred languages"
 msgstr "Αυτόματη δημιουργία εργασιών  μετάφρασης για τις προτιμώμενες γλώσσες"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "manage languages"
 msgstr "Διαχείριση γλωσσών"
 
-#: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:60
+#: templates/teams/settings-permissions.html:108
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:65
 msgid "Review"
 msgstr "Αναθεώρηση"
 
-#: templates/teams/settings-permissions.html:112
+#: templates/teams/settings-permissions.html:111
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
 msgstr "Έγκριση"
@@ -6244,6 +5898,10 @@ msgstr ""
 "Επίβλεψη/ moderation των υπότιτλων αυτού του έργου. Θα υπερισχύσει πάνω "
 "στην, τυχόν προϋπάρχουσα, ροή εργασίας της ομάδας."
 
+#: templates/teams/settings-projects-add.html:42
+msgid "Enable workflows"
+msgstr "Ενεργοποίηση Ροών Εργασίας"
+
 #: templates/teams/settings-projects-add.html:49
 msgid "Automatically create subtitle tasks"
 msgstr "Αυτόματη δημιουργία εργασιών υποτιτλισμού"
@@ -6260,173 +5918,194 @@ msgstr "Είστε σίγουρος/η πως θέλετε να διαγράψε
 msgid "This team does not have any projects yet"
 msgstr "Αυτή η ομάδα δεν έχει, ακόμη, καθόλου έργα."
 
-#: templates/teams/tasks.html:43
+#: templates/teams/tasks.html:48
 msgid "Add Task"
 msgstr "Προσθήκη έργου"
 
-#: templates/teams/tasks.html:58
+#: templates/teams/tasks.html:62 templates/teams/tasks.html.py:207
+msgid "Transcribe"
+msgstr "Μεταγραφή διαλόγων/ Transcribe"
+
+#: templates/teams/tasks.html:63
 #: unisubs-integration/services/templates/services/translation_request.html:6
 msgid "Translate"
 msgstr "Μετάφραση"
 
-#: templates/teams/tasks.html:66
+#: templates/teams/tasks.html:71
 msgid "tasks in"
 msgstr ""
 
-#: templates/teams/tasks.html:70 templates/teams/videos-list.html:54
+#: templates/teams/tasks.html:75 templates/teams/videos-list.html:54
 msgid "any project"
 msgstr ""
 
-#: templates/teams/tasks.html:81
+#: templates/teams/tasks.html:86
 msgid "my languages"
 msgstr "Οι γλώσσες μου"
 
-#: templates/teams/tasks.html:95
+#: templates/teams/tasks.html:100
 msgid "assigned to"
 msgstr "ανατέθηκαν σε"
 
-#: templates/teams/tasks.html:97
+#: templates/teams/tasks.html:102
 msgid "no one"
 msgstr "κανέναν"
 
-#: templates/teams/tasks.html:98 templates/teams/tasks.html.py:268
+#: templates/teams/tasks.html:103 templates/teams/tasks.html.py:271
 msgid "me"
 msgstr "εμένα"
 
-#: templates/teams/tasks.html:99
+#: templates/teams/tasks.html:104
 msgid "anyone"
 msgstr "οποιονδήποτε"
 
-#: templates/teams/tasks.html:108 templates/teams/videos-list.html:70
+#: templates/teams/tasks.html:113 templates/teams/videos-list.html:70
 msgid "sorted by"
 msgstr "Κατάταξη ανά"
 
-#: templates/teams/tasks.html:111
+#: templates/teams/tasks.html:116
 msgid "date, newest"
 msgstr "ημερομηνία, πιο πρόσφατη"
 
-#: templates/teams/tasks.html:114
+#: templates/teams/tasks.html:119
 msgid "date, oldest"
 msgstr "ημερομηνία, πιο παλιά"
 
-#: templates/teams/tasks.html:118
+#: templates/teams/tasks.html:123
 msgid "time left, least"
 msgstr "χρόνο που απομένει, ελάχιστος"
 
-#: templates/teams/tasks.html:121
+#: templates/teams/tasks.html:126
 msgid "time left, most"
 msgstr "χρόνο που απομένει, μέγιστος"
 
-#: templates/teams/tasks.html:128 templates/teams/tasks.html.py:135
-#: templates/teams/tasks.html:142
+#: templates/teams/tasks.html:133 templates/teams/tasks.html.py:140
+#: templates/teams/tasks.html:147
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Καθαρισμός όλων των φίλτρων, των κατατάξεων και των όρων αναζήτησης"
 
-#: templates/teams/tasks.html:140
+#: templates/teams/tasks.html:145
 msgid "NOTE:"
 msgstr "ΣΗΜΕΙΩΣΣΗ:"
 
-#: templates/teams/tasks.html:141
+#: templates/teams/tasks.html:146
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr ""
 "Όταν κάνετε κατάταξη ανά ημερομηνία, δεν θα εμφανίζονται οι εργασίες χωρίς "
 "ημερομηνία λήξεως."
 
-#: templates/teams/tasks.html:148
+#: templates/teams/tasks.html:153
 msgid "Try broadening your selection using the filters above"
 msgstr ""
 "Προσπαθήστε να διευρύνετε τις επιλογές σας, χρησιμοποιώντας τα παραπάνω "
 "φίλτρα"
 
-#: templates/teams/tasks.html:154
-msgid "Tell us what languages you speak"
-msgstr "Πείτε μας τι γλώσσες μιλάτε"
-
-#: templates/teams/tasks.html:154
+#: templates/teams/tasks.html:159
 msgid "and we'll narrow this list for you"
 msgstr "και εμείς θα περιορίσουμε αυτό τον κατάλογο για εσάς"
 
-#: templates/teams/tasks.html:160
+#: templates/teams/tasks.html:165
 msgid "Showing unassigned tasks in languages you speak. "
-msgstr ""
+msgstr "Εμφανίζονται οι μη ανατεθειμένες εργασίες στις γλώσσες που μιλάτε."
 
-#: templates/teams/tasks.html:162
+#: templates/teams/tasks.html:167
 msgid "Want to view "
-msgstr ""
+msgstr "Θέλετε να δείτε"
 
-#: templates/teams/tasks.html:163
+#: templates/teams/tasks.html:168
 msgid "your tasks"
-msgstr ""
+msgstr "τις εργασίες σας"
 
-#: templates/teams/tasks.html:164
+#: templates/teams/tasks.html:169
 msgid " instead?"
-msgstr ""
+msgstr "αντιθέτως;"
 
-#: templates/teams/tasks.html:170
+#: templates/teams/tasks.html:175
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr ""
 "Δοκιμάστε να αλλάξετε την επιλογή σας, χρησιμοποιώντας τα παραπάνω φίλτρα, "
 "για να βρείτε διάφορες εργασίες"
 
-#: templates/teams/tasks.html:196
+#: templates/teams/tasks.html:201
 msgid "You don't have permission to perform this task."
-msgstr ""
+msgstr "Δεν έχετε δικαιώματα να εκτελέσετε αυτή την εργασία."
 
-#: templates/teams/tasks.html:235
+#: templates/teams/tasks.html:222 templates/teams/tasks.html.py:238
+#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:152
+#: templates/videos/subtitle-view.html:186
+msgid "Subtitles"
+msgstr "Υπότιτλοι"
+
+#: templates/teams/tasks.html:239
 msgid "latest draft"
 msgstr "Το πιο πρόσφατο προσχέδιο/ draft"
 
-#: templates/teams/tasks.html:239
+#: templates/teams/tasks.html:242
 msgid "transcribed"
 msgstr "μετεγράφη"
 
-#: templates/teams/tasks.html:241 templates/videos/subtitle-view.html:48
+#: templates/teams/tasks.html:244 templates/videos/subtitle-view.html:48
 msgid "translated"
 msgstr "μεταφράσθηκε"
 
-#: templates/teams/tasks.html:249
+#: templates/teams/tasks.html:252
 msgid "reviewed"
 msgstr "Αναθεωρήθηκε"
 
-#: templates/teams/tasks.html:251
+#: templates/teams/tasks.html:254
 msgid "and edited"
 msgstr "και έγινε επεξεργασία"
 
-#: templates/teams/tasks.html:253 templates/videos/subtitle-view.html:194
+#: templates/teams/tasks.html:256 templates/videos/subtitle-view.html:194
 #: templates/videos/subtitle-view.html:310
 msgid "by"
 msgstr "από τον/ την"
 
-#: templates/teams/tasks.html:266
+#: templates/teams/tasks.html:269
 msgid "Assigned to"
 msgstr "Ανατέθηκε στον/ στην"
 
-#: templates/teams/tasks.html:275
+#: templates/teams/tasks.html:278
 msgid "Unassigned"
 msgstr "Δεν ανατέθηκε"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:293
 msgid "Perform Task"
 msgstr "Εκτέλεση εργασίας"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:302
 msgid "You have reached the maximum number of tasks."
 msgstr "Φθάσατε τον μέγιστο αριθμό εργασιών."
 
-#: templates/teams/tasks.html:318
+#: templates/teams/tasks.html:321
 msgid "Download draft"
 msgstr "Μεταφόρτωση προσχεδίου/ draft"
 
-#: templates/teams/tasks.html:332
+#: templates/teams/tasks.html:337
 msgid "Upload a draft"
 msgstr "Ανεβάστε ένα προσχέδιο/draft"
 
-#: templates/teams/tasks.html:335
+#: templates/teams/tasks.html:343 templates/videos/_upload_subtitles.html:32
+msgid "Video Language"
+msgstr "Γλώσσα του Βίντεο"
+
+#: templates/teams/tasks.html:347 templates/videos/_upload_subtitles.html:37
+msgid ""
+"Please double check the primary spoken language. This step cannot be undone."
+msgstr ""
+"Παρακαλούμε, κάντε διπλό κλικ στις βασικές γλώσσες που μιλάτε. Αυτή η "
+"ενέργεια δεν μπορεί να ανακληθεί."
+
+#: templates/teams/tasks.html:354
+msgid "Translate from"
+msgstr "Μετάφραση από τα"
+
+#: templates/teams/tasks.html:363
 msgid "Important:"
 msgstr "Σημαντικό:"
 
-#: templates/teams/tasks.html:335
+#: templates/teams/tasks.html:363
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
@@ -6438,67 +6117,56 @@ msgstr ""
 "βίντεο και της περιγραφής του βίντεο, στο πρόγραμμα επεξεργασίας onsite "
 "editor και προχωρήστε στην υποβολή της τελευταίας έκδοσης."
 
-#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:27
+#: templates/teams/tasks.html:368 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "Γλώσσα"
 
-#: templates/teams/tasks.html:340 templates/videos/_upload_subtitles.html:37
-msgid ""
-"Please double check the primary spoken language. This step cannot be undone."
-msgstr ""
-"Παρακαλούμε, κάντε διπλό κλικ στις βασικές γλώσσες που μιλάτε. Αυτή η "
-"ενέργεια δεν μπορεί να ανακληθεί."
-
-#: templates/teams/tasks.html:345
-msgid "Translate from"
-msgstr "Μετάφραση από τα"
-
-#: templates/teams/tasks.html:350
+#: templates/teams/tasks.html:376
 msgid "File:"
 msgstr "Αρχείο:"
 
-#: templates/teams/tasks.html:353
+#: templates/teams/tasks.html:382
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr ""
 "Αποδεκτές μορφές αρχείου: .srt, .ssa, .sbv, .dfxp, .txt ή .xml (για TTML)"
 
-#: templates/teams/tasks.html:367
+#: templates/teams/tasks.html:395
 msgid "Download a draft"
 msgstr "Κατεβάστε ένα προσχέδιο/ draft"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 "Μεταφορτώστε ένα προσχέδιο/ draft αυτών των υποτίτλων, για να μπορείτε να "
 "δουλέψετε και χωρίς σύνδεση/ offline"
 
-#: templates/teams/tasks.html:398
+#: templates/teams/tasks.html:426
 msgid "Decline"
 msgstr "Απόρριψη"
 
-#: templates/teams/tasks.html:418
+#: templates/teams/tasks.html:446
 msgid "Reassign"
 msgstr "Εκ νέου ανάθεση"
 
-#: templates/teams/tasks.html:420
+#: templates/teams/tasks.html:448
 msgid "Assign"
 msgstr "Ανάθεση"
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:464
 msgid "Delete task"
 msgstr "Διαγραφή εργασίας"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:470
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 "Τι θα θέλατε  να κάνετε με αυτούς τους υπότιτλους για την εργασία αυτή;"
 
-#: templates/teams/tasks.html:445
+#: templates/teams/tasks.html:473
 msgid "Publish these subtitles immediately"
 msgstr "Άμεση δημοσίευση αυτών των υποτίτλων"
 
-#: templates/teams/tasks.html:449
+#: templates/teams/tasks.html:477
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
@@ -6506,11 +6174,11 @@ msgstr ""
 "Μόνιμη διαγραφή αυτών των υποτίτλων (απόρριψη όλων των προσχεδίων/ drafts, "
 "μετά την πιο πρόσφατα δημοσιευμένη έκδοση)"
 
-#: templates/teams/tasks.html:488
+#: templates/teams/tasks.html:516
 msgid "Assign to User"
 msgstr "Ανάθεση στον Χρήστη"
 
-#: templates/teams/tasks.html:498
+#: templates/teams/tasks.html:526
 msgid "Sorry, no tasks here."
 msgstr "Συγγνώμη, δεν υπάρχουν εργασίες εδώ."
 
@@ -6525,10 +6193,6 @@ msgstr "Επεξεργασία Βίντεο"
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
 msgstr "Αυτό το Βίντεο επιτηρείται από την ομάδα"
-
-#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
-msgid "Your Teams"
-msgstr "Οι ομάδες σας"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -6546,11 +6210,15 @@ msgstr "Η ομάδα σας"
 msgid "Private"
 msgstr "Ιδιωτικό"
 
-#: templates/teams/teams-list.html:74
-msgid "No description..."
-msgstr "Χωρίς περιγραφή ..."
+#: templates/teams/teams-list.html:78
+msgid "Role:"
+msgstr ""
 
-#: templates/teams/teams-list.html:81 templates/teams/teams-list.html.py:87
+#: templates/teams/teams-list.html:82
+msgid "leave team"
+msgstr "Εγκατάλειψη ομάδας"
+
+#: templates/teams/teams-list.html:90 templates/teams/teams-list.html.py:96
 #, python-format
 msgid ""
 "\n"
@@ -6569,7 +6237,7 @@ msgstr[1] ""
 "                                        %(count)s Μέλη\n"
 "                                    "
 
-#: templates/teams/teams-list.html:96
+#: templates/teams/teams-list.html:105
 #, python-format
 msgid ""
 "\n"
@@ -6588,23 +6256,19 @@ msgstr[1] ""
 "                                %(count)s videos\n"
 "                            "
 
-#: templates/teams/teams-list.html:107
-msgid "Leave team"
-msgstr "Εγκατάλειψη της ομάδας"
-
-#: templates/teams/teams-list.html:114
+#: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
 msgstr "Συγγνώμη, δεν βρέθηκαν καθόλου ομάδες."
 
-#: templates/teams/teams-list.html:122
+#: templates/teams/teams-list.html:123
 msgid "Search and Filter"
 msgstr "Αναζήτηση και Φιλτράρισμα"
 
-#: templates/teams/teams-list.html:127
+#: templates/teams/teams-list.html:128
 msgid "Start a Team"
 msgstr "Έναρξη μίας Ομάδας"
 
-#: templates/teams/teams-list.html:131
+#: templates/teams/teams-list.html:132
 msgid ""
 "\n"
 "                Want to create your own subtitling team? Contact <a href="
@@ -6638,12 +6302,6 @@ msgstr "οποιουσδήποτε"
 msgid "no"
 msgstr "καθόλου"
 
-#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
-#: templates/videos/subtitle-view.html:48
-#: templates/videos/subtitle-view.html:75
-msgid "subtitles"
-msgstr "υπότιτλους"
-
 #: templates/teams/videos-list.html:73
 msgid "name, a-z"
 msgstr "όνομα, Α-Ω"
@@ -6654,11 +6312,11 @@ msgstr "όνομα, Ω-Α"
 
 #: templates/teams/videos-list.html:79
 msgid "time, newest"
-msgstr ""
+msgstr "χρόνος, νεώτερο"
 
 #: templates/teams/videos-list.html:82
 msgid "time, oldest"
-msgstr ""
+msgstr "χρόνος, παλιότερο"
 
 #: templates/teams/videos-list.html:85
 msgid "most subtitles"
@@ -6724,6 +6382,11 @@ msgstr ""
 #: templates/teams/videos-list.html:142
 msgid "Delete the video entirely."
 msgstr "Διαγράψτε πλήρως το Βίντεο."
+
+#: templates/videos/_diffing-subtitle.html:17
+#: templates/videos/subtitle-view.html:226
+msgid "Not Synced"
+msgstr "Δεν είναι συγχρονισμένα"
 
 #: templates/videos/_error_feedback_form.html:7
 msgid "Please let us know what you were doing when you encountered this error."
@@ -6984,10 +6647,6 @@ msgid ""
 "                "
 msgstr ""
 
-#: templates/videos/_upload_subtitles.html:32
-msgid "Video Language"
-msgstr "Γλώσσα του Βίντεο"
-
 #: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
 msgstr "Μεταφράσθηκε από"
@@ -7055,10 +6714,6 @@ msgstr "Πρωτεύων/Πρωτεύουσα"
 #: templates/videos/_video_url_panel.html:32
 msgid "Make primary"
 msgstr "Κάντετο πρωτεύοντα/ πρωτεύουσα"
-
-#: templates/videos/_video_url_panel.html:44
-msgid "Learn more"
-msgstr "Μάθετε περισσότερα"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
@@ -7235,24 +6890,19 @@ msgstr "Ιστορικό Αναθεώρησης"
 msgid "Comparing Revision"
 msgstr "Σύγκριση εκδόσεων"
 
-#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:160
 msgid "Roll back to version"
 msgstr "Επαναφορά στην έκδοση"
 
-#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr "Τίτλος:"
 
-#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr "Περιγραφή:"
-
-#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
-#: templates/videos/subtitle-view.html:226
-msgid "Not Synced"
-msgstr "Δεν είναι συγχρονισμένα"
 
 #: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
@@ -7564,6 +7214,22 @@ msgstr "Αυτό το έτος"
 msgid "All Time"
 msgstr "Σε όλες τις εποχές"
 
+#: templates/videos/set-original-language.html:10
+msgid "Change video language"
+msgstr ""
+
+#: templates/videos/set-original-language.html:28
+msgid "Choose a language"
+msgstr ""
+
+#: templates/videos/set-original-language.html:30
+msgid "Current language is"
+msgstr ""
+
+#: templates/videos/set-original-language.html:35
+msgid "not set"
+msgstr ""
+
 #: templates/videos/stop_notification.html:9
 #, python-format
 msgid "Notifications to %(u)s stopped for %(video)s."
@@ -7606,12 +7272,12 @@ msgid "Revisions"
 msgstr "Αναθεωρήσεις"
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:380
+#: templates/videos/subtitle-view.html:370
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:395
+#: templates/videos/subtitle-view.html:385
 msgid "Edit Subtitles"
 msgstr "Επεξεργασία υπότιτλων"
 
@@ -7740,13 +7406,6 @@ msgstr ""
 "Σημείωση: Οποιεσδήποτε εξαρτώμενες γλώσσες δεν θα είναι διαθέσιμες μέχρις "
 "ότου επανεγκριθεί αυτή η γλώσσα."
 
-#: templates/videos/subtitle-view.html:368
-msgid ""
-"Yes, delete these subtitles instead of sending them back for editing/review"
-msgstr ""
-"Ναι, διαγράψτε αυτούς τους υπότιτλους, αντί να τους στείλετε πίσω για "
-"επεξεργασία/ αναθεώρηση."
-
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
 msgstr "Το δικό σας e-mail"
@@ -7821,15 +7480,15 @@ msgstr ""
 
 #: templates/videos/video-view.html:143
 msgid "No subtitles yet."
-msgstr ""
+msgstr "Χωρίς υπότιτλους ακόμη."
 
 #: templates/videos/video-view.html:143
 msgid "View tasks for this video."
-msgstr ""
+msgstr "Εμφάνιση εργασιών για το βίντεο αυτό."
 
 #: templates/videos/video-view.html:145
 msgid "This video doesn't have any subtitles or tasks yet"
-msgstr ""
+msgstr "Αυτό το βίντεο δεν έχει ακόμη υπότιτλους ή εργασίες."
 
 #: templates/videos/video-view.html:148 templates/videos/video-view.html:151
 msgid "Be the first to "
@@ -7909,69 +7568,53 @@ msgid "Help Subtitle Videos"
 msgstr "Βοηθείστε στον υποτιτλισμό των Βίντεο"
 
 #: unisubs-integration/api/1_0/forms.py:64
-#, fuzzy
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
-"Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι ένα "
-"προσχέδιο/ draft, για τη γλώσσα αυτή, βρίσκεται, ήδη, υπό επιτήρηση/ "
-"moderation."
 
 #: unisubs-integration/api/1_0/forms.py:99
 #: unisubs-integration/api/1_0/forms.py:102
-#, fuzzy
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
 msgstr ""
-"Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι, σε αυτή τη "
-"γλώσσα, υπάρχει, ήδη, σε εξέλιξη, κάποια δουλειά ."
 
 #: unisubs-integration/api/1_0/forms.py:333
-#, fuzzy
 msgid "Incorrect subtitles encoding format"
-msgstr "Εσφαλμένη μορφή αρχείου υποτίτλων"
+msgstr ""
 
 #: unisubs-integration/apiv2/forms.py:119
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Υποχρεωτικό πεδίο. 30 ή λιγότεροι χαρακτήρες. Μόνο αλφαριθμητικά (γράμματα, "
-"ψηφία και υπόπαυλες)"
 
 #: unisubs-integration/apiv2/forms.py:120
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Αυτή η τιμή πρέπει να περιέχει μόνο γράμματα, αριθμούς και υπόπαυλες."
+msgstr ""
 
 #: unisubs-integration/services/forms.py:16
-#, fuzzy
 msgid "Fidelity"
-msgstr "Πολιτική για τα Βίντεο"
+msgstr ""
 
 #: unisubs-integration/services/forms.py:18
 msgid "Turnaround"
 msgstr ""
 
 #: unisubs-integration/services/forms.py:28
-#, fuzzy
 msgid "Translate to"
-msgstr "Μετάφραση"
+msgstr ""
 
 #: unisubs-integration/services/forms.py:50
 msgid "Request for this translation already exists"
 msgstr ""
 
 #: unisubs-integration/services/forms.py:53
-#, fuzzy
 msgid "Subtitles should be on English"
-msgstr "Δεν υπάρχουν υπότιτλοι."
+msgstr ""
 
 #: unisubs-integration/services/forms.py:80
-#, fuzzy
 msgid "Transcription for this video is already requested."
-msgstr "Ο υποτιτλισμός αυτού του βίντεο βρίσκεται ήδη σε εξέλιξη."
+msgstr ""
 
 #: unisubs-integration/services/forms.py:93
 #, python-format
@@ -7996,29 +7639,24 @@ msgid "transcipt ID returned by speakertext.com"
 msgstr ""
 
 #: unisubs-integration/services/models.py:48
-#, fuzzy
 msgid "result of transcription"
-msgstr "Αλλαγές στην περιγραφή"
+msgstr ""
 
 #: unisubs-integration/services/models.py:50
-#, fuzzy
 msgid "subtitles created from transcription"
 msgstr ""
-"Αυτόματη δημιουργία εργασιών συγχρονισμού και μεταγραφής/ transcription"
 
 #: unisubs-integration/services/views.py:52
 msgid "Request for translation was success."
 msgstr ""
 
 #: unisubs-integration/services/views.py:63
-#, fuzzy
 msgid "This subtitles does not have any version"
-msgstr "Αυτή η ομάδα δεν έχει, ακόμη, καθόλου έργα."
+msgstr ""
 
 #: unisubs-integration/services/views.py:65
-#, fuzzy
 msgid "Subtitles should be in English"
-msgstr "Δεν υπάρχουν υπότιτλοι."
+msgstr ""
 
 #: unisubs-integration/services/views.py:130
 msgid "Request for transcription was successful."
@@ -8029,14 +7667,12 @@ msgid "From"
 msgstr ""
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
-#, fuzzy
 msgid "Result"
-msgstr "Ανάκτηση"
+msgstr ""
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:15
-#, fuzzy
 msgid "Not finished"
-msgstr "Δεν είναι συγχρονισμένα"
+msgstr ""
 
 #: unisubs-integration/servicesauth/views.py:41
 msgid "Could not authorize with TED."
@@ -8083,6 +7719,10 @@ msgstr "Τα βίντεο δεν υπάρχουν."
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
 msgstr "Λάθος URL."
+
+#: utils/templatetags/i18n_tags.py:28
+msgid "name_local"
+msgstr ""
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."

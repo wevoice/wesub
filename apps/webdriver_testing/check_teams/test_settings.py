@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import auth_page
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
@@ -9,38 +8,11 @@ from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember
 
 class TestCaseTeamSettings(WebdriverTestCase):
-    """
-
-        Videos:
-            who can edit
-            who can add
-
-        Projects:
-            add_project.pending
-            edit_project (name / description)
-            delete_project
-        Languages:
-            set preferred languages (auto-task creation)
-            set blacklisted languages 
-                not displayed
-                can't blacklist preferred language
-        Team Details:
-            edit_description
-            edit visibility (public / private)
-            edit logo
-             - too large > 940x235
-
-        Workflows:
-            edit_permissions_join.pending
-            edit_permissions_subtitle.pending
-            edit_permissions_task.pending
-            edit_permissions_translation.pending
-            edit_permissions_video_management.pending
-
-    """
+    """Test suite for managing team settings. """
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseTeamSettings, self).setUp()
+        self.skipTest('Incomplete test suite')
         self.team_dir_pg = TeamsDirPage(self)
         self.team = TeamMemberFactory.create(team__name='Roles Test',
                                              team__slug='roles-test',

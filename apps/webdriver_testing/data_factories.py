@@ -43,7 +43,11 @@ class VideoUrlFactory(factory.Factory):
     FACTORY_FOR = VideoUrl
     type = 'HTML5'
     url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
+    primary=True
+    original=True
     video = factory.SubFactory(VideoFactory)
+    video__title = factory.Sequence(lambda n: ('Test Video %s' % n))
+
 
 
 class UserLangFactory(factory.Factory):
@@ -70,14 +74,34 @@ class TeamMemberFactory(factory.Factory):
 class TeamContributorMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_CONTRIBUTOR
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ContributorUser' + n))
+
 
 class TeamAdminMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_ADMIN
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'AdminUser' + n))
 
 class TeamManagerMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_MANAGER
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ManagerUser' + n))
+
+class TeamOwnerMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_OWNER
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ManagerUser' + n))
+
+
+class TeamManagerMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_MANAGER
+    user = factory.Sequence(lambda n: 'ManagerUser' + n)
+
 
 class TeamVideoFactory(factory.Factory):
     FACTORY_FOR = TeamVideo

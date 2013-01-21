@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-12 00:06-0600\n"
-"PO-Revision-Date: 2012-11-09 07:54+0000\n"
+"POT-Creation-Date: 2013-01-20 00:06-0600\n"
+"PO-Revision-Date: 2013-01-19 06:37+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/sq/)\n"
@@ -19,8 +19,30 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/auth/admin.py:33 templates/profiles/view_profile.html:53
-#: templates/statistic/users_statistic.html:12
+#: apps/accountlinker/models.py:39
+msgid "Subtitles by the Amara.org community"
+msgstr ""
+
+#: apps/accountlinker/models.py:41
+msgid "Help us caption and translate this video on Amara.org"
+msgstr ""
+
+#: apps/accountlinker/views.py:103
+msgid "The user who requested this action doesn't match the current user."
+msgstr ""
+
+#: apps/accountlinker/views.py:140
+msgid ""
+"We couldn't link your account. Have you <a href='https://accounts.google.com/"
+"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
+"create_channel'>set up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:158
+msgid "Account already linked."
+msgstr ""
+
+#: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
 #: unisubs-integration/apiv2/forms.py:118
 msgid "Username"
@@ -55,47 +77,51 @@ msgstr "Email"
 msgid "Hide"
 msgstr "Fshihe"
 
-#: apps/auth/models.py:98
+#: apps/auth/models.py:92 apps/teams/models.py:151
+msgid "third party accounts"
+msgstr "llogari palësh të treta"
+
+#: apps/auth/models.py:101
 msgid "Retired user"
 msgstr "Përdoruesi i tërhequr"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:339
 msgid "Add comment"
 msgstr "Shtoni koment"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:340
 msgid "Start subtitles"
 msgstr "Filloni titrimin"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:341
 msgid "Start translation"
 msgstr "Filloni përkthimin"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:342
 msgid "Edit subtitles"
 msgstr "Përpunoni titra"
 
-#: apps/auth/models.py:337
+#: apps/auth/models.py:343
 msgid "Edit translation"
 msgstr "Përpunoni përkthimin"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:400
 msgid "understand enough"
 msgstr "e kuptoj mjaftueshëm"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:401
 msgid "understand 99%"
 msgstr "e kuptoj 99%"
 
-#: apps/auth/models.py:396
+#: apps/auth/models.py:402
 msgid "write like a native"
 msgstr "e shkuraj si gjuhën amtare"
 
-#: apps/auth/models.py:401
+#: apps/auth/models.py:407
 msgid "follow requests in language"
 msgstr "ndiq kërkesat në gjuhën"
 
-#: apps/auth/models.py:416
+#: apps/auth/models.py:422
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
@@ -103,11 +129,11 @@ msgstr ""
 "Kjo është data kur fillohet të shfaqet lajmërimi. Dhe do të shfaqet vetëm i "
 "fundmi."
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:521
 msgid "e-mail confirmation"
 msgstr "ripohim me e-mail"
 
-#: apps/auth/models.py:516
+#: apps/auth/models.py:522
 msgid "e-mail confirmations"
 msgstr "ripohime me e-mail"
 
@@ -173,7 +199,8 @@ msgid "You should enter subject or message."
 msgstr "Duhet të jepni subjekt ose mesazh."
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
-#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:39
+#: apps/messages/rpc.py:60 apps/profiles/rpc.py:45 apps/teams/rpc.py:33
+#: apps/videos/rpc.py:39
 msgid "You should be authenticated."
 msgstr "Duhet të keni bërë mirëfilltësimin."
 
@@ -291,6 +318,7 @@ msgstr "Hyni me OpenID-në tuaj"
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
+#: templates/teams/_join.html:61
 msgid "Sign in"
 msgstr "Hyni"
 
@@ -307,15 +335,15 @@ msgstr "Nuk keni bërë mirëfilltësimin."
 msgid "Personal message from %(sender)s on universalsubtitles.org"
 msgstr "Mesazh personal prej %(sender)s në universalsubtitles.org"
 
-#: apps/profiles/forms.py:148
+#: apps/profiles/forms.py:158
 msgid "Confirm new password:"
 msgstr "Ripohoni fjalëkalimin e ri:"
 
-#: apps/profiles/forms.py:165
+#: apps/profiles/forms.py:173
 msgid "Invalid password."
 msgstr "Fjalëkalim i pavlefshëm."
 
-#: apps/profiles/forms.py:167
+#: apps/profiles/forms.py:175
 msgid "The two passwords did not match."
 msgstr "Dy fjalëkalimet nuk u përputhën."
 
@@ -323,17 +351,29 @@ msgstr "Dy fjalëkalimet nuk u përputhën."
 msgid "Your email was updated."
 msgstr "Email-i juaj u përditësua."
 
-#: apps/profiles/views.py:62
-msgid ""
-"File server unavailable. Try later. You can edit some other information "
-"without any problem."
-msgstr ""
-"Shërbyesi i kartelave nuk kapet dot. Provoni më vonë. Ca të dhëna të tjera "
-"mund t'i përpunoni pa ndonjë problem."
-
-#: apps/profiles/views.py:147
+#: apps/profiles/views.py:170
 msgid "Your profile has been updated."
 msgstr "Profili juaj u përditësua."
+
+#: apps/profiles/views.py:191
+msgid "Your account has been updated."
+msgstr ""
+
+#: apps/profiles/views.py:242
+msgid "Your photo has been updated."
+msgstr ""
+
+#: apps/profiles/views.py:247
+msgid "picture"
+msgstr ""
+
+#: apps/profiles/views.py:260
+msgid "Your photo has been removed."
+msgstr ""
+
+#: apps/profiles/views.py:336
+msgid "Account deleted."
+msgstr ""
 
 #: apps/search/forms.py:27
 msgid "Relevance"
@@ -395,7 +435,7 @@ msgstr "Statistika parje videoje"
 msgid "Widget view statistic"
 msgstr "Statistika parjeje widget-i"
 
-#: apps/subtitles/forms.py:78 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
@@ -404,35 +444,36 @@ msgstr ""
 "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë puna për këtë gjë është "
 "tashmë në rrugë e sipër."
 
-#: apps/subtitles/forms.py:92
+#: apps/subtitles/forms.py:96
 msgid "The language already exists and is not a translation."
-msgstr ""
+msgstr "Gjuha ekziston tashmë dhe nuk është përkthim."
 
-#: apps/subtitles/forms.py:98
-#, python-format
-msgid "The language already exists as a translation from %s."
-msgstr ""
-
-#: apps/subtitles/forms.py:106
+#: apps/subtitles/forms.py:103
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
+"Na ndjeni, nuk mund të ngarkojmë titra për këtë gjuhë, ngaqë kjo do të "
+"shkaktonte degëzimin e %s përkthimi(eve) të bëra duke u nisur prej tij."
 
-#: apps/subtitles/forms.py:125
+#: apps/subtitles/forms.py:122
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
+"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë një tjetër përdorues është "
+"caktuar tashmë për këtë gjuhë."
 
-#: apps/subtitles/forms.py:132
+#: apps/subtitles/forms.py:129
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
+"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë nuk keni leje të "
+"pretendoni diçka për këtë gjuhë."
 
-#: apps/subtitles/forms.py:143 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:140 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
@@ -440,19 +481,23 @@ msgstr ""
 "Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë po moderohet tashmë një "
 "skicë për këtë gjuhë."
 
-#: apps/subtitles/forms.py:156
+#: apps/subtitles/forms.py:152
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
 msgstr ""
+"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë kjo gjuhë moderohet dhe "
+"nuk keni leje të mjaftueshme të transkriptoni titra."
 
-#: apps/subtitles/forms.py:164
+#: apps/subtitles/forms.py:160
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
+"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë kjo gjuhë moderohet dhe "
+"nuk keni leje të përktheni titra."
 
-#: apps/subtitles/forms.py:177 apps/teams/forms.py:740
+#: apps/subtitles/forms.py:173
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -460,22 +505,22 @@ msgstr ""
 "Na ndjeni, nuk e ngarkuam dot kartelën tuaj ngaqë numri i rreshtave në "
 "përkthimin tuaj ({0}) nuk përputhet me atë të origjinalit ({1})."
 
-#: apps/subtitles/forms.py:188
+#: apps/subtitles/forms.py:184
 #, python-format
 msgid "File size must be less than %d kb."
-msgstr ""
+msgstr "Madhësia e kartelës duhet të jetë më e vogël se %d kb."
 
-#: apps/subtitles/forms.py:196
+#: apps/subtitles/forms.py:192
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
-msgstr ""
+msgstr "Format i pambuluar. Ju lutemi, ngarkoni një nga sa vijon: %s"
 
-#: apps/subtitles/forms.py:203 apps/teams/forms.py:648 apps/videos/forms.py:63
-#: apps/videos/forms.py:84 unisubs-integration/api/1_0/forms.py:325
+#: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Nuk zbulohet dot kodimi i kartelës"
 
-#: apps/subtitles/forms.py:226 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Dikush po krijon titra për këtë video pikërisht tani. Provoni më vonë."
 
@@ -509,21 +554,21 @@ msgstr "Ekip"
 msgid "User"
 msgstr "Përdorues"
 
-#: apps/teams/forms.py:57 apps/teams/forms.py:165
+#: apps/teams/forms.py:54 apps/teams/forms.py:162
 #: libs/rosetta/templates/rosetta/languages.html:12
-#: templates/teams/_context_team.html:65
+#: templates/teams/_context_team.html:72
 msgid "Project"
 msgstr "Projekt"
 
-#: apps/teams/forms.py:61 apps/teams/forms.py:169
+#: apps/teams/forms.py:58 apps/teams/forms.py:166
 msgid "Let's keep things tidy, shall we?"
 msgstr "Le ta mbajmë pastër vendin, hë?"
 
-#: apps/teams/forms.py:151
+#: apps/teams/forms.py:148
 msgid "Video URL"
 msgstr "URL Videoje"
 
-#: apps/teams/forms.py:152
+#: apps/teams/forms.py:149
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also "
 "browse the site and use the 'Add Video to Team' menu."
@@ -532,28 +577,28 @@ msgstr ""
 "in tonë. Mundeni gjithashtu të shfletoni site0in dhe të përdorni menunë "
 "'Shtoni Video te Ekipi'."
 
-#: apps/teams/forms.py:160
+#: apps/teams/forms.py:157
 msgid "Video language"
 msgstr "Gjuhë videoje"
 
-#: apps/teams/forms.py:162
+#: apps/teams/forms.py:159
 msgid "It will be saved only if video does not exist in our database."
 msgstr ""
 "Do të ruhet vetëm nëse videoja nuk gjendet në bazën tonë të të dhënave."
 
-#: apps/teams/forms.py:216
+#: apps/teams/forms.py:213
 msgid "This video already belongs to a team."
 msgstr "Kjo video i përket tashmë një ekipi."
 
-#: apps/teams/forms.py:222
+#: apps/teams/forms.py:219
 msgid "Set original language for this video."
 msgstr "Caktoni gjuhën origjinale për këtë video."
 
-#: apps/teams/forms.py:261
+#: apps/teams/forms.py:258
 msgid "Team intro video URL"
 msgstr "URL videoje hyrëse për ekipin"
 
-#: apps/teams/forms.py:263
+#: apps/teams/forms.py:260
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -565,126 +610,110 @@ msgstr ""
 "Jepni lidhjen e çfarëdo videoje të përputhshme, ose të një faqeje videosh te "
 "site-i ynë."
 
-#: apps/teams/forms.py:268
+#: apps/teams/forms.py:265
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "URL ekipi: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:313
+#: apps/teams/forms.py:310
 msgid "This video has already been transcribed."
 msgstr "Kjo video është transkriptuar tashmë."
 
-#: apps/teams/forms.py:318
-msgid "Subtitling of this video is already in progress."
-msgstr "Titrimi i kësaj videoje është tashmë në punë e sipër."
-
-#: apps/teams/forms.py:323
+#: apps/teams/forms.py:316
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr ""
 "Askush nuk e ka transkriptuar ende këtë video, ndaj nuk mund të përkthehet."
 
-#: apps/teams/forms.py:330
+#: apps/teams/forms.py:323
 msgid "This language already has a complete set of subtitles."
 msgstr "Për këtë gjuhë ka tashmë një grup të plotë titrash."
 
-#: apps/teams/forms.py:342
+#: apps/teams/forms.py:336
 msgid "This language for this video does not exist or doesn't have a version."
 msgstr "Kjo gjuhë për këtë video nuk ekziston ose nuk ka një version."
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:353
 msgid "There is already a task in progress for that video/language."
 msgstr "Ka tashmë në përmbushje e sipër një punë për këtë video/gjuhë."
 
-#: apps/teams/forms.py:365
+#: apps/teams/forms.py:359
 #, python-format
 msgid "You must select a language for a %s task."
 msgstr "Duhet të përzgjidhni një gjuhë për akt %s."
 
-#: apps/teams/forms.py:400
+#: apps/teams/forms.py:394
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr "Këtij përdoruesi i është caktuar numri maksimum i punëve."
 
-#: apps/teams/forms.py:422
+#: apps/teams/forms.py:416
 msgid "You do not have permission to assign this task."
 msgstr "Nuk keni leje të caktoni këtë punë."
 
-#: apps/teams/forms.py:429
+#: apps/teams/forms.py:423
 msgid "This user cannot perform that task."
 msgstr "Ky përdorues nuk mund të bëjë këtë punë."
 
-#: apps/teams/forms.py:450
+#: apps/teams/forms.py:444
 msgid "You do not have permission to delete this task."
 msgstr "Nuk keni leje ta fshini këtë punë."
 
-#: apps/teams/forms.py:507
+#: apps/teams/forms.py:501
 msgid "You cannot blacklist a preferred language."
-msgstr ""
+msgstr "Nuk mund të kaloni në listën e zezë një gjuhë të parapëlqyer."
 
-#: apps/teams/forms.py:529 apps/teams/forms.py:531
+#: apps/teams/forms.py:523 apps/teams/forms.py:525
 msgid "User does not exist!"
 msgstr "Përdoruesi nuk ekziston!"
 
-#: apps/teams/forms.py:538
+#: apps/teams/forms.py:532
 msgid "User is already a member of this team!"
 msgstr "Përdoruesi është tashmë anëtar i këtij ekipi!"
 
-#: apps/teams/forms.py:543
+#: apps/teams/forms.py:537
 msgid "User has already been invited and has not replied yet."
 msgstr "Përdoruesi është ftuar tashmë dhe nuk është përgjigjur ende."
 
-#: apps/teams/forms.py:567 templates/videos/subtitle-view.html:365
+#: apps/teams/forms.py:561
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Doni të fshihen plotësisht këto titra?"
 
-#: apps/teams/forms.py:571 templates/videos/subtitle-view.html:350
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:350
 msgid "What would you like to unpublish?"
 msgstr "Çfarë do të donit të çbotohet?"
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:567
 msgid "This version (and any later version) for this language."
 msgstr "Këtë version (dhe çfarë versioni të mëvonshëm) për këtë gjuhë."
 
-#: apps/teams/forms.py:574
+#: apps/teams/forms.py:568
 msgid "All versions for this language and any dependent languages."
 msgstr "Krejt versionet për këtë gjuhë dhe çfarëdo gjuhe të varur prej saj."
 
-#: apps/teams/forms.py:592
+#: apps/teams/forms.py:586
 msgid "These subtitles are not under a team's control."
 msgstr "Këto titra nuk janë nën kontrollin e ndonjë ekipi."
 
-#: apps/teams/forms.py:596
+#: apps/teams/forms.py:590
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "Nuk keni leje të çbotoni këto titra."
 
-#: apps/teams/forms.py:615
+#: apps/teams/forms.py:607
 msgid "You cannot perform that task."
 msgstr "Nuk mund ta kryeni këtë punë."
 
-#: apps/teams/forms.py:627
-msgid "Invalid language to translate from."
-msgstr "Gjuhë e pavlefshme për përkthime prej saj."
-
-#: apps/teams/forms.py:636 apps/videos/forms.py:58 apps/videos/forms.py:76
-msgid "File size should be less {0} kb"
-msgstr "Madhësia e kartelës duhet të jetë më e vogël {0} kb"
-
-#: apps/teams/forms.py:641
-#, python-format
-msgid "Incorrect format. Upload %s"
-msgstr "Format i pasaktë. Ngarkoni %s"
-
-#: apps/teams/forms.py:661 apps/videos/forms.py:86
-#: unisubs-integration/api/1_0/forms.py:316
-#: unisubs-integration/api/1_0/forms.py:328
-msgid "Incorrect subtitles format"
-msgstr "Format i pasaktë titrash"
-
-#: apps/teams/forms.py:734
-msgid ""
-"Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
-"the previous version ({1})."
+#: apps/teams/forms.py:610
+msgid "Mismatched video and task!"
 msgstr ""
-"Na ndjeni, nuk e ngarkojmë dot kartelën tuaj, ngaqë ka më pak rreshta ({0}) "
-"se sa versioni i mëparshëm ({1})."
+
+#: apps/teams/forms.py:621
+msgid "The selected language does not match the task."
+msgstr ""
+
+#: apps/teams/forms.py:629
+#, python-format
+msgid ""
+"The selected source language %(from_code)s does not match the existing "
+"source language %(cur_code)s for that task."
+msgstr ""
 
 #: apps/teams/models.py:108
 msgid "Open"
@@ -718,11 +747,11 @@ msgstr "Përgjegjësa dhe administratorë"
 msgid "Admins only"
 msgstr "Vetëm administratorë"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2563
+#: apps/teams/models.py:141 apps/teams/models.py:2625
 msgid "name"
 msgstr "emër"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2564
+#: apps/teams/models.py:142 apps/teams/models.py:2626
 msgid "slug"
 msgstr "identifikues"
 
@@ -755,10 +784,6 @@ msgstr "video"
 #: apps/teams/models.py:148
 msgid "users"
 msgstr "përdoruesa"
-
-#: apps/teams/models.py:151
-msgid "third party accounts"
-msgstr "llogari palësh të treta"
 
 #: apps/teams/models.py:154
 msgid "applicants"
@@ -812,8 +837,8 @@ msgstr "maksimum punësh për anëtar"
 msgid "task expiration (days)"
 msgstr "skadim pune (në ditë)"
 
-#: apps/teams/models.py:202 templates/profiles/_top_user_panel.html:32
-#: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
+#: apps/teams/models.py:202 templates/profiles/base.html:56
+#: templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Ekipe"
 
@@ -838,20 +863,20 @@ msgstr "Lyp ndihmë me krejt gjuhët"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Nëse i vini shenjë kësaj, gjuhët e tjera nuk do të shfaqen."
 
-#: apps/teams/models.py:940 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:944 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Pronar"
 
-#: apps/teams/models.py:941 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:945 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Përgjegjës"
 
-#: apps/teams/models.py:942 apps/teams/permissions_const.py:44
-#: templates/base.html:118
+#: apps/teams/models.py:946 apps/teams/permissions_const.py:44
+#: templates/base.html:130
 msgid "Admin"
 msgstr "Admin"
 
-#: apps/teams/models.py:943 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:947 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Kontribues"
 
@@ -867,7 +892,7 @@ msgstr "Ekipi nuk ekziston"
 msgid "You are already a member of this team."
 msgstr "Jeni tashmë anëtar i këtij ekipi."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:911
+#: apps/teams/rpc.py:50 apps/teams/views.py:938
 msgid "You are now a member of this team."
 msgstr "Tani jeni anëtar i këtij ekipi."
 
@@ -936,21 +961,22 @@ msgstr "Nuk mund t'ia jepni atë rol atij përdoruesi."
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Video të reja nga %(team)s gati për titrim!"
 
-#: apps/teams/views.py:129 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:133 templates/profiles/edit.html:20
+#: templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Emër"
 
-#: apps/teams/views.py:130 templates/teams/teams-list.html:47
+#: apps/teams/views.py:134 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Më të reja"
 
-#: apps/teams/views.py:131 templates/teams/teams-list.html:44
+#: apps/teams/views.py:135 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Shumica e Anëtarëve"
 
-#: apps/teams/views.py:174
+#: apps/teams/views.py:178
 #, python-format
 msgid ""
 "\n"
@@ -985,190 +1011,182 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:200
+#: apps/teams/views.py:204
 msgid "You do not have permission to delete this team."
 msgstr "Nuk keni leje ta fshini këtë ekip."
 
-#: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
-#: apps/teams/views.py:1607
+#: apps/teams/views.py:218 apps/teams/views.py:260 apps/teams/views.py:288
+#: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1737
+#: apps/teams/views.py:1753
 msgid "You do not have permission to edit this team."
 msgstr "Nuk keni leje të përpunoni këtë ekip."
 
-#: apps/teams/views.py:243 apps/teams/views.py:303 apps/teams/views.py:388
+#: apps/teams/views.py:247 apps/teams/views.py:307 apps/teams/views.py:392
 msgid "Settings saved."
 msgstr "Rregullimet u ruajtën."
 
-#: apps/teams/views.py:269
+#: apps/teams/views.py:273
 msgid "Guidelines and messages updated."
 msgstr "U përditësuan udhëzuesit dhe mesazhet."
 
-#: apps/teams/views.py:536
+#: apps/teams/views.py:551
 msgid "You can't add that video to this team/project."
 msgstr "Nuk mund ta shtoni këtë video te ky ekip/projekt."
 
-#: apps/teams/views.py:573
+#: apps/teams/views.py:588
 msgid "The video has been moved to the new team."
 msgstr "Kjo video është kaluar te ekipi i ri."
 
-#: apps/teams/views.py:586
+#: apps/teams/views.py:601
 msgid "You can't add videos to this team/project."
 msgstr "Nuk mund të shtoni video te ky ekip/projekt."
 
-#: apps/teams/views.py:604
+#: apps/teams/views.py:619
 msgid "You can't edit this video."
 msgstr "S&#8217;mund ta përpunoni këtë video. "
 
-#: apps/teams/views.py:613
+#: apps/teams/views.py:628
 msgid "Video has been updated."
 msgstr "Videoja u përditësua."
 
-#: apps/teams/views.py:641
+#: apps/teams/views.py:656
 msgid "Request must be a POST request."
 msgstr "Kërkesa duhet të jetë një kërkesë POST."
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:664
 msgid "You can't delete that video."
 msgstr "S&#8217;mund ta fshini këtë video."
 
-#: apps/teams/views.py:653
+#: apps/teams/views.py:668
 msgid "You can't remove that video."
 msgstr "S&#8217;mund të hiqni këtë video."
 
-#: apps/teams/views.py:665
+#: apps/teams/views.py:680
 msgid "Video has been deleted from Amara."
 msgstr "Videoja është fshirë nga Amara."
 
-#: apps/teams/views.py:668
+#: apps/teams/views.py:683
 msgid "Video has been removed from the team."
 msgstr "Videoja është hequr nga ekipi."
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:817
 msgid "Member has been removed from the team."
 msgstr "Anëtari është hequr nga ekipi."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:820
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Përdorni butonin \"Braktiseni këtë ekip\" që të hiqni veten prej këtij ekipi."
 
-#: apps/teams/views.py:796
+#: apps/teams/views.py:823
 msgid "You don't have permission to remove this member from the team."
 msgstr "Nuk keni leje ta hiqni këtë anëtar nga ekipi?"
 
-#: apps/teams/views.py:830
+#: apps/teams/views.py:857
 msgid "Application approved."
 msgstr "Kërkesa u miratua."
 
-#: apps/teams/views.py:832 apps/teams/views.py:853
+#: apps/teams/views.py:859 apps/teams/views.py:880
 msgid "Application does not exist."
 msgstr "Kërkesa nuk ekziston."
 
-#: apps/teams/views.py:834 apps/teams/views.py:855
+#: apps/teams/views.py:861 apps/teams/views.py:882
 msgid "Application already processed."
 msgstr "Aplikim tashmë i shqyrtuar."
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:863
 msgid "You can't approve applications."
 msgstr "Nuk mund miratoni aplikime."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:878
 msgid "Application denied."
 msgstr "Kërkesa u mohua."
 
-#: apps/teams/views.py:857
+#: apps/teams/views.py:884
 msgid "You can't deny applications."
 msgstr "Nuk mund të hidhni poshtë aplikime."
 
-#: apps/teams/views.py:867
+#: apps/teams/views.py:894
 msgid "You cannot invite people to this team."
 msgstr "Nuk mund të ftoni njerëz në këtë ekip."
 
-#: apps/teams/views.py:898
+#: apps/teams/views.py:925
 msgid "This invite is no longer valid"
 msgstr "Kjo ftesë nuk nuk vlen më"
 
-#: apps/teams/views.py:907
+#: apps/teams/views.py:934
 msgid "You cannot join this team."
 msgstr "Nuk mund të bëheni pjesë e këtij ekipi."
 
-#: apps/teams/views.py:961
+#: apps/teams/views.py:988
 msgid "You have left this team."
 msgstr "E braktisët këtë ekip."
 
-#: apps/teams/views.py:1017
+#: apps/teams/views.py:1044
 msgid "Member saved."
 msgstr "Anëtari u ruajt."
 
-#: apps/teams/views.py:1151
+#: apps/teams/views.py:1293
 msgid "You cannot view this team's tasks."
 msgstr "Nuk mund të shihni punët e caktuara në këtë ekip."
 
-#: apps/teams/views.py:1310 apps/teams/views.py:1313
+#: apps/teams/views.py:1469 apps/teams/views.py:1472
 msgid "You are not allowed to perform this task."
 msgstr "Nuk ju është lejuar kryerja e këtij veprimi."
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1529
 msgid "Task deleted."
 msgstr "Puna u fshi."
 
-#: apps/teams/views.py:1370
+#: apps/teams/views.py:1531
 msgid "You cannot delete this task."
 msgstr "Nuk mund ta fshini këtë punë."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1556
 msgid "Task declined."
 msgstr "Puna u hodh poshtë."
 
-#: apps/teams/views.py:1397
+#: apps/teams/views.py:1558
 msgid "Task assigned."
 msgstr "Puna u caktua."
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1560
 msgid "You cannot assign this task."
 msgstr "Nuk mund ta caktoni këtë punë."
 
-#: apps/teams/views.py:1421
-msgid "Invalid assignment attempt."
-msgstr "Përpjekje e pavlefshme caktimi."
-
-#: apps/teams/views.py:1446
+#: apps/teams/views.py:1596
 msgid "Draft uploaded successfully."
 msgstr "Skica u ngarkua me sukses."
 
-#: apps/teams/views.py:1450
-msgid "/n"
-msgstr "/n"
-
-#: apps/teams/views.py:1468
+#: apps/teams/views.py:1613
 msgid "You are not allowed to download this transcript."
 msgstr "Nuk ju lejohet ta shkarkoni këtë transkript."
 
-#: apps/teams/views.py:1519
+#: apps/teams/views.py:1664
 msgid "There's already a project with this name"
 msgstr "Ka tashmë një projekt me këtë emër"
 
-#: apps/teams/views.py:1531
+#: apps/teams/views.py:1676
 msgid "Project added."
 msgstr "Projekti u shtua."
 
-#: apps/teams/views.py:1548
+#: apps/teams/views.py:1693
 msgid "You cannot edit that project."
 msgstr "Nuk mund ta përpunoni këtë projekt."
 
-#: apps/teams/views.py:1559
+#: apps/teams/views.py:1704
 msgid "Project deleted."
 msgstr "Projekti u fshi."
 
-#: apps/teams/views.py:1577
+#: apps/teams/views.py:1722
 msgid "Project saved."
 msgstr "Projekti u ruajt."
 
-#: apps/teams/views.py:1617
+#: apps/teams/views.py:1763
 msgid "Successfully synced subtitles."
 msgstr "Titrat u sinkronizuan me sukses."
 
-#: apps/teams/views.py:1721
+#: apps/teams/views.py:1867
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1176,11 +1194,11 @@ msgstr ""
 "Kërkesë e pavlefshme çbotimi.\n"
 "Gabime:\n"
 
-#: apps/teams/views.py:1755
+#: apps/teams/views.py:1898
 msgid "Successfully unpublished subtitles."
 msgstr "Titrat u çbotuan me sukses."
 
-#: apps/teams/templatetags/teams_tags.py:260
+#: apps/teams/templatetags/teams_tags.py:261
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)s"
@@ -1189,19 +1207,29 @@ msgstr "A mundet dikush të më ndihmojë në titrimin e këtyre videove? %(url)
 msgid "File should have txt format"
 msgstr "Kartela duhet të jetë në format .txt"
 
+#: apps/videos/forms.py:58 apps/videos/forms.py:76
+msgid "File size should be less {0} kb"
+msgstr "Madhësia e kartelës duhet të jetë më e vogël {0} kb"
+
 #: apps/videos/forms.py:67
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Nuk kodohet dot kartela. Duhet të jetë nën kodimin utf8."
 
-#: apps/videos/forms.py:79
-msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
-msgstr "Format i pasaktë. Ngarkoni .srt, .ssa, .sbv ose .xml (formati TTML)"
+#: apps/videos/forms.py:80
+#, python-format
+msgid "Incorrect format. Upload .%s "
+msgstr ""
 
-#: apps/videos/forms.py:112 apps/videos/forms.py:196 utils/validators.py:38
+#: apps/videos/forms.py:89 unisubs-integration/api/1_0/forms.py:316
+#: unisubs-integration/api/1_0/forms.py:328
+msgid "Incorrect subtitles format"
+msgstr "Format i pasaktë titrash"
+
+#: apps/videos/forms.py:113 apps/videos/forms.py:198 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Kjo URL duket se është lidhje e dëmtuar."
 
-#: apps/videos/forms.py:118 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:119 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1214,11 +1242,11 @@ msgstr ""
 "ose nëse mendoni se ka ndonjë gabim, <a\n"
 "href=\"mailto:%s\">na shkruani</a>!"
 
-#: apps/videos/forms.py:129
+#: apps/videos/forms.py:130
 msgid "You have not permission add video URL for this video"
 msgstr "Nuk keni leje për shtim URL-sh videoje për këtë video"
 
-#: apps/videos/forms.py:181
+#: apps/videos/forms.py:183
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1229,7 +1257,7 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka "
 "ndonjë problem."
 
-#: apps/videos/forms.py:184 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:186 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1247,33 +1275,33 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka ndonjë "
 "problem."
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Youtube usernames"
 msgstr "Emra përdoruesish Youtube-i"
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Enter usernames separated by comma."
 msgstr "Emrat e përdoruesve jepini ndarë me presje."
 
-#: apps/videos/forms.py:213
+#: apps/videos/forms.py:215
 msgid "Youtube page link."
 msgstr "Lidhje faqeje Youtube."
 
-#: apps/videos/forms.py:214
+#: apps/videos/forms.py:216
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Për shembull: http://www.youtube.com/përdorues/emër_përdoruesi"
 
-#: apps/videos/forms.py:215
+#: apps/videos/forms.py:217
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Mbulohen: Youtube, Vimeo, ose Dailymotion. U shtuan vetëm site-et që "
 "mbulohen."
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid "Save feed"
 msgstr "Ruaje prurjen"
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1281,7 +1309,7 @@ msgstr ""
 "Zgjidhni këtë nëse dëshironi të shtoni në të ardhmen video prej kësaj "
 "prurjeje. Do të ruhen vetëm prurje RSS funksionale."
 
-#: apps/videos/forms.py:259
+#: apps/videos/forms.py:261
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1289,7 +1317,7 @@ msgstr ""
 "Na ndjeni, te URL-ja që dhatë nuk gjetëm dot një prurje të vlefshme. Ju "
 "lutemi, kontrolloni URL-në dhe riprovoni."
 
-#: apps/videos/forms.py:264
+#: apps/videos/forms.py:266
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
@@ -1297,27 +1325,27 @@ msgstr ""
 "Videot po shtohen në prapaskenë. Nëse jeni i futur, do të merrni një mesazh "
 "kur kjo të ketë mbaruar."
 
-#: apps/videos/forms.py:276
+#: apps/videos/forms.py:278
 msgid "captcha"
 msgstr "captcha"
 
-#: apps/videos/models.py:139
+#: apps/videos/models.py:137
 msgid "in seconds"
 msgstr "në sekonda"
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:161
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:163
 msgid "Widget views"
 msgstr "Parje widget-i"
 
-#: apps/videos/models.py:167
+#: apps/videos/models.py:165
 msgid "Views"
 msgstr "Parje"
 
-#: apps/videos/models.py:1147
+#: apps/videos/models.py:1153
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1325,7 +1353,7 @@ msgstr ""
 "Na ndjeni, nuk mund të ngarkoni titra këtë çast, ngaqë dikush po përpunon "
 "gjuhën për të cilën po ngarkoni ose një përkthim në të."
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:2006
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1334,7 +1362,7 @@ msgstr ""
 "  shqyrtoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:2011
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1343,7 +1371,7 @@ msgstr ""
 "  pranoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:2016
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1352,7 +1380,7 @@ msgstr ""
 "  hodhi tej titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2021
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1361,7 +1389,7 @@ msgstr ""
 "  miratoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2026
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1370,32 +1398,33 @@ msgstr ""
 "  nuk i pranoi titrat në <a href=\"%(language_url)s\">%(language)s</a> për "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2043
+#: apps/videos/models.py:2032
 #, python-format
-msgid "  deleted video \"%(title)s\""
-msgstr "  fshiu videon \"%(title)s\""
+msgid "  deleted a video: \"%(title)s\""
+msgstr ""
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2037
 #, python-format
-msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "shtoi videon <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgid ""
+"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgstr ""
 
-#: apps/videos/models.py:2050
+#: apps/videos/models.py:2039
 #, python-format
-msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
-msgstr "U shtua videoja <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
+msgstr ""
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2045
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "ndryshoi titullin për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2058
+#: apps/videos/models.py:2047
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Ndryshoi titulli për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2061
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1404,7 +1433,7 @@ msgstr ""
 "komentoi te <a href=\"%(comments_url)s\">titrat në %(language)s</a> për <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2075
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1413,17 +1442,17 @@ msgstr ""
 "U shtua koment për <a href=\"%(comments_url)s\">titrat në %(language)s</a> "
 "për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2066
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "komentoi te <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2080
+#: apps/videos/models.py:2068
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "U shtuan komente për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2076
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1432,7 +1461,7 @@ msgstr ""
 "filloi <a href=\"%(language_url)s\">titrimin në %(language)s</a> për <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2090
+#: apps/videos/models.py:2078
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1441,7 +1470,7 @@ msgstr ""
 "u filluan <a href=\"%(language_url)s\">titra në %(language)s</a> për <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2086
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1450,7 +1479,7 @@ msgstr ""
 "përpunoi <a href=\"%(language_url)s\">titrat në %(language)s</a> për <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2103
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1459,27 +1488,27 @@ msgstr ""
 "u përpunuan <a href=\"%(language_url)s\">titrat në %(language)s</a> për <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2094
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "shtoi URL të re për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2111
+#: apps/videos/models.py:2096
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "U shtua URL e re për <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2116
+#: apps/videos/models.py:2101
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "u bë pjesë e ekipit %(team)s me rolin %(role)s"
 
-#: apps/videos/models.py:2121
+#: apps/videos/models.py:2106
 #, python-format
 msgid "left the %s team"
 msgstr "e la ekipin %s"
 
-#: apps/videos/models.py:2135
+#: apps/videos/models.py:2120
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
@@ -1488,80 +1517,80 @@ msgstr ""
 "  ndërroi url-në parësore nga <a href=\"%(old_url)s\">%(old_url)s</a> në <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 
-#: apps/videos/models.py:2141
+#: apps/videos/models.py:2126
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr "  fshiu url-në <a href=\"%(title)s\">%(title)s</a>"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2204
 msgid "add video"
 msgstr "shtoni video"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2205
 msgid "change title"
 msgstr "ndryshoji titullin"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2206
 msgid "comment"
 msgstr "koment"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2207
 msgid "add version"
 msgstr "shtoni version"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2208
 msgid "add translation"
 msgstr "shtoni përkthim"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2209
 msgid "add video url"
 msgstr "shtoni url videoje"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2210
 msgid "request subtitles"
 msgstr "kërkoni titra"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2211
 msgid "approve version"
 msgstr "miratoje versionin"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2212
 msgid "add contributor"
 msgstr "shtoni pjesëmarrës"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2213
 msgid "remove contributor"
 msgstr "hiqe kontribuesin"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2214
 msgid "reject version"
 msgstr "hidhe tej versionin"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2215
 msgid "review version"
 msgstr "shqyrtoni versionin"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2216
 msgid "accept version"
 msgstr "pranojeni versionin"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2217
 msgid "decline version"
 msgstr "hidheni poshtë versionin"
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2218
 msgid "delete video"
 msgstr "fshije videon"
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2219
 msgid "edit url"
 msgstr "përpunojeni url-në"
 
-#: apps/videos/models.py:2229
+#: apps/videos/models.py:2220
 msgid "delete url"
 msgstr "fshije url-ne"
 
-#: apps/videos/models.py:2487
+#: apps/videos/models.py:2478
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1657,7 +1686,7 @@ msgstr "Hej-- sapo u gjetën titra në %(language)s për %(video_title)s: %(url)
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Sapo u gjet një version i kësaj video me titra në %(language_name)s"
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:176
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1669,7 +1698,7 @@ msgstr ""
 "shtim ose\n"
 "përmirësim titrash, klikoni butonin nën videon."
 
-#: apps/videos/views.py:179
+#: apps/videos/views.py:184
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
@@ -1679,33 +1708,40 @@ msgstr ""
 "                që shërbehet përmes protokollit http.  Shfletuesi juaj mund\n"
 "                të shfaqë sinjalizime jo të qarta mbi lëndën."
 
-#: apps/videos/views.py:184
+#: apps/videos/views.py:189
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Titrat e tanishëm do të importohen brenda pak minutash."
 
-#: apps/videos/views.py:288
+#: apps/videos/views.py:297
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr ""
+"Faleminderit për ngarkimin. Do të kalojë një minutë e ca, para se titrat të "
+"duken."
 
-#: apps/videos/views.py:595
+#: apps/videos/views.py:613
 msgid "You have not permission change this URL"
 msgstr "Nuk keni leje për ndryshimin e kësaj URL-je"
 
-#: apps/videos/views.py:600 apps/videos/views.py:631
+#: apps/videos/views.py:618 apps/videos/views.py:649
 msgid "Object does not exist"
 msgstr "Objekti nuk ekziston"
 
-#: apps/videos/views.py:615
+#: apps/videos/views.py:633
 msgid "You have not permission delete this URL"
 msgstr "Nuk keni leje për fshirjen e kësaj URL-je"
 
-#: apps/videos/views.py:619
+#: apps/videos/views.py:637
 msgid "You can't remove primary URL"
 msgstr "Nuk mund të hiqni URL-në origjinale"
 
-#: apps/videos/feed_parser/__init__.py:107
+#: apps/videos/views.py:791
+#, python-format
+msgid "The language for %s has been changed"
+msgstr ""
+
+#: apps/videos/feed_parser/__init__.py:111
 msgid "Feed is unavailable now."
 msgstr "Prurja nuk funksionoka tani."
 
@@ -1724,11 +1760,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka "
 "ndonjë problem."
 
-#: apps/videos/types/youtube.py:43
+#: apps/videos/types/youtube.py:46
 msgid "Private video"
 msgstr "Video private"
 
-#: apps/videos/types/youtube.py:44
+#: apps/videos/types/youtube.py:47
 msgid "Undefined error"
 msgstr "Gabim i papërcaktuar"
 
@@ -1757,11 +1793,11 @@ msgstr ""
 "Na ndjeni, nuk keni leje të përpunoni këta titra. Nëse besoni se kanë nevojë "
 "për ndreqje, ju lutemi, lidhuni me përgjejgësin e ekipit."
 
-#: apps/widget/rpc.py:1094 apps/widget/rpc.py:1135
+#: apps/widget/rpc.py:1100 apps/widget/rpc.py:1142
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:145
+#: apps/widget/views.py:143
 msgid "That task has already been completed."
 msgstr "Kjo punë është kryer një herë."
 
@@ -1792,7 +1828,7 @@ msgid "Third party"
 msgstr "Palë e tretë"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:56
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:61
 msgid "All"
 msgstr "Krejt"
 
@@ -1801,14 +1837,13 @@ msgid "Progress"
 msgstr " Përparim"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
-#: templates/messages/new.html:14 templates/messages/sent.html:24
-#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
+#: templates/profiles/_top_user_panel.html:24
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
 msgstr "Mesazhe"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
-#: templates/teams/settings-permissions.html:72
+#: templates/teams/settings-permissions.html:53
 msgid "Translated"
 msgstr "Të përkthyera"
 
@@ -1906,7 +1941,7 @@ msgid "Go"
 msgstr "Shko te"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:207 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:212 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
 msgstr "Origjinali"
@@ -1957,11 +1992,11 @@ msgstr[1] "%(hits)s/%(message_number)s mesazhe"
 
 #: templates/_paginator.html:4 templates/_paginator.html.py:6
 msgid "Previous"
-msgstr "I mëparshmi"
+msgstr "E mëparshmja"
 
 #: templates/_paginator.html:28 templates/_paginator.html.py:30
 msgid "Next"
-msgstr "Pasuesi"
+msgstr "Pasuesja"
 
 #: templates/_share_widget.html:4
 msgid "Share your subtitles"
@@ -1978,19 +2013,19 @@ msgstr ""
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_project.html:62
-#: templates/teams/_context_team.html:95
+#: templates/teams/_context_team.html:116
 msgid "Post to Facebook"
 msgstr "Postoje në Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:63
-#: templates/teams/_context_team.html:96
+#: templates/teams/_context_team.html:117
 msgid "Post to Twitter"
 msgstr "Postoje në Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:64
-#: templates/teams/_context_team.html:97
+#: templates/teams/_context_team.html:118
 msgid "Email to friends"
 msgstr "Dërgojuani miqve me email"
 
@@ -2003,7 +2038,7 @@ msgid "Permalink"
 msgstr "Permalidhje"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
+#: templates/teams/_context_team.html:114
 msgid "Share"
 msgstr "Ndajeni Me të Tjerët"
 
@@ -2196,9 +2231,8 @@ msgstr ""
 "        "
 
 #: templates/base.html:9
-msgid ""
-"Universal subtitling: caption, translate, subtitle and transcribe video."
-msgstr "Titrime universale: transkriptoni, titroni dhe përktheni video."
+msgid "Caption, translate, subtitle and transcribe video."
+msgstr ""
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
@@ -2224,46 +2258,67 @@ msgstr "Ndihmë"
 msgid "Sign in / Sign up"
 msgstr "Hyni / Regjistrohuni"
 
-#: templates/base.html:102
+#: templates/base.html:93
+msgid "Got a YouTube account?<"
+msgstr ""
+
+#: templates/base.html:94
+msgid ""
+"New: enable viewer-created translations and captions on your YouTube channel!"
+msgstr ""
+
+#: templates/base.html:96
+msgid "Connect to YouTube"
+msgstr ""
+
+#: templates/base.html:97
+msgid "No thanks"
+msgstr ""
+
+#: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
-"Amara është një projekt i <a href=\"http://participatoryculture.org/\">PCF-"
-"së</a>."
+"Amara është projekt i <a href=\"http://participatoryculture.org/\">PCF-së</"
+"a>."
 
-#: templates/base.html:105 templates/profiles/view_profile.html:68
+#: templates/base.html:116 templates/profiles/base.html:12
 msgid "About"
 msgstr "Rreth"
 
-#: templates/base.html:106
+#: templates/base.html:117
 msgid "Jobs"
 msgstr "Punësim"
 
-#: templates/base.html:109
+#: templates/base.html:120
 msgid "Contact Us"
 msgstr "Na kontaktoni"
 
-#: templates/base.html:110
+#: templates/base.html:121
 msgid "Privacy Policy"
 msgstr "Rregulla Privatësie"
 
-#: templates/base.html:111
+#: templates/base.html:122
 msgid "Terms of Service"
 msgstr "Kushtet e Shërbimit"
 
-#: templates/base.html:121
-msgid "Sentry"
+#: templates/base.html:123
+msgid "Security"
 msgstr ""
 
-#: templates/base.html:124
+#: templates/base.html:133
+msgid "Sentry"
+msgstr "Rojë"
+
+#: templates/base.html:136
 msgid "Rosetta"
 msgstr "Rosetta"
 
-#: templates/base.html:127
+#: templates/base.html:139
 msgid "Impersonate"
 msgstr ""
 
-#: templates/base.html:130 templates/teams/billing/choose.html:11
+#: templates/base.html:142 templates/teams/billing/choose.html:11
 msgid "Billing"
 msgstr "Faturim"
 
@@ -2356,6 +2411,40 @@ msgid ""
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
 msgstr ""
+"\n"
+"Një nënshkrim fizik ose elektronik të personit të autorizuar të veprojë në "
+"emër të\n"
+"të zotit të një të drejte përjashtimore që pretendohet se është shkelur.\n"
+"Identifikim të veprës nën të drejta kopjimi që pretendohen se janë cënuar, "
+"ose, nëse\n"
+"shumë vepra njëherësh, nën të drejta kopjimi në një site të vetëm online "
+"mbulohen nga një njoftim\n"
+"i vetëm, një listë përfaqësuese veprash të tilla në atë site.\n"
+"Identifikim i materialit që pretendohet se është cënuar ose që është "
+"subjekti\n"
+"i veprimtarisë cënuese dhe që do të duhej hequr ose të bllokohet hyrja në "
+"të,\n"
+"dhe të dhëna pak a shumë të mjaftueshme që t'i lejojnë mundësuesit të "
+"shërbimit\n"
+"të piketojë materialin. Dhënia e URL-ve brenda lëndës së email-it është\n"
+"mënyra më e mirë për të na ndihmuar ta gjejmë shpejt gjënë.\n"
+"Të dhëna pak a shumë të mjaftueshme që t'i lejojnë mundësuesit të shërbimit "
+"të lidhet me\n"
+"palën ankuese, të tilla si një adresë, numër telefoni, dhe, në pastë,\n"
+"një adresë poste elektronike përmes së cilës të mund të kontaktohet pala "
+"ankuese.\n"
+"Një deklaratë që pala ankuese beson pa hile se përdorimi i materialit\n"
+"sipas mënyrë kundër të cilës bëhet ankimi nuk është i autorizuar nga "
+"zotëruesi\n"
+"i të drejtave të kopjimit, nga të ngarkuarit prej tij, ose nga ligji.\n"
+"Një deklaratë që të dhënat e njoftimit janë të sakta, dhe në dijeni që "
+"betimi\n"
+"i rremë dënohet nga ligji, që pala ankuese është e autorizuar të veprojë në "
+"emër\n"
+"të të zotit të një të drejte përjashtimore që pretendohet se është shkelur.\n"
+"Një njoftim i tillë me shkrim do të duhej dërguar te agjenti i caktuar prej "
+"nesh\n"
+"si vijon:\n"
 
 #: templates/dmca.html:55
 msgid ""
@@ -2365,6 +2454,10 @@ msgid ""
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
 msgstr ""
+"\n"
+"Vini re gjithashtu, ju lutemi, që sipas Ndarjes 512(f) cilido që pohon\n"
+"në mënyrë të gënjeshtërt dhe me dijeni se një material ose veprimtari\n"
+"cënon ligjin, është subjekt ndjekjeje penale.\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
@@ -2381,6 +2474,16 @@ msgid ""
 "in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 msgstr ""
+"\n"
+"Vini re, ju lutemi, që sipas Ndarjes 512(f) të Ligjit të të Drejtave të "
+"Kopjimit\n"
+"cilido që pohon në mënyrë të gënjeshtërt dhe me dijeni se një material "
+"është\n"
+"hequr ose çaktivizuar gabimisht,  ose ngaqë është identifikuar gabim, është\n"
+"subjekt ndjekjeje penale. Dijeni gjithashtu, ju lutemi, që zbatojmë një "
+"procedurë\n"
+"që, në rrethanat e duhura, çon në përjashtimin e anëtarëve që shkelin\n"
+"në mënyrë të përsëritur të drejta kopjimi.\n"
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
@@ -2393,6 +2496,10 @@ msgid ""
 "Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
 "pdf\n"
 msgstr ""
+"\n"
+"Procesi i kundër-njoftimeve administrohet nga Ndarja 512(g) e\n"
+"ligjit Digital Millennium Copyright Act: http://www.copyright.gov/"
+"legislation/dmca.pdf\n"
 
 #: templates/dmca.html:82
 msgid ""
@@ -2400,6 +2507,9 @@ msgid ""
 "To file a counter notification with us, you must provide a written\n"
 "communication that sets forth the items specified below.\n"
 msgstr ""
+"\n"
+"Për depozitimin e kundër-njoftimeve te ne, duhet të sillni një njoftim\n"
+"të shkruar i cili të paraqesë zërat e përcaktuar më poshtë.\n"
 
 #: templates/dmca.html:87
 msgid ""
@@ -2414,6 +2524,19 @@ msgid ""
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
 msgstr ""
+"\n"
+"Vini re, ju lutemi, që sipas Ndarjes 512(f) të Ligjit të të Drejtave të "
+"Kopjimit\n"
+"cilido që pohon në mënyrë të gënjeshtërt dhe me dijeni se një material ose\n"
+"veprimtari është hequr ose çaktivizuar gabimisht,  ose ngaqë është "
+"identifikuar\n"
+"gabim, është subjekt ndjekjeje penale. Dijeni gjithashtu, ju lutemi, që "
+"zbatojmë\n"
+"një procedurë që, në rrethanat e duhura, çon në përjashtimin e anëtarëve që\n"
+"shkelin në mënyrë të përsëritur të drejta kopjimi.\n"
+" Për pasojë, nëse nuk jeni\n"
+"i sigurt se një material i cënon a jo të drejtat e kopjimit të të tjerëve,\n"
+"ju këshillojmë që së pari të lidheni me një avokat.\n"
 
 #: templates/dmca.html:99
 msgid "Elements of Counter-Notification"
@@ -2429,6 +2552,12 @@ msgid ""
 "(including\n"
 "section numbers):\n"
 msgstr ""
+"\n"
+"Një shembull kundër-njoftimi mund ta gjeni te:\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. Për të na autorizuar\n"
+"të merremi me kundër-njoftimin tuaj, ju lutemi, ndiqni formatin vijues "
+"(përfshi\n"
+"numra ndarjesh):\n"
 
 #: templates/dmca.html:109
 msgid ""
@@ -2456,6 +2585,27 @@ msgid ""
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
 msgstr ""
+"\n"
+"Identifikoni URL-të specifike për materialin që është hequr nga Miro Guide\n"
+"ose për të cilat është bllokuar hyrja nga Miro Guide.\n"
+"Jepni emrin tuaj të plotë, adresën, numrin e telefonit dhe adresën email, "
+"dhe\n"
+"emrin e përdoruesit për llogarinë tuaj te Miro Guide.\n"
+"Bashkangjisni një deklaratë se e pranoni jurisdiksionin e Gjykatës Federale\n"
+"të Distriktit për distriktin gjyqësor që mbulon adresën tuaj (ose San\n"
+"Francisco County, California, nëse adresa juaj është jashtë Shteteve të "
+"Bashkuara),\n"
+"dhe se do të pranoni njoftim procesi gjyqësor prej personit që ka dhënë\n"
+"njoftimin sipas nënndarjes (c)(1)(C) ose një përfaqësues i atij personi.\n"
+"Përfshini deklaratën vijuese: \"Betohem, në dijeni që betimi i rremë dënohet "
+"nga ligji,\n"
+"se besoj pa hile se materiali është hequr ose çaktivizuar si pasojë\n"
+"e një gabimi ose indetifikimi të gabuar të materialit që duhej hequr ose "
+"çaktivizuar.\"\n"
+"Nënshkruajeni njoftimin. Nëse njoftimin po e depozitoni përmes e-mail-i, "
+"pranohet\n"
+"skanimi i një nënshkrimi fizik ose një nënshkrim i vlefshëm elektronik.\n"
+"Dërgojeni komunikimin me shkrim te adresa vijuese:\n"
 
 #: templates/dmca.html:141
 msgid "What happens next?"
@@ -2627,6 +2777,8 @@ msgstr ""
 #: templates/faq.html:23 templates/faq.html.py:78
 msgid "Will Amara support closed captions for the deaf and hard of hearing?"
 msgstr ""
+"A do të mbulojë Amara titrimet pronësore (të mbyllura) për shurdhët dhe "
+"personat me dëgjim të rënduar?"
 
 #: templates/faq.html:24 templates/faq.html.py:82
 msgid "Will your subtitles support my language or characterset?"
@@ -2670,6 +2822,8 @@ msgid ""
 "It says \"Someone else is currently editing these subtitles\" and I can't do "
 "anything.  How long will this last for?  Why does it happen?"
 msgstr ""
+"Thotë se \"Dikush tjetër po i përpunon këta titra tashmë\" dhe nuk bëj dot "
+"gjë.  Sa do të zgjasë kjo?  Dhe pse ndodh?"
 
 #: templates/faq.html:34 templates/faq.html.py:159
 msgid "Why can't I change the timing on a translation?"
@@ -2680,6 +2834,8 @@ msgid ""
 "How do old revisions work? What if somebody makes a change to my work that I "
 "don't approve of?"
 msgstr ""
+"Si është puna me rishikimet e vjetër? Po kur dikush bën te puna ime një "
+"ndryshim të cilin nuk e miratoj?"
 
 #: templates/faq.html:36 templates/faq.html.py:186
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
@@ -2724,6 +2880,14 @@ msgid ""
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
+"\n"
+"      \t\tJeni të mirëpritur të provoni <a href=\"http://universalsubtitles."
+"org/demo/\">demon</a> tonë \n"
+"\t\t\tpër të parë se si funksionon software-i. Mundeni po ashtu \n"
+"\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">të filloni "
+"titrimin</a> \n"
+"\t\t\te një videoje që keni postuar tashmë në web.\t\n"
+"\t\t"
 
 #: templates/faq.html:66
 msgid "VVideo subtitles are a gold mine of untapped potential."
@@ -2733,6 +2897,8 @@ msgstr "Titrat VVideo janë një minierë ari me potencial të pashfrytëzuar."
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
 msgstr ""
+"Titrimi i bën videot të përdorshme për shikues që janë të shurdhër ose me "
+"dëgjim të rënduar"
 
 #: templates/faq.html:69
 msgid ""
@@ -2758,6 +2924,11 @@ msgid ""
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
 msgstr ""
+"Participatory Culture Foundation është një organizm jofitimprurës i llojit "
+"501c3, misioni i të cilit është të ndërtojë një hapësirë mediash më të "
+"paanshme, më të hapur dhe më demokratike. PCF-ja vuri re mungesën në treg të "
+"platformave më të hapura dhe me më tepër bashkëpunim për titrime &mdash; "
+"Amara po ndihmon që të plotësohet kjo nevojë."
 
 #: templates/faq.html:79
 msgid ""
@@ -2786,6 +2957,15 @@ msgid ""
 "\t\tto help improve and add more languages.\n"
 "\t  "
 msgstr ""
+"\n"
+"      \tSite-i dhe mjetet janë të passhëm në një numër gjuhësh (caktoni "
+"gjuhën tuaj \n"
+"\t\tte parapëlqimet e shfletuesit tuaj dhe për të tjerat kujdesemi ne). "
+"Përherë kërkojmë \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
+"translateable-looking-for-translators/\">përkthyesa vullnetarë</a> \n"
+"\t\tqë të na ndihmojnë t'i përmirësojmë dhe t'u shtojmë më tepër gjuhë.\n"
+"\t  "
 
 #: templates/faq.html:99
 msgid ""
@@ -2797,6 +2977,13 @@ msgid ""
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
 msgstr ""
+"\n"
+"\t      Për një video tek, përdorni site-in tonë. Për shumë video te site-i "
+"juaj web, përdorni \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">këtë kod</a> te "
+"gjedhja \n"
+"\t\t  e site-it tuaj web, brenda etiketave &lt;head&gt;.\n"
+"\t\t"
 
 #: templates/faq.html:108
 msgid ""
@@ -2813,6 +3000,9 @@ msgid ""
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
 msgstr ""
+"Ju lutemi, po! Nëse interesoheni për programim, ju lutemi, vizitoni <a href="
+"\"http://wiki.github.com/8planes/unisubs/dev-center\">qendrën tonë për "
+"programuesa</a>."
 
 #: templates/faq.html:117
 msgid ""
@@ -2827,6 +3017,16 @@ msgid ""
 "question for details).\n"
 "\t\t"
 msgstr ""
+"\n"
+"\t\tNëse interesoheni në përgjithësi për t'u përfshirë, ju lutemi, shihni \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">faqen "
+"tonë te Mozilla Drumbeat</a>. \n"
+"\t\tNëse keni një ide specifike, ju lutemi, lidhuni me ne te: \n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
+"\">universalsubtitles@pculture.org</a> \n"
+"\t\tDhe si shoqatë jofitimprurëse e llojit 501c3, pranojmë dhurime (për "
+"hollësi, shihni pyetjen pasuese).\n"
+"\t\t"
 
 #: templates/faq.html:128
 msgid ""
@@ -2836,6 +3036,11 @@ msgid ""
 "Drumbeat project).\n"
 "\t\t"
 msgstr ""
+"\n"
+"      \t\tPo, po! Mund të <a href=\"https://donate.mozilla.org/page/"
+"contribute/universalsubtitles\">dhuroni këtu</a> (përmes projektit Mozilla "
+"Drumbeat).\n"
+"\t\t"
 
 #: templates/faq.html:135
 msgid ""
@@ -2844,6 +3049,11 @@ msgid ""
 "about\">Drumbeat</a>. Drumbeat is a movement to keep the web open for the "
 "next 100 years, and Amara is a featured project!"
 msgstr ""
+"Mozilla Foundation e ka furnizuar Amara-n me fonde fillestare sigurie, "
+"asistencë për bashkësinë, dhe asistencë për mbledhje fondesh përmes "
+"projektit <a href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat "
+"është një lvizje që synim ta mbajë web-in të hapët për 100 vjetët e "
+"ardhshëm, dhe Amara është një nga projektet e zgjedhura!"
 
 #: templates/faq.html:140
 msgid ""
@@ -2857,6 +3067,15 @@ msgid ""
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
 msgstr ""
+"\n"
+"     \t Kur ka titra, mund t'i shkarkoni në format .SRT, .SSA, .SBV, .TXT, "
+"dhe TTML, \n"
+"     \t nga faqja e gjuhës përkatëse (<a href=\"http://universalsubtitles."
+"org/videos/yKsUAgChJlGA/lt/\">shembull</a>). \n"
+"\t\t Klikoni mbi butonin \"Shkarkoni Titra\" djathtas poshtë në të majtë "
+"prej butonit \"Përpunoni Titra\" \n"
+"\t\t dhe prej listës hapmbyll zgjidhni formatin e dëshiruar të kartelës.\n"
+"       "
 
 #: templates/faq.html:151
 msgid ""
@@ -2868,6 +3087,13 @@ msgid ""
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
 msgstr ""
+"\n"
+"        Hëpërhë sistemi lejon vetëm një përdorues në herë të përpunojë titra "
+"për \n"
+"        cilëndo video. Pra, nëse dikush tjetër po merret me titrat e videos "
+"kur \n"
+"        provoni të përpunoni titrat, do të merrni këtë mesazh.\n"
+"        "
 
 #: templates/faq.html:161
 msgid ""
@@ -2881,6 +3107,14 @@ msgid ""
 "\t\twill automatically cascade.\n"
 "        "
 msgstr ""
+"\n"
+"        Mundeni. Shkoni te përpunuesi i përkthimit dhe klikoni “Ndryshoni "
+"kohët e titrave”. \n"
+"\t\tBëjeni këtë vetëm nëse kohët te gjuha origjinale nuk përputhet vërtet \n"
+"\t\tme gjuhën në të cilën po përktheni. Përndryshe, përmirësimet te "
+"origjinali \n"
+"\t\tdo të pasqyrohen vetvetiu edhe këtu.\n"
+"        "
 
 #: templates/faq.html:172
 msgid ""
@@ -2900,6 +3134,24 @@ msgid ""
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
 msgstr ""
+"\n"
+"        Çdo grup titrash apo çdo përkthim ka një historik të plotë "
+"rishikimesh. \n"
+"\t\tThjesht klikoni te skeda në faqen e titrave ku do të shihni një listë të "
+"rishikimeve. \n"
+"\t\tMund të përdorni kutizat e shenjave majtas dhe butonin \"krahaso "
+"rishikimet\" \n"
+"\t\tqë të shihni dallimet mes dy rishikimesh. Ose mund të klikoni mbi "
+"cilindo rishikim, \n"
+"\t\tdhe të bëni përpunime bazuar në atë rishikin apo të riktheni në fuqi atë "
+"rishikim.\n"
+"        <br/><br/>\n"
+"        Nëse versioni i atëçastshëm është i zbrazët, por ka versione më të "
+"vjetër, \n"
+"\t\tështë mirë të kontrollohen këto versione, përpara se të fillohet nga "
+"fillimi, \n"
+"\t\tmeqë në një version të vjetër mund të kenë punë të vlefshme.\n"
+"        "
 
 #: templates/faq.html:188
 msgid ""
@@ -2915,6 +3167,18 @@ msgid ""
 "\t\t  tags in your blog theme.  \n"
 "        "
 msgstr ""
+"\n"
+"          Shkoni te <a href=\"http://universalsubtitles.org/get-code/\">kjo "
+"faqe</a> \n"
+"\t\t  dhe dyklikoni te kodi në kutinë e bardhë që ta përzgjidhni krejt.  \n"
+"\t\t  Kaloni te Përpunim > Kopjim te menuja e shfletuesit tuaj që ta kopjoni "
+"kodin në të papastër.  \n"
+"\t\t  Mandej filloni të përpunoni kryet e kodit html të temës së site-it apo "
+"blogut tuaj, \n"
+"\t\t  dhe hidheni skriptin diku mes etiketave &lt;head&gt; dhe &lt;/"
+"head&gt; \n"
+"\t\t  te tema e blogut tuaj.  \n"
+"        "
 
 #: templates/faq.html:201
 msgid ""
@@ -2922,12 +3186,18 @@ msgid ""
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
 "        "
 msgstr ""
+"\n"
+"          Na ndjeni për këtë.  Thjesht lidhuni me ne dhe do të jemi të "
+"lumtur ta shtojmë.\n"
+"        "
 
 #: templates/feedback_response.html:3
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
 msgstr ""
+"Faleminderit që u lidhët me ne! Kemi shumë dëshirë të dëgjojmë idetë tuaja, "
+"të metat që gjeni, përshtypje dhe të tjera gjëra të tilla."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
@@ -2946,6 +3216,8 @@ msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
 msgstr ""
+"P.S. Përpiqemi me sa mundemi t'u përgjigjemi krejt pyetjeve, por, ju lutemi, "
+"bëni durim -- na vijnë shumë email-e"
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
@@ -2954,6 +3226,8 @@ msgstr "Na ndjeni!"
 #: templates/generic-error.html:8
 msgid "If you need assistance, please visit our support site at "
 msgstr ""
+"Nëse keni nevojë për asistencë, ju lutemi, vizitoni site-in tonë të "
+"asistencës te"
 
 #: templates/generic-error.html:8
 msgid "Get help"
@@ -3008,6 +3282,11 @@ msgid ""
 "for videos that need captions or translations. \n"
 "        "
 msgstr ""
+"\n"
+"            Përdoruesit tanë të shurdhër apo me dëgjim të rënduar dhe "
+"organizma jofitimprurës kërkojnë ndihmë për video që duhen titruar ose "
+"përkthyer. \n"
+"        "
 
 #: templates/index.html:44
 msgid "Start volunteering."
@@ -3025,6 +3304,12 @@ msgid ""
 "reach a global audience, and build a managed volunteer community.\n"
 "        "
 msgstr ""
+"\n"
+"            Shtoni shkallën e shikimit përmes shërbimesh transkriptimi, "
+"titrimi dhe përkthimi, API fleksibël dhe mundësish integrimi. Përmirësoni "
+"vizibilitetin, arrini audiencë globale, dhe ngrini një bashkësi "
+"vullnetarësh.\n"
+"        "
 
 #: templates/index.html:53
 msgid "See our enterprise services."
@@ -3088,18 +3373,25 @@ msgstr " Video të Zgjedhura"
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
 msgstr ""
+"Transkriptoni dhe përktheni me lehtësi videot tuaja, me ndihmën e shikuesve "
+"tuaj."
 
 #: templates/index_old.html:28
 msgid ""
 "Increase video views by reaching global audiences and being accessible to "
 "the deaf and hard-of-hearing."
 msgstr ""
+"Shtojeni shikimin e videove përmes shtrirjes drejt audiencash mbarëbotërore "
+"dhe duke i bërë të përdorshme për personat e shurdhër ose ata me dëgjim të "
+"rënduar."
 
 #: templates/index_old.html:29
 msgid ""
 "It's powered by viewers and other volunteers: it's collaborative editing and "
 "translation, like a wiki."
 msgstr ""
+"Fuqia e saj janë shikuesit dhe vullnetarë të tjerë: përkthim dhe përpunim në "
+"bashkëpunim, si një wiki."
 
 #: templates/index_old.html:30
 msgid "It's the world's easiest subtitle creator - type and tap."
@@ -3110,6 +3402,9 @@ msgid ""
 "The fastest way to add subtitle functionality to a single video or a whole "
 "site. Super easy to integrate with no software to install."
 msgstr ""
+"Rruga më e shpejtë për shtim funksionesh titrimi te një video e vetme apo te "
+"krejt një site me të tilla. Super e lehtë të integrohet, dhe pa u dashur të "
+"instalohet ndonjë software."
 
 #: templates/index_old.html:32
 msgid "Free, open-source, and non-profit!"
@@ -3140,6 +3435,8 @@ msgid ""
 "paste this single line of code into your page header and every video will be "
 "subtitle enabled"
 msgstr ""
+"hidheni këtë rresht të vetëm kodi te kreu i faqes suaj  dhe çdo video do ta "
+"ketë titrimin të aktivizuar"
 
 #: templates/index_old.html:77
 msgid "Amara works with these video sites and formats"
@@ -3159,6 +3456,10 @@ msgid ""
 "toyour video (or your site) and click the \"subtitle me\" button. The rest "
 "is simple! Totally free, and no software to download."
 msgstr ""
+"Kemi krijuar mënyrën më të lehtë për titrim videosh. Shtoni te videoja juaj "
+"(ose te site-i juaj) mekanizmin tonë për titrime dhe klikoni butonin "
+"\"titromëni\". Pjesa pas kësaj është e thjeshtë! Krejtësisht e lirë, dhe pa "
+"software që duhet shkarkuar."
 
 #: templates/index_old.html:96
 msgid "Add translations"
@@ -3176,6 +3477,15 @@ msgid ""
 "          community.\n"
 "          "
 msgstr ""
+"\n"
+"          Sapo të ketë titra, cilido shikues mund të shtojë një përkthim në "
+"çfarëdo gjuhe.  Nuk\n"
+"          ka nevojë për përkthime robotike makinash që ngatërrojnë "
+"shikuesin.  Universal\n"
+"          Subtitles ju lejon të grumbulloni përkthime me cilësi të lartë nga "
+"bashkësia\n"
+"           juaj e shikuesve.\n"
+"          "
 
 #: templates/index_old.html:108
 msgid "Get volunteer help"
@@ -3193,6 +3503,15 @@ msgid ""
 "          your videos more accessible.\n"
 "        "
 msgstr ""
+"\n"
+"          Shikuesit tuaj (dhe anëtarë të bashkësisë sonë të titrimeve) mund "
+"të përmirësojnë\n"
+"          cilëtdo titra apo përkthime. Në këtë mënyrë titrat përmirësohen "
+"vazhdimisht -\n"
+"          si një artikull në wikipedia. Mobilizojmë audiencën ndërkombëtare "
+"për t'i bërë\n"
+"          videot tuaja më të përdorshme.\n"
+"        "
 
 #: templates/index_old.html:122
 msgid "It’s free with no software to download"
@@ -3211,6 +3530,13 @@ msgid ""
 "    (as a small, simple button)\n"
 "    "
 msgstr ""
+"\n"
+"    Parashtrojeni videon tuaj, dhe merrni një kod trupëzimi që ta postoni te "
+"site-i juaj. \n"
+"    Kur ngarkohet faqja, mjetet tona të titrimit do të shfaqen nën videon "
+"tuaj \n"
+"    (si një buton i thjeshtë, i vogël)\n"
+"    "
 
 #: templates/index_old.html:132
 msgid "Subtitling tools open in your page."
@@ -3225,6 +3551,13 @@ msgid ""
 "      Subtitles they create are then visible to other users, on your site.\n"
 "      "
 msgstr ""
+"\n"
+"      Kur dikush klikon butonin “titromëni”, \n"
+"      te faqja juaj shfaqet një ndërfaqe titrimesh (shumica e përdoruesve "
+"nuk shkojnë më tej se site-i juaj). \n"
+"      Titrat që ata krijojnë janë kështu të dukshme për përdoruesit e tjerë, "
+"te site-i juaj.\n"
+"      "
 
 #: templates/index_old.html:142
 msgid "How it works"
@@ -3239,6 +3572,14 @@ msgid ""
 "      where people can track changes, and give feedback.\n"
 "    "
 msgstr ""
+"\n"
+"      Ju u shtoni videove tuaja mekanizmin tonë.  Mandej ju dhe shikuesit "
+"tuaj mund të shtojnë\n"
+"      titra.  Titrat i ruajmë ne në site-in tonë. Dhe çdo video ka në site-"
+"in tonë hapësirën e vet\n"
+"      për bashkëpunime rreth saj, ku njerëzit mund të ndjekin ndryshimet dhe "
+"të japin përshtypjet.\n"
+"    "
 
 #: templates/index_old.html:149
 msgid "Try the demo"
@@ -3285,6 +3626,8 @@ msgid ""
 "You don't have to host your video with us, and you're not dependent on any "
 "one video host, platform, or format."
 msgstr ""
+"Nuk është e domosdoshme t'i strehoni videot tuaja te ne, dhe nuk jeni të "
+"varur në ndonjë nga strehët, platformat apo formatet për video."
 
 #: templates/index_old.html:164
 msgid "People are free to add subtitles to any video"
@@ -3328,6 +3671,9 @@ msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
 msgstr ""
+"<strong>Lidhni me njëri-tjetrin</strong> të interesuarit më me rëndësi, nga "
+"projekte, organizma, dhe lëvizje që kanë nevojë për titrim të hapur ose që "
+"merren me to."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
@@ -3335,12 +3681,17 @@ msgid ""
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
 msgstr ""
+"<strong>Gjeni mënyra</strong> për të përmbushur nevojat e tyre për titrim "
+"dhe mësoni për teknologji ekzistuese që mund të shfrytëzoheshin. Gjeni vende "
+"të arsyeshëm për bashkëpunim/bashkëveprim."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
 msgstr ""
+"<strong>Shkoni drejt</strong> zgjidhjesh standardizuese dhe që e shtyjnë më "
+"tej fjalën e fundit në titrimin e hapur."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -3354,6 +3705,12 @@ msgid ""
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
 msgstr ""
+"Te pjesëmarrësit do të përfshihen: krijues dhe prodhues videosh, përdorues "
+"të thjeshtë, përfaqësues prej shërbimeve të mëdha të strehimit të videove, "
+"inxhinierë standardesh, mbrojtës të përdorshmërisë nga ana e personave me "
+"aftësi të kufizuara, programues nga burimi i hapur, drejtues edukativë, dhe "
+"individë dhe organizma të tjerë të interesuar për botën e titrimeve. Do të "
+"kemi gati një listë, kur veprimtaria të jetë edhe më afër."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
@@ -3385,6 +3742,12 @@ msgid ""
 "73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,"
 "+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 msgstr ""
+"Mbledhja do të zhvillohet në ndërtesën e hijshme Open Plans në Soho, që "
+"gjendet në adresën 148 Lafayette St, Floor 12, New York City. (<a href="
+"\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette"
+"+St,+Floor+12,+New+York+City&sll=40.701809,-"
+"73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,"
+"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">harta</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -3407,6 +3770,22 @@ msgid ""
 "            and make sense of the ever growing sea of online video.\n"
 "           "
 msgstr ""
+"\n"
+"            Objekti i këtij takimit është transkriptime dhe titra për sa më "
+"shumë njerëz dhe sa më të përdorshme, \n"
+"            çka nevojiten shumë që të dyja. Mbahet në një kohë kritike, \n"
+"            teksa përdorimi i videove internet ka kapur qiejt &mdash; "
+"njerëzit që kanë nevojë për titra janë të kërcënuar nga mbetja prapa. \n"
+"            Përdorues të rinj nga të gjitha kulturat po kalojnë në masë "
+"online; \n"
+"            standardizimi dhe bërja të kudondodhur e teknologjisë mund  të "
+"sjellë rritje eksponenciale të audiencës dhe mesazhet mund të kapërcejnë më "
+"lehtë kufijtë kulturorë. \n"
+"            Më tepër titra do ta bëjën më të thjeshtë për kompjuterat të "
+"përpunojnë, indeksojnë, \n"
+"            dhe t'i japin kuptim detin gjithnjë në rritje të videove "
+"online.\n"
+"           "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -3484,16 +3863,17 @@ msgstr "Ridërgo email-in e ripohimit"
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Jeni i sigurt që doni të fshihet përgjithmonë profili juaj?"
 
-#: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:56 templates/teams/tasks.html:427
+#: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
+#: templates/messages/sent.html:49 templates/teams/tasks.html:455
 msgid "Delete"
 msgstr "Fshije"
 
 #: templates/auth/delete_user.html:14
-#: templates/profiles/_select_language_dialog.html:30
+#: templates/profiles/_select_language_dialog.html:33
+#: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:481 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:379
+#: templates/teams/tasks.html:509 templates/videos/_feedback_form.html:25
+#: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr "Anuloje"
 
@@ -3530,620 +3910,13 @@ msgstr "Krijoje Llogarinë"
 msgid "Sign in as a different user"
 msgstr "Hyni si përdorues tjetër"
 
-#: templates/comments/_item.html:3 templates/messages/list.html:70
-#: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
+#: templates/comments/_item.html:3 templates/messages/inbox.html:59
+#: templates/messages/sent.html:46 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
-#: templates/videos/diffing.html.py:164
+#: templates/videos/diffing.html.py:147
 msgid "ago"
 msgstr "më parë"
-
-#: templates/enterprise/advanced-security.html:6
-msgid "A Revolutionary Video Security Model"
-msgstr "Një Model Revolucionar Sigurie Videosh"
-
-#: templates/enterprise/advanced-security.html:8
-msgid ""
-"\n"
-"        You always maintain control of your video, because it never leaves "
-"your server.  Amara doesn’t require any video uploading, so your existing "
-"security policy is always in full effect. We support OAuth, which means your "
-"users never need to log in twice—they can see your video and authenticate "
-"with both organizations at the same time. Amara makes your subtitles "
-"available from the cloud, so you can: deploy just in time via our API; cache "
-"on your server and get pinged when there are updates; or use our embeddable "
-"subtitle widget.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:6
-#: templates/enterprise/base.html:33
-msgid "API Integration"
-msgstr "Integrim API-sh"
-
-#: templates/enterprise/api-integration.html:8
-msgid ""
-"\n"
-"        Amara’s powerful API allows flexible integration with your existing "
-"publishing workflow.  By connecting your backend system directly to Amara, "
-"you can import and export subtitles, manage processing, and import completed "
-"subtitles directly back into your own system.  If you use a custom video "
-"player, importing subtitles via API lets your company fully control subtitle "
-"display and use of the transcript on your website.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:12
-msgid "Amara API Documentation"
-msgstr "Dokumentim API Amara"
-
-#: templates/enterprise/automated-workflows.html:6
-#: templates/enterprise/base.html:24
-msgid "Automated Workflows"
-msgstr "Rrjedha të Automatizuara Pune"
-
-#: templates/enterprise/automated-workflows.html:10
-msgid ""
-"\n"
-"        Workflows enable automating the flow of content through different "
-"authoring groups, including: volunteers, private crowds (staff, employees, "
-"students, etc), and professionals. They can be used for both first pass "
-"(authoring), as well as subsequent review passes for Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:14
-msgid ""
-"\n"
-"        Different workflows can be chained together to create an unlimited "
-"number of highly flexible configurations. The Amara team can help you "
-"determine the best workflow for your subtitle processes and integrate it "
-"with your existing publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:18
-msgid "Contractors with Staff Review"
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:19
-msgid ""
-"\n"
-"        Use captioning and transcription contractors to create your "
-"subtitles, then require staff review and approval before they are published "
-"back to your server. Remember, no one sees your subtitles until YOU publish "
-"it.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:23
-msgid "Crowdsourced subtitles, followed by staff review"
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:24
-msgid ""
-"\n"
-"        In many cases, organizations want to leverage the power of the "
-"crowd, but don’t want to leave any chance for poor quality captions or "
-"subtitles to appear on their content. This workflow keeps videos private "
-"until a staff member has approved the subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:30
-msgid "Professionally created English captions, crowd translation"
-msgstr "Titra Anglisht të krijuar në mënyrë profesionale, përkthim në grup"
-
-#: templates/enterprise/automated-workflows.html:31
-msgid ""
-"\n"
-"        Amara offers professional- quality captions at very low cost with "
-"quick turn-around times. English can often be done in less than a day.  Once "
-"English is completed, it’s a snap to request translations from volunteers or "
-"staff. We have seen videos translated into multiple languages in just days—"
-"through a volunteer crowd.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:35
-msgid "Crowd translations, with professional quality-control"
-msgstr "Përkthime në grup, me kontroll profesional cilësie"
-
-#: templates/enterprise/automated-workflows.html:36
-#, python-format
-msgid ""
-"\n"
-"        Amara is, quite simply, the most cost-effective way to get "
-"professional-level quality for foreign language video subtitles. By "
-"leveraging professional quality review, you can expect to pay roughly 75%% "
-"less than the market price for traditional professional subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/base.html:12
-msgid "Features & Benefits"
-msgstr "Veçori & Përfitime "
-
-#: templates/enterprise/base.html:15
-msgid "Amara Platform"
-msgstr "Platforma Amara"
-
-#: templates/enterprise/base.html:18
-msgid "Global Reach"
-msgstr "Shtrirje Mbarëbotërore"
-
-#: templates/enterprise/base.html:21
-#: templates/enterprise/quality-control.html:6
-msgid "Quality Control"
-msgstr "Kontroll Cilësie"
-
-#: templates/enterprise/base.html:27
-#: templates/enterprise/subtitle-management.html:6
-msgid "Subtitle Management"
-msgstr "Administrim Titrash"
-
-#: templates/enterprise/base.html:30
-msgid "Advanced Security"
-msgstr "Siguri e  Mëtejshme "
-
-#: templates/enterprise/base.html:36
-#: templates/enterprise/transcript-viewer.html:20
-msgid "Transcript Viewer"
-msgstr ""
-
-#: templates/enterprise/base.html:40
-msgid "Customers"
-msgstr "Klientë"
-
-#: templates/enterprise/base.html:43 templates/enterprise/film-tv.html:6
-msgid "Film and Television"
-msgstr "Film dhe Televizion"
-
-#: templates/enterprise/base.html:46
-msgid "Education"
-msgstr ""
-
-#: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
-msgid "Companies"
-msgstr "Shoqëri"
-
-#: templates/enterprise/base.html:52 templates/enterprise/publishers.html:6
-msgid "Publishers"
-msgstr "Botues"
-
-#: templates/enterprise/base.html:55 templates/enterprise/government.html:6
-msgid "Government"
-msgstr "Qeveri"
-
-#: templates/enterprise/base.html:58
-msgid "Non-Profits"
-msgstr "Organizma Jofitimprurës"
-
-#: templates/enterprise/base.html:66
-msgid "Get started with Amara"
-msgstr "Si T'ia Fillohet me Amara-n"
-
-#: templates/enterprise/base.html:67
-msgid "Be in touch at"
-msgstr "Mbani kontakte te"
-
-#: templates/enterprise/companies.html:7
-msgid ""
-"\n"
-"        Corporations need to communicate with their staff and their "
-"customers around the world, and video is becoming a major part of that "
-"process. With Amara, companies make it possible for staff, customers, and "
-"contractors to caption and translate videos, make them searchable, and share "
-"them publicly or privately.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/education.html:6
-msgid "Universities and Online Education"
-msgstr ""
-
-#: templates/enterprise/education.html:16
-msgid ""
-"\n"
-"            Most of the leading online education companies and organizations "
-"use Amara to caption and translate video, including Coursera, Udacity, Khan "
-"Academy, TED Ed, as well as individual colleges and universities.  As online "
-"education explodes in popularity, subtitles are essential to making courses "
-"accessible and international. Colleges and universities are using Amara to "
-"make their rapidly growing video resources readily available to everyone.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/education.html:21
-msgid "Learn more about our work in education:"
-msgstr ""
-
-#: templates/enterprise/film-tv.html:15
-msgid ""
-"\n"
-"        Producers, publishers, and distributors of film and television use "
-"Amara to make captioning and translation simpler and less expensive. Amara "
-"makes it possible to caption and translate for global viewing audiences much "
-"more cost effectively than traditional approaches.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/film-tv.html:19
-msgid ""
-"\n"
-"            Easily manage workflows between distributed teams, whether they "
-"are staff, contractors, or viewers.  Publish completed subtitles directly "
-"through the Amara API.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:6
-msgid "Build a Global Reach"
-msgstr "Mbërrini Në Njerëz Anembanë Botës"
-
-#: templates/enterprise/global-reach.html:10
-msgid ""
-"\n"
-"        Amara is the premiere platform for taking video content global. "
-"Whether you’re working with volunteer translators, engaging your own staff, "
-"or hiring professionals, you can easily manage the end-to-end process.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:14
-msgid "Volunteer Subtitle Creation"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:15
-msgid ""
-"\n"
-"        Amara currently supports some of the largest volunteer video "
-"translation efforts on the planet. Our technology makes captioning, "
-"subtitling, and translating very easy, fun, and engaging which enables "
-"ongoing, massive, collaborations.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:19
-msgid "Private Crowd Subtitle Creation"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:20
-msgid ""
-"\n"
-"        If you have a workforce, student group, or any other non-public "
-"crowd, you can limit access for captioning, translating, and subtitling OR "
-"reviewing the work of peers, volunteers, or professionals.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:24
-msgid "Professional Captioning and Translation Services"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:25
-msgid ""
-"\n"
-"        Use professional services for captioning or subtitling into nearly "
-"any language, or even to help with quality control. All completed work is "
-"centralized on Amara, ready for incremental quality control, integration, "
-"and deployment.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:29
-msgid "Hybrid Approach"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:30
-msgid ""
-"\n"
-"        Many of our customers use a mix of these different approaches on the "
-"initial (subtitle authoring) pass, as well as subsequent review passes (for "
-"quality control). This is an advantage that you only get with Amara, a fully "
-"featured solution that manages the process end to end and integrates more "
-"easily than any other platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/government.html:12
-msgid ""
-"\n"
-"        In governments around the world, making video accessible is often a "
-"legal requirement, not an option.  Amara makes it much easier to coordinate "
-"captioning and translation efforts, so that every citizen gains access.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:6
-msgid "The Most Efficient and Cost Effective Subtitling Platform in the World"
-msgstr ""
-
-#: templates/enterprise/index.html:9
-msgid ""
-"\n"
-"            Amara Enterprise offers unmatched capabilities to create, edit, "
-"and manage production ready subtitles at remarkably low costs. You have "
-"total flexibility: order captions and translations from professional "
-"services, build a volunteer community, manage internal staff or external "
-"contractors, and integrate your publishing platform through our powerful "
-"API. We can make everything you do with subtitles easier, faster, and "
-"cheaper. \n"
-"        "
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "Contact us"
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "for more information and pricing."
-msgstr ""
-
-#: templates/enterprise/index.html:17
-msgid "World-class Users"
-msgstr "Përdorues të Klasit Botëror"
-
-#: templates/enterprise/index.html:25
-msgid "Award-Winning Technology"
-msgstr "Teknologji e Vlerësuar Me Çmime"
-
-#: templates/enterprise/index.html:32
-msgid "Unmatched Functionality and Control"
-msgstr "Funksione dhe Kontroll i Paarritshëm"
-
-#: templates/enterprise/index.html:36
-msgid "Build a Translation Team"
-msgstr "Krijoni një Ekip Përkthimesh"
-
-#: templates/enterprise/index.html:38
-msgid ""
-"\n"
-"        For years, companies like Mozilla, Twitter, and Facebook have built "
-"volunteer communities to translate their websites.  Amara makes this "
-"possible for captions and subtitles.  With Amara, you can accomplish the "
-"seemingly impossible task of translating your videos into dozens of "
-"languages.  Quickly build a powerful, high-quality volunteer translation and "
-"captioning team that makes your content truly global. \n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:43
-msgid ""
-"See how TED uses Amara to build a global volunteer community and create "
-"extremely high quality subtitles: "
-msgstr ""
-"Shihni se si e përdor TED-i Amara-n për të ngritur një bashkësi "
-"mbarëbotërore vullnetarësh dhe për të krijuar titra të një cilësie tejet të "
-"lartë: "
-
-#: templates/enterprise/index.html:43
-msgid "TED Team on Amara"
-msgstr "Ekipi TED në Amara"
-
-#: templates/enterprise/index.html:43
-msgid ""
-"Other companies like Netflix have completely private collaboration teams."
-msgstr ""
-"Kompani të tjera, fjala vjen Netflix-i, kanë ekipe bashkëpunimi krejtësisht "
-"private."
-
-#: templates/enterprise/index.html:46
-msgid "Security and Managed Workflows"
-msgstr "Siguri dhe Rrjedha Pune të Kontrolluara"
-
-#: templates/enterprise/index.html:48
-msgid ""
-"\n"
-"        Create the right workflows for your content and coordinate your "
-"efforts—whether your video is completely private, restricted to premium "
-"subscribers, or public on the web.  You always control who has access to "
-"your subtitles and when to involve staff, contractors, or volunteers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:52
-msgid "Powerful API and Publishing Integration"
-msgstr "API e Fuqishme dhe Integrim Botimesh"
-
-#: templates/enterprise/index.html:54
-msgid ""
-"\n"
-"        Our API helps companies tightly integrate Amara with their existing "
-"publishing and distribution workflow.  By making subtitles key part of your "
-"process, you build a global audience.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:58
-msgid "Professional Services"
-msgstr "Shërbime Profesionale"
-
-#: templates/enterprise/index.html:60
-msgid ""
-"\n"
-"        Access professional services including paid captions, translations, "
-"and quality control.  Or use your own staff and contractors and use Amara to "
-"coordinate their work remotely.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:64
-msgid "Crowdsource with Professional Review"
-msgstr "Punim në Grup me Shqyrtim Profesional"
-
-#: templates/enterprise/index.html:66
-msgid ""
-"\n"
-"        Engage a crowd and use professional quality assurance. This balances "
-"amazingly low cost with professional level quality assurance.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:72
-msgid "Work with Any Video Platform"
-msgstr "Funksionon me Çfarëdo Platforme Videosh"
-
-#: templates/enterprise/index.html:74
-msgid ""
-"\n"
-"        Amara works with all the most popular video hosting services and "
-"video players, and adapts easily to your own custom player. Integrate and "
-"embed videos with subtitles without changing your current publishing "
-"workflow.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:78
-msgid "Subtitles Improve SEO"
-msgstr "Titrat Përmirësojnë SEO-n"
-
-#: templates/enterprise/index.html:80
-msgid ""
-"\n"
-"        Rank higher in Google and other search engines by helping them index "
-"full transcripts for all of your videos. Searchable videos are found more "
-"often.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:6
-msgid "Non-profits"
-msgstr "Organizma Jofitimprurës"
-
-#: templates/enterprise/non-profits.html:18
-msgid ""
-"\n"
-"        Non-profit organizations use Amara to share their mission, their "
-"work, and their media around the world.  Non-profits are ideally positioned "
-"to build volunteer subtitling communities—your existing supporters will be "
-"delighted to find a new way to help support your organization.  Creating a "
-"volunteer team helps deepen engagement with your organization and lets you "
-"caption and translate videos that would be unaffordable to subtitle with a "
-"traditional approach.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:21
-msgid ""
-"\n"
-"        Did you know that Amara is a non-profit organization itself?  Our "
-"mission is to help make video accessible for everyone around the world.  We "
-"offer discounts for other non-profit organizations—we are always delighted "
-"to support work with a social mission.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/publishers.html:10
-msgid ""
-"\n"
-"        Any organization that creates video can reach more people with "
-"subtitles, and Amara provides the most options and flexibility to caption "
-"and translate your videos. Many video publishers use Amara to create "
-"volunteer communities—engaging the people who watch their videos to caption "
-"and translate them for the world, ultimately reaching more viewers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:10
-msgid ""
-"\n"
-"        Amara’s Flexible Workflows offer several ways to ensure outstanding "
-"quality for your subtitles.  Whether you use internal staff, outside "
-"contractors, professional services, or a volunteer community—you’ll be able "
-"to create, review, and approve workflows that meet your needs.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:14
-msgid "Examples of QC processes:"
-msgstr "Shembuj procesesh QC"
-
-#: templates/enterprise/quality-control.html:16
-msgid ""
-"\n"
-"            Have your contractors work inside your Amara account and then "
-"require staff review before subtitles go live.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:19
-msgid ""
-"\n"
-"            Some universities use paid captioning services to quickly "
-"caption lecture videos and then invite experts in the university community "
-"to fix any mistakes with proper names or technical terms.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:22
-msgid ""
-"\n"
-"            Volunteer teams can self-manage and reach very high quality by "
-"requiring peer review of subtitles before they are published.  More senior "
-"members of the community can be promoted to a moderator role.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:8
-msgid ""
-"\n"
-"        At its core, Amara is the definitive platform for managing captions "
-"and subtitles. Whether you are creating, revising, or translating subtitles—"
-"you can choose to centralize the management—or divide up your content, and "
-"delegate responsibilities and control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:12
-msgid "Import"
-msgstr "Importo"
-
-#: templates/enterprise/subtitle-management.html:13
-msgid ""
-"\n"
-"        Your videos are never uploaded to our server (learn more about our "
-"Security Model), so you actually import pointers to existing video files—"
-"whether you’re hosting on your own server, YouTube, Vimeo, other video "
-"hosting service, or combination thereof. Import these video pointers via "
-"graphical interface or API, plus we can import a wide variety of subtitle "
-"and transcript formats in case you have pre-existing data.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:17
-msgid "Process > Author > QC"
-msgstr "Proces > Autor > QC"
-
-#: templates/enterprise/subtitle-management.html:18
-msgid ""
-"\n"
-"        Flexible workflows make creating Global Content simple; your "
-"organization can harness the power of volunteers, private crowds, and/or "
-"professional service providers for content creation and Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:22
-msgid "Deploy"
-msgstr "Zbatoje"
-
-#: templates/enterprise/subtitle-management.html:23
-msgid ""
-"\n"
-"        Use the Amara API to bring completed subtitle data and metadata into "
-"your own backend or publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/transcript-viewer.html:23
-msgid ""
-"\n"
-"            Amara’s beautiful interactive transcript viewer lets you read "
-"the text of any video and jump to and share specific moments.  Take a look "
-"at the example below and try turning the transcript display on and off.\n"
-"        "
-msgstr ""
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
@@ -4270,66 +4043,65 @@ msgstr ""
 "        Keni %(msg_count)s mesazhe të reja.\n"
 "    "
 
-#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
+#: templates/messages/_messages.html:7 templates/teams/dashboard.html:158
+#: templates/teams/dashboard.html.py:200
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "Shihini krejt"
 
-#: templates/messages/list.html:6
-msgid "My Messages"
-msgstr "Mesazhet e Mia"
+#: templates/messages/base.html:10
+msgid "New message"
+msgstr ""
 
-#: templates/messages/list.html:20 templates/messages/sent.html:17
-msgid "Do you really wish to delete this message?"
-msgstr "Doni vërtet të fshihet ky mesazh?"
-
-#: templates/messages/list.html:21
-msgid "The message has been successfully sent."
-msgstr "Mesazhi u dërgua me sukses."
-
-#: templates/messages/list.html:38 templates/messages/sent.html:31
-msgid "Compose"
-msgstr "Hartoni"
-
-#: templates/messages/list.html:74
-msgid "Mark Read"
-msgstr "Shënoje Si të Lexuar"
-
-#: templates/messages/list.html:79
-msgid "Reply"
-msgstr "Përgjigjjuni"
-
-#: templates/messages/list.html:93
-msgid "You have no messages."
-msgstr "Nuk keni mesazhe."
-
-#: templates/messages/list.html:100 templates/messages/new.html:74
-#: templates/messages/sent.html:71
+#: templates/messages/base.html:15
 msgid "Inbox"
 msgstr "Të marrë"
 
-#: templates/messages/list.html:101 templates/messages/new.html:75
-#: templates/messages/sent.html:72
+#: templates/messages/base.html:20
 msgid "Sent"
 msgstr "Të dërguar"
 
-#: templates/messages/list.html:124
+#: templates/messages/inbox.html:6
+msgid "Messages - Inbox"
+msgstr ""
+
+#: templates/messages/inbox.html:20 templates/messages/sent.html:17
+msgid "Do you really wish to delete this message?"
+msgstr "Doni vërtet të fshihet ky mesazh?"
+
+#: templates/messages/inbox.html:21
+msgid "The message has been successfully sent."
+msgstr "Mesazhi u dërgua me sukses."
+
+#: templates/messages/inbox.html:63
+msgid "Mark Read"
+msgstr "Shënoje Si të Lexuar"
+
+#: templates/messages/inbox.html:68
+msgid "Reply"
+msgstr "Përgjigjjuni"
+
+#: templates/messages/inbox.html:82
+msgid "You have no messages."
+msgstr "Nuk keni mesazhe."
+
+#: templates/messages/inbox.html:105
 msgid "Send Message"
 msgstr "Dërgoje Mesazhin"
 
-#: templates/messages/new.html:6
-msgid "Compose a Message"
-msgstr "Hartoni Mesazh"
+#: templates/messages/new.html:9
+msgid "Messages - New"
+msgstr ""
 
 #: templates/messages/sent.html:6
-msgid "Sent Messages"
-msgstr "Mesazhe të Dërguar"
+msgid "Messages - Sent"
+msgstr ""
 
-#: templates/messages/sent.html:47 templates/messages/sent.html.py:49
+#: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
 msgstr "Avatar"
 
-#: templates/messages/sent.html:65
+#: templates/messages/sent.html:58
 msgid "You have no sent messages."
 msgstr "Nuk keni mesazhe të dërguar."
 
@@ -4433,23 +4205,6 @@ msgstr ""
 msgid "Back to Sign In"
 msgstr "Mbrapsht te Hyrja"
 
-#: templates/profiles/_filters.html:5
-msgid "User Details"
-msgstr "Hollësi Përdoruesi"
-
-#: templates/profiles/_filters_dashboard.html:5
-msgid "Overview"
-msgstr "Përmbledhje"
-
-#: templates/profiles/_filters_dashboard.html:8
-#: templates/profiles/dashboard.html:85
-msgid "Recent Activity"
-msgstr "Veprimtari Së Fundi"
-
-#: templates/profiles/_filters_dashboard.html:11
-msgid "My Videos"
-msgstr "Videot e Mia"
-
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
@@ -4485,31 +4240,52 @@ msgstr "Përzgjidhni të paktën një gjuhë."
 msgid "Saving your language settings..."
 msgstr "Po ruhen rregullimet tuaja për gjuhën..."
 
-#: templates/profiles/_select_language_dialog.html:15
-msgid "We really need your help!"
-msgstr "Na duhet vërtet ndihma juaj!"
-
-#: templates/profiles/_select_language_dialog.html:16
+#: templates/profiles/_select_language_dialog.html:17
 msgid "What languages do you speak?"
 msgstr "Cilat gjuhë flisni?"
 
-#: templates/profiles/_select_language_dialog.html:29
+#: templates/profiles/_select_language_dialog.html:32
 #: templates/teams/billing/choose.html:18
 msgid "Submit"
 msgstr "Parashtroje"
 
-#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
-msgid "Profile"
-msgstr "Profil"
+#: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
+#: templates/videos/video-view.html:168
+msgid "Activity"
+msgstr "Veprimtari"
 
-#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
-#: templates/profiles/dashboard.html:13
+#: templates/profiles/_tabs.html:11 templates/profiles/_top_user_panel.html:19
+#: templates/teams/_tabs.html:11 templates/teams/_tabs_projects.html:6
+#: templates/teams/videos-list.html:6
+msgid "Videos"
+msgstr "Video"
+
+#: templates/profiles/_tabs.html:17
+msgid "Personal Info"
+msgstr "Të dhëna Personale"
+
+#: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
+msgid "Account"
+msgstr ""
+
+#: templates/profiles/_top_user_panel.html:11
+#: templates/profiles/dashboard.html:13 templates/teams/_tabs.html:6
+#: templates/teams/dashboard.html:6
 msgid "Dashboard"
 msgstr "Pult"
 
-#: templates/profiles/_top_user_panel.html:26
+#: templates/profiles/_top_user_panel.html:15
+msgid "Profile"
+msgstr "Profil"
+
+#: templates/profiles/_top_user_panel.html:36
 msgid "Logout"
 msgstr "Dilni"
+
+#: templates/profiles/_top_user_panel.html:42
+#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
+msgid "Your Teams"
+msgstr "Ekipet Tuaj"
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -4520,176 +4296,338 @@ msgid "No Activity"
 msgstr "Pa Veprimtari"
 
 #: templates/profiles/_video_detail.html:8
-#: templates/teams/members-list.html:102
+#: templates/teams/_context_team.html:95 templates/teams/members-list.html:102
 msgid "language"
 msgstr "gjuhë"
 
 #: templates/profiles/_video_detail.html:10
-#: templates/teams/_team_video_detail.html:28
 msgid "No subtitles yet"
 msgstr "Ende pa titra"
 
-#: templates/profiles/dashboard.html:38
-msgid "Open Tasks"
-msgstr "Punë të Hapura"
+#: templates/profiles/account.html:17
+msgid "User Details"
+msgstr "Hollësi Përdoruesi"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:57
-#: templates/teams/tasks.html.py:202
-msgid "Transcribe"
-msgstr "Transkriptoni"
+#: templates/profiles/account.html:28
+msgid "YouTube Account"
+msgstr ""
 
-#: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:212
-msgid "Subtitles into"
-msgstr "Titra në"
+#: templates/profiles/account.html:37
+msgid "Link is active"
+msgstr ""
 
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:217
-#: templates/teams/tasks.html.py:233 templates/videos/diffing.html:83
-#: templates/videos/subtitle-view.html:152
-#: templates/videos/subtitle-view.html:186
-msgid "Subtitles"
-msgstr "Titra"
+#: templates/profiles/account.html:46
+msgid "Enable Amara crowd subtitles on your personal YouTube channel"
+msgstr ""
 
-#: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
-#: templates/teams/members-list.html:102 templates/teams/tasks.html:76
-#: unisubs-integration/services/templates/services/translation_request.html:8
-msgid "for"
-msgstr "për"
+#: templates/profiles/account.html:52
+msgid "Other Accounts"
+msgstr ""
 
-#: templates/profiles/dashboard.html:67
-msgid "Decline Task"
-msgstr "Hidhe Tej Punën"
+#: templates/profiles/account.html:54
+msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
+msgstr ""
 
-#: templates/profiles/dashboard.html:80
-msgid "You have no open tasks assigned to you."
-msgstr "Nuk keni të caktuara punë të hapura."
+#: templates/profiles/account.html:55
+msgid "Add an account"
+msgstr ""
 
-#: templates/profiles/dashboard.html:91
-msgid "Sorry, no activity yet."
-msgstr "Na ndjeni, ende pa veprimtari."
+#: templates/profiles/account.html:63 templates/profiles/account.html.py:74
+#: templates/teams/_team_video_detail.html:54
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
+#: templates/videos/_video_url_panel.html:34
+msgid "Remove"
+msgstr "Hiqe"
+
+#: templates/profiles/account.html:85
+msgid "Change Password"
+msgstr ""
+
+#: templates/profiles/account.html:94
+msgid "Notifications"
+msgstr "Njoftime"
+
+#: templates/profiles/account.html:96
+msgid "Send notifications to my UniversalSubtitles.org inbox"
+msgstr ""
+
+#: templates/profiles/account.html:98
+msgid "Send an email notification for each message received"
+msgstr "Dërgo njoftim email për çdo mesazh të marrë"
+
+#: templates/profiles/account.html:101
+msgid "API Access"
+msgstr ""
+
+#: templates/profiles/account.html:103
+msgid "Your API key"
+msgstr ""
+
+#: templates/profiles/account.html:109
+msgid "Reset your API key"
+msgstr ""
+
+#: templates/profiles/account.html:111
+msgid "Get an API key"
+msgstr ""
+
+#: templates/profiles/account.html:118 templates/profiles/edit.html:59
+#: templates/teams/settings-permissions.html:117
+msgid "Save Changes"
+msgstr "Ruaji Ndryshimet"
+
+#: templates/profiles/account.html:120
+msgid "Delete Your Account"
+msgstr ""
+
+#: templates/profiles/account.html:129
+msgid "Add a linked account"
+msgstr ""
+
+#: templates/profiles/account.html:137
+msgid ""
+"\n"
+"                                What kind of account do you want to add?\n"
+"                                "
+msgstr ""
+
+#: templates/profiles/account.html:151
+msgid "Link"
+msgstr ""
+
+#: templates/profiles/account.html:158
+msgid "Enable Crowd Subtitles on your YouTube Channel"
+msgstr ""
+
+#: templates/profiles/account.html:168
+msgid "How We Enable Crowd Subtitles"
+msgstr ""
+
+#: templates/profiles/account.html:171
+msgid ""
+"\n"
+"                                        We automatically <strong>add your "
+"YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:176
+msgid ""
+"\n"
+"                                        We <strong>invite your viewers to "
+"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:181
+msgid ""
+"\n"
+"                                        We <strong>send subtitles to "
+"YouTube</strong> whenever they're completed on Amara.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:187
+msgid "When We Send Subtitles to YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:190
+msgid ""
+"\n"
+"                                        The link is <strong>one-way only</"
+"strong>. Changes made on YouTube won't be reflected on Amara and may be "
+"overwritten. Use Amara to edit subtitles.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:195
+msgid ""
+"\n"
+"                                        Amara will <strong>append a credit</"
+"strong> to the subtitles if space allows.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:201 templates/teams/dashboard.html:97
+#: templates/videos/_video_url_panel.html:44
+msgid "Learn more"
+msgstr "Mësoni më tepër"
+
+#: templates/profiles/account.html:201
+msgid " about Crowd Subtitles and YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:203
+msgid "Step 1: Create/Confirm your YouTube Channel"
+msgstr ""
+
+#: templates/profiles/account.html:204
+msgid "Enable Channel"
+msgstr ""
+
+#: templates/profiles/account.html:206
+msgid "Step 2: Authorize"
+msgstr ""
+
+#: templates/profiles/account.html:207
+msgid "Link accounts"
+msgstr ""
+
+#: templates/profiles/account.html:210
+msgid ""
+"Organizations/companies: interested in YouTube sync and crowd subtitling? "
+msgstr ""
+
+#: templates/profiles/account.html:211
+msgid "Contact us"
+msgstr "Lidhuni me ne"
+
+#: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
+msgid "Languages"
+msgstr "Gjuhë"
+
+#: templates/profiles/base.html:51
+msgid "hasn't selected languages yet."
+msgstr ""
+
+#: templates/profiles/base.html:67
+msgid "hasn't joined any teams yet."
+msgstr ""
+
+#: templates/profiles/dashboard.html:34
+msgid "You have "
+msgstr ""
+
+#: templates/profiles/dashboard.html:35
+msgid "Go to your inbox"
+msgstr ""
+
+#: templates/profiles/dashboard.html:37
+msgid "unread message"
+msgstr ""
+
+#: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:52
+msgid "Videos you're working on"
+msgstr ""
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:87
+#: templates/teams/dashboard.html:67
+msgid "Create"
+msgstr ""
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:63
+#: templates/profiles/dashboard.html:87 templates/profiles/dashboard.html:90
+#: templates/teams/dashboard.html:67 templates/teams/dashboard.html.py:71
+#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
+#: templates/videos/subtitle-view.html:48
+#: templates/videos/subtitle-view.html:75
+msgid "subtitles"
+msgstr "titra"
 
 #: templates/profiles/dashboard.html:98
-msgid "Alerts"
-msgstr "Sinjalizime"
+msgid "I can't do this"
+msgstr ""
 
-#: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
-msgid "Do you really wish to leave this team?"
-msgstr "Jeni i sigurt se doni ta braktisni këtë ekip?"
+#: templates/profiles/dashboard.html:117
+msgid "Activity on your videos"
+msgstr ""
 
-#: templates/profiles/dashboard.html:115
-msgid "leave team"
-msgstr "braktise ekipin"
+#: templates/profiles/dashboard.html:128
+msgid ""
+"\n"
+"                                Nothing happening yet.\n"
+"                            "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:5
-msgid "Edit My Profile"
-msgstr "Përpuno Profilin Tim"
+#: templates/profiles/dashboard.html:132
+msgid ""
+"\n"
+"                                You haven't shared any videos yet.\n"
+"                            "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:16
-msgid "Do you really want delete your picture?"
-msgstr "Doni vërtet të fshihet figura juaj?"
+#: templates/profiles/dashboard.html:143
+msgid "Activity in your teams"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:40
+#: templates/profiles/dashboard.html:154
+msgid ""
+"\n"
+"                                All's quiet in your teams so far. \n"
+"                            "
+msgstr ""
+
+#: templates/profiles/dashboard.html:158
+msgid ""
+"\n"
+"                                You haven't joined any teams yet.\n"
+"                            "
+msgstr ""
+
+#: templates/profiles/edit.html:5
+msgid "Edit Profile"
+msgstr ""
+
+#: templates/profiles/edit.html:30 templates/teams/_application_form.html:36
+msgid "About you"
+msgstr "Rreth jush"
+
+#: templates/profiles/edit.html:40
+msgid "Photo"
+msgstr ""
+
+#: templates/profiles/edit.html:44
+msgid "Remove current photo"
+msgstr ""
+
+#: templates/profiles/edit.html:92
 #: templates/videos/_paste_transcription.html:106
 #: templates/videos/_video_url_panel.html:77
 msgid "Saving..."
 msgstr "Po ruhet..."
 
-#: templates/profiles/edit_profile.html:51
-msgid "Edit Your Profile"
-msgstr "Përpunoni Profilin Tuaj"
+#: templates/profiles/edit.html:97
+msgid "Do you really want to delete your photo?"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:64
-msgid "Personal Info"
-msgstr "Të dhëna Personale"
+#: templates/profiles/remove-third-party.html:16
+msgid "Remove a third party account"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:65
-msgid "Will be displayed publicly"
-msgstr "Do të shfaqet publikisht"
+#: templates/profiles/remove-third-party.html:18
+#, python-format
+msgid ""
+"\n"
+"                            Are you sure you want to remove the %(type)s "
+"account\n"
+"                        "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:83
-msgid "remove picture"
-msgstr "hiqe foton"
+#: templates/profiles/remove-third-party.html:28
+msgid "Remove account"
+msgstr ""
 
-#: templates/profiles/edit_profile.html:88
-msgid "Upload picture"
-msgstr "Ngarkoni foto"
+#: templates/profiles/videos.html:6
+#, python-format
+msgid ""
+"\n"
+"        %(user_info)s's videos | Amara\n"
+"    "
+msgstr ""
 
-#: templates/profiles/edit_profile.html:92
-msgid "Account Details"
-msgstr "Hollësi Llogarie"
+#: templates/profiles/videos.html:29
+msgid "hasn't shared any videos on Amara."
+msgstr ""
 
-#: templates/profiles/edit_profile.html:107
-msgid "Notifications"
-msgstr "Njoftime"
+#: templates/profiles/view.html:25
+msgid "doesn't have any activity yet."
+msgstr ""
 
-#: templates/profiles/edit_profile.html:110
-msgid "Send notifications to my UniversalSubtitles.org message inbox"
-msgstr "Dërgo njoftime te kutia ime e mesazhe në UniversalSubtitles.org"
-
-#: templates/profiles/edit_profile.html:113
-msgid "Send an email notification for each message received"
-msgstr "Dërgo njoftim email për çdo mesazh të marrë"
-
-#: templates/profiles/edit_profile.html:116
-msgid "Language Info"
-msgstr "Të dhëna Gjuhe"
-
-#: templates/profiles/edit_profile.html:133
-msgid "Languages I Know"
-msgstr "Gjuhët Që Njoh"
-
-#: templates/profiles/edit_profile.html:138
-#: templates/profiles/edit_profile.html:155
-msgid "Remove Language"
-msgstr "Hiqe Gjuhën"
-
-#: templates/profiles/edit_profile.html:169
-msgid "Add Language"
-msgstr "Shtoni Gjuhë"
-
-#: templates/profiles/edit_profile.html:173
-msgid "Developer Info"
-msgstr "Të dhëna për Zhvilluesa"
-
-#: templates/profiles/edit_profile.html:183
-#: templates/teams/settings-permissions.html:118
-msgid "Save Changes"
-msgstr "Ruaji Ndryshimet"
-
-#: templates/profiles/edit_profile.html:186
-msgid "Permanently Delete Your Profile"
-msgstr "Fshini Përgjithmonë Profilin Tuaj"
-
-#: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
-msgid "My videos"
-msgstr "Videot e mia"
-
-#: templates/profiles/view_profile.html:56
-msgid "Member since"
-msgstr "Anëtar që prej"
-
-#: templates/profiles/view_profile.html:62
-msgid "Homepage"
-msgstr "Faqe Hyrëse"
-
-#: templates/profiles/view_profile.html:70
-msgid "<i>User has not submitted a bio.</i>"
-msgstr "<i>Përdoruesi nuk ka parashtruar jetëshkrim.</i>"
-
-#: templates/profiles/view_profile.html:82
-#: templates/teams/_subnav_settings.html:17
-msgid "Languages"
-msgstr "Gjuhë"
-
-#: templates/profiles/view_profile.html:98
-msgid "Memberships"
-msgstr "Anëtarësi"
-
-#: templates/profiles/view_profile.html:121
+#: templates/profiles/view.html:28
 msgid "Profile deleted by user."
 msgstr "Përdoruesi e fshiu profilin."
 
-#: templates/profiles/view_profile.html:130
+#: templates/profiles/view.html:36
 msgid "Edit user"
 msgstr "Përpunoni përdorues"
 
@@ -4815,6 +4753,10 @@ msgstr "Kërko për video"
 msgid "Videos In"
 msgstr "Video Te"
 
+#: templates/search/_search_form.html:28 templates/teams/tasks.html:217
+msgid "Subtitles into"
+msgstr "Titra në"
+
 #: templates/search/_video_item.html:14
 #: templates/videos/_video_languages.html:8
 #, python-format
@@ -4930,8 +4872,10 @@ msgstr "GJITHSEJ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:134
-#: templates/teams/tasks.html.py:221 templates/videos/video-view.html:166
+#: templates/teams/_context_team.html:51 templates/teams/tasks.html:139
+#: templates/teams/tasks.html.py:226
+#: templates/videos/set-original-language.html:13
+#: templates/videos/video-view.html:166
 msgid "Video"
 msgstr "Video"
 
@@ -4955,42 +4899,6 @@ msgstr "Metodë"
 msgid "Value"
 msgstr "Vlerë"
 
-#: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
-msgid "Join via"
-msgstr "Bëhuni pjesë përmes"
-
-#: templates/teams/_actions.html:17 templates/teams/_actions.html.py:36
-msgid "You will be logged out and new account will be created via"
-msgstr "Do të kryhet dalja juaj dhe llogaria e re do të krijohet përmes"
-
-#: templates/teams/_actions.html:21
-msgid "Do you really wish to join this team?"
-msgstr "Doni vërtet të bëheni pjesë e këtij ekipi?"
-
-#: templates/teams/_actions.html:21
-msgid "Join this team now!"
-msgstr "Bëhuni pjesë e këtij ekipi që tani!"
-
-#: templates/teams/_actions.html:27
-msgid "Login via"
-msgstr "Hyni përmes"
-
-#: templates/teams/_actions.html:33
-msgid "to apply"
-msgstr "që të aplikoni"
-
-#: templates/teams/_actions.html:43
-msgid "Your application is pending"
-msgstr "Aplikimi juaj është në pritje"
-
-#: templates/teams/_actions.html:58
-msgid "Join Team"
-msgstr "Bëhuni Pjesë e Ekipit"
-
-#: templates/teams/_actions.html:64
-msgid "Want to create your own subtitling team? Contact "
-msgstr "Doni të krijoni ekipin tuaj të titrimit? Lidhuni me"
-
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
 msgstr "Aplikoni Për T'u Bërë Pjesë"
@@ -5009,26 +4917,12 @@ msgid ""
 "\n"
 "                                No formal language training is required to "
 "translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your profile has your "
-"language\n"
+"their translation abilities. Please make sure your language selections are "
+"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
-"\n"
-"                                Nuk është i domosdoshëm arsim formal "
-"gjuhësor për të përkthyer për %(team)s. Por kërkojmë që krejt përkthyesit të "
-"jenë të sigurt për aftësitë e tyre në përkthim. Ju lutemi, sigurohuni që "
-"profili juaj përmban gjuhën tuaj\n"
-"                            "
 
-#: templates/teams/_application_form.html:24
-msgid "proficiency"
-msgstr ""
-
-#: templates/teams/_application_form.html:24
-msgid "specified"
-msgstr ""
-
-#: templates/teams/_application_form.html:29
+#: templates/teams/_application_form.html:28
 msgid ""
 "\n"
 "                                We request that each new applicant does at "
@@ -5042,11 +4936,7 @@ msgstr ""
 "Pas kësaj, varet në dorën tuaj!\n"
 "                            "
 
-#: templates/teams/_application_form.html:37
-msgid "About you"
-msgstr "Rreth jush"
-
-#: templates/teams/_application_form.html:39
+#: templates/teams/_application_form.html:38
 #, python-format
 msgid ""
 "\n"
@@ -5061,7 +4951,7 @@ msgstr ""
 "tepër!\n"
 "                    "
 
-#: templates/teams/_application_form.html:47
+#: templates/teams/_application_form.html:46
 msgid "Submit Application"
 msgstr "Parashtroni Zbatim"
 
@@ -5074,15 +4964,15 @@ msgid "Video Page"
 msgstr "Faqe Videoje"
 
 #: templates/teams/_context_project.html:17
-#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:118
+#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:139
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show all"
 msgstr "Shfaqi krejt"
 
 #: templates/teams/_context_project.html:31
-#: templates/teams/_context_team.html:59
+#: templates/teams/_context_team.html:64
 msgid "Task"
 msgstr "Punë"
 
@@ -5096,29 +4986,61 @@ msgstr "Tjetër"
 msgid "Projects"
 msgstr "Projekte"
 
-#: templates/teams/_context_team.html:29
+#: templates/teams/_context_team.html:33
 #: templates/videos/test_form_page.html:24
 msgid "video"
 msgstr "video"
 
-#: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:114
+#: templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:135
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show less"
 msgstr "Shfaq më pak"
 
-#: templates/teams/_context_team.html:53
+#: templates/teams/_context_team.html:57
 msgid "Member"
 msgstr "Anëtar"
 
-#: templates/teams/_context_team.html:83
+#: templates/teams/_context_team.html:91
+msgid "Your role:"
+msgstr ""
+
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+#: templates/teams/tasks.html:81
+#: unisubs-integration/services/templates/services/translation_request.html:8
+msgid "for"
+msgstr "për"
+
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+msgid "and"
+msgstr " dhe "
+
+#: templates/teams/_context_team.html:94 templates/teams/members-list.html:101
+msgid "project"
+msgstr "projekt"
+
+#: templates/teams/_context_team.html:100
 msgid "Your tasks"
 msgstr "Punët tuaja"
 
-#: templates/teams/_context_team.html:87
+#: templates/teams/_context_team.html:104
 msgid "All available tasks"
 msgstr "Krejt punët e mundshme"
+
+#: templates/teams/_context_team.html:108 templates/teams/teams-list.html:82
+msgid "Do you really wish to leave this team?"
+msgstr "Jeni i sigurt se doni ta braktisni këtë ekip?"
+
+#: templates/teams/_context_team.html:108
+msgid "Leave team"
+msgstr "Braktiseni ekipin"
+
+#: templates/teams/_context_team.html:145
+msgid "Want to create your own subtitling team? Contact "
+msgstr "Doni të krijoni ekipin tuaj të titrimit? Lidhuni me"
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
@@ -5147,13 +5069,49 @@ msgid "You can also invite friends who speak other languages to help out."
 msgstr ""
 "Për t'ju ndihmuar, mund të ftoni gjithashtu shokë që flasin gjuhë të tjera."
 
+#: templates/teams/_join.html:9 templates/teams/_join.html.py:50
+msgid "Join via"
+msgstr "Bëhuni pjesë përmes"
+
+#: templates/teams/_join.html:17 templates/teams/_join.html.py:36
+msgid "You will be logged out and new account will be created via"
+msgstr "Do të kryhet dalja juaj dhe llogaria e re do të krijohet përmes"
+
+#: templates/teams/_join.html:21
+msgid "Do you really wish to join this team?"
+msgstr "Doni vërtet të bëheni pjesë e këtij ekipi?"
+
+#: templates/teams/_join.html:21
+msgid "Join our team now!"
+msgstr ""
+
+#: templates/teams/_join.html:27
+msgid "Login via"
+msgstr "Hyni përmes"
+
+#: templates/teams/_join.html:33
+msgid "to apply"
+msgstr "që të aplikoni"
+
+#: templates/teams/_join.html:43
+msgid "Your application is pending"
+msgstr "Aplikimi juaj është në pritje"
+
+#: templates/teams/_join.html:59
+msgid "Join our team"
+msgstr ""
+
+#: templates/teams/_join.html:61
+msgid "to join our team"
+msgstr ""
+
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:304
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:307
 msgid "Resume"
 msgstr "Rimerre"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:306
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:309
 msgid "Start now"
 msgstr "Fillojeni tani"
 
@@ -5162,30 +5120,20 @@ msgid "Team Details"
 msgstr "Hollësi Ekipi"
 
 #: templates/teams/_subnav_settings.html:13
-#: templates/teams/settings-permissions.html:92
 msgid "Workflows"
 msgstr "Rrjedha Pune"
 
-#: templates/teams/_tabs.html:6 templates/teams/_tabs_projects.html:6
-#: templates/teams/videos-list.html:6
-msgid "Videos"
-msgstr "Video"
-
-#: templates/teams/_tabs.html:11 templates/teams/members-list.html:6
+#: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
 msgstr "Anëtarë"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
-msgid "Activity"
-msgstr "Veprimtari"
-
-#: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
-#: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:29
+#: templates/teams/_tabs.html:28 templates/teams/_tabs_projects.html:12
+#: templates/teams/_team_video_detail.html:41
+#: templates/teams/settings-permissions.html:73 templates/teams/tasks.html:34
 msgid "Tasks"
 msgstr "Punë"
 
-#: templates/teams/_tabs.html:29 templates/teams/_tabs_projects.html:19
+#: templates/teams/_tabs.html:36 templates/teams/_tabs_projects.html:19
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-languages.html:5
 #: templates/teams/settings-permissions.html:5
@@ -5245,6 +5193,19 @@ msgstr "Shtoni ekip të ri"
 #, python-format
 msgid ""
 "\n"
+"                        %(num)s language needed\n"
+"                    "
+msgid_plural ""
+"\n"
+"                        %(num)s languages needed\n"
+"                    "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/teams/_team_video_detail.html:20
+#, python-format
+msgid ""
+"\n"
 "                        %(num)s language\n"
 "                    "
 msgid_plural ""
@@ -5260,55 +5221,11 @@ msgstr[1] ""
 "                        %(num)s gjuhë\n"
 "                    "
 
-#: templates/teams/_team_video_detail.html:19
-#, python-format
-msgid ""
-"\n"
-"                            (%(num)s completed)\n"
-"                            "
-msgid_plural ""
-"\n"
-"                            (%(num)s completed)\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            (%(num)s i plotësuar)\n"
-"                            "
-msgstr[1] ""
-"\n"
-"                            (%(num)s të plotësuar)\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:35
-#, python-format
-msgid ""
-"\n"
-"                            1 task\n"
-"                        "
-msgid_plural ""
-"\n"
-"                            %(counter)s tasks\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            1 punë\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                            %(counter)s punë\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:52
+#: templates/teams/_team_video_detail.html:46
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
 msgstr "Përpunoni"
-
-#: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
-#: templates/videos/_video_url_panel.html:34
-msgid "Remove"
-msgstr "Hiqe"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5339,7 +5256,7 @@ msgstr "Shtoni shumë video njëherazi"
 msgid "Team Aplications"
 msgstr "Zbatime Ekipi"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:63
+#: templates/teams/applications.html:49 templates/teams/tasks.html:68
 msgid "Approve"
 msgstr "Miratoje"
 
@@ -5355,7 +5272,7 @@ msgstr "Dërgo mesazh"
 msgid "There are no applications right now"
 msgstr "Hëpërhë nuk ka aplikime"
 
-#: templates/teams/base.html:39
+#: templates/teams/base.html:37
 msgid "Edit team"
 msgstr "Përpunoni ekipin"
 
@@ -5428,7 +5345,7 @@ msgstr "Cila gjuhë ka nevojë?"
 msgid "Who should do it?"
 msgstr "Cili duhet ta bëjë?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:485
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:513
 msgid "Begin typing to search"
 msgstr "Shtypni, që të kërkohet"
 
@@ -5455,6 +5372,90 @@ msgstr "Formular pune të re"
 #: templates/teams/create_task.html:103
 msgid "Back to tasks list"
 msgstr "Mbrapsht te lista e punëve"
+
+#: templates/teams/dashboard.html:79
+msgid "Due in"
+msgstr ""
+
+#: templates/teams/dashboard.html:81
+msgid "Overdue by"
+msgstr ""
+
+#: templates/teams/dashboard.html:91
+msgid "Helping out is easy!"
+msgstr ""
+
+#: templates/teams/dashboard.html:93
+msgid ""
+"\n"
+"                            Just find a video that interests you and click "
+"the button below it to get started!\n"
+"                        "
+msgstr ""
+
+#: templates/teams/dashboard.html:97
+msgid " about subtitling in Amara."
+msgstr ""
+
+#: templates/teams/dashboard.html:102
+msgid "Welcome!"
+msgstr ""
+
+#: templates/teams/dashboard.html:107
+msgid ""
+"\n"
+"                            We've got lots of great content that we'd love "
+"your help with.\n"
+"                        "
+msgstr ""
+
+#: templates/teams/dashboard.html:119 templates/teams/dashboard.html.py:256
+msgid "Videos that need your help"
+msgstr ""
+
+#: templates/teams/dashboard.html:121
+msgid "Some of the videos we're working on now"
+msgstr ""
+
+#: templates/teams/dashboard.html:127 templates/teams/tasks.html:159
+msgid "Tell us what languages you speak"
+msgstr "Tregonani se ç'gjuhë flisni"
+
+#: templates/teams/dashboard.html:127
+msgid "and we'll personalize this list for you"
+msgstr ""
+
+#: templates/teams/dashboard.html:155 templates/teams/dashboard.html.py:197
+msgid " languages need your help"
+msgstr ""
+
+#: templates/teams/dashboard.html:164 templates/teams/dashboard.html.py:192
+msgid "Create Subtitles"
+msgstr ""
+
+#: templates/teams/dashboard.html:205 templates/teams/dashboard.html.py:216
+msgid "Create "
+msgstr ""
+
+#: templates/teams/dashboard.html:207 templates/teams/dashboard.html.py:218
+msgid " Subtitles"
+msgstr ""
+
+#: templates/teams/dashboard.html:246
+msgid "Sorry, you've reached the maximum number of tasks for this team."
+msgstr ""
+
+#: templates/teams/dashboard.html:258
+msgid "Sorry, we couldn't find any videos for you."
+msgstr ""
+
+#: templates/teams/dashboard.html:262
+msgid "Update your language preferences"
+msgstr ""
+
+#: templates/teams/dashboard.html:268
+msgid "Add videos to the team"
+msgstr ""
 
 #: templates/teams/email_new_video.html:7
 #, python-format
@@ -5532,7 +5533,7 @@ msgstr "Rol që i duhet caktuar përdoruesit nëse pranon ftesën tuaj."
 msgid "Send Invites"
 msgstr "Dërgoni Ftesa"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:47
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:52
 #: templates/teams/videos-list.html:45
 msgid "Filter and Sort"
 msgstr "Filtroni dhe Renditini"
@@ -5562,12 +5563,12 @@ msgstr "kontribues"
 msgid "speaking"
 msgstr ""
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:83
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:88
 msgid "all languages"
 msgstr "krejt gjuhët"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:128
-#: templates/teams/tasks.html.py:135 templates/teams/tasks.html:142
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:133
+#: templates/teams/tasks.html.py:140 templates/teams/tasks.html:147
 #: templates/teams/videos-list.html:94
 msgid "Clear"
 msgstr "Pastroje"
@@ -5587,14 +5588,6 @@ msgstr "Na ndjeni, nuk u gjetën anëtarë."
 #: templates/teams/members-list.html:92
 msgid "Me"
 msgstr "Unë"
-
-#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
-msgid "and"
-msgstr " dhe "
-
-#: templates/teams/members-list.html:101
-msgid "project"
-msgstr "projekt"
 
 #: templates/teams/members-list.html:113
 msgid "Assignments"
@@ -5663,7 +5656,7 @@ msgstr "Punët e përkthimit do të vetëkrijohen për këto gjuhë"
 
 #: templates/teams/settings-languages.html:33
 msgid "Blacklisted Languages"
-msgstr ""
+msgstr "Gjuhë Në Listë të Zezë"
 
 #: templates/teams/settings-languages.html:34
 msgid "Will not be shown when creating or performing tasks"
@@ -5681,15 +5674,69 @@ msgstr "Si mund të anëtarësohen te ekipi juaj përdoruesit?"
 msgid "Who can add/remove videos?"
 msgstr "Kush mund të shtojë/heqë video?"
 
-#: templates/teams/settings-permissions.html:37
-msgid "Manage subtitling and translation work for your videos"
-msgstr "Administroni punën e titrimit dhe përkthimit për videot tuaja"
+#: templates/teams/settings-permissions.html:36
+msgid "Subtitling"
+msgstr "Titrim"
+
+#: templates/teams/settings-permissions.html:38
+msgid "Who can transcribe subtitles?"
+msgstr "Kush mund të transkriptojë tituj?"
 
 #: templates/teams/settings-permissions.html:39
+msgid "i.e. transcribe from video and perform time-alignment"
+msgstr "pra, transkriptoni video dhe kryeni shpërndarjen e kohës"
+
+#: templates/teams/settings-permissions.html:42
+msgid "Who can translate subtitles?"
+msgstr "Kush mund të përkthejë titra?"
+
+#: templates/teams/settings-permissions.html:43
+msgid "i.e. translate text from an original subtitle into a new language"
+msgstr "pra, përktheni tekst prej titrash origjinalë në një gjuhë të re"
+
+#: templates/teams/settings-permissions.html:48
+msgid "How your subtitles will get published <em>(configure below)</em>"
+msgstr "Si do të botohen titrat tuaj <em>(formësojeni më poshtë)</em>"
+
+#: templates/teams/settings-permissions.html:50
+msgid "Transcribed"
+msgstr "Të transkriptuara"
+
+#: templates/teams/settings-permissions.html:52
+msgid "or ..."
+msgstr "ose ..."
+
+#: templates/teams/settings-permissions.html:58
+msgid "Reviewed"
+msgstr "Të shqyrtuar"
+
+#: templates/teams/settings-permissions.html:63
+msgid "Approved"
+msgstr "Të miratuar"
+
+#: templates/teams/settings-permissions.html:68
+msgid "Published"
+msgstr "Të botuar"
+
+#: templates/teams/settings-permissions.html:74
+msgid ""
+"Tasks enable you to manage and assign subtitling and translation work for "
+"your videos"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:75
+msgid "Enable tasks"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:80
+msgid "Permissions and Limits"
+msgstr ""
+
+#: templates/teams/settings-permissions.html:82
 msgid "Who can create and assign tasks?"
 msgstr "Kush mund të krijojë dhe caktojë punë?"
 
-#: templates/teams/settings-permissions.html:41
+#: templates/teams/settings-permissions.html:84
 msgid ""
 "Specified members will only be able to create/assign tasks they are "
 "permitted to complete themselves"
@@ -5697,96 +5744,46 @@ msgstr ""
 "Anëtarët e përcaktuar do të jenë në gjendje vetëm të krijojnë/caktojnë punë "
 "plotësimi i të cilave u është lejuar atyre vetë"
 
-#: templates/teams/settings-permissions.html:43
+#: templates/teams/settings-permissions.html:86
 msgid "How many tasks can a user have at once?"
 msgstr "Sa punë mund të ketë njëherazi një përdorues?"
 
-#: templates/teams/settings-permissions.html:46
+#: templates/teams/settings-permissions.html:89
 msgid "If left blank there will be no limit."
 msgstr "Po u la e zbrazët, nuk do të ketë kufi."
 
-#: templates/teams/settings-permissions.html:48
+#: templates/teams/settings-permissions.html:91
 msgid "How many days should an assignee get to complete a task?"
 msgstr "Sa ditë i duhen dhënë dikujt për të plotësuar një punë?"
 
-#: templates/teams/settings-permissions.html:51
+#: templates/teams/settings-permissions.html:94
 msgid "If left blank tasks will not expire."
 msgstr "Po u la e zbrazët, punët nuk do të skadojnë."
 
-#: templates/teams/settings-permissions.html:55
-msgid "Subtitling"
-msgstr "Titrim"
-
-#: templates/teams/settings-permissions.html:57
-msgid "Who can transcribe subtitles?"
-msgstr "Kush mund të transkriptojë tituj?"
-
-#: templates/teams/settings-permissions.html:58
-msgid "i.e. transcribe from video and perform time-alignment"
-msgstr "pra, transkriptoni video dhe kryeni shpërndarjen e kohës"
-
-#: templates/teams/settings-permissions.html:61
-msgid "Who can translate subtitles?"
-msgstr "Kush mund të përkthejë titra?"
-
-#: templates/teams/settings-permissions.html:62
-msgid "i.e. translate text from an original subtitle into a new language"
-msgstr "pra, përktheni tekst prej titrash origjinalë në një gjuhë të re"
-
-#: templates/teams/settings-permissions.html:67
-msgid "How your subtitles will get published <em>(configure below)</em>"
-msgstr "Si do të botohen titrat tuaj <em>(formësojeni më poshtë)</em>"
-
-#: templates/teams/settings-permissions.html:69
-msgid "Transcribed"
-msgstr "Të transkriptuara"
-
-#: templates/teams/settings-permissions.html:71
-msgid "or ..."
-msgstr "ose ..."
-
-#: templates/teams/settings-permissions.html:77
-msgid "Reviewed"
-msgstr "Të shqyrtuar"
-
-#: templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr "Të miratuar"
-
-#: templates/teams/settings-permissions.html:87
-msgid "Published"
-msgstr "Të botuar"
-
-#: templates/teams/settings-permissions.html:93
-msgid "Workflows enable you to add moderation steps and automate tasks"
+#: templates/teams/settings-permissions.html:97
+msgid "Workflow"
 msgstr ""
-"Rrjedhat e punës ju lejojnë të shtoni hapa moderimi dhe të automatizoni punët"
 
-#: templates/teams/settings-permissions.html:94
-#: templates/teams/settings-projects-add.html:42
-msgid "Enable workflows"
-msgstr "Aktivizoni rrjedha punësh"
-
-#: templates/teams/settings-permissions.html:101
+#: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
 msgstr "Krijo vetvetiu punë transkriptimi"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "Automatically create translation tasks for preferred languages"
 msgstr "Krijo vetvetiu punë përkthimi për gjuhët e parapëlqyera"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "manage languages"
 msgstr "administroni gjuhët"
 
-#: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:60
+#: templates/teams/settings-permissions.html:108
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:65
 msgid "Review"
 msgstr "Shqyrtoni"
 
-#: templates/teams/settings-permissions.html:112
+#: templates/teams/settings-permissions.html:111
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
 msgstr "Miratim"
@@ -5814,6 +5811,10 @@ msgstr ""
 "Moderoni titrat e këtij projekti. Kështu doi të anashkalohet rrjedha e punës "
 "së ekipit, në pastë."
 
+#: templates/teams/settings-projects-add.html:42
+msgid "Enable workflows"
+msgstr "Aktivizoni rrjedha punësh"
+
 #: templates/teams/settings-projects-add.html:49
 msgid "Automatically create subtitle tasks"
 msgstr "Krijo vetvetiu punë titrimi"
@@ -5830,231 +5831,249 @@ msgstr "Jeni i sigurt se doni të fshihet ky projekt?"
 msgid "This team does not have any projects yet"
 msgstr "Ky ekip ende nuk ka ndonjë projekt"
 
-#: templates/teams/tasks.html:43
+#: templates/teams/tasks.html:48
 msgid "Add Task"
 msgstr "Shtoni Punë"
 
-#: templates/teams/tasks.html:58
+#: templates/teams/tasks.html:62 templates/teams/tasks.html.py:207
+msgid "Transcribe"
+msgstr "Transkriptoni"
+
+#: templates/teams/tasks.html:63
 #: unisubs-integration/services/templates/services/translation_request.html:6
 msgid "Translate"
 msgstr "Përktheni"
 
-#: templates/teams/tasks.html:66
+#: templates/teams/tasks.html:71
 msgid "tasks in"
 msgstr "punë në"
 
-#: templates/teams/tasks.html:70 templates/teams/videos-list.html:54
+#: templates/teams/tasks.html:75 templates/teams/videos-list.html:54
 msgid "any project"
 msgstr "çfarëdo projekti"
 
-#: templates/teams/tasks.html:81
+#: templates/teams/tasks.html:86
 msgid "my languages"
 msgstr "gjuhët e mia"
 
-#: templates/teams/tasks.html:95
+#: templates/teams/tasks.html:100
 msgid "assigned to"
 msgstr "caktuar për"
 
-#: templates/teams/tasks.html:97
+#: templates/teams/tasks.html:102
 msgid "no one"
 msgstr "asnjë"
 
-#: templates/teams/tasks.html:98 templates/teams/tasks.html.py:268
+#: templates/teams/tasks.html:103 templates/teams/tasks.html.py:271
 msgid "me"
 msgstr "unë"
 
-#: templates/teams/tasks.html:99
+#: templates/teams/tasks.html:104
 msgid "anyone"
 msgstr "cilido"
 
-#: templates/teams/tasks.html:108 templates/teams/videos-list.html:70
+#: templates/teams/tasks.html:113 templates/teams/videos-list.html:70
 msgid "sorted by"
 msgstr "renditur sipas"
 
-#: templates/teams/tasks.html:111
+#: templates/teams/tasks.html:116
 msgid "date, newest"
 msgstr "datash, më e reja"
 
-#: templates/teams/tasks.html:114
+#: templates/teams/tasks.html:119
 msgid "date, oldest"
 msgstr "datash, më e vjetra"
 
-#: templates/teams/tasks.html:118
+#: templates/teams/tasks.html:123
 msgid "time left, least"
 msgstr "kohë e mbetur, më e pakta"
 
-#: templates/teams/tasks.html:121
+#: templates/teams/tasks.html:126
 msgid "time left, most"
 msgstr "kohë e mbetur, më e shumta"
 
-#: templates/teams/tasks.html:128 templates/teams/tasks.html.py:135
-#: templates/teams/tasks.html:142
+#: templates/teams/tasks.html:133 templates/teams/tasks.html.py:140
+#: templates/teams/tasks.html:147
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Pastro krejt filtrat, renditjet dhe termat e kërkimit"
 
-#: templates/teams/tasks.html:140
+#: templates/teams/tasks.html:145
 msgid "NOTE:"
 msgstr "SHËNIM:"
 
-#: templates/teams/tasks.html:141
+#: templates/teams/tasks.html:146
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr ""
 "Kur kryhet renditje sipas datash skadimi, nuk tregohen punët që nuk kanë "
 "datë skadimi."
 
-#: templates/teams/tasks.html:148
+#: templates/teams/tasks.html:153
 msgid "Try broadening your selection using the filters above"
 msgstr "Provoni ta zgjeroni përzgjedhjen tuaj duke përdorur filtrat e mësipërm"
 
-#: templates/teams/tasks.html:154
-msgid "Tell us what languages you speak"
-msgstr "Tregonani se ç'gjuhë flisni"
-
-#: templates/teams/tasks.html:154
+#: templates/teams/tasks.html:159
 msgid "and we'll narrow this list for you"
 msgstr "dhe do t'jua ngushtojmë këtë listë"
 
-#: templates/teams/tasks.html:160
+#: templates/teams/tasks.html:165
 msgid "Showing unassigned tasks in languages you speak. "
 msgstr "Po shfaqen punë pa zot te gjuhët që flisni."
 
-#: templates/teams/tasks.html:162
+#: templates/teams/tasks.html:167
 msgid "Want to view "
-msgstr ""
+msgstr "Dëshironi të shihni"
 
-#: templates/teams/tasks.html:163
+#: templates/teams/tasks.html:168
 msgid "your tasks"
-msgstr ""
+msgstr "punët tuaja"
 
-#: templates/teams/tasks.html:164
+#: templates/teams/tasks.html:169
 msgid " instead?"
-msgstr ""
+msgstr "më mirë?"
 
-#: templates/teams/tasks.html:170
+#: templates/teams/tasks.html:175
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr ""
+"Që të gjeni hapa për t'u kryer, përmes përdorimit të filtrave më sipër "
+"provoni të ndryshoni përzgjedhjen tuaj"
 
-#: templates/teams/tasks.html:196
+#: templates/teams/tasks.html:201
 msgid "You don't have permission to perform this task."
 msgstr "Nuk keni leje të kryeni këtë punë."
 
-#: templates/teams/tasks.html:235
+#: templates/teams/tasks.html:222 templates/teams/tasks.html.py:238
+#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:152
+#: templates/videos/subtitle-view.html:186
+msgid "Subtitles"
+msgstr "Titra"
+
+#: templates/teams/tasks.html:239
 msgid "latest draft"
 msgstr "skica më e re"
 
-#: templates/teams/tasks.html:239
+#: templates/teams/tasks.html:242
 msgid "transcribed"
 msgstr "të transkriptuara"
 
-#: templates/teams/tasks.html:241 templates/videos/subtitle-view.html:48
+#: templates/teams/tasks.html:244 templates/videos/subtitle-view.html:48
 msgid "translated"
 msgstr "përkthyer"
 
-#: templates/teams/tasks.html:249
+#: templates/teams/tasks.html:252
 msgid "reviewed"
 msgstr "shqyrtuar"
 
-#: templates/teams/tasks.html:251
+#: templates/teams/tasks.html:254
 msgid "and edited"
 msgstr "dhe përpunuar"
 
-#: templates/teams/tasks.html:253 templates/videos/subtitle-view.html:194
+#: templates/teams/tasks.html:256 templates/videos/subtitle-view.html:194
 #: templates/videos/subtitle-view.html:310
 msgid "by"
 msgstr "nga"
 
-#: templates/teams/tasks.html:266
+#: templates/teams/tasks.html:269
 msgid "Assigned to"
 msgstr "Caktuar për"
 
-#: templates/teams/tasks.html:275
+#: templates/teams/tasks.html:278
 msgid "Unassigned"
 msgstr "E pacaktuar"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:293
 msgid "Perform Task"
 msgstr "Kryeje Punën"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:302
 msgid "You have reached the maximum number of tasks."
 msgstr "Keni mbërritur në numrin maksimum të punëve."
 
-#: templates/teams/tasks.html:318
+#: templates/teams/tasks.html:321
 msgid "Download draft"
 msgstr "Shkarkoje skicën"
 
-#: templates/teams/tasks.html:332
+#: templates/teams/tasks.html:337
 msgid "Upload a draft"
 msgstr "Ngarkoni një skicë"
 
-#: templates/teams/tasks.html:335
+#: templates/teams/tasks.html:343 templates/videos/_upload_subtitles.html:32
+msgid "Video Language"
+msgstr "Gjuhë Videoje"
+
+#: templates/teams/tasks.html:347 templates/videos/_upload_subtitles.html:37
+msgid ""
+"Please double check the primary spoken language. This step cannot be undone."
+msgstr ""
+"Ju lutemi, gjuhën parësore kontrollojeni mirë, për t'u siguruar. Ky hap nuk "
+"mund të zhbëhet."
+
+#: templates/teams/tasks.html:354
+msgid "Translate from"
+msgstr "Përktheni nga"
+
+#: templates/teams/tasks.html:363
 msgid "Important:"
 msgstr "E rëndësishme:"
 
-#: templates/teams/tasks.html:335
+#: templates/teams/tasks.html:363
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
 "and video description in the onsite editor and to submit the final version."
 msgstr ""
+"Ngarkimi i një pune paraprake nuk është fundi i punës. Pas ngarkimit, "
+"përzgjidhni prej menusë hap-mbyll \"Kryeni Punën\" zërin \"Rimerre\" qëtë "
+"verifikoni kohët, titullin e videos dhe përshkrimin e videos te përpunuesi i "
+"vetë site-it dhe që të parashtroni versionin përfundimtar."
 
-#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:27
+#: templates/teams/tasks.html:368 templates/videos/_upload_subtitles.html:27
 #: templates/videos/video-view.html:109
 msgid "Language"
 msgstr "Gjuhë"
 
-#: templates/teams/tasks.html:340 templates/videos/_upload_subtitles.html:37
-msgid ""
-"Please double check the primary spoken language. This step cannot be undone."
-msgstr ""
-
-#: templates/teams/tasks.html:345
-msgid "Translate from"
-msgstr "Përktheni nga"
-
-#: templates/teams/tasks.html:350
+#: templates/teams/tasks.html:376
 msgid "File:"
 msgstr "Kartelë:"
 
-#: templates/teams/tasks.html:353
+#: templates/teams/tasks.html:382
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
 msgstr ""
 "Formate të pranueshëm: .srt, .ssa, .sbv, .dfxp, txt ose .xml (për TTML)"
 
-#: templates/teams/tasks.html:367
+#: templates/teams/tasks.html:395
 msgid "Download a draft"
 msgstr "Shkarkoni një skicë"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Shkarkoni një skicë të këtyre titrave që të mund të punoni i palidhur."
 
-#: templates/teams/tasks.html:398
+#: templates/teams/tasks.html:426
 msgid "Decline"
 msgstr "Hidhe poshtë"
 
-#: templates/teams/tasks.html:418
+#: templates/teams/tasks.html:446
 msgid "Reassign"
 msgstr "Ricaktoni"
 
-#: templates/teams/tasks.html:420
+#: templates/teams/tasks.html:448
 msgid "Assign"
 msgstr "Caktoje"
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:464
 msgid "Delete task"
 msgstr "Fshije punën"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:470
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "Ç'do të donit të bënit me titra për këtë punë?"
 
-#: templates/teams/tasks.html:445
+#: templates/teams/tasks.html:473
 msgid "Publish these subtitles immediately"
 msgstr "Botoji menjëherë këto titra"
 
-#: templates/teams/tasks.html:449
+#: templates/teams/tasks.html:477
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
@@ -6062,11 +6081,11 @@ msgstr ""
 "Fshiji këto titra përgjithmonë (hidh tej çfarëdo skice që pas versionit të "
 "fundit të botuar)"
 
-#: templates/teams/tasks.html:488
+#: templates/teams/tasks.html:516
 msgid "Assign to User"
 msgstr "Caktoja Përdoruesit"
 
-#: templates/teams/tasks.html:498
+#: templates/teams/tasks.html:526
 msgid "Sorry, no tasks here."
 msgstr "Na ndjeni, nuk ka punë këtu."
 
@@ -6081,10 +6100,6 @@ msgstr "Përpunoni videon"
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
 msgstr "Kjo video po moderohet nga ekipi"
-
-#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
-msgid "Your Teams"
-msgstr "Ekipet Tuaj"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -6102,11 +6117,15 @@ msgstr "Ekipi juaj"
 msgid "Private"
 msgstr "Private"
 
-#: templates/teams/teams-list.html:74
-msgid "No description..."
-msgstr "Pa përshkrim..."
+#: templates/teams/teams-list.html:78
+msgid "Role:"
+msgstr ""
 
-#: templates/teams/teams-list.html:81 templates/teams/teams-list.html.py:87
+#: templates/teams/teams-list.html:82
+msgid "leave team"
+msgstr "braktise ekipin"
+
+#: templates/teams/teams-list.html:90 templates/teams/teams-list.html.py:96
 #, python-format
 msgid ""
 "\n"
@@ -6125,7 +6144,7 @@ msgstr[1] ""
 "                                        %(count)s anëtarë\n"
 "                                    "
 
-#: templates/teams/teams-list.html:96
+#: templates/teams/teams-list.html:105
 #, python-format
 msgid ""
 "\n"
@@ -6144,23 +6163,19 @@ msgstr[1] ""
 "                                %(count)s video\n"
 "                            "
 
-#: templates/teams/teams-list.html:107
-msgid "Leave team"
-msgstr "Braktiseni ekipin"
-
-#: templates/teams/teams-list.html:114
+#: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
 msgstr "Na ndjeni, nuk u gjetën ekipe."
 
-#: templates/teams/teams-list.html:122
+#: templates/teams/teams-list.html:123
 msgid "Search and Filter"
 msgstr "Kërkoni dhe Filtroni"
 
-#: templates/teams/teams-list.html:127
+#: templates/teams/teams-list.html:128
 msgid "Start a Team"
 msgstr "Filloni një Ekip"
 
-#: templates/teams/teams-list.html:131
+#: templates/teams/teams-list.html:132
 msgid ""
 "\n"
 "                Want to create your own subtitling team? Contact <a href="
@@ -6192,12 +6207,6 @@ msgstr "çfarëdo"
 #: templates/teams/videos-list.html:62
 msgid "no"
 msgstr "pa"
-
-#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
-#: templates/videos/subtitle-view.html:48
-#: templates/videos/subtitle-view.html:75
-msgid "subtitles"
-msgstr "titra"
 
 #: templates/teams/videos-list.html:73
 msgid "name, a-z"
@@ -6250,6 +6259,11 @@ msgid ""
 "will be deleted. Private videos will become available for viewing and "
 "editing to the general public. Are you sure you want to proceed?"
 msgstr ""
+"Po ia hiqni këtë video ekipit %(team)s.<br /><br />\n"
+"                                Do të mbetet në Amara por nuk do të jetë më "
+"subjekt për leje dhe rrjedha pune të ekipit. Çfarëdo hapash të mbetur do të "
+"fshihen. Videot private do të bëhen të dukshme dhe të përpunueshme nga "
+"publiku i rëndomtë. Jeni i sigurt se doni të vazhdohet?"
 
 #: templates/teams/videos-list.html:134
 #, python-format
@@ -6276,6 +6290,11 @@ msgstr ""
 #: templates/teams/videos-list.html:142
 msgid "Delete the video entirely."
 msgstr "Fshije këtë video krejtësisht."
+
+#: templates/videos/_diffing-subtitle.html:17
+#: templates/videos/subtitle-view.html:226
+msgid "Not Synced"
+msgstr "I Panjëkohësuar"
 
 #: templates/videos/_error_feedback_form.html:7
 msgid "Please let us know what you were doing when you encountered this error."
@@ -6362,11 +6381,11 @@ msgstr "Ju lutemi, shkruani përshtypjet."
 
 #: templates/videos/_follow_video_button.html:37
 msgid "✓ Following"
-msgstr ""
+msgstr "✓ E ndiqni"
 
 #: templates/videos/_follow_video_button.html:40
 msgid " Not Following"
-msgstr ""
+msgstr "Nuk e ndiqni"
 
 #: templates/videos/_follow_video_button.html:85
 msgid ""
@@ -6530,10 +6549,12 @@ msgid ""
 "                    (for TTML) are accepted.\n"
 "                "
 msgstr ""
-
-#: templates/videos/_upload_subtitles.html:32
-msgid "Video Language"
-msgstr "Gjuhë Videoje"
+"\n"
+"                  Site-i ynë pranon formatet SRT, SSA, SBV, DFXP, TTML dhe "
+"TXT.\n"
+"                  Pranohen vetëm kartela që mbarojnë me .srt, .ssa, ."
+"sbv,                  .dfxp, txt ose .xml (për TTML).\n"
+"                            "
 
 #: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
@@ -6602,10 +6623,6 @@ msgstr "Parësor"
 #: templates/videos/_video_url_panel.html:32
 msgid "Make primary"
 msgstr "Bëje parësore"
-
-#: templates/videos/_video_url_panel.html:44
-msgid "Learn more"
-msgstr "Mësoni më tepër"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
@@ -6782,24 +6799,19 @@ msgstr "Historik Rishikimesh"
 msgid "Comparing Revision"
 msgstr "Krahasim Rishikimesh"
 
-#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:160
 msgid "Roll back to version"
 msgstr "Kthe versionin"
 
-#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr "Titull:"
 
-#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr "Përshkrim:"
-
-#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
-#: templates/videos/subtitle-view.html:226
-msgid "Not Synced"
-msgstr "I Panjëkohësuar"
 
 #: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
@@ -7111,6 +7123,22 @@ msgstr "Këtë Vit"
 msgid "All Time"
 msgstr "Tërë Kohën"
 
+#: templates/videos/set-original-language.html:10
+msgid "Change video language"
+msgstr ""
+
+#: templates/videos/set-original-language.html:28
+msgid "Choose a language"
+msgstr ""
+
+#: templates/videos/set-original-language.html:30
+msgid "Current language is"
+msgstr ""
+
+#: templates/videos/set-original-language.html:35
+msgid "not set"
+msgstr ""
+
 #: templates/videos/stop_notification.html:9
 #, python-format
 msgid "Notifications to %(u)s stopped for %(video)s."
@@ -7153,12 +7181,12 @@ msgid "Revisions"
 msgstr "Rishikime"
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:380
+#: templates/videos/subtitle-view.html:370
 msgid "Unpublish"
 msgstr "Çbotoje"
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:395
+#: templates/videos/subtitle-view.html:385
 msgid "Edit Subtitles"
 msgstr "Përpunoni Titrat"
 
@@ -7209,7 +7237,7 @@ msgstr "Këto titra janë në përmbushje e sipër."
 
 #: templates/videos/subtitle-view.html:248
 msgid "Make more?"
-msgstr ""
+msgstr "Edhe ca?"
 
 #: templates/videos/subtitle-view.html:250
 msgid "No subtitles available yet."
@@ -7217,7 +7245,7 @@ msgstr "Ende pa titra të passhëm."
 
 #: templates/videos/subtitle-view.html:251
 msgid "Make some!"
-msgstr ""
+msgstr "Bëni ca!"
 
 #: templates/videos/subtitle-view.html:259
 msgid ""
@@ -7286,12 +7314,6 @@ msgid ""
 msgstr ""
 "Shënim: Çfarëdo gjuhe e varur prej saj do të jetë e papërdorshme deri sa kjo "
 "gjuhë të rimiratohet."
-
-#: templates/videos/subtitle-view.html:368
-msgid ""
-"Yes, delete these subtitles instead of sending them back for editing/review"
-msgstr ""
-"Po, fshiji këto titra, në vend se të dërgohen mbrapsht për përpunim/shqyrtim"
 
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
@@ -7453,73 +7475,67 @@ msgid "Help Subtitle Videos"
 msgstr "Ndihmoni Titrimin e Videove"
 
 #: unisubs-integration/api/1_0/forms.py:64
-#, fuzzy
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
-"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë po moderohet tashmë një "
-"skicë për këtë gjuhë."
+"Na ndjeni, nuk i ngarkojmë dot titrat për këtë gjuhë, ngaqë kjo do të "
+"shkatërronte përkthimet e bëra me ato si bazë"
 
 #: unisubs-integration/api/1_0/forms.py:99
 #: unisubs-integration/api/1_0/forms.py:102
-#, fuzzy
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
 msgstr ""
-"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë puna për këtë gjë është "
-"tashmë në rrugë e sipër."
+"Na ndjeni, nuk i ngarkojmë dot titrat tuaj, ngaqë kjo gjuhë moderohet dhe "
+"nuk keni leje të mjaftueshme."
 
 #: unisubs-integration/api/1_0/forms.py:333
-#, fuzzy
 msgid "Incorrect subtitles encoding format"
-msgstr "Format i pasaktë titrash"
+msgstr "Format i pasaktë kodimi titrash"
 
 #: unisubs-integration/apiv2/forms.py:119
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"E domosdoshme. 30 ose më pak shenja. Vetëm shenja alfanumerike (shkronja, "
-"numra dhe nënviza)."
+"E domosdoshme. 30 ose më pak shenja. Vetëm shkronja, shifra dhe shenjat @/./"
+"+/-/_ ."
 
 #: unisubs-integration/apiv2/forms.py:120
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Kjo vlerë duhet të përmbajë vetëm numra, shkronja dhe nënviza."
+msgstr ""
+"Kjo vlerë mund të përmbajë vetëm shkronja, numra dhe shenja si @/./+/-/_ ."
 
 #: unisubs-integration/services/forms.py:16
-#, fuzzy
 msgid "Fidelity"
-msgstr "rregulla videosh"
+msgstr "Besnikëri"
 
 #: unisubs-integration/services/forms.py:18
 msgid "Turnaround"
 msgstr ""
 
 #: unisubs-integration/services/forms.py:28
-#, fuzzy
 msgid "Translate to"
-msgstr "Përktheni"
+msgstr "Përkthejeni në"
 
 #: unisubs-integration/services/forms.py:50
 msgid "Request for this translation already exists"
-msgstr ""
+msgstr "Ka tashmë një kërkesë për këtë përkthim"
 
 #: unisubs-integration/services/forms.py:53
-#, fuzzy
 msgid "Subtitles should be on English"
-msgstr "Titrat nuk ekzistojnë."
+msgstr "Titrat duhet të jenë në Anglisht"
 
 #: unisubs-integration/services/forms.py:80
-#, fuzzy
 msgid "Transcription for this video is already requested."
-msgstr "Titrimi i kësaj videoje është tashmë në punë e sipër."
+msgstr "Është bërë tashmë kërkesë për transkriptimin e kësaj videoje."
 
 #: unisubs-integration/services/forms.py:93
 #, python-format
 msgid "Video URL does not exist. Visit video page and add one for %(sites)s"
 msgstr ""
+"URL-ja e videos nuk ekziston. Vizitoni faqen e videos dhe shtoni një për %"
+"(sites)s"
 
 #: unisubs-integration/services/models.py:41
 #: unisubs-integration/services/models.py:65
@@ -7528,61 +7544,55 @@ msgstr ""
 
 #: unisubs-integration/services/models.py:43
 msgid "supported speakertext.com platform"
-msgstr ""
+msgstr "mbulim për platformën speakertext.com"
 
 #: unisubs-integration/services/models.py:44
 msgid "video id for platform"
-msgstr ""
+msgstr "id videoje për platformën"
 
 #: unisubs-integration/services/models.py:46
 msgid "transcipt ID returned by speakertext.com"
-msgstr ""
+msgstr "ID transkriptimi siç janë kthyer nga speakertext.com"
 
 #: unisubs-integration/services/models.py:48
-#, fuzzy
 msgid "result of transcription"
-msgstr "Ndryshime te përshkrimi"
+msgstr "përfundimi i transkriptimit"
 
 #: unisubs-integration/services/models.py:50
-#, fuzzy
 msgid "subtitles created from transcription"
-msgstr "Krijo vetvetiu punë transkriptimi"
+msgstr "titra të krijuar nga transkriptimi"
 
 #: unisubs-integration/services/views.py:52
 msgid "Request for translation was success."
-msgstr ""
+msgstr "Kërkesa për përkthim qe e suksesshme."
 
 #: unisubs-integration/services/views.py:63
-#, fuzzy
 msgid "This subtitles does not have any version"
-msgstr "Ky ekip ende nuk ka ndonjë projekt"
+msgstr "Ende nuk ka ndonjë version për këta titra"
 
 #: unisubs-integration/services/views.py:65
-#, fuzzy
 msgid "Subtitles should be in English"
-msgstr "Titrat nuk ekzistojnë."
+msgstr "Titrat do të duhej të ishin në Anglisht"
 
 #: unisubs-integration/services/views.py:130
 msgid "Request for transcription was successful."
-msgstr ""
+msgstr "Kërkesa për transkriptim qe e suksesshme."
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:5
 msgid "From"
-msgstr ""
+msgstr "Prej"
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
-#, fuzzy
 msgid "Result"
-msgstr "Rimerre"
+msgstr "Përfundim"
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:15
-#, fuzzy
 msgid "Not finished"
-msgstr "I Panjëkohësuar"
+msgstr "Nuk ka përfunduar"
 
 #: unisubs-integration/servicesauth/views.py:41
 msgid "Could not authorize with TED."
-msgstr ""
+msgstr "Nuk u krye dot mirëfilltësimi te TED-i."
 
 #: utils/ajaxmiddleware.py:27
 #, python-format
@@ -7625,6 +7635,10 @@ msgstr "Videoja nuk ekziston."
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
 msgstr "URL e pasaktë."
+
+#: utils/templatetags/i18n_tags.py:28
+msgid "name_local"
+msgstr ""
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."

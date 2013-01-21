@@ -6,69 +6,68 @@ from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
 
 from apps.webdriver_testing.data_factories import TeamMemberFactory, TeamVideoFactory, UserFactory
 
-
-def setup_teams():
-    """Create a user and some teams for the tests.
-
-    """
-    #CREATE A USER
-    cool_user = UserFactory.create(username='Wicked Cool', password='password')
-
-    print "creating some teams for testing"
-    #create 5 open teams
-    for x in range(5):
-        TeamMemberFactory.create(
-            team__name='my team ' + str(x),
-            team__slug='my-team-' + str(x),
-            user__username='open team owner' + str(x),
-            user__password='password'
-            )
-
-    #create an open team with description text and 2 members
-    team = TeamMemberFactory.create(
-        team__name="A1 Waay Cool team",
-        team__slug='a1-waay-cool-team',
-        team__description='this is the coolest, most creative team ever',
-        user__username='cool guy',
-        user__password='password'
-        ).team
-    TeamMemberFactory.create(team=team, user=cool_user)
-    TeamVideoFactory.create(team=team, added_by=cool_user)
-
-    #create an application team with 3 members and 5 videos
-    app_team = TeamMemberFactory.create(
-        team__name='the application-only team',
-        team__slug='the-application-only-team',
-        team__membership_policy=1,
-        user__username='application owner',
-        user__password='password'
-        ).team
-    TeamMemberFactory.create(team=app_team, user=UserFactory.create())
-    TeamMemberFactory.create(team=app_team, user=cool_user)
-    for x in range(5):
-        TeamVideoFactory.create(team=app_team, added_by=cool_user)
-
-    #create 1 private team
-    priv_team = TeamMemberFactory.create(
-        team__name='my own private idaho ',
-        team__slug='private-idaho',
-        team__membership_policy=1,
-        team__is_visible=False,
-        user__username='Id A Read',
-        user__password='password').team
-
-    return team, app_team, priv_team
-
-
 class TestCaseTeamsPage(WebdriverTestCase):
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.COOL_TEAM_NAME = "A1 Waay Cool team"
+    """Test suite for the teams directory page. """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-        self.team, self.app_team, self.priv_team = setup_teams()  # ADD TEST DATA
-        self.teams_dir_pg = TeamsDirPage(self)
-        self.a_team_pg = ATeamPage(self)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseTeamsPage, cls).setUpClass()
+        cls.COOL_TEAM_NAME = "A1 Waay Cool team"
+
+        #CREATE A USER
+        cls.cool_user = UserFactory.create(username='Wicked Cool', 
+                                           password='password')
+
+        cls.logger.info("creating some teams for testing")
+        #create 5 open teams
+        for x in range(5):
+            TeamMemberFactory.create(
+                team__name='my team ' + str(x),
+                team__slug='my-team-' + str(x),
+                user__username='open team owner' + str(x),
+                user__password='password'
+                )
+
+        #create an open team with description text and 2 members
+        cls.team = TeamMemberFactory.create(
+            team__name="A1 Waay Cool team",
+            team__slug='a1-waay-cool-team',
+            team__description='this is the coolest, most creative team ever',
+            user__username='cool guy',
+            user__password='password'
+            ).team
+        TeamMemberFactory.create(team=cls.team, user=cls.cool_user)
+        TeamVideoFactory.create(team=cls.team, added_by=cls.cool_user)
+
+        #create an application team with 3 members and 5 videos
+        cls.app_team = TeamMemberFactory.create(
+            team__name='the application-only team',
+            team__slug='the-application-only-team',
+            team__membership_policy=1,
+            user__username='application owner',
+            user__password='password'
+            ).team
+        TeamMemberFactory.create(team=cls.app_team, user=UserFactory.create())
+        TeamMemberFactory.create(team=cls.app_team, user=cls.cool_user)
+        for x in range(5):
+            TeamVideoFactory.create(team=cls.app_team, added_by=cls.cool_user)
+
+        #create 1 private team
+        cls.priv_team = TeamMemberFactory.create(
+            team__name='my own private idaho ',
+            team__slug='private-idaho',
+            team__membership_policy=1,
+            team__is_visible=False,
+            user__username='Id A Read',
+            user__password='password').team
+
+        cls.teams_dir_pg = TeamsDirPage(cls)
+        cls.a_team_pg = ATeamPage(cls)
+
+    def setUp(self):
         self.teams_dir_pg.open_teams_page()
+
 
     def test_directory__search_name(self):
         """Search for a team by parital name text, has results.

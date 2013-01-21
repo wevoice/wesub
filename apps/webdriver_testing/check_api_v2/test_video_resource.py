@@ -14,34 +14,35 @@ class TestCaseVideoResource(WebdriverTestCase):
     """TestSuite for videos via the api
 
     """
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'user')
-        data_helpers.create_user_api_key(self, self.user)
-        self.test_video = data_helpers.create_video(self, 
-            'http://www.example.com/upload_test.mp4')
-        self.open_team = TeamMemberFactory.create(
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseVideoResource, cls).setUpClass()
+        cls.user = UserFactory.create(username = 'user')
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.data_utils.create_user_api_key(cls.user)
+        cls.test_video = cls.data_utils.create_video()
+        cls.open_team = TeamMemberFactory.create(
             team__name="Cool team",
             team__slug='team-with-projects',
             team__description='this is the coolest, most creative team ever',
-            user = self.user,
+            user = cls.user,
             ).team
-        #Open to the teams page so you can see what's there.
-        self.project1 = TeamProjectFactory(
-            team=self.open_team,
+        cls.project1 = TeamProjectFactory(
+            team=cls.open_team,
             name='team project one',
             slug = 'team-project-one',
             description = 'subtitle project number 1',
             guidelines = 'do a good job',
             workflow_enabled=False)
         
-        self.project2 = TeamProjectFactory(
-            team=self.open_team,
+        cls.project2 = TeamProjectFactory(
+            team=cls.open_team,
             name='team project two',
             workflow_enabled=True)
 
-        self.video_pg = video_page.VideoPage(self)
+        cls.video_pg = video_page.VideoPage(cls)
 
     def test_video__list(self):
         """List the available videos.
@@ -61,7 +62,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/'
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -87,7 +88,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/?project=%s' %self.project1.slug
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -105,7 +106,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/?team=%s' %self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -127,7 +128,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             
             time.sleep(1)
         url_part = 'videos/?order_by=-created' 
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -152,7 +153,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
 
         url_part = 'videos/?order_by=-title' 
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         
         video_objects =  response['objects']
         videos_list = []
@@ -172,8 +173,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = data_helpers.post_api_request(self, 
-            url_part, url_data)
+        status, response = self.data_utils.post_api_request(self.user, url_part, url_data)
         self.video_pg.open_video_page(response['id'])
         #Check response metadata
         for k, v in url_data.iteritems():
@@ -189,21 +189,16 @@ class TestCaseVideoResource(WebdriverTestCase):
         GET /api2/partners/videos/[video-id]/
         """
 
-        expected_data = {
-            'all_urls': ['http://www.youtube.com/watch?v=WqJineyEszo'], 
-            'title': ('X Factor Audition - Stop Looking At My Mom Rap -'
-                      ' Brian Bradley'),
-            'languages': [], 
-            'thumbnail': 'http://i.ytimg.com/vi/WqJineyEszo/0.jpg', 
-            'duration': 121, 
-            }
-        
-        test_video = data_helpers.create_video(self)
+        test_video = self.data_utils.create_video()
         url_part = 'videos/%s/' % test_video.video_id
-        status, response = data_helpers.api_get_request(self, url_part)
-        self.video_pg.open_video_page(response['id'])
-        for k, v in expected_data.iteritems():
-            self.assertEqual(v, response[k])
+        s, r = self.data_utils.api_get_request(self.user, url_part)
+        self.assertEqual(r['title'], test_video.title)
+        self.assertIn(test_video.get_primary_videourl_obj().url, 
+                      r['all_urls'])
+        self.video_pg.open_page(r['site_url'])
+        self.assertEqual(self.video_pg.video_id(), r['id'])
+
+
 
         
     def test_update__metatdata(self):
@@ -217,8 +212,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = data_helpers.post_api_request(self, 
-            url_part, url_data)
+        status, response = self.data_utils.post_api_request(self.user,
+                                                   url_part, url_data)
         vid_id = response['id']
 
         url_part = 'videos/%s/' % vid_id
@@ -226,8 +221,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
                    }
-        status, response = data_helpers.put_api_request(self, url_part, 
-            new_data)
+        status, response = self.data_utils.put_api_request(self.user, 
+                                                  url_part, new_data)
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata
@@ -249,8 +244,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = data_helpers.post_api_request(self, 
-            url_part, url_data)
+        status, response = self.data_utils.post_api_request(self.user, 
+                                                   url_part, url_data)
         vid_id = response['id']
 
         url_part = 'videos/%s/' % vid_id
@@ -258,8 +253,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
                    }
-        status, response = data_helpers.put_api_request(self, url_part, 
-            new_data)
+        status, response = self.data_utils.put_api_request(self.user,
+                                                  url_part, new_data)
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata
@@ -280,8 +275,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        s, r = data_helpers.post_api_request(self, 
-            url_part, url_data)
+        s, r = self.data_utils.post_api_request(self.user, 
+                                       url_part, url_data)
         vid_id = r['id']
 
         #Update the video setting the team and project and new description.
@@ -291,8 +286,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
                    }
-        status, response = data_helpers.put_api_request(self, url_part, 
-            new_data)
+        status, response = self.data_utils.put_api_request(self.user, 
+                                                  url_part, new_data)
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata

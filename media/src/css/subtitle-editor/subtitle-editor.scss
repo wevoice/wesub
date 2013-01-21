@@ -152,7 +152,7 @@ header.main {
             border-right: 1px solid #2B2C2D;
             float: left;
             position: relative;
-            width: 50%;
+            width: 40%;
 
             a {
                 color: #999999;
@@ -221,7 +221,7 @@ header.main {
         div.exit {
             float: right;
             text-align: right;
-            width: 50%;
+            width: 60%;
 
             a {
                 color: #999999;
@@ -271,9 +271,32 @@ section.main {
                 color: #3C3C3D;
                 font-size: 12px;
                 line-height: 25px;
+                position: relative;
 
-                span {
+                textarea, span {
+                    border: 0;
+                    border-top: 1px solid #EBECED;
+                    border-left: 0;
+                    border-right: 0;
+                }
+                textarea {
+                    font: normal 12px $OpenSans;
+                    line-height: 25px;
                     display: block;
+                    height: 46px;
+                    margin: 0;
+                    resize: none;
+                    padding: 10px 40px;
+                    width: 100%;
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                span {
+                    cursor: text;
+                    display: block;
+                    min-height: 46px;
                     padding: 10px 40px;
 
                     b {
@@ -283,59 +306,45 @@ section.main {
                         font-style: italic;
                     }
                 }
-            }
-            &[editable="true"] {
-                li {
-                    position: relative;
+                a.remove {
+                    background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
+                    color: transparent;
+                    display: none;
+                    height: 100%;
+                    position: absolute;
+                    right: 0;
+                    top: 0;
+                    width: 40px;
+                    @include opacity(.2);
 
-                    textarea {
-                        border: 0;
-                        font: normal 12px $OpenSans;
-                        line-height: 25px;
-                        display: block;
-                        height: 45px;
-                        margin: 0;
-                        resize: none;
-                        padding: 10px 40px;
-                        width: 100%;
-
-                        &:focus {
-                            outline: none;
-                        }
-                    }
-                    span {
-                        cursor: text;
-                        min-height: 45px;
-                    }
-                    a.remove {
-                        background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
-                        color: transparent;
-                        display: none;
-                        height: 100%;
-                        position: absolute;
-                        right: 0;
-                        top: 0;
-                        width: 40px;
-                        @include opacity(.2);
-
-                        &:hover {
-                            @include opacity(.5);
-                        }
-                        &:active {
-                            background: transparent url('../../../images/subtitle-editor/hourglass.png') center center no-repeat;
-                        }
-                    }
-                    &.editing {
-                        background: white;
-                        padding: 0;
-                    }
                     &:hover {
-                        background: #EBECED;
-
-                        a.remove {
-                            display: block;
-                        }
+                        @include opacity(.5);
                     }
+                    &:active {
+                        background: transparent url('../../../images/subtitle-editor/hourglass.png') center center no-repeat;
+                    }
+                }
+                &.editing {
+                    background: white;
+                    padding: 0;
+                }
+                &:hover {
+                    a.remove {
+                        display: block;
+                    }
+                }
+                &.empty {
+                    background: #F2DEDE;
+
+                    textarea, span {
+                        background: #F2DEDE;
+                        border-top: 1px solid #EED3D7;
+                    }
+                }
+            }
+            &[editable="false"] {
+                li {
+                    margin-right: 6px;
                 }
             }
         }
@@ -367,13 +376,14 @@ section.main {
                 margin-bottom: 20px;
             }
             p {
+                font-size: 11px;
                 line-height: 18px;
             }
             ul {
                 margin: 20px 0 0 10px;
 
                 li {
-                    margin: 20px 0;
+                    margin: 10px 0;
 
                     span.key {
                         background: white;
@@ -382,7 +392,7 @@ section.main {
                         float: left;
                         margin-right: 10px;
                         position: relative;
-                        width: 54px;
+                        width: 20%;
                         @include border-radius(3px);
 
                         span {
