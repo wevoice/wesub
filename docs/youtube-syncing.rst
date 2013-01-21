@@ -71,12 +71,18 @@ Working around quota issues
 
 There are a few things we can do based on our understanding of the problem.
 
-1.  Create a dedicated celery queue for Youtube-related tasks
-2.  Assign a single worker process for the queue
-3.  Rate limit the queue to one task execution per second (`Celery
-    documentation on rate limiting`_)
-4.  Set a ``yt:quota_exceeded`` key in Redis if we're over limit
-5.  Retry task in 90 seconds if we are over limit (`Retrying example`_)
+*  Create a dedicated celery queue for Youtube-related tasks
+*  Create a second celery worker machine to spread all tasks over 2 IP
+   addresses
+*  Rate limit the queue to one task execution per second (`Celery
+   documentation on rate limiting`_)
+*  Set a ``yt:quota_exceeded`` key in Redis if we're over limit
+*  Retry task in 90 seconds if we are over limit (`Retrying example`_)
+
+It would also help if we alterned users on whose behalf we make the API
+request.  Instead of doing 5 requests as user A and then 5 requests as user B,
+it would be better to alternate: A1, B1, A2, B2, etc.  Looking for suggestions
+on how to do implement that.
 
 .. _Celery documentation on rate limiting: http://docs.celeryproject.org/en/latest/userguide/tasks.html#Task.rate_limit
 .. _Retrying example: http://docs.celeryproject.org/en/latest/userguide/tasks.html#retrying>
