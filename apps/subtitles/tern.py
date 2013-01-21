@@ -312,9 +312,8 @@ def _create_subtitle_language(sl):
     if not dry:
         nsl.save()
 
-        # Has to be saved separately because it's a magic Redis field.  Sigh.
+        # Has to be set separately because it's a magic Redis field.
         nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
-        nsl.save()
 
         # TODO: is this right, or does it need to be save()'ed?
         nsl.followers = sl.followers.all()
