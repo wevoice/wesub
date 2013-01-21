@@ -15,6 +15,7 @@ class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
+    NEW_BROWSER_PER_TEST_CASE = True
 
     def setUp(self):
         WebdriverTestCase.setUp(self)
