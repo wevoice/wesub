@@ -47,8 +47,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        #if not cls.NEW_BROWSER_PER_TEST_CASE:
-        cls.destroy_browser()
+        if not cls.NEW_BROWSER_PER_TEST_CASE:
+            cls.destroy_browser()
         #destroy the selenium browser before teardown to avoid liveserver
         #shutdown errors.  See https://code.djangoproject.com/ticket/19051
         super(WebdriverTestCase, cls).tearDownClass()
@@ -94,6 +94,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             dc['tags'] = [os.environ.get('JOB_NAME', 'amara-local'),] 
 
             #Setup the remote browser capabilities
+            cls.destroy_browser()
             cls.browser = webdriver.Remote(
                 desired_capabilities=dc,
                 command_executor=("http://{0}:{1}@ondemand.saucelabs.com:80/"
