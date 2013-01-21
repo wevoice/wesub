@@ -108,10 +108,5 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
     @classmethod
     def destroy_browser(cls):
         if cls.browser is not None:
-            try:
-                cls.browser.quit()
-            except:
-                # possibly should try to kill off the process so we don't
-                # leave any around block ports.
-                pass
+            cls.browser.quit()
             cls.browser = None
