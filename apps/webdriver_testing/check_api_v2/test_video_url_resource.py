@@ -143,10 +143,11 @@ class TestCaseVideoUrl(WebdriverTestCase):
     def test_url__delete_last(self):
         """Can not delete the last (only) url.  
 
-        If this is the only URL for a video, the request will fail. A video must have at least one URL.  
+        If this is the only URL for a video, the request will fail. 
+        A video must have at least one URL.  
         """
         video_id = self.test_video.video_id
-
+        url = self.test_video.get_video_url())
         #Get a list of the current urls
         url_part = 'videos/%s/urls/' % video_id
         status, response = self.data_utils.api_get_request(self.user,url_part) 
@@ -164,8 +165,7 @@ class TestCaseVideoUrl(WebdriverTestCase):
         #Open the video page on the ui - for the verification screenshot
         video_pg = video_page.VideoPage(self)
         video_pg.open_video_page(video_id)
-        self.assertEqual('http://www.youtube.com/watch?v=WqJineyEszo', 
-            self.test_video.get_video_url())
+        self.assertEqual(url, self.test_video.get_video_url())
 
 
 
