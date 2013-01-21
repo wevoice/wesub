@@ -47,8 +47,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        if not cls.NEW_BROWSER_PER_TEST_CASE:
-            cls.destroy_browser()
+        #if not cls.NEW_BROWSER_PER_TEST_CASE:
+        cls.destroy_browser()
         #destroy the selenium browser before teardown to avoid liveserver
         #shutdown errors.  See https://code.djangoproject.com/ticket/19051
         super(WebdriverTestCase, cls).tearDownClass()
