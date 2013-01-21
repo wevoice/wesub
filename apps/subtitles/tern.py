@@ -36,10 +36,10 @@
 import datetime
 import csv as csv_module
 import os, sys
+import random
 import re
 import warnings
 from optparse import OptionGroup, OptionParser
-from random import random
 
 
 csv = csv_module.writer(sys.stdout)
@@ -77,6 +77,15 @@ def die(msg):
 
 
 # Utilities
+def get_random(qs):
+    """Return a single random model from the given queryset.
+
+    This works around MySQL's broken-ass ORDER BY RAND() so we don't spend the
+    next year migrating data.
+
+    """
+    return qs[random.randint(0, qs.count())]
+
 def get_specific_language(pk):
     from apps.videos.models import SubtitleLanguage
 
@@ -103,7 +112,7 @@ def get_unsynced_subtitle_language():
     from apps.videos.models import SubtitleLanguage
 
     try:
-        sl = SubtitleLanguage.objects.filter(needs_sync=True)[0]
+        sl = get_random(SubtitleLanguage.objects.filter(needs_sync=True))
     except IndexError:
         return None
 
@@ -127,9 +136,9 @@ def get_unsynced_subtitle_version_language():
     from apps.videos.models import SubtitleVersion
 
     try:
-        sv = SubtitleVersion.objects.filter(
+        sv = get_random(SubtitleVersion.objects.filter(
             needs_sync=True, language__needs_sync=False
-        )[0]
+        ))
     except IndexError:
         return None
 
@@ -385,7 +394,7 @@ def _sync_language(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.language-syncs').inc()
 
-        if random() < 0.01:
+        if random.random() < 0.01:
             report_metrics()
 
     return True
@@ -568,7 +577,7 @@ def _sync_versions(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.version-syncs').inc()
 
-        if random() < 0.01:
+        if random.random() < 0.01:
             report_metrics()
 
     return True
