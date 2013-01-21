@@ -30,7 +30,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
     """
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseAddRemoveEdit, self).setUp()
         management.call_command('flush', interactive=False)
 
         self.data_utils = data_helpers.DataHelpers()

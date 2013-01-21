@@ -16,7 +16,7 @@ class TestCaseSubmittable(WebdriverTestCase):
     NEW_BROWSER_PER_TEST_CASE = True
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseSubmittable, self).setUp()
         self.data_utils = data_helpers.DataHelpers()
 
         self.video_pg = video_page.VideoPage(self)
@@ -56,6 +56,8 @@ class TestCaseSubmittable(WebdriverTestCase):
 
     def tearDown(self):
         self.video_pg.open_video_page(self.test_video.video_id)
+        super(TestCaseSubmittable, self).tearDown()
+
 
 
     def test_display__checkpage(self):
@@ -91,7 +93,7 @@ class TestCaseSubmittable(WebdriverTestCase):
             self.sub_editor.sub_timings(check_step=True))
 
 
-    def skiptest_close__abruptly(self):
+    def test_close__abruptly(self):
         """Test subs are saved when browser closes abruptly.
       
         Note: the browser needs to be open for about 80 seconds for saving.

@@ -103,7 +103,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         else:
             test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
             cls.browser = getattr(webdriver, test_browser)()
-            cls.base_url = ('http://unisubs.example.com:%s/' % cls.server_thread.port)
+        cls.base_url = ('http://unisubs.example.com:%s/' % cls.server_thread.port)
             
     @classmethod
     def destroy_browser(cls):

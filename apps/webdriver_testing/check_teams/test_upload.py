@@ -14,7 +14,7 @@ class TestCaseUploadSubs(WebdriverTestCase):
     """
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseUploadSubs, self).setUp()
         self.data_utils = data_helpers.DataHelpers()
 
         self.user = UserFactory.create(username = 'user')

@@ -15,7 +15,7 @@ class TestCaseTeamTasks(WebdriverTestCase):
     """Test suite for tasks creation, modification, assignment. """
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseTeamTasks, self).setUp()
         self.tasks_tab = tasks_tab.TasksTab(self)
         self.videos_tab = videos_tab.VideosTab(self)
 

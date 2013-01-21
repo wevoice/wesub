@@ -11,8 +11,8 @@ class TestCaseTeamSettings(WebdriverTestCase):
     """Test suite for managing team settings. """
 
     def setUp(self):
+        super(TestCaseTeamSettings, self).setUp()
         self.skipTest('Incomplete test suite')
-        WebdriverTestCase.setUp(self)
         self.team_dir_pg = TeamsDirPage(self)
         self.team = TeamMemberFactory.create(team__name='Roles Test',
                                              team__slug='roles-test',

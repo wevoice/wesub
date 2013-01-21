@@ -32,6 +32,7 @@ class TestCaseCreateVideos(WebdriverTestCase):
     
 
     def tearDown(self):
+        super(TestCaseCreateVideos, self).setUp()
         self.create_pg.open_create_page()
 
     def test_create__youtube(self):
@@ -132,7 +133,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.open_create_page()
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseAddFeeds, self).setUp()
         self.create_pg = create_page.CreatePage(self)
         self.create_pg.open_create_page()
 
