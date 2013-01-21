@@ -66,6 +66,21 @@ we hit the quota error.
 We are working with someone from the Youtube API support team to resolve this
 issue.
 
+Working around quota issues
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are a few things we can do based on our understanding of the problem.
+
+1.  Create a dedicated celery queue for Youtube-related tasks
+2.  Assign a single worker process for the queue
+3.  Rate limit the queue to one task execution per second (`Celery
+    documentation on rate limiting`_)
+4.  Set a ``yt:quota_exceeded`` key in Redis if we're over limit
+5.  Retry task in 90 seconds if we are over limit (`Retrying example`_)
+
+.. _Celery documentation on rate limiting: http://docs.celeryproject.org/en/latest/userguide/tasks.html#Task.rate_limit
+.. _Retrying example: http://docs.celeryproject.org/en/latest/userguide/tasks.html#retrying>
+
 Metrics
 -------
 
