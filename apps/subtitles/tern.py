@@ -94,7 +94,7 @@ def get_specific_language(pk):
 def get_unsynced_subtitle_language():
     """Return a SubtitleLanguage that needs to be synced.
 
-    SubtitleLanguages will be returned in a random order (except that "base"
+    SubtitleLanguages will be returned in no specific order (except that "base"
     languages will always come before their translations).  Forcing the syncing
     code to deal with this will make it robust against different data in
     dev/staging/prod.
@@ -103,7 +103,7 @@ def get_unsynced_subtitle_language():
     from apps.videos.models import SubtitleLanguage
 
     try:
-        sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
+        sl = SubtitleLanguage.objects.filter(needs_sync=True)[0]
     except IndexError:
         return None
 
@@ -119,9 +119,9 @@ def get_unsynced_subtitle_version_language():
 
     The SubtitleLanguage itself must have already been synced on its own.
 
-    Languages will be returned in a random order (but "base" languages will come
-    before translations).  Forcing the syncing code to deal with this will make
-    it robust against different data in dev/staging/prod.
+    Languages will be returned in no specific order (but "base" languages will
+    come before translations).  Forcing the syncing code to deal with this will
+    make it robust against different data in dev/staging/prod.
 
     """
     from apps.videos.models import SubtitleVersion
@@ -129,7 +129,7 @@ def get_unsynced_subtitle_version_language():
     try:
         sv = SubtitleVersion.objects.filter(
             needs_sync=True, language__needs_sync=False
-        ).order_by('?')[0]
+        )[0]
     except IndexError:
         return None
 
