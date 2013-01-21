@@ -38,7 +38,6 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.destroy_browser()
         super(WebdriverTestCase, cls).setUpClass()
         management.call_command('flush', interactive=False)
         Site.objects.get_current().domain = ('unisubs.example.com:%d' 

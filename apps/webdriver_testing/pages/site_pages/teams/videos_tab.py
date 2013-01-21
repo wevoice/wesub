@@ -139,7 +139,7 @@ class VideosTab(ATeamPage):
         """Return the webdriver object for a video based on the title.
 
         """
-        self.wait_for_element_visible(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_TITLE)
         time.sleep(2)  #Make sure all the vids have a chance to load.
         video_els = self.browser.find_elements_by_css_selector(
                       self._VIDEO)
@@ -157,10 +157,10 @@ class VideosTab(ATeamPage):
 
         """
         if not video: # choose the first one present
-            self.hover_by_css(self._VIDEO_THUMB)
+            self.hover_by_css(self._VIDEO_TITLE)
         else:
             vid_element = self._video_element(video)
-            self.hover_by_element(vid_element, self._VIDEO_THUMB)
+            self.hover_by_element(vid_element, self._VIDEO_TITLE)
 
  
     def _click_video_action(self, action, video):
@@ -279,20 +279,20 @@ class VideosTab(ATeamPage):
  
     def video_present(self, video):
         self.logger.info('Checking if video %s is displayed' % video)
-        self.wait_for_element_present(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_TITLE)
         video_el = self._video_element(video)
         if video_el:
             return True
 
     def video_url(self, video):
         self.logger.info('Gtting the video url for video %s' % video)
-        self.wait_for_element_present(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_TITLE)
         video_el = self._video_element(video)
         return video_el.get_attribute('href')       
 
     def open_video(self, video):
         self.logger.info('Opening the video page for %s' % video)
-        self.wait_for_element_present(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_TITLE)
         video_el = self._video_element(video)
         video_el.click() 
 
@@ -318,9 +318,9 @@ class VideosTab(ATeamPage):
 
     def num_videos(self):
         self.logger.info('Getting the number of videos on the page')
-        video_els = self.browser.find_elements_by_css_selector(self._VIDEO_THUMB)
+        video_els = self.browser.find_elements_by_css_selector(self._VIDEO_TITLE)
         return len(video_els)
 
     def videos_displayed(self):
         self.logger.info('Waiting for videos to display on page.')
-        self.wait_for_element_present(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_TITLE)

@@ -357,9 +357,10 @@ class TestCaseFilterSort(WebdriverTestCase):
             team = cls.team,
             user = UserFactory()).user
         cls.videos_tab = videos_tab.VideosTab(cls)
-        cls.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        cls.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
-            '- Brian Bradley')
+        vidurl_data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                       'video__title': 'X Factor Audition - Stop Looking At My Mom Rap'
+                      }
+        cls.test_video = cls.data_utils.create_video(**vidurl_data)
         cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
         TeamVideoFactory.create(
             team=cls.team, 
@@ -424,9 +425,7 @@ class TestCaseFilterSort(WebdriverTestCase):
         self.videos_tab.video_sort(sort_option = 'time, oldest')
         self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
-            'X Factor Audition - Stop Looking At My Mom Rap - Brian Bradley')
-
-
+                         self.test_video.title)
 
 
 class TestCaseProjectsAddEdit(WebdriverTestCase):

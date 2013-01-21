@@ -293,7 +293,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Return the tasks give a video id, and language via the api.
  
         """
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             team.slug, video_id)
         status, response = self.data_utils.api_get_request(self.user, url_part) 
         task_objects =  response['objects']
@@ -422,7 +422,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
             
         self.data_utils.upload_subs(video, video_data)
         
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             self.team.slug, video.video_id)
         status, response = self.data_utils.api_get_request(self.user, url_part) 
         task_objects = response['objects']
@@ -463,7 +463,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
             
         self.data_utils.upload_subs(video, video_data)
         
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             self.team.slug, video.video_id)
         _, r = self.data_utils.api_get_request(self.user, url_part) 
         task_objects = r['objects']
