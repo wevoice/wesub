@@ -539,7 +539,6 @@ class Page(object):
             e = 'webdriver error: ' + self.browser.current_url
         self.logger.error(str(e) + self.browser.current_url)
         self.browser.close()
-
         raise ValueError(e)
 
 

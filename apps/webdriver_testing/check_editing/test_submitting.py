@@ -91,7 +91,7 @@ class TestCaseSubmittable(WebdriverTestCase):
             self.sub_editor.sub_timings(check_step=True))
 
 
-    def test_close__abruptly(self):
+    def skiptest_close__abruptly(self):
         """Test subs are saved when browser closes abruptly.
       
         Note: the browser needs to be open for about 80 seconds for saving.
