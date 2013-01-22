@@ -33,6 +33,7 @@ from auth.models import CustomUser
 from videos.models import Video, Action, SubtitleLanguage
 from videos import models
 from subtitles import models as sub_models
+from apps.subtitles.pipeline import rollback_to
 from widget.models import SubtitlingSession
 from widget.rpc import Rpc
 from widget.null_rpc import NullRpc
@@ -40,6 +41,7 @@ from django.core.urlresolvers import reverse
 from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
+from utils import test_utils, test_factories
 
 VIDEO_URL = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
 
@@ -1138,3 +1140,56 @@ class TestFormatConvertion(TestCase):
     def test_sbv(self):
         raw, parsed = self._retrieve('sbv')
         self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))
+
+class TestLineageOnRPC(TestCase):
+    def setUp(self):
+        self.video = test_factories.create_video()
+        self.user_0 = test_factories.create_user()
+
+    def _edit_and_save(self, video, language_code, sset, translated_from_language_code=None):
+        request = RequestMockup(self.user_0)
+
+        response = rpc.start_editing(request, self.video.video_id,
+            language_code, base_language_code=translated_from_language_code)
+        session_pk = response['session_pk']
+        rpc.finished_subtitles(request, session_pk, sset.to_xml())
+
+    def test_correct_lineage(self):
+
+        # German lineage for v1 should be en-v2
+        # for ge-v2 should be en-v3
+
+        # Create en-v1
+        en_v1_sset = create_subtitle_set()
+
+        self._edit_and_save(self.video, 'en', en_v1_sset)
+        en = self.video.newsubtitlelanguage_set.get(language_code='en')
+        en_v1 = en.subtitleversion_set.get(version_number=1)
+        self.assertEquals(en_v1.lineage, dict())
+
+        # create en-v2 with a changed timming
+        en_v2_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'en', en_v2_sset)
+        en_v2 = en.subtitleversion_set.get(version_number=2)
+        self.assertEquals(en_v2.lineage, {'en':1})
+
+        # create ge-v1 from en-v2
+        de_v1_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'de', de_v1_sset, 'en')
+        de = self.video.newsubtitlelanguage_set.get(language_code='de')
+        de_v1 = de.subtitleversion_set.get(version_number=1)
+        self.assertEquals(de_v1.lineage, {'en':2})
+
+        # rollback the en-v2 to en-v1
+        en_v3 = rollback_to(en_v1.subtitle_language.video,
+            en_v1.subtitle_language.language_code,
+            version_number=en_v1.version_number,
+            rollback_author=self.user_0)
+        # make sure this exists
+        en_v3 = en.subtitleversion_set.get(version_number=3)
+
+        # make sure we have the right lineages:
+        de_v2_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'de', de_v2_sset, 'en')
+        de_v2 = de.subtitleversion_set.get(version_number=2)
+        self.assertEquals(de_v2.lineage, {'en':3})

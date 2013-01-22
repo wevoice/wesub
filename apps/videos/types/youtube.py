@@ -120,7 +120,7 @@ def should_add_credit(subtitle_version=None, video=None):
         raise Exception("You need to pass in at least one argument")
 
     if not video:
-        video = subtitle_version.language.video
+        video = subtitle_version.subtitle_language.video
 
     return not video.get_team_video()
 
