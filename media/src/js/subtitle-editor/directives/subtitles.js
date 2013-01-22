@@ -112,13 +112,14 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             var nextSubtitle;
 
+            var $currentSubtitle = $(e.currentTarget).parent();
+
             // Save the current subtitle.
             selectedScope.textChanged(activeTextArea.val());
 
             // Enter / return without shift.
             if (keyCode === 13 && !e.shiftKey) {
 
-                var $currentSubtitle = $(e.currentTarget).parent();
 
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
@@ -163,13 +164,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
 
-                // Tab with shift, move to the previous subtitle.
-
-                var lastIndex = parser.getSubtitleIndex(subtitle, subtitles) - 1;
-                var lastSubtitle = parser.getSubtitle(lastIndex);
-                if (lastSubtitle) {
-                    nextSubtitle = $('span.subtitle-text', $('.subtitle-list-item', rootEl)[lastIndex]);
-                }
+                // Tab with shift, move to the previous subtitle,.
+                nextSubtitle = $currentSubtitle.prev().get(0);
 
             }
 
@@ -190,6 +186,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
             var subtitleScope = angular.element($subtitle.get(0)).scope();
 
             subtitleScope.empty = $textarea.val() === '';
+            subtitleScope.characterCount = $textarea.val().length;
+
             subtitleScope.$digest();
 
         }

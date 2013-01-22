@@ -306,6 +306,13 @@ section.main {
                         font-style: italic;
                     }
                 }
+                div.character-count {
+                    background: blue;
+                    position: absolute;
+                    right: 0px;
+                    top: 0;
+                    z-index: 999;
+                }
                 a.remove {
                     background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
                     color: transparent;
