@@ -413,7 +413,21 @@ class Rpc(BaseRpc):
         language.save()
 
         # Create the subtitling session and subtitle version for these edits.
-        session = self._make_subtitling_session(request, language, base_language_code, video_id)
+
+        # we determine that a it's a translation if:
+        # - the front end specifically said to translate from (base_language_code)
+        # - The language has another source in it's lineage and it is not marked as forking
+        translated_from_code  = None
+        translated_from = None
+        if base_language_code:
+            translated_from_code = base_language_code
+        elif language.is_forked == False:
+            translated_from_code = language.get_translation_source_language_code()
+
+        if translated_from_code:
+            translated_from = language.video.subtitle_language(translated_from_code)
+
+        session = self._make_subtitling_session(request, language, translated_from_code, video_id)
         version_for_subs, version_number = self._get_version_to_edit(language, session)
 
         args = {'session': session}
@@ -428,15 +442,6 @@ class Rpc(BaseRpc):
         subtitles = self._subtitles_dict(**args)
         # this is basically how it worked before. don't ask.
         subtitles['forked'] = base_language_code is None
-
-        # we determine that a it's a translation if:
-        # - the front end specifically said to translate from (base_language_code)
-        # - The language has another source in it's lineage and it is not marked as forking
-        translated_from_code = base_language_code or (not language.is_forked and language.get_translation_source_language_code())
-        translated_from = None
-
-        if translated_from_code:
-            translated_from = language.video.subtitle_language(translated_from_code)
 
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
@@ -1236,7 +1241,6 @@ class Rpc(BaseRpc):
             raise ValueError("You need to specify either language or version")
 
         latest_version = language.get_tip() if language else None
-        translated_from = session.base_language if session else None
         is_latest = False
 
         if not version and not latest_version:
@@ -1254,6 +1258,10 @@ class Rpc(BaseRpc):
         if latest_version is None or version_number >= latest_version.version_number:
             is_latest = True
 
+        if session:
+            translated_from = session.base_language
+        else:
+           translated_from = language.get_translation_source_language()
         return self._make_subtitles_dict(
             subtitles,
             language,
