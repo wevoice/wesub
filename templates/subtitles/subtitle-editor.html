@@ -127,8 +127,17 @@
                 </div>
             </div>
         </section>
-        <section class="right column">
-
+        <section class="right column" ng-controller="CollabSidebarController">
+            <a href="#"
+               class="toggle-collab"
+               ng-click="toggleCollabSidebar($event)"
+               ng-show="!collabOpen"></a>
+            <aside class="collab" ng-show="collabOpen">
+                <a href="#"
+                   class="toggle-collab"
+                   ng-click="toggleCollabSidebar($event)"
+                   ng-show="collabOpen"></a>
+            </aside>
         </section>
     </section>
 
@@ -150,6 +159,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
 
 </body>
 </html>

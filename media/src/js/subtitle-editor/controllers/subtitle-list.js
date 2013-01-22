@@ -284,7 +284,7 @@
 
             initialText =  $scope.parser.content($scope.subtitle);
 
-            $scope.isEditing  = true;
+            $scope.isEditing = true;
 
             // Tell the root scope that we're editing, now.
             $scope.$root.$emit('editing');
