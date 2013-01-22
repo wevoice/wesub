@@ -1192,4 +1192,6 @@ class TestLineageOnRPC(TestCase):
         de_v2_sset = create_subtitle_set()
         self._edit_and_save(self.video, 'de', de_v2_sset, 'en')
         de_v2 = de.subtitleversion_set.get(version_number=2)
-        self.assertEquals(de_v2.lineage, {'en':3})
+        self.assertIn('en', de_v2.lineage)
+        self.assertEquals(de_v2.lineage['en'], 3)
+        self.assertEqual(en, de.get_translation_source_language())
