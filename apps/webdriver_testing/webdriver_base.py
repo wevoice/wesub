@@ -46,7 +46,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         cls.logger = logging.getLogger('test_steps')
         cls.logger.setLevel(logging.INFO)
         if not cls.NEW_BROWSER_PER_TEST_CASE:
-            cls.create_browser()
+            cls.create_browser(cls.__name__)
 
     @classmethod
     def tearDownClass(cls):
@@ -55,7 +55,6 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         #destroy the selenium browser before teardown to avoid liveserver
         #shutdown errors.  See https://code.djangoproject.com/ticket/19051
         super(WebdriverTestCase, cls).tearDownClass()
- 
 
     def setUp(self):
         super(WebdriverTestCase, self).setUp()
@@ -65,7 +64,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         
         #Match the Site port with the liveserver port so search redirects work.
         if self.NEW_BROWSER_PER_TEST_CASE:
-            self.__class__.create_browser()
+            self.__class__.create_browser(self.shortDescription())
         
     def tearDown(self):
         if self.use_sauce:
@@ -77,7 +76,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.__class__.destroy_browser()
 
     @classmethod
-    def create_browser(cls):
+    def create_browser(cls, suite_or_test):
         #If running on sauce config values are from env vars 
         cls.use_sauce = os.environ.get('USE_SAUCE', False)
         if cls.use_sauce: 
@@ -88,7 +87,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
 
             dc['version'] = os.environ.get('SELENIUM_VERSION', '')
             dc['platform'] = os.environ.get('SELENIUM_PLATFORM', 'WINDOWS 2008')
-            #dc['name'] = 'amara testing' 
+            dc['name'] = suite_or_test 
             dc['tags'] = [os.environ.get('JOB_NAME', 'amara-local'),] 
 
             #Setup the remote browser capabilities
