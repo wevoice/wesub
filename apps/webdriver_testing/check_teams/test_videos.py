@@ -365,7 +365,7 @@ class TestCaseFilterSort(WebdriverTestCase):
                        'video__title': 'X Factor Audition - Stop Looking At My Mom Rap'
                       }
         cls.test_video = cls.data_utils.create_video(**vidurl_data)
-        cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
+        cls.data_utils.upload_subs(cls.test_video)
         TeamVideoFactory.create(
             team=cls.team, 
             video=cls.test_video, 
