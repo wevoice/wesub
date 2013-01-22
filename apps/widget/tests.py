@@ -584,33 +584,14 @@ class TestRpc(TestCase):
 
         # now fork subtitles
         response = rpc.start_editing(request, session.video.video_id, 'es', subtitle_language_pk=language.pk)
-        sub_state = response['subtitles']
-        self.assertEquals(True, sub_state['forked'])
-        self.assertTrue(('base_language_pk' not in sub_state) or sub_state['base_language_pk'] is None)
+        subtitles = create_subtitle_set(10)
+        response = rpc.finished_subtitles(request, response['session_pk'], subtitles=subtitles.to_xml(), forked=True)
 
-        subtitles = SubtitleSet('es', sub_state['subtitles'])
+        self.assertEquals('ok', response['response'])
+        es = session.video.newsubtitlelanguage_set.get(language_code='es' )
+        self.assertTrue(es.is_forked)
+        self.assertIn('en', es.get_tip().lineage)
 
-        self.assertEquals(3, len(subtitles))
-        self.assertEquals('hey you 0', subtitles[0][2])
-
-        session_pk = response['session_pk']
-
-        subtitles.append_subtitle(4000, 5000, 'heyooo')
-
-        rpc.finished_subtitles(request, session_pk, subtitles.to_xml())
-
-        language = sub_models.SubtitleLanguage.objects.get(pk=session.language.pk)
-
-        self.assertEquals(True, language.is_forked)
-
-        subs = rpc.fetch_subtitles(request, session.video.video_id, session.language.pk)
-        subtitles = subs['subtitles']
-        subtitles = SubtitleSet('es', subs['subtitles'])
-
-        self.assertEquals(4, len(subtitles))
-        self.assertEquals(4000, subtitles[3][0])
-        self.assertEquals(5000, subtitles[3][1])
-        self.assertEquals('heyooo', subtitles[3][2])
 
     def test_fork_on_finish(self):
         request = RequestMockup(self.user_0)
