@@ -749,7 +749,6 @@ class TestRpc(TestCase):
     def test_fork_translation_dependent_on_forked(self):
         request = RequestMockup(self.user_0)
         video = self._create_two_sub_forked_subs(request)
-
         response = rpc.start_editing(request, video.video_id, 'fr', base_language_code='es')
         session_pk = response['session_pk']
         rpc.finished_subtitles(request, session_pk, create_subtitle_set(2).to_xml())
@@ -762,6 +761,7 @@ class TestRpc(TestCase):
         video_id = return_value['video_id']
         fr_sl = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         response = rpc.start_editing(request, video_id, 'fr', subtitle_language_pk=fr_sl.pk)
+        session_pk = response['session_pk']
 
         subtitles = SubtitleSet('fr', response['subtitles']['subtitles'])
 
@@ -771,19 +771,18 @@ class TestRpc(TestCase):
         self.assertEquals(1000, subtitles[0].end_time)
 
         # update the timing on the French sub.
-        session_pk = response['session_pk']
         updated = SubtitleSet('fr')
 
         updated.append_subtitle(1020, 1500, 'hey 0')
         updated.append_subtitle(2500, 3500, 'hey 1')
 
-        rpc.finished_subtitles(request, session_pk, updated.to_xml())
+        rpc.finished_subtitles(request, session_pk, updated.to_xml(), forked=True)
 
         french_lang = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         fr_version = french_lang.get_tip()
         fr_version_subtitles = fr_version.get_subtitles()
 
-        self.assertEquals(True, french_lang.is_forked)
+        self.assertTrue(french_lang.is_forked)
         self.assertEquals(1020, fr_version_subtitles[0].start_time)
 
         spanish_lang = models.Video.objects.get(video_id=video_id).subtitle_language('es')
@@ -925,7 +924,7 @@ class TestRpc(TestCase):
         subtitle_set.append_subtitle(500, 1500, 'hey')
         subtitle_set.append_subtitle(1600, 2500, 'you')
 
-        rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml())
+        rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml(), forked=True)
         return Video.objects.get(pk=session.video.pk)
 
     def test_edit_cicle_creates_only_one_version(self):
