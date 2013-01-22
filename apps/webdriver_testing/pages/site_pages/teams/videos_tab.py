@@ -139,7 +139,7 @@ class VideosTab(ATeamPage):
         """Return the webdriver object for a video based on the title.
 
         """
-        self.wait_for_element_visible(self._VIDEO_THUMB)
+        self.wait_for_element_present(self._VIDEO_THUMB)
         time.sleep(2)  #Make sure all the vids have a chance to load.
         video_els = self.browser.find_elements_by_css_selector(
                       self._VIDEO)

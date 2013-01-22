@@ -59,7 +59,7 @@ class EditorDialogs(Page):
 
     def click_saved_ok(self):
         self.logger.info('clicking the subtitles saved confirmation box')
-        self.wait_for_element_present(self._SAVED_OK)
+        self.wait_for_element_present(self._SAVED_OK, wait_time=10)
         self.click_by_css(self._SAVED_OK)
 
     def resume_dialog_ok(self):

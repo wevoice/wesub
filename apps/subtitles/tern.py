@@ -36,10 +36,10 @@
 import datetime
 import csv as csv_module
 import os, sys
+import random
 import re
 import warnings
 from optparse import OptionGroup, OptionParser
-from random import random
 
 
 csv = csv_module.writer(sys.stdout)
@@ -77,6 +77,15 @@ def die(msg):
 
 
 # Utilities
+def get_random(qs):
+    """Return a single random model from the given queryset.
+
+    This works around MySQL's broken-ass ORDER BY RAND() so we don't spend the
+    next year migrating data.
+
+    """
+    return qs[random.randint(0, qs.count())]
+
 def get_specific_language(pk):
     from apps.videos.models import SubtitleLanguage
 
@@ -94,7 +103,7 @@ def get_specific_language(pk):
 def get_unsynced_subtitle_language():
     """Return a SubtitleLanguage that needs to be synced.
 
-    SubtitleLanguages will be returned in a random order (except that "base"
+    SubtitleLanguages will be returned in no specific order (except that "base"
     languages will always come before their translations).  Forcing the syncing
     code to deal with this will make it robust against different data in
     dev/staging/prod.
@@ -103,7 +112,7 @@ def get_unsynced_subtitle_language():
     from apps.videos.models import SubtitleLanguage
 
     try:
-        sl = SubtitleLanguage.objects.filter(needs_sync=True).order_by('?')[0]
+        sl = get_random(SubtitleLanguage.objects.filter(needs_sync=True))
     except IndexError:
         return None
 
@@ -119,17 +128,17 @@ def get_unsynced_subtitle_version_language():
 
     The SubtitleLanguage itself must have already been synced on its own.
 
-    Languages will be returned in a random order (but "base" languages will come
-    before translations).  Forcing the syncing code to deal with this will make
-    it robust against different data in dev/staging/prod.
+    Languages will be returned in no specific order (but "base" languages will
+    come before translations).  Forcing the syncing code to deal with this will
+    make it robust against different data in dev/staging/prod.
 
     """
     from apps.videos.models import SubtitleVersion
 
     try:
-        sv = SubtitleVersion.objects.filter(
+        sv = get_random(SubtitleVersion.objects.filter(
             needs_sync=True, language__needs_sync=False
-        ).order_by('?')[0]
+        ))
     except IndexError:
         return None
 
@@ -303,9 +312,8 @@ def _create_subtitle_language(sl):
     if not dry:
         nsl.save()
 
-        # Has to be saved separately because it's a magic Redis field.  Sigh.
+        # Has to be set separately because it's a magic Redis field.
         nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
-        nsl.save()
 
         # TODO: is this right, or does it need to be save()'ed?
         nsl.followers = sl.followers.all()
@@ -385,7 +393,7 @@ def _sync_language(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.language-syncs').inc()
 
-        if random() < 0.01:
+        if random.random() < 0.01:
             report_metrics()
 
     return True
@@ -568,7 +576,7 @@ def _sync_versions(language_pk=None):
         from utils.metrics import Meter
         Meter('data-model-refactor.version-syncs').inc()
 
-        if random() < 0.01:
+        if random.random() < 0.01:
             report_metrics()
 
     return True

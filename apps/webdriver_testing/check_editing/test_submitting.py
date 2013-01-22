@@ -13,10 +13,10 @@ import time
 
 class TestCaseSubmittable(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.  """
+    NEW_BROWSER_PER_TEST_CASE = True
 
-        
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseSubmittable, self).setUp()
         self.data_utils = data_helpers.DataHelpers()
 
         self.video_pg = video_page.VideoPage(self)
@@ -56,6 +56,8 @@ class TestCaseSubmittable(WebdriverTestCase):
 
     def tearDown(self):
         self.video_pg.open_video_page(self.test_video.video_id)
+        super(TestCaseSubmittable, self).tearDown()
+
 
 
     def test_display__checkpage(self):

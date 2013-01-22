@@ -14,7 +14,10 @@ class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
+    NEW_BROWSER_PER_TEST_CASE = True
+
     def setUp(self):
+        super(TestCasePartialSync, self).setUp()
         WebdriverTestCase.setUp(self)
         self.data_utils = data_helpers.DataHelpers()
         self.user = UserFactory.create(username = 'user')
@@ -38,9 +41,11 @@ class TestCasePartialSync(WebdriverTestCase):
         self.sub_editor.continue_to_next_step()
         self.sub_editor.sync_subs(num_synced_subs)
 
+    def tearDown(self):
+        super(TestCasePartialSync, self).tearDown()
 
     def test_display__normal(self):
-        """Manually entered unsynced subs display in editor.
+        """Manually entered partially subs display in editor.
 
         """
 
@@ -53,7 +58,7 @@ class TestCasePartialSync(WebdriverTestCase):
 
        
     def test_save(self):
-        """Manually entered unsynced subs are saved upon save and exit.
+        """Manually entered partially subs are saved upon save and exit.
         
         """
         timing_list = self.sub_editor.sub_timings()
@@ -66,7 +71,7 @@ class TestCasePartialSync(WebdriverTestCase):
 
 
     def test_close__abruptly(self):
-        """Test subs are saved when browser closes abruptly.
+        """Partially synced subs are saved when browser closes abruptly.
       
         Note: the browser needs to be open for about 80 seconds for saving.
         """
@@ -92,7 +97,7 @@ class TestCasePartialSync(WebdriverTestCase):
         self.assertEqual(timing_list, self.sub_editor.sub_timings())
 
     def test_download(self):
-        """Manually entered unsynced subs can be download from check page.
+        """Manually entered partially synced subs can be download from check page.
 
         """
         timing_list = self.sub_editor.sub_timings()

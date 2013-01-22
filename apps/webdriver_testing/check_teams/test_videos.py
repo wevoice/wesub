@@ -30,7 +30,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
     """
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseAddRemoveEdit, self).setUp()
         management.call_command('flush', interactive=False)
 
         self.data_utils = data_helpers.DataHelpers()
@@ -245,10 +245,14 @@ class TestCaseSearch(WebdriverTestCase):
             team = cls.team,
             user = UserFactory()).user
         cls.videos_tab = videos_tab.VideosTab(cls)
-        cls.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        cls.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
-            '- Brian Bradley')
-        cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
+
+        data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                'video__title': ('X Factor Audition - Stop Looking At My '
+                                'Mom Rap - Brian Bradley'),
+                'type': 'Youtube'
+               }
+        cls.test_video = cls.data_utils.create_video(**data)
+        cls.data_utils.upload_subs(cls.test_video) 
         TeamVideoFactory.create(
             team=cls.team, 
             video=cls.test_video, 
@@ -266,7 +270,7 @@ class TestCaseSearch(WebdriverTestCase):
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('X Factor')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
+        self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
     def test_search__updated_title(self):
         """Team video search for title text after it has been updated.
@@ -305,7 +309,7 @@ class TestCaseSearch(WebdriverTestCase):
         #Open team videos page and search for updated title text.
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('grammar and politeness')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
+        self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
 
     def test_search__subs(self):
@@ -315,7 +319,7 @@ class TestCaseSearch(WebdriverTestCase):
         
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('show this text')
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
+        self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
     def test_search__nonascii(self):
         """Team video search for non-ascii char strings.
@@ -326,7 +330,7 @@ class TestCaseSearch(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.browser.execute_script("document.getElementsByName"
                                     "('q')[1].value='日本語'")
-        self.assertTrue(self.videos_tab.video_present(self.video_title))
+        self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
     def test_search__no_results(self):
         """Team video search returns no results.
@@ -357,9 +361,10 @@ class TestCaseFilterSort(WebdriverTestCase):
             team = cls.team,
             user = UserFactory()).user
         cls.videos_tab = videos_tab.VideosTab(cls)
-        cls.video_url = 'http://www.youtube.com/watch?v=WqJineyEszo'
-        cls.video_title = ('X Factor Audition - Stop Looking At My Mom Rap '
-            '- Brian Bradley')
+        vidurl_data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                       'video__title': 'X Factor Audition - Stop Looking At My Mom Rap'
+                      }
+        cls.test_video = cls.data_utils.create_video(**vidurl_data)
         cls.test_video = cls.data_utils.create_video_with_subs(cls.video_url)
         TeamVideoFactory.create(
             team=cls.team, 
@@ -424,9 +429,7 @@ class TestCaseFilterSort(WebdriverTestCase):
         self.videos_tab.video_sort(sort_option = 'time, oldest')
         self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
-            'X Factor Audition - Stop Looking At My Mom Rap - Brian Bradley')
-
-
+                         self.test_video.title)
 
 
 class TestCaseProjectsAddEdit(WebdriverTestCase):

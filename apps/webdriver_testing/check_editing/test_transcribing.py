@@ -15,9 +15,10 @@ class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
+    NEW_BROWSER_PER_TEST_CASE = True
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseTranscribing, self).setUp()
         self.data_utils = data_helpers.DataHelpers()
         td = {'url': ('http://qa.pculture.org/amara_tests/'
                    'Birds_short.webmsd.webm')
@@ -36,6 +37,8 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.create_modal.create_original_subs('English', 'English')
         self.typed_subs = self.sub_editor.type_subs()
 
+    def tearDown(self):
+        super(TestCaseTranscribing, self).tearDown()
 
     def test_display__normal(self):
         """Manually entered unsynced subs display in editor.

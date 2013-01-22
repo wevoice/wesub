@@ -52,7 +52,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
 
     def setUp(self):
         self.watch_pg.open_watch_page()
-
+        
     def test_search__simple(self):
         """Search for text contained in video title.
 
@@ -166,7 +166,6 @@ class TestCaseWatchPageListings(WebdriverTestCase):
     def setUp(self):
         #Open the watch page as a test starting point.
         self.watch_pg.open_watch_page()
-
 
     def test_latest__section(self):
         """Latest section displays the expected videos.

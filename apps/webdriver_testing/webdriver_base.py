@@ -40,6 +40,9 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
     def setUpClass(cls):
         super(WebdriverTestCase, cls).setUpClass()
         management.call_command('flush', interactive=False)
+        Site.objects.get_current().domain = ('unisubs.example.com:%d' 
+                                             % cls.server_thread.port)
+        Site.objects.get_current().save()
         cls.logger = logging.getLogger('test_steps')
         cls.logger.setLevel(logging.INFO)
         if not cls.NEW_BROWSER_PER_TEST_CASE:
@@ -60,12 +63,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         self.logger.info('testcase: %s' % self.id())
         self.logger.info('description: %s' % self.shortDescription())
         
-
         #Match the Site port with the liveserver port so search redirects work.
-        Site.objects.get_current().domain = ('unisubs.example.com:%d' 
-                                             % self.server_thread.port)
-        Site.objects.get_current().save()
-
         if self.NEW_BROWSER_PER_TEST_CASE:
             self.__class__.create_browser()
         
@@ -103,15 +101,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         else:
             test_browser = os.environ.get('TEST_BROWSER', 'Firefox')
             cls.browser = getattr(webdriver, test_browser)()
-            cls.base_url = ('http://unisubs.example.com:%s/' % cls.server_thread.port)
+        cls.base_url = ('http://unisubs.example.com:%s/' % cls.server_thread.port)
             
     @classmethod
     def destroy_browser(cls):
         if cls.browser is not None:
-            try:
-                cls.browser.quit()
-            except:
-                # possibly should try to kill off the process so we don't
-                # leave any around block ports.
-                pass
+            cls.browser.quit()
             cls.browser = None

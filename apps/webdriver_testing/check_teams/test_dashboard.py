@@ -34,10 +34,10 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                        ('fireplace.mp4', 'en', 'en')
                        ]
         for vid in test_videos:
-            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
-                                                '%s' % vid[0])
-            video.title = vid[0]
-            video.save()
+            vidurl_data = {'url': 'http://qa.pculture.org/amara_tests/%s' % vid[0],
+                           'video__title': vid[0]}
+
+            video = cls.data_utils.create_video(**vidurl_data)
 
             if vid[1] is not None:
                 video_data = {'language_code': vid[1],
@@ -265,11 +265,10 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                        ]
         cls.vid_obj_list = []
         for vid in test_videos:
-            
-            video = cls.data_utils.create_video(url = 'http://qa.pculture.org/amara_tests/'
-                                                 '%s' % vid[0])
-            video.title = vid[0]
-            video.save()
+            vidurl_data = {'url': 'http://qa.pculture.org/amara_tests/%s' % vid[0],
+                           'video__title': vid[0]}
+
+            video = cls.data_utils.create_video(**vidurl_data)
             if vid[1] is not None:
                 video.primary_audio_language_code = vid[1]
                 video.save()
@@ -294,7 +293,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Return the tasks give a video id, and language via the api.
  
         """
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             team.slug, video_id)
         status, response = self.data_utils.api_get_request(self.user, url_part) 
         task_objects =  response['objects']
@@ -423,7 +422,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
             
         self.data_utils.upload_subs(video, video_data)
         
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             self.team.slug, video.video_id)
         status, response = self.data_utils.api_get_request(self.user, url_part) 
         task_objects = response['objects']
@@ -464,7 +463,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
             
         self.data_utils.upload_subs(video, video_data)
         
-        url_part = 'teams/{0}/tasks/?video_id={1}'.format(
+        url_part = 'teams/{0}/tasks?video_id={1}'.format(
             self.team.slug, video.video_id)
         _, r = self.data_utils.api_get_request(self.user, url_part) 
         task_objects = r['objects']
