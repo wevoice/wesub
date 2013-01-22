@@ -120,29 +120,28 @@ var SubtitleListItemController = SubtitleListItemController || null;
             // Enter / return without shift.
             if (keyCode === 13 && !e.shiftKey) {
 
-
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
 
-                var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
-
                 // If canAddAndRemove is true and this is the last subtitle in the set,
                 // save the current subtitle and create a new subtitle at the end.
-                if (selectedScope.subtitles[index] === undefined && selectedScope.canAddAndRemove) {
+                if (selectedScope.canAddAndRemove) {
+                    if ($currentSubtitle.next().length === 0) {
 
-                    // Save the current subtitle.
-                    selectedScope.finishEditingMode(activeTextArea.val());
+                        // Save the current subtitle.
+                        selectedScope.finishEditingMode(activeTextArea.val());
 
-                    // Passing true as the last argument indicates that we want
-                    // to select this subtitle after it is created.
-                    selectedScope.addSubtitle(index - 1, {}, '', true);
+                        // Passing true as the last argument indicates that we want
+                        // to select this subtitle after it is created.
+                        selectedScope.addSubtitle(null, {}, '', true);
 
+                        // Apply the current scope.
+                        selectedScope.$apply();
+
+                    }
                 }
 
-                // Apply the current scope.
-                selectedScope.$apply();
-
-                // Set the element to select.
+                // Set the next subtitle to be the one after this.
                 nextSubtitle = $currentSubtitle.next().get(0);
 
             }
@@ -164,7 +163,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
 
-                // Tab with shift, move to the previous subtitle,.
+                // Set the next subtitle to be the one before this.
                 nextSubtitle = $currentSubtitle.prev().get(0);
 
             }

@@ -274,8 +274,6 @@
             var content = $scope.parser.content($scope.subtitle, newValue);
 
             if (content !== initialText) {
-                // mark dirty variable on root scope so we can allow
-                // saving the session
                 $scope.$root.$emit('workDone');
             }
         };
