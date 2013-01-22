@@ -11,7 +11,7 @@ class CreatePage(UnisubsPage):
 
     _SINGLE_URL_ENTRY_BOX = "input.main_video_form_field"
     _INPUT_PREFOCUS = "input#submit_video_field.prefocus"
-    _URL = "videos/create"
+    _URL = "videos/create/"
     _SUBMIT_BUTTON = "form.main_video_form button.green_button"
     _MULTI_SUBMIT_LINK = (" div#submit_multiple_toggle "
                          "a#btn_submit_multiple_toggle.toogle-create-form")
