@@ -50,6 +50,9 @@ from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from subtitles.models import (
+    SubtitleVersion as NewSubtitleVersion,
+)
 
 from functools import partial
 
@@ -636,7 +639,6 @@ class TeamVideo(models.Model):
     # this is an auto_add like field, but done on the model save so the
     # admin doesn't throw a fit
     created = models.DateTimeField(blank=True)
-    completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
     project = models.ForeignKey(Project)
@@ -1592,6 +1594,8 @@ class Task(models.Model):
                                 db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
+    new_subtitle_version = models.ForeignKey(NewSubtitleVersion,
+                                             blank=True, null=True)
 
     # The original source version being reviewed or approved.
     #
@@ -1621,6 +1625,9 @@ class Task(models.Model):
     # future as well.
     review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
                                             null=True, related_name='tasks_based_on')
+    new_review_base_version = models.ForeignKey(NewSubtitleVersion, blank=True,
+                                                null=True,
+                                                related_name='tasks_based_on_new')
 
     deleted = models.BooleanField(default=False)
 
