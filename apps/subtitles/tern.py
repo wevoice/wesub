@@ -209,18 +209,20 @@ def fix_blank_original(video):
     # Copied from the widget RPC code in production.
     # Note that this doesn't necessarily fix all blank languages.  The ones that
     # are marked as "is_original=False" won't be touched.
-    originals = video.subtitlelanguage_set.filter(is_original=True, language='')
+    languages = video.subtitlelanguage_set.filter(language='')
     to_delete = []
-    if len(originals) > 0:
-        for original in originals:
-            if not original.latest_version():
-                # result of weird practice of saving SL with is_original=True
-                # and blank language code on Video creation.
-                to_delete.append(original)
-            else:
-                # decided to mark authentic blank originals as English.
-                original.language = 'en'
-                original.save()
+    for sl in languages:
+        if not sl.latest_version():
+            # result of weird practice of saving SL with is_original=True
+            # and blank language code on Video creation.
+            to_delete.append(sl)
+        elif sl.is_original:
+            # Mark blank originals as English.
+            sl.language = 'en'
+            sl.save()
+        else:
+            # TODO: Determine what to do with these.
+            pass
     for sl in to_delete:
         sl.delete()
 
