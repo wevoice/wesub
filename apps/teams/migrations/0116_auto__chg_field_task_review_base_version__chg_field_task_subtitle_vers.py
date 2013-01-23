@@ -1,25 +1,26 @@
 # encoding: utf-8
+
+################################################################################
+# NOTE: The naming of this file is a historical accident.  It only removes the #
+# completed_languages table, it does NOT touch the foreign keys it originally  #
+# did.                                                                         #
+################################################################################
+
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
     def forwards(self, orm):
-        
+
         # Removing M2M table for field completed_languages on 'TeamVideo'
         db.delete_table('teams_teamvideo_completed_languages')
 
-        # Changing field 'Task.review_base_version'
-        db.alter_column('teams_task', 'review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, null=True, to=orm['subtitles.SubtitleVersion']))
 
-        # Changing field 'Task.subtitle_version'
-        db.alter_column('teams_task', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleVersion'], null=True, blank=True))
-    
-    
     def backwards(self, orm):
-        
+
         # Adding M2M table for field completed_languages on 'TeamVideo'
         db.create_table('teams_teamvideo_completed_languages', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
@@ -28,13 +29,7 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('teams_teamvideo_completed_languages', ['teamvideo_id', 'subtitlelanguage_id'])
 
-        # Changing field 'Task.review_base_version'
-        db.alter_column('teams_task', 'review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['videos.SubtitleVersion'], blank=True))
 
-        # Changing field 'Task.subtitle_version'
-        db.alter_column('teams_task', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion'], null=True, blank=True))
-    
-    
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -219,8 +214,8 @@ class Migration(SchemaMigration):
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'priority': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'db_index': 'True', 'blank': 'True'}),
             'public': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on'", 'null': 'True', 'to': "orm['subtitles.SubtitleVersion']"}),
-            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
+            'review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on'", 'null': 'True', 'to': "orm['videos.SubtitleVersion']"}),
+            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
             'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
             'team_video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.TeamVideo']"}),
             'type': ('django.db.models.fields.PositiveIntegerField', [], {})
@@ -344,5 +339,5 @@ class Migration(SchemaMigration):
             'writelock_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         }
     }
-    
+
     complete_apps = ['teams']
