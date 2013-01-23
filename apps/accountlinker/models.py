@@ -128,7 +128,7 @@ def can_be_synced(version):
             # Don't sync incomplete languages
             return False
 
-        if version.subtitle_language.is_imported_from_youtube_and_not_worked_on:
+        if version.video.is_imported_from_youtube_and_not_worked_on:
             return False
 
     return True
