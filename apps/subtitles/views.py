@@ -138,13 +138,13 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
-    editing_language.writelock(request.user, request.browser_id, save=True)
-
     message = _check_team_video_locking(request.user, video, language_code)
 
     if message:
         messages.error(request, message)
         return redirect(video)
+
+    editing_language.writelock(request.user, request.browser_id, save=True)
 
     # if this language is a traslation, show both
     editing_version = editing_language.get_tip(public=False)

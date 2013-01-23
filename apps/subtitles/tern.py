@@ -209,18 +209,20 @@ def fix_blank_original(video):
     # Copied from the widget RPC code in production.
     # Note that this doesn't necessarily fix all blank languages.  The ones that
     # are marked as "is_original=False" won't be touched.
-    originals = video.subtitlelanguage_set.filter(is_original=True, language='')
+    languages = video.subtitlelanguage_set.filter(language='')
     to_delete = []
-    if len(originals) > 0:
-        for original in originals:
-            if not original.latest_version():
-                # result of weird practice of saving SL with is_original=True
-                # and blank language code on Video creation.
-                to_delete.append(original)
-            else:
-                # decided to mark authentic blank originals as English.
-                original.language = 'en'
-                original.save()
+    for sl in languages:
+        if not sl.latest_version():
+            # result of weird practice of saving SL with is_original=True
+            # and blank language code on Video creation.
+            to_delete.append(sl)
+        elif sl.is_original:
+            # Mark blank originals as English.
+            sl.language = 'en'
+            sl.save()
+        else:
+            # TODO: Determine what to do with these.
+            pass
     for sl in to_delete:
         sl.delete()
 
@@ -288,15 +290,18 @@ def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
     from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
     from apps.subtitles.models import VALID_LANGUAGE_CODES
+    from utils.metrics import Meter
 
     exists = (NewSubtitleLanguage.objects.filter(video=sl.video,
                                                  language_code=sl.language)
                                          .exists())
     if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
+        Meter('data-model-refactor.language-errors.duplicate-language').inc()
         return
     elif sl.language not in VALID_LANGUAGE_CODES:
         log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
+        Meter('data-model-refactor.language-errors.invalid-language-code').inc()
         return
 
     nsl = NewSubtitleLanguage(
@@ -357,6 +362,8 @@ def _sync_language(language_pk=None):
 
     """
 
+    from utils.metrics import Meter
+
     sl = (get_specific_language(language_pk)
           if language_pk
           else get_unsynced_subtitle_language())
@@ -370,6 +377,7 @@ def _sync_language(language_pk=None):
         # If we picked a writelocked language, bail for now, but come back to it
         # later.
         log('SubtitleLanguage', 'ERROR_WRITELOCKED', sl.pk, None)
+        Meter('data-model-refactor.language-errors.writelocked').inc()
         return True
 
     try:
@@ -380,17 +388,20 @@ def _sync_language(language_pk=None):
             # later.  Hopefully it will have been fixed by the above call, but
             # there's a chance that it's is_original=False and so is still borked.
             log('SubtitleLanguage', 'ERROR_EMPTY_LANGUAGE', sl.pk, None)
+            Meter('data-model-refactor.language-errors.empty-language').inc()
             return True
 
         if sl.new_subtitle_language:
             _update_subtitle_language(sl)
         else:
             _create_subtitle_language(sl)
+    except:
+        Meter('data-model-refactor.language-errors.other').inc()
+        raise
     finally:
         sl.release_writelock()
 
     if not dry:
-        from utils.metrics import Meter
         Meter('data-model-refactor.language-syncs').inc()
 
         if random.random() < 0.01:
@@ -535,6 +546,9 @@ def _update_subtitle_version(sv):
 def _sync_versions(language_pk=None):
     """Sync a single language worth of SubtitleVersions."""
 
+    from utils.metrics import Meter
+    meter = Meter('data-model-refactor.version-syncs')
+
     sl = get_unsynced_subtitle_version_language()
 
     if not sl:
@@ -546,6 +560,7 @@ def _sync_versions(language_pk=None):
         # If we picked a writelocked language, bail for now, but come back to it
         # later.
         log('SubtitleLanguage', 'ERROR_WRITELOCKED', sl.pk, None)
+        Meter('data-model-refactor.version-errors.writelocked').inc()
         return True
 
     try:
@@ -555,6 +570,8 @@ def _sync_versions(language_pk=None):
 
         for version in versions.order_by('version_no'):
             _update_subtitle_version(version)
+            if not dry:
+                meter.inc()
 
         # Then sync any new versions.
         versions = sl.subtitleversion_set.filter(needs_sync=True,
@@ -566,16 +583,20 @@ def _sync_versions(language_pk=None):
 
         for version in new_versions[:-1]:
             _create_subtitle_version(version, False)
+            if not dry:
+                meter.inc()
 
         for version in new_versions[-1:]:
             _create_subtitle_version(version, True)
+            if not dry:
+                meter.inc()
+    except:
+        Meter('data-model-refactor.version-errors.other').inc()
+        raise
     finally:
         sl.release_writelock()
 
     if not dry:
-        from utils.metrics import Meter
-        Meter('data-model-refactor.version-syncs').inc()
-
         if random.random() < 0.01:
             report_metrics()
 
