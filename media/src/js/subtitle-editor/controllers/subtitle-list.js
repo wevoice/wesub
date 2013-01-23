@@ -125,8 +125,9 @@
 
                 var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
 
-                promise.then(function onSuccess() {
+                promise.then(function onSuccess(response) {
                     $scope.status = 'saved';
+                    window.location = response['data']['site_url'];
                 }, function onError() {
                     $scope.status = 'error';
                     window.alert('Sorry, there was an error...');
