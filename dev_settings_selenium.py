@@ -78,7 +78,7 @@ NOSE_ARGS = ['--logging-filter=test_steps, -remote_connection, '
              '-selenium.webdriver.remote.remote_connection',
              '--with-xunit',
              '--xunit-file=nosetests.xml',
-             '--with-id',
+             #'--with-id',
              '--failed',
             ]
 

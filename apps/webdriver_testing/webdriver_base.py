@@ -40,9 +40,8 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
     def setUpClass(cls):
         super(WebdriverTestCase, cls).setUpClass()
         management.call_command('flush', interactive=False)
-        Site.objects.get_current().domain = ('unisubs.example.com:%d' 
-                                             % cls.server_thread.port)
-        Site.objects.get_current().save()
+
+        
         cls.logger = logging.getLogger('test_steps')
         cls.logger.setLevel(logging.INFO)
         if not cls.NEW_BROWSER_PER_TEST_CASE:
@@ -61,6 +60,12 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         #Set up logging to capture the test steps.
         self.logger.info('testcase: %s' % self.id())
         self.logger.info('description: %s' % self.shortDescription())
+        site_obj = Site.objects.get_current()
+        
+        site_obj.domain = ('unisubs.example.com:%d' 
+                           % self.server_thread.port)
+        site_obj.save()
+        Site.objects.clear_cache()
         
         #Match the Site port with the liveserver port so search redirects work.
         if self.NEW_BROWSER_PER_TEST_CASE:

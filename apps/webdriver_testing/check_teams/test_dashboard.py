@@ -285,6 +285,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                 ).user
 
     def setUp(self):
+        super(TestCaseTasksEnabledDashboard, self).setUp()
         self.dashboard_tab.open_team_page(self.team.slug)
         
 
