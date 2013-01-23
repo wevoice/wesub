@@ -135,7 +135,8 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         editing_language = SubtitleLanguage(video=video,language_code=language_code )
 
     if not editing_language.can_writelock(request.browser_id):
-        return render_to_response("subtitles/subtitle-editor-locked.html")
+        messages.error(request, _("You can't edit this subtitle because it's locked"))
+        return redirect(video)
 
     editing_language.writelock(request.user, request.browser_id, save=True)
 
