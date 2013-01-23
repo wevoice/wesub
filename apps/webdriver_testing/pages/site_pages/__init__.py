@@ -82,9 +82,9 @@ class UnisubsPage(Page):
                                   u'name': u'sessionid',
                                   u'value': session.session_key,
                                   u'path': u'/',
+                                  u'secure': False,
                                  })
         self.logger.info("cookie saved")
-        self.logger.info("cookies: %s", self.browser.get_cookies())
 
     def set_skiphowto(self):
         self.browser.add_cookie({ u'name': u'skiphowto', 
@@ -94,10 +94,17 @@ class UnisubsPage(Page):
 
 
     def _get_session_id(self):
-        for cookie in self.browser.get_cookies():
-            if (cookie['domain'] == 'unisubs.example.com' and 
-                cookie['name'] == 'sessionid'):
-                return cookie['value']
+        #jed - modified this because sauce fails when get_cookies used.
+        try:
+            cookie = self.browser.get_cookie_by_name('sessionid')
+            return cookie['value']
+        except:
+            return None
+     
+        #for cookie in self.browser.get_cookies():
+        #    if (cookie['domain'] == 'unisubs.example.com' and 
+        #        cookie['name'] == 'sessionid'):
+        #        return cookie['value']
         return None
 
     def current_teams(self):

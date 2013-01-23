@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-22 00:04-0600\n"
+"POT-Creation-Date: 2013-01-23 00:04-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1668,7 +1668,7 @@ msgid ""
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1100 apps/widget/rpc.py:1142
+#: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
 msgid "\n"
 msgstr ""
 

@@ -13,9 +13,13 @@ from django.http import HttpResponse
 from django.test.client import RequestFactory, Client
 from django.contrib.sites.models import Site
 from django.db import IntegrityError
-
+import logging
 
 class DataHelpers(object):
+    def __init__(self):
+        self.logger = logging.getLogger('test_steps')
+        self.logger.setLevel(logging.INFO)
+
 
     def create_user_api_key(self, user_obj):
         c = Client()
@@ -41,16 +45,16 @@ class DataHelpers(object):
 
     def api_url(self, url_part):
         base_url = 'http://%s/' % Site.objects.get_current().domain
-        if 'api2/partners' in url_part:
-            url = base_url + url_part[1:]
+        if url_part.startswith('http'):
+            return url_part
+        elif url_part.startswith('/api2/partners'):
+            return (base_url + url_part[1:])
         else:
-            url = base_url + 'api2/partners/' + url_part
-        return url
+            return (base_url + 'api2/partners/' + url_part)
 
 
     def post_api_request(self, user, url_part, data):
-        r = requests.session()
-        r.config['keep_alive'] = False
+        r = requests
         url = self.api_url(url_part)
         headers = { 'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -62,8 +66,7 @@ class DataHelpers(object):
 
 
     def put_api_request(self, user, url_part, data):
-        r = requests.session()
-        r.config['keep_alive'] = False
+        r = requests
         url = self.api_url(url_part)
         headers = { 'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -99,13 +102,6 @@ class DataHelpers(object):
 
 
     def create_video(self, **kwargs):
-        #if 'url' not in kwargs:
-        #    data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
-        #            'video__title': ('X Factor Audition - Stop Looking At My '
-        #                            'Mom Rap - Brian Bradley'),
-        #            'type': 'Youtube'
-        #           }
-        #    kwargs.update(data)
         try:         
             v = VideoUrlFactory(**kwargs).video
         except IntegrityError:

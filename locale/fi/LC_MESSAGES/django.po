@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-22 00:03-0600\n"
+"POT-Creation-Date: 2013-01-23 00:03-0600\n"
 "PO-Revision-Date: 2013-01-19 06:38+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/"
@@ -1682,7 +1682,7 @@ msgid ""
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/widget/rpc.py:1100 apps/widget/rpc.py:1142
+#: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
 msgid "\n"
 msgstr ""
 

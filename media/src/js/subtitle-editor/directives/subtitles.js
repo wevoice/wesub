@@ -56,8 +56,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var isEditable;
-        var selectedScope, selectedController, activeTextArea,
-            rootEl;
+        var selectedScope, selectedController, activeTextArea, rootEl;
 
         function onSubtitleItemSelected(elm) {
             /**
@@ -84,9 +83,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
                 activeTextArea = $('textarea', elm);
                 selectedScope = scope;
 
-                var editableText = selectedScope.startEditingMode();
-
-                activeTextArea.val(editableText);
+                activeTextArea.val(selectedScope.startEditingMode());
                 selectedScope.$digest();
 
                 activeTextArea.focus();

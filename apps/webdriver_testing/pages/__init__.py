@@ -538,6 +538,7 @@ class Page(object):
         if not e:
             e = 'webdriver error: ' + self.browser.current_url
         self.logger.error(str(e) + self.browser.current_url)
+        self.browser.get_screenshot_as_file('apps/webdriver_testing/Results/error.png')
         raise ValueError(e)
 
 
