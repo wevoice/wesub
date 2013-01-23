@@ -25,8 +25,9 @@ class TestCaseUntimedText(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
 
     def setUp(self):
+        super(TestCaseUntimedText, self).setUp()
         self.video_pg.open_video_page(self.test_video.video_id)
-
+        
     def _upload_and_verify(self, sub_file):
         """Upload the subtitle file and confirm subs are stored.
 
@@ -216,6 +217,7 @@ class TestCaseTimedText(WebdriverTestCase):
 
 
     def setUp(self):
+        super(TestCaseTimedText, self).setUp()
         self.video_pg.open_video_page(self.test_video.video_id)
 
     def _upload_and_verify(self, sub_file, lang, lang_code, expected_count):
