@@ -535,6 +535,9 @@ def _update_subtitle_version(sv):
 def _sync_versions(language_pk=None):
     """Sync a single language worth of SubtitleVersions."""
 
+    from utils.metrics import Meter
+    meter = Meter('data-model-refactor.version-syncs')
+
     sl = get_unsynced_subtitle_version_language()
 
     if not sl:
@@ -555,6 +558,8 @@ def _sync_versions(language_pk=None):
 
         for version in versions.order_by('version_no'):
             _update_subtitle_version(version)
+            if not dry:
+                meter.inc()
 
         # Then sync any new versions.
         versions = sl.subtitleversion_set.filter(needs_sync=True,
@@ -566,16 +571,17 @@ def _sync_versions(language_pk=None):
 
         for version in new_versions[:-1]:
             _create_subtitle_version(version, False)
+            if not dry:
+                meter.inc()
 
         for version in new_versions[-1:]:
             _create_subtitle_version(version, True)
+            if not dry:
+                meter.inc()
     finally:
         sl.release_writelock()
 
     if not dry:
-        from utils.metrics import Meter
-        Meter('data-model-refactor.version-syncs').inc()
-
         if random.random() < 0.01:
             report_metrics()
 
