@@ -23,8 +23,10 @@
     var CollabSidebarController = function($scope, SubtitleStorage) {
 
         $scope.collabOpen = false;
+
+        // Default module open states.
         $scope.modulesOpen = {
-            notes: false
+            notes: true
         };
 
         $scope.toggleCollabSidebar = function($event) {
