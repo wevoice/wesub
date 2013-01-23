@@ -52,7 +52,10 @@ class TestCasePartialSync(WebdriverTestCase):
         timing_list = self.sub_editor.sub_timings()
         self.logger.info( timing_list)
         #Verify synced subs are increasing
-        self.assertGreater(float(timing_list[1]), float(timing_list[0]))
+        if timing_list[1] is not '':
+            self.assertGreater(float(timing_list[1]), float(timing_list[0]))
+        else:
+            self.fail("did not sync enough subs for compare")
         #Verify last sub is blank
         self.assertEqual(timing_list[-1], '')
 

@@ -3,6 +3,7 @@ import factory
 from apps.videos.models import Video 
 from apps.videos.models import VideoUrl
 from apps.videos.models import SubtitleLanguage
+from apps.videos.types import video_type_registrar
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
 from apps.teams.models import MembershipNarrowing
@@ -17,11 +18,6 @@ from apps.auth.models import CustomUser as User
 from apps.auth.models import UserLanguage
 from apps.messages.models import Message
 from apps.subtitles.models import SubtitleLanguage
-
-
-
-
-
 
 class TeamManagerLanguageFactory(factory.Factory):
     FACTORY_FOR = MembershipNarrowing
@@ -41,8 +37,8 @@ class VideoUrlFactory(factory.Factory):
 
     """
     FACTORY_FOR = VideoUrl
-    type = 'HTML5'
     url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
+    type = 'H'
     primary=True
     original=True
     video = factory.SubFactory(VideoFactory)

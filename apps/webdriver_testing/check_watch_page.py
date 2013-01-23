@@ -25,7 +25,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         testdata = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
                     'video__title': ('X Factor Audition - Stop Looking At My '
                                     'Mom Rap - Brian Bradley'),
-                    'type': 'Youtube'
+                    'type': 'Y'
                    }
 
         video = cls.data.create_video(**testdata)

@@ -41,7 +41,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         super(WebdriverTestCase, cls).setUpClass()
         management.call_command('flush', interactive=False)
 
-        
+                
         cls.logger = logging.getLogger('test_steps')
         cls.logger.setLevel(logging.INFO)
         if not cls.NEW_BROWSER_PER_TEST_CASE:
@@ -61,11 +61,10 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         self.logger.info('testcase: %s' % self.id())
         self.logger.info('description: %s' % self.shortDescription())
         site_obj = Site.objects.get_current()
-        
+        Site.objects.clear_cache()
         site_obj.domain = ('unisubs.example.com:%d' 
                            % self.server_thread.port)
         site_obj.save()
-        Site.objects.clear_cache()
         
         #Match the Site port with the liveserver port so search redirects work.
         if self.NEW_BROWSER_PER_TEST_CASE:
@@ -87,12 +86,13 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
         if cls.use_sauce: 
             cls.sauce_key = os.environ.get('SAUCE_API_KEY')
             cls.sauce_user = os.environ.get('SAUCE_USER_NAME')
-            test_browser = os.environ.get('SELENIUM_BROWSER', 'Chrome').upper()
+            test_browser = os.environ.get('SELENIUM_BROWSER', 'Firefox').upper()
             dc = getattr(webdriver.DesiredCapabilities, test_browser)
 
             dc['version'] = os.environ.get('SELENIUM_VERSION', '')
             dc['platform'] = os.environ.get('SELENIUM_PLATFORM', 'WINDOWS 2008')
             dc['name'] = suite_or_test 
+            dc['public'] = True
             dc['tags'] = [os.environ.get('JOB_NAME', 'amara-local'),] 
 
             #Setup the remote browser capabilities
