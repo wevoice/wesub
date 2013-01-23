@@ -3,6 +3,7 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing.pages.editor_pages import dialogs
 from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
@@ -14,35 +15,45 @@ class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
-    NEW_BROWSER_PER_TEST_CASE = True
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    def setUp(self):
-        super(TestCasePartialSync, self).setUp()
-        WebdriverTestCase.setUp(self)
-        self.data_utils = data_helpers.DataHelpers()
-        self.user = UserFactory.create(username = 'user')
-        self.create_modal = dialogs.CreateLanguageSelection(self)
-        self.sub_editor = subtitle_editor.SubtitleEditor(self)
-        self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
-        self.video_pg = video_page.VideoPage(self)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCasePartialSync, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create(username = 'user')
+        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+        cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
+
 
         td = {'url': ('http://qa.pculture.org/amara_tests/'
                    'Birds_short.webmsd.webm')
              }
-        self.test_video = self.data_utils.create_video(**td)
-        self.video_pg.open_video_page(self.test_video.video_id)
-        self.video_pg.log_in(self.user.username, 'password')
-        self.video_pg.set_skiphowto()
+        cls.test_video = cls.data_utils.create_video(**td)
+        cls.video_pg.open_video_page(cls.test_video.video_id)
+        cls.video_pg.log_in(cls.user.username, 'password')
+        cls.video_pg.set_skiphowto()
         #Open the video page and sync the first 3 subs
-        num_synced_subs = 3
-        self.video_pg.add_subtitles()
-        self.create_modal.create_original_subs('English', 'English')
-        self.typed_subs = self.sub_editor.type_subs()
+        cls.video_pg.add_subtitles()
+        cls.create_modal.create_original_subs('English', 'English')
+        cls.typed_subs = cls.sub_editor.type_subs()
+        cls.sub_editor.save_and_exit()
+                
+    def setUp(self):
+        super(TestCasePartialSync, self).setUp()
+        self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
+                                                    'en')
+        self.video_language_pg.edit_subtitles()
         self.sub_editor.continue_to_next_step()
+        num_synced_subs = 3
         self.sub_editor.sync_subs(num_synced_subs)
 
     def tearDown(self):
         super(TestCasePartialSync, self).tearDown()
+
 
     def test_display__normal(self):
         """Manually entered partially subs display in editor.
@@ -52,10 +63,10 @@ class TestCasePartialSync(WebdriverTestCase):
         timing_list = self.sub_editor.sub_timings()
         self.logger.info( timing_list)
         #Verify synced subs are increasing
-        if timing_list[1] is not '':
+        try:
             self.assertGreater(float(timing_list[1]), float(timing_list[0]))
-        else:
-            self.fail("did not sync enough subs for compare")
+        except ValueError as e:
+            self.fail(e)
         #Verify last sub is blank
         self.assertEqual(timing_list[-1], '')
 
