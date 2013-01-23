@@ -562,5 +562,19 @@ section.main {
                 }
             }
         }
+        div.errors {
+            .error {
+                background: #F2DEDE url('../../../images/warning.png') center center no-repeat;
+                border: 1px solid #EED3D7;
+                border-left: 1px solid #D9DADB;
+                bottom: 30%;
+                display: block;
+                height: 17px;
+                padding: 20px;
+                position: fixed;
+                width: 20px;
+                @include multi-border-radius(0, 2px, 2px, 0);
+            }
+        }
     }
 }
