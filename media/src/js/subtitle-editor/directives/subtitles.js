@@ -55,8 +55,12 @@ var SubtitleListItemController = SubtitleListItemController || null;
     });
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
-        var isEditable;
-        var selectedScope, selectedController, activeTextArea, rootEl;
+        var activeTextArea,
+            isEditable,
+            rootEl,
+            selectedController,
+            selectedScope,
+            value;
 
         function onSubtitleItemSelected(elm) {
             /**
@@ -168,18 +172,18 @@ var SubtitleListItemController = SubtitleListItemController || null;
         }
         function onSubtitleTextKeyUp(e) {
 
-            // Save the current subtitle.
+            // Save the content to the DFXP wrapper.
             selectedScope.textChanged(activeTextArea.val());
 
-            var $textarea = $(e.currentTarget);
-            var $subtitle = $textarea.parent();
+            // Cache the value for a negligible performance boost.
+            value = activeTextArea.val();
 
-            selectedScope.empty = $textarea.val() === '';
-            selectedScope.characterCount = $textarea.val().length;
+            selectedScope.empty = value === '';
+            selectedScope.characterCount = value.length;
 
             selectedScope.$root.$emit('subtitleKeyUp', selectedScope.parser);
 
-            selectedScope.$apply();
+            selectedScope.$digest();
 
         }
 

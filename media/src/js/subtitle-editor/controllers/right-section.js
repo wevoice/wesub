@@ -34,14 +34,12 @@
         };
 
         $scope.$root.$on('subtitleKeyUp', function($event, parser) {
-            $timeout(function() {
-                if (parser.needsAnyTranscribed()) {
-                    $scope.error = 'You have empty subtitles.';
-                } else {
-                    $scope.error = null;
-                }
-                $scope.$apply();
-            });
+            if (parser.needsAnyTranscribed()) {
+                $scope.error = 'You have empty subtitles.';
+            } else {
+                $scope.error = null;
+            }
+            $scope.$digest();
         });
         
     };
