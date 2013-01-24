@@ -223,7 +223,7 @@ def fix_blank_original(video):
             log('SubtitleLanguage', 'englished', sl.pk, None)
         else:
             # TODO: Determine what to do with these.
-            pass
+            log('SubtitleLanguage', 'skipped', sl.pk, None)
     for sl in to_delete:
         log('SubtitleLanguage', 'deleted', sl.pk, None)
         sl.delete()
