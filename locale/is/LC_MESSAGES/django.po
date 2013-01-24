@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-23 00:04-0600\n"
+"POT-Creation-Date: 2013-01-24 00:08-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -499,6 +499,33 @@ msgstr ""
 
 #: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
+msgstr ""
+
+#: apps/subtitles/views.py:95 apps/widget/rpc.py:326
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+
+#: apps/subtitles/views.py:97 apps/widget/rpc.py:328
+msgid "Sorry, these subtitles are privately moderated."
+msgstr ""
+
+#: apps/subtitles/views.py:107 apps/widget/rpc.py:338
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+
+#: apps/subtitles/views.py:118
+msgid ""
+"You can't edit because there is a task for this language and you can't "
+"complete it."
+msgstr ""
+
+#: apps/subtitles/views.py:138
+msgid "You can't edit this subtitle because it's locked"
 msgstr ""
 
 #: apps/teams/admin.py:60
@@ -1649,23 +1676,6 @@ msgstr ""
 
 #: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
-msgstr ""
-
-#: apps/widget/rpc.py:326
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-
-#: apps/widget/rpc.py:328
-msgid "Sorry, these subtitles are privately moderated."
-msgstr ""
-
-#: apps/widget/rpc.py:338
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
 msgstr ""
 
 #: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
