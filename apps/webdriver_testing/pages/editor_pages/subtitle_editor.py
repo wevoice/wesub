@@ -87,9 +87,9 @@ class SubtitleEditor(EditorDialogs):
         time.sleep(2)
         self.pause()
         start_time = time.time()
-        while time.time() - start_time < 20:
+        while time.time() - start_time < 30:
             if (self.is_element_present and 
-                    self.get_size_by_css(self._BUFFERED)['width'] > 70):
+                    self.get_size_by_css(self._BUFFERED)['width'] > 90):
                 break 
             else:
                 time.sleep(0.1)
@@ -98,18 +98,16 @@ class SubtitleEditor(EditorDialogs):
         """Syncs the given number of subtitles.
 
         """
-        self.logger.info('syncing subtitles') 
         self.buffer_video()
         self.play()
-        time.sleep(2)
+        time.sleep(4)
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
             time.sleep(3)
+            self.logger.info('syncing') 
             self.click_by_css(self._SYNC)
-        time.sleep(1)
         self.pause()
-        time.sleep(2)
 
     def sub_timings(self, check_step=None):
         self.logger.info('getting the list of subtitle times')
