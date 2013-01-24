@@ -220,10 +220,12 @@ def fix_blank_original(video):
             # Mark blank originals as English.
             sl.language = 'en'
             sl.save()
+            log('SubtitleLanguage', 'englished', sl.pk, None)
         else:
             # TODO: Determine what to do with these.
             pass
     for sl in to_delete:
+        log('SubtitleLanguage', 'deleted', sl.pk, None)
         sl.delete()
 
 
