@@ -181,7 +181,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
             selectedScope.empty = value === '';
             selectedScope.characterCount = value.length;
 
-            selectedScope.$root.$emit('subtitleKeyUp', selectedScope.parser);
+            selectedScope.$root.$emit('subtitleKeyUp', {
+                parser: selectedScope.parser,
+                subtitles: $(selectedScope.subtitles)
+            });
 
             selectedScope.$digest();
 
