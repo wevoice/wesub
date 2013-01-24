@@ -1767,6 +1767,8 @@ class Task(models.Model):
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
+        assert self.new_subtitle_version != None, 'to complete a task, subtitle version cannot be None'
+
         self.completed = datetime.datetime.now()
         self.save()
 

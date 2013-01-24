@@ -79,7 +79,7 @@ def _language_data(language, editing_version, translated_from_version):
 def _check_team_video_locking(user, video, language_code):
     """Check whether the a team prevents the user from editing the subs.
 
-    Returns a dict appropriate for sending back if the user should be
+    Returns a message appropriate for sending back if the user should be
     prevented from editing them, or None if the user can safely edit.
 
     """
