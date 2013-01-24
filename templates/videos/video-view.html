@@ -238,6 +238,11 @@
             <li>
                 <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
             </li>
+            <li>
+                <a href="{% url subtitles:subtitle-editor video.video_id video.primary_audio_language_code %}" target="_blank">New editor</a>
+            </li>
+            <li>
+            </li>
             <li>{% feature_video video %}</li>
             {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}
         </ul>
