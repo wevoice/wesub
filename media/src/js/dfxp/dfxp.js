@@ -698,21 +698,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Otherwise, we're good.
         return false;
     };
-    this.needsAnyTranscribed = function() {
+    this.needsAnyTranscribed = function($subtitles) {
         /*
          * Check all of the subtitles for empty content.
          *
          * Returns: true || false
          */
 
-        var $subtitles = this.getSubtitles();
+        if (!$subtitles) {
+            $subtitles = this.getSubtitles();
+        }
 
         for (var i = 0; i < $subtitles.length; i++) {
 
             var $subtitle = $subtitles.eq(i);
-            var content = $('<div>').append($subtitle.contents().clone()).remove().html();
 
-            if (content === '') {
+            if ($subtitle.text() === '') {
                 return true;
             }
         }

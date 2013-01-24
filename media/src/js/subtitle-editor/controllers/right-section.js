@@ -20,27 +20,30 @@
 
     var root = this;
 
-    var CollabSidebarController = function($scope, SubtitleStorage) {
+    var RightSectionController = function($scope, $timeout) {
 
-        $scope.collabOpen = false;
-
-        // Default module open states.
+        // Default module opened/closed states.
         $scope.modulesOpen = {
+            collab: false,
             notes: true
         };
 
-        $scope.toggleCollabSidebar = function($event) {
-            $scope.collabOpen = !$scope.collabOpen;
-            $event.preventDefault();
-        };
-        
         $scope.toggleModule = function($event, module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
             $event.preventDefault();
         };
+
+        $scope.$root.$on('subtitleKeyUp', function($event, options) {
+            if (options.parser.needsAnyTranscribed(options.subtitles)) {
+                $scope.error = 'You have empty subtitles.';
+            } else {
+                $scope.error = null;
+            }
+            $scope.$digest();
+        });
         
     };
 
-    root.CollabSidebarController = CollabSidebarController;
+    root.RightSectionController = RightSectionController;
 
 }).call(this);

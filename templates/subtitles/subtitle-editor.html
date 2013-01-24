@@ -14,6 +14,19 @@
         var editorData = {{ editor_data|safe }}
     </script>
 
+    <!--[if IE]>
+        <style type="text/css">
+            .group {
+                display: block;
+                zoom: 1;
+            }
+        </style>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+        <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
 </head>
 <body>
     <header class="main group">
@@ -127,10 +140,10 @@
                 </div>
             </div>
         </section>
-        <section class="right column" ng-controller="CollabSidebarController">
-            <a href="#" class="toggle-collab" ng-click="toggleCollabSidebar($event)" ng-show="!collabOpen"></a>
-            <aside class="collab" ng-show="collabOpen">
-                <a href="#" class="toggle-collab" ng-click="toggleCollabSidebar($event)" ng-show="collabOpen"></a>
+        <section class="right column" ng-controller="RightSectionController">
+            <a href="#" class="toggle-collab" ng-click="toggleModule($event, 'collab')" ng-show="!modulesOpen.collab"></a>
+            <aside class="collab" ng-show="modulesOpen.collab">
+                <a href="#" class="toggle-collab" ng-click="toggleModule($event, 'collab')" ng-show="modulesOpen.collab"></a>
                 <div class="notes module" ng-class="{open: modulesOpen.notes}">
                     <a href="#" class="title" ng-click="toggleModule($event, 'notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
@@ -138,6 +151,9 @@
                     </div>
                 </div>
             </aside>
+            <div class="errors">
+                [[ error ]]
+            </div>
         </section>
     </section>
 
@@ -159,7 +175,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/right-section.js"></script>
 
 </body>
 </html>
