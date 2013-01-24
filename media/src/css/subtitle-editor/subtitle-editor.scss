@@ -498,6 +498,7 @@ section.main {
             position: fixed;
             right: 0;
             min-width: 250px;
+            z-index: 50;
 
             a.toggle-collab {
                 background: #333333 url('../../../images/arrow-right.png') center center no-repeat;
@@ -564,15 +565,15 @@ section.main {
         }
         div.errors {
             .error {
-                background: #F2DEDE url('../../../images/warning.png') center center no-repeat;
+                background: #F2DEDE url('../../../images/warning.png') 10px center no-repeat;
                 border: 1px solid #EED3D7;
-                border-left: 1px solid #D9DADB;
+                border-left: 0;
                 bottom: 30%;
+                color: #B94A48;
                 display: block;
-                height: 17px;
-                padding: 20px;
+                padding: 10px 20px 10px 36px;
                 position: fixed;
-                width: 20px;
+                z-index: 49;
                 @include multi-border-radius(0, 2px, 2px, 0);
             }
         }
