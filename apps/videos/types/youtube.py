@@ -23,6 +23,7 @@ from urlparse import urlparse
 import requests
 
 import gdata.youtube.client
+from gdata.youtube.client import YouTubeError
 import httplib2
 from celery.task import task
 from django.conf import settings
@@ -471,6 +472,12 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             }
 
         return self.captions
+
+    def get_user_profile(self, username=None):
+        if not username:
+            raise YouTubeError("You need to pass a username")
+        uri = '%s%s' % (gdata.youtube.client.YOUTUBE_USER_FEED_URI, username)
+        return self.get_feed(uri, desired_class=gdata.youtube.data.UserProfileEntry)
 
     def upload_captions(self, subtitle_version):
         """
