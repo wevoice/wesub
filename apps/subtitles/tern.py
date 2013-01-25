@@ -61,13 +61,14 @@ def err(m):
     sys.stderr.write("\n")
     sys.stderr.flush()
 
-def log(model, event_type, original_pk, new_pk):
+def log(model, event_type, original_pk, new_pk, extra=None):
     csv.writerow([
         datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         model,
         event_type,
         str(original_pk),
         str(new_pk),
+        repr(extra),
     ])
     sys.stdout.flush()
 
@@ -208,7 +209,7 @@ def markup_to_dfxp(text):
 def fix_blank_original(video):
     # Copied from the widget RPC code in production.
     # Note that this doesn't necessarily fix all blank languages.  The ones that
-    # are marked as "is_original=False" won't be touched.
+    # are marked as "is_original=False" and have versions won't be touched.
     languages = video.subtitlelanguage_set.filter(language='')
     to_delete = []
     for sl in languages:
@@ -299,6 +300,10 @@ def _create_subtitle_language(sl):
                                          .exists())
     if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
+        log('SubtitleLanguage', 'duplicate_counts', sl.pk, None,
+            [l.subtitleversion_set.count() for l
+             in sl.video.subtitlelanguage_set.filter(language=sl.language)]
+        )
         Meter('data-model-refactor.language-errors.duplicate-language').inc()
         return
     elif sl.language not in VALID_LANGUAGE_CODES:
