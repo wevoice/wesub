@@ -11,7 +11,7 @@
     <meta name="description" content="The easiest way to caption and translate any video, with crowdsourcing, volunteers, and professional services." />
 
     <meta charset="utf-8" />
-    {% if not current_site.name == 'unisubs' %}
+    {% if not current_site.name == 'amara-production' %}
         <meta name="robots" content="noindex, nofollow"/>
     {% endif %}
     {% block opengraph-head %}
@@ -87,6 +87,7 @@
         {% endblock %}
     </div>
     <div class="content container_12 wrapper clearfix">
+        {% comment %}
         {% if request|show_youtube_prompt and not hide_prompt %}
             <div id="youtube-prompt">
                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
@@ -98,6 +99,7 @@
                 </ul>
             </div>
         {% endif %}
+        {% endcomment %}
         {% if messages %}
             <div id="messages">
                 {% for message in messages %}

@@ -180,7 +180,7 @@ class ThirdPartyAccountManager(models.Manager):
         Get the ThirdPartyAccount that is able to push to any video on Youtube.
         Raise ``ImproperlyConfigured`` if it can't be found.
         """
-        username = getattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME')
+        username = getattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
         try:
             return self.get(username=username)

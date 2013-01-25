@@ -44,6 +44,8 @@ from libs.unilangs.unilangs import LanguageCode
 logger = logging.getLogger("youtube")
 
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
+YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
+    'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
 
 _('Private video')
@@ -358,10 +360,12 @@ class YoutubeVideoType(VideoType):
             func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
+        # Because somehow Django's ORM is case insensitive on CharFields.
+        is_always = third_party_account.username.lower() == \
+                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
-                                  third_party_account.oauth_refresh_token,
-                                  self.videoid)
+            third_party_account.oauth_refresh_token, self.videoid, is_always)
 
     def update_subtitles(self, subtitle_version, third_party_account):
         """
@@ -382,7 +386,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
     upload_uri_base = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
 
-    def __init__(self, access_token, refresh_token, youtube_video_id):
+    def __init__(self, access_token, refresh_token, youtube_video_id,
+            is_always_push_account=False):
         """
         A wrapper around the gdata client, to make life easier.
         In order to edit captions for a video, the oauth credentials
@@ -402,6 +407,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         )
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
+        self.is_always_push_account = is_always_push_account
 
     def request(self, *args, **kwargs):
         """
@@ -486,8 +492,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         handler = GenerateSubtitlesHandler.get('srt')
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
 
-        subs = add_credit(subtitle_version, subs)
-        self.add_credit_to_description(subtitle_version.language.video)
+        if not self.is_always_push_account:
+            subs = add_credit(subtitle_version, subs)
+            self.add_credit_to_description(subtitle_version.language.video)
 
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = ""
