@@ -300,9 +300,14 @@ def _create_subtitle_language(sl):
                                          .exists())
     if exists:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
-        log('SubtitleLanguage', 'duplicate_counts', sl.pk, None,
+        log('SubtitleLanguage', 'duplicate_version_counts', sl.pk, None,
             [l.subtitleversion_set.count() for l
              in sl.video.subtitlelanguage_set.filter(language=sl.language)]
+        )
+        log('SubtitleLanguage', 'duplicate_subtitle_counts', sl.pk, None,
+            [[len(v.subtitles())
+              for v in l.subtitleversion_set.order_by('version_no')]
+             for l in sl.video.subtitlelanguage_set.filter(language=sl.language)]
         )
         Meter('data-model-refactor.language-errors.duplicate-language').inc()
         return
