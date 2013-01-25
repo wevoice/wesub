@@ -127,6 +127,7 @@
 
                 promise.then(function onSuccess(response) {
                     $scope.status = 'saved';
+                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
                     window.location = response['data']['site_url'];
                 }, function onError() {
                     $scope.status = 'error';
@@ -141,7 +142,7 @@
             $event.preventDefault();
         };
 
-        $scope.$root.$on('workDone', function() {
+        $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
@@ -277,7 +278,7 @@
             var content = $scope.parser.content($scope.subtitle, newValue);
 
             if (content !== initialText) {
-                $scope.$root.$emit('workDone');
+                $scope.$root.$emit('work-done');
             }
         };
         $scope.getSubtitleIndex = function() {

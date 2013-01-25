@@ -134,6 +134,75 @@ strong {
         width: 26%;
     }
 }
+div.modal {
+    background: rgba(black, .6);
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+
+    div.inner {
+        background: #212223;
+        color: #F1F1F1;
+        margin: 230px auto 0 auto;
+        padding: 40px;
+        width: 50%;
+        @include border-radius(3px);
+        @include box-shadow(0, 0, 30px, rgba(black, .4));
+
+        h1 {
+            font: normal 17px $OpenSans;
+            margin-bottom: 20px;
+            
+            &.loading {
+                margin-bottom: 0;
+            }
+        }
+        p {
+            color: #AEAEAE;
+            font: normal 12px/20px $OpenSans;
+            margin-bottom: 20px;
+        }
+        div.buttons {
+            margin-top: 40px;
+            text-align: right;
+        }
+    }
+}
+button {
+    border: 0;
+    color: #DEDFDF;
+    cursor: pointer;
+    display: inline-block;
+    font: normal 12px $OpenSans;
+    margin: 0 5px;
+    padding: 5px 0;
+    width: 90px;
+
+    @include border-radius(2px);
+
+    &.approve {
+        background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
+    }
+    &.no {
+        background: #4A4B4C;
+    }
+    &.send-back {
+        background: #D24655 url('../../../images/thumbs-down.png') 10px center no-repeat;
+    }
+    &.yes {
+        background: #126895;
+    }
+    &:first-of-type {
+        margin-left: 0;
+    }
+    &:last-of-type {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
 
 header.main {
     background: #212223;
@@ -558,24 +627,11 @@ section.main {
                     border-top: 0;
 
                     button {
-                        border: 0;
                         color: #EFDFE1;
-                        cursor: pointer;
-                        display: block;
-                        float: left;
                         font: normal 13px $OpenSans;
                         padding: 10px 0 10px 30px;
                         text-align: left;
                         width: 48%;
-                        @include border-radius(2px);
-
-                        &.approve {
-                            background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
-                            margin-left: 4%;
-                        }
-                        &.send-back {
-                            background: #D24655 url('../../../images/thumbs-down.png') 10px center no-repeat;
-                        }
                     }
                 }
                 &.open {
@@ -592,7 +648,7 @@ section.main {
                     }
                     div.content {
                         border-bottom: 1px solid #292929;
-                        margin-bottom: 10px;
+                        margin-bottom: 15px;
                         padding-bottom: 10px;
                     }
                 }
