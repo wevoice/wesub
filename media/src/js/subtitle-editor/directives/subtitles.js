@@ -173,7 +173,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
         function onSubtitleTextKeyUp(e) {
 
             // Save the content to the DFXP wrapper.
-            selectedScope.textChanged(activeTextArea.val());
+            selectedScope.parser.content(selectedScope.subtitle, activeTextArea.val());
 
             // Cache the value for a negligible performance boost.
             value = activeTextArea.val();
