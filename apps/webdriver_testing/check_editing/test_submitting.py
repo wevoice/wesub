@@ -64,8 +64,6 @@ class TestCaseSubmittable(WebdriverTestCase):
     def tearDown(self):
         super(TestCaseSubmittable, self).tearDown()
 
-
-
     def test_display__checkpage(self):
         """Manually entered synced subs display in check step.
 
@@ -122,9 +120,48 @@ class TestCaseSubmittable(WebdriverTestCase):
         video_language_pg = video_language_page.VideoLanguagePage(self)
         video_language_pg.open_video_lang_page(self.test_video.video_id, 'en')
         self.assertEqual(6, sub_lang.get_subtitle_count())
-       
 
-    def test_submit__as_incomplete(self):
+
+
+class TestCaseIncomplete(WebdriverTestCase):
+    """Tests for the Subtitle Transcription editor page.  """
+    NEW_BROWSER_PER_TEST_CASE = True
+
+    def setUp(self):
+        super(TestCaseIncomplete, self).setUp()
+        self.data_utils = data_helpers.DataHelpers()
+        self.video_pg = video_page.VideoPage(self)
+        self.user = UserFactory.create(username = 'user')
+        self.create_modal = dialogs.CreateLanguageSelection(self)
+        self.sub_editor = subtitle_editor.SubtitleEditor(self)
+        self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
+        td = {'url': ('http://qa.pculture.org/amara_tests/'
+                   'Birds_short.webmsd.webm')
+             }
+
+        self.test_video = self.data_utils.create_video(**td)
+        self.video_pg.open_video_page(self.test_video.video_id)
+        self.video_pg.log_in(self.user.username, 'password')
+        self.video_pg.set_skiphowto()
+ 
+        #Open the video page and sync the first 3 subs
+        self.video_pg.add_subtitles()
+        self.create_modal.create_original_subs('English', 'English')
+
+        self.logger.info( 'typing subs')
+        self.typed_subs = self.sub_editor.type_subs()
+        self.sub_editor.continue_to_next_step()
+        
+        self.logger.info( 'syncing subs')
+        self.sub_editor.sync_subs(len(self.typed_subs)+2)
+        self.timing_list = self.sub_editor.sub_timings()
+        self.sub_editor.continue_to_next_step()
+        self.logger.info( 'continue to description screen')
+        self.sub_editor.continue_to_next_step()
+        self.logger.info( 'continue to review screen')
+        self.sub_editor.continue_to_next_step()
+
+    def test_submit__incomplete(self):
         """Manually entered are submitted, but not marked complete.
 
         """

@@ -88,7 +88,7 @@ class SubtitleEditor(EditorDialogs):
         self.pause()
         start_time = time.time()
         while time.time() - start_time < 30:
-            if (self.is_element_present and 
+            if (self.is_element_present(self._BUFFERED) and 
                     self.get_size_by_css(self._BUFFERED)['width'] > 90):
                 break 
             else:
