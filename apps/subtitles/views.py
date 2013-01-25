@@ -63,12 +63,14 @@ def _language_data(language, editing_version, translated_from_version):
 
         versions_data.append(version_data)
 
+    subtitle_language = editing_version.subtitle_language if editing_version else ''
+
     return {
         'translatedFrom': translated_from_version and {
             'language_code': translated_from_version.subtitle_language.language_code,
             'version_number': translated_from_version.version_number,
         },
-        'editingLanguage': language == editing_version.subtitle_language,
+        'editingLanguage': language == subtitle_language,
         'code': language.language_code,
         'name': language.get_language_code_display(),
         'pk': language.pk,
@@ -141,7 +143,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
     except SubtitleLanguage.DoesNotExist:
-        editing_language = SubtitleLanguage(video=video,language_code=language_code )
+        editing_language = SubtitleLanguage(video=video,language_code=language_code)
 
     if not editing_language.can_writelock(request.browser_id):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
