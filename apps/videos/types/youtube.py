@@ -41,6 +41,8 @@ from unilangs.unilangs import LanguageCode
 logger = logging.getLogger("youtube")
 
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
+YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
+    'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
 
 _('Private video')
@@ -304,10 +306,12 @@ class YoutubeVideoType(VideoType):
             save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
+        # Because somehow Django's ORM is case insensitive on CharFields.
+        is_always = third_party_account.username.lower() == \
+                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
-                                  third_party_account.oauth_refresh_token,
-                                  self.videoid)
+            third_party_account.oauth_refresh_token, self.videoid, is_always)
 
     def update_subtitles(self, subtitle_version, third_party_account):
         """
@@ -351,7 +355,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
     upload_uri_base = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
 
-    def __init__(self, access_token, refresh_token, youtube_video_id):
+    def __init__(self, access_token, refresh_token, youtube_video_id,
+            is_always_push_account=False):
         """
         A wrapper around the gdata client, to make life easier.
         In order to edit captions for a video, the oauth credentials
@@ -371,6 +376,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         )
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
+        self.is_always_push_account = is_always_push_account
 
     def request(self, *args, **kwargs):
         """
@@ -441,21 +447,35 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the subtitle already exists, will delete it and recreate it.
         This subs should be synced! Else we upload might fail.
         """
-        # TODO: The language_code here is in "unisubs" and should be encoded
-        # to bcp47.
-        content, title, language_code = \
-                self._prepare_subtitle_data_for_version(subtitle_version)
-        self.add_credit_to_description(subtitle_version)
+        from widget.srt_subs import GenerateSubtitlesHandler
+
+        lang = subtitle_version.subtitle_language.language_code
+
+        try:
+            lc = LanguageCode(lang.lower(), "unisubs")
+            lang = lc.encode("youtube")
+        except KeyError:
+            logger.error("Couldn't encode LC %s to youtube" % lang)
+            return
+
+        subs = subtitle_version.get_subtitles()
+
+        if not self.is_always_push_account:
+            subs = add_credit(subtitle_version, subs)
+            self.add_credit_to_description(subtitle_version.language.video)
+
+        content = babelsubs.generators.discover('srt').generate(subs)
+        title = ""
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
 
         # We can't just update a subtitle track in place.  We need to delete
         # the old one and upload a new one.
-        if language_code in self.captions:
-            self._delete_track(self.captions[language_code]['track'])
+        if lang in self.captions:
+            self._delete_track(self.captions[lang]['track'])
 
-        res = self.create_track(self.youtube_video_id, title, language_code,
+        res = self.create_track(self.youtube_video_id, title, lang,
                 content, settings.YOUTUBE_CLIENT_ID,
                 settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
         Meter('youtube.subs_pushed').inc()
