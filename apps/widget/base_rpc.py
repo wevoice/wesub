@@ -22,6 +22,9 @@ from videos import models
 
 LANGUAGES_MAP = dict(LANGUAGES)
 
+# Handle blank language codes, for now.  Eventually these should be going away.
+LANGUAGES_MAP[''] = u'Original'
+
 class BaseRpc:
     def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest, is_forked, base_language, title, description, language_is_rtl, is_moderated):
         return {

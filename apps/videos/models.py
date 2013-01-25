@@ -402,6 +402,10 @@ class Video(models.Model):
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
+        from videos.tasks import (
+            save_thumbnail_in_s3,
+            add_amara_description_credit_to_youtube_video
+        )
 
         try:
             vt = vt or video_type_registrar.video_type_for_url(video_url)
@@ -433,9 +437,7 @@ class Video(models.Model):
                 obj.user = user
                 obj.save()
 
-                from videos.tasks import save_thumbnail_in_s3
                 save_thumbnail_in_s3.delay(obj.pk)
-
                 Action.create_video_handler(obj, user)
 
                 #Save video url
@@ -467,6 +469,12 @@ class Video(models.Model):
             if hasattr(vt, 'username'):
                 video_url_obj.owner_username = vt.username
                 video_url_obj.save()
+
+        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+            # Only try to update the Youtube description once we have made sure
+            # that we have set the owner_username.
+            add_amara_description_credit_to_youtube_video.delay(video.video_id)
+
         return video, created
 
     @property
@@ -1232,6 +1240,19 @@ class SubtitleLanguage(models.Model):
     @property
     def first_approved_version(self):
         return self.first_version_with_status(APPROVED)
+
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.all()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -2552,6 +2573,8 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
+    YOUTUBE_PAGE_SIZE = 25
+
     def __unicode__(self):
         return self.url
 
@@ -2567,6 +2590,40 @@ class VideoFeed(models.Model):
         except (IndexError, KeyError):
             pass
 
+        if not last_link and 'youtube' in self.url:
+            # This is a newly added Youtube feed.  Let's make sure that we get
+            # all the videos even if we have to page the results.
+            video_count = feed_parser.feed.feed.opensearch_totalresults
+
+            if video_count > self.YOUTUBE_PAGE_SIZE:
+                pages = self._get_pages(video_count)
+
+                for x in range(1, pages + 1):
+                    start = (x - 1) * self.YOUTUBE_PAGE_SIZE + 1
+                    url = '{0}?start-index={1}&max-results={2}'.format(
+                            self.url, start, self.YOUTUBE_PAGE_SIZE)
+                    feed_parser = FeedParser(url)
+                    checked_entries += self._create_videos(feed_parser,
+                            last_link)
+
+        else:
+            checked_entries += self._create_videos(feed_parser, last_link)
+
+        return checked_entries
+
+    def _get_pages(self, total):
+        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
+
+        if pages > int(pages):
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+
+        return pages
+
+    def _create_videos(self, feed_parser, last_link):
+        checked_entries = 0
+
         _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
@@ -2574,4 +2631,3 @@ class VideoFeed(models.Model):
             checked_entries += 1
 
         return checked_entries
-

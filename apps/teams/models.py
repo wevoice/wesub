@@ -820,8 +820,11 @@ def autocreate_tasks(team_video):
     # We may need to create a transcribe task, if there are no existing subs.
     if workflow.autocreate_subtitle and not existing_subtitles:
         if not team_video.task_set.not_deleted().exists():
-            Task(team=team_video.team, team_video=team_video,
-                 subtitle_version=None, language='',
+            original_language = team_video.video._original_subtitle_language()
+            Task(team=team_video.team,
+                 team_video=team_video,
+                 subtitle_version=None,
+                 language= original_language and original_language.language or '',
                  type=Task.TYPE_IDS['Subtitle']
             ).save()
 
@@ -2331,15 +2334,16 @@ class TeamNotificationSettingManager(models.Manager):
                     extra={"team_pk": team_pk, "event_name": event_name})
             return
 
-        if team.partner:
-            notification_settings = self.get(partner=team.partner)
-        else:
-            try:
+        try:
+            if team.partner:
+                notification_settings = self.get(partner=team.partner)
+            else:
                 notification_settings = self.get(team=team)
-            except TeamNotificationSetting.DoesNotExist:
-                return
+        except TeamNotificationSetting.DoesNotExist:
+            return
 
         notification_settings.notify(event_name, **kwargs)
+
 
 class TeamNotificationSetting(models.Model):
     """Info on how a team should be notified of changes to its videos.
