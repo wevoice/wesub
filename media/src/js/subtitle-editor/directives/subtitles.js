@@ -213,8 +213,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
                             // be used instead of keydown.
                             $(document).on('keyup', function(e) {
                                 if (e.keyCode === 27) {
-                                    selectedScope.finishEditingMode(activeTextArea.val());
-                                    selectedScope.$digest();
+                                    if (selectedScope) {
+                                        selectedScope.finishEditingMode(activeTextArea.val());
+                                        selectedScope.$digest();
+                                    }
                                 }
                             });
 
