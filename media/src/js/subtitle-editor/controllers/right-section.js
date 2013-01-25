@@ -24,12 +24,21 @@
 
         // Default module opened/closed states.
         $scope.modulesOpen = {
+            approval: true,
             collab: false,
             notes: true
         };
 
+        $scope.approve = function($event) {
+            console.log('send back');
+            $event.preventDefault();
+        };
         $scope.toggleModule = function($event, module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
+            $event.preventDefault();
+        };
+        $scope.sendBack = function($event) {
+            console.log('send back');
             $event.preventDefault();
         };
 

@@ -120,6 +120,10 @@ strong {
 .column {
     float: left;
 
+    // Note: there's a bug in Chrome Linux that prevents proper rendering of
+    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
+    //
+    // Thus, the following does not add up to 100%.
     &.left {
         width: 34%;
     }
@@ -127,7 +131,7 @@ strong {
         width: 39%;
     }
     &.right {
-        width: 27%;
+        width: 26%;
     }
 }
 
@@ -484,6 +488,7 @@ section.main {
     section.right {
         a.toggle-collab {
             background: #333333 url('../../../images/arrow-left.png') center center no-repeat;
+            color: transparent;
             display: block;
             height: 30px;
             position: fixed;
@@ -531,19 +536,6 @@ section.main {
                         color: white;
                     }
                 }
-                &.open {
-                    a {
-                        border-bottom: 0;
-
-                        &:before {
-                            border-top: 6px solid #ECECEC;
-                            border-right: 4px solid transparent;
-                            border-left: 4px solid transparent;
-                            margin-right: 8px;
-                            vertical-align: -3px;
-                        }
-                    }
-                }
                 div.content {
                     padding: 0 20px;
 
@@ -559,6 +551,49 @@ section.main {
                         &:focus {
                             outline: none;
                         }
+                    }
+                }
+                
+                &.approval {
+                    border-top: 0;
+
+                    button {
+                        border: 0;
+                        color: #EFDFE1;
+                        cursor: pointer;
+                        display: block;
+                        float: left;
+                        font: normal 13px $OpenSans;
+                        padding: 10px 0 10px 30px;
+                        text-align: left;
+                        width: 48%;
+                        @include border-radius(2px);
+
+                        &.approve {
+                            background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
+                            margin-left: 4%;
+                        }
+                        &.send-back {
+                            background: #D24655 url('../../../images/thumbs-down.png') 10px center no-repeat;
+                        }
+                    }
+                }
+                &.open {
+                    a {
+                        border-bottom: 0;
+
+                        &:before {
+                            border-top: 6px solid #ECECEC;
+                            border-right: 4px solid transparent;
+                            border-left: 4px solid transparent;
+                            margin-right: 8px;
+                            vertical-align: -3px;
+                        }
+                    }
+                    div.content {
+                        border-bottom: 1px solid #292929;
+                        margin-bottom: 10px;
+                        padding-bottom: 10px;
                     }
                 }
             }

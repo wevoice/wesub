@@ -294,9 +294,6 @@
 
             return initialText;
         };
-        $scope.textChanged = function(newText) {
-            $scope.parser.content($scope.subtitle, newText);
-        };
 
     };
 

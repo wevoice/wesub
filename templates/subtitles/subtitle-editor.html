@@ -141,13 +141,29 @@
             </div>
         </section>
         <section class="right column" ng-controller="RightSectionController">
-            <a href="#" class="toggle-collab" ng-click="toggleModule($event, 'collab')" ng-show="!modulesOpen.collab"></a>
+            <a href="#"
+                class="toggle-collab"
+                ng-click="toggleModule($event, 'collab')"
+                ng-show="!modulesOpen.collab">
+                Open Collab
+            </a>
             <aside class="collab" ng-show="modulesOpen.collab">
-                <a href="#" class="toggle-collab" ng-click="toggleModule($event, 'collab')" ng-show="modulesOpen.collab"></a>
+                <a href="#"
+                    class="toggle-collab"
+                    ng-click="toggleModule($event, 'collab')"
+                    ng-show="modulesOpen.collab">
+                    Close Collab
+                </a>
                 <div class="notes module" ng-class="{open: modulesOpen.notes}">
                     <a href="#" class="title" ng-click="toggleModule($event, 'notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
                         <textarea ng-model="notes"></textarea>
+                    </div>
+                </div>
+                <div class="approval module" ng-show="modulesOpen.approval">
+                    <div class="content">
+                        <button class="send-back" ng-click="sendBack($event)">Send Back</button>
+                        <button class="approve" ng-click="approve($event)">Approve</button>
                     </div>
                 </div>
             </aside>
