@@ -19,6 +19,7 @@ import json
 from django.contrib.auth.decorators import login_required
 
 from videos.models import Video
+from teams.models import Task
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 
 from django.db.models import Count
@@ -76,7 +77,7 @@ def _language_data(language, editing_version, translated_from_version):
         'is_primary_audio_language': language.is_primary_audio_language()
     }
 
-def _check_team_video_locking(user, video, language_code):
+def _check_team_video_locking(user, video, language_code, task_id=None):
     """Check whether the a team prevents the user from editing the subs.
 
     Returns a message appropriate for sending back if the user should be
@@ -87,7 +88,7 @@ def _check_team_video_locking(user, video, language_code):
 
     if not team_video:
         # If there's no team video to worry about, just bail early.
-        return None
+        return None, None
 
     team = team_video.team
 
@@ -97,17 +98,21 @@ def _check_team_video_locking(user, video, language_code):
         message = _(u"Sorry, these subtitles are privately moderated.")
 
     if not team_video.video.can_user_see(user):
-        return message
+        return message, None
 
     language = video.subtitle_language(language_code)
 
     if (language and language.is_complete_and_synced()
                  and team.moderates_videos()
                  and not can_post_edit_subtitles(team, user)):
-        return _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
+        return _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator."), None
 
     # Check that there are no open tasks for this action.
-    tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
+    # todo: make this better.
+    if task_id:
+        tasks = [Task.objects.get(id=task_id)]
+    else:
+        tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
 
     if tasks:
         task = tasks[0]
@@ -115,7 +120,11 @@ def _check_team_video_locking(user, video, language_code):
         # 1. assign the task to himself
         # 2. do the task himself (the task is assigned to him)
         if (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
-            return _("You can't edit because there is a task for this language and you can't complete it.")
+            return _("You can't edit because there is a task for this language and you can't complete it."), task
+        else:
+            return None, task
+
+    return None, None
 
 @login_required
 def subtitle_editor(request, video_id, language_code, task_id=None):
@@ -138,7 +147,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
-    message = _check_team_video_locking(request.user, video, language_code)
+    message, task = _check_team_video_locking(request.user, video, language_code, task_id)
 
     if message:
         messages.error(request, message)
@@ -177,12 +186,16 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
     }
 
+    if task:
+        editor_data['task'] = task.id
+
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
         'language': editing_language,
         'other_languages': languages,
         'version': editing_version,
         'translated_from_version': translated_from_version,
+        'task': task,
         'editor_data': json.dumps(editor_data, indent=4)
     }, context_instance=RequestContext(request))
 
