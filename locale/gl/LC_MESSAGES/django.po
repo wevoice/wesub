@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-23 00:23-0600\n"
-"PO-Revision-Date: 2013-01-19 06:38+0000\n"
+"POT-Creation-Date: 2013-01-25 00:26-0600\n"
+"PO-Revision-Date: 2013-01-24 06:59+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Galician (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/gl/)\n"
@@ -516,6 +516,35 @@ msgstr "Non é posíbel detectar a codificación do ficheiro"
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Alguén está subtitulando o vídeo xusto agora. Inténteo máis tarde."
 
+#: apps/subtitles/views.py:95 apps/widget/rpc.py:326
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+"Estes subtítulos están moderados. Vexa a páxina do equipo %s para "
+"información sobre como colaborar."
+
+#: apps/subtitles/views.py:97 apps/widget/rpc.py:328
+msgid "Sorry, these subtitles are privately moderated."
+msgstr "Estes subtítulos teñen moderación privada."
+
+#: apps/subtitles/views.py:107 apps/widget/rpc.py:338
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+
+#: apps/subtitles/views.py:118
+msgid ""
+"You can't edit because there is a task for this language and you can't "
+"complete it."
+msgstr ""
+
+#: apps/subtitles/views.py:138
+msgid "You can't edit this subtitle because it's locked"
+msgstr ""
+
 #: apps/teams/admin.py:60
 #, python-format
 msgid "%(count)s messages sent"
@@ -738,11 +767,11 @@ msgstr "Xestores e admins"
 msgid "Admins only"
 msgstr "Soamente admins"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2625
+#: apps/teams/models.py:141 apps/teams/models.py:2627
 msgid "name"
 msgstr "nome"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2626
+#: apps/teams/models.py:142 apps/teams/models.py:2628
 msgid "slug"
 msgstr "ligazón fácil"
 
@@ -1319,23 +1348,23 @@ msgstr ""
 msgid "captcha"
 msgstr "captcha"
 
-#: apps/videos/models.py:137
+#: apps/videos/models.py:139
 msgid "in seconds"
 msgstr "en segundos"
 
-#: apps/videos/models.py:161
+#: apps/videos/models.py:163
 msgid "Sub.fetched"
 msgstr "Sub. obtido"
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:165
 msgid "Widget views"
 msgstr "Vistas do trebello"
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:167
 msgid "Views"
 msgstr "Visualizacións"
 
-#: apps/videos/models.py:1153
+#: apps/videos/models.py:1155
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1343,7 +1372,7 @@ msgstr ""
 "Non pode enviar subtítulos ata agora porque alguén está a editar o idioma "
 "que está enviando ou unha tradución del"
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1352,7 +1381,7 @@ msgstr ""
 "  revisado <a href=\"%(language_url)s\">os subtítulos en %(language)s</a> de "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2013
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1361,7 +1390,7 @@ msgstr ""
 "  aceptados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos para "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2016
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1370,7 +1399,7 @@ msgstr ""
 "  rexeitados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos "
 "para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1379,7 +1408,7 @@ msgstr ""
 "  aceptados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos para "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1388,33 +1417,33 @@ msgstr ""
 "  declinados <a href=\"%(language_url)s\">%(language)s</a> os subtítulos "
 "para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2034
 #, python-format
 msgid "  deleted a video: \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2039
 #, python-format
 msgid ""
 "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2039
+#: apps/videos/models.py:2041
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2045
+#: apps/videos/models.py:2047
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "título cambiado <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2049
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Cambiouse o título de <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2061
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1423,7 +1452,7 @@ msgstr ""
 "comentado en <a href=\"%(comments_url)s\"> os subtítulos en %(language)s</a> "
 "para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2063
+#: apps/videos/models.py:2065
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1432,17 +1461,17 @@ msgstr ""
 "Engadiuse comentario en <a href=\"%(comments_url)s\"> nos subtítulos en %"
 "(language)s</a> para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2066
+#: apps/videos/models.py:2068
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "comentado en <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2068
+#: apps/videos/models.py:2070
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Engadiuse comentario de <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2078
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1451,7 +1480,7 @@ msgstr ""
 "iniciados <a href=\"%(language_url)s\">os subtítulos en %(language)s</a> "
 "para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2080
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1460,7 +1489,7 @@ msgstr ""
 "<a href=\"%(language_url)s\">subtítulos en %(language)s</a> iniciados para "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1469,7 +1498,7 @@ msgstr ""
 "editados <a href=\"%(language_url)s\">os subtítulos en %(language)s</a> para "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2090
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1478,107 +1507,107 @@ msgstr ""
 "<a href=\"%(language_url)s\">subtítulos en %(language)s</a> editados para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2096
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "novo URL engadido para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2096
+#: apps/videos/models.py:2098
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Novo URL engadido para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2103
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "uniuse ao %(team)s como %(role)s"
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2108
 #, python-format
 msgid "left the %s team"
 msgstr "Deixou o equipo %s"
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2122
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2128
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2204
+#: apps/videos/models.py:2206
 msgid "add video"
 msgstr "engadir vídeo"
 
-#: apps/videos/models.py:2205
+#: apps/videos/models.py:2207
 msgid "change title"
 msgstr "Título de cambio"
 
-#: apps/videos/models.py:2206
+#: apps/videos/models.py:2208
 msgid "comment"
 msgstr "comentario"
 
-#: apps/videos/models.py:2207
+#: apps/videos/models.py:2209
 msgid "add version"
 msgstr "engadir versión"
 
-#: apps/videos/models.py:2208
+#: apps/videos/models.py:2210
 msgid "add translation"
 msgstr "engadir tradución"
 
-#: apps/videos/models.py:2209
+#: apps/videos/models.py:2211
 msgid "add video url"
 msgstr "engadir enderezo url do vídeo"
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2212
 msgid "request subtitles"
 msgstr "consultar subtítulos"
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2213
 msgid "approve version"
 msgstr "aprobar versión"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2214
 msgid "add contributor"
 msgstr "engadir colaborador"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2215
 msgid "remove contributor"
 msgstr "retirar colaborador"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2216
 msgid "reject version"
 msgstr "rexeitar versión"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2217
 msgid "review version"
 msgstr "revisar versión"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2218
 msgid "accept version"
 msgstr "aceptar versión"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2219
 msgid "decline version"
 msgstr "declinar versión"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2220
 msgid "delete video"
 msgstr "eliminar vídeo"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2221
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2222
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2478
+#: apps/videos/models.py:2480
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1758,25 +1787,6 @@ msgstr "Erro indefinido"
 #: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr "Incorporación de vídeo desactivada polo propietario"
-
-#: apps/widget/rpc.py:326
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-"Estes subtítulos están moderados. Vexa a páxina do equipo %s para "
-"información sobre como colaborar."
-
-#: apps/widget/rpc.py:328
-msgid "Sorry, these subtitles are privately moderated."
-msgstr "Estes subtítulos teñen moderación privada."
-
-#: apps/widget/rpc.py:338
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
-msgstr ""
 
 #: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
 msgid "\n"

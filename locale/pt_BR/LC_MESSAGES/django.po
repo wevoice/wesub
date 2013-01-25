@@ -11,6 +11,7 @@
 # danimatielo <dacamat@gmail.com>, 2011.
 #   <diegosouza.br@gmail.com>, 2012.
 # Diego Souza <diegosouza.br@gmail.com>, 2012.
+# Enrico Nicoletto <enrico.BR@gmx.co.uk>, 2013.
 # Gabriel Grumiche <g.grumiche@gmail.com>, 2011, 2012.
 # Giovane Guerreiro <giovaneguerreiro@gmail.com>, 2012.
 # Kenzo Okamura <kenzo.okamura@gmail.com>, 2012.
@@ -22,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-23 00:13-0600\n"
-"PO-Revision-Date: 2013-01-19 06:38+0000\n"
+"POT-Creation-Date: 2013-01-25 00:15-0600\n"
+"PO-Revision-Date: 2013-01-24 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/pt_BR/)\n"
@@ -35,11 +36,11 @@ msgstr ""
 
 #: apps/accountlinker/models.py:39
 msgid "Subtitles by the Amara.org community"
-msgstr ""
+msgstr "Legendas pela comunidade Amara.org"
 
 #: apps/accountlinker/models.py:41
 msgid "Help us caption and translate this video on Amara.org"
-msgstr ""
+msgstr "Ajude-nos a transcrever e traduzir este vídeo em Amara.org"
 
 #: apps/accountlinker/views.py:103
 msgid "The user who requested this action doesn't match the current user."
@@ -372,15 +373,15 @@ msgstr "O seu perfil foi atualizado."
 
 #: apps/profiles/views.py:191
 msgid "Your account has been updated."
-msgstr ""
+msgstr "Sua conta foi atualizada."
 
 #: apps/profiles/views.py:242
 msgid "Your photo has been updated."
-msgstr ""
+msgstr "Sua foto foi enviada."
 
 #: apps/profiles/views.py:247
 msgid "picture"
-msgstr ""
+msgstr "imagem"
 
 #: apps/profiles/views.py:260
 msgid "Your photo has been removed."
@@ -461,7 +462,7 @@ msgstr ""
 
 #: apps/subtitles/forms.py:96
 msgid "The language already exists and is not a translation."
-msgstr ""
+msgstr "O idioma já existe e não é uma tradução."
 
 #: apps/subtitles/forms.py:103
 #, python-format
@@ -475,6 +476,8 @@ msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
+"Desculpe-me, não podemos enviar suas legendas devido a outro usuário já "
+"estar atribuído a este idioma."
 
 #: apps/subtitles/forms.py:129
 msgid ""
@@ -501,6 +504,8 @@ msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
+"Desculpe, não podemos enviar suas legendas porque este idioma é moderado e "
+"você não tem permissão para traduzir legendas."
 
 #: apps/subtitles/forms.py:173
 msgid ""
@@ -513,12 +518,12 @@ msgstr ""
 #: apps/subtitles/forms.py:184
 #, python-format
 msgid "File size must be less than %d kb."
-msgstr ""
+msgstr "O tamanho do arquivo deve ser inferior a %d kb."
 
 #: apps/subtitles/forms.py:192
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
-msgstr ""
+msgstr "O formato não é suportado. Por favor envie um dos seguintes: %s"
 
 #: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
@@ -528,6 +533,38 @@ msgstr "Não pudemos detectar o 'encoding' do arquivo."
 #: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Alguém está legendando este vídeo neste momento. Tente mais tarde."
+
+#: apps/subtitles/views.py:95 apps/widget/rpc.py:326
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+"Estas legendas são moderadas. Veja a página da equipe %s para informação "
+"sobre como contribuir."
+
+#: apps/subtitles/views.py:97 apps/widget/rpc.py:328
+msgid "Sorry, these subtitles are privately moderated."
+msgstr "Desculpe, estas legendas são moderadas privativamente."
+
+#: apps/subtitles/views.py:107 apps/widget/rpc.py:338
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+"Desculpe-me, você não possui permissão para editar estas legendas. Se você "
+"acredita que elas precisam de correção, por favor contate o administrador da "
+"equipe."
+
+#: apps/subtitles/views.py:118
+msgid ""
+"You can't edit because there is a task for this language and you can't "
+"complete it."
+msgstr ""
+
+#: apps/subtitles/views.py:138
+msgid "You can't edit this subtitle because it's locked"
+msgstr ""
 
 #: apps/teams/admin.py:60
 #, python-format
@@ -746,11 +783,11 @@ msgstr "Gerentes e administradores"
 msgid "Admins only"
 msgstr "Apenas administradores"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2625
+#: apps/teams/models.py:141 apps/teams/models.py:2627
 msgid "name"
 msgstr "nome"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2626
+#: apps/teams/models.py:142 apps/teams/models.py:2628
 msgid "slug"
 msgstr "slogan"
 
@@ -1217,7 +1254,7 @@ msgstr "Não foi possível codificar o arquivo. Ele deve ter codificação utf8.
 #: apps/videos/forms.py:80
 #, python-format
 msgid "Incorrect format. Upload .%s "
-msgstr ""
+msgstr "Formato incorreto. Envie .%s"
 
 #: apps/videos/forms.py:89 unisubs-integration/api/1_0/forms.py:316
 #: unisubs-integration/api/1_0/forms.py:328
@@ -1328,23 +1365,23 @@ msgstr ""
 msgid "captcha"
 msgstr "captcha"
 
-#: apps/videos/models.py:137
+#: apps/videos/models.py:139
 msgid "in seconds"
 msgstr "em segundos."
 
-#: apps/videos/models.py:161
+#: apps/videos/models.py:163
 msgid "Sub.fetched"
 msgstr "Sub.fetched"
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:165
 msgid "Widget views"
 msgstr "Visualização de Widgets"
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:167
 msgid "Views"
 msgstr "Visualizações"
 
-#: apps/videos/models.py:1153
+#: apps/videos/models.py:1155
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
@@ -1352,7 +1389,7 @@ msgstr ""
 "Desculpe, mas não é possível fazer upload de legendas agora, pois alguém "
 "está editando este idioma ou uma tradução a partir dele."
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1361,7 +1398,7 @@ msgstr ""
 "  revisou <a href=\"%(language_url)s\">legendas de %(language)s</a> para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2013
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1370,7 +1407,7 @@ msgstr ""
 "  aceitou <a href=\"%(language_url)s\">legendas de %(language)s</a> para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2016
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1379,7 +1416,7 @@ msgstr ""
 "legendas <a href=\"%(language_url)s\">%(language)s</a> rejeitadas para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1388,7 +1425,7 @@ msgstr ""
 "  legendas <a href=\"%(language_url)s\">%(language)s</a> aprovadas para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1397,34 +1434,34 @@ msgstr ""
 "  recusou <a href=\"%(language_url)s\">legendas de %(language)s</a> para <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2034
 #, python-format
 msgid "  deleted a video: \"%(title)s\""
-msgstr ""
+msgstr "  excluiu um vídeo: \"%(title)s\""
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2039
 #, python-format
 msgid ""
 "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2039
+#: apps/videos/models.py:2041
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2045
+#: apps/videos/models.py:2047
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "alterou o título para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2049
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "O título foi alterado para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2061
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1433,7 +1470,7 @@ msgstr ""
 "comentou as <a href=\"%(comments_url)s\">legendas em %(language)s</a> de <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2063
+#: apps/videos/models.py:2065
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1442,19 +1479,19 @@ msgstr ""
 "Foram adicionados comentários sobre as <a href=\"%(comments_url)s\">legendas "
 "em %(language)s</a> de <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2066
+#: apps/videos/models.py:2068
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "comentou em <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2068
+#: apps/videos/models.py:2070
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Foram adicionados comentários para <a href=\"%(video_url)s\">%(video_name)s</"
 "a>"
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2078
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1463,7 +1500,7 @@ msgstr ""
 "iniciou as <a href=\"%(language_url)s\">legendas em %(language)s</a> de <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2080
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
@@ -1472,7 +1509,7 @@ msgstr ""
 "As <a href=\"%(language_url)s\">legendas em %(language)s</a> de <a href=\"%"
 "(video_url)s\">%(video_name)s</a> foram iniciadas"
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1481,7 +1518,7 @@ msgstr ""
 "editou as <a href=\"%(language_url)s\">legendas em %(language)s</a> de <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2090
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1490,109 +1527,109 @@ msgstr ""
 "As<a href=\"%(language_url)s\">legendas em %(language)s</a> de <a href=\"%"
 "(video_url)s\">%(video_name)s</a> foram editadas"
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2096
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "adicionou uma nova URL para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2096
+#: apps/videos/models.py:2098
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "Foi adicionada uma nova URL para <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2103
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "juntou-se à equipe %(team)s como um %(role)s"
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2108
 #, python-format
 msgid "left the %s team"
 msgstr "deixou o time %s"
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2122
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2128
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr "  url <a href=\"%(title)s\">%(title)s</a> removida"
 
-#: apps/videos/models.py:2204
+#: apps/videos/models.py:2206
 msgid "add video"
 msgstr "adicionar vídeo"
 
-#: apps/videos/models.py:2205
+#: apps/videos/models.py:2207
 msgid "change title"
 msgstr "alterar título"
 
-#: apps/videos/models.py:2206
+#: apps/videos/models.py:2208
 msgid "comment"
 msgstr "comentar"
 
-#: apps/videos/models.py:2207
+#: apps/videos/models.py:2209
 msgid "add version"
 msgstr "adicionar versão"
 
-#: apps/videos/models.py:2208
+#: apps/videos/models.py:2210
 msgid "add translation"
 msgstr "adicionar tradução"
 
-#: apps/videos/models.py:2209
+#: apps/videos/models.py:2211
 msgid "add video url"
 msgstr "adicionar URL de vídeo"
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2212
 msgid "request subtitles"
 msgstr "solicitar legendas"
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2213
 msgid "approve version"
 msgstr "aprovar versão"
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2214
 msgid "add contributor"
 msgstr "Adicionar contribuidor"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2215
 msgid "remove contributor"
 msgstr "remover contribuidor"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2216
 msgid "reject version"
 msgstr "Rejeitar versão"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2217
 msgid "review version"
 msgstr "rever versão"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2218
 msgid "accept version"
 msgstr "aceitar versão"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2219
 msgid "decline version"
 msgstr "recursar versão"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2220
 msgid "delete video"
 msgstr "excluir vídeo"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2221
 msgid "edit url"
 msgstr "editar url"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2222
 msgid "delete url"
 msgstr "remover url"
 
-#: apps/videos/models.py:2478
+#: apps/videos/models.py:2480
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1740,7 +1777,7 @@ msgstr "Você não pode remover a URL primária"
 #: apps/videos/views.py:791
 #, python-format
 msgid "The language for %s has been changed"
-msgstr ""
+msgstr "O idioma para %s foi alterado"
 
 #: apps/videos/feed_parser/__init__.py:111
 msgid "Feed is unavailable now."
@@ -1772,25 +1809,6 @@ msgstr "Erro indefinido"
 #: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
 msgstr "Incorporação do vídeo desabilitada pelo dono"
-
-#: apps/widget/rpc.py:326
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-"Estas legendas são moderadas. Veja a página da equipe %s para informação "
-"sobre como contribuir."
-
-#: apps/widget/rpc.py:328
-msgid "Sorry, these subtitles are privately moderated."
-msgstr "Desculpe, estas legendas são moderadas privativamente."
-
-#: apps/widget/rpc.py:338
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
-msgstr ""
 
 #: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
 msgid "\n"
@@ -3768,7 +3786,7 @@ msgstr "Ver todos"
 
 #: templates/messages/base.html:10
 msgid "New message"
-msgstr ""
+msgstr "Nova mensagem"
 
 #: templates/messages/base.html:15
 msgid "Inbox"
@@ -3780,7 +3798,7 @@ msgstr "Enviado"
 
 #: templates/messages/inbox.html:6
 msgid "Messages - Inbox"
-msgstr ""
+msgstr "Mensagens - Recebidas"
 
 #: templates/messages/inbox.html:20 templates/messages/sent.html:17
 msgid "Do you really wish to delete this message?"
@@ -3808,11 +3826,11 @@ msgstr "Enviar mensagem"
 
 #: templates/messages/new.html:9
 msgid "Messages - New"
-msgstr ""
+msgstr "Mensagens - Novas"
 
 #: templates/messages/sent.html:6
 msgid "Messages - Sent"
-msgstr ""
+msgstr "Mensagens - Enviadas"
 
 #: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
@@ -3951,7 +3969,7 @@ msgstr "Informações pessoais"
 
 #: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
 msgid "Account"
-msgstr ""
+msgstr "Conta"
 
 #: templates/profiles/_top_user_panel.html:11
 #: templates/profiles/dashboard.html:13 templates/teams/_tabs.html:6
@@ -3995,11 +4013,11 @@ msgstr "Detalhes do Usuário"
 
 #: templates/profiles/account.html:28
 msgid "YouTube Account"
-msgstr ""
+msgstr "Conta do YouTube"
 
 #: templates/profiles/account.html:37
 msgid "Link is active"
-msgstr ""
+msgstr "O link está ativo"
 
 #: templates/profiles/account.html:46
 msgid "Enable Amara crowd subtitles on your personal YouTube channel"
@@ -4007,7 +4025,7 @@ msgstr ""
 
 #: templates/profiles/account.html:52
 msgid "Other Accounts"
-msgstr ""
+msgstr "Outras contas"
 
 #: templates/profiles/account.html:54
 msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
@@ -4015,7 +4033,7 @@ msgstr ""
 
 #: templates/profiles/account.html:55
 msgid "Add an account"
-msgstr ""
+msgstr "Adicionar uma conta"
 
 #: templates/profiles/account.html:63 templates/profiles/account.html.py:74
 #: templates/teams/_team_video_detail.html:54
@@ -4042,11 +4060,11 @@ msgstr "Enviar um email de notificação para cada mensagem recebida"
 
 #: templates/profiles/account.html:101
 msgid "API Access"
-msgstr ""
+msgstr "Acesso da API"
 
 #: templates/profiles/account.html:103
 msgid "Your API key"
-msgstr ""
+msgstr "Sua chave de API"
 
 #: templates/profiles/account.html:109
 msgid "Reset your API key"
@@ -4054,7 +4072,7 @@ msgstr ""
 
 #: templates/profiles/account.html:111
 msgid "Get an API key"
-msgstr ""
+msgstr "Obter uma chave API"
 
 #: templates/profiles/account.html:118 templates/profiles/edit.html:59
 #: templates/teams/settings-permissions.html:117
@@ -4063,11 +4081,11 @@ msgstr "Salvar Alterações"
 
 #: templates/profiles/account.html:120
 msgid "Delete Your Account"
-msgstr ""
+msgstr "Excluir sua conta"
 
 #: templates/profiles/account.html:129
 msgid "Add a linked account"
-msgstr ""
+msgstr "Adicionar uma conta vinculada"
 
 #: templates/profiles/account.html:137
 msgid ""
@@ -4075,6 +4093,9 @@ msgid ""
 "                                What kind of account do you want to add?\n"
 "                                "
 msgstr ""
+"\n"
+"                                Que tipo de conta deseja adicionar?\n"
+"                                "
 
 #: templates/profiles/account.html:151
 msgid "Link"
@@ -4165,7 +4186,7 @@ msgstr ""
 
 #: templates/profiles/account.html:211
 msgid "Contact us"
-msgstr ""
+msgstr "Contate-nos"
 
 #: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
 msgid "Languages"
@@ -4879,7 +4900,13 @@ msgid_plural ""
 "                        %(num)s languages needed\n"
 "                    "
 msgstr[0] ""
+"\n"
+"                        %(num)s idioma necessário\n"
+"                    "
 msgstr[1] ""
+"\n"
+"                        %(num)s idiomas necessários\n"
+"                    "
 
 #: templates/teams/_team_video_detail.html:20
 #, python-format
@@ -5071,7 +5098,7 @@ msgstr ""
 
 #: templates/teams/dashboard.html:102
 msgid "Welcome!"
-msgstr ""
+msgstr "Bem vindo!"
 
 #: templates/teams/dashboard.html:107
 msgid ""
@@ -5103,15 +5130,15 @@ msgstr ""
 
 #: templates/teams/dashboard.html:164 templates/teams/dashboard.html.py:192
 msgid "Create Subtitles"
-msgstr ""
+msgstr "Criar legendas"
 
 #: templates/teams/dashboard.html:205 templates/teams/dashboard.html.py:216
 msgid "Create "
-msgstr ""
+msgstr "Criar"
 
 #: templates/teams/dashboard.html:207 templates/teams/dashboard.html.py:218
 msgid " Subtitles"
-msgstr ""
+msgstr "Legendas"
 
 #: templates/teams/dashboard.html:246
 msgid "Sorry, you've reached the maximum number of tasks for this team."
@@ -5400,7 +5427,7 @@ msgstr ""
 
 #: templates/teams/settings-permissions.html:75
 msgid "Enable tasks"
-msgstr ""
+msgstr "Ativar tarefas"
 
 #: templates/teams/settings-permissions.html:80
 msgid "Permissions and Limits"
@@ -5436,7 +5463,7 @@ msgstr "Se deixado em branco, as tarefas não expirarão."
 
 #: templates/teams/settings-permissions.html:97
 msgid "Workflow"
-msgstr ""
+msgstr "Fluxo de trabalho"
 
 #: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
@@ -5596,7 +5623,7 @@ msgstr "Mostrando tarefas não atribuídas nos idiomas que você fala."
 
 #: templates/teams/tasks.html:167
 msgid "Want to view "
-msgstr ""
+msgstr "Deseja visualizar"
 
 #: templates/teams/tasks.html:168
 msgid "your tasks"
@@ -6221,7 +6248,7 @@ msgstr ""
 
 #: templates/videos/_upload_subtitles.html:72
 msgid "Processing, please be patient..."
-msgstr ""
+msgstr "Processando, por favor seja paciente..."
 
 #: templates/videos/_video.html:23
 msgid "view"
@@ -6719,15 +6746,15 @@ msgstr "Desde o Início"
 
 #: templates/videos/set-original-language.html:10
 msgid "Change video language"
-msgstr ""
+msgstr "Alterar idioma do vídeo"
 
 #: templates/videos/set-original-language.html:28
 msgid "Choose a language"
-msgstr ""
+msgstr "Escolher um idioma"
 
 #: templates/videos/set-original-language.html:30
 msgid "Current language is"
-msgstr ""
+msgstr "O idioma atual é"
 
 #: templates/videos/set-original-language.html:35
 msgid "not set"
@@ -7080,6 +7107,7 @@ msgstr ""
 #: unisubs-integration/apiv2/forms.py:119
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Obrigatório. 30 caracteres ou menos. Letras, dígitos e @/./+/-/_  apenas."
 
 #: unisubs-integration/apiv2/forms.py:120
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
@@ -7087,7 +7115,7 @@ msgstr ""
 
 #: unisubs-integration/services/forms.py:16
 msgid "Fidelity"
-msgstr ""
+msgstr "Fidelidade"
 
 #: unisubs-integration/services/forms.py:18
 msgid "Turnaround"
@@ -7095,7 +7123,7 @@ msgstr ""
 
 #: unisubs-integration/services/forms.py:28
 msgid "Translate to"
-msgstr ""
+msgstr "Traduzir para"
 
 #: unisubs-integration/services/forms.py:50
 msgid "Request for this translation already exists"
@@ -7117,7 +7145,7 @@ msgstr ""
 #: unisubs-integration/services/models.py:41
 #: unisubs-integration/services/models.py:65
 msgid "cost in credits"
-msgstr ""
+msgstr "custo em créditos"
 
 #: unisubs-integration/services/models.py:43
 msgid "supported speakertext.com platform"
@@ -7133,7 +7161,7 @@ msgstr ""
 
 #: unisubs-integration/services/models.py:48
 msgid "result of transcription"
-msgstr ""
+msgstr "resultado da transcrição"
 
 #: unisubs-integration/services/models.py:50
 msgid "subtitles created from transcription"
@@ -7161,7 +7189,7 @@ msgstr ""
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
 msgid "Result"
-msgstr ""
+msgstr "Resultado"
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:15
 msgid "Not finished"

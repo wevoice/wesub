@@ -134,6 +134,8 @@ JS_CORE = \
      'js/player/controlledvideoplayer.js',
      'js/player/vimeovideosource.js',
      'js/player/vimeovideoplayer.js',
+     'js/player/wistiavideosource.js',
+     'js/player/wistiavideoplayer.js',
      'js/player/dailymotionvideosource.js',
      'js/player/dailymotionvideoplayer.js',
      'js/startdialog/model.js',

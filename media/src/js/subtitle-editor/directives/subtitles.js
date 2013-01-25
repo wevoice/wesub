@@ -55,8 +55,12 @@ var SubtitleListItemController = SubtitleListItemController || null;
     });
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
-        var isEditable;
-        var selectedScope, selectedController, activeTextArea, rootEl;
+        var activeTextArea,
+            isEditable,
+            rootEl,
+            selectedController,
+            selectedScope,
+            value;
 
         function onSubtitleItemSelected(elm) {
             /**
@@ -101,21 +105,12 @@ var SubtitleListItemController = SubtitleListItemController || null;
              * Any other key: do nothing.
              */
 
-            var keyCode = e.keyCode;
-
-            var parser = selectedScope.parser;
-            var subtitle = selectedScope.subtitle;
-            var subtitles = selectedScope.subtitles;
-
             var nextSubtitle;
 
             var $currentSubtitle = $(e.currentTarget).parent();
 
-            // Save the current subtitle.
-            selectedScope.textChanged(activeTextArea.val());
-
             // Enter / return without shift.
-            if (keyCode === 13 && !e.shiftKey) {
+            if (e.keyCode === 13 && !e.shiftKey) {
 
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
@@ -144,7 +139,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
             }
 
             // Tab without shift.
-            if (keyCode === 9 && !e.shiftKey) {
+            if (e.keyCode === 9 && !e.shiftKey) {
 
                 // We're letting this event bubble up to the subtitleEditor directive
                 // where it will trigger the appropriate video method.
@@ -155,7 +150,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
             }
             
             // Tab with shift.
-            if (keyCode === 9 && e.shiftKey) {
+            if (e.keyCode === 9 && e.shiftKey) {
 
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
@@ -177,14 +172,21 @@ var SubtitleListItemController = SubtitleListItemController || null;
         }
         function onSubtitleTextKeyUp(e) {
 
-            var $textarea = $(e.currentTarget);
-            var $subtitle = $textarea.parent();
-            var subtitleScope = angular.element($subtitle.get(0)).scope();
+            // Save the content to the DFXP wrapper.
+            selectedScope.textChanged(activeTextArea.val());
 
-            subtitleScope.empty = $textarea.val() === '';
-            subtitleScope.characterCount = $textarea.val().length;
+            // Cache the value for a negligible performance boost.
+            value = activeTextArea.val();
 
-            subtitleScope.$digest();
+            selectedScope.empty = value === '';
+            selectedScope.characterCount = value.length;
+
+            selectedScope.$root.$emit('subtitleKeyUp', {
+                parser: selectedScope.parser,
+                subtitles: $(selectedScope.subtitles)
+            });
+
+            selectedScope.$digest();
 
         }
 

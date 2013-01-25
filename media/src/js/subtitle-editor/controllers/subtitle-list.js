@@ -263,6 +263,8 @@
 
         var initialText;
 
+        $scope.text = '';
+        $scope.empty = false;
         $scope.isEditing = false;
 
         $scope.finishEditingMode = function(newValue) {
@@ -283,7 +285,7 @@
         };
         $scope.startEditingMode = function() {
 
-            initialText =  $scope.parser.content($scope.subtitle);
+            initialText = $scope.parser.content($scope.subtitle);
 
             $scope.isEditing = true;
 

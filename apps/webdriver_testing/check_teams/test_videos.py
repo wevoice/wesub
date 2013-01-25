@@ -100,19 +100,6 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.assertEqual(self.videos_tab.error_message(), 
                          'This video already belongs to a team.')
 
-    def test_remove(self):
-        """Remove video from team, video stays on site.
-
-        """
-        self.videos_tab.log_in(self.team_owner.username, 'password')
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search(self.test_video.title)
-        self.videos_tab.remove_video(video=self.test_video.title)
-        self.videos_tab.search('X Factor Audition')
-        self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
-
-
     def test_remove__site(self):
         """Remove video from team and site, total destruction!
 
@@ -120,29 +107,29 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         """
         self.videos_tab.log_in(self.team_owner.username, 'password')
         #Create a team video for removal.
-        tv = TeamVideoFactory.create(
+        tv = VideoUrlFactory(video__title = 'total destruction').video
+        TeamVideoFactory.create(
             team=self.team, 
-            added_by=self.manager_user).video
+            video = tv,
+            added_by=self.manager_user)
         #Search for the video in team videos and remove it.
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(tv.title)
         self.videos_tab.remove_video(video = tv.title, 
             removal_action='total-destruction')
 
-
-        #Update the solr index
-        management.call_command('update_index', interactive=False)
-
         #Verify video no longer in teams
         self.videos_tab.search(tv.title)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
-            self.videos_tab.search_no_result())
+                         self.videos_tab.search_no_result())
         self.videos_tab.open_videos_tab(self.team.slug)
 
         #Verify video no longer on site
         watch_pg = watch_page.WatchPage(self)
         watch_pg.open_watch_page()
+        self.logger.info('searching for the test video %s' % tv.title)
         results_pg = watch_pg.basic_search(tv.title)
+
         self.assertTrue(results_pg.search_has_no_results())
 
 
@@ -154,10 +141,11 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
 
         self.videos_tab.log_in(self.team_owner.username, 'password')
 
-        #Create a team video for removal.
-        tv = TeamVideoFactory.create(
+        tv = VideoUrlFactory(video__title = 'team only annihilation').video
+        TeamVideoFactory.create(
             team=self.team, 
-            added_by=self.manager_user).video
+            video = tv,
+            added_by=self.manager_user)
 
         #Search for the video in team videos and remove it.
         self.videos_tab.open_videos_tab(self.team.slug)

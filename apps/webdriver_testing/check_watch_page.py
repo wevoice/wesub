@@ -51,6 +51,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
 
 
     def setUp(self):
+        super(TestCaseWatchPageSearch, self).setUp()
         self.watch_pg.open_watch_page()
         
     def test_search__simple(self):
@@ -164,6 +165,7 @@ class TestCaseWatchPageListings(WebdriverTestCase):
                                  'original swa incomplete 2 lines' ]
 
     def setUp(self):
+        super(TestCaseWatchPageListings, self).setUp()
         #Open the watch page as a test starting point.
         self.watch_pg.open_watch_page()
 

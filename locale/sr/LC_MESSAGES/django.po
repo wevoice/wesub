@@ -4,13 +4,14 @@
 #
 # Translators:
 #   <djnatasa@gmail.com>, 2011.
+# Igor Popov <gonadarian@gmail.com>, 2013.
 #   <luka.rackom@gmail.com>, 2012.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-23 00:02-0600\n"
-"PO-Revision-Date: 2013-01-19 06:38+0000\n"
+"POT-Creation-Date: 2013-01-25 00:02-0600\n"
+"PO-Revision-Date: 2013-01-24 06:58+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Serbian (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/sr/)\n"
@@ -56,7 +57,7 @@ msgid ""
 "digits and underscores)."
 msgstr ""
 "Obavezno. 30 znakova ili manje. Samo alfanumerički znaci (slova, brojevi i "
-"donja crta)"
+"donje crte)"
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
@@ -93,11 +94,11 @@ msgstr "Dodaj komentar"
 
 #: apps/auth/models.py:340
 msgid "Start subtitles"
-msgstr "Startuj titlove"
+msgstr "Pokreni titlove"
 
 #: apps/auth/models.py:341
 msgid "Start translation"
-msgstr "Почетак превод"
+msgstr "Pokreni prevod"
 
 #: apps/auth/models.py:342
 msgid "Edit subtitles"
@@ -312,14 +313,14 @@ msgstr ""
 #: apps/openid_consumer/templates/openid_consumer/signin.html:27
 #: templates/openid_consumer/signin.html:17
 msgid "Sign in with your OpenID"
-msgstr ""
+msgstr "Prijavite se vašim OpenID-jem"
 
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
 #: templates/teams/_join.html:61
 msgid "Sign in"
-msgstr ""
+msgstr "Prijava"
 
 #: apps/profiles/forms.py:98
 msgid "This user has not email"
@@ -327,17 +328,16 @@ msgstr "Ovaj korisnik nema imejl"
 
 #: apps/profiles/forms.py:103
 msgid "You are not authenticated."
-msgstr "Niste autorizovani"
+msgstr "Niste autentifikovani."
 
 #: apps/profiles/forms.py:110
 #, python-format
 msgid "Personal message from %(sender)s on universalsubtitles.org"
-msgstr ""
-"Lična poruka od korisnika %(sender)s je na sajtu universalsubtitles.org"
+msgstr "Lična poruka od korisnika %(sender)s na universalsubtitles.org"
 
 #: apps/profiles/forms.py:158
 msgid "Confirm new password:"
-msgstr "Potvrdi novu šifru"
+msgstr "Potvrdi novu lozinku"
 
 #: apps/profiles/forms.py:173
 msgid "Invalid password."
@@ -345,7 +345,7 @@ msgstr "Nevažeća lozinka"
 
 #: apps/profiles/forms.py:175
 msgid "The two passwords did not match."
-msgstr "Lozinke se ne poklapaju."
+msgstr "Dve lozinke se ne poklapaju."
 
 #: apps/profiles/rpc.py:50
 msgid "Your email was updated."
@@ -506,7 +506,34 @@ msgstr ""
 
 #: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
-msgstr "Neko upravo postavlja titlove za ovaj video. Pokušajte kasnije."
+msgstr "Neko upravo radi na titlu ovog snimka. Pokušajte kasnije."
+
+#: apps/subtitles/views.py:95 apps/widget/rpc.py:326
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+
+#: apps/subtitles/views.py:97 apps/widget/rpc.py:328
+msgid "Sorry, these subtitles are privately moderated."
+msgstr ""
+
+#: apps/subtitles/views.py:107 apps/widget/rpc.py:338
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+
+#: apps/subtitles/views.py:118
+msgid ""
+"You can't edit because there is a task for this language and you can't "
+"complete it."
+msgstr ""
+
+#: apps/subtitles/views.py:138
+msgid "You can't edit this subtitle because it's locked"
+msgstr ""
 
 #: apps/teams/admin.py:60
 #, python-format
@@ -722,11 +749,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:141 apps/teams/models.py:2625
+#: apps/teams/models.py:141 apps/teams/models.py:2627
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:142 apps/teams/models.py:2626
+#: apps/teams/models.py:142 apps/teams/models.py:2628
 msgid "slug"
 msgstr ""
 
@@ -1257,242 +1284,242 @@ msgstr ""
 msgid "captcha"
 msgstr ""
 
-#: apps/videos/models.py:137
+#: apps/videos/models.py:139
 msgid "in seconds"
 msgstr ""
 
-#: apps/videos/models.py:161
+#: apps/videos/models.py:163
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:165
 msgid "Widget views"
 msgstr ""
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:167
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:1153
+#: apps/videos/models.py:1155
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:2006
+#: apps/videos/models.py:2008
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2011
+#: apps/videos/models.py:2013
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2016
+#: apps/videos/models.py:2018
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2021
+#: apps/videos/models.py:2023
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2026
+#: apps/videos/models.py:2028
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2034
 #, python-format
 msgid "  deleted a video: \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2039
 #, python-format
 msgid ""
 "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2039
+#: apps/videos/models.py:2041
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2045
+#: apps/videos/models.py:2047
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2047
+#: apps/videos/models.py:2049
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2061
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2063
+#: apps/videos/models.py:2065
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2066
+#: apps/videos/models.py:2068
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2068
+#: apps/videos/models.py:2070
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2076
+#: apps/videos/models.py:2078
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2080
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2086
+#: apps/videos/models.py:2088
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2090
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2096
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2096
+#: apps/videos/models.py:2098
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2103
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:2106
+#: apps/videos/models.py:2108
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2120
+#: apps/videos/models.py:2122
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2128
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2204
+#: apps/videos/models.py:2206
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:2205
+#: apps/videos/models.py:2207
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:2206
+#: apps/videos/models.py:2208
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:2207
+#: apps/videos/models.py:2209
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:2208
+#: apps/videos/models.py:2210
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:2209
+#: apps/videos/models.py:2211
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2212
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2213
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2214
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2215
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2216
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2217
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2218
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2219
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2220
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2221
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2222
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2478
+#: apps/videos/models.py:2480
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1656,23 +1683,6 @@ msgstr ""
 
 #: apps/widget/rpc.py:111
 msgid "Video embedding disabled by owner"
-msgstr ""
-
-#: apps/widget/rpc.py:326
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-
-#: apps/widget/rpc.py:328
-msgid "Sorry, these subtitles are privately moderated."
-msgstr ""
-
-#: apps/widget/rpc.py:338
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
 msgstr ""
 
 #: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
@@ -1878,12 +1888,12 @@ msgstr "Podeli svoje titlove"
 
 #: templates/_share_widget.html:6
 msgid "Now everyone can watch the video with subtitles-- try it!"
-msgstr "Sad svako može da gleda video sa titlovima - isprobaj i ti!"
+msgstr "Sad svako može da gleda snimak sa titlovima - isprobaj i ti!"
 
 #: templates/_share_widget.html:7
 msgid "Then tell the world and invite your friends to help translate:"
 msgstr ""
-"Zatim razglasi celom svetu i pozovi prijatelje da pomognu oko prevođenja"
+"Zatim razglasi celom svetu i pozovi prijatelje da pomognu oko prevođenja:"
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_project.html:62
@@ -1909,7 +1919,7 @@ msgstr ""
 
 #: templates/_share_widget.html:24
 msgid "Permalink"
-msgstr "Permalink"
+msgstr "Trajni link"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
 #: templates/teams/_context_team.html:114
@@ -2436,11 +2446,11 @@ msgstr "Kako mogu da ubacim titlove u svoj video snimak?"
 
 #: templates/faq.html:27 templates/faq.html.py:107
 msgid "What open source license do you use?"
-msgstr ""
+msgstr "Koju licencu otvorenog koda koristite?"
 
 #: templates/faq.html:28 templates/faq.html.py:111
 msgid "I'm a developer, can I help out?"
-msgstr ""
+msgstr "Ja sam programer, mogu li pomoći?"
 
 #: templates/faq.html:29 templates/faq.html.py:115
 msgid "Can non-technical people get involved with the project?"
@@ -2449,7 +2459,7 @@ msgstr ""
 
 #: templates/faq.html:30 templates/faq.html.py:126
 msgid "Do you accept donations? Are they tax deductible?"
-msgstr ""
+msgstr "Primate li donacije? Da li su one oslobođene poreza?"
 
 #: templates/faq.html:31 templates/faq.html.py:134
 msgid "What is your relationship with Mozilla Drumbeat?"
@@ -2711,7 +2721,7 @@ msgstr ""
 
 #: templates/feedback_response.html:12
 msgid "Best"
-msgstr ""
+msgstr "Najbolje"
 
 #: templates/feedback_response.html:16
 msgid ""
@@ -3063,7 +3073,7 @@ msgstr "Mozilla će udvostručiti Vašu donaciju!"
 
 #: templates/index_old.html:171 templates/jsdemo/home.html:113
 msgid "We're a featured Mozilla Drumbeat project!"
-msgstr ""
+msgstr "Mi smo promovisani Mozilla Drumbeat projekat!"
 
 #: templates/index_old.html:172 templates/jsdemo/home.html:113
 msgid "Donate Now"
@@ -3106,7 +3116,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
-msgstr ""
+msgstr "Učesnici"
 
 #: templates/opensubtitles2010.html:55
 msgid ""
@@ -3125,7 +3135,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
-msgstr ""
+msgstr "Kada"
 
 #: templates/opensubtitles2010.html:63
 msgid "September 29th and 30th, beginning at 9am on both days."
@@ -3133,7 +3143,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:67
 msgid "Where"
-msgstr ""
+msgstr "Gde"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
@@ -3147,7 +3157,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
-msgstr ""
+msgstr "Zašto"
 
 #: templates/opensubtitles2010.html:75
 msgid ""
@@ -3187,7 +3197,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:94
 msgid "Organizers"
-msgstr ""
+msgstr "Organizatori"
 
 #: templates/opensubtitles2010.html:95
 msgid ""
@@ -3199,7 +3209,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:99
 msgid "Facilitators"
-msgstr ""
+msgstr "Fasilitatori"
 
 #: templates/opensubtitles2010.html:100
 msgid ""
@@ -3211,7 +3221,7 @@ msgstr ""
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
-msgstr ""
+msgstr "Sponzori"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
@@ -3231,7 +3241,7 @@ msgstr ""
 
 #: templates/admin/base_site.html:12
 msgid "View site"
-msgstr ""
+msgstr "Pogledajte sajt"
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
@@ -3346,7 +3356,7 @@ msgstr "Probajte naš demo"
 
 #: templates/jsdemo/home.html:25
 msgid "Become a tester"
-msgstr ""
+msgstr "Postanite tester"
 
 #: templates/jsdemo/home.html:31
 msgid "Subtitle Widget"
@@ -3599,7 +3609,7 @@ msgstr "Video snimci"
 
 #: templates/profiles/_tabs.html:17
 msgid "Personal Info"
-msgstr ""
+msgstr "Lične informacije"
 
 #: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
 msgid "Account"
@@ -3975,12 +3985,12 @@ msgstr ""
 #: templates/registration/password_reset_form.html:8
 #: templates/registration/password_reset_form.html:14
 msgid "Password reset"
-msgstr ""
+msgstr "Resetovanje lozinke"
 
 #: templates/registration/password_reset_complete.html:6
 #: templates/registration/password_reset_complete.html:12
 msgid "Password reset complete"
-msgstr ""
+msgstr "Resetovanje lozinke je završeno"
 
 #: templates/registration/password_reset_complete.html:14
 msgid "Your password has been set.  You may go ahead and sign in now."
@@ -3988,33 +3998,35 @@ msgstr ""
 
 #: templates/registration/password_reset_confirm.html:4
 msgid "Password reset confirmation"
-msgstr ""
+msgstr "Potvrda resetovanja lozinke"
 
 #: templates/registration/password_reset_confirm.html:15
 msgid "Enter new password"
-msgstr ""
+msgstr "Unesite novu lozinku"
 
 #: templates/registration/password_reset_confirm.html:16
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Molimo vas, unseite vašu novu lozinku dva puta kako bi mogli da potvrdimo da "
+"ste je ispravno uneli."
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
-msgstr ""
+msgstr "Nova lozinka:"
 
 #: templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
-msgstr ""
+msgstr "Potvrdite lozinku:"
 
 #: templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
-msgstr ""
+msgstr "Promena moje lozinke"
 
 #: templates/registration/password_reset_confirm.html:33
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Resetovanje lozinke neuspešno"
 
 #: templates/registration/password_reset_confirm.html:35
 msgid ""
@@ -4025,7 +4037,7 @@ msgstr ""
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:12
 msgid "Password reset successful"
-msgstr ""
+msgstr "Resetovanje lozinke uspešno"
 
 #: templates/registration/password_reset_done.html:14
 msgid ""
@@ -4035,7 +4047,7 @@ msgstr ""
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr ""
+msgstr "Dobijate ovaj imejl, jer ste zahtevali resetovanje lozinke"
 
 #: templates/registration/password_reset_email.html:3
 #, python-format
@@ -4052,7 +4064,7 @@ msgstr ""
 
 #: templates/registration/password_reset_email.html:11
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Hvala vam što koristite naš sajt!"
 
 #: templates/registration/password_reset_email.html:13
 #, python-format
@@ -4067,11 +4079,11 @@ msgstr ""
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
-msgstr ""
+msgstr "E-mail adresa:"
 
 #: templates/registration/password_reset_form.html:19
 msgid "Reset my password"
-msgstr ""
+msgstr "Resetujte moju lozinku"
 
 #: templates/search/_search_form.html:12
 msgid "Search videos"
@@ -5540,7 +5552,7 @@ msgstr ""
 
 #: templates/videos/_error_feedback_form.html:9
 msgid "Sorry, the page you requested was not found."
-msgstr ""
+msgstr "Izvinite, stranica koju ste tražili nije pronađena."
 
 #: templates/videos/_feature_video.html:12
 msgid "Unfeature video"
@@ -5565,11 +5577,11 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
-msgstr ""
+msgstr "Vaš e-mail:"
 
 #: templates/videos/_feedback_form.html:16
 msgid "Your Feedback"
-msgstr ""
+msgstr "Vaša povratna informacija"
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send feedback"
@@ -5577,7 +5589,7 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send Feedback"
-msgstr ""
+msgstr "Pošaljite povratnu informaciju"
 
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_paste_transcription.html:113
@@ -5589,7 +5601,7 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:37
 msgid "Thank you for your feedback."
-msgstr ""
+msgstr "Hvala Vam na Vašoj povratnoj informaciji."
 
 #: templates/videos/_feedback_form.html:38
 msgid "If you would like to perform some additional testing"
@@ -6182,7 +6194,7 @@ msgstr ""
 
 #: templates/videos/email_video_url_add.html:13
 msgid "Anonymous"
-msgstr ""
+msgstr "Anoniman"
 
 #: templates/videos/email_video_url_add.html:15
 msgid ""
