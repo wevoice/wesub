@@ -120,6 +120,10 @@ strong {
 .column {
     float: left;
 
+    // Note: there's a bug in Chrome Linux that prevents proper rendering of
+    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
+    //
+    // Thus, the following does not add up to 100%.
     &.left {
         width: 34%;
     }
@@ -127,7 +131,7 @@ strong {
         width: 39%;
     }
     &.right {
-        width: 27%;
+        width: 26%;
     }
 }
 
