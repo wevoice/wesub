@@ -1,5 +1,5 @@
 /*
- * popcorn.js version 35665ff
+ * popcorn.js version 8e85416
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -100,7 +100,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "35665ff";
+  Popcorn.version = "8e85416";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -4013,6 +4013,18 @@
       get: function() {
         return 1.0;
       }
+    },
+
+    style: {
+      get: function() {
+        return this.parentNode.style;
+      }
+    },
+
+    id: {
+      get: function() {
+        return this.parentNode.id;
+      }
     }
 
     // TODO:
@@ -4126,7 +4138,7 @@
 
     var self = this,
       parent = typeof id === "string" ? document.querySelector( id ) : id,
-      elem,
+      elem = document.createElement( "div" ),
       playerReady = false,
       player,
       impl = {
@@ -4201,7 +4213,7 @@
       player.pause();
       player = null;
       parent.removeChild( elem );
-      elem = null;
+      elem = document.createElement( "div" );
     }
 
     function changeSrc( aSrc ) {
@@ -4221,7 +4233,6 @@
         destroyPlayer();
       }
 
-      elem = document.createElement( "div" );
       elem.width = impl.width;
       elem.height = impl.height;
       parent.appendChild( elem );
@@ -4393,7 +4404,8 @@
           return elem.width;
         },
         set: function( aValue ) {
-          impl.width = aValue;
+          elem.width = aValue;
+          impl.width = elem.width;
         }
       },
 
@@ -4402,7 +4414,8 @@
           return elem.height;
         },
         set: function( aValue ) {
-          impl.height = aValue;
+          elem.height = aValue;
+          impl.height = elem.height;
         }
       },
 
@@ -4552,7 +4565,7 @@
 
     var self = this,
       parent = typeof id === "string" ? Popcorn.dom.find( id ) : id,
-      elem,
+      elem = document.createElement( "iframe" ),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -4643,11 +4656,6 @@
 
       playerReady = true;
       player.getDuration( updateDuration );
-
-      // Apply the current controls state again, since we have
-      // to do one thing for controls=false and loading, and another
-      // for controls=false and loaded.
-      setControls( impl.controls );
     }
 
     // When the player widget is ready, kick-off a play/pause
@@ -4747,7 +4755,7 @@
       player.unbind( SC.Widget.Events.FINISH );
 
       parent.removeChild( elem );
-      elem = null;
+      elem = document.createElement( "iframe" );
     }
 
     self.play = function() {
@@ -4762,16 +4770,23 @@
     };
 
     function changeCurrentTime( aTime ) {
-      if( !playerReady ) {
-        addPlayerReadyCallback( function() { changeCurrentTime( aTime ); } );
-        return;
-      }
+      impl.currentTime = aTime;
 
       // Convert to ms
       aTime = aTime * 1000;
 
-      onSeeking();
-      player.seekTo( aTime );
+      function seek() {
+        onSeeking();
+        player.seekTo( aTime );
+        onSeeked();
+      }
+
+      if( !playerReady ) {
+        addMediaReadyCallback( seek );
+        return;
+      }
+
+      seek();
     }
 
     function onSeeking() {
@@ -4880,7 +4895,6 @@
           break;
         case "seek":
           onCurrentTime( event.data );
-          onSeeked();
           break;
       }
     }
@@ -4921,7 +4935,6 @@
       playerReady = false;
 
       SC.get( "/resolve", { url: aSrc }, function( data ) {
-        elem = document.createElement( "iframe" );
         elem.id = Popcorn.guid( "soundcloud-" );
         elem.width = impl.width;
         elem.height = impl.height;
@@ -4945,7 +4958,7 @@
           self.dispatchEvent( "loadstart" );
           self.dispatchEvent( "progress" );
         };
-        elem.src = "http://w.soundcloud.com/player/?url=" + data.uri +
+        elem.src = "https://w.soundcloud.com/player/?url=" + data.uri +
           "&show_artwork=false" +
           "&buying=false" +
           "&liking=false" +
@@ -4999,21 +5012,18 @@
     }
 
     function setControls( controls ) {
-      // If the iframe elem isn't ready yet, bail.  We'll call again when it is.
-      if ( elem ) {
-        // Due to loading issues with hidden content, we have to be careful
-        // about how we hide the player when controls=false.  Using opacity:0
-        // will let the content load, but allow mouse events.  When it's totally
-        // loaded we can visibility:hidden + position:absolute it.
-        if ( playerReady ) {
-          elem.style.position = "absolute";
-          elem.style.visibility = controls ? "visible" : "hidden";
-        } else {
-          elem.style.opacity = controls ? "1" : "0";
-          // Try to stop mouse events over the iframe while loading. This won't
-          // work in current Opera or IE, but there's not much I can do
-          elem.style.pointerEvents = controls ? "auto" : "none";
-        }
+      // Due to loading issues with hidden content, we have to be careful
+      // about how we hide the player when controls=false.  Using opacity:0
+      // will let the content load, but allow mouse events.  When it's totally
+      // loaded we can visibility:hidden + position:absolute it.
+      if ( playerReady ) {
+        elem.style.position = "absolute";
+        elem.style.visibility = controls ? "visible" : "hidden";
+      } else {
+        elem.style.opacity = controls ? "1" : "0";
+        // Try to stop mouse events over the iframe while loading. This won't
+        // work in current Opera or IE, but there's not much I can do
+        elem.style.pointerEvents = controls ? "auto" : "none";
       }
       impl.controls = controls;
     }
@@ -5054,7 +5064,8 @@
           return elem.width;
         },
         set: function( aValue ) {
-          impl.width = aValue;
+          elem.width = aValue;
+          impl.width = elem.width;
         }
       },
 
@@ -5063,7 +5074,8 @@
           return elem.height;
         },
         set: function( aValue ) {
-          impl.height = aValue;
+          elem.height = aValue;
+          impl.height = elem.height;
         }
       },
 
@@ -5234,7 +5246,7 @@
 
     var self = this,
       parent = typeof id === "string" ? Popcorn.dom.find( id ) : id,
-      elem,
+      elem = document.createElement( "iframe" ),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -5345,7 +5357,7 @@
 
       window.removeEventListener( 'message', onStateChange, false );
       parent.removeChild( elem );
-      elem = null;
+      elem = document.createElement( "iframe" );
     }
 
     self.play = function() {
@@ -5605,7 +5617,6 @@
       }
       src += optionsArray.join( "&" );
 
-      elem = document.createElement( "iframe" );
       elem.id = playerUID;
       elem.width = impl.width; // 500?
       elem.height = impl.height; // 281?
@@ -5704,7 +5715,8 @@
           return elem.width;
         },
         set: function( aValue ) {
-          impl.width = aValue;
+          elem.width = aValue;
+          impl.width = elem.width;
         }
       },
 
@@ -5713,7 +5725,8 @@
           return elem.height;
         },
         set: function( aValue ) {
-          impl.height = aValue;
+          elem.height = aValue;
+          impl.height = elem.height;
         }
       },
 
@@ -5819,10 +5832,6 @@
   CURRENT_TIME_MONITOR_MS = 10,
   EMPTY_STRING = "",
 
-  // YouTube suggests 200x200 as minimum, video spec says 300x150.
-  MIN_WIDTH = 300,
-  MIN_HEIGHT = 200,
-
   // Example: http://www.youtube.com/watch?v=12345678901
   regexYouTube = /^.*(?:\/|v=)(.{11})/,
 
@@ -5876,7 +5885,7 @@
 
     var self = this,
       parent = typeof id === "string" ? document.querySelector( id ) : id,
-      elem,
+      elem = document.createElement( "div" ),
       impl = {
         src: EMPTY_STRING,
         networkState: self.NETWORK_EMPTY,
@@ -5893,8 +5902,6 @@
         duration: NaN,
         ended: false,
         paused: true,
-        width: parent.width|0   ? parent.width  : MIN_WIDTH,
-        height: parent.height|0 ? parent.height : MIN_HEIGHT,
         error: null
       },
       playerReady = false,
@@ -5905,8 +5912,7 @@
       mediaReadyCallbacks = [],
       currentTimeInterval,
       timeUpdateInterval,
-      firstPlay = true,
-      forcedLoadMetadata = false;
+      firstPlay = true;
 
     // Namespace all events we'll produce
     self._eventNamespace = Popcorn.guid( "HTMLYouTubeVideoElement::" );
@@ -5924,21 +5930,9 @@
       playerReady = true;
     }
 
-    // YouTube sometimes sends a duration of 0.  From the docs:
-    // "Note that getDuration() will return 0 until the video's metadata is loaded,
-    // which normally happens just after the video starts playing."
-    function forceLoadMetadata() {
-      if( !forcedLoadMetadata ) {
-        forcedLoadMetadata = true;
-        self.play();
-        self.pause();
-      }
-    }
-
     function getDuration() {
       if( !mediaReady ) {
-        // Queue a getDuration() call so we have correct duration info for loadedmetadata
-        addMediaReadyCallback( function() { getDuration(); } );
+        // loadedmetadata properly sets the duration, so nothing to do here yet.
         return impl.duration;
       }
 
@@ -5952,8 +5946,6 @@
           self.dispatchEvent( "durationchange" );
         }
       } else {
-        // Force loading metadata, and wait on duration>0
-        forceLoadMetadata();
         setTimeout( getDuration, 50 );
       }
 
@@ -6006,6 +5998,10 @@
         case -1:
           // XXX: this should really live in cued below, but doesn't work.
 
+          // Browsers using flash will have the pause() call take too long and cause some
+          // sound to leak out. Muting before to prevent this.
+          player.mute();
+
           // force an initial play on the video, to remove autostart on initial seekTo.
           player.playVideo();
           break;
@@ -6028,7 +6024,13 @@
             } else {
               player.pauseVideo();
             }
-            
+
+            // Ensure video will now be unmuted when playing due to the mute on initial load.
+            if( !impl.muted ) {
+              player.unMute();
+            }
+
+            impl.duration = player.getDuration();
             impl.readyState = self.HAVE_METADATA;
             self.dispatchEvent( "loadedmetadata" );
             currentTimeInterval = setInterval( monitorCurrentTime,
@@ -6081,7 +6083,7 @@
       player.clearVideo();
 
       parent.removeChild( elem );
-      elem = null;
+      elem = document.createElement( "div" );
     }
 
     function changeSrc( aSrc ) {
@@ -6107,9 +6109,6 @@
         destroyPlayer();
       }
 
-      elem = document.createElement( "div" );
-      elem.width = impl.width;
-      elem.height = impl.height;
       parent.appendChild( elem );
 
       // Use any player vars passed on the URL
@@ -6154,8 +6153,8 @@
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
 
       player = new YT.Player( elem, {
-        width: impl.width,
-        height: impl.height,
+        width: "100%",
+        height: "100%",
         wmode: playerVars.wmode,
         videoId: aSrc,
         playerVars: playerVars,
@@ -6172,7 +6171,6 @@
 
       // Queue a get duration call so we'll have duration info
       // and can dispatch durationchange.
-      forcedLoadMetadata = false;
       getDuration();
     }
 
@@ -6226,9 +6224,6 @@
     }
 
     function onPlay() {
-      // We've called play once (maybe through autoplay),
-      // no need to force it from now on.
-      forcedLoadMetadata = true;
 
       if( impl.ended ) {
         changeCurrentTime( 0 );
@@ -6349,19 +6344,13 @@
 
       width: {
         get: function() {
-          return elem.width;
-        },
-        set: function( aValue ) {
-          impl.width = aValue;
+          return self.parentNode.offsetWidth;
         }
       },
 
       height: {
         get: function() {
-          return elem.height;
-        },
-        set: function( aValue ) {
-          impl.height = aValue;
+          return self.parentNode.offsetHeight;
         }
       },
 
@@ -6449,7 +6438,7 @@
 
   // Helper for identifying URLs we know how to play.
   HTMLYouTubeVideoElement.prototype._canPlaySrc = function( url ) {
-    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu)/).test( url ) ?
+    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(youtu).*(?:\/|v=)(.{11})/).test( url ) ?
       "probably" :
       EMPTY_STRING;
   };
@@ -11135,415 +11124,35 @@ var wikiCallback;
 
 }( window, Popcorn ));
 (function( window, Popcorn ) {
-  var videoIdRegex = new RegExp( "(?:http://www\\.|http://|www\\.|\\.|^)(?:youtu).*(?:/|v=)(.{11})" );
-  // A global callback for youtube... that makes me angry
-  window.onYouTubePlayerAPIReady = function() {
 
-    onYouTubePlayerAPIReady.ready = true;
-    for ( var i = 0; i < onYouTubePlayerAPIReady.waiting.length; i++ ) {
-      onYouTubePlayerAPIReady.waiting[ i ]();
-    }
+  var canPlayType = function( nodeName, url ) {
+    return ( typeof url === "string" &&
+             Popcorn.HTMLYouTubeVideoElement._canPlaySrc( url ) );
   };
 
-  // existing youtube references can break us.
-  // remove it and use the one we can trust.
-  if ( window.YT ) {
-    window.quarantineYT = window.YT;
-    window.YT = null;
-  }
-
-  onYouTubePlayerAPIReady.waiting = [];
-
-  var _loading = false;
-
   Popcorn.player( "youtube", {
-    _canPlayType: function( nodeName, url ) {
-      return typeof url === "string" && videoIdRegex.test( url ) && nodeName.toLowerCase() !== "video";
-    },
-    _setup: function( options ) {
-      if ( !window.YT && !_loading ) {
-        _loading = true;
-        Popcorn.getScript( "//youtube.com/player_api" );
-      }
-
-      var media = this,
-          autoPlay = false,
-          container = document.createElement( "div" ),
-          currentTime = 0,
-          paused = true,
-          seekTime = 0,
-          firstGo = true,
-          seeking = false,
-          fragmentStart = 0,
-
-          // state code for volume changed polling
-          lastMuted = false,
-          lastVolume = 100,
-          playerQueue = Popcorn.player.playerQueue();
-
-      var createProperties = function() {
-
-        Popcorn.player.defineProperty( media, "currentTime", {
-          set: function( val ) {
-
-            if ( options.destroyed ) {
-              return;
-            }
-
-            val = Number( val );
-            
-            if ( isNaN ( val ) ) {
-              return;
-            }
-            
-            currentTime = val;
-            
-            seeking = true;
-            media.dispatchEvent( "seeking" );
-            
-            options.youtubeObject.seekTo( val );
-          },
-          get: function() {
-
-            return currentTime;
-          }
-        });
-
-        Popcorn.player.defineProperty( media, "paused", {
-          get: function() {
-
-            return paused;
-          }
-        });
-
-        Popcorn.player.defineProperty( media, "muted", {
-          set: function( val ) {
-
-            if ( options.destroyed ) {
-
-              return val;
-            }
-
-            if ( options.youtubeObject.isMuted() !== val ) {
-
-              if ( val ) {
-
-                options.youtubeObject.mute();
-              } else {
-
-                options.youtubeObject.unMute();
-              }
-
-              lastMuted = options.youtubeObject.isMuted();
-              media.dispatchEvent( "volumechange" );
-            }
-
-            return options.youtubeObject.isMuted();
-          },
-          get: function() {
-
-            if ( options.destroyed ) {
-
-              return 0;
-            }
-
-            return options.youtubeObject.isMuted();
-          }
-        });
-
-        Popcorn.player.defineProperty( media, "volume", {
-          set: function( val ) {
-
-            if ( options.destroyed ) {
-
-              return val;
-            }
-
-            if ( options.youtubeObject.getVolume() / 100 !== val ) {
-
-              options.youtubeObject.setVolume( val * 100 );
-              lastVolume = options.youtubeObject.getVolume();
-              media.dispatchEvent( "volumechange" );
-            }
-
-            return options.youtubeObject.getVolume() / 100;
-          },
-          get: function() {
-
-            if ( options.destroyed ) {
-
-              return 0;
-            }
-
-            return options.youtubeObject.getVolume() / 100;
-          }
-        });
-
-        media.play = function() {
-
-          if ( options.destroyed ) {
-
-            return;
-          }
-
-          paused = false;
-          playerQueue.add(function() {
-
-            if ( options.youtubeObject.getPlayerState() !== 1 ) {
-
-              seeking = false;
-              options.youtubeObject.playVideo();
-            } else {
-              playerQueue.next();
-            }
-          });
-        };
-
-        media.pause = function() {
-
-          if ( options.destroyed ) {
-
-            return;
-          }
-
-          paused = true;
-          playerQueue.add(function() {
-
-            if ( options.youtubeObject.getPlayerState() !== 2 ) {
-
-              options.youtubeObject.pauseVideo();
-            } else {
-              playerQueue.next();
-            }
-          });
-        };
-      };
-
-      container.id = media.id + Popcorn.guid();
-      options._container = container;
-      media.appendChild( container );
-
-      var youtubeInit = function() {
-
-        var src, query, params, playerVars, queryStringItem, firstPlay = true, seekEps = 0.1;
-
-        var timeUpdate = function() {
-
-          if ( options.destroyed ) {
-            return;
-          }
-
-          var ytTime = options.youtubeObject.getCurrentTime();
-
-          if ( !seeking ) {
-            currentTime = ytTime;
-          } else if ( currentTime >= ytTime - seekEps && currentTime <= ytTime + seekEps ) {
-            seeking = false;
-            seekEps = 0.1;
-            media.dispatchEvent( "seeked" );
-          } else {
-            // seek didn't work very well, try again with higher tolerance
-            seekEps *= 2;
-            options.youtubeObject.seekTo( currentTime );
-          }
-          
-          media.dispatchEvent( "timeupdate" );
-          
-          setTimeout( timeUpdate, 200 );
-        };
-
-        // delay is in seconds
-        var fetchDuration = function( delay ) {
-          var ytDuration = options.youtubeObject.getDuration();
-
-          if ( isNaN( ytDuration ) || ytDuration === 0 ) {
-            setTimeout( function() {
-              fetchDuration( delay * 2 );
-            }, delay*1000 );
-          } else {
-            // set duration and dispatch ready events
-            media.duration = ytDuration;
-            media.dispatchEvent( "durationchange" );
-            
-            media.dispatchEvent( "loadedmetadata" );
-            media.dispatchEvent( "loadeddata" );
-            
-            media.readyState = 4;
-
-            timeUpdate();
-
-            media.dispatchEvent( "canplay" );
-            media.dispatchEvent( "canplaythrough" );
-          }
-        };
-
-        // Default controls to off
-        options.controls = +options.controls === 0 || +options.controls === 1 ? options.controls : 0;
-        options.annotations = +options.annotations === 1 || +options.annotations === 3 ? options.annotations : 1;
-
-        src = videoIdRegex.exec( media.src )[ 1 ];
-
-        query = ( media.src.split( "?" )[ 1 ] || "" )
-                           .replace( /v=.{11}/, "" );
-        query = query.replace( /&t=(?:(\d+)m)?(?:(\d+)s)?/, function( all, minutes, seconds ) {
-
-          // Make sure we have real zeros
-          minutes = minutes | 0; // bit-wise OR
-          seconds = seconds | 0; // bit-wise OR
-
-          fragmentStart = ( +seconds + ( minutes * 60 ) );
-          return "";
-        });
-        query = query.replace( /&start=(\d+)?/, function( all, seconds ) {
-
-          // Make sure we have real zeros
-          seconds = seconds | 0; // bit-wise OR
-
-          fragmentStart = seconds;
-          return "";
-        });
-
-        autoPlay = ( /autoplay=1/.test( query ) );
-
-        params = query.split( /[\&\?]/g );
-        playerVars = { wmode: "transparent" };
-
-        for( var i = 0; i < params.length; i++ ) {
-          queryStringItem = params[ i ].split( "=" );
-          playerVars[ queryStringItem[ 0 ] ] = queryStringItem[ 1 ];
-        }
-
-        // Don't show related videos when ending
-        playerVars.rel = playerVars.rel || 0;
-
-        // Don't show YouTube's branding
-        playerVars.modestbranding = playerVars.modestbranding || 1;
-
-        // Don't show annotations by default
-        playerVars.iv_load_policy = playerVars.iv_load_policy || 3;
-
-        // Don't show video info before playing
-        playerVars.showinfo = playerVars.showinfo || 0;
-
-        // Show/hide controls.
-        playerVars.controls = playerVars.controls || ( options.controls || 0 );
-
-        options.youtubeObject = new YT.Player( container.id, {
-          height: "100%",
-          width: "100%",
-          wmode: "transparent",
-          playerVars: playerVars,
-          videoId: src,
-          events: {
-            "onReady": function(){
-
-              // pulling initial volume states form baseplayer
-              lastVolume = media.volume;
-              lastMuted = media.muted;
-
-              volumeupdate();
-
-              paused = media.paused;
-              createProperties();
-              options.youtubeObject.playVideo();
-
-              media.currentTime = fragmentStart;
-
-              media.dispatchEvent( "loadstart" );
-
-              // wait to dispatch ready events until we get a duration
-            },
-            "onStateChange": function( state ){
-
-              if ( options.destroyed || state.data === -1 ) {
-                return;
-              }
-
-              // state.data === 2 is for pause events
-              // state.data === 1 is for play events
-              if ( state.data === 2 ) {
-                paused = true;
-                media.dispatchEvent( "pause" );
-                playerQueue.next();
-              } else if ( state.data === 1 && !firstPlay ) {
-                paused = false;
-                media.dispatchEvent( "play" );
-                media.dispatchEvent( "playing" );
-                playerQueue.next();
-              } else if ( state.data === 0 ) {
-                media.dispatchEvent( "ended" );
-              } else if ( state.data === 1 && firstPlay ) {
-                firstPlay = false;
-
-                // pulling initial paused state from autoplay or the baseplayer
-                // also need to explicitly set to paused otherwise.
-                if ( autoPlay || !media.paused ) {
-                  paused = false;
-                }
-
-                if ( paused ) {
-                  options.youtubeObject.pauseVideo();
-                }
-                
-                fetchDuration( 0.025 );
-              }
-            },
-            "onError": function( error ) {
-
-              if ( [ 2, 100, 101, 150 ].indexOf( error.data ) !== -1 ) {
-                media.error = {
-                  customCode: error.data
-                };
-                media.dispatchEvent( "error" );
-              }
-            }
-          }
-        });
-
-        var volumeupdate = function() {
-
-          if ( options.destroyed ) {
-
-            return;
-          }
-
-          if ( lastMuted !== options.youtubeObject.isMuted() ) {
-
-            lastMuted = options.youtubeObject.isMuted();
-            media.dispatchEvent( "volumechange" );
-          }
-
-          if ( lastVolume !== options.youtubeObject.getVolume() ) {
-
-            lastVolume = options.youtubeObject.getVolume();
-            media.dispatchEvent( "volumechange" );
-          }
-
-          setTimeout( volumeupdate, 250 );
-        };
-      };
-
-      if ( onYouTubePlayerAPIReady.ready ) {
-
-        youtubeInit();
-      } else {
-
-        onYouTubePlayerAPIReady.waiting.push( youtubeInit );
-      }
-    },
-    _teardown: function( options ) {
-
-      options.destroyed = true;
-
-      var youtubeObject = options.youtubeObject;
-      if( youtubeObject ){
-        youtubeObject.stopVideo();
-        youtubeObject.clearVideo && youtubeObject.clearVideo();
-      }
-
-      this.removeChild( document.getElementById( options._container.id ) );
-    }
+    _canPlayType: canPlayType
   });
+
+  Popcorn.youtube = function( container, url, options ) {
+    if ( typeof console !== "undefined" && console.warn ) {
+      console.warn( "Deprecated player 'youtube'. Please use Popcorn.HTMLYouTubeVideoElement directly." );
+    }
+
+    var media = Popcorn.HTMLYouTubeVideoElement( container ),
+        popcorn = Popcorn( media, options );
+
+    // Set the src "soon" but return popcorn instance first, so
+    // the caller can listen for error events.
+    setTimeout( function() {
+      media.src = url;
+    }, 0 );
+
+    return popcorn;
+  };
+
+  Popcorn.youtube.canPlayType = canPlayType;
+
 }( window, Popcorn ));
 // EFFECT: applyclass
 

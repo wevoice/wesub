@@ -56,7 +56,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var activeTextArea,
-            isEditable,
             rootEl,
             selectedController,
             selectedScope,
@@ -198,10 +197,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
 
-                        isEditable = attrs.editable === 'true';
+                        scope.isEditable = attrs.editable === 'true';
                         scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
 
-                        if (isEditable) {
+                        if (scope.isEditable) {
                             $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });

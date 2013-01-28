@@ -148,7 +148,7 @@
         });
 
     };
-    var SubtitleListController = function($scope, SubtitleStorage) {
+    var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -209,7 +209,13 @@
             $scope.subtitles = $scope.parser.getSubtitles().get();
 
             $scope.status = 'ready';
-            $scope.$broadcast('onSubtitlesFetched');
+
+            // When we have subtitles for an editable set, tell the kids.
+            $timeout(function() {
+                if ($scope.isEditable) {
+                    $scope.$broadcast('subtitlesFetched');
+                }
+            });
 
         };
         $scope.removeSubtitle = function(subtitle) {
@@ -264,7 +270,6 @@
 
         var initialText;
 
-        $scope.text = '';
         $scope.empty = false;
         $scope.isEditing = false;
 
@@ -295,6 +300,16 @@
 
             return initialText;
         };
+
+        $scope.$on('subtitlesFetched', function() {
+            // When subtitles are first retrieved, we need to set up the amarasubtitle
+            // on the video and bind to this scope.
+            //
+            // This will happen on the video controller. Just throw an event stating that
+            // we're ready.
+
+            $scope.$root.$emit('subtitleReady', $scope);
+        });
 
     };
 

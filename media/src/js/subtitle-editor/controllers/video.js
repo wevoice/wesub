@@ -79,6 +79,21 @@
             }
 
         };
+
+        $scope.$root.$on('subtitleReady', function($event, subtitleScope) {
+
+            var parser = subtitleScope.parser;
+
+            var text = subtitleScope.parser.content(subtitleScope.subtitle);
+            var endTimeMilliseconds = parser.endTime(subtitleScope.subtitle) / 1000;
+            var startTimeMilliseconds = parser.startTime(subtitleScope.subtitle) / 1000;
+
+            $scope.popcornSubtitle = $scope.pop.amarasubtitle({
+                start: startTimeMilliseconds,
+                end:   endTimeMilliseconds,
+                text:  text
+            });
+        });
     };
 
     root.VideoController = VideoController;
