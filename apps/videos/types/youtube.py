@@ -234,7 +234,7 @@ class YoutubeVideoType(VideoType):
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
 
-    CAN_IMPORT_SUBTITLES = False
+    CAN_IMPORT_SUBTITLES = True
 
     def __init__(self, url):
         self.url = url
