@@ -40,8 +40,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                             var video = angular.element($('#video').get(0)).scope();
 
-                            // Tab without shift, toggle play / pause.
-                            if (e.keyCode === 9 && !e.shiftKey) {
+                            // Space with shift, toggle play / pause.
+                            if (e.keyCode === 32 && e.shiftKey) {
                                 e.preventDefault();
                                 video.togglePlay();
                             }
@@ -109,8 +109,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             var $currentSubtitle = $(e.currentTarget).parent();
 
-            // Enter / return without shift.
-            if (e.keyCode === 13 && !e.shiftKey) {
+            // Tab without shift.
+            if (e.keyCode === 9 && !e.shiftKey) {
 
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
@@ -138,17 +138,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             }
 
-            // Tab without shift.
-            if (e.keyCode === 9 && !e.shiftKey) {
-
-                // We're letting this event bubble up to the subtitleEditor directive
-                // where it will trigger the appropriate video method.
-
-                // Keep the cursor in the current subtitle.
-                e.preventDefault();
-
-            }
-            
             // Tab with shift.
             if (e.keyCode === 9 && e.shiftKey) {
 
@@ -157,6 +146,17 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                 // Set the next subtitle to be the one before this.
                 nextSubtitle = $currentSubtitle.prev().get(0);
+
+            }
+
+            // Space with shift.
+            if (e.keyCode === 32 && e.shiftKey) {
+
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
 
             }
 
