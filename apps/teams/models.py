@@ -798,7 +798,7 @@ class TeamVideo(models.Model):
                 destination_team=new_team, video=self.video)
 
 
-def _create_translation_tasks(team_video, subtitle_version):
+def _create_translation_tasks(team_video, subtitle_version=None):
     """Create any translation tasks that should be autocreated for this video.
 
     subtitle_version should be the original SubtitleVersion that these tasks
@@ -826,6 +826,7 @@ def _create_translation_tasks(team_video, subtitle_version):
         task = Task(team=team_video.team, team_video=team_video,
                     language=lang, type=Task.TYPE_IDS['Translate'])
 
+        task.subtitle_version = subtitle_version or task.get_subtitle_version()
         # we should only update the team video after all tasks for
         # this video are saved, else we end up with a lot of
         # wasted tasks
@@ -856,7 +857,7 @@ def autocreate_tasks(team_video):
     #       new team for translation, but we can probably be smarter about this
     #       if we spend some time.
     if workflow.autocreate_translate and existing_subtitles:
-        _create_translation_tasks(team_video, existing_subtitles[0].get_tip(public=True))
+        _create_translation_tasks(team_video)
 
 
 def team_video_save(sender, instance, created, **kwargs):

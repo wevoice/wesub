@@ -68,6 +68,11 @@ class UnisubsPage(Page):
 
         """
         self.logger.info("LOG IN")
+        host = self.testcase.server_thread.host
+        port = self.testcase.server_thread.port
+        self.logger.info('HOST AND PORT')
+        self.logger.info(host)
+
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(self._get_session_id())
         user = authenticate(username=username, password=password)
@@ -78,7 +83,7 @@ class UnisubsPage(Page):
         session['_auth_user_backend'] = u'auth.backends.CustomUserBackend'
         session.save()
         self.logger.info("session saved: %s", session.session_key)
-        self.browser.add_cookie({ u'domain': u'unisubs.example.com',
+        self.browser.add_cookie({ u'domain': '%s:%s' % (host, port),
                                   u'name': u'sessionid',
                                   u'value': session.session_key,
                                   u'path': u'/',

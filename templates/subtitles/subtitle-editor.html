@@ -29,6 +29,26 @@
 
 </head>
 <body>
+    <div class="modal"
+        ng-controller="ModalController"
+        ng-show="content || loading">
+        <div class="loading inner"
+            ng-show="loading">
+            <h1 class="loading" ng-bind="loading">Loading subtitle editor&hellip;</h1>
+        </div>
+        <div class="content inner ng-cloak"
+            ng-show="content"
+            ng-cloak>
+            <h1 ng-show="content.heading">[[ content.heading ]]</h1>
+            <p ng-show="content.text">[[ content.text ]]</p>
+            <div class="content.buttons"
+                ng-show="content.buttons.length">
+                <button ng-repeat="button in content.buttons"
+                    ng-click="button.fn($event)"
+                    ng-class="button.class">[[ button.text ]]</button>
+            </div>
+        </div>
+    </div>
     <header class="main group">
         <section class="site left column">
             <h1>Amara</h1>
@@ -182,6 +202,7 @@
     <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
+    <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/helper-selector.js"></script>
@@ -192,6 +213,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/right-section.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
 
 </body>
 </html>

@@ -28,7 +28,7 @@ class TestCaseSubmittable(WebdriverTestCase):
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
         td = {'url': ('http://qa.pculture.org/amara_tests/'
-                     'Birds_short.webmsd.webm')
+                     'Birds_short.mp4')
              }
         cls.test_video = cls.data_utils.create_video(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)

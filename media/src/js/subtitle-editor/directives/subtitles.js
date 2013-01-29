@@ -40,8 +40,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                             var video = angular.element($('#video').get(0)).scope();
 
-                            // Tab without shift, toggle play / pause.
-                            if (e.keyCode === 9 && !e.shiftKey) {
+                            // Space with shift, toggle play / pause.
+                            if (e.keyCode === 32 && e.shiftKey) {
                                 e.preventDefault();
                                 video.togglePlay();
                             }
@@ -56,7 +56,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var activeTextArea,
-            isEditable,
             rootEl,
             selectedController,
             selectedScope,
@@ -109,8 +108,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             var $currentSubtitle = $(e.currentTarget).parent();
 
-            // Enter / return without shift.
-            if (e.keyCode === 13 && !e.shiftKey) {
+            // Tab without shift.
+            if (e.keyCode === 9 && !e.shiftKey) {
 
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
@@ -138,17 +137,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             }
 
-            // Tab without shift.
-            if (e.keyCode === 9 && !e.shiftKey) {
-
-                // We're letting this event bubble up to the subtitleEditor directive
-                // where it will trigger the appropriate video method.
-
-                // Keep the cursor in the current subtitle.
-                e.preventDefault();
-
-            }
-            
             // Tab with shift.
             if (e.keyCode === 9 && e.shiftKey) {
 
@@ -157,6 +145,17 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                 // Set the next subtitle to be the one before this.
                 nextSubtitle = $currentSubtitle.prev().get(0);
+
+            }
+
+            // Space with shift.
+            if (e.keyCode === 32 && e.shiftKey) {
+
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
+
+                // Keep the cursor in the current subtitle.
+                e.preventDefault();
 
             }
 
@@ -173,7 +172,7 @@ var SubtitleListItemController = SubtitleListItemController || null;
         function onSubtitleTextKeyUp(e) {
 
             // Save the content to the DFXP wrapper.
-            selectedScope.textChanged(activeTextArea.val());
+            selectedScope.parser.content(selectedScope.subtitle, activeTextArea.val());
 
             // Cache the value for a negligible performance boost.
             value = activeTextArea.val();
@@ -198,10 +197,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
 
-                        isEditable = attrs.editable === 'true';
+                        scope.isEditable = attrs.editable === 'true';
                         scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
 
-                        if (isEditable) {
+                        if (scope.isEditable) {
                             $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
@@ -213,8 +212,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
                             // be used instead of keydown.
                             $(document).on('keyup', function(e) {
                                 if (e.keyCode === 27) {
-                                    selectedScope.finishEditingMode(activeTextArea.val());
-                                    selectedScope.$digest();
+                                    if (selectedScope) {
+                                        selectedScope.finishEditingMode(activeTextArea.val());
+                                        selectedScope.$digest();
+                                    }
                                 }
                             });
 

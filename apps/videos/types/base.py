@@ -23,7 +23,8 @@ class VideoType(object):
 
     abbreviation = None
     name = None    
-    
+
+    CAN_IMPORT_SUBTITLES = False
     def __init__(self, url):
         self.url = url
 

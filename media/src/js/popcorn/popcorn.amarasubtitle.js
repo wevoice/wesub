@@ -14,7 +14,7 @@
 
         style.width = media.offsetWidth + 'px';
 
-        context.media.parentNode.childNodes[0].appendChild(ctxContainer);
+        context.media.parentNode.appendChild(ctxContainer);
 
         return ctxContainer;
     };
