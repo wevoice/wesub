@@ -50,10 +50,9 @@
         },
         end: function(event, options) {
             options.innerContainer.style.display = 'none';
-            options.innerContainer.innerHTML = '';
         },
         _update: function(event, newOptions) {
-            event.innerContainer.innerHTML = newOptions.text;
+            event.innerContainer.innerHTML = event.text = newOptions.text;
         },
         _teardown: function (options) {
             options.container.removeChild(options.innerContainer);

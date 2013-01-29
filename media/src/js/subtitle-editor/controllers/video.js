@@ -82,12 +82,13 @@
 
         $scope.$root.$on('subtitleKeyUp', function($event, options) {
 
+            var parser = options.parser;
             var subtitle = options.subtitle;
             var value = options.value;
 
             // Update the Popcorn subtitle instance's text.
             $scope.pop.amarasubtitle(subtitle.popcornSubtitle.id, {
-                text: value
+                text: parser.markdownToHTML(value)
             });
 
         });

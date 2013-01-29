@@ -557,6 +557,16 @@ section.main {
                     padding: 12px 20px;
                     text-align: center;
                     @include border-radius(5px);
+
+                    b {
+                        font-weight: bold;
+                    }
+                    i {
+                        font-style: italic;
+                    }
+                    u {
+                        text-decoration: underline;
+                    }
                 }
             }
             iframe {
