@@ -87,7 +87,7 @@
             var value = options.value;
 
             // Update the Popcorn subtitle instance's text.
-            $scope.pop.amarasubtitle(subtitle.popcornSubtitle.id, {
+            $scope.pop.amarasubtitle(subtitle.$id, {
                 text: parser.markdownToHTML(value)
             });
 
@@ -108,9 +108,6 @@
                 start: startTimeSeconds,
                 text:  text
             });
-
-            // Store this subtitle reference for easier retrieval later.
-            subtitle.popcornSubtitle = $scope.pop.getTrackEvent(subtitle.$id);
 
         });
         $scope.$root.$on('subtitleSelected', function($event, subtitle) {
