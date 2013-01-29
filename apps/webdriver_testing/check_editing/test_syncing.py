@@ -28,10 +28,9 @@ class TestCasePartialSync(WebdriverTestCase):
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
 
-        td = {'url': 'http://macbook-pro.lan/~janet/qa-site/amara_tests/Birds_short.webmsd.webm'}
-        #td = {'url': ('http://qa.pculture.org/amara_tests/'
-        #           'Birds_short.webmsd.webm')
-        #     }
+        td = {'url': ('http://qa.pculture.org/amara_tests/'
+                   'Birds_short.webmsd.webm')
+             }
         cls.test_video = cls.data_utils.create_video(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
@@ -61,10 +60,6 @@ class TestCasePartialSync(WebdriverTestCase):
         except:
             pass
         
-
-
-
-
     def test_display__normal(self):
         """Manually entered partially subs display in editor.
 
