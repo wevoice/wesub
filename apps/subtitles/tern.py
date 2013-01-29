@@ -55,7 +55,7 @@ UNDER_RE_INNER = re.compile(r'_(\S+?)_')
 UNDER_RE_OUTER = re.compile(r'\b_(.+?)_\b')
 
 
-# Output
+# Utilities -------------------------------------------------------------------
 def err(m):
     sys.stderr.write(m)
     sys.stderr.write("\n")
@@ -76,8 +76,6 @@ def die(msg):
     sys.stderr.write('ERROR: %s\n' % msg)
     sys.exit(1)
 
-
-# Utilities
 def get_random(qs):
     """Return a single random model from the given queryset.
 
@@ -205,6 +203,15 @@ def markup_to_dfxp(text):
 
     return text
 
+def log_subtitle_error(sv, subtitles):
+    err("=" * 60)
+    err("Error occured for version: %s" % sv.pk)
+    err("=" * 60)
+    err("Subtitles:")
+    err("-" * 60)
+    from pprint import pprint
+    pprint(subtitles, stream=sys.stderr)
+    err("=" * 60)
 
 def fix_blank_original(video):
     # Copied from the widget RPC code in production.
@@ -244,7 +251,7 @@ class FakeRequest(object):
 TERN_REQUEST = FakeRequest()
 
 
-# Commands
+# Basic Commands --------------------------------------------------------------
 def header():
     print 'Time,Model,Action,Original PK,New PK'
 
@@ -289,32 +296,14 @@ def report_metrics():
     Gauge('data-model-refactor.subtitle-version.done').report(sv_done)
 
 
-def _create_subtitle_language(sl):
-    """Sync the given subtitle language, creating a new one."""
-    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
-    from apps.subtitles.models import VALID_LANGUAGE_CODES
-    from utils.metrics import Meter
+# Languages -------------------------------------------------------------------
+def _add_sl(sl):
+    """Actually create a new SL in the database for the given old SL.
+    
+    Doesn't perform any sanity checks.
 
-    exists = (NewSubtitleLanguage.objects.filter(video=sl.video,
-                                                 language_code=sl.language)
-                                         .exists())
-    if exists:
-        log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
-        log('SubtitleLanguage', 'duplicate_version_counts', sl.pk, None,
-            [l.subtitleversion_set.count() for l
-             in sl.video.subtitlelanguage_set.filter(language=sl.language)]
-        )
-        log('SubtitleLanguage', 'duplicate_subtitle_counts', sl.pk, None,
-            [[len(v.subtitles())
-              for v in l.subtitleversion_set.order_by('version_no')]
-             for l in sl.video.subtitlelanguage_set.filter(language=sl.language)]
-        )
-        Meter('data-model-refactor.language-errors.duplicate-language').inc()
-        return
-    elif sl.language not in VALID_LANGUAGE_CODES:
-        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
-        Meter('data-model-refactor.language-errors.invalid-language-code').inc()
-        return
+    """
+    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 
     nsl = NewSubtitleLanguage(
         video=sl.video,
@@ -339,7 +328,185 @@ def _create_subtitle_language(sl):
         sl.needs_sync = False
         sl.save(tern_sync=True)
 
-    log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
+    return nsl
+
+
+def _stack_version(sv, nsl):
+    """Stack the given version onto the given new SL."""
+    from apps.subtitles import pipeline
+
+    visibility = 'public' if sv.is_public else 'private'
+
+    subtitles = _get_subtitles(sv)
+
+    try:
+        subtitles = list(subtitles)
+        nsv = pipeline.add_subtitles(
+            nsl.video, nsl.language_code, subtitles,
+            title=sv.title, description=sv.description, parents=[],
+            visibility=visibility, author=sv.user,
+            created=sv.datetime_started)
+    except:
+        log_subtitle_error(sv, subtitles)
+        raise
+
+    sv.new_subtitle_version = nsv
+    sv.needs_sync = False
+
+    sv.save(tern_sync=True)
+
+    log('SubtitleVersion', 'stacked', sv.pk, nsv.pk)
+
+def _stack_versions(sls):
+    """Stack the versions of the given SubtitleLanguages.
+
+    There are a couple of parts to this:
+
+    1. We need to create a single new SL that will contain all the data.
+    2. We need to shove all the versions into it.
+
+    """
+    from apps.subtitles.models import SubtitleLanguage as NewSubtitleLanguage
+
+    # First we'll turn the Queryset into a list so we don't hit the DB all the
+    # time.
+    sls = list(sls)
+
+    try:
+        for sl in sls:
+            if sl.can_writelock(TERN_REQUEST):
+                sl.writelock(TERN_REQUEST)
+            else:
+                # If any of the languages in question are writelocked, bail.
+                return
+
+        # All these SLs share the same video and language code.
+        video = sls[0].video
+        language_code = sls[0].language
+
+        # Sort the languages properly.
+        def _last_version_date(sl):
+            """SubtitleLanguages will be stacked in order of last version."""
+            last_sv = sl.subtitleversion_set.order_by('-version_no')[0]
+            return last_sv.datetime_started
+
+        sls = sorted(sls, key=_last_version_date)
+
+        # Next we'll turn the list of languages into a (flat) list of versions.
+        svs = []
+        for sl in sls:
+            for sv in sl.subtitleversion_set.order_by('version_no'):
+                svs.append(sv)
+
+        # Now we can get the single new SL for this batch.
+        try:
+            # We can't just blindly create one, because there may already be one.
+            nsl = NewSubtitleLanguage.objects.get(video=video,
+                                                  language_code=language_code)
+        except NewSubtitleLanguage.DoesNotExist:
+            # If there aren't any yet, we'll add one and base it off the most
+            # recent SL.
+            source = sls[-1]
+            nsl = _add_sl(source)
+            log('SubtitleLanguage', 'created_single_for_dupe', source.pk, nsl.pk)
+
+        # And finally we'll stack the versions into it.
+        for sv in svs:
+            if not sv.needs_sync:
+                # This version has already been synced at some point and is up
+                # to date.
+                pass
+            else:
+                # We need to sync this subtitle version.
+                if sv.new_subtitle_version:
+                    # This version has already been synced in the past, but
+                    # needs an update.  Since its new_subtitle_version field
+                    # will have been set we can just use the normal tern
+                    # machinery here.
+                    _update_subtitle_version(sv)
+                else:
+                    # This version has never been synced before, so we'll stack
+                    # it on top of the rest.
+                    _stack_version(sv, nsl)
+
+        # Update the batch of duplicate SLs to point to the new one.
+        for sl in sls:
+            sl.needs_sync = False
+            sl.new_subtitle_language = nsl
+            sl.save(tern_sync=True)
+    finally:
+        # Release the writelocks on any languages that tern locked (but not on
+        # languages that were locked by someone else).
+        for sl in sls:
+            if sl.can_writelock(TERN_REQUEST):
+                sl.release_writelock(TERN_REQUEST)
+
+
+def _handle_duplicate_languages(sl):
+    """Handle SubtitleLanguages who have siblings with the same language code.
+
+    There are two steps to this process:
+
+    1. First, if there are any siblings with 0 versions, delete them.
+    2. Otherwise, we need to "stack" their versions.
+
+    Yes, this means that running tern --languages will actually sync a few
+    versions as well.  I don't think it's a big problem.
+
+    """
+    from apps.videos.models import SubtitleLanguage
+
+    if dry:
+        # Yeah I'm not even gonna try to handle this fully, we'll just bail on
+        # dry runs.
+        return
+
+    sls = SubtitleLanguage.objects.filter(video=sl.video, language=sl.language)
+
+    empty_sls = []
+    for sl in sls:
+        if not sl.subtitleversion_set.exists():
+            empty_sls.append(sl)
+
+    if empty_sls:
+        for sl in empty_sls:
+            log('SubtitleLanguage', 'deleted_empty', sl.pk, None)
+            sl.delete()
+    else:
+        _stack_versions(sls)
+
+
+def _create_subtitle_language(sl):
+    """Sync the given subtitle language, creating a new one."""
+    from apps.subtitles.models import VALID_LANGUAGE_CODES
+    from apps.videos.models import SubtitleLanguage
+    from utils.metrics import Meter
+
+    duplicates = (SubtitleLanguage.objects.filter(video=sl.video,
+                                                  language=sl.language)
+                                          .exclude(pk=sl.pk)
+                                          .exists())
+
+    if duplicates:
+        log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
+        log('SubtitleLanguage', 'duplicate_version_counts', sl.pk, None,
+            [l.subtitleversion_set.count() for l
+             in sl.video.subtitlelanguage_set.filter(language=sl.language)]
+        )
+        log('SubtitleLanguage', 'duplicate_subtitle_counts', sl.pk, None,
+            [[len(v.subtitles())
+              for v in l.subtitleversion_set.order_by('version_no')]
+             for l in sl.video.subtitlelanguage_set.filter(language=sl.language)]
+        )
+        Meter('data-model-refactor.language-errors.duplicate-language').inc()
+        _handle_duplicate_languages(sl)
+    elif sl.language not in VALID_LANGUAGE_CODES:
+        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
+        Meter('data-model-refactor.language-errors.invalid-language-code').inc()
+    else:
+        nsl = _add_sl(sl)
+        log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
+
 
 def _update_subtitle_language(sl):
     """Sync the given subtitle language, updating the existing new SL."""
@@ -365,6 +532,7 @@ def _update_subtitle_language(sl):
         sl.save(tern_sync=True)
 
     log('SubtitleLanguage', 'update', sl.pk, nsl.pk)
+
 
 def _sync_language(language_pk=None):
     """Try to sync one SubtitleLanguage.
@@ -431,6 +599,7 @@ def sync_languages():
                 result = _sync_language()
 
 
+# Versions --------------------------------------------------------------------
 def _get_subtitles(sv):
     """Return a generator of subtitle tuples for the given (old) version."""
 
@@ -482,6 +651,7 @@ def _get_subtitles(sv):
                 {'new_paragraph': paragraph},
             )
 
+
 def _create_subtitle_version(sv, last_version):
     """Sync the old SubtitleVersion by creating a new SubtitleVersion.
 
@@ -513,17 +683,7 @@ def _create_subtitle_version(sv, last_version):
                 visibility=visibility, author=sv.user,
                 created=sv.datetime_started)
         except:
-            # Log the subtitles when an error happens.
-            err("=" * 60)
-            err("Error occured for version: %s" % sv.pk)
-            err("=" * 60)
-            err("Subtitles:")
-            err("-" * 60)
-            from pprint import pprint
-            pprint(subtitles, stream=sys.stderr)
-            err("=" * 60)
-
-            # And reraise so we get the traceback too.
+            log_subtitle_error(sv, subtitles)
             raise
 
         sv.new_subtitle_version = nsv
@@ -532,6 +692,7 @@ def _create_subtitle_version(sv, last_version):
         sv.save(tern_sync=True)
 
         log('SubtitleVersion', 'create', sv.pk, nsv.pk)
+
 
 def _update_subtitle_version(sv):
     """Update a previously-synced SubtitleVersion.
@@ -554,6 +715,7 @@ def _update_subtitle_version(sv):
         sv.save(tern_sync=True)
 
     log('SubtitleVersion', 'update', sv.pk, nsv.pk)
+
 
 def _sync_versions(language_pk=None):
     """Sync a single language worth of SubtitleVersions."""
@@ -624,7 +786,7 @@ def sync_versions():
                 result = _sync_versions()
 
 
-# Setup
+# Setup -----------------------------------------------------------------------
 def setup_path():
     """Set up the Python path with the appropriate magic directories."""
 
@@ -646,7 +808,7 @@ def setup_settings(options):
     settings.TERN_IMPORT = True
 
 
-# Main
+# Main ------------------------------------------------------------------------
 def build_option_parser():
     p = OptionParser('usage: %prog [options]')
 
