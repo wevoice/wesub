@@ -68,8 +68,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
              * mark this one as being edited, creating the textarea for
              * editing.
              */
-            // make sure this works if the event was trigger in the
-            // originating li or any descendants
 
             elm = $(elm).hasClass('subtitle-list-item') ?
                       elm : $(elm).parents('.subtitle-list-item');
@@ -77,7 +75,6 @@ var SubtitleListItemController = SubtitleListItemController || null;
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
-            // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
                     selectedScope.finishEditingMode(activeTextArea.val());
@@ -91,6 +88,8 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
                 activeTextArea.focus();
                 activeTextArea.autosize();
+
+                selectedScope.$root.$broadcast('subtitleSelected', selectedScope);
             }
         }
         function onSubtitleTextKeyDown(e) {
@@ -171,8 +170,10 @@ var SubtitleListItemController = SubtitleListItemController || null;
         }
         function onSubtitleTextKeyUp(e) {
 
+            var newText = activeTextArea.val();
+
             // Save the content to the DFXP wrapper.
-            selectedScope.parser.content(selectedScope.subtitle, activeTextArea.val());
+            selectedScope.parser.content(selectedScope.subtitle, newText);
 
             // Cache the value for a negligible performance boost.
             value = activeTextArea.val();
@@ -182,7 +183,9 @@ var SubtitleListItemController = SubtitleListItemController || null;
 
             selectedScope.$root.$emit('subtitleKeyUp', {
                 parser: selectedScope.parser,
-                subtitles: $(selectedScope.subtitles)
+                subtitles: $(selectedScope.subtitles),
+                subtitle: selectedScope,
+                value: value
             });
 
             selectedScope.$digest();

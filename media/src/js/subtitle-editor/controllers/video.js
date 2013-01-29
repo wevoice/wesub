@@ -80,19 +80,46 @@
 
         };
 
-        $scope.$root.$on('subtitleReady', function($event, subtitleScope) {
+        $scope.$root.$on('subtitleKeyUp', function($event, options) {
 
-            var parser = subtitleScope.parser;
+            var subtitle = options.subtitle;
+            var value = options.value;
 
-            var text = subtitleScope.parser.content(subtitleScope.subtitle);
-            var endTimeMilliseconds = parser.endTime(subtitleScope.subtitle) / 1000;
-            var startTimeMilliseconds = parser.startTime(subtitleScope.subtitle) / 1000;
+            // Update the Popcorn subtitle instance's text.
+            $scope.pop.amarasubtitle(subtitle.popcornSubtitle.id, {
+                text: value
+            });
 
-            $scope.popcornSubtitle = $scope.pop.amarasubtitle({
-                start: startTimeMilliseconds,
-                end:   endTimeMilliseconds,
+        });
+        $scope.$root.$on('subtitleReady', function($event, subtitle) {
+            // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
+            // video's Popcorn instance.
+
+            var parser = subtitle.parser;
+
+            var text = subtitle.parser.content(subtitle.subtitle);
+            var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
+            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
+
+            // Create the amarasubtitle instance.
+            $scope.pop.amarasubtitle(subtitle.$id, {
+                end:   endTimeSeconds,
+                start: startTimeSeconds,
                 text:  text
             });
+
+            // Store this subtitle reference for easier retrieval later.
+            subtitle.popcornSubtitle = $scope.pop.getTrackEvent(subtitle.$id);
+
+        });
+        $scope.$root.$on('subtitleSelected', function($event, subtitle) {
+
+            var parser = subtitle.parser;
+            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
+
+            // Set the current time to the start of the subtitle.
+            $scope.pop.currentTime(startTimeSeconds);
+
         });
     };
 

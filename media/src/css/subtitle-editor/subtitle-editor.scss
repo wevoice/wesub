@@ -325,7 +325,6 @@ header.main {
     }
 }
 section.main {
-
     /*
      * Don't ask.
      *
@@ -545,6 +544,21 @@ section.main {
             height: 321px;
             position: relative;
 
+            div.amara-popcorn-subtitles {
+                bottom: 63px;
+                left: 0;
+                position: absolute;
+
+                div {
+                    background: rgba(0, 0, 0, .8);
+                    color: #FFF;
+                    font: bold 16px/22px Helvetica;
+                    margin: 0 22px 0 20px;
+                    padding: 12px 20px;
+                    text-align: center;
+                    @include border-radius(5px);
+                }
+            }
             iframe {
                 height: 320px;
                 width: 100%;
