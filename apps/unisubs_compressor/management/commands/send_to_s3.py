@@ -96,18 +96,22 @@ class Command(BaseCommand):
             help="Enables setting a far future expires header."),
         optparse.make_option('--force',
             action='store_true', dest='force', default=True,
-            help="Skip the file mtime check to force upload of all files.")
+            help="Skip the file mtime check to force upload of all files."),
+        optparse.make_option('-b', '--bucket',
+            dest='aws_bucket_name', default='',
+            help="(optional) Override destination bucket"),
     )
 
-    help = 'Syncs the complete STATIC_ROOT structure and files to S3 into the given bucket name.'
-    args = 'bucket_name'
+    help = 'Syncs the complete STATIC_ROOT structure and files to S3'
+    #args = 'bucket_name'
 
     can_import_settings = True
 
     def handle(self, *args, **options):
         from django.conf import settings
 
-
+        # set AWS_BUCKET_NAME from options
+        self.AWS_BUCKET_NAME = options.get('aws_bucket_name')
         if not hasattr(settings, 'STATIC_ROOT'):
             raise CommandError('STATIC_ROOT must be set in your settings.')
         else:
@@ -122,14 +126,14 @@ class Command(BaseCommand):
         else:
             self.AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
             self.AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
-
-        if not hasattr(settings, 'AWS_BUCKET_NAME'):
-            raise CommandError('Missing bucket name from settings file. Please' +
-                ' add the AWS_BUCKET_NAME to your settings file.')
-        else:
-            if not settings.AWS_BUCKET_NAME:
-                raise CommandError('AWS_BUCKET_NAME cannot be empty.')
-        self.AWS_BUCKET_NAME = settings.AWS_BUCKET_NAME 
+        if not self.AWS_BUCKET_NAME:
+            if not hasattr(settings, 'AWS_BUCKET_NAME'):
+                raise CommandError('Missing bucket name from settings file. Please' +
+                    ' add the AWS_BUCKET_NAME to your settings file.')
+            else:
+                if not settings.AWS_BUCKET_NAME:
+                    raise CommandError('AWS_BUCKET_NAME cannot be empty.')
+            self.AWS_BUCKET_NAME = settings.AWS_BUCKET_NAME 
         self.verbosity = int(options.get('verbosity'))
         self.prefix = options.get('prefix')
         if bool(self.prefix) is False:
@@ -265,8 +269,10 @@ class Command(BaseCommand):
 
         try:
             key.name = file_key
-            key.set_contents_from_string(filedata, headers, replace=True)
-            key.make_public()
+            key.set_contents_from_string(filedata, headers, replace=True,
+                policy='public-read')
+            # the make_public() method seems inconsistent
+            #key.make_public()
         except boto.s3.connection.BotoClientError, e:
             print "Failed: %s" % e
         except Exception, e:

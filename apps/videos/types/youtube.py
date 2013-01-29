@@ -23,6 +23,7 @@ from urlparse import urlparse
 import requests
 
 import gdata.youtube.client
+from gdata.youtube.client import YouTubeError
 import httplib2
 from celery.task import task
 from django.conf import settings
@@ -225,7 +226,9 @@ class YoutubeVideoType(VideoType):
 
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
-    
+
+    CAN_IMPORT_SUBTITLES = True
+
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -259,10 +262,12 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj):
-        video_obj.title = self.entry.media.title.text or ''
+    def set_values(self, video_obj, fetch_subs_async=True):
+        video_obj.title =  self.entry.media.title.text or ''
+        description = ''
         if self.entry.media.description:
-            video_obj.description = self.entry.media.description.text or ''
+            description =  self.entry.media.description.text or ''
+        video_obj.description = description
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
@@ -275,7 +280,7 @@ class YoutubeVideoType(VideoType):
         Meter('youtube.video_imported').inc()
 
         try:
-            self.get_subtitles(video_obj)
+            self.get_subtitles(video_obj, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
@@ -345,17 +350,23 @@ class YoutubeVideoType(VideoType):
 
         return output
 
-    def get_subtitles(self, video_obj):
+    def get_subtitles(self, video_obj, async=True):
         langs = self.get_subtitled_languages()
 
+        if async:
+            func = save_subtitles_for_lang.delay
+        else:
+            func = save_subtitles_for_lang.run
         for item in langs:
-            save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
+        # Because somehow Django's ORM is case insensitive on CharFields.
+        is_always = third_party_account.username.lower() == \
+                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
-            third_party_account.oauth_refresh_token, self.videoid,
-            third_party_account.username == YOUTUBE_ALWAYS_PUSH_USERNAME)
+            third_party_account.oauth_refresh_token, self.videoid, is_always)
 
     def update_subtitles(self, subtitle_version, third_party_account):
         """
@@ -461,6 +472,12 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             }
 
         return self.captions
+
+    def get_user_profile(self, username=None):
+        if not username:
+            raise YouTubeError("You need to pass a username")
+        uri = '%s%s' % (gdata.youtube.client.YOUTUBE_USER_FEED_URI, username)
+        return self.get_feed(uri, desired_class=gdata.youtube.data.UserProfileEntry)
 
     def upload_captions(self, subtitle_version):
         """
