@@ -926,10 +926,10 @@ class SubtitleLanguage(models.Model):
 
     # Fields for the big DMR migration.
     needs_sync = models.BooleanField(default=True, editable=False)
-    new_subtitle_language = models.OneToOneField('subtitles.SubtitleLanguage',
-                                                 related_name='old_subtitle_version',
-                                                 null=True, blank=True,
-                                                 editable=False)
+    new_subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                              related_name='old_subtitle_version',
+                                              null=True, blank=True,
+                                              editable=False)
 
     subtitles_fetched_counter = RedisSimpleField()
 
