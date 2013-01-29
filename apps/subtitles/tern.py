@@ -439,7 +439,7 @@ def _stack_versions(sls):
         # languages that were locked by someone else).
         for sl in sls:
             if sl.can_writelock(TERN_REQUEST):
-                sl.release_writelock(TERN_REQUEST)
+                sl.release_writelock()
 
 
 def _handle_duplicate_languages(sl):
