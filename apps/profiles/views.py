@@ -322,7 +322,7 @@ def remove_third_party(request, account_id):
             username = account.username.replace(' ', '')
             url = "https://gdata.youtube.com/feeds/api/users/%s/uploads" % username
             try:
-                feed = VideoFeed.objects.get(url=url)
+                feed = VideoFeed.objects.filter(url=url)
                 feed.delete()
             except VideoFeed.DoesNotExist:
                 logger.error("Feed for youtube account doesn't exist", extra={
