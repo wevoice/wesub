@@ -24,11 +24,10 @@ class Migration(DataMigration):
                     continue
 
                 if username:
-                    account.username = username
+                    account.username = username.decode("utf-8")
 
                 if author:
                     account.full_name = author.name.text
-
 
                 try:
                     account.save()
