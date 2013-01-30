@@ -29,9 +29,13 @@ class Migration(DataMigration):
                 if author:
                     account.full_name = author.name.text
 
-                print "migrated account %s -> %s" % (account.username, account.full_name)
 
-                account.save()
+                try:
+                    account.save()
+                    print "migrated account %s -> %s" % (account.username, account.full_name)
+                except Exception, e:
+                    print "error - could not migrate account %s -> %s, %s" % (account.username, account.full_name, e)
+
                 time.sleep(1)
     
     def backwards(self, orm):
@@ -50,7 +54,11 @@ class Migration(DataMigration):
                 if author:
                     account.username = author.name.text
 
-                account.save()
+                try:
+                    account.save()
+                except Exception, e:
+                    print "error - could not migrate account %s -> %s, %s" % (account.username, account.full_name, e)
+
                 print "backwarded account %s" % account.username
                 time.sleep(1)
     
