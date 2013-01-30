@@ -104,7 +104,6 @@
             $event.preventDefault();
 
             // TODO: Need a redirect URL.
-
         };
         $scope.saveAndExit = function($event) { 
 
@@ -117,7 +116,6 @@
 
                 }
             });
-
         };
         $scope.saveSession = function() {
             if ($scope.status !== 'saving') {
@@ -146,7 +144,6 @@
             $scope.canSave = '';
             $scope.$digest();
         });
-
     };
     var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
         /**
@@ -175,7 +172,6 @@
 
             // Update the subtitles on the list scope.
             $scope.updateParserSubtitles();
-
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -216,7 +212,6 @@
                     $scope.$broadcast('subtitlesFetched');
                 }
             });
-
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.parser.removeSubtitle(subtitle);
@@ -245,7 +240,6 @@
         window.onresize = function() {
             $scope.$digest();
         };
-
     };
     var SubtitleListHelperController = function($scope) {
 
@@ -259,7 +253,6 @@
             $scope.isEditingAny = false;
             $scope.$digest();
         });
-
     };
     var SubtitleListItemController = function($scope) {
         /**
@@ -310,7 +303,6 @@
 
             $scope.$root.$emit('subtitleReady', $scope);
         });
-
     };
 
     root.LanguageSelectorController = LanguageSelectorController;
@@ -320,3 +312,4 @@
     root.SubtitleListItemController = SubtitleListItemController;
 
 }).call(this);
+
