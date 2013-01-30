@@ -69,18 +69,20 @@ def find_environment_tag():
 
 ENV_TAG = find_environment_tag()
 
-def send(service, tag, metric=None):
-    rev = ''
-    # only use revs in demo
+GIT_CURRENTBRANCH = 'git rev-parse --abbrev-ref HEAD'
+
+def find_branch():
     if ENV_TAG.lower() == 'demo':
-        if not globals().has_key('BRANCH'):
-            global BRANCH
-            p = Popen('git rev-parse --abbrev-ref HEAD',
-                shell=True, stdout=PIPE, close_fds=True)
-            BRANCH = p.stdout.read().strip()
-        rev = '.{0}'.format(BRANCH)
+        p = Popen(GIT_CURRENTBRANCH, shell=True, stdout=PIPE, close_fds=True)
+        return '.{0}'.format(p.stdout.read().strip())
+    else:
+        return ''
+
+BRANCH = find_branch()
+
+def send(service, tag, metric=None):
     data = {
-        'host': '{0}{1}'.format(HOST, rev),
+        'host': HOST + BRANCH,
         'service': service,
         'tags': [tag, ENV_TAG]
     }
