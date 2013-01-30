@@ -31,9 +31,8 @@ class Migration(DataMigration):
 
                 try:
                     account.save()
-                    print "migrated account %s -> %s" % (account.username, account.full_name)
                 except Exception, e:
-                    print "error - could not migrate account %s -> %s, %s" % (account.username, account.full_name, e)
+                    print "error - could not migrate account %s" % e
 
                 time.sleep(1)
     
