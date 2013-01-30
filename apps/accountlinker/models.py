@@ -248,7 +248,7 @@ class ThirdPartyAccountManager(models.Manager):
             if not username:
                 continue
             try:
-                account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
+                account = ThirdPartyAccount.objects.get(type=vurl.type, full_name=username)
             except ThirdPartyAccount.DoesNotExist:
                 continue
 
@@ -269,9 +269,13 @@ class ThirdPartyAccount(models.Model):
     working with others.
     """
     type = models.CharField(max_length=10, choices=ACCOUNT_TYPES)
+
     # this is the third party account user name, eg the youtube user
     username  = models.CharField(max_length=255, db_index=True, 
                                  null=False, blank=False)
+
+    # user's real/full name, like Foo Bar
+    full_name = models.CharField(max_length=255, null=True, blank=True, default='')
     oauth_access_token = models.CharField(max_length=255, db_index=True, 
                                           null=False, blank=False)
     oauth_refresh_token = models.CharField(max_length=255, db_index=True,
@@ -283,7 +287,7 @@ class ThirdPartyAccount(models.Model):
         unique_together = ("type", "username")
 
     def __unicode__(self):
-        return '%s - %s' % (self.get_type_display(), self.username)
+        return '%s - %s' % (self.get_type_display(), self.full_name or self.username)
 
     @property
     def is_team_account(self):
@@ -292,7 +296,6 @@ class ThirdPartyAccount(models.Model):
     @property
     def is_individual_account(self):
         return self.users.exists()
-
 
 class YoutubeSyncRule(models.Model):
     """

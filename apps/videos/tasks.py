@@ -40,7 +40,7 @@ from videos.models import (
     VIDEO_TYPE_YOUTUBE, VideoUrl
 )
 from videos.types import video_type_registrar
-from videos.types.base import VideoTypeError
+from apps.videos.types import VideoTypeError
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
@@ -549,7 +549,7 @@ def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
         return
 
     try:
-        account = ThirdPartyAccount.objects.get(username=vurl.owner_username)
+        account = ThirdPartyAccount.objects.get(full_name=vurl.owner_username)
     except ThirdPartyAccount.DoesNotExist:
         celery_logger.info("TPA not found for {0}".format(vurl.owner_username))
         return
