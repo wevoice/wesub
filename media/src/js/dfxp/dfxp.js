@@ -24,13 +24,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      * time expressions to milliseconds.
      */
 
-    MARKUP_REPLACE_SEQ = [
-        // Order matters, need to apply double markers first.
+    var MARKUP_REPLACE_SEQ = [
         [/(\*\*)([^\*]+)(\*\*)/g, '<span tts:fontWeight="bold">$2</span>'],
         [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>'],
         [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
-    DFXP_REPLACE_SEQ = [
+    var DFXP_REPLACE_SEQ = [
         ["span[tts\\:fontWeight='bold']", "**"],
         ["span[tts\\:fontStyle='italic']", "*"],
         ["span[tts\\:textDecoration='underline']", "_"],
@@ -46,6 +45,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     var that = this;
     var $ = window.AmarajQuery? window.AmarajQuery.noConflict(): window.$;
+    var AmarajQuery = window.AmarajQuery || null;
 
     this.init = function(xml) {
 
@@ -202,7 +202,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             return xmlString;
         }
-
     };
 
     this.addSubtitle = function(after, newAttrs, content) {
@@ -221,7 +220,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: new subtitle element
          */
 
-        if (typeof after != 'number') {
+        if (typeof after !== 'number') {
 
             // If we have subtitles, default placement should be at the end.
             if (this.subtitlesCount()) {
@@ -277,7 +276,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $newSubtitle.get(0);
     };
     this.addSubtitleNode = function (newSubtitle, after){
-        if (typeof after != 'number') {
+        if (typeof after !== 'number') {
 
             // If we have subtitles, default placement should be at the end.
             if (this.subtitlesCount()) {
@@ -301,7 +300,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // Then place it.
             $previousSubtitle.after(newSubtitle);
         }
-    }
+    };
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
@@ -312,7 +311,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var originalString = that.utils.xmlToString(that.$originalXml.get(0));
         var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
-        return originalString != xmlString;
+        return originalString !== xmlString;
     };
     this.clearAllContent = function() {
         /*
@@ -346,12 +345,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return parser;
     };
     this.cloneSubtitle = function (indexOrElement, preserveText){
-        var $subtitle = this.getSubtitle(indexOrElement).clone()
+        var $subtitle = this.getSubtitle(indexOrElement).clone();
         if (!preserveText){
             $subtitle.text('');
         }
         return $subtitle;
-    }
+    };
     this.content = function(indexOrElement, content) {
         /*
          * Either get or set the HTML content for the subtitle.
@@ -373,9 +372,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         //
         // Reference: http://bit.ly/SwbPeR
         return $('<div>').append($subtitle.contents().clone()).remove().html();
-
     };
-    this.contentRenderedFromRaw = function(node) {
+    this.contentRenderedFromNode = function(node) {
         /*
          * Pass the actual subtitle node, and get the raw nodeValue parsed
          * into Markdown-style HTML. Useful when you know you're getting
@@ -424,7 +422,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 sub.attr('end', convertFn.call(this, currentEndTime));
             }
         }
-
     };
     this.dfxpToMarkdown = function(node) {
         /**
@@ -443,7 +440,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         for (var i = 0; i < DFXP_REPLACE_SEQ.length; i++) {
             selector = DFXP_REPLACE_SEQ[i][0];
             marker = DFXP_REPLACE_SEQ[i][1];
-            $targets = $(selector, node);
+            var $targets = $(selector, node);
 
             for (var t = 0; t < $targets.length; t++) {
                 var $target = $targets.eq(t);
@@ -544,7 +541,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         return $(subtitles).index(subtitle);
-
     };
     this.getSubtitle = function(indexOrElement) {
         /*
@@ -644,16 +640,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g,
-              replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g,
-              replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g,
-              replaceWith: "<u>$2</u>" },
-            { match: /(\r\n|\n|\r)/gm,
-              replaceWith: "<br />" },
-            { match: / {2}/g,
-              replaceWith: "&nbsp;&nbsp;" }
+            { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
+            { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
+            { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+            { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
+            { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
         ];
 
         for (var i = 0; i < replacements.length; i++) {
@@ -664,7 +655,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         return text;
-
     };
     this.needsAnySynced = function() {
         /*
@@ -766,7 +756,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         return $subtitle.attr('originalcontent');
-
     };
     this.originalEndTime = function(indexOrElement, originalEndTime) {
         /*
@@ -888,7 +877,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $subtitle.is(':first-child');
     };
-    this.startTime = function(indexOrElement, startTime) {
+    this.startTime = function(indexOrElement, startTime, inSeconds) {
         /*
          * Either get or set the start time for the subtitle.
          *
@@ -910,6 +899,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         return parseFloat($subtitle.attr('begin')) || -1;
+    };
+    this.startTimeFromNode = function(node) {
+        /*
+         * Retrieves the start time from the node, and converts it to seconds.
+         * This is primarily for speed and display in a UI.
+         */
+
+        var startTime = node.getAttribute('begin');
+
+        return parseFloat(startTime / 1000) || -1;
     };
     this.subtitlesCount = function() {
         /*
@@ -947,7 +946,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
                 // If the converted text is different from the subtitle text, it
                 // means we were able to convert some Markdown to DFXP.
-                if (convertedText != $subtitle.text()) {
+                if (convertedText !== $subtitle.text()) {
 
                     // First, empty out the subtitle's text.
                     $subtitle.text('');

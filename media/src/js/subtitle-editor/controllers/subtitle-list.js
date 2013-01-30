@@ -312,4 +312,3 @@
     root.SubtitleListItemController = SubtitleListItemController;
 
 }).call(this);
-

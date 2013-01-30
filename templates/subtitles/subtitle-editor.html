@@ -110,18 +110,30 @@
             </div>
             <div class="subtitles-wrapper">
                 <div class="reference subtitles" ng-controller="SubtitleListController">
+
                     <ul subtitle-list="reference-subtitle-set"
                         editable="false"
                         version-number="{{ translated_from_version.version_number }}"
                         language-code="{{ translated_from_version.subtitle_language.language_code }}"
                         video-id="{{ video.video_id }}">
+
                         <li ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
                             class="subtitle-list-item">
-                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRenderedFromRaw(subtitle)"></span>
-                            <textarea style="display: none;" ng-show="isEditing"></textarea>
+
+                            <span class="start-time">
+                                [[ parser.startTimeFromNode(subtitle) ]]
+                            </span>
+
+                            <span ng-show="!isEditing"
+                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  class="subtitle-text">
+                            </span>
+
                         </li>
+
                     </ul>
+
                 </div>
             </div>
         </section>
@@ -129,25 +141,43 @@
             <div class="video" id="video" ng-controller="VideoController"></div>
             <div class="subtitles-wrapper">
                 <div class="working subtitles" ng-controller="SubtitleListController">
+
                     <ul subtitle-list="working-subtitle-set"
                         editable="true"
                         can-add-and-remove="false"
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
                         video-id="{{ video.video_id }}">
-                        <li ng-repeat="subtitle in subtitles"
+
+                        <li subtitle-list-item
+                            ng-repeat="subtitle in subtitles"
                             ng-controller="SubtitleListItemController"
                             ng-class="{editing: isEditing, empty: empty}"
-                            class="subtitle-list-item"
-                            subtitle-list-item>
-                            <span ng-show="!isEditing" class="subtitle-text" ng-bind-html-unsafe="parser.contentRenderedFromRaw(subtitle)"></span>
-                            <textarea
-                                ng-show="isEditing"
-                                style="display: none;">
+                            class="subtitle-list-item">
+
+                            <span class="start-time">
+                                [[ parser.startTimeFromNode(subtitle) ]]
+                            </span>
+
+                            <span ng-show="!isEditing"
+                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  class="subtitle-text">
+                            </span>
+
+                            <textarea ng-show="isEditing"
+                                      style="display: none;">
                             </textarea>
-                            <a ng-show="canAddAndRemove" class="remove" ng-click="removeSubtitle(subtitle)">Remove</a>
+
+                            <a ng-show="canAddAndRemove"
+                               class="remove"
+                               ng-click="removeSubtitle(subtitle)">
+                                Remove
+                            </a>
+
                         </li>
+
                     </ul>
+
                     <a class="end"
                        ng-show="canAddAndRemove"
                        ng-controller="SubtitleListHelperController"

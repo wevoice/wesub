@@ -257,13 +257,13 @@ describe('DFXP', function() {
             expect(parser.content(lastSubtitle)).toBe('Some new text.');
         });
     });
-    describe('#contentRenderedFromRaw()', function() {
+    describe('#contentRenderedFromNode()', function() {
         it('should retrieve the rendered HTML content of a subtitle when passed a node', function() {
 
             // Get the last subtitle.
             var lastSubtitle = parser.getLastSubtitle();
 
-            expect(parser.contentRenderedFromRaw(lastSubtitle)).toBe('Some new text.');
+            expect(parser.contentRenderedFromNode(lastSubtitle)).toBe('Some new text.');
         });
     });
     describe('#contentRendered()', function() {

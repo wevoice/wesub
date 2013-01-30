@@ -371,7 +371,7 @@ section.main {
                 line-height: 25px;
                 position: relative;
 
-                textarea, span {
+                textarea, span.subtitle-text {
                     border: 0;
                     border-top: 1px solid #EBECED;
                     border-left: 0;
@@ -384,18 +384,18 @@ section.main {
                     height: 46px;
                     margin: 0;
                     resize: none;
-                    padding: 10px 40px;
+                    padding: 10px 50px 10px 40px;
                     width: 100%;
 
                     &:focus {
                         outline: none;
                     }
                 }
-                span {
+                span.subtitle-text {
                     cursor: text;
                     display: block;
                     min-height: 46px;
-                    padding: 10px 40px;
+                    padding: 10px 50px 10px 40px;
 
                     b {
                         font-weight: bold;
@@ -403,6 +403,13 @@ section.main {
                     i {
                         font-style: italic;
                     }
+                }
+                span.start-time {
+                    color: #CCC;
+                    font: normal 10px $OpenSans;
+                    right: 5px;
+                    position: absolute;
+                    top: 17px;
                 }
                 a.remove {
                     background: transparent url('../../../images/subtitle-editor/x.png') center center no-repeat;
