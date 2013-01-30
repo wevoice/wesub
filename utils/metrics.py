@@ -61,12 +61,23 @@ def find_environment_tag():
         return 'staging'
     if env == getattr(settings, 'PRODUCTION', -1):
         return 'production'
+    if env == getattr(settings, 'DEMO', -1):
+        return 'demo'
     else:
         return 'unknown'
 
 ENV_TAG = find_environment_tag()
 
 def send(service, tag, metric=None):
+    rev = ''
+    try:
+        # only use revs in demo
+        if ENV_TAG.lower() == 'demo':
+            import commit
+            guid = commit.LAST_COMMIT_GUID
+            rev = '.{0}'.format(guid.split('/')[-1])
+    except:
+        pass
     data = {'host': HOST, 'service': service, 'tags': [tag, ENV_TAG]}
 
     if metric:
