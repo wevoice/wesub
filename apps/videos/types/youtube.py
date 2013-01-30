@@ -362,7 +362,7 @@ class YoutubeVideoType(VideoType):
 
     def _get_bridge(self, third_party_account):
         # Because somehow Django's ORM is case insensitive on CharFields.
-        is_always = third_party_account.username.lower() == \
+        is_always = third_party_account.full_name.lower() == \
                 YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
@@ -543,6 +543,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         entry = gdata.youtube.YouTubeVideoEntryFromString(entry)
 
         old_description = entry.media.description.text
+
+        if old_description:
+            old_description = old_description.decode("utf-8")
 
         video_url = shortlink_for_video(video)
 

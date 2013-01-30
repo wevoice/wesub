@@ -21,7 +21,8 @@ from models import ThirdPartyAccount, YoutubeSyncRule
 
 
 class ThirdPartyAccountAdmin(admin.ModelAdmin):
-    list_display = ('type', 'username',)
+    list_display = ('type', 'full_name', 'username',)
+    search_fields = ('full_name', 'username',)
 
 
 admin.site.register(ThirdPartyAccount, ThirdPartyAccountAdmin)
