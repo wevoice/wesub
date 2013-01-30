@@ -295,7 +295,7 @@ def remove_third_party(request, account_id):
     if account_type == 'generic':
         account = get_object_or_404(ThirdPartyAccount, pk=account_id)
         display_type = account.get_type_display()
-        uid = account.username
+        uid = account.full_name
 
         if account not in request.user.third_party_accounts.all():
             raise Http404
