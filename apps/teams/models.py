@@ -56,6 +56,10 @@ from subtitles.models import (
     SubtitleLanguage as NewSubtitleLanguage
 )
 from subtitles import pipeline
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from subtitles.models import (
+    SubtitleVersion as NewSubtitleVersion,
+)
 
 from functools import partial
 

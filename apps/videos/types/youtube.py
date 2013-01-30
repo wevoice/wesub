@@ -22,6 +22,7 @@ import babelsubs
 import requests
 
 import gdata.youtube.client
+from gdata.youtube.client import YouTubeError
 import httplib2
 from celery.task import task
 from django.conf import settings
@@ -178,7 +179,7 @@ class YoutubeVideoType(VideoType):
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
 
-    CAN_IMPORT_SUBTITLES = False
+    CAN_IMPORT_SUBTITLES = True
 
     def __init__(self, url):
         self.url = url
@@ -448,6 +449,12 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             }
 
         return self.captions
+
+    def get_user_profile(self, username=None):
+        if not username:
+            raise YouTubeError("You need to pass a username")
+        uri = '%s%s' % (gdata.youtube.client.YOUTUBE_USER_FEED_URI, username)
+        return self.get_feed(uri, desired_class=gdata.youtube.data.UserProfileEntry)
 
     def upload_captions(self, subtitle_version):
         """
