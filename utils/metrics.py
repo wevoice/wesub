@@ -76,9 +76,14 @@ def send(service, tag, metric=None):
             import commit
             guid = commit.LAST_COMMIT_GUID
             rev = '.{0}'.format(guid.split('/')[-1])
+            print(rev)
     except:
         pass
-    data = {'host': HOST, 'service': service, 'tags': [tag, ENV_TAG]}
+    data = {
+        'host': '{0}{1}'.format(HOST, rev),
+        'service': service,
+        'tags': [tag, ENV_TAG]
+    }
 
     if metric:
         data['metric'] = metric
