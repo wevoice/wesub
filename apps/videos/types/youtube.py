@@ -146,8 +146,15 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         subtitle.version = version
         subtitle.subtitle_id = int(random.random()*10e12)
         subtitle.subtitle_order = i+1
+
+        try:
+            assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+        except AssertionError:
+            # Don't bother saving the subtitle if it's not synced
+            continue
+
         subtitle.save()
-        assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+
     version.finished = True
     version.save()
 
