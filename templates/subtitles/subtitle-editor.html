@@ -121,7 +121,8 @@
                             ng-controller="SubtitleListItemController"
                             class="subtitle-list-item">
 
-                            <span class="start-time">
+                            <span ng-show="showStartTime"
+                                  class="start-time">
                                 [[ parser.startTimeFromNode(subtitle) ]]
                             </span>
 
@@ -155,7 +156,8 @@
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
-                            <span class="start-time">
+                            <span ng-show="showStartTime"
+                                  class="start-time">
                                 [[ parser.startTimeFromNode(subtitle) ]]
                             </span>
 

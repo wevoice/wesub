@@ -265,6 +265,7 @@
 
         $scope.empty = false;
         $scope.isEditing = false;
+        $scope.showStartTime = $scope.parser.startTimeFromNode($scope.subtitle) > 0;
 
         $scope.finishEditingMode = function(newValue) {
 
