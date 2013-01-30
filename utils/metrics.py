@@ -20,6 +20,7 @@ import socket
 import time as _time
 from contextlib import contextmanager
 from functools import wraps
+from subprocess import Popen, PIPE
 
 from django.conf import settings
 
@@ -70,15 +71,14 @@ ENV_TAG = find_environment_tag()
 
 def send(service, tag, metric=None):
     rev = ''
-    try:
-        # only use revs in demo
-        if ENV_TAG.lower() == 'demo':
-            import commit
-            guid = commit.LAST_COMMIT_GUID
-            rev = '.{0}'.format(guid.split('/')[-1])
-            print(rev)
-    except:
-        pass
+    # only use revs in demo
+    if ENV_TAG.lower() == 'demo':
+        if not globals().has_key('BRANCH'):
+            global BRANCH
+            p = Popen('git rev-parse --abbrev-ref HEAD',
+                shell=True, stdout=PIPE, close_fds=True)
+            BRANCH = p.stdout.read().strip()
+        rev = '.{0}'.format(BRANCH)
     data = {
         'host': '{0}{1}'.format(HOST, rev),
         'service': service,
