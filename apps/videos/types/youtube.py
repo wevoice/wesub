@@ -534,7 +534,10 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         entry = entry.to_string()
         entry = gdata.youtube.YouTubeVideoEntryFromString(entry)
 
-        old_description = entry.media.description.text.decode('utf-8')
+        old_description = entry.media.description.text
+
+        if old_description:
+            old_description = old_description.decode("utf-8")
 
         video_url = shortlink_for_video(video)
 
