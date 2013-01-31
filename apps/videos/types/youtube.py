@@ -157,8 +157,15 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         subtitle.version = version
         subtitle.subtitle_id = int(random.random()*10e12)
         subtitle.subtitle_order = i+1
+
+        try:
+            assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+        except AssertionError:
+            # Don't bother saving the subtitle if it's not synced
+            continue
+
         subtitle.save()
-        assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+
     version.finished = True
     version.save()
 
@@ -237,7 +244,9 @@ class YoutubeVideoType(VideoType):
 
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
-    
+
+    CAN_IMPORT_SUBTITLES = True
+
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -271,10 +280,12 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj):
-        video_obj.title = self.entry.media.title.text or ''
+    def set_values(self, video_obj, fetch_subs_async=True):
+        video_obj.title =  self.entry.media.title.text or ''
         if self.entry.media.description:
             video_obj.description = self.entry.media.description.text or ''
+        else:
+            video_obj.description = u''
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
@@ -287,7 +298,7 @@ class YoutubeVideoType(VideoType):
         Meter('youtube.video_imported').inc()
 
         try:
-            self.get_subtitles(video_obj)
+            self.get_subtitles(video_obj, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
@@ -357,11 +368,15 @@ class YoutubeVideoType(VideoType):
 
         return output
 
-    def get_subtitles(self, video_obj):
+    def get_subtitles(self, video_obj, async=True):
         langs = self.get_subtitled_languages()
 
+        if async:
+            func = save_subtitles_for_lang.delay
+        else:
+            func = save_subtitles_for_lang.run
         for item in langs:
-            save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
         # Because somehow Django's ORM is case insensitive on CharFields.
