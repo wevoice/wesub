@@ -81,7 +81,18 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
 
     yt_lc = lang.get('lang_code')
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+
+    try:
+        lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    except KeyError:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": lc,
+                "youtube_id": youtube_id,
+            }
+        })
+        return
+
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
