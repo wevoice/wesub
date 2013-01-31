@@ -543,8 +543,9 @@ def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
 
     try:
         vt = video_type_registrar.video_type_for_url(vurl.url)
-    except VideoTypeError:
-        celery_logger.info("Could not get video {0}".format(vurl.url))
+    except VideoTypeError, e:
+        celery_logger.warning("Video type error", extra={
+            "exception_thrown": str(e)})
         return
 
     try:

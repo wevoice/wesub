@@ -430,7 +430,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         }
 
         r = requests.post(url, data=data)
-        self.access_token = r.json.get('access_token')
+        self.access_token = r.json and r.json.get('access_token')
 
     def _get_captions_info(self):
         """
