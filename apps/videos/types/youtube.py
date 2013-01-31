@@ -272,7 +272,9 @@ class YoutubeVideoType(VideoType):
     def set_values(self, video_obj, fetch_subs_async=True):
         video_obj.title =  self.entry.media.title.text or ''
         if self.entry.media.description:
-            video_obj.description =  self.entry.media.description.text
+            video_obj.description = self.entry.media.description.text or ''
+        else:
+            video_obj.description = u''
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
