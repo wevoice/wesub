@@ -110,7 +110,7 @@ class SubtitlesUploadForm(forms.Form):
             raise forms.ValidationError(_(
                 u"Sorry, we cannot upload subtitles for this language "
                 u"because this would fork the %s translation(s) made from it."
-                % [sl.get_language_code_display() for sl in dependents]
+                % ", ".join([sl.get_language_code_display() for sl in dependents])
             ))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
