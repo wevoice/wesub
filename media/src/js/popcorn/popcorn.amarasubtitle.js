@@ -1,7 +1,5 @@
 (function (Popcorn) {
 
-    // TODO: Document the hell out of this.
-
     var i = 0;
     var createDefaultContainer = function(context, id) {
 
@@ -12,9 +10,9 @@
         ctxContainer.id = id || Popcorn.guid();
         ctxContainer.className = 'amara-popcorn-subtitles';
 
-        style.width = media.offsetWidth + 'px';
+        style.width = context.media.width + 'px';
 
-        context.media.parentNode.childNodes[0].appendChild(ctxContainer);
+        context.media.parentNode.appendChild(ctxContainer);
 
         return ctxContainer;
     };
@@ -45,17 +43,16 @@
             }
             options.innerContainer = newdiv;
 
-            options.showSubtitle = function() {
-                options.innerContainer.innerHTML = options.text || '';
-            };
         },
         start: function(event, options){
             options.innerContainer.style.display = 'block';
-            options.showSubtitle(options, options.text);
+            options.innerContainer.innerHTML = options.text || '';
         },
         end: function(event, options) {
             options.innerContainer.style.display = 'none';
-            options.innerContainer.innerHTML = '';
+        },
+        _update: function(event, newOptions) {
+            event.innerContainer.innerHTML = event.text = newOptions.text;
         },
         _teardown: function (options) {
             options.container.removeChild(options.innerContainer);

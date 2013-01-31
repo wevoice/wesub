@@ -104,7 +104,6 @@
             $event.preventDefault();
 
             // TODO: Need a redirect URL.
-
         };
         $scope.saveAndExit = function($event) { 
 
@@ -117,7 +116,6 @@
 
                 }
             });
-
         };
         $scope.saveSession = function() {
             if ($scope.status !== 'saving') {
@@ -127,6 +125,7 @@
 
                 promise.then(function onSuccess(response) {
                     $scope.status = 'saved';
+                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
                     window.location = response['data']['site_url'];
                 }, function onError() {
                     $scope.status = 'error';
@@ -141,13 +140,12 @@
             $event.preventDefault();
         };
 
-        $scope.$root.$on('workDone', function() {
+        $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
-
     };
-    var SubtitleListController = function($scope, SubtitleStorage) {
+    var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -174,7 +172,6 @@
 
             // Update the subtitles on the list scope.
             $scope.updateParserSubtitles();
-
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -208,8 +205,13 @@
             $scope.subtitles = $scope.parser.getSubtitles().get();
 
             $scope.status = 'ready';
-            $scope.$broadcast('onSubtitlesFetched');
 
+            // When we have subtitles for an editable set, tell the kids.
+            $timeout(function() {
+                if ($scope.isEditable) {
+                    $scope.$broadcast('subtitlesFetched');
+                }
+            });
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.parser.removeSubtitle(subtitle);
@@ -238,7 +240,6 @@
         window.onresize = function() {
             $scope.$digest();
         };
-
     };
     var SubtitleListHelperController = function($scope) {
 
@@ -252,7 +253,6 @@
             $scope.isEditingAny = false;
             $scope.$digest();
         });
-
     };
     var SubtitleListItemController = function($scope) {
         /**
@@ -263,9 +263,9 @@
 
         var initialText;
 
-        $scope.text = '';
         $scope.empty = false;
         $scope.isEditing = false;
+        $scope.showStartTime = $scope.parser.startTimeFromNode($scope.subtitle) > 0;
 
         $scope.finishEditingMode = function(newValue) {
 
@@ -277,7 +277,7 @@
             var content = $scope.parser.content($scope.subtitle, newValue);
 
             if (content !== initialText) {
-                $scope.$root.$emit('workDone');
+                $scope.$root.$emit('work-done');
             }
         };
         $scope.getSubtitleIndex = function() {
@@ -295,6 +295,15 @@
             return initialText;
         };
 
+        $scope.$on('subtitlesFetched', function() {
+            // When subtitles are first retrieved, we need to set up the amarasubtitle
+            // on the video and bind to this scope.
+            //
+            // This will happen on the video controller. Just throw an event stating that
+            // we're ready.
+
+            $scope.$root.$emit('subtitleReady', $scope);
+        });
     };
 
     root.LanguageSelectorController = LanguageSelectorController;

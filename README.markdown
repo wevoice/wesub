@@ -13,7 +13,7 @@ never used Vagrant before we highly recommend going through its [quick start
 guide][vagrant-guide] to learn how it works.
 
 [Vagrant]: http://vagrantup.com/
-[vagrant-guide]: http://vagrantup.com/docs/getting-started/index.html
+[vagrant-guide]: http://docs.vagrantup.com/v1/docs/getting-started/index.html
 
 To run the development version:
 

@@ -79,6 +79,46 @@
             }
 
         };
+
+        $scope.$root.$on('subtitleKeyUp', function($event, options) {
+
+            var parser = options.parser;
+            var subtitle = options.subtitle;
+            var value = options.value;
+
+            // Update the Popcorn subtitle instance's text.
+            $scope.pop.amarasubtitle(subtitle.$id, {
+                text: parser.markdownToHTML(value)
+            });
+
+        });
+        $scope.$root.$on('subtitleReady', function($event, subtitle) {
+            // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
+            // video's Popcorn instance.
+
+            var parser = subtitle.parser;
+
+            var text = subtitle.parser.content(subtitle.subtitle);
+            var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
+            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
+
+            // Create the amarasubtitle instance.
+            $scope.pop.amarasubtitle(subtitle.$id, {
+                end:   endTimeSeconds,
+                start: startTimeSeconds,
+                text:  text
+            });
+
+        });
+        $scope.$root.$on('subtitleSelected', function($event, subtitle) {
+
+            var parser = subtitle.parser;
+            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
+
+            // Set the current time to the start of the subtitle.
+            $scope.pop.currentTime(startTimeSeconds);
+
+        });
     };
 
     root.VideoController = VideoController;

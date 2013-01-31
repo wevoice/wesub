@@ -300,11 +300,9 @@ class UploadSubtitlesTest(WebUseTest):
         self._upload(video, 'fr', 'en', 'en', True, 'test.srt')
         self._assertVersionCount(video, 3)
 
-        # Now fr is  translated from de
+        # Now fr is  translated from de, this should fail
         self._upload(video, 'fr', 'en', 'de', True, 'test.srt')
-        self._assertVersionCount(video, 4)
-        language = video.newsubtitlelanguage_set.get(language_code='fr')
-        self.assertEqual(language.get_translation_source_language_code(), 'de')
+        self._assertVersionCount(video, 3)
 
 
     def test_upload_to_language_with_dependents(self):
