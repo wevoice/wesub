@@ -48,7 +48,7 @@ class OpenIdBackend(object):
 
     def authenticate(self, openid_key, request, provider):
         try:
-            assoc = UserAssociation.objects.get(openid_key = openid_key)
+            assoc = self._lookup_association(openid_key, request, provider)
             if assoc.user.is_active:
                 return assoc.user
             else:
@@ -110,6 +110,17 @@ class OpenIdBackend(object):
             auth_meta = AuthMeta(user = user, provider = provider)
             auth_meta.save()
             return user
+
+    def _lookup_association(self, openid_key, request, provider):
+        if provider == 'Google':
+            email = request.openid.ax.get('http://axschema.org/contact/email')
+            email = email.pop()
+            try:
+                return UserAssociation.objects.filter(email=email)[0]
+            except IndexError:
+                raise UserAssociation.DoesNotExist()
+        else:
+            return UserAssociation.objects.get(openid_key = openid_key)
 
     def get_user(self, user_id):
         try:
