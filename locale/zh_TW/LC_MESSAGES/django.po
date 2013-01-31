@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-30 00:40-0600\n"
+"POT-Creation-Date: 2013-01-31 00:39-0600\n"
 "PO-Revision-Date: 2013-01-26 07:04+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/"
@@ -76,7 +76,7 @@ msgstr "Email"
 msgid "Hide"
 msgstr "隱藏"
 
-#: apps/auth/models.py:92 apps/teams/models.py:151
+#: apps/auth/models.py:92 apps/teams/models.py:155
 msgid "third party accounts"
 msgstr "第三方帳號"
 
@@ -553,7 +553,7 @@ msgid "Unfeature teams"
 msgstr "取消團隊"
 
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:201
-#: apps/teams/models.py:201
+#: apps/teams/models.py:205
 msgid "Team"
 msgstr "團隊"
 
@@ -716,164 +716,164 @@ msgid ""
 "source language %(cur_code)s for that task."
 msgstr ""
 
-#: apps/teams/models.py:108
+#: apps/teams/models.py:112
 msgid "Open"
 msgstr "開啟"
 
-#: apps/teams/models.py:109 libs/rosetta/templates/rosetta/languages.html:28
+#: apps/teams/models.py:113 libs/rosetta/templates/rosetta/languages.html:28
 msgid "Application"
 msgstr "應用"
 
-#: apps/teams/models.py:110
+#: apps/teams/models.py:114
 msgid "Invitation by any team member"
 msgstr "由團隊成員邀請"
 
-#: apps/teams/models.py:111
+#: apps/teams/models.py:115
 msgid "Invitation by manager"
 msgstr "由管理者邀請"
 
-#: apps/teams/models.py:112
+#: apps/teams/models.py:116
 msgid "Invitation by admin"
 msgstr "管理者邀請"
 
-#: apps/teams/models.py:119
+#: apps/teams/models.py:123
 msgid "Any team member"
 msgstr "任何團隊成員"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:124
 msgid "Managers and admins"
 msgstr ""
 
-#: apps/teams/models.py:121
+#: apps/teams/models.py:125
 msgid "Admins only"
 msgstr "僅限管理員使用"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2628
+#: apps/teams/models.py:145 apps/teams/models.py:2632
 msgid "name"
 msgstr "名稱"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2629
+#: apps/teams/models.py:146 apps/teams/models.py:2633
 msgid "slug"
 msgstr "SLUG"
 
-#: apps/teams/models.py:143
+#: apps/teams/models.py:147
 msgid "description"
 msgstr "描述"
 
-#: apps/teams/models.py:143
+#: apps/teams/models.py:147
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr "所有網址會被轉換成連結。不支援斷行及HTML代碼。"
 
-#: apps/teams/models.py:145
+#: apps/teams/models.py:149
 msgid "logo"
 msgstr "logo"
 
-#: apps/teams/models.py:146
+#: apps/teams/models.py:150
 msgid "publicly Visible?"
 msgstr "公開？"
 
-#: apps/teams/models.py:147 templates/search/search.html:152
+#: apps/teams/models.py:151 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "影片"
 
-#: apps/teams/models.py:148
+#: apps/teams/models.py:152
 msgid "users"
 msgstr "使用者"
 
-#: apps/teams/models.py:154
+#: apps/teams/models.py:158
 msgid "applicants"
 msgstr "申請者"
 
-#: apps/teams/models.py:157
+#: apps/teams/models.py:161
 msgid "Intro Video"
 msgstr "介紹影片"
 
-#: apps/teams/models.py:159
+#: apps/teams/models.py:163
 msgid "Page content"
 msgstr "頁面內容"
 
-#: apps/teams/models.py:159
+#: apps/teams/models.py:163
 msgid "You can use markdown. This will replace Description."
 msgstr "您可以使用登記功能來取代描述"
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:165
 msgid "HTML that appears at the top of the teams page."
 msgstr "在團隊頁面置頂的HTML"
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:168
 msgid "authentication provider code"
 msgstr ""
 
-#: apps/teams/models.py:172
+#: apps/teams/models.py:176
 msgid "membership policy"
 msgstr "成員規範"
 
-#: apps/teams/models.py:175
+#: apps/teams/models.py:179
 msgid "video policy"
 msgstr "影片規範"
 
-#: apps/teams/models.py:178
+#: apps/teams/models.py:182
 msgid "task assignment policy"
 msgstr "職務分配原則"
 
-#: apps/teams/models.py:181
+#: apps/teams/models.py:185
 msgid "subtitling policy"
 msgstr "字幕規則"
 
-#: apps/teams/models.py:184
+#: apps/teams/models.py:188
 msgid "translation policy"
 msgstr "翻譯規則"
 
-#: apps/teams/models.py:187
+#: apps/teams/models.py:191
 msgid "maximum tasks per member"
 msgstr "成員任務數上限"
 
-#: apps/teams/models.py:189
+#: apps/teams/models.py:193
 msgid "task expiration (days)"
 msgstr "任務有效期限(天)"
 
-#: apps/teams/models.py:202 templates/profiles/base.html:56
+#: apps/teams/models.py:206 templates/profiles/base.html:56
 #: templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "團隊"
 
-#: apps/teams/models.py:650
+#: apps/teams/models.py:654
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
 msgstr ""
 "藉此處說明為何您或您的團隊需要對這部影片配字幕。增加註解能讓大家更樂意幫忙！"
 
-#: apps/teams/models.py:654
+#: apps/teams/models.py:658
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr "某些網站的縮圖會自動抓取，例如Youtube"
 
-#: apps/teams/models.py:656
+#: apps/teams/models.py:660
 msgid "Need help with all languages"
 msgstr "需要所有語言的翻譯協助"
 
-#: apps/teams/models.py:657
+#: apps/teams/models.py:661
 msgid "If you check this, other languages will not be displayed."
 msgstr "如果勾選，就不會顯示其他語言"
 
-#: apps/teams/models.py:945 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:949 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "擁有者"
 
-#: apps/teams/models.py:946 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:950 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "管理者"
 
-#: apps/teams/models.py:947 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:951 apps/teams/permissions_const.py:44
 #: templates/base.html:133
 msgid "Admin"
 msgstr "管理"
 
-#: apps/teams/models.py:948 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:952 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "提供者"
 
@@ -1712,11 +1712,11 @@ msgstr ""
 "請使用連至影片頁面的連結，再試一次 \n"
 "                        若有問題請<a href=\"mailto:%s\">連絡我們</a>"
 
-#: apps/videos/types/youtube.py:48
+#: apps/videos/types/youtube.py:49
 msgid "Private video"
 msgstr "私人影片"
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Undefined error"
 msgstr "不明錯誤"
 
