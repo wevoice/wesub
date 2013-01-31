@@ -20,17 +20,35 @@
 
     var root = this;
 
-    var RightSectionController = function($scope, $timeout) {
+    var RightSectionController = function($scope, $timeout, SubtitleStorage) {
 
-        // Default module opened/closed states.
+        // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
-            approval: true,
             collab: false,
-            notes: true
+            notes: false
         };
 
+        // These states define whether the modules are enabled at all.
+        $scope.modulesEnabled = {
+            approval: false,
+            collab: false,
+            notes: false
+        };
+
+        // If this is a task, setup the proper panels.
+        if (SubtitleStorage.getCachedData().task) {
+            $scope.modulesOpen = {
+                collab: true,
+                notes: true
+            };
+            $scope.modulesEnabled = {
+                approval: true,
+                collab: true,
+                notes: true
+            };
+        }
+
         $scope.approve = function($event) {
-            console.log('send back');
             $event.preventDefault();
         };
         $scope.toggleModule = function($event, module) {
@@ -38,7 +56,6 @@
             $event.preventDefault();
         };
         $scope.sendBack = function($event) {
-            console.log('send back');
             $event.preventDefault();
         };
 

@@ -656,6 +656,7 @@ section.main {
                 
                 &.approval {
                     border-top: 0;
+                    margin: 15px 0;
 
                     button {
                         color: #EFDFE1;
@@ -679,7 +680,6 @@ section.main {
                     }
                     div.content {
                         border-bottom: 1px solid #292929;
-                        margin-bottom: 15px;
                         padding-bottom: 10px;
                     }
                 }
