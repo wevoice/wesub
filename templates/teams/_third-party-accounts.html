@@ -30,7 +30,7 @@
         <ul class="accounts listing">
             {% for account in linked_accounts %}
                 <li>
-                    <h3>{{account.username}}</h3>
+                    <h3>{{account.full_name}}</h3>
                     {% if account.oauth_access_token %}
                         <ul class="actions">
                             <li><a href="" title="Unlink this account">Remove</a></li>
