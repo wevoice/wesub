@@ -271,6 +271,8 @@ class YoutubeVideoType(VideoType):
         video_obj.title = self.entry.media.title.text or ''
         if self.entry.media.description:
             video_obj.description = self.entry.media.description.text or ''
+        else:
+            video_obj.description = u''
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
