@@ -112,6 +112,7 @@ def _check_team_video_locking(user, video, language_code, task_id=None):
     # Check that there are no open tasks for this action.
     # todo: make this better.
     if task_id:
+        task_id = task_id.strip('/')
         tasks = [Task.objects.get(id=task_id)]
     else:
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
