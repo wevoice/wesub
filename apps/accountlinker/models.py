@@ -25,7 +25,8 @@ from django.utils import translation
 
 from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
-    video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
+    video_type_registrar, UPDATE_VERSION_ACTION,
+    DELETE_LANGUAGE_ACTION, VideoTypeError
 )
 from teams.models import Team
 from teams.moderation_const import APPROVED, UNMODERATED
@@ -226,7 +227,16 @@ class ThirdPartyAccountManager(models.Manager):
 
         for vurl in video.videourl_set.all():
             already_updated = False
-            vt = video_type_registrar.video_type_for_url(vurl.url)
+
+            try:
+                vt = video_type_registrar.video_type_for_url(vurl.url)
+            except VideoTypeError, e:
+                logger.error('Getting video from youtube failed.', extra={
+                    'video': video.video_id,
+                    'vurl': vurl.pk,
+                    'gdata_exception': str(e)
+                })
+                return
 
             if should_sync and not ignore_new_syncing_logic:
                 try:
