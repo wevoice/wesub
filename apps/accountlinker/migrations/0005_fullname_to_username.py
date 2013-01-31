@@ -1,6 +1,7 @@
 # encoding: utf-8
 import time
 import atom
+from south.db import db
 from south.v2 import DataMigration
 from apps.videos.types.youtube import YouTubeApiBridge
 
@@ -9,45 +10,55 @@ import logging
 class Migration(DataMigration):
     
     def forwards(self, orm):
-        for account in orm.ThirdPartyAccount.objects.filter(type='Y').all():
-            bridge = YouTubeApiBridge(account.oauth_access_token, 
-                                      account.oauth_refresh_token, '')
+        if not db.dry_run:
+            for account in orm.ThirdPartyAccount.objects.filter(type='Y').all():
+                bridge = YouTubeApiBridge(account.oauth_access_token, 
+                                          account.oauth_refresh_token, '')
 
-            try:
-                feed = bridge.get_user_profile('default')
-                author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
-                username = [x for x in feed.get_elements() if x.tag == 'username'][0].text
-            except Exception:
-                logging.exception("Could not login account %s" % account.username)
-                continue
+                try:
+                    feed = bridge.get_user_profile('default')
+                    author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
+                    username = [x for x in feed.get_elements() if x.tag == 'username'][0].text
+                except Exception:
+                    logging.exception("Could not login account %s" % account.username)
+                    continue
 
-            if username:
-                account.username = username
+                if username:
+                    account.username = username.decode("utf-8")
 
-            if author:
-                account.full_name = author.name.text
+                if author:
+                    account.full_name = author.name.text
 
-            account.save()
-            time.sleep(1)
+                try:
+                    account.save()
+                except Exception, e:
+                    print "error - could not migrate account %s" % e
+
+                time.sleep(1)
     
     def backwards(self, orm):
-        for account in orm.ThirdPartyAccount.objects.filter(type='Y').all():
-            bridge = YouTubeApiBridge(account.oauth_access_token, 
-                                      account.oauth_refresh_token, '')
+        if not db.dry_run:
+            for account in orm.ThirdPartyAccount.objects.filter(type='Y').all():
+                bridge = YouTubeApiBridge(account.oauth_access_token, 
+                                          account.oauth_refresh_token, '')
 
-            try:
-                feed = bridge.get_user_profile('default')
-                author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
-            except Exception:
-                logging.exception("Could not login account %s" % account.username)
-                continue
+                try:
+                    feed = bridge.get_user_profile('default')
+                    author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
+                except Exception:
+                    logging.exception("Could not login account %s" % account.username)
+                    continue
 
-            if author:
-                account.username = author.name.text
+                if author:
+                    account.username = author.name.text
 
-            account.save()
-            print "backwarded account %s" % account.username
-            time.sleep(1)
+                try:
+                    account.save()
+                except Exception, e:
+                    print "error - could not migrate account %s -> %s, %s" % (account.username, account.full_name, e)
+
+                print "backwarded account %s" % account.username
+                time.sleep(1)
     
     models = {
         'accountlinker.thirdpartyaccount': {
