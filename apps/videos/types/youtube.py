@@ -81,7 +81,18 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
 
     yt_lc = lang.get('lang_code')
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+
+    try:
+        lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    except KeyError:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": yt_lc,
+                "youtube_id": youtube_id,
+            }
+        })
+        return
+
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
@@ -369,8 +380,10 @@ class YoutubeVideoType(VideoType):
 
     def _get_bridge(self, third_party_account):
         # Because somehow Django's ORM is case insensitive on CharFields.
-        is_always = third_party_account.full_name.lower() == \
-                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
+        is_always = (third_party_account.full_name.lower() == 
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower() or
+                     third_party_account.username.lower() ==
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower())
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
             third_party_account.oauth_refresh_token, self.videoid, is_always)
