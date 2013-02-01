@@ -92,6 +92,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             dc['platform'] = os.environ.get('SELENIUM_PLATFORM', 'WINDOWS 2008')
             dc['name'] = suite_or_test 
             dc['public'] = True
+            dc['idle-timout'] = 120
             dc['tags'] = [os.environ.get('JOB_NAME', 'amara-local'),] 
 
             #Setup the remote browser capabilities
