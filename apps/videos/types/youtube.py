@@ -120,7 +120,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     xml = force_unicode(xml, 'utf-8')
 
     subs = babelsubs.parsers.discover('youtube').parse(xml).to_internal()
-    add_subtitles(video, lc, subs)
+    add_subtitles(video, lc, subs, note="From youtube")
 
     video_changed_tasks.delay(video.pk)
 
