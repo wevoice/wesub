@@ -551,11 +551,17 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
+        from accountlinker.models import add_amara_description_credit, check_authorization
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
+
         if not should_add_credit(video=video):
             return False
 
-        from accountlinker.models import add_amara_description_credit
-        from apps.videos.templatetags.videos_tags import shortlink_for_video
+        is_authorized, _ = check_authorization(video)
+
+        if not is_authorized:
+            return False
+
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
