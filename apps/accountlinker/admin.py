@@ -24,9 +24,9 @@ from models import ThirdPartyAccount, YoutubeSyncRule
 class ThirdPartyAccountAdminForm(forms.ModelForm):
 
     users = forms.fields.CharField(
-            help_text="Changing this field does nothing")
+            help_text="List of users that have this account (changing this field does nothing)")
     teams = forms.fields.CharField(
-            help_text="Changing this field does nothing")
+            help_text="List of teams that have this account (changing this field does nothing)")
 
     def __init__(self, *args, **kwargs):
         super(ThirdPartyAccountAdminForm, self).__init__(*args, **kwargs)
@@ -39,6 +39,9 @@ class ThirdPartyAccountAdminForm(forms.ModelForm):
 
         self.fields['users'].initial = users
         self.fields['teams'].initial = teams
+
+        self.fields['users'].widget.attrs['readonly'] = True
+        self.fields['teams'].widget.attrs['readonly'] = True
 
     class Meta:
         model = ThirdPartyAccount
