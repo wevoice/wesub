@@ -87,7 +87,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     except KeyError:
         logger.warn("Youtube import did not find language code", extra={
             "data":{
-                "language_code": lc,
+                "language_code": yt_lc,
                 "youtube_id": youtube_id,
             }
         })
