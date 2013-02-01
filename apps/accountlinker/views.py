@@ -152,8 +152,13 @@ def youtube_oauth_callback(request):
         defaults={
             'oauth_refresh_token': content['refresh_token'],
             'oauth_access_token': content['access_token'],
+            'full_name': author.name.text
         }
     )
+
+    if not created and not team and user:
+        messages.error(request, _("Account already linked."))
+        return redirect('/')
 
     if team:
         team.third_party_accounts.add(account)

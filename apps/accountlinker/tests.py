@@ -212,3 +212,28 @@ class AccountTest(TestCase):
 
         is_authorized, ignore = check_authorization(video)
         self.assertTrue(is_authorized)
+
+    def test_resolve_ownership(self):
+        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
+
+        tpa1 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
+                                 username='PCFQA', full_name='PCFQA', type='Y')
+        tpa1.save()
+
+        tpa2 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='',
+                                 username='PCFQA_not_this_one', full_name='PCFQA', type='Y')
+        tpa2.save()
+
+        video_url = video.get_primary_videourl_obj()
+        owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
+
+        self.assertEquals(owner.username, 'PCFQA')
+        self.assertEquals(owner.full_name, 'PCFQA')
+        self.assertEquals(owner.type, 'Y')
+
+        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=9bZkp7q19f0')
+
+        video_url = video.get_primary_videourl_obj()
+        owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
+
+        self.assertEquals(owner, None)
