@@ -259,7 +259,7 @@ class ThirdPartyAccountManager(models.Manager):
             if not username:
                 continue
 
-            account = ThirdPartyAccountManager.objects.resolve_ownership(vurl)
+            account = self.resolve_ownership(vurl)
 
             if not account:
                 return
