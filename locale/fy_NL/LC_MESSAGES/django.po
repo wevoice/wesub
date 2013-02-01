@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 00:36-0600\n"
+"POT-Creation-Date: 2013-02-01 00:25-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -424,76 +424,80 @@ msgstr ""
 msgid "Widget view statistic"
 msgstr ""
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:83 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/subtitles/forms.py:96
+#: apps/subtitles/forms.py:97
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:104
+msgid "The language already exists as a translation from"
+msgstr ""
+
+#: apps/subtitles/forms.py:111
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:122
+#: apps/subtitles/forms.py:130
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:137
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:140 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:148 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:152
+#: apps/subtitles/forms.py:160
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:160
+#: apps/subtitles/forms.py:168
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:173
+#: apps/subtitles/forms.py:181
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/subtitles/forms.py:184
+#: apps/subtitles/forms.py:192
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:192
+#: apps/subtitles/forms.py:200
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:207 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:230 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 
@@ -514,13 +518,13 @@ msgid ""
 "believe that they need correction, please contact the team administrator."
 msgstr ""
 
-#: apps/subtitles/views.py:125
+#: apps/subtitles/views.py:126
 msgid ""
 "You can't edit because there is a task for this language and you can't "
 "complete it."
 msgstr ""
 
-#: apps/subtitles/views.py:149
+#: apps/subtitles/views.py:150
 msgid "You can't edit this subtitle because it's locked"
 msgstr ""
 
