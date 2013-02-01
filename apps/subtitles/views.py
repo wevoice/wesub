@@ -112,6 +112,7 @@ def _check_team_video_locking(user, video, language_code, task_id=None):
     # Check that there are no open tasks for this action.
     # todo: make this better.
     if task_id:
+        task_id = task_id.strip('/')
         tasks = [Task.objects.get(id=task_id)]
     else:
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
@@ -161,7 +162,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     editing_version = editing_language.get_tip(public=False)
     translated_from_version = None
     lineage = editing_version and editing_version.get_lineage()
-    translated_from_language_code = editing_language.get_translation_source_language()
+    translated_from_language_code = editing_language.get_translation_source_language().language_code
 
     if editing_version and translated_from_language_code and \
         translated_from_language_code != editing_language.language_code :

@@ -30,6 +30,7 @@ from apps.teams.permissions import (
 )
 from apps.videos.tasks import video_changed_tasks
 from utils.translation import get_language_choices
+from utils.templatetags.i18n_tags import to_localized_display
 
 
 SUBTITLE_FILESIZE_LIMIT_KB = 512
@@ -94,6 +95,13 @@ class SubtitlesUploadForm(forms.Form):
             if language_is_not_a_translation and subtitle_language.get_tip():
                 raise forms.ValidationError(_(
                     u"The language already exists and is not a translation."))
+            # If it's marked as a translation from a different language, don't
+            # allow that until our UI can handle showing different reference
+            # languages
+            elif existing_from_language_code and existing_from_language_code != from_language_code:
+                language_name = to_localized_display(existing_from_language_code)
+                raise forms.ValidationError(_(
+                    u"The language already exists as a translation from" % language_name))
 
     def _verify_no_dependents(self, subtitle_language):
         # You cannot upload to a language with dependents.
@@ -102,7 +110,7 @@ class SubtitlesUploadForm(forms.Form):
             raise forms.ValidationError(_(
                 u"Sorry, we cannot upload subtitles for this language "
                 u"because this would fork the %s translation(s) made from it."
-                % [sl.get_language_code_display() for sl in dependents]
+                % ", ".join([sl.get_language_code_display() for sl in dependents])
             ))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
