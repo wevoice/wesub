@@ -32,6 +32,7 @@ from .videos.types import (
 from teams.models import Team
 from teams.moderation_const import APPROVED, UNMODERATED
 from auth.models import CustomUser as User
+from django.db.models import Q
 
 from utils.metrics import Meter
 
@@ -102,7 +103,7 @@ def check_authorization(video):
         if yt_url.exists():
             usernames = [url.owner_username for url in yt_url]
             linked_accounts = ThirdPartyAccount.objects.filter(
-                    username__in=usernames)
+                    Q(full_name__in=usernames)|Q(username__in=usernames))
 
             if linked_accounts.exists():
                 if any(a.is_team_account for a in linked_accounts):
