@@ -480,7 +480,7 @@ def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
 
     account = ThirdPartyAccount.objects.resolve_ownership(vurl)
 
-    if not account:
+    if not account or account.is_team_account:
         return
 
     bridge = vt._get_bridge(account)

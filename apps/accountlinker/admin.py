@@ -18,11 +18,22 @@
 
 from django.contrib import admin
 from models import ThirdPartyAccount, YoutubeSyncRule
+from auth.models import CustomUser as User
+from teams.models import Team
+
+
+class TeamMemberInline(admin.TabularInline):
+    model = Team.third_party_accounts.through
+
+
+class UserMemberInline(admin.TabularInline):
+    model = User.third_party_accounts.through
 
 
 class ThirdPartyAccountAdmin(admin.ModelAdmin):
     list_display = ('type', 'full_name', 'username',)
     search_fields = ('full_name', 'username',)
+    inlines = [UserMemberInline, TeamMemberInline]
 
 
 admin.site.register(ThirdPartyAccount, ThirdPartyAccountAdmin)
