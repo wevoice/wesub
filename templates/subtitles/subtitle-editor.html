@@ -192,18 +192,18 @@
                 </div>
             </div>
         </section>
-        <section class="right column" ng-controller="RightSectionController">
+        <section class="collab column" ng-controller="CollabController">
             <a href="#"
-               class="toggle-collab"
-               ng-click="toggleModule($event, 'collab')"
-               ng-show="modulesEnabled.collab && !modulesOpen.collab">
+               class="toggle-pane"
+               ng-click="toggleModule($event, 'pane')"
+               ng-show="modulesEnabled.pane && !modulesOpen.pane">
                 Open Collab
             </a>
-            <aside class="collab" ng-show="modulesEnabled.collab && modulesOpen.collab">
+            <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
                 <a href="#"
-                   class="toggle-collab"
-                   ng-click="toggleModule($event, 'collab')"
-                   ng-show="modulesOpen.collab">
+                   class="toggle-pane"
+                   ng-click="toggleModule($event, 'pane')"
+                   ng-show="modulesOpen.pane">
                     Close Collab
                 </a>
                 <div class="notes module"
@@ -246,7 +246,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitle-list.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/right-section.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
 
 </body>

@@ -585,119 +585,119 @@ section.main {
             }
         }
     }
-    section.right {
+}
+section.collab {
+    a.toggle-pane {
+        background: #333333 url('../../../images/arrow-left.png') center center no-repeat;
+        color: transparent;
+        display: block;
+        height: 30px;
+        position: fixed;
+        right: 0;
+        top: 100px;
+        width: 24px;
+        @include multi-border-radius(2px, 0, 0, 2px);
+    }
+    aside {
+        background: #333;
+        height: 100%;
+        position: fixed;
+        right: 0;
+        min-width: 250px;
+        z-index: 50;
+
         a.toggle-collab {
-            background: #333333 url('../../../images/arrow-left.png') center center no-repeat;
-            color: transparent;
-            display: block;
-            height: 30px;
-            position: fixed;
-            right: 0;
-            top: 100px;
-            width: 24px;
-            @include multi-border-radius(2px, 0, 0, 2px);
+            background: #333333 url('../../../images/arrow-right.png') center center no-repeat;
+            left: -24px;
+            position: absolute;
+            top: 61px;
         }
-        aside.collab {
-            background: #333;
-            height: 100%;
-            position: fixed;
-            right: 0;
-            min-width: 250px;
-            z-index: 50;
+        div.module {
+            border-top: 1px solid #292929;
 
-            a.toggle-collab {
-                background: #333333 url('../../../images/arrow-right.png') center center no-repeat;
-                left: -24px;
-                position: absolute;
-                top: 61px;
+            a {
+                border-bottom: 1px solid #292929;
+                color: #E6E6E6;
+                display: block;
+                font: bold 12px $OpenSans;
+                padding: 15px 0 15px 20px;
+                text-decoration: none;
+
+                &:before {
+                    border-top: 4px solid transparent;
+                    border-bottom: 4px solid transparent;
+                    border-left: 6px solid #ECECEC;
+                    content: "";
+                    display: inline-block;
+                    height: 0; 
+                    margin-right: 10px;
+                    width: 0;
+                }
+                &:hover {
+                    color: white;
+                }
             }
-            div.module {
-                border-top: 1px solid #292929;
+            div.content {
+                padding: 0 20px;
 
+                textarea {
+                    background: #ECECEC;
+                    border: 0;
+                    color: #5C5C5C;
+                    min-height: 150px;
+                    padding: 10px;
+                    width: 100%;
+                    @include border-radius(3px);
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+            }
+            
+            &.approval {
+                border-top: 0;
+                margin: 15px 0;
+
+                button {
+                    color: #EFDFE1;
+                    font: normal 13px $OpenSans;
+                    padding: 10px 0 10px 30px;
+                    text-align: left;
+                    width: 48%;
+                }
+            }
+            &.open {
                 a {
-                    border-bottom: 1px solid #292929;
-                    color: #E6E6E6;
-                    display: block;
-                    font: bold 12px $OpenSans;
-                    padding: 15px 0 15px 20px;
-                    text-decoration: none;
+                    border-bottom: 0;
 
                     &:before {
-                        border-top: 4px solid transparent;
-                        border-bottom: 4px solid transparent;
-                        border-left: 6px solid #ECECEC;
-                        content: "";
-                        display: inline-block;
-                        height: 0; 
-                        margin-right: 10px;
-                        width: 0;
-                    }
-                    &:hover {
-                        color: white;
+                        border-top: 6px solid #ECECEC;
+                        border-right: 4px solid transparent;
+                        border-left: 4px solid transparent;
+                        margin-right: 8px;
+                        vertical-align: -3px;
                     }
                 }
                 div.content {
-                    padding: 0 20px;
-
-                    textarea {
-                        background: #ECECEC;
-                        border: 0;
-                        color: #5C5C5C;
-                        min-height: 150px;
-                        padding: 10px;
-                        width: 100%;
-                        @include border-radius(3px);
-
-                        &:focus {
-                            outline: none;
-                        }
-                    }
-                }
-                
-                &.approval {
-                    border-top: 0;
-                    margin: 15px 0;
-
-                    button {
-                        color: #EFDFE1;
-                        font: normal 13px $OpenSans;
-                        padding: 10px 0 10px 30px;
-                        text-align: left;
-                        width: 48%;
-                    }
-                }
-                &.open {
-                    a {
-                        border-bottom: 0;
-
-                        &:before {
-                            border-top: 6px solid #ECECEC;
-                            border-right: 4px solid transparent;
-                            border-left: 4px solid transparent;
-                            margin-right: 8px;
-                            vertical-align: -3px;
-                        }
-                    }
-                    div.content {
-                        border-bottom: 1px solid #292929;
-                        padding-bottom: 10px;
-                    }
+                    border-bottom: 1px solid #292929;
+                    padding-bottom: 10px;
                 }
             }
         }
-        div.errors {
-            .error {
-                background: #F2DEDE url('../../../images/warning.png') 10px center no-repeat;
-                border: 1px solid #EED3D7;
-                border-left: 0;
-                bottom: 30%;
-                color: #B94A48;
-                display: block;
-                padding: 10px 20px 10px 36px;
-                position: fixed;
-                z-index: 49;
-                @include multi-border-radius(0, 2px, 2px, 0);
-            }
+    }
+    div.errors {
+        .error {
+            background: #F2DEDE url('../../../images/warning.png') 10px center no-repeat;
+            border: 1px solid #EED3D7;
+            border-left: 0;
+            bottom: 30%;
+            color: #B94A48;
+            display: block;
+            padding: 10px 20px 10px 36px;
+            position: fixed;
+            z-index: 49;
+            @include multi-border-radius(0, 2px, 2px, 0);
         }
     }
 }
