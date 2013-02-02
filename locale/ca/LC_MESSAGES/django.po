@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-01 00:24-0600\n"
-"PO-Revision-Date: 2013-02-01 06:41+0000\n"
+"POT-Creation-Date: 2013-02-02 00:23-0600\n"
+"PO-Revision-Date: 2013-02-02 06:39+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/universalsubtitles/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -22,11 +22,11 @@ msgstr ""
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/accountlinker/models.py:39
+#: apps/accountlinker/models.py:42
 msgid "Subtitles by the Amara.org community"
 msgstr "Subtítols per la comunitat Amara.org"
 
-#: apps/accountlinker/models.py:41
+#: apps/accountlinker/models.py:44
 msgid "Help us caption and translate this video on Amara.org"
 msgstr "Ajudeu-nos a etiquetar i traduir aquest vídeo a Amara.org"
 
@@ -40,6 +40,10 @@ msgid ""
 "href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
 " up a channel</a>?"
 msgstr "No hem pogut enllaçar el vostre compte. Heu <a href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>creat un canal</a>?"
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
+msgstr ""
 
 #: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
@@ -442,7 +446,7 @@ msgstr "Ja existeix l'idioma i no és una traducció"
 
 #: apps/subtitles/forms.py:104
 msgid "The language already exists as a translation from"
-msgstr ""
+msgstr "L'idioma ja existeix com a traducció del"
 
 #: apps/subtitles/forms.py:111
 #, python-format
@@ -1643,7 +1647,7 @@ msgstr "No podeu eliminar la URL primària"
 msgid "The language for %s has been changed"
 msgstr "L'idioma per a %s ha estat canviat"
 
-#: apps/videos/feed_parser/__init__.py:111
+#: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "El fil no està disponible ara."
 
@@ -3475,8 +3479,8 @@ msgid "User Details"
 msgstr "Detalls d'usuari"
 
 #: templates/profiles/account.html:28
-msgid "YouTube Account"
-msgstr "Compte YouTube"
+msgid "YouTube Sync"
+msgstr ""
 
 #: templates/profiles/account.html:37
 msgid "Link is active"
@@ -3562,8 +3566,8 @@ msgid "Link"
 msgstr "Enllaç"
 
 #: templates/profiles/account.html:158
-msgid "Enable Crowd Subtitles on your YouTube Channel (beta)"
-msgstr "Habilitar els subtítols públics al vostre canal YouTube (beta)"
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
+msgstr ""
 
 #: templates/profiles/account.html:168
 msgid "How We Enable Crowd Subtitles"

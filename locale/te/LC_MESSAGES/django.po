@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-01 00:24-0600\n"
-"PO-Revision-Date: 2013-02-01 06:40+0000\n"
+"POT-Creation-Date: 2013-02-02 00:23-0600\n"
+"PO-Revision-Date: 2013-02-02 06:39+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Telugu (http://www.transifex.com/projects/p/universalsubtitles/language/te/)\n"
 "MIME-Version: 1.0\n"
@@ -21,11 +21,11 @@ msgstr ""
 "Language: te\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/accountlinker/models.py:39
+#: apps/accountlinker/models.py:42
 msgid "Subtitles by the Amara.org community"
 msgstr ""
 
-#: apps/accountlinker/models.py:41
+#: apps/accountlinker/models.py:44
 msgid "Help us caption and translate this video on Amara.org"
 msgstr ""
 
@@ -38,6 +38,10 @@ msgid ""
 "We couldn't link your account. Have you <a "
 "href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
 " up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
 msgstr ""
 
 #: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
@@ -1642,7 +1646,7 @@ msgstr ""
 msgid "The language for %s has been changed"
 msgstr ""
 
-#: apps/videos/feed_parser/__init__.py:111
+#: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr ""
 
@@ -3474,7 +3478,7 @@ msgid "User Details"
 msgstr "వాడుకరి వివరాలు"
 
 #: templates/profiles/account.html:28
-msgid "YouTube Account"
+msgid "YouTube Sync"
 msgstr ""
 
 #: templates/profiles/account.html:37
@@ -3561,7 +3565,7 @@ msgid "Link"
 msgstr ""
 
 #: templates/profiles/account.html:158
-msgid "Enable Crowd Subtitles on your YouTube Channel (beta)"
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
 msgstr ""
 
 #: templates/profiles/account.html:168

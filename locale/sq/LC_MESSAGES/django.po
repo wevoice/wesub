@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-01 00:24-0600\n"
-"PO-Revision-Date: 2013-02-01 06:40+0000\n"
+"POT-Creation-Date: 2013-02-02 00:23-0600\n"
+"PO-Revision-Date: 2013-02-02 06:39+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/universalsubtitles/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/accountlinker/models.py:39
+#: apps/accountlinker/models.py:42
 msgid "Subtitles by the Amara.org community"
 msgstr "Titra nga bashkësia Amara.org"
 
-#: apps/accountlinker/models.py:41
+#: apps/accountlinker/models.py:44
 msgid "Help us caption and translate this video on Amara.org"
 msgstr "Na ndihmoni ta titrojmë dhe përkthejmë këtë video në Amara.org"
 
@@ -36,6 +36,10 @@ msgid ""
 "href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
 " up a channel</a>?"
 msgstr "Nuk e lidhëm dot llogarinë tuaj. A keni <a href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>rregulluar një kanal</a>?"
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
+msgstr ""
 
 #: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
@@ -1639,7 +1643,7 @@ msgstr "Nuk mund të hiqni URL-në origjinale"
 msgid "The language for %s has been changed"
 msgstr "Gjuha për %s është ndryshuar"
 
-#: apps/videos/feed_parser/__init__.py:111
+#: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "Prurja nuk funksionoka tani."
 
@@ -3471,8 +3475,8 @@ msgid "User Details"
 msgstr "Hollësi Përdoruesi"
 
 #: templates/profiles/account.html:28
-msgid "YouTube Account"
-msgstr "Llogari YouTube"
+msgid "YouTube Sync"
+msgstr ""
 
 #: templates/profiles/account.html:37
 msgid "Link is active"
@@ -3558,7 +3562,7 @@ msgid "Link"
 msgstr "Lidhje"
 
 #: templates/profiles/account.html:158
-msgid "Enable Crowd Subtitles on your YouTube Channel (beta)"
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
 msgstr ""
 
 #: templates/profiles/account.html:168
