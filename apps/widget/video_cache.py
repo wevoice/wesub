@@ -26,8 +26,7 @@ from django.utils.translation import (
 
 from videos.types import video_type_registrar
 from videos.types.base import VideoTypeError
-from libs.unilangs import unilangs
-
+import unilangs
 
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
