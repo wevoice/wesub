@@ -379,7 +379,7 @@
                                                                     {{ form.draft }}
 
                                                                     <p class="notation">
-                                                                        {% trans 'Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)' %}
+                                                                        {% trans 'Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)' %}
                                                                     </p>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -402,7 +402,6 @@
                                                                         <option value="">Select a format</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='srt' %}">SRT</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ssa' %}">SSA</option>
-                                                                        <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ttml' %}">TTML</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='txt' %}">TXT</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='sbv' %}">SBV</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='dfxp' %}">DFXP</option>
