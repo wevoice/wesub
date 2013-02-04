@@ -32,7 +32,6 @@ from .videos.types import (
 from teams.models import Team
 from teams.moderation_const import APPROVED, UNMODERATED
 from auth.models import CustomUser as User
-from django.db.models import Q
 
 from utils.metrics import Meter
 
@@ -74,11 +73,13 @@ def youtube_sync(video, language):
             Meter('youtube.push.request').inc()
 
 
-def get_linked_youtube_accounts(video):
+def get_linked_accounts_for_video(video):
     yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
-    usernames = [url.owner_username for url in yt_url]
-    return ThirdPartyAccount.objects.filter(
-            username__in=usernames)
+
+    if yt_url.exists():
+        return [ThirdPartyAccount.objects.resolve_ownership(u) for u in yt_url]
+
+    return None
 
 
 def check_authorization(video):
@@ -89,42 +90,22 @@ def check_authorization(video):
     Return a tuple of (is_authorized, ignore_new_syncing_logic).
     """
     team_video = video.get_team_video()
-    ignore_new_syncing_logic = False
 
-    if team_video:
-        team = team_video.team
-        has_linked_youtube_account = team.third_party_accounts.filter(
-                type=VIDEO_TYPE_YOUTUBE).exists()
+    linked_accounts = get_linked_accounts_for_video(video)
 
-        if has_linked_youtube_account:
-            # Ignore the new syncing logic.  Use the linked Youtube account
-            # to publish subtitles to Youtube.
-            ignore_new_syncing_logic = True
-        else:
-            # If the linked account is an individual account, we allow the
-            # sync.
-            linked_accounts = get_linked_youtube_accounts(video)
+    if all([a.is_team_account for a in linked_accounts]):
+        if not team_video:
+            return False, False
 
-            if any(a.is_individual_account for a in linked_accounts):
-                return True, ignore_new_syncing_logic
+        tpas_for_team = team_video.team.third_party_accounts.all()
 
-            # The assumption is that it's the partner's official Youtube
-            # account and they don't want it messed up with strange subs.
-            return False, None
-    else:
-        # If a video isn't part of a team but the video's Youtube URL is linked
-        # to a team third party account, we don't sync to Youtube.
-        yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
-        if yt_url.exists():
-            usernames = [url.owner_username for url in yt_url]
-            linked_accounts = ThirdPartyAccount.objects.filter(
-                    Q(full_name__in=usernames)|Q(username__in=usernames))
+        if any(tpa in tpas_for_team for tpa in linked_accounts):
+            return True, True
 
-            if linked_accounts.exists():
-                if any(a.is_team_account for a in linked_accounts):
-                    return False, None
+    if all([a.is_user_account for a in linked_accounts]):
+        return True, True
 
-    return True, ignore_new_syncing_logic
+    return False, False
 
 
 def can_be_synced(version):
