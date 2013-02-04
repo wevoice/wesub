@@ -2597,13 +2597,13 @@ class VideoFeed(models.Model):
         checked_entries += self._create_videos(feed_parser, last_link)
 
         if not last_link and 'youtube' in self.url:
-            next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
 
             while next_url:
                 url = next_url[0].href
                 feed_parser = FeedParser(url)
                 checked_entries += self._create_videos(feed_parser, last_link)
-                next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+                next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
 
         return checked_entries
 
