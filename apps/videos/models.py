@@ -175,6 +175,9 @@ class Video(models.Model):
     # directely
     is_public = models.BooleanField(default=True)
 
+    primary_audio_language_code = models.CharField(max_length=16, blank=True,
+                                                   default='',
+                                                   choices=ALL_LANGUAGES)
 
     objects = models.Manager()
     public  = PublicVideoManager()
@@ -399,9 +402,13 @@ class Video(models.Model):
         return vurl.effective_url if vurl else None
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, fetch_subs_async=True):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
+        from videos.tasks import (
+            save_thumbnail_in_s3,
+            add_amara_description_credit_to_youtube_video
+        )
 
         try:
             vt = vt or video_type_registrar.video_type_for_url(video_url)
@@ -427,23 +434,17 @@ class Video(models.Model):
                 return video_url_obj.video, False
             except VideoUrl.DoesNotExist:
                 obj = Video()
-                obj = vt.set_values(obj)
+                # video types can can fecth subtitles might do it async:
+                kwargs = {}
+                if vt.CAN_IMPORT_SUBTITLES:
+                    kwargs['fetch_subs_async'] = fetch_subs_async
+                obj = vt.set_values(obj, **kwargs)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
                 obj.save()
 
-                from videos.tasks import (
-                    save_thumbnail_in_s3,
-                    add_amara_description_credit_to_youtube_video
-                )
-
                 save_thumbnail_in_s3.delay(obj.pk)
-
-                if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
-                    add_amara_description_credit_to_youtube_video.delay(
-                            obj.video_id)
-
                 Action.create_video_handler(obj, user)
 
                 #Save video url
@@ -475,6 +476,12 @@ class Video(models.Model):
             if hasattr(vt, 'username'):
                 video_url_obj.owner_username = vt.username
                 video_url_obj.save()
+
+        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+            # Only try to update the Youtube description once we have made sure
+            # that we have set the owner_username.
+            add_amara_description_credit_to_youtube_video.delay(video.video_id)
+
         return video, created
 
     @property
@@ -921,6 +928,13 @@ class SubtitleLanguage(models.Model):
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
 
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                              related_name='old_subtitle_version',
+                                              null=True, blank=True,
+                                              editable=False)
+
     subtitles_fetched_counter = RedisSimpleField()
 
     class Meta:
@@ -1193,6 +1207,11 @@ class SubtitleLanguage(models.Model):
         self.save()
 
     def save(self, updates_timestamp=True, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         if updates_timestamp:
             self.created = datetime.now()
         if self.language:
@@ -1434,6 +1453,13 @@ class SubtitleVersion(SubtitleCollection):
     title = models.CharField(max_length=2048, blank=True)
     description = models.TextField(blank=True, null=True)
 
+    # Fields for the big DMR migration.
+    needs_sync = models.BooleanField(default=True, editable=False)
+    new_subtitle_version = models.OneToOneField('subtitles.SubtitleVersion',
+                                                related_name='old_subtitle_version',
+                                                null=True, blank=True,
+                                                editable=False)
+
     objects = SubtitleVersionManager()
 
     class Meta:
@@ -1444,7 +1470,12 @@ class SubtitleVersion(SubtitleCollection):
     def __unicode__(self):
         return u'%s #%s' % (self.language, self.version_no)
 
-    def save(self,  *args, **kwargs):
+    def save(self, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
         created = not self.pk
         super(SubtitleVersion, self).save(*args, **kwargs)
         if created:
@@ -2263,6 +2294,7 @@ class Action(models.Model):
     user = models.ForeignKey(User, null=True, blank=True)
     video = models.ForeignKey(Video, null=True, blank=True)
     language = models.ForeignKey(SubtitleLanguage, blank=True, null=True)
+    new_language = models.ForeignKey('subtitles.SubtitleLanguage', blank=True, null=True)
     team = models.ForeignKey("teams.Team", blank=True, null=True)
     member = models.ForeignKey("teams.TeamMember", blank=True, null=True)
     comment = models.ForeignKey(Comment, blank=True, null=True)
@@ -2573,6 +2605,8 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
+    YOUTUBE_PAGE_SIZE = 25
+
     def __unicode__(self):
         return self.url
 
@@ -2588,6 +2622,32 @@ class VideoFeed(models.Model):
         except (IndexError, KeyError):
             pass
 
+        checked_entries += self._create_videos(feed_parser, last_link)
+
+        if not last_link and 'youtube' in self.url:
+            next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+
+            while next_url:
+                url = next_url[0].href
+                feed_parser = FeedParser(url)
+                checked_entries += self._create_videos(feed_parser, last_link)
+                next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+
+        return checked_entries
+
+    def _get_pages(self, total):
+        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
+
+        if pages > int(pages):
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+
+        return pages
+
+    def _create_videos(self, feed_parser, last_link):
+        checked_entries = 0
+
         _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
@@ -2595,4 +2655,3 @@ class VideoFeed(models.Model):
             checked_entries += 1
 
         return checked_entries
-

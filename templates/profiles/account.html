@@ -25,7 +25,7 @@
             </fieldset>
             <div class="grid_8 alpha third-party">
                 <fieldset>
-                    <h3>{% trans "YouTube Account" %}</h3>
+                    <h3>{% trans "YouTube Sync" %}</h3>
                     <div class="callout">
                         {% if third_party %}
                             {% for account in third_party  %}
@@ -35,7 +35,7 @@
                                 <p>
                                     <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
                                     <strong>{% trans "Link is active" %}</strong>
-                                    <span> for {{ account.username }}.</span>
+                                    <span> for {{ account.full_name }}.</span>
                                 </p>
                             {% endfor %}
                         {% else %}
@@ -43,7 +43,7 @@
                                 <span>Connect to</span>
                                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
                             </a>
-                            <p>{% trans "Enable Amara crowd subtitles on your personal YouTube channel" %}</p>
+                            <p>{% trans "Enable Amara crowd subtitles on your personal YouTube channel (beta)" %}</p>
                         {% endif %}
                     </div>
                 </fieldset>
@@ -155,7 +155,7 @@
         <div class="modal" id="youtube-modal">
             <div class="modal-header">
                 <a href="#" class="close">x</a>
-                <h3>{% trans 'Enable Crowd Subtitles on your YouTube Channel' %}</h3>
+                <h3>{% trans 'Enable Crowd Subtitles on your Personal YouTube Channel (beta)' %}</h3>
             </div>
 
                 <form method="get" action="{% url profiles:add-third-party %}">

@@ -23,6 +23,7 @@ from urlparse import urlparse
 import requests
 
 import gdata.youtube.client
+from gdata.youtube.client import YouTubeError
 import httplib2
 from celery.task import task
 from django.conf import settings
@@ -44,6 +45,8 @@ from libs.unilangs.unilangs import LanguageCode
 logger = logging.getLogger("youtube")
 
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
+YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
+    'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
 
 _('Private video')
@@ -78,7 +81,18 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
 
     yt_lc = lang.get('lang_code')
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+
+    try:
+        lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    except KeyError:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": yt_lc,
+                "youtube_id": youtube_id,
+            }
+        })
+        return
+
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
@@ -143,8 +157,15 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         subtitle.version = version
         subtitle.subtitle_id = int(random.random()*10e12)
         subtitle.subtitle_order = i+1
+
+        try:
+            assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+        except AssertionError:
+            # Don't bother saving the subtitle if it's not synced
+            continue
+
         subtitle.save()
-        assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+
     version.finished = True
     version.save()
 
@@ -223,7 +244,9 @@ class YoutubeVideoType(VideoType):
 
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
-    
+
+    CAN_IMPORT_SUBTITLES = True
+
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -257,10 +280,12 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj):
-        video_obj.title = self.entry.media.title.text or ''
+    def set_values(self, video_obj, fetch_subs_async=True):
+        video_obj.title =  self.entry.media.title.text or ''
+        description = ''
         if self.entry.media.description:
-            video_obj.description = self.entry.media.description.text or ''
+            description =  self.entry.media.description.text or ''
+        video_obj.description = description
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
@@ -273,7 +298,7 @@ class YoutubeVideoType(VideoType):
         Meter('youtube.video_imported').inc()
 
         try:
-            self.get_subtitles(video_obj)
+            self.get_subtitles(video_obj, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
@@ -343,17 +368,25 @@ class YoutubeVideoType(VideoType):
 
         return output
 
-    def get_subtitles(self, video_obj):
+    def get_subtitles(self, video_obj, async=True):
         langs = self.get_subtitled_languages()
 
+        if async:
+            func = save_subtitles_for_lang.delay
+        else:
+            func = save_subtitles_for_lang.run
         for item in langs:
-            save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
+        # Because somehow Django's ORM is case insensitive on CharFields.
+        is_always = (third_party_account.full_name.lower() == 
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower() or
+                     third_party_account.username.lower() ==
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower())
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
-                                  third_party_account.oauth_refresh_token,
-                                  self.videoid)
+            third_party_account.oauth_refresh_token, self.videoid, is_always)
 
     def update_subtitles(self, subtitle_version, third_party_account):
         """
@@ -374,7 +407,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
     upload_uri_base = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
 
-    def __init__(self, access_token, refresh_token, youtube_video_id):
+    def __init__(self, access_token, refresh_token, youtube_video_id,
+            is_always_push_account=False):
         """
         A wrapper around the gdata client, to make life easier.
         In order to edit captions for a video, the oauth credentials
@@ -394,6 +428,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         )
         self.token.authorize(self)
         self.youtube_video_id  = youtube_video_id
+        self.is_always_push_account = is_always_push_account
 
     def request(self, *args, **kwargs):
         """
@@ -423,7 +458,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         }
 
         r = requests.post(url, data=data)
-        self.access_token = r.json.get('access_token')
+        self.access_token = r.json and r.json.get('access_token')
 
     def _get_captions_info(self):
         """
@@ -458,6 +493,12 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         return self.captions
 
+    def get_user_profile(self, username=None):
+        if not username:
+            raise YouTubeError("You need to pass a username")
+        uri = '%s%s' % (gdata.youtube.client.YOUTUBE_USER_FEED_URI, username)
+        return self.get_feed(uri, desired_class=gdata.youtube.data.UserProfileEntry)
+
     def upload_captions(self, subtitle_version):
         """
         Will upload the subtitle version to this youtube video id.
@@ -478,8 +519,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         handler = GenerateSubtitlesHandler.get('srt')
         subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
 
-        subs = add_credit(subtitle_version, subs)
-        self.add_credit_to_description(subtitle_version.language.video)
+        if not self.is_always_push_account:
+            subs = add_credit(subtitle_version, subs)
+            self.add_credit_to_description(subtitle_version.language.video)
 
         content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
         title = ""
@@ -509,11 +551,17 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
+        from accountlinker.models import add_amara_description_credit, check_authorization
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
+
         if not should_add_credit(video=video):
             return False
 
-        from accountlinker.models import add_amara_description_credit
-        from apps.videos.templatetags.videos_tags import shortlink_for_video
+        is_authorized, _ = check_authorization(video)
+
+        if not is_authorized:
+            return False
+
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
@@ -521,6 +569,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         entry = gdata.youtube.YouTubeVideoEntryFromString(entry)
 
         old_description = entry.media.description.text
+
+        if old_description:
+            old_description = old_description.decode("utf-8")
 
         video_url = shortlink_for_video(video)
 

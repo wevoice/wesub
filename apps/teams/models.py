@@ -50,6 +50,9 @@ from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from subtitles.models import (
+    SubtitleVersion as NewSubtitleVersion,
+)
 
 from functools import partial
 
@@ -636,7 +639,6 @@ class TeamVideo(models.Model):
     # this is an auto_add like field, but done on the model save so the
     # admin doesn't throw a fit
     created = models.DateTimeField(blank=True)
-    completed_languages = models.ManyToManyField(SubtitleLanguage, blank=True)
     partner_id = models.CharField(max_length=100, blank=True, default="")
 
     project = models.ForeignKey(Project)
@@ -778,7 +780,7 @@ class TeamVideo(models.Model):
                 destination_team=new_team, video=self.video)
 
 
-def _create_translation_tasks(team_video, subtitle_version):
+def _create_translation_tasks(team_video, subtitle_version=None):
     """Create any translation tasks that should be autocreated for this video.
 
     subtitle_version should be the original SubtitleVersion that these tasks
@@ -804,8 +806,8 @@ def _create_translation_tasks(team_video, subtitle_version):
 
         # Otherwise, go ahead and create it.
         task = Task(team=team_video.team, team_video=team_video,
-                    subtitle_version=subtitle_version,
                     language=lang, type=Task.TYPE_IDS['Translate'])
+        task.subtitle_version = subtitle_version or task.get_subtitle_version()
         # we should only update the team video after all tasks for
         # this video are saved, else we end up with a lot of
         # wasted tasks
@@ -836,7 +838,7 @@ def autocreate_tasks(team_video):
     #       new team for translation, but we can probably be smarter about this
     #       if we spend some time.
     if workflow.autocreate_translate and existing_subtitles:
-        _create_translation_tasks(team_video, existing_subtitles[0].latest_version())
+        _create_translation_tasks(team_video)
 
 
 def team_video_save(sender, instance, created, **kwargs):
@@ -1592,6 +1594,8 @@ class Task(models.Model):
                                 db_index=True)
     assignee = models.ForeignKey(User, blank=True, null=True)
     subtitle_version = models.ForeignKey(SubtitleVersion, blank=True, null=True)
+    new_subtitle_version = models.ForeignKey(NewSubtitleVersion,
+                                             blank=True, null=True)
 
     # The original source version being reviewed or approved.
     #
@@ -1621,6 +1625,9 @@ class Task(models.Model):
     # future as well.
     review_base_version = models.ForeignKey(SubtitleVersion, blank=True,
                                             null=True, related_name='tasks_based_on')
+    new_review_base_version = models.ForeignKey(NewSubtitleVersion, blank=True,
+                                                null=True,
+                                                related_name='tasks_based_on_new')
 
     deleted = models.BooleanField(default=False)
 

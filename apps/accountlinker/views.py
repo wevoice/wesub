@@ -134,7 +134,7 @@ def youtube_oauth_callback(request):
     bridge = YouTubeApiBridge(content['access_token'], content['refresh_token'], None) 
 
     try:
-        feed = bridge.GetUserFeed(username='default')
+        feed = bridge.get_user_profile(username='default')
     except Unauthorized:
         messages.error(request,
             _("We couldn't link your account. Have you <a href="
@@ -143,18 +143,20 @@ def youtube_oauth_callback(request):
         return redirect(reverse("profiles:account"))
 
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
+    username = [x for x in feed.get_elements() if x.tag == 'username'][0].text
     
     # make sure we don't store multiple auth tokes for the same account
     account, created = ThirdPartyAccount.objects.get_or_create(
         type=VIDEO_TYPE_YOUTUBE,
-        username=author.name.text,
+        username=username,
         defaults={
             'oauth_refresh_token': content['refresh_token'],
             'oauth_access_token': content['access_token'],
+            'full_name': author.name.text
         }
     )
 
-    if not created:
+    if not created and not team and user:
         messages.error(request, _("Account already linked."))
         return redirect('/')
 
