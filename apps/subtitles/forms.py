@@ -34,7 +34,6 @@ from utils.templatetags.i18n_tags import to_localized_display
 
 
 SUBTITLE_FILESIZE_LIMIT_KB = 512
-SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
 
 
 class SubtitlesUploadForm(forms.Form):
@@ -99,9 +98,8 @@ class SubtitlesUploadForm(forms.Form):
             # allow that until our UI can handle showing different reference
             # languages
             elif existing_from_language_code and existing_from_language_code != from_language_code:
-                language_name = to_localized_display(existing_from_language_code)
                 raise forms.ValidationError(_(
-                    u"The language already exists as a translation from" % language_name))
+                    u"The language already exists as a translation from %s." % existing_from_language_code.get_language_code_display()))
 
     def _verify_no_dependents(self, subtitle_language):
         # You cannot upload to a language with dependents.
