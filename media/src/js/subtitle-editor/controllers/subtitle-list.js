@@ -103,9 +103,13 @@
 
             $event.preventDefault();
 
-            // TODO: Need a redirect URL.
+            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
+
+            $scope.$root.$emit('show-loading-modal', 'Canceled. Redirecting…');
+            window.location = '/videos/' + subtitleListScope.videoID;
+
         };
-        $scope.saveAndExit = function($event) { 
+        $scope.saveAndExit = function($event) {
 
             $event.preventDefault();
 
