@@ -16,6 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+
 (function() {
 
     var root = this;
@@ -97,7 +99,7 @@
 
         $scope.$watch('version', $scope.versionChanged);
     };
-    var SaveSessionButtonController = function($scope, SubtitleListFinder) {
+    var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
         $scope.cancel = function($event) {
 
@@ -107,6 +109,27 @@
 
             $scope.$root.$emit('show-loading-modal', 'Canceled. Redirecting…');
             window.location = '/videos/' + subtitleListScope.videoID;
+
+        };
+        $scope.getNotes = function() {
+            var collabScope = angular.element($('section.collab').get(0)).scope();
+            return collabScope.notes || '';
+        };
+        $scope.saveAndApprove = function($event) {
+
+            $scope.saveSession().then(function(response) {
+                if ($scope.status === 'saved') {
+
+                    $scope.status = 'approving';
+
+                    SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
+
+                    }, function onError() {
+                        $scope.status = 'error';
+                        window.alert('Sorry, there was an error...');
+                    });
+                }
+            });
 
         };
         $scope.saveAndExit = function($event) {
@@ -119,8 +142,22 @@
                     $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
                     window.location = response['data']['site_url'];
 
-                } else if ($scope.status === 'error') {
-                    window.alert('Sorry, there was an error...');
+                }
+            });
+        };
+        $scope.saveAndSendBack = function() {
+            $scope.saveSession().then(function(response) {
+                if ($scope.status === 'saved') {
+
+                    $scope.status = 'sending-back';
+
+                    SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
+
+                    }, function onError() {
+                        $scope.status = 'error';
+                        window.alert('Sorry, there was an error...');
+                    });
+
                 }
             });
         };
@@ -134,6 +171,7 @@
                     $scope.status = 'saved';
                 }, function onError() {
                     $scope.status = 'error';
+                    window.alert('Sorry, there was an error...');
                 });
 
                 return promise;
@@ -144,10 +182,17 @@
             $event.preventDefault();
         };
 
+        $scope.$root.$on('approve-task', function() {
+            $scope.saveAndApprove();
+        });
+        $scope.$root.$on('send-back-task', function() {
+            $scope.saveAndSendBack();
+        });
         $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
+
     };
     var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
         /**
@@ -311,7 +356,7 @@
     };
 
     root.LanguageSelectorController = LanguageSelectorController;
-    root.SaveSessionButtonController = SaveSessionButtonController;
+    root.SaveSessionController = SaveSessionController;
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListHelperController = SubtitleListHelperController;
     root.SubtitleListItemController = SubtitleListItemController;

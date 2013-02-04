@@ -111,6 +111,11 @@
             getVideoURL: function() {
                 return cachedData.video.videoURL;
             },
+
+            approveTask: function(response, notes) {
+            },
+            sendBackTask: function(response, notes) {
+            },
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally
                 //
@@ -174,4 +179,5 @@
             }
         };
     });
+
 }).call(this);

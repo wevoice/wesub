@@ -50,6 +50,7 @@
 
         $scope.approve = function($event) {
             $event.preventDefault();
+            $scope.$root.$emit('approve-task');
         };
         $scope.toggleModule = function($event, module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
@@ -57,6 +58,7 @@
         };
         $scope.sendBack = function($event) {
             $event.preventDefault();
+            $scope.$root.$emit('send-back-task');
         };
 
         $scope.$root.$on('subtitleKeyUp', function($event, options) {
