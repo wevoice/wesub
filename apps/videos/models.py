@@ -399,9 +399,13 @@ class Video(models.Model):
         return vurl.effective_url if vurl else None
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, fetch_subs_async=True):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
+        from videos.tasks import (
+            save_thumbnail_in_s3,
+            add_amara_description_credit_to_youtube_video
+        )
 
         try:
             vt = vt or video_type_registrar.video_type_for_url(video_url)
@@ -427,15 +431,17 @@ class Video(models.Model):
                 return video_url_obj.video, False
             except VideoUrl.DoesNotExist:
                 obj = Video()
-                obj = vt.set_values(obj)
+                # video types can can fecth subtitles might do it async:
+                kwargs = {}
+                if vt.CAN_IMPORT_SUBTITLES:
+                    kwargs['fetch_subs_async'] = fetch_subs_async
+                obj = vt.set_values(obj, **kwargs)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
                 obj.save()
 
-                from videos.tasks import save_thumbnail_in_s3
                 save_thumbnail_in_s3.delay(obj.pk)
-
                 Action.create_video_handler(obj, user)
 
                 #Save video url
@@ -467,6 +473,12 @@ class Video(models.Model):
             if hasattr(vt, 'username'):
                 video_url_obj.owner_username = vt.username
                 video_url_obj.save()
+
+        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+            # Only try to update the Youtube description once we have made sure
+            # that we have set the owner_username.
+            add_amara_description_credit_to_youtube_video.delay(video.video_id)
+
         return video, created
 
     @property
@@ -1232,6 +1244,19 @@ class SubtitleLanguage(models.Model):
     @property
     def first_approved_version(self):
         return self.first_version_with_status(APPROVED)
+
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.all()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -2552,6 +2577,8 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
+    YOUTUBE_PAGE_SIZE = 25
+
     def __unicode__(self):
         return self.url
 
@@ -2567,11 +2594,36 @@ class VideoFeed(models.Model):
         except (IndexError, KeyError):
             pass
 
-        _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
+        checked_entries += self._create_videos(feed_parser, last_link)
+
+        if not last_link and 'youtube' in self.url:
+            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+
+            while next_url:
+                url = next_url[0].href
+                feed_parser = FeedParser(url)
+                checked_entries += self._create_videos(feed_parser, last_link)
+                next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+
+        return checked_entries
+
+    def _get_pages(self, total):
+        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
+
+        if pages > int(pages):
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+
+        return pages
+
+    def _create_videos(self, feed_parser, last_link):
+        checked_entries = 0
+
+        _iter = feed_parser.items(since=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
             vt and Video.get_or_create_for_url(vt=vt, user=self.user)
             checked_entries += 1
 
         return checked_entries
-

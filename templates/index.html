@@ -16,41 +16,45 @@
     
 <div id="home-blurb">
     <h1>{% trans "The easiest way to caption and translate any video." %}</h1>
-    <p>{% trans "Subtitles make videos more powerful, more global, and more searchable." %}</p>
+    <p>{% trans "The most powerful and flexible subtitling platform in the world." %}</p>
 </div>
 <div id="home-left">
     <div id="subtitle" class="clearfix">
         <form action="{% url videos:create %}" method="POST">
-            <h2>{% trans "Subtitle a Video Now" %}</h2>
+            <h2>{% trans "Add a Video" %}</h2>
             <input type="text" name="video_url" />
             <button class="button" type="submit">{% trans "Subtitle" %}</button>
-            <p>{% trans "Works with YouTube, Vimeo, HTML5, and more." %}</p>
+            <p>
+                {% trans "Works with YouTube, Vimeo, HTML5, and more." %}
+            </p>
+            <p>
+                {% trans "Using YouTube?" %} <a href="{% url profiles:account %}?prompt=true">{% trans "Sync automatically" %}</a>
+            </p>
         </form>
         <div id="features">
             <h3>{% trans "Features" %}</h3>
             <ul>
                 <li>{% trans "Embed the video anywhere" %}</li>
                 <li>{% trans "Add subtitles yourself or ask viewers to help." %}</li>
-                <li><a href="https://github.com/pculture/unisubs/wiki/Widgetizer-Script---for-YouTube-and-HTML5">{% trans "Full site integration" %}</a></li>
             </ul>
         </div>
     </div>
     <div>
-        <h2>{% trans "Volunteers Needed" %}</h2>
+        <h2>{% trans "Help Create Captions and Subtitles" %}</h2>
         <p>
         {% blocktrans %}
-            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. 
+            Help organizations and deaf and hard of hearing viewers make videos accessible around the world.
         {% endblocktrans %}
-        <a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Start volunteering." %}</a>
+        <a href="http://blog.universalsubtitles.org/volunteer/">{% trans "Take a Look." %}</a>
         </p>
     </div>
     <div>
-        <h2>{% trans "Complete Subtitling Solutions" %}</h2>
+        <h2>{% trans "Groundbreaking Crowdsource Platform" %}</h2>
         <p>
         {% blocktrans %}
-            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.
+            Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.
         {% endblocktrans %}
-        <a href="http://about.amara.org/enterprise/">{% trans "See our enterprise services." %}</a>
+        <a href="http://about.amara.org/enterprise/">{% trans "See our pro services." %}</a>
         </p>
     </div>
 </div>
@@ -137,7 +141,7 @@
         <a href="http://www.soros.org/"><img src="{{ STATIC_URL }}images/funders/opensociety.png" alt="Open Society Foundations"/></a></p>
     </div>
     <div id="recognition" class="grid_5 omega">
-        <p>Recognized by<br />
+        <p>{% trans "Awards for Amara" %}<br />
         <a href="/about#fcc-award"><img src="{{ STATIC_URL }}images/awards/fcc.png" alt="FCC Award Advancement in Accessibility"/></a>
         <a href="/about#tech-award"><img src="{{ STATIC_URL }}images/awards/tech_awards.png" alt="Tech Awards 2011"/></a>
         <a href="/about#iia-award"><img src="{{ STATIC_URL }}images/awards/iia.png" alt="Intercultural Innovation Award"/></a></p>

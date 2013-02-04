@@ -28,7 +28,22 @@ from videos.models import Video, VideoUrl, SubtitleLanguage
 from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
 from tasks import get_youtube_data
+from apps.testhelpers import views as helpers
 
+from mock import Mock, MagicMock
+
+def _set_subtitles(video, language, original, complete, translations=[]):
+    translations = [{'code': lang, 'is_original': False, 'is_complete': True,
+                     'num_subs': 1} for lang in translations]
+
+    data = {'code': language, 'is_original': original, 'is_complete': complete,
+            'num_subs': 1, 'translations': translations}
+
+    helpers._add_lang_to_video(video, data, None)
+
+def assert_update_subtitles(version_or_language, account):
+    assert version_or_language != None
+    assert account != None
 
 class AccountTest(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
@@ -280,3 +295,50 @@ class AccountTest(TestCase):
 
         is_authorized, _ = check_authorization(video)
         self.assertTrue(is_authorized)
+
+    def test_resolve_ownership(self):
+        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
+
+        tpa1 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
+                                 username='PCFQA', full_name='PCFQA', type='Y')
+        tpa1.save()
+
+        tpa2 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='',
+                                 username='PCFQA_not_this_one', full_name='PCFQA', type='Y')
+        tpa2.save()
+
+        video_url = video.get_primary_videourl_obj()
+        owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
+
+        self.assertEquals(owner.username, 'PCFQA')
+        self.assertEquals(owner.full_name, 'PCFQA')
+        self.assertEquals(owner.type, 'Y')
+
+        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=9bZkp7q19f0')
+
+        video_url = video.get_primary_videourl_obj()
+        owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
+
+        self.assertEquals(owner, None)
+
+    def test_mirror_on_third_party(self):
+        from videos.types import UPDATE_VERSION_ACTION
+        from videos.types import video_type_registrar
+        from videos.types.youtube import YoutubeVideoType
+
+        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
+        tpa = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
+                                 username='PCFQA', full_name='PCFQA', type='Y')
+        tpa.save()
+
+        _set_subtitles(video, 'en', True, True, [])
+        language = video.subtitle_language('en')
+        version = language.subtitleversion_set.all()[0]
+
+        youtube_type_mock = Mock(spec=YoutubeVideoType)
+        video_type_registrar.video_type_for_url = Mock()
+        video_type_registrar.video_type_for_url.return_value = youtube_type_mock
+
+        ThirdPartyAccount.objects.mirror_on_third_party(video, 'en', UPDATE_VERSION_ACTION, version)
+
+        youtube_type_mock.update_subtitles.assert_called_once_with(version, tpa)
