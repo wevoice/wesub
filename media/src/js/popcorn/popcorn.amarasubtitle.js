@@ -1,3 +1,5 @@
+var Popcorn = Popcorn || null;
+
 (function (Popcorn) {
 
     var i = 0;
@@ -37,7 +39,6 @@
                 // use shared default container
                 options.container = this.container;
             }
-
             if (document.getElementById(options.container.id)) {
                 document.getElementById(options.container.id).appendChild(newdiv);
             }
