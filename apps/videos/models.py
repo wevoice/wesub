@@ -2620,7 +2620,7 @@ class VideoFeed(models.Model):
     def _create_videos(self, feed_parser, last_link):
         checked_entries = 0
 
-        _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
+        _iter = feed_parser.items(since=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
             vt and Video.get_or_create_for_url(vt=vt, user=self.user)
