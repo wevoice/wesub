@@ -109,11 +109,14 @@
 
             $event.preventDefault();
 
-            $scope.saveSession().then(function() {
+            $scope.saveSession().then(function(response) {
                 if ($scope.status === 'saved') {
 
-                    // TODO: Need a redirect URL.
+                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
+                    window.location = response['data']['site_url'];
 
+                } else if ($scope.status === 'error') {
+                    window.alert('Sorry, there was an error...');
                 }
             });
         };
@@ -125,11 +128,8 @@
 
                 promise.then(function onSuccess(response) {
                     $scope.status = 'saved';
-                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
-                    window.location = response['data']['site_url'];
                 }, function onError() {
                     $scope.status = 'error';
-                    window.alert('Sorry, there was an error...');
                 });
 
                 return promise;
