@@ -16,21 +16,21 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+
 (function() {
     /*
      * When you request a set of subtitles the api is hit if data is not yet on
      * the cache.
      */
 
-    var root, module, API_BASE_PATH;
-    var getSubtitleFetchAPIUrl, getSubtitleSaveAPIUrl, getVideoLangAPIUrl;
+    var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
+    var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
+    var root = this;
+    var module = angular.module('amara.SubtitleEditor.services', []);
 
-    API_BASE_PATH = '/api2/partners/videos/';
-    root = this;
-    module = angular.module('amara.SubtitleEditor.services', []);
-
-    getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
-        var url = API_BASE_PATH + videoId +
+    var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
+        var url = API_BASE_PATH_VIDEOS + videoId +
             '/languages/' + languageCode + '/subtitles/?format=dfxp';
 
         if (versionNumber) {
@@ -38,13 +38,16 @@
         }
         return url;
     };
-    getSubtitleSaveAPIUrl = function(videoId, languageCode) {
-        var url = API_BASE_PATH + videoId +
+    var getSubtitleSaveAPIUrl = function(videoId, languageCode) {
+        var url = API_BASE_PATH_VIDEOS + videoId +
             '/languages/' + languageCode + '/subtitles/';
         return url;
     };
-    getVideoLangAPIUrl = function(videoId) {
-        return API_BASE_PATH + videoId + '/languages/';
+    var getTaskSaveAPIUrl = function(teamSlug, taskID) {
+        return API_BASE_PATH_TEAMS + teamSlug + '/tasks/' + taskID + '/';
+    };
+    var getVideoLangAPIUrl = function(videoId) {
+        return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
 
     module.factory('SubtitleStorage', function($http) {
@@ -113,8 +116,26 @@
             },
 
             approveTask: function(response, notes) {
+                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+
+
+                // TODO: We need to complete the task.
+                //
+                // Can I just send a PUT to the task API URL?
+                // Does "completed" need to be true?
+                //var promise = $http({
+                    //method: 'PUT',
+                    //url: url,
+                    //headers: authHeaders,
+                    //data:  {
+                        //approved: 20
+                    //}
+                //});
+
+                //return promise;
             },
             sendBackTask: function(response, notes) {
+                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
             },
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally
