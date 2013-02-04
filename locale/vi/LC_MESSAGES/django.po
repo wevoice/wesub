@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 00:10-0600\n"
-"PO-Revision-Date: 2013-01-26 07:04+0000\n"
+"POT-Creation-Date: 2013-02-04 00:08-0600\n"
+"PO-Revision-Date: 2013-02-02 06:39+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/vi/)\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/accountlinker/models.py:39
+#: apps/accountlinker/models.py:42
 msgid "Subtitles by the Amara.org community"
 msgstr ""
 
-#: apps/accountlinker/models.py:41
+#: apps/accountlinker/models.py:44
 msgid "Help us caption and translate this video on Amara.org"
 msgstr ""
 
@@ -36,6 +36,10 @@ msgid ""
 "We couldn't link your account. Have you <a href='https://accounts.google.com/"
 "ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
 "create_channel'>set up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
 msgstr ""
 
 #: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
@@ -430,7 +434,7 @@ msgstr "Thống kê lượt xem phim"
 msgid "Widget view statistic"
 msgstr "Thống kê lượt xem Widget"
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:83 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
@@ -439,11 +443,15 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi công việc thực "
 "hiện trên ngôn ngữ này vẫn đang được tiếp diễn."
 
-#: apps/subtitles/forms.py:96
+#: apps/subtitles/forms.py:97
 msgid "The language already exists and is not a translation."
 msgstr "Ngôn ngữ đã tồn tại và không phải là bản dịch."
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:104
+msgid "The language already exists as a translation from"
+msgstr ""
+
+#: apps/subtitles/forms.py:111
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
@@ -452,7 +460,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề cho ngôn ngữ này lên được bởi việc "
 "này sẽ làm phân li bản dịch %s được thực hiện từ nó."
 
-#: apps/subtitles/forms.py:122
+#: apps/subtitles/forms.py:130
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
@@ -460,7 +468,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi một người dùng "
 "khác đã được phân công cho ngôn ngữ này."
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:137
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
@@ -468,7 +476,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi bạn không được "
 "phép khai thác cho ngôn ngữ này."
 
-#: apps/subtitles/forms.py:140 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:148 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
@@ -476,7 +484,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi một bản phác "
 "thảo cho ngôn ngữ này đã và đang trong quá trình đánh giá."
 
-#: apps/subtitles/forms.py:152
+#: apps/subtitles/forms.py:160
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
@@ -484,7 +492,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi ngôn ngữ này "
 "hiện đang chịu sự kiểm soát và bạn không được phép chuyển thể phụ đề."
 
-#: apps/subtitles/forms.py:160
+#: apps/subtitles/forms.py:168
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
@@ -492,7 +500,7 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi ngôn ngữ này "
 "hiện đang chịu sự kiểm soát và bạn không được phép dịch phụ đề."
 
-#: apps/subtitles/forms.py:173
+#: apps/subtitles/forms.py:181
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -500,22 +508,22 @@ msgstr ""
 "Xin lỗi, chúng tôi không thể tải phụ đề của bạn lên được bởi số dòng trong "
 "bản dịch ({0}) của bạn không khớp với bản gốc ({1})."
 
-#: apps/subtitles/forms.py:184
+#: apps/subtitles/forms.py:192
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr "Kích thước tập tin phải nhỏ hơn %d kb."
 
-#: apps/subtitles/forms.py:192
+#: apps/subtitles/forms.py:200
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr "Định dạng không hỗ trợ. Xin hãy tải lên một trong các dạng sau: %s"
 
-#: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:207 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Không thể nhận dạng bộ hoán mã tập tin"
 
-#: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:230 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 "Hiện giờ có một ai đó đang tạo phụ đề cho đoạn phim này. Hãy thử lại sau."
@@ -541,13 +549,13 @@ msgstr ""
 "Xin lỗi, bạn không được phép chỉnh sửa những phụ đề này. Nếu bạn tin rằng "
 "chúng cần được đính chính, xin hãy liên hệ với người quản trị nhóm."
 
-#: apps/subtitles/views.py:125
+#: apps/subtitles/views.py:126
 msgid ""
 "You can't edit because there is a task for this language and you can't "
 "complete it."
 msgstr ""
 
-#: apps/subtitles/views.py:149
+#: apps/subtitles/views.py:150
 msgid "You can't edit this subtitle because it's locked"
 msgstr ""
 
@@ -1781,7 +1789,7 @@ msgstr "Bạn không thể loại bỏ đường dẫn URL chính"
 msgid "The language for %s has been changed"
 msgstr ""
 
-#: apps/videos/feed_parser/__init__.py:111
+#: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "Hiện giờ Feed không thể hoạt động."
 
@@ -4290,7 +4298,7 @@ msgid "User Details"
 msgstr "Thông tin chi tiết Người dùng"
 
 #: templates/profiles/account.html:28
-msgid "YouTube Account"
+msgid "YouTube Sync"
 msgstr ""
 
 #: templates/profiles/account.html:37
@@ -4377,7 +4385,7 @@ msgid "Link"
 msgstr ""
 
 #: templates/profiles/account.html:158
-msgid "Enable Crowd Subtitles on your YouTube Channel (beta)"
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
 msgstr ""
 
 #: templates/profiles/account.html:168

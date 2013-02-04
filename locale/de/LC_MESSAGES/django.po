@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-31 00:11-0600\n"
-"PO-Revision-Date: 2013-01-26 07:04+0000\n"
+"POT-Creation-Date: 2013-02-04 00:09-0600\n"
+"PO-Revision-Date: 2013-02-02 06:39+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/de/)\n"
@@ -28,11 +28,11 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/accountlinker/models.py:39
+#: apps/accountlinker/models.py:42
 msgid "Subtitles by the Amara.org community"
 msgstr ""
 
-#: apps/accountlinker/models.py:41
+#: apps/accountlinker/models.py:44
 msgid "Help us caption and translate this video on Amara.org"
 msgstr ""
 
@@ -45,6 +45,10 @@ msgid ""
 "We couldn't link your account. Have you <a href='https://accounts.google.com/"
 "ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
 "create_channel'>set up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
 msgstr ""
 
 #: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
@@ -441,7 +445,7 @@ msgstr "Videoaufrufstatistik"
 msgid "Widget view statistic"
 msgstr "Widget-Ansichtsstatistik"
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:83 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
@@ -450,11 +454,15 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da schon jemand anders an "
 "dieser Sprache arbeitet."
 
-#: apps/subtitles/forms.py:96
+#: apps/subtitles/forms.py:97
 msgid "The language already exists and is not a translation."
 msgstr "Diese Sprache existiert schon und ist keine Übersetzung."
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:104
+msgid "The language already exists as a translation from"
+msgstr ""
+
+#: apps/subtitles/forms.py:111
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
@@ -463,7 +471,7 @@ msgstr ""
 "Sorry, wir können die Untertitel für diese Sprache nicht hochladen, da sonst "
 "die %s darauf basierenden Übersetzung(en) verzweigt würden."
 
-#: apps/subtitles/forms.py:122
+#: apps/subtitles/forms.py:130
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
@@ -471,7 +479,7 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da diese Sprache schon "
 "einem anderen Benutzer zugeordnet ist."
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:137
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
@@ -479,7 +487,7 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da Ihnen die "
 "Berechtigungen fehlen, diese Sprache an sich zu reißen."
 
-#: apps/subtitles/forms.py:140 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:148 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
@@ -487,7 +495,7 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da ein Entwurf für diese "
 "Sprache bereits moderiert wird."
 
-#: apps/subtitles/forms.py:152
+#: apps/subtitles/forms.py:160
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
@@ -495,7 +503,7 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da diese Sprache "
 "moderiert ist und Sie keine Berechtigung haben, Untertitel zu transkribieren."
 
-#: apps/subtitles/forms.py:160
+#: apps/subtitles/forms.py:168
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
@@ -503,7 +511,7 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da diese Sprache "
 "moderiert ist und Sie keine Berechtigung haben, Untertitel zu übersetzen."
 
-#: apps/subtitles/forms.py:173
+#: apps/subtitles/forms.py:181
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -511,23 +519,23 @@ msgstr ""
 "Sorry, wir können Ihre Untertitel nicht hochladen, da die Anzahl der Zeilen "
 "in Ihrer Übersetzung ({0}) nicht mit dem Original ({1}) übereinstimmt."
 
-#: apps/subtitles/forms.py:184
+#: apps/subtitles/forms.py:192
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr "Die Datei darf höchstens %d kB groß sein."
 
-#: apps/subtitles/forms.py:192
+#: apps/subtitles/forms.py:200
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 "Nicht unterstütztes Format. Bitte laden Sie eins dieser Formate hoch: %s"
 
-#: apps/subtitles/forms.py:199 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:207 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Kann Dateicodierung nicht erkennen."
 
-#: apps/subtitles/forms.py:222 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:230 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 "Jemand erstellt gerade Untertitel für diese Video. Versuchen Sie es später "
@@ -555,13 +563,13 @@ msgstr ""
 "Wenn Sie glauben, dass die Untertitel korrigiert werden sollten, wenden Sie "
 "sich an den Admin des Teams."
 
-#: apps/subtitles/views.py:125
+#: apps/subtitles/views.py:126
 msgid ""
 "You can't edit because there is a task for this language and you can't "
 "complete it."
 msgstr ""
 
-#: apps/subtitles/views.py:149
+#: apps/subtitles/views.py:150
 msgid "You can't edit this subtitle because it's locked"
 msgstr ""
 
@@ -1794,7 +1802,7 @@ msgstr "Sie können die Haupt-URL nicht löschen."
 msgid "The language for %s has been changed"
 msgstr ""
 
-#: apps/videos/feed_parser/__init__.py:111
+#: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
 msgstr "Der Feed ist gerade nicht verfügbar."
 
@@ -4173,7 +4181,7 @@ msgid "User Details"
 msgstr "Benutzerdetails"
 
 #: templates/profiles/account.html:28
-msgid "YouTube Account"
+msgid "YouTube Sync"
 msgstr ""
 
 #: templates/profiles/account.html:37
@@ -4260,7 +4268,7 @@ msgid "Link"
 msgstr ""
 
 #: templates/profiles/account.html:158
-msgid "Enable Crowd Subtitles on your YouTube Channel (beta)"
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
 msgstr ""
 
 #: templates/profiles/account.html:168

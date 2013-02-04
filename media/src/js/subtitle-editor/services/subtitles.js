@@ -62,6 +62,9 @@
              * @param callback Function to be called with the dfxp xlm
              * once it's ready.
              */
+            getCachedData: function() {
+                return cachedData;
+            },
             getLanguages: function(callback) {
                 if (cachedData.languages && cachedData.languages.length === 0) {
                     var url = getVideoLangAPIUrl(cachedData.video.id);
@@ -84,7 +87,7 @@
                     var langObj = cachedData.languages[i];
                     if (langObj.code === languageCode){
                         for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].version_no === parseInt(versionNumber)){
+                            if (langObj.versions[j].version_no === parseInt(versionNumber, 10)){
                                 subtitlesXML = langObj.versions[j].subtitlesXML;
                                 break;
                             }
