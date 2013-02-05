@@ -56,7 +56,6 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
             this.videoSource_.getVideoId());
     this.addQueryString_(embedUri);
     this.playerSize_.width = 400;
-    alert(this.playerSize_.width);
     this.iframe_ = this.getDomHelper().createDom(
         'iframe', 
         { 'id': this.playerElemID_,
