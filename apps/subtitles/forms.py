@@ -30,10 +30,10 @@ from apps.teams.permissions import (
 )
 from apps.videos.tasks import video_changed_tasks
 from utils.translation import get_language_choices
-from utils.templatetags.i18n_tags import to_localized_display
 
 
 SUBTITLE_FILESIZE_LIMIT_KB = 512
+SUBTITLE_FILE_FORMATS = babelsubs.get_available_formats()
 
 
 class SubtitlesUploadForm(forms.Form):
