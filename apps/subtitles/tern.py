@@ -175,7 +175,7 @@ def get_counts():
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
 
 def markup_to_dfxp(text):
-    from django.template.defaultfilters import escape
+    from django.template.defaultfilters import force_escape
 
     # Escape the HTML entities in the text first.  So something like:
     #
@@ -184,7 +184,13 @@ def markup_to_dfxp(text):
     # gets escaped to:
     #
     #     x &lt; _10_
-    text = escape(text)
+    text = force_escape(text)
+
+    # Some subtitles have ASCII control characters in them.  We're just gonna
+    # strip those out entirely rather than try to deal with them.
+    control_chars = ['\x02', '\x03', '\x00', '\x08']
+    for c in control_chars:
+        text = text.replace(c, '')
 
     # Now we substitute in the DFXP formatting tags for our custom Markdown-like
     # thing:
@@ -488,9 +494,8 @@ def _create_subtitle_language(sl):
                                               .exclude(pk=sl.pk)
                                               .exists())
     except Video.DoesNotExist:
-        err('=' * 70)
-        err(str(sl.video))
-        raise
+        log('SubtitleLanguage', 'ERROR_MISSING_VIDEO', sl.pk, None)
+        return
 
     if duplicates:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
@@ -505,12 +510,24 @@ def _create_subtitle_language(sl):
         )
         Meter('data-model-refactor.language-errors.duplicate-language').inc()
         _handle_duplicate_languages(sl)
-    elif sl.language not in VALID_LANGUAGE_CODES:
-        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
-        Meter('data-model-refactor.language-errors.invalid-language-code').inc()
-    else:
-        nsl = _add_sl(sl)
-        log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
+        return
+
+    if sl.language not in VALID_LANGUAGE_CODES:
+        if sl.language == 'no':
+            log('SubtitleLanguage', 'FIXED_LANGUAGE_CODE', sl.pk, None, sl.language)
+            sl.language = 'nb'
+            sl.save()
+        elif sl.language == 'iw':
+            log('SubtitleLanguage', 'FIXED_LANGUAGE_CODE', sl.pk, None, sl.language)
+            sl.language = 'he'
+            sl.save()
+        else:
+            log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None, sl.language)
+            Meter('data-model-refactor.language-errors.invalid-language-code').inc()
+            return
+
+    nsl = _add_sl(sl)
+    log('SubtitleLanguage', 'create', sl.pk, nsl.pk)
 
 
 def _update_subtitle_language(sl):
