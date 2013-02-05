@@ -276,7 +276,7 @@ class Command(BaseCommand):
             key.set_contents_from_string(filedata, headers, replace=True,
                 policy='public-read')
             # validate key exists
-            k = bucket.get_key(file_key+'foo')
+            k = bucket.get_key(file_key)
         except boto.s3.connection.BotoClientError, e:
             print "Failed: %s" % e
         except Exception, e:
