@@ -830,7 +830,6 @@ def _create_translation_tasks(team_video, subtitle_version=None):
         task = Task(team=team_video.team, team_video=team_video,
                     language=lang, type=Task.TYPE_IDS['Translate'])
 
-        task.subtitle_version = subtitle_version or task.get_subtitle_version()
         # we should only update the team video after all tasks for
         # this video are saved, else we end up with a lot of
         # wasted tasks
@@ -1785,12 +1784,22 @@ class Task(models.Model):
 
     def _can_publish_directly(self, subtitle_version):
         from teams.permissions import can_publish_edits_immediately
+
+        type = {10: 'Review',
+                20: 'Review',
+                30: 'Approve'}.get(self.type)
+
+        tasks = (Task.objects._type([type], True, 'Approved')
+                             .filter(language=self.language))
+
         return (can_publish_edits_immediately(self.team_video,
                                                     self.assignee,
                                                     self.language) and
                 subtitle_version and
                 subtitle_version.previous_version() and
-                subtitle_version.subtitle_language.is_complete_and_synced())
+                subtitle_version.previous_version().is_public() and
+                subtitle_version.subtitle_language.is_complete_and_synced() and 
+                tasks.exists())
 
     def _find_previous_assignee(self, type):
         """Find the previous assignee for a new review/approve task for this video.

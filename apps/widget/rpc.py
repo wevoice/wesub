@@ -419,6 +419,7 @@ class Rpc(BaseRpc):
         # - The language has another source in it's lineage and it is not marked as forking
         translated_from_code  = None
         translated_from = None
+
         if base_language_code:
             translated_from_code = base_language_code
         elif language.is_forked == False:
@@ -1262,6 +1263,7 @@ class Rpc(BaseRpc):
             translated_from = session.base_language
         else:
            translated_from = language.get_translation_source_language()
+
         return self._make_subtitles_dict(
             subtitles,
             language,
