@@ -50,11 +50,13 @@ goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlay
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
-
+    
     var embedUri = new goog.Uri(
         "http://fast.wistia.com/embed/iframe/" + 
             this.videoSource_.getVideoId());
     this.addQueryString_(embedUri);
+    this.playerSize_.width = 400;
+    alert(this.playerSize_.width);
     this.iframe_ = this.getDomHelper().createDom(
         'iframe', 
         { 'id': this.playerElemID_,
@@ -79,12 +81,15 @@ unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
     var domain = window.location.protocol + "//" + 
         locationUri.getDomain() + 
         (locationUri.getPort() != null ? (':' + locationUri.getPort()) : '');
-    uri.setParameterValue('enablejsapi', '1').
-        setParameterValue('origin', domain).
-        setParameterValue('wmode', 'opaque');
+    uri.setParameterValue('origin', domain).
+        setParameterValue('wmode', 'opaque').
+        setParameterValue('videoWidth',400).
+        setParameterValue('videoHeight',300).
+        setParameterValue('doNotTrack',true);
+        
     if (this.forDialog_) {
-        uri.setParameterValue('disablekb', '1').
-            setParameterValue('controls', '0');
+        uri.setParameterValue('playbar',false).
+        setParameterValue('chromeless', true);
     }
 };
 
@@ -111,7 +116,7 @@ unisubs.player.WistiaVideoPlayer.prototype.decorateInternal = function(elem) {
         elem.id = this.playerElemID_;
     }
     this.playerSize_ = new goog.math.Size(
-        parseInt(elem['width']), parseInt(elem['height']));
+        parseInt(400), parseInt(300));
     this.setDimensionsKnownInternal();
 };
 
@@ -130,7 +135,6 @@ unisubs.player.WistiaVideoPlayer.prototype.enterDocument = function() {
             oldReady();
             myOnReady();
         };
-        unisubs.addScript("http://fast.wistia.com/static/E-v1.js");
     }
 };
 
