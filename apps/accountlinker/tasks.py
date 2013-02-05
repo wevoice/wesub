@@ -26,7 +26,7 @@ def get_youtube_data(user_pk):
         logger.error('User with PK %s not found' % user_pk)
         return
 
-    usernames = [a.full_name for a in user.third_party_accounts.all()]
+    usernames = [a.username for a in user.third_party_accounts.all()]
     urls = VideoUrl.objects.filter(owner_username__in=usernames)
     videos = [url.video for url in urls]
 

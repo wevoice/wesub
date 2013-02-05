@@ -149,10 +149,13 @@ class AccountTest(TestCase):
 
         version.language.is_complete = True
         version.language.save()
+        version.note = ''
+        version.save()
 
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
         self.assertEquals(version.moderation_status, UNMODERATED)
+        self.assertFalse(version.language.is_imported_from_youtube_and_not_worked_on)
 
         self.assertTrue(can_be_synced(version))
 
@@ -176,6 +179,8 @@ class AccountTest(TestCase):
 
         version.language.is_complete = True
         version.language.save()
+        version.note = ''
+        version.save()
 
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
@@ -215,6 +220,8 @@ class AccountTest(TestCase):
         self.assertEquals(len(synced_sl), len(data))
 
         video, language, version = data[0]
+        version.note = ''
+        version.save()
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
         self.assertTrue(language.is_complete)
