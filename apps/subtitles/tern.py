@@ -488,9 +488,8 @@ def _create_subtitle_language(sl):
                                               .exclude(pk=sl.pk)
                                               .exists())
     except Video.DoesNotExist:
-        err('=' * 70)
-        err(str(sl.video))
-        raise
+        log('SubtitleLanguage', 'ERROR_MISSING_VIDEO', sl.pk, None)
+        return
 
     if duplicates:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)
