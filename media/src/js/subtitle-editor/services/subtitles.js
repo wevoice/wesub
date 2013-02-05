@@ -118,24 +118,36 @@ var angular = angular || null;
             approveTask: function(response, notes) {
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
 
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        complete: true,
+                        notes: notes,
+                        version_number: response.data.version_number
+                    }
+                });
 
-                // TODO: We need to complete the task.
-                //
-                // Can I just send a PUT to the task API URL?
-                // Does "completed" need to be true?
-                //var promise = $http({
-                    //method: 'PUT',
-                    //url: url,
-                    //headers: authHeaders,
-                    //data:  {
-                        //approved: 20
-                    //}
-                //});
-
-                //return promise;
+                return promise;
             },
             sendBackTask: function(response, notes) {
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        complete: true,
+                        notes: notes,
+                        send_back: true,
+                        version_number: response.data.version_number
+                    }
+                });
+
+                return promise;
+
             },
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally

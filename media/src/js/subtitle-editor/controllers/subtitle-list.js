@@ -124,6 +124,9 @@ var angular = angular || null;
 
                     SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
+                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
+                        window.location = response['data']['site_url'];
+
                     }, function onError() {
                         $scope.status = 'error';
                         window.alert('Sorry, there was an error...');
@@ -153,6 +156,9 @@ var angular = angular || null;
 
                     SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
+                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
+                        window.location = response['data']['site_url'];
+                        
                     }, function onError() {
                         $scope.status = 'error';
                         window.alert('Sorry, there was an error...');
