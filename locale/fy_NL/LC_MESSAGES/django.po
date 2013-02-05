@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-04 00:29-0600\n"
+"POT-Creation-Date: 2013-02-05 00:25-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -428,80 +428,81 @@ msgstr ""
 msgid "Widget view statistic"
 msgstr ""
 
-#: apps/subtitles/forms.py:83 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/subtitles/forms.py:97
+#: apps/subtitles/forms.py:96
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:104
-msgid "The language already exists as a translation from"
+#: apps/subtitles/forms.py:102
+#, python-format
+msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:111
+#: apps/subtitles/forms.py:109
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:130
+#: apps/subtitles/forms.py:128
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:137
+#: apps/subtitles/forms.py:135
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:148 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:146 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:160
+#: apps/subtitles/forms.py:158
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:168
+#: apps/subtitles/forms.py:166
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:181
+#: apps/subtitles/forms.py:179
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/subtitles/forms.py:192
+#: apps/subtitles/forms.py:190
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:200
+#: apps/subtitles/forms.py:198
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:207 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:205 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr ""
 
-#: apps/subtitles/forms.py:230 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:228 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr ""
 
@@ -993,8 +994,8 @@ msgid "You do not have permission to delete this team."
 msgstr ""
 
 #: apps/teams/views.py:218 apps/teams/views.py:260 apps/teams/views.py:288
-#: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1737
-#: apps/teams/views.py:1753
+#: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1741
+#: apps/teams/views.py:1757
 msgid "You do not have permission to edit this team."
 msgstr ""
 
@@ -1130,45 +1131,45 @@ msgstr ""
 msgid "You cannot assign this task."
 msgstr ""
 
-#: apps/teams/views.py:1596
+#: apps/teams/views.py:1600
 msgid "Draft uploaded successfully."
 msgstr ""
 
-#: apps/teams/views.py:1613
+#: apps/teams/views.py:1617
 msgid "You are not allowed to download this transcript."
 msgstr ""
 
-#: apps/teams/views.py:1664
+#: apps/teams/views.py:1668
 msgid "There's already a project with this name"
 msgstr ""
 
-#: apps/teams/views.py:1676
+#: apps/teams/views.py:1680
 msgid "Project added."
 msgstr ""
 
-#: apps/teams/views.py:1693
+#: apps/teams/views.py:1697
 msgid "You cannot edit that project."
 msgstr ""
 
-#: apps/teams/views.py:1704
+#: apps/teams/views.py:1708
 msgid "Project deleted."
 msgstr ""
 
-#: apps/teams/views.py:1722
+#: apps/teams/views.py:1726
 msgid "Project saved."
 msgstr ""
 
-#: apps/teams/views.py:1763
+#: apps/teams/views.py:1767
 msgid "Successfully synced subtitles."
 msgstr ""
 
-#: apps/teams/views.py:1867
+#: apps/teams/views.py:1871
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
 msgstr ""
 
-#: apps/teams/views.py:1898
+#: apps/teams/views.py:1902
 msgid "Successfully unpublished subtitles."
 msgstr ""
 
@@ -2603,7 +2604,7 @@ msgstr ""
 msgid ""
 "\n"
 "     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and TTML \n"
+"TXT, and DFXP.\n"
 "     \t formats on the page for that language (<a href=\"http://"
 "universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
 "\t\t Click \"Download Subtitles\" button in the lower right to the left from "
@@ -3212,7 +3213,7 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr ""
 
 #: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
-#: templates/messages/sent.html:49 templates/teams/tasks.html:455
+#: templates/messages/sent.html:49 templates/teams/tasks.html:454
 msgid "Delete"
 msgstr ""
 
@@ -3220,7 +3221,7 @@ msgstr ""
 #: templates/profiles/_select_language_dialog.html:33
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:509 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
 #: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr ""
@@ -4596,7 +4597,7 @@ msgstr ""
 msgid "Who should do it?"
 msgstr ""
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:513
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:512
 msgid "Begin typing to search"
 msgstr ""
 
@@ -5261,7 +5262,7 @@ msgid "File:"
 msgstr ""
 
 #: templates/teams/tasks.html:382
-msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
+msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
 msgstr ""
 
 #: templates/teams/tasks.html:395
@@ -5272,41 +5273,41 @@ msgstr ""
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr ""
 
-#: templates/teams/tasks.html:426
+#: templates/teams/tasks.html:425
 msgid "Decline"
 msgstr ""
 
-#: templates/teams/tasks.html:446
+#: templates/teams/tasks.html:445
 msgid "Reassign"
 msgstr ""
 
-#: templates/teams/tasks.html:448
+#: templates/teams/tasks.html:447
 msgid "Assign"
 msgstr ""
 
-#: templates/teams/tasks.html:464
+#: templates/teams/tasks.html:463
 msgid "Delete task"
 msgstr ""
 
-#: templates/teams/tasks.html:470
+#: templates/teams/tasks.html:469
 msgid "What would you like to do with the subtitles for this task?"
 msgstr ""
 
-#: templates/teams/tasks.html:473
+#: templates/teams/tasks.html:472
 msgid "Publish these subtitles immediately"
 msgstr ""
 
-#: templates/teams/tasks.html:477
+#: templates/teams/tasks.html:476
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr ""
 
-#: templates/teams/tasks.html:516
+#: templates/teams/tasks.html:515
 msgid "Assign to User"
 msgstr ""
 
-#: templates/teams/tasks.html:526
+#: templates/teams/tasks.html:525
 msgid "Sorry, no tasks here."
 msgstr ""
 
@@ -5715,11 +5716,10 @@ msgstr ""
 #: templates/videos/_upload_subtitles.html:16
 msgid ""
 "\n"
-"                    Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT "
-"format.\n"
+"                    Our site accepts SRT, SSA, SBV, DFXP, and TXT format.\n"
 "                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
 "xml\n"
-"                    (for TTML) are accepted.\n"
+"                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
 
