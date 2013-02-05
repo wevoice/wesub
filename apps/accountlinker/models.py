@@ -77,7 +77,8 @@ def get_linked_accounts_for_video(video):
     yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
 
     if yt_url.exists():
-        return [ThirdPartyAccount.objects.resolve_ownership(u) for u in yt_url]
+        accounts = [ThirdPartyAccount.objects.resolve_ownership(u) for u in yt_url]
+        return filter(None, accounts)
 
     return None
 
@@ -93,6 +94,9 @@ def check_authorization(video):
 
     linked_accounts = get_linked_accounts_for_video(video)
 
+    if not linked_accounts:
+        return False, False
+
     if all([a.is_team_account for a in linked_accounts]):
         if not team_video:
             return False, False
@@ -102,7 +106,7 @@ def check_authorization(video):
         if any(tpa in tpas_for_team for tpa in linked_accounts):
             return True, True
 
-    if all([a.is_user_account for a in linked_accounts]):
+    if all([a.is_individual_account for a in linked_accounts]):
         return True, True
 
     return False, False

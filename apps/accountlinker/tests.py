@@ -99,19 +99,23 @@ class AccountTest(TestCase):
         vurl.owner_username = 'test'
         vurl.save()
         video = vurl.video
+
         third = ThirdPartyAccount.objects.all().exists()
         self.assertFalse(third)
+        self.assertEquals(0, ThirdPartyAccount.objects.count())
 
-        is_authorized, ignore = check_authorization(video)
+        is_authorized, _ = check_authorization(video)
+        self.assertFalse(is_authorized)
+
+        user = User.objects.get(username='admin')
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                full_name=vurl.owner_username)
+
+        user.third_party_accounts.add(account)
+
+        is_authorized, _ = check_authorization(video)
         self.assertTrue(is_authorized)
-        self.assertFalse(ignore)
-
-        ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-        self.assertFalse(ignore)
 
     def test_part_of_team(self):
         # Prep stuff
@@ -126,6 +130,8 @@ class AccountTest(TestCase):
         TeamVideo.objects.create(video=video, team=team, added_by=user)
 
         third = ThirdPartyAccount.objects.all().exists()
+        tpa = ThirdPartyAccount.objects.get(username='test')
+        team.third_party_accounts.add(tpa)
         self.assertFalse(third)
 
         # Start testing
@@ -239,16 +245,16 @@ class AccountTest(TestCase):
         self.assertFalse(third)
 
         is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
+        self.assertFalse(is_authorized)
         self.assertFalse(ignore)
 
         account = ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
+                full_name=vurl.owner_username)
 
         team = Team.objects.get(slug='volunteer')
 
         is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
+        self.assertFalse(is_authorized)
 
         team.third_party_accounts.add(account)
 
@@ -287,16 +293,15 @@ class AccountTest(TestCase):
         team = Team.objects.all()[0]
         TeamVideo.objects.create(video=video, team=team, added_by=user)
 
-        third = ThirdPartyAccount.objects.all().exists()
-        self.assertFalse(third)
+        self.assertEquals(0, ThirdPartyAccount.objects.count())
 
         # Start testing
         is_authorized, ignore = check_authorization(video)
         self.assertFalse(is_authorized)
-        self.assertEquals(None, ignore)
+        self.assertFalse(ignore)
 
         account = ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
+                full_name=vurl.owner_username)
 
         user.third_party_accounts.add(account)
 
