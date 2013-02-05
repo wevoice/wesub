@@ -175,7 +175,7 @@ def get_counts():
             sv_total, sv_unsynced, sv_broken, sv_outdated, sv_done,)
 
 def markup_to_dfxp(text):
-    from django.template.defaultfilters import escape
+    from django.template.defaultfilters import force_escape
 
     # Escape the HTML entities in the text first.  So something like:
     #
@@ -184,7 +184,7 @@ def markup_to_dfxp(text):
     # gets escaped to:
     #
     #     x &lt; _10_
-    text = escape(text)
+    text = force_escape(text)
 
     # Now we substitute in the DFXP formatting tags for our custom Markdown-like
     # thing:
