@@ -511,7 +511,7 @@ def _create_subtitle_language(sl):
         Meter('data-model-refactor.language-errors.duplicate-language').inc()
         _handle_duplicate_languages(sl)
     elif sl.language not in VALID_LANGUAGE_CODES:
-        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None)
+        log('SubtitleLanguage', 'ERROR_INVALID_LANGUAGE_CODE', sl.pk, None, sl.language)
         Meter('data-model-refactor.language-errors.invalid-language-code').inc()
     else:
         nsl = _add_sl(sl)
