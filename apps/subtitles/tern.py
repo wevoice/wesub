@@ -479,13 +479,18 @@ def _handle_duplicate_languages(sl):
 def _create_subtitle_language(sl):
     """Sync the given subtitle language, creating a new one."""
     from apps.subtitles.models import VALID_LANGUAGE_CODES
-    from apps.videos.models import SubtitleLanguage
+    from apps.videos.models import SubtitleLanguage, Video
     from utils.metrics import Meter
 
-    duplicates = (SubtitleLanguage.objects.filter(video=sl.video,
-                                                  language=sl.language)
-                                          .exclude(pk=sl.pk)
-                                          .exists())
+    try:
+        duplicates = (SubtitleLanguage.objects.filter(video=sl.video,
+                                                      language=sl.language)
+                                              .exclude(pk=sl.pk)
+                                              .exists())
+    except Video.DoesNotExist:
+        err('=' * 70)
+        err(str(sl.video))
+        raise
 
     if duplicates:
         log('SubtitleLanguage', 'ERROR_DUPLICATE_LANGUAGE', sl.pk, None)

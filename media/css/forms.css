@@ -624,3 +624,9 @@ input.open-id {
     float: none;
     margin-top: 2em;
 }
+#create .prompt {
+    clear: both;
+    margin-top: 4em;
+    text-align: center;
+    font-size: 1.25em;
+}
