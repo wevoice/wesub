@@ -186,6 +186,12 @@ def markup_to_dfxp(text):
     #     x &lt; _10_
     text = force_escape(text)
 
+    # Some subtitles have ASCII control characters in them.  We're just gonna
+    # strip those out entirely rather than try to deal with them.
+    control_chars = ['\x02', '\x03', '\x00', '\x08']
+    for c in control_chars:
+        text = text.replace(c, '')
+
     # Now we substitute in the DFXP formatting tags for our custom Markdown-like
     # thing:
     #
