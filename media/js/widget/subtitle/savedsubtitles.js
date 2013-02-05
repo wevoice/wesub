@@ -48,6 +48,7 @@ unisubs.widget.SavedSubtitles.prototype.serialize = function() {
         { 'version': unisubs.widget.SavedSubtitles.VERSION_,
           'sessionPK': this.SESSION_PK,
           'title': this.CAPTION_SET.title,
+          'description': this.CAPTION_SET.description,
           'isComplete': this.CAPTION_SET.completed,
           'forked': this.CAPTION_SET.wasForkedDuringEdits(),
           'dfxp': this.CAPTION_SET.makeDFXPString() });
