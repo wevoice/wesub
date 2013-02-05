@@ -2625,13 +2625,13 @@ class VideoFeed(models.Model):
         checked_entries += self._create_videos(feed_parser, last_link)
 
         if not last_link and 'youtube' in self.url:
-            next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
 
             while next_url:
                 url = next_url[0].href
                 feed_parser = FeedParser(url)
                 checked_entries += self._create_videos(feed_parser, last_link)
-                next_url = [x for x in feed_parser.feed.feed['links'] if x['rel'] == 'next']
+                next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
 
         return checked_entries
 
@@ -2648,7 +2648,7 @@ class VideoFeed(models.Model):
     def _create_videos(self, feed_parser, last_link):
         checked_entries = 0
 
-        _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
+        _iter = feed_parser.items(since=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
             vt and Video.get_or_create_for_url(vt=vt, user=self.user)
