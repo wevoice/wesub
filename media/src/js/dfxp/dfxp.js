@@ -61,7 +61,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // When we get subtitles from the server, they will contain DFXP-style
         // formatting for bold, italic, etc. Convert them back to Markdown.
         var $preXml = $(xml.documentElement);
-        var $preSubtitles = $('div p', $preXml);
+        var $preSubtitles = $('p', $preXml);
 
         // Convert subtitles from DFXP to Markdown.
         for (var i = 0; i < $preSubtitles.length; i++) {
@@ -75,15 +75,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Store the working XML for local edits.
         this.$xml = $preXml.clone();
 
-        // Cache the query for the containing div.
-        //
-        // TODO: This is broken because there may be multiple containing divs.
-        // The only reliable container is a <body> element.
-        this.$div = $('div', this.$xml);
+        // Cache the first div.
+        this.$firstDiv = $('div:first-child', this.$xml);
 
         // Convert both subtitle sets to milliseconds.
-        this.convertTimes('milliseconds', $('div p', this.$originalXml));
-        this.convertTimes('milliseconds', $('div p', this.$xml));
+        this.convertTimes('milliseconds', $('p', this.$originalXml));
+        this.convertTimes('milliseconds', $('p', this.$xml));
 
         return this;
     };
@@ -250,10 +247,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // If after is -1, we need to place the subtitle at the beginning.
         if (after === -1) {
 
-            // Prepend this new subtitle directly inside of the containing div.
-            // TODO: This is broken because there may be multiple containing
-            // divs.
-            this.$div.prepend($newSubtitle);
+            // Prepend the new subtitle to the first div.
+            this.$firstDiv.prepend($newSubtitle);
 
         // Otherwise, place it after the designated subtitle.
         } else {
@@ -289,7 +284,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         if (after === -1) {
 
-            this.$div.prepend(newSubtitle);
+            // Prepend the new subtitle to the first div.
+            this.$firstDiv.prepend(newSubtitle);
 
             // Otherwise, place it after the designated subtitle.
         } else {
@@ -340,7 +336,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var parser =  new this.constructor();
         parser.init(this.xmlToString(true));
         if (!preserveText){
-            $('div p', parser.$xml).text('');
+            $('p', parser.$xml).text('');
         }
         return parser;
     };
@@ -598,7 +594,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: jQuery selection of nodes
          */
 
-        return $('div p', this.$xml);
+        return $('p', this.$xml);
     };
     this.isShownAt = function(indexOrElement, time) {
         /*
@@ -862,17 +858,49 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        // If startOrParagraph was passed, we need to do something.
+        //
+        // Otherwise, we'll just return the current state.
         if (typeof startOfParagraph !== 'undefined') {
 
-            // If the subtitle is not the first child, then we need to wrap
-            // the subtitle in a div.
             if (startOfParagraph) {
+                // This subtitle should now indicate that it is the start of a paragraph.
+
+                // If the subtitle is not the first child, then we need to
+                // close the previous div, and open a new div before this subtitle.
                 if (!$subtitle.is(':first-child')) {
-                     $subtitle.wrap('<div>');
+
+                    // Get the next siblings after this subtitle. We'll need to move them
+                    // into our containing div later.
+                    var $allNextSiblings = $subtitle.nextAll();
+
+                    // Get the parent containing div of this subtitle. We'll need to move
+                    // the new group of subtitles after the parent.
+                    var $parentDiv = $subtitle.parent('div');
+
+                    // Wrap the subtitle in a div.
+                    $subtitle.wrap('<div>');
+
+                    // Get the newly created div.
+                    var $newDiv = $subtitle.parent('div');
+
+                    // Append the siblings to the new div.
+                    $newDiv.append($allNextSiblings);
+
+                    // Move the new containing div after the original parent div.
+                    $parentDiv.after($newDiv);
                 }
-            } else if ($subtitle.is(':first-child') &&
-                       $subtitle.parent().get(0) !== this.$div.get(0)) {
-                $subtitle.unwrap();
+            
+            // startOfParagraph is false. Check to see if this is a valid subtitle to unmark
+            // as a start of a paragraph.
+            } else if ($subtitle.is(':first-child') && $subtitle.parent().get(0) !== this.$firstDiv.get(0)) {
+                // Otherwise, this subtitle should no longer indicate that it is the start of
+                // a paragraph.
+                //
+                // If this subtitle is the first child of the first div, do nothing (we
+                // can't unwrap the first div).
+
+                //$subtitle.unwrap();
             }
         }
 
@@ -942,7 +970,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         // If we need to convert Markdown to DFXP, do it here.
         if (convertMarkdownToDFXP) {
-            var $subtitles = $('div p', $cloned);
+            var $subtitles = $('p', $cloned);
 
             for (var i = 0; i < $subtitles.length; i++) {
                 var $subtitle = $subtitles.eq(i);
@@ -964,7 +992,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Since our back-end is expecting time expressions, we may need to convert
         // the working XML's times to time expressions.
         if (convertToTimeExpression) {
-            this.convertTimes('timeExpression', $('div p', $cloned));
+            this.convertTimes('timeExpression', $('p', $cloned));
         }
 
         return this.utils.xmlToString($cloned.get(0));
