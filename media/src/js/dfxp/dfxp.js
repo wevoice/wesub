@@ -539,7 +539,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          *
          * Returns: integer
          */
-
+        subtitles = subtitles || this.getSubtitles();
         return $(subtitles).index(subtitle);
     };
     this.getSubtitle = function(indexOrElement) {
@@ -819,6 +819,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         this.getSubtitles().remove();
+
 
         return true;
     };

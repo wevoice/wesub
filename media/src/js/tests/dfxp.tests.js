@@ -430,6 +430,7 @@ describe('DFXP', function() {
             
             // The first subtitle's index should be '0'.
             expect(parser.getSubtitleIndex(parser.getFirstSubtitle(), parser.getSubtitles())).toBe(0);
+            expect(parser.getSubtitleIndex(parser.getFirstSubtitle() ).toBe(0);
 
         });
     });
