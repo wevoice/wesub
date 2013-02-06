@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-05 00:25-0600\n"
-"PO-Revision-Date: 2013-02-05 06:41+0000\n"
+"POT-Creation-Date: 2013-02-06 00:33-0600\n"
+"PO-Revision-Date: 2013-02-06 06:53+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/universalsubtitles/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -75,7 +75,7 @@ msgid "Email"
 msgstr "メールアドレス"
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
-#: templates/messages/_messages.html:8 templates/videos/create.html:63
+#: templates/messages/_messages.html:8 templates/videos/create.html:71
 msgid "Hide"
 msgstr "非表示にする"
 
@@ -441,74 +441,74 @@ msgid ""
 "already in progress."
 msgstr "この言語の字幕はすでに進行中であるため、アップロードすることができません。"
 
-#: apps/subtitles/forms.py:96
+#: apps/subtitles/forms.py:97
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:102
+#: apps/subtitles/forms.py:103
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:109
+#: apps/subtitles/forms.py:110
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:128
+#: apps/subtitles/forms.py:129
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:135
+#: apps/subtitles/forms.py:136
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:146 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:147 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:158
+#: apps/subtitles/forms.py:159
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:166
+#: apps/subtitles/forms.py:167
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:179
+#: apps/subtitles/forms.py:180
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr "翻訳の行数 ({0}) が原文の行数 ({1}) と同じでないため、ファイルをアップロードすることができません。"
 
-#: apps/subtitles/forms.py:190
+#: apps/subtitles/forms.py:191
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:198
+#: apps/subtitles/forms.py:199
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:205 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:206 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "ファイルのエンコーディングを検出できません"
 
-#: apps/subtitles/forms.py:228 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:229 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "このビデオは、現在他のユーザが編集中です。後ほどまたお試しください。"
 
@@ -752,11 +752,11 @@ msgstr "マネジャーと管理人"
 msgid "Admins only"
 msgstr "管理人のみ"
 
-#: apps/teams/models.py:145 apps/teams/models.py:2632
+#: apps/teams/models.py:145 apps/teams/models.py:2641
 msgid "name"
 msgstr "名前"
 
-#: apps/teams/models.py:146 apps/teams/models.py:2633
+#: apps/teams/models.py:146 apps/teams/models.py:2642
 msgid "slug"
 msgstr "怠け者"
 
@@ -863,20 +863,20 @@ msgstr "全ての言語で手伝いが必要です。"
 msgid "If you check this, other languages will not be displayed."
 msgstr "これをチェックすると、他の言語は表示されません。"
 
-#: apps/teams/models.py:949 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:948 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "所有者"
 
-#: apps/teams/models.py:950 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:949 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "マネージャー"
 
-#: apps/teams/models.py:951 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:950 apps/teams/permissions_const.py:44
 #: templates/base.html:133
 msgid "Admin"
 msgstr "管理"
 
-#: apps/teams/models.py:952 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:951 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "寄稿者"
 
@@ -1676,7 +1676,7 @@ msgstr "原因不明のエラー"
 msgid "Video embedding disabled by owner"
 msgstr "所有者によって埋め込みが禁止されています"
 
-#: apps/widget/rpc.py:1105 apps/widget/rpc.py:1147
+#: apps/widget/rpc.py:1106 apps/widget/rpc.py:1148
 msgid "\n"
 msgstr "\n⏎\n"
 
@@ -2007,12 +2007,12 @@ msgstr "ビデオに字幕を付ける"
 msgid "Watch"
 msgstr "観る"
 
-#: templates/base.html:72
+#: templates/base.html:72 templates/videos/create.html:63
 msgid "Volunteer"
 msgstr "ボランティア"
 
 #: templates/base.html:73
-msgid "Enterprise"
+msgid "Pro Services"
 msgstr ""
 
 #: templates/base.html:74
@@ -2616,120 +2616,128 @@ msgid "The easiest way to caption and translate any video."
 msgstr "簡単にビデオに字幕を付け、翻訳しよう"
 
 #: templates/index.html:19
-msgid "Subtitles make videos more powerful, more global, and more searchable."
-msgstr "字幕の力でビデオをより効果的、国際的、かつ検索しやすくしよう"
+msgid "The most powerful and flexible subtitling platform in the world."
+msgstr ""
 
 #: templates/index.html:24
-msgid "Subtitle a Video Now"
-msgstr "今すぐビデオに字幕を付ける"
+msgid "Add a Video"
+msgstr ""
 
 #: templates/index.html:26
 msgid "Subtitle"
 msgstr "字幕"
 
-#: templates/index.html:27
+#: templates/index.html:28
 msgid "Works with YouTube, Vimeo, HTML5, and more."
 msgstr "YouTube、Vimeo、HTML5などに適合。"
 
-#: templates/index.html:30
+#: templates/index.html:31
+msgid "Using YouTube?"
+msgstr ""
+
+#: templates/index.html:31
+msgid "Sync automatically"
+msgstr ""
+
+#: templates/index.html:35
 msgid "Features"
 msgstr "特徴"
 
-#: templates/index.html:32
+#: templates/index.html:37
 msgid "Embed the video anywhere"
 msgstr "好きな場所にビデオを埋め込むことが可能"
 
-#: templates/index.html:33
+#: templates/index.html:38
 msgid "Add subtitles yourself or ask viewers to help."
 msgstr "自分で字幕を付け加え、または閲覧者に協力してもらうことが可能"
 
-#: templates/index.html:34
-msgid "Full site integration"
-msgstr "サイト全体の統合"
-
-#: templates/index.html:39
-msgid "Volunteers Needed"
-msgstr "ボランティア募集中"
-
-#: templates/index.html:41
-msgid ""
-"\n"
-"            Our deaf and hard of hearing users and non-profits request help for videos that need captions or translations. \n"
-"        "
+#: templates/index.html:43
+msgid "Help Create Captions and Subtitles"
 msgstr ""
 
-#: templates/index.html:44
-msgid "Start volunteering."
-msgstr "ボランティアを始める。"
+#: templates/index.html:45
+msgid ""
+"\n"
+"            Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
+"        "
+msgstr ""
 
 #: templates/index.html:48
-msgid "Complete Subtitling Solutions"
-msgstr "完全な字幕ソリューション"
+msgid "Take a Look."
+msgstr ""
 
-#: templates/index.html:50
+#: templates/index.html:52
+msgid "Groundbreaking Crowdsource Platform"
+msgstr ""
+
+#: templates/index.html:54
 msgid ""
 "\n"
-"            Increase viewership with transcription, captioning, and translation services, and flexible API and integration options. Improve SEO, reach a global audience, and build a managed volunteer community.\n"
+"            Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.\n"
 "        "
 msgstr ""
 
-#: templates/index.html:53
-msgid "See our enterprise services."
-msgstr "企業向けサービスをご覧ください"
+#: templates/index.html:57
+msgid "See our pro services."
+msgstr ""
 
-#: templates/index.html:77
+#: templates/index.html:81
 msgid "For Enterprise"
 msgstr ""
 
-#: templates/index.html:78
+#: templates/index.html:82
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr "世界で最大、最強の字幕／翻訳追加プラットフォーム"
 
-#: templates/index.html:84
+#: templates/index.html:88
 msgid "TED"
 msgstr ""
 
-#: templates/index.html:89
+#: templates/index.html:93
 msgid "Mozilla"
 msgstr ""
 
-#: templates/index.html:94
+#: templates/index.html:98
 msgid "Netflix"
 msgstr ""
 
-#: templates/index.html:99
+#: templates/index.html:103
 msgid "Coursera"
 msgstr ""
 
-#: templates/index.html:104
+#: templates/index.html:108
 msgid "PBS Newshour"
 msgstr ""
 
-#: templates/index.html:110
+#: templates/index.html:114
 msgid "More Popular"
 msgstr "人気ビデオををもっと観る"
 
-#: templates/index.html:111
+#: templates/index.html:115
 msgid "Most Popular Today"
 msgstr "今日の人気"
 
-#: templates/index.html:113
+#: templates/index.html:117
 msgid "Top this month"
 msgstr "今月のトップ"
 
-#: templates/index.html:114
+#: templates/index.html:118
 msgid "Top all-time"
 msgstr "全期間のトップ"
 
-#: templates/index.html:121
+#: templates/index.html:125
 msgid "More Featured"
 msgstr "注目ビデオをもっと観る"
 
-#: templates/index.html:122 templates/videos/featured_videos.html:36
+#: templates/index.html:126 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr "注目ビデオ"
+
+#: templates/index.html:144
+msgid "Awards for Amara"
+msgstr ""
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -5742,9 +5750,16 @@ msgstr "ビデオを自動的に投稿する"
 msgid "Let's Go!"
 msgstr "はじめてみましょう！"
 
-#: templates/videos/create.html:55 templates/videos/create.html.py:65
+#: templates/videos/create.html:55 templates/videos/create.html.py:73
 msgid "Or Submit Multiple Videos"
 msgstr "もしくは複数のビデオを投稿する"
+
+#: templates/videos/create.html:59
+msgid ""
+"\n"
+"        Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
+"    "
+msgstr ""
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
@@ -6293,12 +6308,12 @@ msgid "Create subtitles now"
 msgstr "字幕を今すぐ作成する"
 
 #: templates/videos/video-view.html:188
-msgid "Don't see the language you're looking for?"
-msgstr "探している言語が見つかりませんか？"
+msgid "Don't see one of your languages?"
+msgstr ""
 
 #: templates/videos/video-view.html:188
-msgid "Start a new translation"
-msgstr "新しい翻訳を開始する"
+msgid "Create a new translation"
+msgstr ""
 
 #: templates/videos/video-view.html:194
 msgid ""
