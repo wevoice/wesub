@@ -48,6 +48,7 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
+	unisubs.addScript("//fast.wistia.com/static/E-v1.js");
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
     
@@ -55,7 +56,7 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
         "http://fast.wistia.com/embed/iframe/" + 
             this.videoSource_.getVideoId());
     this.addQueryString_(embedUri);
-    this.playerSize_.width = 400;
+    /*this.playerSize_.width = 400;
     this.iframe_ = this.getDomHelper().createDom(
         'iframe', 
         { 'id': this.playerElemID_,
@@ -66,6 +67,21 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
           'frameborder': '0',
           'style': unisubs.style.setSizeInString('', this.playerSize_) });
     this.setElementInternal(this.iframe_);
+    */
+    /*this.playerDiv_ = this.getDomHelper().createDom(
+    	'div',
+    	{'id': this.playerElemID_,
+          'data-video-width': this.playerSize_.width + '',
+          'data-video-height': this.playerSize_.height + '', 
+          'style': unisubs.style.setSizeInString('', this.playerSize_) });
+    this.setElementInternal(this.playerDiv_);*/
+    var videoDiv = this.getDomHelper().createDom('div');
+        videoDiv.id = this.playerElemID_;
+        this.getElement().appendChild(videoDiv);
+        alert(this.playerElemID_);
+    
+
+    
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
@@ -114,6 +130,7 @@ unisubs.player.WistiaVideoPlayer.prototype.decorateInternal = function(elem) {
     else {
         elem.id = this.playerElemID_;
     }
+    
     this.playerSize_ = new goog.math.Size(
         parseInt(400), parseInt(300));
     this.setDimensionsKnownInternal();
