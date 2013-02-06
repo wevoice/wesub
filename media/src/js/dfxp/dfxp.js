@@ -898,7 +898,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             return -1;
         }
 
-        return parseFloat($subtitle.attr('begin')) || -1;
+        var val =  parseFloat($subtitle.attr('begin')) ;
+        return isNaN(val) ? -1 : val;
     };
     this.startTimeFromNode = function(node) {
         /*
@@ -908,7 +909,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var startTime = node.getAttribute('begin');
 
-        return parseFloat(startTime / 1000) || -1;
+        var val = parseFloat(startTime / 1000);
+        return isNaN(val) ? -1 : val;
+
     };
     this.subtitlesCount = function() {
         /*
