@@ -241,7 +241,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $newSubtitle = $(newSubtitle).attr(newAttrs);
 
-
         // Finally, place the new subtitle.
         //
         // If after is -1, we need to place the subtitle at the beginning.
@@ -802,8 +801,25 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitleParent = $subtitle.parent();
 
-        $subtitle.remove();
+        // If the parent div has only one child, remove the parent div along with this
+        // subtitle.
+        if ($subtitleParent.children('p').length === 1) {
+
+            // If the parent div is the first div, only remove the subtitle.
+            if ($subtitleParent.get(0) === this.$firstDiv.get(0)) {
+                $subtitle.remove();
+            
+            // Otherwise, remove the parent.
+            } else {
+                $subtitleParent.remove();
+            }
+
+        // Otherwise, there are other subtitles in this parent div. Only remove the subtitle.
+        } else {
+            $subtitle.remove();
+        }
 
         return true;
     };
@@ -814,7 +830,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true
          */
 
-        this.getSubtitles().remove();
+        // Remove everything inside the body.
+        $('body > *', this.$xml).remove();
+
+        // Create a new original container for new subs.
+        var newDiv = document.createElementNS('http://www.w3.org/ns/ttml', 'div');
+        $('body', this.$xml).append(newDiv);
+
+        this.$firstDiv = $(newDiv);
 
 
         return true;
@@ -892,15 +915,25 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 }
             
             // startOfParagraph is false. Check to see if this is a valid subtitle to unmark
-            // as a start of a paragraph.
+            // as a start of a paragraph. We can't unmark any non-first-children, or if the
+            // subtitle is the first-child of the first div.
             } else if ($subtitle.is(':first-child') && $subtitle.parent().get(0) !== this.$firstDiv.get(0)) {
-                // Otherwise, this subtitle should no longer indicate that it is the start of
-                // a paragraph.
-                //
-                // If this subtitle is the first child of the first div, do nothing (we
-                // can't unwrap the first div).
+                // This subtitle should no longer indicate that it is the start of a paragraph.
 
-                //$subtitle.unwrap();
+                // Get the current div that we'll be removing.
+                var $currentDiv = $subtitle.parent();
+
+                // Get previous div.
+                var $previousDiv = $currentDiv.prev();
+
+                // Get all of the subtitles inside of this subtitle's containing div.
+                var $subtitlesInDiv = $subtitle.parent().children('p');
+
+                // Move the subtitles in the current div to the previous div.
+                $previousDiv.append($subtitlesInDiv);
+
+                // Remove the current div.
+                $currentDiv.remove();
             }
         }
 

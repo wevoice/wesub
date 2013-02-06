@@ -430,7 +430,7 @@ describe('DFXP', function() {
             
             // The first subtitle's index should be '0'.
             expect(parser.getSubtitleIndex(parser.getFirstSubtitle(), parser.getSubtitles())).toBe(0);
-            expect(parser.getSubtitleIndex(parser.getFirstSubtitle() ).toBe(0);
+            expect(parser.getSubtitleIndex(parser.getFirstSubtitle())).toBe(0);
 
         });
     });
@@ -786,9 +786,11 @@ describe('DFXP', function() {
 
             // Remove all subtitles.
             parser.removeSubtitles();
-            
+
             // Add a mock subtitle.
             parser.addSubtitle(null, {'begin': 50, 'end': 100}, 'Test');
+
+            console.log(parser.xmlToString());
 
             // Get the XML string.
             var xmlString = parser.xmlToString(true);
@@ -797,7 +799,7 @@ describe('DFXP', function() {
             var newXML = $.parseXML(xmlString);
 
             // Grab the first subtitle's start time.
-            var startTime = $('div p', newXML).eq(0).attr('begin');
+            var startTime = $('p', newXML).eq(0).attr('begin');
 
             // Verify that the start time is a time expression.
             expect(startTime).toBe('00:00:00,050');
@@ -818,7 +820,7 @@ describe('DFXP', function() {
             var newXML = $.parseXML(xmlString);
 
             // Grab the first subtitle's start time.
-            var startTime = $('div p', newXML).eq(0).attr('begin');
+            var startTime = $('p', newXML).eq(0).attr('begin');
 
             // Verify that the start time is in milliseconds.
             expect(startTime).toBe('50');
@@ -835,7 +837,7 @@ describe('DFXP', function() {
             // Get the XML string.
             var xmlString = parser.xmlToString(true, true);
 
-            expect(xmlString).toBe('<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace"> <head> <metadata/> <styling xmlns:tts="http://www.w3.org/2006/10/ttaf1#styling"><style tts:textStyle="italic" xml:id="emphasis"/><style tts:fontWeight="bold" xml:id="strong"/><style tts:textDecoration="underline" xml:id="underlined"/></styling> <layout/> </head> <body region="subtitleArea"> <div><p begin="" end=""><span tts:fontWeight="bold">Test</span></p><div/> </div> </body> </tt>');
+            expect(xmlString).toBe('<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace"> <head> <metadata/> <styling xmlns:tts="http://www.w3.org/2006/10/ttaf1#styling"><style tts:textStyle="italic" xml:id="emphasis"/><style tts:fontWeight="bold" xml:id="strong"/><style tts:textDecoration="underline" xml:id="underlined"/></styling> <layout/> </head> <body region="subtitleArea">  <div><p begin="" end=""><span tts:fontWeight="bold">Test</span></p></div></body> </tt>');
 
         });
     });
