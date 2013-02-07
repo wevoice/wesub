@@ -47,42 +47,66 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
 };
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
+var embedded_video = null;
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
-	unisubs.addScript("//fast.wistia.com/static/E-v1.js");
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
-    
     var embedUri = new goog.Uri(
         "http://fast.wistia.com/embed/iframe/" + 
             this.videoSource_.getVideoId());
     this.addQueryString_(embedUri);
-    /*this.playerSize_.width = 400;
-    this.iframe_ = this.getDomHelper().createDom(
-        'iframe', 
-        { 'id': this.playerElemID_,
-          'type': 'text/html',
-          'width': this.playerSize_.width + '',
-          'height': this.playerSize_.height + '', 
-          'src': embedUri.toString(),
-          'frameborder': '0',
-          'style': unisubs.style.setSizeInString('', this.playerSize_) });
-    this.setElementInternal(this.iframe_);
-    */
-    /*this.playerDiv_ = this.getDomHelper().createDom(
-    	'div',
-    	{'id': this.playerElemID_,
-          'data-video-width': this.playerSize_.width + '',
-          'data-video-height': this.playerSize_.height + '', 
-          'style': unisubs.style.setSizeInString('', this.playerSize_) });
-    this.setElementInternal(this.playerDiv_);*/
-    var videoDiv = this.getDomHelper().createDom('div');
-        videoDiv.id = this.playerElemID_;
-        this.getElement().appendChild(videoDiv);
-        alert(this.playerElemID_);
+    this.playerSize_.width = 400;
+    div_args = {
+        'id': this.playerElemID_,
+        'data-video-width': this.playerSize_.width + '',
+        'data-video-height': this.playerSize_.height + '', 
+        'style': unisubs.style.setSizeInString('', this.playerSize_) 
+    };
+    var videoDiv = this.getDomHelper().createDom('div', div_args);
+    this.getElement().appendChild(videoDiv);
+	unisubs.addScript("http://fast.wistia.com/static/E-v1.js", false);
     
-
-    
+    window.setTimeout( 
+      (function (video_id, container_id) {
+        return function () {
+          embedded_video = window.Wistia.embed(video_id, {
+            playerColor: "ff0000",
+            fullscreenButton: false,
+        	container: container_id 
+          });
+          // add listeners to buttons
+          var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
+          var skip_btn = goog.dom.getElementByClass('unisubs-skip');
+          goog.events.listen(play_btn, goog.events.EventType.CLICK, vid_play);
+          goog.events.listen(skip_btn, goog.events.EventType.CLICK, vid_skip);
+          // add listeners for TAB key
+          var docKh = new goog.events.KeyHandler(document);
+          goog.events.listen(docKh, 'key', function (e) {
+              if (e.keyCode == 9) { // TAB key
+                  if (e.shiftKey) {
+                      vid_skip();
+                  } else {
+                      vid_play();
+                  }
+              }
+          });
+        }; // return function
+      })(this.videoSource_.getVideoId(), this.playerElemID_)
+    , 500);
 };
+
+function vid_play() {
+    if (! embedded_video) { return; }
+    embedded_video.play();
+    window.setTimeout(function () { embedded_video.pause(); }, 4000);
+}
+
+function vid_skip() {
+    if (! embedded_video) { return; }
+    embedded_video.time(embedded_video.time() - 4).play();
+    window.setTimeout(function () { embedded_video.pause(); }, 4000);
+}
+
 
 unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
     var config = this.videoSource_.getVideoConfig();
