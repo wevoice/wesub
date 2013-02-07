@@ -332,22 +332,26 @@ class Rpc(BaseRpc):
 
         language = video.subtitle_language(language_code)
 
-        if (language and language.is_complete_and_synced()
-                     and team.moderates_videos()
-                     and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
-            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-            
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
+        task = None
 
         if tasks:
             task = tasks[0]
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
+            if not user.is_authenticated() or \
+               (task.assignee and task.assignee != user) or \
+               (not task.assignee and not can_assign_task(task, user)):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
+
+        if (language and language.is_complete_and_synced()
+                     and team.moderates_videos()
+                     and not can_post_edit_subtitles(team, user)
+                     and not task):
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
+            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
         if mode not in ['review', 'approve']:
@@ -1202,6 +1206,7 @@ class Rpc(BaseRpc):
                         break
                 # if we reached this point, we have no good matches
                 language = candidates[0]
+
         editable = language.can_writelock(request.browser_id)
 
         if editable:
