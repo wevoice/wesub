@@ -208,7 +208,7 @@
                                     {% else %}
                                         {{ task.get_type_display }}
                                         {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                            {% if not task.new_subtitle_version.subtitle_language.get_translation_source_code %}
+                                            {% if not task.new_subtitle_version.subtitle_language.get_translation_source_language_code %}
                                                 {% trans 'Original' %}
                                             {% endif %}
                                         {% endif %}
