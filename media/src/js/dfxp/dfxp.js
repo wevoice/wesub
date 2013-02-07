@@ -366,7 +366,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // the rendered HTML that way. Then remove the temporary div.
         //
         // Reference: http://bit.ly/SwbPeR
-        return $('<div>').append($subtitle.contents().clone()).remove().html();
+
+        var subtitleContents = $subtitle.contents();
+
+        for (var i = 0; i < subtitleContents.length; i++) {
+            
+            // Single newlines in subtitle text nodes will report as two newlines
+            // when we use contents().
+            //
+            if (subtitleContents[i].data === '\n\n') {
+
+                // Set them to single newlines.
+                subtitleContents[i].data = '\n';
+            }
+        }
+
+        return $('<div>').append(subtitleContents.clone()).remove().html();
     };
     this.contentRenderedFromNode = function(node) {
         /*
