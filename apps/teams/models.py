@@ -1758,8 +1758,7 @@ class Task(models.Model):
                     language=self.language, type=type, 
                     assignee=assignee)
 
-        if type == Task.TYPE_IDS['Review']:
-            task.new_subtitle_version = self.new_subtitle_version
+        task.new_subtitle_version = self.new_subtitle_version
 
         task.set_expiration()
 
