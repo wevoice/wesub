@@ -918,7 +918,7 @@ class Rpc(BaseRpc):
         subtitle_version.visibility = 'private'
         subtitle_version.save()
 
-        if subtitle_version.is_dependent():
+        if subtitle_version.subtitle_language.get_translation_source_language_code() != None:
             task_type = Task.TYPE_IDS['Translate']
             can_do = can_create_and_edit_translations
         else:
