@@ -188,7 +188,7 @@ def markup_to_dfxp(text):
 
     # Some subtitles have ASCII control characters in them.  We're just gonna
     # strip those out entirely rather than try to deal with them.
-    control_chars = ['\x02', '\x03', '\x00', '\x08', '\x1f']
+    control_chars = ['\x02', '\x03', '\x00', '\x08', '\x1e', '\x1f']
     for c in control_chars:
         text = text.replace(c, '')
 
