@@ -832,7 +832,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'sentry': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'class': 'raven.contrib.django.handlers.SentryHandler',
         },
     },
