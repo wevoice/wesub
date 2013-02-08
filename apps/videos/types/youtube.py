@@ -612,6 +612,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         r = requests.put(uri, data=entry, headers=headers)
 
         if r.status_code == 403 and 'too_many_recent_calls' in r.content:
+            logger.info('too_many_calls: {0}, {1}, {2}'.format(uri, r.headers,
+                r.raw))
             raise TooManyRecentCallsException
 
         return r.status_code
