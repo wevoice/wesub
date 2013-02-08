@@ -12,7 +12,7 @@ var Popcorn = Popcorn || null;
         ctxContainer.id = id || Popcorn.guid();
         ctxContainer.className = 'amara-popcorn-subtitles';
 
-        style.width = context.media.width + 'px';
+        style.width = '100%';
 
         context.media.parentNode.appendChild(ctxContainer);
 
