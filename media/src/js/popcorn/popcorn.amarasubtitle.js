@@ -46,14 +46,22 @@ var Popcorn = Popcorn || null;
 
         },
         start: function(event, options){
-            options.innerContainer.style.display = 'block';
-            options.innerContainer.innerHTML = options.text || '';
+            if (options.text !== '') {
+                options.innerContainer.style.display = 'inline-block';
+                options.innerContainer.innerHTML = options.text || '';
+            }
         },
         end: function(event, options) {
             options.innerContainer.style.display = 'none';
         },
         _update: function(event, newOptions) {
             event.innerContainer.innerHTML = event.text = newOptions.text;
+
+            if (newOptions.text === '') {
+                event.innerContainer.style.display = 'none';
+            } else {
+                event.innerContainer.style.display = 'inline-block';
+            }
         },
         _teardown: function (options) {
             options.container.removeChild(options.innerContainer);

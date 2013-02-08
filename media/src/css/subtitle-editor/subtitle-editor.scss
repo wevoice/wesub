@@ -554,15 +554,20 @@ section.main {
             div.amara-popcorn-subtitles {
                 bottom: 63px;
                 left: 0;
+                padding: 0 20px;
                 position: absolute;
+                text-align: center;
 
                 div {
                     background: rgba(0, 0, 0, .8);
                     color: #FFF;
+                    display: inline-block;
                     font: bold 16px/22px Helvetica;
-                    margin: 0 22px 0 20px;
+                    margin: 0;
                     padding: 12px 20px;
                     text-align: center;
+                    max-width: 100%;
+                    width: auto;
                     @include border-radius(5px);
 
                     b {
