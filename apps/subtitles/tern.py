@@ -189,7 +189,8 @@ def markup_to_dfxp(text):
     # Some subtitles have ASCII control characters in them.  We're just gonna
     # strip those out entirely rather than try to deal with them.
     control_chars = ['\x02', '\x03', '\x00', '\x08', '\x0c', '\x0e', '\x0f',
-                     '\x10', '\x13', '\x17', '\x1c', '\x1d', '\x1e', '\x1f']
+                     '\x10', '\x13', '\x14', '\x17', '\x1c', '\x1d', '\x1e',
+                     '\x1f']
     for c in control_chars:
         text = text.replace(c, '')
 
@@ -683,6 +684,7 @@ def _create_subtitle_version(sv, last_version):
 
     """
     from apps.subtitles import pipeline
+    from apps import teams
 
     sl = sv.language
     nsl = sl.new_subtitle_language
@@ -709,6 +711,8 @@ def _create_subtitle_version(sv, last_version):
                 title=sv.title, description=sv.description, parents=parents,
                 visibility=visibility, author=sv.user,
                 created=sv.datetime_started)
+        except teams.models.MultipleObjectsReturned:
+            log('SubtitleVersion', 'DUPLICATE_TASKS', sv.pk, None)
         except:
             log_subtitle_error(sv, subtitles)
             raise
