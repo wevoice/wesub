@@ -48,6 +48,8 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
 var embedded_video = null;
+var mode_select = null;
+
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
@@ -72,7 +74,15 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
           embedded_video = window.Wistia.embed(video_id, {
             playerColor: "ff0000",
             fullscreenButton: false,
-        	container: container_id 
+        	container: container_id,
+            autoplay: false,
+            chromeless: true,
+            controlsVisibleOnLoad: false,
+            doNotTrack: true,
+            fullscreenButton: false,
+            playButton: false,
+            playBar: false,
+            videoFoam: false             
           });
           // add listeners to buttons
           var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
@@ -97,16 +107,43 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
 
 function vid_play() {
     if (! embedded_video) { return; }
-    embedded_video.play();
-    window.setTimeout(function () { embedded_video.pause(); }, 4000);
+    var speedmode = vid_get_mode();
+    if (speedmode == 'no') { // no autopause
+        if (embedded_video.state() == 'playing') {
+            embedded_video.pause();
+        } else {
+            embedded_video.play();
+        }
+    } else if (speedmode == 'au') { // magical autopause
+    } else { // beginner {
+        embedded_video.play();
+        window.setTimeout(function () { embedded_video.pause(); }, 4000);
+    }
 }
 
 function vid_skip() {
     if (! embedded_video) { return; }
-    embedded_video.time(embedded_video.time() - 4).play();
-    window.setTimeout(function () { embedded_video.pause(); }, 4000);
+    var speedmode = vid_get_mode();
+    if (speedmode == 'pl') { // beginner
+        embedded_video.time(embedded_video.time() - 4).play();
+        window.setTimeout(function () { embedded_video.pause(); }, 4000);
+    } else {
+        embedded_video.time(embedded_video.time() - 8).play();
+    }
 }
 
+function vid_get_mode() {
+    if (! mode_select) {
+        var nodes = goog.dom.getChildren(goog.dom.getElementByClass('unisubs-speedmode'));
+        for (ii = 0; ii < nodes.length; ++ii) {
+            if (nodes[ii].nodeName == 'SELECT') { 
+                mode_select = nodes[ii];
+                break;
+            }
+        }
+    }
+    return mode_select == null ? 'pl' : goog.dom.forms.getValue(mode_select);
+}
 
 unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
     var config = this.videoSource_.getVideoConfig();
