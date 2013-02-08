@@ -74,7 +74,7 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
           embedded_video = window.Wistia.embed(video_id, {
             playerColor: "ff0000",
             fullscreenButton: false,
-        	container: container_id,
+            container: container_id,
             autoplay: false,
             chromeless: true,
             controlsVisibleOnLoad: false,
@@ -100,6 +100,14 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
                   }
               }
           });
+          // player controls
+          goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
+                  goog.events.EventType.CLICK, function () {
+                      if (! embedded_video) { return; }
+                      embedded_video.state() == 'playing' ?
+                        embedded_video.pause() :
+                        embedded_video.play();
+                  });
         }; // return function
       })(this.videoSource_.getVideoId(), this.playerElemID_)
     , 500);
