@@ -856,6 +856,11 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
+        },
+        'api': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
         }
     },
 }
