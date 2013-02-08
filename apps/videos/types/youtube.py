@@ -60,6 +60,7 @@ class TooManyRecentCallsException(Exception):
 
     def __init__(self, *args, **kwargs):
         super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
+        logger.info('too_many_calls: {0}, {1}'.format(args, kwargs))
         Occurrence('youtube.api_too_many_calls').mark()
 
 
@@ -612,7 +613,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         r = requests.put(uri, data=entry, headers=headers)
 
         if r.status_code == 403 and 'too_many_recent_calls' in r.content:
-            raise TooManyRecentCallsException
+            raise TooManyRecentCallsException(r.headers, r.raw)
 
         return r.status_code
 

@@ -861,6 +861,11 @@ LOGGING = {
             'level': 'INFO',
             'handlers': ['sentry', 'console'],
             'propagate': False
+        },
+        'youtube': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
         }
     },
 }
