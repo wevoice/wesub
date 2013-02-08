@@ -693,9 +693,13 @@ def _create_subtitle_version(sv, last_version):
 
     parents = []
     if last_version and sl.is_dependent():
-        tip = sl.standard_language.new_subtitle_language.get_tip()
-        if tip:
-            parents = [tip]
+        if sl.standard_language:
+            tip = sl.standard_language.new_subtitle_language.get_tip()
+            if tip:
+                parents = [tip]
+        else:
+            log('SubtitleVersion', 'ORPHAN', sl.pk, None)
+
 
     if not dry:
         try:
