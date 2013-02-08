@@ -684,7 +684,7 @@ def _create_subtitle_version(sv, last_version):
 
     """
     from apps.subtitles import pipeline
-    from apps import teams
+    from django.core.exceptions import MultipleObjectsReturned
 
     sl = sv.language
     nsl = sl.new_subtitle_language
@@ -711,7 +711,7 @@ def _create_subtitle_version(sv, last_version):
                 title=sv.title, description=sv.description, parents=parents,
                 visibility=visibility, author=sv.user,
                 created=sv.datetime_started)
-        except teams.models.MultipleObjectsReturned:
+        except MultipleObjectsReturned:
             log('SubtitleVersion', 'DUPLICATE_TASKS', sv.pk, None)
         except:
             log_subtitle_error(sv, subtitles)
