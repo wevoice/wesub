@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-07 00:16-0600\n"
+"POT-Creation-Date: 2013-02-10 00:22-0600\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -518,7 +518,7 @@ msgstr ""
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/subtitles/views.py:110 apps/widget/rpc.py:338
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:353
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -748,11 +748,11 @@ msgstr ""
 msgid "Admins only"
 msgstr ""
 
-#: apps/teams/models.py:145 apps/teams/models.py:2641
+#: apps/teams/models.py:145 apps/teams/models.py:2640
 msgid "name"
 msgstr ""
 
-#: apps/teams/models.py:146 apps/teams/models.py:2642
+#: apps/teams/models.py:146 apps/teams/models.py:2641
 msgid "slug"
 msgstr ""
 
@@ -868,7 +868,7 @@ msgid "Manager"
 msgstr ""
 
 #: apps/teams/models.py:950 apps/teams/permissions_const.py:44
-#: templates/base.html:133
+#: templates/base.html:130
 msgid "Admin"
 msgstr ""
 
@@ -1684,7 +1684,7 @@ msgstr ""
 msgid "Video embedding disabled by owner"
 msgstr ""
 
-#: apps/widget/rpc.py:1106 apps/widget/rpc.py:1148
+#: apps/widget/rpc.py:1110 apps/widget/rpc.py:1152
 msgid "\n"
 msgstr ""
 
@@ -2059,48 +2059,65 @@ msgstr ""
 msgid "Sign in / Sign up"
 msgstr ""
 
-#: templates/base.html:116
+#: templates/base.html:93
+msgid "Got a YouTube account?<"
+msgstr ""
+
+#: templates/base.html:94
+msgid ""
+"New: enable viewer-created translations and captions on your YouTube channel!"
+msgstr ""
+
+#: templates/base.html:96
+msgid "Connect to YouTube"
+msgstr ""
+
+#: templates/base.html:97
+msgid "No thanks"
+msgstr ""
+
+#: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
 
-#: templates/base.html:119 templates/profiles/base.html:12
+#: templates/base.html:116 templates/profiles/base.html:12
 msgid "About"
 msgstr ""
 
-#: templates/base.html:120
+#: templates/base.html:117
 msgid "Jobs"
 msgstr ""
 
-#: templates/base.html:123
+#: templates/base.html:120
 msgid "Contact Us"
 msgstr ""
 
-#: templates/base.html:124
+#: templates/base.html:121
 msgid "Privacy Policy"
 msgstr ""
 
-#: templates/base.html:125
+#: templates/base.html:122
 msgid "Terms of Service"
 msgstr ""
 
-#: templates/base.html:126
+#: templates/base.html:123
 msgid "Security"
 msgstr ""
 
-#: templates/base.html:136
+#: templates/base.html:133
 msgid "Sentry"
 msgstr ""
 
-#: templates/base.html:139
+#: templates/base.html:136
 msgid "Rosetta"
 msgstr ""
 
-#: templates/base.html:142
+#: templates/base.html:139
 msgid "Impersonate"
 msgstr ""
 
-#: templates/base.html:145 templates/teams/billing/choose.html:11
+#: templates/base.html:142 templates/teams/billing/choose.html:11
 msgid "Billing"
 msgstr ""
 
@@ -3769,27 +3786,23 @@ msgid " about Crowd Subtitles and YouTube"
 msgstr ""
 
 #: templates/profiles/account.html:203
-msgid "Step 1: Create/Confirm your YouTube Channel"
+msgid "Ready to Enable Crowd Subtitles?"
 msgstr ""
 
 #: templates/profiles/account.html:204
-msgid "Enable Channel"
-msgstr ""
-
-#: templates/profiles/account.html:206
-msgid "Step 2: Authorize"
-msgstr ""
-
-#: templates/profiles/account.html:207
 msgid "Link accounts"
 msgstr ""
 
-#: templates/profiles/account.html:210
+#: templates/profiles/account.html:206
+msgid "create one now"
+msgstr ""
+
+#: templates/profiles/account.html:209
 msgid ""
 "Organizations/companies: interested in YouTube sync and crowd subtitling? "
 msgstr ""
 
-#: templates/profiles/account.html:211
+#: templates/profiles/account.html:210
 msgid "Contact us"
 msgstr ""
 
