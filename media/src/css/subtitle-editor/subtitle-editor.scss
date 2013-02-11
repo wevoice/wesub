@@ -526,18 +526,29 @@ section.main {
             background: #ECECEC;
             border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
-            height: 31px;
-            padding: 5px 20px;
             position: relative;
 
             &:before {
                 @include shadow;
             }
             select {
+                background: transparent url('../../../images/down-arrow-offset.png') center right no-repeat;
+                border: 0;
+                border-right: 1px solid #DADBDC;
+                cursor: pointer;
                 display: block;
                 float: left;
                 margin: 0;
+                padding: 8px 10px;
+                position: relative;
+                text-indent: 0;
                 width: 33%;
+                -webkit-appearance: none;
+                @include border-radius(0);
+
+                &:focus {
+                    outline: none;
+                }
             }
         }
     }
