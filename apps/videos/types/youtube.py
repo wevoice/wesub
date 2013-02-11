@@ -441,7 +441,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             return super(YouTubeApiBridge, self).request(*args, **kwargs)
         except gdata.client.RequestError, e:
             if 'too_many_recent_calls' in str(e):
-                raise TooManyRecentCallsException
+                raise TooManyRecentCallsException(e.headers, e.reason,
+                        e.status, e.body)
             else:
                 raise e
 
