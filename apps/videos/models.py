@@ -34,7 +34,6 @@ from django.utils.dateformat import format as date_format
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
-from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
@@ -1732,36 +1731,6 @@ def update_followers(sender, instance, created, **kwargs):
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
 
-
-def restrict_versions(version_qs, user, subtitle_language):
-    """Filter the given queryset of SubtitleVersions for the user.
-
-    Returns a list of SubtitleVersions the user has permission to see.
-
-    This function performs several DB queries, so try not to call it more than
-    once per page.
-
-    This will realize the queryset into a list, so do any other filtering you
-    might need before you call this function.
-
-    """
-    from teams.permissions import get_member
-
-    versions = list(version_qs)
-
-    # Videos that don't have team videos aren't moderated, so all versions
-    # should be viewable.
-    team_video = subtitle_language.video.get_team_video()
-    if not team_video:
-        return versions
-
-    # Members can always view all versions for their team's videos.
-    member = get_member(user, team_video.team)
-    if member:
-        return versions
-
-    # Non-members can only see public versions.
-    return filter(lambda v: v.is_public, version_qs)
 
 def has_viewable_draft(version, user):
     """Return whether the given version has draft subtitles viewable by the user.
