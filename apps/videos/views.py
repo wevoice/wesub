@@ -58,8 +58,7 @@ from apps.videos.forms import (
     ChangeVideoOriginalLanguageForm
 )
 from apps.videos.models import (
-    Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException,
-    restrict_versions
+    Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException
 )
 from apps.videos.rpc import VideosApiClass
 from apps.videos.search_indexes import VideoIndex
@@ -416,12 +415,20 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
             config["languageCode"] = lang
             url = reverse('onsite_widget')+'?config='+urlquote_plus(json.dumps(config))
             return redirect(url)
-        elif video.subtitlelanguage_set.count() > 0:
+        elif video.newsubtitlelanguage_set.count() > 0:
             language = video.newsubtitlelanguage_set.all()[0]
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.select_related('user')
+    qs = language.subtitleversion_set
+    team_video = video.get_team_video()
+    if team_video and not team_video.team.is_member(request.user):
+        # Non-members can only see public versions.
+        qs = qs.public()
+    else:
+        qs = qs.all()
+    qs = qs.select_related('user')
+
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -447,7 +454,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['task'] =  _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
 
-    versions = restrict_versions(qs, request.user, language)
+    versions = list(qs)
     context['revision_list'] = versions
 
     if versions:
@@ -472,7 +479,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         # user can only edit a subtitle draft if he
         # has a subtitle/translate task assigned to him
         tasks = Task.objects.incomplete_subtitle_or_translate() \
-                            .filter(team_video=video.get_team_video(),
+                            .filter(team_video=team_video,
                                     assignee=request.user,
                                     language=language.language_code)
 
