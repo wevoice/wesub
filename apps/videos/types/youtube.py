@@ -122,7 +122,13 @@ class HttpClient(atom.http_core.HttpClient):
 
         extra = {
             'youtube_headers': headers,
-            'youtube_uri': uri,
+            'youtube_uri': {
+                'host': uri.host,
+                'port': uri.port,
+                'scheme': uri.scheme,
+                'path': uri.path,
+                'query': uri.query
+            },
             'youtube_method': method,
             'youtube_body_parts': body_parts
         }
