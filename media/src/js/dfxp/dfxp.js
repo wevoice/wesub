@@ -469,18 +469,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof endTime !== 'undefined') {
-            if (parseFloat(endTime)) {
+            if (parseFloat(endTime) || endTime === 0) {
                 $subtitle.attr('end', endTime);
             } else {
                 $subtitle.attr('end', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
-        return parseFloat($subtitle.attr('end')) || -1;
+        var val =  parseFloat($subtitle.attr('end')) ;
+
+        return isNaN(val) ? -1 : val;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -963,19 +966,20 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof startTime !== 'undefined') {
-            if (parseFloat(startTime)) {
+            if (parseFloat(startTime) || startTime === 0) {
                 $subtitle.attr('begin', startTime);
             } else {
                 $subtitle.attr('begin', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
-
         var val =  parseFloat($subtitle.attr('begin')) ;
+
         return isNaN(val) ? -1 : val;
     };
     this.startTimeFromNode = function(node) {
@@ -987,6 +991,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var startTime = node.getAttribute('begin');
 
         var val = parseFloat(startTime / 1000);
+
         return isNaN(val) ? -1 : val;
 
     };
