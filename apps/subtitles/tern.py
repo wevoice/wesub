@@ -326,7 +326,7 @@ def _add_sl(sl):
         nsl.save()
 
         # Has to be set separately because it's a magic Redis field.
-        nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+        nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter.val
 
         # TODO: is this right, or does it need to be save()'ed?
         nsl.followers = sl.followers.all()
