@@ -21,6 +21,7 @@ class EditorDialogs(Page):
 
     _DONE = 'a.unisubs-done span'
     _CHECKBOX = 'span.goog-checkbox'
+    _CHECKBOX_CHECKED = 'span.goog-checkbox-checked'
     _CLOSE = 'span.unisubs-modal-widget-title-close'
     _CLOSE_LANG_MODAL = 'span.unisubs-modal-lang-title-close'
 
@@ -81,7 +82,8 @@ class EditorDialogs(Page):
         if self.is_element_visible(self._CHECKBOX):
             if complete == True:
                 self.logger.info('Marking subs as complete')
-                self.click_by_css(self._CHECKBOX)
+                if not self.is_element_present(self._CHECKBOX_CHECKED):
+                    self.click_by_css(self._CHECKBOX)
             self.logger.info('Click OK in the subs complete diaplog')
             self.click_by_css(self._SAVED_OK)
         
