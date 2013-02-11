@@ -189,7 +189,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // on the fly from a string.
             //
             // TODO: Do something that makes more sense.
-            xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
+            //
+            // Update: What in the mother is going on here?
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
 
             // Hey look, more hacks. For some reason, when the XML is spit to a
             // string, the attributes are all lower-cased. Fix them here.
