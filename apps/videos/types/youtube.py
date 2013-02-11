@@ -60,7 +60,9 @@ class TooManyRecentCallsException(Exception):
 
     def __init__(self, *args, **kwargs):
         super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
-        logger.info('too_many_calls: {0}, {1}'.format(args, kwargs))
+        logger.info('too_many_calls', extra={
+            'exception_args': args,
+            'exception_kwargs': kwargs})
         Occurrence('youtube.api_too_many_calls').mark()
 
 
