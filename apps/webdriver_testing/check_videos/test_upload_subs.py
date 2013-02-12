@@ -23,6 +23,8 @@ class TestCaseUntimedText(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
+        cls.video_pg.set_skiphowto()
+
 
     def setUp(self):
         super(TestCaseUntimedText, self).setUp()
@@ -214,6 +216,7 @@ class TestCaseTimedText(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
         cls.video_pg.open_video_page(cls.test_video.video_id)
         cls.video_pg.log_in(cls.user.username, 'password')
+        cls.video_pg.set_skiphowto()
 
 
     def setUp(self):
