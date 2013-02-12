@@ -47,6 +47,23 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
 };
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
+unisubs.player.WistiaVideoPlayer.prototype.getVolume = function() 
+{
+    console.log('getting');
+    return this.player_ ? (this.player_['getVolume']() / 100) : 0;
+}
+
+unisubs.player.WistiaVideoPlayer.prototype.setVolume = function(vol) 
+{
+    console.log('setting');
+    if (this.player_) {
+        this.player_['setVolume'](vol * 100);
+    } else {
+        this.commands_.push(goog.bind(this.setVolume, this, vol));
+    }
+}
+
+var embed_try_interval = 300;
 var embedded_video = null;
 var mode_select = null;
 
@@ -69,9 +86,26 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
 	unisubs.addScript("http://fast.wistia.com/static/E-v1.js", false);
     
     window.setTimeout( 
-      (function (video_id, container_id) {
-        return function () {
-          embedded_video = window.Wistia.embed(video_id, {
+          get_embed_func(
+                this.videoSource_.getVideoId()
+              , this.playerElemID_
+          )
+        , embed_try_interval
+    );
+};
+
+function get_embed_func(video_id, container_id) 
+{
+    return function () 
+    {
+        if (window.Wistia == undefined) {
+            window.setTimeout(
+                  get_embed_func(video_id, container_id) 
+                , embed_try_interval
+            );
+            return;
+        }
+        embedded_video = window.Wistia.embed(video_id, {
             playerColor: "ff0000",
             fullscreenButton: false,
             container: container_id,
@@ -83,37 +117,39 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
             playButton: false,
             playBar: false,
             videoFoam: false             
-          });
-          // add listeners to buttons
-          var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
-          var skip_btn = goog.dom.getElementByClass('unisubs-skip');
-          goog.events.listen(play_btn, goog.events.EventType.CLICK, vid_play);
-          goog.events.listen(skip_btn, goog.events.EventType.CLICK, vid_skip);
-          // add listeners for TAB key
-          var docKh = new goog.events.KeyHandler(document);
-          goog.events.listen(docKh, 'key', function (e) {
-              if (e.keyCode == 9) { // TAB key
-                  if (e.shiftKey) {
-                      vid_skip();
-                  } else {
-                      vid_play();
-                  }
-              }
-          });
-          // player controls
-          goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
-                  goog.events.EventType.CLICK, function () {
-                      if (! embedded_video) { return; }
-                      embedded_video.state() == 'playing' ?
-                        embedded_video.pause() :
-                        embedded_video.play();
-                  });
-        }; // return function
-      })(this.videoSource_.getVideoId(), this.playerElemID_)
-    , 500);
-};
+        });
+        // add listeners to buttons
+        var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
+        var skip_btn = goog.dom.getElementByClass('unisubs-skip');
+        goog.events.listen(play_btn, goog.events.EventType.CLICK, vid_play);
+        goog.events.listen(skip_btn, goog.events.EventType.CLICK, vid_skip);
+        // add listeners for TAB key
+        var docKh = new goog.events.KeyHandler(document);
+        goog.events.listen(docKh, 'key', function (e) {
+            if (e.keyCode == 9) { // TAB key
+                if (e.shiftKey) {
+                    vid_skip();
+                } else {
+                    vid_play();
+                }
+            }
+        });
+        // player controls
+        goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
+            goog.events.EventType.CLICK, function () {
+                if (! embedded_video) { return; }
+                embedded_video.state() == 'playing' ?
+                    embedded_video.pause() :
+                    embedded_video.play();
+            }
+        );
+	var vc = goog.dom.getElementByClass('unisubs-volume-scrobbler');
+	console.log(vc);
+    }; // return function
+}
 
-function vid_play() {
+function vid_play() 
+{
     if (! embedded_video) { return; }
     var speedmode = vid_get_mode();
     if (speedmode == 'no') { // no autopause
@@ -129,7 +165,8 @@ function vid_play() {
     }
 }
 
-function vid_skip() {
+function vid_skip() 
+{
     if (! embedded_video) { return; }
     var speedmode = vid_get_mode();
     if (speedmode == 'pl') { // beginner
@@ -140,7 +177,8 @@ function vid_skip() {
     }
 }
 
-function vid_get_mode() {
+function vid_get_mode() 
+{
     if (! mode_select) {
         var nodes = goog.dom.getChildren(goog.dom.getElementByClass('unisubs-speedmode'));
         for (ii = 0; ii < nodes.length; ++ii) {
