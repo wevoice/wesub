@@ -58,7 +58,7 @@ def mirror_existing_youtube_videos(user_pk):
 
 
 @periodic_task(run_every=timedelta(seconds=60))
-def gauge_videos():
+def gauge_tpas():
     count = ThirdPartyAccount.objects.filter(type=VIDEO_TYPE_YOUTUBE).count()
     Gauge('youtube.accounts_linked').report(count)
 
