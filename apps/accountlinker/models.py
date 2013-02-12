@@ -44,6 +44,9 @@ AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
 AMARA_DESCRIPTION_CREDIT = translation.ugettext(
     "Help us caption and translate this video on Amara.org")
 
+AMARA_SHORT_DESCRIPTON_CREDIT = translation.ugettext(
+    "Help us caption & translate this video!")
+
 
 def youtube_sync(video, language):
     """
