@@ -100,11 +100,11 @@ class SubtitleEditor(EditorDialogs):
         """
         self.buffer_video()
         self.play()
-        time.sleep(4)
+        time.sleep(3)
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
-            time.sleep(3)
+            time.sleep(2)
             self.logger.info('syncing') 
             self.click_by_css(self._SYNC)
         self.pause()

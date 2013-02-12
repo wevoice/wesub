@@ -30,6 +30,7 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
 
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_language_pg.set_skiphowto()
 
 
 

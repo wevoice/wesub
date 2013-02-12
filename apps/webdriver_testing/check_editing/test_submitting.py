@@ -39,11 +39,10 @@ class TestCaseSubmittable(WebdriverTestCase):
         cls.video_pg.add_subtitles()
         cls.create_modal.create_original_subs('English', 'English')
 
-        cls.logger.info( 'typing subs')
+        cls.logger.info('typing subs')
         cls.typed_subs = cls.sub_editor.type_subs()
         cls.sub_editor.continue_to_next_step()
-        
-        cls.logger.info( 'syncing subs')
+        cls.logger.info('syncing subs')
         cls.sub_editor.sync_subs(len(cls.typed_subs)+2)
         cls.timing_list = cls.sub_editor.sub_timings()
         cls.sub_editor.save_and_exit()
@@ -52,17 +51,17 @@ class TestCaseSubmittable(WebdriverTestCase):
         super(TestCaseSubmittable, self).setUp()
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
                                                     'en')
+        #time.sleep(2)
+        self.video_language_pg.handle_js_alert('accept')
         self.video_language_pg.edit_subtitles()
         self.sub_editor.continue_to_next_step()
-        self.logger.info( 'continue to description screen')
+        self.logger.info('continue to description screen')
         self.sub_editor.continue_to_next_step()
-        self.logger.info( 'continue to review screen')
+        self.logger.info('continue to review screen')
         self.sub_editor.continue_to_next_step()
 
         #All tests start in check step with fully synced subs 
 
-    def tearDown(self):
-        super(TestCaseSubmittable, self).tearDown()
 
     def test_display__checkpage(self):
         """Manually entered synced subs display in check step.
@@ -148,17 +147,17 @@ class TestCaseIncomplete(WebdriverTestCase):
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
 
-        self.logger.info( 'typing subs')
+        self.logger.info('typing subs')
         self.typed_subs = self.sub_editor.type_subs()
         self.sub_editor.continue_to_next_step()
         
-        self.logger.info( 'syncing subs')
+        self.logger.info('syncing subs')
         self.sub_editor.sync_subs(len(self.typed_subs)+2)
         self.timing_list = self.sub_editor.sub_timings()
         self.sub_editor.continue_to_next_step()
-        self.logger.info( 'continue to description screen')
+        self.logger.info('continue to description screen')
         self.sub_editor.continue_to_next_step()
-        self.logger.info( 'continue to review screen')
+        self.logger.info('continue to review screen')
         self.sub_editor.continue_to_next_step()
 
     def test_submit__incomplete(self):

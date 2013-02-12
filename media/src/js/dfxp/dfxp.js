@@ -189,7 +189,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // on the fly from a string.
             //
             // TODO: Do something that makes more sense.
-            xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
+            //
+            // Update: What in the mother is going on here?
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
 
             // Hey look, more hacks. For some reason, when the XML is spit to a
             // string, the attributes are all lower-cased. Fix them here.
@@ -469,18 +473,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof endTime !== 'undefined') {
-            if (parseFloat(endTime)) {
+            if (parseFloat(endTime) || endTime === 0) {
                 $subtitle.attr('end', endTime);
             } else {
                 $subtitle.attr('end', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
-        return parseFloat($subtitle.attr('end')) || -1;
+        var val =  parseFloat($subtitle.attr('end')) ;
+
+        return isNaN(val) ? -1 : val;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -963,19 +970,20 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof startTime !== 'undefined') {
-            if (parseFloat(startTime)) {
+            if (parseFloat(startTime) || startTime === 0) {
                 $subtitle.attr('begin', startTime);
             } else {
                 $subtitle.attr('begin', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
-
         var val =  parseFloat($subtitle.attr('begin')) ;
+
         return isNaN(val) ? -1 : val;
     };
     this.startTimeFromNode = function(node) {
@@ -987,6 +995,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var startTime = node.getAttribute('begin');
 
         var val = parseFloat(startTime / 1000);
+
         return isNaN(val) ? -1 : val;
 
     };

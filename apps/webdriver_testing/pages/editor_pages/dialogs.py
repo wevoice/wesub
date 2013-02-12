@@ -21,6 +21,7 @@ class EditorDialogs(Page):
 
     _DONE = 'a.unisubs-done span'
     _CHECKBOX = 'span.goog-checkbox'
+    _CHECKBOX_CHECKED = 'span.goog-checkbox-checked'
     _CLOSE = 'span.unisubs-modal-widget-title-close'
     _CLOSE_LANG_MODAL = 'span.unisubs-modal-lang-title-close'
 
@@ -61,6 +62,7 @@ class EditorDialogs(Page):
         self.logger.info('clicking the subtitles saved confirmation box')
         self.wait_for_element_present(self._SAVED_OK, wait_time=10)
         self.click_by_css(self._SAVED_OK)
+        self.wait_for_element_not_present(self._SAVED_OK)
 
     def resume_dialog_ok(self):
         self.logger.info('clicking OK in the resume dialog')
@@ -81,9 +83,10 @@ class EditorDialogs(Page):
         if self.is_element_visible(self._CHECKBOX):
             if complete == True:
                 self.logger.info('Marking subs as complete')
-                self.click_by_css(self._CHECKBOX)
-            self.logger.info('Click OK in the subs complete diaplog')
-            self.click_by_css(self._SAVED_OK)
+                if not self.is_element_present(self._CHECKBOX_CHECKED):
+                    self.click_by_css(self._CHECKBOX)
+            self.wait_for_element_not_visible(self._CHECKBOX)
+            self.click_saved_ok()
         
 
     def incomplete_alert_text(self):
