@@ -64,15 +64,15 @@ class Page(object):
 
         """
         self.logger.info('Handling alert dialog with: %s' % action)
+        time.sleep(2)
         try:
-            time.sleep(2)
             a = self.browser.switch_to_alert()
             if action == "accept":
                 a.accept()
             elif action == "reject":
                 a.dismiss()
         except:
-            self.record_error('failed handling the expected alert')
+            self.logger.info('Error with handling alert dialog')
 
     def check(self, element):
         """Check the box for the element provided by css selector.

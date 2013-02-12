@@ -51,6 +51,8 @@ class TestCaseSubmittable(WebdriverTestCase):
         super(TestCaseSubmittable, self).setUp()
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
                                                     'en')
+        #time.sleep(2)
+        self.video_language_pg.handle_js_alert('accept')
         self.video_language_pg.edit_subtitles()
         self.sub_editor.continue_to_next_step()
         self.logger.info('continue to description screen')
@@ -60,8 +62,6 @@ class TestCaseSubmittable(WebdriverTestCase):
 
         #All tests start in check step with fully synced subs 
 
-    def tearDown(self):
-        super(TestCaseSubmittable, self).tearDown()
 
     def test_display__checkpage(self):
         """Manually entered synced subs display in check step.
