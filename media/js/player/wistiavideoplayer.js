@@ -110,7 +110,7 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
                   });
         }; // return function
       })(this.videoSource_.getVideoId(), this.playerElemID_)
-    , 500);
+    , 5500);
 };
 
 function vid_play() {
