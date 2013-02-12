@@ -16,6 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+goog.require("goog.events.KeyCodes");
+goog.require("goog.events.KeyHandler");
 goog.require("goog.ui.Dialog");
 goog.require("goog.net.Cookies");
 goog.require("goog.json.Serializer");
