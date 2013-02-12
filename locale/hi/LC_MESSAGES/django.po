@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-11 00:33-0600\n"
+"POT-Creation-Date: 2013-02-12 00:17-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/universalsubtitles/"
@@ -1284,242 +1284,242 @@ msgstr ""
 msgid "captcha"
 msgstr ""
 
-#: apps/videos/models.py:139
+#: apps/videos/models.py:138
 msgid "in seconds"
 msgstr ""
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:162
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:164
 msgid "Widget views"
 msgstr ""
 
-#: apps/videos/models.py:167
+#: apps/videos/models.py:166
 msgid "Views"
 msgstr ""
 
-#: apps/videos/models.py:1159
+#: apps/videos/models.py:1158
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
 
-#: apps/videos/models.py:2012
+#: apps/videos/models.py:1981
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:1986
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:1991
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:1996
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:2001
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2038
+#: apps/videos/models.py:2007
 #, python-format
 msgid "  deleted a video: \"%(title)s\""
 msgstr ""
 
-#: apps/videos/models.py:2043
+#: apps/videos/models.py:2012
 #, python-format
 msgid ""
 "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2045
+#: apps/videos/models.py:2014
 #, python-format
 msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
 msgstr ""
 
-#: apps/videos/models.py:2051
+#: apps/videos/models.py:2020
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2053
+#: apps/videos/models.py:2022
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2067
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2069
+#: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2072
+#: apps/videos/models.py:2041
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2074
+#: apps/videos/models.py:2043
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2082
+#: apps/videos/models.py:2051
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2084
+#: apps/videos/models.py:2053
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2092
+#: apps/videos/models.py:2061
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2094
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2100
+#: apps/videos/models.py:2069
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2102
+#: apps/videos/models.py:2071
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2107
+#: apps/videos/models.py:2076
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr ""
 
-#: apps/videos/models.py:2112
+#: apps/videos/models.py:2081
 #, python-format
 msgid "left the %s team"
 msgstr ""
 
-#: apps/videos/models.py:2126
+#: apps/videos/models.py:2095
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2132
+#: apps/videos/models.py:2101
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2210
+#: apps/videos/models.py:2179
 msgid "add video"
 msgstr ""
 
-#: apps/videos/models.py:2211
+#: apps/videos/models.py:2180
 msgid "change title"
 msgstr ""
 
-#: apps/videos/models.py:2212
+#: apps/videos/models.py:2181
 msgid "comment"
 msgstr ""
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2182
 msgid "add version"
 msgstr ""
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2183
 msgid "add translation"
 msgstr ""
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2184
 msgid "add video url"
 msgstr ""
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2185
 msgid "request subtitles"
 msgstr ""
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2186
 msgid "approve version"
 msgstr ""
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2187
 msgid "add contributor"
 msgstr ""
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2188
 msgid "remove contributor"
 msgstr ""
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2189
 msgid "reject version"
 msgstr ""
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2190
 msgid "review version"
 msgstr ""
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2191
 msgid "accept version"
 msgstr ""
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2192
 msgid "decline version"
 msgstr ""
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2193
 msgid "delete video"
 msgstr ""
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2194
 msgid "edit url"
 msgstr ""
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2195
 msgid "delete url"
 msgstr ""
 
-#: apps/videos/models.py:2484
+#: apps/videos/models.py:2453
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
@@ -1611,7 +1611,7 @@ msgstr ""
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr ""
 
-#: apps/videos/views.py:176
+#: apps/videos/views.py:175
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1619,40 +1619,40 @@ msgid ""
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:184
+#: apps/videos/views.py:183
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:189
+#: apps/videos/views.py:188
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr ""
 
-#: apps/videos/views.py:297
+#: apps/videos/views.py:296
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr ""
 
-#: apps/videos/views.py:613
+#: apps/videos/views.py:620
 msgid "You have not permission change this URL"
 msgstr ""
 
-#: apps/videos/views.py:618 apps/videos/views.py:649
+#: apps/videos/views.py:625 apps/videos/views.py:656
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:633
+#: apps/videos/views.py:640
 msgid "You have not permission delete this URL"
 msgstr ""
 
-#: apps/videos/views.py:637
+#: apps/videos/views.py:644
 msgid "You can't remove primary URL"
 msgstr ""
 
-#: apps/videos/views.py:791
+#: apps/videos/views.py:798
 #, python-format
 msgid "The language for %s has been changed"
 msgstr ""
@@ -3660,7 +3660,7 @@ msgid "Add an account"
 msgstr ""
 
 #: templates/profiles/account.html:63 templates/profiles/account.html.py:74
-#: templates/teams/_team_video_detail.html:57
+#: templates/teams/_team_video_detail.html:55
 #: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
 #: templates/videos/_video_url_panel.html:34
 msgid "Remove"
@@ -4420,7 +4420,7 @@ msgid "Members"
 msgstr ""
 
 #: templates/teams/_tabs.html:28 templates/teams/_tabs_projects.html:12
-#: templates/teams/_team_video_detail.html:44
+#: templates/teams/_team_video_detail.html:42
 #: templates/teams/settings-permissions.html:73 templates/teams/tasks.html:34
 msgid "Tasks"
 msgstr ""
@@ -4501,7 +4501,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/teams/_team_video_detail.html:49
+#: templates/teams/_team_video_detail.html:47
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
