@@ -41,16 +41,31 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
         unisubs.player.AbstractVideoPlayer.PROGRESS_INTERVAL);
     this.timeUpdateTimer_ = new goog.Timer(
         unisubs.player.AbstractVideoPlayer.TIMEUPDATE_INTERVAL);
-    goog.mixin(unisubs.player.WistiaVideoPlayer.prototype,
-               unisubs.player.YoutubeBaseMixin.prototype);
     this.videoPlayerType_ = 'wistia';
 
-    this.embeddedVideo = null;
+    this.player_ = null;
     this.modeSelect = null;
 };
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
+unisubs.player.WistiaVideoPlayer.prototype.isChromeless = function() {
+    return true;
+};
 
+unisubs.player.WistiaVideoPlayer.prototype.setDimensionsKnownInternal = function() {
+    this.dimensionsKnown_ = true;
+    var size = this.getVideoSize();
+    unisubs.style.setSize(this.getElement(), size.width, size.height);
+    this.dispatchEvent(
+        unisubs.player.AbstractVideoPlayer.EventType.DIMENSIONS_KNOWN);
+};
+
+unisubs.player.WistiaVideoPlayer.prototype.getVideoSize = function() {
+    return this.playerSize_;
+};
+unisubs.player.WistiaVideoPlayer.prototype.getDuration = function() {
+    return this.player_['duration']();
+};
 unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
     var isReady =  window['Wistia'] && window['Wistia']['embed'];
     return isReady;
@@ -58,7 +73,7 @@ unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
 
 unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId, containerID){
 
-    this.embeddedVideo = window['Wistia']['embed'](videoId, {
+    this.player_ = window['Wistia']['embed'](videoId, {
         playerColor: "ff0000",
         fullscreenButton: false,
         container: containerID,
@@ -66,7 +81,6 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId,
         chromeless: true,
         controlsVisibleOnLoad: false,
         doNotTrack: true,
-        fullscreenButton: false,
         playButton: false,
         playBar: false,
         videoFoam: false
@@ -74,7 +88,7 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId,
     // add listeners to buttons
     var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
     var skip_btn = goog.dom.getElementByClass('unisubs-skip');
-    goog.events.listen(play_btn, goog.events.EventType.CLICK, this.videoPlay);
+    goog.events.listen(play_btn, goog.events.EventType.CLICK, this.playInternal);
     goog.events.listen(skip_btn, goog.events.EventType.CLICK, this.videoSkip);
     // add listeners for TAB key
     var docKh = new goog.events.KeyHandler(document);
@@ -84,18 +98,25 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId,
             if (e.shiftKey) {
                 that.videoSkip();
             } else {
-                that.videoPlay();
+                that.playInternal();
             }
         }
     });
     // player controls
     goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
         goog.events.EventType.CLICK, function () {
-            if (! that.embeddedVideo) { return; }
-            that.embeddedVideo['state']() == 'playing' ?
-                that.embeddedVideo['pause']() :
-                that.embeddedVideo['play']();
+            if (! that.player_) { return; }
+            that.player_['state']() == 'playing' ?
+                that.player_['pause']() :
+                that.player_['play']();
         });
+    this.player_['bind']('timechange', function(t){that.onPlayerTimeChanged(t);});
+};
+
+unisubs.player.WistiaVideoPlayer.prototype.onPlayerTimeChanged = function(newTime) {
+    this.playTime_ = newTime *1000;
+    this.dispatchEvent(
+        unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
@@ -125,32 +146,44 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
 
 };
 
-unisubs.player.WistiaVideoPlayer.prototype.videoPlay = function() {
-    if (! this.embeddedVideo) { return; }
+unisubs.player.WistiaVideoPlayer.prototype.setPlayheadTime = function(t) {
+    if (!this.player_){
+        return;
+    }
+    this.player_['time'](t ? t /1000 : 0);
+}
+unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
+    if (!this.player_){
+        return;
+    }
+    this.player_['pause']();
+}
+unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
+    if (! this.player_) { return; }
     var speedmode = this.videoGetMode();
     if (speedmode == 'no') { // no autopause
-        if (this.embeddedVideo['state']() == 'playing') {
-            this.embeddedVideo['pause']();
+        if (this.player_['state']() == 'playing') {
+            this.player_['pause']();
         } else {
-            this.embeddedVideo['play']();
+            this.player_['play']();
         }
     } else if (speedmode == 'au') { // magical autopause
     } else { // beginner {
-        this.embeddedVideo['play']();
+        this.player_['play']();
         var that = this;
-        window.setTimeout(function () { that.embeddedVideo['pause'](); }, 4000);
+        window.setTimeout(function () { that.player_['pause'](); }, 4000);
     }
 }
 
 unisubs.player.WistiaVideoPlayer.prototype.videoSkip = function() {
-    if (! this.embeddedVideo) { return; }
+    if (! this.player_) { return; }
     var speedmode = this.videoGetMode();
     if (speedmode == 'pl') { // beginner
-        this.embeddedVideo.time(this.embeddedVideo['time']() - 4)['play']();
+        this.player_.time(this.player_['time']() - 4)['play']();
         var that = this;
-        window.setTimeout(function () { that.embeddedVideo['pause'](); }, 4000);
+        window.setTimeout(function () { that.player_['pause'](); }, 4000);
     } else {
-        this.embeddedVideo.time(this.embeddedVideo['time']() - 8)['play']();
+        this.player_.time(this.player_['time']() - 8)['play']();
     }
 }
 
@@ -275,3 +308,34 @@ unisubs.player.WistiaVideoPlayer.prototype.exitDocument = function() {
     this.progressTimer_.stop();
     this.timeUpdateTimer_.stop();
 };
+
+unisubs.player.WistiaVideoPlayer.prototype.isPlaying = function() {
+    return this.player_ && this.player_['state']() == 'playing';
+};
+
+unisubs.player.WistiaVideoPlayer.prototype.isPaused = function() {
+    return this.player_ && this.player_['state']() == 'paused';
+};
+unisubs.player.WistiaVideoPlayer.prototype.getPlayheadTimeInternal = function() {
+    if (this.player_) {
+        return this.player_['time']();
+    } else {
+        return 0;
+    }
+};
+
+unisubs.player.WistiaVideoPlayer.prototype.getVolume = function()
+{
+    return this.player_ ? this.player_['volume']() : 0;
+};
+unisubs.player.WistiaVideoPlayer.prototype.setVolume = function(vol)
+{
+    if (this.player_)
+    {
+
+        this.player_['volume'](vol);
+        this.playVolume_ = vol;
+    }
+    else
+        this.commands_.push(goog.bind(this.setVolume, this, vol));
+}
