@@ -7,6 +7,7 @@ import time
 class SubtitleEditor(EditorDialogs):
 
     _EDITOR = 'div.unisubs-modal-widget'
+    _DIALOG_HEADING = 'div.unisubs-help-heading h2'
 
     #UNISUBS ON-VIDEO CONTROLS
     _VIDEO_PLAYBACK = 'div.unisubs-videoControls'
@@ -170,6 +171,8 @@ class SubtitleEditor(EditorDialogs):
         self.continue_to_next_step()
         self.mark_subs_complete(complete)
         self.click_saved_ok()
-        
+
+    def dialog_title(self):
+        return self.get_text_by_css(self._DIALOG_HEADING) 
 
 

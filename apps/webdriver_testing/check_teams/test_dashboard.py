@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from django.core import management
+import datetime
+import os
 from apps.webdriver_testing import data_helpers
+from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
 from apps.webdriver_testing.pages.site_pages.teams import dashboard_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TaskFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
+from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import UserLangFactory
 from apps.webdriver_testing.pages.editor_pages import dialogs
+from subtitles.models import SubtitleVersion
+from django.db import models
 
 class TestCaseTaskFreeDashboard(WebdriverTestCase):
     """Test suite for display of Team dashboard when there are no tasks.  """
@@ -208,8 +214,6 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.assertEqual(langs, None)
 
 
-
-
 class TestCaseTasksEnabledDashboard(WebdriverTestCase):
     """Verify team dashboard displays for teams with tasks enabled.
 
@@ -221,6 +225,13 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         super(TestCaseTasksEnabledDashboard, cls).setUpClass()
         #management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
+        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+
+        cls.subs_file = os.path.join(os.path.dirname
+                (os.path.abspath(__file__)), 'oneline.txt')
+
+
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
         cls.user = UserFactory(username = 'user', is_partner=True)
@@ -235,7 +246,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                                              autocreate_subtitle=True,
                                              autocreate_translate=True,
                                             )
-
+        cls.team_workflow.review_allowed = 10
+        cls.team_workflow.save()
         #ADD SOME PREFERRED LANGUAGES TO THE TEAM
         cls.logger.info('setup: Add some preferred languages to the team.')
 
@@ -256,8 +268,22 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         for lang in polly_speaks:
             UserLangFactory(user = cls.polly_glott,
                             language = lang)
+
+        cls.reviewer = TeamManagerMemberFactory.create(
+                team = cls.team,
+                user = UserFactory(username =  'reviewer')
+                ).user
+        for lang in polly_speaks:
+            UserLangFactory(user = cls.reviewer,
+                            language = lang)
+
         #Add some videos with various languages required.
         cls.logger.info('setup: Add some videos and set primary audio lang.')
+        d = {'url': 'http://qa.pculture.org/amara_tests/Birds_short.mp4',
+             'video__title': 'Short Birds MP4', 
+             'video__primary_audio_language_code': 'en'}
+        cls.non_team_video = cls.data_utils.create_video(**d)
+
         test_videos = [('jaws.mp4', 'fr'),
                        ('Birds_short.oggtheora.ogg', 'de'),
                        ('fireplace.mp4', 'en'),
@@ -287,8 +313,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
     def setUp(self):
         super(TestCaseTasksEnabledDashboard, self).setUp()
         self.dashboard_tab.open_team_page(self.team.slug)
-        
-
 
     def get_task(self, video_id, team, task_type, lang):
         """Return the tasks give a video id, and language via the api.
@@ -390,21 +414,34 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertTrue(self.dashboard_tab.suggestion_present(
                              suggestion_type='authed_language'))
 
-    def test_member__start_subtitles(self):
+    def test_start__subtitles(self):
         """Member starts subtitling from any task in “Videos that need your help”.
 
         """
-        create_modal = dialogs.CreateLanguageSelection(self)
+        self.create_modal = dialogs.CreateLanguageSelection(self)
         #Login user and go to team dashboard page
         self.logger.info('Polly Glott logs in and goes to team dashboard page.')
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
         self.dashboard_tab.set_skiphowto()
         self.dashboard_tab.open_team_page(self.team.slug)
-        self.dashboard_tab.languages_needed('jaws.mp4', 
-                click_lang='Create French subtitles')
-        self.assertTrue(create_modal.lang_selection_dialog_present())
+        self.dashboard_tab.click_lang_task('jaws.mp4', 'Create French')
 
-    def test_member__start_translation(self):
+        #self.assertTrue(create_modal.lang_selection_dialog_present())
+        self.create_modal.create_original_subs('English', 'French')
+        self.typed_subs = self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.continue_to_next_step()
+        self.logger.info('syncing subs')
+        self.sub_editor.sync_subs(2)
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.submit(complete=True)
+        self.dashboard_tab.log_in(self.reviewer.username, 'password')
+        self.dashboard_tab.open_team_page(self.team.slug)
+        langs = self.dashboard_tab.languages_needed('jaws.mp4')
+        self.assertIn('Review French subtitles', langs)
+
+
+    def test_start__translation(self):
         """Member starts translation from any task in “Videos that need your help”.
 
         """
@@ -412,23 +449,11 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.team.task_assign_policy=20
         self.team.video_policy=1
         self.team.save()
-        video = self.vid_obj_list[2]  #fireplace vid see setUp for data details.
-        video_data = {'language_code': 'en',
-                      'video': video.pk,
-                      'primary_audio_language_code': 'en',
-                      'draft': open('apps/videos/fixtures/test.srt'),
-                      'is_complete': True,
-                      'complete': 1
-                      }
-            
-        self.data_utils.upload_subs(video, video_data)
-        
-        url_part = 'teams/{0}/tasks?video_id={1}'.format(
-            self.team.slug, video.video_id)
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
-        task_objects = response['objects']
-        print task_objects
-
+        video = self.non_team_video
+        self.data_utils.upload_subs(video)     
+        tv = TeamVideoFactory(video = video,
+                              team = self.team,
+                              added_by = self.polly_glott)
         create_modal = dialogs.CreateLanguageSelection(self)
         #Login user and go to team dashboard page
         self.logger.info('Polly Glott logs in and goes to team dashboard page.')
@@ -436,16 +461,17 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.set_skiphowto()
 
         self.dashboard_tab.open_team_page(self.team.slug)
+        self.dashboard_tab.click_lang_task('Short Birds MP4', 'Translate Russian')
+        self.create_modal.lang_selection()
+        self.assertEqual('Adding a New Translation', self.sub_editor.dialog_title())
 
-        #self.dashboard_tab.languages_needed('fireplace', 
-        #        click_lang='Create French subtitles')
-        #self.assertTrue(create_modal.lang_selection_dialog_present())
 
-    def test_member__start_review(self):
+    def test_start__review(self):
         """Member starts review from any task in “Videos that need your help”.
 
         """
-        self.skipTest('Clicking Review link makes selenium loopy')
+        self.skipTest('Sends amara out to lunch, see issue:' 
+                      'https://unisubs.sifterapp.com/issues/2061')
         self.team_workflow.review_allowed = 10
         self.team_workflow.save()
 
@@ -453,35 +479,32 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.team.task_assign_policy=20
         self.team.video_policy=1
         self.team.save()
-        video = self.vid_obj_list[2]  #fireplace vid see setUp for data details.
-        video_data = {'language_code': 'en',
-                      'video': video.pk,
-                      'primary_audio_language_code': 'en',
-                      'draft': open('apps/videos/fixtures/test.srt'),
-                      'is_complete': True,
-                      'complete': 1
-                      }
-            
-        self.data_utils.upload_subs(video, video_data)
-        
-        url_part = 'teams/{0}/tasks?video_id={1}'.format(
-            self.team.slug, video.video_id)
-        _, r = self.data_utils.api_get_request(self.user, url_part) 
-        task_objects = r['objects']
-
         create_modal = dialogs.CreateLanguageSelection(self)
-        #Login user and go to team dashboard page
-        self.logger.info('Polly Glott logs in and goes to team dashboard page.')
+
+        #Login user and create subtitles to get a review task created.
+        self.logger.info('Polly Glott logs in and creates subtitles.')
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
+        self.dashboard_tab.set_skiphowto()
 
         self.dashboard_tab.open_team_page(self.team.slug)
+        self.logger.info("Clicking the Create English task for video fireplace.mp4")
+        self.dashboard_tab.click_lang_task('fireplace.mp4', 'Create English')
+        self.logger.info('Specifying the video language, English and subs, English')
+        self.create_modal.create_original_subs('English', 'English')
+        self.typed_subs = self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.continue_to_next_step()
+        self.logger.info('syncing subs')
+        self.sub_editor.sync_subs(2)
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.submit(complete=True)
 
-        self.dashboard_tab.languages_needed('fireplace', 
-                click_lang='Review English subtitles')
-        #self.assertTrue(create_modal.lang_selection_dialog_present())
+        #Login as reviewer and start the review task.
+        self.logger.info('Log in as user review to perform the review task.')
+        self.dashboard_tab.log_in(self.reviewer.username, 'password')
+        self.dashboard_tab.open_team_page(self.team.slug)
+        self.logger.info("Clicking the Review English task for video fireplace.mp4")
+        self.dashboard_tab.click_lang_task('fireplace.mp4', 'Review English')
 
-
-
-
-
-
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())

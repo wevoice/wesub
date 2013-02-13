@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-12 00:15-0600\n"
+"POT-Creation-Date: 2013-02-13 00:14-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1634,23 +1634,23 @@ msgid ""
 "appear."
 msgstr ""
 
-#: apps/videos/views.py:620
+#: apps/videos/views.py:627
 msgid "You have not permission change this URL"
 msgstr ""
 
-#: apps/videos/views.py:625 apps/videos/views.py:656
+#: apps/videos/views.py:632 apps/videos/views.py:663
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:640
+#: apps/videos/views.py:647
 msgid "You have not permission delete this URL"
 msgstr ""
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:651
 msgid "You can't remove primary URL"
 msgstr ""
 
-#: apps/videos/views.py:798
+#: apps/videos/views.py:805
 #, python-format
 msgid "The language for %s has been changed"
 msgstr ""

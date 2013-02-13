@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-12 00:08-0600\n"
+"POT-Creation-Date: 2013-02-13 00:07-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/"
@@ -1757,23 +1757,23 @@ msgid ""
 msgstr ""
 "Gràcies per pujar. Trigarà uns minuts fins que apareguen els subtítols."
 
-#: apps/videos/views.py:620
+#: apps/videos/views.py:627
 msgid "You have not permission change this URL"
 msgstr "No teniu permís per a canviar aquest URL"
 
-#: apps/videos/views.py:625 apps/videos/views.py:656
+#: apps/videos/views.py:632 apps/videos/views.py:663
 msgid "Object does not exist"
 msgstr "No existeix l'objecte"
 
-#: apps/videos/views.py:640
+#: apps/videos/views.py:647
 msgid "You have not permission delete this URL"
 msgstr "No teniu permís per a eliminar aquest URL"
 
-#: apps/videos/views.py:644
+#: apps/videos/views.py:651
 msgid "You can't remove primary URL"
 msgstr "No podeu eliminar la URL primària"
 
-#: apps/videos/views.py:798
+#: apps/videos/views.py:805
 #, python-format
 msgid "The language for %s has been changed"
 msgstr "L'idioma per a %s ha estat canviat"
