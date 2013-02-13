@@ -71,7 +71,7 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     window.setTimeout( 
       (function (video_id, container_id) {
         return function () {
-          embedded_video = window.Wistia.embed(video_id, {
+          embedded_video = window['Wistia'].embed(video_id, {
             playerColor: "ff0000",
             fullscreenButton: false,
             container: container_id,
@@ -104,9 +104,9 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
           goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
                   goog.events.EventType.CLICK, function () {
                       if (! embedded_video) { return; }
-                      embedded_video.state() == 'playing' ?
-                        embedded_video.pause() :
-                        embedded_video.play();
+                      embedded_video['state']() == 'playing' ?
+                        embedded_video['pause']() :
+                        embedded_video['play']();
                   });
         }; // return function
       })(this.videoSource_.getVideoId(), this.playerElemID_)
@@ -117,15 +117,15 @@ function vid_play() {
     if (! embedded_video) { return; }
     var speedmode = vid_get_mode();
     if (speedmode == 'no') { // no autopause
-        if (embedded_video.state() == 'playing') {
-            embedded_video.pause();
+        if (embedded_video['state']() == 'playing') {
+            embedded_video['pause']();
         } else {
-            embedded_video.play();
+            embedded_video['play']();
         }
     } else if (speedmode == 'au') { // magical autopause
     } else { // beginner {
-        embedded_video.play();
-        window.setTimeout(function () { embedded_video.pause(); }, 4000);
+        embedded_video['play']();
+        window.setTimeout(function () { embedded_video['pause'](); }, 4000);
     }
 }
 
@@ -133,10 +133,10 @@ function vid_skip() {
     if (! embedded_video) { return; }
     var speedmode = vid_get_mode();
     if (speedmode == 'pl') { // beginner
-        embedded_video.time(embedded_video.time() - 4).play();
-        window.setTimeout(function () { embedded_video.pause(); }, 4000);
+        embedded_video.time(embedded_video['time']() - 4).play();
+        window.setTimeout(function () { embedded_video['pause'](); }, 4000);
     } else {
-        embedded_video.time(embedded_video.time() - 8).play();
+        embedded_video.time(embedded_video['time']() - 8).play();
     }
 }
 
