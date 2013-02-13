@@ -150,7 +150,7 @@ unisubs.player.WistiaVideoPlayer.prototype.setPlayheadTime = function(t) {
     if (!this.player_){
         return;
     }
-    this.player_['time'](t ? t /1000 : 0);
+    this.player_['time'](t ? t : 0);
 }
 unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
     if (!this.player_){
