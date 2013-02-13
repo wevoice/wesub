@@ -71,7 +71,7 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     window.setTimeout( 
       (function (video_id, container_id) {
         return function () {
-          embedded_video = window['Wistia'].embed(video_id, {
+          embedded_video = window['Wistia']['embed'](video_id, {
             playerColor: "ff0000",
             fullscreenButton: false,
             container: container_id,
