@@ -2,6 +2,7 @@
 import datetime
 from south.db import db
 from south.v2 import DataMigration
+from django.core.exceptions import DoesNotExist
 from django.db import models
 from utils.chunkediter import chunkediter
 
@@ -14,9 +15,15 @@ class Migration(DataMigration):
     def forwards(self, orm):
         if not db.dry_run:
             for t in chunkediter(orm.Task.objects.all()):
-                t.new_subtitle_version = get_new_version(t.subtitle_version)
-                t.new_review_base_version = get_new_version(t.review_base_version)
-                t.save()
+                try:
+                    t.new_subtitle_version = get_new_version(t.subtitle_version)
+                    t.new_review_base_version = get_new_version(t.review_base_version)
+                    t.save()
+                except DoesNotExist:
+                    # Some tasks seem to have bad data in their foreign keys (on
+                    # dev at least).  There's nothing we can do for them, so
+                    # we'll just skip them.
+                    pass
 
     def backwards(self, orm):
         # We don't actually need to do anything to migrate backwards, because
