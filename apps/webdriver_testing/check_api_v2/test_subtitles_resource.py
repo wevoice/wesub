@@ -528,7 +528,7 @@ class TestCaseModeratedSubtitlesUpload(WebdriverTestCase):
         task = TaskFactory(type = 10, 
                            team = cls.my_team, 
                            team_video = cls.tv, 
-            language = cls.lang_code)
+                           language = cls.lang_code)
 
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.tasks_pg = tasks_tab.TasksTab(cls)

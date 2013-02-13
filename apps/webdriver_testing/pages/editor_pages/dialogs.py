@@ -151,6 +151,16 @@ class CreateLanguageSelection(EditorDialogs):
         self._set_new_language(new_language)
         self._submit_choices()
 
+    def lang_selection(self, **kwargs):
+        self.logger.info('Specifying the languages')
+        assert self._is_lang_selection_dialog()
+        if 'video_language' in kwargs:
+            self._set_video_language(kwargs['video_language'])
+        if 'new_language' in kwargs:
+            self._set_new_language(kwargs['new_language'])
+        if 'translation_source' in kwargs:
+            self._set_translation_source(kwargs['translation_source'])
+        self._submit_choices()
 
 
 
