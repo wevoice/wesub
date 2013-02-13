@@ -360,11 +360,15 @@ var angular = angular || null;
             $scope.$root.$emit('subtitleReady', $scope);
         });
     };
+    var VideoTitleController = function($scope, SubtitleStorage) {
+        $scope.title = "Oh hai.";
+    };
 
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionController = SaveSessionController;
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListHelperController = SubtitleListHelperController;
     root.SubtitleListItemController = SubtitleListItemController;
+    root.VideoTitleController = VideoTitleController;
 
 }).call(this);
