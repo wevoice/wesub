@@ -2,7 +2,7 @@
 import datetime
 from south.db import db
 from south.v2 import DataMigration
-from django.core.exceptions import DoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from utils.chunkediter import chunkediter
 
@@ -19,7 +19,7 @@ class Migration(DataMigration):
                     t.new_subtitle_version = get_new_version(t.subtitle_version)
                     t.new_review_base_version = get_new_version(t.review_base_version)
                     t.save()
-                except DoesNotExist:
+                except ObjectDoesNotExist:
                     # Some tasks seem to have bad data in their foreign keys (on
                     # dev at least).  There's nothing we can do for them, so
                     # we'll just skip them.
