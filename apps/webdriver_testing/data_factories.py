@@ -3,6 +3,7 @@ import factory
 from apps.videos.models import Video 
 from apps.videos.models import VideoUrl
 from apps.videos.models import SubtitleLanguage
+from apps.videos.types import video_type_registrar
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
 from apps.teams.models import MembershipNarrowing
@@ -17,11 +18,6 @@ from apps.auth.models import CustomUser as User
 from apps.auth.models import UserLanguage
 from apps.messages.models import Message
 from apps.subtitles.models import SubtitleLanguage
-
-
-
-
-
 
 class TeamManagerLanguageFactory(factory.Factory):
     FACTORY_FOR = MembershipNarrowing
@@ -41,9 +37,13 @@ class VideoUrlFactory(factory.Factory):
 
     """
     FACTORY_FOR = VideoUrl
-    type = 'HTML5'
     url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
+    type = 'H'
+    primary=True
+    original=True
     video = factory.SubFactory(VideoFactory)
+    video__title = factory.Sequence(lambda n: ('Test Video %s' % n))
+
 
 
 class UserLangFactory(factory.Factory):
@@ -70,14 +70,34 @@ class TeamMemberFactory(factory.Factory):
 class TeamContributorMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_CONTRIBUTOR
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ContributorUser' + n))
+
 
 class TeamAdminMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_ADMIN
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'AdminUser' + n))
 
 class TeamManagerMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_MANAGER
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ManagerUser' + n))
+
+class TeamOwnerMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_OWNER
+    user = factory.SubFactory(UserFactory, username=
+        factory.Sequence(lambda n: 'ManagerUser' + n))
+
+
+class TeamManagerMemberFactory(factory.Factory):
+    FACTORY_FOR = TeamMember
+    role = TeamMember.ROLE_MANAGER
+    user = factory.Sequence(lambda n: 'ManagerUser' + n)
+
 
 class TeamVideoFactory(factory.Factory):
     FACTORY_FOR = TeamVideo
@@ -112,5 +132,6 @@ class WorkflowFactory(factory.Factory):
 class TaskFactory(factory.Factory):
     FACTORY_FOR = Task 
     team_video = factory.SubFactory(TeamVideoFactory)
+
 
 

@@ -4,15 +4,16 @@
 #
 # Translators:
 #   <janis.peisenieks@gmail.com>, 2011.
-# Kristaps  <krkadikis@inbox.lv>, 2012.
+# Kristaps <krkadikis@inbox.lv>, 2013.
+# Kristaps  <krkadikis@inbox.lv>, 2012-2013.
 #   <krkadikis@inbox.lv>, 2012.
 #   <veisa.kristine@gmail.com>, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-12 00:13-0600\n"
-"PO-Revision-Date: 2012-11-09 07:55+0000\n"
+"POT-Creation-Date: 2013-02-13 00:07-0600\n"
+"PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
 "universalsubtitles/language/lv_LV/)\n"
@@ -23,8 +24,30 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
 
-#: apps/auth/admin.py:33 templates/profiles/view_profile.html:53
-#: templates/statistic/users_statistic.html:12
+#: apps/accountlinker/models.py:42
+msgid "Subtitles by the Amara.org community"
+msgstr "Amara.org kopienas subtitri"
+
+#: apps/accountlinker/models.py:44
+msgid "Help us caption and translate this video on Amara.org"
+msgstr "Palīdziet mums subtitrēt un pārtulkot šo video Amara.org"
+
+#: apps/accountlinker/views.py:103
+msgid "The user who requested this action doesn't match the current user."
+msgstr ""
+
+#: apps/accountlinker/views.py:140
+msgid ""
+"We couldn't link your account. Have you <a href='https://accounts.google.com/"
+"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
+"create_channel'>set up a channel</a>?"
+msgstr ""
+
+#: apps/accountlinker/views.py:160
+msgid "Account already linked."
+msgstr ""
+
+#: apps/auth/admin.py:33 templates/statistic/users_statistic.html:12
 #: templates/teams/invite_members.html:25
 #: unisubs-integration/apiv2/forms.py:118
 msgid "Username"
@@ -55,61 +78,66 @@ msgid "Email"
 msgstr "E-pasts"
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
-#: templates/messages/_messages.html:8 templates/videos/create.html:63
+#: templates/messages/_messages.html:8 templates/videos/create.html:71
 msgid "Hide"
 msgstr "Paslēpt"
 
-#: apps/auth/models.py:98
+#: apps/auth/models.py:92 apps/teams/models.py:155
+msgid "third party accounts"
+msgstr "trešās puses konti"
+
+#: apps/auth/models.py:101
 msgid "Retired user"
 msgstr "Atvaļinājies lietotājs"
 
-#: apps/auth/models.py:333
+#: apps/auth/models.py:339
 msgid "Add comment"
 msgstr "Pievienot komentāru"
 
-#: apps/auth/models.py:334
+#: apps/auth/models.py:340
 msgid "Start subtitles"
 msgstr "Sākt subtitrus"
 
-#: apps/auth/models.py:335
+#: apps/auth/models.py:341
 msgid "Start translation"
 msgstr "Sākt tulkojumu"
 
-#: apps/auth/models.py:336
+#: apps/auth/models.py:342
 msgid "Edit subtitles"
 msgstr "Rediģēt subtitrus"
 
-#: apps/auth/models.py:337
+#: apps/auth/models.py:343
 msgid "Edit translation"
 msgstr "Rediģēt tulkojumu"
 
-#: apps/auth/models.py:394
+#: apps/auth/models.py:400
 msgid "understand enough"
 msgstr "saprotu pietiekami daudz"
 
-#: apps/auth/models.py:395
+#: apps/auth/models.py:401
 msgid "understand 99%"
 msgstr "saprotu 99%"
 
-#: apps/auth/models.py:396
+#: apps/auth/models.py:402
 msgid "write like a native"
 msgstr "rakstu kā cilvēks, kuram valoda ir dzimtā"
 
-#: apps/auth/models.py:401
+#: apps/auth/models.py:407
 msgid "follow requests in language"
 msgstr ""
 
-#: apps/auth/models.py:416
+#: apps/auth/models.py:422
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
 msgstr ""
+"Datums, kad sākt rādīt paziņojumu. Parādīts tiks tikai pēdējais paziņojums."
 
-#: apps/auth/models.py:515
+#: apps/auth/models.py:521
 msgid "e-mail confirmation"
 msgstr "e-pasta apstiprinājums"
 
-#: apps/auth/models.py:516
+#: apps/auth/models.py:522
 msgid "e-mail confirmations"
 msgstr "e-pasta apstiprinājumi"
 
@@ -123,7 +151,7 @@ msgstr "E-pasts ir apstiprināts."
 
 #: apps/auth/views.py:73
 msgid "Confirmation email was sent."
-msgstr "Tika aizsūtīts apstiprinājuma e-pasts."
+msgstr "Nosūtīts apstiprinājuma e-pasts."
 
 #: apps/auth/views.py:75
 msgid "You email is empty or already confirmed."
@@ -174,7 +202,8 @@ msgid "You should enter subject or message."
 msgstr "Jums vajag ierakstīt tematu vai ziņojumu."
 
 #: apps/messages/rpc.py:28 apps/messages/rpc.py:44 apps/messages/rpc.py:52
-#: apps/profiles/rpc.py:45 apps/teams/rpc.py:33 apps/videos/rpc.py:39
+#: apps/messages/rpc.py:60 apps/profiles/rpc.py:45 apps/teams/rpc.py:33
+#: apps/videos/rpc.py:39
 msgid "You should be authenticated."
 msgstr "Jums jābūt autentificējamušies."
 
@@ -292,6 +321,7 @@ msgstr "Pierakstīties, izmantojot OpenID"
 #: apps/openid_consumer/templates/openid_consumer/signin.html:15
 #: templates/auth/login.html:10
 #: templates/registration/password_reset_complete.html:16
+#: templates/teams/_join.html:61
 msgid "Sign in"
 msgstr "Pierakstīties"
 
@@ -309,15 +339,15 @@ msgid "Personal message from %(sender)s on universalsubtitles.org"
 msgstr ""
 "Personīgs ziņojums no lietotāja %(sender)s vietnē universalsubtitles.org"
 
-#: apps/profiles/forms.py:148
+#: apps/profiles/forms.py:158
 msgid "Confirm new password:"
 msgstr "Apstipriniet jauno paroli:"
 
-#: apps/profiles/forms.py:165
+#: apps/profiles/forms.py:173
 msgid "Invalid password."
 msgstr "Nederīga parole."
 
-#: apps/profiles/forms.py:167
+#: apps/profiles/forms.py:175
 msgid "The two passwords did not match."
 msgstr "Abas paroles nesakrīt."
 
@@ -325,17 +355,29 @@ msgstr "Abas paroles nesakrīt."
 msgid "Your email was updated."
 msgstr "Jūsu e-pasts ir ticis atjaunināts."
 
-#: apps/profiles/views.py:62
-msgid ""
-"File server unavailable. Try later. You can edit some other information "
-"without any problem."
-msgstr ""
-"Datņu serveris nepieejams. Pamēģiniet vēlāk. Jūs varat bez problēmām rediģēt "
-"citu informāciju."
-
-#: apps/profiles/views.py:147
+#: apps/profiles/views.py:170
 msgid "Your profile has been updated."
 msgstr "Jūsu profils ir ticis atjaunināts."
+
+#: apps/profiles/views.py:191
+msgid "Your account has been updated."
+msgstr "Atjaunināts Jūsu konts,"
+
+#: apps/profiles/views.py:242
+msgid "Your photo has been updated."
+msgstr "Atjaunināta Jūsu fotogtāfija."
+
+#: apps/profiles/views.py:247
+msgid "picture"
+msgstr "attēls"
+
+#: apps/profiles/views.py:260
+msgid "Your photo has been removed."
+msgstr "Attēls noņemts."
+
+#: apps/profiles/views.py:336
+msgid "Account deleted."
+msgstr "Konts izdzēsts."
 
 #: apps/search/forms.py:27
 msgid "Relevance"
@@ -397,7 +439,7 @@ msgstr "Video skatījumu statistika"
 msgid "Widget view statistic"
 msgstr "Sīkrīka skatījumu statistika"
 
-#: apps/subtitles/forms.py:78 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
@@ -406,53 +448,57 @@ msgstr ""
 "Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs "
 "valodas jau ir sākts."
 
-#: apps/subtitles/forms.py:92
+#: apps/subtitles/forms.py:97
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:98
+#: apps/subtitles/forms.py:103
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:106
+#: apps/subtitles/forms.py:110
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:125
+#: apps/subtitles/forms.py:129
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
+"Piedodiet, mēs nevaram augšuplādēt Jūsu subtitrus, jo šai valodai jau ir "
+"nozīmēts cits lietotājs."
 
-#: apps/subtitles/forms.py:132
+#: apps/subtitles/forms.py:136
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
+"Piedodiet, mēs nevaram augšuplādēt Jūsu subtitrus, jo jums nav atļaujas "
+"pieteikties šai valodai."
 
-#: apps/subtitles/forms.py:143 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:147 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:156
+#: apps/subtitles/forms.py:159
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:164
+#: apps/subtitles/forms.py:167
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:177 apps/teams/forms.py:740
+#: apps/subtitles/forms.py:180
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
@@ -460,24 +506,55 @@ msgstr ""
 "Piedodiet, mums neizdevās augšuplielādēt Jūsu datni, jo rindiņu skaits Jūsu "
 "({0}) tulkojumā neatbilst oriģinālam ({1})."
 
-#: apps/subtitles/forms.py:188
+#: apps/subtitles/forms.py:191
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr "Datnes izmēram jābūt mazākam kā %d kb."
 
-#: apps/subtitles/forms.py:196
+#: apps/subtitles/forms.py:199
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
-msgstr ""
+msgstr "Neatbalstīts formāts. Lūdzu, augšuplādējiet kādu no šiem: %s"
 
-#: apps/subtitles/forms.py:203 apps/teams/forms.py:648 apps/videos/forms.py:63
-#: apps/videos/forms.py:84 unisubs-integration/api/1_0/forms.py:325
+#: apps/subtitles/forms.py:206 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Neizdevās noteikt datnes kodējumu"
 
-#: apps/subtitles/forms.py:226 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:229 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Kāds pašlaik šim video pievieno subtitrus. Mēģiniet vēlāk."
+
+#: apps/subtitles/views.py:98 apps/widget/rpc.py:326
+#, python-format
+msgid ""
+"These subtitles are moderated. See the %s team page for information on how "
+"to contribute."
+msgstr ""
+"Šie subtitri tiek moderēti. Dodieties uz %s komandas lapu, lai uzzinātu, kā "
+"sniegt savu ieguldījumu."
+
+#: apps/subtitles/views.py:100 apps/widget/rpc.py:328
+msgid "Sorry, these subtitles are privately moderated."
+msgstr "Piedodiet, šie subtitri ir privāti moderēti."
+
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:353
+msgid ""
+"Sorry, you do not have the permission to edit these subtitles. If you "
+"believe that they need correction, please contact the team administrator."
+msgstr ""
+"Piedodiet, Jums nav atļaujas šo subtitru rediģēšanai. Ja uzskatāt, ka tos "
+"nepieciešams labot, lūdzu, sazinieties ar komandas administratoru."
+
+#: apps/subtitles/views.py:126
+msgid ""
+"You can't edit because there is a task for this language and you can't "
+"complete it."
+msgstr ""
+
+#: apps/subtitles/views.py:150
+msgid "You can't edit this subtitle because it's locked"
+msgstr "Jūs nevarat labot šos subtitrus, jo tie ir aizslēgti."
 
 #: apps/teams/admin.py:60
 #, python-format
@@ -501,7 +578,7 @@ msgid "Unfeature teams"
 msgstr "Nepiedāvāt komandas"
 
 #: apps/teams/admin.py:81 apps/teams/admin.py:98 apps/teams/admin.py:201
-#: apps/teams/models.py:201
+#: apps/teams/models.py:205
 msgid "Team"
 msgstr "Komanda"
 
@@ -509,21 +586,21 @@ msgstr "Komanda"
 msgid "User"
 msgstr "Lietotājs"
 
-#: apps/teams/forms.py:57 apps/teams/forms.py:165
+#: apps/teams/forms.py:54 apps/teams/forms.py:162
 #: libs/rosetta/templates/rosetta/languages.html:12
-#: templates/teams/_context_team.html:65
+#: templates/teams/_context_team.html:72
 msgid "Project"
 msgstr "Filtrs"
 
-#: apps/teams/forms.py:61 apps/teams/forms.py:169
+#: apps/teams/forms.py:58 apps/teams/forms.py:166
 msgid "Let's keep things tidy, shall we?"
 msgstr "Būsim tīrīgi, labi?"
 
-#: apps/teams/forms.py:151
+#: apps/teams/forms.py:148
 msgid "Video URL"
 msgstr "Video URL"
 
-#: apps/teams/forms.py:152
+#: apps/teams/forms.py:149
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also "
 "browse the site and use the 'Add Video to Team' menu."
@@ -531,27 +608,27 @@ msgstr ""
 "Ievadiet jebkura saderīga video vai mūsu lapas video vietrādi URL. Jūs varat "
 "arī pārlūkot vietni un izmantot 'Pievienot video komandai' izvēlni."
 
-#: apps/teams/forms.py:160
+#: apps/teams/forms.py:157
 msgid "Video language"
 msgstr "Video valoda"
 
-#: apps/teams/forms.py:162
+#: apps/teams/forms.py:159
 msgid "It will be saved only if video does not exist in our database."
 msgstr "Tas tiks saglabāts tikai tad, ja video jau nav mūsu datubāzē."
 
-#: apps/teams/forms.py:216
+#: apps/teams/forms.py:213
 msgid "This video already belongs to a team."
 msgstr "Šis video jau pieder komandai."
 
-#: apps/teams/forms.py:222
+#: apps/teams/forms.py:219
 msgid "Set original language for this video."
-msgstr "Uzlikt video oriģinālo valodu."
+msgstr "Iestatīt video oriģinālo valodu."
 
-#: apps/teams/forms.py:261
+#: apps/teams/forms.py:258
 msgid "Team intro video URL"
-msgstr "Komanda ievadvideo URL"
+msgstr "Komandas ievadvideo URL"
 
-#: apps/teams/forms.py:263
+#: apps/teams/forms.py:260
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract "
@@ -563,258 +640,238 @@ msgstr ""
 "komanda nodarbojas, tādējādi piesaistot brīvprātīgos.\n"
 "Ievadiet mūsu vietnē jebkura saderīga video vai video lapas saiti."
 
-#: apps/teams/forms.py:268
+#: apps/teams/forms.py:265
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "Komandas URL: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:313
+#: apps/teams/forms.py:310
 msgid "This video has already been transcribed."
 msgstr "Šis video jau ir ticis transkribēts."
 
-#: apps/teams/forms.py:318
-msgid "Subtitling of this video is already in progress."
-msgstr "Pašlaik jau noris šī video subtitrēšana."
-
-#: apps/teams/forms.py:323
+#: apps/teams/forms.py:316
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr "Neviens šo video vēl nav transkribējis, tādēļ to nevar pārtulkot."
 
-#: apps/teams/forms.py:330
+#: apps/teams/forms.py:323
 msgid "This language already has a complete set of subtitles."
 msgstr "Šai valodai jau ir pabeigti subtitri."
 
-#: apps/teams/forms.py:342
+#: apps/teams/forms.py:336
 msgid "This language for this video does not exist or doesn't have a version."
 msgstr "Šī valoda šim video nepastāv vai arī tai nav versijas."
 
-#: apps/teams/forms.py:359
+#: apps/teams/forms.py:353
 msgid "There is already a task in progress for that video/language."
 msgstr "Šī video/valodas uzdevums jau pašlaik tiek veikts."
 
-#: apps/teams/forms.py:365
+#: apps/teams/forms.py:359
 #, python-format
 msgid "You must select a language for a %s task."
 msgstr "Jums jāizvēlas valoda %s uzdevumam."
 
-#: apps/teams/forms.py:400
+#: apps/teams/forms.py:394
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr "Šim lietotājam jau ir uzdots maksimālais skaits uzdevumu."
 
-#: apps/teams/forms.py:422
+#: apps/teams/forms.py:416
 msgid "You do not have permission to assign this task."
 msgstr "Jums nav atļaujas piešķirt šo uzdevumu."
 
-#: apps/teams/forms.py:429
+#: apps/teams/forms.py:423
 msgid "This user cannot perform that task."
 msgstr "Šis lietotājs nevar veikt šo uzdevumu."
 
-#: apps/teams/forms.py:450
+#: apps/teams/forms.py:444
 msgid "You do not have permission to delete this task."
 msgstr "Jums nav atļaujas šī uzdevuma dzēšanai."
 
-#: apps/teams/forms.py:507
+#: apps/teams/forms.py:501
 msgid "You cannot blacklist a preferred language."
 msgstr ""
 
-#: apps/teams/forms.py:529 apps/teams/forms.py:531
+#: apps/teams/forms.py:523 apps/teams/forms.py:525
 msgid "User does not exist!"
 msgstr "Lietotājs nepastāv!"
 
-#: apps/teams/forms.py:538
+#: apps/teams/forms.py:532
 msgid "User is already a member of this team!"
 msgstr "Lietotājs jau ir šīs komandas dalībnieks!"
 
-#: apps/teams/forms.py:543
+#: apps/teams/forms.py:537
 msgid "User has already been invited and has not replied yet."
 msgstr "Šis lietotājs ir jau ticis uzaicināts un vēl sniedzis atbildi."
 
-#: apps/teams/forms.py:567 templates/videos/subtitle-view.html:365
+#: apps/teams/forms.py:561
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Vai Jūs vēlētos pilnībā dzēst subtitrus?"
 
-#: apps/teams/forms.py:571 templates/videos/subtitle-view.html:350
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:350
 msgid "What would you like to unpublish?"
 msgstr "Ko Jūs vēlātos atpublicēt?"
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:567
 msgid "This version (and any later version) for this language."
 msgstr "Šīs valodas šī (un jebkura turpmākā) versija."
 
-#: apps/teams/forms.py:574
+#: apps/teams/forms.py:568
 msgid "All versions for this language and any dependent languages."
 msgstr "Visas šīs valodas un jebkuru neatkarīgo valodu versijas."
 
-#: apps/teams/forms.py:592
+#: apps/teams/forms.py:586
 msgid "These subtitles are not under a team's control."
-msgstr ""
+msgstr "Šie subtitri nav komandas kontrolē."
 
-#: apps/teams/forms.py:596
+#: apps/teams/forms.py:590
 msgid "You do not have permission to unpublish these subtitles."
 msgstr "Jums nav atļaujas atpublicēt šos subtitrus."
 
-#: apps/teams/forms.py:615
+#: apps/teams/forms.py:607
 msgid "You cannot perform that task."
 msgstr "Jūs nevarat veikt šo uzdevumu."
 
-#: apps/teams/forms.py:627
-msgid "Invalid language to translate from."
-msgstr "Nederīga valoda, no kuras tulkot."
-
-#: apps/teams/forms.py:636 apps/videos/forms.py:58 apps/videos/forms.py:76
-msgid "File size should be less {0} kb"
-msgstr "Datnes izmēram būtu jābūt mazākam par {0} kb"
-
-#: apps/teams/forms.py:641
-#, python-format
-msgid "Incorrect format. Upload %s"
-msgstr "Nepareizs formāts. Augšuplādējiet %s"
-
-#: apps/teams/forms.py:661 apps/videos/forms.py:86
-#: unisubs-integration/api/1_0/forms.py:316
-#: unisubs-integration/api/1_0/forms.py:328
-msgid "Incorrect subtitles format"
-msgstr "Nepareizs subtitru formāts"
-
-#: apps/teams/forms.py:734
-msgid ""
-"Sorry, we couldn't upload your file because it has fewer lines ({0}) than "
-"the previous version ({1})."
+#: apps/teams/forms.py:610
+msgid "Mismatched video and task!"
 msgstr ""
-"Atvainojiet, mums neizdevās augšupielādēt Jūsu datni, jo tajā ir mazāk "
-"rindiņas ({0}), nekā iepriekšējā versijā ({1})."
 
-#: apps/teams/models.py:108
-msgid "Open"
-msgstr "Atvērt"
+#: apps/teams/forms.py:621
+msgid "The selected language does not match the task."
+msgstr "Izvēlētā valoda nesakrīt ar uzdevumu."
 
-#: apps/teams/models.py:109 libs/rosetta/templates/rosetta/languages.html:28
-msgid "Application"
-msgstr "Pieteikums"
-
-#: apps/teams/models.py:110
-msgid "Invitation by any team member"
-msgstr "Uzaicināt var jebkurš komandas biedrs"
-
-#: apps/teams/models.py:111
-msgid "Invitation by manager"
+#: apps/teams/forms.py:629
+#, python-format
+msgid ""
+"The selected source language %(from_code)s does not match the existing "
+"source language %(cur_code)s for that task."
 msgstr ""
 
 #: apps/teams/models.py:112
-msgid "Invitation by admin"
+msgid "Open"
+msgstr "Atvērt"
+
+#: apps/teams/models.py:113 libs/rosetta/templates/rosetta/languages.html:28
+msgid "Application"
+msgstr "Pieteikums"
+
+#: apps/teams/models.py:114
+msgid "Invitation by any team member"
+msgstr "Uzaicināt var jebkurš komandas biedrs"
+
+#: apps/teams/models.py:115
+msgid "Invitation by manager"
 msgstr ""
 
-#: apps/teams/models.py:119
+#: apps/teams/models.py:116
+msgid "Invitation by admin"
+msgstr "Administratora ielūgums"
+
+#: apps/teams/models.py:123
 msgid "Any team member"
 msgstr "Jebkurš komandas dalībnieks"
 
-#: apps/teams/models.py:120
+#: apps/teams/models.py:124
 msgid "Managers and admins"
 msgstr "Pārvaldnieki un administratori"
 
-#: apps/teams/models.py:121
+#: apps/teams/models.py:125
 msgid "Admins only"
 msgstr "Tikai administratori"
 
-#: apps/teams/models.py:141 apps/teams/models.py:2563
+#: apps/teams/models.py:145 apps/teams/models.py:2640
 msgid "name"
 msgstr "nosaukums"
 
-#: apps/teams/models.py:142 apps/teams/models.py:2564
+#: apps/teams/models.py:146 apps/teams/models.py:2641
 msgid "slug"
 msgstr "īsā adrese"
 
-#: apps/teams/models.py:143
+#: apps/teams/models.py:147
 msgid "description"
 msgstr "apraksts"
 
-#: apps/teams/models.py:143
+#: apps/teams/models.py:147
 msgid ""
 "All urls will be converted to links. Line breaks and HTML not supported."
 msgstr ""
 "Visi URL tiks pārveidoti par saitēm. Rindu pārtraukumi un HTML netiek "
 "atbalstīts."
 
-#: apps/teams/models.py:145
+#: apps/teams/models.py:149
 msgid "logo"
 msgstr "logo"
 
-#: apps/teams/models.py:146
+#: apps/teams/models.py:150
 msgid "publicly Visible?"
 msgstr "publiski redzama?"
 
-#: apps/teams/models.py:147 templates/search/search.html:152
+#: apps/teams/models.py:151 templates/search/search.html:152
 #: templates/teams/project_list.html:10
 #: templates/videos/featured_videos.html:52
 #: templates/videos/popular_videos.html:87
 msgid "videos"
 msgstr "video"
 
-#: apps/teams/models.py:148
+#: apps/teams/models.py:152
 msgid "users"
 msgstr "lietotāji"
 
-#: apps/teams/models.py:151
-msgid "third party accounts"
-msgstr "trešās puses konti"
-
-#: apps/teams/models.py:154
+#: apps/teams/models.py:158
 msgid "applicants"
 msgstr "dalībnieki"
 
-#: apps/teams/models.py:157
+#: apps/teams/models.py:161
 msgid "Intro Video"
 msgstr "Ievadvideo"
 
-#: apps/teams/models.py:159
+#: apps/teams/models.py:163
 msgid "Page content"
 msgstr "Lapas saturs"
 
-#: apps/teams/models.py:159
+#: apps/teams/models.py:163
 msgid "You can use markdown. This will replace Description."
-msgstr ""
+msgstr "Jūs varat izmantot markdown. Tas aizstās Aprakstu."
 
-#: apps/teams/models.py:161
+#: apps/teams/models.py:165
 msgid "HTML that appears at the top of the teams page."
 msgstr "HTML, kas parādās komandas lapas augšpusē."
 
-#: apps/teams/models.py:164
+#: apps/teams/models.py:168
 msgid "authentication provider code"
 msgstr ""
 
-#: apps/teams/models.py:172
+#: apps/teams/models.py:176
 msgid "membership policy"
 msgstr "dalības politika"
 
-#: apps/teams/models.py:175
+#: apps/teams/models.py:179
 msgid "video policy"
 msgstr "video politika"
 
-#: apps/teams/models.py:178
+#: apps/teams/models.py:182
 msgid "task assignment policy"
 msgstr "uzdevumu piešķiršanas politika"
 
-#: apps/teams/models.py:181
+#: apps/teams/models.py:185
 msgid "subtitling policy"
 msgstr "subtitrēšanas politika"
 
-#: apps/teams/models.py:184
+#: apps/teams/models.py:188
 msgid "translation policy"
 msgstr "tulkošanas politika"
 
-#: apps/teams/models.py:187
+#: apps/teams/models.py:191
 msgid "maximum tasks per member"
 msgstr "maksimālais uzdevumu skaits dalībniekam"
 
-#: apps/teams/models.py:189
+#: apps/teams/models.py:193
 msgid "task expiration (days)"
 msgstr "uzdevuma termiņš (dienas)"
 
-#: apps/teams/models.py:202 templates/profiles/_top_user_panel.html:32
-#: templates/profiles/dashboard.html:109 templates/teams/teams-list.html:6
+#: apps/teams/models.py:206 templates/profiles/base.html:56
+#: templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Komandas"
 
-#: apps/teams/models.py:650
+#: apps/teams/models.py:654
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
@@ -822,33 +879,33 @@ msgstr ""
 "Izmantojiet šo lauku, lai izskaidrotu, kādēļ Jūsu komanda vēlās subtitrēt šo "
 "video. Šāda informācija palielina iespēju, ka pieteiksies vairāk brīvprātīgo!"
 
-#: apps/teams/models.py:654
+#: apps/teams/models.py:658
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
 msgstr ""
 "Mēs sīktēlus paņemam automātiski no konkrētām mājaslapām, piemēram, Youtube"
 
-#: apps/teams/models.py:656
+#: apps/teams/models.py:660
 msgid "Need help with all languages"
 msgstr "Nepieciešama palīdzība ar visām valodām"
 
-#: apps/teams/models.py:657
+#: apps/teams/models.py:661
 msgid "If you check this, other languages will not be displayed."
 msgstr "Ja Jūs šo atķeksējat, citas valodas netiks parādītas"
 
-#: apps/teams/models.py:940 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:948 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Īpašnieks"
 
-#: apps/teams/models.py:941 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:949 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Pārvaldītājs"
 
-#: apps/teams/models.py:942 apps/teams/permissions_const.py:44
-#: templates/base.html:118
+#: apps/teams/models.py:950 apps/teams/permissions_const.py:44
+#: templates/base.html:130
 msgid "Admin"
 msgstr "Administrācija"
 
-#: apps/teams/models.py:943 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:951 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Artavnieks"
 
@@ -864,7 +921,7 @@ msgstr "Komanda nepastāv"
 msgid "You are already a member of this team."
 msgstr "Jūs jau esat šīs komandas dalībnieks."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:911
+#: apps/teams/rpc.py:50 apps/teams/views.py:938
 msgid "You are now a member of this team."
 msgstr "Nu jūs esat šīs komandas dalībnieks."
 
@@ -934,21 +991,22 @@ msgstr "Jūs nevarat šim dalībniekam piešķirt šo lomu."
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Jauns %(team)s video gatavs subtitrēšanai!"
 
-#: apps/teams/views.py:129 templates/teams/settings-projects-add.html:28
+#: apps/teams/views.py:133 templates/profiles/edit.html:20
+#: templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Nosaukums"
 
-#: apps/teams/views.py:130 templates/teams/teams-list.html:47
+#: apps/teams/views.py:134 templates/teams/teams-list.html:47
 msgid "Newest"
-msgstr "Jaunākie"
+msgstr "jaunuma"
 
-#: apps/teams/views.py:131 templates/teams/teams-list.html:44
+#: apps/teams/views.py:135 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Visvairāk lietotāju"
 
-#: apps/teams/views.py:174
+#: apps/teams/views.py:178
 #, python-format
 msgid ""
 "\n"
@@ -984,190 +1042,182 @@ msgstr ""
 "                </ul>\n"
 "                "
 
-#: apps/teams/views.py:200
+#: apps/teams/views.py:204
 msgid "You do not have permission to delete this team."
 msgstr "Jums nav atļaujas šīs komandas dzēšanai."
 
-#: apps/teams/views.py:214 apps/teams/views.py:256 apps/teams/views.py:284
-#: apps/teams/views.py:318 apps/teams/views.py:373 apps/teams/views.py:1592
-#: apps/teams/views.py:1607
+#: apps/teams/views.py:218 apps/teams/views.py:260 apps/teams/views.py:288
+#: apps/teams/views.py:322 apps/teams/views.py:377 apps/teams/views.py:1741
+#: apps/teams/views.py:1757
 msgid "You do not have permission to edit this team."
 msgstr "Jums nav atļaujas šīs komandas rediģēšanai."
 
-#: apps/teams/views.py:243 apps/teams/views.py:303 apps/teams/views.py:388
+#: apps/teams/views.py:247 apps/teams/views.py:307 apps/teams/views.py:392
 msgid "Settings saved."
-msgstr "Uzstādījumi saglabāti."
+msgstr "Saglabāti iestatījumi"
 
-#: apps/teams/views.py:269
+#: apps/teams/views.py:273
 msgid "Guidelines and messages updated."
-msgstr "Vadlīnijas un ziņojumu atjaunināti."
+msgstr "Atjauninātas vadlīnijas un ziņojumi."
 
-#: apps/teams/views.py:536
+#: apps/teams/views.py:551
 msgid "You can't add that video to this team/project."
 msgstr "Jūs nevarat pievienot šo video šai komandai/projektam."
 
-#: apps/teams/views.py:573
+#: apps/teams/views.py:588
 msgid "The video has been moved to the new team."
 msgstr "Video ir ticis pārvietots uz jaunu komandu."
 
-#: apps/teams/views.py:586
+#: apps/teams/views.py:601
 msgid "You can't add videos to this team/project."
 msgstr "Jūs nevarat pievienot video šai komandai/projektam."
 
-#: apps/teams/views.py:604
+#: apps/teams/views.py:619
 msgid "You can't edit this video."
-msgstr "Jūs nevarat rediģēt šo video."
+msgstr "Jūs nevarat šo video labot."
 
-#: apps/teams/views.py:613
+#: apps/teams/views.py:628
 msgid "Video has been updated."
 msgstr "Video ir ticis atjaunināts."
 
-#: apps/teams/views.py:641
+#: apps/teams/views.py:656
 msgid "Request must be a POST request."
 msgstr "Vaicājumam jābūt POST vaicājumam."
 
-#: apps/teams/views.py:649
+#: apps/teams/views.py:664
 msgid "You can't delete that video."
 msgstr "Jūs nevarat izdzēst šo video."
 
-#: apps/teams/views.py:653
+#: apps/teams/views.py:668
 msgid "You can't remove that video."
-msgstr "Jūs nevarat noņemt šo video."
+msgstr "Jūs nevarat šo video noņemt."
 
-#: apps/teams/views.py:665
+#: apps/teams/views.py:680
 msgid "Video has been deleted from Amara."
 msgstr "Video no Amara ir ticis dzēsts."
 
-#: apps/teams/views.py:668
+#: apps/teams/views.py:683
 msgid "Video has been removed from the team."
 msgstr "Video ir ticis noņemts no komandas."
 
-#: apps/teams/views.py:790
+#: apps/teams/views.py:817
 msgid "Member has been removed from the team."
 msgstr "Dalībnieks ir ticis noņemts no komandas."
 
-#: apps/teams/views.py:793
+#: apps/teams/views.py:820
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr ""
 "Izmantojiet pogu „Pamest šo komandu”, lai noņemtu sevi no šīs komandas."
 
-#: apps/teams/views.py:796
+#: apps/teams/views.py:823
 msgid "You don't have permission to remove this member from the team."
 msgstr "Jums nav atļaujas izmest šo dalībnieku no komandas."
 
-#: apps/teams/views.py:830
+#: apps/teams/views.py:857
 msgid "Application approved."
 msgstr "Pieteikums apstiprināts."
 
-#: apps/teams/views.py:832 apps/teams/views.py:853
+#: apps/teams/views.py:859 apps/teams/views.py:880
 msgid "Application does not exist."
 msgstr "Pieteikums nepastāv."
 
-#: apps/teams/views.py:834 apps/teams/views.py:855
+#: apps/teams/views.py:861 apps/teams/views.py:882
 msgid "Application already processed."
 msgstr "Pieteikums jau apstrādāts."
 
-#: apps/teams/views.py:836
+#: apps/teams/views.py:863
 msgid "You can't approve applications."
 msgstr "Jūs nevarat apstiprināt pieteikumus."
 
-#: apps/teams/views.py:851
+#: apps/teams/views.py:878
 msgid "Application denied."
 msgstr "Pieteikums noraidīts."
 
-#: apps/teams/views.py:857
+#: apps/teams/views.py:884
 msgid "You can't deny applications."
 msgstr "Jūs nevarat noraidīt pieteikumus."
 
-#: apps/teams/views.py:867
+#: apps/teams/views.py:894
 msgid "You cannot invite people to this team."
 msgstr "Jūs uzaicināt cilvēkus pievienoties šai komandai."
 
-#: apps/teams/views.py:898
+#: apps/teams/views.py:925
 msgid "This invite is no longer valid"
 msgstr "Šis ielūgums vairs nav derīgs"
 
-#: apps/teams/views.py:907
+#: apps/teams/views.py:934
 msgid "You cannot join this team."
 msgstr "Jūs nevarat pievienoties šai komandai."
 
-#: apps/teams/views.py:961
+#: apps/teams/views.py:988
 msgid "You have left this team."
 msgstr "Jūs esat pametis šo komandu."
 
-#: apps/teams/views.py:1017
+#: apps/teams/views.py:1044
 msgid "Member saved."
 msgstr "Dalībnieks saglabāts."
 
-#: apps/teams/views.py:1151
+#: apps/teams/views.py:1293
 msgid "You cannot view this team's tasks."
 msgstr "Jūs nevarat apskatīt šīs komandas uzdevumus."
 
-#: apps/teams/views.py:1310 apps/teams/views.py:1313
+#: apps/teams/views.py:1469 apps/teams/views.py:1472
 msgid "You are not allowed to perform this task."
 msgstr "Jums nav atļaujas veikt šo uzdevumu."
 
-#: apps/teams/views.py:1368
+#: apps/teams/views.py:1529
 msgid "Task deleted."
 msgstr "Uzdevums dzēsts."
 
-#: apps/teams/views.py:1370
+#: apps/teams/views.py:1531
 msgid "You cannot delete this task."
 msgstr "Jūs nevarat izdzēst šo uzdevumu."
 
-#: apps/teams/views.py:1395
+#: apps/teams/views.py:1556
 msgid "Task declined."
 msgstr "Atteikts no uzdevuma."
 
-#: apps/teams/views.py:1397
+#: apps/teams/views.py:1558
 msgid "Task assigned."
 msgstr "Uzdevums piešķir."
 
-#: apps/teams/views.py:1399
+#: apps/teams/views.py:1560
 msgid "You cannot assign this task."
 msgstr "Jūs nevarat piešķirt šo uzdevumu."
 
-#: apps/teams/views.py:1421
-msgid "Invalid assignment attempt."
-msgstr "Nederīgs piešķiršanas mēģinājums."
-
-#: apps/teams/views.py:1446
+#: apps/teams/views.py:1600
 msgid "Draft uploaded successfully."
 msgstr "Jaunā versija veiksmīgi augšupielādēta."
 
-#: apps/teams/views.py:1450
-msgid "/n"
-msgstr "/n"
-
-#: apps/teams/views.py:1468
+#: apps/teams/views.py:1617
 msgid "You are not allowed to download this transcript."
 msgstr "Jums nav atļaujas lejuplādēt šo transkriptu."
 
-#: apps/teams/views.py:1519
+#: apps/teams/views.py:1668
 msgid "There's already a project with this name"
 msgstr "Projekts ar šādu nosaukumu jau pastāv"
 
-#: apps/teams/views.py:1531
+#: apps/teams/views.py:1680
 msgid "Project added."
 msgstr "Projekts pievienots."
 
-#: apps/teams/views.py:1548
+#: apps/teams/views.py:1697
 msgid "You cannot edit that project."
 msgstr "Jūs nevarat rediģēt šo projektu."
 
-#: apps/teams/views.py:1559
+#: apps/teams/views.py:1708
 msgid "Project deleted."
 msgstr "Projekts dzēsts."
 
-#: apps/teams/views.py:1577
+#: apps/teams/views.py:1726
 msgid "Project saved."
 msgstr "Projekts saglabāts."
 
-#: apps/teams/views.py:1617
+#: apps/teams/views.py:1767
 msgid "Successfully synced subtitles."
 msgstr "Subtitri veiksmīgi sinhronizēt."
 
-#: apps/teams/views.py:1721
+#: apps/teams/views.py:1871
 msgid ""
 "Invalid unpublishing request.\n"
 "Errors:\n"
@@ -1175,11 +1225,11 @@ msgstr ""
 "Nederīgs atpublicēšanas pieprasījums. \n"
 "Kļūdas: \n"
 
-#: apps/teams/views.py:1755
+#: apps/teams/views.py:1902
 msgid "Successfully unpublished subtitles."
 msgstr "Subtitri veiksmīgi atpublicēti."
 
-#: apps/teams/templatetags/teams_tags.py:260
+#: apps/teams/templatetags/teams_tags.py:261
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Vai kāds var man palīdzēt subtitrēt šos video? %(url)s"
@@ -1188,20 +1238,29 @@ msgstr "Vai kāds var man palīdzēt subtitrēt šos video? %(url)s"
 msgid "File should have txt format"
 msgstr "Datnei jābūt txt formātā"
 
+#: apps/videos/forms.py:58 apps/videos/forms.py:76
+msgid "File size should be less {0} kb"
+msgstr "Datnes izmēram būtu jābūt mazākam par {0} kb"
+
 #: apps/videos/forms.py:67
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Neizdevās šifrēt datni. Tai jābūt utf8 kodējumā."
 
-#: apps/videos/forms.py:79
-msgid "Incorrect format. Upload .srt, .ssa, .sbv or .xml (TTML  format)"
-msgstr ""
-"Nepareizs formāts. Augšuplādējiet .srt, .ssa, .sbv vai .xml (TTML  formātus)"
+#: apps/videos/forms.py:80
+#, python-format
+msgid "Incorrect format. Upload .%s "
+msgstr "Nepareizs formāts. Augšuplādējiet .%s"
 
-#: apps/videos/forms.py:112 apps/videos/forms.py:196 utils/validators.py:38
+#: apps/videos/forms.py:89 unisubs-integration/api/1_0/forms.py:316
+#: unisubs-integration/api/1_0/forms.py:328
+msgid "Incorrect subtitles format"
+msgstr "Nepareizs subtitru formāts"
+
+#: apps/videos/forms.py:113 apps/videos/forms.py:198 utils/validators.py:38
 msgid "This URL appears to be a broken link."
 msgstr "Šī URL ir bojāta saite."
 
-#: apps/videos/forms.py:118 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:119 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1215,11 +1274,11 @@ msgstr ""
 "vietni vai formātu padarītu saderīgu, vai arī ja uzskatāt, ka ir radusies "
 "kāda kļūme."
 
-#: apps/videos/forms.py:129
+#: apps/videos/forms.py:130
 msgid "You have not permission add video URL for this video"
 msgstr "Jums nav atļaujas šim video pievienot URL."
 
-#: apps/videos/forms.py:181
+#: apps/videos/forms.py:183
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
@@ -1230,7 +1289,7 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja "
 "rodas kāda problēma."
 
-#: apps/videos/forms.py:184 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:186 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to "
@@ -1247,33 +1306,33 @@ msgstr ""
 "                    <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja rodas "
 "kāda problēma."
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Youtube usernames"
 msgstr "Youtube lietotājvārdi"
 
-#: apps/videos/forms.py:212
+#: apps/videos/forms.py:214
 msgid "Enter usernames separated by comma."
 msgstr "Ievadiet lietotājvārdus, atdalot tos ar komatiem."
 
-#: apps/videos/forms.py:213
+#: apps/videos/forms.py:215
 msgid "Youtube page link."
 msgstr "Youtube lapas saite"
 
-#: apps/videos/forms.py:214
+#: apps/videos/forms.py:216
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Piemēram: http://www.youtube.com/lietotājs/lietotājvārds"
 
-#: apps/videos/forms.py:215
+#: apps/videos/forms.py:217
 msgid "Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added."
 msgstr ""
 "Atbalsta: Youtube, Vimeo un Dailymotion. Pievienotas tikai atbalstītās "
 "vietnes."
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid "Save feed"
 msgstr "Saglabāt barotni"
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:218
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
@@ -1281,7 +1340,7 @@ msgstr ""
 "Izvēlēties, ja vēlaties no šīs barotnes pievienot video arī turpmāk. "
 "Saglabātas tiks tikai derīgas RSS barotnes."
 
-#: apps/videos/forms.py:259
+#: apps/videos/forms.py:261
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
@@ -1289,46 +1348,48 @@ msgstr ""
 "Piedodiet, mums jūsu norādītajā vietrādī URL neizdevās atrast derīgu "
 "barotni. Lūdzu, pārbaudiet vietrādi un mēģiniet vēlreiz."
 
-#: apps/videos/forms.py:264
+#: apps/videos/forms.py:266
 msgid ""
 "The videos are being added in the background. If you are logged in, you will "
 "receive a message when it's done"
 msgstr ""
 
-#: apps/videos/forms.py:276
+#: apps/videos/forms.py:278
 msgid "captcha"
 msgstr "CAPTCHA"
 
-#: apps/videos/models.py:139
+#: apps/videos/models.py:138
 msgid "in seconds"
 msgstr ""
 
-#: apps/videos/models.py:163
+#: apps/videos/models.py:162
 msgid "Sub.fetched"
 msgstr ""
 
-#: apps/videos/models.py:165
+#: apps/videos/models.py:164
 msgid "Widget views"
 msgstr "velsiešu valoda"
 
-#: apps/videos/models.py:167
+#: apps/videos/models.py:166
 msgid "Views"
 msgstr "Skatījumu"
 
-#: apps/videos/models.py:1147
+#: apps/videos/models.py:1158
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
 msgstr ""
+"Piedodiet, pašlaik nevar augšuplādēt subtitrus, jo kāds jau rediģē valodu, "
+"kura tulkojumu Jūs augšuplādējat."
 
-#: apps/videos/models.py:2017
+#: apps/videos/models.py:1981
 #, python-format
 msgid ""
 "  reviewed <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2022
+#: apps/videos/models.py:1986
 #, python-format
 msgid ""
 "  accepted <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1337,16 +1398,16 @@ msgstr ""
 "apstiprināja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2027
+#: apps/videos/models.py:1991
 #, python-format
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
-"  noraidīja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video <a "
+"noraidīja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2032
+#: apps/videos/models.py:1996
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1355,7 +1416,7 @@ msgstr ""
 "  apstiprināja <a href=\"%(language_url)s\">%(language)s</a> subtitrus video "
 "<a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2037
+#: apps/videos/models.py:2001
 #, python-format
 msgid ""
 "  declined <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
@@ -1364,32 +1425,34 @@ msgstr ""
 "noraidīja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s</a> subtitrus"
 
-#: apps/videos/models.py:2043
+#: apps/videos/models.py:2007
 #, python-format
-msgid "  deleted video \"%(title)s\""
-msgstr "  dzēsts video „%(title)s”"
+msgid "  deleted a video: \"%(title)s\""
+msgstr "izdzēsa video: \"%(title)s\""
 
-#: apps/videos/models.py:2048
+#: apps/videos/models.py:2012
 #, python-format
-msgid "added video <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "pievienoja video <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgid ""
+"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgstr ""
+"pievienoja Amara <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a>"
 
-#: apps/videos/models.py:2050
+#: apps/videos/models.py:2014
 #, python-format
-msgid "<a href=\"%(video_url)s\">%(video_name)s</a> video added"
-msgstr "pievienots video <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgid "<a href=\"%(video_url)s\">%(video_name)s</a> added to Amara"
+msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots Amara"
 
-#: apps/videos/models.py:2056
+#: apps/videos/models.py:2020
 #, python-format
 msgid "changed title for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "nomainīts nosaukums video <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2058
+#: apps/videos/models.py:2022
 #, python-format
 msgid "Title was changed for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "Video <a href=\"%(video_url)s\">%(video_name)s</a> nomainīts nosaukums"
 
-#: apps/videos/models.py:2073
+#: apps/videos/models.py:2036
 #, python-format
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
@@ -1398,7 +1461,7 @@ msgstr ""
 "komentēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(comments_url)s\">%(language)s subtitrus</a>"
 
-#: apps/videos/models.py:2075
+#: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
@@ -1407,17 +1470,17 @@ msgstr ""
 "Video <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%(comments_url)s"
 "\">%(language)s </a>s subtitriem pievienots komentārs"
 
-#: apps/videos/models.py:2078
+#: apps/videos/models.py:2041
 #, python-format
 msgid "commented on <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "pievienoja komentāru <a href=\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2080
+#: apps/videos/models.py:2043
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots komentārs"
 
-#: apps/videos/models.py:2088
+#: apps/videos/models.py:2051
 #, python-format
 msgid ""
 "started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1426,14 +1489,16 @@ msgstr ""
 "sāka <a href=\"%(language_url)s\">%(language)s subtitrus</a> video <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 
-#: apps/videos/models.py:2090
+#: apps/videos/models.py:2053
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
 "\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
+"Video <a href=\"%(video_url)s\">%(video_name)s</a> sākti <a href=\"%"
+"(language_url)s\">%(language)s subtitri</a>"
 
-#: apps/videos/models.py:2101
+#: apps/videos/models.py:2061
 #, python-format
 msgid ""
 "edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
@@ -1442,7 +1507,7 @@ msgstr ""
 "rediģēja <a href=\"%(video_url)s\">%(video_name)s</a> <a href=\"%"
 "(language_url)s\">%(language)s subtitrus</a> "
 
-#: apps/videos/models.py:2103
+#: apps/videos/models.py:2063
 #, python-format
 msgid ""
 "<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
@@ -1451,115 +1516,117 @@ msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> video <a href=\"%(language_url)s"
 "\">%(language)s subtitri</a> tika rediģēti"
 
-#: apps/videos/models.py:2109
+#: apps/videos/models.py:2069
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "pievienoja jaunu video <a href=\"%(video_url)s\">%(video_name)s</a> vietrādi "
 "URL"
 
-#: apps/videos/models.py:2111
+#: apps/videos/models.py:2071
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgstr ""
 "<a href=\"%(video_url)s\">%(video_name)s</a> pievienots jauns vietrādis URL"
 
-#: apps/videos/models.py:2116
+#: apps/videos/models.py:2076
 #, python-format
 msgid "joined the %(team)s team as a %(role)s"
 msgstr "pievienojās %(team)s komandai kā %(role)s"
 
-#: apps/videos/models.py:2121
+#: apps/videos/models.py:2081
 #, python-format
 msgid "left the %s team"
 msgstr "pameta %s komandu"
 
-#: apps/videos/models.py:2135
+#: apps/videos/models.py:2095
 #, python-format
 msgid ""
 "  changed primary url from <a href=\"%(old_url)s\">%(old_url)s</a> to <a "
 "href=\"%(new_url)s\">%(new_url)s</a>"
 msgstr ""
 
-#: apps/videos/models.py:2141
+#: apps/videos/models.py:2101
 #, python-format
 msgid "  deleted url <a href=\"%(title)s\">%(title)s</a>"
-msgstr ""
+msgstr "izdzēsts URL vientrādis <a href=\"%(title)s\">%(title)s</a>"
 
-#: apps/videos/models.py:2213
+#: apps/videos/models.py:2179
 msgid "add video"
 msgstr "pievienot video"
 
-#: apps/videos/models.py:2214
+#: apps/videos/models.py:2180
 msgid "change title"
 msgstr "mainīt nosaukumu"
 
-#: apps/videos/models.py:2215
+#: apps/videos/models.py:2181
 msgid "comment"
 msgstr "komentēt"
 
-#: apps/videos/models.py:2216
+#: apps/videos/models.py:2182
 msgid "add version"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2217
+#: apps/videos/models.py:2183
 msgid "add translation"
 msgstr "pievienot tulkojumu"
 
-#: apps/videos/models.py:2218
+#: apps/videos/models.py:2184
 msgid "add video url"
 msgstr "pievienot video url"
 
-#: apps/videos/models.py:2219
+#: apps/videos/models.py:2185
 msgid "request subtitles"
 msgstr "prasīt subtitrus"
 
-#: apps/videos/models.py:2220
+#: apps/videos/models.py:2186
 msgid "approve version"
 msgstr "apstiprināt versiju"
 
-#: apps/videos/models.py:2221
+#: apps/videos/models.py:2187
 msgid "add contributor"
 msgstr "pievienot artavnieku"
 
-#: apps/videos/models.py:2222
+#: apps/videos/models.py:2188
 msgid "remove contributor"
 msgstr "noņemt artavnieku"
 
-#: apps/videos/models.py:2223
+#: apps/videos/models.py:2189
 msgid "reject version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2224
+#: apps/videos/models.py:2190
 msgid "review version"
 msgstr "pārskatīt versiju"
 
-#: apps/videos/models.py:2225
+#: apps/videos/models.py:2191
 msgid "accept version"
 msgstr "pieņemt versiju"
 
-#: apps/videos/models.py:2226
+#: apps/videos/models.py:2192
 msgid "decline version"
 msgstr "noraidīt versiju"
 
-#: apps/videos/models.py:2227
+#: apps/videos/models.py:2193
 msgid "delete video"
 msgstr "dzēst video"
 
-#: apps/videos/models.py:2228
+#: apps/videos/models.py:2194
 msgid "edit url"
 msgstr "rediģēt URL"
 
-#: apps/videos/models.py:2229
+#: apps/videos/models.py:2195
 msgid "delete url"
 msgstr "dzēst URL"
 
-#: apps/videos/models.py:2487
+#: apps/videos/models.py:2453
 #, python-format
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
 msgstr ""
+"Šis vietrādis URL mūsu sistēmā jau <a href=\"%(url)s\">pastāv</a> kā "
+"neatkarīgs video. To nevar pievienot kā papildu vietrādi."
 
 #: apps/videos/rpc.py:50 apps/videos/rpc.py:66
 msgid "You have not permission"
@@ -1619,7 +1686,7 @@ msgstr "Jūs pārstājāt sekot šiem subtitriem."
 
 #: apps/videos/share_utils.py:52
 msgid "Just found a version of this video with subtitles"
-msgstr ""
+msgstr "Tikko atradu šī video versiju ar subtitriem"
 
 #: apps/videos/share_utils.py:54
 msgid "Check out this video and help make subtitles"
@@ -1646,9 +1713,9 @@ msgstr ""
 #: apps/videos/share_utils.py:106
 #, python-format
 msgid "Just found a version of this video with %(language_name)s subtitles"
-msgstr ""
+msgstr "Tikko atradu šī video versiju ar '%(language_name)s's subtitriem"
 
-#: apps/videos/views.py:171
+#: apps/videos/views.py:175
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add "
@@ -1656,18 +1723,18 @@ msgid ""
 "improve subtitles, click the button below the video."
 msgstr ""
 
-#: apps/videos/views.py:179
+#: apps/videos/views.py:183
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr ""
 
-#: apps/videos/views.py:184
+#: apps/videos/views.py:188
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Esošie subtitri tiks importētie turpmāko minūšu laikā."
 
-#: apps/videos/views.py:288
+#: apps/videos/views.py:296
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
@@ -1675,21 +1742,26 @@ msgstr ""
 "Paldies par augšuplādēšanu. Paies pāris minūtes, līdz Jūsu subtitri būs "
 "redzami."
 
-#: apps/videos/views.py:595
+#: apps/videos/views.py:627
 msgid "You have not permission change this URL"
 msgstr "Jums nav atļaujas mainīt šo URL"
 
-#: apps/videos/views.py:600 apps/videos/views.py:631
+#: apps/videos/views.py:632 apps/videos/views.py:663
 msgid "Object does not exist"
 msgstr "Objekts nepastāv"
 
-#: apps/videos/views.py:615
+#: apps/videos/views.py:647
 msgid "You have not permission delete this URL"
 msgstr "Jums nav atļaujas dzēst šo URL"
 
-#: apps/videos/views.py:619
+#: apps/videos/views.py:651
 msgid "You can't remove primary URL"
 msgstr "Jūs nevarat noņemt galveno vietrādi URL."
+
+#: apps/videos/views.py:805
+#, python-format
+msgid "The language for %s has been changed"
+msgstr "%s valodu mainīja"
 
 #: apps/videos/feed_parser/__init__.py:107
 msgid "Feed is unavailable now."
@@ -1710,11 +1782,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja "
 "rodas kāda problēma."
 
-#: apps/videos/types/youtube.py:43
+#: apps/videos/types/youtube.py:49
 msgid "Private video"
 msgstr "Privāts video"
 
-#: apps/videos/types/youtube.py:44
+#: apps/videos/types/youtube.py:50
 msgid "Undefined error"
 msgstr "Nenoteikta kļūda"
 
@@ -1722,28 +1794,11 @@ msgstr "Nenoteikta kļūda"
 msgid "Video embedding disabled by owner"
 msgstr "Video iegulšanu atspējojis īpašnieks"
 
-#: apps/widget/rpc.py:326
-#, python-format
-msgid ""
-"These subtitles are moderated. See the %s team page for information on how "
-"to contribute."
-msgstr ""
-
-#: apps/widget/rpc.py:328
-msgid "Sorry, these subtitles are privately moderated."
-msgstr ""
-
-#: apps/widget/rpc.py:338
-msgid ""
-"Sorry, you do not have the permission to edit these subtitles. If you "
-"believe that they need correction, please contact the team administrator."
-msgstr ""
-
-#: apps/widget/rpc.py:1094 apps/widget/rpc.py:1135
+#: apps/widget/rpc.py:1110 apps/widget/rpc.py:1152
 msgid "\n"
 msgstr "\n"
 
-#: apps/widget/views.py:145
+#: apps/widget/views.py:143
 msgid "That task has already been completed."
 msgstr "Šis uzdevums jau ir ticis izpildīts."
 
@@ -1774,7 +1829,7 @@ msgid "Third party"
 msgstr "Trešā puse"
 
 #: libs/rosetta/templates/rosetta/languages.html:15
-#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:56
+#: libs/rosetta/templates/rosetta/pofile.html:35 templates/teams/tasks.html:61
 msgid "All"
 msgstr "Visi"
 
@@ -1783,14 +1838,13 @@ msgid "Progress"
 msgstr "Progress"
 
 #: libs/rosetta/templates/rosetta/languages.html:30
-#: templates/messages/new.html:14 templates/messages/sent.html:24
-#: templates/profiles/_tabs.html:13 templates/profiles/_top_user_panel.html:19
+#: templates/profiles/_top_user_panel.html:24
 #: templates/teams/_subnav_settings.html:9
 msgid "Messages"
 msgstr "Ziņojumi"
 
 #: libs/rosetta/templates/rosetta/languages.html:31
-#: templates/teams/settings-permissions.html:72
+#: templates/teams/settings-permissions.html:53
 msgid "Translated"
 msgstr "Tulkotie"
 
@@ -1801,7 +1855,7 @@ msgstr ""
 
 #: libs/rosetta/templates/rosetta/languages.html:33
 msgid "Obsolete"
-msgstr "Novecojušie"
+msgstr "Novecojis"
 
 #: libs/rosetta/templates/rosetta/languages.html:34
 msgid "File"
@@ -1879,10 +1933,10 @@ msgid "Go"
 msgstr "Doties"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:207 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:212 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
-msgstr "oriģinālos"
+msgstr "Oriģināls"
 
 #: libs/rosetta/templates/rosetta/pofile.html:58
 msgid "Occurrences(s)"
@@ -1912,7 +1966,7 @@ msgstr[2] "%(more_count)s vairāk"
 
 #: libs/rosetta/templates/rosetta/pofile.html:123
 msgid "Save and translate next block"
-msgstr ""
+msgstr "Saglabāt un tulkot nākamo daļu"
 
 #: libs/rosetta/templates/rosetta/pofile.html:127
 msgid "Skip to page:"
@@ -1953,19 +2007,19 @@ msgstr ""
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_project.html:62
-#: templates/teams/_context_team.html:95
+#: templates/teams/_context_team.html:116
 msgid "Post to Facebook"
 msgstr "Ievietot Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:63
-#: templates/teams/_context_team.html:96
+#: templates/teams/_context_team.html:117
 msgid "Post to Twitter"
 msgstr "Ievietot Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:64
-#: templates/teams/_context_team.html:97
+#: templates/teams/_context_team.html:118
 msgid "Email to friends"
 msgstr "Nosūtīt draugam pa e-pastu"
 
@@ -1978,7 +2032,7 @@ msgid "Permalink"
 msgstr "Pastāvīgā adrese"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:93
+#: templates/teams/_context_team.html:114
 msgid "Share"
 msgstr "Dalīties"
 
@@ -2095,10 +2149,8 @@ msgid ""
 msgstr ""
 
 #: templates/base.html:9
-msgid ""
-"Universal subtitling: caption, translate, subtitle and transcribe video."
-msgstr ""
-"Universālā subtitrēšana: pārtulkojiet, subtitrējiet un transkribējiet video."
+msgid "Caption, translate, subtitle and transcribe video."
+msgstr "Subtitrējiet un pārtulkojiet video."
 
 #: templates/base.html:70
 msgid "Subtitle Videos"
@@ -2108,13 +2160,13 @@ msgstr "Subtitrēt video"
 msgid "Watch"
 msgstr "Skatīties"
 
-#: templates/base.html:72
+#: templates/base.html:72 templates/videos/create.html:63
 msgid "Volunteer"
 msgstr "Brīvprātīgajiem"
 
 #: templates/base.html:73
-msgid "Enterprise"
-msgstr "Uzņēmums"
+msgid "Pro Services"
+msgstr ""
 
 #: templates/base.html:74
 msgid "Help"
@@ -2124,45 +2176,66 @@ msgstr "Palīdzība"
 msgid "Sign in / Sign up"
 msgstr "Ieiet / Reģistrēties"
 
-#: templates/base.html:102
+#: templates/base.html:93
+msgid "Got a YouTube account?<"
+msgstr ""
+
+#: templates/base.html:94
+msgid ""
+"New: enable viewer-created translations and captions on your YouTube channel!"
+msgstr ""
+
+#: templates/base.html:96
+msgid "Connect to YouTube"
+msgstr ""
+
+#: templates/base.html:97
+msgid "No thanks"
+msgstr ""
+
+#: templates/base.html:113
 msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr ""
 "Amara ir <a href=\"http://participatoryculture.org/\">PCF</a> projekts."
 
-#: templates/base.html:105 templates/profiles/view_profile.html:68
+#: templates/base.html:116 templates/profiles/base.html:12
 msgid "About"
 msgstr "Par"
 
-#: templates/base.html:106
+#: templates/base.html:117
 msgid "Jobs"
 msgstr "Vakances"
 
-#: templates/base.html:109
+#: templates/base.html:120
 msgid "Contact Us"
 msgstr "Sazinieties ar mums"
 
-#: templates/base.html:110
+#: templates/base.html:121
 msgid "Privacy Policy"
 msgstr "Privātuma politika"
 
-#: templates/base.html:111
+#: templates/base.html:122
 msgid "Terms of Service"
 msgstr "Lietošanas noteikumi"
 
-#: templates/base.html:121
-msgid "Sentry"
-msgstr ""
+#: templates/base.html:123
+msgid "Security"
+msgstr "Drošības"
 
-#: templates/base.html:124
+#: templates/base.html:133
+msgid "Sentry"
+msgstr "Sentry"
+
+#: templates/base.html:136
 msgid "Rosetta"
 msgstr "Rosetta"
 
-#: templates/base.html:127
+#: templates/base.html:139
 msgid "Impersonate"
 msgstr ""
 
-#: templates/base.html:130 templates/teams/billing/choose.html:11
+#: templates/base.html:142 templates/teams/billing/choose.html:11
 msgid "Billing"
 msgstr "Apmaksa"
 
@@ -2256,6 +2329,10 @@ msgid ""
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
 msgstr ""
+"\n"
+"Lūdzu, ņemiet arī vērā, ka, saskaņā ar 512(f) nodaļu, jebkurš cilvēks, kurš "
+"apzināti iesniedz nepatiesu prasību pret kāda materiāla vai darbības "
+"pārkāpumu, var tikt saukts pie atbildības.\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
@@ -2416,7 +2493,7 @@ msgstr ""
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
-msgstr ""
+msgstr "Pievienot kopējas subtitrēšanas iespēju katram video savā mājaslapā"
 
 #: templates/embed_page.html:28
 msgid "Just drop one line of code into your page:"
@@ -2776,7 +2853,7 @@ msgstr ""
 msgid ""
 "\n"
 "     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
-"TXT, and TTML \n"
+"TXT, and DFXP.\n"
 "     \t formats on the page for that language (<a href=\"http://"
 "universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
 "\t\t Click \"Download Subtitles\" button in the lower right to the left from "
@@ -2833,6 +2910,21 @@ msgid ""
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
 msgstr ""
+"\n"
+"        Katram subtitru vai tulkojumu komplektam ir pilna iepriekšējo "
+"versiju vēsture. \n"
+"\t\tVienkārši uzklikšķiniet uz subtitru lapas cilnes, lai redzētu pilnu "
+"versiju uzskaitījumu.\n"
+"\t\tJūs varat arī izmantot kreisajā pusē esošās izvēles rūtiņas un pogu "
+"„salīdzināt versijas”, \n"
+"\t\tlai redzētu atšķirību starp divām versijām. Vai uzklikšķināt tikai uz "
+"vienas versijas \n"
+"\t\tun sākt tās rediģēšanu vai atjaunot izvēlēto versiju.\n"
+"        <br/><br/>\n"
+"        Ja pašreizējā versija ir tukša, bet pastāv vecākas versijas, \n"
+"\t\tieteicams tās apskatīties pirms sākt visu no nulles, \n"
+"\t\tjo vecākajās versijās varbūt kas noderīgs.\n"
+"        "
 
 #: templates/faq.html:188
 msgid ""
@@ -2885,7 +2977,7 @@ msgstr "Palieciet ar mums, projektam attīstoties!"
 
 #: templates/feedback_response.html:9
 msgid "Announcement Signup"
-msgstr ""
+msgstr "Reģistrēšanās paziņojumiem"
 
 #: templates/feedback_response.html:12
 msgid "Best"
@@ -2917,133 +3009,131 @@ msgid "The easiest way to caption and translate any video."
 msgstr "Vienkāršākais veids, kā subtitrēt un pārtulkot jebkuru video."
 
 #: templates/index.html:19
-msgid "Subtitles make videos more powerful, more global, and more searchable."
-msgstr "Subtitri padara video jaudīgākus, globālākus un atrodamākus."
+msgid "The most powerful and flexible subtitling platform in the world."
+msgstr ""
 
 #: templates/index.html:24
-msgid "Subtitle a Video Now"
-msgstr "Subtitrēt video"
+msgid "Add a Video"
+msgstr ""
 
 #: templates/index.html:26
 msgid "Subtitle"
 msgstr "Subtitrēt"
 
-#: templates/index.html:27
+#: templates/index.html:28
 msgid "Works with YouTube, Vimeo, HTML5, and more."
 msgstr "Darbojas ar YouTube, Vimeo, HTML5 un vēl."
 
-#: templates/index.html:30
+#: templates/index.html:31
+msgid "Using YouTube?"
+msgstr ""
+
+#: templates/index.html:31
+msgid "Sync automatically"
+msgstr ""
+
+#: templates/index.html:35
 msgid "Features"
 msgstr "Iespējas"
 
-#: templates/index.html:32
+#: templates/index.html:37
 msgid "Embed the video anywhere"
 msgstr "Ieguliet video jebkur"
 
-#: templates/index.html:33
+#: templates/index.html:38
 msgid "Add subtitles yourself or ask viewers to help."
 msgstr "Pievienojiet subtitrus pats vai lūdziet skatītāju palīdzību."
 
-#: templates/index.html:34
-msgid "Full site integration"
-msgstr "Pilnas vietnes integrācija"
+#: templates/index.html:43
+msgid "Help Create Captions and Subtitles"
+msgstr ""
 
-#: templates/index.html:39
-msgid "Volunteers Needed"
-msgstr "Nepieciešami brīvprātīgie"
-
-#: templates/index.html:41
+#: templates/index.html:45
 msgid ""
 "\n"
-"            Our deaf and hard of hearing users and non-profits request help "
-"for videos that need captions or translations. \n"
+"            Help organizations and deaf and hard of hearing viewers make "
+"videos accessible around the world.\n"
 "        "
 msgstr ""
-"\n"
-"            Mūsu nedzirdīgie un vājdzirdīgie lietotāji, kā arī bezpeļņas "
-"organizācijas lūdz palīdzību ar video subtitrēšanu un tulkošanu.\n"
-"        "
-
-#: templates/index.html:44
-msgid "Start volunteering."
-msgstr "Sākt brīvprātīgo darbu."
 
 #: templates/index.html:48
-msgid "Complete Subtitling Solutions"
-msgstr "Pilnīgie subtitrēšanas risinājumi"
+msgid "Take a Look."
+msgstr ""
 
-#: templates/index.html:50
+#: templates/index.html:52
+msgid "Groundbreaking Crowdsource Platform"
+msgstr ""
+
+#: templates/index.html:54
 msgid ""
 "\n"
-"            Increase viewership with transcription, captioning, and "
-"translation services, and flexible API and integration options. Improve SEO, "
-"reach a global audience, and build a managed volunteer community.\n"
+"            Revolutionize how you create subtitles and reach viewers. "
+"Increase viewership with transcription, captioning, and translation "
+"services, and flexible API and integration options.\n"
 "        "
 msgstr ""
-"\n"
-"            Ar transkripcijas, subtitrēšanas un tulkošanas pakalpojumu, kā "
-"arī elastīgu API un integrācijas iespēju palīdzību paplašiniet skatītāju "
-"loku. Uzlabojiet meklēšanas optimizāciju (SEO), sasniedziet vispasaules "
-"publiku un izveidojiet pārvaldītu brīvprātīgo kopienu.\n"
-"        "
 
-#: templates/index.html:53
-msgid "See our enterprise services."
-msgstr "Apskatiet mūsu uzņēmuma pakalpojumus."
+#: templates/index.html:57
+msgid "See our pro services."
+msgstr ""
 
-#: templates/index.html:77
+#: templates/index.html:81
 msgid "For Enterprise"
 msgstr "Uzņēmumiem"
 
-#: templates/index.html:78
+#: templates/index.html:82
 msgid ""
 "The largest, most powerful captioning and translation platform in the world."
 msgstr "Pasaulē lielākā un jaudīgākā subtitrēšanas un tulkošanas platforma."
 
-#: templates/index.html:84
+#: templates/index.html:88
 msgid "TED"
 msgstr "TED"
 
-#: templates/index.html:89
+#: templates/index.html:93
 msgid "Mozilla"
 msgstr "Mozilla"
 
-#: templates/index.html:94
+#: templates/index.html:98
 msgid "Netflix"
 msgstr "Netflix"
 
-#: templates/index.html:99
+#: templates/index.html:103
 msgid "Coursera"
 msgstr "Coursera"
 
-#: templates/index.html:104
+#: templates/index.html:108
 msgid "PBS Newshour"
 msgstr "PBS Newshour"
 
-#: templates/index.html:110
+#: templates/index.html:114
 msgid "More Popular"
 msgstr "Vairāk populārāko"
 
-#: templates/index.html:111
+#: templates/index.html:115
 msgid "Most Popular Today"
 msgstr "Populārākie šodien"
 
-#: templates/index.html:113
+#: templates/index.html:117
 msgid "Top this month"
 msgstr "Populārākie šomēnes"
 
-#: templates/index.html:114
+#: templates/index.html:118
 msgid "Top all-time"
 msgstr "Visu laiku populārākie"
 
-#: templates/index.html:121
+#: templates/index.html:125
 msgid "More Featured"
 msgstr "Vairāk piedāvāto"
 
-#: templates/index.html:122 templates/videos/featured_videos.html:36
+#: templates/index.html:126 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr "Piedāvātie video"
+
+#: templates/index.html:144
+msgid "Awards for Amara"
+msgstr ""
 
 #: templates/index_old.html:26
 msgid "Easily caption and translate your videos, with help from your viewers."
@@ -3075,7 +3165,7 @@ msgid ""
 "The fastest way to add subtitle functionality to a single video or a whole "
 "site. Super easy to integrate with no software to install."
 msgstr ""
-"Ātrākais veids kā pievienot subtitru funkcionalitāti atsevišķiem video vai "
+"Ātrākais veids, kā pievienot subtitru funkcionalitāti atsevišķiem video vai "
 "visai lapai. Ārkārtīgi vienkārša integrējamība bez nepieciešamības uzstādīt "
 "īpašu programmatūru."
 
@@ -3085,7 +3175,7 @@ msgstr "Bezmaksas, brīvpiekļuves un bezpeļņas!"
 
 #: templates/index_old.html:35
 msgid "videos use"
-msgstr ""
+msgstr "video izmanto"
 
 #: templates/index_old.html:62
 msgid "Add this subtitle tab to a video in seconds."
@@ -3256,7 +3346,7 @@ msgstr ""
 
 #: templates/index_old.html:158
 msgid "find out how to volunteer"
-msgstr ""
+msgstr "uzzināt, kā brīvprātīgi palīdzēt"
 
 #: templates/index_old.html:160
 msgid "The code is free and open source"
@@ -3271,6 +3361,8 @@ msgid ""
 "It's built using Javascript and HTML5 instead of proprietary software like "
 "Flash"
 msgstr ""
+"Tas ir veidots, izmantojot Javascript un HTML5, tā vietā, lai izmantotu "
+"patentētu programmatūru kā Flash"
 
 #: templates/index_old.html:162
 #, python-format
@@ -3355,6 +3447,11 @@ msgid ""
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
 msgstr ""
+"Dalībnieku vidū būs: video veidotāji un producenti, galalietotāji, galveno "
+"video uzglabāšanas pakalpojumu pārstāvji, standartu inženieri, pieejamības "
+"aizbildņi, brīvā koda izstrādātāji, izglītības vadītāji, kā arī citi cilvēki "
+"un organizācijas, kurām ir teikšana subtitrēšanas pasaulē. Mēs izveidosim "
+"precīzāku sarakstu, pasākumam tuvojoties."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
@@ -3486,7 +3583,7 @@ msgstr "Amara"
 
 #: templates/admin/base_site.html:12
 msgid "View site"
-msgstr ""
+msgstr "Doties uz vietni"
 
 #: templates/admin/teams/team/change_list.html:9
 msgid "Send"
@@ -3500,16 +3597,17 @@ msgstr "Vēlreiz atsūtīt apstiprināšanas e-pastu"
 msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Vai esat drošs, ka vēlaties neatgriezeniski dzēst savu profilu?"
 
-#: templates/auth/delete_user.html:13 templates/messages/list.html:83
-#: templates/messages/sent.html:56 templates/teams/tasks.html:427
+#: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
+#: templates/messages/sent.html:49 templates/teams/tasks.html:454
 msgid "Delete"
 msgstr "Dzēst"
 
 #: templates/auth/delete_user.html:14
-#: templates/profiles/_select_language_dialog.html:30
+#: templates/profiles/_select_language_dialog.html:33
+#: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:481 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:379
+#: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
+#: templates/videos/subtitle-view.html:369
 msgid "Cancel"
 msgstr "Atcelt"
 
@@ -3546,618 +3644,13 @@ msgstr "Izveidot kontu"
 msgid "Sign in as a different user"
 msgstr "Ieiet kā citam lietotājam"
 
-#: templates/comments/_item.html:3 templates/messages/list.html:70
-#: templates/messages/sent.html:53 templates/videos/_action_tpl.html:9
+#: templates/comments/_item.html:3 templates/messages/inbox.html:59
+#: templates/messages/sent.html:46 templates/videos/_action_tpl.html:9
 #: templates/videos/_action_tpl_video.html:9
 #: templates/videos/_video_url_panel.html:29 templates/videos/diffing.html:101
-#: templates/videos/diffing.html.py:164
+#: templates/videos/diffing.html.py:147
 msgid "ago"
 msgstr "atpakaļ"
-
-#: templates/enterprise/advanced-security.html:6
-msgid "A Revolutionary Video Security Model"
-msgstr "Revolucionārs video drošības modelis"
-
-#: templates/enterprise/advanced-security.html:8
-msgid ""
-"\n"
-"        You always maintain control of your video, because it never leaves "
-"your server.  Amara doesn’t require any video uploading, so your existing "
-"security policy is always in full effect. We support OAuth, which means your "
-"users never need to log in twice—they can see your video and authenticate "
-"with both organizations at the same time. Amara makes your subtitles "
-"available from the cloud, so you can: deploy just in time via our API; cache "
-"on your server and get pinged when there are updates; or use our embeddable "
-"subtitle widget.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:6
-#: templates/enterprise/base.html:33
-msgid "API Integration"
-msgstr "API integrācija"
-
-#: templates/enterprise/api-integration.html:8
-msgid ""
-"\n"
-"        Amara’s powerful API allows flexible integration with your existing "
-"publishing workflow.  By connecting your backend system directly to Amara, "
-"you can import and export subtitles, manage processing, and import completed "
-"subtitles directly back into your own system.  If you use a custom video "
-"player, importing subtitles via API lets your company fully control subtitle "
-"display and use of the transcript on your website.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/api-integration.html:12
-msgid "Amara API Documentation"
-msgstr "Amara API dokumentācija"
-
-#: templates/enterprise/automated-workflows.html:6
-#: templates/enterprise/base.html:24
-msgid "Automated Workflows"
-msgstr "Automatizētās darbplūsmas"
-
-#: templates/enterprise/automated-workflows.html:10
-msgid ""
-"\n"
-"        Workflows enable automating the flow of content through different "
-"authoring groups, including: volunteers, private crowds (staff, employees, "
-"students, etc), and professionals. They can be used for both first pass "
-"(authoring), as well as subsequent review passes for Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:14
-msgid ""
-"\n"
-"        Different workflows can be chained together to create an unlimited "
-"number of highly flexible configurations. The Amara team can help you "
-"determine the best workflow for your subtitle processes and integrate it "
-"with your existing publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:18
-msgid "Contractors with Staff Review"
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:19
-msgid ""
-"\n"
-"        Use captioning and transcription contractors to create your "
-"subtitles, then require staff review and approval before they are published "
-"back to your server. Remember, no one sees your subtitles until YOU publish "
-"it.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:23
-msgid "Crowdsourced subtitles, followed by staff review"
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:24
-msgid ""
-"\n"
-"        In many cases, organizations want to leverage the power of the "
-"crowd, but don’t want to leave any chance for poor quality captions or "
-"subtitles to appear on their content. This workflow keeps videos private "
-"until a staff member has approved the subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:30
-msgid "Professionally created English captions, crowd translation"
-msgstr "Profesionāli izveidoti angļu valodas subtitri, pūļa tulkojums"
-
-#: templates/enterprise/automated-workflows.html:31
-msgid ""
-"\n"
-"        Amara offers professional- quality captions at very low cost with "
-"quick turn-around times. English can often be done in less than a day.  Once "
-"English is completed, it’s a snap to request translations from volunteers or "
-"staff. We have seen videos translated into multiple languages in just days—"
-"through a volunteer crowd.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/automated-workflows.html:35
-msgid "Crowd translations, with professional quality-control"
-msgstr "Pūļa tulkojumi ar profesionālu kvalitātes kontroli"
-
-#: templates/enterprise/automated-workflows.html:36
-#, python-format
-msgid ""
-"\n"
-"        Amara is, quite simply, the most cost-effective way to get "
-"professional-level quality for foreign language video subtitles. By "
-"leveraging professional quality review, you can expect to pay roughly 75%% "
-"less than the market price for traditional professional subtitles.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/base.html:12
-msgid "Features & Benefits"
-msgstr "Iespējas & ieguvumi"
-
-#: templates/enterprise/base.html:15
-msgid "Amara Platform"
-msgstr "Amara platforma"
-
-#: templates/enterprise/base.html:18
-msgid "Global Reach"
-msgstr "Globāla sasniedzamība"
-
-#: templates/enterprise/base.html:21
-#: templates/enterprise/quality-control.html:6
-msgid "Quality Control"
-msgstr "Kvalitātes kontrole"
-
-#: templates/enterprise/base.html:27
-#: templates/enterprise/subtitle-management.html:6
-msgid "Subtitle Management"
-msgstr "Subtitru pārvaldība"
-
-#: templates/enterprise/base.html:30
-msgid "Advanced Security"
-msgstr "Attīstība aizsardzība"
-
-#: templates/enterprise/base.html:36
-#: templates/enterprise/transcript-viewer.html:20
-msgid "Transcript Viewer"
-msgstr ""
-
-#: templates/enterprise/base.html:40
-msgid "Customers"
-msgstr "Klienti"
-
-#: templates/enterprise/base.html:43 templates/enterprise/film-tv.html:6
-msgid "Film and Television"
-msgstr "Filmas un televīzija"
-
-#: templates/enterprise/base.html:46
-msgid "Education"
-msgstr ""
-
-#: templates/enterprise/base.html:49 templates/enterprise/companies.html:6
-msgid "Companies"
-msgstr "Kompānijas"
-
-#: templates/enterprise/base.html:52 templates/enterprise/publishers.html:6
-msgid "Publishers"
-msgstr "Publicētāji"
-
-#: templates/enterprise/base.html:55 templates/enterprise/government.html:6
-msgid "Government"
-msgstr "Valdība"
-
-#: templates/enterprise/base.html:58
-msgid "Non-Profits"
-msgstr "Bezpeļņas organizācijas"
-
-#: templates/enterprise/base.html:66
-msgid "Get started with Amara"
-msgstr "Sākt Amara"
-
-#: templates/enterprise/base.html:67
-msgid "Be in touch at"
-msgstr "Sazinieties caur"
-
-#: templates/enterprise/companies.html:7
-msgid ""
-"\n"
-"        Corporations need to communicate with their staff and their "
-"customers around the world, and video is becoming a major part of that "
-"process. With Amara, companies make it possible for staff, customers, and "
-"contractors to caption and translate videos, make them searchable, and share "
-"them publicly or privately.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/education.html:6
-msgid "Universities and Online Education"
-msgstr ""
-
-#: templates/enterprise/education.html:16
-msgid ""
-"\n"
-"            Most of the leading online education companies and organizations "
-"use Amara to caption and translate video, including Coursera, Udacity, Khan "
-"Academy, TED Ed, as well as individual colleges and universities.  As online "
-"education explodes in popularity, subtitles are essential to making courses "
-"accessible and international. Colleges and universities are using Amara to "
-"make their rapidly growing video resources readily available to everyone.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/education.html:21
-msgid "Learn more about our work in education:"
-msgstr ""
-
-#: templates/enterprise/film-tv.html:15
-msgid ""
-"\n"
-"        Producers, publishers, and distributors of film and television use "
-"Amara to make captioning and translation simpler and less expensive. Amara "
-"makes it possible to caption and translate for global viewing audiences much "
-"more cost effectively than traditional approaches.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/film-tv.html:19
-msgid ""
-"\n"
-"            Easily manage workflows between distributed teams, whether they "
-"are staff, contractors, or viewers.  Publish completed subtitles directly "
-"through the Amara API.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:6
-msgid "Build a Global Reach"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:10
-msgid ""
-"\n"
-"        Amara is the premiere platform for taking video content global. "
-"Whether you’re working with volunteer translators, engaging your own staff, "
-"or hiring professionals, you can easily manage the end-to-end process.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:14
-msgid "Volunteer Subtitle Creation"
-msgstr "Brīvprātīga subtitru izveide"
-
-#: templates/enterprise/global-reach.html:15
-msgid ""
-"\n"
-"        Amara currently supports some of the largest volunteer video "
-"translation efforts on the planet. Our technology makes captioning, "
-"subtitling, and translating very easy, fun, and engaging which enables "
-"ongoing, massive, collaborations.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:19
-msgid "Private Crowd Subtitle Creation"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:20
-msgid ""
-"\n"
-"        If you have a workforce, student group, or any other non-public "
-"crowd, you can limit access for captioning, translating, and subtitling OR "
-"reviewing the work of peers, volunteers, or professionals.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:24
-msgid "Professional Captioning and Translation Services"
-msgstr ""
-
-#: templates/enterprise/global-reach.html:25
-msgid ""
-"\n"
-"        Use professional services for captioning or subtitling into nearly "
-"any language, or even to help with quality control. All completed work is "
-"centralized on Amara, ready for incremental quality control, integration, "
-"and deployment.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/global-reach.html:29
-msgid "Hybrid Approach"
-msgstr "Jauktā pieeja"
-
-#: templates/enterprise/global-reach.html:30
-msgid ""
-"\n"
-"        Many of our customers use a mix of these different approaches on the "
-"initial (subtitle authoring) pass, as well as subsequent review passes (for "
-"quality control). This is an advantage that you only get with Amara, a fully "
-"featured solution that manages the process end to end and integrates more "
-"easily than any other platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/government.html:12
-msgid ""
-"\n"
-"        In governments around the world, making video accessible is often a "
-"legal requirement, not an option.  Amara makes it much easier to coordinate "
-"captioning and translation efforts, so that every citizen gains access.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:6
-msgid "The Most Efficient and Cost Effective Subtitling Platform in the World"
-msgstr ""
-
-#: templates/enterprise/index.html:9
-msgid ""
-"\n"
-"            Amara Enterprise offers unmatched capabilities to create, edit, "
-"and manage production ready subtitles at remarkably low costs. You have "
-"total flexibility: order captions and translations from professional "
-"services, build a volunteer community, manage internal staff or external "
-"contractors, and integrate your publishing platform through our powerful "
-"API. We can make everything you do with subtitles easier, faster, and "
-"cheaper. \n"
-"        "
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "Contact us"
-msgstr ""
-
-#: templates/enterprise/index.html:13
-msgid "for more information and pricing."
-msgstr ""
-
-#: templates/enterprise/index.html:17
-msgid "World-class Users"
-msgstr "Pasaules klases lietotāji"
-
-#: templates/enterprise/index.html:25
-msgid "Award-Winning Technology"
-msgstr "Apbalvota tehnoloģija"
-
-#: templates/enterprise/index.html:32
-msgid "Unmatched Functionality and Control"
-msgstr "Nepārspēta funkcionalitāte un vadība"
-
-#: templates/enterprise/index.html:36
-msgid "Build a Translation Team"
-msgstr "Izveidot tulkotāji komandu"
-
-#: templates/enterprise/index.html:38
-msgid ""
-"\n"
-"        For years, companies like Mozilla, Twitter, and Facebook have built "
-"volunteer communities to translate their websites.  Amara makes this "
-"possible for captions and subtitles.  With Amara, you can accomplish the "
-"seemingly impossible task of translating your videos into dozens of "
-"languages.  Quickly build a powerful, high-quality volunteer translation and "
-"captioning team that makes your content truly global. \n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:43
-msgid ""
-"See how TED uses Amara to build a global volunteer community and create "
-"extremely high quality subtitles: "
-msgstr ""
-"Redziet, kā TED izmanto Amara vispasaules brīvprātīgo kopienas un ārkārtīgi "
-"augstas kvalitātes subtitru radīšanai:"
-
-#: templates/enterprise/index.html:43
-msgid "TED Team on Amara"
-msgstr "TED komanda Amara"
-
-#: templates/enterprise/index.html:43
-msgid ""
-"Other companies like Netflix have completely private collaboration teams."
-msgstr ""
-"Citām kompānijām, piemēram, Netflix ir pilnībā privātas sadarbības komandas."
-
-#: templates/enterprise/index.html:46
-msgid "Security and Managed Workflows"
-msgstr "Drošība un pārvaldītas darbplūsmas"
-
-#: templates/enterprise/index.html:48
-msgid ""
-"\n"
-"        Create the right workflows for your content and coordinate your "
-"efforts—whether your video is completely private, restricted to premium "
-"subscribers, or public on the web.  You always control who has access to "
-"your subtitles and when to involve staff, contractors, or volunteers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:52
-msgid "Powerful API and Publishing Integration"
-msgstr "Jaudīgs API un publicēšanas integrācija."
-
-#: templates/enterprise/index.html:54
-msgid ""
-"\n"
-"        Our API helps companies tightly integrate Amara with their existing "
-"publishing and distribution workflow.  By making subtitles key part of your "
-"process, you build a global audience.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:58
-msgid "Professional Services"
-msgstr "Profesionālie pakalpojumi"
-
-#: templates/enterprise/index.html:60
-msgid ""
-"\n"
-"        Access professional services including paid captions, translations, "
-"and quality control.  Or use your own staff and contractors and use Amara to "
-"coordinate their work remotely.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:64
-msgid "Crowdsource with Professional Review"
-msgstr ""
-
-#: templates/enterprise/index.html:66
-msgid ""
-"\n"
-"        Engage a crowd and use professional quality assurance. This balances "
-"amazingly low cost with professional level quality assurance.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:72
-msgid "Work with Any Video Platform"
-msgstr "Darbojas ar jebkuru video platformu"
-
-#: templates/enterprise/index.html:74
-msgid ""
-"\n"
-"        Amara works with all the most popular video hosting services and "
-"video players, and adapts easily to your own custom player. Integrate and "
-"embed videos with subtitles without changing your current publishing "
-"workflow.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/index.html:78
-msgid "Subtitles Improve SEO"
-msgstr "Subtitri uzlabo meklēšanas optimizāciju (SEO)"
-
-#: templates/enterprise/index.html:80
-msgid ""
-"\n"
-"        Rank higher in Google and other search engines by helping them index "
-"full transcripts for all of your videos. Searchable videos are found more "
-"often.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:6
-msgid "Non-profits"
-msgstr "Bezpeļņas organizācijas"
-
-#: templates/enterprise/non-profits.html:18
-msgid ""
-"\n"
-"        Non-profit organizations use Amara to share their mission, their "
-"work, and their media around the world.  Non-profits are ideally positioned "
-"to build volunteer subtitling communities—your existing supporters will be "
-"delighted to find a new way to help support your organization.  Creating a "
-"volunteer team helps deepen engagement with your organization and lets you "
-"caption and translate videos that would be unaffordable to subtitle with a "
-"traditional approach.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/non-profits.html:21
-msgid ""
-"\n"
-"        Did you know that Amara is a non-profit organization itself?  Our "
-"mission is to help make video accessible for everyone around the world.  We "
-"offer discounts for other non-profit organizations—we are always delighted "
-"to support work with a social mission.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/publishers.html:10
-msgid ""
-"\n"
-"        Any organization that creates video can reach more people with "
-"subtitles, and Amara provides the most options and flexibility to caption "
-"and translate your videos. Many video publishers use Amara to create "
-"volunteer communities—engaging the people who watch their videos to caption "
-"and translate them for the world, ultimately reaching more viewers.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:10
-msgid ""
-"\n"
-"        Amara’s Flexible Workflows offer several ways to ensure outstanding "
-"quality for your subtitles.  Whether you use internal staff, outside "
-"contractors, professional services, or a volunteer community—you’ll be able "
-"to create, review, and approve workflows that meet your needs.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:14
-msgid "Examples of QC processes:"
-msgstr ""
-
-#: templates/enterprise/quality-control.html:16
-msgid ""
-"\n"
-"            Have your contractors work inside your Amara account and then "
-"require staff review before subtitles go live.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:19
-msgid ""
-"\n"
-"            Some universities use paid captioning services to quickly "
-"caption lecture videos and then invite experts in the university community "
-"to fix any mistakes with proper names or technical terms.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/quality-control.html:22
-msgid ""
-"\n"
-"            Volunteer teams can self-manage and reach very high quality by "
-"requiring peer review of subtitles before they are published.  More senior "
-"members of the community can be promoted to a moderator role.\n"
-"        "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:8
-msgid ""
-"\n"
-"        At its core, Amara is the definitive platform for managing captions "
-"and subtitles. Whether you are creating, revising, or translating subtitles—"
-"you can choose to centralize the management—or divide up your content, and "
-"delegate responsibilities and control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:12
-msgid "Import"
-msgstr "Importēt"
-
-#: templates/enterprise/subtitle-management.html:13
-msgid ""
-"\n"
-"        Your videos are never uploaded to our server (learn more about our "
-"Security Model), so you actually import pointers to existing video files—"
-"whether you’re hosting on your own server, YouTube, Vimeo, other video "
-"hosting service, or combination thereof. Import these video pointers via "
-"graphical interface or API, plus we can import a wide variety of subtitle "
-"and transcript formats in case you have pre-existing data.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:17
-msgid "Process > Author > QC"
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:18
-msgid ""
-"\n"
-"        Flexible workflows make creating Global Content simple; your "
-"organization can harness the power of volunteers, private crowds, and/or "
-"professional service providers for content creation and Quality Control.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:22
-msgid "Deploy"
-msgstr ""
-
-#: templates/enterprise/subtitle-management.html:23
-msgid ""
-"\n"
-"        Use the Amara API to bring completed subtitle data and metadata into "
-"your own backend or publishing platform.\n"
-"    "
-msgstr ""
-
-#: templates/enterprise/transcript-viewer.html:23
-msgid ""
-"\n"
-"            Amara’s beautiful interactive transcript viewer lets you read "
-"the text of any video and jump to and share specific moments.  Take a look "
-"at the example below and try turning the transcript display on and off.\n"
-"        "
-msgstr ""
 
 #: templates/jsdemo/home.html:16
 msgid "Subtitles and Captions for Every Video on the Web"
@@ -4284,66 +3777,65 @@ msgstr ""
 "        Jums ir %(msg_count)s jauni ziņojumi.\n"
 "    "
 
-#: templates/messages/_messages.html:7 templates/profiles/dashboard.html:85
+#: templates/messages/_messages.html:7 templates/teams/dashboard.html:158
+#: templates/teams/dashboard.html.py:200
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "Apskatīt visu"
 
-#: templates/messages/list.html:6
-msgid "My Messages"
-msgstr "Mani ziņojumi"
+#: templates/messages/base.html:10
+msgid "New message"
+msgstr "Jauna ziņa"
 
-#: templates/messages/list.html:20 templates/messages/sent.html:17
-msgid "Do you really wish to delete this message?"
-msgstr "Vai Jūs patiešām vēlaties izdzēst šo ziņojumu?"
-
-#: templates/messages/list.html:21
-msgid "The message has been successfully sent."
-msgstr "Ziņojums veiksmīgi nosūtīts."
-
-#: templates/messages/list.html:38 templates/messages/sent.html:31
-msgid "Compose"
-msgstr "Rakstīt"
-
-#: templates/messages/list.html:74
-msgid "Mark Read"
-msgstr "Atzīmēt kā izlasītu"
-
-#: templates/messages/list.html:79
-msgid "Reply"
-msgstr "Atbildēt"
-
-#: templates/messages/list.html:93
-msgid "You have no messages."
-msgstr "Jums nav ziņojumu."
-
-#: templates/messages/list.html:100 templates/messages/new.html:74
-#: templates/messages/sent.html:71
+#: templates/messages/base.html:15
 msgid "Inbox"
 msgstr "Iesūtne"
 
-#: templates/messages/list.html:101 templates/messages/new.html:75
-#: templates/messages/sent.html:72
+#: templates/messages/base.html:20
 msgid "Sent"
 msgstr "Nosūtītie"
 
-#: templates/messages/list.html:124
+#: templates/messages/inbox.html:6
+msgid "Messages - Inbox"
+msgstr "Ziņas — Iesūtne"
+
+#: templates/messages/inbox.html:20 templates/messages/sent.html:17
+msgid "Do you really wish to delete this message?"
+msgstr "Vai Jūs patiešām vēlaties izdzēst šo ziņojumu?"
+
+#: templates/messages/inbox.html:21
+msgid "The message has been successfully sent."
+msgstr "Ziņojums veiksmīgi nosūtīts."
+
+#: templates/messages/inbox.html:63
+msgid "Mark Read"
+msgstr "Atzīmēt kā izlasītu"
+
+#: templates/messages/inbox.html:68
+msgid "Reply"
+msgstr "Atbildēt"
+
+#: templates/messages/inbox.html:82
+msgid "You have no messages."
+msgstr "Jums nav ziņojumu."
+
+#: templates/messages/inbox.html:105
 msgid "Send Message"
 msgstr "Sūtīt ziņojumu"
 
-#: templates/messages/new.html:6
-msgid "Compose a Message"
-msgstr "Rakstīt ziņojumu"
+#: templates/messages/new.html:9
+msgid "Messages - New"
+msgstr "Ziņas — Jaunās"
 
 #: templates/messages/sent.html:6
-msgid "Sent Messages"
-msgstr "Aizsūtītie ziņojumi"
+msgid "Messages - Sent"
+msgstr "Ziņas — Nosūtītās"
 
-#: templates/messages/sent.html:47 templates/messages/sent.html.py:49
+#: templates/messages/sent.html:40 templates/messages/sent.html.py:42
 msgid "Avatar"
 msgstr "Avatars"
 
-#: templates/messages/sent.html:65
+#: templates/messages/sent.html:58
 msgid "You have no sent messages."
 msgstr "Jums nav nosūtīto ziņojumu."
 
@@ -4447,23 +3939,6 @@ msgstr ""
 msgid "Back to Sign In"
 msgstr "Atgriezties, lai ieietu"
 
-#: templates/profiles/_filters.html:5
-msgid "User Details"
-msgstr "Informācija par lietotāju"
-
-#: templates/profiles/_filters_dashboard.html:5
-msgid "Overview"
-msgstr "Pārskats"
-
-#: templates/profiles/_filters_dashboard.html:8
-#: templates/profiles/dashboard.html:85
-msgid "Recent Activity"
-msgstr "Nesenā aktivitāte"
-
-#: templates/profiles/_filters_dashboard.html:11
-msgid "My Videos"
-msgstr "Mani video"
-
 #: templates/profiles/_require_email_dialog.html:7
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
@@ -4499,31 +3974,52 @@ msgstr "Izvēlēties vismaz vienu valodu"
 msgid "Saving your language settings..."
 msgstr "Saglabā Jūsu valodu uzstādījumus"
 
-#: templates/profiles/_select_language_dialog.html:15
-msgid "We really need your help!"
-msgstr "Mums patiešām ir vajadzīga Jūsu palīdzība!"
-
-#: templates/profiles/_select_language_dialog.html:16
+#: templates/profiles/_select_language_dialog.html:17
 msgid "What languages do you speak?"
 msgstr "Kādās valodas runājat?"
 
-#: templates/profiles/_select_language_dialog.html:29
+#: templates/profiles/_select_language_dialog.html:32
 #: templates/teams/billing/choose.html:18
 msgid "Submit"
 msgstr "Pievienot"
 
-#: templates/profiles/_tabs.html:6 templates/profiles/_top_user_panel.html:15
-msgid "Profile"
-msgstr "Profils"
+#: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
+#: templates/videos/video-view.html:168
+msgid "Activity"
+msgstr "Aktivitāte"
 
-#: templates/profiles/_tabs.html:19 templates/profiles/_top_user_panel.html:11
-#: templates/profiles/dashboard.html:13
+#: templates/profiles/_tabs.html:11 templates/profiles/_top_user_panel.html:19
+#: templates/teams/_tabs.html:11 templates/teams/_tabs_projects.html:6
+#: templates/teams/videos-list.html:6
+msgid "Videos"
+msgstr "Video"
+
+#: templates/profiles/_tabs.html:17
+msgid "Personal Info"
+msgstr "Personīgā informācija"
+
+#: templates/profiles/_tabs.html:22 templates/profiles/_top_user_panel.html:32
+msgid "Account"
+msgstr "Konts"
+
+#: templates/profiles/_top_user_panel.html:11
+#: templates/profiles/dashboard.html:13 templates/teams/_tabs.html:6
+#: templates/teams/dashboard.html:6
 msgid "Dashboard"
 msgstr "Panelis"
 
-#: templates/profiles/_top_user_panel.html:26
+#: templates/profiles/_top_user_panel.html:15
+msgid "Profile"
+msgstr "Profils"
+
+#: templates/profiles/_top_user_panel.html:36
 msgid "Logout"
 msgstr "Iziet"
+
+#: templates/profiles/_top_user_panel.html:42
+#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
+msgid "Your Teams"
+msgstr "Jūsu komandas"
 
 #: templates/profiles/_user_videos_activity.html:4
 msgid "Edits to my videos"
@@ -4534,178 +4030,358 @@ msgid "No Activity"
 msgstr "Nav aktivitātes"
 
 #: templates/profiles/_video_detail.html:8
-#: templates/teams/members-list.html:102
+#: templates/teams/_context_team.html:95 templates/teams/members-list.html:102
 msgid "language"
 msgstr "valoda"
 
 #: templates/profiles/_video_detail.html:10
-#: templates/teams/_team_video_detail.html:28
 msgid "No subtitles yet"
 msgstr "Vēl nav subtitru"
 
-#: templates/profiles/dashboard.html:38
-msgid "Open Tasks"
-msgstr "Atvērt uzdevumus"
+#: templates/profiles/account.html:17
+msgid "User Details"
+msgstr "Informācija par lietotāju"
 
-#: templates/profiles/dashboard.html:45 templates/teams/tasks.html:57
-#: templates/teams/tasks.html.py:202
-msgid "Transcribe"
-msgstr "Transkribējamie"
-
-#: templates/profiles/dashboard.html:50 templates/search/_search_form.html:28
-#: templates/teams/tasks.html:212
-msgid "Subtitles into"
-msgstr "Subtitri"
-
-#: templates/profiles/dashboard.html:55 templates/teams/tasks.html:217
-#: templates/teams/tasks.html.py:233 templates/videos/diffing.html:83
-#: templates/videos/subtitle-view.html:152
-#: templates/videos/subtitle-view.html:186
-msgid "Subtitles"
-msgstr "subtitrus"
-
-#: templates/profiles/dashboard.html:57 templates/teams/members-list.html:101
-#: templates/teams/members-list.html:102 templates/teams/tasks.html:76
-#: unisubs-integration/services/templates/services/translation_request.html:8
-msgid "for"
+#: templates/profiles/account.html:28
+msgid "YouTube Sync"
 msgstr ""
 
-#: templates/profiles/dashboard.html:67
-msgid "Decline Task"
-msgstr "Atteikties no uzdevuma"
+#: templates/profiles/account.html:37
+msgid "Link is active"
+msgstr "Saite ir aktīva"
 
-#: templates/profiles/dashboard.html:80
-msgid "You have no open tasks assigned to you."
-msgstr "Jums pašlaik nav piešķirts neviens uzdevums."
+#: templates/profiles/account.html:46
+msgid "Enable Amara crowd subtitles on your personal YouTube channel (beta)"
+msgstr ""
+"Iespējot Amara pūļpakalpojuma subtitrus savā personīgajā YouTube kanālā "
+"(beta)"
 
-#: templates/profiles/dashboard.html:91
-msgid "Sorry, no activity yet."
-msgstr "Piedodiet, pagaidām nav nekādas aktivitātes."
+#: templates/profiles/account.html:52
+msgid "Other Accounts"
+msgstr "Citi konti"
+
+#: templates/profiles/account.html:54
+msgid "Sign in to Amara with Twitter, Facebook, and other accounts"
+msgstr "Ieiet Amara ar Twitter, Facebook vai citu kontu"
+
+#: templates/profiles/account.html:55
+msgid "Add an account"
+msgstr "Pievienot kontu"
+
+#: templates/profiles/account.html:63 templates/profiles/account.html.py:74
+#: templates/teams/_team_video_detail.html:55
+#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
+#: templates/videos/_video_url_panel.html:34
+msgid "Remove"
+msgstr "Noņemt"
+
+#: templates/profiles/account.html:85
+msgid "Change Password"
+msgstr "Mainīt paroli"
+
+#: templates/profiles/account.html:94
+msgid "Notifications"
+msgstr "Paziņojuumi"
+
+#: templates/profiles/account.html:96
+msgid "Send notifications to my UniversalSubtitles.org inbox"
+msgstr "Sūtīt paziņojumus uz manu UniversalSubtitles.org iesūtni"
+
+#: templates/profiles/account.html:98
+msgid "Send an email notification for each message received"
+msgstr "Nosūtīt e-pasta paziņojumu par katru saņemto ziņojumu"
+
+#: templates/profiles/account.html:101
+msgid "API Access"
+msgstr ""
+
+#: templates/profiles/account.html:103
+msgid "Your API key"
+msgstr ""
+
+#: templates/profiles/account.html:109
+msgid "Reset your API key"
+msgstr ""
+
+#: templates/profiles/account.html:111
+msgid "Get an API key"
+msgstr ""
+
+#: templates/profiles/account.html:118 templates/profiles/edit.html:59
+#: templates/teams/settings-permissions.html:117
+msgid "Save Changes"
+msgstr "Saglabāt izmaiņas"
+
+#: templates/profiles/account.html:120
+msgid "Delete Your Account"
+msgstr "Izdzēst kontu"
+
+#: templates/profiles/account.html:129
+msgid "Add a linked account"
+msgstr "Pievienot saistīto kontu"
+
+#: templates/profiles/account.html:137
+msgid ""
+"\n"
+"                                What kind of account do you want to add?\n"
+"                                "
+msgstr ""
+"\n"
+"                                Kāda veida kontu Jūs vēlaties pievienot?\n"
+"                                "
+
+#: templates/profiles/account.html:151
+msgid "Link"
+msgstr "Saite"
+
+#: templates/profiles/account.html:158
+msgid "Enable Crowd Subtitles on your Personal YouTube Channel (beta)"
+msgstr ""
+
+#: templates/profiles/account.html:168
+msgid "How We Enable Crowd Subtitles"
+msgstr ""
+
+#: templates/profiles/account.html:171
+msgid ""
+"\n"
+"                                        We automatically <strong>add your "
+"YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:176
+msgid ""
+"\n"
+"                                        We <strong>invite your viewers to "
+"subtitle</strong> by adding a link to your video descriptions.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:181
+msgid ""
+"\n"
+"                                        We <strong>send subtitles to "
+"YouTube</strong> whenever they're completed on Amara.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:187
+msgid "When We Send Subtitles to YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:190
+msgid ""
+"\n"
+"                                        The link is <strong>one-way only</"
+"strong>. Changes made on YouTube won't be reflected on Amara and may be "
+"overwritten. Use Amara to edit subtitles.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:195
+msgid ""
+"\n"
+"                                        Amara will <strong>append a credit</"
+"strong> to the subtitles if space allows.\n"
+"                                    "
+msgstr ""
+
+#: templates/profiles/account.html:201 templates/teams/dashboard.html:97
+#: templates/videos/_video_url_panel.html:44
+msgid "Learn more"
+msgstr "Uzzināt vairāk"
+
+#: templates/profiles/account.html:201
+msgid " about Crowd Subtitles and YouTube"
+msgstr ""
+
+#: templates/profiles/account.html:203
+msgid "Ready to Enable Crowd Subtitles?"
+msgstr ""
+
+#: templates/profiles/account.html:204
+msgid "Link accounts"
+msgstr "Sasaistīt kontus"
+
+#: templates/profiles/account.html:206
+msgid "create one now"
+msgstr ""
+
+#: templates/profiles/account.html:209
+msgid ""
+"Organizations/companies: interested in YouTube sync and crowd subtitling? "
+msgstr ""
+
+#: templates/profiles/account.html:210
+msgid "Contact us"
+msgstr "Sazinieties ar mums,"
+
+#: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
+msgid "Languages"
+msgstr "Valoda"
+
+#: templates/profiles/base.html:51
+msgid "hasn't selected languages yet."
+msgstr "vēl nav izvēlējies valodas."
+
+#: templates/profiles/base.html:67
+msgid "hasn't joined any teams yet."
+msgstr "vēl nav pievienojies nevienai komandai."
+
+#: templates/profiles/dashboard.html:34
+msgid "You have "
+msgstr "Jums ir"
+
+#: templates/profiles/dashboard.html:35
+msgid "Go to your inbox"
+msgstr "Doties uz iesūtni"
+
+#: templates/profiles/dashboard.html:37
+msgid "unread message"
+msgstr "neizlasītas ziņas"
+
+#: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:52
+msgid "Videos you're working on"
+msgstr "Video, pie kuriem pašlaik strādājat"
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:87
+#: templates/teams/dashboard.html:67
+msgid "Create"
+msgstr "Izveidot"
+
+#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:63
+#: templates/profiles/dashboard.html:87 templates/profiles/dashboard.html:90
+#: templates/teams/dashboard.html:67 templates/teams/dashboard.html.py:71
+#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
+#: templates/videos/subtitle-view.html:48
+#: templates/videos/subtitle-view.html:75
+msgid "subtitles"
+msgstr "subtitri"
 
 #: templates/profiles/dashboard.html:98
-msgid "Alerts"
-msgstr "Paziņojumi"
+msgid "I can't do this"
+msgstr ""
 
-#: templates/profiles/dashboard.html:115 templates/teams/teams-list.html:107
-msgid "Do you really wish to leave this team?"
-msgstr "Vai Jūs tiešām vēlaties pamest šo komandu?"
+#: templates/profiles/dashboard.html:117
+msgid "Activity on your videos"
+msgstr "Aktivitāte Jūsu video"
 
-#: templates/profiles/dashboard.html:115
-msgid "leave team"
-msgstr "pamest komandu"
+#: templates/profiles/dashboard.html:128
+msgid ""
+"\n"
+"                                Nothing happening yet.\n"
+"                            "
+msgstr ""
+"\n"
+"                                Pagaidām nekas nenotiek.\n"
+"                            "
 
-#: templates/profiles/edit_profile.html:5
-msgid "Edit My Profile"
+#: templates/profiles/dashboard.html:132
+msgid ""
+"\n"
+"                                You haven't shared any videos yet.\n"
+"                            "
+msgstr ""
+"\n"
+"                                Jūs vēl neesat dalījies ne ar vienu video.\n"
+"                            "
+
+#: templates/profiles/dashboard.html:143
+msgid "Activity in your teams"
+msgstr "Aktivitāte Jūsu komandās"
+
+#: templates/profiles/dashboard.html:154
+msgid ""
+"\n"
+"                                All's quiet in your teams so far. \n"
+"                            "
+msgstr ""
+
+#: templates/profiles/dashboard.html:158
+msgid ""
+"\n"
+"                                You haven't joined any teams yet.\n"
+"                            "
+msgstr ""
+"\n"
+"                               Jūs vēl neesat pievienojies nevienai "
+"komandai.\n"
+"                            "
+
+#: templates/profiles/edit.html:5
+msgid "Edit Profile"
 msgstr "Labot profilu"
 
-#: templates/profiles/edit_profile.html:16
-msgid "Do you really want delete your picture?"
-msgstr "Vai Jūs tiešām vēlaties izdzēst savu attēlu?"
+#: templates/profiles/edit.html:30 templates/teams/_application_form.html:36
+msgid "About you"
+msgstr "Par jums"
 
-#: templates/profiles/edit_profile.html:40
+#: templates/profiles/edit.html:40
+msgid "Photo"
+msgstr "Fotogrāfija"
+
+#: templates/profiles/edit.html:44
+msgid "Remove current photo"
+msgstr "Noņemt pašreizējo fotogrāfiju"
+
+#: templates/profiles/edit.html:92
 #: templates/videos/_paste_transcription.html:106
 #: templates/videos/_video_url_panel.html:77
 msgid "Saving..."
 msgstr "Saglabā..."
 
-#: templates/profiles/edit_profile.html:51
-msgid "Edit Your Profile"
-msgstr "Rediģēt profilu"
+#: templates/profiles/edit.html:97
+msgid "Do you really want to delete your photo?"
+msgstr "Vai Jūs tiešām vēlaties izdzēst savu fotogrāfiju?"
 
-#: templates/profiles/edit_profile.html:64
-msgid "Personal Info"
-msgstr "Personīgā informācija"
+#: templates/profiles/remove-third-party.html:16
+msgid "Remove a third party account"
+msgstr "Noņemt trešās puses kontu?"
 
-#: templates/profiles/edit_profile.html:65
-msgid "Will be displayed publicly"
-msgstr "Tiks parādīti publiski"
+#: templates/profiles/remove-third-party.html:18
+#, python-format
+msgid ""
+"\n"
+"                            Are you sure you want to remove the %(type)s "
+"account\n"
+"                        "
+msgstr ""
+"\n"
+"                            Vai esat drošs, ka vēlaties noņemt %(type)s "
+"kontu\n"
+"                        "
 
-#: templates/profiles/edit_profile.html:83
-msgid "remove picture"
-msgstr "noņemt attēlu"
+#: templates/profiles/remove-third-party.html:28
+msgid "Remove account"
+msgstr "Noņemt kontu"
 
-#: templates/profiles/edit_profile.html:88
-msgid "Upload picture"
-msgstr "Augšupielādēt attēlu"
+#: templates/profiles/videos.html:6
+#, python-format
+msgid ""
+"\n"
+"        %(user_info)s's videos | Amara\n"
+"    "
+msgstr ""
+"\n"
+"        %(user_info)s videos | Amara\n"
+"    "
 
-#: templates/profiles/edit_profile.html:92
-msgid "Account Details"
-msgstr "Konta informācija"
+#: templates/profiles/videos.html:29
+msgid "hasn't shared any videos on Amara."
+msgstr "vēl nav dalījies ar video Amara."
 
-#: templates/profiles/edit_profile.html:107
-msgid "Notifications"
-msgstr "Paziņojuumi"
+#: templates/profiles/view.html:25
+msgid "doesn't have any activity yet."
+msgstr ""
 
-#: templates/profiles/edit_profile.html:110
-msgid "Send notifications to my UniversalSubtitles.org message inbox"
-msgstr "Sūtīt paziņojumus uz manu UniversalSubtitles.org ziņojumu iesūtni."
-
-#: templates/profiles/edit_profile.html:113
-msgid "Send an email notification for each message received"
-msgstr "Nosūtīt e-pasta paziņojumu par katru saņemto ziņojumu"
-
-#: templates/profiles/edit_profile.html:116
-msgid "Language Info"
-msgstr "Valodu informācija"
-
-#: templates/profiles/edit_profile.html:133
-msgid "Languages I Know"
-msgstr "Man zināmās valodas"
-
-#: templates/profiles/edit_profile.html:138
-#: templates/profiles/edit_profile.html:155
-msgid "Remove Language"
-msgstr "Noņemt valodu"
-
-#: templates/profiles/edit_profile.html:169
-msgid "Add Language"
-msgstr "Pievienot valodu"
-
-#: templates/profiles/edit_profile.html:173
-msgid "Developer Info"
-msgstr "Informācija par izstrādātāju"
-
-#: templates/profiles/edit_profile.html:183
-#: templates/teams/settings-permissions.html:118
-msgid "Save Changes"
-msgstr "Saglabāt izmaiņas"
-
-#: templates/profiles/edit_profile.html:186
-msgid "Permanently Delete Your Profile"
-msgstr "Neatgriezeniski dzēst profilu"
-
-#: templates/profiles/my_videos.html:6 templates/profiles/my_videos.html:22
-msgid "My videos"
-msgstr "Mani video"
-
-#: templates/profiles/view_profile.html:56
-msgid "Member since"
-msgstr "Biedrs kopš"
-
-#: templates/profiles/view_profile.html:62
-msgid "Homepage"
-msgstr "Mājaslapa"
-
-#: templates/profiles/view_profile.html:70
-msgid "<i>User has not submitted a bio.</i>"
-msgstr "<i>Lietotājs nav iesniedzis biogrāfiju.</i>"
-
-#: templates/profiles/view_profile.html:82
-#: templates/teams/_subnav_settings.html:17
-msgid "Languages"
-msgstr "Valoda"
-
-#: templates/profiles/view_profile.html:98
-msgid "Memberships"
-msgstr "Dalībniecības"
-
-#: templates/profiles/view_profile.html:121
+#: templates/profiles/view.html:28
 msgid "Profile deleted by user."
 msgstr "Lietotājs dzēsis profilu."
 
-#: templates/profiles/view_profile.html:130
+#: templates/profiles/view.html:36
 msgid "Edit user"
-msgstr "Rediģēt lietotāju"
+msgstr "Labot lietotāju"
 
 #: templates/registration/password_reset_complete.html:4
 #: templates/registration/password_reset_confirm.html:6
@@ -4828,6 +4504,10 @@ msgstr "Meklēt video"
 msgid "Videos In"
 msgstr "Video"
 
+#: templates/search/_search_form.html:28 templates/teams/tasks.html:217
+msgid "Subtitles into"
+msgstr "Subtitri"
+
 #: templates/search/_video_item.html:14
 #: templates/videos/_video_languages.html:8
 #, python-format
@@ -4947,8 +4627,10 @@ msgstr "KOPĀ"
 
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
-#: templates/teams/_context_team.html:47 templates/teams/tasks.html:134
-#: templates/teams/tasks.html.py:221 templates/videos/video-view.html:166
+#: templates/teams/_context_team.html:51 templates/teams/tasks.html:139
+#: templates/teams/tasks.html.py:226
+#: templates/videos/set-original-language.html:13
+#: templates/videos/video-view.html:166
 msgid "Video"
 msgstr "Video"
 
@@ -4972,50 +4654,13 @@ msgstr "Metode"
 msgid "Value"
 msgstr "Vērtība"
 
-#: templates/teams/_actions.html:9 templates/teams/_actions.html.py:50
-msgid "Join via"
-msgstr "Pievienoties caur"
-
-#: templates/teams/_actions.html:17 templates/teams/_actions.html.py:36
-msgid "You will be logged out and new account will be created via"
-msgstr "Jūs tiksit izžurnalizēts un jaunais konts tiks izveidots caur"
-
-#: templates/teams/_actions.html:21
-msgid "Do you really wish to join this team?"
-msgstr "Vai Jūs tiešām vēlaties pievienoties šai komandai?"
-
-#: templates/teams/_actions.html:21
-msgid "Join this team now!"
-msgstr "Pievienoties komandai!"
-
-#: templates/teams/_actions.html:27
-msgid "Login via"
-msgstr "Ieiet caur"
-
-#: templates/teams/_actions.html:33
-msgid "to apply"
-msgstr ""
-
-#: templates/teams/_actions.html:43
-msgid "Your application is pending"
-msgstr "dienvidndebelu valoda"
-
-#: templates/teams/_actions.html:58
-msgid "Join Team"
-msgstr "Pievienoties komandai"
-
-#: templates/teams/_actions.html:64
-msgid "Want to create your own subtitling team? Contact "
-msgstr ""
-"Vēlaties izveidot paši savu subtitrēšanas komandu? Sazinieties ar mums "
-
 #: templates/teams/_application_form.html:4
 msgid "Apply to Join"
 msgstr "Pieteikties dalībai"
 
 #: templates/teams/_application_form.html:11
 msgid "Apply to"
-msgstr ""
+msgstr "Piemērot"
 
 #: templates/teams/_application_form.html:19
 msgid "Language skill"
@@ -5027,26 +4672,12 @@ msgid ""
 "\n"
 "                                No formal language training is required to "
 "translate for %(team)s. But we do ask that all translators are confident in "
-"their translation abilities. Please make sure your profile has your "
-"language\n"
+"their translation abilities. Please make sure your language selections are "
+"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
-"\n"
-"                                Tulkošanai %(team)s komandā nav nepieciešama "
-"nekāda formāla tulkošanas apmācība. Tomēr mēs aicinām, lai tulkotājs būtu "
-"pārliecināts par savām tulkošanas spējām. Lūdzu, pārliecinieties, ka Jūsu "
-"profilā ir norādīta Jūsu valoda\n"
-"                            "
 
-#: templates/teams/_application_form.html:24
-msgid "proficiency"
-msgstr "māka"
-
-#: templates/teams/_application_form.html:24
-msgid "specified"
-msgstr ""
-
-#: templates/teams/_application_form.html:29
+#: templates/teams/_application_form.html:28
 msgid ""
 "\n"
 "                                We request that each new applicant does at "
@@ -5054,12 +4685,13 @@ msgid ""
 "that, it’s up to you!\n"
 "                            "
 msgstr ""
+"\n"
+"                                Mēs lūdzam katram jaunajam dalībniekam "
+"pirmajā pievienošanās nedēļā pabeigt vismaz vienu subtitru komplektu. Viss "
+"pārējais ir Jūsu ziņā!\n"
+"                            "
 
-#: templates/teams/_application_form.html:37
-msgid "About you"
-msgstr "Par jums"
-
-#: templates/teams/_application_form.html:39
+#: templates/teams/_application_form.html:38
 #, python-format
 msgid ""
 "\n"
@@ -5074,7 +4706,7 @@ msgstr ""
 "teikumiem, ne vairāk!\n"
 "                    "
 
-#: templates/teams/_application_form.html:47
+#: templates/teams/_application_form.html:46
 msgid "Submit Application"
 msgstr "Pievienot pieteikumu"
 
@@ -5087,21 +4719,21 @@ msgid "Video Page"
 msgstr "Video lapa"
 
 #: templates/teams/_context_project.html:17
-#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:118
+#: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:139
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show all"
 msgstr "Parādīt visu"
 
 #: templates/teams/_context_project.html:31
-#: templates/teams/_context_team.html:59
+#: templates/teams/_context_team.html:64
 msgid "Task"
 msgstr "Uzdevums"
 
 #: templates/teams/_context_project.html:81
 msgid "Other"
-msgstr ""
+msgstr "Pārējais"
 
 #: templates/teams/_context_project.html:81
 #: templates/teams/_context_team.html:21
@@ -5109,29 +4741,62 @@ msgstr ""
 msgid "Projects"
 msgstr "Projekti"
 
-#: templates/teams/_context_team.html:29
+#: templates/teams/_context_team.html:33
 #: templates/videos/test_form_page.html:24
 msgid "video"
 msgstr "video"
 
-#: templates/teams/_context_team.html:36
-#: templates/teams/_context_team.html:114
+#: templates/teams/_context_team.html:40
+#: templates/teams/_context_team.html:135
 #: templates/videos/subtitle-view.html:140
 #: templates/videos/video-view.html:131
 msgid "Show less"
 msgstr "Parādīt mazāk"
 
-#: templates/teams/_context_team.html:53
+#: templates/teams/_context_team.html:57
 msgid "Member"
 msgstr "Dalībnieks"
 
-#: templates/teams/_context_team.html:83
+#: templates/teams/_context_team.html:91
+msgid "Your role:"
+msgstr "Jūsu loma:"
+
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+#: templates/teams/tasks.html:81
+#: unisubs-integration/services/templates/services/translation_request.html:8
+msgid "for"
+msgstr ""
+
+#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
+msgid "and"
+msgstr "un"
+
+#: templates/teams/_context_team.html:94 templates/teams/members-list.html:101
+msgid "project"
+msgstr "projekts"
+
+#: templates/teams/_context_team.html:100
 msgid "Your tasks"
 msgstr "Jūsu uzdevumi"
 
-#: templates/teams/_context_team.html:87
+#: templates/teams/_context_team.html:104
 msgid "All available tasks"
 msgstr "Visi pieejamie uzdevumi"
+
+#: templates/teams/_context_team.html:108 templates/teams/teams-list.html:82
+msgid "Do you really wish to leave this team?"
+msgstr "Vai Jūs tiešām vēlaties pamest šo komandu?"
+
+#: templates/teams/_context_team.html:108
+msgid "Leave team"
+msgstr "Pamest komandu"
+
+#: templates/teams/_context_team.html:145
+msgid "Want to create your own subtitling team? Contact "
+msgstr ""
+"Vēlaties izveidot paši savu subtitrēšanas komandu? Sazinieties ar mums "
 
 #: templates/teams/_filters_videos.html:7
 msgid "All videos"
@@ -5159,13 +4824,49 @@ msgstr ""
 msgid "You can also invite friends who speak other languages to help out."
 msgstr "Jūs varat arī uzaicināt palīgā savus draugus, kuri prot citas valodas,"
 
+#: templates/teams/_join.html:9 templates/teams/_join.html.py:50
+msgid "Join via"
+msgstr "Pievienoties caur"
+
+#: templates/teams/_join.html:17 templates/teams/_join.html.py:36
+msgid "You will be logged out and new account will be created via"
+msgstr "Jūs tiksit izžurnalizēts un jaunais konts tiks izveidots caur"
+
+#: templates/teams/_join.html:21
+msgid "Do you really wish to join this team?"
+msgstr "Vai Jūs tiešām vēlaties pievienoties šai komandai?"
+
+#: templates/teams/_join.html:21
+msgid "Join our team now!"
+msgstr ""
+
+#: templates/teams/_join.html:27
+msgid "Login via"
+msgstr "Ieiet caur"
+
+#: templates/teams/_join.html:33
+msgid "to apply"
+msgstr ""
+
+#: templates/teams/_join.html:43
+msgid "Your application is pending"
+msgstr "dienvidndebelu valoda"
+
+#: templates/teams/_join.html:59
+msgid "Join our team"
+msgstr "Pievienoties mūsu komandai"
+
+#: templates/teams/_join.html:61
+msgid "to join our team"
+msgstr "lai pievienotos mūsu komandai"
+
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:304
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:307
 msgid "Resume"
 msgstr "Atsākt"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:306
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:309
 msgid "Start now"
 msgstr "Sākt"
 
@@ -5174,30 +4875,20 @@ msgid "Team Details"
 msgstr "Informācija par komandu"
 
 #: templates/teams/_subnav_settings.html:13
-#: templates/teams/settings-permissions.html:92
 msgid "Workflows"
 msgstr "Darbplūsmas"
 
-#: templates/teams/_tabs.html:6 templates/teams/_tabs_projects.html:6
-#: templates/teams/videos-list.html:6
-msgid "Videos"
-msgstr "Video"
-
-#: templates/teams/_tabs.html:11 templates/teams/members-list.html:6
+#: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
 msgstr "Dalībnieki"
 
-#: templates/teams/_tabs.html:16 templates/videos/video-view.html:168
-msgid "Activity"
-msgstr "Aktivitāte"
-
-#: templates/teams/_tabs.html:22 templates/teams/_tabs_projects.html:12
-#: templates/teams/_team_video_detail.html:48
-#: templates/teams/settings-permissions.html:36 templates/teams/tasks.html:29
+#: templates/teams/_tabs.html:28 templates/teams/_tabs_projects.html:12
+#: templates/teams/_team_video_detail.html:42
+#: templates/teams/settings-permissions.html:73 templates/teams/tasks.html:34
 msgid "Tasks"
 msgstr "Uzdevumi"
 
-#: templates/teams/_tabs.html:29 templates/teams/_tabs_projects.html:19
+#: templates/teams/_tabs.html:36 templates/teams/_tabs_projects.html:19
 #: templates/teams/settings-guidelines.html:5
 #: templates/teams/settings-languages.html:5
 #: templates/teams/settings-permissions.html:5
@@ -5205,7 +4896,7 @@ msgstr "Uzdevumi"
 #: templates/teams/settings-projects-edit.html:5
 #: templates/teams/settings-projects.html:5 templates/teams/settings.html:5
 msgid "Settings"
-msgstr "Uzstādījumi"
+msgstr "Iestatījumi"
 
 #: templates/teams/_team_add_video_select.html:4
 msgid "Add this video to one of your teams"
@@ -5257,6 +4948,29 @@ msgstr "Pievienot jaunu komandu"
 #, python-format
 msgid ""
 "\n"
+"                        %(num)s language needed\n"
+"                    "
+msgid_plural ""
+"\n"
+"                        %(num)s languages needed\n"
+"                    "
+msgstr[0] ""
+"\n"
+"                        nepieciešamas %(num)s valodas\n"
+"                    "
+msgstr[1] ""
+"\n"
+"                        nepieciešama %(num)s valoda\n"
+"                    "
+msgstr[2] ""
+"\n"
+"                        nepieciešamas %(num)s valodas\n"
+"                    "
+
+#: templates/teams/_team_video_detail.html:20
+#, python-format
+msgid ""
+"\n"
 "                        %(num)s language\n"
 "                    "
 msgid_plural ""
@@ -5276,63 +4990,11 @@ msgstr[2] ""
 "                        %(num)s valodās\n"
 "                    "
 
-#: templates/teams/_team_video_detail.html:19
-#, python-format
-msgid ""
-"\n"
-"                            (%(num)s completed)\n"
-"                            "
-msgid_plural ""
-"\n"
-"                            (%(num)s completed)\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            (%(num)s pabeigtas)\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                            (%(num)s pabeigta)\n"
-"                            "
-msgstr[2] ""
-"\n"
-"                            (%(num)s pabeigtas)\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:35
-#, python-format
-msgid ""
-"\n"
-"                            1 task\n"
-"                        "
-msgid_plural ""
-"\n"
-"                            %(counter)s tasks\n"
-"                        "
-msgstr[0] ""
-"\n"
-"                            %(counter)s uzdevumi\n"
-"                        "
-msgstr[1] ""
-"\n"
-"                            1 uzdevums\n"
-"                        "
-msgstr[2] ""
-"\n"
-"                            %(counter)s uzdevumi\n"
-"                        "
-
-#: templates/teams/_team_video_detail.html:52
+#: templates/teams/_team_video_detail.html:47
 #: templates/teams/members-list.html:119
 #: templates/teams/settings-projects.html:29
 msgid "Edit"
 msgstr "Labot"
-
-#: templates/teams/_team_video_detail.html:60
-#: templates/teams/members-list.html:122 templates/teams/videos-list.html:153
-#: templates/videos/_video_url_panel.html:34
-msgid "Remove"
-msgstr "Noņemt"
 
 #: templates/teams/_third-party-accounts.html:42
 msgid "You haven't linked any accounts yet."
@@ -5363,7 +5025,7 @@ msgstr "Pievienot vairākus video"
 msgid "Team Aplications"
 msgstr "Pieteikumi dalībai komandā"
 
-#: templates/teams/applications.html:49 templates/teams/tasks.html:63
+#: templates/teams/applications.html:49 templates/teams/tasks.html:68
 msgid "Approve"
 msgstr "Apstiprināmie"
 
@@ -5379,9 +5041,9 @@ msgstr "Sūtīt ziņojumu"
 msgid "There are no applications right now"
 msgstr "Pašlaik nav neviena pieteikuma"
 
-#: templates/teams/base.html:39
+#: templates/teams/base.html:37
 msgid "Edit team"
-msgstr "Rediģēt komandu"
+msgstr "Labot komandu"
 
 #: templates/teams/create.html:6
 msgid "Create team"
@@ -5452,7 +5114,7 @@ msgstr "Kāda valoda ir nepieciešama?"
 msgid "Who should do it?"
 msgstr "Kam tas būtu jādara?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:485
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:512
 msgid "Begin typing to search"
 msgstr "Rakstiet, lai sāktu meklētu"
 
@@ -5477,6 +5139,94 @@ msgstr "Jauna uzdevuma veidlapa"
 #: templates/teams/create_task.html:103
 msgid "Back to tasks list"
 msgstr "Atgriezties pie uzdevumu saraksta"
+
+#: templates/teams/dashboard.html:79
+msgid "Due in"
+msgstr "Termiņš:"
+
+#: templates/teams/dashboard.html:81
+msgid "Overdue by"
+msgstr ""
+
+#: templates/teams/dashboard.html:91
+msgid "Helping out is easy!"
+msgstr "Palīdzēt ir vienkārši!"
+
+#: templates/teams/dashboard.html:93
+msgid ""
+"\n"
+"                            Just find a video that interests you and click "
+"the button below it to get started!\n"
+"                        "
+msgstr ""
+"\n"
+"                            Vienkārši izvēlieties video, kas jums interesē "
+"un uzklikšķiniet uz zemāk esošo pogu, lai sāktu!\n"
+"                        "
+
+#: templates/teams/dashboard.html:97
+msgid " about subtitling in Amara."
+msgstr "par subtitrēšanu Amara."
+
+#: templates/teams/dashboard.html:102
+msgid "Welcome!"
+msgstr "Esi sveicināts!"
+
+#: templates/teams/dashboard.html:107
+msgid ""
+"\n"
+"                            We've got lots of great content that we'd love "
+"your help with.\n"
+"                        "
+msgstr ""
+
+#: templates/teams/dashboard.html:119 templates/teams/dashboard.html.py:256
+msgid "Videos that need your help"
+msgstr "Video, ar kuriem nepieciešama jūsu palīdzība"
+
+#: templates/teams/dashboard.html:121
+msgid "Some of the videos we're working on now"
+msgstr "Daži no video, pie kuriem pašlaik strādājam"
+
+#: templates/teams/dashboard.html:127 templates/teams/tasks.html:159
+msgid "Tell us what languages you speak"
+msgstr "Pastāstiet, kādas valodas protat,"
+
+#: templates/teams/dashboard.html:127
+msgid "and we'll personalize this list for you"
+msgstr ""
+
+#: templates/teams/dashboard.html:155 templates/teams/dashboard.html.py:197
+msgid " languages need your help"
+msgstr "valodas, ar kurām nepieciešama Jūsu palīdzība"
+
+#: templates/teams/dashboard.html:164 templates/teams/dashboard.html.py:192
+msgid "Create Subtitles"
+msgstr "Izveidot subtitrus"
+
+#: templates/teams/dashboard.html:205 templates/teams/dashboard.html.py:216
+msgid "Create "
+msgstr "Izveidot"
+
+#: templates/teams/dashboard.html:207 templates/teams/dashboard.html.py:218
+msgid " Subtitles"
+msgstr "subtitrus"
+
+#: templates/teams/dashboard.html:246
+msgid "Sorry, you've reached the maximum number of tasks for this team."
+msgstr "Atvainojiet, Jūs esat savācis maksimālo uzdevumu skaitu šajā komandā."
+
+#: templates/teams/dashboard.html:258
+msgid "Sorry, we couldn't find any videos for you."
+msgstr ""
+
+#: templates/teams/dashboard.html:262
+msgid "Update your language preferences"
+msgstr ""
+
+#: templates/teams/dashboard.html:268
+msgid "Add videos to the team"
+msgstr "Pievienot video komandai"
 
 #: templates/teams/email_new_video.html:7
 #, python-format
@@ -5554,7 +5304,7 @@ msgstr "Lietotājam piešķiramā loma, ja tas pieņem ielūgumu."
 msgid "Send Invites"
 msgstr "Izsūtīt uzaicinājumus"
 
-#: templates/teams/members-list.html:47 templates/teams/tasks.html:47
+#: templates/teams/members-list.html:47 templates/teams/tasks.html:52
 #: templates/teams/videos-list.html:45
 msgid "Filter and Sort"
 msgstr "Filtrēt un šķirot"
@@ -5582,14 +5332,14 @@ msgstr "artavnieks"
 
 #: templates/teams/members-list.html:62
 msgid "speaking"
-msgstr ""
+msgstr "runā"
 
-#: templates/teams/members-list.html:64 templates/teams/tasks.html:83
+#: templates/teams/members-list.html:64 templates/teams/tasks.html:88
 msgid "all languages"
 msgstr "visām valodām"
 
-#: templates/teams/members-list.html:72 templates/teams/tasks.html:128
-#: templates/teams/tasks.html.py:135 templates/teams/tasks.html:142
+#: templates/teams/members-list.html:72 templates/teams/tasks.html:133
+#: templates/teams/tasks.html.py:140 templates/teams/tasks.html:147
 #: templates/teams/videos-list.html:94
 msgid "Clear"
 msgstr "Subtitrēt video"
@@ -5610,14 +5360,6 @@ msgstr "Piedodiet, neviens dalībnieks netika atrasts."
 msgid "Me"
 msgstr "Man"
 
-#: templates/teams/members-list.html:101 templates/teams/members-list.html:102
-msgid "and"
-msgstr "un"
-
-#: templates/teams/members-list.html:101
-msgid "project"
-msgstr "projekts"
-
 #: templates/teams/members-list.html:113
 msgid "Assignments"
 msgstr "Uzdevumi"
@@ -5633,7 +5375,7 @@ msgstr "Vadlīnijas"
 
 #: templates/teams/settings-guidelines.html:25
 msgid "Custom messages"
-msgstr ""
+msgstr "Personalizētie ziņojumi"
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
@@ -5703,15 +5445,72 @@ msgstr "Kā lietotāji var pievienoties komandai?"
 msgid "Who can add/remove videos?"
 msgstr "Kurš var pievienot/noņemt video?"
 
-#: templates/teams/settings-permissions.html:37
-msgid "Manage subtitling and translation work for your videos"
-msgstr "Pārvaldiet savu video subtitrēšanu un tulkošanu."
+#: templates/teams/settings-permissions.html:36
+msgid "Subtitling"
+msgstr "Subtitrēšana"
+
+#: templates/teams/settings-permissions.html:38
+msgid "Who can transcribe subtitles?"
+msgstr "Kuri var transkribēt subtitrus?"
 
 #: templates/teams/settings-permissions.html:39
+msgid "i.e. transcribe from video and perform time-alignment"
+msgstr ""
+"t.i. transkribējiet no video un veiciet subtitru parādīšanās laika regulēšanu"
+
+#: templates/teams/settings-permissions.html:42
+msgid "Who can translate subtitles?"
+msgstr "Kurš var tulkot subtitrus?"
+
+#: templates/teams/settings-permissions.html:43
+msgid "i.e. translate text from an original subtitle into a new language"
+msgstr "t.i. pārtulkot sākotnējo subtitru tekstu jaunā valodā"
+
+#: templates/teams/settings-permissions.html:48
+msgid "How your subtitles will get published <em>(configure below)</em>"
+msgstr "Kā Jūsu subtitri tiks publicēti <em>(iestatīt zemāk)</em>"
+
+#: templates/teams/settings-permissions.html:50
+msgid "Transcribed"
+msgstr "Transkribēts"
+
+#: templates/teams/settings-permissions.html:52
+msgid "or ..."
+msgstr "vai ..."
+
+#: templates/teams/settings-permissions.html:58
+msgid "Reviewed"
+msgstr "Pārskatīts"
+
+#: templates/teams/settings-permissions.html:63
+msgid "Approved"
+msgstr "Apstiprināts"
+
+#: templates/teams/settings-permissions.html:68
+msgid "Published"
+msgstr "Publicēts"
+
+#: templates/teams/settings-permissions.html:74
+msgid ""
+"Tasks enable you to manage and assign subtitling and translation work for "
+"your videos"
+msgstr ""
+"Uzdevumi ļauj pārvaldīt un piešķirt subtitrēšanas un tulkošanas darbus Jūsu "
+"video"
+
+#: templates/teams/settings-permissions.html:75
+msgid "Enable tasks"
+msgstr "Iespējot uzdevumus"
+
+#: templates/teams/settings-permissions.html:80
+msgid "Permissions and Limits"
+msgstr "Atļaujas un ierobežojumi"
+
+#: templates/teams/settings-permissions.html:82
 msgid "Who can create and assign tasks?"
 msgstr "Kurš var izveidot un piešķirt uzdevumus?"
 
-#: templates/teams/settings-permissions.html:41
+#: templates/teams/settings-permissions.html:84
 msgid ""
 "Specified members will only be able to create/assign tasks they are "
 "permitted to complete themselves"
@@ -5719,96 +5518,46 @@ msgstr ""
 "Tikai īpašiem lietotājiem būs iespēja izveidot/piešķirt uzdevumus, kurus "
 "drīkst veikt arī viņi paši"
 
-#: templates/teams/settings-permissions.html:43
+#: templates/teams/settings-permissions.html:86
 msgid "How many tasks can a user have at once?"
 msgstr "Cik uzdevumi reizē var būt vienam lietotājam?"
 
-#: templates/teams/settings-permissions.html:46
+#: templates/teams/settings-permissions.html:89
 msgid "If left blank there will be no limit."
 msgstr "Atstājot tukšu, nebūs ierobežojuma."
 
-#: templates/teams/settings-permissions.html:48
+#: templates/teams/settings-permissions.html:91
 msgid "How many days should an assignee get to complete a task?"
 msgstr "Cik dienas būs nozīmētajam cilvēkam uzdevuma izpildei?"
 
-#: templates/teams/settings-permissions.html:51
+#: templates/teams/settings-permissions.html:94
 msgid "If left blank tasks will not expire."
 msgstr "Atstājot tukšu, uzdevumiem nebūs termiņa."
 
-#: templates/teams/settings-permissions.html:55
-msgid "Subtitling"
-msgstr "Subtitrēšana"
+#: templates/teams/settings-permissions.html:97
+msgid "Workflow"
+msgstr "Darbplūsma"
 
-#: templates/teams/settings-permissions.html:57
-msgid "Who can transcribe subtitles?"
-msgstr "Kuri var transkribēt subtitrus?"
-
-#: templates/teams/settings-permissions.html:58
-msgid "i.e. transcribe from video and perform time-alignment"
-msgstr ""
-
-#: templates/teams/settings-permissions.html:61
-msgid "Who can translate subtitles?"
-msgstr "Kurš var tulkot subtitrus?"
-
-#: templates/teams/settings-permissions.html:62
-msgid "i.e. translate text from an original subtitle into a new language"
-msgstr "t.i. pārtulkot sākotnējo subtitru tekstu jaunā valodā"
-
-#: templates/teams/settings-permissions.html:67
-msgid "How your subtitles will get published <em>(configure below)</em>"
-msgstr "Kā Jūsu subtitri tiks publicēti <em>(iestatīt zemāk)</em>"
-
-#: templates/teams/settings-permissions.html:69
-msgid "Transcribed"
-msgstr "Transkribēts"
-
-#: templates/teams/settings-permissions.html:71
-msgid "or ..."
-msgstr "vai ..."
-
-#: templates/teams/settings-permissions.html:77
-msgid "Reviewed"
-msgstr "Pārskatīts"
-
-#: templates/teams/settings-permissions.html:82
-msgid "Approved"
-msgstr "Apstiprināts"
-
-#: templates/teams/settings-permissions.html:87
-msgid "Published"
-msgstr "Publicēts"
-
-#: templates/teams/settings-permissions.html:93
-msgid "Workflows enable you to add moderation steps and automate tasks"
-msgstr ""
-"Darbplūsmas ļauj Jums pievienot pārvaldības soļus un automatizēt uzdevumus"
-
-#: templates/teams/settings-permissions.html:94
-#: templates/teams/settings-projects-add.html:42
-msgid "Enable workflows"
-msgstr "Iespējot darbplūsmas"
-
-#: templates/teams/settings-permissions.html:101
+#: templates/teams/settings-permissions.html:100
 msgid "Automatically create transcription tasks"
 msgstr "Transkripcijas uzdevumus izveidot automātiski"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "Automatically create translation tasks for preferred languages"
 msgstr "Automātiski izveidot tulkošanas uzdevumus izvēlētajām valodām"
 
-#: templates/teams/settings-permissions.html:106
+#: templates/teams/settings-permissions.html:105
 #: templates/teams/settings-projects-add.html:54
 msgid "manage languages"
 msgstr "pārvaldīt valodas"
 
-#: templates/teams/settings-permissions.html:109
-#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:60
+#: templates/teams/settings-permissions.html:108
+#: templates/teams/settings-projects-add.html:57 templates/teams/tasks.html:65
 msgid "Review"
 msgstr "Pārskatāmie"
 
-#: templates/teams/settings-permissions.html:112
+#: templates/teams/settings-permissions.html:111
 #: templates/teams/settings-projects-add.html:60
 msgid "Approval"
 msgstr "Apstiprinājums"
@@ -5833,6 +5582,12 @@ msgid ""
 "Moderate this project's subtitles. Will override the team's workflow if "
 "exists."
 msgstr ""
+"Moderēt šī projekta subtitrus. Tas pārrakstīs komandas darbplūsmu, ja tāda "
+"pastāv."
+
+#: templates/teams/settings-projects-add.html:42
+msgid "Enable workflows"
+msgstr "Iespējot darbplūsmas"
 
 #: templates/teams/settings-projects-add.html:49
 msgid "Automatically create subtitle tasks"
@@ -5840,7 +5595,7 @@ msgstr "Izveidot subtitrēšanas uzdevumus automātiski"
 
 #: templates/teams/settings-projects-edit.html:34
 msgid "Edit Project"
-msgstr "Rediģēt projektu"
+msgstr "Labot projektu"
 
 #: templates/teams/settings-projects-edit.html:76
 msgid "Are you sure you want to delete this project?"
@@ -5850,232 +5605,246 @@ msgstr "Vai esat drošs, ka vēlaties izdzēst šo projektu?"
 msgid "This team does not have any projects yet"
 msgstr "Šai komandai pagaidām nav neviena projekta"
 
-#: templates/teams/tasks.html:43
+#: templates/teams/tasks.html:48
 msgid "Add Task"
 msgstr "Pievienot uzdevumu"
 
-#: templates/teams/tasks.html:58
+#: templates/teams/tasks.html:62 templates/teams/tasks.html.py:207
+msgid "Transcribe"
+msgstr "Transkribējamie"
+
+#: templates/teams/tasks.html:63
 #: unisubs-integration/services/templates/services/translation_request.html:6
 msgid "Translate"
 msgstr "Tulkojamie"
 
-#: templates/teams/tasks.html:66
+#: templates/teams/tasks.html:71
 msgid "tasks in"
 msgstr "uzdevumi"
 
-#: templates/teams/tasks.html:70 templates/teams/videos-list.html:54
+#: templates/teams/tasks.html:75 templates/teams/videos-list.html:54
 msgid "any project"
 msgstr "jebkurā projektā"
 
-#: templates/teams/tasks.html:81
+#: templates/teams/tasks.html:86
 msgid "my languages"
 msgstr "manām valodām"
 
-#: templates/teams/tasks.html:95
+#: templates/teams/tasks.html:100
 msgid "assigned to"
 msgstr "uzdots"
 
-#: templates/teams/tasks.html:97
+#: templates/teams/tasks.html:102
 msgid "no one"
 msgstr "nevienam"
 
-#: templates/teams/tasks.html:98 templates/teams/tasks.html.py:268
+#: templates/teams/tasks.html:103 templates/teams/tasks.html.py:271
 msgid "me"
 msgstr "man"
 
-#: templates/teams/tasks.html:99
+#: templates/teams/tasks.html:104
 msgid "anyone"
 msgstr "visiem"
 
-#: templates/teams/tasks.html:108 templates/teams/videos-list.html:70
+#: templates/teams/tasks.html:113 templates/teams/videos-list.html:70
 msgid "sorted by"
 msgstr "šķirot pēc"
 
-#: templates/teams/tasks.html:111
+#: templates/teams/tasks.html:116
 msgid "date, newest"
 msgstr "datuma, jaunākie vispirms"
 
-#: templates/teams/tasks.html:114
+#: templates/teams/tasks.html:119
 msgid "date, oldest"
 msgstr "datuma, vecākie vispirms"
 
-#: templates/teams/tasks.html:118
+#: templates/teams/tasks.html:123
 msgid "time left, least"
-msgstr "atlikušais laiks, vismazāk"
+msgstr "atlikušā laika, vismazāk"
 
-#: templates/teams/tasks.html:121
+#: templates/teams/tasks.html:126
 msgid "time left, most"
-msgstr "atlikušais laiks, visvairāk"
+msgstr "atlikušā laika, visvairāk"
 
-#: templates/teams/tasks.html:128 templates/teams/tasks.html.py:135
-#: templates/teams/tasks.html:142
+#: templates/teams/tasks.html:133 templates/teams/tasks.html.py:140
+#: templates/teams/tasks.html:147
 msgid "Clear all filters, sorts, and search terms"
 msgstr "Notīrīt visus filtrus, šķirošanas un meklēto"
 
-#: templates/teams/tasks.html:140
+#: templates/teams/tasks.html:145
 msgid "NOTE:"
 msgstr "PIEZĪME:"
 
-#: templates/teams/tasks.html:141
+#: templates/teams/tasks.html:146
 msgid ""
 "When sorting by expiration date, tasks without an expiration are not shown."
 msgstr "Šķirojot pēc termiņa, uzdevumi bez termiņa netiek parādīti."
 
-#: templates/teams/tasks.html:148
+#: templates/teams/tasks.html:153
 msgid "Try broadening your selection using the filters above"
 msgstr "Pamēģiniet paplašināt savu"
 
-#: templates/teams/tasks.html:154
-msgid "Tell us what languages you speak"
-msgstr "Pastāstiet, kādas valodas protat,"
-
-#: templates/teams/tasks.html:154
+#: templates/teams/tasks.html:159
 msgid "and we'll narrow this list for you"
 msgstr "un mēs sašaurināsim šo sarakstu."
 
-#: templates/teams/tasks.html:160
+#: templates/teams/tasks.html:165
 msgid "Showing unassigned tasks in languages you speak. "
 msgstr "Rāda nepiešķirtos uzdevumus Jūsu prastajās valodās."
 
-#: templates/teams/tasks.html:162
+#: templates/teams/tasks.html:167
 msgid "Want to view "
 msgstr "Tā vietā vēlaties skatīt"
 
-#: templates/teams/tasks.html:163
+#: templates/teams/tasks.html:168
 msgid "your tasks"
 msgstr "savus uzdevumus"
 
-#: templates/teams/tasks.html:164
+#: templates/teams/tasks.html:169
 msgid " instead?"
 msgstr "?"
 
-#: templates/teams/tasks.html:170
+#: templates/teams/tasks.html:175
 msgid "Try changing your selection using the filters above to find tasks"
 msgstr ""
 "Pamēģiniet mainīt savu izvēli, uzdevumu meklēšanai izmantojot augstāk esošos "
 "filtrus"
 
-#: templates/teams/tasks.html:196
+#: templates/teams/tasks.html:201
 msgid "You don't have permission to perform this task."
 msgstr "Jums nav atļaujas veikt šo uzdevumu."
 
-#: templates/teams/tasks.html:235
+#: templates/teams/tasks.html:222 templates/teams/tasks.html.py:238
+#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:152
+#: templates/videos/subtitle-view.html:186
+msgid "Subtitles"
+msgstr "subtitrus"
+
+#: templates/teams/tasks.html:239
 msgid "latest draft"
 msgstr "jaunākā versija"
 
-#: templates/teams/tasks.html:239
+#: templates/teams/tasks.html:242
 msgid "transcribed"
 msgstr "transkribēja"
 
-#: templates/teams/tasks.html:241 templates/videos/subtitle-view.html:48
+#: templates/teams/tasks.html:244 templates/videos/subtitle-view.html:48
 msgid "translated"
 msgstr "pārtulkošana"
 
-#: templates/teams/tasks.html:249
+#: templates/teams/tasks.html:252
 msgid "reviewed"
 msgstr "pārskatīja"
 
-#: templates/teams/tasks.html:251
+#: templates/teams/tasks.html:254
 msgid "and edited"
 msgstr "un koriģēja"
 
-#: templates/teams/tasks.html:253 templates/videos/subtitle-view.html:194
+#: templates/teams/tasks.html:256 templates/videos/subtitle-view.html:194
 #: templates/videos/subtitle-view.html:310
 msgid "by"
-msgstr ""
+msgstr " "
 
-#: templates/teams/tasks.html:266
+#: templates/teams/tasks.html:269
 msgid "Assigned to"
 msgstr "Uzdots"
 
-#: templates/teams/tasks.html:275
+#: templates/teams/tasks.html:278
 msgid "Unassigned"
 msgstr "Neuzdots"
 
-#: templates/teams/tasks.html:290
+#: templates/teams/tasks.html:293
 msgid "Perform Task"
 msgstr "Veikt uzdevumu"
 
-#: templates/teams/tasks.html:299
+#: templates/teams/tasks.html:302
 msgid "You have reached the maximum number of tasks."
 msgstr "Jūs esat sasniedzis maksimālo uzdevumu skaitu."
 
-#: templates/teams/tasks.html:318
+#: templates/teams/tasks.html:321
 msgid "Download draft"
 msgstr "Lejuplādēt versiju"
 
-#: templates/teams/tasks.html:332
+#: templates/teams/tasks.html:337
 msgid "Upload a draft"
 msgstr "Augšuplādēt jaunu versiju"
 
-#: templates/teams/tasks.html:335
-msgid "Important:"
-msgstr "Svarīgi:"
+#: templates/teams/tasks.html:343 templates/videos/_upload_subtitles.html:32
+msgid "Video Language"
+msgstr "Video valoda"
 
-#: templates/teams/tasks.html:335
-msgid ""
-"Uploading a draft will not complete the task. After uploading, select "
-"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
-"and video description in the onsite editor and to submit the final version."
-msgstr ""
-
-#: templates/teams/tasks.html:338 templates/videos/_upload_subtitles.html:27
-#: templates/videos/video-view.html:109
-msgid "Language"
-msgstr "Valoda"
-
-#: templates/teams/tasks.html:340 templates/videos/_upload_subtitles.html:37
+#: templates/teams/tasks.html:347 templates/videos/_upload_subtitles.html:37
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
 msgstr ""
 "Lūdzu, divreiz pārbaudiet galveno runāto valodu. Šo soli nevar veikt "
 "atkārtoti."
 
-#: templates/teams/tasks.html:345
+#: templates/teams/tasks.html:354
 msgid "Translate from"
 msgstr "Tulkot no"
 
-#: templates/teams/tasks.html:350
+#: templates/teams/tasks.html:363
+msgid "Important:"
+msgstr "Svarīgi:"
+
+#: templates/teams/tasks.html:363
+msgid ""
+"Uploading a draft will not complete the task. After uploading, select "
+"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
+"and video description in the onsite editor and to submit the final version."
+msgstr ""
+"Versijas augšupielādēšana nepabeigs uzdevumu. Pēc augšuplādes izvēlieties "
+"„Atsākt” no „Veikt uzdevumu” izslīdošās izvēlnes, lai lapas redaktorā "
+"apstiprinātu subtitru laikus, video nosaukumu, kā arī aprakstu un iesūtītu "
+"gala versiju."
+
+#: templates/teams/tasks.html:368 templates/videos/_upload_subtitles.html:27
+#: templates/videos/video-view.html:109
+msgid "Language"
+msgstr "Valoda"
+
+#: templates/teams/tasks.html:376
 msgid "File:"
 msgstr "Datne:"
 
-#: templates/teams/tasks.html:353
-msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)"
-msgstr "Pieņemtie formāti: .srt, .ssa, .sbv, .dfxp, .txt vai .xml (TTML)"
+#: templates/teams/tasks.html:382
+msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
+msgstr ""
 
-#: templates/teams/tasks.html:367
+#: templates/teams/tasks.html:395
 msgid "Download a draft"
 msgstr "Lejuplādēt versiju"
 
-#: templates/teams/tasks.html:372
+#: templates/teams/tasks.html:400
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Lejuplādējiet šo subtitru versiju, lai varētu strādāt nesaistē."
 
-#: templates/teams/tasks.html:398
+#: templates/teams/tasks.html:425
 msgid "Decline"
 msgstr "Atteikties"
 
-#: templates/teams/tasks.html:418
+#: templates/teams/tasks.html:445
 msgid "Reassign"
 msgstr "Pārpiešķirt"
 
-#: templates/teams/tasks.html:420
+#: templates/teams/tasks.html:447
 msgid "Assign"
 msgstr "Piešķirt"
 
-#: templates/teams/tasks.html:436
+#: templates/teams/tasks.html:463
 msgid "Delete task"
 msgstr "Dzēst uzdevumu"
 
-#: templates/teams/tasks.html:442
+#: templates/teams/tasks.html:469
 msgid "What would you like to do with the subtitles for this task?"
-msgstr ""
+msgstr "Ko Jūs vēlētos darīt ar šī uzdevuma subtitriem?"
 
-#: templates/teams/tasks.html:445
+#: templates/teams/tasks.html:472
 msgid "Publish these subtitles immediately"
 msgstr "Nekavējoties publicēt subtitrus"
 
-#: templates/teams/tasks.html:449
+#: templates/teams/tasks.html:476
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
@@ -6083,11 +5852,11 @@ msgstr ""
 "Neatgriezeniski izdzēst šos subtitrus (atmet visas versijas līdz pēdējai "
 "publicētajai)"
 
-#: templates/teams/tasks.html:488
+#: templates/teams/tasks.html:515
 msgid "Assign to User"
 msgstr "Uzdot lietotājam"
 
-#: templates/teams/tasks.html:498
+#: templates/teams/tasks.html:525
 msgid "Sorry, no tasks here."
 msgstr "Piedodiet, šeit nav neviena uzdevuma."
 
@@ -6102,10 +5871,6 @@ msgstr "Rediģēt video"
 #: templates/teams/team_video.html:40
 msgid "This video is being moderated by team"
 msgstr "Šo video uzrauga komanda"
-
-#: templates/teams/teams-list.html:6 templates/teams/teams-list.html.py:29
-msgid "Your Teams"
-msgstr "Jūsu komandas"
 
 #: templates/teams/teams-list.html:18
 msgid "Team Directory"
@@ -6123,11 +5888,15 @@ msgstr "Jūsu komanda"
 msgid "Private"
 msgstr "Privāts"
 
-#: templates/teams/teams-list.html:74
-msgid "No description..."
-msgstr "Nav apraksta..."
+#: templates/teams/teams-list.html:78
+msgid "Role:"
+msgstr "Loma:"
 
-#: templates/teams/teams-list.html:81 templates/teams/teams-list.html.py:87
+#: templates/teams/teams-list.html:82
+msgid "leave team"
+msgstr "pamest komandu"
+
+#: templates/teams/teams-list.html:90 templates/teams/teams-list.html.py:96
 #, python-format
 msgid ""
 "\n"
@@ -6150,7 +5919,7 @@ msgstr[2] ""
 "                                        %(count)s dalībnieki\n"
 "                                    "
 
-#: templates/teams/teams-list.html:96
+#: templates/teams/teams-list.html:105
 #, python-format
 msgid ""
 "\n"
@@ -6173,23 +5942,19 @@ msgstr[2] ""
 "                                %(count)s video\n"
 "                            "
 
-#: templates/teams/teams-list.html:107
-msgid "Leave team"
-msgstr "Pamest komandu"
-
-#: templates/teams/teams-list.html:114
+#: templates/teams/teams-list.html:115
 msgid "Sorry, no teams found."
 msgstr "Piedodiet, neviena komanda netika atrasta."
 
-#: templates/teams/teams-list.html:122
+#: templates/teams/teams-list.html:123
 msgid "Search and Filter"
 msgstr "Meklēšana un filtrēšana"
 
-#: templates/teams/teams-list.html:127
+#: templates/teams/teams-list.html:128
 msgid "Start a Team"
 msgstr "Izveidot komandu"
 
-#: templates/teams/teams-list.html:131
+#: templates/teams/teams-list.html:132
 msgid ""
 "\n"
 "                Want to create your own subtitling team? Contact <a href="
@@ -6212,7 +5977,7 @@ msgstr "Video"
 #: templates/teams/videos-list.html:59 templates/videos/subtitle-view.html:46
 #: templates/videos/subtitle-view.html:48
 msgid "with"
-msgstr ""
+msgstr "ar"
 
 #: templates/teams/videos-list.html:61
 msgid "any"
@@ -6222,27 +5987,21 @@ msgstr "jebkuras valodas"
 msgid "no"
 msgstr "nekādas valodas"
 
-#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
-#: templates/videos/subtitle-view.html:48
-#: templates/videos/subtitle-view.html:75
-msgid "subtitles"
-msgstr "subtitri"
-
 #: templates/teams/videos-list.html:73
 msgid "name, a-z"
-msgstr "nosaukums, a-z"
+msgstr "nosaukuma, a—z"
 
 #: templates/teams/videos-list.html:76
 msgid "name, z-a"
-msgstr "nosaukums, z-a"
+msgstr "nosaukuma, z—a"
 
 #: templates/teams/videos-list.html:79
 msgid "time, newest"
-msgstr "laiks, jaunākie"
+msgstr "laika, jaunākie"
 
 #: templates/teams/videos-list.html:82
 msgid "time, oldest"
-msgstr "laiks, vecākie"
+msgstr "laika, vecākie"
 
 #: templates/teams/videos-list.html:85
 msgid "most subtitles"
@@ -6254,7 +6013,7 @@ msgstr "vismazāk subtitru"
 
 #: templates/teams/videos-list.html:110
 msgid "Rebuilding video index. Please try again in a few minutes"
-msgstr ""
+msgstr "Atjauno video indeksu. Lūdzu, pamēģiniet vēlreiz pēc pāris minūtēm."
 
 #: templates/teams/videos-list.html:112
 msgid "Sorry, no videos here"
@@ -6278,6 +6037,11 @@ msgid ""
 "will be deleted. Private videos will become available for viewing and "
 "editing to the general public. Are you sure you want to proceed?"
 msgstr ""
+"Jūs noņemat video no %(team)s komandas.<br /><br />\n"
+"                                Tās paliks Amara, taču vairs nebūs pakļauts "
+"komandas atļaujām un darbplūsmām. Visi ar to saistītie nepabeigtie uzdevumi "
+"tiks izdzēsti. Privātie video kļūs pieejami vispārējās publikas apskatīšanai "
+"un rediģēšanai. Vai esat drošs, ka vēlaties turpināt?"
 
 #: templates/teams/videos-list.html:134
 #, python-format
@@ -6302,6 +6066,11 @@ msgstr ""
 #: templates/teams/videos-list.html:142
 msgid "Delete the video entirely."
 msgstr "Pilnībā dzēst video"
+
+#: templates/videos/_diffing-subtitle.html:17
+#: templates/videos/subtitle-view.html:226
+msgid "Not Synced"
+msgstr "Nav sinhronizēts"
 
 #: templates/videos/_error_feedback_form.html:7
 msgid "Please let us know what you were doing when you encountered this error."
@@ -6408,7 +6177,7 @@ msgstr "Pārtraukt sekot šim video"
 
 #: templates/videos/_follow_video_button.html:89
 msgid "You will stop receiving notification when "
-msgstr "Jūs pārstāsiet saņem paziņojumus kad"
+msgstr "Jūs pārstāsiet saņem paziņojumus, kad"
 
 #: templates/videos/_follow_video_button.html:91
 msgid ""
@@ -6436,6 +6205,8 @@ msgstr "Jūs saņemsit paziņojumu, tiklīdz kāds rediģēs"
 #: templates/videos/_follow_video_button.html:144
 msgid " subtitles for this video. You can stop these emails at any time."
 msgstr ""
+"subtitri šim video. Jūs jebkurā brīdī varat atteikties no šo e-pasta vēstuļu "
+"saņemšanas."
 
 #: templates/videos/_follow_video_button.html:145
 msgid "Follow "
@@ -6519,7 +6290,7 @@ msgstr "Augšupielādēt TXT datni"
 #: templates/videos/_paste_transcription.html:144
 #: templates/videos/_upload_subtitles.html:61
 msgid "Login to upload subtitles"
-msgstr "Ieejiet, lai varētu augšupielādēt subtitrus"
+msgstr "Ienāciet, lai varētu augšupielādēt subtitrus"
 
 #: templates/videos/_team_list.html:5 templates/videos/video-view.html:201
 #: templates/videos/video-view.html:207
@@ -6545,24 +6316,12 @@ msgstr "Augšupielādēt subtitrus"
 #: templates/videos/_upload_subtitles.html:16
 msgid ""
 "\n"
-"                    Our site accepts SRT, SSA, SBV, DFXP, TTML, and TXT "
-"format.\n"
+"                    Our site accepts SRT, SSA, SBV, DFXP, and TXT format.\n"
 "                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
 "xml\n"
-"                    (for TTML) are accepted.\n"
+"                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
-"\n"
-"                    Mūsu vietne pieņem tikai SRT, SSA, SBV, DFXP, TTML, un "
-"TXT formātus.\n"
-"                    Tiek pieņemtas tikai tās datnes, kuru nosaukums beidzas "
-"ar .srt, .ssa, .sbv, .dfxp, .txt vai .xml\n"
-"                    (TTML valodai).\n"
-"                "
-
-#: templates/videos/_upload_subtitles.html:32
-msgid "Video Language"
-msgstr "Video valoda"
 
 #: templates/videos/_upload_subtitles.html:42
 msgid "Translated from"
@@ -6636,10 +6395,6 @@ msgstr "Galvenais"
 #: templates/videos/_video_url_panel.html:32
 msgid "Make primary"
 msgstr "Padarīt par galveno"
-
-#: templates/videos/_video_url_panel.html:44
-msgid "Learn more"
-msgstr "Uzzināt vairāk"
 
 #: templates/videos/_video_url_panel.html:46
 msgid ""
@@ -6723,7 +6478,7 @@ msgstr ""
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
-msgstr ""
+msgstr "Atjauno video indeksu. Lūdzu, pamēģiniet mazliet vēlāk."
 
 #: templates/videos/_watch_page.html:15
 msgid "No videos found"
@@ -6788,9 +6543,17 @@ msgstr "Pievienot video automātiski"
 msgid "Let's Go!"
 msgstr "Aiziet!"
 
-#: templates/videos/create.html:55 templates/videos/create.html.py:65
+#: templates/videos/create.html:55 templates/videos/create.html.py:73
 msgid "Or Submit Multiple Videos"
 msgstr "Vai pievienot vairākus video"
+
+#: templates/videos/create.html:59
+msgid ""
+"\n"
+"        Help organizations and deaf and hard of hearing viewers make videos "
+"accessible around the world.\n"
+"    "
+msgstr ""
 
 #: templates/videos/diffing.html:41
 msgid "Subtitles will be rolled back to a previous version"
@@ -6808,24 +6571,19 @@ msgstr "Redakciju vēsture"
 msgid "Comparing Revision"
 msgstr "Salīdzināt redakcijas"
 
-#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:177
+#: templates/videos/diffing.html:112 templates/videos/diffing.html.py:160
 msgid "Roll back to version"
 msgstr "Atjaunot līdz versijai"
 
-#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:184
+#: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
 #: templates/videos/subtitle-view.html:202
 msgid "Title:"
 msgstr "Nosaukums:"
 
-#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:188
+#: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
 #: templates/videos/subtitle-view.html:206
 msgid "Description:"
 msgstr "Apraksts:"
-
-#: templates/videos/diffing.html:150 templates/videos/diffing.html.py:215
-#: templates/videos/subtitle-view.html:226
-msgid "Not Synced"
-msgstr "Nav sinhronizēts"
 
 #: templates/videos/email_base.html:94
 msgid "Don't send any more emails about this particular video."
@@ -6843,7 +6601,7 @@ msgstr "Mans profils / izvēles"
 
 #: templates/videos/email_friend.html:6
 msgid "Email this to a friend"
-msgstr "Aizsūtīt pa e-pastu draugam"
+msgstr "Aizsūtīt draugam pa e-pastu"
 
 #: templates/videos/email_friend.html:10
 msgid "Send to Friend!"
@@ -6996,7 +6754,7 @@ msgstr "Video virsraksts"
 
 #: templates/videos/email_title_changed.html:10
 msgid "has been changed by"
-msgstr ""
+msgstr "mainīja"
 
 #: templates/videos/email_title_changed.html:13
 msgid "has been changed"
@@ -7094,6 +6852,22 @@ msgstr "Šogad"
 msgid "All Time"
 msgstr "Visu laiku"
 
+#: templates/videos/set-original-language.html:10
+msgid "Change video language"
+msgstr "Mainīt video valodu"
+
+#: templates/videos/set-original-language.html:28
+msgid "Choose a language"
+msgstr "Mainīt valodu"
+
+#: templates/videos/set-original-language.html:30
+msgid "Current language is"
+msgstr "Pašreizējā valoda ir"
+
+#: templates/videos/set-original-language.html:35
+msgid "not set"
+msgstr "nav uzstādīts"
+
 #: templates/videos/stop_notification.html:9
 #, python-format
 msgid "Notifications to %(u)s stopped for %(video)s."
@@ -7133,15 +6907,15 @@ msgstr "Komentāri"
 
 #: templates/videos/subtitle-view.html:154
 msgid "Revisions"
-msgstr ""
+msgstr "Versijas"
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:380
+#: templates/videos/subtitle-view.html:370
 msgid "Unpublish"
 msgstr "Atpublicēt"
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:395
+#: templates/videos/subtitle-view.html:385
 msgid "Edit Subtitles"
 msgstr "Rediģēt subtitrus"
 
@@ -7269,13 +7043,6 @@ msgstr ""
 "Piezīme: Visas atkarīgās valodas būs nepieejamas, kamēr šī valoda netiks "
 "atkārtoti apstiprināta."
 
-#: templates/videos/subtitle-view.html:368
-msgid ""
-"Yes, delete these subtitles instead of sending them back for editing/review"
-msgstr ""
-"Jā, izdzēst subtitrus, tā vietā, lai to nosūtītu atpakaļ labošanai/"
-"pārskatīšanai"
-
 #: templates/videos/test_form_page.html:18
 msgid "Your Email"
 msgstr "E-pasts"
@@ -7286,14 +7053,14 @@ msgstr "1. uzdevums"
 
 #: templates/videos/test_form_page.html:24
 msgid "Try creating subtitles on the following"
-msgstr ""
+msgstr "Pamēģiniet izveidot subtitrus"
 
 #: templates/videos/test_form_page.html:25
 #: templates/videos/test_form_page.html:31
 #: templates/videos/test_form_page.html:37
 #: templates/videos/test_form_page.html:57
 msgid "how was it? were the instructions clear? what would improve it?"
-msgstr "kā bija? vai norādes bija saprotamas? ko jūs uzlabotu?"
+msgstr "kā bija? vai norādes bija saprotamas? ko Jūs uzlabotu?"
 
 #: templates/videos/test_form_page.html:29
 msgid "Task 2"
@@ -7382,12 +7149,12 @@ msgid "Create subtitles now"
 msgstr "Izveidot subtitrus"
 
 #: templates/videos/video-view.html:188
-msgid "Don't see the language you're looking for?"
-msgstr "Neatradāt meklēto valodu?"
+msgid "Don't see one of your languages?"
+msgstr ""
 
 #: templates/videos/video-view.html:188
-msgid "Start a new translation"
-msgstr "Sākt jaunu tulkojumu"
+msgid "Create a new translation"
+msgstr ""
 
 #: templates/videos/video-view.html:194
 msgid ""
@@ -7433,68 +7200,58 @@ msgid "Help Subtitle Videos"
 msgstr "Palīdziet subtitrēt video"
 
 #: unisubs-integration/api/1_0/forms.py:64
-#, fuzzy
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would ruin "
 "translations made from it"
 msgstr ""
-"Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs "
-"valodas jau ir sākts."
+"Atvainojiet, mēs nevar augšuplādēt šīs valodas subtitrus, jo tas sabojātu no "
+"tās veiktos tulkojumus."
 
 #: unisubs-integration/api/1_0/forms.py:99
 #: unisubs-integration/api/1_0/forms.py:102
-#, fuzzy
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and "
 "you don't have sufficient permission."
 msgstr ""
-"Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs "
-"valodas jau ir sākts."
+"Atvainojiet, mēs nevar augšuplādēt jūsu subtitrus, jo šī valoda tiek "
+"moderēta un jums nav vajadzīgā atļauja."
 
 #: unisubs-integration/api/1_0/forms.py:333
-#, fuzzy
 msgid "Incorrect subtitles encoding format"
-msgstr "Nepareizs subtitru formāts"
+msgstr "Nepareizs subtitru kodēšanas formāts"
 
 #: unisubs-integration/apiv2/forms.py:119
-#, fuzzy
 msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
-"Jānorāda obligāti. 30 rakstzīmes vai mazāk. Tikai burtciparzīmes (burti, "
-"cipari un pasvītras)."
+"Nepieciešamais. 30 rakstzīmes vai mazāk. Tikai burti, skaitļi un @/./+/-/_."
 
 #: unisubs-integration/apiv2/forms.py:120
-#, fuzzy
 msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Šī vērtība var saturēt tikai burtus, ciparus un pasvītras."
+msgstr ""
 
 #: unisubs-integration/services/forms.py:16
-#, fuzzy
 msgid "Fidelity"
-msgstr "video politika"
+msgstr ""
 
 #: unisubs-integration/services/forms.py:18
 msgid "Turnaround"
 msgstr ""
 
 #: unisubs-integration/services/forms.py:28
-#, fuzzy
 msgid "Translate to"
-msgstr "Tulkojamie"
+msgstr "Pārtulkot"
 
 #: unisubs-integration/services/forms.py:50
 msgid "Request for this translation already exists"
-msgstr ""
+msgstr "Šī tulkojuma pieprasījums jau pastāv."
 
 #: unisubs-integration/services/forms.py:53
-#, fuzzy
 msgid "Subtitles should be on English"
-msgstr "Subtitri nepastāv."
+msgstr "Subtitriem būtu jābūt angliski."
 
 #: unisubs-integration/services/forms.py:80
-#, fuzzy
 msgid "Transcription for this video is already requested."
-msgstr "Pašlaik jau noris šī video subtitrēšana."
+msgstr "Šī video transkripcija ir jau pieprasīta."
 
 #: unisubs-integration/services/forms.py:93
 #, python-format
@@ -7508,7 +7265,7 @@ msgstr ""
 
 #: unisubs-integration/services/models.py:43
 msgid "supported speakertext.com platform"
-msgstr ""
+msgstr "atbalstītā speakertext.com platforma"
 
 #: unisubs-integration/services/models.py:44
 msgid "video id for platform"
@@ -7519,50 +7276,44 @@ msgid "transcipt ID returned by speakertext.com"
 msgstr ""
 
 #: unisubs-integration/services/models.py:48
-#, fuzzy
 msgid "result of transcription"
-msgstr "Apraksta izmaiņas"
+msgstr "transkripcijas rezultāts"
 
 #: unisubs-integration/services/models.py:50
-#, fuzzy
 msgid "subtitles created from transcription"
-msgstr "Transkripcijas uzdevumus izveidot automātiski"
+msgstr "subtitri izveidoti no transkripcijas"
 
 #: unisubs-integration/services/views.py:52
 msgid "Request for translation was success."
-msgstr ""
+msgstr "Tulkošanas pieprasījums bija sekmīgs."
 
 #: unisubs-integration/services/views.py:63
-#, fuzzy
 msgid "This subtitles does not have any version"
-msgstr "Šai komandai pagaidām nav neviena projekta"
+msgstr "Šiem subtitriem nav nekādas versijas"
 
 #: unisubs-integration/services/views.py:65
-#, fuzzy
 msgid "Subtitles should be in English"
-msgstr "Subtitri nepastāv."
+msgstr "Subtitriem būtu jābūt angliski."
 
 #: unisubs-integration/services/views.py:130
 msgid "Request for transcription was successful."
-msgstr ""
+msgstr "Transkripcijas pieprasījums bija sekmīgs."
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:5
 msgid "From"
-msgstr ""
+msgstr "No"
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
-#, fuzzy
 msgid "Result"
-msgstr "Atsākt"
+msgstr "Iznākums"
 
 #: unisubs-integration/services/templates/services/translation_request_list.html:15
-#, fuzzy
 msgid "Not finished"
-msgstr "Nav sinhronizēts"
+msgstr "Nepabeigts"
 
 #: unisubs-integration/servicesauth/views.py:41
 msgid "Could not authorize with TED."
-msgstr ""
+msgstr "Neizdevās autorizēties ar TED."
 
 #: utils/ajaxmiddleware.py:27
 #, python-format
@@ -7605,6 +7356,10 @@ msgstr "Video nepastāv."
 #: utils/forms/unisub_video_form.py:70
 msgid "Incorrect URL."
 msgstr "Nepareizs URL."
+
+#: utils/templatetags/i18n_tags.py:28
+msgid "name_local"
+msgstr "name_local"
 
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."

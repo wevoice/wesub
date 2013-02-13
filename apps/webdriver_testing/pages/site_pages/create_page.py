@@ -11,7 +11,7 @@ class CreatePage(UnisubsPage):
 
     _SINGLE_URL_ENTRY_BOX = "input.main_video_form_field"
     _INPUT_PREFOCUS = "input#submit_video_field.prefocus"
-    _URL = "videos/create"
+    _URL = "videos/create/"
     _SUBMIT_BUTTON = "form.main_video_form button.green_button"
     _MULTI_SUBMIT_LINK = (" div#submit_multiple_toggle "
                          "a#btn_submit_multiple_toggle.toogle-create-form")
@@ -56,8 +56,7 @@ class CreatePage(UnisubsPage):
             self.type_by_css(self._YOUTUBE_USER_FIELD, name)
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
-        self.click_by_css(self._SUBMIT_MULTI)
-        time.sleep(3)
+        self.submit_by_css(self._SUBMIT_MULTI)
 
     def submit_youtube_user_page(self, youtube_user_url, save=False):
         """Submit videos from youtube user page url.
@@ -69,8 +68,7 @@ class CreatePage(UnisubsPage):
         if save == True:
             self.logger.info('Choosing the save option')
             self.click_by_css(self._SAVE_OPTION)
-        self.click_by_css(self._SUBMIT_MULTI)
-        time.sleep(3)
+        self.submit_by_css(self._SUBMIT_MULTI)
 
     def submit_feed_url(self, feed_url, save=False):
         """Submit videos from a supported feed type.
@@ -81,11 +79,11 @@ class CreatePage(UnisubsPage):
         self.type_by_css(self._FEED_URL, feed_url)
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
-        self.click_by_css(self._SUBMIT_MULTI)
+        self.submit_by_css(self._SUBMIT_MULTI)
 
     def multi_submit_successful(self):
         self.logger.info("Checking if multi submit successful")
-        self.wait_for_element_present(self._SUCCESS_MESSAGE)
+        self.wait_for_element_present(self._SUCCESS_MESSAGE, wait_time=20)
         if self.is_text_present(self._SUCCESS_MESSAGE,
                                 ("The videos are being added in the "
                                  "background. If you are logged in, you "
@@ -96,7 +94,6 @@ class CreatePage(UnisubsPage):
 
     def multi_submit_failed(self):
         self.logger.info("Checking if multi submit failed")
-        self.wait_for_element_present(self._ERROR_MESSAGE)
         if self.is_element_present(self._ERROR_MESSAGE):
             return True
 

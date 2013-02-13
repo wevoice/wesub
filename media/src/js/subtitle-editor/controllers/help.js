@@ -31,8 +31,9 @@
         $scope.heading = 'Thanks for making subtitles!';
         $scope.paragraph = 'It\'s easy as pie. Just watch the video and type everything you hear (and any important text that appears on the screen).';
         $scope.commands = [
-            { key: 'tab', description: 'plays the <strong>next 4 seconds</strong> of the video' },
-            { key: 'shift + tab', description: 'replays the <strong>previous 4 seconds</strong>' }
+            { key: 'shift + space', description: 'play / pause the video' },
+            { key: 'shift + tab', description: 'move to the previous subtitle' },
+            { key: 'tab', description: 'move to the next subtitle' }
         ];
 
     };

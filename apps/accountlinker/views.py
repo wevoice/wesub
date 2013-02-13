@@ -33,7 +33,8 @@ from accountlinker.models import ThirdPartyAccount
 from localeurl.utils import universal_url
 
 from teams.models import Team
-from videos.models import VIDEO_TYPE_YOUTUBE
+from videos.models import VIDEO_TYPE_YOUTUBE, VideoFeed
+from videos.tasks import update_video_feed
 from videos.types.youtube import YouTubeApiBridge
 
 from tasks import mirror_existing_youtube_videos
@@ -133,7 +134,7 @@ def youtube_oauth_callback(request):
     bridge = YouTubeApiBridge(content['access_token'], content['refresh_token'], None) 
 
     try:
-        feed = bridge.GetUserFeed(username='default')
+        feed = bridge.get_user_profile(username='default')
     except Unauthorized:
         messages.error(request,
             _("We couldn't link your account. Have you <a href="
@@ -142,18 +143,20 @@ def youtube_oauth_callback(request):
         return redirect(reverse("profiles:account"))
 
     author = [x for x in feed.get_elements() if type(x) == atom.data.Author][0]
+    username = [x for x in feed.get_elements() if x.tag == 'username'][0].text
     
     # make sure we don't store multiple auth tokes for the same account
     account, created = ThirdPartyAccount.objects.get_or_create(
         type=VIDEO_TYPE_YOUTUBE,
-        username=author.name.text,
+        username=username,
         defaults={
             'oauth_refresh_token': content['refresh_token'],
             'oauth_access_token': content['access_token'],
+            'full_name': author.name.text
         }
     )
 
-    if not created:
+    if not created and not team and user:
         messages.error(request, _("Account already linked."))
         return redirect('/')
 
@@ -164,5 +167,8 @@ def youtube_oauth_callback(request):
 
     if user:
         user.third_party_accounts.add(account)
+        uri = author.uri.text + '/uploads'
+        video_feed = VideoFeed.objects.create(url=uri, user=user)
+        update_video_feed.delay(video_feed.pk)
         mirror_existing_youtube_videos.delay(user.pk)
         return redirect(reverse("profiles:account"))

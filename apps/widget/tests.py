@@ -33,6 +33,7 @@ from auth.models import CustomUser
 from videos.models import Video, Action, SubtitleLanguage
 from videos import models
 from subtitles import models as sub_models
+from apps.subtitles.pipeline import rollback_to
 from widget.models import SubtitlingSession
 from widget.rpc import Rpc
 from widget.null_rpc import NullRpc
@@ -40,6 +41,7 @@ from django.core.urlresolvers import reverse
 from widget import video_cache
 from datetime import datetime, timedelta
 from django.conf import settings
+from utils import test_utils, test_factories
 
 VIDEO_URL = 'http://videos.mozilla.org/firefox/3.5/switch/switch.ogv'
 
@@ -582,33 +584,14 @@ class TestRpc(TestCase):
 
         # now fork subtitles
         response = rpc.start_editing(request, session.video.video_id, 'es', subtitle_language_pk=language.pk)
-        sub_state = response['subtitles']
-        self.assertEquals(True, sub_state['forked'])
-        self.assertTrue(('base_language_pk' not in sub_state) or sub_state['base_language_pk'] is None)
+        subtitles = create_subtitle_set(10)
+        response = rpc.finished_subtitles(request, response['session_pk'], subtitles=subtitles.to_xml(), forked=True)
 
-        subtitles = SubtitleSet('es', sub_state['subtitles'])
+        self.assertEquals('ok', response['response'])
+        es = session.video.newsubtitlelanguage_set.get(language_code='es' )
+        self.assertTrue(es.is_forked)
+        self.assertIn('en', es.get_tip().lineage)
 
-        self.assertEquals(3, len(subtitles))
-        self.assertEquals('hey you 0', subtitles[0][2])
-
-        session_pk = response['session_pk']
-
-        subtitles.append_subtitle(4000, 5000, 'heyooo')
-
-        rpc.finished_subtitles(request, session_pk, subtitles.to_xml())
-
-        language = sub_models.SubtitleLanguage.objects.get(pk=session.language.pk)
-
-        self.assertEquals(True, language.is_forked)
-
-        subs = rpc.fetch_subtitles(request, session.video.video_id, session.language.pk)
-        subtitles = subs['subtitles']
-        subtitles = SubtitleSet('es', subs['subtitles'])
-
-        self.assertEquals(4, len(subtitles))
-        self.assertEquals(4000, subtitles[3][0])
-        self.assertEquals(5000, subtitles[3][1])
-        self.assertEquals('heyooo', subtitles[3][2])
 
     def test_fork_on_finish(self):
         request = RequestMockup(self.user_0)
@@ -766,7 +749,6 @@ class TestRpc(TestCase):
     def test_fork_translation_dependent_on_forked(self):
         request = RequestMockup(self.user_0)
         video = self._create_two_sub_forked_subs(request)
-
         response = rpc.start_editing(request, video.video_id, 'fr', base_language_code='es')
         session_pk = response['session_pk']
         rpc.finished_subtitles(request, session_pk, create_subtitle_set(2).to_xml())
@@ -779,6 +761,7 @@ class TestRpc(TestCase):
         video_id = return_value['video_id']
         fr_sl = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         response = rpc.start_editing(request, video_id, 'fr', subtitle_language_pk=fr_sl.pk)
+        session_pk = response['session_pk']
 
         subtitles = SubtitleSet('fr', response['subtitles']['subtitles'])
 
@@ -788,19 +771,18 @@ class TestRpc(TestCase):
         self.assertEquals(1000, subtitles[0].end_time)
 
         # update the timing on the French sub.
-        session_pk = response['session_pk']
         updated = SubtitleSet('fr')
 
         updated.append_subtitle(1020, 1500, 'hey 0')
         updated.append_subtitle(2500, 3500, 'hey 1')
 
-        rpc.finished_subtitles(request, session_pk, updated.to_xml())
+        rpc.finished_subtitles(request, session_pk, updated.to_xml(), forked=True)
 
         french_lang = models.Video.objects.get(video_id=video_id).subtitle_language('fr')
         fr_version = french_lang.get_tip()
         fr_version_subtitles = fr_version.get_subtitles()
 
-        self.assertEquals(True, french_lang.is_forked)
+        self.assertTrue(french_lang.is_forked)
         self.assertEquals(1020, fr_version_subtitles[0].start_time)
 
         spanish_lang = models.Video.objects.get(video_id=video_id).subtitle_language('es')
@@ -942,7 +924,7 @@ class TestRpc(TestCase):
         subtitle_set.append_subtitle(500, 1500, 'hey')
         subtitle_set.append_subtitle(1600, 2500, 'you')
 
-        rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml())
+        rpc.finished_subtitles(request, session_pk, subtitle_set.to_xml(), forked=True)
         return Video.objects.get(pk=session.video.pk)
 
     def test_edit_cicle_creates_only_one_version(self):
@@ -1138,3 +1120,58 @@ class TestFormatConvertion(TestCase):
     def test_sbv(self):
         raw, parsed = self._retrieve('sbv')
         self.assertEqual(parsed[1], (1000, 2000, '1 - and *italics* and **bold** and >>.', {'new_paragraph': False}))
+
+class TestLineageOnRPC(TestCase):
+    def setUp(self):
+        self.video = test_factories.create_video()
+        self.user_0 = test_factories.create_user()
+
+    def _edit_and_save(self, video, language_code, sset, translated_from_language_code=None):
+        request = RequestMockup(self.user_0)
+
+        response = rpc.start_editing(request, self.video.video_id,
+            language_code, base_language_code=translated_from_language_code)
+        session_pk = response['session_pk']
+        rpc.finished_subtitles(request, session_pk, sset.to_xml())
+
+    def test_correct_lineage(self):
+
+        # German lineage for v1 should be en-v2
+        # for ge-v2 should be en-v3
+
+        # Create en-v1
+        en_v1_sset = create_subtitle_set()
+
+        self._edit_and_save(self.video, 'en', en_v1_sset)
+        en = self.video.newsubtitlelanguage_set.get(language_code='en')
+        en_v1 = en.subtitleversion_set.get(version_number=1)
+        self.assertEquals(en_v1.lineage, dict())
+
+        # create en-v2 with a changed timming
+        en_v2_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'en', en_v2_sset)
+        en_v2 = en.subtitleversion_set.get(version_number=2)
+        self.assertEquals(en_v2.lineage, {'en':1})
+
+        # create ge-v1 from en-v2
+        de_v1_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'de', de_v1_sset, 'en')
+        de = self.video.newsubtitlelanguage_set.get(language_code='de')
+        de_v1 = de.subtitleversion_set.get(version_number=1)
+        self.assertEquals(de_v1.lineage, {'en':2})
+
+        # rollback the en-v2 to en-v1
+        en_v3 = rollback_to(en_v1.subtitle_language.video,
+            en_v1.subtitle_language.language_code,
+            version_number=en_v1.version_number,
+            rollback_author=self.user_0)
+        # make sure this exists
+        en_v3 = en.subtitleversion_set.get(version_number=3)
+
+        # make sure we have the right lineages:
+        de_v2_sset = create_subtitle_set()
+        self._edit_and_save(self.video, 'de', de_v2_sset, 'en')
+        de_v2 = de.subtitleversion_set.get(version_number=2)
+        self.assertIn('en', de_v2.lineage)
+        self.assertEquals(de_v2.lineage['en'], 3)
+        self.assertEqual(en, de.get_translation_source_language())

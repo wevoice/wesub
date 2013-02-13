@@ -16,21 +16,21 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+
 (function() {
     /*
      * When you request a set of subtitles the api is hit if data is not yet on
      * the cache.
      */
 
-    var root, module, API_BASE_PATH;
-    var getSubtitleFetchAPIUrl, getSubtitleSaveAPIUrl, getVideoLangAPIUrl;
+    var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
+    var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
+    var root = this;
+    var module = angular.module('amara.SubtitleEditor.services', []);
 
-    API_BASE_PATH = '/api2/partners/videos/';
-    root = this;
-    module = angular.module('amara.SubtitleEditor.services', []);
-
-    getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
-        var url = API_BASE_PATH + videoId +
+    var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
+        var url = API_BASE_PATH_VIDEOS + videoId +
             '/languages/' + languageCode + '/subtitles/?format=dfxp';
 
         if (versionNumber) {
@@ -38,13 +38,16 @@
         }
         return url;
     };
-    getSubtitleSaveAPIUrl = function(videoId, languageCode) {
-        var url = API_BASE_PATH + videoId +
+    var getSubtitleSaveAPIUrl = function(videoId, languageCode) {
+        var url = API_BASE_PATH_VIDEOS + videoId +
             '/languages/' + languageCode + '/subtitles/';
         return url;
     };
-    getVideoLangAPIUrl = function(videoId) {
-        return API_BASE_PATH + videoId + '/languages/';
+    var getTaskSaveAPIUrl = function(teamSlug, taskID) {
+        return API_BASE_PATH_TEAMS + teamSlug + '/tasks/' + taskID + '/';
+    };
+    var getVideoLangAPIUrl = function(videoId) {
+        return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
 
     module.factory('SubtitleStorage', function($http) {
@@ -62,6 +65,9 @@
              * @param callback Function to be called with the dfxp xlm
              * once it's ready.
              */
+            getCachedData: function() {
+                return cachedData;
+            },
             getLanguages: function(callback) {
                 if (cachedData.languages && cachedData.languages.length === 0) {
                     var url = getVideoLangAPIUrl(cachedData.video.id);
@@ -84,7 +90,7 @@
                     var langObj = cachedData.languages[i];
                     if (langObj.code === languageCode){
                         for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].version_no === parseInt(versionNumber)){
+                            if (langObj.versions[j].version_no === parseInt(versionNumber, 10)){
                                 subtitlesXML = langObj.versions[j].subtitlesXML;
                                 break;
                             }
@@ -107,6 +113,41 @@
             },
             getVideoURL: function() {
                 return cachedData.video.videoURL;
+            },
+
+            approveTask: function(response, notes) {
+                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        complete: true,
+                        notes: notes,
+                        version_number: response.data.version_number
+                    }
+                });
+
+                return promise;
+            },
+            sendBackTask: function(response, notes) {
+                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        complete: true,
+                        notes: notes,
+                        send_back: true,
+                        version_number: response.data.version_number
+                    }
+                });
+
+                return promise;
+
             },
             saveSubtitles: function(videoID, languageCode, dfxpString){
                 // first we should save those subs locally
@@ -171,4 +212,5 @@
             }
         };
     });
+
 }).call(this);

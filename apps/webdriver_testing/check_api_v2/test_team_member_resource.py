@@ -17,28 +17,30 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
 
        One can list, update, delete and add video urls to existing videos.
     """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.user = UserFactory.create(username = 'TestUser', is_partner=True)
-        self.team_member = UserFactory.create(username = 'team_member')
-        data_helpers.create_user_api_key(self, self.user)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseTeamMemberResource, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create(username = 'TestUser', is_partner=True)
+        cls.team_member = UserFactory.create(username = 'team_member')
+        cls.data_utils.create_user_api_key(cls.user)
 
         #create an open team with description text and 2 members
-        self.open_team = TeamMemberFactory.create(
+        cls.open_team = TeamMemberFactory.create(
             team__name="A1 Waay Cool team",
             team__slug='a1-waay-cool-team',
             team__description='this is the coolest, most creative team ever',
-            user = self.user,
+            user = cls.user,
             ).team
 
-        TeamContributorMemberFactory.create(team=self.open_team, 
-            user = UserFactory.create(username = 'member'))
+        TeamContributorMemberFactory.create(team=cls.open_team, 
+                user = UserFactory.create(username = 'member'))
 
         #Open to the teams page so you can see what's there.
-        self.teams_dir_pg = TeamsDirPage(self)
-        self.teams_dir_pg.open_teams_page()
+        cls.teams_dir_pg = TeamsDirPage(cls)
+        cls.teams_dir_pg.open_teams_page()
 
     def test_members__list(self):
         """List off the existing team members.
@@ -47,7 +49,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         """
         expected_members = ['TestUser', 'member'] 
         url_part = 'teams/%s/members/' % self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         member_objects =  response['objects']
         members_list = []
         for k, v in itertools.groupby(member_objects, operator.itemgetter('username')):
@@ -65,8 +67,8 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
             'role': 'admin' 
             } 
 
-        url_part = 'teams/%s/members/member' % self.open_team.slug
-        status, response = data_helpers.put_api_request(self, url_part, updated_info) 
+        url_part = 'teams/%s/members/member/' % self.open_team.slug
+        status, response = self.data_utils.put_api_request(self.user, url_part, updated_info) 
         
         self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
@@ -94,13 +96,13 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
                         "role": "admin"
                        } 
         url_part = 'teams/%s/members/' % self.open_team.slug
-        status, response = data_helpers.post_api_request(self, url_part, user_details) 
+        status, response = self.data_utils.post_api_request(self.user, url_part, user_details) 
         
         self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
        
         url_part = 'teams/%s/members/' % self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part) 
         
         self.assertNotEqual(None, response, "Got a None response")
 
@@ -126,7 +128,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
                         "note": "we need you on our team"
                        } 
         url_part = 'teams/%s/safe-members/' % self.open_team.slug
-        status, response = data_helpers.post_api_request(self, 
+        status, response = self.data_utils.post_api_request(self.user, 
             url_part, user_details)
         
         #Login in a verify invitation message is displayed 
@@ -148,10 +150,10 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
                         "role": "contributor"
                        } 
         url_part = 'teams/%s/safe-members/' % self.open_team.slug
-        status, response = data_helpers.post_api_request(self, 
+        status, response = self.data_utils.post_api_request(self.user, 
             url_part, user_details) 
         
-        status, response = data_helpers.api_get_request(self, 'users/') 
+        status, response = self.data_utils.api_get_request(self.user, 'users/') 
         users_objects =  response['objects']
         users_list = []
         for k, v in itertools.groupby(users_objects, 
@@ -168,10 +170,10 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         """
         url_part = 'teams/%s/members/member' % self.open_team.slug
         
-        status, response = data_helpers.delete_api_request(self, url_part) 
+        status, response = self.data_utils.delete_api_request(self.user, url_part) 
         
         url_part = 'teams/%s/members/' % self.open_team.slug
-        status, response = data_helpers.api_get_request(self, url_part)
+        status, response = self.data_utils.api_get_request(self.user, url_part)
         self.assertNotEqual(None, response, "Got a None response")
 
         member_objects =  response['objects']

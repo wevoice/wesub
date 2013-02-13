@@ -177,18 +177,38 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex, 
     return c;
 };
 unisubs.subtitle.EditableCaptionSet.prototype.setTimesOnInsertedSub_ = function(insertedSub, prevSub, nextSub) {
-    var startTime = -1, endTime = -1;
-    if (nextSub.getStartTime() != -1) {
-        startTime = nextSub.getStartTime();
-        endTime = (nextSub.getEndTime() + nextSub.getStartTime()) / 2.0;
-    }
-    else if (prevSub && prevSub.getEndTime() != -1) {
-        startTime = prevSub.getEndTime();
-    }
-    if (startTime != -1) {
-        insertedSub.setStartTime(startTime);
-        if (endTime != -1)
-            insertedSub.setEndTime(endTime);
+    // if the gap between the prevSub.end_time and nextSub.start time is
+    // > a minimal, we insert the sub right there.
+    // Else, we take the time interval between the prevSub.startTime and nextSub.endTime
+    // and divide by 3, that's the duration of each of the subs now..
+
+    if (!nextSub.needsSync() && !prevSub.needsSync()){
+        // both are synced we can set actual time values for the new one
+         var gap = nextSub.getStartTime() - prevSub.getEndTime();
+        if (gap > 500){
+            // gap is enough to fit in a sub between it
+            insertedSub.setStartTime(prevSub.getEndTime());
+            insertedSub.setEndTime(nextSub.getStartTime());
+            return;
+        }
+        // no gap enough, so we need to divide times:
+        var initialTime = prevSub.getStartTime();
+        var finalTime = nextSub.getEndTime();
+        if (finalTime == -1){
+            // not synched can't rely on that timing
+            finalTime = nextSub.getStartTime();
+            // since there is no end time for the final one,
+            // we can only split the time between the first
+            // two
+            gap = (finalTime - initialTime) / 2;
+        }{
+
+            gap = (finalTime - initialTime) / 3;
+        }
+        prevSub.setEndTime(initialTime + gap);
+        insertedSub.setStartTime(prevSub.getEndTime());
+        insertedSub.setEndTime(prevSub.getEndTime() + gap);
+        nextSub.setStartTime(insertedSub.getEndTime());
     }
 };
 

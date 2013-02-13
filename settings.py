@@ -768,8 +768,8 @@ MEDIA_BUNDLES = {
             'src/js/third-party/zepto.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
-            'src/js/embedder/popcorn.amaratranscript.js',
-            'src/js/embedder/popcorn.amarasubtitle.js',
+            'src/js/popcorn/popcorn.amaratranscript.js',
+            'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
@@ -857,6 +857,16 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
+        },
+        'api': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
+        },
+        'youtube': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
         }
     },
 }

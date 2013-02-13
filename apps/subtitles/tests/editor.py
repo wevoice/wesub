@@ -76,28 +76,24 @@ class EditorViewTest(TestCase):
         self.assertEqual(self.user.username, data['authHeaders']['x-api-username'])
 
 
-    @skip
     def test_permission(self):
         # test public video is ok
         # test video on hidden team to non members is not ok
         # test video on public team with memebership requirements
         pass
 
-    @skip
     def test_writelock(self):
         # test two users can't access the same langauge at the same time
         # expire the first write lock
         # test second user can aquire it
         pass
 
-    @skip
     def test_translated_language_present(self):
         # make sure if the subtitle version to be edited
         # is a translation, that we bootstrap the data correctly on
         # the editor data
         pass
 
-    @skip
     def test_stand_alone_langauge_loads(self):
         # make sure the view doesn't blow up if there is
         # no translation to be showed

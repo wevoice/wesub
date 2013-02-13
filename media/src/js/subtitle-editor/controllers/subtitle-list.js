@@ -16,6 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+
 (function() {
 
     var root = this;
@@ -97,33 +99,108 @@
 
         $scope.$watch('version', $scope.versionChanged);
     };
-    var SaveSessionButtonController = function($scope, SubtitleListFinder) {
+    var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
+        $scope.cancel = function($event) {
+
+            $event.preventDefault();
+
+            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
+
+            $scope.$root.$emit('show-loading-modal', 'Canceled. Redirecting…');
+            window.location = '/videos/' + subtitleListScope.videoID;
+
+        };
+        $scope.getNotes = function() {
+            var collabScope = angular.element($('section.collab').get(0)).scope();
+            return collabScope.notes || '';
+        };
+        $scope.saveAndApprove = function($event) {
+
+            $scope.saveSession().then(function(response) {
+                if ($scope.status === 'saved') {
+
+                    $scope.status = 'approving';
+
+                    SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
+
+                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
+                        window.location = response['data']['site_url'];
+
+                    }, function onError() {
+                        $scope.status = 'error';
+                        window.alert('Sorry, there was an error...');
+                    });
+                }
+            });
+
+        };
+        $scope.saveAndExit = function($event) {
+
+            $event.preventDefault();
+
+            $scope.saveSession().then(function(response) {
+                if ($scope.status === 'saved') {
+
+                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
+                    window.location = response['data']['site_url'];
+
+                }
+            });
+        };
+        $scope.saveAndSendBack = function() {
+            $scope.saveSession().then(function(response) {
+                if ($scope.status === 'saved') {
+
+                    $scope.status = 'sending-back';
+
+                    SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
+
+                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
+                        window.location = response['data']['site_url'];
+                        
+                    }, function onError() {
+                        $scope.status = 'error';
+                        window.alert('Sorry, there was an error...');
+                    });
+
+                }
+            });
+        };
         $scope.saveSession = function() {
             if ($scope.status !== 'saving') {
                 $scope.status = 'saving';
 
                 var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
 
-                promise.then(function onSuccess() {
+                promise.then(function onSuccess(response) {
                     $scope.status = 'saved';
                 }, function onError() {
                     $scope.status = 'error';
                     window.alert('Sorry, there was an error...');
                 });
+
+                return promise;
             }
         };
         $scope.toggleSaveDropdown = function($event) {
             $scope.dropdownOpen = !$scope.dropdownOpen;
             $event.preventDefault();
         };
-        $scope.$root.$on('workDone', function() {
+
+        $scope.$root.$on('approve-task', function() {
+            $scope.saveAndApprove();
+        });
+        $scope.$root.$on('send-back-task', function() {
+            $scope.saveAndSendBack();
+        });
+        $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
             $scope.$digest();
         });
 
     };
-    var SubtitleListController = function($scope, SubtitleStorage) {
+    var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -150,7 +227,6 @@
 
             // Update the subtitles on the list scope.
             $scope.updateParserSubtitles();
-
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - 359;
@@ -184,8 +260,13 @@
             $scope.subtitles = $scope.parser.getSubtitles().get();
 
             $scope.status = 'ready';
-            $scope.$broadcast('onSubtitlesFetched');
 
+            // When we have subtitles for an editable set, tell the kids.
+            $timeout(function() {
+                if ($scope.isEditable) {
+                    $scope.$broadcast('subtitlesFetched');
+                }
+            });
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.parser.removeSubtitle(subtitle);
@@ -214,7 +295,6 @@
         window.onresize = function() {
             $scope.$digest();
         };
-
     };
     var SubtitleListHelperController = function($scope) {
 
@@ -228,7 +308,6 @@
             $scope.isEditingAny = false;
             $scope.$digest();
         });
-
     };
     var SubtitleListItemController = function($scope) {
         /**
@@ -239,7 +318,9 @@
 
         var initialText;
 
+        $scope.empty = false;
         $scope.isEditing = false;
+        $scope.showStartTime = $scope.parser.startTimeFromNode($scope.subtitle) > 0;
 
         $scope.finishEditingMode = function(newValue) {
 
@@ -251,9 +332,7 @@
             var content = $scope.parser.content($scope.subtitle, newValue);
 
             if (content !== initialText) {
-                // mark dirty variable on root scope so we can allow
-                // saving the session
-                $scope.$root.$emit('workDone');
+                $scope.$root.$emit('work-done');
             }
         };
         $scope.getSubtitleIndex = function() {
@@ -261,25 +340,35 @@
         };
         $scope.startEditingMode = function() {
 
-            initialText =  $scope.parser.content($scope.subtitle);
+            initialText = $scope.parser.content($scope.subtitle);
 
-            $scope.isEditing  = true;
+            $scope.isEditing = true;
 
             // Tell the root scope that we're editing, now.
             $scope.$root.$emit('editing');
 
             return initialText;
         };
-        $scope.textChanged = function(newText) {
-            $scope.parser.content($scope.subtitle, newText);
-        };
 
+        $scope.$on('subtitlesFetched', function() {
+            // When subtitles are first retrieved, we need to set up the amarasubtitle
+            // on the video and bind to this scope.
+            //
+            // This will happen on the video controller. Just throw an event stating that
+            // we're ready.
+
+            $scope.$root.$emit('subtitleReady', $scope);
+        });
+    };
+    var VideoTitleController = function($scope, SubtitleStorage) {
+        $scope.title = "Oh hai.";
     };
 
     root.LanguageSelectorController = LanguageSelectorController;
-    root.SaveSessionButtonController = SaveSessionButtonController;
+    root.SaveSessionController = SaveSessionController;
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListHelperController = SubtitleListHelperController;
     root.SubtitleListItemController = SubtitleListItemController;
+    root.VideoTitleController = VideoTitleController;
 
 }).call(this);

@@ -1,51 +1,37 @@
 # -*- coding: utf-8 -*-
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import auth_page
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.pages.site_pages.teams import members_tab
 from apps.webdriver_testing.pages.site_pages import user_messages_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
+from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
-from apps.teams.models import TeamMember
 
 class TestCaseMembersTab(WebdriverTestCase):
-    """Verify edit of member roles and restrictions.
+    """Verify edit of member roles and restrictions.  """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-       Scenario: Assign another admin with no restrictions
-       Scenario: Assign an admin with project restrictions
-       Scenario: Asign a manager with no restrictions
-       Scenario: Assign a manager with project restrictions
-       Scenario: Assign a manager with language restrictions
-       Scenario: Assign a manager with project and language restrictions
-       Scenario: Invite user via form
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseMembersTab, cls).setUpClass()
+        cls.team_dir_pg = TeamsDirPage(cls)
+        cls.user_message_pg = user_messages_page.UserMessagesPage(cls)
 
-
-    """
-
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.team_dir_pg = TeamsDirPage(self)
-        self.user_message_pg = user_messages_page.UserMessagesPage(self)
-
-        self.members_tab = members_tab.MembersTab(self)
-        self.team = TeamMemberFactory.create(team__name='Roles Test',
-                                             team__slug='roles-test',
-                                             user__username='team_owner',
-                                             ).team
-        self.manager_test_user = TeamMemberFactory.create(team=self.team,
-                                 user=UserFactory.create(username=
-                                                         'promotedToManager'),
-                                 role=TeamMember.ROLE_CONTRIBUTOR)
-        self.admin_test_user = TeamMemberFactory.create(team=self.team,
-                                 user=UserFactory.create(username=
-                                                         'promotedToAdmin'),
-                                 role=TeamMember.ROLE_CONTRIBUTOR)
-        TeamProjectFactory.create(team=self.team,
-                                  name='my translation project',
-                                  workflow_enabled=True,
-                                  )
+        cls.members_tab = members_tab.MembersTab(cls)
+        cls.team_owner =  UserFactory.create()
+        cls.team = TeamMemberFactory.create(team__name='Members tab roles Test',
+                                            user = cls.team_owner).team
+        cls.promoted_manager = TeamContributorMemberFactory.create(
+                               team=cls.team,
+                               user = UserFactory()).user
+        cls.promoted_admin = TeamContributorMemberFactory.create(
+                             team=cls.team,
+                             user = UserFactory()).user
+        cls.project = TeamProjectFactory.create(team=cls.team, 
+                                                workflow_enabled=True,)
+        cls.members_tab.open_members_page(cls.team.slug)
 
 
     def test_invitation_form(self):
@@ -53,18 +39,17 @@ class TestCaseMembersTab(WebdriverTestCase):
 
         """
         user = UserFactory.create()
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.open_members_page('roles-test')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.open_members_page(self.team.slug)
         self.members_tab.invite_user_via_form(username = user.username,
                                               message = 'Join my team',
                                               role = 'Contributor')
-        self.members_tab.log_out()
         self.members_tab.log_in(user.username, 'password')
         self.assertEqual(1, user.team_invitations.count())
         self.assertEqual(1, self.team.invitations.count())
         #Verify the user gets the message displayed.
         self.user_message_pg.open_messages()
-        self.assertTrue('team_owner has invited you' in 
+        self.assertTrue('has invited you' in 
             self.user_message_pg.message_text())
 
 
@@ -74,19 +59,22 @@ class TestCaseMembersTab(WebdriverTestCase):
            Verify the display of the roles in the members tab.
         """
  
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
         self.members_tab.edit_user(role="Manager")
-        self.members_tab.member_search('roles-test', 'promotedToManager')
-        self.assertEqual(self.members_tab.user_role(), 
-                      'Manager')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
+        self.assertEqual(self.members_tab.user_role(), 'Manager')
 
     def test_assign__manager_lang_restrictions(self):
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+        self.members_tab.log_in(self.team_owner, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
         self.members_tab.edit_user(
             role="Manager", languages=['English', 'French'])
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
 
         self.assertEqual(self.members_tab.user_role(), 
                       'Manager for French, and English languages')
@@ -96,15 +84,16 @@ class TestCaseMembersTab(WebdriverTestCase):
 
            Verify the display of the roles in the members tab.
         """
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
         self.members_tab.edit_user(
-            role="Manager", projects=['my translation project'],
+            role="Manager", projects=self.project.name,
             languages=['English', 'French'])
-        self.members_tab.member_search('roles-test', 'promotedToManager')
-        self.assertEqual(self.members_tab.user_role(), 
-                      ('Manager for my translation project project '
-                       'and for French, and English languages'))
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
+        self.assertEqual(self.members_tab.user_role(), ('Manager for %s project '
+                    'and for French, and English languages' % self.project.name))
 
 
     def test_assign__manager_project_restrictions(self):
@@ -112,13 +101,15 @@ class TestCaseMembersTab(WebdriverTestCase):
 
            Verify the display of the roles in the members tab.
         """
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
         self.members_tab.edit_user(
-            role="Manager", projects=['my translation project'])
-        self.members_tab.member_search('roles-test', 'promotedToManager')
+            role="Manager", projects=self.project.name)
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_manager.username)
         self.assertEqual(self.members_tab.user_role(), 
-                      'Manager for my translation project project')
+                      'Manager for %s project' % self.project.name)
 
 
     def test_assign__admin(self):
@@ -126,10 +117,12 @@ class TestCaseMembersTab(WebdriverTestCase):
 
            Verify the display of the roles in the members tab.
         """
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToAdmin')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_admin.username)
         self.members_tab.edit_user(role="Admin")
-        self.members_tab.member_search('roles-test', 'promotedToAdmin')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_admin.username)
         self.assertEqual(self.members_tab.user_role(), 
                       'Admin')
 
@@ -139,11 +132,13 @@ class TestCaseMembersTab(WebdriverTestCase):
 
            Verify the display of the roles in the members tab.
         """
-        self.members_tab.log_in('team_owner', 'password')
-        self.members_tab.member_search('roles-test', 'promotedToAdmin')
+        self.members_tab.log_in(self.team_owner.username, 'password')
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_admin.username)
         self.members_tab.edit_user(
-            role="Admin", projects=['my translation project'])
-        self.members_tab.member_search('roles-test', 'promotedToAdmin')
+            role="Admin", projects=self.project.name)
+        self.members_tab.member_search(self.team.slug, 
+                                       self.promoted_admin.username)
         self.assertEqual(self.members_tab.user_role(), 
-                      'Admin for my translation project project')
+                      'Admin for %s project' % self.project.name)
 

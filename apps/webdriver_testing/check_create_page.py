@@ -20,10 +20,19 @@
 from apps.webdriver_testing.pages.site_pages import create_page
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 
-class TestCaseVideosCreateVideos(WebdriverTestCase):
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.create_pg = create_page.CreatePage(self)
+class TestCaseCreateVideos(WebdriverTestCase):
+    """ TestSuite for video submission tests. """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseCreateVideos, cls).setUpClass()
+        cls.create_pg = create_page.CreatePage(cls)
+        cls.create_pg.open_create_page()
+    
+
+    def tearDown(self):
+        super(TestCaseCreateVideos, self).setUp()
         self.create_pg.open_create_page()
 
     def test_create__youtube(self):
@@ -39,8 +48,6 @@ class TestCaseVideosCreateVideos(WebdriverTestCase):
         """Add a brightcove video.
 
         """
-        #Brightcove support added under this ticket: 
-        #https://unisubs.sifterapp.com/issues/1648
         url = 'http://bcove.me/8yxc6sxy'
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
@@ -110,12 +117,23 @@ class TestCaseVideosCreateVideos(WebdriverTestCase):
         self.assertTrue(self.create_pg.submit_success())
 
 
-class TestCaseAddFeeds(WebdriverTestCase):
-    """Test Suite for adding video feeds.
 
-    """
+class TestCaseAddFeeds(WebdriverTestCase):
+    """ TestSuite for adding video feeds. """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseAddFeeds, cls).setUpClass()
+        cls.create_pg = create_page.CreatePage(cls)
+        cls.create_pg.open_create_page()
+    
+
+    def tearDown(self):
+        self.create_pg.open_create_page()
+
     def setUp(self):
-        WebdriverTestCase.setUp(self)
+        super(TestCaseAddFeeds, self).setUp()
         self.create_pg = create_page.CreatePage(self)
         self.create_pg.open_create_page()
 
@@ -123,7 +141,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a youtube user feed
 
         """
-
         youtube_user = 'croatiadivers'
         self.create_pg.submit_youtube_users_videos(youtube_user, save=True)
         self.assertTrue(self.create_pg.multi_submit_successful())
@@ -132,7 +149,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a youtube user url feed
 
         """
-
         url = "http://www.youtube.com/user/jdragojevic"
         self.create_pg.submit_youtube_user_page(url, save=True)
         self.assertTrue(self.create_pg.multi_submit_successful())
@@ -141,7 +157,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a vimeo feed
 
         """
-
         url = "http://vimeo.com/jeroenhouben/videos/rss"
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
@@ -150,7 +165,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a dailymotion feed
 
         """
-
         url = "http://www.dailymotion.com/rss/user/WildFilmsIndia/1"
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
@@ -167,7 +181,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a blip feed
 
         """
-
         url = "http://blip.tv/stitchnbitch/rss"
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
@@ -176,7 +189,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a individual blip video as feed (blip workaround)
 
         """
-
         url = ('http://blip.tv/cord-cutters/'
                'cord-cutters-sync-mobile-media-with-miro-4-5280931?skin=rss')
         self.create_pg.submit_feed_url(url)
@@ -186,7 +198,6 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a youtube feed
 
         """
-
         url = "http://gdata.youtube.com/feeds/api/users/janetefinn/uploads"
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())

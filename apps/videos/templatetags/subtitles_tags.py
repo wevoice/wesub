@@ -97,7 +97,7 @@ def display_subtitle(text):
     if not text:
         return ""
     # FIXME: implement from dfxp formatting to html
-    return bleach.clean(text, tags=['em', 'u', 'strong', 'span', 'p'])
+    return bleach.clean(text, tags=['em', 'u', 'strong', 'span', 'p', 'br'])
 
 @register.filter
 def is_synced_value(val):

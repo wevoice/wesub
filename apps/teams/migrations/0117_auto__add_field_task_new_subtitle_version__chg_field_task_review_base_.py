@@ -5,31 +5,22 @@ from south.v2 import SchemaMigration
 from django.db import models
 
 class Migration(SchemaMigration):
-    
+
+    depends_on = (
+        ("subtitles", "0001_initial"),
+    )
+
     def forwards(self, orm):
-        
+
         # Adding field 'Task.new_subtitle_version'
         db.add_column('teams_task', 'new_subtitle_version', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleVersion'], null=True, blank=True), keep_default=False)
 
-        # Changing field 'Task.review_base_version'
-        db.alter_column('teams_task', 'review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, null=True, to=orm['videos.SubtitleVersion']))
-
-        # Changing field 'Task.subtitle_version'
-        db.alter_column('teams_task', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion'], null=True, blank=True))
-    
-    
     def backwards(self, orm):
-        
+
         # Deleting field 'Task.new_subtitle_version'
         db.delete_column('teams_task', 'new_subtitle_version_id')
 
-        # Changing field 'Task.review_base_version'
-        db.alter_column('teams_task', 'review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['subtitles.SubtitleVersion'], blank=True))
 
-        # Changing field 'Task.subtitle_version'
-        db.alter_column('teams_task', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleVersion'], null=True, blank=True))
-    
-    
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -378,5 +369,5 @@ class Migration(SchemaMigration):
             'writelock_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         }
     }
-    
+
     complete_apps = ['teams']

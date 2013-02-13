@@ -16,6 +16,9 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var angular = angular || null;
+var SubtitleListItemController = SubtitleListItemController || null;
+
 (function($) {
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
@@ -27,11 +30,36 @@
             }
         };
     });
+    directives.directive('subtitleEditor', function(SubtitleStorage) {
+        return {
+            compile: function compile(elm, attrs, transclude) {
+                return {
+                    post: function post(scope, elm, attrs) {
+
+                        $(elm).on('keydown', function(e) {
+
+                            var video = angular.element($('#video').get(0)).scope();
+
+                            // Space with shift, toggle play / pause.
+                            if (e.keyCode === 32 && e.shiftKey) {
+                                e.preventDefault();
+                                video.togglePlay();
+                            }
+
+                        });
+
+                    }
+                };
+            }
+        };
+    });
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
-        var isEditable;
-        var selectedScope, selectedController, activeTextArea,
-            rootEl;
+        var activeTextArea,
+            rootEl,
+            selectedController,
+            selectedScope,
+            value;
 
         function onSubtitleItemSelected(elm) {
             /**
@@ -40,8 +68,6 @@
              * mark this one as being edited, creating the textarea for
              * editing.
              */
-            // make sure this works if the event was trigger in the
-            // originating li or any descendants
 
             elm = $(elm).hasClass('subtitle-list-item') ?
                       elm : $(elm).parents('.subtitle-list-item');
@@ -49,7 +75,6 @@
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
 
-            // make sure the user clicked on the list item
             if (controller instanceof SubtitleListItemController) {
                 if (selectedScope) {
                     selectedScope.finishEditingMode(activeTextArea.val());
@@ -58,13 +83,13 @@
                 activeTextArea = $('textarea', elm);
                 selectedScope = scope;
 
-                var editableText = selectedScope.startEditingMode();
-
-                activeTextArea.val(editableText);
+                activeTextArea.val(selectedScope.startEditingMode());
                 selectedScope.$digest();
 
                 activeTextArea.focus();
                 activeTextArea.autosize();
+
+                selectedScope.$root.$broadcast('subtitleSelected', selectedScope);
             }
         }
         function onSubtitleTextKeyDown(e) {
@@ -78,74 +103,58 @@
              * Any other key: do nothing.
              */
 
-            var keyCode = e.keyCode;
-
-            var parser = selectedScope.parser;
-            var subtitle = selectedScope.subtitle;
-            var subtitles = selectedScope.subtitles;
-
-            var video = angular.element($('#video').get(0)).scope();
-
             var nextSubtitle;
 
-            // Enter / return without shift.
-            if (keyCode === 13 && !e.shiftKey) {
+            var $currentSubtitle = $(e.currentTarget).parent();
 
-                var $currentSubtitle = $(e.currentTarget).parent();
+            // Tab without shift.
+            if (e.keyCode === 9 && !e.shiftKey) {
 
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
 
-                var index = parser.getSubtitleIndex(subtitle, subtitles) + 1;
+                // If canAddAndRemove is true and this is the last subtitle in the set,
+                // save the current subtitle and create a new subtitle at the end.
+                if (selectedScope.canAddAndRemove) {
+                    if ($currentSubtitle.next().length === 0) {
 
-                // If this is the last subtitle in the set, save the current subtitle,
-                // and create a new subtitle at the end.
-                if (selectedScope.subtitles[index] === undefined) {
+                        // Save the current subtitle.
+                        selectedScope.finishEditingMode(activeTextArea.val());
 
-                    // Save the current subtitle.
-                    selectedScope.finishEditingMode(activeTextArea.val());
+                        // Passing true as the last argument indicates that we want
+                        // to select this subtitle after it is created.
+                        selectedScope.addSubtitle(null, {}, '', true);
 
-                    // Passing true as the last argument indicates that we want
-                    // to select this subtitle after it is created.
-                    selectedScope.addSubtitle(index - 1, {}, '', true);
+                        // Apply the current scope.
+                        selectedScope.$apply();
 
+                    }
                 }
 
-                // Apply the current scope.
-                selectedScope.$apply();
-
-                // Set the element to select.
+                // Set the next subtitle to be the one after this.
                 nextSubtitle = $currentSubtitle.next().get(0);
 
             }
 
-            // Tab without shift.
-            if (keyCode === 9 && !e.shiftKey) {
-
-                // TODO: This needs to bubble up so we can handle tab
-                // and shift + tab on the document level, not only when
-                // you're selected into a subtitle.
+            // Tab with shift.
+            if (e.keyCode === 9 && e.shiftKey) {
 
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
-                
-                // Move the video forward four seconds.
-                video.playChunk(video.pop.currentTime(), 4);
+
+                // Set the next subtitle to be the one before this.
+                nextSubtitle = $currentSubtitle.prev().get(0);
 
             }
-            
-            // Tab with shift.
-            if (keyCode === 9 && e.shiftKey) {
 
-                // TODO: This needs to bubble up so we can handle tab
-                // and shift + tab on the document level, not only when
-                // you're selected into a subtitle.
+            // Space with shift.
+            if (e.keyCode === 32 && e.shiftKey) {
+
+                // We're letting this event bubble up to the subtitleEditor directive
+                // where it will trigger the appropriate video method.
 
                 // Keep the cursor in the current subtitle.
                 e.preventDefault();
-
-                // Move the video backwards four seconds.
-                video.playChunk(video.pop.currentTime() - 4, 4);
 
             }
 
@@ -157,12 +166,29 @@
                 // Focus on the active textarea.
                 activeTextArea.focus();
 
-            } else {
-
-                // Otherwise, just save the current subtitle.
-                selectedScope.textChanged(activeTextArea.val());
-
             }
+        }
+        function onSubtitleTextKeyUp(e) {
+
+            var newText = activeTextArea.val();
+
+            // Save the content to the DFXP wrapper.
+            selectedScope.parser.content(selectedScope.subtitle, newText);
+
+            // Cache the value for a negligible performance boost.
+            value = activeTextArea.val();
+
+            selectedScope.empty = value === '';
+            selectedScope.characterCount = value.length;
+
+            selectedScope.$root.$emit('subtitleKeyUp', {
+                parser: selectedScope.parser,
+                subtitles: $(selectedScope.subtitles),
+                subtitle: selectedScope,
+                value: value
+            });
+
+            selectedScope.$digest();
 
         }
 
@@ -173,21 +199,26 @@
                     post: function post(scope, elm, attrs) {
 
                         scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-                        isEditable = attrs.editable === 'true';
 
-                        if (isEditable) {
+                        scope.isEditable = attrs.editable === 'true';
+                        scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
+
+                        if (scope.isEditable) {
                             $(elm).click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
                             $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
+                            $(elm).on('keyup', 'textarea', onSubtitleTextKeyUp);
 
                             // In order to catch an <esc> key sequence, we need to catch
                             // the keycode on the document, not the list. Also, keyup must
                             // be used instead of keydown.
                             $(document).on('keyup', function(e) {
                                 if (e.keyCode === 27) {
-                                    selectedScope.finishEditingMode(activeTextArea.val());
-                                    selectedScope.$digest();
+                                    if (selectedScope) {
+                                        selectedScope.finishEditingMode(activeTextArea.val());
+                                        selectedScope.$digest();
+                                    }
                                 }
                             });
 
@@ -211,8 +242,8 @@
 
                             });
                         }
-                        scope.setVideoID(attrs['videoId']);
-                        scope.setLanguageCode(attrs['languageCode']);
+                        scope.setVideoID(attrs.videoId);
+                        scope.setLanguageCode(attrs.languageCode);
                         SubtitleListFinder.register(attrs.subtitleList, elm,
                             angular.element(elm).controller(), scope);
                     }

@@ -17,11 +17,40 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.contrib import admin
+from django import forms
 from models import ThirdPartyAccount, YoutubeSyncRule
 
 
+class ThirdPartyAccountAdminForm(forms.ModelForm):
+
+    users = forms.fields.CharField(
+            help_text="List of users that have this account (changing this field does nothing)")
+    teams = forms.fields.CharField(
+            help_text="List of teams that have this account (changing this field does nothing)")
+
+    def __init__(self, *args, **kwargs):
+        super(ThirdPartyAccountAdminForm, self).__init__(*args, **kwargs)
+
+        users = self.instance.users.all()
+        users = ", ".join([u.username for u in users])
+
+        teams = self.instance.teams.all()
+        teams = ", ".join([u.slug for u in teams])
+
+        self.fields['users'].initial = users
+        self.fields['teams'].initial = teams
+
+        self.fields['users'].widget.attrs['readonly'] = True
+        self.fields['teams'].widget.attrs['readonly'] = True
+
+    class Meta:
+        model = ThirdPartyAccount
+
+
 class ThirdPartyAccountAdmin(admin.ModelAdmin):
-    list_display = ('type', 'username',)
+    list_display = ('type', 'full_name', 'username',)
+    search_fields = ('full_name', 'username',)
+    form = ThirdPartyAccountAdminForm
 
 
 admin.site.register(ThirdPartyAccount, ThirdPartyAccountAdmin)

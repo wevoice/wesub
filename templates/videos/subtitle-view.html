@@ -209,7 +209,7 @@
                             </div>
                         </li>
                         {% for item in subtitle_lines %}
-                        <li class="subtitle-item">
+                        <li class="subtitle-item {%if item.meta.new_paragraph %} start-of-paragraph{% endif %}">
                             {% if item.0 != None %}
                             <div class="timing">
                                 <a class="time_link" href="#" title="Play video here">
@@ -227,7 +227,7 @@
                             </div>
                             {% endif %}
                             <div class="translation-text">
-                                {{ item.2|display_subtitle|safe }}
+                                {{ item.2|display_subtitle|safe|linebreaksbr }}
                             </div>
                         </li>
                         {% endfor %}

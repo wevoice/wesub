@@ -17,6 +17,8 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from babelsubs.storage import  SubtitleSet
+
 from apps.videos.models import Video
 from apps.subtitles.models import SubtitleLanguage
 
@@ -59,4 +61,8 @@ def parent_ids(version):
 def ancestor_ids(version):
     return ids(version.get_ancestors())
 
-
+def make_subtitle_set(language_code, num_subs=4):
+    sset = SubtitleSet(language_code)
+    for x in xrange(0, num_subs):
+        sset.append_subtitle(x*1000, x*1000 - 1, "Sub %s" % x)
+    return sset

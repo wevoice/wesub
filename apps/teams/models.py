@@ -56,6 +56,10 @@ from subtitles.models import (
     SubtitleLanguage as NewSubtitleLanguage
 )
 from subtitles import pipeline
+from videos.models import Video, SubtitleLanguage, SubtitleVersion
+from subtitles.models import (
+    SubtitleVersion as NewSubtitleVersion,
+)
 
 from functools import partial
 
@@ -798,7 +802,7 @@ class TeamVideo(models.Model):
                 destination_team=new_team, video=self.video)
 
 
-def _create_translation_tasks(team_video, subtitle_version):
+def _create_translation_tasks(team_video, subtitle_version=None):
     """Create any translation tasks that should be autocreated for this video.
 
     subtitle_version should be the original SubtitleVersion that these tasks
@@ -856,7 +860,7 @@ def autocreate_tasks(team_video):
     #       new team for translation, but we can probably be smarter about this
     #       if we spend some time.
     if workflow.autocreate_translate and existing_subtitles:
-        _create_translation_tasks(team_video, existing_subtitles[0].get_tip(public=True))
+        _create_translation_tasks(team_video)
 
 
 def team_video_save(sender, instance, created, **kwargs):
@@ -1698,7 +1702,7 @@ class Task(models.Model):
             )
             comment.save()
             notifier.send_video_comment_notification.delay(
-                comment.pk, version_pk=self.subtitle_version.pk)
+                comment.pk, version_pk=self.new_subtitle_version.pk)
 
     def future(self):
         """Return whether this task expires in the future."""
@@ -1754,8 +1758,7 @@ class Task(models.Model):
                     language=self.language, type=type, 
                     assignee=assignee)
 
-        if type == Task.TYPE_IDS['Review']:
-            task.new_subtitle_version = self.new_subtitle_version
+        task.new_subtitle_version = self.new_subtitle_version
 
         task.set_expiration()
 
@@ -1767,6 +1770,8 @@ class Task(models.Model):
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
+        assert self.new_subtitle_version != None, 'to complete a task, subtitle version cannot be None'
+
         self.completed = datetime.datetime.now()
         self.save()
 
@@ -1778,12 +1783,22 @@ class Task(models.Model):
 
     def _can_publish_directly(self, subtitle_version):
         from teams.permissions import can_publish_edits_immediately
+
+        type = {10: 'Review',
+                20: 'Review',
+                30: 'Approve'}.get(self.type)
+
+        tasks = (Task.objects._type([type], True, 'Approved')
+                             .filter(language=self.language))
+
         return (can_publish_edits_immediately(self.team_video,
                                                     self.assignee,
                                                     self.language) and
                 subtitle_version and
                 subtitle_version.previous_version() and
-                subtitle_version.subtitle_language.is_complete_and_synced())
+                subtitle_version.previous_version().is_public() and
+                subtitle_version.subtitle_language.is_complete_and_synced() and 
+                tasks.exists())
 
     def _find_previous_assignee(self, type):
         """Find the previous assignee for a new review/approve task for this video.

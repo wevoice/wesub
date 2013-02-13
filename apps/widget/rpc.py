@@ -332,22 +332,26 @@ class Rpc(BaseRpc):
 
         language = video.subtitle_language(language_code)
 
-        if (language and language.is_complete_and_synced()
-                     and team.moderates_videos()
-                     and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
-            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-            
         # Check that there are no open tasks for this action.
         tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
+        task = None
 
         if tasks:
             task = tasks[0]
             # can_assign verify if the user has permission to either
             # 1. assign the task to himself
             # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
+            if not user.is_authenticated() or \
+               (task.assignee and task.assignee != user) or \
+               (not task.assignee and not can_assign_task(task, user)):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
+
+        if (language and language.is_complete_and_synced()
+                     and team.moderates_videos()
+                     and not can_post_edit_subtitles(team, user)
+                     and not task):
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
+            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
 
         # Check that the team's policies don't prevent the action.
         if mode not in ['review', 'approve']:
@@ -413,7 +417,22 @@ class Rpc(BaseRpc):
         language.save()
 
         # Create the subtitling session and subtitle version for these edits.
-        session = self._make_subtitling_session(request, language, base_language_code, video_id)
+
+        # we determine that a it's a translation if:
+        # - the front end specifically said to translate from (base_language_code)
+        # - The language has another source in it's lineage and it is not marked as forking
+        translated_from_code  = None
+        translated_from = None
+
+        if base_language_code:
+            translated_from_code = base_language_code
+        elif language.is_forked == False:
+            translated_from_code = language.get_translation_source_language_code()
+
+        if translated_from_code:
+            translated_from = language.video.subtitle_language(translated_from_code)
+
+        session = self._make_subtitling_session(request, language, translated_from_code, video_id)
         version_for_subs, version_number = self._get_version_to_edit(language, session)
 
         args = {'session': session}
@@ -428,15 +447,6 @@ class Rpc(BaseRpc):
         subtitles = self._subtitles_dict(**args)
         # this is basically how it worked before. don't ask.
         subtitles['forked'] = base_language_code is None
-
-        # we determine that a it's a translation if:
-        # - the front end specifically said to translate from (base_language_code)
-        # - The language has another source in it's lineage and it is not marked as forking
-        translated_from_code = base_language_code or (not language.is_forked and language.get_translation_source_language_code())
-        translated_from = None
-
-        if translated_from_code:
-            translated_from = language.video.subtitle_language(translated_from_code)
 
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
@@ -912,7 +922,7 @@ class Rpc(BaseRpc):
         subtitle_version.visibility = 'private'
         subtitle_version.save()
 
-        if subtitle_version.is_dependent():
+        if subtitle_version.subtitle_language.get_translation_source_language_code() != None:
             task_type = Task.TYPE_IDS['Translate']
             can_do = can_create_and_edit_translations
         else:
@@ -1196,6 +1206,7 @@ class Rpc(BaseRpc):
                         break
                 # if we reached this point, we have no good matches
                 language = candidates[0]
+
         editable = language.can_writelock(request.browser_id)
 
         if editable:
@@ -1236,7 +1247,6 @@ class Rpc(BaseRpc):
             raise ValueError("You need to specify either language or version")
 
         latest_version = language.get_tip() if language else None
-        translated_from = session.base_language if session else None
         is_latest = False
 
         if not version and not latest_version:
@@ -1253,6 +1263,11 @@ class Rpc(BaseRpc):
 
         if latest_version is None or version_number >= latest_version.version_number:
             is_latest = True
+
+        if session:
+            translated_from = session.base_language
+        else:
+           translated_from = language.get_translation_source_language()
 
         return self._make_subtitles_dict(
             subtitles,

@@ -218,6 +218,23 @@ class TestSubtitleLanguage(TestCase):
         _assert_version(sl_1_en, None, version_number=3)
         _assert_version(sl_1_en, None, version_number=2023)
 
+    def test_is_imported_from_youtube_and_not_worked_on(self):
+        from subtitles.pipeline import add_subtitles
+        sl_en = make_sl(self.video, 'en')
+
+        subtitles_1 = [
+            (0, 1000, 'Hello there'),
+        ]
+        subtitles_2 = [
+            (0, 1000, 'Hello there'),
+            (1000, 2000, 'Hello there'),
+        ]
+
+        add_subtitles(self.video, 'en', subtitles_1, note='From youtube')
+        self.assertTrue(sl_en.is_imported_from_youtube_and_not_worked_on)
+
+        add_subtitles(self.video, 'en', subtitles_2)
+        self.assertFalse(sl_en.is_imported_from_youtube_and_not_worked_on)
 
 class TestSubtitleVersion(TestCase):
     def setUp(self):

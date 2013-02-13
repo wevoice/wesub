@@ -55,6 +55,7 @@ unisubs.subtitle.MSServerModel = function( sessionPK, videoID, videoURL, editabl
     this.taskNotes = null;
     this.taskApproved = null;
     this.taskType = null;
+    window.server = this;
 };
 
 goog.inherits(unisubs.subtitle.MSServerModel, goog.Disposable);
@@ -112,8 +113,7 @@ unisubs.subtitle.MSServerModel.prototype.saveSubsLocally_ = function() {
     unisubs.widget.SavedSubtitles.saveLatest(savedSubs);
 };
 unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
-    var initialSubs = this.fetchInitialSubs_();
-    return !initialSubs.CAPTION_SET.identicalTo(this.captionSet_);
+    return this.captionSet_.count() > 0;
 };
 unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristineSubtitlesJSON) {
     this.pristineSubtitlesJSON = pristineSubtitlesJSON;
@@ -153,7 +153,6 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
         args['new_title'] = this.captionSet_.title;
         atLeastOneThingChanged = true;
     }
-
 
     if (goog.isDefAndNotNull(this.captionSet_.description) &&
         this.captionSet_.description != initialCaptionSet.description) {

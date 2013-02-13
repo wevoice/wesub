@@ -810,6 +810,19 @@ class SubtitleLanguage(models.Model):
         tip = self.get_tip(public=True)
         return tip.unpublish() if tip else None
 
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.all()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
+
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
@@ -1034,7 +1047,14 @@ class SubtitleVersion(models.Model):
         assert self.visibility in ('public', 'private',), \
             "Version visibility must be either 'public' or 'private'!"
 
-        Action.create_caption_handler(self, self.created)
+        from django.conf import settings
+        if hasattr(settings, 'TERN_IMPORT') and settings.TERN_IMPORT:
+            # This check is a shim for the data import.  We can delete it once
+            # that's done and just always create an action.
+            pass
+        else:
+            Action.create_caption_handler(self, self.created)
+
         return super(SubtitleVersion, self).save(*args, **kwargs)
 
 

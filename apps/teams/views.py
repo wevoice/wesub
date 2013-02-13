@@ -1575,8 +1575,12 @@ def assign_task_ajax(request, slug):
         if not assignee:
             return HttpResponseForbidden(u'Invalid assignment attempt - assignee is empty (%s).' % assignee)
 
+        if task.assignee == assignee:
+            return { 'success': True }
+
         task.assignee = assignee
         task.set_expiration()
+
         task.save()
         notifier.team_task_assigned.delay(task.pk)
 

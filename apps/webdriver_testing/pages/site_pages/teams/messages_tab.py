@@ -82,7 +82,7 @@ class MessagesTab(ATeamPage):
         """
 
         self._customize_messages(**messages)
-        self.click_by_css(self._SAVE_CHANGES)
+        self.submit_by_css(self._SAVE_CHANGES)
 
     def edit_guidelines(self, guidelines):
         """Edit the text of the guidelines fields and save.

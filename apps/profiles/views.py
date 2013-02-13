@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+
+import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -36,8 +38,13 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
-from videos.models import Action, VideoUrl, Video
 from subtitles.models import SubtitleLanguage
+from videos.models import (
+    Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
+)
+
+
+logger = logging.getLogger(__name__)
 
 
 rpc_router = RpcRouter('profiles:rpc_router', {
@@ -291,7 +298,7 @@ def remove_third_party(request, account_id):
     if account_type == 'generic':
         account = get_object_or_404(ThirdPartyAccount, pk=account_id)
         display_type = account.get_type_display()
-        uid = account.username
+        uid = account.full_name
 
         if account not in request.user.third_party_accounts.all():
             raise Http404
@@ -313,6 +320,18 @@ def remove_third_party(request, account_id):
             raise Http404
 
     if request.method == 'POST':
+        if account.type == VIDEO_TYPE_YOUTUBE:
+            # Delete the corresponding VideoFeed
+            username = account.username.replace(' ', '')
+            url = "https://gdata.youtube.com/feeds/api/users/%s/uploads" % username
+            try:
+                feed = VideoFeed.objects.filter(url=url)
+                feed.delete()
+            except VideoFeed.DoesNotExist:
+                logger.error("Feed for youtube account doesn't exist", extra={
+                    "youtube_username": username
+                })
+
         account.delete()
         messages.success(request, _('Account deleted.'))
         return redirect('profiles:account')

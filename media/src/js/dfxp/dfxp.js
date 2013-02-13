@@ -24,13 +24,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
      * time expressions to milliseconds.
      */
 
-    MARKUP_REPLACE_SEQ = [
-        // Order matters, need to apply double markers first.
+    var MARKUP_REPLACE_SEQ = [
         [/(\*\*)([^\*]+)(\*\*)/g, '<span tts:fontWeight="bold">$2</span>'],
         [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>'],
         [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
-    DFXP_REPLACE_SEQ = [
+    var DFXP_REPLACE_SEQ = [
         ["span[tts\\:fontWeight='bold']", "**"],
         ["span[tts\\:fontStyle='italic']", "*"],
         ["span[tts\\:textDecoration='underline']", "_"],
@@ -46,6 +45,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
     var that = this;
     var $ = window.AmarajQuery? window.AmarajQuery.noConflict(): window.$;
+    var AmarajQuery = window.AmarajQuery || null;
 
     this.init = function(xml) {
 
@@ -61,7 +61,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // When we get subtitles from the server, they will contain DFXP-style
         // formatting for bold, italic, etc. Convert them back to Markdown.
         var $preXml = $(xml.documentElement);
-        var $preSubtitles = $('div p', $preXml);
+        var $preSubtitles = $('p', $preXml);
 
         // Convert subtitles from DFXP to Markdown.
         for (var i = 0; i < $preSubtitles.length; i++) {
@@ -75,15 +75,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Store the working XML for local edits.
         this.$xml = $preXml.clone();
 
-        // Cache the query for the containing div.
-        //
-        // TODO: This is broken because there may be multiple containing divs.
-        // The only reliable container is a <body> element.
-        this.$div = $('div', this.$xml);
+        // Cache the first div.
+        this.$firstDiv = $('div:first-child', this.$xml);
 
         // Convert both subtitle sets to milliseconds.
-        this.convertTimes('milliseconds', $('div p', this.$originalXml));
-        this.convertTimes('milliseconds', $('div p', this.$xml));
+        this.convertTimes('milliseconds', $('p', this.$originalXml));
+        this.convertTimes('milliseconds', $('p', this.$xml));
 
         return this;
     };
@@ -192,7 +189,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // on the fly from a string.
             //
             // TODO: Do something that makes more sense.
-            xmlString = xmlString.replace(/span xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, 'span');
+            //
+            // Update: What in the mother is going on here?
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
 
             // Hey look, more hacks. For some reason, when the XML is spit to a
             // string, the attributes are all lower-cased. Fix them here.
@@ -202,7 +203,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
             return xmlString;
         }
-
     };
 
     this.addSubtitle = function(after, newAttrs, content) {
@@ -221,7 +221,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: new subtitle element
          */
 
-        if (typeof after != 'number') {
+        if (typeof after !== 'number') {
 
             // If we have subtitles, default placement should be at the end.
             if (this.subtitlesCount()) {
@@ -245,16 +245,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $newSubtitle = $(newSubtitle).attr(newAttrs);
 
-
         // Finally, place the new subtitle.
         //
         // If after is -1, we need to place the subtitle at the beginning.
         if (after === -1) {
 
-            // Prepend this new subtitle directly inside of the containing div.
-            // TODO: This is broken because there may be multiple containing
-            // divs.
-            this.$div.prepend($newSubtitle);
+            // Prepend the new subtitle to the first div.
+            this.$firstDiv.prepend($newSubtitle);
 
         // Otherwise, place it after the designated subtitle.
         } else {
@@ -277,7 +274,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return $newSubtitle.get(0);
     };
     this.addSubtitleNode = function (newSubtitle, after){
-        if (typeof after != 'number') {
+        if (typeof after !== 'number') {
 
             // If we have subtitles, default placement should be at the end.
             if (this.subtitlesCount()) {
@@ -290,7 +287,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         if (after === -1) {
 
-            this.$div.prepend(newSubtitle);
+            // Prepend the new subtitle to the first div.
+            this.$firstDiv.prepend(newSubtitle);
 
             // Otherwise, place it after the designated subtitle.
         } else {
@@ -301,7 +299,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // Then place it.
             $previousSubtitle.after(newSubtitle);
         }
-    }
+    };
     this.changesMade = function() {
         /*
          * Check to see if any changes have been made to the working XML.
@@ -312,7 +310,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var originalString = that.utils.xmlToString(that.$originalXml.get(0));
         var xmlString = that.utils.xmlToString(that.$xml.get(0));
 
-        return originalString != xmlString;
+        return originalString !== xmlString;
     };
     this.clearAllContent = function() {
         /*
@@ -341,17 +339,17 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var parser =  new this.constructor();
         parser.init(this.xmlToString(true));
         if (!preserveText){
-            $('div p', parser.$xml).text('');
+            $('p', parser.$xml).text('');
         }
         return parser;
     };
     this.cloneSubtitle = function (indexOrElement, preserveText){
-        var $subtitle = this.getSubtitle(indexOrElement).clone()
+        var $subtitle = this.getSubtitle(indexOrElement).clone();
         if (!preserveText){
             $subtitle.text('');
         }
         return $subtitle;
-    }
+    };
     this.content = function(indexOrElement, content) {
         /*
          * Either get or set the HTML content for the subtitle.
@@ -372,10 +370,24 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // the rendered HTML that way. Then remove the temporary div.
         //
         // Reference: http://bit.ly/SwbPeR
-        return $('<div>').append($subtitle.contents().clone()).remove().html();
 
+        var subtitleContents = $subtitle.contents();
+
+        for (var i = 0; i < subtitleContents.length; i++) {
+            
+            // Single newlines in subtitle text nodes will report as two newlines
+            // when we use contents().
+            //
+            if (subtitleContents[i].data === '\n\n') {
+
+                // Set them to single newlines.
+                subtitleContents[i].data = '\n';
+            }
+        }
+
+        return $('<div>').append(subtitleContents.clone()).remove().html();
     };
-    this.contentRenderedFromRaw = function(node) {
+    this.contentRenderedFromNode = function(node) {
         /*
          * Pass the actual subtitle node, and get the raw nodeValue parsed
          * into Markdown-style HTML. Useful when you know you're getting
@@ -424,7 +436,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 sub.attr('end', convertFn.call(this, currentEndTime));
             }
         }
-
     };
     this.dfxpToMarkdown = function(node) {
         /**
@@ -443,7 +454,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         for (var i = 0; i < DFXP_REPLACE_SEQ.length; i++) {
             selector = DFXP_REPLACE_SEQ[i][0];
             marker = DFXP_REPLACE_SEQ[i][1];
-            $targets = $(selector, node);
+            var $targets = $(selector, node);
 
             for (var t = 0; t < $targets.length; t++) {
                 var $target = $targets.eq(t);
@@ -462,18 +473,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof endTime !== 'undefined') {
-            if (parseFloat(endTime)) {
+            if (parseFloat(endTime) || endTime === 0) {
                 $subtitle.attr('end', endTime);
             } else {
                 $subtitle.attr('end', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
-        return parseFloat($subtitle.attr('end')) || -1;
+        var val =  parseFloat($subtitle.attr('end')) ;
+
+        return isNaN(val) ? -1 : val;
     };
     this.getFirstSubtitle = function() {
         /*
@@ -542,9 +556,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          *
          * Returns: integer
          */
-
+        subtitles = subtitles || this.getSubtitles();
         return $(subtitles).index(subtitle);
-
     };
     this.getSubtitle = function(indexOrElement) {
         /*
@@ -602,7 +615,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: jQuery selection of nodes
          */
 
-        return $('div p', this.$xml);
+        return $('p', this.$xml);
     };
     this.isShownAt = function(indexOrElement, time) {
         /*
@@ -644,16 +657,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g,
-              replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g,
-              replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g,
-              replaceWith: "<u>$2</u>" },
-            { match: /(\r\n|\n|\r)/gm,
-              replaceWith: "<br />" },
-            { match: / {2}/g,
-              replaceWith: "&nbsp;&nbsp;" }
+            { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
+            { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
+            { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+            { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
+            { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
         ];
 
         for (var i = 0; i < replacements.length; i++) {
@@ -664,7 +672,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         return text;
-
     };
     this.needsAnySynced = function() {
         /*
@@ -698,21 +705,22 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Otherwise, we're good.
         return false;
     };
-    this.needsAnyTranscribed = function() {
+    this.needsAnyTranscribed = function($subtitles) {
         /*
          * Check all of the subtitles for empty content.
          *
          * Returns: true || false
          */
 
-        var $subtitles = this.getSubtitles();
+        if (!$subtitles) {
+            $subtitles = this.getSubtitles();
+        }
 
         for (var i = 0; i < $subtitles.length; i++) {
 
             var $subtitle = $subtitles.eq(i);
-            var content = $('<div>').append($subtitle.contents().clone()).remove().html();
 
-            if (content === '') {
+            if ($subtitle.text() === '') {
                 return true;
             }
         }
@@ -765,7 +773,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         return $subtitle.attr('originalcontent');
-
     };
     this.originalEndTime = function(indexOrElement, originalEndTime) {
         /*
@@ -816,8 +823,25 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitleParent = $subtitle.parent();
 
-        $subtitle.remove();
+        // If the parent div has only one child, remove the parent div along with this
+        // subtitle.
+        if ($subtitleParent.children('p').length === 1) {
+
+            // If the parent div is the first div, only remove the subtitle.
+            if ($subtitleParent.get(0) === this.$firstDiv.get(0)) {
+                $subtitle.remove();
+            
+            // Otherwise, remove the parent.
+            } else {
+                $subtitleParent.remove();
+            }
+
+        // Otherwise, there are other subtitles in this parent div. Only remove the subtitle.
+        } else {
+            $subtitle.remove();
+        }
 
         return true;
     };
@@ -828,7 +852,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true
          */
 
-        this.getSubtitles().remove();
+        // Remove everything inside the body.
+        $('body > *', this.$xml).remove();
+
+        // Create a new original container for new subs.
+        var newDiv = document.createElementNS('http://www.w3.org/ns/ttml', 'div');
+        $('body', this.$xml).append(newDiv);
+
+        this.$firstDiv = $(newDiv);
+
 
         return true;
     };
@@ -871,23 +903,65 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        // If startOrParagraph was passed, we need to do something.
+        //
+        // Otherwise, we'll just return the current state.
         if (typeof startOfParagraph !== 'undefined') {
 
-            // If the subtitle is not the first child, then we need to wrap
-            // the subtitle in a div.
             if (startOfParagraph) {
+                // This subtitle should now indicate that it is the start of a paragraph.
+
+                // If the subtitle is not the first child, then we need to
+                // close the previous div, and open a new div before this subtitle.
                 if (!$subtitle.is(':first-child')) {
-                     $subtitle.wrap('<div>');
+
+                    // Get the next siblings after this subtitle. We'll need to move them
+                    // into our containing div later.
+                    var $allNextSiblings = $subtitle.nextAll();
+
+                    // Get the parent containing div of this subtitle. We'll need to move
+                    // the new group of subtitles after the parent.
+                    var $parentDiv = $subtitle.parent('div');
+
+                    // Wrap the subtitle in a div.
+                    $subtitle.wrap('<div>');
+
+                    // Get the newly created div.
+                    var $newDiv = $subtitle.parent('div');
+
+                    // Append the siblings to the new div.
+                    $newDiv.append($allNextSiblings);
+
+                    // Move the new containing div after the original parent div.
+                    $parentDiv.after($newDiv);
                 }
-            } else if ($subtitle.is(':first-child') &&
-                       $subtitle.parent().get(0) !== this.$div.get(0)) {
-                $subtitle.unwrap();
+            
+            // startOfParagraph is false. Check to see if this is a valid subtitle to unmark
+            // as a start of a paragraph. We can't unmark any non-first-children, or if the
+            // subtitle is the first-child of the first div.
+            } else if ($subtitle.is(':first-child') && $subtitle.parent().get(0) !== this.$firstDiv.get(0)) {
+                // This subtitle should no longer indicate that it is the start of a paragraph.
+
+                // Get the current div that we'll be removing.
+                var $currentDiv = $subtitle.parent();
+
+                // Get previous div.
+                var $previousDiv = $currentDiv.prev();
+
+                // Get all of the subtitles inside of this subtitle's containing div.
+                var $subtitlesInDiv = $subtitle.parent().children('p');
+
+                // Move the subtitles in the current div to the previous div.
+                $previousDiv.append($subtitlesInDiv);
+
+                // Remove the current div.
+                $currentDiv.remove();
             }
         }
 
         return $subtitle.is(':first-child');
     };
-    this.startTime = function(indexOrElement, startTime) {
+    this.startTime = function(indexOrElement, startTime, inSeconds) {
         /*
          * Either get or set the start time for the subtitle.
          *
@@ -896,19 +970,34 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         var $subtitle = this.getSubtitle(indexOrElement);
 
+        if (!$subtitle ) {
+            return -1;
+        }
+
         if (typeof startTime !== 'undefined') {
-            if (parseFloat(startTime)) {
+            if (parseFloat(startTime) || startTime === 0) {
                 $subtitle.attr('begin', startTime);
             } else {
                 $subtitle.attr('begin', '');
             }
         }
 
-        if (!$subtitle ) {
-            return -1;
-        }
+        var val =  parseFloat($subtitle.attr('begin')) ;
 
-        return parseFloat($subtitle.attr('begin')) || -1;
+        return isNaN(val) ? -1 : val;
+    };
+    this.startTimeFromNode = function(node) {
+        /*
+         * Retrieves the start time from the node, and converts it to seconds.
+         * This is primarily for speed and display in a UI.
+         */
+
+        var startTime = node.getAttribute('begin');
+
+        var val = parseFloat(startTime / 1000);
+
+        return isNaN(val) ? -1 : val;
+
     };
     this.subtitlesCount = function() {
         /*
@@ -938,7 +1027,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         // If we need to convert Markdown to DFXP, do it here.
         if (convertMarkdownToDFXP) {
-            var $subtitles = $('div p', $cloned);
+            var $subtitles = $('p', $cloned);
 
             for (var i = 0; i < $subtitles.length; i++) {
                 var $subtitle = $subtitles.eq(i);
@@ -946,7 +1035,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
                 // If the converted text is different from the subtitle text, it
                 // means we were able to convert some Markdown to DFXP.
-                if (convertedText != $subtitle.text()) {
+                if (convertedText !== $subtitle.text()) {
 
                     // First, empty out the subtitle's text.
                     $subtitle.text('');
@@ -960,7 +1049,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         // Since our back-end is expecting time expressions, we may need to convert
         // the working XML's times to time expressions.
         if (convertToTimeExpression) {
-            this.convertTimes('timeExpression', $('div p', $cloned));
+            this.convertTimes('timeExpression', $('p', $cloned));
         }
 
         return this.utils.xmlToString($cloned.get(0));

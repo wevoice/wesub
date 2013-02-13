@@ -15,23 +15,30 @@ class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
     """
+    NEW_BROWSER_PER_TEST_CASE = True
 
     def setUp(self):
-        WebdriverTestCase.setUp(self)
-        data_helpers.set_skip_howto(self.browser)
+        super(TestCaseTranscribing, self).setUp()
+        self.data_utils = data_helpers.DataHelpers()
+        td = {'url': ('http://qa.pculture.org/amara_tests/'
+                   'Birds_short.webmsd.webm')
+             }
+        self.test_video = self.data_utils.create_video(**td)
         self.video_pg = video_page.VideoPage(self)
-        self.user = UserFactory.create(username = 'user')
+        self.user = UserFactory.create()
+        self.video_pg.open_video_page(self.test_video.video_id)
+        self.video_pg.log_in(self.user.username, 'password')
+        self.video_pg.set_skiphowto()
         self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
         self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
         self.video_pg.log_in(self.user.username, 'password')
-        self.test_video = data_helpers.create_video(self)
-        self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.add_subtitles()
         self.create_modal.create_original_subs('English', 'English')
-        #self.create_modal.continue_past_help()
         self.typed_subs = self.sub_editor.type_subs()
 
+    def tearDown(self):
+        super(TestCaseTranscribing, self).tearDown()
 
     def test_display__normal(self):
         """Manually entered unsynced subs display in editor.
@@ -57,9 +64,10 @@ class TestCaseTranscribing(WebdriverTestCase):
         Note: the browser needs to be open for about 80 seconds for saving.
         """
 
-        print 'sleeping for 90 seconds to trigger the save'
+        self.logger.info( 'sleeping for 90 seconds to trigger the save')
         time.sleep(90)
-        self.sub_editor.open_page("")
+        self.logger.info('On page: %s' % self.sub_editor.current_url())
+        self.sub_editor.open_page("http://www.google.com")
         self.sub_editor.handle_js_alert('accept')
         time.sleep(5)
         self.video_pg.open_video_page(self.test_video.video_id)
@@ -69,10 +77,6 @@ class TestCaseTranscribing(WebdriverTestCase):
 
         # Resume dialog - click OK
         self.create_modal.resume_dialog_ok()
- 
-        # Helper videos click continue
-        self.create_modal.continue_past_help()
-        time.sleep(5)
         self.assertEqual(self.typed_subs, self.sub_editor.subtitles_list())
 
     def test_download(self):

@@ -65,44 +65,57 @@ class DashboardTab(ATeamPage):
                     return el
             except:
                 continue
+    def _has_languages(self, video):
+        try:
+            lang_el = video_el.find_element_by_css_selector(
+                    self._VIDEO_LANGS)
+        except:
+            self.logger.info('No create links found for the video %s' %video)
+            return None
 
 
-    def languages_needed(self, video, click_lang=None):
-        """Return a list of languages displayed as needed on a particular video.
+
+    def languages_needed(self, video):
+        """Return a list of languages displayed as needed for video.
 
         """
         langs_needed = []
         video_el = self._video_element(video)
         try:
-            lang_el = video_el.find_element_by_css_selector(
-                    self._VIDEO_LANGS)
+            lang_el = video_el.find_element_by_css_selector(self._VIDEO_LANGS)
+            self.logger.info(lang_el.text)
         except:
-            self.logger.info('No create subtitles links found for the video ' 
-                             '%s' %video)
+            self.logger.info('No create links found for the video %s' %video)
             return None
+
         if 'languages need your help' in lang_el.text:
             show_el = video_el.find_element_by_css_selector(self._SHOW_LANGS)
             show_el.click()
             lang_list = video_el.find_elements_by_css_selector(
                 self._LANG_LIST)
             for el in lang_list:
-                if el.text == click_lang:
-                    self.logger.info('Clicking the %s text: ' % click_lang)
-                    el.click()
-                    return
+                self.logger.info(el.text)
                 langs_needed.append(el.text)
         else:
-            if lang_el.text == click_lang:
-                self.logger.info('Clicking the %s text: ' % click_lang)
-                lang_el.click()
-                return
+            self.logger.info(lang_el.text)
             langs_needed.append(lang_el.text)
-
-        self.logger.info('Returning the list of languages needed %s' % langs_needed)
+        self.logger.info('List of languages needed %s' % langs_needed)
         return langs_needed
 
+    def click_lang_task(self, video, language):
+        video_el = self._video_element(video)
+        langs = video_el.find_elements_by_css_selector(self._VIDEO_LANGS)
+        if 'languages need your help' in langs[0].text:
+            video_el.find_element_by_css_selector(self._SHOW_LANGS).click()
+            els = self.get_elements_list(self._LANG_LIST)
+            for el in els:
+                if language in el.text:
+                    el.click()
+        else:
+            assert language in langs[0].text
+            langs[0].click()
 
-
+            
     def _dash_task_info(self):
         task_els = self.get_elements_list(self._TASK_VIDEO)
         print len(task_els)
@@ -123,10 +136,5 @@ class DashboardTab(ATeamPage):
         for task in all_tasks:
             if task_type in task['action'] and title in task['title']:
                 return True
-
-
-
-
-
 
         

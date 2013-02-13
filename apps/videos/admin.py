@@ -86,7 +86,7 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     #    for some reason.
     # 2. It's only 20 extra queries, so it's not the end of the world.
     list_display = ['video_title', 'is_original', 'language', 'is_complete',
-                    'had_version', 'subtitle_count']
+                    'had_version', 'subtitle_count', 'new_subtitle_language']
     list_filter = ['is_original', 'is_complete']
     search_fields = ['video__title', 'video__video_id', 'language']
     raw_id_fields = ['video']

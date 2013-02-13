@@ -252,11 +252,16 @@ unisubs.subtitle.SubtitleList.prototype.scrollToCaption = function(captionID) {
             subtitleWidget.getElement(),
             this.getElement(), true);
 };
-unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing, timeChanged, subtitleWidget) { this.currentlyEditing_ = editing; if (editing) {
+unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing, timeChanged, subtitleWidget) {
+
+    this.currentlyEditing_ = editing;
+
+    if (editing) {
         this.videoPlayer_.pause();
     }
     else {
         var subStartTime = subtitleWidget.getSubtitle().getStartTime();
+
         if (timeChanged) {
             this.videoPlayer_.playWithNoUpdateEvents(subStartTime, 2);
         }

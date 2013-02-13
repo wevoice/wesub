@@ -34,7 +34,6 @@ from django.utils.dateformat import format as date_format
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import slugify
-from django.utils.http import urlquote_plus
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 
@@ -402,9 +401,13 @@ class Video(models.Model):
         return vurl.effective_url if vurl else None
 
     @classmethod
-    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None):
+    def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, fetch_subs_async=True):
         assert video_url or vt, 'should be video URL or VideoType'
         from types.base import VideoTypeError
+        from videos.tasks import (
+            save_thumbnail_in_s3,
+            add_amara_description_credit_to_youtube_video
+        )
 
         try:
             vt = vt or video_type_registrar.video_type_for_url(video_url)
@@ -430,15 +433,17 @@ class Video(models.Model):
                 return video_url_obj.video, False
             except VideoUrl.DoesNotExist:
                 obj = Video()
-                obj = vt.set_values(obj)
+                # video types can can fecth subtitles might do it async:
+                kwargs = {}
+                if vt.CAN_IMPORT_SUBTITLES:
+                    kwargs['fetch_subs_async'] = fetch_subs_async
+                obj = vt.set_values(obj, **kwargs)
                 if obj.title:
                     obj.slug = slugify(obj.title)
                 obj.user = user
                 obj.save()
 
-                from videos.tasks import save_thumbnail_in_s3
                 save_thumbnail_in_s3.delay(obj.pk)
-
                 Action.create_video_handler(obj, user)
 
                 #Save video url
@@ -470,6 +475,12 @@ class Video(models.Model):
             if hasattr(vt, 'username'):
                 video_url_obj.owner_username = vt.username
                 video_url_obj.save()
+
+        if vt.abbreviation == VIDEO_TYPE_YOUTUBE:
+            # Only try to update the Youtube description once we have made sure
+            # that we have set the owner_username.
+            add_amara_description_credit_to_youtube_video.delay(video.video_id)
+
         return video, created
 
     @property
@@ -914,10 +925,10 @@ class SubtitleLanguage(models.Model):
 
     # Fields for the big DMR migration.
     needs_sync = models.BooleanField(default=True, editable=False)
-    new_subtitle_language = models.OneToOneField('subtitles.SubtitleLanguage',
-                                                 related_name='old_subtitle_version',
-                                                 null=True, blank=True,
-                                                 editable=False)
+    new_subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                              related_name='old_subtitle_version',
+                                              null=True, blank=True,
+                                              editable=False)
 
     subtitles_fetched_counter = RedisSimpleField()
 
@@ -1236,6 +1247,19 @@ class SubtitleLanguage(models.Model):
     @property
     def first_approved_version(self):
         return self.first_version_with_status(APPROVED)
+
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.all()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
 
 models.signals.m2m_changed.connect(User.sl_followers_change_handler, sender=SubtitleLanguage.followers.through)
 
@@ -1707,36 +1731,6 @@ def update_followers(sender, instance, created, **kwargs):
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
 
-
-def restrict_versions(version_qs, user, subtitle_language):
-    """Filter the given queryset of SubtitleVersions for the user.
-
-    Returns a list of SubtitleVersions the user has permission to see.
-
-    This function performs several DB queries, so try not to call it more than
-    once per page.
-
-    This will realize the queryset into a list, so do any other filtering you
-    might need before you call this function.
-
-    """
-    from teams.permissions import get_member
-
-    versions = list(version_qs)
-
-    # Videos that don't have team videos aren't moderated, so all versions
-    # should be viewable.
-    team_video = subtitle_language.video.get_team_video()
-    if not team_video:
-        return versions
-
-    # Members can always view all versions for their team's videos.
-    member = get_member(user, team_video.team)
-    if member:
-        return versions
-
-    # Non-members can only see public versions.
-    return filter(lambda v: v.is_public, version_qs)
 
 def has_viewable_draft(version, user):
     """Return whether the given version has draft subtitles viewable by the user.
@@ -2518,6 +2512,8 @@ class VideoFeed(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
 
+    YOUTUBE_PAGE_SIZE = 25
+
     def __unicode__(self):
         return self.url
 
@@ -2533,11 +2529,36 @@ class VideoFeed(models.Model):
         except (IndexError, KeyError):
             pass
 
-        _iter = feed_parser.items(reverse=True, until=last_link, ignore_error=True)
+        checked_entries += self._create_videos(feed_parser, last_link)
+
+        if not last_link and 'youtube' in self.url:
+            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+
+            while next_url:
+                url = next_url[0].href
+                feed_parser = FeedParser(url)
+                checked_entries += self._create_videos(feed_parser, last_link)
+                next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+
+        return checked_entries
+
+    def _get_pages(self, total):
+        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
+
+        if pages > int(pages):
+            pages = int(pages) + 1
+        else:
+            pages = int(pages)
+
+        return pages
+
+    def _create_videos(self, feed_parser, last_link):
+        checked_entries = 0
+
+        _iter = feed_parser.items(since=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
             vt and Video.get_or_create_for_url(vt=vt, user=self.user)
             checked_entries += 1
 
         return checked_entries
-

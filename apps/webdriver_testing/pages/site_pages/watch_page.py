@@ -11,7 +11,7 @@ class WatchPage(VideoListings):
      elements and methods that pertain to those elements.
     """
 
-    _URL = "videos/watch"
+    _URL = "videos/watch/"
     _SEARCH = "form.search-form div#watch_search input#id_q"
     _SEARCH_PULLDOWN = "a#advanced_search"
     _SEARCH_ORIG_LANG = "select#id_video_lang"
@@ -114,6 +114,7 @@ class WatchPage(VideoListings):
         self.search_complete()
 
     def popular_current_sort(self):
+        self.wait_for_element_present(self._CURRENT_SORT)
         return self.get_text_by_css(self._CURRENT_SORT)
 
     def popular_sort(self, sort_param):

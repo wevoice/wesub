@@ -1,6 +1,6 @@
-(function (Popcorn) {
+var Popcorn = Popcorn || null;
 
-    // TODO: Document the hell out of this.
+(function (Popcorn) {
 
     var i = 0;
     var createDefaultContainer = function(context, id) {
@@ -12,9 +12,9 @@
         ctxContainer.id = id || Popcorn.guid();
         ctxContainer.className = 'amara-popcorn-subtitles';
 
-        style.width = media.offsetWidth + 'px';
+        style.width = '100%';
 
-        context.media.parentNode.childNodes[0].appendChild(ctxContainer);
+        context.media.parentNode.appendChild(ctxContainer);
 
         return ctxContainer;
     };
@@ -39,23 +39,29 @@
                 // use shared default container
                 options.container = this.container;
             }
-
             if (document.getElementById(options.container.id)) {
                 document.getElementById(options.container.id).appendChild(newdiv);
             }
             options.innerContainer = newdiv;
 
-            options.showSubtitle = function() {
-                options.innerContainer.innerHTML = options.text || '';
-            };
         },
         start: function(event, options){
-            options.innerContainer.style.display = 'block';
-            options.showSubtitle(options, options.text);
+            if (options.text !== '') {
+                options.innerContainer.style.display = 'inline-block';
+                options.innerContainer.innerHTML = options.text || '';
+            }
         },
         end: function(event, options) {
             options.innerContainer.style.display = 'none';
-            options.innerContainer.innerHTML = '';
+        },
+        _update: function(event, newOptions) {
+            event.innerContainer.innerHTML = event.text = newOptions.text;
+
+            if (newOptions.text === '') {
+                event.innerContainer.style.display = 'none';
+            } else {
+                event.innerContainer.style.display = 'inline-block';
+            }
         },
         _teardown: function (options) {
             options.container.removeChild(options.innerContainer);

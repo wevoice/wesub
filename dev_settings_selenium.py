@@ -20,6 +20,10 @@ import os
 from settings import *
 from dev_settings import *
 
+# We need unisubs-integration for the tests to pass
+if not USE_INTEGRATION:
+    raise AssertionError("unisubs-integration not present at %s" %
+                         INTEGRATION_PATH)
 #There are differences in the configs for selenium testing when running 
 #in vagrant vm.
 
@@ -37,7 +41,8 @@ DATABASES = {
         }
     }
 
-INSTALLED_APPS + ('webdriver_testing',)
+INSTALLED_APPS + ('django_nose',
+                  'webdriver_testing',)
 
 JS_USE_COMPILED = False
 COMPRESS_MEDIA = False
@@ -69,6 +74,13 @@ STATIC_URL_BASE = STATIC_URL
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = ['--logging-filter=test_steps, -remote_connection, '
+             '-selenium.webdriver.remote.remote_connection',
+             '--with-xunit',
+             '--xunit-file=nosetests.xml',
+             #'--failed',
+            ]
+
 CELERY_ALWAYS_EAGER = True
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)

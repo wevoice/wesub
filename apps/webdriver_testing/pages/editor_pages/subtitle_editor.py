@@ -7,6 +7,7 @@ import time
 class SubtitleEditor(EditorDialogs):
 
     _EDITOR = 'div.unisubs-modal-widget'
+    _DIALOG_HEADING = 'div.unisubs-help-heading h2'
 
     #UNISUBS ON-VIDEO CONTROLS
     _VIDEO_PLAYBACK = 'div.unisubs-videoControls'
@@ -81,40 +82,33 @@ class SubtitleEditor(EditorDialogs):
         """Start and Stop playback to get the video buffered up to about 30%'
      
         """
-        self.logger.info('buffering up the video')
+        self.logger.info('buffering up the video...')
         self.play()
-        time.sleep(4)
+        self.wait_for_element_present(self._PAUSE)
+        time.sleep(2)
         self.pause()
-        buffered = 0
-        time.sleep(4)
-        if self.is_element_present(self._BUFFERED):
-            sys.stdout.write('buffering.')
-            count = 0
-            while buffered < 50 or count < 25:
-                buffered = self.get_size_by_css(self._BUFFERED)['width']
-                time.sleep(1)
-                count += 1
-                sys.stdout.write('.')
-        else:
-            time.sleep(10) #If no buffer, give it 10 secs to load a bit.
-      
+        start_time = time.time()
+        while time.time() - start_time < 30:
+            if (self.is_element_present(self._BUFFERED) and 
+                    self.get_size_by_css(self._BUFFERED)['width'] > 90):
+                break 
+            else:
+                time.sleep(0.1)
 
     def sync_subs(self, num_subs):
         """Syncs the given number of subtitles.
 
         """
-        self.logger.info('syncing subtitles') 
         self.buffer_video()
         self.play()
-        time.sleep(2)
+        time.sleep(3)
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):
-            time.sleep(3)
+            time.sleep(2)
+            self.logger.info('syncing') 
             self.click_by_css(self._SYNC)
-        time.sleep(1)
         self.pause()
-        time.sleep(2)
 
     def sub_timings(self, check_step=None):
         self.logger.info('getting the list of subtitle times')
@@ -128,6 +122,7 @@ class SubtitleEditor(EditorDialogs):
             timing_element)
         for el in timing_els:
             timing_list.append(el.text.strip())
+        self.logger.info(timing_list)
         return timing_list
 
             
@@ -174,10 +169,10 @@ class SubtitleEditor(EditorDialogs):
     def submit(self, complete=True):
         self.logger.info('submitting subtitles')
         self.continue_to_next_step()
-        time.sleep(2)
         self.mark_subs_complete(complete)
-        time.sleep(2)
         self.click_saved_ok()
-        
+
+    def dialog_title(self):
+        return self.get_text_by_css(self._DIALOG_HEADING) 
 
 

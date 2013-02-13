@@ -84,8 +84,9 @@ class SubtitlesUploadForm(forms.Form):
 
     def _verify_no_translation_conflict(self, subtitle_language,
                                         from_language_code):
+        existing_from_language =  subtitle_language.get_translation_source_language()
         existing_from_language_code = (
-            subtitle_language.get_translation_source_language_code() or '')
+            existing_from_language and existing_from_language.language_code) or ''
 
         # If the user said this is a translation, but the language already
         # exists and *isn't* a translation, fail.
@@ -94,6 +95,12 @@ class SubtitlesUploadForm(forms.Form):
             if language_is_not_a_translation and subtitle_language.get_tip():
                 raise forms.ValidationError(_(
                     u"The language already exists and is not a translation."))
+            # If it's marked as a translation from a different language, don't
+            # allow that until our UI can handle showing different reference
+            # languages
+            elif existing_from_language_code and existing_from_language_code != from_language_code:
+                raise forms.ValidationError(_(
+                    u"The language already exists as a translation from %s." % existing_from_language.get_language_code_display()))
 
     def _verify_no_dependents(self, subtitle_language):
         # You cannot upload to a language with dependents.
@@ -102,7 +109,7 @@ class SubtitlesUploadForm(forms.Form):
             raise forms.ValidationError(_(
                 u"Sorry, we cannot upload subtitles for this language "
                 u"because this would fork the %s translation(s) made from it."
-                % [sl.get_language_code_display() for sl in dependents]
+                % ", ".join([sl.get_language_code_display() for sl in dependents])
             ))
 
     def _verify_no_blocking_subtitle_translate_tasks(self, team_video,
