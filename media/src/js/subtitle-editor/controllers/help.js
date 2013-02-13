@@ -28,8 +28,6 @@
          * @constructor
          */
 
-        $scope.heading = 'Thanks for making subtitles!';
-        $scope.paragraph = 'It\'s easy as pie. Just watch the video and type everything you hear (and any important text that appears on the screen).';
         $scope.commands = [
             { key: 'shift + space', description: 'play / pause the video' },
             { key: 'shift + tab', description: 'move to the previous subtitle' },
