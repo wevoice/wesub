@@ -179,11 +179,11 @@ unisubs.player.WistiaVideoPlayer.prototype.videoSkip = function() {
     if (! this.player_) { return; }
     var speedmode = this.videoGetMode();
     if (speedmode == 'pl') { // beginner
-        this.player_.time(this.player_['time']() - 4)['play']();
+        this.player_['time'](this.player_['time']() - 4)['play']();
         var that = this;
         window.setTimeout(function () { that.player_['pause'](); }, 4000);
     } else {
-        this.player_.time(this.player_['time']() - 8)['play']();
+        this.player_['time'](this.player_['time']() - 8)['play']();
     }
 }
 
