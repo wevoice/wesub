@@ -5,7 +5,8 @@ from django.http import Http404
 from django.shortcuts import  get_object_or_404
 from django.utils.functional import  wraps
 
-from videos.models import Video, SubtitleVersion
+from videos.models import Video
+from subtitles.models import SubtitleVersion
 
 
 SHA1_RE = re.compile('^[a-f0-9]{40}$')

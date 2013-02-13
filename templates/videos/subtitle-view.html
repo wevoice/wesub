@@ -3,7 +3,7 @@
 {% block body_attrs %}id="video" class="v1 video_view"{% endblock %}
 {% block html_attrs %}id="subtitle_view"{% endblock %}
 
-{% load paginator widget comments i18n subtitles_tags teams_tags media_compressor videos_tags utils_tags %}
+{% load paginator widget comments i18n subtitles_tags teams_tags media_compressor videos_tags utils_tags i18n_tags %}
 
 {% block css %}
     {{ block.super }}
@@ -42,10 +42,10 @@
 {% endblock %}
 
 {% block title %}
-    {% if language.is_original %}
-        "{{ language.get_title_display }}" {% trans "with" %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
+    {% if language.is_primary_audio_language %}
+        "{{ last_version.title }}" {% trans "with" %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ language.get_title_display }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_display }} {% trans "subtitles" %} | Amara
+        "{{ last_version.title }}" {% trans "with" %} {% if language.is_dependent %}{% trans 'translated' %}{% endif %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
@@ -71,7 +71,7 @@
                 {% if language.is_original %}
                     {% trans 'Original' %}
                 {% endif %}
-                {{ language.get_language_display }}
+                {{ language.get_language_code_display }}
                 {% trans "subtitles" %}
             </a>
         </h3>
@@ -80,7 +80,7 @@
                 {% if not language.is_rtl %}
                 ←
                 {% endif %}
-                {{ language.get_title_display }}
+                {{ last_version.title }}
             </a>
         </h2>
         {% widget widget_params %}
@@ -97,8 +97,8 @@
         <ul class="metrics">
             <li>
                 <div>
-                    <p>{{ language.subtitles_fetched_count|simplify_number }}</p>
-                    <h4>{% trans "View" %}{{ language.subtitles_fetched_count|pluralize }}</h4>
+                    <p>{{ language.subtitles_fetched_counter.val|simplify_number }}</p>
+                    <h4>{% trans "View" %}{{ language.subtitles_fetched_counter.val|pluralize }}</h4>
                 </div>
             </li>
             <li>
@@ -115,8 +115,8 @@
             </li>
             <li>
                 <div>
-                    <p>{{ language.subtitle_count }}</p>
-                    <h4>{% trans "Line" %}{{ language.subtitle_count|pluralize }}</h4>
+                    <p>{{ last_version.subtitle_count }}</p>
+                    <h4>{% trans "Line" %}{{ last_version.subtitle_count|pluralize }}</h4>
                 </div>
             </li>
         </ul>
@@ -161,7 +161,7 @@
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
                     <a id="edit_subtitles_button" class="button{% if not last_version.is_public and not can_edit %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
-                {% if last_version.subtitles %}
+                {% if last_version.has_subtitles %}
                     <div class="sort_button action">
                         <div class='arrow'>
                         </div>
@@ -169,24 +169,11 @@
                             <strong>{% trans 'Download' %}</strong>
                         </span>
                         <ul>
-                            <li>
-                               <a href="{% url widget:download_srt %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">SRT</a>
+                          {% for format_name in downloadable_formats %}
+                             <li>
+                               <a href="{% url widget:download format_name %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_number }}">{{format_name|upper}}</a>
                             </li>
-                            <li>
-                                <a href="{% url widget:download_ssa %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">SSA</a>
-                            </li>
-                            <li>
-                                <a href="{% url widget:download_ttml %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">TTML</a>
-                            </li>
-                            <li>
-                                <a href="{% url widget:download_txt %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">TXT</a>
-                            </li>
-                            <li>
-                                <a href="{% url widget:download_sbv %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">SBV</a>
-                            </li>
-                            <li>
-                                <a href="{% url widget:download_dfxp %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ last_version.version_no }}">DFXP</a>
-                            </li>
+                          {% endfor %}
                         </ul>
                     </div>
                 {% endif %}
@@ -195,18 +182,18 @@
                 {% if last_version.has_subtitles %}
                     <p class="view-notice{% if not last_version.is_public %} draft{% endif %}">
                         {% if not last_version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
-                        {% if language.is_dependent %}
+                        {% if language.get_translation_source_language_code %}
                             {% trans "Subtitles" %}
                             {% trans 'translated from' %}
-                            {{ language.standard_language }}.
+                            {{  language.get_translation_source_language_code|to_localized_display }}.
                         {% endif %}
                         {% trans "Showing" %}
-                        <strong>{% trans "Revision" %} {{ last_version.version_no }}</strong>,
+                        <strong>{% trans "Revision" %} {{ last_version.version_number }}</strong>,
                         {% trans "created" %}
                         <strong>{{ last_version.revision_time }}</strong>
                         {% trans "by" %}
-                        <a href="{{ last_version.user.profile_url}}" title="View {{ last_version.user }}'s profile">
-                            <strong>{{ last_version.user }}</strong>
+                        <a href="{{ last_version.author.profile_url}}" title="View {{ last_version.author }}'s profile">
+                            <strong>{{ last_version.author }}</strong>
                         </a>.
                     </p>
 
@@ -221,16 +208,16 @@
                                 {{ last_version.description|urlize|linebreaks }}
                             </div>
                         </li>
-                        {% for item in last_version.ordered_subtitles %}
-                        <li {%if item.start_of_paragraph %}class="start-of-paragraph"{% endif %}>
-                            {% if item.has_start_time %}
+                        {% for item in subtitle_lines %}
+                        <li class="subtitle-item {%if item.meta.new_paragraph %} start-of-paragraph{% endif %}">
+                            {% if item.0 != None %}
                             <div class="timing">
                                 <a class="time_link" href="#" title="Play video here">
-                                    <span class="data">{{ item.start_time }}</span>
-                                    {{ item.start_time|format_sub_time }}
-                                    {% if item.has_end_time %}
+                                    <span class="data">{{ item.0 }}</span>
+                                    {{ item.0|format_sub_time }}
+                                    {% if item.1 %}
                                     –
-                                    {{ item.end_time|format_sub_time }}
+                                    {{ item.1|format_sub_time }}
                                     {% endif %}
                                 </a>
                             </div>
@@ -240,7 +227,7 @@
                             </div>
                             {% endif %}
                             <div class="translation-text">
-                                {{ item.text|display_subtitle|safe }}{% if item.start_of_paragraph %}<p class='quiet'>¶</p>{% endif %} 
+                                {{ item.2|display_subtitle|safe|linebreaksbr }}
                             </div>
                         </li>
                         {% endfor %}
@@ -307,27 +294,27 @@
                             <h3>
                                 <input type="checkbox" class="version_checkbox" value="{{ item.pk }}"/>
 
-                                {% if not item.language.language %}
+                                {% if not item.subtitle_language.language_code %}
                                     {# Hack to work around SubtitleLanguages with blank language attributes. #}
                                     {# Once those are gone we can remove this. #}
-                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang="unknown",lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang="unknown",lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_number }} - {{ item.revision_time }}</a>
                                 {% else %}
-                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.language.language,lang_id=item.language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_no }} - {{ item.revision_time }}</a>
+                                    <a href="{% url videos:subtitleversion_detail video_id=item.video.video_id,lang=item.subtitle_language.language_code,lang_id=item.subtitle_language.id,version_id=item.pk %}">{% trans "Revision" %} {{ item.version_number }} - {{ item.revision_time }}</a>
                                 {% endif %}
 
                                 {% if item.moderation_status == 'waiting_moderation' %}
                                     (draft)
                                 {% endif %}
                             </h3>
-                            {% if item.user %}
-                                <p>{% trans "by" %} <a href="{% url profiles:profile item.user.pk %}">{{ item.user }}</a></p>
+                            {% if item.author %}
+                                <p>{% trans "by" %} <a href="{% url profiles:profile item.author.pk %}">{{ item.author }}</a></p>
                             {% endif %}
                             {% if item.note %}
                                 <p>{{ item.note }}</p>
                             {% endif %}
                             <ul class="actions">
-                                <li><h4>{% trans "Timing" %}: {{ item.time_change_display }}</h4></li>
-                                <li><h4>{% trans "Text" %}: {{ item.text_change_display }}</h4></li>
+                                <li><h4>{% trans "Timing" %}: {{ item.time_change }}</h4></li>
+                                <li><h4>{% trans "Text" %}: {{ item.text_change }}</h4></li>
                             </ul>
                         </li>
                     {% endfor %}
@@ -373,16 +360,6 @@
                                     </label>
                                 </fieldset>
 
-                                {% if request.user|can_delete_subtitles_for:video %}
-                                    <fieldset>
-                                        <h5>{% trans 'Would you like to delete these subtitles completely?' %}</h5>
-                                        <label class="checkbox">
-                                            <input type="checkbox" name="should_delete" value="1">
-                                            {% trans 'Yes, delete these subtitles instead of sending them back for editing/review' %}
-                                        </label>
-                                    </fieldset>
-                                {% endif %}
-
                                 {% csrf_token %}
 
                                 <input type="hidden" name="next" value="{{ request.path }}" />
@@ -405,7 +382,7 @@
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">
             <li>
-                <a href="{% url admin:videos_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
+                <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
             </li>
         </ul>
     {% endif %}

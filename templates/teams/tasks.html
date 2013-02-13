@@ -149,15 +149,15 @@
         {% endif %}
 
         {% if not tasks and filtered %}
-        <p class="view-notice">
-            <strong>{% trans 'Try broadening your selection using the filters above' %}</strong>
-        </p>
+            <p class="view-notice">
+                <strong>{% trans 'Try broadening your selection using the filters above' %}</strong>
+            </p>
         {% endif %}
 
         {% if user.is_authenticated and not user.get_languages %}
-        <p class="prompt">
-            <a href="#" data-modal="language_modal" id="lang_select_btn">{% trans 'Tell us what languages you speak' %}</a> {% trans "and we'll personalize this list for you" %}
-        </p>
+            <p class="prompt">
+                <strong><a href="#" data-modal="language_modal" id="lang_select_btn">{% trans 'Tell us what languages you speak' %}</a> {% trans "and we'll narrow this list for you" %}</strong>
+            </p>
         {% else %}
             {% if not filtered %}
             <p class="view-notice">
@@ -184,17 +184,17 @@
             <ul class="tasks listing">
                 {% with member.has_max_tasks as has_max_tasks %}
                     {% for task in tasks %}
-                        {% with task.subtitle_version.language.standard_language as translated_from %}
+                        {% with task.new_subtitle_version.subtitle_language.get_translation_source_language as translated_from %}
                             <li
                                 {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                    {% if translated_from and not translated_from.had_version %}
+                                    {% if translated_from and not translated_from.get_tip %}
                                         class="disabled">
-                                        <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ translated_from.get_language_display }}) is finished.</div
+                                        <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ translated_from.get_language_code_display }}) is finished.</div
                                     {% endif %}
                                 {% endif %}
                                 {% if task.is_blocked %}
                                     class="disabled">
-                                    <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ task.subtitle_version.language }}) has been approved.</div
+                                    <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ task.new_subtitle_version.get_language_code_display }}) has been approved.</div
                                 {% endif %}
                                 {% if not task|can_perform_task:user %}
                                     class="disabled">
@@ -208,7 +208,7 @@
                                     {% else %}
                                         {{ task.get_type_display }}
                                         {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                            {% if task.subtitle_version.language.is_original %}
+                                            {% if not task.new_subtitle_version.subtitle_language.get_translation_source_language_code %}
                                                 {% trans 'Original' %}
                                             {% endif %}
                                         {% endif %}
@@ -232,27 +232,25 @@
                                     {% endif %}
                                 </p>
 
-                                {% if task.get_subtitle_version %}
-                                    {% with task.get_subtitle_version as version %}
+                                {% with task.get_subtitle_version as version %}
+                                    {% if version %}
                                         <p>
                                             <strong>{% trans 'Subtitles' %}:</strong>
-                                            <a href="{{ version.get_absolute_url }}">
-                                                {% trans 'latest draft' %}
-                                            </a>
-                                            {% if task.get_reviewer != version.user %}
-                                                {% if version.language.is_original %}
+                                            <a href="{{ version.get_absolute_url }}">{% trans 'latest draft' %}</a>
+                                            {% if task.get_reviewer != version.author %}
+                                                {% if not version.subtitle_language.get_translation_source_language_code %}
                                                     {% trans 'transcribed' %}
                                                 {% else %}
                                                     {% trans 'translated' %}
                                                 {% endif %}
                                                 by
-                                                <a href="{{ version.user.get_absolute_url }}" title="View {{ version.user }}'s profile">{{ version.user }}</a>
+                                                <a href="{{ version.author.get_absolute_url }}" title="View {{ version.author }}'s profile">{{ version.author }}</a>
                                             {% endif %}
                                             {% if task.get_type_display == 'Approve' %}
                                                 {% with task.get_reviewer as reviewer %}
                                                     {% if reviewer %}
                                                         {% trans 'reviewed' %}
-                                                        {% if reviewer = version.user %}
+                                                        {% if reviewer == version.author %}
                                                             {% trans 'and edited' %}
                                                         {% endif %}
                                                         {% trans 'by' %} <a href="{{ reviewer.get_absolute_url }}">{{ reviewer }}</a>.
@@ -260,8 +258,8 @@
                                                 {% endwith %}
                                             {% endif %}
                                         </p>
-                                    {% endwith %}
-                                {% endif %} 
+                                    {% endif %}
+                                {% endwith %}
 
                                 <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                                 <ul class="actions">
@@ -320,7 +318,7 @@
                                                     {% endif %}
                                                     {% if task.get_subtitle_version %}
                                                         <li>
-                                                        <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
+                                                            <a href="#download-draft-{{task.id}}" class="open-modal upload-draft-button">{% trans 'Download draft' %}</a>
                                                         </li>
                                                     {% endif %}
                                                     {% if not has_max_tasks or task.assignee == user %}
@@ -331,39 +329,64 @@
                                                 </ul>
                                                 <div class="bootstrap">
                                                     <div class="modal upload-draft-modal" id="upload-draft-{{task.id}}" style="display: none">
-                                                        <form action="{% url teams:upload_draft slug=team.slug %}" method="post" enctype="multipart/form-data">
-                                                            <div class="modal-header">
-                                                                <a href="#" class="close">x</a>
-                                                                <h3>{% trans 'Upload a draft' %}</h3>
-                                                            </div>
-                                                            <div class="modal-body">
-                                                                <p><strong>{% trans 'Important:' %}</strong> {% trans 'Uploading a draft will not complete the task. After uploading, select "Resume" from the "Perform Task" drop-down to verify timing, video title and video description in the onsite editor and to submit the final version.' %}</p>
-                                                                {% if not task.language %}
-                                                                <div class="ajaxChosen">
-                                                                    <label>{% trans 'Language' %}</label>
-                                                                    {{ upload_draft_form.language }}
-                                                                    <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
+                                                        <form action="{% url teams:upload_draft slug=team.slug,video_id=task.team_video.video.video_id %}"
+                                                              method="post" enctype="multipart/form-data">
+                                                            {% with task|get_upload_form:request.user as form %}
+                                                                <div class="modal-header">
+                                                                    <a href="#" class="close">x</a>
+                                                                    <h3>{% trans 'Upload a draft' %}</h3>
                                                                 </div>
-                                                                {% endif %}
-                                                                {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}
-                                                                <div class="ajaxChosen">
-                                                                    <label>{% trans 'Translate from' %}</label>
-                                                                    {% languages_to_translate task %}
+                                                                <div class="modal-body">
+                                                                    <input type="hidden" name="task" value="{{ task.id }}" />
+
+                                                                    {% if not form.video.primary_audio_language_code %}
+                                                                        <label for="id_primary_audio_language_code">{% trans 'Video Language' %}</label>
+                                                                        <div class="no-chosen">
+                                                                            {{ form.primary_audio_language_code }}
+                                                                        </div>
+                                                                        <p class="notice">{% trans "Please double check the primary spoken language. This step cannot be undone." %}</p>
+                                                                    {% else %}
+                                                                        <input type="hidden" name="primary_audio_language_code" value="{{ form.video.primary_audio_language_code|default:"" }}" />
+                                                                    {% endif %}
+
+                                                                    {% if task.get_type_display == "Translate" and not task.get_subtitle_version %}
+                                                                        <div class="no-chosen">
+                                                                            <label for="id_from_language_code">{% trans 'Translate from' %}</label>
+                                                                            {{ form.from_language_code }}
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <input type="hidden" name="from_language_code"
+                                                                               value="{{ task.get_subtitle_version.subtitle_language.get_translation_source_language_code|default:"" }}" />
+                                                                    {% endif %}
+
+                                                                    <p>
+                                                                        <strong>{% trans 'Important:' %}</strong> {% trans 'Uploading a draft will not complete the task. After uploading, select "Resume" from the "Perform Task" drop-down to verify timing, video title and video description in the onsite editor and to submit the final version.' %}
+                                                                    </p>
+
+                                                                    {% if not task.language %}
+                                                                        <div class="no-chosen">
+                                                                            <label for="id_language_code">{% trans 'Language' %}</label>
+                                                                            {{ form.language_code }}
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <input type="hidden" name="language_code" value="{{ task.language|default:"" }}" />
+                                                                    {% endif %}
+
+                                                                    <label for="id_draft">
+                                                                        {% trans 'File:' %}
+                                                                    </label>
+
+                                                                    {{ form.draft }}
+
+                                                                    <p class="notation">
+                                                                        {% trans 'Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)' %}
+                                                                    </p>
                                                                 </div>
-                                                                {% endif %}
-                                                                <label for="id_draft">
-                                                                    {% trans 'File:' %}
-                                                                </label>
-                                                                {{ upload_draft_form.draft }}
-                                                                <p class="notation">{% trans 'Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for TTML)' %}</p>
-                                                                <div class="hidden">
-                                                                    <input type="hidden" name="task" id="task_id" value="{{ task.id }}" />
+                                                                <div class="modal-footer">
+                                                                    {% csrf_token %}
+                                                                    <input type="submit" class="btn primary" value="Upload draft" />
                                                                 </div>
-                                                            </div>
-                                                            <div class="modal-footer">
-                                                                {% csrf_token %}
-                                                                <input type="submit" class="btn primary" value="Upload draft" />
-                                                            </div>
+                                                            {% endwith %}
                                                         </form>
                                                     </div>
                                                     <div class="modal" id="download-draft-{{task.id}}" style="display: none">
@@ -379,7 +402,6 @@
                                                                         <option value="">Select a format</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='srt' %}">SRT</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ssa' %}">SSA</option>
-                                                                        <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='ttml' %}">TTML</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='txt' %}">TXT</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='sbv' %}">SBV</option>
                                                                         <option value="{% url teams:download_draft slug=team.slug task_pk=task.id type='dfxp' %}">DFXP</option>
@@ -390,7 +412,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        {% endif %}    
+                                        {% endif %}
                                     {% endif %}
                                 </ul>
 

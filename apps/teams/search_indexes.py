@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -26,6 +26,7 @@ from haystack.indexes import (
 )
 from haystack.query import SearchQuerySet
 from teams import models
+from apps.subtitles.models import SubtitleLanguage
 
 from haystack.exceptions import AlreadyRegistered
 
@@ -93,14 +94,16 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['video_id'] = obj.video.video_id
         self.prepared_data['video_title'] = obj.video.title.strip()
         self.prepared_data['video_url'] = obj.video.get_video_url()
+
         original_sl = obj.video.subtitle_language()
+
         if original_sl:
-            self.prepared_data['original_language_display'] = \
-                original_sl.get_language_display()
-            self.prepared_data['original_language'] = original_sl.language
+            self.prepared_data['original_language_display'] = original_sl.get_language_code_display
+            self.prepared_data['original_language'] = original_sl.language_code
         else:
             self.prepared_data['original_language_display'] = ''
             self.prepared_data['original_language'] = ''
+
         self.prepared_data['absolute_url'] = obj.get_absolute_url()
         self.prepared_data['thumbnail'] = obj.get_thumbnail()
         self.prepared_data['title'] = obj.video.title_display_unabridged()
@@ -113,17 +116,13 @@ class TeamVideoLanguagesIndex(SearchIndex):
         self.prepared_data['team_video_create_date'] = obj.created
 
         completed_sls = obj.video.completed_subtitle_languages()
-        all_sls = (obj.video.subtitlelanguage_set
-                            .annotate(num_versions=Count('subtitleversion'))
-                            .filter(num_versions__gt=0))
-        all_sls = [sl for sl in all_sls
-                   if not sl.latest_version(public_only=False).is_all_blank()]
+        all_sls = obj.video.newsubtitlelanguage_set.having_nonempty_tip()
 
         self.prepared_data['num_total_langs'] = len(all_sls)
         self.prepared_data['num_completed_langs'] = len(completed_sls)
 
         self.prepared_data['video_completed_langs'] = \
-            [sl.language for sl in completed_sls]
+            [sl.language_code for sl in completed_sls]
         self.prepared_data['video_completed_lang_urls'] = \
             [sl.get_absolute_url() for sl in completed_sls]
 

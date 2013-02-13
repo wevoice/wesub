@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -35,17 +35,14 @@ unisubs.startdialog.VideoLanguage = function(json) {
 };
 
 unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
-    return this.LANGUAGE ?
-        unisubs.languageNameForCode(this.LANGUAGE) : "Original";
+    return unisubs.languageNameForCode(this.LANGUAGE);
 };
 
 unisubs.startdialog.VideoLanguage.prototype.toString = function() {
     var name = this.languageName();
 
-    if (!this.DEPENDENT && this.SUBTITLE_COUNT > 0) {
+    if (this.SUBTITLE_COUNT > 0) {
         name += (this.IS_COMPLETE ? " (100%)" : " (incomplete)");
-    } else if (this.DEPENDENT && this.PERCENT_DONE > 0) {
-        name += " (" + this.PERCENT_DONE + "%)";
     }
 
     name += (this.IN_PROGRESS ? " (in progress)" : "");
@@ -54,9 +51,7 @@ unisubs.startdialog.VideoLanguage.prototype.toString = function() {
 };
 
 unisubs.startdialog.VideoLanguage.prototype.completionStatus = function() {
-    return "(" +
-        (this.DEPENDENT ? (this.PERCENT_DONE + "%") :
-         (this.SUBTITLE_COUNT + " lines")) + ")";
+    return "(" + (this.SUBTITLE_COUNT + " lines") + ")";
 };
 
 unisubs.startdialog.VideoLanguage.prototype.setAll = function(all) {

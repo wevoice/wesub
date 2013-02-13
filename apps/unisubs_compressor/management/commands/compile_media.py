@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,7 @@ import re
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
@@ -286,6 +287,13 @@ class Command(BaseCommand):
             compiled_js_text = compiled_js_file.read()
 
         with open(compiled_js, 'w') as compiled_js_file:
+
+            # Include dependencies needed for DFXP parsing.
+            with open(os.path.join(JS_LIB, 'src', 'js', 'third-party', 'amara-jquery-1.8.2.min.js'), 'r') as jqueryjs_file:
+                compiled_js_file.write(jqueryjs_file.read())
+            with open(os.path.join(JS_LIB, 'src', 'js', 'dfxp', 'dfxp.js'), 'r') as dfxpjs_file:
+                compiled_js_file.write(dfxpjs_file.read())
+
             if include_flash_deps:
                 with open(os.path.join(JS_LIB, 'js', 'swfobject.js'), 'r') as swfobject_file:
                     compiled_js_file.write(swfobject_file.read())
@@ -344,6 +352,20 @@ class Command(BaseCommand):
         mr = settings.STATIC_ROOT
         for dirname in os.listdir(mr):
             original_path = os.path.join(mr, dirname)
+            if os.path.isdir(original_path) and dirname not in SKIP_COPING_ON :
+                dest =  os.path.join(self.temp_dir, dirname)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                shutil.copytree(original_path,
+                         dest,
+                         ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
+
+    def _copy_admin_media_to_cache_dir(self):
+        # temporary until we switch to staticfiles
+        # find admin media
+        admin_media_dir = os.path.join(os.path.dirname(admin.__file__), 'static')
+        for dirname in os.listdir(admin_media_dir):
+            original_path = os.path.join(admin_media_dir, dirname)
             if os.path.isdir(original_path) and dirname not in SKIP_COPING_ON :
                 dest =  os.path.join(self.temp_dir, dirname)
                 if os.path.exists(dest):
@@ -517,6 +539,7 @@ class Command(BaseCommand):
             self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
+        self._copy_admin_media_to_cache_dir()
 
         if not self.keeps_previous:
             self._remove_cache_dirs_before(1)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -34,6 +34,8 @@ from teams.models import Team, TeamMember, Application, Workflow,\
 from teams.forms import InviteForm
 from videos.models import Action, Video, SubtitleVersion, SubtitleLanguage, \
      Subtitle
+from subtitles import models as sub_models
+from subtitles.pipeline import add_subtitles
 from utils import send_templated_email
 
 class MessageTest(TestCase):
@@ -331,24 +333,20 @@ class MessageTest(TestCase):
             v.followers.add(f1, f2)
             return v
         def new_version(v):
-            
-            language, created = SubtitleLanguage.objects.get_or_create(video=v, language='en', is_original=True)
-            prev = language.version(public_only=False)
-            version_no = 0
-            if prev:
-                version_no = prev.version_no + 1
-            sv = SubtitleVersion(
-                language=language, user=User.objects.all()[2], version_no=version_no,
-                datetime_started = datetime.now()
-            )
-            sv.save()
-            s = Subtitle(
-                version=sv, subtitle_text=str(version_no + random.random()),
-                subtitle_order=1, subtitle_id=str(version_no),
-                start_time = random.random())
-            s.save()
-            return sv
-   
+
+            subs = [
+                (0, 1000, 'Hello', {}),
+                (2000, 5000, 'world.', {})
+            ]
+            add_subtitles(v, 'en', subs, author=self.author,
+                    committer=self.author)
+            subs = [
+                (0, 1000, 'Hello', {}),
+                (3000, 5000, 'world.', {})
+            ]
+            return add_subtitles(v, 'en', subs, author=self.author,
+                    committer=self.author)
+
         v = video_with_two_followers()
         mail.outbox = []
         from videos.tasks import  video_changed_tasks
@@ -363,8 +361,9 @@ class MessageTest(TestCase):
         self.assertEquals(len(mail.outbox), 2)
         mail.outbox = []
         # add to a moderated video
-        team = Team.objects.create(slug='my-team', name='myteam', workflow_enabled=True)
-        workflow = Workflow(team=team, review_allowed=20,approve_allowed=20 )
+        team = Team.objects.create(slug='my-team', name='myteam',
+                workflow_enabled=True)
+        workflow = Workflow(team=team, review_allowed=20,approve_allowed=20)
         workflow.save()
 
         tv = TeamVideo(team=team, video=v, added_by=User.objects.all()[2])
@@ -375,15 +374,16 @@ class MessageTest(TestCase):
         sv.save()
         
         video_changed_tasks(v.pk, sv.pk)
-        sv = SubtitleVersion.objects.get(pk=sv.pk)
-        self.assertFalse(sv.is_public)
+        sv = sub_models.SubtitleVersion.objects.get(pk=sv.pk)
+        self.assertFalse(sv.is_public())
         # approve video
-        t = Task(type=40, approved=20, team_video=tv, team=team, language='en', subtitle_version=sv)
+        t = Task(type=40, approved=20, team_video=tv, team=team, language='en',
+                new_subtitle_version=sv, assignee=self.author)
         t.save()
         t.complete()
         video_changed_tasks(v.pk, sv.pk)
         
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_send_message_view(self):
         to_user = User.objects.filter(notify_by_email=True)[0]
@@ -449,14 +449,21 @@ class TeamBlockSettingsTest(TestCase):
         member = TeamMember.objects.create(team=team, user=user)
         team_video = TeamVideo.objects.filter(team=team)[0]
         task_assigned = Task.objects.create(team=team, team_video=team_video, type=10, assignee=member.user)
+
         sv = SubtitleVersion.objects.all()[0]
         language = team_video.video.subtitlelanguage_set.all()[0]
         language.language = 'en'
         language.save()
         sv.language = language
         sv.save()
+
+        subs = [
+            (0, 1000, 'Hello', {}),
+            (2000, 5000, 'world.', {})
+        ]
+        sv = add_subtitles(sv.video, 'en', subs)
         task_with_version = Task.objects.create(team=team, team_video=team_video, type=10, assignee=member.user,
-                                                subtitle_version=sv, language='en')
+                                                new_subtitle_version=sv, language='en')
 
         to_test = (
             ("block_invitation_sent_message", n.team_invitation_sent, (invite.pk,)),

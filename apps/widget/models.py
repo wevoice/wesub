@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -17,12 +17,13 @@
 from django.db import models
 
 from auth.models import CustomUser as User
-from videos.models import SubtitleLanguage, SubtitleVersion
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 
 
 class SubtitlingSession(models.Model):
     language = models.ForeignKey(
         SubtitleLanguage, related_name='subtitling_sessions')
+    # fix me: write this migration to base_language_code
     base_language = models.ForeignKey(
         SubtitleLanguage, null=True, related_name='based_subtitling_sessions')
     parent_version = models.ForeignKey(SubtitleVersion, null=True)

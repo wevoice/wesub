@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -115,24 +115,32 @@ unisubs.startdialog.Model.prototype.bestLanguages = function(toLangCode, fromLan
  */
 unisubs.startdialog.Model.prototype.fromLanguages = function() {
     var originalLanguage = this.originalLanguage_;
-    if (!originalLanguage)
+    if (!originalLanguage) {
         originalLanguage = this.selectedOriginalLanguage_;
+    }
+
     var selectedLanguage = this.getSelectedLanguage();
-    if (selectedLanguage.LANGUAGE == originalLanguage)
+
+    if (selectedLanguage.LANGUAGE == originalLanguage) {
         return [];
+    }
+
     var videoLanguages = this.videoLanguages_.findForLanguage(
         selectedLanguage.LANGUAGE);
+
     var possibleFromLanguages = [];
+
     this.videoLanguages_.forEach(function(vl) {
         if (!goog.array.contains(videoLanguages, vl))
             possibleFromLanguages.push(vl);
     });
+
     possibleFromLanguages = goog.array.filter(
         possibleFromLanguages,
         function(vl) {
-            return (vl.DEPENDENT && vl.PERCENT_DONE > 0) ||
-                (!vl.DEPENDENT && vl.SUBTITLE_COUNT > 0);
+            return vl.SUBTITLE_COUNT > 0;
         });
+
     var myLanguages = new goog.structs.Set(this.myLanguages_);
     goog.array.sort(
         possibleFromLanguages,
@@ -142,6 +150,7 @@ unisubs.startdialog.Model.prototype.fromLanguages = function() {
                 myLanguages.contains(b.LANGUAGE) ? 0 : 1);
         });
     return possibleFromLanguages;
+
 };
 
 unisubs.startdialog.Model.prototype.toLanguageForKey = function(key) {

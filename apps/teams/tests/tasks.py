@@ -3,7 +3,8 @@ from django.test import TestCase
 from auth.models import CustomUser as User
 from apps.teams.models import Team, TeamVideo, TeamMember
 from apps.teams.tests.teamstestsutils import  create_team, create_member
-from apps.videos.models import Video, SubtitleLanguage
+from apps.videos.models import Video
+from apps.subtitles.models import SubtitleLanguage
 
 class AutoCreateTest(TestCase):
 
@@ -23,7 +24,8 @@ class AutoCreateTest(TestCase):
 
     def test_audio_language(self):
         # create the original language for this video
-        sl = SubtitleLanguage.objects.create(video=self.video, language='en', is_original=True)
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
         tv = TeamVideo(team=self.team, video=self.video, added_by=self.member.user)
         tv.save()
         tasks = tv.task_set.all()

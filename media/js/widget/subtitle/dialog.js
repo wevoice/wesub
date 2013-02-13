@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -88,7 +88,14 @@ unisubs.subtitle.Dialog.END_TIME_PADDING = 4000;
 
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
-    this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
+    var text;
+
+    if (c) {
+        text = this.captionSet_.x['content'](c.node);
+    } else {
+        text = '';
+    }
+    this.getVideoPlayerInternal().showCaptionText(text);
 };
 unisubs.subtitle.Dialog.prototype.createDom = function() {
     unisubs.subtitle.Dialog.superClass_.createDom.call(this);
@@ -102,7 +109,7 @@ unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
         function() {
-            return that.makeJsonSubs();
+            return that.makeDFXPString();
         });
 };
 unisubs.subtitle.Dialog.prototype.enterDocument = function() {
@@ -650,6 +657,6 @@ unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
-unisubs.subtitle.Dialog.prototype.makeJsonSubs =  function (){
-    return this.captionSet_.makeJsonSubs();
+unisubs.subtitle.Dialog.prototype.makeDFXPString =  function (){
+    return this.captionSet_.makeDFXPString();
 };

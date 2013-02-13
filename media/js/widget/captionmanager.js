@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -28,12 +28,15 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
     goog.events.EventTarget.call(this);
 
     this.captions_ = captionSet.captionsWithTimes();
+    this.x = captionSet.x;
+
+    var that = this;
 
     this.binaryCompare_ = function(time, caption) {
-	return time - caption.getStartTime();
+        return time - that.x['startTime'](caption);
     };
     this.binaryCaptionCompare_ = function(c0, c1) {
-        return c0.getStartTime() - c1.getStartTime();
+        return that.x['startTime'](c0) - that.x['startTime'](c1);
     };
     this.videoPlayer_ = videoPlayer;
     this.eventHandler_ = new goog.events.EventHandler(this);
@@ -104,31 +107,35 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    if (this.captions_.length == 0)
+    var subs = this.x['getSubtitles']();
+
+    if (subs.length === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
-        playheadTime < this.captions_[0].getStartTime())
+        playheadTime < this.x['startTime'](this.x['getSubtitle'](0)))
         return;
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
-        this.captions_[this.currentCaptionIndex_] : null;
+        this.x['getSubtitle'](this.currentCaptionIndex_) : null;
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null &&
-	curCaption.isShownAt(playheadTime))
+	this.x['isShownAt'](curCaption, playheadTime))
         return;
 
-    var nextCaption = this.currentCaptionIndex_ < this.captions_.length - 1 ?
+    var nextCaptionIndex =  this.currentCaptionIndex_ < subs.length -1 ?
+        this.currentCaptionIndex_ + 1 : null;
+    var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
     if (nextCaption != null &&
-	nextCaption.isShownAt(playheadTime)) {
+	this.x['isShownAt'](this.x['getSubtitle'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
-        this.dispatchCaptionEvent_(nextCaption);
+        this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
     }
     if ((nextCaption == null ||
-         playheadTime < nextCaption.getStartTime()) &&
+         playheadTime < this.x['startTime'](nextCaption)) &&
         (curCaption == null ||
-         playheadTime >= curCaption.getStartTime())) {
+         playheadTime >= this.x['startTime'](curCaption))) {
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_)
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
@@ -140,27 +147,28 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
     function(playheadTime)
 {
-    var lastCaptionIndex = goog.array.binarySearch(this.captions_,
+    var subs = this.x['getSubtitles']();
+    var lastCaptionIndex = goog.array.binarySearch(subs,
         playheadTime, this.binaryCompare_);
     if (lastCaptionIndex < 0)
-        lastCaptionIndex = -lastCaptionIndex - 2;
+        lastCaptionIndex = -lastCaptionIndex - subs.length -1;
     this.currentCaptionIndex_ = lastCaptionIndex;
     if (lastCaptionIndex >= 0 &&
-	this.captions_[lastCaptionIndex].isShownAt(playheadTime)) {
-        this.dispatchCaptionEvent_(this.captions_[lastCaptionIndex]);
+	this.x['isShownAt'](lastCaptionIndex, playheadTime)) {
+        this.dispatchCaptionEvent_(this.captions_[lastCaptionIndex], lastCaptionIndex);
     }
     else {
         this.dispatchCaptionEvent_(null);
     }
 };
 
-unisubs.CaptionManager.prototype.dispatchCaptionEvent_ = function(caption) {
+unisubs.CaptionManager.prototype.dispatchCaptionEvent_ = function(caption, index) {
     if (caption == this.lastCaptionDispatched_)
         return;
     if (this.eventsDisabled_)
         return;
     this.lastCaptionDispatched_ = caption;
-    this.dispatchEvent(new unisubs.CaptionManager.CaptionEvent(caption));
+    this.dispatchEvent(new unisubs.CaptionManager.CaptionEvent(caption, index));
 };
 
 unisubs.CaptionManager.prototype.disposeInternal = function() {
@@ -175,7 +183,8 @@ unisubs.CaptionManager.prototype.disableCaptionEvents = function(disabled) {
 /**
 * @constructor
 */
-unisubs.CaptionManager.CaptionEvent = function(editableCaption) {
+unisubs.CaptionManager.CaptionEvent = function(editableCaption, index) {
     this.type = unisubs.CaptionManager.CAPTION;
     this.caption = editableCaption;
+    this.index = index;
 };

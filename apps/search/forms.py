@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,7 +19,6 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from utils.translation import get_language_choices
-from videos.search_indexes import LanguageField
 
 ALL_LANGUAGES = get_language_choices()
 
@@ -88,7 +87,6 @@ class SearchForm(forms.Form):
         ALL_LANGUAGES_NAMES = dict(get_language_choices())
 
         for lang, val in data:
-            lang = LanguageField.convert(lang)
             try:
                 choices.append((lang, u'%s (%s)' % (ALL_LANGUAGES_NAMES[lang], val), val))
             except KeyError:
@@ -118,10 +116,10 @@ class SearchForm(forms.Form):
 
         #aplly filtering
         if video_language:
-            qs = qs.filter(video_language_exact=LanguageField.prepare_lang(video_language))
+            qs = qs.filter(video_language_exact=video_language)
 
         if langs:
-            qs = qs.filter(languages_exact=LanguageField.prepare_lang(langs))
+            qs = qs.filter(languages_exact=langs)
 
         if ordering:
             qs = qs.order_by('-' + ordering)

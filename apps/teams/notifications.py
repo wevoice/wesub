@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
 from utils.metrics import Meter
-from libs.unilangs import LanguageCode
+from unilangs import LanguageCode
 from videos.models import Video
 
 import logging

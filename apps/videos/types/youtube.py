@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,14 +16,14 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-import random
 import re
-from datetime import datetime
 from urlparse import urlparse
+import babelsubs
 import requests
 
 import gdata.youtube.client
 from gdata.youtube.client import YouTubeError
+import httplib
 import httplib2
 from celery.task import task
 from django.conf import settings
@@ -33,14 +33,11 @@ from gdata.service import RequestError
 from gdata.youtube.service import YouTubeService
 from lxml import etree
 
-from auth.models import CustomUser as User
 from base import VideoType, VideoTypeError
-from utils.subtitles import YoutubeXMLParser
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 from utils.metrics import Meter, Occurrence
 
 from libs.unilangs.unilangs import LanguageCode
-import httplib
 
 
 logger = logging.getLogger("youtube")
@@ -213,12 +210,17 @@ yt_service = get_youtube_service()
 
 @task
 def save_subtitles_for_lang(lang, video_pk, youtube_id):
+    from django.utils.encoding import force_unicode
     from videos.models import Video
+    from videos.tasks import video_changed_tasks
+    from subtitles.pipeline import add_subtitles
 
     yt_lc = lang.get('lang_code')
 
+    # TODO: Make sure we can store all language data given to us by Youtube.
+    # Right now, the bcp47 codec will refuse data it can't reliably parse.
     try:
-        lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+        lc  = LanguageCode(yt_lc, "bcp47").encode("unisubs")
     except KeyError:
         logger.warn("Youtube import did not find language code", extra={
             "data":{
@@ -227,7 +229,6 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
             }
         })
         return
-
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
@@ -243,73 +244,19 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     except Video.DoesNotExist:
         return
 
-    from videos.models import SubtitleLanguage, SubtitleVersion, Subtitle
-
     url = u'http://www.youtube.com/api/timedtext?v=%s&lang=%s&name=%s'
     url = url % (youtube_id, yt_lc, urlquote(lang.get('name', u'')))
 
-    xml = YoutubeVideoType._get_response_from_youtube(url)
+    xml = YoutubeVideoType._get_response_from_youtube(url, return_string=True)
 
     if xml is None:
         return
 
-    parser = YoutubeXMLParser(xml)
+    xml = force_unicode(xml, 'utf-8')
 
-    if not parser:
-        return
+    subs = babelsubs.parsers.discover('youtube').parse(xml).to_internal()
+    add_subtitles(video, lc, subs, note="From youtube")
 
-    language, create = SubtitleLanguage.objects.get_or_create(
-        video=video,
-        language=lc,
-        defaults={
-            'created': datetime.now(),
-    })
-    language.is_original = False
-    language.is_forked = True
-    language.save()
-
-    try:
-        version_no = language.subtitleversion_set.order_by('-version_no')[:1] \
-            .get().version_no + 1
-    except SubtitleVersion.DoesNotExist:
-        version_no = 0
-
-    version = SubtitleVersion(language=language)
-    version.title = video.title
-    version.description = video.description
-    version.version_no = version_no
-    version.datetime_started = datetime.now()
-    version.user = User.get_anonymous()
-    version.note = u'From youtube'
-    version.is_forked = True
-    version.save()
-
-    for i, item in enumerate(parser):
-        subtitle = Subtitle()
-        subtitle.subtitle_text = item['subtitle_text']
-        subtitle.start_time = item['start_time']
-        subtitle.end_time = item['end_time']
-        subtitle.version = version
-        subtitle.subtitle_id = int(random.random()*10e12)
-        subtitle.subtitle_order = i+1
-
-        try:
-            assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
-        except AssertionError:
-            # Don't bother saving the subtitle if it's not synced
-            continue
-
-        subtitle.save()
-
-    version.finished = True
-    version.save()
-
-    language.has_version = True
-    language.had_version = True
-    language.is_complete = True
-    language.save()
-
-    from videos.tasks import video_changed_tasks
     video_changed_tasks.delay(video.pk)
 
     Meter('youtube.lang_imported').inc()
@@ -321,7 +268,7 @@ def should_add_credit(subtitle_version=None, video=None):
         raise Exception("You need to pass in at least one argument")
 
     if not video:
-        video = subtitle_version.language.video
+        video = subtitle_version.subtitle_language.video
 
     return not video.get_team_video()
 
@@ -338,11 +285,11 @@ def add_credit(subtitle_version, subs):
 
     from accountlinker.models import get_amara_credit_text
 
-    language_code = subtitle_version.language.language
-    dur = subtitle_version.language.video.duration
+    language_code = subtitle_version.language_code
+    dur = subtitle_version.video.duration
 
     last_sub = subs[-1]
-    time_left_at_the_end = (dur * 1000) - last_sub['end']
+    time_left_at_the_end = (dur * 1000) - last_sub[1]
 
     if time_left_at_the_end <= 0:
         return subs
@@ -352,17 +299,14 @@ def add_credit(subtitle_version, subs):
     else:
         start = (dur * 1000) - time_left_at_the_end
 
-    credit_sub = {
-        'text': get_amara_credit_text(language_code),
-        'start': start,
-        'end': dur * 1000,
-        'id': '',
-        'start_of_paragraph': ''
-    }
+    subs.append_subtitle(
+        start,
+        dur * 1000,
+        get_amara_credit_text(language_code),
+        {}
+    )
 
-    subs.append(credit_sub)
     return subs
-
 
 class YoutubeVideoType(VideoType):
 
@@ -461,7 +405,7 @@ class YoutubeVideoType(VideoType):
         return False
 
     @classmethod
-    def _get_response_from_youtube(cls, url):
+    def _get_response_from_youtube(cls, url, return_string=False):
         h = httplib2.Http()
         resp, content = h.request(url, "GET")
 
@@ -476,6 +420,8 @@ class YoutubeVideoType(VideoType):
             return
 
         try:
+            if return_string:
+                return content
             return etree.fromstring(content)
         except etree.XMLSyntaxError:
             logger.error("Youtube subtitles error. Failed to parse response.", extra={
@@ -536,6 +482,29 @@ class YoutubeVideoType(VideoType):
     def delete_subtitles(self, language, third_party_account):
         bridge = self._get_bridge(third_party_account)
         bridge.delete_subtitles(language)
+
+
+def _prepare_subtitle_data_for_version(subtitle_version):
+    """
+    Given a subtitles.models.SubtitleVersion, return a tuple of srt content,
+    title and language code.
+    """
+    language_code = subtitle_version.subtitle_language.language_code
+
+    try:
+        lc = LanguageCode(language_code.lower(), "unisubs")
+        language_code = lc.encode("bcp47")
+    except KeyError:
+        error = "Couldn't encode LC %s to youtube" % language_code
+        logger.error(error)
+        raise KeyError(error)
+
+    subs = subtitle_version.get_subtitles()
+    subs = add_credit(subtitle_version, subs)
+    content = babelsubs.generators.discover('srt').generate(subs)
+    content = unicode(content).encode('utf-8')
+
+    return content, "", language_code
 
 
 class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
@@ -641,9 +610,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the subtitle already exists, will delete it and recreate it.
         This subs should be synced! Else we upload might fail.
         """
-        from widget.srt_subs import GenerateSubtitlesHandler
-
-        lang = subtitle_version.language.language
+        lang = subtitle_version.subtitle_language.language_code
 
         try:
             lc = LanguageCode(lang.lower(), "unisubs")
@@ -652,26 +619,26 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             logger.error("Couldn't encode LC %s to youtube" % lang)
             return
 
-        handler = GenerateSubtitlesHandler.get('srt')
-        subs = [x.for_generator() for x in subtitle_version.ordered_subtitles()]
+        subs = subtitle_version.get_subtitles()
 
         if not self.is_always_push_account:
             subs = add_credit(subtitle_version, subs)
             self.add_credit_to_description(subtitle_version.language.video)
 
-        content = unicode(handler(subs, subtitle_version.language.video )).encode('utf-8')
+        content = babelsubs.generators.discover('srt').generate(subs)
         title = ""
 
         if hasattr(self, "captions") is False:
             self._get_captions_info()
 
-        # we cant just update, we need to check if it already exists... if so, we delete it
+        # We can't just update a subtitle track in place.  We need to delete
+        # the old one and upload a new one.
         if lang in self.captions:
             self._delete_track(self.captions[lang]['track'])
 
-        res = self.create_track(self.youtube_video_id, title, lang, content,
-                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
-                self.token, {'fmt':'srt'})
+        res = self.create_track(self.youtube_video_id, title, lang,
+                content, settings.YOUTUBE_CLIENT_ID,
+                settings.YOUTUBE_API_SECRET, self.token, {'fmt':'srt'})
         Meter('youtube.subs_pushed').inc()
         return res
 
@@ -753,7 +720,9 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         return r.status_code
 
     def _delete_track(self, track):
-        res = self.delete_track(self.youtube_video_id, track, settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET, self.token)
+        res = self.delete_track(self.youtube_video_id, track,
+                settings.YOUTUBE_CLIENT_ID, settings.YOUTUBE_API_SECRET,
+                self.token)
         return res
 
     def delete_subtitles(self, language):

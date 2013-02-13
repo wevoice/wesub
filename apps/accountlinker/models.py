@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -30,7 +30,6 @@ from .videos.types import (
     YoutubeVideoType
 )
 from teams.models import Team
-from teams.moderation_const import APPROVED, UNMODERATED
 from auth.models import CustomUser as User
 from django.db.models import Q
 
@@ -54,7 +53,7 @@ def youtube_sync(video, language):
     we should be syncing this or not.  Only does the new Youtube/Amara
     integration syncing.
     """
-    version = language.latest_version()
+    version = language.get_tip()
 
     always_push_account = ThirdPartyAccount.objects.always_push_account()
 
@@ -114,29 +113,25 @@ def check_authorization(video):
 
 def can_be_synced(version):
     """
-    Determine if a subtitle version can be synced to Youtube.
+    Return whether a subtitle version can be synced to Youtube.
 
-    A version must be public, synced and complete; it must also be either
-    "approved" or "unmoderated".
+    A version must be public, synced and complete.
+
+    TODO: take visibility into account
 
     We can't sync a version if it's the only version in that language and it
     has the "From youtube" note.
     """
     if version:
-        if not version.is_public or not version.is_synced():
+        if not version.is_public() or not version.is_synced():
             # We can't mirror unsynced or non-public versions.
             return False
 
-        if not version.language.is_complete:
+        if not version.subtitle_language.subtitles_complete:
             # Don't sync incomplete languages
             return False
 
-        status = version.moderation_status
-
-        if (status != APPROVED) and (status != UNMODERATED):
-            return False
-
-        if version.language.is_imported_from_youtube_and_not_worked_on:
+        if version.subtitle_language.is_imported_from_youtube_and_not_worked_on:
             return False
 
     return True
@@ -240,7 +235,7 @@ class ThirdPartyAccountManager(models.Manager):
                 })
                 return
 
-            if should_sync and not ignore_new_syncing_logic:
+            if should_sync:
                 try:
                     vt.update_subtitles(version, always_push_account)
                     already_updated = True

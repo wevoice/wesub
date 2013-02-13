@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -510,11 +510,12 @@ def can_review(team_video, user, lang=None, allow_own=False):
 
     # Users usually cannot review their own subtitles.
     if not hasattr(team_video, '_cached_version_for_review'):
-        team_video._cached_version_for_review = team_video.video.latest_version(language_code=lang, public_only=False)
+        team_video._cached_version_for_review = team_video.video.latest_version(
+            language_code=lang, public_only=False)
 
     subtitle_version = team_video._cached_version_for_review
 
-    if lang and subtitle_version.user_id == user.id:
+    if lang and subtitle_version and subtitle_version.author_id == user.id:
         if can_review_own_subtitles(role, team_video):
             return True
         else:
@@ -770,15 +771,19 @@ def can_create_task_subtitle(team_video, user=None, workflows=None):
 
     A subtitle task can be created iff:
 
-    * There are no subtitles for the video already.
+    * There are no public subtitles for the video already.
     * There are no subtitle tasks for it already.
     * The user has permission to create subtitle tasks.
 
     """
+    from subtitles.models import SubtitleLanguage
+
     if user and not _user_can_create_task_subtitle(user, team_video):
         return False
 
-    if team_video.subtitles_started():
+    if (SubtitleLanguage.objects.having_public_versions()
+                                .filter(video=team_video.video)
+                                .exists()):
         return False
 
     if team_video.task_set.all_subtitle().exists():
@@ -825,7 +830,7 @@ def can_create_task_translate(team_video, user=None, workflows=None):
         existing_languages = set(team_video.completed_langs)
     else:
         existing_languages = set(
-                sl.language for sl in team_video.video.completed_subtitle_languages())
+                sl.language_code for sl in team_video.video.completed_subtitle_languages())
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)

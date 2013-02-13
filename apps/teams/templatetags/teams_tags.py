@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -32,6 +32,7 @@ from templatetag_sugar.parser import Name, Variable, Constant
 
 from teams.models import Application
 
+from apps.teams.forms import TaskUploadForm
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
     can_edit_video as _can_edit_video,
@@ -560,3 +561,14 @@ def sync_third_party_account(account, team):
     return reverse('teams:sync-third-party-account',
             kwargs={'slug': team.slug, 'account_id': account.pk})
 
+
+@register.filter
+def get_upload_form(task, user):
+    """Return a TaskUploadForm for the given Task and User.
+
+        {% with task|get_upload_form:request.user as form %}
+            ...
+        {% endif %}
+
+    """
+    return TaskUploadForm(user=user, video=task.team_video.video)

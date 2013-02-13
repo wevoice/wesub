@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -55,6 +55,7 @@ unisubs.subtitle.MSServerModel = function( sessionPK, videoID, videoURL, editabl
     this.taskNotes = null;
     this.taskApproved = null;
     this.taskType = null;
+    window.server = this;
 };
 
 goog.inherits(unisubs.subtitle.MSServerModel, goog.Disposable);
@@ -112,8 +113,7 @@ unisubs.subtitle.MSServerModel.prototype.saveSubsLocally_ = function() {
     unisubs.widget.SavedSubtitles.saveLatest(savedSubs);
 };
 unisubs.subtitle.MSServerModel.prototype.anySubtitlingWorkDone = function() {
-    var initialSubs = this.fetchInitialSubs_();
-    return !initialSubs.CAPTION_SET.identicalTo(this.captionSet_);
+    return this.captionSet_.count() > 0;
 };
 unisubs.subtitle.MSServerModel.prototype.setPristineSubtitles = function(pristineSubtitlesJSON) {
     this.pristineSubtitlesJSON = pristineSubtitlesJSON;
@@ -144,8 +144,7 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
     var atLeastOneThingChanged = false;
 
     if (!goog.isNull(subtitles)) {
-        args['subtitles'] = goog.array.map(
-            subtitles, function(s) { return s.json; });
+        args['subtitles'] = this.captionSet_.x['xmlToString'](true, true);
         atLeastOneThingChanged = true;
     }
 
@@ -210,6 +209,7 @@ unisubs.subtitle.MSServerModel.prototype.finish = function(successCallback, fail
         successCallback("Saved"); // TODO: is this the right ux?
         return;
     }
+
     unisubs.Rpc.call(
         'finished_subtitles',
         args,
