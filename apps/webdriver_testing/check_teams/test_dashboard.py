@@ -505,6 +505,3 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.open_team_page(self.team.slug)
         self.logger.info("Clicking the Review English task for video fireplace.mp4")
         self.dashboard_tab.click_lang_task('fireplace.mp4', 'Review English')
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
