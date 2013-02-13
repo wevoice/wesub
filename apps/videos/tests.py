@@ -3020,8 +3020,11 @@ class ShortUrlTest(TestCase):
     def test_short_url(self):
         from videos.templatetags.videos_tags import shortlink_for_video
         short_url = shortlink_for_video(self.video)
-        response = self.client.get(short_url)
+
+        self.assertFalse('/en/' in short_url)
+
+        response = self.client.get(short_url, follow=True)
         regular_url = reverse("videos:video", args=(self.video.video_id,))
-        # short urls have no language path on the url, so take that out
-        regular_url = '/'.join(regular_url.split('/')[2:])
-        self.assertTrue(response['Location'].endswith(regular_url))
+
+        location = response.redirect_chain[-1][0]
+        self.assertTrue(location.endswith(regular_url))

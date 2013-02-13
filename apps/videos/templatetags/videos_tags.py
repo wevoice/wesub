@@ -198,7 +198,7 @@ def shortlink_for_video( video):
     protocol = getattr(settings, 'DEFAULT_PROTOCOL')
     domain = Site.objects.get_current().domain
     encoded_pk = base62.from_decimal(video.pk)
-    path = reverse('shortlink', args=[encoded_pk])
+    path = reverse('shortlink', args=[encoded_pk], no_locale=True)
 
     return u"{0}://{1}{2}".format(unicode(protocol),
                                   unicode(domain), 
