@@ -51,6 +51,53 @@ unisubs.player.WistiaVideoPlayer = function(videoSource, opt_forDialog) {
 goog.inherits(unisubs.player.WistiaVideoPlayer, unisubs.player.AbstractVideoPlayer);
 
 
+unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
+    var isReady =  window['Wistia'] && window['Wistia']['embed'];
+    return isReady;
+};
+
+unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId, containerID){
+
+    this.embeddedVideo = window['Wistia']['embed'](videoId, {
+        playerColor: "ff0000",
+        fullscreenButton: false,
+        container: containerID,
+        autoplay: false,
+        chromeless: true,
+        controlsVisibleOnLoad: false,
+        doNotTrack: true,
+        fullscreenButton: false,
+        playButton: false,
+        playBar: false,
+        videoFoam: false
+    });
+    // add listeners to buttons
+    var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
+    var skip_btn = goog.dom.getElementByClass('unisubs-skip');
+    goog.events.listen(play_btn, goog.events.EventType.CLICK, this.videoPlay);
+    goog.events.listen(skip_btn, goog.events.EventType.CLICK, this.videoSkip);
+    // add listeners for TAB key
+    var docKh = new goog.events.KeyHandler(document);
+    var that = this;
+    goog.events.listen(docKh, 'key', function (e) {
+        if (e.keyCode == 9) { // TAB key
+            if (e.shiftKey) {
+                that.videoSkip();
+            } else {
+                that.videoPlay();
+            }
+        }
+    });
+    // player controls
+    goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
+        goog.events.EventType.CLICK, function () {
+            if (! that.embeddedVideo) { return; }
+            that.embeddedVideo['state']() == 'playing' ?
+                that.embeddedVideo['pause']() :
+                that.embeddedVideo['play']();
+        });
+};
+
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
@@ -67,52 +114,15 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     };
     var videoDiv = this.getDomHelper().createDom('div', div_args);
     this.getElement().appendChild(videoDiv);
-	unisubs.addScript("http://fast.wistia.com/static/E-v1.js", false);
-    
     var that = this;
-    window.setTimeout( 
-      (function (video_id, container_id) {
-        return function () {
-          that.embeddedVideo = window['Wistia']['embed'](video_id, {
-            playerColor: "ff0000",
-            fullscreenButton: false,
-            container: container_id,
-            autoplay: false,
-            chromeless: true,
-            controlsVisibleOnLoad: false,
-            doNotTrack: true,
-            fullscreenButton: false,
-            playButton: false,
-            playBar: false,
-            videoFoam: false             
-          });
-          // add listeners to buttons
-          var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
-          var skip_btn = goog.dom.getElementByClass('unisubs-skip');
-          goog.events.listen(play_btn, goog.events.EventType.CLICK, that.videoPlay);
-          goog.events.listen(skip_btn, goog.events.EventType.CLICK, that.videoSkip);
-          // add listeners for TAB key
-          var docKh = new goog.events.KeyHandler(document);
-          goog.events.listen(docKh, 'key', function (e) {
-              if (e.keyCode == 9) { // TAB key
-                  if (e.shiftKey) {
-                      vid_skip();
-                  } else {
-                      vid_play();
-                  }
-              }
-          });
-          // player controls
-          goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
-                  goog.events.EventType.CLICK, function () {
-                      if (! that.embeddedVideo) { return; }
-                      that.embeddedVideo['state']() == 'playing' ?
-                        that.embeddedVideo['pause']() :
-                        that.embeddedVideo['play']();
-                  });
-        }; // return function
-      })(this.videoSource_.getVideoId(), this.playerElemID_)
-    , 5500);
+	unisubs.addScript(
+        "http://fast.wistia.com/static/E-v1.js",
+        true,
+        unisubs.player.WistiaVideoPlayer.isWistiaAPIReady,
+        function(){
+            that.onWistiaAPIReady(that.videoSource_.getVideoId(), that.playerElemID_);
+     });
+
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.videoPlay = function() {
