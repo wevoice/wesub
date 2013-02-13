@@ -37,7 +37,7 @@ from base import VideoType, VideoTypeError
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 from utils.metrics import Meter, Occurrence
 
-from libs.unilangs.unilangs import LanguageCode
+from libs.unilangs import LanguageCode
 
 
 logger = logging.getLogger("youtube")
