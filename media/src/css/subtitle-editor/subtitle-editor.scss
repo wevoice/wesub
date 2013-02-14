@@ -225,6 +225,17 @@ header.main {
     section.video {
         border-left: 1px solid #2B2C2D;
         border-right: 1px solid #2B2C2D;
+        padding: 10px;
+
+        span.video-title {
+            color: #D0D1D2;
+            display: block;
+            font: normal 13px $OpenSans;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
     }
     section.status {
         > * {

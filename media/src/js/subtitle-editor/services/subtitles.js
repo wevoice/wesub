@@ -74,33 +74,48 @@ var angular = angular || null;
                 }
             },
             getSubtitles: function(languageCode, versionNumber, callback){
+
+                // You must supply a language code in order to get subtitles.
                 if (!languageCode) {
-                    throw Error('You have to give me a languageCode');
+                    throw Error('You must supply a language code to getSubtitles().');
                 }
 
-                var subtitlesXML;
+                var subtitles;
 
-                for (var i=0; i < cachedData.languages.length ; i++){
-                    var langObj = cachedData.languages[i];
-                    if (langObj.code === languageCode){
-                        for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].version_no === parseInt(versionNumber, 10)){
-                                subtitlesXML = langObj.versions[j].subtitlesXML;
+                // Loop through all of our cached languages to find the correct subtitle version.
+                for (var i=0; i < cachedData.languages.length; i++){
+
+                    var language = cachedData.languages[i];
+
+                    // Once we find the language we're looking for, find the version.
+                    if (language.code === languageCode){
+
+                        for (var j = 0; j < language.versions.length; j++){
+
+                            // We've found the version.
+                            if (language.versions[j].version_no === parseInt(versionNumber, 10)){
+
+                                subtitles = language.versions[j];
+
                                 break;
                             }
                         }
+
                         break;
                     }
                 }
-                if (subtitlesXML !== undefined){
-                   callback(subtitlesXML);
-                } else {
-                    // fetch data
-                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode,
-                                        versionNumber);
 
+                // If we found subtitles, call the callback with them.
+                if (subtitles !== undefined){
+                   callback(subtitles);
+
+                // Otherwise, ask the API for this version.
+                } else {
+
+                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode, versionNumber);
+
+                    // TODO: Cache this. And handle errors.
                     $http.get(url).success(function(response) {
-                        // TODO: Cache this
                         callback(response);
                     });
                 }

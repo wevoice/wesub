@@ -54,7 +54,7 @@
             <h1>Amara</h1>
         </section>
         <section class="video center column" ng-controller="VideoTitleController">
-            [[ title ]]
+            <span class="video-title">[[ workingSubtitles.videoTitle ]] fiuodpas ufiopdas ufoipadsu piof udsafs</span>
         </section>
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
@@ -151,7 +151,8 @@
                         can-add-and-remove="false"
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
-                        video-id="{{ video.video_id }}">
+                        video-id="{{ video.video_id }}"
+                        id="working-subtitle-set">
 
                         <li subtitle-list-item
                             ng-repeat="subtitle in subtitles"

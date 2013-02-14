@@ -63,29 +63,29 @@ var angular = angular || null;
                 $scope.version = $scope.versions[0];
             }
         };
-        $scope.setReferenceSubs = function(subtitlesXML) {
+        $scope.setReferenceSubs = function(subtitles) {
             if (!$scope.refSubList) {
                 $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
             }
-            $scope.refSubList.scope.onSubtitlesFetched(subtitlesXML);
+            $scope.refSubList.scope.onSubtitlesFetched(subtitles);
         };
         $scope.versionChanged = function(newVersion) {
-            var subtitlesXML;
 
             if (!newVersion) {
                 return;
             }
-            subtitlesXML = newVersion.subtitlesXML;
+
+            var subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
                 SubtitleStorage.getSubtitles($scope.language.code,
                                              newVersion.version_no,
-                                             function(subtitlesXML) {
-                    $scope.version.subtitlesXML = subtitlesXML;
-                    $scope.setReferenceSubs(subtitlesXML);
+                                             function(subtitles) {
+                    $scope.version.subtitlesXML = subtitles.subtitlesXML;
+                    $scope.setReferenceSubs(subtitles);
                 });
             } else {
-                $scope.setReferenceSubs(subtitlesXML);
+                $scope.setReferenceSubs(newVersion);
             }
         };
 
@@ -232,30 +232,34 @@ var angular = angular || null;
             return $(window).height() - 359;
         };
         $scope.getSubtitles = function(languageCode, versionNumber) {
-            // if this version has no default source translation language
+
+            // If this version has no default source translation language
             // it will be empty, in which case we want to wait for user
             // interaction to request a reference subtitle set.
             if (!languageCode || !versionNumber) {
                 $scope.status = 'idle';
                 return;
             }
+
             $scope.status = 'loading';
-            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
-                $scope.onSubtitlesFetched(subtitlesXML);
+
+            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitles) {
+                $scope.onSubtitlesFetched(subtitles);
             });
+
         };
-        $scope.onSubtitlesFetched = function (dfxpXML) {
-            /**
-             * Once we have the dfxp from the server,
-             * massage the data as a simpler object and set it on the
-             * template. Angular will pick up the change (from the broadcast)
-             * and will re-render the UI.
-             * @param dfxpXML
-             */
+        $scope.onSubtitlesFetched = function (subtitles) {
 
+            // Save the title and description to this scope.
+            $scope.videoTitle = subtitles.title;
+            $scope.videoDescription = subtitles.description;
+
+            // Set up a new parser instance with this DFXP XML set.
             this.dfxpWrapper = new root.AmaraDFXPParser();
-            this.dfxpWrapper.init(dfxpXML);
+            this.dfxpWrapper.init(subtitles.subtitlesXML);
 
+            // Reference the parser and instance on the scope so we can access it via
+            // the templates.
             $scope.parser = this.dfxpWrapper;
             $scope.subtitles = $scope.parser.getSubtitles().get();
 
@@ -264,7 +268,7 @@ var angular = angular || null;
             // When we have subtitles for an editable set, tell the kids.
             $timeout(function() {
                 if ($scope.isEditable) {
-                    $scope.$broadcast('subtitlesFetched');
+                    $scope.$root.$broadcast('subtitlesFetched');
                 }
             });
         };
@@ -291,6 +295,10 @@ var angular = angular || null;
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));
         });
+
+        $scope.test = function() {
+            $scope.videoTitle = 'wafdsafsa';
+        };
 
         window.onresize = function() {
             $scope.$digest();
@@ -360,7 +368,17 @@ var angular = angular || null;
             $scope.$root.$emit('subtitleReady', $scope);
         });
     };
-    var VideoTitleController = function($scope, SubtitleStorage) {
+    var VideoTitleController = function($scope, SubtitleListFinder) {
+
+        // Once the working subtitles have been fetched, set the title and description.
+        $scope.$root.$on('subtitlesFetched', function() {
+
+            // Reference the actual scope in the template so we can get automatic binding
+            // on the title and description.
+            $scope.workingSubtitles = SubtitleListFinder.get('working-subtitle-set').scope;
+
+        });
+
     };
 
     root.LanguageSelectorController = LanguageSelectorController;
