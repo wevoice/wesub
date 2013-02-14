@@ -25,7 +25,7 @@
             </fieldset>
             <div class="grid_8 alpha third-party">
                 <fieldset>
-                    <h3>{% trans "Sync subtitles" %}</h3>
+                    <h3>{% trans "YouTube Sync" %}</h3>
                     <div class="callout">
                         {% if third_party %}
                             {% for account in third_party  %}
@@ -34,8 +34,8 @@
                                 </a>
                                 <p>
                                     <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
-                                    <strong>{% trans "Sync is active" %}</strong>
-                                    <span> for {{ account.username }}.</span>
+                                    <strong>{% trans "Link is active" %}</strong>
+                                    <span> for {{ account.full_name }}.</span>
                                 </p>
                             {% endfor %}
                         {% else %}
@@ -43,13 +43,13 @@
                                 <span>Connect to</span>
                                 <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube"/>
                             </a>
-                            <p>{% trans "Send Amara-created subtitles right to your YouTube videos!" %}</p>
+                            <p>{% trans "Enable Amara crowd subtitles on your personal YouTube channel (beta)" %}</p>
                         {% endif %}
                     </div>
                 </fieldset>
 
                 <fieldset>
-                    <h3>{% trans "Link Accounts" %}</h3>
+                    <h3>{% trans "Other Accounts" %}</h3>
                     <div class="callout">
                         <p>{% trans "Sign in to Amara with Twitter, Facebook, and other accounts" %}</p>
                         <a href="#account-modal" class="open-modal button reduced">{% trans "Add an account" %}</a>
@@ -155,7 +155,7 @@
         <div class="modal" id="youtube-modal">
             <div class="modal-header">
                 <a href="#" class="close">x</a>
-                <h3>{% trans 'Connect to YouTube' %}</h3>
+                <h3>{% trans 'Enable Crowd Subtitles on your Personal YouTube Channel (beta)' %}</h3>
             </div>
 
                 <form method="get" action="{% url profiles:add-third-party %}">
@@ -165,46 +165,50 @@
                             <img src="{{ STATIC_URL }}images/partners/youtube.png" alt="YouTube" height="65"/>
                             <input type="hidden" name="account_type" value="youtube"/>
 
-                            <h5>{% trans "What gets synced" %}</h5>
+                            <h5>{% trans "How We Enable Crowd Subtitles" %}</h5>
                             <ul>
                                 <li>
                                     {% blocktrans %}
-                                        Existing, completed Amara subtitles will be <strong>sent to YouTube immediately</strong>.
+                                        We automatically <strong>add your YouTube videos to Amara</strong> (and import their subtitles).
                                     {% endblocktrans %}
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        While linked, <strong>any newly edited, complete subtitles</strong> will be sent to YouTube.
+                                        We <strong>invite your viewers to subtitle</strong> by adding a link to your video descriptions.
                                     {% endblocktrans %}
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        Sync is <strong>one-way only</strong>. Changes made on YouTube will not be reflected on Amara.
+                                        We <strong>send subtitles to YouTube</strong> whenever they're completed on Amara.
                                     {% endblocktrans %}
                                 </li>
                             </ul>
 
-                            <h5>{% trans "Your YouTube data" %}</h5>
+                            <h5>{% trans "When We Send Subtitles to YouTube" %}</h5>
                             <ul>
                                 <li>
                                     {% blocktrans %}
-                                        Amara subtitles <strong>will overwrite</strong> existing YouTube subtitles if both exist.
+                                        The link is <strong>one-way only</strong>. Changes made on YouTube won't be reflected on Amara and may be overwritten. Use Amara to edit subtitles.
                                     {% endblocktrans %}
                                 </li>
                                 <li>
                                     {% blocktrans %}
-                                        Amara <strong>invites your viewers to subtitle</strong> by adding your video's URL to its YouTube description and appending a final subtitle (if space allows).
+                                        Amara will <strong>append a credit</strong> to the subtitles if space allows.
                                     {% endblocktrans %}
-                                    <a href="http://support.universalsubtitles.org/solution/articles/40227-syncing-to-youtube">{% trans "See what it looks like" %}</a>.
                                 </li>
                             </ul>
 
-                            <h5>{% trans "Step 1: Enable your YouTube account by creating a channel" %}</h5>
-                            <p><a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank" class="btn">{% trans "Create a channel" %}</a> (opens in a new window)</p>
+                            <p><a href="http://support.universalsubtitles.org/solution/articles/40227-syncing-to-youtube" target="_blank">{% trans "Learn more" %}</a>{% trans " about Crowd Subtitles and YouTube" %}</p>
 
-                            <h5>{% trans "Step 2: Link accounts" %}</h5>
-                            <input type="submit" class="btn btn-primary" value="{% trans 'Connect and Sync' %}" />
+                            <h5>{% trans "Ready to Enable Crowd Subtitles?" %}</h5>
+                            <input type="submit" class="btn btn-primary" value="{% trans 'Link accounts' %}" />
+
+                            <p class="notation">If you don't yet have a YouTube channel you should <a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank">{% trans "create one now" %}</a> (opens in a new window)</p>
                         </fieldset>
+                        <p>
+                            {% trans "Organizations/companies: interested in YouTube sync and crowd subtitling? " %}
+                            <a href="mailto:enterprise@amara.org">{% trans "Contact us" %}</a>.
+                        </p>
                     </div>
                 </form>
         </div>
