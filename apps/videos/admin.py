@@ -168,6 +168,7 @@ class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
         return obj.subtitle_version.language.video.title
 
 class SubtitleAdmin(admin.ModelAdmin):
+    search_fields = ['version_id']
     list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text', 'start_time', 'end_time']
 
 class VideoFeedAdmin(admin.ModelAdmin):

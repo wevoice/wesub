@@ -242,9 +242,11 @@ def edit_avatar(request):
             'message': force_unicode(_('Your photo has been updated.'))
         }
     else:
+        errors = []
+        [errors.append(force_unicode(e)) for e in form.errors['picture']]
         result = {
             'status': 'error',
-            'message': force_unicode(_(form.errors['picture']))
+            'message': ''.join(errors)
         }
     result['avatar'] = request.user._get_avatar_by_size(240)
     return HttpResponse(json.dumps(result))

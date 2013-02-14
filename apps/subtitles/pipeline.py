@@ -166,23 +166,22 @@ def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
     )
 
     if outstanding_subtrans_tasks.exists():
-        task = outstanding_subtrans_tasks.get()
+        for task in outstanding_subtrans_tasks.all():
+            # If there are any outstanding subtitle/translate tasks that are
+            # unassigned, we can go ahead and assign them to the committer (as long
+            # as they have permission to do so).
+            if not task.assignee and committer and can_assign_task(task, committer):
+                task.assignee = committer
 
-        # If there are any outstanding subtitle/translate tasks that are
-        # unassigned, we can go ahead and assign them to the committer (as long
-        # as they have permission to do so).
-        if not task.assignee and committer and can_assign_task(task, committer):
-            task.assignee = committer
+                # We save here only if the subtitles are not complete, because
+                # .complete() actually saves the task too.
+                if not complete:
+                    task.save()
 
-            # We save here only if the subtitles are not complete, because
-            # .complete() actually saves the task too.
-            if not complete:
-                task.save()
-
-        # Also, if the subtitles are complete, we can mark that outstanding
-        # subtitle/translate task as complete.
-        if complete:
-            task.complete()
+            # Also, if the subtitles are complete, we can mark that outstanding
+            # subtitle/translate task as complete.
+            if complete:
+                task.complete()
 
     # Outstanding review/approve tasks will need to be handled elsewhere.
     # TODO: Handle those here as well?

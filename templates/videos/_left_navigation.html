@@ -2,7 +2,7 @@
 
 {% with lang=video.subtitle_language %}
     {% if lang %}
-        {% if lang.has_version or lang|in_progress %}
+        {% if lang.get_public_tip or lang|in_progress %}
             <li class="{% complete_color video.subtitle_language %}{% if language.is_original %} active{% endif %}">
                 <a href="{% language_url request video.subtitle_language %}">
                     <span class="done_indicator"></span>

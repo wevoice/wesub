@@ -67,12 +67,9 @@ class UnisubsPage(Page):
         """Log in with the specified account type - default as a no-priv user.
 
         """
-        self.logger.info("LOG IN")
+        self.logger.info("LOG IN %s" % username)
         host = self.testcase.server_thread.host
         port = self.testcase.server_thread.port
-        self.logger.info('HOST AND PORT')
-        self.logger.info(host)
-
         engine = import_module(settings.SESSION_ENGINE)
         session = engine.SessionStore(self._get_session_id())
         user = authenticate(username=username, password=password)

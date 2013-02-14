@@ -117,7 +117,7 @@ class DataHelpers(object):
         return auth
 
 
-    def upload_subs(self, video, data=None):
+    def upload_subs(self, video, data=None, user=None):
         if not data:
             data = {'language_code': 'en',
                     'video': video.pk,
@@ -127,8 +127,12 @@ class DataHelpers(object):
                     'complete': 1
                     }
         c = Client()
-        c.login(**self.super_user())
+        if user:
+            c.login(**user)
+        else:
+            c.login(**self.super_user())
         response = c.post(reverse('videos:upload_subtitles'), data)
+
 
     def create_video_with_subs(self, video_url=None, data=None):
         """Create a video and subtitles.

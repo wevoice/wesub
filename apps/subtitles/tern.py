@@ -188,8 +188,9 @@ def markup_to_dfxp(text):
 
     # Some subtitles have ASCII control characters in them.  We're just gonna
     # strip those out entirely rather than try to deal with them.
-    control_chars = ['\x02', '\x03', '\x00', '\x08', '\x0e', '\x0f', '\x13',
-                     '\x17', '\x1c', '\x1e', '\x1f']
+    control_chars = ['\x00', '\x02', '\x03', '\x08', '\x0c', '\x0e', '\x0f',
+                     '\x10', '\x11', '\x13', '\x14', '\x17', '\x1b', '\x1c',
+                     '\x1d', '\x1e', '\x1f']
     for c in control_chars:
         text = text.replace(c, '')
 
@@ -655,6 +656,7 @@ def _get_subtitles(sv):
             # marked as unsynced).
             source_subtitles = {}
 
+        data = []
         for s in subtitle_objects:
             source = source_subtitles.get(s.subtitle_id)
 
@@ -662,15 +664,22 @@ def _get_subtitles(sv):
                 start = source.start_time
                 end = source.end_time
                 paragraph = source.start_of_paragraph
+                order = source.subtitle_order
             else:
                 start = None
                 end = None
                 paragraph = s.start_of_paragraph
+                order = None
 
+            data.append((order, start, end, paragraph, s.subtitle_text))
+
+        data.sort()
+
+        for order, start, end, paragraph, text in data:
             yield (
                 start,
                 end,
-                markup_to_dfxp(s.subtitle_text),
+                markup_to_dfxp(text),
                 {'new_paragraph': paragraph},
             )
 
@@ -683,6 +692,7 @@ def _create_subtitle_version(sv, last_version):
 
     """
     from apps.subtitles import pipeline
+    from django.core.exceptions import MultipleObjectsReturned
 
     sl = sv.language
     nsl = sl.new_subtitle_language
@@ -693,9 +703,13 @@ def _create_subtitle_version(sv, last_version):
 
     parents = []
     if last_version and sl.is_dependent():
-        tip = sl.standard_language.new_subtitle_language.get_tip()
-        if tip:
-            parents = [tip]
+        if sl.standard_language:
+            tip = sl.standard_language.new_subtitle_language.get_tip()
+            if tip:
+                parents = [tip]
+        else:
+            log('SubtitleVersion', 'ORPHAN', sl.pk, None)
+
 
     if not dry:
         try:
@@ -705,6 +719,8 @@ def _create_subtitle_version(sv, last_version):
                 title=sv.title, description=sv.description, parents=parents,
                 visibility=visibility, author=sv.user,
                 created=sv.datetime_started)
+        except MultipleObjectsReturned:
+            log('SubtitleVersion', 'DUPLICATE_TASKS', sv.pk, None)
         except:
             log_subtitle_error(sv, subtitles)
             raise

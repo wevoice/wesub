@@ -19,13 +19,10 @@
 var angular = angular || null;
 
 (function() {
-    /*
-     * When you request a set of subtitles the api is hit if data is not yet on
-     * the cache.
-     */
 
     var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
     var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
+
     var root = this;
     var module = angular.module('amara.SubtitleEditor.services', []);
 
@@ -56,57 +53,69 @@ var angular = angular || null;
         var authHeaders = cachedData.authHeaders;
 
         return {
-
-            /**
-             * Tries to find the data in an in memory, if it's not there
-             * fetch from the server side.
-             * @param languageCode
-             * @param versionNumber
-             * @param callback Function to be called with the dfxp xlm
-             * once it's ready.
-             */
             getCachedData: function() {
                 return cachedData;
             },
             getLanguages: function(callback) {
+
+                // If there are no languages in our cached data, ask the API.
                 if (cachedData.languages && cachedData.languages.length === 0) {
+
                     var url = getVideoLangAPIUrl(cachedData.video.id);
+
                     $http.get(url).success(function(response) {
                         cachedData.languages = response.objects;
                         callback(response.objects);
                     });
+
+                // If we have cached languages, just call the callback.
                 } else {
                     callback(cachedData.languages);
                 }
             },
             getSubtitles: function(languageCode, versionNumber, callback){
+
+                // You must supply a language code in order to get subtitles.
                 if (!languageCode) {
-                    throw Error('You have to give me a languageCode');
+                    throw Error('You must supply a language code to getSubtitles().');
                 }
 
-                var subtitlesXML;
-                // will trigger a subtitlesFetched event when ready
-                for (var i=0; i < cachedData.languages.length ; i++){
-                    var langObj = cachedData.languages[i];
-                    if (langObj.code === languageCode){
-                        for (var j = 0; j < langObj.versions.length ; j++){
-                            if (langObj.versions[j].version_no === parseInt(versionNumber, 10)){
-                                subtitlesXML = langObj.versions[j].subtitlesXML;
+                var subtitles;
+
+                // Loop through all of our cached languages to find the correct subtitle version.
+                for (var i=0; i < cachedData.languages.length; i++){
+
+                    var language = cachedData.languages[i];
+
+                    // Once we find the language we're looking for, find the version.
+                    if (language.code === languageCode){
+
+                        for (var j = 0; j < language.versions.length; j++){
+
+                            // We've found the version.
+                            if (language.versions[j].version_no === parseInt(versionNumber, 10)){
+
+                                subtitles = language.versions[j];
+
                                 break;
                             }
                         }
+
                         break;
                     }
                 }
-                if (subtitlesXML !== undefined){
-                   callback(subtitlesXML);
-                } else {
-                    // fetch data
-                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode,
-                                        versionNumber);
 
+                // If we found subtitles, call the callback with them.
+                if (subtitles !== undefined){
+                   callback(subtitles);
+
+                // Otherwise, ask the API for this version.
+                } else {
+
+                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode, versionNumber);
+
+                    // TODO: Cache this. And handle errors.
                     $http.get(url).success(function(response) {
-                        // TODO: Cache this
                         callback(response);
                     });
                 }
@@ -116,6 +125,7 @@ var angular = angular || null;
             },
 
             approveTask: function(response, notes) {
+
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
 
                 var promise = $http({
@@ -130,8 +140,10 @@ var angular = angular || null;
                 });
 
                 return promise;
+
             },
             sendBackTask: function(response, notes) {
+
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
 
                 var promise = $http({
@@ -150,9 +162,9 @@ var angular = angular || null;
 
             },
             saveSubtitles: function(videoID, languageCode, dfxpString){
-                // first we should save those subs locally
-                //
+
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
+
                 var promise = $http({
                     method: 'POST',
                     url: url,
@@ -170,44 +182,40 @@ var angular = angular || null;
 
         };
     });
-
-    /**
-     * Since we might have more than one subtitle list components on the
-     * page (e.g. one for editing, the other is the reference one), we
-     * need a way to identify / find them. For example, when changing the
-     * reference language, the selector must know how which of the components
-     * to update.
-     */
     module.factory('SubtitleListFinder', function($http) {
+        /**
+         * A sevice to cache and retrieve instances of the subtitle-list directive.
+         *
+         * TODO: We don't really need this service. We can simply use angular.element to retrieve
+         * subtitle-list instances and access the scope / controller from there.
+         */
         var registry = {};
 
         return {
+            register: function(name, elm, controller, scope) {
+                /**
+                 * @param name  String to identify this subtitle list by, this is taken from the
+                 * value of the 'subtitle-list' attribute on the SubtitleList directive.
+                 * @param elm The wrapped element for the subtitle list.
+                 * @param controller Controller for the the subtitle list
+                 * @param scope The scope for the list
+                 */
 
-            /**
-             * Add to the registry what subtitle list should be found
-             * when refered by this name.  Registring the same name more
-             * than once will throw an error
-             * @param name  String to identify this subtitle list by, this is taken from the
-             * value of the 'subtitle-list' attribute on the SubtitleList directive
-             * @param elm The wrapped element for the subtitle list.
-             * @param controller Controller for the the subtitle list
-             * @param scope The scope for the list
-             */
-            register: function(name, elm, controller, scope){
-                if(registry[name]) {
-                    // not sure we want to error on this, but let's be cautious until
-                    // we are sure
-                   throw new Error("Already registred a subtitle list component with name'" + name + "'") ;
+                // Registering the same name more than once will throw an error.
+                if (registry[name]){
+                   throw new Error('Already registred a subtitle list component with name"' + name + '".') ;
                 }
+
                 registry[name] = {
                     name: name,
                     elm: elm,
                     controller: controller,
                     scope: scope
                 };
+
                 return this;
             },
-            get: function(name){
+            get: function(name) {
                 return registry[name];
             }
         };
