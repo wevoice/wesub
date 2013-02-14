@@ -656,6 +656,7 @@ def _get_subtitles(sv):
             # marked as unsynced).
             source_subtitles = {}
 
+        data = []
         for s in subtitle_objects:
             source = source_subtitles.get(s.subtitle_id)
 
@@ -663,15 +664,22 @@ def _get_subtitles(sv):
                 start = source.start_time
                 end = source.end_time
                 paragraph = source.start_of_paragraph
+                order = source.subtitle_order
             else:
                 start = None
                 end = None
                 paragraph = s.start_of_paragraph
+                order = None
 
+            data.append((order, start, end, paragraph, s.subtitle_text))
+
+        data.sort()
+
+        for order, start, end, paragraph, text in data:
             yield (
                 start,
                 end,
-                markup_to_dfxp(s.subtitle_text),
+                markup_to_dfxp(text),
                 {'new_paragraph': paragraph},
             )
 
