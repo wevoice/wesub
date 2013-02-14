@@ -311,7 +311,7 @@ header.main {
             width: 60%;
 
             a {
-                color: #999999;
+                color: #E4EFF0;
                 display: inline-block;
                 font: normal 11px $OpenSans;
                 padding: 11px 12px 12px 12px;
@@ -319,6 +319,9 @@ header.main {
 
                 &:hover {
                     color: white;
+                }
+                &.save-and-exit {
+                    background: #126295;
                 }
             }
         }
@@ -478,7 +481,7 @@ section.main {
 
             h1 {
                 font-size: 16px;
-                margin-bottom: 20px;
+                margin-bottom: 30px;
             }
             p {
                 font-size: 11px;
