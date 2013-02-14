@@ -240,7 +240,7 @@ var angular = angular || null;
                 return;
             }
             $scope.status = 'loading';
-            $scope.items = SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
+            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitlesXML) {
                 $scope.onSubtitlesFetched(subtitlesXML);
             });
         };
@@ -361,7 +361,6 @@ var angular = angular || null;
         });
     };
     var VideoTitleController = function($scope, SubtitleStorage) {
-        $scope.title = "Oh hai.";
     };
 
     root.LanguageSelectorController = LanguageSelectorController;

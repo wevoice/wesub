@@ -85,7 +85,7 @@ var angular = angular || null;
                 }
 
                 var subtitlesXML;
-                // will trigger a subtitlesFetched event when ready
+
                 for (var i=0; i < cachedData.languages.length ; i++){
                     var langObj = cachedData.languages[i];
                     if (langObj.code === languageCode){
@@ -150,8 +150,7 @@ var angular = angular || null;
 
             },
             saveSubtitles: function(videoID, languageCode, dfxpString){
-                // first we should save those subs locally
-                //
+
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
                 var promise = $http({
                     method: 'POST',
