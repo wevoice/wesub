@@ -23,9 +23,10 @@ class UnisubsMenu(Page):
     _LOGOUT = 'Logout'   #visible text link
     _LANG_PREFERENCES = '.unisubs-languagePreferences'
 
+    _CAPTIONS = "span.unisubs-captionSpan"
 
 
-    def _visible_menu_text(self):
+    def visible_menu_text(self):
         """Return the text displayed for the Subs menu.
 
         """
@@ -39,7 +40,7 @@ class UnisubsMenu(Page):
         language_list = []
         elements = self.browser.find_elements_by_css_selector(
             self._LANG_LIST)
-        for el in elements():
+        for el in elements:
             lang = el.find_element_by_css(self._LANG_TITLE).text
             language_list.append(lang)
         return language_list
@@ -50,7 +51,7 @@ class UnisubsMenu(Page):
         """
         elements = self.browser.find_elements_by_css_selector(
             self._LANG_TITLE)
-        for el in elements():
+        for el in elements:
             if el.text == language:
                 parent = el.parent()
                 status = parent.find_element_by_css_selector(
@@ -63,7 +64,8 @@ class UnisubsMenu(Page):
         """
         elements = self.browser.find_elements_by_css_selector(
             self._LANG_TITLE)
-        for el in elements():
+        for el in elements:
+            self.logger.info(el.text)
             if el.text == language:
                 return el
 
@@ -85,7 +87,15 @@ class UnisubsMenu(Page):
         self.open_menu()
         self.click_by_css(self._IMPROVE_SUBS)
 
+    def new_translation(self):
+        self.open_menu()
+        self.click_by_css(self._NEW_TRANSLATION)
 
+    def displays_new_translation(self):
+        return self.is_element_visible(self._NEW_TRANSLATION)
+
+    def displays_improve_subtitles(self):
+        return self.is_element_visible(self._IMPROVE_SUBS)
  
     def open_subtitle_homepage(self):
         """Open the subtitle homepage.
@@ -99,11 +109,28 @@ class UnisubsMenu(Page):
         """Returns the download url of the specified language.
 
         """
-        if self._visible_menu_text is not language:
+        if self.visible_menu_text is not language:
             self.open_menu()
             self.select_language(language)
         self.open_menu()
         return self.get_element_attribute(self._DOWNLOAD_SUBTITLES, 'href')
+            
+    def start_playback(self, video_position=0):
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].play()"
+                                    % video_position)
 
+    def pause_playback(self, video_position=0):
+        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].pause()" 
+                                    % video_position)
 
-             
+    def displays_subs_in_correct_position(self):
+        """Return true if subs are found in correct position on video.
+
+        """
+        self.wait_for_element_visible(self._CAPTIONS)
+        self.pause_playback(video_position)
+        size = self.get_size_by_css(self._CAPTIONS)
+        height = size["height"]
+        if 10 < height < 80:
+            return True
+ 

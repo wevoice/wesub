@@ -85,7 +85,7 @@ class SubtitleEditor(EditorDialogs):
         self.logger.info('buffering up the video...')
         self.play()
         self.wait_for_element_present(self._PAUSE)
-        time.sleep(2)
+        time.sleep(1)
         self.pause()
         start_time = time.time()
         while time.time() - start_time < 30:
@@ -101,7 +101,7 @@ class SubtitleEditor(EditorDialogs):
         """
         self.buffer_video()
         self.play()
-        time.sleep(3)
+        time.sleep(2)
         self.click_by_css(self._SYNC)
 
         for x in range(num_subs):

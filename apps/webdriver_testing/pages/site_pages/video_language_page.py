@@ -57,4 +57,13 @@ class VideoLanguagePage(VideoPage):
         self.logger.info(r.content)
         return r.headers
 
+    def displays_subtitles(self):
+        try:
+            self.get_elements_list(self._SUB_LINES)
+            return True
+        except:
+            return None
+
+        
+
 
