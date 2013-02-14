@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import logging
 import random
 
 from django.contrib.auth.backends import ModelBackend
@@ -23,6 +24,7 @@ from django.contrib.auth.models import User as AuthUser
 from auth.models import CustomUser as User
 from socialauth.models import OpenidProfile as UserAssociation, AuthMeta
 
+logger = logging.getLogger(__name__)
 
 class CustomUserBackend(ModelBackend):
     supports_object_permissions = False
@@ -113,14 +115,25 @@ class OpenIdBackend(object):
 
     def _lookup_association(self, openid_key, request, provider):
         if provider == 'Google':
-            email = request.openid.ax.get('http://axschema.org/contact/email')
-            email = email.pop()
-            try:
-                return UserAssociation.objects.filter(email=email)[0]
-            except IndexError:
-                raise UserAssociation.DoesNotExist()
+            return self._lookup_gmail_assocation(openid_key, request,
+                                                 provider)
         else:
             return UserAssociation.objects.get(openid_key = openid_key)
+
+    def _lookup_gmail_assocation(self, openid_key, request, provider):
+        email = request.openid.ax.get('http://axschema.org/contact/email')
+        email = email.pop()
+        try:
+            rv = UserAssociation.objects.filter(email=email)[0]
+        except IndexError:
+            raise UserAssociation.DoesNotExist()
+        if rv.openid_key != openid_key:
+            logger.error("Gmail OpenID key different for user", extra={
+                'email': email,
+                'original OpenID key': rv.openid_key,
+                'new OpenID key': openid_key,
+            })
+        return rv
 
     def get_user(self, user_id):
         try:
