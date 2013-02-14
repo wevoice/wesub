@@ -142,3 +142,17 @@ class VideoPage(UnisubsPage):
     def unfeature_video(self):
         self.click_link_text('Unfeature video')
 
+    def displays_subtitle_me(self):
+        return self.is_element_visible(self._SUBTITLE_MENU)
+
+    def click_subtitle_me(self):
+        self.click_by_css(self._SUBTITLE_MENU)
+
+    def displays_add_subtitles(self):
+        return self.is_element_visible(self._ADD_SUBTITLES)
+
+    def displays_add_translation(self):
+        return self.is_element_visible(self._ADD_TRANSLATION)
+
+    def displays_upload_subtitles(self):
+        return self.is_element_visible(self._UPLOAD_SUBTITLES)
