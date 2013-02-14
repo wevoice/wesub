@@ -101,7 +101,7 @@ var angular = angular || null;
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
-        $scope.cancel = function($event) {
+        $scope.cancelAndClose = function($event) {
 
             $event.preventDefault();
 
@@ -135,7 +135,7 @@ var angular = angular || null;
             });
 
         };
-        $scope.saveAndExit = function($event) {
+        $scope.saveAndClose = function($event) {
 
             $event.preventDefault();
 
@@ -182,10 +182,6 @@ var angular = angular || null;
 
                 return promise;
             }
-        };
-        $scope.toggleSaveDropdown = function($event) {
-            $scope.dropdownOpen = !$scope.dropdownOpen;
-            $event.preventDefault();
         };
 
         $scope.$root.$on('approve-task', function() {
