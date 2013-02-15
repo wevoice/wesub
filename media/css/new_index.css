@@ -88,7 +88,7 @@ body#index a:hover {
 #home-left #features h3, #home-left #features ul {
     padding-left: 14px
 }
-#home-left button {
+#home-left button, #partners a.button {
     background: #1573AF;
     -moz-box-shadow: inset 0px 1px 0 #23bddb, 0 1px 3px rgba(0,0,0,0.1);
     -ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#177db6', EndColorStr='#1369a8');
