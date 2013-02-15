@@ -73,17 +73,17 @@ unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
 
 unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, containerID) 
 {
-    window.thePlayer = this.player_ = window['Wistia']['embed'](videoId, {
-        playerColor: "ff0000",
-        fullscreenButton: false,
-        container: containerID,
-        autoplay: false,
-        chromeless: this.forDialog_,
-        controlsVisibleOnLoad: false,
-        doNotTrack: true,
-        playButton: ! this.forDialog_,
-        playBar: ! this.forDialog_,
-        videoFoam: false
+    this.player_ = window['Wistia']['embed'](videoId, {
+        'playerColor': "ff0000",
+        'fullscreenButton': false,
+        'container': containerID,
+        'autoplay': false,
+        'chromeless': this.forDialog_,
+        'controlsVisibleOnLoad': false,
+        'doNotTrack': true,
+        'playButton': ! this.forDialog_,
+        'playBar': ! this.forDialog_,
+        'videoFoam': false
     });
     // add listeners to buttons
     var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
@@ -267,7 +267,7 @@ unisubs.player.WistiaVideoPlayer.prototype.makePlayer_ = function() {
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.playerReady_ = function(e) {
-    window.thePlayer  = this.player_ = this.almostPlayer_;
+    this.player_ = this.almostPlayer_;
     goog.array.forEach(this.commands_, function(cmd) { cmd(); });
     this.commands_ = [];
     this.getHandler().
