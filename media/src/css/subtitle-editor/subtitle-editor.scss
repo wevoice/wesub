@@ -225,6 +225,17 @@ header.main {
     section.video {
         border-left: 1px solid #2B2C2D;
         border-right: 1px solid #2B2C2D;
+        padding: 10px;
+
+        span.video-title {
+            color: #D0D1D2;
+            display: block;
+            font: normal 13px $OpenSans;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%;
+        }
     }
     section.status {
         > * {
@@ -237,9 +248,8 @@ header.main {
         }
         div.dropdown {
             border-right: 1px solid #2B2C2D;
-            float: left;
+            float: right;
             position: relative;
-            width: 40%;
 
             a {
                 color: #999999;
@@ -254,7 +264,7 @@ header.main {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
-                    width: 80%;
+                    width: 100%;
                 }
                 img {
                     float: right;
@@ -274,11 +284,11 @@ header.main {
             }
             ul {
                 background: #212223;
-                left: 20px;
+                right: 0;
                 padding: 7px 15px;
                 position: absolute;
                 top: 58px;
-                width: 100%;
+                min-width: 130px;
                 @include border-radius(3px);
 
                 &:before {
@@ -304,25 +314,18 @@ header.main {
                     }
                 }
             }
+            &.status {
+                a {
+                    cursor: default;
+                }
+            }
         }
         div.exit {
-            float: right;
-            text-align: right;
-            width: 60%;
+            text-align: center;
 
-            a {
-                color: #E4EFF0;
-                display: inline-block;
-                font: normal 11px $OpenSans;
-                padding: 11px 12px 12px 12px;
-                text-decoration: none;
-
-                &:hover {
-                    color: white;
-                }
-                &.save-and-exit {
-                    background: #126295;
-                }
+            > a {
+                background: #126295;
+                color: white;
             }
         }
     }

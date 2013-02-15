@@ -352,6 +352,7 @@ class SubtitleLanguage(models.Model):
             related_name='new_followed_languages', editable=False)
 
     # Statistics
+    subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     subtitles_fetched_counter = RedisSimpleField()
 
     # Manager

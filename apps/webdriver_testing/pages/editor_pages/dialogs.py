@@ -162,8 +162,3 @@ class CreateLanguageSelection(EditorDialogs):
             self._set_translation_source(kwargs['translation_source'])
         self._submit_choices()
 
-
-
-
-    
-

@@ -481,11 +481,9 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
 
         """
         tv = self.videos_list[0]
-
         self.videos_tab.open_page(self.project2_page)
-        #self.videos_tab.search(tv.title)
-        #self.assertTrue(self.videos_tab.video_present(tv.title))
-        self.browser.get_screenshot_as_file('apps/webdriver_testing/Results/pass.png')
+        self.videos_tab.search(tv.title)
+        self.assertTrue(self.videos_tab.video_present(tv.title))
 
 
     def test_remove(self):

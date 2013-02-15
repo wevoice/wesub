@@ -71,18 +71,18 @@ unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
     return isReady;
 };
 
-unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId, containerID){
-
+unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, containerID) 
+{
     this.player_ = window['Wistia']['embed'](videoId, {
         playerColor: "ff0000",
         fullscreenButton: false,
         container: containerID,
         autoplay: false,
-        chromeless: true,
+        chromeless: this.forDialog_,
         controlsVisibleOnLoad: false,
         doNotTrack: true,
-        playButton: false,
-        playBar: false,
+        playButton: ! this.forDialog_,
+        playBar: ! this.forDialog_,
         videoFoam: false
     });
     // add listeners to buttons
@@ -109,7 +109,8 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function( videoId,
             that.player_['state']() == 'playing' ?
                 that.player_['pause']() :
                 that.player_['play']();
-        });
+        }
+    );
     this.player_['bind']('timechange', function(t){that.onPlayerTimeChanged(t);});
 };
 
@@ -147,10 +148,11 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.setPlayheadTime = function(t) {
-    if (!this.player_){
-        return;
+    if (this.player_) {
+        this.player_['time'](t);
+    } else {
+        this.commands_.push(goog.bind(this.setPlayheadTime, this, playheadTime));
     }
-    this.player_['time'](t ? t : 0);
 }
 unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
     if (!this.player_){
@@ -168,7 +170,7 @@ unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
             this.player_['play']();
         }
     } else if (speedmode == 'au') { // magical autopause
-    } else { // beginner {
+    } else { // beginner 
         this.player_['play']();
         var that = this;
         window.setTimeout(function () { that.player_['pause'](); }, 4000);
@@ -179,11 +181,11 @@ unisubs.player.WistiaVideoPlayer.prototype.videoSkip = function() {
     if (! this.player_) { return; }
     var speedmode = this.videoGetMode();
     if (speedmode == 'pl') { // beginner
-        this.player_.time(this.player_['time']() - 4)['play']();
+        this.player_['time'](this.player_['time']() - 4)['play']();
         var that = this;
         window.setTimeout(function () { that.player_['pause'](); }, 4000);
     } else {
-        this.player_.time(this.player_['time']() - 8)['play']();
+        this.player_['time'](this.player_['time']() - 8)['play']();
     }
 }
 
@@ -316,6 +318,7 @@ unisubs.player.WistiaVideoPlayer.prototype.isPlaying = function() {
 unisubs.player.WistiaVideoPlayer.prototype.isPaused = function() {
     return this.player_ && this.player_['state']() == 'paused';
 };
+
 unisubs.player.WistiaVideoPlayer.prototype.getPlayheadTimeInternal = function() {
     if (this.player_) {
         return this.player_['time']();
@@ -328,11 +331,11 @@ unisubs.player.WistiaVideoPlayer.prototype.getVolume = function()
 {
     return this.player_ ? this.player_['volume']() : 0;
 };
+
 unisubs.player.WistiaVideoPlayer.prototype.setVolume = function(vol)
 {
     if (this.player_)
     {
-
         this.player_['volume'](vol);
         this.playVolume_ = vol;
     }
