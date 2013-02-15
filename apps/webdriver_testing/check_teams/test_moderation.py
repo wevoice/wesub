@@ -68,11 +68,6 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.team.translate_policy=20
         self.team.save()
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-        self.video_pg.log_out()
-
-
 
     def test_subtitleme(self):
         """Subtitle Me button displayed  published transcript. """
@@ -231,10 +226,6 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.team.translate_policy=20
         self.team.save()
         self.video_pg.open_video_page(self.draft.video_id)
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-        self.video_pg.log_out()
 
 
     def test_subtitleme__draft(self):
