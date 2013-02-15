@@ -224,7 +224,7 @@
                                 </h3>
                                 <p>
                                     <strong>{% trans "Video" %}:</strong>
-                                    <a href="{{ task.team_video.video.get_absolute_url }}">
+                                    <a href="{{ task.team_video.video.get_absolute_url }}" title="{{ task.team_video.video.get_title_display }}">
                                         {{ task.team_video|truncatewords:12 }}
                                     </a>
                                     {% if task.team_video.video.duration %}
