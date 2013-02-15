@@ -109,7 +109,7 @@ class CreateVideoUrlForm(forms.ModelForm):
 
             video_url = video_type.video_url(video_type)
 
-            if not url_exists(video_url) :
+            if video_type.requires_url_exists and  not url_exists(video_url) :
                 raise forms.ValidationError(_(u'This URL appears to be a broken link.'))
 
         except VideoTypeError, e:

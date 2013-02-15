@@ -79,7 +79,7 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, 
         'container': containerID,
         'autoplay': false,
         'chromeless': this.forDialog_,
-        'controlsVisibleOnLoad': false,
+        'controlsVisibleOnLoad': !this.forDialog_,
         'doNotTrack': true,
         'playButton': ! this.forDialog_,
         'playBar': ! this.forDialog_,
@@ -87,15 +87,19 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, 
     });
     // add listeners to buttons
     var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
-    var skip_btn = goog.dom.getElementByClass('unisubs-skip');
-    goog.events.listen(play_btn, goog.events.EventType.CLICK, goog.bind(this.playInternal, this));
+    if (play_btn){
+
+        goog.events.listen(play_btn, goog.events.EventType.CLICK, goog.bind(this.playInternal, this));
+    }
     // add listeners for TAB key
-    var docKh = new goog.events.KeyHandler(document);
     var that = this;
     // player controls
     var boundFunc = goog.bind(that.playPause, that);
-    goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
-        goog.events.EventType.CLICK, boundFunc);
+    var playPauseBtn = goog.dom.getElementByClass('unisubs-playPause');
+    if (playPauseBtn){
+        goog.events.listen(playPauseBtn,
+            goog.events.EventType.CLICK, boundFunc);
+    }
     this.player_['bind']('timechange', function(t){that.onPlayerTimeChanged(t);});
     // init the player correctly else play pause states will be weird
     this.player_['play']() && this.player_['pause']();
