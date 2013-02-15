@@ -88,7 +88,7 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, 
     // add listeners to buttons
     var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
     var skip_btn = goog.dom.getElementByClass('unisubs-skip');
-    goog.events.listen(play_btn, goog.events.EventType.CLICK, this.playInternal);
+    goog.events.listen(play_btn, goog.events.EventType.CLICK, goog.bind(this.playInternal, this));
     // add listeners for TAB key
     var docKh = new goog.events.KeyHandler(document);
     var that = this;
@@ -161,6 +161,7 @@ unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
     }
     this.player_['pause']();
     this.paused = true;
+    this.timeUpdateTimer_.stop();
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
@@ -170,10 +171,14 @@ unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
     }
     this.player_['play']();
     this.paused = false;
+    this.timeUpdateTimer_.start();
 };
 
-
-
+unisubs.player.WistiaVideoPlayer.prototype.progressTick_ = function(e) {
+    if (this.getDuration() > 0)
+        this.dispatchEvent(
+            unisubs.player.AbstractVideoPlayer.EventType.PROGRESS);
+};
 
 unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
     var config = this.videoSource_.getVideoConfig();
@@ -243,6 +248,9 @@ unisubs.player.WistiaVideoPlayer.prototype.enterDocument = function() {
             myOnReady();
         };
     }
+    this.getHandler().
+        listen(this.timeUpdateTimer_, goog.Timer.TICK, this.timeUpdateTick_);
+    this.progressTimer_.start();
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.makePlayer_ = function() {
@@ -268,6 +276,11 @@ unisubs.player.WistiaVideoPlayer.prototype.playerReady_ = function(e) {
     this.progressTimer_.start();
 };
 
+unisubs.player.WistiaVideoPlayer.prototype.timeUpdateTick_ = function (){
+    if (this.getDuration() > 0){
+        this.sendTimeUpdateInternal();
+    }
+}
 unisubs.player.WistiaVideoPlayer.prototype.getVideoElements = function() {
     return [this.iframe_];
 };
