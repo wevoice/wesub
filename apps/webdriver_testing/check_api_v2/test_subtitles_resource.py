@@ -104,10 +104,17 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
                                                             upload_data )
         self.video_language_pg.open_video_lang_page(self.test_video.video_id, 
             'en')
+         
         verification_file = os.path.join(self.subs_data_dir,'Untimed_lines.txt')
         expected_list = [line.strip() for line in codecs.open(
-        verification_file, encoding='utf-8')]
+                verification_file, encoding='utf-8')]
         displayed_list = self.video_language_pg.displayed_lines()
+        #f = codecs.open('myworkfile', 'w', encoding="utf-8")
+        #for line in displayed_list:
+        #    f.write(line)
+
+        #f.close()
+        self.logger.info([(i,j) for i,j in zip(expected_list, displayed_list) if i!=j])
         self.assertEqual(expected_list, displayed_list) 
 
     def test_upload__resource_uri(self):

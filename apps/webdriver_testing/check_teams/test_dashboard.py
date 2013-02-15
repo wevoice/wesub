@@ -404,12 +404,12 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.click_lang_task(video.title, 
                                           'Create French subtitles')
         self.create_modal.lang_selection(video_language='English')
-        self.assertEqual('Typing', 
-                         self.sub_editor.dialog_title())
+        self.assertEqual('Typing', self.sub_editor.dialog_title())
 
 
     def test_start__translation(self):
-        """Member starts translation from any task in “Videos that need your help”.
+        """Member starts translation from any task in “Videos that need your
+           help”.
 
         """
         self.logger.info('setup: Setting task policy to all team members')

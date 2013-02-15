@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# -*- coding: utf-8 -*-
 from video_page import VideoPage
 import requests
 
@@ -32,7 +32,9 @@ class VideoLanguagePage(VideoPage):
         displayed_subtitles = []
         line_elements = self.get_elements_list(self._SUB_LINES)
         for el in line_elements:
-            displayed_subtitles.append(el.text)
+            l = el.text
+            l = l.replace('\n', ' ')
+            displayed_subtitles.append(l)
         return displayed_subtitles
 
 
