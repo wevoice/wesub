@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
-from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
 import time
 
 class VideosTab(ATeamPage):
@@ -247,7 +246,6 @@ class VideosTab(ATeamPage):
         """
         self.logger.info('Opening tasks for video %s' % video)
         self._click_video_action('Tasks', video)
-        return tasks_tab.TasksTab(self.testcase)
 
 
     def team_video_id(self, video):

@@ -65,9 +65,7 @@ class TeamMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     team = factory.SubFactory(TeamFactory)
     role = TeamMember.ROLE_OWNER
-    user = factory.SubFactory(UserFactory, 
-            username=factory.Sequence(lambda n: 'TeamMember' + n))
-
+    user = factory.SubFactory(UserFactory)
 
 class TeamContributorMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember

@@ -34,6 +34,8 @@ class TasksTab(ATeamPage):
 
     #TASK OPTIONS
     _PERFORM = 'div.action-group h5' #Opens on hover
+    _PERFORM_ASSIGNED = '.perform'
+    _ASSIGN_AND_PERFORM = '.assign-and-perform'
 
     def open_tasks_tab(self, team):
         """Open the team with the provided team slug.
@@ -54,7 +56,7 @@ class TasksTab(ATeamPage):
                 kind = el.find_element_by_css_selector(self._TASK_KIND).text,
                 video =  el.find_element_by_css_selector(self._TASK_VIDEO).text,
                 assignee = el.find_element_by_css_selector(self._ASSIGNEE).text,
-                trigger = el.find_element_by_css_selector(self._TASK_TRIGGER)
+                perform = el.find_element_by_css_selector(self._TASK_TRIGGER)
                 )
             task_list.append(task)
         return task_list
@@ -63,7 +65,7 @@ class TasksTab(ATeamPage):
         all_tasks = self._task_info()
         for task in all_tasks:
             if task_type in task['kind'] and title in task['video']:
-                return True
+                return task 
 
 
     def _hover_perform(self): 
@@ -74,13 +76,12 @@ class TasksTab(ATeamPage):
         self.click_by_css(self._PERFORM)
  
  
-    def click_perform_task_action(self, action):
-        """Hover over the task perform and choose the action link.
+    def perform_and_assign_task(self, task_type, title):
+        task = self.task_present(task_type, title)
+        perform_el = task['perform']
+        self.click_item_after_hover(perform_el.tag_name, 
+                                    self._ASSIGN_AND_PERFORM)
 
-        Current options are 'Start now', 'Upload draft, Resume'
-        """
-        url = self.get_element_attribute('a.perform', 'href')
-        print url
 
     def filtered_video(self):
         return self.get_text_by_css(self._FILTERED_VIDEO)
