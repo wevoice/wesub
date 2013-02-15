@@ -35,7 +35,7 @@ goog.provide('unisubs.subtitle.EditableCaptionSet');
  *     when deserializing an EditableCaptionSet from memory after a finish failure. It means that 
  *     during the failed editing session, the EditableCaptionSet got forked.
  */
-unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated) {
+unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated, opt_languageWasForked) {
     goog.events.EventTarget.call(this);
     var that = this;
     var c;
@@ -65,6 +65,8 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
     this.languageName = opt_languageName;
     this.languageIsRTL = opt_languageIsRTL;
     this.isModerated = opt_isModerated;
+
+    this.languageWasForked = opt_languageWasForked;
 };
 
 goog.inherits(unisubs.subtitle.EditableCaptionSet, goog.events.EventTarget);
