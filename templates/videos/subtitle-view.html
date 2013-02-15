@@ -227,7 +227,7 @@
                             </div>
                             {% endif %}
                             <div class="translation-text">
-                                {{ item.2|display_subtitle|safe|linebreaksbr }}{{ item.text|display_subtitle|safe }}{% if item.meta.new_paragraph %}<p class='quiet'>¶</p>{% endif %}
+                                {{ item.2|display_subtitle|safe|linebreaksbr }}{% if item.meta.new_paragraph %}<p class='quiet'>¶</p>{% endif %}
                             </div>
                         </li>
                         {% endfor %}
