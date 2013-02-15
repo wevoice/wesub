@@ -73,7 +73,7 @@ unisubs.player.WistiaVideoPlayer.isWistiaAPIReady = function() {
 
 unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, containerID) 
 {
-    this.player_ = window['Wistia']['embed'](videoId, {
+    window.thePlayer = this.player_ = window['Wistia']['embed'](videoId, {
         playerColor: "ff0000",
         fullscreenButton: false,
         container: containerID,
@@ -89,29 +89,16 @@ unisubs.player.WistiaVideoPlayer.prototype.onWistiaAPIReady = function(videoId, 
     var play_btn = goog.dom.getElementByClass('unisubs-play-beginner');
     var skip_btn = goog.dom.getElementByClass('unisubs-skip');
     goog.events.listen(play_btn, goog.events.EventType.CLICK, this.playInternal);
-    goog.events.listen(skip_btn, goog.events.EventType.CLICK, this.videoSkip);
     // add listeners for TAB key
     var docKh = new goog.events.KeyHandler(document);
     var that = this;
-    goog.events.listen(docKh, 'key', function (e) {
-        if (e.keyCode == 9) { // TAB key
-            if (e.shiftKey) {
-                that.videoSkip();
-            } else {
-                that.playInternal();
-            }
-        }
-    });
     // player controls
+    var boundFunc = goog.bind(that.playPause, that);
     goog.events.listen(goog.dom.getElementByClass('unisubs-playPause'),
-        goog.events.EventType.CLICK, function () {
-            if (! that.player_) { return; }
-            that.player_['state']() == 'playing' ?
-                that.player_['pause']() :
-                that.player_['play']();
-        }
-    );
+        goog.events.EventType.CLICK, boundFunc);
     this.player_['bind']('timechange', function(t){that.onPlayerTimeChanged(t);});
+    // init the player correctly else play pause states will be weird
+    this.player_['play']() && this.player_['pause']();
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.onPlayerTimeChanged = function(newTime) {
@@ -120,6 +107,18 @@ unisubs.player.WistiaVideoPlayer.prototype.onPlayerTimeChanged = function(newTim
         unisubs.player.AbstractVideoPlayer.EventType.TIMEUPDATE);
 };
 
+unisubs.player.WistiaVideoPlayer.prototype.playPause = function() {
+    if (! this.player_){
+        this.commands_.push(goog.bind(this, this.playPause));
+        return;
+    }
+    return;
+    if (this.isPlaying()){
+        this.pauseInternal();
+    }else{
+        this.playInternal();
+    }
+}
 unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
     unisubs.player.WistiaVideoPlayer.superClass_.createDom.call(this);
     this.setPlayerSize_();
@@ -148,59 +147,33 @@ unisubs.player.WistiaVideoPlayer.prototype.createDom = function() {
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.setPlayheadTime = function(t) {
-    if (this.player_) {
-        this.player_['time'](t);
-    } else {
-        this.commands_.push(goog.bind(this.setPlayheadTime, this, playheadTime));
+    if (!this.player_) {
+        this.commands_.push(goog.bind(this.setPlayheadTime, this, t));
+        return;
     }
-}
+    this.player_['time'](t);
+};
+
 unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
     if (!this.player_){
+        this.commands_.push(goog.bind(this.pauseInternal, this));
         return;
     }
     this.player_['pause']();
-}
+    this.paused = true;
+};
+
 unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
-    if (! this.player_) { return; }
-    var speedmode = this.videoGetMode();
-    if (speedmode == 'no') { // no autopause
-        if (this.player_['state']() == 'playing') {
-            this.player_['pause']();
-        } else {
-            this.player_['play']();
-        }
-    } else if (speedmode == 'au') { // magical autopause
-    } else { // beginner 
-        this.player_['play']();
-        var that = this;
-        window.setTimeout(function () { that.player_['pause'](); }, 4000);
+    if (! this.player_) {
+        this.commands_.push(goog.bind(this.playInternal, this));
+        return;
     }
-}
+    this.player_['play']();
+    this.paused = false;
+};
 
-unisubs.player.WistiaVideoPlayer.prototype.videoSkip = function() {
-    if (! this.player_) { return; }
-    var speedmode = this.videoGetMode();
-    if (speedmode == 'pl') { // beginner
-        this.player_['time'](this.player_['time']() - 4)['play']();
-        var that = this;
-        window.setTimeout(function () { that.player_['pause'](); }, 4000);
-    } else {
-        this.player_['time'](this.player_['time']() - 8)['play']();
-    }
-}
 
-unisubs.player.WistiaVideoPlayer.prototype.videoGetMode = function() {
-    if (! this.modeSelect) {
-        var nodes = goog.dom.getChildren(goog.dom.getElementByClass('unisubs-speedmode'));
-        for (ii = 0; ii < nodes.length; ++ii) {
-            if (nodes[ii].nodeName == 'SELECT') { 
-                this.modeSelect = nodes[ii];
-                break;
-            }
-        }
-    }
-    return this.modeSelect == null ? 'pl' : goog.dom.forms.getValue(this.modeSelect);
-}
+
 
 unisubs.player.WistiaVideoPlayer.prototype.addQueryString_ = function(uri) {
     var config = this.videoSource_.getVideoConfig();
@@ -286,7 +259,7 @@ unisubs.player.WistiaVideoPlayer.prototype.makePlayer_ = function() {
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.playerReady_ = function(e) {
-    this.player_ = this.almostPlayer_;
+    window.thePlayer  = this.player_ = this.almostPlayer_;
     goog.array.forEach(this.commands_, function(cmd) { cmd(); });
     this.commands_ = [];
     this.getHandler().
@@ -342,3 +315,5 @@ unisubs.player.WistiaVideoPlayer.prototype.setVolume = function(vol)
     else
         this.commands_.push(goog.bind(this.setVolume, this, vol));
 }
+
+
