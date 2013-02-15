@@ -278,8 +278,6 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
         this.getHandler().listen(
             saveAndExitAnchor, goog.events.EventType.CLICK,
             this.saveAndExitClicked_);
-
-        console.log(this.serverModel_.captionSet_.languageWasForked);
     }
 
     goog.dom.append(el, stepsDiv);
