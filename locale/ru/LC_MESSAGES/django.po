@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:12-0600\n"
+"POT-Creation-Date: 2013-02-16 00:12-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/"
@@ -368,15 +368,11 @@ msgstr ""
 msgid "Your photo has been updated."
 msgstr ""
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr ""
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr ""
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr ""
 
@@ -1771,11 +1767,11 @@ msgstr ""
 "Пожалуйста, попробуйте ещё раз со ссылкой на страницу видео.\n"
 "<a href=\"mailto:%s\">Свяжитесь с нами</a> если есть проблемы."
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "Частное видео"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "Неопределённая ошибка"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:04-0600\n"
+"POT-Creation-Date: 2013-02-16 00:04-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/"
@@ -367,15 +367,11 @@ msgstr "Llogaria juaj u përditësua."
 msgid "Your photo has been updated."
 msgstr "Fotografia juaj u përditësua."
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr "foto"
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr "Fotoja juaj u hoq."
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr "Llogaria u fshi."
 
@@ -1803,11 +1799,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Lidhuni me ne</a>, nëse ka "
 "ndonjë problem."
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "Video private"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "Gabim i papërcaktuar"
 
@@ -7716,3 +7712,6 @@ msgstr ""
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."
 msgstr "më tepër..."
+
+#~ msgid "picture"
+#~ msgstr "foto"

@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:01-0600\n"
+"POT-Creation-Date: 2013-02-16 00:01-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/universalsubtitles/"
@@ -369,15 +369,11 @@ msgstr ""
 msgid "Your photo has been updated."
 msgstr ""
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr ""
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr ""
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr ""
 
@@ -1748,11 +1744,11 @@ msgstr ""
 "Probeer het aub opnieuw met een link naar een video-pagina. <a href=\"mailto:"
 "%s\">Contacteer ons</a> als er een probleem is."
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "Privévideo"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "Onbepaalde fout"
 
