@@ -358,10 +358,6 @@ def email_friend(request):
     return render_to_response('videos/email_friend.html', context,
                               context_instance=RequestContext(request))
 
-def demo(request):
-    context = widget.add_onsite_js_files({})
-    return render_to_response('demo.html', context,
-                              context_instance=RequestContext(request))
 
 @get_video_from_code
 def legacy_history(request, video, lang=None):
