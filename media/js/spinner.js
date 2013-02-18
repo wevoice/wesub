@@ -117,8 +117,7 @@ unisubs.Spinner.prototype.timerTick_ = function(event) {
         }
         if (this.increment_) {
             this.increase_();
-        }
-        else {
+        } else {
             this.decrease_();
         }
     }

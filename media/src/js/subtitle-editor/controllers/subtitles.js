@@ -101,6 +101,8 @@ var angular = angular || null;
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
+        $scope.closeText = window.location.search.indexOf('from-old-editor') !== -1 ? 'Return' : 'Close';
+
         $scope.cancelAndClose = function($event) {
 
             $event.preventDefault();
