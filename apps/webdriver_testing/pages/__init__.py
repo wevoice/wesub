@@ -63,7 +63,7 @@ class Page(object):
         """Accept or reject js alert.
 
         """
-        self.logger.info('Handling alert dialog with: %s' % action)
+        self.logger.info('Checking for alert dialog, will %s' % action)
         time.sleep(2)
         try:
             a = self.browser.switch_to_alert()
@@ -129,6 +129,7 @@ class Page(object):
                        .perform())
         menu_item_element = self._safe_find(menu_item_el)
         self.wait_for_element_visible(menu_item_el)
+        
         mouseAction = (webdriver.ActionChains(self.browser)
                        .move_to_element(menu_item_element)
                        .click(menu_item_element)
@@ -361,7 +362,7 @@ class Page(object):
             "Element %s is not present." % element)
         return self.browser.find_element_by_css_selector(element)
 
-    def wait_for_element_not_present(self, element, wait_time=10):
+    def wait_for_element_not_present(self, element, wait_time=15):
         """Wait for element (by css) to disappear on page, within 10 seconds.
 
            Settings the default to 10 since we shouldn't have to wait long for 
@@ -465,6 +466,10 @@ class Page(object):
 
     def go_back(self):
         """Go back to previous page.
+self._poll_for_condition(
+            lambda: self.is_element_present(element),
+            wait_time,
+            "Element %s is not present." % element)
 
         """
         self.browser.back()

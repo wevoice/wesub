@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+import os
+
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
 from apps.webdriver_testing.pages.site_pages.teams.videos_tab import VideosTab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
+from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import UserLangFactory
@@ -13,6 +16,7 @@ from apps.webdriver_testing.data_factories import VideoFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 from apps.webdriver_testing.pages.editor_pages import dialogs
+from apps.webdriver_testing.pages.editor_pages import subtitle_editor
 from apps.webdriver_testing import data_helpers
 
 class TestCaseManualTasks(WebdriverTestCase):    
@@ -46,8 +50,11 @@ class TestCaseManualTasks(WebdriverTestCase):
             user = UserFactory.create()
             ).user
 
+
         #Create a test video and add it to the team
-        cls.test_video = VideoFactory.create()
+        cls.test_video = cls.data_utils.create_video()
+
+        #cls.test_video = VideoFactory.create()
         TeamVideoFactory.create(
             team=cls.team, 
             video=cls.test_video,
@@ -86,6 +93,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.videos_tab = VideosTab(cls)
         cls.menu = unisubs_menu.UnisubsMenu(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
 
         #Create a partner user to own the team.
         cls.owner = UserFactory.create(is_partner=True)
@@ -108,26 +116,38 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                 preferred = True)
         #Create a member of the team
         cls.contributor = TeamContributorMemberFactory.create(
-            team = cls.team,
-            user = UserFactory.create()
-            ).user
+                team = cls.team,
+                user = UserFactory.create()
+                ).user
+        cls.manager = TeamManagerMemberFactory.create(
+                team = cls.team,
+                user = UserFactory.create()
+                ).user
+
         user_langs = ['en', 'ru', 'pt-br']
         for lang in user_langs:
             UserLangFactory(user=cls.contributor, language=lang)
+        cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
+                                     ), 'oneline.txt')
 
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
+        self.tasks_tab.handle_js_alert('accept')
         self.tasks_tab.set_skiphowto()
 
 
     def tearDown(self):
         self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
+        if self.team.subtitle_policy > 10:
+            self.team.subtitle_policy = 10
+            self.team.save() 
 
 
     def test_transcription__perform(self):
         """Starting a Transcription task opens the subtitling dialog."""
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner).video
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Transcribe', tv.title)
@@ -140,36 +160,76 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
            assigned to the same user.
 
         """
-        self.skipTest('Needs to be completed') 
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Transcribe', tv.title)
+        self.create_modal.lang_selection(video_language='English')
+        self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.save_and_exit()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 
+                                 % self.team.slug)
+        task = self.tasks_tab.task_present('Transcribe', tv.title)
+        self.assertEqual(task['assignee'], 'Assigned to me')
+
 
     def test_transcription__resume(self):
         """Saved trasncription task can be resumed. """
-        self.skipTest('Needs to be completed') 
-
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Transcribe', tv.title)
+        self.create_modal.lang_selection(video_language='English')
+        self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.save_and_exit()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all'
+                                 % self.team.slug)
+        self.tasks_tab.perform_assigned_task('Transcribe', tv.title)
+        self.create_modal.lang_selection(new_language='English (incomplete)')
+        self.assertEqual('Typing', self.sub_editor.dialog_title())
+        
     def test_transcription__permissions(self):
         """User must have permission to start a transcription task. 
         """
-        self.skipTest('Needs to be completed') 
+        self.team.subtitle_policy = 30
+        self.team.save()
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.assertEqual(self.tasks_tab.disabled_task('Transcribe', tv.title), 
+                         "You don't have permission to perform this task.")
+
+
 
     def test_transcription__complete(self):
         """When transcription is completed, translation tasks are created 
            for preferred languages.
 
         """
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner).video
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         video_data = {'language_code': 'en',
                       'video': tv.pk,
                       'draft': open('apps/videos/fixtures/test.srt'),
                      }
-
         self.data_utils.upload_subs(
                 tv,
-                data=None, 
+                data=video_data, 
                 user=dict(username=self.contributor.username, 
                 password='password'))
 
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Transcribe', tv.title)
-        self.create_modal.lang_selection(video_language='English')
+        self.create_modal.lang_selection(
+                video_language='English',
+                new_language='English (incomplete)')
         self.assertEqual('Typing', self.sub_editor.dialog_title())
+        self.fail('Needs i2069 fixed, then can mark as complete in dialog.') 
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+                                 % self.team.slug)
+
+
