@@ -115,13 +115,16 @@ unisubs.Spinner.prototype.timerTick_ = function(event) {
             this.speed_--;
             this.counter_ = 0;
         }
-        if (this.increment_)
+        if (this.increment_) {
             this.increase_();
-        else
+        }
+        else {
             this.decrease_();
+        }
     }
-    if (this.speed_ < 0 && this.step_ < this.maxStep_)
+    if (this.speed_ < 0 && this.step_ < this.maxStep_) {
         this.step_ += this.stepIncrease_;
+    }
 };
 unisubs.Spinner.prototype.mouseDown_ = function(event) {
     if (this.enabled_) {
