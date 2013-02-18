@@ -847,11 +847,12 @@ div.fix-chosen div.chzn-container {
     }
 
     &.disabled, &.assigned {
-        h3, p, a {
+
+        p, a {
             opacity: .8;
         }
-        img {
-            opacity: .6;
+        h3, img {
+            opacity: .5;
         }
     }
 
