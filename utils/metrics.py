@@ -20,6 +20,7 @@ import socket
 import time as _time
 from contextlib import contextmanager
 from functools import wraps
+from subprocess import Popen, PIPE
 
 from django.conf import settings
 
@@ -61,13 +62,30 @@ def find_environment_tag():
         return 'staging'
     if env == getattr(settings, 'PRODUCTION', -1):
         return 'production'
+    if env == getattr(settings, 'DEMO', -1):
+        return 'demo'
     else:
         return 'unknown'
 
 ENV_TAG = find_environment_tag()
 
+GIT_CURRENTBRANCH = 'git rev-parse --abbrev-ref HEAD'
+
+def find_branch():
+    if ENV_TAG.lower() == 'demo':
+        p = Popen(GIT_CURRENTBRANCH, shell=True, stdout=PIPE, close_fds=True)
+        return '.{0}'.format(p.stdout.read().strip())
+    else:
+        return ''
+
+BRANCH = find_branch()
+
 def send(service, tag, metric=None):
-    data = {'host': HOST, 'service': service, 'tags': [tag, ENV_TAG]}
+    data = {
+        'host': HOST + BRANCH,
+        'service': service,
+        'tags': [tag, ENV_TAG]
+    }
 
     if metric:
         data['metric'] = metric

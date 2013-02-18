@@ -400,6 +400,7 @@ INSTALLED_APPS = (
     'utils',
     'videos',
     'widget',
+    'subtitles',
 )
 
 # Celery settings
