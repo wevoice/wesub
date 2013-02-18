@@ -62,6 +62,15 @@ venv
 ./deploy/build
 ./deploy/src
 
+.json
+soundcloud-demo
+js/third-party
+js/libs
+media/flowplayer
+libs/rosetta
+swfobject
+.min.js
+
 syntax: re
 .*~$
 .*\.pyc$
@@ -76,3 +85,4 @@ syntax: re
 ^./media/js/unisubs-widgetizer*.js$
 ^./media/js/unisubs-api*.js$
 ^./apps/webdriver_testing/Screenshots/.*\.png$
+jquery[-.].*.js$
