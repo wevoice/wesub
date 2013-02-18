@@ -237,6 +237,25 @@ class TeamVideoTest(TestCase):
         except AssertionError:
             pass
 
+    def test_publish_draft_when_teamvideo_deleted(self):
+        user = User.objects.all()[0]
+        team = test_factories.create_team()
+        tv = test_factories.create_team_video(team, user)
+        video = tv.video
+
+        subs = [(0, 1000, 'Hello',)]
+        add_subtitles(video, 'en', subs, visibility='private')
+
+        self.assertEquals(1, sub_models.SubtitleVersion.objects.count())
+        sub = sub_models.SubtitleVersion.objects.all()[0]
+        self.assertEquals('private', sub.visibility)
+
+        tv.delete()
+
+        self.assertEquals(1, sub_models.SubtitleVersion.objects.count())
+        sub = sub_models.SubtitleVersion.objects.all()[0]
+        self.assertEquals('public', sub.visibility)
+
 
 class TeamsTest(TestCase):
 
