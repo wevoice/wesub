@@ -297,9 +297,6 @@ class TestViews(WebUseTest):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_demo(self):
-        self._simple_test('videos:demo')
-
     def test_history(self):
         # Redirect for now, until we remove the concept of SubtitleLanguages
         # with blank language codes.
