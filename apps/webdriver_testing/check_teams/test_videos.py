@@ -6,6 +6,7 @@ import os
 import filecmp
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams import videos_tab
+from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
 from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
@@ -609,6 +610,8 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         #management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
+        cls.tasks_tab = TasksTab(cls)
+
         cls.team_owner = UserFactory.create()
 
         cls.logger.info('Creating team limited access: workflows enabled, '
@@ -976,9 +979,9 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         test_title = vids[0].title
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
-        tasks_tab = self.videos_tab.open_video_tasks(test_title)
+        self.videos_tab.open_video_tasks(test_title)
 
-        self.assertEqual(test_title, tasks_tab.filtered_video())
+        self.assertEqual(test_title, self.tasks_tab.filtered_video())
 
     def test_languages__no_tasks(self):
         """Without tasks, display number of completed languages for video.

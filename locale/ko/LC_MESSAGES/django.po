@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:05-0600\n"
+"POT-Creation-Date: 2013-02-18 00:06-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/"
@@ -362,15 +362,11 @@ msgstr ""
 msgid "Your photo has been updated."
 msgstr ""
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr ""
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr ""
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr ""
 
@@ -1737,11 +1733,11 @@ msgstr ""
 "비디오 페이지에 대한 링크와 함께 다시 시도해 주십시오. 만약 문제가 있다면 <a "
 "href=\"mailto:%s\">문의해 주세요.</a> "
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "비공개 동영상"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "확실하지 않은 오류"
 

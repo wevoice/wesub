@@ -189,15 +189,16 @@ def team_application_denied(application_pk):
         "url_base": get_url_base(),
         "note": application.note,
     }
+    subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
     if application.user.notify_by_message:
         msg = Message()
-        msg.subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
+        msg.subject = subject
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
         msg.object = application.team
         msg.save()
     Meter('templated-emails-sent-by-type.teams.application-declined').inc()
-    send_templated_email(msg.user, msg.subject, template_name, context)
+    send_templated_email(application.user, subject, template_name, context)
 
 @task()
 def team_member_new(member_pk):

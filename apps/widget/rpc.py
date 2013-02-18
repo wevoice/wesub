@@ -456,7 +456,7 @@ class Rpc(BaseRpc):
 
         # If this is a translation, include the subtitles it's based on in the response.
         if translated_from:
-            version = translated_from.get_tip()
+            version = translated_from.get_tip(public=True)
 
             if not version:
                 return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }

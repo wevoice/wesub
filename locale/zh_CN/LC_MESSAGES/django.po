@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:15-0600\n"
+"POT-Creation-Date: 2013-02-18 00:16-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/"
@@ -364,15 +364,11 @@ msgstr "你的账户信息已更新。"
 msgid "Your photo has been updated."
 msgstr "你的头像已更新。"
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr ""
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr "你的头像已被移除。"
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr "账户已移除。"
 
@@ -1738,11 +1734,11 @@ msgstr ""
 "请再次尝试通过链接至一个视频页面\n"
 "                        <a href=\"mailto:%s\">联系我们</a> 如果仍然有问题"
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "民营视频"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "未定义错误"
 

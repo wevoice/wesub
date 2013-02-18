@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-14 00:09-0600\n"
+"POT-Creation-Date: 2013-02-18 00:10-0600\n"
 "PO-Revision-Date: 2013-02-10 06:48+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/"
@@ -367,15 +367,11 @@ msgstr "Atjaunināts Jūsu konts,"
 msgid "Your photo has been updated."
 msgstr "Atjaunināta Jūsu fotogtāfija."
 
-#: apps/profiles/views.py:247
-msgid "picture"
-msgstr "attēls"
-
-#: apps/profiles/views.py:260
+#: apps/profiles/views.py:262
 msgid "Your photo has been removed."
 msgstr "Attēls noņemts."
 
-#: apps/profiles/views.py:336
+#: apps/profiles/views.py:338
 msgid "Account deleted."
 msgstr "Konts izdzēsts."
 
@@ -1782,11 +1778,11 @@ msgstr ""
 "                        <a href=\"mailto:%s\">Sazinieties ar mums</a>, ja "
 "rodas kāda problēma."
 
-#: apps/videos/types/youtube.py:49
+#: apps/videos/types/youtube.py:50
 msgid "Private video"
 msgstr "Privāts video"
 
-#: apps/videos/types/youtube.py:50
+#: apps/videos/types/youtube.py:51
 msgid "Undefined error"
 msgstr "Nenoteikta kļūda"
 
@@ -7364,3 +7360,6 @@ msgstr "name_local"
 #: utils/templatetags/utils_tags.py:49
 msgid "more..."
 msgstr "vairāk..."
+
+#~ msgid "picture"
+#~ msgstr "attēls"

@@ -47,6 +47,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel, subtitles, opt_open
     this.currentSubtitlePanel_ = null;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.doneButtonEnabled_ = true;
+    this.exitURL = null;
 
     /**
      * @type {unisubs.widget.SubtitleState}
@@ -195,6 +196,8 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
         listen(
             rightPanel, et.DONE, this.handleDoneKeyPress_).
         listen(
+            rightPanel, et.SAVEANDOPENINNEWEDITOR, this.handleSaveAndOpenInNewEditor_).
+        listen(
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
@@ -239,7 +242,12 @@ unisubs.subtitle.Dialog.prototype.setFinishedState_ = function() {
     if (this.skipFinished_)
         this.setVisible(false);
     if (!unisubs.isFromDifferentDomain()) {
-        window.location.assign(this.serverModel_.getPermalink() + '?saved=true');
+
+        if (this.exitURL) {
+            window.location = this.exitURL;
+        } else {
+            window.location.assign(this.serverModel_.getPermalink() + '?saved=true');
+        }
         return;
     }
     this.state_ = unisubs.subtitle.Dialog.State_.FINISHED;
@@ -311,6 +319,14 @@ unisubs.subtitle.Dialog.prototype.handleLegendKeyPress_ = function(event) {
         else
             this.togglePause_();
     }
+};
+unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event) {
+    if (!this.doneButtonEnabled_) {
+        return;
+    }
+    this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
+        this.subtitles_.LANGUAGE + '/';
+    this.saveWork(false, true);
 };
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
     if (!this.doneButtonEnabled_) {

@@ -31,7 +31,8 @@ class WistiaVideoType(VideoType):
     name = 'Wistia.com'   
     site = 'wistia.com'
     linkurl = None
-    
+
+    requires_url_exists = False
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_wistia_id(url)
