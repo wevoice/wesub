@@ -312,6 +312,9 @@
                             {% if item.note %}
                                 <p>{{ item.note }}</p>
                             {% endif %}
+                            {% if item.rollback_of_version_number %}
+                                <p>{%  trans "Rollback to version #" %}{{ item.rollback_of_version_number }}</p>
+                            {% endif %}
                             <ul class="actions">
                                 <li><h4>{% trans "Timing" %}: {{ item.time_change }}</h4></li>
                                 <li><h4>{% trans "Text" %}: {{ item.text_change }}</h4></li>
