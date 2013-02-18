@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
-import time
 
 class TasksTab(ATeamPage):
     """Actions for the Videos tab of a Team Page.
@@ -36,6 +35,7 @@ class TasksTab(ATeamPage):
     _PERFORM = 'div.action-group h5' #Opens on hover
     _PERFORM_ASSIGNED = '.perform'
     _ASSIGN_AND_PERFORM = '.assign-and-perform'
+    _DISABLED_TASK = '.cannot-perform'
 
     def open_tasks_tab(self, team):
         """Open the team with the provided team slug.
@@ -53,11 +53,14 @@ class TasksTab(ATeamPage):
         task_list = []
         for el in task_els:
             task = dict(
+                task = el,
                 kind = el.find_element_by_css_selector(self._TASK_KIND).text,
                 video =  el.find_element_by_css_selector(self._TASK_VIDEO).text,
-                assignee = el.find_element_by_css_selector(self._ASSIGNEE).text,
-                perform = el.find_element_by_css_selector(self._TASK_TRIGGER)
-                )
+                assignee = el.find_element_by_css_selector(self._ASSIGNEE).text)
+            try:
+                task['perform'] = el.find_element_by_css_selector(self._TASK_TRIGGER)
+            except:
+                task['perform'] =  None
             task_list.append(task)
         return task_list
 
@@ -82,6 +85,12 @@ class TasksTab(ATeamPage):
         self.click_item_after_hover(perform_el.tag_name, 
                                     self._ASSIGN_AND_PERFORM)
 
+    def perform_assigned_task(self, task_type, title):
+        task = self.task_present(task_type, title)
+        perform_el = task['perform']
+        self.click_item_after_hover(perform_el.tag_name, 
+                                    self._PERFORM_ASSIGNED)
+
 
     def filtered_video(self):
         return self.get_text_by_css(self._FILTERED_VIDEO)
@@ -95,6 +104,14 @@ class TasksTab(ATeamPage):
             self.select_from_chosen(self._TASK_ASSIGNEE, task_assignee)
         
         self.submit_by_css(self._TASK_SAVE)
+
+    def disabled_task(self, task_type, title):
+        task = self.task_present(task_type, title)
+        try:
+            return task['task'].find_element_by_css_selector(self._DISABLED_TASK).text
+        except:
+            return None
+
 
  
 

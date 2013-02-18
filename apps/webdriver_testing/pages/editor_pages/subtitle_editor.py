@@ -152,7 +152,7 @@ class SubtitleEditor(EditorDialogs):
         # but keep pooling for a terminating value
         start_time = time.time()
         while time.time() - start_time < 15:
-            time.sleep(2)
+            time.sleep(.2)
             stored_subs = self.browser.execute_script(
             "return document.getElementsByTagName('textarea')[0].value")
             # server errored out
