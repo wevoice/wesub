@@ -1493,6 +1493,11 @@ div#language_picker {
 .profile.v1 .context img.avatar {
     margin: 0 17px;
 }
+.profile.v1 .context a.button {
+    display: block;
+    width: 60%;
+    margin: 1em auto;
+}
 .profile.v1 form {
     padding-top: 3em;
 
@@ -2245,7 +2250,7 @@ div#rollback-button {
         a:hover {
             color: #35424A;
         }
-        &.last, &:last-child {
+        &.last {
             border: none;
         }
     }
@@ -2256,15 +2261,6 @@ div#rollback-button {
         &:last-child {
             border: none;
         }
-    }
-}
-
-#teams .context .metrics {
-    li:last-child {
-        border-right: 1px solid #eaeaea;
-    }
-    li.last {
-        border: none;
     }
 }
 

@@ -47,8 +47,8 @@ from compile_media import NO_UNIQUE_URL
 def add_far_future_expires(headers, verbose=False):
     # HTTP/1.0
     headers['Expires'] = '%s GMT' % (email.Utils.formatdate(
-            time.mktime((datetime.datetime.now() +
-                         datetime.timedelta(days=365*2)).timetuple())))
+        time.mktime((datetime.datetime.now() +
+                     datetime.timedelta(days=365*2)).timetuple())))
     # HTTP/1.1
     headers['Cache-Control'] = 'max-age %d' % (3600 * 24 * 365 * 2)
     if verbose:
@@ -59,8 +59,8 @@ def add_no_cache(headers, verbose=False):
     headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
     headers['Pragma'] = 'no-cache'
     headers['Expires'] = '%s GMT' % (email.Utils.formatdate(
-            time.mktime((datetime.datetime.now() +
-                         datetime.timedelta(days=-30*365)).timetuple())))
+        time.mktime((datetime.datetime.now() +
+                     datetime.timedelta(days=-30*365)).timetuple())))
     if verbose:
         print "\texpires: %s" % (headers['Expires'])
         print "\tcache-control: %s" % (headers['Cache-Control'])
@@ -73,13 +73,13 @@ class Command(BaseCommand):
     AWS_SECRET_ACCESS_KEY = ''
     AWS_BUCKET_NAME = ''
     DIRECTORY = ''
-    FILTER_LIST = [re.compile(x) for x in ['\.DS_Store', "^videos.+","^js\/closure-lib" , "^teams", "^test", "^videos"]]
+    FILTER_LIST = [re.compile(x) for x in ['\.DS_Store', "^videos.+", "^js\/closure-lib" , "^teams", "^test", "^videos"]]
 
     GZIP_CONTENT_TYPES = (
         'text/css',
         'application/javascript',
         'application/x-javascript'
-    )
+        )
 
     upload_count = 0
     skip_count = 0
@@ -96,55 +96,64 @@ class Command(BaseCommand):
             help="Enables setting a far future expires header."),
         optparse.make_option('--force',
             action='store_true', dest='force', default=True,
-            help="Skip the file mtime check to force upload of all files.")
+            help="Skip the file mtime check to force upload of all files."),
+        optparse.make_option('-b', '--bucket',
+            dest='aws_bucket_name', default='',
+            help="(optional) Override destination bucket"),
     )
 
-    help = 'Syncs the complete STATIC_ROOT structure and files to S3 into the given bucket name.'
-    args = 'bucket_name'
+    help = 'Syncs the complete STATIC_ROOT structure and files to S3'
+    #args = 'bucket_name'
 
     can_import_settings = True
 
     def handle(self, *args, **options):
         from django.conf import settings
 
-
+        # set AWS_BUCKET_NAME from options
+        self.AWS_BUCKET_NAME = options.get('aws_bucket_name')
         if not hasattr(settings, 'STATIC_ROOT'):
             raise CommandError('STATIC_ROOT must be set in your settings.')
         else:
             if not settings.STATIC_ROOT:
                 raise CommandError('STATIC_ROOT must be set in your settings.')
-        self.DIRECTORY = get_cache_dir()
-        # Check for AWS keys in settings
-        if not hasattr(settings, 'AWS_ACCESS_KEY_ID') or \
-           not hasattr(settings, 'AWS_SECRET_ACCESS_KEY'):
-           raise CommandError('Missing AWS keys from settings file.  Please' +
-                     'supply both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.')
-        else:
-            self.AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
-            self.AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+        try:
+            self.DIRECTORY = get_cache_dir()
+            # Check for AWS keys in settings
+            if not hasattr(settings, 'AWS_ACCESS_KEY_ID') or \
+               not hasattr(settings, 'AWS_SECRET_ACCESS_KEY'):
+               raise CommandError('Missing AWS keys from settings file.  Please' +
+                         'supply both AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.')
+            else:
+                self.AWS_ACCESS_KEY_ID = settings.AWS_ACCESS_KEY_ID
+                self.AWS_SECRET_ACCESS_KEY = settings.AWS_SECRET_ACCESS_KEY
+            if not self.AWS_BUCKET_NAME:
+                if not hasattr(settings, 'AWS_BUCKET_NAME'):
+                    raise CommandError('Missing bucket name from settings file. Please' +
+                        ' add the AWS_BUCKET_NAME to your settings file.')
+                else:
+                    if not settings.AWS_BUCKET_NAME:
+                        raise CommandError('AWS_BUCKET_NAME cannot be empty.')
+                self.AWS_BUCKET_NAME = settings.AWS_BUCKET_NAME 
+            self.verbosity = int(options.get('verbosity'))
+            self.prefix = options.get('prefix')
+            if bool(self.prefix) is False:
+                self.prefix = os.path.join(settings.COMPRESS_OUTPUT_DIRNAME, get_current_commit_hash())
+            self.do_gzip = options.get('gzip')
+            self.do_expires = options.get('expires')
+            self.do_force = options.get('force')
 
-        if not hasattr(settings, 'AWS_BUCKET_NAME'):
-            raise CommandError('Missing bucket name from settings file. Please' +
-                ' add the AWS_BUCKET_NAME to your settings file.')
-        else:
-            if not settings.AWS_BUCKET_NAME:
-                raise CommandError('AWS_BUCKET_NAME cannot be empty.')
-        self.AWS_BUCKET_NAME = settings.AWS_BUCKET_NAME 
-        self.verbosity = int(options.get('verbosity'))
-        self.prefix = options.get('prefix')
-        if bool(self.prefix) is False:
-            self.prefix = os.path.join(settings.COMPRESS_OUTPUT_DIRNAME, get_current_commit_hash())
-        self.do_gzip = options.get('gzip')
-        self.do_expires = options.get('expires')
-        self.do_force = options.get('force')
+            # Now call the syncing method to walk the STATIC_ROOT directory and
+            # upload all files found.
+            self.sync_s3()
 
-        # Now call the syncing method to walk the STATIC_ROOT directory and
-        # upload all files found.
-        self.sync_s3()
-
-        print
-        print "%d files uploaded." % (self.upload_count)
-        print "%d files skipped." % (self.skip_count)
+            print
+            print "%d files uploaded." % (self.upload_count)
+            print "%d files skipped." % (self.skip_count)
+        except Exception, e:
+            import traceback
+            print("Error uploading: {0}".format(traceback.format_exc()))
+            sys.exit(10)
 
     def sync_s3(self):
         """
@@ -176,7 +185,7 @@ class Command(BaseCommand):
         # these are not to be prefixed by commit, e.g. outside systems link to them
         no_unique_url_items = NO_UNIQUE_URL
         # embed.js is a special case :(
-        no_unique_url_items += ({ "name": "embed.js", "no-cache": True },)
+        no_unique_url_items += ({"name": "embed.js", "no-cache": True },)
         for item in no_unique_url_items:
             file_name = item['name']
             upload_no_unique_url_item(file_name)
@@ -237,10 +246,9 @@ class Command(BaseCommand):
             cache_strategy = None
             if self.do_expires:
                 cache_strategy = add_far_future_expires
-            self.upload_one(bucket, key, bucket_name, root_dir, filename, file_key, cache_strategy)                    
+            self.upload_one(bucket, key, bucket_name, root_dir, filename, file_key, cache_strategy)
 
-
-    def upload_one(self, bucket, key, bucket_name, root_dir, filename, 
+    def upload_one(self, bucket, key, bucket_name, root_dir, filename,
                    file_key, cache_strategy=None):
         if self.verbosity > 0:
             print "Uploading %s..." % (file_key)
@@ -265,8 +273,10 @@ class Command(BaseCommand):
 
         try:
             key.name = file_key
-            key.set_contents_from_string(filedata, headers, replace=True)
-            key.make_public()
+            key.set_contents_from_string(filedata, headers, replace=True,
+                policy='public-read')
+            # validate key exists
+            k = bucket.get_key(file_key)
         except boto.s3.connection.BotoClientError, e:
             print "Failed: %s" % e
         except Exception, e:
