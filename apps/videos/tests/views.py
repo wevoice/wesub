@@ -430,9 +430,6 @@ class TestViews(WebUseTest):
     def test_about_page(self):
         self._simple_test('about_page')
 
-    def test_demo_page(self):
-        self._simple_test('demo')
-
     def test_policy_page(self):
         self._simple_test('policy_page')
 
