@@ -204,7 +204,6 @@ var angular = angular || null;
         });
         $scope.$root.$on('subtitles-fetched', function() {
             $scope.setCloseStates();
-            console.log($scope.closeURL);
         });
         $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
