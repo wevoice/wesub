@@ -30,8 +30,15 @@
 
         // The Popcorn instance.
         //
-        // For now, make sure we force controls.
-        $scope.pop = window.Popcorn.smart('#video', SubtitleStorage.getVideoURL() + '&controls=1');
+        // If this is a YouTube video, force controls.
+
+        var videoURL = SubtitleStorage.getVideoURL();
+
+        if (videoURL.indexOf('youtube.com') !== -1) {
+            videoURL = videoURL + '&controls=1';
+        }
+
+        $scope.pop = window.Popcorn.smart('#video', videoURL);
 
         $scope.playChunk = function(start, duration) {
             // Play a specified amount of time in a video, beginning at 'start',
@@ -80,7 +87,7 @@
 
         };
 
-        $scope.$root.$on('subtitleKeyUp', function($event, options) {
+        $scope.$root.$on('subtitle-key-up', function($event, options) {
 
             var parser = options.parser;
             var subtitle = options.subtitle;
@@ -92,7 +99,7 @@
             });
 
         });
-        $scope.$root.$on('subtitleReady', function($event, subtitle) {
+        $scope.$root.$on('subtitle-ready', function($event, subtitle) {
             // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
             // video's Popcorn instance.
 

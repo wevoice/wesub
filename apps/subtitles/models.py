@@ -833,6 +833,27 @@ class SubtitleVersionManager(models.Manager):
                     .exclude(visibility='private', visibility_override='')
                     .exclude(visibility_override='private'))
 
+
+ORIGIN_API = 'api'
+ORIGIN_IMPORTED = 'imported'
+ORIGIN_LEGACY_EDITOR = 'web-legacy-editor'
+ORIGIN_ROLLBACK = 'rollback'
+ORIGIN_SCRIPTED = 'scripted'
+ORIGIN_TERN = 'tern'
+ORIGIN_UPLOAD = 'upload'
+ORIGIN_WEB_EDITOR = 'web-editor'
+
+SUBTITLE_VERSION_ORIGINS = (
+    (ORIGIN_API, _("API")),
+    (ORIGIN_LEGACY_EDITOR, _("Subtitle Editor")),
+    (ORIGIN_IMPORTED, _("Imported")),
+    (ORIGIN_ROLLBACK, _("Rollback")),
+    (ORIGIN_SCRIPTED, _("Scripted")),
+    (ORIGIN_TERN, _("Tern")),
+    (ORIGIN_UPLOAD, _("Uploaded")),
+    (ORIGIN_WEB_EDITOR, _("Through web editor")),
+)
+
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
 
@@ -899,6 +920,9 @@ class SubtitleVersion(models.Model):
                                                              blank=True,
                                                              default=None)
 
+    # Keeps tab of how this SV was originated (uploads, api, etc)
+    origin = models.CharField(max_length=255, choices=SUBTITLE_VERSION_ORIGINS,
+                              blank=True, default='')
     # Denormalized count of the number of subtitles this version contains, for
     # easier filtering later.
     subtitle_count = models.PositiveIntegerField(default=0)

@@ -51,6 +51,7 @@ from libs.bulkops import insert_many
 
 from functools import partial
 from apps.subtitles import pipeline
+from apps.subtitles.models import ORIGIN_LEGACY_EDITOR
 from babelsubs.storage import SubtitleSet
 
 
@@ -1027,6 +1028,7 @@ class Rpc(BaseRpc):
         kwargs['video'] = language.video
         kwargs['language_code'] = language.language_code
         kwargs['subtitles'] = subtitles
+        kwargs['origin'] = ORIGIN_LEGACY_EDITOR
 
         if session and session.base_language:
             base_language_code = session.base_language.language_code

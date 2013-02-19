@@ -24,6 +24,8 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 
 from apps.subtitles import pipeline
+from apps.subtitles.shims import is_dependent
+from apps.subtitles.models import ORIGIN_UPLOAD
 from apps.teams.permissions import (
     can_assign_task, can_create_and_edit_subtitles,
     can_create_and_edit_translations
@@ -343,7 +345,17 @@ class SubtitlesUploadForm(forms.Form):
         version = pipeline.add_subtitles(
             self.video, language_code, self._parsed_subtitles,
             title=title, description=description, author=self.user,
-            parents=parents, committer=self.user, complete=complete)
+            parents=parents, committer=self.user, complete=complete,
+            origin=ORIGIN_UPLOAD)
+
+        # Handle forking SubtitleLanguages that were translations when
+        # a standalone version is uploaded.
+        #
+        # For example: assume there is a French translation of English.
+        # Uploading a "straight from video" version of French should fork it.
+        if not from_language_code and is_dependent(version.subtitle_language):
+            version.subtitle_language.is_forked = True
+            version.subtitle_language.save()
 
         # TODO: Pipeline this.
         video_changed_tasks.delay(version.subtitle_language.video_id,

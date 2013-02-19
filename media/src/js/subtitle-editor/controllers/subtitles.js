@@ -40,7 +40,7 @@ var angular = angular || null;
          * side panel.
          */
 
-        $scope.languageSelectChanged = function(lang) {
+        $scope.languageChanged = function(lang) {
             var vers, language;
 
             if (lang) {
@@ -78,9 +78,7 @@ var angular = angular || null;
             var subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.code,
-                                             newVersion.version_no,
-                                             function(subtitles) {
+                SubtitleStorage.getSubtitles($scope.language.code, newVersion.version_no, function(subtitles) {
                     $scope.version.subtitlesXML = subtitles.subtitlesXML;
                     $scope.setReferenceSubs(subtitles);
                 });
@@ -94,9 +92,10 @@ var angular = angular || null;
             $scope.language = _.find(languages, function(item) {
                 return item.editingLanguage;
             });
-            $scope.languageSelectChanged($scope.language);
+            $scope.languageChanged($scope.language);
         });
 
+        $scope.$watch('language', $scope.languageChanged);
         $scope.$watch('version', $scope.versionChanged);
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
@@ -276,7 +275,7 @@ var angular = angular || null;
 
             $scope.status = 'ready';
 
-            // When we have subtitles for an editable set, tell the kids.
+            // When we have subtitles for an editable set, broadcast it.
             $timeout(function() {
                 if ($scope.isEditable) {
                     $scope.$root.$broadcast('subtitles-fetched');
@@ -291,7 +290,9 @@ var angular = angular || null;
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
-                                          $scope.parser.xmlToString(true, true));
+                                          $scope.parser.xmlToString(true, true),
+                                          $scope.videoTitle,
+                                          $scope.videoDescription);
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
@@ -365,14 +366,18 @@ var angular = angular || null;
             return initialText;
         };
 
-        $scope.$on('subtitles-fetched', function() {
+        $scope.$root.$on('subtitles-fetched', function() {
             // When subtitles are first retrieved, we need to set up the amarasubtitle
             // on the video and bind to this scope.
             //
             // This will happen on the video controller. Just throw an event stating that
             // we're ready.
 
-            $scope.$root.$emit('subtitleReady', $scope);
+            // Only emit the event on editable subtitles. We don't want to initialize
+            // Popcorn subtitles for the non-editable set.
+            if ($scope.$parent.isEditable) {
+                $scope.$root.$emit('subtitle-ready', $scope);
+            }
         });
     };
     var VideoTitleController = function($scope, SubtitleListFinder) {
