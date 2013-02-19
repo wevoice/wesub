@@ -219,6 +219,8 @@ class TestRpc(TestCase):
                                   .objects.having_nonempty_tip()
                                   .filter(pk=language.pk).exists())
 
+        sv = sub_models.SubtitleVersion.objects.order_by('-id')[0]
+        self.assertEqual(sv.origin, sub_models.ORIGIN_LEGACY_EDITOR)
 
         self.assertTrue(language.video.is_subtitled)
 

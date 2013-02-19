@@ -24,6 +24,7 @@ from django.core.urlresolvers import reverse
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
+from apps.subtitles.models import ORIGIN_UPLOAD
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, Subtitle
 from apps.videos.tasks import video_changed_tasks
@@ -372,4 +373,10 @@ class UploadSubtitlesTest(WebUseTest):
         self._assertCounts(video, {'en': 4, 'fr': 1})
 
 
+    def test_upload_origin_on_version(self):
+        # Start with a fresh video.
+        video = get_video()
 
+        self._upload(video, 'fr', 'en', None, True, 'test.srt')
+        sv = video.newsubtitlelanguage_set.get(language_code='fr').get_tip()
+        self.assertEqual(sv.origin, ORIGIN_UPLOAD)

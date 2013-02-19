@@ -56,7 +56,7 @@ a nutshell:
 
 from django.db import transaction
 
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
+from apps.subtitles.models import SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK
 
 
 # Utility Functions -----------------------------------------------------------
@@ -351,7 +351,7 @@ def _get_language(video, language_code):
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
                    rollback_of_version_number, committer, complete, created,
-                   note):
+                   note, origin):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -371,7 +371,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
             'visibility': visibility, 'visibility_override': visibility_override,
             'parents': [_get_version(video, p) for p in (parents or [])],
             'rollback_of_version_number': rollback_of_version_number,
-            'created': created, 'note': note}
+            'created': created, 'note': note, 'origin': origin}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
@@ -400,6 +400,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'committer': None,
         'created': None,
         'note': target.note,
+        'origin': ORIGIN_ROLLBACK,
     }
 
     # If any version in the history is public, then rollbacks should also result
@@ -453,7 +454,7 @@ def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
                   parents=None, committer=None, complete=None,
-                  created=None, note=None):
+                  created=None, note=None, origin=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -504,7 +505,7 @@ def add_subtitles(video, language_code, subtitles,
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
                               visibility_override, parents, None, committer,
-                              complete, created, note)
+                              complete, created, note, origin)
 
 
 def unsafe_rollback_to(video, language_code, version_number,
