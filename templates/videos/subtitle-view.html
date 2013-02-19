@@ -312,8 +312,14 @@
                             {% if item.note %}
                                 <p>{{ item.note }}</p>
                             {% endif %}
-                            {% if item.rollback_of_version_number %}
+                            {% if item.origin == 'rollback' and item.rollback_of_version_number %}
                                 <p>{%  trans "Rollback to version #" %}{{ item.rollback_of_version_number }}</p>
+                             {% elif item.origin == 'upload' %}
+                                <p>{%  trans "Uploaded" %}</p>
+                            {% elif item.origin == 'api' %}
+                                <p>{%  trans "API" %}</p>
+                            {% elif item.origin == 'web-legacy-editor' %}
+                                <p>{%  trans "Subtitle Editor" %}</p>
                             {% endif %}
                             <ul class="actions">
                                 <li><h4>{% trans "Timing" %}: {{ item.time_change }}</h4></li>
