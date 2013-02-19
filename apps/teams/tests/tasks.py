@@ -57,9 +57,8 @@ class AutoCreateTest(TestCase):
         transcribe_task = tasks.filter(type=10, language='en')
         self.assertEqual(transcribe_task.count(), 1)
 
-class TranscriptionTaskTest(TestCase):
-    """Tests for transcription tasks."""
-
+class TranslateTranscribeTestBase(TestCase):
+    """Base class for TranscriptionTaskTest and TranslationTaskTest."""
     def setUp(self):
         self.team = test_factories.create_team(workflow_enabled=True)
         self.workflow = test_factories.create_workflow(
@@ -73,11 +72,17 @@ class TranscriptionTaskTest(TestCase):
         self.client = Client()
         self.login(self.admin.user)
 
+
     def login(self, user):
         self.client.login(username=user.username, password="password")
 
     def get_subtitle_task(self):
         tasks = list(self.team_video.task_set.all_subtitle().all())
+        self.assertEqual(len(tasks), 1)
+        return tasks[0]
+
+    def get_translate_task(self):
+        tasks = list(self.team_video.task_set.all_translate().all())
         self.assertEqual(len(tasks), 1)
         return tasks[0]
 
@@ -113,13 +118,19 @@ class TranscriptionTaskTest(TestCase):
             url_name = 'teams:assign_task'
         url = reverse(url_name, kwargs={'slug': self.team.slug})
         post_data = {'task': task.pk, 'assignee': member.user.pk}
-        return self.client.post(url, post_data)
+        response = self.client.post(url, post_data)
+        if ('form' in response.context and
+            not response.context['form'].is_valid()):
+            raise AssertionError("submit failed -- errors:\n%s" %
+                                 response.context['form'].errors.as_text)
+        return response
 
-    def submit_create_task(self, type, assignee='', expecting_error=False):
+    def submit_create_task(self, type, assignee='', language='',
+                           expecting_error=False):
         url = reverse('teams:create_task',
                              kwargs={'slug': self.team.slug,
                                      'team_video_pk': self.team_video.pk})
-        post_data = {'type': type, 'language': '', 'assignee': assignee}
+        post_data = {'type': type, 'language': language, 'assignee': assignee}
         response = self.client.post(url, post_data)
         # This isn't the best way to check, but if the form was had an error,
         # than the status code will be 200, since we don't redirect in that
@@ -132,20 +143,34 @@ class TranscriptionTaskTest(TestCase):
         elif expecting_error and not form_had_error:
             raise AssertionError("submit to %s succeeded" % url)
 
-    def perform_subtitle_task(self, task):
-        editor = TestEditor(self.client, self.team_video.video)
-        editor.run()
+    def perform_subtitle_task(self, task, base_language_code=None,
+                              language_code='en'):
+        """Perform a subtitling task.
 
-    def perform_review_task(self, task, notes=None):
-        editor = TestEditor(self.client, self.team_video.video, mode="review")
-        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
-        editor.run()
-
-    def perform_approve_task(self, task, notes=None):
+        :param task: Task object we are working on.
+        :param base_language_code: for translations, the language that this is
+        translated from.
+        :param language_code: the language that the subtitles are in.
+        """
         editor = TestEditor(self.client, self.team_video.video,
-                mode="approve")
+                            base_language_code=base_language_code)
+        # We don't send task info for transcription tasks.
+        editor.run(language_code=language_code)
+
+    def perform_review_task(self, task, notes, base_language_code=None,
+                            language_code='en'):
+        editor = TestEditor(self.client, self.team_video.video, mode="review",
+                            base_language_code=base_language_code)
         editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
-        editor.run()
+        editor.run(language_code=language_code)
+
+    def perform_approve_task(self, task, notes, base_language_code=None,
+                            language_code='en'):
+        editor = TestEditor(self.client, self.team_video.video,
+                            mode="approve",
+                            base_language_code=base_language_code)
+        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
+        editor.run(language_code=language_code)
 
     def change_workflow_settings(self, review_allowed, approve_allowed):
         self.workflow.review_allowed = review_allowed
@@ -156,6 +181,10 @@ class TranscriptionTaskTest(TestCase):
         return test_factories.create_team_member(
             self.team, role=TeamMember.ROLE_CONTRIBUTOR)
 
+
+class TranscriptionTaskTest(TranslateTranscribeTestBase):
+    """Tests for transcription tasks."""
+
     def test_create(self):
         self.submit_create_task(TYPE_SUBTITLE)
         task = self.get_subtitle_task()
@@ -163,7 +192,7 @@ class TranscriptionTaskTest(TestCase):
         self.assertEqual(task.language, '')
         self.assertEqual(task.assignee, None)
 
-    def test_assign_on_create_form(self):
+    def test_create_with_asignee(self):
         member = self.create_member()
         self.submit_create_task(TYPE_SUBTITLE, assignee=member.user.pk)
         task = self.get_subtitle_task()
@@ -175,11 +204,7 @@ class TranscriptionTaskTest(TestCase):
         task = self.get_subtitle_task()
         # create a member and assign the task to them
         member = self.create_member()
-        response = self.submit_assign(member, task)
-        if ('form' in response.context and
-            not response.context['form'].is_valid()):
-            raise AssertionError("submit failed -- errors:\n%s" %
-                                 response.context['form'].errors.as_text)
+        self.submit_assign(member, task)
         # check that it worked
         task = self.get_subtitle_task()
         self.assertEquals(task.assignee, member.user)
@@ -191,10 +216,6 @@ class TranscriptionTaskTest(TestCase):
         # create a member and assign the task to them
         member = self.create_member()
         response = self.submit_assign(member, task, ajax=True)
-        if ('form' in response.context and
-            not response.context['form'].is_valid()):
-            raise AssertionError("submit failed -- errors:\n%s" %
-                                 response.context['form'].errors.as_text)
         # check that it worked
         response_data = json.loads(response.content)
         self.assertEquals(response_data.get('success'), True)
@@ -308,29 +329,155 @@ class TranscriptionTaskTest(TestCase):
         self.assert_(approx_expiration + datetime.timedelta(seconds=1) >
                      expiration_date)
 
-class TranslationTaskTest(TestCase):
+class TranslationTaskTest(TranslateTranscribeTestBase):
     """Tests for translation tasks."""
 
-    def test_create(self):
-        pass
+    def setUp(self):
+        TranslateTranscribeTestBase.setUp(self)
+        # make a transcription that we can use for our translations
+        editor = TestEditor(self.client, self.team_video.video)
+        editor.run(language_code='en')
 
-    def test_assign(self):
-        pass
+    def test_create(self):
+        self.submit_create_task(TYPE_TRANSLATE, language='ru')
+        task = self.get_translate_task()
+        self.assertEqual(task.type, TYPE_TRANSLATE)
+        self.assertEqual(task.language, 'ru')
+        self.assertEqual(task.assignee, None)
+
+    def test_create_with_asignee(self):
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, assignee=member.user.pk,
+                                language='ru')
+        task = self.get_translate_task()
+        self.assertEqual(task.type, TYPE_TRANSLATE)
+        self.assertEqual(task.language, 'ru')
+        self.assertEqual(task.assignee, member.user)
+
+    def test_assign_with_form(self):
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru')
+        task = self.get_translate_task()
+        self.assertEquals(task.assignee, None)
+        self.submit_assign(member, task)
+        self.assertEqual(self.get_translate_task().assignee, member.user)
+
+    def test_assign_with_ajax(self):
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru')
+        task = self.get_translate_task()
+        self.assertEquals(task.assignee, None)
+        self.submit_assign(member, task, ajax=True)
+        self.assertEqual(self.get_translate_task().assignee, member.user)
+
+    def test_perform(self):
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru',
+                                assignee=member.user.pk)
+        task = self.get_translate_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task, 'en', 'ru')
+        task = self.get_translate_task()
+        self.assertNotEquals(task.completed, None)
+        self.assertEquals(task.approved, None)
+        self.check_incomplete_counts(0, 0, 0)
 
     def test_review(self):
-        pass
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      DONT_REQUIRE_APPROVAL)
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru',
+                                assignee=member.user.pk)
+        task = self.get_translate_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task, 'en', 'ru')
+        # test test that the review is ready to go
+        self.check_incomplete_counts(0, 1, 0)
+        subtitle_language = self.team_video.video.subtitle_language('ru')
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the review
+        review_task = self.get_review_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Note", 'en', 'ru')
+        # The review is now complete, check aftermath
+        self.assertEquals(self.get_review_task().body, "Test Note")
+        self.check_incomplete_counts(0, 0, 0)
+        self.assertEquals(subtitle_language.get_tip().is_public(), True)
 
     def test_approve(self):
-        pass
+        self.change_workflow_settings(DONT_REQUIRE_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru',
+                                assignee=member.user.pk)
+        task = self.get_translate_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task, 'en', 'ru')
+        # test test that the review is ready to go
+        self.check_incomplete_counts(0, 0, 1)
+        subtitle_language = self.team_video.video.subtitle_language('ru')
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the approve
+        approve_task = self.get_approve_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, approve_task)
+        self.perform_approve_task(approve_task, "Test Note", 'en', 'ru')
+        # The approve is now complete, check aftermath
+        self.assertEquals(self.get_approve_task().body, "Test Note")
+        self.check_incomplete_counts(0, 0, 0)
+        self.assertEquals(subtitle_language.get_tip().is_public(), True)
 
-    def test_create_permissions(self):
-        pass
-
-    def test_review_permissions(self):
-        pass
-
-    def test_approve_permissions(self):
-        pass
+    def test_review_and_approve(self):
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        self.workflow.save()
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru',
+                                assignee=member.user.pk)
+        task = self.get_translate_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task, 'en', 'ru')
+        # test test that the review is ready to go
+        self.check_incomplete_counts(0, 1, 0)
+        subtitle_language = self.team_video.video.subtitle_language('ru')
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the review
+        review_task = self.get_review_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Note", 'en', 'ru')
+        # The review is now complete, next step is approval
+        self.assertEquals(self.get_review_task().body, "Test Note")
+        self.check_incomplete_counts(0, 0, 1)
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the approve
+        approve_task = self.get_approve_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, approve_task)
+        self.perform_approve_task(approve_task, "Test Note", 'en', 'ru')
+        # The approve is now complete, check aftermath
+        self.assertEquals(self.get_approve_task().body, "Test Note")
+        self.check_incomplete_counts(0, 0, 0)
+        self.assertEquals(subtitle_language.get_tip().is_public(), True)
 
     def test_due_date(self):
-        pass
+        self.team.task_expiration = 2
+        self.team.save()
+        # submit the task.  It shouldn't have an expiration date before it
+        # gets assigned
+        member = self.create_member()
+        self.submit_create_task(TYPE_TRANSLATE, language='ru')
+        task = self.get_translate_task()
+        self.assertEquals(task.expiration_date, None)
+        # create a member and assign the task to them.  After thi, the
+        # expiration date should be set.
+        member = self.create_member()
+        self.submit_assign(member, task)
+        approx_expiration = (datetime.datetime.now() +
+                             datetime.timedelta(days=2))
+        expiration_date = self.get_translate_task().expiration_date
+        self.assert_(approx_expiration - datetime.timedelta(seconds=1) <
+                     expiration_date)
+        self.assert_(approx_expiration + datetime.timedelta(seconds=1) >
+                     expiration_date)

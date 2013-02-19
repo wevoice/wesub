@@ -207,7 +207,8 @@ class BleachSanityTest(TestCase):
 
 class TestEditor(object):
     """Simulates the editor widget for unit tests"""
-    def __init__(self, client, video, original_language_code=None, mode=None):
+    def __init__(self, client, video, original_language_code=None,
+                 base_language_code=None, mode=None):
         """Construct a TestEditor
 
         :param client: django TestClient object for HTTP requests
@@ -215,10 +216,13 @@ class TestEditor(object):
         :param original_language_code: language code for the video audio.
         Should be set if and only if the primary_audio_language_code hasn't
         been set for the video.
+        :param base_language_code: base language code for to use for
+        translation tasks.
         :param mode: one of ("review", "approve" or None)
         """
         self.client = client
         self.video = video
+        self.base_language_code = base_language_code
         if original_language_code is None:
             self.original_language_code = video.primary_audio_language_code
         else:
@@ -264,7 +268,7 @@ class TestEditor(object):
                                  (method, response_data['error']))
         return response_data
 
-    def run(self, language_code="en", completed=True, save_for_later=False):
+    def run(self, language_code, completed=True, save_for_later=False):
         """Make the HTTP requests to simulate the editor
 
         We will use test_factories.dxfp_sample() for the subtitle data.
@@ -287,7 +291,7 @@ class TestEditor(object):
             video_id=self.video.video_id,
             language_code=language_code,
             original_language_code=self.original_language_code,
-            base_language_code=None,
+            base_language_code=self.base_language_code,
             mode=self.mode,
             subtitle_language_pk=subtitle_language_pk)
         session_pk = response_data['session_pk']
