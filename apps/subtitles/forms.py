@@ -172,7 +172,7 @@ class SubtitlesUploadForm(forms.Form):
         if from_language_code:
             from_sl = self.video.subtitle_language(from_language_code)
 
-            from_count = len(from_sl.get_tip().get_subtitles())
+            from_count = len(from_sl.get_tip(public=True).get_subtitles())
             current_count = len(self._parsed_subtitles.get_subtitles())
 
             if from_count != current_count:
@@ -293,7 +293,7 @@ class SubtitlesUploadForm(forms.Form):
         title, description = self.video.title, self.video.description
 
         if subtitle_language:
-            previous_version = subtitle_language.get_tip()
+            previous_version = subtitle_language.get_tip(public=True)
             if previous_version:
                 title = previous_version.title
                 description = previous_version.description
@@ -311,7 +311,7 @@ class SubtitlesUploadForm(forms.Form):
 
         if from_language_code:
             from_language = self.video.subtitle_language(from_language_code)
-            from_version = from_language.get_tip()
+            from_version = from_language.get_tip(public=True)
             parents = [from_version]
 
         return parents
