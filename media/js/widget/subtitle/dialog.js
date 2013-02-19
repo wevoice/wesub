@@ -325,7 +325,8 @@ unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event
         return;
     }
     this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
-        this.subtitles_.LANGUAGE + '/?from-old-editor=true';
+        this.subtitles_.LANGUAGE + '/?from-old-editor=true&' +
+        window.location.search.replace('?', '');
     this.saveWork(false, true);
 };
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
