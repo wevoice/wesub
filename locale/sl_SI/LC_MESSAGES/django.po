@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-18 00:12-0600\n"
+"POT-Creation-Date: 2013-02-19 00:11-0600\n"
 "PO-Revision-Date: 2012-07-10 06:47+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Slovenian (Slovenia) (http://www.transifex.com/projects/p/"
@@ -71,7 +71,7 @@ msgid "Email"
 msgstr ""
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
-#: templates/messages/_messages.html:8 templates/videos/create.html:71
+#: templates/messages/_messages.html:8 templates/videos/create.html:70
 msgid "Hide"
 msgstr ""
 
@@ -223,56 +223,56 @@ msgstr ""
 msgid "%(user)s is applying for team %(team)s"
 msgstr ""
 
-#: apps/messages/tasks.py:194
+#: apps/messages/tasks.py:192
 #, python-format
 msgid "Your application to join the %s team has been declined"
 msgstr ""
 
-#: apps/messages/tasks.py:229
+#: apps/messages/tasks.py:230
 #, python-format
 msgid "%s team has a new member"
 msgstr ""
 
-#: apps/messages/tasks.py:253
+#: apps/messages/tasks.py:254
 #, python-format
 msgid "You've joined the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:280
+#: apps/messages/tasks.py:281
 #, python-format
 msgid "%(user)s has left the %(team)s team"
 msgstr ""
 
-#: apps/messages/tasks.py:305
+#: apps/messages/tasks.py:306
 #, python-format
 msgid "You've left the %s team!"
 msgstr ""
 
-#: apps/messages/tasks.py:370
+#: apps/messages/tasks.py:371
 msgid "You have a new task assignment on Amara!"
 msgstr ""
 
-#: apps/messages/tasks.py:419
+#: apps/messages/tasks.py:420
 msgid "Your subtitles have been reviewed"
 msgstr ""
 
-#: apps/messages/tasks.py:421
+#: apps/messages/tasks.py:422
 msgid " and published"
 msgstr ""
 
-#: apps/messages/tasks.py:524
+#: apps/messages/tasks.py:525
 msgid "Your subtitles have been approved and published!"
 msgstr ""
 
-#: apps/messages/tasks.py:530
+#: apps/messages/tasks.py:531
 msgid "Your subtitles have been returned for further editing"
 msgstr ""
 
-#: apps/messages/tasks.py:585
+#: apps/messages/tasks.py:586
 msgid "Your subtitles were not accepted"
 msgstr ""
 
-#: apps/messages/tasks.py:629
+#: apps/messages/tasks.py:630
 #, python-format
 msgid "%(user)s left a comment on the video %(title)s"
 msgstr ""
@@ -674,7 +674,7 @@ msgstr ""
 msgid "Would you like to delete these subtitles completely?"
 msgstr ""
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:350
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
 msgid "What would you like to unpublish?"
 msgstr ""
 
@@ -1632,23 +1632,23 @@ msgid ""
 "appear."
 msgstr ""
 
-#: apps/videos/views.py:627
+#: apps/videos/views.py:623
 msgid "You have not permission change this URL"
 msgstr ""
 
-#: apps/videos/views.py:632 apps/videos/views.py:663
+#: apps/videos/views.py:628 apps/videos/views.py:659
 msgid "Object does not exist"
 msgstr ""
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:643
 msgid "You have not permission delete this URL"
 msgstr ""
 
-#: apps/videos/views.py:651
+#: apps/videos/views.py:647
 msgid "You can't remove primary URL"
 msgstr ""
 
-#: apps/videos/views.py:805
+#: apps/videos/views.py:801
 #, python-format
 msgid "The language for %s has been changed"
 msgstr ""
@@ -1935,23 +1935,19 @@ msgstr ""
 msgid "Just launch our feedback form and try captioning a video"
 msgstr ""
 
-#: templates/_testing_widget.html:7
-msgid "Test the Widget"
-msgstr ""
-
-#: templates/_testing_widget.html:12
+#: templates/_testing_widget.html:11
 msgid ""
 "Warning: These videos should not be embeded--there is a good possibility "
 "they will break at some point!"
 msgstr ""
 
-#: templates/_testing_widget.html:16
+#: templates/_testing_widget.html:15
 msgid ""
 "Warning #2: These subtitles are non-permanent and should not be relied on -- "
 "someone could change them."
 msgstr ""
 
-#: templates/_testing_widget.html:17
+#: templates/_testing_widget.html:16
 msgid "This alpha site is for purely testing purposes."
 msgstr ""
 
@@ -2042,7 +2038,7 @@ msgstr ""
 msgid "Watch"
 msgstr ""
 
-#: templates/base.html:72 templates/videos/create.html:63
+#: templates/base.html:72 templates/videos/create.html:62
 msgid "Volunteer"
 msgstr ""
 
@@ -2412,76 +2408,76 @@ msgstr ""
 msgid "How can I use Amara?"
 msgstr ""
 
-#: templates/faq.html:21 templates/faq.html.py:65
+#: templates/faq.html:21 templates/faq.html.py:63
 msgid "What are the benefits of subtitles?"
 msgstr ""
 
-#: templates/faq.html:22 templates/faq.html.py:74
+#: templates/faq.html:22 templates/faq.html.py:72
 msgid ""
 "Who is the Participatory Culture Foundation and why are they making Amara?"
 msgstr ""
 
-#: templates/faq.html:23 templates/faq.html.py:78
+#: templates/faq.html:23 templates/faq.html.py:76
 msgid "Will Amara support closed captions for the deaf and hard of hearing?"
 msgstr ""
 
-#: templates/faq.html:24 templates/faq.html.py:82
+#: templates/faq.html:24 templates/faq.html.py:80
 msgid "Will your subtitles support my language or characterset?"
 msgstr ""
 
-#: templates/faq.html:25 templates/faq.html.py:86
+#: templates/faq.html:25 templates/faq.html.py:84
 msgid "When will the tools, including this site, be available in my language?"
 msgstr ""
 
-#: templates/faq.html:26 templates/faq.html.py:97
+#: templates/faq.html:26 templates/faq.html.py:95
 msgid "How can I add subtitles to my video?"
 msgstr ""
 
-#: templates/faq.html:27 templates/faq.html.py:107
+#: templates/faq.html:27 templates/faq.html.py:105
 msgid "What open source license do you use?"
 msgstr ""
 
-#: templates/faq.html:28 templates/faq.html.py:111
+#: templates/faq.html:28 templates/faq.html.py:109
 msgid "I'm a developer, can I help out?"
 msgstr ""
 
-#: templates/faq.html:29 templates/faq.html.py:115
+#: templates/faq.html:29 templates/faq.html.py:113
 msgid "Can non-technical people get involved with the project?"
 msgstr ""
 
-#: templates/faq.html:30 templates/faq.html.py:126
+#: templates/faq.html:30 templates/faq.html.py:124
 msgid "Do you accept donations? Are they tax deductible?"
 msgstr ""
 
-#: templates/faq.html:31 templates/faq.html.py:134
+#: templates/faq.html:31 templates/faq.html.py:132
 msgid "What is your relationship with Mozilla Drumbeat?"
 msgstr ""
 
-#: templates/faq.html:32 templates/faq.html.py:138
+#: templates/faq.html:32 templates/faq.html.py:136
 msgid "Where can I download subtitles in .SRT or other formats?"
 msgstr ""
 
-#: templates/faq.html:33 templates/faq.html.py:149
+#: templates/faq.html:33 templates/faq.html.py:147
 msgid ""
 "It says \"Someone else is currently editing these subtitles\" and I can't do "
 "anything.  How long will this last for?  Why does it happen?"
 msgstr ""
 
-#: templates/faq.html:34 templates/faq.html.py:159
+#: templates/faq.html:34 templates/faq.html.py:157
 msgid "Why can't I change the timing on a translation?"
 msgstr ""
 
-#: templates/faq.html:35 templates/faq.html.py:170
+#: templates/faq.html:35 templates/faq.html.py:168
 msgid ""
 "How do old revisions work? What if somebody makes a change to my work that I "
 "don't approve of?"
 msgstr ""
 
-#: templates/faq.html:36 templates/faq.html.py:186
+#: templates/faq.html:36 templates/faq.html.py:184
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
 msgstr ""
 
-#: templates/faq.html:37 templates/faq.html.py:199
+#: templates/faq.html:37 templates/faq.html.py:197
 msgid "Hey, you don’t list my language!"
 msgstr ""
 
@@ -2501,38 +2497,35 @@ msgstr ""
 #: templates/faq.html:56
 msgid ""
 "\n"
-"      \t\tYou're welcome to try our <a href=\"http://universalsubtitles.org/"
-"demo/\">demo</a> \n"
-"\t\t\tto see how the software works. You can also \n"
-"\t\t\t<a href=\"http://universalsubtitles.org/videos/create\">begin "
-"subtitling</a> \n"
+"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin "
+"subtitling</a>\n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
 
-#: templates/faq.html:66
+#: templates/faq.html:64
 msgid "VVideo subtitles are a gold mine of untapped potential."
 msgstr ""
 
-#: templates/faq.html:68
+#: templates/faq.html:66
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
 msgstr ""
 
-#: templates/faq.html:69
+#: templates/faq.html:67
 msgid ""
 "Translations make it possible for all of us to watch video in languages that "
 "we don't speak"
 msgstr ""
 
-#: templates/faq.html:70
+#: templates/faq.html:68
 msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
 msgstr ""
 
-#: templates/faq.html:75
+#: templates/faq.html:73
 msgid ""
 "he Participatory Culture Foundation is a 501c3 non-profit organization whose "
 "mission is to build a fairer, more open, and more democratic media space. "
@@ -2540,18 +2533,18 @@ msgid ""
 "&mdash; Amara is helping to fill that need."
 msgstr ""
 
-#: templates/faq.html:79
+#: templates/faq.html:77
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
 msgstr ""
 
-#: templates/faq.html:83
+#: templates/faq.html:81
 msgid ""
 "We will be working to support as many languages/charactersets as possible."
 msgstr ""
 
-#: templates/faq.html:88
+#: templates/faq.html:86
 msgid ""
 "\n"
 "      \tThe site and tools are available in a number of languages (set your "
@@ -2564,7 +2557,7 @@ msgid ""
 "\t  "
 msgstr ""
 
-#: templates/faq.html:99
+#: templates/faq.html:97
 msgid ""
 "\n"
 "\t      For a single video, use our site. For multiple videos on your "
@@ -2575,20 +2568,20 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: templates/faq.html:108
+#: templates/faq.html:106
 msgid ""
 "For our subtitling widget and community website, we're using the <a href="
 "\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 msgstr ""
 
-#: templates/faq.html:112
+#: templates/faq.html:110
 msgid ""
 "Please do! If you're interested in coding and development, please visit our "
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
 msgstr ""
 
-#: templates/faq.html:117
+#: templates/faq.html:115
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
@@ -2602,7 +2595,7 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: templates/faq.html:128
+#: templates/faq.html:126
 msgid ""
 "\n"
 "      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
@@ -2611,7 +2604,7 @@ msgid ""
 "\t\t"
 msgstr ""
 
-#: templates/faq.html:135
+#: templates/faq.html:133
 msgid ""
 "The Mozilla Foundation has provided Amara with seed funding, community "
 "support, and fundraising support through <a href=\"http://www.drumbeat.org/"
@@ -2619,7 +2612,7 @@ msgid ""
 "next 100 years, and Amara is a featured project!"
 msgstr ""
 
-#: templates/faq.html:140
+#: templates/faq.html:138
 msgid ""
 "\n"
 "     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
@@ -2632,7 +2625,7 @@ msgid ""
 "       "
 msgstr ""
 
-#: templates/faq.html:151
+#: templates/faq.html:149
 msgid ""
 "\n"
 "        The system currently only allows one user to edit subtitles for any "
@@ -2643,7 +2636,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/faq.html:161
+#: templates/faq.html:159
 msgid ""
 "\n"
 "        You can. Go to the translation editor and click “Change subtitle "
@@ -2656,7 +2649,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/faq.html:172
+#: templates/faq.html:170
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
@@ -2675,7 +2668,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/faq.html:188
+#: templates/faq.html:186
 msgid ""
 "\n"
 "          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
@@ -2690,7 +2683,7 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/faq.html:201
+#: templates/faq.html:199
 msgid ""
 "\n"
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
@@ -2862,219 +2855,6 @@ msgstr ""
 
 #: templates/index.html:144
 msgid "Awards for Amara"
-msgstr ""
-
-#: templates/index_old.html:26
-msgid "Easily caption and translate your videos, with help from your viewers."
-msgstr ""
-
-#: templates/index_old.html:28
-msgid ""
-"Increase video views by reaching global audiences and being accessible to "
-"the deaf and hard-of-hearing."
-msgstr ""
-
-#: templates/index_old.html:29
-msgid ""
-"It's powered by viewers and other volunteers: it's collaborative editing and "
-"translation, like a wiki."
-msgstr ""
-
-#: templates/index_old.html:30
-msgid "It's the world's easiest subtitle creator - type and tap."
-msgstr ""
-
-#: templates/index_old.html:31
-msgid ""
-"The fastest way to add subtitle functionality to a single video or a whole "
-"site. Super easy to integrate with no software to install."
-msgstr ""
-
-#: templates/index_old.html:32
-msgid "Free, open-source, and non-profit!"
-msgstr ""
-
-#: templates/index_old.html:35
-msgid "videos use"
-msgstr ""
-
-#: templates/index_old.html:62
-msgid "Add this subtitle tab to a video in seconds."
-msgstr ""
-
-#: templates/index_old.html:65
-msgid "For an individual video"
-msgstr ""
-
-#: templates/index_old.html:68
-msgid "enter a video URL to enable and then embed anywhere"
-msgstr ""
-
-#: templates/index_old.html:71
-msgid "For every video on a page or site"
-msgstr ""
-
-#: templates/index_old.html:73
-msgid ""
-"paste this single line of code into your page header and every video will be "
-"subtitle enabled"
-msgstr ""
-
-#: templates/index_old.html:77
-msgid "Amara works with these video sites and formats"
-msgstr ""
-
-#: templates/index_old.html:89
-msgid "With Amara, you can:"
-msgstr ""
-
-#: templates/index_old.html:91
-msgid "Add subtitles"
-msgstr ""
-
-#: templates/index_old.html:92
-msgid ""
-"We've built the easiest way to subtitle videos. Add our subtitling widget "
-"toyour video (or your site) and click the \"subtitle me\" button. The rest "
-"is simple! Totally free, and no software to download."
-msgstr ""
-
-#: templates/index_old.html:96
-msgid "Add translations"
-msgstr ""
-
-#: templates/index_old.html:98
-msgid ""
-"\n"
-"          Once subtitles exist, any viewer can add a translation in any "
-"language.  No\n"
-"          need for robotic machine translations that confuse viewers.  "
-"Universal\n"
-"          Subtitles lets you collect high-quality translations from your "
-"viewer\n"
-"          community.\n"
-"          "
-msgstr ""
-
-#: templates/index_old.html:108
-msgid "Get volunteer help"
-msgstr ""
-
-#: templates/index_old.html:110
-msgid ""
-"\n"
-"          Your viewers (and members of our subtitling community) can improve "
-"any\n"
-"          subtitles or translation. That way subtitles are constantly "
-"getting better -\n"
-"          like an article on wikipedia. We mobilize your international "
-"audience to make\n"
-"          your videos more accessible.\n"
-"        "
-msgstr ""
-
-#: templates/index_old.html:122
-msgid "It’s free with no software to download"
-msgstr ""
-
-#: templates/index_old.html:123
-msgid "Add our embed code to your videos."
-msgstr ""
-
-#: templates/index_old.html:124
-msgid ""
-"\n"
-"    Submit your video, and get an embed code to post in your site. \n"
-"    When the page loads, our subtitle tools will display underneath your "
-"video \n"
-"    (as a small, simple button)\n"
-"    "
-msgstr ""
-
-#: templates/index_old.html:132
-msgid "Subtitling tools open in your page."
-msgstr ""
-
-#: templates/index_old.html:133
-msgid ""
-"\n"
-"      When someone clicks the “subtitle me” button, \n"
-"      a subtitling interface appears on your page (most users never leave "
-"your site). \n"
-"      Subtitles they create are then visible to other users, on your site.\n"
-"      "
-msgstr ""
-
-#: templates/index_old.html:142
-msgid "How it works"
-msgstr ""
-
-#: templates/index_old.html:144
-msgid ""
-"\n"
-"      You add our widget to your videos.  Then you and your viewers can add\n"
-"      subtitles.  We save the subtitles on our site.  And each video has its "
-"own collaboration space on our site\n"
-"      where people can track changes, and give feedback.\n"
-"    "
-msgstr ""
-
-#: templates/index_old.html:149
-msgid "Try the demo"
-msgstr ""
-
-#: templates/index_old.html:156
-msgid "Why Amara is different"
-msgstr ""
-
-#: templates/index_old.html:158
-msgid ""
-"It's built by a 501(c)3 nonprofit working with a community of volunteers"
-msgstr ""
-
-#: templates/index_old.html:158
-msgid "find out how to volunteer"
-msgstr ""
-
-#: templates/index_old.html:160
-msgid "The code is free and open source"
-msgstr ""
-
-#: templates/index_old.html:160
-msgid "get the source code"
-msgstr ""
-
-#: templates/index_old.html:161
-msgid ""
-"It's built using Javascript and HTML5 instead of proprietary software like "
-"Flash"
-msgstr ""
-
-#: templates/index_old.html:162
-#, python-format
-msgid "It's 100%% web-based, there’s no software to download."
-msgstr ""
-
-#: templates/index_old.html:163
-msgid ""
-"You don't have to host your video with us, and you're not dependent on any "
-"one video host, platform, or format."
-msgstr ""
-
-#: templates/index_old.html:164
-msgid "People are free to add subtitles to any video"
-msgstr ""
-
-#: templates/index_old.html:170 templates/jsdemo/home.html:112
-msgid "Mozilla will double your donation!"
-msgstr ""
-
-#: templates/index_old.html:171 templates/jsdemo/home.html:113
-msgid "We're a featured Mozilla Drumbeat project!"
-msgstr ""
-
-#: templates/index_old.html:172 templates/jsdemo/home.html:113
-msgid "Donate Now"
 msgstr ""
 
 #: templates/opensubtitles2010.html:8 templates/opensubtitles2010.html:26
@@ -3249,7 +3029,7 @@ msgstr ""
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:369
+#: templates/videos/subtitle-view.html:372
 msgid "Cancel"
 msgstr ""
 
@@ -3330,7 +3110,7 @@ msgstr ""
 msgid "we're in an alpha stage, building and testing. You can help!"
 msgstr ""
 
-#: templates/jsdemo/home.html:25 templates/videos/create.html:31
+#: templates/jsdemo/home.html:25
 msgid "Try our demo"
 msgstr ""
 
@@ -3382,6 +3162,18 @@ msgstr ""
 
 #: templates/jsdemo/home.html:93
 msgid "Please enter your email address."
+msgstr ""
+
+#: templates/jsdemo/home.html:112
+msgid "Mozilla will double your donation!"
+msgstr ""
+
+#: templates/jsdemo/home.html:113
+msgid "We're a featured Mozilla Drumbeat project!"
+msgstr ""
+
+#: templates/jsdemo/home.html:113
+msgid "Donate Now"
 msgstr ""
 
 #: templates/jsdemo/home.html:121
@@ -5929,23 +5721,23 @@ msgstr ""
 msgid "to subtitle all the videos on your site. Just looking?"
 msgstr ""
 
-#: templates/videos/create.html:37
+#: templates/videos/create.html:36
 msgid "for example"
 msgstr ""
 
-#: templates/videos/create.html:45
+#: templates/videos/create.html:44
 msgid "Automatically submit videos"
 msgstr ""
 
-#: templates/videos/create.html:49
+#: templates/videos/create.html:48
 msgid "Let's Go!"
 msgstr ""
 
-#: templates/videos/create.html:55 templates/videos/create.html.py:73
+#: templates/videos/create.html:54 templates/videos/create.html.py:72
 msgid "Or Submit Multiple Videos"
 msgstr ""
 
-#: templates/videos/create.html:59
+#: templates/videos/create.html:58
 msgid ""
 "\n"
 "        Help organizations and deaf and hard of hearing viewers make videos "
@@ -6298,12 +6090,12 @@ msgid "Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:370
+#: templates/videos/subtitle-view.html:373
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:385
+#: templates/videos/subtitle-view.html:388
 msgid "Edit Subtitles"
 msgstr ""
 
@@ -6384,34 +6176,38 @@ msgid "Compare Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:316
+msgid "Rollback to version #"
+msgstr ""
+
+#: templates/videos/subtitle-view.html:319
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:317
+#: templates/videos/subtitle-view.html:320
 msgid "Text"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:323
+#: templates/videos/subtitle-view.html:326
 msgid "No subtitles for this language."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:332
+#: templates/videos/subtitle-view.html:335
 msgid "Roll back to this version"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:345
+#: templates/videos/subtitle-view.html:348
 msgid "Unpublish subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:353
+#: templates/videos/subtitle-view.html:356
 msgid "This version only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:357
+#: templates/videos/subtitle-view.html:360
 msgid "This entire language and all dependent languages"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:359
+#: templates/videos/subtitle-view.html:362
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."
