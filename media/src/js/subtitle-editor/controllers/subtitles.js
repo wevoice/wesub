@@ -276,7 +276,7 @@ var angular = angular || null;
 
             $scope.status = 'ready';
 
-            // When we have subtitles for an editable set, tell the kids.
+            // When we have subtitles for an editable set, broadcast it.
             $timeout(function() {
                 if ($scope.isEditable) {
                     $scope.$root.$broadcast('subtitles-fetched');
@@ -365,14 +365,18 @@ var angular = angular || null;
             return initialText;
         };
 
-        $scope.$on('subtitles-fetched', function() {
+        $scope.$root.$on('subtitles-fetched', function() {
             // When subtitles are first retrieved, we need to set up the amarasubtitle
             // on the video and bind to this scope.
             //
             // This will happen on the video controller. Just throw an event stating that
             // we're ready.
 
-            $scope.$root.$emit('subtitleReady', $scope);
+            // Only emit the event on editable subtitles. We don't want to initialize
+            // Popcorn subtitles for the non-editable set.
+            if ($scope.$parent.isEditable) {
+                $scope.$root.$emit('subtitle-ready', $scope);
+            }
         });
     };
     var VideoTitleController = function($scope, SubtitleListFinder) {
@@ -395,4 +399,4 @@ var angular = angular || null;
     root.SubtitleListItemController = SubtitleListItemController;
     root.VideoTitleController = VideoTitleController;
 
-}).call(this);
+}).call(this);'hi'
