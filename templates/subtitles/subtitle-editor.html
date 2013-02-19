@@ -106,12 +106,11 @@
                 </ul>
             </div>
             <div class="language-selections group" ng-controller="LanguageSelectorController">
-                <select name="alternate-language" id="alternate-language"
+                <select name="language"
                         ng-model="language"
-                        ng-change="languageSelectChanged()"
                         ng-options="item.name for item in languages">
                 </select>
-                <select name="alternate-version" id="alternate-version"
+                <select name="version"
                     ng-options="'Version ' + version.version_no for version in versions"
                     ng-model="version">
                 </select>

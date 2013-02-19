@@ -40,7 +40,7 @@ var angular = angular || null;
          * side panel.
          */
 
-        $scope.languageSelectChanged = function(lang) {
+        $scope.languageChanged = function(lang) {
             var vers, language;
 
             if (lang) {
@@ -78,9 +78,7 @@ var angular = angular || null;
             var subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.code,
-                                             newVersion.version_no,
-                                             function(subtitles) {
+                SubtitleStorage.getSubtitles($scope.language.code, newVersion.version_no, function(subtitles) {
                     $scope.version.subtitlesXML = subtitles.subtitlesXML;
                     $scope.setReferenceSubs(subtitles);
                 });
@@ -94,9 +92,10 @@ var angular = angular || null;
             $scope.language = _.find(languages, function(item) {
                 return item.editingLanguage;
             });
-            $scope.languageSelectChanged($scope.language);
+            $scope.languageChanged($scope.language);
         });
 
+        $scope.$watch('language', $scope.languageChanged);
         $scope.$watch('version', $scope.versionChanged);
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {

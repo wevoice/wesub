@@ -96,8 +96,10 @@ var angular = angular || null;
                             if (language.versions[j].version_no === parseInt(versionNumber, 10)){
 
                                 subtitles = language.versions[j];
+                                if (subtitles.subtitlesXML) {
+                                    break;
+                                }
 
-                                break;
                             }
                         }
 
@@ -106,7 +108,7 @@ var angular = angular || null;
                 }
 
                 // If we found subtitles, call the callback with them.
-                if (subtitles !== undefined){
+                if (subtitles.subtitlesXML !== undefined){
                    callback(subtitles);
 
                 // Otherwise, ask the API for this version.
@@ -114,9 +116,12 @@ var angular = angular || null;
 
                     var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode, versionNumber);
 
-                    // TODO: Cache this. And handle errors.
                     $http.get(url).success(function(response) {
-                        callback(response);
+
+                        // Cache these subtitles on the cached data object.
+                        subtitles.subtitlesXML = response;
+                        callback(subtitles);
+
                     });
                 }
             },
