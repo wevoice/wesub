@@ -1,5 +1,5 @@
 /*
- * popcorn.js version 6045d68
+ * popcorn.js version 879399e
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -100,7 +100,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "6045d68";
+  Popcorn.version = "879399e";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -4103,6 +4103,7 @@
     this.currentTime = options.currentTime || 0;
     this.duration = options.duration || NaN;
     this.playInterval = null;
+    this.paused = true;
     this.ended = options.endedCallback || Popcorn.nop;
   }
 
@@ -4120,12 +4121,18 @@
 
     play: function() {
       var video = this;
-      this.playInterval = setInterval( function() { nullPlay( video ); },
-                                       DEFAULT_UPDATE_RESOLUTION_MS );
+      if ( this.paused ) {
+        this.paused = false;
+        this.playInterval = setInterval( function() { nullPlay( video ); },
+                                         DEFAULT_UPDATE_RESOLUTION_MS );
+      }
     },
 
     pause: function() {
-      clearInterval( this.playInterval );
+      if ( !this.paused ) {
+        this.paused = true;
+        clearInterval( this.playInterval );
+      }
     },
 
     seekTo: function( aTime ) {
@@ -4285,6 +4292,7 @@
     }
 
     function onSeeked() {
+      impl.ended = false;
       impl.seeking = false;
       self.dispatchEvent( "timeupdate" );
       self.dispatchEvent( "seeked" );
@@ -4301,6 +4309,7 @@
       } else {
         if( impl.ended ) {
           changeCurrentTime( 0 );
+          impl.ended = false;
         }
 
         if ( impl.paused ) {
@@ -4322,7 +4331,9 @@
         return;
       }
       player.play();
-      onPlay();
+      if ( impl.paused ) {
+        onPlay();
+      }
     };
 
     function onPause() {
@@ -4337,7 +4348,9 @@
         return;
       }
       player.pause();
-      onPause();
+      if ( !impl.paused ) {
+        onPause();
+      }
     };
 
     function onEnded() {
@@ -4346,7 +4359,7 @@
         self.play();
       } else {
         impl.ended = true;
-        clearInterval( timeUpdateInterval );
+        onPause();
         self.dispatchEvent( "timeupdate" );
         self.dispatchEvent( "ended" );
       }
@@ -4860,10 +4873,10 @@
         // restart playing after ended.  Also, the onPause callback won't get
         // called when we do self.pause() here, so we manually set impl.paused
         // to get the state right.
+        impl.ended = true;
         self.pause();
         onPause();
-
-        impl.ended = true;
+        self.dispatchEvent( "timeupdate" );
         self.dispatchEvent( "ended" );
       }
     }
@@ -5175,7 +5188,7 @@
 
   // Helper for identifying URLs we know how to play.
   HTMLSoundCloudAudioElement.prototype._canPlaySrc = function( url ) {
-    return (/(?:http:\/\/www\.|http:\/\/|www\.|\.|^)(soundcloud)/).test( url ) ?
+    return (/(?:https?:\/\/www\.|https?:\/\/|www\.|\.|^)(soundcloud)/).test( url ) ?
       "probably" : EMPTY_STRING;
   };
 
@@ -5196,12 +5209,7 @@
 
   CURRENT_TIME_MONITOR_MS = 16,
   EMPTY_STRING = "",
-  VIMEO_HOST = window.location.protocol + "//player.vimeo.com",
-
-  // Vimeo doesn't give a suggested min size, YouTube suggests 200x200
-  // as minimum, video spec says 300x150.
-  MIN_WIDTH = 300,
-  MIN_HEIGHT = 200;
+  VIMEO_HOST = window.location.protocol + "//player.vimeo.com";
 
   // Utility wrapper around postMessage interface
   function VimeoPlayer( vimeoIFrame ) {
@@ -5268,8 +5276,6 @@
         duration: NaN,
         ended: false,
         paused: true,
-        width: parent.width|0   ? parent.width  : MIN_WIDTH,
-        height: parent.height|0 ? parent.height : MIN_HEIGHT,
         error: null
       },
       playerReady = false,
@@ -5620,8 +5626,8 @@
       src += optionsArray.join( "&" );
 
       elem.id = playerUID;
-      elem.width = impl.width; // 500?
-      elem.height = impl.height; // 281?
+      elem.style.width = "100%";
+      elem.style.height = "100%";
       elem.frameBorder = 0;
       elem.webkitAllowFullScreen = true;
       elem.mozAllowFullScreen = true;
@@ -5714,21 +5720,13 @@
 
       width: {
         get: function() {
-          return elem.width;
-        },
-        set: function( aValue ) {
-          elem.width = aValue;
-          impl.width = elem.width;
+          return self.parentNode.offsetWidth;
         }
       },
 
       height: {
         get: function() {
-          return elem.height;
-        },
-        set: function( aValue ) {
-          elem.height = aValue;
-          impl.height = elem.height;
+          return self.parentNode.offsetHeight;
         }
       },
 
@@ -5907,6 +5905,7 @@
         error: null
       },
       playerReady = false,
+      catchRoguePauseEvent = false,
       mediaReady = false,
       loopedPlay = false,
       player,
@@ -6011,6 +6010,10 @@
         // ended
         case YT.PlayerState.ENDED:
           onEnded();
+          // Seek back to the start of the video to reset the player,
+          // otherwise the player can become locked out.
+          // I do not see this happen all the time or on all systems.
+          player.seekTo( 0 );
           break;
 
         // playing
@@ -6024,6 +6027,10 @@
               impl.paused = false;
               addMediaReadyCallback( function() { onPlay(); } );
             } else {
+              // if a pause happens while seeking, ensure we catch it.
+              // in youtube seeks fire pause events, and we don't want to listen to that.
+              // except for the case of an actual pause.
+              catchRoguePauseEvent = false;
               player.pauseVideo();
             }
 
@@ -6060,6 +6067,12 @@
 
         // paused
         case YT.PlayerState.PAUSED:
+          // a seekTo call fires a pause event, which we don't want at this point.
+          // as long as a seekTo continues to do this, we can safly toggle this state.
+          if ( catchRoguePauseEvent ) {
+            catchRoguePauseEvent = false;
+            break;
+          }
           onPause();
           break;
 
@@ -6213,11 +6226,15 @@
     }
 
     function onSeeking() {
+      // a seek in youtube fires a paused event.
+      // we don't want to listen for this, so this state catches the event.
+      catchRoguePauseEvent = true;
       impl.seeking = true;
       self.dispatchEvent( "seeking" );
     }
 
     function onSeeked() {
+      impl.ended = false;
       impl.seeking = false;
       self.dispatchEvent( "timeupdate" );
       self.dispatchEvent( "seeked" );
@@ -6229,6 +6246,7 @@
 
       if( impl.ended ) {
         changeCurrentTime( 0 );
+        impl.ended = false;
       }
       timeUpdateInterval = setInterval( onTimeUpdate,
                                         self._util.TIMEUPDATE_MS );
@@ -6268,6 +6286,10 @@
         addMediaReadyCallback( function() { self.pause(); } );
         return;
       }
+      // if a pause happens while seeking, ensure we catch it.
+      // in youtube seeks fire pause events, and we don't want to listen to that.
+      // except for the case of an actual pause.
+      catchRoguePauseEvent = false;
       player.pauseVideo();
     };
 
@@ -6277,6 +6299,8 @@
         self.play();
       } else {
         impl.ended = true;
+        onPause();
+        self.dispatchEvent( "timeupdate" );
         self.dispatchEvent( "ended" );
       }
     }
