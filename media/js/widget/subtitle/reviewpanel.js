@@ -62,7 +62,7 @@ unisubs.subtitle.ReviewPanel.prototype.createRightPanelInternal = function() {
         this.bodyInput_ = internalComponents['bodyInput'];
     }
     return new unisubs.subtitle.ReviewRightPanel(
-        this.dialog_, this.serverModel, internalComponents['helpContents'],
+        this.dialog_, this.serverModel_, internalComponents['helpContents'],
         internalComponents['extraHelp'], keySpecs , false, "Done?",
         this.nextButtonText_,  this.reviewOrApprovalType_ , this.bodyInput_);
 };

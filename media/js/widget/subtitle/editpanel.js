@@ -31,7 +31,7 @@ unisubs.subtitle.EditPanel.prototype.createRightPanelInternal =
     function()
 {
     return new unisubs.subtitle.EditRightPanel(
-        this.serverModel, null, null,
+        this.serverModel_, null, null,
         this.makeKeySpecsInternal(), false, "Done?",
         "Submit your work");
 }
