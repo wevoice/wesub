@@ -10,6 +10,7 @@ from auth.models import CustomUser as User
 from apps.teams.forms import TaskCreateForm, TaskAssignForm
 from apps.teams.models import Task, Team, TeamVideo, TeamMember
 from apps.videos.models import Video
+from utils.tests import TestEditor
 from utils import test_factories
 
 # review setting constants
@@ -131,84 +132,20 @@ class TranscriptionTaskTest(TestCase):
         elif expecting_error and not form_had_error:
             raise AssertionError("submit to %s succeeded" % url)
 
-    def submit_widget_rpc(self, method, **data):
-        url = reverse('widget:rpc', args=(method,))
-        post_data = dict((k, json.dumps(v)) for k, v in data.items())
-        response = self.client.post(url, post_data)
-        response_data = json.loads(response.content)
-        if 'error' in response_data:
-            raise AssertionError("Error calling widget rpc method %s:\n%s" %
-                                 (method, response_data['error']))
-        return response_data
-
     def perform_subtitle_task(self, task):
-        self.submit_widget_rpc('fetch_start_dialog_contents',
-                               video_id=self.team_video.video.video_id)
-        response_data = self.submit_widget_rpc(
-            'start_editing',
-            video_id=self.team_video.video.video_id,
-            language_code="en",
-            original_language_code="en",
-            base_language_code=None,
-            mode=None,
-            subtitle_language_pk=None)
-        session_pk = response_data['session_pk']
-
-        self.submit_widget_rpc('finished_subtitles',
-                               completed=True,
-                               save_for_later=False,
-                               session_pk=session_pk,
-                               subtitles=test_factories.dxfp_sample('en'),
-                               task_approved=None,
-                               task_id=None,
-                               task_notes=None,
-                               task_type=None,)
+        editor = TestEditor(self.client, self.team_video.video)
+        editor.run()
 
     def perform_review_task(self, task, notes=None):
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.submit_widget_rpc('fetch_start_dialog_contents',
-                               video_id=self.team_video.video.video_id)
-        response_data = self.submit_widget_rpc(
-            'start_editing',
-            video_id=self.team_video.video.video_id,
-            language_code="en",
-            original_language_code="en",
-            base_language_code=None,
-            mode="review",
-            subtitle_language_pk=subtitle_language.pk)
-        session_pk = response_data['session_pk']
-        self.submit_widget_rpc('finished_subtitles',
-                               completed=True,
-                               save_for_later=False,
-                               session_pk=session_pk,
-                               subtitles=test_factories.dxfp_sample('en'),
-                               task_approved=Task.APPROVED_IDS['Approved'],
-                               task_id=task.id,
-                               task_notes=notes,
-                               task_type='review')
+        editor = TestEditor(self.client, self.team_video.video, mode="review")
+        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
+        editor.run()
 
     def perform_approve_task(self, task, notes=None):
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.submit_widget_rpc('fetch_start_dialog_contents',
-                               video_id=self.team_video.video.video_id)
-        response_data = self.submit_widget_rpc(
-            'start_editing',
-            video_id=self.team_video.video.video_id,
-            language_code="en",
-            original_language_code="en",
-            base_language_code=None,
-            mode="approve",
-            subtitle_language_pk=subtitle_language.pk)
-        session_pk = response_data['session_pk']
-        self.submit_widget_rpc('finished_subtitles',
-                               completed=True,
-                               save_for_later=False,
-                               session_pk=session_pk,
-                               subtitles=test_factories.dxfp_sample('en'),
-                               task_approved=Task.APPROVED_IDS['Approved'],
-                               task_id=task.id,
-                               task_notes=notes,
-                               task_type='approve')
+        editor = TestEditor(self.client, self.team_video.video,
+                mode="approve")
+        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
+        editor.run()
 
     def change_workflow_settings(self, review_allowed, approve_allowed):
         self.workflow.review_allowed = review_allowed
