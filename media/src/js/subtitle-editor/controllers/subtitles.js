@@ -399,4 +399,4 @@ var angular = angular || null;
     root.SubtitleListItemController = SubtitleListItemController;
     root.VideoTitleController = VideoTitleController;
 
-}).call(this);'hi'
+}).call(this);
