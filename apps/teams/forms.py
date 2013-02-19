@@ -612,6 +612,8 @@ class TaskUploadForm(SubtitlesUploadForm):
         return task
 
     def clean(self):
+        super(TaskUploadForm, self).clean()
+
         task = self.cleaned_data['task']
         language_code = self.cleaned_data['language_code']
         from_language_code = self.cleaned_data['from_language_code']
