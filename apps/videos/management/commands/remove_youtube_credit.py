@@ -73,6 +73,8 @@ class Command(BaseCommand):
             default=None),
         make_option('--team', '-t', dest='team', type="str",
             default=None),
+        make_option('--query', '-q', dest='query', type="str",
+            default=None),
     )
 
     CACHE_PATH = os.path.join(getattr(settings, 'PROJECT_ROOT'), 'yt-cache')
@@ -188,10 +190,38 @@ class Command(BaseCommand):
         self.log('Pausing')
         sleep(3)
 
-    def handle(self, video_id, team, *args, **kwargs):
-        if video_id and team:
-            raise CommandError("You can specify either a video or a team.")
+    def _get_videos_from_query(self, query):
+        uri = "http://gdata.youtube.com/feeds/api/videos?q=%s&v=2"
+        uri = uri % query
 
+        from videos.feed_parser import FeedParser
+
+        urls = []
+
+        feed_parser = FeedParser(uri)
+        _iter = feed_parser.items()
+
+        for vt, info, entry in _iter:
+            urls.append(vt.convert_to_video_url())
+
+        next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+
+        while next_url:
+            url = next_url[0].href
+            feed_parser = FeedParser(url)
+            _iter = feed_parser.items()
+
+            for vt, info, entry in _iter:
+                urls.append(vt.convert_to_video_url())
+
+            self.log("% videos loaded" % len(urls))
+
+            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+            self._sleep()
+
+        return VideoUrl.objects.select_related('video').filter(url__in=urls)
+
+    def handle(self, video_id, team, query, *args, **kwargs):
         if video_id:
             try:
                 video = Video.objects.get(video_id=video_id)
@@ -217,17 +247,22 @@ class Command(BaseCommand):
 
         try:
 
-            all_team_videos = Video.objects.filter(teamvideo__isnull=False)
+            if query:
+                urls = self._get_videos_from_query(query)
+                videos = [u.video for u in urls]
+            else:
 
-            if team:
-                self.log('Only processing videos for %s' % team)
-                all_team_videos = all_team_videos.filter(
-                        teamvideo__team__slug=team)
+                all_team_videos = Video.objects.filter(teamvideo__isnull=False)
 
-            videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
+                if team:
+                    self.log('Only processing videos for %s' % team)
+                    all_team_videos = all_team_videos.filter(
+                            teamvideo__team__slug=team)
 
-            urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
-                    video__in=videos)
+                videos = all_team_videos.exclude(video_id__in=self.cache['desc'])
+
+                urls = VideoUrl.objects.filter(type=VIDEO_TYPE_YOUTUBE,
+                        video__in=videos)
 
             self.log('%s video descriptions to process' % len(urls))
 
