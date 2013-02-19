@@ -42,6 +42,8 @@ Not critical.  Some of our admin icons have been missing for a while.
 CSS class names in admin forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Not critical.  I haven't noticed any brokenness in the admin.
+
 Compatibility with old signed data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,6 +62,8 @@ will still work.
 
 ``supports_timezone`` changed to ``False`` for SQLite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+No issues here.
 
 ``MySQLdb``-specific exceptions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,6 +87,8 @@ No issues here.
 
 CSRF protection extended to PUT and DELETE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+No issues here.
 
 Password reset view now accepts ``subject_template_name``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,6 +124,8 @@ The ``urlize`` filter no longer escapes every URL
 
 Database connections after running the test suite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Not critical.
 
 Output of ``manage.py help <help>``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -34,9 +34,12 @@ class VideoUrlInline(admin.StackedInline):
 
 class VideoAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ['__unicode__', 'video_thumbnail', 'languages', 'languages_count', 'is_subtitled']
+    list_display = ['__unicode__', 'video_thumbnail', 'languages',
+                    'languages_count', 'is_subtitled',
+                    'primary_audio_language_code']
     search_fields = ['video_id', 'title', 'videourl__url', 'user__username']
-    readonly_fields = ['subtitles_fetched_count', 'widget_views_count', 'view_count']
+    readonly_fields = ['subtitles_fetched_count', 'widget_views_count',
+                       'view_count']
     raw_id_fields = ['user', 'moderated_by']
     inlines = [VideoUrlInline]
 
@@ -165,6 +168,7 @@ class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
         return obj.subtitle_version.language.video.title
 
 class SubtitleAdmin(admin.ModelAdmin):
+    search_fields = ['version_id']
     list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text', 'start_time', 'end_time']
 
 class VideoFeedAdmin(admin.ModelAdmin):

@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -48,9 +48,10 @@ unisubs.widget.SavedSubtitles.prototype.serialize = function() {
         { 'version': unisubs.widget.SavedSubtitles.VERSION_,
           'sessionPK': this.SESSION_PK,
           'title': this.CAPTION_SET.title,
+          'description': this.CAPTION_SET.description,
           'isComplete': this.CAPTION_SET.completed,
           'forked': this.CAPTION_SET.wasForkedDuringEdits(),
-          'captionSet': this.CAPTION_SET.makeJsonSubs() });
+          'dfxp': this.CAPTION_SET.makeDFXPString() });
 };
 
 unisubs.widget.SavedSubtitles.deserialize = function(json) {
@@ -60,7 +61,7 @@ unisubs.widget.SavedSubtitles.deserialize = function(json) {
         return new unisubs.widget.SavedSubtitles(
             obj['sessionPK'], 
             new unisubs.subtitle.EditableCaptionSet(
-                obj['captionSet'], obj['isComplete'], obj['title'], 
+                obj['dfxp'], obj['isComplete'], obj['title'], 
                 obj['forked'], obj['description']));
     }
     else {
@@ -93,8 +94,9 @@ unisubs.widget.SavedSubtitles.save_ = function(index, savedSubs) {
 unisubs.widget.SavedSubtitles.fetchSaved_ = function(index) {
     var savedSubsText = unisubs.fetchFromLocalStorage(
         unisubs.widget.SavedSubtitles.STORAGEKEY_ + index);
-    if (savedSubsText)
+    if (savedSubsText) {
         return unisubs.widget.SavedSubtitles.deserialize(savedSubsText);
-    else
+    } else {
         return null;
+    }
 };

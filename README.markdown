@@ -13,7 +13,7 @@ never used Vagrant before we highly recommend going through its [quick start
 guide][vagrant-guide] to learn how it works.
 
 [Vagrant]: http://vagrantup.com/
-[vagrant-guide]: http://vagrantup.com/docs/getting-started/index.html
+[vagrant-guide]: http://docs.vagrantup.com/v1/docs/getting-started/index.html
 
 To run the development version:
 
@@ -39,7 +39,7 @@ To run the development version:
 
    Now run following command:
 
-        ./bootstrap-vagrant.sh
+        bootstrap-vagrant.sh
 
    It's safe to run `bootstrap-vagrant.sh` multiple times if something goes
    wrong (like PyPi goes down).
@@ -49,7 +49,7 @@ To run the development version:
 
 5. In your vagrant vm (the one you switched to in step 3), run the site with:
 
-        ./dev-runserver.sh
+        dev-runserver.sh
 
    You can access the site at <http://unisubs.example.com:8000>.
 

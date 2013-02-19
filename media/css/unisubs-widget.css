@@ -473,11 +473,14 @@ span.unisubs-widget {
     text-align: center !important;
     width: auto !important;
 }
-.unisubs-saveandexit {
+.unisubs-saveandexit, .unisubs-saveandopeninneweditor {
     clear: both;
     font-size: 15px;
     padding: 0 24px;
     text-align: center;
+}
+.unisubs-saveandopeninneweditor {
+    margin-top: 10px;
 }
 @media screen and (-webkit-min-device-pixel-ratio:0) { 
     .unisubs-steps {

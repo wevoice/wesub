@@ -327,7 +327,7 @@ def _add_sl(sl):
         nsl.save()
 
         # Has to be set separately because it's a magic Redis field.
-        nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+        nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter.val
 
         # TODO: is this right, or does it need to be save()'ed?
         nsl.followers = sl.followers.all()
@@ -544,7 +544,7 @@ def _update_subtitle_language(sl):
     nsl.writelock_session_key = sl.writelock_session_key
     nsl.writelock_owner = sl.writelock_owner
     nsl.is_forked = sl.is_forked
-    nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter
+    nsl.subtitles_fetched_counter = sl.subtitles_fetched_counter.val
 
     if not dry:
         nsl.save()
@@ -656,6 +656,7 @@ def _get_subtitles(sv):
             # marked as unsynced).
             source_subtitles = {}
 
+        data = []
         for s in subtitle_objects:
             source = source_subtitles.get(s.subtitle_id)
 
@@ -663,15 +664,22 @@ def _get_subtitles(sv):
                 start = source.start_time
                 end = source.end_time
                 paragraph = source.start_of_paragraph
+                order = source.subtitle_order
             else:
                 start = None
                 end = None
                 paragraph = s.start_of_paragraph
+                order = None
 
+            data.append((order, start, end, paragraph, s.subtitle_text))
+
+        data.sort()
+
+        for order, start, end, paragraph, text in data:
             yield (
                 start,
                 end,
-                markup_to_dfxp(s.subtitle_text),
+                markup_to_dfxp(text),
                 {'new_paragraph': paragraph},
             )
 

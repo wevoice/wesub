@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html ng-app="amara.SubtitleEditor" lang="{{ language.language_code }}" subtitle-editor>
+<head>
+
+    <meta charset="utf-8" />
+    <title>Editing {{ language.get_language_code_display }} subtitles for &ldquo;{{ video }}&rdquo; - Amara</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="{{ STATIC_URL }}src/css/third-party/reset.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
+
+    <script type="text/javascript">
+        var editorData = {{ editor_data|safe }}
+    </script>
+
+    <!--[if IE]>
+        <style type="text/css">
+            .group {
+                display: block;
+                zoom: 1;
+            }
+        </style>
+    <![endif]-->
+
+    <!--[if lt IE 9]>
+        <script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+    <div class="modal"
+        ng-controller="ModalController"
+        ng-show="content || loading">
+        <div class="loading inner"
+            ng-show="loading">
+            <h1 class="loading" ng-bind="loading">Loading subtitle editor&hellip;</h1>
+        </div>
+        <div class="content inner ng-cloak"
+            ng-show="content"
+            ng-cloak>
+            <h1 ng-show="content.heading">[[ content.heading ]]</h1>
+            <p ng-show="content.text">[[ content.text ]]</p>
+            <div class="content.buttons"
+                ng-show="content.buttons.length">
+                <button ng-repeat="button in content.buttons"
+                    ng-click="button.fn($event)"
+                    ng-class="button.class">[[ button.text ]]</button>
+            </div>
+        </div>
+    </div>
+    <header class="main group">
+        <section class="site left column">
+            <h1>Amara</h1>
+        </section>
+        <section class="video center column" ng-controller="VideoTitleController">
+            <span class="video-title">[[ workingSubtitles.videoTitle ]]</span>
+        </section>
+        <section class="status right column group">
+            <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
+                <div class="exit dropdown">
+                    <a href="#" ng-click="exitDropdownEnabled = !exitDropdownEnabled">Save or Cancel</a>
+                    <ul ng-show="exitDropdownEnabled">
+                        <li>
+                            <a class="cancel-and-close" ng-click="cancelAndClose($event)" href="#">
+                                Cancel and [[ closeText ]]
+                            </a>
+                        </li>
+                        <li>
+                            <a class="save-and-close" ng-click="saveAndClose($event)" href="#">
+                                Save and [[ closeText ]]
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="status dropdown">
+                    <a href="#">
+                        <ng-switch on="status">
+                            <span ng-switch-when="saving">Saving&hellip;</span>
+                            <span ng-switch-when="saved">Saved.</span>
+                            <span ng-switch-when="error">Error.</span>
+                            <span ng-switch-when="idle">Idle.</span>
+                            <span ng-switch-when="loading">Loading&hellip;</span>
+                            <span ng-switch-when="ready">Ready.</span>
+                            <span ng-switch-when="approving">Approving&hellip;</span>
+                            <span ng-switch-when="sending-back">Sending back&hellip;</span>
+                        </ng-switch>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </header>
+    <section class="main ng-cloak" ng-cloak>
+        <section class="left column">
+            <div class="help-panel" ng-controller="HelpController">
+                <h1>Keyboard controls</h1>
+                <ul ng-show="commands">
+                    <li ng-repeat="command in commands" class="group">
+                        <span class="key">
+                            <span>
+                                [[ command.key ]]
+                            </span>
+                        </span>
+                        <span class="description" ng-bind-html-unsafe="command.description">[[ command.description ]]</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="language-selections group" ng-controller="LanguageSelectorController">
+                <select name="alternate-language" id="alternate-language"
+                        ng-model="language"
+                        ng-change="languageSelectChanged()"
+                        ng-options="item.name for item in languages">
+                </select>
+                <select name="alternate-version" id="alternate-version"
+                    ng-options="'Version ' + version.version_no for version in versions"
+                    ng-model="version">
+                </select>
+            </div>
+            <div class="subtitles-wrapper">
+                <div class="reference subtitles" ng-controller="SubtitleListController">
+
+                    <ul subtitle-list="reference-subtitle-set"
+                        editable="false"
+                        version-number="{{ translated_from_version.version_number }}"
+                        language-code="{{ translated_from_version.subtitle_language.language_code }}"
+                        video-id="{{ video.video_id }}">
+
+                        <li ng-repeat="subtitle in subtitles"
+                            ng-controller="SubtitleListItemController"
+                            class="subtitle-list-item">
+
+                            <span ng-show="showStartTime"
+                                  class="start-time">
+                                [[ parser.startTimeFromNode(subtitle) ]]
+                            </span>
+
+                            <span ng-show="!isEditing"
+                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  class="subtitle-text">
+                            </span>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </section>
+        <section class="center column">
+            <div class="video" id="video" ng-controller="VideoController"></div>
+            <div class="subtitles-wrapper">
+                <div class="working subtitles" ng-controller="SubtitleListController">
+
+                    <ul subtitle-list="working-subtitle-set"
+                        editable="true"
+                        can-add-and-remove="false"
+                        version-number="{{ version.version_number }}"
+                        language-code="{{ language.language_code }}"
+                        video-id="{{ video.video_id }}"
+                        id="working-subtitle-set">
+
+                        <li subtitle-list-item
+                            ng-repeat="subtitle in subtitles"
+                            ng-controller="SubtitleListItemController"
+                            ng-class="{editing: isEditing, empty: empty}"
+                            class="subtitle-list-item">
+
+                            <span ng-show="showStartTime"
+                                  class="start-time">
+                                [[ parser.startTimeFromNode(subtitle) ]]
+                            </span>
+
+                            <span ng-show="!isEditing"
+                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  class="subtitle-text">
+                            </span>
+
+                            <textarea ng-show="isEditing"
+                                      style="display: none;">
+                            </textarea>
+
+                            <a ng-show="canAddAndRemove"
+                               class="remove"
+                               ng-click="removeSubtitle(subtitle)">
+                                Remove
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                    <a class="end"
+                       ng-show="canAddAndRemove"
+                       ng-controller="SubtitleListHelperController"
+                       ng-click="addSubtitle(null, {}, '', true)">
+                        <span ng-show="!isEditingAny">+ New subtitle</span>
+                        <span ng-show="isEditingAny">
+                            Press ENTER to save subtitle and move to next.<br />
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <section class="collab column" ng-controller="CollabController">
+            <a href="#"
+               class="toggle-pane"
+               ng-click="toggleModule($event, 'pane')"
+               ng-show="modulesEnabled.pane && !modulesOpen.pane">
+                Open Collab
+            </a>
+            <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
+                <a href="#"
+                   class="toggle-pane"
+                   ng-click="toggleModule($event, 'pane')"
+                   ng-show="modulesOpen.pane">
+                    Close Collab
+                </a>
+                <div class="notes module"
+                     ng-show="modulesEnabled.notes"
+                     ng-class="{open: modulesOpen.notes}">
+                    <a href="#" class="title" ng-click="toggleModule($event, 'notes')">Notes</a>
+                    <div class="content" ng-show="modulesOpen.notes">
+                        <textarea ng-model="notes"></textarea>
+                    </div>
+                </div>
+                <div class="approval module"ng-show="modulesEnabled.approval">
+                    <div class="content">
+                        <button class="send-back" ng-click="sendBack($event)">Send Back</button>
+                        <button class="approve" ng-click="approve($event)">Approve</button>
+                    </div>
+                </div>
+            </aside>
+            <div class="errors">
+                <div ng-show="error" class="error">[[ error ]]</div>
+            </div>
+        </section>
+    </section>
+
+    {% if DEBUG %}
+        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+    {% endif %}
+
+    <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery-1.8.2.min.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/jquery.autosize.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
+    <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/helper-selector.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/services.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
+    <script src="{{ STATIC_URL }}src/js/dfxp/dfxp.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitles.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
+
+</body>
+</html>

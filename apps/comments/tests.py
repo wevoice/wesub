@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -34,7 +34,7 @@ from messages.tasks import  send_video_comment_notification, SUBJECT_EMAIL_VIDEO
 
 class CommentEmailTests(TestCase):
 
-    fixtures = ['test.json']
+    fixtures = ['test.json', 'subtitle_fixtures.json']
 
     def setUp(self):
         self.user = User.objects.all()[0]
@@ -43,7 +43,7 @@ class CommentEmailTests(TestCase):
         self.auth = dict(username='admin', password='admin')
         self.logged_user = User.objects.get(username=self.auth['username'])
         l = self.video.subtitle_language()
-        l.language = "en"
+        l.language_code = "en"
         l.save()
         comment = Comment(content_object=self.video)
         comment.user = self.logged_user
@@ -75,8 +75,8 @@ class CommentEmailTests(TestCase):
         from localeurl.utils import universal_url
         domain= Site.objects.get_current().domain
         vid = self.video.video_id
-        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid) , universal_url( "videos:video", kwargs={"video_id":vid} ))
-        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid) , universal_url( "videos:video", args=(vid,) ))
+        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid), universal_url("videos:video", kwargs={"video_id":vid}))
+        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid), universal_url("videos:video", args=(vid,)))
                     
     def test_simple_email(self):
         num_followers = 5
@@ -119,7 +119,6 @@ class CommentEmailTests(TestCase):
         mail.outbox = []
         response = self._post_comment_for(lang)
         followers = set(self.video.notification_list(self.logged_user))
-        followers.update(lang.notification_list(self.logged_user))
         self.assertEqual(len(mail.outbox), len(followers))
         email = mail.outbox[0]
         self.assertEqual(email.subject, SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=self.comment.user.username,

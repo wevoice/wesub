@@ -105,3 +105,9 @@
   fields:
     domain: www.amara.org
     name: amara-production
+
+- model: sites.site
+  pk: 19 
+  fields:
+    domain: unisubs.example.com:80
+    name: unisubs-dev    

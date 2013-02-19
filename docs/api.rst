@@ -369,7 +369,7 @@ Fetching subtitles for a given language:
 .. http:get:: /api2/partners/videos/asfssd/languages/111111/subtitles/?format=ssa
 
     :query format: The format to return the subtitles in. Supports all the
-        formats the regular website does: rst, ssa, txt, dfxp, ttml.
+        formats the regular website does: srt, ssa, txt, dfxp, ttml.
     :query version: the numeric version number to fetch.  Versions are listed in the
         VideoLanguageResouce request.
 
@@ -386,6 +386,8 @@ Creating new subtitles for a language:
     :query subtitles: The subtitles to submit
     :query sub_format: The format used to parse the subs. The same formats as
         for fetching subtitles are accepted. Optional - defaults to ``srt``.
+    :query title: Give a title to the new revision
+    :query description: Give a description to the new revision
 
 This will create a new subtitle version with the new subtitles.
 
@@ -540,6 +542,32 @@ Creating a team:
 
 .. http:post:: /api2/partners/teams/
 
+    :form name: (required) Name of the team
+    :form slug: (required) A unique slug (used in URLs)
+    :form description:
+    :form is_visible: Should this team be publicly visible?
+    :form membership_policy: See below for possible values
+    :form video_policy: See below for possible values
+    :form task_assign_policy: See below for possible values
+    :form max_tasks_per_member: Maximum tasks per member
+    :form task_expiration: Task expiration in days
+
+Example payload:
+
+.. code-block:: json
+
+    {
+        "name": "Full Team",
+        "slug": "full-team",
+        "description": "One full team",
+        "is_visible": false,
+        "membership_policy": "Invitation by any team member",
+        "video_policy": "Admins only",
+        "task_assign_policy": "Managers and admins",
+        "max_tasks_per_member": 3,
+        "task_expiration": 14
+    }
+
 Updating a team:
 
 .. http:put:: /api2/partners/teams/[team-slug]/
@@ -570,10 +598,9 @@ Video policy:
 
 Task assign policy:
 
-* ``Anyone``
 * ``Any team member``
-* ``Only managers and admins``
-* ``Only admins``
+* ``Managers and admins``
+* ``Admins only``
 
 Example response
 
@@ -866,7 +893,7 @@ You can only send the ``user`` parameter or the ``team`` parameter at once.
 
 
 Application resource
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 For teams with membership by application only.
 
@@ -881,7 +908,7 @@ List application items:
 
 Application item detail:
 
-.. http:get:: /api2/partners/teams/[team-slug]/application/[application-id]/
+.. http:get:: /api2/partners/teams/[team-slug]/applications/[application-id]/
 
 Example response:
 
@@ -900,12 +927,16 @@ Example response:
 
 To delete an Application:
 
-.. http:delete:: /api2/partners/teams/[team-slug]/application/[application-id]/
+.. http:delete:: /api2/partners/teams/[team-slug]/applications/[application-id]/
 
 Applications can have their statuses updated:
 
-.. http:put:: /api2/partners/teams/[team-slug]/application/[application-id]/
+.. http:put:: /api2/partners/teams/[team-slug]/applications/[application-id]/
 
     :query status: What status the application is at, possible values are 'Denied', 'Approved', 'Pending', 'Member Removed' and 'Member Left'
 
-Note that if an application is pending (has the status='Pending'), the API can set it to whatever new status. Else, if the application has already been approved or denied, you won't be able to set the new status. For cases were an approval was wrongly issues, you'd want to remove the team member. Otherwise you'd want to invite the user to the team.
+Note that if an application is pending (has the status='Pending'), the API can
+set it to whatever new status. Else, if the application has already been
+approved or denied, you won't be able to set the new status. For cases were an
+approval was wrongly issues, you'd want to remove the team member. Otherwise
+you'd want to invite the user to the team.

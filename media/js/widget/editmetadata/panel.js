@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -99,7 +99,7 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
             }
         } else {
             this.baseLanguageCaptionSet_ = new unisubs.subtitle.EditableCaptionSet(
-                this.dialog_.translationPanel_.translationList_.baseLanguageSubtitles_);
+                this.dialog_.translationPanel_.translationList_.originalWrapper);
         }
 
         if (this.dialog_.translationPanel_) {

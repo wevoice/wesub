@@ -74,7 +74,7 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display_unabridged }}</a>
         </h2>
-        {% with video.get_description_display as description %}
+        {% with video.description as description %}
             <div id="description"{% if description|length > 300 %} class="abbr collapsed"{% endif %}>
                 <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
                     {{ description|urlize|linebreaks }}
@@ -237,6 +237,11 @@
             </li>
             <li>
                 <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
+            </li>
+            <li>
+                <a href="{% url subtitles:subtitle-editor video.video_id 'en' %}" target="_blank">New editor</a>
+            </li>
+            <li>
             </li>
             <li>{% feature_video video %}</li>
             {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}

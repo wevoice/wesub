@@ -352,6 +352,7 @@ class SubtitleLanguage(models.Model):
             related_name='new_followed_languages', editable=False)
 
     # Statistics
+    subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     subtitles_fetched_counter = RedisSimpleField()
 
     # Manager
@@ -809,6 +810,19 @@ class SubtitleLanguage(models.Model):
         """ Unpublishes the last public version for this Subtitle Language """
         tip = self.get_tip(public=True)
         return tip.unpublish() if tip else None
+
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.all()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
 
 
 # SubtitleVersions ------------------------------------------------------------

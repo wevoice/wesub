@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -114,7 +114,8 @@ class TaskAdmin(admin.ModelAdmin):
     #    for some reason.
     # 2. It's only a few extra queries, so it's not the end of the world.
     list_display = ('id', 'type', 'team_title', 'team_video_title',
-                    'language_title', 'assignee_name', 'is_complete', 'deleted', 'created')
+                    'language_title', 'assignee_name', 'is_complete', 'deleted',
+                    'subtitle_version', 'new_subtitle_version')
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__video__title')

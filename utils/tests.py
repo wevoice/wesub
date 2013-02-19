@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,9 +17,14 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from string import printable as chars
+from random import randint, choice
+
 from django.test import TestCase
 from videos.models import Video
 from utils.multi_query_set import MultiQuerySet
+from utils.compress import compress, decompress
+from utils.chunkediter import chunkediter
 
 
 class MultiQuerySetTest(TestCase):
@@ -113,6 +118,71 @@ class MultiQuerySetTest(TestCase):
         self.assertEqual(qs[3:7],
                          list(mqs[3:7]),
                          "MQS[3:7] (out-of-bounds endpoint) failed.")
+
+
+class CompressTest(TestCase):
+    def test_compression(self):
+        # Make sure the empty string is handled.
+        self.assertEqual('', decompress(compress('')))
+
+        # Make sure a bunch of random ASCII data compresses correctly.
+        for _ in xrange(100):
+            l = randint(1, 4096)
+            data = ''.join(choice(chars) for _ in xrange(l))
+            self.assertEqual(data, decompress(compress(data)))
+
+        # Make sure a bunch of random bytes compress correctly.
+        for _ in xrange(100):
+            l = randint(1, 4096)
+            data = ''.join(chr(randint(0, 255)) for _ in xrange(l))
+            self.assertEqual(data, decompress(compress(data)))
+
+        # Make sure a bunch of random Unicode data compresses correctly.
+        for _ in xrange(100):
+            l = randint(1, 1024)
+            data = ''.join(choice(u'☃ಠ_ಠ✿☺☻☹♣♠♥♦⌘⌥✔★☆™※±×~≈÷≠π'
+                                  u'αßÁáÀàÅåÄäÆæÇçÉéÈèÊêÍíÌìÎîÑñ'
+                                  u'ÓóÒòÔôÖöØøÚúÙùÜüŽž')
+                           for _ in xrange(l))
+
+            encoded_data = data.encode('utf-8')
+            round_tripped = decompress(compress(encoded_data)).decode('utf-8')
+
+            self.assertEqual(data, round_tripped)
+
+
+# TODO: Test chunking somehow.
+class ChunkedIterTest(TestCase):
+    def test_iterate(self):
+        data = [1, 10, 100, 1000, 10000]
+
+        sum = 0
+        for i in chunkediter(data):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+        sum = 0
+        for i in chunkediter(data, 2):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+        sum = 0
+        for i in chunkediter(data, 1):
+            sum += i
+        self.assertEqual(sum, 11111)
+
+    def test_empty(self):
+        data = []
+
+        sum = 0
+        for i in chunkediter(data):
+            sum += i
+        self.assertEqual(sum, 0)
+
+        sum = 0
+        for i in chunkediter(data, 1):
+            sum += i
+        self.assertEqual(sum, 0)
 
 
 class BleachSanityTest(TestCase):

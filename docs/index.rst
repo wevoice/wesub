@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    running-amara
+   development
    static-files
    deployment-guide
    permissions
@@ -21,6 +22,13 @@ Contents:
    data
    teams-callbacks
    testing
+   subtitle-storage
+   subtitle-formats
+   model-refactor
+   youtube-syncing
+   bugs
+   languages
+
 
 Contributing
 ------------
