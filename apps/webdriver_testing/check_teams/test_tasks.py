@@ -358,8 +358,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.set_skiphowto()
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_submit_transcript__creates_review_task(self):
         """Review task is created on transcription submission. """
@@ -443,11 +441,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
+        self.complete_review_task(tv, 20)
         #self.logger.info(dir(task))
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
@@ -506,12 +500,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 30
-        task.save()
-        task.complete()
-
+        self.complete_review_task(tv, 30)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
                                  % self.team.slug)
@@ -536,11 +525,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
+        self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Approve Original English ' 
@@ -570,18 +555,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
-        task = list(tv.task_set.all_approve().all())[0]
-        task.assignee = self.owner
-        task.approved = 20
-        task.save()
-        task.complete()
-
-        #self.logger.info(dir(task))
+        self.complete_review_task(tv, 20)
+        self.complete_approve_task(tv, 20)
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
@@ -605,16 +580,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
-        task = list(tv.task_set.all_approve().all())[0]
-        task.assignee = self.owner
-        task.approved = 30
-        task.save()
-        task.complete()
+        self.complete_review_task(tv, 20)
+        self.complete_approve_task(tv, 30)
 
         #self.logger.info(dir(task))
         self.tasks_tab.log_in(self.manager, 'password')
@@ -641,11 +608,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
+        self.complete_review_task(tv, 20)
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Approve Original English ' 
@@ -678,16 +641,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        task = list(tv.task_set.all_review().all())[0]
-        task.assignee = self.manager
-        task.approved = 20
-        task.save()
-        task.complete()
-        task = list(tv.task_set.all_approve().all())[0]
-        task.assignee = self.owner
-        task.approved = 20
-        task.save()
-        task.complete()
+        self.complete_review_task(tv, 20)
+        self.complete_approve_task(tv, 20)
         return video, tv
 
     def upload_translation(self, video):
