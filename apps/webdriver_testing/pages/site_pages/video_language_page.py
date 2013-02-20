@@ -27,6 +27,7 @@ class VideoLanguagePage(VideoPage):
 
     def edit_subtitles(self):
         self.logger.info('Clicking edit subtitles')
+        self.wait_for_element_present(self._EDIT_SUBTITLES, wait_time=10)
         self.click_by_css(self._EDIT_SUBTITLES)
 
     def displayed_lines(self):
