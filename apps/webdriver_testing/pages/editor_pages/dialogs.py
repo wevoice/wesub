@@ -60,8 +60,8 @@ class EditorDialogs(Page):
 
     def click_saved_ok(self):
         self.logger.info('clicking the subtitles saved confirmation box')
-        self.wait_for_element_present(self._SAVED_OK, wait_time=10)
-        self.click_by_css(self._SAVED_OK)
+        if self.check_if_element_present(self._SAVED_OK, wait_time=10):
+            self.click_by_css(self._SAVED_OK)
         #self.wait_for_element_not_present(self._SAVED_OK)
 
     def resume_dialog_ok(self):
@@ -102,11 +102,6 @@ class CreateLanguageSelection(EditorDialogs):
     _TRANSCRIBE_LANG = 'select.to-language'
     _SOURCE_LANG = 'select.from-language'
 
-    def _is_lang_selection_dialog(self):
-        self.wait_for_element_present(self._HEADING)
-        if self._DIALOG_NAME in self.get_text_by_css(self._HEADING):
-            return True
-
     def lang_selection_dialog_present(self):
         self.logger.info('checking for lang selection dialog')
         self.wait_for_element_present(self._HEADING)
@@ -145,14 +140,14 @@ class CreateLanguageSelection(EditorDialogs):
         self.click_by_css(self._CONTINUE)
 
     def create_original_subs(self, video_language, new_language):
-        assert self._is_lang_selection_dialog()
+        assert self.lang_selection_dialog_present()
         self._set_video_language(video_language)
         self._set_new_language(new_language)
         self._submit_choices()
 
     def lang_selection(self, **kwargs):
         self.logger.info('Specifying the languages')
-        assert self._is_lang_selection_dialog()
+        assert self.lang_selection_dialog_present()
         if 'video_language' in kwargs:
             self._set_video_language(kwargs['video_language'])
         if 'new_language' in kwargs:
