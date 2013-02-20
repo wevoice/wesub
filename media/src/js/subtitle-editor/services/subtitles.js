@@ -166,7 +166,7 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(videoID, languageCode, dfxpString){
+            saveSubtitles: function(videoID, languageCode, dfxpString, title, description){
 
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
 
@@ -178,7 +178,9 @@ var angular = angular || null;
                         video: videoID,
                         language: languageCode,
                         subtitles: dfxpString,
-                        sub_format: 'dfxp'
+                        sub_format: 'dfxp',
+                        title: title,
+                        description: description
                     }
                 });
 

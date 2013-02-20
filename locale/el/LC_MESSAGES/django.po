@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-19 00:18-0600\n"
-"PO-Revision-Date: 2013-02-19 06:31+0000\n"
+"POT-Creation-Date: 2013-02-20 00:18-0600\n"
+"PO-Revision-Date: 2013-02-20 06:32+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Greek (Greece) (http://www.transifex.com/projects/p/universalsubtitles/language/el_GR/)\n"
 "MIME-Version: 1.0\n"
@@ -425,96 +425,128 @@ msgstr "Προβολή στατιστικών Βίντεο"
 msgid "Widget view statistic"
 msgstr "Στατιστική προβολής widget"
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:84 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι, σε αυτή τη γλώσσα, υπάρχει, ήδη, σε εξέλιξη, κάποια δουλειά ."
 
-#: apps/subtitles/forms.py:97
+#: apps/subtitles/forms.py:99
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:105
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:110
+#: apps/subtitles/forms.py:112
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:131
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:136
+#: apps/subtitles/forms.py:138
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:147 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:149 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr "Συγγνώμη, δεν μπορούμε να φορτώσουμε τους υποτίτλους σας, διότι ένα προσχέδιο/ draft, για τη γλώσσα αυτή, βρίσκεται, ήδη, υπό επιτήρηση/ moderation."
 
-#: apps/subtitles/forms.py:159
+#: apps/subtitles/forms.py:161
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:167
+#: apps/subtitles/forms.py:169
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:180
+#: apps/subtitles/forms.py:182
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr "Συγγνώμη, δεν μπορούσαμε να ανεβάσουμε/ upload το αρχείο σας, διότι ο αριθμός γραμμών στη μετάφρασή σας ({0}) δεν αντιστοιχεί με εκείνες στο πρωτότυπο ({1})."
 
-#: apps/subtitles/forms.py:191
+#: apps/subtitles/forms.py:193
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:199
+#: apps/subtitles/forms.py:201
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:206 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:208 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Δεν εντοπίζεται η κωδικοποίηση του αρχείου"
 
-#: apps/subtitles/forms.py:229 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:231 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Κάποιος υποτιτλίζει το βίντεο ακριβώς τώρα. Προσπαθείστε αργότερα."
 
-#: apps/subtitles/views.py:98 apps/widget/rpc.py:326
+#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:320
+msgid "API"
+msgstr ""
+
+#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:322
+msgid "Subtitle Editor"
+msgstr ""
+
+#: apps/subtitles/models.py:849
+msgid "Imported"
+msgstr ""
+
+#: apps/subtitles/models.py:850
+msgid "Rollback"
+msgstr ""
+
+#: apps/subtitles/models.py:851
+msgid "Scripted"
+msgstr ""
+
+#: apps/subtitles/models.py:852
+msgid "Tern"
+msgstr ""
+
+#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:318
+msgid "Uploaded"
+msgstr ""
+
+#: apps/subtitles/models.py:854
+msgid "Through web editor"
+msgstr ""
+
+#: apps/subtitles/views.py:98 apps/widget/rpc.py:327
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Aυτοί οι υπότιτλοι επιτηρούνται / moderated. Δείτε τη σελίδα της ομάδας %s για πληροφορίες σχετικά με το πως μπορείτε να συνεισφέρετε."
 
-#: apps/subtitles/views.py:100 apps/widget/rpc.py:328
+#: apps/subtitles/views.py:100 apps/widget/rpc.py:329
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Σγγνώμη, αυτοί οι υπότιτλοι επιτηρούνται ιδιωτικά/ moderated"
 
-#: apps/subtitles/views.py:110 apps/widget/rpc.py:353
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:354
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -672,7 +704,7 @@ msgstr "Ο χρήστης έχει ήδη προσκληθεί αλλά δεν �
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Μήπως επιθυμείτε να διαγράψετε εντελώς αυτούς τους υπότιτλους;"
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:359
 msgid "What would you like to unpublish?"
 msgstr "Τι θα θέλατε να δημοσιεύσετε;"
 
@@ -700,11 +732,11 @@ msgstr "Δεν μπορείτε να κάνετε αυτή την εργασία
 msgid "Mismatched video and task!"
 msgstr ""
 
-#: apps/teams/forms.py:621
+#: apps/teams/forms.py:623
 msgid "The selected language does not match the task."
 msgstr ""
 
-#: apps/teams/forms.py:629
+#: apps/teams/forms.py:631
 #, python-format
 msgid ""
 "The selected source language %(from_code)s does not match the existing "
@@ -1663,11 +1695,11 @@ msgstr "Ιδιωτικό Βίντεο"
 msgid "Undefined error"
 msgstr "Απροσδιόριστο σφάλμα"
 
-#: apps/widget/rpc.py:111
+#: apps/widget/rpc.py:112
 msgid "Video embedding disabled by owner"
 msgstr "Η ενσωμάτωση ροής απενεργοποιήθηκε από τον ιδιοκτήτη"
 
-#: apps/widget/rpc.py:1110 apps/widget/rpc.py:1152
+#: apps/widget/rpc.py:1112 apps/widget/rpc.py:1154
 msgid "\n"
 msgstr "\n"
 
@@ -2908,7 +2940,7 @@ msgstr "Διαγραφή"
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:372
+#: templates/videos/subtitle-view.html:378
 msgid "Cancel"
 msgstr "Ακύρωση"
 
@@ -5551,8 +5583,8 @@ msgid ""
 msgstr "Εισάγετε ένα URL ενός βίντεο σε Ogg, WebM, flv, mp4, Youtube, Vimeo ή σε Dailymotion. Μπορείτε, επίσης, να χρησιμοποιήσετε το δικό μας"
 
 #: templates/videos/create.html:30
-msgid "to subtitle all the videos on your site. Just looking?"
-msgstr "για τον υποτιτλισμό όλων των βίντεο της ιστοσελίδα σας. Aπλώς κοιτάτε;"
+msgid "to subtitle all the videos on your site."
+msgstr ""
 
 #: templates/videos/create.html:36
 msgid "for example"
@@ -5906,12 +5938,12 @@ msgid "Revisions"
 msgstr "Αναθεωρήσεις"
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:373
+#: templates/videos/subtitle-view.html:379
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:388
+#: templates/videos/subtitle-view.html:394
 msgid "Edit Subtitles"
 msgstr "Επεξεργασία υπότιτλων"
 
@@ -5992,35 +6024,35 @@ msgstr "Σύγκριση αναθεωρήσεων"
 msgid "Rollback to version #"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:319
+#: templates/videos/subtitle-view.html:325
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:320
+#: templates/videos/subtitle-view.html:326
 msgid "Text"
 msgstr "Κείμενο"
 
-#: templates/videos/subtitle-view.html:326
+#: templates/videos/subtitle-view.html:332
 msgid "No subtitles for this language."
 msgstr "Δεν υπάρχουν υπότιτλοι για την γλώσσα αυτή."
 
-#: templates/videos/subtitle-view.html:335
+#: templates/videos/subtitle-view.html:341
 msgid "Roll back to this version"
 msgstr "Επιστρέψτε σε αυτή την έκδοση"
 
-#: templates/videos/subtitle-view.html:348
+#: templates/videos/subtitle-view.html:354
 msgid "Unpublish subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:356
+#: templates/videos/subtitle-view.html:362
 msgid "This version only"
 msgstr "Μόνον αυτή η έκδοση"
 
-#: templates/videos/subtitle-view.html:360
+#: templates/videos/subtitle-view.html:366
 msgid "This entire language and all dependent languages"
 msgstr "Ολόκληρη αυτή η γλώσσα και όλες οι εξαρτώμενες γλώσσες"
 
-#: templates/videos/subtitle-view.html:362
+#: templates/videos/subtitle-view.html:368
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."

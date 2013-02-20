@@ -885,9 +885,11 @@ def team_video_delete(sender, instance, **kwargs):
     tv_search_index.backend.remove(instance)
     try:
         video = instance.video
+
         # we need to publish all unpublished subs for this video:
-        SubtitleVersion.objects.filter(language__video=video).update(
-            moderation_status=MODERATION.UNMODERATED)
+        NewSubtitleVersion.objects.filter(video=video,
+                visibility='private').update(visibility='public')
+
         video.is_public = True
         video.moderated_by = None
         video.save()

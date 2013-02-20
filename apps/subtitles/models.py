@@ -808,8 +808,8 @@ class SubtitleLanguage(models.Model):
 
     def unpublish(self):
         """ Unpublishes the last public version for this Subtitle Language """
-        tip = self.get_tip(public=True)
-        return tip.unpublish() if tip else None
+        version = self.subtitleversion_set.order_by('version_number')[:1]
+        return version[0].unpublish() if version else None
 
     @property
     def is_imported_from_youtube_and_not_worked_on(self):
@@ -1297,10 +1297,20 @@ class SubtitleVersion(models.Model):
         assert team_video.team.unpublishing_enabled(), \
                "Cannot unpublish for a team without unpublishing enabled."
 
-        self.visibility_override = 'private'
-        self.save()
+        versions = SubtitleVersion.objects.filter(
+            # This filter includes this SubtitleVersion itself
+            subtitle_language=self.subtitle_language,
+            version_number__gte=self.version_number
+        ).order_by('version_number')
 
-        return self
+        last_version = None
+
+        for version in versions:
+            version.visibility_override = 'private'
+            version.save()
+            last_version = version
+
+        return last_version
 
     @models.permalink
     def get_absolute_url(self):

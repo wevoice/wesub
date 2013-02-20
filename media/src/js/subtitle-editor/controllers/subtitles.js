@@ -290,7 +290,9 @@ var angular = angular || null;
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
-                                          $scope.parser.xmlToString(true, true));
+                                          $scope.parser.xmlToString(true, true),
+                                          $scope.videoTitle,
+                                          $scope.videoDescription);
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;

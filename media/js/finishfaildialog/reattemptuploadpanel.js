@@ -69,7 +69,7 @@ unisubs.finishfaildialog.ReattemptUploadPanel.prototype.saveAgainClicked_ = func
 unisubs.finishfaildialog.ReattemptUploadPanel.prototype.downloadClicked_ = function(e) {
     e.preventDefault();
     unisubs.finishfaildialog.CopyDialog.showForSubs(
-        this.captionSet_.makeJsonSubs());
+        this.captionSet_.makeDFXPString());
 };
 
 unisubs.finishfaildialog.ReattemptUploadPanel.prototype.showTryAgain = function() {

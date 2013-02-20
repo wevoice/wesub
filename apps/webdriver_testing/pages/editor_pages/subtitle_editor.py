@@ -19,6 +19,7 @@ class SubtitleEditor(EditorDialogs):
     #SUBS ENTRY AND DISPLAY (LEFT SIDE)
     _TEXT_INPUT = 'textarea.goog-textarea.trans'
     _ACTIVE_SUB_EDIT = 'span.unisubs-title textarea'
+    _TRANSLATE_INPUT = 'textarea.unisubs-translateField'
     _SUBS = 'ul.unisubs-titlesList li span.unisubs-title span:nth-child(1)'
     _TIMINGS = 'ul.unisubs-titlesList li span.unisubs-timestamp'
     _REVIEW_TIMINGS = 'span.unisubs-timestamp-time'
@@ -38,6 +39,9 @@ class SubtitleEditor(EditorDialogs):
     _DOWNLOAD_SUBTITLES = 'a.unisubs-download-subs'
     _DOWNLOAD_FORMAT = 'select.copy-dialog-select'
 
+    #REVIEW DIALOG
+    _REVIEW_DONE = 'a.unisubs-done'
+
 
     def type_subs(self, subs_file=None):
         self.logger.info('typing in subtitles')
@@ -49,6 +53,17 @@ class SubtitleEditor(EditorDialogs):
             self.type_by_css(self._TEXT_INPUT, line)
             typed_sub_list.append(line.strip())
         return typed_sub_list
+
+    def type_translation(self, subs_file=None):
+        self.logger.info('typing in translation')
+        if not subs_file:
+            subs_file = os.path.join(os.path.dirname
+                (os.path.abspath(__file__)), 'default_sub_text.txt')
+        input_elements = self.browser.find_elements_by_css_selector(
+                self._TRANSLATE_INPUT)
+        for i, line in enumerate(codecs.open(subs_file, encoding='utf-8')):
+            input_elements[i].send_keys(line)
+
 
     def edit_subs(self, subs_file=None):
         self.logger.info('editing subtitles')
@@ -133,6 +148,11 @@ class SubtitleEditor(EditorDialogs):
         self.mark_subs_complete()
         self.click_saved_ok()
 
+    def save_translation(self):
+        self.logger.info('clicking save and exit from the translation dialog')
+        self.page_down(self._SAVE_AND_EXIT)
+        self.click_by_css(self._SAVE_AND_EXIT)
+        self.click_saved_ok()
 
     def subtitles_list(self):
         self.logger.info('getting the list of current subtitles')
@@ -175,4 +195,20 @@ class SubtitleEditor(EditorDialogs):
     def dialog_title(self):
         return self.get_text_by_css(self._DIALOG_HEADING) 
 
+    def complete_review(self, result='Accept'):
+        """Accept or Send Back the transcript. """
+        self.logger.info('Review draft and %s' % result)
+        done_buttons = self.browser.find_elements_by_css_selector(self._REVIEW_DONE)
+        for el in done_buttons:
+            if el.text == result:
+                el.click()
+                return
 
+    def complete_approve(self, result='Approve'):
+        """Approve or Send Back the transcript. """
+        self.logger.info('Approve draft and %s' % result)
+        done_buttons = self.browser.find_elements_by_css_selector(self._REVIEW_DONE)
+        for el in done_buttons:
+            if el.text == result:
+                el.click()
+                return
