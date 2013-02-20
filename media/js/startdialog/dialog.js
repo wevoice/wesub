@@ -356,8 +356,9 @@ unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
     var warning = null;
     if (this.fromLanguageDropdown_ &&
         this.fromLanguageDropdown_.value !=
-        unisubs.startdialog.Dialog.FORK_VALUE)
+        unisubs.startdialog.Dialog.FORK_VALUE) {
         warning = this.warningMessage_();
+    }
     this.showWarning_(warning);
 };
 unisubs.startdialog.Dialog.prototype.showWarning_ = function(warning) {
@@ -373,6 +374,7 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
      * @type {unisubs.startdialog.VideoLanguageLanguage}
      */
     var fromLanguage = this.fromLanguageDropdown_.value;
+
     if (toLanguage.translationStartsFromScratch(fromLanguage)) {
         var message = "";
         if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
@@ -387,13 +389,16 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
             message += "There is a better choice for translating into " +
                 toLanguage.LANGUAGE_NAME + " from " +
                 fromLanguage.languageName() + ". ";
-        }
-        else {
-            // FIXME: this has been  wrong for a while, it's not a language model here
-            // but the language code, this should be rare, though
-            message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
-                " from " + fromLanguage + ", you'll need to " +
-                "start from scratch.";
+        } else {
+            // TODO: I don't really know if this is right.  Hopefully we can
+            // toss this stuff out once the new editor is completely finished.
+            // I'm sorry.
+            var source_language_code = toLanguage.VIDEO_LANGUAGE.getStandardLang().LANGUAGE;
+            if (source_language_code !== fromLanguage) {
+                message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
+                    " from " + fromLanguage + ", you'll need to " +
+                    "start from scratch.";
+            }
         }
         return message;
     }
