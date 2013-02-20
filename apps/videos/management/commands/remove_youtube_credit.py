@@ -105,6 +105,7 @@ class Command(BaseCommand):
 
     def _fix_video(self, vurl):
         from apps.accountlinker.models import ThirdPartyAccount
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
         video = vurl.video
         language_code = video.language
 
@@ -121,7 +122,8 @@ class Command(BaseCommand):
                                 account.oauth_refresh_token,
                                 vt.videoid)
 
-        video_url = video.get_absolute_url()
+        video_url = shortlink_for_video(video)
+        self.log(video_url)
 
         uri = UPLOAD_URI_BASE % bridge.youtube_video_id
         entry = bridge.GetVideoEntry(uri=uri)
@@ -132,15 +134,23 @@ class Command(BaseCommand):
 
         # For some reason the above video.get_absolute_url() call didn't
         # include the /en/ prefix.
-        unisubs_video_url = "http://www.universalsubtitles.org/en%s" % video_url
-        amara_video_url = "http://www.amara.org/en%s" % video_url
+        unisubs_video_url = video_url
+        amara_video_url = video_url
 
         unisubs_supposed_credit = self._get_supposed_credit(unisubs_video_url,
                 language_code)
         amara_supposed_credit = self._get_supposed_credit(amara_video_url,
                 language_code)
 
-        credits = (amara_supposed_credit, unisubs_supposed_credit,)
+        shortlink_supposed_credit = self._get_supposed_credit(amara_video_url,
+                language_code)
+
+        credits = (amara_supposed_credit, unisubs_supposed_credit,
+                shortlink_supposed_credit)
+
+        self.log(amara_supposed_credit)
+        self.log(unisubs_supposed_credit)
+        self.log(current_description)
 
         if not current_description.startswith(credits):
             self.log("%s doesn't have desc credit" % vurl.url)
@@ -153,6 +163,10 @@ class Command(BaseCommand):
         if current_description.startswith(unisubs_supposed_credit):
             new_description = current_description.replace(
                     unisubs_supposed_credit, '')
+
+        if current_description.startswith(shortlink_supposed_credit):
+            new_description = current_description.replace(
+                    shortlink_supposed_credit, '')
 
         entry.media.description.text = new_description
         entry = entry.ToString()
@@ -191,7 +205,6 @@ class Command(BaseCommand):
         sleep(3)
 
     def _get_videos_from_query(self, query):
-        self.log('Collectiong videos from youtube based on a query.')
         uri = "http://gdata.youtube.com/feeds/api/videos?q=%s&v=2"
         uri = uri % query
 
@@ -282,7 +295,6 @@ class Command(BaseCommand):
             # Now, sync all completed languages to Youtube to remove the last
             # sub credit.
 
-            videos = all_team_videos.exclude(video_id__in=self.cache['sub'])
             self.log('%s videos to resync' % len(videos))
 
             for video in videos:
