@@ -375,7 +375,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'Review Original English Subtitles', tv.title))
 
     def test_submit_transcript__removes_transcribe_task(self):
-        """Transcribe task is no longer present on transcription submission.
+        """Transcribe task removed when transcript is submitted.
 
         """
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
@@ -392,7 +392,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                         'Transcribe Subtitles', tv.title))
 
     def test_review_accept__creates_approve_task(self):
-        """Approve task is created on review accept. """
+        """Approve task is created when reviewer accept transcription. """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -424,7 +424,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.logger.info(dir(task))
 
     def test_review_accept__removes_review_task(self):
-        """Review task is not displayed after review acceptance. """
+        """Review task removed after reviewer accepts transcription. """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -442,14 +442,13 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 user=dict(username=self.contributor.username, 
                           password='password'))
         self.complete_review_task(tv, 20)
-        #self.logger.info(dir(task))
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Review Original English Subtitles', video.title))
 
     def test_review_reject__transcription_reassigned(self):
-        """Transcription task is assigned back when reviewer rejects. """
+        """Transcription task is reassigned when rejected by reviewer """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -482,7 +481,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                          'Assigned to %s' %self.contributor.username)
 
     def test_review_reject__removes_review_task(self):
-        """Review task is removed from UI when reviewer rejects. """
+        """Review task is removed when transcription rejected by reviewer """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -508,7 +507,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                         'Review Original English Subtitles', video.title))
 
     def test_approve__creates_translate_tasks(self):
-        """On approval, translation tasks are created in preferred langs. """
+        """Translation tasks created, when transcription approved by approver.
+
+        """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -538,7 +539,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                         'Translate Subtitles into German', video.title))
 
     def test_approve__removes_approve_tasks(self):
-        """On approval, translation tasks are created in preferred langs. """
+        """Approve task removed when transcription is approved by approver.
+
+        """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -563,7 +566,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                         'Approve Original English Subtitles', video.title))
 
     def test_approve_reject__removes_approve_tasks(self):
-        """On approval, translation tasks are created in preferred langs. """
+        """Approve task removed when transcription is rejected by approver.
+
+        """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -591,7 +596,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                         'Approve Original English Subtitles', video.title))
 
     def test_approve_reject__reassigns_review(self):
-        """On approval, translation tasks are created in preferred langs. """
+        """Review task reassigned when, approver rejects transcription.
+
+        """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -684,7 +691,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         task.complete()
 
     def test_submit_translation__displays_as_draft(self):
-        """Unreviewd translations are marked as drafts on site. """
+        """Unreviewed translations are marked as drafts on site. """
         video, tv = self.make_video_with_approved_transcript()
         self.upload_translation(video)
 
@@ -695,7 +702,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
 
     def test_submit_translation__creates_review_task(self):
-        """Review task is created on translation submission. """
+        """Review task is created when translation is submitted. """
         video, tv = self.make_video_with_approved_transcript()
         self.upload_translation(video)
 
@@ -715,7 +722,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'Translate Subtitles into Swedish', video.title))
 
     def test_translation_review_accept__creates_approve_task(self):
-        """Approve task is created when translation passes review. """
+        """Approve task is created when translation accepted by reviewer.
+
+        """
         video, tv = self.make_video_with_approved_transcript()
         self.upload_translation(video)
         self.complete_review_task(tv, 20)
@@ -725,7 +734,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'Approve Swedish Subtitles', video.title))
 
     def test_translation_review_accept__removes_review_task(self):
-        """Approve task is created when translation passes review. """
+        """Review task removed when translation accepted by reviewer.
+
+        """
         video, tv = self.make_video_with_approved_transcript()
         self.upload_translation(video)
         self.complete_review_task(tv, 20)
@@ -749,7 +760,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
 
     def test_translation_review_reject__removes_review(self):
-        """Approve task is created when translation passes review. """
+        """Review task removed when translation rejected by reviewer.
+
+        """
         video, tv = self.make_video_with_approved_transcript()
         self.upload_translation(video)
         self.complete_review_task(tv, 30)
@@ -759,7 +772,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'Review Swedish Subtitles', video.title))
 
     def test_translation_approve__removes_approve(self):
-        """Approve task removed when translation review accepted by approver.
+        """Approve task removed when accepted by approver.
 
         """
         video, tv = self.make_video_with_approved_transcript()
@@ -772,7 +785,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'Approve Swedish Subtitles', video.title))
 
     def test_translation_approve__published(self):
-        """Approve task removed when translation review accepted by approver.
+        """Translation is published when approved.
 
         """
         video, tv = self.make_video_with_approved_transcript()
