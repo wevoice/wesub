@@ -386,10 +386,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-
-
     def test_start__subtitles(self):
         """Member starts subtitling from dash, “Videos that need your help”.
 
