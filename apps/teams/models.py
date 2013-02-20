@@ -2008,7 +2008,7 @@ class Task(models.Model):
             video = self.team_video.video
 
             if self.language:
-                sl = video.subtitle_languge(language_code=self.language)
+                sl = video.subtitle_language(language_code=self.language)
 
                 if sl:
                     base_url = reverse("videos:translation_history", kwargs={
