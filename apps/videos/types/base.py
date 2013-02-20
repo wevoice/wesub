@@ -59,7 +59,7 @@ class VideoType(object):
     
     @classmethod
     def format_url(cls, url):
-        parsed_url = urlparse(url)
+        parsed_url = urlparse(url.strip())
         return '%s://%s%s' % (parsed_url.scheme or 'http', parsed_url.netloc, parsed_url.path)    
     
 class VideoTypeRegistrar(dict):

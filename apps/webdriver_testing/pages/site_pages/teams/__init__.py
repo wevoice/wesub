@@ -97,7 +97,8 @@ class ATeamPage(UnisubsPage):
 
     def submit_application(self, text=None):
         if text is None:
-            text = "Please let me join your team, I'll subtitle hard. I promise."
+            text = ("Please let me join your team, I'll subtitle hard. "
+                    "I promise.")
         self.application_displayed()
         self.type_by_css(self._APPLICATION_TEXT, text)
         self.click_by_css(self._SUBMIT_APPLICATION)
@@ -125,8 +126,7 @@ class ATeamPage(UnisubsPage):
         return self.get_text_by_css(self._DASHBOARD_WELCOME)
 
     def settings_tab_visible(self):
-        if self.is_element_visible(self._SETTINGS_TAB) == True:
-            return True
+        return self.is_element_visible(self._SETTINGS_TAB)
 
     def has_project(self, project_slug):
         if not self.is_element_present(self._PROJECTS_SECTION):
