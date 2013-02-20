@@ -101,7 +101,7 @@ fi
 log "Running syncdb..."
 python manage.py syncdb --all --settings=dev_settings --noinput
 log "Running migrations..."
-python manage.py migrate --fake --settings=dev_settings
+python manage.py migrate  --settings=dev_settings
 
 # Solr ------------------------------------------------------------------------
 log "Updating Solr schema"
