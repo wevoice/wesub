@@ -435,8 +435,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Member starts review from any task in “Videos that need your help”.
 
         """
-        self.skipTest('Sends amara out to lunch, see issue:' 
-                      'https://unisubs.sifterapp.com/issues/2061')
         self.team_workflow.review_allowed = 10
         self.team_workflow.save()
 
@@ -452,7 +450,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.set_skiphowto()
 
         self.dashboard_tab.open_team_page(self.team.slug)
-        self.dashboard_tab.click_lang_task('trailer.webm', 'Create English')
+        self.dashboard_tab.click_lang_task('trailer.webm', 'Create English subtitles')
         self.create_modal.create_original_subs('English', 'English')
         self.typed_subs = self.sub_editor.type_subs(self.subs_file)
         self.sub_editor.continue_to_next_step()
@@ -467,7 +465,9 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.log_in(self.reviewer.username, 'password')
         self.dashboard_tab.open_team_page(self.team.slug)
         self.logger.info("Clicking the Review English task for video trailer.webm")
-        self.dashboard_tab.click_lang_task('trailer.webm', 'Review English')
+        self.dashboard_tab.click_lang_task('trailer.webm', 'Review English subtitles')
+        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
+
 
 
 
