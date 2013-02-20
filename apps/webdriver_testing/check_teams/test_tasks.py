@@ -78,7 +78,7 @@ class TestCaseManualTasks(WebdriverTestCase):
 
         self.videos_tab.open_video_tasks(self.test_video.title)
         self.tasks_tab.add_task(task_type = 'Transcribe')
-        self.assertTrue(self.tasks_tab.task_present('Transcribe', 
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', 
                         self.test_video.title))
 
 class TestCaseAutomaticTasks(WebdriverTestCase):    
