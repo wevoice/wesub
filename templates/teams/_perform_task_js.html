@@ -26,20 +26,20 @@ $('.perform-task-{{ task.pk }}').click(function() {
 </script>
 {% else %}
 <script type="text/javascript">
-$('.perform-task-{{ task.pk }}').click(function(e) {
+$('.perform-task-{{ task.pk }}').click(function() {
     var $link = $(e.target);
     $link.text('Loading...');
         
     {% if task.assignee != request.user %}
     site.Utils.assignTask({{ task.pk }}, function(){
         window.location = $link.attr('href');
-        $link.click();
     });
 
     return false;
     {% else %}
     return true;
     {% endif %}
+
 });
 </script>
 {% endif %}

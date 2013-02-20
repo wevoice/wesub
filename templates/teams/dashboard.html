@@ -176,7 +176,7 @@
                                             </div>
                                         {% else %} {# there is only one task for this video #}
                                             {% with task=team_video.tasks|first %}
-                                            <a href="{{ task.get_widget_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
+                                            <a href="{{ task.get_perform_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
                                                     {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
                                                         Create {{ task.get_language_display }} subtitles
                                                     {% else %}
