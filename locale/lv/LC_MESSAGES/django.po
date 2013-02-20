@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-19 00:18-0600\n"
-"PO-Revision-Date: 2013-02-19 06:31+0000\n"
+"POT-Creation-Date: 2013-02-20 00:18-0600\n"
+"PO-Revision-Date: 2013-02-20 06:32+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Latvian (Latvia) (http://www.transifex.com/projects/p/universalsubtitles/language/lv_LV/)\n"
 "MIME-Version: 1.0\n"
@@ -429,96 +429,128 @@ msgstr "Video skatījumu statistika"
 msgid "Widget view statistic"
 msgstr "Sīkrīka skatījumu statistika"
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:84 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr "Piedodiet, mēs nevaram augšupielādēt Jūsu subtitrus, jo darbs pie šīs valodas jau ir sākts."
 
-#: apps/subtitles/forms.py:97
+#: apps/subtitles/forms.py:99
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:105
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:110
+#: apps/subtitles/forms.py:112
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:131
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr "Piedodiet, mēs nevaram augšuplādēt Jūsu subtitrus, jo šai valodai jau ir nozīmēts cits lietotājs."
 
-#: apps/subtitles/forms.py:136
+#: apps/subtitles/forms.py:138
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr "Piedodiet, mēs nevaram augšuplādēt Jūsu subtitrus, jo jums nav atļaujas pieteikties šai valodai."
 
-#: apps/subtitles/forms.py:147 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:149 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:159
+#: apps/subtitles/forms.py:161
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:167
+#: apps/subtitles/forms.py:169
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:180
+#: apps/subtitles/forms.py:182
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr "Piedodiet, mums neizdevās augšuplielādēt Jūsu datni, jo rindiņu skaits Jūsu ({0}) tulkojumā neatbilst oriģinālam ({1})."
 
-#: apps/subtitles/forms.py:191
+#: apps/subtitles/forms.py:193
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr "Datnes izmēram jābūt mazākam kā %d kb."
 
-#: apps/subtitles/forms.py:199
+#: apps/subtitles/forms.py:201
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr "Neatbalstīts formāts. Lūdzu, augšuplādējiet kādu no šiem: %s"
 
-#: apps/subtitles/forms.py:206 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:208 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "Neizdevās noteikt datnes kodējumu"
 
-#: apps/subtitles/forms.py:229 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:231 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Kāds pašlaik šim video pievieno subtitrus. Mēģiniet vēlāk."
 
-#: apps/subtitles/views.py:98 apps/widget/rpc.py:326
+#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:320
+msgid "API"
+msgstr ""
+
+#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:322
+msgid "Subtitle Editor"
+msgstr ""
+
+#: apps/subtitles/models.py:849
+msgid "Imported"
+msgstr ""
+
+#: apps/subtitles/models.py:850
+msgid "Rollback"
+msgstr ""
+
+#: apps/subtitles/models.py:851
+msgid "Scripted"
+msgstr ""
+
+#: apps/subtitles/models.py:852
+msgid "Tern"
+msgstr ""
+
+#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:318
+msgid "Uploaded"
+msgstr ""
+
+#: apps/subtitles/models.py:854
+msgid "Through web editor"
+msgstr ""
+
+#: apps/subtitles/views.py:98 apps/widget/rpc.py:327
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Šie subtitri tiek moderēti. Dodieties uz %s komandas lapu, lai uzzinātu, kā sniegt savu ieguldījumu."
 
-#: apps/subtitles/views.py:100 apps/widget/rpc.py:328
+#: apps/subtitles/views.py:100 apps/widget/rpc.py:329
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Piedodiet, šie subtitri ir privāti moderēti."
 
-#: apps/subtitles/views.py:110 apps/widget/rpc.py:353
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:354
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -676,7 +708,7 @@ msgstr "Šis lietotājs ir jau ticis uzaicināts un vēl sniedzis atbildi."
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Vai Jūs vēlētos pilnībā dzēst subtitrus?"
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:359
 msgid "What would you like to unpublish?"
 msgstr "Ko Jūs vēlātos atpublicēt?"
 
@@ -704,11 +736,11 @@ msgstr "Jūs nevarat veikt šo uzdevumu."
 msgid "Mismatched video and task!"
 msgstr ""
 
-#: apps/teams/forms.py:621
+#: apps/teams/forms.py:623
 msgid "The selected language does not match the task."
 msgstr "Izvēlētā valoda nesakrīt ar uzdevumu."
 
-#: apps/teams/forms.py:629
+#: apps/teams/forms.py:631
 #, python-format
 msgid ""
 "The selected source language %(from_code)s does not match the existing "
@@ -1667,11 +1699,11 @@ msgstr "Privāts video"
 msgid "Undefined error"
 msgstr "Nenoteikta kļūda"
 
-#: apps/widget/rpc.py:111
+#: apps/widget/rpc.py:112
 msgid "Video embedding disabled by owner"
 msgstr "Video iegulšanu atspējojis īpašnieks"
 
-#: apps/widget/rpc.py:1110 apps/widget/rpc.py:1152
+#: apps/widget/rpc.py:1112 apps/widget/rpc.py:1154
 msgid "\n"
 msgstr "\n"
 
@@ -2914,7 +2946,7 @@ msgstr "Dzēst"
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:372
+#: templates/videos/subtitle-view.html:378
 msgid "Cancel"
 msgstr "Atcelt"
 
@@ -5564,8 +5596,8 @@ msgid ""
 msgstr "Ievadiet Ogg, WebM, flv, mp4, Youtube, Vimeo vai Dailymotion video URL vietrādi. Jūs varat arī izmantot mūsu"
 
 #: templates/videos/create.html:30
-msgid "to subtitle all the videos on your site. Just looking?"
-msgstr "subtitrēt visus video savā tīmekļa vietnē. Tāpat pētāt lapu?"
+msgid "to subtitle all the videos on your site."
+msgstr ""
 
 #: templates/videos/create.html:36
 msgid "for example"
@@ -5919,12 +5951,12 @@ msgid "Revisions"
 msgstr "Versijas"
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:373
+#: templates/videos/subtitle-view.html:379
 msgid "Unpublish"
 msgstr "Atpublicēt"
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:388
+#: templates/videos/subtitle-view.html:394
 msgid "Edit Subtitles"
 msgstr "Rediģēt subtitrus"
 
@@ -6005,35 +6037,35 @@ msgstr "Salīdzināt redakcijas"
 msgid "Rollback to version #"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:319
+#: templates/videos/subtitle-view.html:325
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:320
+#: templates/videos/subtitle-view.html:326
 msgid "Text"
 msgstr "Teksts"
 
-#: templates/videos/subtitle-view.html:326
+#: templates/videos/subtitle-view.html:332
 msgid "No subtitles for this language."
 msgstr "Šajā valodā subtitru nav."
 
-#: templates/videos/subtitle-view.html:335
+#: templates/videos/subtitle-view.html:341
 msgid "Roll back to this version"
 msgstr "Atjaunot šo versiju"
 
-#: templates/videos/subtitle-view.html:348
+#: templates/videos/subtitle-view.html:354
 msgid "Unpublish subtitles"
 msgstr "Atpublicēt subtitrus"
 
-#: templates/videos/subtitle-view.html:356
+#: templates/videos/subtitle-view.html:362
 msgid "This version only"
 msgstr "Tikai šai versijai"
 
-#: templates/videos/subtitle-view.html:360
+#: templates/videos/subtitle-view.html:366
 msgid "This entire language and all dependent languages"
 msgstr "Visu šo valodu un visas neatkarīgās valodas."
 
-#: templates/videos/subtitle-view.html:362
+#: templates/videos/subtitle-view.html:368
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."

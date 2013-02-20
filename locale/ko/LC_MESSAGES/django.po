@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-19 00:18-0600\n"
-"PO-Revision-Date: 2013-02-19 06:31+0000\n"
+"POT-Creation-Date: 2013-02-20 00:18-0600\n"
+"PO-Revision-Date: 2013-02-20 06:32+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/universalsubtitles/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -428,96 +428,128 @@ msgstr "비디오 보기 통계"
 msgid "Widget view statistic"
 msgstr "위젯 시청 수 통계"
 
-#: apps/subtitles/forms.py:82 unisubs-integration/api/1_0/forms.py:55
+#: apps/subtitles/forms.py:84 unisubs-integration/api/1_0/forms.py:55
 #: unisubs-integration/api/1_0/forms.py:81
 msgid ""
 "Sorry, we can't upload your subtitles because work on this language is "
 "already in progress."
 msgstr ""
 
-#: apps/subtitles/forms.py:97
+#: apps/subtitles/forms.py:99
 msgid "The language already exists and is not a translation."
 msgstr ""
 
-#: apps/subtitles/forms.py:103
+#: apps/subtitles/forms.py:105
 #, python-format
 msgid "The language already exists as a translation from %s."
 msgstr ""
 
-#: apps/subtitles/forms.py:110
+#: apps/subtitles/forms.py:112
 #, python-format
 msgid ""
 "Sorry, we cannot upload subtitles for this language because this would fork "
 "the %s translation(s) made from it."
 msgstr ""
 
-#: apps/subtitles/forms.py:129
+#: apps/subtitles/forms.py:131
 msgid ""
 "Sorry, we can't upload your subtitles because another user is already "
 "assigned to this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:136
+#: apps/subtitles/forms.py:138
 msgid ""
 "Sorry, we can't upload your subtitles because you do not have permission to "
 "claim this language."
 msgstr ""
 
-#: apps/subtitles/forms.py:147 unisubs-integration/api/1_0/forms.py:93
+#: apps/subtitles/forms.py:149 unisubs-integration/api/1_0/forms.py:93
 msgid ""
 "Sorry, we can't upload your subtitles because a draft for this language is "
 "already in moderation."
 msgstr ""
 
-#: apps/subtitles/forms.py:159
+#: apps/subtitles/forms.py:161
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to transcribe subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:167
+#: apps/subtitles/forms.py:169
 msgid ""
 "Sorry, we can't upload your subtitles because this language is moderated and"
 " you don't have permission to translate subtitles."
 msgstr ""
 
-#: apps/subtitles/forms.py:180
+#: apps/subtitles/forms.py:182
 msgid ""
 "Sorry, we couldn't upload your file because the number of lines in your "
 "translation ({0}) doesn't match the original ({1})."
 msgstr ""
 
-#: apps/subtitles/forms.py:191
+#: apps/subtitles/forms.py:193
 #, python-format
 msgid "File size must be less than %d kb."
 msgstr ""
 
-#: apps/subtitles/forms.py:199
+#: apps/subtitles/forms.py:201
 #, python-format
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr ""
 
-#: apps/subtitles/forms.py:206 apps/videos/forms.py:63 apps/videos/forms.py:84
+#: apps/subtitles/forms.py:208 apps/videos/forms.py:63 apps/videos/forms.py:84
 #: unisubs-integration/api/1_0/forms.py:325
 msgid "Can not detect file encoding"
 msgstr "파일 인코딩을 찾을 수 없음"
 
-#: apps/subtitles/forms.py:229 unisubs-integration/api/1_0/forms.py:40
+#: apps/subtitles/forms.py:231 unisubs-integration/api/1_0/forms.py:40
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "누군가가 지금 이 비디오에 자막을 만들고 있습니다. 나중에 다시 시도해 주세요."
 
-#: apps/subtitles/views.py:98 apps/widget/rpc.py:326
+#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:320
+msgid "API"
+msgstr ""
+
+#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:322
+msgid "Subtitle Editor"
+msgstr ""
+
+#: apps/subtitles/models.py:849
+msgid "Imported"
+msgstr ""
+
+#: apps/subtitles/models.py:850
+msgid "Rollback"
+msgstr ""
+
+#: apps/subtitles/models.py:851
+msgid "Scripted"
+msgstr ""
+
+#: apps/subtitles/models.py:852
+msgid "Tern"
+msgstr ""
+
+#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:318
+msgid "Uploaded"
+msgstr ""
+
+#: apps/subtitles/models.py:854
+msgid "Through web editor"
+msgstr ""
+
+#: apps/subtitles/views.py:98 apps/widget/rpc.py:327
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr ""
 
-#: apps/subtitles/views.py:100 apps/widget/rpc.py:328
+#: apps/subtitles/views.py:100 apps/widget/rpc.py:329
 msgid "Sorry, these subtitles are privately moderated."
 msgstr ""
 
-#: apps/subtitles/views.py:110 apps/widget/rpc.py:353
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:354
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -675,7 +707,7 @@ msgstr ""
 msgid "Would you like to delete these subtitles completely?"
 msgstr "이 자막을 완전히 삭제하시겠습니까?"
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:359
 msgid "What would you like to unpublish?"
 msgstr "무엇을 공개하지 않겠습니까?"
 
@@ -703,11 +735,11 @@ msgstr ""
 msgid "Mismatched video and task!"
 msgstr ""
 
-#: apps/teams/forms.py:621
+#: apps/teams/forms.py:623
 msgid "The selected language does not match the task."
 msgstr ""
 
-#: apps/teams/forms.py:629
+#: apps/teams/forms.py:631
 #, python-format
 msgid ""
 "The selected source language %(from_code)s does not match the existing "
@@ -1666,11 +1698,11 @@ msgstr "비공개 동영상"
 msgid "Undefined error"
 msgstr "확실하지 않은 오류"
 
-#: apps/widget/rpc.py:111
+#: apps/widget/rpc.py:112
 msgid "Video embedding disabled by owner"
 msgstr "동영상을 올린 사용자로 부터 동영상 삽입은 할 수 없게 지정되었습니다."
 
-#: apps/widget/rpc.py:1110 apps/widget/rpc.py:1152
+#: apps/widget/rpc.py:1112 apps/widget/rpc.py:1154
 msgid "\n"
 msgstr "\n"
 
@@ -2909,7 +2941,7 @@ msgstr "삭제"
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:372
+#: templates/videos/subtitle-view.html:378
 msgid "Cancel"
 msgstr "취소"
 
@@ -5545,7 +5577,7 @@ msgid ""
 msgstr ""
 
 #: templates/videos/create.html:30
-msgid "to subtitle all the videos on your site. Just looking?"
+msgid "to subtitle all the videos on your site."
 msgstr ""
 
 #: templates/videos/create.html:36
@@ -5900,12 +5932,12 @@ msgid "Revisions"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:373
+#: templates/videos/subtitle-view.html:379
 msgid "Unpublish"
 msgstr ""
 
 #: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:388
+#: templates/videos/subtitle-view.html:394
 msgid "Edit Subtitles"
 msgstr "자막 편집"
 
@@ -5986,35 +6018,35 @@ msgstr "수정 내용 비교"
 msgid "Rollback to version #"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:319
+#: templates/videos/subtitle-view.html:325
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:320
+#: templates/videos/subtitle-view.html:326
 msgid "Text"
 msgstr "본문"
 
-#: templates/videos/subtitle-view.html:326
+#: templates/videos/subtitle-view.html:332
 msgid "No subtitles for this language."
 msgstr "이 언어에 대한 자막 없습니다."
 
-#: templates/videos/subtitle-view.html:335
+#: templates/videos/subtitle-view.html:341
 msgid "Roll back to this version"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:348
+#: templates/videos/subtitle-view.html:354
 msgid "Unpublish subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:356
+#: templates/videos/subtitle-view.html:362
 msgid "This version only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:360
+#: templates/videos/subtitle-view.html:366
 msgid "This entire language and all dependent languages"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:362
+#: templates/videos/subtitle-view.html:368
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."

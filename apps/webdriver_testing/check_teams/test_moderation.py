@@ -281,10 +281,6 @@ class TestCaseDraftVideos(WebdriverTestCase):
     def test_draft__translate(self):
         """Draft can not be the source for a new translation.
         
-        Not 100% sure how this works, maybe draft language should not be 
-        available in the language selection dialog.  
-        Need bug 2043 fixed to finish this test.
-
         """
         #Opening up translation permissions, otherwise the menu is hidden
         self.team.translate_policy=10
@@ -293,16 +289,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.video_pg.open_video_page(self.draft.video_id)
 
         self.menu.new_translation()
-        self.assertFalse('https://unisubs.sifterapp.com/issues/2043'
-                         'Draft should not be source for new translation')
-        self.create_modal.lang_selection(new_language='French', 
-                                         translation_source='English (100%)')
-
-        #FIXME - add correct verification when bug fixed. 
-        #self.menu.open_menu()
-        self.logger.info('checking for translation editor')
-        self.assertEqual('Adding a New Translation', 
-                         self.sub_editor.dialog_title())
+        self.assertTrue(self.create_modal.lang_selection_dialog_present())
 
     def test_draft__guest_improve(self):
         """Subtitle policy: members, guest has no improve subtitles in menu."""
