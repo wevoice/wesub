@@ -43,7 +43,9 @@ from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
     ROLE_CONTRIBUTOR
 )
-from videos.tasks import upload_subtitles_to_original_service
+from videos.tasks import (
+    upload_subtitles_to_original_service, sync_latest_versions_for_video
+)
 from teams.tasks import update_one_team_video
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
@@ -870,6 +872,7 @@ def team_video_delete(sender, instance, **kwargs):
 
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
+        sync_latest_versions_for_video.delay(video.pk)
     except Video.DoesNotExist:
         pass
 
