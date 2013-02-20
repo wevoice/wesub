@@ -191,6 +191,7 @@ class Command(BaseCommand):
         sleep(3)
 
     def _get_videos_from_query(self, query):
+        self.log('Collectiong videos from youtube based on a query.')
         uri = "http://gdata.youtube.com/feeds/api/videos?q=%s&v=2"
         uri = uri % query
 
@@ -214,7 +215,7 @@ class Command(BaseCommand):
             for vt, info, entry in _iter:
                 urls.append(vt.convert_to_video_url())
 
-            self.log("% videos loaded" % len(urls))
+            self.log("%s videos loaded" % len(urls))
 
             next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
             self._sleep()
