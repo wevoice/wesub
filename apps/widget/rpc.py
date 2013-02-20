@@ -42,7 +42,9 @@ from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
 from videos import models
 from videos.models import record_workflow_origin, Subtitle
-from videos.tasks import video_changed_tasks
+from videos.tasks import (
+    video_changed_tasks, upload_subtitles_to_original_service
+)
 from widget import video_cache
 from widget.base_rpc import BaseRpc
 from widget.forms import  FinishReviewForm, FinishApproveForm

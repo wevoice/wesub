@@ -117,23 +117,6 @@ strong {
 }
 
 // Modules
-.column {
-    float: left;
-
-    // Note: there's a bug in Chrome Linux that prevents proper rendering of
-    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
-    //
-    // Thus, the following does not add up to 100%.
-    &.left {
-        width: 34%;
-    }
-    &.center {
-        width: 40%;
-    }
-    &.right {
-        width: 26%;
-    }
-}
 div.modal {
     background: rgba(black, .6);
     height: 100%;
@@ -204,6 +187,25 @@ button {
     }
 }
 
+.column {
+    float: left;
+
+    // Note: there's a bug in Chrome Linux that prevents proper rendering of
+    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
+    //
+    // Thus, the following does not add up to 100%.
+    &.left {
+        min-width: 255px;
+        width: 34%;
+    }
+    &.center {
+        min-width: 255px;
+        width: 40%;
+    }
+    &.right {
+        width: 26%;
+    }
+}
 header.main {
     background: #212223;
     border-bottom: 1px solid #474849;
@@ -442,6 +444,9 @@ section.main {
                 &:hover {
                     a.remove {
                         display: block;
+                    }
+                    span.start-time {
+                        color: #616263;
                     }
                 }
                 &.empty {
