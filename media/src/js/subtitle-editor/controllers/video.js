@@ -87,7 +87,7 @@
 
         };
 
-        $scope.$root.$on('subtitleKeyUp', function($event, options) {
+        $scope.$root.$on('subtitle-key-up', function($event, options) {
 
             var parser = options.parser;
             var subtitle = options.subtitle;
@@ -99,7 +99,7 @@
             });
 
         });
-        $scope.$root.$on('subtitleReady', function($event, subtitle) {
+        $scope.$root.$on('subtitle-ready', function($event, subtitle) {
             // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
             // video's Popcorn instance.
 

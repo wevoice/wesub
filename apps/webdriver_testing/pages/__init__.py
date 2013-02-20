@@ -28,9 +28,12 @@ class Page(object):
         self.logger = testsetup.logger
 
     def _safe_find(self, element):
-        self.wait_for_element_present(element)
-        elem = self.browser.find_element_by_css_selector(element)
-        return elem
+        if isinstance(element, basestring):
+            self.wait_for_element_present(element)
+            return self.browser.find_element_by_css_selector(element)
+        else:
+            self.logger.info(element.text)
+            return element
 
     def quit(self):
         """Quit the browser.
@@ -96,6 +99,9 @@ class Page(object):
 
         """
         select = Select(self._safe_find(element))
+        #els = self.browser.find_elements_by_css_selector('option')
+        #for el in els:
+        #    self.logger.info(el.text)
         select.select_by_visible_text(text)
 
     def hover_by_css(self, page_element):
@@ -125,15 +131,16 @@ class Page(object):
         menu_element = self._safe_find(menu_el)
         mouseAction = (webdriver.ActionChains(self.browser)
                        .move_to_element(menu_element)
-                       #.click(menu_item_element)
                        .perform())
-        menu_item_element = self._safe_find(menu_item_el)
-        self.wait_for_element_visible(menu_item_el)
+        #self.wait_for_element_visible(menu_item_el)
+        el = self.is_element_visible(menu_item_el)
+        el.click()
+        #menu_element.find_element_by_css_selector(menu_item_el).click()
         
-        mouseAction = (webdriver.ActionChains(self.browser)
-                       .move_to_element(menu_item_element)
-                       .click(menu_item_element)
-                       .perform())
+        #mouseAction = (webdriver.ActionChains(self.browser)
+        #               .move_to_element(menu_item_element)
+        #               .click(menu_item_element)
+        #               .perform())
 
 
     def hover_by_element(self, webdriver_object, page_element):
@@ -278,11 +285,9 @@ class Page(object):
         """Return whether element (by css) is visible on the page.
 
         """
-        if not self.is_element_present(element):
-            return False
-        else:
-            return any([e.is_displayed() for e in
-                        self.browser.find_elements_by_css_selector(element)])
+        if any([e.is_displayed() for e in
+                        self.browser.find_elements_by_css_selector(element)]):
+            return e
 
     def is_unique_text_present(self, element, text):
         """Return whether element (by css) text is unique).
@@ -345,8 +350,23 @@ class Page(object):
         if condition():
             return True
         else:
-            self.record_error(error_message)
+            if error_message is not None:
+                self.record_error(error_message)
             return False
+
+
+    def check_if_element_present(self, element, wait_time=5):
+        """Wait for element (by css) present on page, within x seconds.
+
+           Settings the default to 5 since we shouldn't have to wait long for 
+           most things.  Using implicit_wait in webdriver_base so this
+           is a multiplied by the implicit wait value.
+
+        """
+        return self._poll_for_condition(
+            lambda: self.is_element_present(element),
+            wait_time, None)
+
 
     def wait_for_element_present(self, element, wait_time=5):
         """Wait for element (by css) present on page, within x seconds.
@@ -445,18 +465,12 @@ class Page(object):
         """If the parent element exists, return a list of the child elements.
   
         """
-        if isinstance(parent_el, basestring):
-            if not self.is_element_present(parent_el):
-                return None
-            else: 
-                parent_el = self.browser.find_element_by_css_selector(parent_el)
+        parent_el = self._safe_find(parent_el)
         try:
             child_els = parent_el.find_elements_by_css_selector(child_el)
             return child_els
         except NoSuchElementException:
             return None
-
-
 
     def open_page(self, url):
         """Open a page by the full url.
@@ -465,13 +479,7 @@ class Page(object):
         self.browser.get(self.get_absolute_url(url))
 
     def go_back(self):
-        """Go back to previous page.
-self._poll_for_condition(
-            lambda: self.is_element_present(element),
-            wait_time,
-            "Element %s is not present." % element)
-
-        """
+        """Go back to previous page.  """
         self.browser.back()
 
     def page_down(self, elements):

@@ -751,7 +751,7 @@ class Video(models.Model):
 
         """
         l = self.subtitle_language()
-        return l.get_title_display() if l else self.title
+        return l.get_title() if l else self.title
 
     def get_description_display(self):
         """Return a suitable description to display to a user for this video.
@@ -762,7 +762,7 @@ class Video(models.Model):
 
         """
         l = self.subtitle_language()
-        return l.get_description_display() if l else self.description
+        return l.get_description() if l else self.description
 
 
     @property

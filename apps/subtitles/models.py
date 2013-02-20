@@ -808,8 +808,8 @@ class SubtitleLanguage(models.Model):
 
     def unpublish(self):
         """ Unpublishes the last public version for this Subtitle Language """
-        tip = self.get_tip(public=True)
-        return tip.unpublish() if tip else None
+        version = self.subtitleversion_set.order_by('version_number')[:1]
+        return version[0].unpublish() if version else None
 
     @property
     def is_imported_from_youtube_and_not_worked_on(self):
@@ -832,6 +832,27 @@ class SubtitleVersionManager(models.Manager):
         return (self.get_query_set()
                     .exclude(visibility='private', visibility_override='')
                     .exclude(visibility_override='private'))
+
+
+ORIGIN_API = 'api'
+ORIGIN_IMPORTED = 'imported'
+ORIGIN_LEGACY_EDITOR = 'web-legacy-editor'
+ORIGIN_ROLLBACK = 'rollback'
+ORIGIN_SCRIPTED = 'scripted'
+ORIGIN_TERN = 'tern'
+ORIGIN_UPLOAD = 'upload'
+ORIGIN_WEB_EDITOR = 'web-editor'
+
+SUBTITLE_VERSION_ORIGINS = (
+    (ORIGIN_API, _("API")),
+    (ORIGIN_LEGACY_EDITOR, _("Subtitle Editor")),
+    (ORIGIN_IMPORTED, _("Imported")),
+    (ORIGIN_ROLLBACK, _("Rollback")),
+    (ORIGIN_SCRIPTED, _("Scripted")),
+    (ORIGIN_TERN, _("Tern")),
+    (ORIGIN_UPLOAD, _("Uploaded")),
+    (ORIGIN_WEB_EDITOR, _("Through web editor")),
+)
 
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
@@ -899,6 +920,9 @@ class SubtitleVersion(models.Model):
                                                              blank=True,
                                                              default=None)
 
+    # Keeps tab of how this SV was originated (uploads, api, etc)
+    origin = models.CharField(max_length=255, choices=SUBTITLE_VERSION_ORIGINS,
+                              blank=True, default='')
     # Denormalized count of the number of subtitles this version contains, for
     # easier filtering later.
     subtitle_count = models.PositiveIntegerField(default=0)
@@ -1273,10 +1297,20 @@ class SubtitleVersion(models.Model):
         assert team_video.team.unpublishing_enabled(), \
                "Cannot unpublish for a team without unpublishing enabled."
 
-        self.visibility_override = 'private'
-        self.save()
+        versions = SubtitleVersion.objects.filter(
+            # This filter includes this SubtitleVersion itself
+            subtitle_language=self.subtitle_language,
+            version_number__gte=self.version_number
+        ).order_by('version_number')
 
-        return self
+        last_version = None
+
+        for version in versions:
+            version.visibility_override = 'private'
+            version.save()
+            last_version = version
+
+        return last_version
 
     @models.permalink
     def get_absolute_url(self):

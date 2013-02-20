@@ -72,14 +72,16 @@ from utils.metrics import Meter
 from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
 
-
-AVAILABLE_SUBTITLE_FORMATS = get_available_formats()
 from teams.permissions import  can_edit_video
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
 })
 
+
+# We don't want to display all formats we understand to the end user
+# .e.g json, nor include aliases
+AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [ 'dfxp',  'sbv', 'srt', 'ssa', 'txt']
 
 def index(request):
     context = widget.add_onsite_js_files({})
@@ -475,7 +477,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
                                  if version else None)
     context['next_version'] = version.next_version() if version else None
     context['can_edit'] = False
-    context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS
+    context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
 
     if request.user.is_authenticated():
         # user can only edit a subtitle draft if he
