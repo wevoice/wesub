@@ -13,6 +13,8 @@ class VideoLanguagePage(VideoPage):
     _VIDEO_DESCRIPTION  = "li.description"
     _SUB_LINES = "div.translation-text"
 
+    _DRAFT_NOTICE = 'p.view-notice.draft'
+
     #SUBTITLES TAB
     _EDIT_SUBTITLES = "a#edit_subtitles_button"
     _DOWNLOAD_SUBS = "span.sort_label strong"
@@ -66,6 +68,6 @@ class VideoLanguagePage(VideoPage):
         except:
             return None
 
+    def is_draft(self):
+        return self.is_element_visible(self._DRAFT_NOTICE)
         
-
-

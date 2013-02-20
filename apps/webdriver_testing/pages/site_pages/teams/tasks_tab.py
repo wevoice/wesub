@@ -67,7 +67,7 @@ class TasksTab(ATeamPage):
     def task_present(self, task_type, title):
         all_tasks = self._task_info()
         for task in all_tasks:
-            if task_type in task['kind'] and title in task['video']:
+            if task_type == task['kind'] and title in task['video']:
                 return task 
 
 
@@ -82,14 +82,13 @@ class TasksTab(ATeamPage):
     def perform_and_assign_task(self, task_type, title):
         task = self.task_present(task_type, title)
         perform_el = task['perform']
-        self.click_item_after_hover(perform_el.tag_name, 
+        self.click_item_after_hover(perform_el, 
                                     self._ASSIGN_AND_PERFORM)
 
     def perform_assigned_task(self, task_type, title):
         task = self.task_present(task_type, title)
         perform_el = task['perform']
-        self.click_item_after_hover(perform_el.tag_name, 
-                                    self._PERFORM_ASSIGNED)
+        self.click_item_after_hover(perform_el, self._PERFORM_ASSIGNED)
 
 
     def filtered_video(self):
@@ -108,7 +107,8 @@ class TasksTab(ATeamPage):
     def disabled_task(self, task_type, title):
         task = self.task_present(task_type, title)
         try:
-            return task['task'].find_element_by_css_selector(self._DISABLED_TASK).text
+            return task['task'].find_element_by_css_selector(
+                    self._DISABLED_TASK).text
         except:
             return None
 
