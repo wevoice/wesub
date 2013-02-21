@@ -133,7 +133,7 @@ class SubtitlesUploadForm(forms.Form):
 
             # If this language is unassigned, and the user can't assign herself
             # to it, fail.
-            if (not task.assignee and not can_perform_task(task, self.user)):
+            if (not task.assignee and not can_perform_task(self.user, task)):
                 raise forms.ValidationError(_(
                     u"Sorry, we can't upload your subtitles because you do not "
                     u"have permission to claim this language."))

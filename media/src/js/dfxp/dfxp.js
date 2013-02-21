@@ -30,6 +30,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
     var DFXP_REPLACE_SEQ = [
+
+        // This first set is to handle malformed DFXP XML.
+        ["span[fontWeight='bold']", "**"],
+        ["span[fontStyle='italic']", "*"],
+        ["span[textDecoration='underline']", "_"],
+
         ["span[tts\\:fontWeight='bold']", "**"],
         ["span[tts\\:fontStyle='italic']", "*"],
         ["span[tts\\:textDecoration='underline']", "_"],
