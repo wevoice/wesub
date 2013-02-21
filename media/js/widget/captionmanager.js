@@ -36,7 +36,7 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
         return time - that.x['startTime'](caption);
     };
     this.binaryCaptionCompare_ = function(c0, c1) {
-        return that.x['startTime'](c0) - that.x['startTime'](c1);
+        return that.x['startTime'](c0.node) - that.x['startTime'](c1.node);
     };
     this.videoPlayer_ = videoPlayer;
     this.eventHandler_ = new goog.events.EventHandler(this);
@@ -112,11 +112,11 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (subs.length === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
-        playheadTime < this.x['startTime'](this.x['getSubtitle'](0)))
+        playheadTime < this.x['startTime'](this.x['getFirstSubtitle']()))
         return;
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
-        this.x['getSubtitle'](this.currentCaptionIndex_) : null;
+        this.x['getSubtitleByIndex'](this.currentCaptionIndex_) : null;
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null &&
 	this.x['isShownAt'](curCaption, playheadTime))
@@ -127,15 +127,15 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
     if (nextCaption != null &&
-	this.x['isShownAt'](this.x['getSubtitle'](nextCaptionIndex), playheadTime)) {
+	this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
     }
     if ((nextCaption == null ||
-         playheadTime < this.x['startTime'](nextCaption)) &&
+         playheadTime < this.x['startTime'](nextCaption.node)) &&
         (curCaption == null ||
-         playheadTime >= this.x['startTime'](curCaption))) {
+         playheadTime >= this.x['startTime'](curCaption.node))) {
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_)
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);

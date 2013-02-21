@@ -130,11 +130,11 @@
 
                             <span ng-show="showStartTime"
                                   class="start-time">
-                                [[ parser.startTimeFromNode(subtitle) ]]
+                                [[ parser.startTime(subtitle) ]]
                             </span>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  ng-bind-html-unsafe="parser.contentRendered(subtitle)"
                                   class="subtitle-text">
                             </span>
 
@@ -166,11 +166,11 @@
 
                             <span ng-show="showStartTime"
                                   class="start-time">
-                                [[ parser.startTimeFromNode(subtitle) ]]
+                                [[ parser.startTime(subtitle) ]]
                             </span>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="parser.contentRenderedFromNode(subtitle)"
+                                  ng-bind-html-unsafe="parser.contentRendered(subtitle)"
                                   class="subtitle-text">
                             </span>
 

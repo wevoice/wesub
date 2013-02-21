@@ -279,10 +279,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var isLast = false;
     var length = captions.length;
     for (i = 0; i < length; i++){
-        currentStartTime = this.x['startTime'](i);
+        currentStartTime = this.x['startTime'](this.x['getSubtitleByIndex'](i));
         isLast = i == length -1;
         if (!isLast){
-            nextStartTime = this.x['startTime'](i+1);
+            nextStartTime = this.x['startTime'](this.x['getSubtitleByIndex'](i+1));
         }else{
             nextStartTime  = undefined;
         }

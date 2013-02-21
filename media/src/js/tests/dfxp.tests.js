@@ -116,12 +116,15 @@ describe('DFXP', function() {
 
             // Add a new subtitle after the first subtitle, with content and
             // begin/end attrs pre-set.
-            var newSubtitle = parser.addSubtitle(0,
+
+            var firstSubtitle = parser.getFirstSubtitle();
+
+            var newSubtitle = parser.addSubtitle(firstSubtitle,
                 {'begin': 1160, 'end': 1170},
                 'New subtitle with timing, after the first subtitle.');
 
             // Get the second subtitle in the list.
-            var secondSubtitle = parser.getSubtitle(1).get(0);
+            var secondSubtitle = parser.getNextSubtitle(firstSubtitle);
 
             expect(secondSubtitle).toBe(newSubtitle);
             expect(parser.startTime(secondSubtitle)).toBe(1160);
@@ -255,15 +258,6 @@ describe('DFXP', function() {
             var lastSubtitle = parser.getLastSubtitle();
 
             expect(parser.content(lastSubtitle)).toBe('Some new text.');
-        });
-    });
-    describe('#contentRenderedFromNode()', function() {
-        it('should retrieve the rendered HTML content of a subtitle when passed a node', function() {
-
-            // Get the last subtitle.
-            var lastSubtitle = parser.getLastSubtitle();
-
-            expect(parser.contentRenderedFromNode(lastSubtitle)).toBe('Some new text.');
         });
     });
     describe('#contentRendered()', function() {
@@ -425,6 +419,19 @@ describe('DFXP', function() {
             expect(previousSubtitle).toBe(firstSubtitle);
         });
     });
+    describe('#getSubtitleByIndex()', function() {
+        it('should get a subtitle node by its index instead of node', function() {
+
+            // Get the first subtitle.
+            var firstSubtitle = parser.getFirstSubtitle();
+
+            // Get the first subtitle by index.
+            var firstSubtitleByIndex = parser.getSubtitleByIndex(0);
+
+            // Verify.
+            expect(firstSubtitle).toBe(firstSubtitleByIndex);
+        });
+    });
     describe('#getSubtitleIndex()', function() {
         it('should retrieve the index of the given subtitle', function() {
             
@@ -432,30 +439,6 @@ describe('DFXP', function() {
             expect(parser.getSubtitleIndex(parser.getFirstSubtitle(), parser.getSubtitles())).toBe(0);
             expect(parser.getSubtitleIndex(parser.getFirstSubtitle())).toBe(0);
 
-        });
-    });
-    describe('#getSubtitle()', function() {
-        it('should retrieve the subtitle based on the index given', function() {
-
-            var firstSubtitle = parser.getSubtitle(0);
-            var $subtitles = parser.getSubtitles();
-
-            // It should be the first subtitle in the node list.
-            expect($subtitles.get(0)).toBe(firstSubtitle.get(0));
-
-        });
-        it('should retrieve the subtitle based on a given node', function() {
-            // This helps us streamline the process by which we retrieve
-            // subtitles. If you pass along a node, we'll simply return the
-            // jQuery selection of that node.
-
-            var $subtitles = parser.getSubtitles();
-            var firstSubtitleNode = $subtitles.eq(0).get(0);
-            var retrievedSubtitleNode = parser.getSubtitle(firstSubtitleNode).get(0);
-
-            // The retrieved subtitle's node should be the same as the first
-            // subtitle's node.
-            expect(retrievedSubtitleNode).toBe(firstSubtitleNode);
         });
     });
     describe('#getSubtitles()', function() {
@@ -555,7 +538,7 @@ describe('DFXP', function() {
             //
             // We have to put this subtitle at the beginning, because subtitles at
             // the end are allowed to not have an end time.
-            var newSubtitle = parser.addSubtitle(1, {'begin': 1500});
+            var newSubtitle = parser.addSubtitle(parser.getFirstSubtitle(), {'begin': 1500});
 
             expect(parser.needsSyncing(newSubtitle)).toBe(true);
 
@@ -563,7 +546,7 @@ describe('DFXP', function() {
         it('should tell us a subtitle does not need syncing with timing set', function() {
 
             // Create a new subtitle with start and end times set.
-            var newSubtitle = parser.addSubtitle(1, {'begin': 1500, 'end': 1700});
+            var newSubtitle = parser.addSubtitle(parser.getFirstSubtitle(), {'begin': 1500, 'end': 1700});
 
             expect(parser.needsSyncing(newSubtitle)).toBe(false);
 
@@ -789,8 +772,6 @@ describe('DFXP', function() {
 
             // Add a mock subtitle.
             parser.addSubtitle(null, {'begin': 50, 'end': 100}, 'Test');
-
-            console.log(parser.xmlToString());
 
             // Get the XML string.
             var xmlString = parser.xmlToString(true);
