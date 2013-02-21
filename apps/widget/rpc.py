@@ -1330,5 +1330,6 @@ def language_summary(language, team_video=-1, user=None):
     if is_translation:
         summary['standard_pk'] = translation_source.pk
     summary['is_complete'] = language.subtitles_complete
+    summary['is_public'] = latest_version.is_public() if latest_version else False
 
     return summary
