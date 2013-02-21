@@ -298,41 +298,26 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.open_team_page(self.team.slug)
         self.dashboard_tab.handle_js_alert(action='accept')
 
-
-    def get_task(self, video_id, team, task_type, lang):
-        """Return the tasks give a video id, and language via the api.
- 
-        """
-        url_part = 'teams/{0}/tasks?video_id={1}'.format(
-            team.slug, video_id)
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
-        task_objects =  response['objects']
-        for task in task_objects:
-            if task['type'] == task_type and task['language'] == lang:
-                return task
-
-
     def test_members__assigned_tasks(self):
         """Members see “Videos you're working on” with  assigned languages.
  
         """
+        video = self.data_utils.create_video()
+        video.primary_audio_language_code = 'fr'
+        video.save()
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        task = list(tv.task_set.incomplete_subtitle().filter(language='fr'))[0]
+        task.assignee = self.polly_glott
+        task.save()
+
         #Login user and go to team dashboard page
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 
         #Verify expected videos are displayed.
         self.dashboard_tab.open_team_page(self.team.slug)
-        jaws_vid = self.vid_obj_list[0]  #see setUp for data details.
-
-        task_resp = self.get_task(jaws_vid.video_id, self.team, 'Subtitle', 
-                                  'fr')
-        url_part = task_resp['resource_uri'] 
-        updated_info = {'assignee': self.polly_glott.username} 
-        status, response = self.data_utils.put_api_request(self.user, url_part, 
-            updated_info) 
-        self.dashboard_tab.open_team_page(self.team.slug)
         self.assertTrue(self.dashboard_tab.dash_task_present(
                             task_type='Create French subtitles',
-                            title='jaws'))
+                            title=video.title))
 
     def test_members__available_tasks(self):
         """Members see “Videos that need your help” with the relevant tasks.
@@ -343,18 +328,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
 
         #Verify expected videos are displayed.
         self.dashboard_tab.open_team_page(self.team.slug)
-        jaws_vid = self.vid_obj_list[0]  #see setUp for data details.
-
-        task_resp = self.get_task(jaws_vid.video_id, self.team, 'Subtitle', 'fr')
-        url_part = task_resp['resource_uri'] 
-        updated_info = {'assignee': self.polly_glott.username} 
-        status, response = self.data_utils.put_api_request(self.user, url_part, 
-            updated_info) 
-        self.dashboard_tab.open_team_page(self.team.slug)
-        self.assertTrue(self.dashboard_tab.dash_task_present(
-                            task_type='Create French subtitles',
-                            title='jaws'))
-
         expected_lang_list = ['Create English subtitles'] 
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
@@ -364,22 +337,20 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Members with no lang prefs the list of available tasks in English.
 
         """
-        #Login user and go to team dashboard page
         mono_glot = TeamContributorMemberFactory.create(
                 team = self.team,
                 user = UserFactory()
                 ).user
-        self.dashboard_tab.log_in(mono_glot.username, 'password')
+        video = self.data_utils.create_video()
+        video.primary_audio_language_code = 'fr'
+        video.save()
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        task = list(tv.task_set.incomplete_subtitle().filter(language='fr'))[0]
+        task.assignee = mono_glot
+        task.save()
 
-        self.logger.info('Create French Subtitles task for jaws video' 
-                         'is assigned to user via api.')
-        jaws_vid = self.vid_obj_list[0]  #see setUp for data details.
-        task_resp = self.get_task(jaws_vid.video_id, self.team, 'Subtitle', 
-                                  'fr')
-        url_part = task_resp['resource_uri'] 
-        updated_info = {'assignee': mono_glot.username} 
-        status, response = self.data_utils.put_api_request(self.user, url_part, 
-            updated_info) 
+        #Login user and go to team dashboard page
+        self.dashboard_tab.log_in(mono_glot.username, 'password')
         self.dashboard_tab.open_team_page(self.team.slug)
         expected_lang_list = ['Create English subtitles'] 
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
@@ -390,10 +361,14 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Member starts subtitling from dash, “Videos that need your help”.
 
         """
+
+        video = self.data_utils.create_video()
+        video.primary_audio_language_code = 'fr'
+        video.save()
+        TeamVideoFactory(team=self.team, added_by=self.user, video=video)
         self.create_modal = dialogs.CreateLanguageSelection(self)
         #Login user and go to team dashboard page
         self.logger.info('Polly Glott logs in and goes to team dashboard page.')
-        video = self.vid_obj_list[0]
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
         self.dashboard_tab.set_skiphowto()
         self.dashboard_tab.open_team_page(self.team.slug)
@@ -435,8 +410,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Member starts review from any task in “Videos that need your help”.
 
         """
-        self.skipTest('Sends amara out to lunch, see issue:' 
-                      'https://unisubs.sifterapp.com/issues/2061')
         self.team_workflow.review_allowed = 10
         self.team_workflow.save()
 
@@ -446,28 +419,31 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.team.save()
         create_modal = dialogs.CreateLanguageSelection(self)
 
-        #Login user and create subtitles to get a review task created.
-        self.logger.info('Polly Glott logs in and creates subtitles.')
-        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
-        self.dashboard_tab.set_skiphowto()
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        video_data = {'language_code': 'en',
+                      'primary_audio_language_code': 'en',
+                      'video': video.pk,
+                      'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                      'is_complete': True, 
+                      'complete': 1
+                     }
+        self.data_utils.upload_subs(
+                video,
+                data=video_data, 
+                user=dict(username=self.user.username, 
+                password='password'))
 
-        self.dashboard_tab.open_team_page(self.team.slug)
-        self.dashboard_tab.click_lang_task('trailer.webm', 'Create English')
-        self.create_modal.create_original_subs('English', 'English')
-        self.typed_subs = self.sub_editor.type_subs(self.subs_file)
-        self.sub_editor.continue_to_next_step()
-        self.logger.info('syncing subs')
-        self.sub_editor.sync_subs(2)
-        self.sub_editor.continue_to_next_step()
-        self.sub_editor.continue_to_next_step()
-        self.sub_editor.submit(complete=True)
 
         #Login as reviewer and start the review task.
         self.logger.info('Log in as user review to perform the review task.')
         self.dashboard_tab.log_in(self.reviewer.username, 'password')
         self.dashboard_tab.open_team_page(self.team.slug)
-        self.logger.info("Clicking the Review English task for video trailer.webm")
-        self.dashboard_tab.click_lang_task('trailer.webm', 'Review English')
+        self.logger.info("Clicking the Review English subtitles task")
+        self.dashboard_tab.click_lang_task(video.title, 'Review English subtitles')
+        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
+
 
 
 

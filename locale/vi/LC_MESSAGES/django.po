@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-20 00:18-0600\n"
-"PO-Revision-Date: 2013-02-20 06:32+0000\n"
+"POT-Creation-Date: 2013-02-21 00:18-0600\n"
+"PO-Revision-Date: 2013-02-21 06:31+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/universalsubtitles/language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -503,11 +503,11 @@ msgstr "Không thể nhận dạng bộ hoán mã tập tin"
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Hiện giờ có một ai đó đang tạo phụ đề cho đoạn phim này. Hãy thử lại sau."
 
-#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:320
+#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:314
 msgid "API"
 msgstr ""
 
-#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:322
+#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:316
 msgid "Subtitle Editor"
 msgstr ""
 
@@ -527,7 +527,7 @@ msgstr ""
 msgid "Tern"
 msgstr ""
 
-#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:318
+#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:312
 msgid "Uploaded"
 msgstr ""
 
@@ -535,18 +535,18 @@ msgstr ""
 msgid "Through web editor"
 msgstr ""
 
-#: apps/subtitles/views.py:98 apps/widget/rpc.py:327
+#: apps/subtitles/views.py:98 apps/widget/rpc.py:329
 #, python-format
 msgid ""
 "These subtitles are moderated. See the %s team page for information on how "
 "to contribute."
 msgstr "Những phụ đề này đều được giám sát. Xem trang nhóm %s để biết thêm thông tin về việc làm thế nào để đóng góp."
 
-#: apps/subtitles/views.py:100 apps/widget/rpc.py:329
+#: apps/subtitles/views.py:100 apps/widget/rpc.py:331
 msgid "Sorry, these subtitles are privately moderated."
 msgstr "Xin lỗi, những phụ đề này đều được giám sát riêng."
 
-#: apps/subtitles/views.py:110 apps/widget/rpc.py:354
+#: apps/subtitles/views.py:110 apps/widget/rpc.py:356
 msgid ""
 "Sorry, you do not have the permission to edit these subtitles. If you "
 "believe that they need correction, please contact the team administrator."
@@ -704,7 +704,7 @@ msgstr "Người dùng đã được mời nhưng chưa hồi âm lại."
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Bạn có muốn xóa hoàn toàn những phụ đề này?"
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:359
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
 msgid "What would you like to unpublish?"
 msgstr "Bạn muốn hủy đăng tải cái gì?"
 
@@ -775,11 +775,11 @@ msgstr "Người quản lí và quản trị viên"
 msgid "Admins only"
 msgstr "Chỉ có quản trị viên"
 
-#: apps/teams/models.py:145 apps/teams/models.py:2640
+#: apps/teams/models.py:145 apps/teams/models.py:2642
 msgid "name"
 msgstr "tên"
 
-#: apps/teams/models.py:146 apps/teams/models.py:2641
+#: apps/teams/models.py:146 apps/teams/models.py:2643
 msgid "slug"
 msgstr "tên xuất bản (slug)"
 
@@ -863,7 +863,7 @@ msgstr "số công việc tối đa cho mỗi thành viên"
 msgid "task expiration (days)"
 msgstr "công việc hết hạn (ngày) (days)"
 
-#: apps/teams/models.py:206 templates/profiles/base.html:56
+#: apps/teams/models.py:206 templates/profiles/base.html:59
 #: templates/teams/teams-list.html:6
 msgid "Teams"
 msgstr "Nhóm"
@@ -886,20 +886,20 @@ msgstr "Cần trợ giúp với tất cả ngôn ngữ"
 msgid "If you check this, other languages will not be displayed."
 msgstr "Nếu bạn chọn nó, các ngôn ngữ khác sẽ không được hiển thị."
 
-#: apps/teams/models.py:948 apps/teams/permissions_const.py:45
+#: apps/teams/models.py:950 apps/teams/permissions_const.py:45
 msgid "Owner"
 msgstr "Người sở hữu"
 
-#: apps/teams/models.py:949 apps/teams/permissions_const.py:46
+#: apps/teams/models.py:951 apps/teams/permissions_const.py:46
 msgid "Manager"
 msgstr "Quản lí"
 
-#: apps/teams/models.py:950 apps/teams/permissions_const.py:44
+#: apps/teams/models.py:952 apps/teams/permissions_const.py:44
 #: templates/base.html:130
 msgid "Admin"
 msgstr "Quản trị viên"
 
-#: apps/teams/models.py:951 apps/teams/permissions_const.py:47
+#: apps/teams/models.py:953 apps/teams/permissions_const.py:47
 msgid "Contributor"
 msgstr "Người đóng góp"
 
@@ -1627,47 +1627,47 @@ msgstr "Này bạn ơi-- vừa tìm thấy phụ đề %(language)s cho %(video_
 msgid "Just found a version of this video with %(language_name)s subtitles"
 msgstr "Vừa tìm thấy một phiên bản có kèm theo phụ đề %(language_name)s của đoạn phim này"
 
-#: apps/videos/views.py:175
+#: apps/videos/views.py:177
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
 "share the video with friends, or get an embed code for your site.  To add or\n"
 "improve subtitles, click the button below the video."
 msgstr "Đây là không gian làm phụ đề cho đoạn phim của bạn. Bạn có thể\nchia sẻ đoạn phim với bạn bè, hoặc lấy mã nhúng vào trang của mình. Để thêm hay\ncải thiện phụ đề, nhấn nút bên dưới đoạn phim."
 
-#: apps/videos/views.py:183
+#: apps/videos/views.py:185
 msgid ""
 "You have submitted a video\n"
 "                that is served over http.  Your browser may display mixed\n"
 "                content warnings."
 msgstr "Bạn đã gửi một đoạn phim\n\t\t\t\t được cung cấp thông qua giao thức http.  Trình duyệt của bạn có thể hiển thị\n  \t\t\t\t những cảnh báo hỗn tạp."
 
-#: apps/videos/views.py:188
+#: apps/videos/views.py:190
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Phụ đề hiện hữu sẽ được nhập vào trong một vài phút."
 
-#: apps/videos/views.py:296
+#: apps/videos/views.py:298
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr "Cảm ơn bạn đã tải lên. Có thể mất vaifp hút để phụ đề của bạn có thể xuất hiện."
 
-#: apps/videos/views.py:623
+#: apps/videos/views.py:625
 msgid "You have not permission change this URL"
 msgstr "Bạn không được phép thay đổi đường dẫn URL này"
 
-#: apps/videos/views.py:628 apps/videos/views.py:659
+#: apps/videos/views.py:630 apps/videos/views.py:661
 msgid "Object does not exist"
 msgstr "Đối tượng không tồn tại"
 
-#: apps/videos/views.py:643
+#: apps/videos/views.py:645
 msgid "You have not permission delete this URL"
 msgstr "Bạn không được phép xóa đường dẫn URL này"
 
-#: apps/videos/views.py:647
+#: apps/videos/views.py:649
 msgid "You can't remove primary URL"
 msgstr "Bạn không thể loại bỏ đường dẫn URL chính"
 
-#: apps/videos/views.py:801
+#: apps/videos/views.py:803
 #, python-format
 msgid "The language for %s has been changed"
 msgstr ""
@@ -1695,11 +1695,11 @@ msgstr "Phim riêng tư"
 msgid "Undefined error"
 msgstr "Lỗi không xác định"
 
-#: apps/widget/rpc.py:112
+#: apps/widget/rpc.py:114
 msgid "Video embedding disabled by owner"
 msgstr "Nhúng phim đã bị vô hiệu hóa bởi chủ sở hữu"
 
-#: apps/widget/rpc.py:1112 apps/widget/rpc.py:1154
+#: apps/widget/rpc.py:1114 apps/widget/rpc.py:1156
 msgid "\n"
 msgstr "\n"
 
@@ -1838,7 +1838,7 @@ msgid "Go"
 msgstr "Tới"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
-#: templates/teams/tasks.html:212 templates/videos/_video_url_panel.html:19
+#: templates/teams/tasks.html:215 templates/videos/_video_url_panel.html:19
 #: templates/videos/subtitle-view.html:72
 msgid "Original"
 msgstr "Gốc"
@@ -1907,19 +1907,19 @@ msgstr "Hãy kể cho thế giới biết và mời bạn bè cùng hỗ trợ d
 
 #: templates/_share_widget.html:10 templates/_sharing_widget.html:7
 #: templates/teams/_context_project.html:62
-#: templates/teams/_context_team.html:116
+#: templates/teams/_context_team.html:118
 msgid "Post to Facebook"
 msgstr "Đăng lên Facebook"
 
 #: templates/_share_widget.html:11 templates/_sharing_widget.html:8
 #: templates/teams/_context_project.html:63
-#: templates/teams/_context_team.html:117
+#: templates/teams/_context_team.html:119
 msgid "Post to Twitter"
 msgstr "Đăng lên Twitter"
 
 #: templates/_share_widget.html:12 templates/_sharing_widget.html:9
 #: templates/teams/_context_project.html:64
-#: templates/teams/_context_team.html:118
+#: templates/teams/_context_team.html:120
 msgid "Email to friends"
 msgstr "Gửi thư cho bạn bè"
 
@@ -1932,7 +1932,7 @@ msgid "Permalink"
 msgstr "Liên kết bền"
 
 #: templates/_sharing_widget.html:3 templates/teams/_context_project.html:60
-#: templates/teams/_context_team.html:114
+#: templates/teams/_context_team.html:116
 msgid "Share"
 msgstr "Chia sẻ"
 
@@ -2030,7 +2030,7 @@ msgstr "Xem"
 msgid "Volunteer"
 msgstr "Tình nguyện viên"
 
-#: templates/base.html:73
+#: templates/base.html:73 templates/index.html:88
 msgid "Pro Services"
 msgstr ""
 
@@ -2065,7 +2065,7 @@ msgid ""
 "Amara is a project of <a href=\"http://participatoryculture.org/\">PCF</a>."
 msgstr "Amara là một dụ án của <a href=\"http://participatoryculture.org/\">PCF</a>."
 
-#: templates/base.html:116 templates/profiles/base.html:12
+#: templates/base.html:116 templates/profiles/base.html:15
 msgid "About"
 msgstr "Thông tin"
 
@@ -2716,61 +2716,115 @@ msgstr ""
 msgid "See our pro services."
 msgstr ""
 
-#: templates/index.html:81
-msgid "For Enterprise"
-msgstr "Dành  cho Doanh nghiệp"
+#: templates/index.html:61
+msgid "Order Captions"
+msgstr ""
 
-#: templates/index.html:82
+#: templates/index.html:63
 msgid ""
-"The largest, most powerful captioning and translation platform in the world."
-msgstr "Thể thức làm thuyết minh và dịch thuật lớn mạnh nhất trên thế giới."
+"Lower costs and higher quality. Order captions and translations from Amara "
+"now, with rapid turnaround."
+msgstr ""
 
-#: templates/index.html:88
+#: templates/index.html:64
+msgid "Learn more."
+msgstr ""
+
+#: templates/index.html:89
+msgid ""
+"See how these companies use Amara to caption and subtitle more effectively."
+msgstr ""
+
+#: templates/index.html:95
 msgid "TED"
 msgstr "TED"
 
-#: templates/index.html:93
+#: templates/index.html:97
+msgid "TED Community"
+msgstr ""
+
+#: templates/index.html:101
 msgid "Mozilla"
 msgstr "Mozilla"
 
-#: templates/index.html:98
+#: templates/index.html:103
+msgid "Mozilla Community"
+msgstr ""
+
+#: templates/index.html:107
 msgid "Netflix"
 msgstr "Netflix"
 
-#: templates/index.html:103
+#: templates/index.html:109
+msgid "Netflix Community"
+msgstr ""
+
+#: templates/index.html:113
 msgid "Coursera"
 msgstr "Coursera"
 
-#: templates/index.html:108
+#: templates/index.html:115
+msgid "Coursera Community"
+msgstr ""
+
+#: templates/index.html:121
+msgid "Twitter"
+msgstr ""
+
+#: templates/index.html:123
+msgid "Twitter Community"
+msgstr ""
+
+#: templates/index.html:127
+msgid "Udacity"
+msgstr ""
+
+#: templates/index.html:129
+msgid "Udacity Community"
+msgstr ""
+
+#: templates/index.html:133
+msgid "Gravitas"
+msgstr ""
+
+#: templates/index.html:135
+msgid "Gravitas Community"
+msgstr ""
+
+#: templates/index.html:139
 msgid "PBS Newshour"
 msgstr "PBS Newshour"
 
-#: templates/index.html:114
+#: templates/index.html:141
+msgid "PBS Newshour Community"
+msgstr ""
+
+#: templates/index.html:146
 msgid "More Popular"
 msgstr "Phổ biến hơn"
 
-#: templates/index.html:115
+#: templates/index.html:147
 msgid "Most Popular Today"
 msgstr "Phổ biến nhất hôm nay"
 
-#: templates/index.html:117
+#: templates/index.html:149
 msgid "Top this month"
 msgstr "Dẫn đầu tháng này"
 
-#: templates/index.html:118
+#: templates/index.html:150
 msgid "Top all-time"
 msgstr "Dẫn đầu mọi thời đại"
 
-#: templates/index.html:125
+#: templates/index.html:157
 msgid "More Featured"
 msgstr "Nổi bật hơn"
 
-#: templates/index.html:126 templates/videos/featured_videos.html:36
+#: templates/index.html:158 templates/videos/featured_videos.html:36
 #: templates/videos/volunteer.html:25 templates/videos/watch.html:25
 msgid "Featured Videos"
 msgstr "Phim nổi bật"
 
-#: templates/index.html:144
+#: templates/index.html:186
 msgid "Awards for Amara"
 msgstr ""
 
@@ -2929,7 +2983,7 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Bạn có chắc rằng bạn muốn xóa hẳn hồ sơ của mình luôn?"
 
 #: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
-#: templates/messages/sent.html:49 templates/teams/tasks.html:454
+#: templates/messages/sent.html:49 templates/teams/tasks.html:457
 msgid "Delete"
 msgstr "Xóa"
 
@@ -2937,8 +2991,8 @@ msgstr "Xóa"
 #: templates/profiles/_select_language_dialog.html:33
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:508 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:378
+#: templates/teams/tasks.html:511 templates/videos/_feedback_form.html:25
+#: templates/videos/subtitle-view.html:372
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
@@ -3271,7 +3325,7 @@ msgid "Submit"
 msgstr "Gửi"
 
 #: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
-#: templates/videos/video-view.html:168
+#: templates/videos/video-view.html:162
 msgid "Activity"
 msgstr "Hoạt động"
 
@@ -3317,7 +3371,7 @@ msgid "No Activity"
 msgstr "Không có hoạt động"
 
 #: templates/profiles/_video_detail.html:8
-#: templates/teams/_context_team.html:95 templates/teams/members-list.html:102
+#: templates/teams/_context_team.html:97 templates/teams/members-list.html:102
 msgid "language"
 msgstr "ngôn ngữ"
 
@@ -3493,15 +3547,23 @@ msgstr ""
 msgid "Contact us"
 msgstr "Liên hệ với chúng tôi"
 
-#: templates/profiles/base.html:30 templates/teams/_subnav_settings.html:17
+#: templates/profiles/base.html:12
+msgid "Send "
+msgstr ""
+
+#: templates/profiles/base.html:12
+msgid " a Message"
+msgstr ""
+
+#: templates/profiles/base.html:33 templates/teams/_subnav_settings.html:17
 msgid "Languages"
 msgstr "Ngôn ngữ"
 
-#: templates/profiles/base.html:51
+#: templates/profiles/base.html:54
 msgid "hasn't selected languages yet."
 msgstr ""
 
-#: templates/profiles/base.html:67
+#: templates/profiles/base.html:70
 msgid "hasn't joined any teams yet."
 msgstr ""
 
@@ -3754,7 +3816,7 @@ msgstr "Tìm phim"
 msgid "Videos In"
 msgstr "Phim trong"
 
-#: templates/search/_search_form.html:28 templates/teams/tasks.html:217
+#: templates/search/_search_form.html:28 templates/teams/tasks.html:220
 msgid "Subtitles into"
 msgstr "Thông tin phụ đề"
 
@@ -3774,18 +3836,6 @@ msgstr[0] "\n              %(number)s ngôn ngữ\n          "
 #: templates/search/_video_item.html:24
 msgid "lines"
 msgstr "dòng"
-
-#: templates/search/_video_item.html:34
-msgid "Plays (this week)"
-msgstr "Xem (tuần này)"
-
-#: templates/search/_video_item.html:35
-msgid "Plays (this month)"
-msgstr "Xem (tháng này)"
-
-#: templates/search/_video_item.html:36
-msgid "Plays (all time)"
-msgstr "Xem (mọi thời đại)"
 
 #: templates/search/search.html:87 templates/search/search.html.py:126
 msgid "Search Videos"
@@ -3864,9 +3914,9 @@ msgstr "TỔNG CỘNG"
 #: templates/statistic/videos_statistic.html:12
 #: templates/teams/_context_project.html:25
 #: templates/teams/_context_team.html:51 templates/teams/tasks.html:139
-#: templates/teams/tasks.html.py:226
+#: templates/teams/tasks.html.py:229
 #: templates/videos/set-original-language.html:13
-#: templates/videos/video-view.html:166
+#: templates/videos/video-view.html:160
 msgid "Video"
 msgstr "Phim"
 
@@ -3939,9 +3989,9 @@ msgstr "Trang Phim"
 
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
-#: templates/teams/_context_team.html:139
-#: templates/videos/subtitle-view.html:140
-#: templates/videos/video-view.html:131
+#: templates/teams/_context_team.html:141
+#: templates/videos/subtitle-view.html:134
+#: templates/videos/video-view.html:125
 msgid "Show all"
 msgstr "Hiện tất cả"
 
@@ -3966,9 +4016,9 @@ msgid "video"
 msgstr "video"
 
 #: templates/teams/_context_team.html:40
-#: templates/teams/_context_team.html:135
-#: templates/videos/subtitle-view.html:140
-#: templates/videos/video-view.html:131
+#: templates/teams/_context_team.html:137
+#: templates/videos/subtitle-view.html:134
+#: templates/videos/video-view.html:125
 msgid "Show less"
 msgstr "Hiện ít hơn"
 
@@ -3976,43 +4026,43 @@ msgstr "Hiện ít hơn"
 msgid "Member"
 msgstr "Thành viên"
 
-#: templates/teams/_context_team.html:91
+#: templates/teams/_context_team.html:93
 msgid "Your role:"
 msgstr ""
 
-#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/_context_team.html:96 templates/teams/_context_team.html:97
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 #: templates/teams/tasks.html:81
 #: unisubs-integration/services/templates/services/translation_request.html:8
 msgid "for"
 msgstr "cho"
 
-#: templates/teams/_context_team.html:94 templates/teams/_context_team.html:95
+#: templates/teams/_context_team.html:96 templates/teams/_context_team.html:97
 #: templates/teams/members-list.html:101 templates/teams/members-list.html:102
 msgid "and"
 msgstr "và"
 
-#: templates/teams/_context_team.html:94 templates/teams/members-list.html:101
+#: templates/teams/_context_team.html:96 templates/teams/members-list.html:101
 msgid "project"
 msgstr "dự án"
 
-#: templates/teams/_context_team.html:100
+#: templates/teams/_context_team.html:102
 msgid "Your tasks"
 msgstr "Công việc của bạn"
 
-#: templates/teams/_context_team.html:104
+#: templates/teams/_context_team.html:106
 msgid "All available tasks"
 msgstr "Toàn bộ các công việc hiện có"
 
-#: templates/teams/_context_team.html:108 templates/teams/teams-list.html:82
+#: templates/teams/_context_team.html:110 templates/teams/teams-list.html:82
 msgid "Do you really wish to leave this team?"
 msgstr "Bạn thực sự muốn rời khỏi nhóm này?"
 
-#: templates/teams/_context_team.html:108
+#: templates/teams/_context_team.html:110
 msgid "Leave team"
 msgstr "Rời khỏi nhóm"
 
-#: templates/teams/_context_team.html:145
+#: templates/teams/_context_team.html:147
 msgid "Want to create your own subtitling team? Contact "
 msgstr "Muốn tạo nhóm làm phụ đề riêng của bạn? Liên hệ"
 
@@ -4077,12 +4127,12 @@ msgid "to join our team"
 msgstr ""
 
 #: templates/teams/_perform_task_link.html:5
-#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:307
+#: templates/teams/_perform_task_link.html:29 templates/teams/tasks.html:310
 msgid "Resume"
 msgstr "Trở lại"
 
 #: templates/teams/_perform_task_link.html:7
-#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:309
+#: templates/teams/_perform_task_link.html:31 templates/teams/tasks.html:312
 msgid "Start now"
 msgstr "Bắt đầu ngay bây giờ"
 
@@ -4297,7 +4347,7 @@ msgstr "Cần ngôn ngữ gì?"
 msgid "Who should do it?"
 msgstr "Ai sẽ thực hiện?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:512
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:515
 msgid "Begin typing to search"
 msgstr "Bắt đầu nhập vào để tìm kiếm"
 
@@ -4476,7 +4526,7 @@ msgid "Filter and Sort"
 msgstr "Lọc và Sắp xếp"
 
 #: templates/teams/members-list.html:53
-#: templates/videos/subtitle-view.html:190
+#: templates/videos/subtitle-view.html:184
 msgid "Showing"
 msgstr "Đang xem"
 
@@ -4766,7 +4816,7 @@ msgstr "Nhóm này vẫn chưa có dự án nào"
 msgid "Add Task"
 msgstr "Thêm Công việc"
 
-#: templates/teams/tasks.html:62 templates/teams/tasks.html.py:207
+#: templates/teams/tasks.html:62 templates/teams/tasks.html.py:210
 msgid "Transcribe"
 msgstr "Chuyển thể"
 
@@ -4795,7 +4845,7 @@ msgstr "được giao cho"
 msgid "no one"
 msgstr "không ai cả"
 
-#: templates/teams/tasks.html:103 templates/teams/tasks.html.py:271
+#: templates/teams/tasks.html:103 templates/teams/tasks.html.py:274
 msgid "me"
 msgstr "tôi"
 
@@ -4869,141 +4919,141 @@ msgstr "Hãy thử thay đổi lựa chọn của bạn bằng cách sử dụng
 msgid "You don't have permission to perform this task."
 msgstr "Bạn không được phép thực hiện công việc này."
 
-#: templates/teams/tasks.html:222 templates/teams/tasks.html.py:238
-#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:152
-#: templates/videos/subtitle-view.html:186
+#: templates/teams/tasks.html:225 templates/teams/tasks.html.py:241
+#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:146
+#: templates/videos/subtitle-view.html:180
 msgid "Subtitles"
 msgstr "Phụ đề"
 
-#: templates/teams/tasks.html:239
+#: templates/teams/tasks.html:242
 msgid "latest draft"
 msgstr "bản thảo mới đây nhất"
 
-#: templates/teams/tasks.html:242
+#: templates/teams/tasks.html:245
 msgid "transcribed"
 msgstr "đã được chuyển thể"
 
-#: templates/teams/tasks.html:244 templates/videos/subtitle-view.html:48
+#: templates/teams/tasks.html:247 templates/videos/subtitle-view.html:48
 msgid "translated"
 msgstr "đã được dịch"
 
-#: templates/teams/tasks.html:252
+#: templates/teams/tasks.html:255
 msgid "reviewed"
 msgstr "đã được đánh giá"
 
-#: templates/teams/tasks.html:254
+#: templates/teams/tasks.html:257
 msgid "and edited"
 msgstr "và được thay đổi"
 
-#: templates/teams/tasks.html:256 templates/videos/subtitle-view.html:194
-#: templates/videos/subtitle-view.html:310
+#: templates/teams/tasks.html:259 templates/videos/subtitle-view.html:188
+#: templates/videos/subtitle-view.html:304
 msgid "by"
 msgstr "bởi"
 
-#: templates/teams/tasks.html:269
+#: templates/teams/tasks.html:272
 msgid "Assigned to"
 msgstr "Được giao cho"
 
-#: templates/teams/tasks.html:278
+#: templates/teams/tasks.html:281
 msgid "Unassigned"
 msgstr "Chưa được phân công"
 
-#: templates/teams/tasks.html:293
+#: templates/teams/tasks.html:296
 msgid "Perform Task"
 msgstr "Thực hiện Công việc"
 
-#: templates/teams/tasks.html:302
+#: templates/teams/tasks.html:305
 msgid "You have reached the maximum number of tasks."
 msgstr "Bạn đã đạt tới số công việc tối đa"
 
-#: templates/teams/tasks.html:321
+#: templates/teams/tasks.html:324
 msgid "Download draft"
 msgstr "Tải bản thảo về"
 
-#: templates/teams/tasks.html:337
+#: templates/teams/tasks.html:340
 msgid "Upload a draft"
 msgstr "Tải bản thảo lên"
 
-#: templates/teams/tasks.html:343 templates/videos/_upload_subtitles.html:32
+#: templates/teams/tasks.html:346 templates/videos/_upload_subtitles.html:32
 msgid "Video Language"
 msgstr "Ngôn ngữ Phim"
 
-#: templates/teams/tasks.html:347 templates/videos/_upload_subtitles.html:37
+#: templates/teams/tasks.html:350 templates/videos/_upload_subtitles.html:37
 msgid ""
 "Please double check the primary spoken language. This step cannot be undone."
 msgstr "Xin hãy kiểm tra hai lần ngôn ngữ chính mà bạn nói. Bước này không thể không làm."
 
-#: templates/teams/tasks.html:354
+#: templates/teams/tasks.html:357
 msgid "Translate from"
 msgstr "Dịch từ"
 
-#: templates/teams/tasks.html:363
+#: templates/teams/tasks.html:366
 msgid "Important:"
 msgstr "Quan trọng:"
 
-#: templates/teams/tasks.html:363
+#: templates/teams/tasks.html:366
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr "Tải bản thảo lên sẽ không hoàn tất công việc. Sau khi tải lên, chọn \"Trở lại\" từ thanh kéo thả \"Thực hiện Công việc\" để xác minh thời gian, tiêu đề phim và thông tin mô tả phim trong trình biên tập trực tiếp và nộp bản cuối cùng."
 
-#: templates/teams/tasks.html:368 templates/videos/_upload_subtitles.html:27
-#: templates/videos/video-view.html:109
+#: templates/teams/tasks.html:371 templates/videos/_upload_subtitles.html:27
+#: templates/videos/video-view.html:103
 msgid "Language"
 msgstr "Ngôn ngữ"
 
-#: templates/teams/tasks.html:376
+#: templates/teams/tasks.html:379
 msgid "File:"
 msgstr "Tệp:"
 
-#: templates/teams/tasks.html:382
+#: templates/teams/tasks.html:385
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
 msgstr ""
 
-#: templates/teams/tasks.html:395
+#: templates/teams/tasks.html:398
 msgid "Download a draft"
 msgstr "Tải bản thảo về"
 
-#: templates/teams/tasks.html:400
+#: templates/teams/tasks.html:403
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Tải một bản thảo của các phụ đề này về để bạn có thể làm việc."
 
-#: templates/teams/tasks.html:425
+#: templates/teams/tasks.html:428
 msgid "Decline"
 msgstr "Khước từ"
 
-#: templates/teams/tasks.html:445
+#: templates/teams/tasks.html:448
 msgid "Reassign"
 msgstr "Phân công lại"
 
-#: templates/teams/tasks.html:447
+#: templates/teams/tasks.html:450
 msgid "Assign"
 msgstr "Phân công"
 
-#: templates/teams/tasks.html:463
+#: templates/teams/tasks.html:466
 msgid "Delete task"
 msgstr "Xóa công việc"
 
-#: templates/teams/tasks.html:469
+#: templates/teams/tasks.html:472
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "Bạn muốn làm gì với những phụ đề cho công việc này?"
 
-#: templates/teams/tasks.html:472
+#: templates/teams/tasks.html:475
 msgid "Publish these subtitles immediately"
 msgstr "Đăng tải các phụ đề này ngay lập tức"
 
-#: templates/teams/tasks.html:476
+#: templates/teams/tasks.html:479
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr "Xóa vĩnh viễn các phụ đề này (bỏ qua toàn bộ các bản thảo kể từ phiên bản được đăng tải trước đó)"
 
-#: templates/teams/tasks.html:515
+#: templates/teams/tasks.html:518
 msgid "Assign to User"
 msgstr "Giao cho Người dùng"
 
-#: templates/teams/tasks.html:525
+#: templates/teams/tasks.html:528
 msgid "Sorry, no tasks here."
 msgstr "Rất tiếc, không có công việc nào ở đây."
 
@@ -5011,7 +5061,7 @@ msgstr "Rất tiếc, không có công việc nào ở đây."
 msgid "Edit team video"
 msgstr "Thay đổi phim của nhóm"
 
-#: templates/teams/team_video.html:27 templates/videos/video-view.html:239
+#: templates/teams/team_video.html:27 templates/videos/video-view.html:233
 msgid "Edit video"
 msgstr "Sửa phim"
 
@@ -5178,7 +5228,7 @@ msgid "Delete the video entirely."
 msgstr "Xóa hoàn toàn thước phim."
 
 #: templates/videos/_diffing-subtitle.html:17
-#: templates/videos/subtitle-view.html:226
+#: templates/videos/subtitle-view.html:220
 msgid "Not Synced"
 msgstr "Chưa đồng bộ"
 
@@ -5383,8 +5433,8 @@ msgstr "Tải tệp TXT lên"
 msgid "Login to upload subtitles"
 msgstr "Đăng nhập để tải phụ đề lên"
 
-#: templates/videos/_team_list.html:5 templates/videos/video-view.html:201
-#: templates/videos/video-view.html:207
+#: templates/videos/_team_list.html:5 templates/videos/video-view.html:195
+#: templates/videos/video-view.html:201
 msgid "Collaborate"
 msgstr "Cộng tác"
 
@@ -5392,7 +5442,7 @@ msgstr "Cộng tác"
 msgid "View team:"
 msgstr "Xem nhóm:"
 
-#: templates/videos/_team_list.html:19 templates/videos/video-view.html:208
+#: templates/videos/_team_list.html:19 templates/videos/video-view.html:202
 msgid "Translation Project"
 msgstr "Dự án Dịch thuật"
 
@@ -5437,16 +5487,11 @@ msgstr "Nếu bạn tin rằng tệp phụ đề của mình hoàn toàn tương
 msgid "Processing, please be patient..."
 msgstr "Đang xử lí, xin hãy kiên nhẫn..."
 
-#: templates/videos/_video.html:23
-msgid "view"
-msgid_plural "views"
-msgstr[0] "lượt xem"
-
-#: templates/videos/_video.html:26
+#: templates/videos/_video.html:22
 msgid "Added"
 msgstr "Đã thêm vào"
 
-#: templates/videos/_video.html:33
+#: templates/videos/_video.html:29
 #, python-format
 msgid ""
 "\n"
@@ -5621,12 +5666,12 @@ msgid "Roll back to version"
 msgstr "Thu hồi về phiên bản"
 
 #: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
-#: templates/videos/subtitle-view.html:202
+#: templates/videos/subtitle-view.html:196
 msgid "Title:"
 msgstr "Tiêu đề:"
 
 #: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
-#: templates/videos/subtitle-view.html:206
+#: templates/videos/subtitle-view.html:200
 msgid "Description:"
 msgstr "Mô tả:"
 
@@ -5897,70 +5942,65 @@ msgid "Select two revisions to compare, please"
 msgstr "Lựa chọn hai phiên bản để so sánh, xin hãy"
 
 #: templates/videos/subtitle-view.html:101 templates/videos/video-view.html:91
-msgid "View"
-msgstr "Xem"
-
-#: templates/videos/subtitle-view.html:107 templates/videos/video-view.html:97
 msgid "Follower"
 msgstr "Người theo dõi"
 
-#: templates/videos/subtitle-view.html:113
-#: templates/videos/video-view.html:103
+#: templates/videos/subtitle-view.html:107 templates/videos/video-view.html:97
 msgid "Comment"
 msgstr "Bình luận"
 
-#: templates/videos/subtitle-view.html:119
+#: templates/videos/subtitle-view.html:113
 msgid "Line"
 msgstr "Dòng"
 
-#: templates/videos/subtitle-view.html:129
-#: templates/videos/video-view.html:119
+#: templates/videos/subtitle-view.html:123
+#: templates/videos/video-view.html:113
 msgid "View Subtitles"
 msgstr "Xem Phụ đề"
 
-#: templates/videos/subtitle-view.html:153
-#: templates/videos/subtitle-view.html:277
-#: templates/videos/video-view.html:167 templates/videos/video-view.html:219
+#: templates/videos/subtitle-view.html:147
+#: templates/videos/subtitle-view.html:271
+#: templates/videos/video-view.html:161 templates/videos/video-view.html:213
 msgid "Comments"
 msgstr "Bình Luận"
 
-#: templates/videos/subtitle-view.html:154
+#: templates/videos/subtitle-view.html:148
 msgid "Revisions"
 msgstr "Bản hiệu đính"
 
-#: templates/videos/subtitle-view.html:159
-#: templates/videos/subtitle-view.html:379
+#: templates/videos/subtitle-view.html:153
+#: templates/videos/subtitle-view.html:373
 msgid "Unpublish"
 msgstr "Hủy đăng tải"
 
-#: templates/videos/subtitle-view.html:162
-#: templates/videos/subtitle-view.html:394
+#: templates/videos/subtitle-view.html:156
+#: templates/videos/subtitle-view.html:388
 msgid "Edit Subtitles"
 msgstr "Sửa phụ đề"
 
-#: templates/videos/subtitle-view.html:169
+#: templates/videos/subtitle-view.html:163
 msgid "Download"
 msgstr "Tải về"
 
-#: templates/videos/subtitle-view.html:184
+#: templates/videos/subtitle-view.html:178
 msgid "Draft only"
 msgstr "Chỉ những bản thảo thôi"
 
-#: templates/videos/subtitle-view.html:187
+#: templates/videos/subtitle-view.html:181
 msgid "translated from"
 msgstr "được dịch từ"
 
-#: templates/videos/subtitle-view.html:191
-#: templates/videos/subtitle-view.html:300
-#: templates/videos/subtitle-view.html:302
+#: templates/videos/subtitle-view.html:185
+#: templates/videos/subtitle-view.html:294
+#: templates/videos/subtitle-view.html:296
 msgid "Revision"
 msgstr "Bản hiệu đính"
 
-#: templates/videos/subtitle-view.html:192
+#: templates/videos/subtitle-view.html:186
 msgid "created"
 msgstr "được tạo"
 
-#: templates/videos/subtitle-view.html:238
+#: templates/videos/subtitle-view.html:232
 msgid ""
 "\n"
 "                            The most recent revision for this language is blank, but there are older\n"
@@ -5968,82 +6008,82 @@ msgid ""
 "                            "
 msgstr "\n                            Phiên bản mới đây nhất cho ngôn ngữ này còn bỏ trống, nhưng lại có các phiên bản cũ hơn\n                            có chứa phụ đề.\n                            "
 
-#: templates/videos/subtitle-view.html:242
+#: templates/videos/subtitle-view.html:236
 msgid "View revision history"
 msgstr "Xem lịch sử hiệu đính"
 
-#: templates/videos/subtitle-view.html:247
+#: templates/videos/subtitle-view.html:241
 msgid "These subtitles are in progress."
 msgstr "Những phụ đề này đang trong quá trình tiếp diễn."
 
-#: templates/videos/subtitle-view.html:248
+#: templates/videos/subtitle-view.html:242
 msgid "Make more?"
 msgstr "Làm nhiều hơn?"
 
-#: templates/videos/subtitle-view.html:250
+#: templates/videos/subtitle-view.html:244
 msgid "No subtitles available yet."
 msgstr "Vẫn chưa có phụ đề nào cả."
 
-#: templates/videos/subtitle-view.html:251
+#: templates/videos/subtitle-view.html:245
 msgid "Make some!"
 msgstr "Làm vài phát!"
 
-#: templates/videos/subtitle-view.html:259
+#: templates/videos/subtitle-view.html:253
 msgid ""
 "\n"
 "                            This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                        "
 msgstr "\n                            Ngôn ngữ này chứa các phụ đề vẫn đang chờ được giám sát.  Hãy kiểm tra lại sau.\n                        "
 
-#: templates/videos/subtitle-view.html:265
+#: templates/videos/subtitle-view.html:259
 msgid ""
 "\n"
 "                            No subtitles have been added for this language yet.\n"
 "                        "
 msgstr "\n                            Chưa có phụ đề nào được thêm vào cho ngôn ngữ này.\n                        "
 
-#: templates/videos/subtitle-view.html:275
-#: templates/videos/video-view.html:217
+#: templates/videos/subtitle-view.html:269
+#: templates/videos/video-view.html:211
 msgid "Leave a comment"
 msgstr "Để lại lời bình"
 
-#: templates/videos/subtitle-view.html:284
+#: templates/videos/subtitle-view.html:278
 msgid "Compare Revisions"
 msgstr "So sánh Hiệu đính"
 
-#: templates/videos/subtitle-view.html:316
+#: templates/videos/subtitle-view.html:310
 msgid "Rollback to version #"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:325
+#: templates/videos/subtitle-view.html:319
 msgid "Timing"
 msgstr "Thời gian"
 
-#: templates/videos/subtitle-view.html:326
+#: templates/videos/subtitle-view.html:320
 msgid "Text"
 msgstr "Kí tự"
 
-#: templates/videos/subtitle-view.html:332
+#: templates/videos/subtitle-view.html:326
 msgid "No subtitles for this language."
 msgstr "Không có phụ đề cho ngôn ngữ này."
 
-#: templates/videos/subtitle-view.html:341
+#: templates/videos/subtitle-view.html:335
 msgid "Roll back to this version"
 msgstr "Thu hồi về phiên bản này"
 
-#: templates/videos/subtitle-view.html:354
+#: templates/videos/subtitle-view.html:348
 msgid "Unpublish subtitles"
 msgstr "Ngưng đăng tải phụ đề"
 
-#: templates/videos/subtitle-view.html:362
+#: templates/videos/subtitle-view.html:356
 msgid "This version only"
 msgstr "Chỉ phiên bản này"
 
-#: templates/videos/subtitle-view.html:366
+#: templates/videos/subtitle-view.html:360
 msgid "This entire language and all dependent languages"
 msgstr "Toàn bộ ngôn ngữ này và các ngôn ngữ lệ thuộc khác"
 
-#: templates/videos/subtitle-view.html:368
+#: templates/videos/subtitle-view.html:362
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."
@@ -6114,61 +6154,61 @@ msgid ""
 "for your site. To add atranslation, click the button below."
 msgstr "Phụ đề đã được lưu! Bạn có thể chia sẻ phim với bạn bè, hoặc lấy mã nhúng cho trang của bạn. Để thêm một bản dịch vào, nhấn nút bên dưới."
 
-#: templates/videos/video-view.html:143
+#: templates/videos/video-view.html:137
 msgid "No subtitles yet."
 msgstr "Vẫn chưa có phụ đề nào."
 
-#: templates/videos/video-view.html:143
+#: templates/videos/video-view.html:137
 msgid "View tasks for this video."
 msgstr "Xem các công việc cho thước phim này."
 
-#: templates/videos/video-view.html:145
+#: templates/videos/video-view.html:139
 msgid "This video doesn't have any subtitles or tasks yet"
 msgstr "Thước phim này vẫn chưa có bất cứ phụ đề hay công việc nào"
 
-#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
+#: templates/videos/video-view.html:142 templates/videos/video-view.html:145
 msgid "Be the first to "
 msgstr "Hãy là người đầu tiên"
 
-#: templates/videos/video-view.html:148 templates/videos/video-view.html:151
+#: templates/videos/video-view.html:142 templates/videos/video-view.html:145
 msgid "create subtitles"
 msgstr "tạo phụ đề"
 
-#: templates/videos/video-view.html:156 templates/videos/video-view.html:184
+#: templates/videos/video-view.html:150 templates/videos/video-view.html:178
 msgid "This video doesn't have any subtitles yet"
 msgstr "Thước phim này vẫn chưa có phụ đề nào"
 
-#: templates/videos/video-view.html:169
+#: templates/videos/video-view.html:163
 msgid "URLs"
 msgstr "Đường dẫn URL"
 
-#: templates/videos/video-view.html:179
+#: templates/videos/video-view.html:173
 msgid "Contribute"
 msgstr "Đóng góp"
 
-#: templates/videos/video-view.html:184
+#: templates/videos/video-view.html:178
 msgid "Create subtitles now"
 msgstr "Tạo phụ đề ngay bây giờ"
 
-#: templates/videos/video-view.html:188
+#: templates/videos/video-view.html:182
 msgid "Don't see one of your languages?"
 msgstr ""
 
-#: templates/videos/video-view.html:188
+#: templates/videos/video-view.html:182
 msgid "Create a new translation"
 msgstr ""
 
-#: templates/videos/video-view.html:194
+#: templates/videos/video-view.html:188
 msgid ""
 "Subtitles for this video are moderated. If it belongs to a team, try joining"
 " the team to contribute."
 msgstr "Phụ đề cho thước phim này được giám sát. Nếu nó thuộc một nhóm nào đó, hãy thử gia nhập nhóm để đóng góp."
 
-#: templates/videos/video-view.html:208
+#: templates/videos/video-view.html:202
 msgid "This video belongs to the"
 msgstr "Thước phim này thuộc về"
 
-#: templates/videos/video-view.html:224
+#: templates/videos/video-view.html:218
 msgid "View all activity"
 msgstr "Xem toàn bộ hoạt động"
 
@@ -6324,9 +6364,9 @@ msgstr "Lỗi bên trong"
 #: utils/validators.py:13
 #, python-format
 msgid ""
-"Please keep filesize under %(required_size)s. Current filesize "
+"Please keep file size under %(required_size)s. Current file size "
 "%(current_size)s"
-msgstr "Xin hãy giữ cho kích thước tập tin dưới %(required_size)s. Kích thước tập tin hiện tại %(current_size)s"
+msgstr ""
 
 #: utils/forms/__init__.py:75
 msgid "Enter valid e-mail addresses separated by commas."

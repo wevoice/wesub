@@ -36,11 +36,12 @@
         };
 
         // If this is a task, set up the proper panels.
-        if (SubtitleStorage.getCachedData().task_id) {
+        if (SubtitleStorage.getCachedData().task_needs_pane) {
             $scope.modulesOpen = {
                 notes: true,
                 pane: true
             };
+
             $scope.modulesEnabled = {
                 approval: true,
                 notes: true,

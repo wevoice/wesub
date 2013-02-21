@@ -191,6 +191,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
 
     if task:
         editor_data['task_id'] = task.id
+        editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
         editor_data['team_slug'] = task.team.slug
 
     return render_to_response("subtitles/subtitle-editor.html", {
