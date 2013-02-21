@@ -40,6 +40,7 @@ from utils.translation import SUPPORTED_LANGUAGE_CODES
 from utils.metrics import Meter, Occurrence
 
 from libs.unilangs.unilangs import LanguageCode
+import httplib
 
 
 logger = logging.getLogger("youtube")
@@ -60,7 +61,141 @@ class TooManyRecentCallsException(Exception):
 
     def __init__(self, *args, **kwargs):
         super(TooManyRecentCallsException, self).__init__(*args, **kwargs)
+        logger.info('too_many_calls', extra={
+            'exception_args': args,
+            'exception_kwargs': kwargs})
         Occurrence('youtube.api_too_many_calls').mark()
+
+
+from atom.http_core import Uri
+import atom
+
+def monkeypatch_class(name, bases, namespace):
+    assert len(bases) == 1, "Exactly one base class required"
+    base = bases[0]
+    for name, value in namespace.iteritems():
+        if name != "__metaclass__":
+            setattr(base, name, value)
+    return base
+
+class HttpClient(atom.http_core.HttpClient):
+    __metaclass__ = monkeypatch_class
+    debug = None
+
+    def Request(self, http_request):
+        return self._http_request(http_request.method, http_request.uri,
+                              http_request.headers, http_request._body_parts)
+
+    def _get_connection(self, uri, headers=None):
+        """Opens a socket connection to the server to set up an HTTP request.
+
+        Args:
+        uri: The full URL for the request as a Uri object.
+        headers: A dict of string pairs containing the HTTP headers for the
+            request.
+        """
+        connection = None
+        if uri.scheme == 'https':
+            if not uri.port:
+                connection = httplib.HTTPSConnection(uri.host)
+            else:
+                connection = httplib.HTTPSConnection(uri.host, int(uri.port))
+        else:
+            if not uri.port:
+                connection = httplib.HTTPConnection(uri.host)
+            else:
+                connection = httplib.HTTPConnection(uri.host, int(uri.port))
+        return connection
+
+    def _http_request(self, method, uri, headers=None, body_parts=None):
+        """Makes an HTTP request using httplib.
+
+        Args:
+        method: str example: 'GET', 'POST', 'PUT', 'DELETE', etc.
+        uri: str or atom.http_core.Uri
+        headers: dict of strings mapping to strings which will be sent as HTTP
+                headers in the request.
+        body_parts: list of strings, objects with a read method, or objects
+                    which can be converted to strings using str. Each of these
+                    will be sent in order as the body of the HTTP request.
+        """
+
+        extra = {
+            'youtube_headers': headers,
+            'youtube_uri': {
+                'host': uri.host,
+                'port': uri.port,
+                'scheme': uri.scheme,
+                'path': uri.path,
+                'query': uri.query
+            },
+            'youtube_method': method,
+            'youtube_body_parts': body_parts
+        }
+        logger.info('youtube api request', extra=extra)
+
+        if isinstance(uri, (str, unicode)):
+            uri = Uri.parse_uri(uri)
+
+        connection = self._get_connection(uri, headers=headers)
+
+        if self.debug:
+            connection.debuglevel = 1
+
+        if connection.host != uri.host:
+            connection.putrequest(method, str(uri))
+        else:
+            connection.putrequest(method, uri._get_relative_path())
+
+        # Overcome a bug in Python 2.4 and 2.5
+        # httplib.HTTPConnection.putrequest adding
+        # HTTP request header 'Host: www.google.com:443' instead of
+        # 'Host: www.google.com', and thus resulting the error message
+        # 'Token invalid - AuthSub token has wrong scope' in the HTTP response.
+        if (uri.scheme == 'https' and int(uri.port or 443) == 443 and
+            hasattr(connection, '_buffer') and
+            isinstance(connection._buffer, list)):
+
+            header_line = 'Host: %s:443' % uri.host
+            replacement_header_line = 'Host: %s' % uri.host
+            try:
+                connection._buffer[connection._buffer.index(header_line)] = (
+                    replacement_header_line)
+            except ValueError:  # header_line missing from connection._buffer
+                pass
+
+        # Send the HTTP headers.
+        for header_name, value in headers.iteritems():
+            connection.putheader(header_name, value)
+        connection.endheaders()
+
+        # If there is data, send it in the request.
+        if body_parts and filter(lambda x: x != '', body_parts):
+            for part in body_parts:
+                _send_data_part(part, connection)
+
+        # Return the HTTP Response from the server.
+        return connection.getresponse()
+
+
+def _send_data_part(data, connection):
+    if isinstance(data, (str, unicode)):
+        # I might want to just allow str, not unicode.
+        connection.send(data)
+        return
+    # Check to see if data is a file-like object that has a read method.
+    elif hasattr(data, 'read'):
+        # Read the file and send it a chunk at a time.
+        while 1:
+            binarydata = data.read(100000)
+            if binarydata == '': break
+            connection.send(binarydata)
+        return
+    else:
+        # The data object was not a file.
+        # Try to convert to a string and send the data.
+        connection.send(str(data))
+        return
 
 
 def get_youtube_service():
@@ -81,7 +216,18 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
 
     yt_lc = lang.get('lang_code')
-    lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+
+    try:
+        lc  = LanguageCode(yt_lc, "youtube").encode("unisubs")
+    except KeyError:
+        logger.warn("Youtube import did not find language code", extra={
+            "data":{
+                "language_code": yt_lc,
+                "youtube_id": youtube_id,
+            }
+        })
+        return
+
 
     if not lc in SUPPORTED_LANGUAGE_CODES:
         logger.warn("Youtube import did not find language code", extra={
@@ -146,8 +292,15 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
         subtitle.version = version
         subtitle.subtitle_id = int(random.random()*10e12)
         subtitle.subtitle_order = i+1
+
+        try:
+            assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+        except AssertionError:
+            # Don't bother saving the subtitle if it's not synced
+            continue
+
         subtitle.save()
-        assert subtitle.start_time or subtitle.end_time, item['subtitle_text']
+
     version.finished = True
     version.save()
 
@@ -226,7 +379,9 @@ class YoutubeVideoType(VideoType):
 
     # changing this will cause havock, let's talks about this first
     URL_TEMPLATE = 'http://www.youtube.com/watch?v=%s'
-    
+
+    CAN_IMPORT_SUBTITLES = True
+
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_video_id(self.url)
@@ -260,10 +415,12 @@ class YoutubeVideoType(VideoType):
     def create_kwars(self):
         return {'videoid': self.video_id}
 
-    def set_values(self, video_obj):
-        video_obj.title = self.entry.media.title.text or ''
+    def set_values(self, video_obj, fetch_subs_async=True):
+        video_obj.title =  self.entry.media.title.text or ''
         if self.entry.media.description:
             video_obj.description = self.entry.media.description.text or ''
+        else:
+            video_obj.description = u''
         if self.entry.media.duration:
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
@@ -276,7 +433,7 @@ class YoutubeVideoType(VideoType):
         Meter('youtube.video_imported').inc()
 
         try:
-            self.get_subtitles(video_obj)
+            self.get_subtitles(video_obj, async=fetch_subs_async)
         except :
             logger.exception("Error getting subs from youtube:" )
 
@@ -346,16 +503,22 @@ class YoutubeVideoType(VideoType):
 
         return output
 
-    def get_subtitles(self, video_obj):
+    def get_subtitles(self, video_obj, async=True):
         langs = self.get_subtitled_languages()
 
+        if async:
+            func = save_subtitles_for_lang.delay
+        else:
+            func = save_subtitles_for_lang.run
         for item in langs:
-            save_subtitles_for_lang.delay(item, video_obj.pk, self.video_id)
+            func(item, video_obj.pk, self.video_id)
 
     def _get_bridge(self, third_party_account):
         # Because somehow Django's ORM is case insensitive on CharFields.
-        is_always = third_party_account.full_name.lower() == \
-                YOUTUBE_ALWAYS_PUSH_USERNAME.lower()
+        is_always = (third_party_account.full_name.lower() == 
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower() or
+                     third_party_account.username.lower() ==
+                        YOUTUBE_ALWAYS_PUSH_USERNAME.lower())
 
         return YouTubeApiBridge(third_party_account.oauth_access_token,
             third_party_account.oauth_refresh_token, self.videoid, is_always)
@@ -412,7 +575,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             return super(YouTubeApiBridge, self).request(*args, **kwargs)
         except gdata.client.RequestError, e:
             if 'too_many_recent_calls' in str(e):
-                raise TooManyRecentCallsException
+                raise TooManyRecentCallsException(e.headers, e.reason,
+                        e.status, e.body)
             else:
                 raise e
 
@@ -430,7 +594,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         }
 
         r = requests.post(url, data=data)
-        self.access_token = r.json.get('access_token')
+        self.access_token = r.json and r.json.get('access_token')
 
     def _get_captions_info(self):
         """
@@ -523,11 +687,17 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         If the existing description starts with the credit text, we just
         return.
         """
+        from accountlinker.models import add_amara_description_credit, check_authorization
+        from apps.videos.templatetags.videos_tags import shortlink_for_video
+
         if not should_add_credit(video=video):
             return False
 
-        from accountlinker.models import add_amara_description_credit
-        from apps.videos.templatetags.videos_tags import shortlink_for_video
+        is_authorized, _ = check_authorization(video)
+
+        if not is_authorized:
+            return False
+
         uri = self.upload_uri_base % self.youtube_video_id
 
         entry = self.GetVideoEntry(uri=uri)
@@ -578,7 +748,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         r = requests.put(uri, data=entry, headers=headers)
 
         if r.status_code == 403 and 'too_many_recent_calls' in r.content:
-            raise TooManyRecentCallsException
+            raise TooManyRecentCallsException(r.headers, r.raw)
 
         return r.status_code
 

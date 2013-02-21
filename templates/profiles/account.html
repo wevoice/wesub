@@ -25,7 +25,7 @@
             </fieldset>
             <div class="grid_8 alpha third-party">
                 <fieldset>
-                    <h3>{% trans "YouTube Account" %}</h3>
+                    <h3>{% trans "YouTube Sync" %}</h3>
                     <div class="callout">
                         {% if third_party %}
                             {% for account in third_party  %}
@@ -155,7 +155,7 @@
         <div class="modal" id="youtube-modal">
             <div class="modal-header">
                 <a href="#" class="close">x</a>
-                <h3>{% trans 'Enable Crowd Subtitles on your YouTube Channel (beta)' %}</h3>
+                <h3>{% trans 'Enable Crowd Subtitles on your Personal YouTube Channel (beta)' %}</h3>
             </div>
 
                 <form method="get" action="{% url profiles:add-third-party %}">
@@ -200,11 +200,10 @@
 
                             <p><a href="http://support.universalsubtitles.org/solution/articles/40227-syncing-to-youtube" target="_blank">{% trans "Learn more" %}</a>{% trans " about Crowd Subtitles and YouTube" %}</p>
 
-                            <h5>{% trans "Step 1: Create/Confirm your YouTube Channel" %}</h5>
-                            <p><a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank" class="btn">{% trans "Enable Channel" %}</a> (opens in a new window)</p>
-
-                            <h5>{% trans "Step 2: Authorize" %}</h5>
+                            <h5>{% trans "Ready to Enable Crowd Subtitles?" %}</h5>
                             <input type="submit" class="btn btn-primary" value="{% trans 'Link accounts' %}" />
+
+                            <p class="notation">If you don't yet have a YouTube channel you should <a href="https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel" target="_blank">{% trans "create one now" %}</a> (opens in a new window)</p>
                         </fieldset>
                         <p>
                             {% trans "Organizations/companies: interested in YouTube sync and crowd subtitling? " %}
