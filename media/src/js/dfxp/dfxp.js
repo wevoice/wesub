@@ -484,14 +484,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof endTime !== 'undefined') {
-            if (parseFloat(endTime) || endTime === 0) {
+            if (parseInt(endTime) || endTime === 0) {
                 $subtitle.attr('end', endTime);
             } else {
                 $subtitle.attr('end', '');
             }
         }
 
-        var val =  parseFloat($subtitle.attr('end')) ;
+        var val =  parseInt($subtitle.attr('end')) ;
 
         return isNaN(val) ? -1 : val;
     };
@@ -790,7 +790,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof originalEndTime !== 'undefined') {
-            if (parseFloat(originalEndTime)) {
+            if (parseInt(originalEndTime)) {
                 $subtitle.attr('originalend', originalEndTime);
             } else {
                 $subtitle.attr('originalend', '');
@@ -809,7 +809,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         var $subtitle = this.getSubtitle(indexOrElement);
 
         if (typeof originalStartTime !== 'undefined') {
-            if (parseFloat(originalStartTime)) {
+            if (parseInt(originalStartTime)) {
                 $subtitle.attr('originalbegin', originalStartTime);
             } else {
                 $subtitle.attr('originalbegin', '');
@@ -981,14 +981,15 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof startTime !== 'undefined') {
-            if (parseFloat(startTime) || startTime === 0) {
+            console.log('settings start time', startTime)
+            if (parseInt(startTime) || startTime === 0) {
                 $subtitle.attr('begin', startTime);
             } else {
                 $subtitle.attr('begin', '');
             }
         }
 
-        var val =  parseFloat($subtitle.attr('begin')) ;
+        var val =  parseInt($subtitle.attr('begin')) ;
 
         return isNaN(val) ? -1 : val;
     };
