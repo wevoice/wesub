@@ -157,8 +157,9 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
-    if (goog.isDefAndNotNull(this.x['startTime'](this.node))) {
-        return this.x['startTime'](this.node);
+    var val = this.x['startTime'](this.node);
+    if (goog.isDefAndNotNull(val)) {
+        return val;
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -209,8 +210,9 @@ unisubs.subtitle.EditableCaption.prototype.resetSub = function() {
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {
-    if (goog.isDefAndNotNull(this.x['endTime'](this.node))) {
-        return this.x['endTime'](this.node);
+    var val = this.x['endTime'](this.node);
+    if (goog.isDefAndNotNull(val)) {
+        return val;
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
