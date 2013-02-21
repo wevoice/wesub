@@ -348,9 +348,10 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 user = UserFactory.create()
                 ).user
 
-        user_langs = ['en', 'ru', 'pt-br']
+        user_langs = ['en', 'ru', 'de', 'sv', 'pt-br']
         for lang in user_langs:
             UserLangFactory(user=cls.contributor, language=lang)
+            UserLangFactory(user=cls.manager, language=lang)
         cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
                                      ), 'oneline.txt')
 
@@ -358,6 +359,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.set_skiphowto()
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_submit_transcript__creates_review_task(self):
         """Review task is created on transcription submission. """
