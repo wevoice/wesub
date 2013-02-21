@@ -54,7 +54,7 @@ unisubs.widget.DropDown.Selection = {
 };
 
 unisubs.widget.DropDown.prototype.hasSubtitles = function() {
-    return this.videoLanguages_.length > 0;
+    return goog.array.some(this.videoLanguages_, function(el){ return el.IS_PUBLIC });
 };
 unisubs.widget.DropDown.prototype.setStats_ = function(dropDownContents) {
     this.videoLanguages_ = dropDownContents.LANGUAGES;
