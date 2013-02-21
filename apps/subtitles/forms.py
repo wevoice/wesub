@@ -27,7 +27,7 @@ from apps.subtitles import pipeline
 from apps.subtitles.shims import is_dependent
 from apps.subtitles.models import ORIGIN_UPLOAD
 from apps.teams.permissions import (
-    can_assign_task, can_create_and_edit_subtitles,
+    can_perform_task, can_create_and_edit_subtitles,
     can_create_and_edit_translations
 )
 from apps.videos.tasks import video_changed_tasks
@@ -133,7 +133,7 @@ class SubtitlesUploadForm(forms.Form):
 
             # If this language is unassigned, and the user can't assign herself
             # to it, fail.
-            if (not task.assignee and not can_assign_task(task, self.user)):
+            if (not task.assignee and not can_perform_task(task, self.user)):
                 raise forms.ValidationError(_(
                     u"Sorry, we can't upload your subtitles because you do not "
                     u"have permission to claim this language."))
