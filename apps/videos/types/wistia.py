@@ -32,10 +32,11 @@ class WistiaVideoType(VideoType):
     site = 'wistia.com'
     linkurl = None
 
-    requires_url_exists = False
+    requires_url_exists = True
     def __init__(self, url):
         self.url = url
         self.videoid = self._get_wistia_id(url)
+        # not sure why this is being done, it breaks external URL
         self.linkurl = url.replace('/embed/', '/medias/')
         try:
             self.shortmem = wistia.get_shortmem(url)
@@ -49,7 +50,11 @@ class WistiaVideoType(VideoType):
         return self.videoid
     
     def convert_to_video_url(self):
-        return self.linkurl
+        # Not sure what to do here since Wistia's model, in part, involves
+        # customer branded URLs, preventing any sort of canonical URL from
+        # working correctly
+        # return self.linkurl
+        return self.url
 
     @classmethod    
     def video_url(cls, obj):
