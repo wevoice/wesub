@@ -119,6 +119,9 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.menu.open_menu()
         self.assertFalse(self.menu.displays_improve_subtitles())
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
+
     def test_trans_policy_members__guest(self):
         """Translate policy: members, guest has no new translation in menu.
 
@@ -126,6 +129,8 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.video_pg.open_video_page(self.published.video_id)
         self.menu.open_menu()
         self.assertFalse(self.menu.displays_new_translation())
+        self.assertTrue(self.menu.displays_moderated_message())
+
 
     def test_sub_policy_members__nonmember(self):
         """Subtitle policy: members, non-member has no improve subtitles menu.
