@@ -136,7 +136,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(originalNode, dfxpWrapper, atIndex) {
     var newNode = dfxpWrapper['cloneSubtitle'](originalNode,false);
-    var c = this.insertCaption(atIndex, newNode)
+    var c = this.insertCaption(atIndex, newNode);
     return c;
 };
 
@@ -171,7 +171,9 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex, 
     }
     c.setNextCaption(nextSub);
     nextSub.setPreviousCaption(c);
-    this.setTimesOnInsertedSub_(c, prevSub, nextSub);
+    if (c.needsSync()){
+        this.setTimesOnInsertedSub_(c, prevSub, nextSub);
+    }
     c.setParentEventTarget(this);
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaptionSet.CaptionEvent(
