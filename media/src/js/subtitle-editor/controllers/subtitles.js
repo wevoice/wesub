@@ -100,12 +100,10 @@ var angular = angular || null;
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
-        $scope.cancelAndClose = function($event) {
+        $scope.discard = function($event) {
 
             $event.preventDefault();
-
-            $scope.$root.$emit('show-loading-modal', 'Canceled. Redirecting…');
-            window.location = $scope.closeURL;
+            $scope.showCloseModal();
 
         };
         $scope.getNotes = function() {
@@ -122,7 +120,7 @@ var angular = angular || null;
                     SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
-                        window.location = $scope.closeURL;
+                        window.location = $scope.videoURL;
 
                     }, function onError() {
                         $scope.status = 'error';
@@ -132,16 +130,13 @@ var angular = angular || null;
             });
 
         };
-        $scope.saveAndClose = function($event) {
+        $scope.save = function($event) {
 
             $event.preventDefault();
 
             $scope.saveSession().then(function(response) {
                 if ($scope.status === 'saved') {
-
-                    $scope.$root.$emit('show-loading-modal', 'Subtitles saved! Redirecting…');
-                    window.location = $scope.closeURL;
-
+                    $scope.showCloseModal();
                 }
             });
         };
@@ -154,7 +149,7 @@ var angular = angular || null;
                     SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
-                        window.location = $scope.closeURL;
+                        window.location = $scope.videoURL;
                         
                     }, function onError() {
                         $scope.status = 'error';
@@ -181,18 +176,48 @@ var angular = angular || null;
             }
         };
         $scope.setCloseStates = function() {
+
             var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
 
             $scope.fromOldEditor = window.location.search.indexOf('from-old-editor') !== -1 ? true : false;
+            $scope.videoURL = '/videos/' + subtitleListScope.videoID + '/';
 
             if ($scope.fromOldEditor) {
-                $scope.closeText = 'Return';
-                $scope.closeURL = '/onsite_widget/?config=' + window.location.search.split('config=')[1];
-            } else {
-                $scope.closeText = 'Close';
-                $scope.closeURL = '/videos/' + subtitleListScope.videoID + '/' +
-                    subtitleListScope.languageCode + '/';
+                $scope.dialogURL = '/onsite_widget/?config=' + window.location.search.split('config=')[1];
             }
+        };
+        $scope.showCloseModal = function() {
+
+            var buttons = [];
+
+            if ($scope.fromOldEditor) {
+                buttons.push({
+                    'text': 'Back to full editor', 'class': 'yes', 'fn': function() {
+                        window.location = $scope.dialogURL;
+                    }
+                });
+            }
+
+            buttons.push({
+                'text': 'Exit', 'class': 'no', 'fn': function() {
+                    window.location = $scope.videoURL;
+                }
+            });
+
+            if ($scope.status !== 'saved') {
+
+                buttons.push({
+                    'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
+                        $scope.$root.$broadcast('hide-modal');
+                    }
+                });
+
+            }
+
+            $scope.$root.$emit('show-modal', {
+                heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
+                buttons: buttons
+            });
         };
 
         $scope.$root.$on('approve-task', function() {
@@ -336,7 +361,7 @@ var angular = angular || null;
 
         $scope.empty = false;
         $scope.isEditing = false;
-        $scope.showStartTime = $scope.parser.startTime($scope.subtitle) > 0;
+        $scope.showStartTime = $scope.parser.startTime($scope.subtitle) !== -1;
 
         $scope.finishEditingMode = function(newValue) {
 

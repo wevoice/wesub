@@ -31,33 +31,15 @@
         $scope.loading = false;
         $scope.content = null;
 
-        // Sample usage:
-        //
-        //$scope.content = {
-            //'heading': null,
-            //'text': null,
-            //'buttons': [
-                //{'text': 'No',
-                 //'class': 'no',
-                    //'fn': function($event) {
-                        //$scope.hide($event);
-                    //}
-                //},
-                //{'text': 'Yes, please',
-                 //'class': 'yes',
-                    //'fn': function($event) {
-                        //$scope.hide($event);
-                    //}
-                //}
-            //]
-        //};
-
         $scope.hide = function($event) {
             $scope.content = null;
             $scope.loading = null;
             $event.preventDefault();
         };
 
+        $scope.$root.$on('hide-modal', function($event) {
+            $scope.hide($event);
+        });
         $scope.$root.$on('show-loading-modal', function($event, content) {
 
             // Clear out any existing modal.

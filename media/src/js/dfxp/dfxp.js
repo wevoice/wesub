@@ -916,6 +916,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return isNaN(val) ? -1 : val;
     };
+    this.startTimeInSeconds = function(node) {
+        return parseFloat(this.startTime(node) / 1000).toFixed(3);
+    };
     this.subtitlesCount = function() {
         /*
          * Retrieve the current number of subtitles.
