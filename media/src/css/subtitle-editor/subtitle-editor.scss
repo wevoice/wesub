@@ -498,7 +498,7 @@ section.main {
             background: #666666;
             color: white;
             font-size: 12px;
-            height: 250px;
+            height: 216px;
             margin: 20px;
             padding: 20px;
             @include border-radius(3px);
@@ -546,6 +546,21 @@ section.main {
                     &:last-of-type {
                         margin-bottom: 0;
                     }
+                }
+            }
+        }
+        div.preview {
+            color: #949596;
+            height: 34px;
+            text-align: center;
+            text-shadow: 0 1px 0 white;
+
+            a {
+                color: #256F9E;
+                text-decoration: none;
+                
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }
