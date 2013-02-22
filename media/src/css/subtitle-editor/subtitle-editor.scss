@@ -160,9 +160,8 @@ button {
     cursor: pointer;
     display: inline-block;
     font: normal 12px $OpenSans;
-    margin: 0 5px;
-    padding: 5px 0;
-    width: 90px;
+    margin: 0 10px;
+    padding: 5px 20px;
 
     @include border-radius(2px);
 
@@ -323,11 +322,16 @@ header.main {
             }
         }
         div.exit {
+            border-right: none;
             text-align: center;
 
-            > a {
-                background: #126295;
-                color: white;
+            a {
+                display: inline-block;
+
+                &.save {
+                    background: #126295;
+                    color: white;
+                }
             }
         }
     }
