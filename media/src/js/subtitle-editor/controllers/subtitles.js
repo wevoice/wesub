@@ -336,7 +336,7 @@ var angular = angular || null;
 
         $scope.empty = false;
         $scope.isEditing = false;
-        $scope.showStartTime = $scope.parser.startTime($scope.subtitle) > 0;
+        $scope.showStartTime = $scope.parser.startTime($scope.subtitle) !== -1;
 
         $scope.finishEditingMode = function(newValue) {
 
