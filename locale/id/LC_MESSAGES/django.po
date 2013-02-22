@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 #   <awang.n6600@gmail.com>, 2012.
 # Dwi Rianto <dwiriantop@gmail.com>, 2012.
@@ -10,10 +10,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-02-21 00:18-0600\n"
+"POT-Creation-Date: 2013-02-22 00:16-0600\n"
 "PO-Revision-Date: 2013-02-21 06:31+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
-"Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/universalsubtitles/language/id_ID/)\n"
+"Language-Team: Indonesian (Indonesia) (http://www.transifex.com/projects/p/"
+"universalsubtitles/language/id_ID/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,9 +35,9 @@ msgstr ""
 
 #: apps/accountlinker/views.py:140
 msgid ""
-"We couldn't link your account. Have you <a "
-"href='https://accounts.google.com/ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/create_channel'>set"
-" up a channel</a>?"
+"We couldn't link your account. Have you <a href='https://accounts.google.com/"
+"ServiceLogin?passive=true&continue=http%3A%2F%2Fwww.youtube.com/"
+"create_channel'>set up a channel</a>?"
 msgstr ""
 
 #: apps/accountlinker/views.py:160
@@ -53,7 +54,9 @@ msgstr "Nama pengguna"
 msgid ""
 "Required. 30 characters or fewer. Alphanumeric characters only (letters, "
 "digits and underscores)."
-msgstr "Wajib. 30 karakter atau kurang. Karakter hanya alfanumerik (huruf, angka dan garis bawah)."
+msgstr ""
+"Wajib. 30 karakter atau kurang. Karakter hanya alfanumerik (huruf, angka dan "
+"garis bawah)."
 
 #: apps/auth/admin.py:35
 msgid "This value must contain only letters, numbers and underscores."
@@ -124,7 +127,9 @@ msgstr "ikuti permintaan dalam bahasa"
 msgid ""
 "This is date when start to display announcement. And only the last will be "
 "displayed."
-msgstr "Tanggal ini ketika mulai untuk menampilkan pengumuman. Dan hanya yang terakhir yang akan ditampilkan."
+msgstr ""
+"Tanggal ini ketika mulai untuk menampilkan pengumuman. Dan hanya yang "
+"terakhir yang akan ditampilkan."
 
 #: apps/auth/models.py:521
 msgid "e-mail confirmation"
@@ -470,14 +475,14 @@ msgstr ""
 
 #: apps/subtitles/forms.py:161
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and"
-" you don't have permission to transcribe subtitles."
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to transcribe subtitles."
 msgstr ""
 
 #: apps/subtitles/forms.py:169
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and"
-" you don't have permission to translate subtitles."
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have permission to translate subtitles."
 msgstr ""
 
 #: apps/subtitles/forms.py:182
@@ -505,11 +510,11 @@ msgstr "Tidak dapat mendeteksi pengkodean berkas"
 msgid "Somebody is subtitling this video right now. Try later."
 msgstr "Seseorang sedang menterjemahkan file ini sekarang. Coba lagi."
 
-#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:314
+#: apps/subtitles/models.py:847 templates/videos/subtitle-view.html:319
 msgid "API"
 msgstr ""
 
-#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:316
+#: apps/subtitles/models.py:848 templates/videos/subtitle-view.html:321
 msgid "Subtitle Editor"
 msgstr ""
 
@@ -529,7 +534,7 @@ msgstr ""
 msgid "Tern"
 msgstr ""
 
-#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:312
+#: apps/subtitles/models.py:853 templates/videos/subtitle-view.html:317
 msgid "Uploaded"
 msgstr ""
 
@@ -610,9 +615,11 @@ msgstr "Surel video"
 
 #: apps/teams/forms.py:149
 msgid ""
-"Enter the URL of any compatible video or any video on our site. You can also"
-" browse the site and use the 'Add Video to Team' menu."
-msgstr "Masukkan sembarang surel video atau sembarang video ke situs Anda. Anda juga bisa menjelajai situs dan menggunakan menu 'Tambah Video ke Tim'."
+"Enter the URL of any compatible video or any video on our site. You can also "
+"browse the site and use the 'Add Video to Team' menu."
+msgstr ""
+"Masukkan sembarang surel video atau sembarang video ke situs Anda. Anda juga "
+"bisa menjelajai situs dan menggunakan menu 'Tambah Video ke Tim'."
 
 #: apps/teams/forms.py:157
 msgid "Video language"
@@ -637,9 +644,14 @@ msgstr "Surel pendahuluan video tim"
 #: apps/teams/forms.py:260
 msgid ""
 "You can put an optional video\n"
-"on your team homepage that explains what your team is about, to attract volunteers.\n"
+"on your team homepage that explains what your team is about, to attract "
+"volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
-msgstr "Untuk menarik para sukarelawan, Anda dapat meletakkan video pilihan \npada beranda tim Anda yang menjelaskan tentang tim Anda. \nMasukkan pranala ke sembarang video terkait, atau ke sembarang video pada situs Anda."
+msgstr ""
+"Untuk menarik para sukarelawan, Anda dapat meletakkan video pilihan \n"
+"pada beranda tim Anda yang menjelaskan tentang tim Anda. \n"
+"Masukkan pranala ke sembarang video terkait, atau ke sembarang video pada "
+"situs Anda."
 
 #: apps/teams/forms.py:265
 msgid "Team URL: http://universalsubtitles.org/teams/"
@@ -706,7 +718,7 @@ msgstr ""
 msgid "Would you like to delete these subtitles completely?"
 msgstr "Apakah anda ingin menghapus subtitle ini?"
 
-#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:353
+#: apps/teams/forms.py:565 templates/videos/subtitle-view.html:358
 msgid "What would you like to unpublish?"
 msgstr ""
 
@@ -874,11 +886,15 @@ msgstr "Tim"
 msgid ""
 "Use this space to explain why you or your team need to caption or subtitle "
 "this video. Adding a note makes volunteers more likely to help out!"
-msgstr "Gunakan kolom ini untuk menjelaskan mengapa tim Anda perlu membuat penterjemahan dan keterangan gambar video. Menambahkan pesan akan membuat para sukarelawan dengan senang hati membantu!"
+msgstr ""
+"Gunakan kolom ini untuk menjelaskan mengapa tim Anda perlu membuat "
+"penterjemahan dan keterangan gambar video. Menambahkan pesan akan membuat "
+"para sukarelawan dengan senang hati membantu!"
 
 #: apps/teams/models.py:658
 msgid "We automatically grab thumbnails for certain sites, e.g. Youtube"
-msgstr "Kami secara otomatis mengambil thumbnails beberapa situs, seperti Youtube"
+msgstr ""
+"Kami secara otomatis mengambil thumbnails beberapa situs, seperti Youtube"
 
 #: apps/teams/models.py:660
 msgid "Need help with all languages"
@@ -1005,11 +1021,16 @@ msgid ""
 "\n"
 "                Your team has been created. Here are some next steps:\n"
 "                <ul>\n"
-"                    <li><a href=\"%(edit)s\">Edit team members' permissions</a></li>\n"
-"                    <li><a href=\"%(activate)s\">Activate and customize workflows for your team</a></li>\n"
-"                    <li><a href=\"%(create)s\">Create and customize projects</a></li>\n"
-"                    <li><a href=\"%(lang)s\">Edit language preferences</a></li>\n"
-"                    <li><a href=\"%(custom)s\">Customize instructions to caption makers and translators</a></li>\n"
+"                    <li><a href=\"%(edit)s\">Edit team members' permissions</"
+"a></li>\n"
+"                    <li><a href=\"%(activate)s\">Activate and customize "
+"workflows for your team</a></li>\n"
+"                    <li><a href=\"%(create)s\">Create and customize "
+"projects</a></li>\n"
+"                    <li><a href=\"%(lang)s\">Edit language preferences</a></"
+"li>\n"
+"                    <li><a href=\"%(custom)s\">Customize instructions to "
+"caption makers and translators</a></li>\n"
 "                </ul>\n"
 "                "
 msgstr ""
@@ -1246,16 +1267,25 @@ msgstr "Anda tidak mempunyai izin menambah surel video ini"
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
+"problem."
 msgstr ""
 
 #: apps/videos/forms.py:186 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
-"You must link to a video on a compatible site (like YouTube) or directly to a\n"
-"                    video file that works with HTML5 browsers. For example: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
-"                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr "Anda harus menghubungkan ke video dengan situs yang telah disetujui/didukung (seperti YouTube) atau langsung ke\n                    berkas video yang berjalan di peramban HTML5. Seperti contoh: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Hubungi kami</a> jika ada masalah."
+"You must link to a video on a compatible site (like YouTube) or directly to "
+"a\n"
+"                    video file that works with HTML5 browsers. For example: "
+"http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
+"                    <a href=\"mailto:%s\">Contact us</a> if there's a "
+"problem."
+msgstr ""
+"Anda harus menghubungkan ke video dengan situs yang telah disetujui/didukung "
+"(seperti YouTube) atau langsung ke\n"
+"                    berkas video yang berjalan di peramban HTML5. Seperti "
+"contoh: http://mysite.com/myvideo.ogg or http://mysite.com/myipadvideo.m4v\n"
+"                    <a href=\"mailto:%s\">Hubungi kami</a> jika ada masalah."
 
 #: apps/videos/forms.py:214
 msgid "Youtube usernames"
@@ -1285,18 +1315,22 @@ msgstr "Simpan feed"
 msgid ""
 "Choose this if you wish to add videos from this feed in the future. Only "
 "valid RSS feeds will be saved."
-msgstr "Pilih jika Anda ingin menambahkan video ke dalam pengumpan ini di kemudian hari. Hanya pengumpan RSS yang sah yang akan disimpan."
+msgstr ""
+"Pilih jika Anda ingin menambahkan video ke dalam pengumpan ini di kemudian "
+"hari. Hanya pengumpan RSS yang sah yang akan disimpan."
 
 #: apps/videos/forms.py:261
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
-msgstr "Maaf, kami tidak menemukan feed yang berlaku pada surel yang Anda sediakan. Cek ulang surel dan coba sekali lagi."
+msgstr ""
+"Maaf, kami tidak menemukan feed yang berlaku pada surel yang Anda sediakan. "
+"Cek ulang surel dan coba sekali lagi."
 
 #: apps/videos/forms.py:266
 msgid ""
-"The videos are being added in the background. If you are logged in, you will"
-" receive a message when it's done"
+"The videos are being added in the background. If you are logged in, you will "
+"receive a message when it's done"
 msgstr ""
 
 #: apps/videos/forms.py:278
@@ -1323,7 +1357,9 @@ msgstr "Dilihat"
 msgid ""
 "Sorry, you cannot upload subtitles right now because someone is editing the "
 "language you are uploading or a translation of it"
-msgstr "Maaf, Anda tidak bisa mengunggah terjemahan saat ini dikarenakan seseorang sedang menyunting atau menterjemahkan bahasa yang Anda unggah"
+msgstr ""
+"Maaf, Anda tidak bisa mengunggah terjemahan saat ini dikarenakan seseorang "
+"sedang menyunting atau menterjemahkan bahasa yang Anda unggah"
 
 #: apps/videos/models.py:1981
 #, python-format
@@ -1344,14 +1380,18 @@ msgstr ""
 msgid ""
 "  rejected <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "  telah ditolak <a href=\"%(language_url)s\">%(language)s</a> terjemahan untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"  telah ditolak <a href=\"%(language_url)s\">%(language)s</a> terjemahan "
+"untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:1996
 #, python-format
 msgid ""
 "  approved <a href=\"%(language_url)s\">%(language)s</a> subtitles for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "  telah disetujui <a href=\"%(language_url)s\">%(language)s</a> terjemahan untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"  telah disetujui <a href=\"%(language_url)s\">%(language)s</a> terjemahan "
+"untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2001
 #, python-format
@@ -1367,7 +1407,8 @@ msgstr ""
 
 #: apps/videos/models.py:2012
 #, python-format
-msgid "added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
+msgid ""
+"added <a href=\"%(video_url)s\">&#8220;%(video_name)s&#8221;</a> to Amara"
 msgstr ""
 
 #: apps/videos/models.py:2014
@@ -1390,14 +1431,18 @@ msgstr "Judul telah diubah untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 msgid ""
 "commented on <a href=\"%(comments_url)s\">%(language)s subtitles</a> for <a "
 "href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "komentar pada <a href=\"%(comments_url)s\">%(language)s terjemahan</a> untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"komentar pada <a href=\"%(comments_url)s\">%(language)s terjemahan</a> untuk "
+"<a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2038
 #, python-format
 msgid ""
 "Comment added for <a href=\"%(comments_url)s\">%(language)s subtitles</a> "
 "for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "Telah ditambahkan komentar untuk <a href=\"%(comments_url)s\">%(language)s terjemahan</a> untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"Telah ditambahkan komentar untuk <a href=\"%(comments_url)s\">%(language)s "
+"terjemahan</a> untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2041
 #, python-format
@@ -1407,45 +1452,57 @@ msgstr "komentar di <a href=\"%(video_url)s\">%(video_name)s</a>"
 #: apps/videos/models.py:2043
 #, python-format
 msgid "Comment added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "Telah ditambahkan komentar untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"Telah ditambahkan komentar untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2051
 #, python-format
 msgid ""
-"started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
-"href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "telah dimulai <a href=\"%(language_url)s\">%(language)s terjemahan</a> untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+"started <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
+"\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"telah dimulai <a href=\"%(language_url)s\">%(language)s terjemahan</a> untuk "
+"<a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2053
 #, python-format
 msgid ""
-"<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a "
-"href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "<a href=\"%(language_url)s\">%(language)s terjemahan</a> telah dimulai untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+"<a href=\"%(language_url)s\">%(language)s subtitles</a> started for <a href="
+"\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"<a href=\"%(language_url)s\">%(language)s terjemahan</a> telah dimulai untuk "
+"<a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2061
 #, python-format
 msgid ""
-"edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a "
-"href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "telah disunting <a href=\"%(language_url)s\">%(language)s terjemahan</a> untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+"edited <a href=\"%(language_url)s\">%(language)s subtitles</a> for <a href="
+"\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"telah disunting <a href=\"%(language_url)s\">%(language)s terjemahan</a> "
+"untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2063
 #, python-format
 msgid ""
-"<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a "
-"href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "<a href=\"%(language_url)s\">%(language)s terjemahan</a> telah disunting untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+"<a href=\"%(language_url)s\">%(language)s subtitles</a> edited for <a href="
+"\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"<a href=\"%(language_url)s\">%(language)s terjemahan</a> telah disunting "
+"untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2069
 #, python-format
 msgid "added new URL for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "telah ditambahkan surel untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"telah ditambahkan surel untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
 
 #: apps/videos/models.py:2071
 #, python-format
 msgid "New URL added for <a href=\"%(video_url)s\">%(video_name)s</a>"
-msgstr "Surel Baru telah ditambahkan untuk <a href=\"%(video_url)s\">%(video_name)s</a>"
+msgstr ""
+"Surel Baru telah ditambahkan untuk <a href=\"%(video_url)s\">%(video_name)s</"
+"a>"
 
 #: apps/videos/models.py:2076
 #, python-format
@@ -1542,7 +1599,9 @@ msgstr ""
 msgid ""
 "This URL already <a href=\"%(url)s\">exists</a> as its own video in our "
 "system. You can't add it as a secondary URL."
-msgstr "Surel ini <a href=\"%(url)s\">sudah ada</a> videonya di sistem kami. Anda tidak bisa menambahkan surel kedua atas video yang sama."
+msgstr ""
+"Surel ini <a href=\"%(url)s\">sudah ada</a> videonya di sistem kami. Anda "
+"tidak bisa menambahkan surel kedua atas video yang sama."
 
 #: apps/videos/rpc.py:50 apps/videos/rpc.py:66
 msgid "You have not permission"
@@ -1612,7 +1671,8 @@ msgstr "Lihat video ini dan bantu membuat terjemahan"
 #, python-format
 msgid ""
 "Hey-- check out this video %(video_title)s and help make subtitles: %(url)s"
-msgstr "Hi-- Lihat video ini %(video_title)s dan bantu membuat terjemahan: %(url)s"
+msgstr ""
+"Hi-- Lihat video ini %(video_title)s dan bantu membuat terjemahan: %(url)s"
 
 #: apps/videos/share_utils.py:75
 #, python-format
@@ -1627,14 +1687,20 @@ msgstr ""
 #: apps/videos/share_utils.py:106
 #, python-format
 msgid "Just found a version of this video with %(language_name)s subtitles"
-msgstr "Telah ditemukan sebuah versi lain video ini dengan bahasa %(language_name)s"
+msgstr ""
+"Telah ditemukan sebuah versi lain video ini dengan bahasa %(language_name)s"
 
 #: apps/videos/views.py:177
 msgid ""
 "Here is the subtitle workspace for your video. You can\n"
-"share the video with friends, or get an embed code for your site.  To add or\n"
+"share the video with friends, or get an embed code for your site.  To add "
+"or\n"
 "improve subtitles, click the button below the video."
-msgstr "Ini adalah ruang penterjemahan untuk video Anda. Anda dapat\nberbagi video dengan teman, atau mendapatkan kode-pasang untuk situs Anda.  Untuk menambah atau\nmengkoreksi terjemahan, klik tombol dibawah video."
+msgstr ""
+"Ini adalah ruang penterjemahan untuk video Anda. Anda dapat\n"
+"berbagi video dengan teman, atau mendapatkan kode-pasang untuk situs Anda.  "
+"Untuk menambah atau\n"
+"mengkoreksi terjemahan, klik tombol dibawah video."
 
 #: apps/videos/views.py:185
 msgid ""
@@ -1686,8 +1752,12 @@ msgstr "Video tidak tersedia"
 #, python-format
 msgid ""
 "Please try again with a link to a video page. \n"
-"                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
-msgstr "Silahkan coba lagi dengan pranala ke halaman videonya. \n                        <a href=\"mailto:%s\">Hubungi kami</a> jika ada masalah."
+"                        <a href=\"mailto:%s\">Contact us</a> if there's a "
+"problem."
+msgstr ""
+"Silahkan coba lagi dengan pranala ke halaman videonya. \n"
+"                        <a href=\"mailto:%s\">Hubungi kami</a> jika ada "
+"masalah."
 
 #: apps/videos/types/youtube.py:50
 msgid "Private video"
@@ -1776,15 +1846,18 @@ msgstr "Tidak ada yang harus diterjemahkan!"
 msgid ""
 "You haven't specified any languages in your settings file, or haven't yet "
 "generated a batch of translation catalogs."
-msgstr "Anda belum menentukan bahasa mana yang dipilih pada berkas pengaturan, atau belum menggerakkan setumpuk katalog terjemahan."
+msgstr ""
+"Anda belum menentukan bahasa mana yang dipilih pada berkas pengaturan, atau "
+"belum menggerakkan setumpuk katalog terjemahan."
 
 #: libs/rosetta/templates/rosetta/languages.html:57
 #, python-format
 msgid ""
-"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N "
-"documentation</a> for a guide on how to set up internationalization for your"
-" project."
-msgstr "Silahkan mengacu ke <a href=\"%(i18n_doc_link)s\">Dokumentasi Django's I18N</a> untuk mengetahui cara mengglobalkan proyek Anda."
+"Please refer to <a href=\"%(i18n_doc_link)s\">Django's I18N documentation</"
+"a> for a guide on how to set up internationalization for your project."
+msgstr ""
+"Silahkan mengacu ke <a href=\"%(i18n_doc_link)s\">Dokumentasi Django's I18N</"
+"a> untuk mengetahui cara mengglobalkan proyek Anda."
 
 #: libs/rosetta/templates/rosetta/pofile.html:8
 msgid "Pick another file"
@@ -1807,7 +1880,10 @@ msgstr "Berkasa hanya dapat-dibaca: unduh berkas setelah selesai menyunting!"
 msgid ""
 "Some items in your last translation block couldn't be saved: this usually "
 "happens when the catalog file changes on disk after you last loaded it."
-msgstr "Beberapa item diblok terjemahan terakhir Anda tidak bisa disimpan: ini biasanya terjadi karena berkas katalog berubah sejurus pada saat terakhir saat Anda memuat."
+msgstr ""
+"Beberapa item diblok terjemahan terakhir Anda tidak bisa disimpan: ini "
+"biasanya terjadi karena berkas katalog berubah sejurus pada saat terakhir "
+"saat Anda memuat."
 
 #: libs/rosetta/templates/rosetta/pofile.html:28
 #, python-format
@@ -1841,7 +1917,7 @@ msgstr "Teruskan"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:215 templates/videos/_video_url_panel.html:19
-#: templates/videos/subtitle-view.html:72
+#: templates/videos/subtitle-view.html:77
 msgid "Original"
 msgstr "Asli"
 
@@ -1954,13 +2030,17 @@ msgstr "Buka formulir saran lalu tulislah keterangan gambar video"
 msgid ""
 "Warning: These videos should not be embeded--there is a good possibility "
 "they will break at some point!"
-msgstr "Peringatan: Video-video jangan dipasang-- Ada kemungkinan tidak berfungsi pada beberapa titik!"
+msgstr ""
+"Peringatan: Video-video jangan dipasang-- Ada kemungkinan tidak berfungsi "
+"pada beberapa titik!"
 
 #: templates/_testing_widget.html:15
 msgid ""
-"Warning #2: These subtitles are non-permanent and should not be relied on --"
-" someone could change them."
-msgstr "Peringatan ke-2: Terjemahan ini tidak permanen dan tidak disarankan-- Ada kemungkinan seseorang bisa menggantinya."
+"Warning #2: These subtitles are non-permanent and should not be relied on -- "
+"someone could change them."
+msgstr ""
+"Peringatan ke-2: Terjemahan ini tidak permanen dan tidak disarankan-- Ada "
+"kemungkinan seseorang bisa menggantinya."
 
 #: templates/_testing_widget.html:16
 msgid "This alpha site is for purely testing purposes."
@@ -1971,47 +2051,72 @@ msgid ""
 "\n"
 "            <h2>About Amara</h2>\n"
 "            <p>\n"
-"                Amara gives individuals, communities, and larger organizations the power \n"
-"                to overcome accessibility and language barriers for online video. The tools are free \n"
-"                and open source and make the work of subtitling and translating video simpler, more \n"
+"                Amara gives individuals, communities, and larger "
+"organizations the power \n"
+"                to overcome accessibility and language barriers for online "
+"video. The tools are free \n"
+"                and open source and make the work of subtitling and "
+"translating video simpler, more \n"
 "                appealing, and, most of all, more collaborative.\n"
 "            </p>\n"
 "            <p>\n"
 "                The benefits of captioning and subtitling are immense:\n"
 "                <ul>\n"
-"                    <li>Captions make videos accessible for viewers who are deaf or hard of hearing</li>\n"
-"                    <li>Translations make it possible for all of us to watch video in languages that we don't speak</li>\n"
-"                    <li>Video creators get: better SEO, more views, access to a far bigger (potentially multilingual and global) audience, accessibility for deaf and hard of hearing viewers, and more</li>\n"
+"                    <li>Captions make videos accessible for viewers who are "
+"deaf or hard of hearing</li>\n"
+"                    <li>Translations make it possible for all of us to watch "
+"video in languages that we don't speak</li>\n"
+"                    <li>Video creators get: better SEO, more views, access "
+"to a far bigger (potentially multilingual and global) audience, "
+"accessibility for deaf and hard of hearing viewers, and more</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
 "                Amara is composed of three main parts:\n"
 "                <ul>\n"
-"                    <li>A subtitle creation and viewing tool (aka the widget)</li>\n"
+"                    <li>A subtitle creation and viewing tool (aka the widget)"
+"</li>\n"
 "                    <li>A collaborative subtitling website</li>\n"
 "                    <li>An open protocol for subtitle search/delivery</li>\n"
 "                </ul>\n"
 "            </p>\n"
 "            <p>\n"
-"                Everything we do is available under the open source <a href=\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
+"                Everything we do is available under the open source <a href="
+"\"http://www.gnu.org/licenses/agpl-3.0.html\">AGPL</a> license.\n"
 "            </p>\n"
 "            <h2>Our Organization</h2>\n"
 "            <p>\n"
-"                <a href=\"http://www.pculture.org/\">Participatory Culture Foundation</a> \n"
-"                is a non-profit organization building free and open tools for more a democratic and \n"
-"                decentralized media. Other projects of ours include <a href=\"http://www.getmiro.com/\">Miro</a>, \n"
-"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video Converter</a>, \n"
-"                <a href=\"http://www.mirocommunity.org/\">Miro Community</a>, and \n"
-"                <a href=\"http://www.openvideoalliance.org/\">Open Video Alliance</a>.\n"
+"                <a href=\"http://www.pculture.org/\">Participatory Culture "
+"Foundation</a> \n"
+"                is a non-profit organization building free and open tools "
+"for more a democratic and \n"
+"                decentralized media. Other projects of ours include <a href="
+"\"http://www.getmiro.com/\">Miro</a>, \n"
+"                <a href=\"http://www.mirovideoconverter.com/\">Miro Video "
+"Converter</a>, \n"
+"                <a href=\"http://www.mirocommunity.org/\">Miro Community</"
+"a>, and \n"
+"                <a href=\"http://www.openvideoalliance.org/\">Open Video "
+"Alliance</a>.\n"
 "            </p>\n"
 "            <p>\n"
-"                Amara is a featured project of <a href=\"http://www.drumbeat.org/\">Mozilla Drumbeat</a>, \n"
-"                and the Mozilla Foundation has provided development support.  \n"
-"                Open Society Institute and the MacArthur Foundation are also financial supporters.\n"
+"                Amara is a featured project of <a href=\"http://www.drumbeat."
+"org/\">Mozilla Drumbeat</a>, \n"
+"                and the Mozilla Foundation has provided development "
+"support.  \n"
+"                Open Society Institute and the MacArthur Foundation are also "
+"financial supporters.\n"
 "            </p>\n"
 "            <h2>Publisher and Enterprise Services</h2>\n"
 "            <p>\n"
-"                Amara offers a set of professional tools and services that enable publishers and video platforms to create and manage high quality subtitles.  With Amara, you can build a community of volunteers to subtitle your content, integrate with professional services, and use a powerful quality control system to ensure world-class quality.  To learn more, see our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org\">dean@pculture.org</a>.\n"
+"                Amara offers a set of professional tools and services that "
+"enable publishers and video platforms to create and manage high quality "
+"subtitles.  With Amara, you can build a community of volunteers to subtitle "
+"your content, integrate with professional services, and use a powerful "
+"quality control system to ensure world-class quality.  To learn more, see "
+"our <a href=\"http://www.universalsubtitles.org/en/enterprise/\">enterprise "
+"services</a> and contact Dean Jansen, <a href=\"mailto:dean@pculture.org"
+"\">dean@pculture.org</a>.\n"
 "            </p>\n"
 "        "
 msgstr ""
@@ -2050,8 +2155,7 @@ msgstr ""
 
 #: templates/base.html:94
 msgid ""
-"New: enable viewer-created translations and captions on your YouTube "
-"channel!"
+"New: enable viewer-created translations and captions on your YouTube channel!"
 msgstr ""
 
 #: templates/base.html:96
@@ -2115,15 +2219,22 @@ msgstr ""
 msgid ""
 "\n"
 "        <strong>What's this?</strong> The video below is for \n"
-"        demonstration purposes &mdash; try clicking the 'Subtitle Me' button!\n"
+"        demonstration purposes &mdash; try clicking the 'Subtitle Me' "
+"button!\n"
 "        Don't worry, nothing you do will be saved.\n"
 "        "
-msgstr "\n        <strong>Apa ini?</strong> Video dibawah adalah untuk \n        tujuan demo &mdash; cobalah klik tombol 'Terjemahkan Saya'!\n        Jangan khawatir, tidak ada yang akan disimpan.\n        "
+msgstr ""
+"\n"
+"        <strong>Apa ini?</strong> Video dibawah adalah untuk \n"
+"        tujuan demo &mdash; cobalah klik tombol 'Terjemahkan Saya'!\n"
+"        Jangan khawatir, tidak ada yang akan disimpan.\n"
+"        "
 
 #: templates/demo.html:45
 msgid ""
 "\n"
-"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main menu to report bugs or to leave comments for the team.\n"
+"        <strong>Feedback is welcome.</strong> Choose \"Help\" from the main "
+"menu to report bugs or to leave comments for the team.\n"
 "        "
 msgstr ""
 
@@ -2134,44 +2245,102 @@ msgstr "Pemberitahuan Pelanggaran Hak Cipta"
 #: templates/dmca.html:9
 msgid ""
 "\n"
-"To file a copyright infringement notification with us, you will need to send a\n"
-"written communication that includes substantially the following (please consult\n"
+"To file a copyright infringement notification with us, you will need to send "
+"a\n"
+"written communication that includes substantially the following (please "
+"consult\n"
 "your legal counsel or see Section 512(c)(3) of the Copyright Act to confirm\n"
 "these requirements):\n"
-msgstr "\nUntuk mengirimkan pemberitahuan pelanggaran karya cipta kepada kami, Anda perlu mengirimkan\nberkas komunikasi tertulis berikut substansinya (silahkan berkonsultasi kepada\nkuasa hukum Anda atau lihat Section 512(c)(3) dari Tindak Pelanggaran Karya Cipta untuk mengkonfirmasi\npermintaan ini):\n"
+msgstr ""
+"\n"
+"Untuk mengirimkan pemberitahuan pelanggaran karya cipta kepada kami, Anda "
+"perlu mengirimkan\n"
+"berkas komunikasi tertulis berikut substansinya (silahkan berkonsultasi "
+"kepada\n"
+"kuasa hukum Anda atau lihat Section 512(c)(3) dari Tindak Pelanggaran Karya "
+"Cipta untuk mengkonfirmasi\n"
+"permintaan ini):\n"
 
 #: templates/dmca.html:18
 msgid ""
 "\n"
-"A physical or electronic signature of a person authorized to act on behalf of\n"
+"A physical or electronic signature of a person authorized to act on behalf "
+"of\n"
 "the owner of an exclusive right that is allegedly infringed.\n"
-"Identification of the copyrighted work claimed to have been infringed, or, if\n"
+"Identification of the copyrighted work claimed to have been infringed, or, "
+"if\n"
 "multiple copyrighted works at a single online site are covered by a single\n"
 "notification, a representative list of such works at that site.\n"
-"Identification of the material that is claimed to be infringing or to be the\n"
-"subject of infringing activity and that is to be removed or access to which is\n"
+"Identification of the material that is claimed to be infringing or to be "
+"the\n"
+"subject of infringing activity and that is to be removed or access to which "
+"is\n"
 "to be disabled, and information reasonably sufficient to permit the service\n"
-"provider to locate the material. Providing URLs in the body of an email is the\n"
+"provider to locate the material. Providing URLs in the body of an email is "
+"the\n"
 "best way to help us locate content quickly.\n"
-"Information reasonably sufficient to permit the service provider to contact the\n"
-"complaining party, such as an address, telephone number, and, if available, an\n"
+"Information reasonably sufficient to permit the service provider to contact "
+"the\n"
+"complaining party, such as an address, telephone number, and, if available, "
+"an\n"
 "electronic mail address at which the complaining party may be contacted.\n"
-"A statement that the complaining party has a good faith belief that use of the\n"
-"material in the manner complained of is not authorized by the copyright owner,\n"
+"A statement that the complaining party has a good faith belief that use of "
+"the\n"
+"material in the manner complained of is not authorized by the copyright "
+"owner,\n"
 "its agent, or the law.\n"
 "A statement that the information in the notification is accurate, and under\n"
-"penalty of perjury, that the complaining party is authorized to act on behalf\n"
+"penalty of perjury, that the complaining party is authorized to act on "
+"behalf\n"
 "of the owner of an exclusive right that is allegedly infringed.\n"
 "Such written notice should be sent to our designated agent as follows:\n"
-msgstr "\nSebuah tanda tangan elektronik seseorang yang mempunyai perizinan untuk melakukan aksi atas\nizin dari pemilik sebuah hak eksklusif yang diduga telah dilanggar.\nIdentifikasi dari pekerjaan yang berhubungan dengan hak cipta yang diklaim telah dilanggar, atau, jika\npekerjaan multi yang berhubungan dengan hak cipta pada satu situs online yang diwadahi oleh sebuah\npemberitahuan, daftar representasi masing-masing pekerjaan pada situs tersebut.\nIdentifikasi dari materi yang diklaim akan dilanggar atau menjadi\nsubyek dari aktifitas pelanggaran yang telah dihapus atau akses yang telah\ndinonaktifkan, dan informasi dengan alasan yang cukup untuk mengizinkan layanan\nprovider untuk melokasikan materi. Menyediakan Surel pada email\nadalah cara terbaik bagi kami untuk melokasikan kontent dengan cepat.\nInformasi yang cukup agar layanan provider dapat menghubungi\npihak yang melakukan aduan, seperti alamat, nomor telepon, dan jika ada, sebuah\nalamat email dimana pihak pengadu dapat dihubungi.\nSebuah pernyataan bahwa pihak pengadu mempunya itikad baik menggunakan\nmateri pada hal-hal yang diadukan yang tidak ada izinnya dari pemilik hak cipta, atau\nagennya, atau oleh undang-undang.\nSebuah pernyataan bahwa informasi yang diberitahukan adalah benar-benar akurat, dan dibawah\nhukuman sumpah palsu, dimana pihak yang mengadukan mempunya hak untuk melakukan aksi atas izin\npemilik hak cipta eksklusuf yang telah dilanggar.\nPemberitahuan tertulis yang harus dikirimkan kepada agen yang ditunjuk oleh kami yaitu:\n"
+msgstr ""
+"\n"
+"Sebuah tanda tangan elektronik seseorang yang mempunyai perizinan untuk "
+"melakukan aksi atas\n"
+"izin dari pemilik sebuah hak eksklusif yang diduga telah dilanggar.\n"
+"Identifikasi dari pekerjaan yang berhubungan dengan hak cipta yang diklaim "
+"telah dilanggar, atau, jika\n"
+"pekerjaan multi yang berhubungan dengan hak cipta pada satu situs online "
+"yang diwadahi oleh sebuah\n"
+"pemberitahuan, daftar representasi masing-masing pekerjaan pada situs "
+"tersebut.\n"
+"Identifikasi dari materi yang diklaim akan dilanggar atau menjadi\n"
+"subyek dari aktifitas pelanggaran yang telah dihapus atau akses yang telah\n"
+"dinonaktifkan, dan informasi dengan alasan yang cukup untuk mengizinkan "
+"layanan\n"
+"provider untuk melokasikan materi. Menyediakan Surel pada email\n"
+"adalah cara terbaik bagi kami untuk melokasikan kontent dengan cepat.\n"
+"Informasi yang cukup agar layanan provider dapat menghubungi\n"
+"pihak yang melakukan aduan, seperti alamat, nomor telepon, dan jika ada, "
+"sebuah\n"
+"alamat email dimana pihak pengadu dapat dihubungi.\n"
+"Sebuah pernyataan bahwa pihak pengadu mempunya itikad baik menggunakan\n"
+"materi pada hal-hal yang diadukan yang tidak ada izinnya dari pemilik hak "
+"cipta, atau\n"
+"agennya, atau oleh undang-undang.\n"
+"Sebuah pernyataan bahwa informasi yang diberitahukan adalah benar-benar "
+"akurat, dan dibawah\n"
+"hukuman sumpah palsu, dimana pihak yang mengadukan mempunya hak untuk "
+"melakukan aksi atas izin\n"
+"pemilik hak cipta eksklusuf yang telah dilanggar.\n"
+"Pemberitahuan tertulis yang harus dikirimkan kepada agen yang ditunjuk oleh "
+"kami yaitu:\n"
 
 #: templates/dmca.html:55
 msgid ""
 "\n"
-"Please also note that under Section 512(f) any person who knowingly materially\n"
+"Please also note that under Section 512(f) any person who knowingly "
+"materially\n"
 "misrepresents that material or activity is infringing may be subject to\n"
 "liability.\n"
-msgstr "\nDengan catatan setiap orang berada dibawah Section 512(f) yang mengetahui materi-materi\nyang telah salah direpresentasikan atau aktifitas yang telah dilanggar dapat\ndipertanggungjawabkan.\n"
+msgstr ""
+"\n"
+"Dengan catatan setiap orang berada dibawah Section 512(f) yang mengetahui "
+"materi-materi\n"
+"yang telah salah direpresentasikan atau aktifitas yang telah dilanggar "
+"dapat\n"
+"dipertanggungjawabkan.\n"
 
 #: templates/dmca.html:63
 msgid "Counter-Notification"
@@ -2182,10 +2351,22 @@ msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. Please\n"
-"also be advised that we enforce a policy that provides for the termination in\n"
+"disabled by mistake or misidentification may be subject to liability. "
+"Please\n"
+"also be advised that we enforce a policy that provides for the termination "
+"in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
-msgstr "\nDengan catatan bahwa dibawah aturan Hukum Hak Cipta Section 512(f), adanya kesalahan pada setiap orang yang\ndiketahui salah merepresentasikan secara material terhadap materi atau aktifitas telah dihapus atau\ndinonaktifkan atau telah terjadi kesalahan identifikasi yang dapat dipertanggungjawabkan. Mohon\njuga diketahui bahwa kami mendesak adanya kebijakan yang disediakan untuk menghapus\nkeadaan sehubungan dengan pelanggan yang mengulang pelanggaran.\n"
+msgstr ""
+"\n"
+"Dengan catatan bahwa dibawah aturan Hukum Hak Cipta Section 512(f), adanya "
+"kesalahan pada setiap orang yang\n"
+"diketahui salah merepresentasikan secara material terhadap materi atau "
+"aktifitas telah dihapus atau\n"
+"dinonaktifkan atau telah terjadi kesalahan identifikasi yang dapat "
+"dipertanggungjawabkan. Mohon\n"
+"juga diketahui bahwa kami mendesak adanya kebijakan yang disediakan untuk "
+"menghapus\n"
+"keadaan sehubungan dengan pelanggan yang mengulang pelanggaran.\n"
 
 #: templates/dmca.html:75
 msgid "How do I file a DMCA counter notice?"
@@ -2195,27 +2376,49 @@ msgstr "Bagaimana cara saya memberkas pemberitahuan banding DMCA?"
 msgid ""
 "\n"
 "The process for counter-notifications is governed by Section 512(g) of the\n"
-"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
-msgstr "\nProses pemberitahuan balik diatur oleh Section 512(g)\nDigital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca.pdf\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
+"pdf\n"
+msgstr ""
+"\n"
+"Proses pemberitahuan balik diatur oleh Section 512(g)\n"
+"Digital Millennium Copyright Act: http://www.copyright.gov/legislation/dmca."
+"pdf\n"
 
 #: templates/dmca.html:82
 msgid ""
 "\n"
 "To file a counter notification with us, you must provide a written\n"
 "communication that sets forth the items specified below.\n"
-msgstr "\nUntuk mengirimkan pemberitahuan balik kepada kami, Anda harus memberikan\npernyataan berupa komunikasi tertulis yang diatur oleh butir-butir dibawah ini.\n"
+msgstr ""
+"\n"
+"Untuk mengirimkan pemberitahuan balik kepada kami, Anda harus memberikan\n"
+"pernyataan berupa komunikasi tertulis yang diatur oleh butir-butir dibawah "
+"ini.\n"
 
 #: templates/dmca.html:87
 msgid ""
 "\n"
 "Please note that under Section 512(f) of the Copyright Act, any person who\n"
 "knowingly materially misrepresents that material or activity was removed or\n"
-"disabled by mistake or misidentification may be subject to liability. Please\n"
-"also be advised that we enforce a policy that provides for the termination in\n"
+"disabled by mistake or misidentification may be subject to liability. "
+"Please\n"
+"also be advised that we enforce a policy that provides for the termination "
+"in\n"
 "appropriate circumstances of subscribers who are repeat infringers.\n"
 "Accordingly, if you are not sure whether certain material infringes the\n"
 "copyrights of others, we suggest that you first contact an attorney.\n"
-msgstr "\nDengan catatan dibawah Hukum Hak Cipta Section 512(f), setiap orang\nyang mengetahui ada kesalahan representasi secara material akan materi tersebut atau aktifitas yang telah dihapus atau\ndinonaktifkan secara salah atau secara salah identifikasi yang dapat dipertanggungjawabkan. Mohon\njuga diketahui bahwa kami mendesak adanya kebijakan yang menyediakan untuk menghapus\nkeadaan sehubungan dengan pelanggan yang mengulang pelanggaran.\nBerdasarkan bahwa, jika Anda tidak yakin akan adanya pelanggaran material\nterhadap hak cipta orang lain, kami sarankan untuk menghubungi pengacara.\n"
+msgstr ""
+"\n"
+"Dengan catatan dibawah Hukum Hak Cipta Section 512(f), setiap orang\n"
+"yang mengetahui ada kesalahan representasi secara material akan materi "
+"tersebut atau aktifitas yang telah dihapus atau\n"
+"dinonaktifkan secara salah atau secara salah identifikasi yang dapat "
+"dipertanggungjawabkan. Mohon\n"
+"juga diketahui bahwa kami mendesak adanya kebijakan yang menyediakan untuk "
+"menghapus\n"
+"keadaan sehubungan dengan pelanggan yang mengulang pelanggaran.\n"
+"Berdasarkan bahwa, jika Anda tidak yakin akan adanya pelanggaran material\n"
+"terhadap hak cipta orang lain, kami sarankan untuk menghubungi pengacara.\n"
 
 #: templates/dmca.html:99
 msgid "Elements of Counter-Notification"
@@ -2225,30 +2428,69 @@ msgstr "Bagian dari Pemberitahuan-Banding"
 msgid ""
 "\n"
 "A sample counter notification may be found at:\n"
-"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability to\n"
-"process your counter notification, please use the following format (including\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. To expedite our ability "
+"to\n"
+"process your counter notification, please use the following format "
+"(including\n"
 "section numbers):\n"
-msgstr "\nContoh pemberitahuan balik bisa ditemukan pada:\nhttp://www.chillingeffects.org/dmca/counter512.pdf. Guna mempercepat kami untuk\nmemproses pemberitahuan balik Anda, silakan kirimkan pernyataan dalam format berikut (termasuk\nnomor seksi):\n"
+msgstr ""
+"\n"
+"Contoh pemberitahuan balik bisa ditemukan pada:\n"
+"http://www.chillingeffects.org/dmca/counter512.pdf. Guna mempercepat kami "
+"untuk\n"
+"memproses pemberitahuan balik Anda, silakan kirimkan pernyataan dalam format "
+"berikut (termasuk\n"
+"nomor seksi):\n"
 
 #: templates/dmca.html:109
 msgid ""
 "\n"
-"Identify the specific URLs of material that Miro Guide has removed or to which\n"
+"Identify the specific URLs of material that Miro Guide has removed or to "
+"which\n"
 "Miro Guide has disabled access.\n"
-"Provide your full name, address, telephone number, and email address, and the\n"
+"Provide your full name, address, telephone number, and email address, and "
+"the\n"
 "username of your Miro Guide account.\n"
-"Provide a statement that you consent to the jurisdiction of Federal District\n"
+"Provide a statement that you consent to the jurisdiction of Federal "
+"District\n"
 "Court for the judicial district in which your address is located (or San\n"
-"Francisco County, California if your address is outside of the United States),\n"
+"Francisco County, California if your address is outside of the United "
+"States),\n"
 "and that you will accept service of process from the person who provided\n"
 "notification under subsection (c)(1)(C) or an agent of such person.\n"
-"Include the following statement: \"I swear, under penalty of perjury, that I\n"
-"have a good faith belief that the material was removed or disabled as a result\n"
-"of a mistake or misidentification of the material to be removed or disabled.\"\n"
+"Include the following statement: \"I swear, under penalty of perjury, that "
+"I\n"
+"have a good faith belief that the material was removed or disabled as a "
+"result\n"
+"of a mistake or misidentification of the material to be removed or disabled."
+"\"\n"
 "Sign the notice. If you are providing notice by e-mail, a scanned physical\n"
 "signature or a valid electronic signature will be accepted.\n"
 "Send the written communication to the following address:\n"
-msgstr "\nIdentifikasikan Surel dari material yang telah dihapus oleh Miro Guide atau yang\ntelah dinonaktifkan aksesnya.\nBerikan informasi berupa nama lengkap, alamat, nomor telepon, dan alamat email juga\nnama pengguna akun Miro Guide Anda.\nBerikan pernyataan bahwa Anda mengerti terhadap perundang-undangan Federal District\nCourt untuk wilyah hukum dimana Anda berada (atau negara bagian\nSan Fransisco, California jika alamat Anda berada diluar Amerika Serikat),\nmaka Anda akan menerima layanan proses dari orang yang memberikan\npemberitahuan dibawah subseksi (c)(1)(C) atau agen dari perorangan.\nSertakan juga pernyataan berikut ini: \"Saya bersumpah, dibawah hukum dan para juri, bahwasannya saya\ndengan itikad baik menyatakan material tersebut telah dihapus atau dinonaktifkan sebagai hasil dari\nkesalahan misidentifikasi dari material yang telah dihapus atau dinonaktifkan.\"\nTandatangani pernyataan tersebut. Jika Anda melayangkannya lewat e-mail, jangan lupa menyertakan tandatangan\nyang telah di-scan atau tandatangan elektronik yang berlaku.\nKirimkan komunikasi tertulis ke alamat berikut:\n"
+msgstr ""
+"\n"
+"Identifikasikan Surel dari material yang telah dihapus oleh Miro Guide atau "
+"yang\n"
+"telah dinonaktifkan aksesnya.\n"
+"Berikan informasi berupa nama lengkap, alamat, nomor telepon, dan alamat "
+"email juga\n"
+"nama pengguna akun Miro Guide Anda.\n"
+"Berikan pernyataan bahwa Anda mengerti terhadap perundang-undangan Federal "
+"District\n"
+"Court untuk wilyah hukum dimana Anda berada (atau negara bagian\n"
+"San Fransisco, California jika alamat Anda berada diluar Amerika Serikat),\n"
+"maka Anda akan menerima layanan proses dari orang yang memberikan\n"
+"pemberitahuan dibawah subseksi (c)(1)(C) atau agen dari perorangan.\n"
+"Sertakan juga pernyataan berikut ini: \"Saya bersumpah, dibawah hukum dan "
+"para juri, bahwasannya saya\n"
+"dengan itikad baik menyatakan material tersebut telah dihapus atau "
+"dinonaktifkan sebagai hasil dari\n"
+"kesalahan misidentifikasi dari material yang telah dihapus atau "
+"dinonaktifkan.\"\n"
+"Tandatangani pernyataan tersebut. Jika Anda melayangkannya lewat e-mail, "
+"jangan lupa menyertakan tandatangan\n"
+"yang telah di-scan atau tandatangan elektronik yang berlaku.\n"
+"Kirimkan komunikasi tertulis ke alamat berikut:\n"
 
 #: templates/dmca.html:141
 msgid "What happens next?"
@@ -2257,31 +2499,70 @@ msgstr "Apa yang berlaku selanjutnya?"
 #: templates/dmca.html:143
 msgid ""
 "\n"
-"After we receive your counter-notification, we will forward it to the party who\n"
-"submitted the original claim of copyright infringement. Please note that when\n"
-"we forward the counter-notification, it includes your personal information. By\n"
+"After we receive your counter-notification, we will forward it to the party "
+"who\n"
+"submitted the original claim of copyright infringement. Please note that "
+"when\n"
+"we forward the counter-notification, it includes your personal information. "
+"By\n"
 "submitting a counter-notification, you consent to having your information\n"
-"revealed in this way. We will not forward the counter-notification to any party\n"
+"revealed in this way. We will not forward the counter-notification to any "
+"party\n"
 "other than the original claimant.\n"
-msgstr "\n\nSetelah kami mnenerima surat pemberitahuan balik dari Anda, kami akan meneruskannya ke pihak yang\ntelah menyatakan klaim resmi adanya pelanggaran hak karya cipta. Mohon dicatat ketika\nkami meneruskan pemberitahuan-balik tersebut, kami akan menyertakan informasi pribadi Anda. Dengan\nmengirimkan sebuah pemberitahuan-balik, Anda paham dan mengerti tentang informasi\nyang seperti ini. Kami tidak akan meneruskan pemberitahuan-balik ke pihak manapun\nselain kepada pengklaim yang sebenarnya.\n"
+msgstr ""
+"\n"
+"\n"
+"Setelah kami mnenerima surat pemberitahuan balik dari Anda, kami akan "
+"meneruskannya ke pihak yang\n"
+"telah menyatakan klaim resmi adanya pelanggaran hak karya cipta. Mohon "
+"dicatat ketika\n"
+"kami meneruskan pemberitahuan-balik tersebut, kami akan menyertakan "
+"informasi pribadi Anda. Dengan\n"
+"mengirimkan sebuah pemberitahuan-balik, Anda paham dan mengerti tentang "
+"informasi\n"
+"yang seperti ini. Kami tidak akan meneruskan pemberitahuan-balik ke pihak "
+"manapun\n"
+"selain kepada pengklaim yang sebenarnya.\n"
 
 #: templates/dmca.html:153
 msgid ""
 "\n"
-"After we send out the counter-notification, the claimant must then notify us\n"
+"After we send out the counter-notification, the claimant must then notify "
+"us\n"
 "within 10 days that he or she has filed an action seeking a court order to\n"
-"restrain you from engaging in infringing activity relating to the material on\n"
-"the Miro Guide. If we receive such notification we will be unable to restore\n"
+"restrain you from engaging in infringing activity relating to the material "
+"on\n"
+"the Miro Guide. If we receive such notification we will be unable to "
+"restore\n"
 "the material. If we do not receive such notification, we may reinstate the\n"
 "material.\n"
-msgstr "\nSetelah kami mengirimkan pemberitahuan-balik, pihak pengklaim harus mengontak kami\ndalam jangka waktu tidak lebih dari 10 hari bahwa dia telah memberkaskan ke pihak pengadilan untuk\nmencegah Anda dari terlibat aktifitas pelanggaran hukum sehubungan dengan material yang ada\npada Miro Guide. Apabila kami menerima suatu pemberitahuan setelah itu maka kami akan mengembalikan\nmaterial tersebut. Apabila kami tidak menerima sembarang pemberitahuan, kami akan mengembalikannya\nkepada keadaan seperti semula sebelum ada pemberitahuan.\n"
+msgstr ""
+"\n"
+"Setelah kami mengirimkan pemberitahuan-balik, pihak pengklaim harus "
+"mengontak kami\n"
+"dalam jangka waktu tidak lebih dari 10 hari bahwa dia telah memberkaskan ke "
+"pihak pengadilan untuk\n"
+"mencegah Anda dari terlibat aktifitas pelanggaran hukum sehubungan dengan "
+"material yang ada\n"
+"pada Miro Guide. Apabila kami menerima suatu pemberitahuan setelah itu maka "
+"kami akan mengembalikan\n"
+"material tersebut. Apabila kami tidak menerima sembarang pemberitahuan, kami "
+"akan mengembalikannya\n"
+"kepada keadaan seperti semula sebelum ada pemberitahuan.\n"
 
 #: templates/dmca.html:163
 msgid ""
 "\n"
-"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE IS\n"
-"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES ONLY.\n"
-msgstr "\nPENYANGKALAN: BAHWA KAMI BUKANLAH PENGACARA ANDA, DAN INFORMASI YANG TERSEDIA DISINI\nBUKANLAH SARAN HUKUM. KAMI MENYEDIAKAN INFORMASI SEBATAS UNTUK DIKETAHUI SAJA.\n"
+"DISCLAIMER: WE ARE NOT YOUR ATTORNEYS, AND THE INFORMATION WE PRESENT HERE "
+"IS\n"
+"NOT LEGAL ADVICE. WE PRESENT THIS INFORMATION FOR INFORMATIONAL PURPOSES "
+"ONLY.\n"
+msgstr ""
+"\n"
+"PENYANGKALAN: BAHWA KAMI BUKANLAH PENGACARA ANDA, DAN INFORMASI YANG "
+"TERSEDIA DISINI\n"
+"BUKANLAH SARAN HUKUM. KAMI MENYEDIAKAN INFORMASI SEBATAS UNTUK DIKETAHUI "
+"SAJA.\n"
 
 #: templates/embed_page.html:24
 msgid "Add collaborative subtitling to every video on your site"
@@ -2294,9 +2575,16 @@ msgstr "Masukkan sebaris kode ke halaman Anda:"
 #: templates/embed_page.html:32
 msgid ""
 "\n"
-"            You can add it just before the <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
+"            You can add it just before the <code>&lt;/head&gt;</code> or "
+"<code>&lt;/body&gt;</code> tag (<a href=\"https://github.com/pculture/"
+"unisubs/wiki/Widgetizer-script-usage-guide\">see usage notes</a>).\n"
 "        "
-msgstr "\n            Anda dapat menambahkannya sebelum tag <code>&lt;/head&gt;</code> or <code>&lt;/body&gt;</code> (<a href=\"https://github.com/pculture/unisubs/wiki/Widgetizer-script-usage-guide\">lihat catatan penggunaan</a>).\n        "
+msgstr ""
+"\n"
+"            Anda dapat menambahkannya sebelum tag <code>&lt;/head&gt;</code> "
+"or <code>&lt;/body&gt;</code> (<a href=\"https://github.com/pculture/unisubs/"
+"wiki/Widgetizer-script-usage-guide\">lihat catatan penggunaan</a>).\n"
+"        "
 
 #: templates/embed_page.html:37
 msgid "This lets you and visitors to your site"
@@ -2333,10 +2621,16 @@ msgstr "Merupakan fitur dari Proyek Mozilla Drumbeat"
 #: templates/embed_page.html:66
 msgid ""
 "\n"
-"        A \"subtitle me\" or \"choose language\" button will appear across all compatible videos. \n"
+"        A \"subtitle me\" or \"choose language\" button will appear across "
+"all compatible videos. \n"
 "        Users can click to activate (or create) subtitles.\n"
 "        "
-msgstr "\n        Tombol \"subtitlekan saya\" atau \"pilih bahasa\" akan muncul disemua video yang kompatibel. \n        Pengguna dapat mengklik untuk mengaktifasi (atau membuat) subtitle.\n        "
+msgstr ""
+"\n"
+"        Tombol \"subtitlekan saya\" atau \"pilih bahasa\" akan muncul "
+"disemua video yang kompatibel. \n"
+"        Pengguna dapat mengklik untuk mengaktifasi (atau membuat) subtitle.\n"
+"        "
 
 #: templates/embed_page.html:77
 msgid "This code is experimental. If you run into problems, please"
@@ -2405,13 +2699,17 @@ msgstr "Apa hubungan Anda dengan Mozilla Drumbeat?"
 
 #: templates/faq.html:32 templates/faq.html.py:136
 msgid "Where can I download subtitles in .SRT or other formats?"
-msgstr "Dimana saya bisa mengunduh teks film dalam format .SRT atau yang lainnya?"
+msgstr ""
+"Dimana saya bisa mengunduh teks film dalam format .SRT atau yang lainnya?"
 
 #: templates/faq.html:33 templates/faq.html.py:147
 msgid ""
-"It says \"Someone else is currently editing these subtitles\" and I can't do"
-" anything.  How long will this last for?  Why does it happen?"
-msgstr "Yang menyatakan \"Seseorang sedang menyunting subtitle ini\" dan saya tidak dapat berbuat apa-apa.  Berapa lama keadaan ini bisa berlangsung?  Mengapa bisa terjadi?"
+"It says \"Someone else is currently editing these subtitles\" and I can't do "
+"anything.  How long will this last for?  Why does it happen?"
+msgstr ""
+"Yang menyatakan \"Seseorang sedang menyunting subtitle ini\" dan saya tidak "
+"dapat berbuat apa-apa.  Berapa lama keadaan ini bisa berlangsung?  Mengapa "
+"bisa terjadi?"
 
 #: templates/faq.html:34 templates/faq.html.py:157
 msgid "Why can't I change the timing on a translation?"
@@ -2419,9 +2717,11 @@ msgstr "Mengapa saya tidak bisa mengubah penata waktu pada terjemahan?"
 
 #: templates/faq.html:35 templates/faq.html.py:168
 msgid ""
-"How do old revisions work? What if somebody makes a change to my work that I"
-" don't approve of?"
-msgstr "Bagiamana cara revisi yang lama bekerja? Bagaimana jika seseorang membuat perubahan kedalam hasil kerja saya yang tidak saya setujui?"
+"How do old revisions work? What if somebody makes a change to my work that I "
+"don't approve of?"
+msgstr ""
+"Bagiamana cara revisi yang lama bekerja? Bagaimana jika seseorang membuat "
+"perubahan kedalam hasil kerja saya yang tidak saya setujui?"
 
 #: templates/faq.html:36 templates/faq.html.py:184
 msgid "How do I add the Amara &quot;embed all videos&quot; code to my site?"
@@ -2435,16 +2735,20 @@ msgstr "Hi, Anda tidak terdaftar dalam daftar bahasa saya!"
 msgid ""
 "\n"
 "      \t\tAmara is an easy way for anyone to add subtitles, captions, \n"
-"\t\t\tor translate nearly any video on the web. It works in a collaborative \n"
-"\t\t\tWikipedia-like fashion. The software is free and open source and can be used and \n"
-"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center\">improved by anyone</a>.\n"
+"\t\t\tor translate nearly any video on the web. It works in a "
+"collaborative \n"
+"\t\t\tWikipedia-like fashion. The software is free and open source and can "
+"be used and \n"
+"\t\t\t<a href=\"http://wiki.github.com/pculture/unisubs/dev-center"
+"\">improved by anyone</a>.\n"
 "\t\t"
 msgstr ""
 
 #: templates/faq.html:56
 msgid ""
 "\n"
-"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin subtitling</a>\n"
+"\t\t\tYou can <a href=\"http://universalsubtitles.org/videos/create\">begin "
+"subtitling</a>\n"
 "\t\t\ta video you have already posted on the web.\t\n"
 "\t\t"
 msgstr ""
@@ -2456,25 +2760,32 @@ msgstr "Teks film VVideo adalah tambang emas yang belum dimanfaatkan."
 #: templates/faq.html:66
 msgid ""
 "Captions make videos accessible for viewers who are deaf or hard of hearing "
-msgstr "Keterangan gambar video membuat video dapat diakses oleh penonton tunarungu dan sulit pendengaran"
+msgstr ""
+"Keterangan gambar video membuat video dapat diakses oleh penonton tunarungu "
+"dan sulit pendengaran"
 
 #: templates/faq.html:67
 msgid ""
-"Translations make it possible for all of us to watch video in languages that"
-" we don't speak"
-msgstr "Penterjemahan membuatnya mungkin bagi kita menyaksikan & mengerti video dalam bahasa yang tidak kita kuasai"
+"Translations make it possible for all of us to watch video in languages that "
+"we don't speak"
+msgstr ""
+"Penterjemahan membuatnya mungkin bagi kita menyaksikan & mengerti video "
+"dalam bahasa yang tidak kita kuasai"
 
 #: templates/faq.html:68
 msgid ""
 "Video creators get: better SEO, more views, access to a far bigger "
 "(potentially multilingual and global) audience, accessibility for deaf and "
 "hard of hearing viewers, and more"
-msgstr "Pembuat video mendapat: SEO yang lebih baik, lebih banyak penonton, akses ke penonton yang lebih besar (secara potensial multibahasa dan mendunia), akses para penonton tunarungu dan sulit pendengaran, dan masih banyak lagi"
+msgstr ""
+"Pembuat video mendapat: SEO yang lebih baik, lebih banyak penonton, akses ke "
+"penonton yang lebih besar (secara potensial multibahasa dan mendunia), akses "
+"para penonton tunarungu dan sulit pendengaran, dan masih banyak lagi"
 
 #: templates/faq.html:73
 msgid ""
-"he Participatory Culture Foundation is a 501c3 non-profit organization whose"
-" mission is to build a fairer, more open, and more democratic media space. "
+"he Participatory Culture Foundation is a 501c3 non-profit organization whose "
+"mission is to build a fairer, more open, and more democratic media space. "
 "PCF saw a gap in the marketplace for more open and collaborative subtitling "
 "&mdash; Amara is helping to fill that need."
 msgstr ""
@@ -2483,7 +2794,9 @@ msgstr ""
 msgid ""
 "Yes, we are working on a solution for making closed captions [including "
 "information about sounds and music], as well as subtitles/translations."
-msgstr "Ya, kami sedang mengerjakan closed captions [termasuk suara dan musik], seiring dengan teks film/terjemahan."
+msgstr ""
+"Ya, kami sedang mengerjakan closed captions [termasuk suara dan musik], "
+"seiring dengan teks film/terjemahan."
 
 #: templates/faq.html:81
 msgid ""
@@ -2493,68 +2806,136 @@ msgstr "Kami akan mendukung sebanyak mungkin bahasa/set karakter."
 #: templates/faq.html:86
 msgid ""
 "\n"
-"      \tThe site and tools are available in a number of languages (set your language \n"
-"\t\tin your browser preferences and we’ll take care of the rest). We’re always looking for \n"
-"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">volunteer translators</a> \n"
+"      \tThe site and tools are available in a number of languages (set your "
+"language \n"
+"\t\tin your browser preferences and we’ll take care of the rest). We’re "
+"always looking for \n"
+"\t\t<a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-"
+"translateable-looking-for-translators/\">volunteer translators</a> \n"
 "\t\tto help improve and add more languages.\n"
 "\t  "
-msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span>Situs dan alat ini tersedia dalam berbagai bahasa (pilih bahasa \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>dalam preferensi peramban Anda dan kami akan melakukan selebihnya). Kami menunggu partisipasi \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"http://blog.universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-translators/\">penterjemah sukarela</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>untuk membantu dan menambah lebih banyak lagi bahasa-bahasa.\n<span class=\"whitespace other\" title=\"Tab\">»</span>  "
+msgstr ""
+"\n"
+"      <span class=\"whitespace other\" title=\"Tab\">»</span>Situs dan alat "
+"ini tersedia dalam berbagai bahasa (pilih bahasa \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>dalam preferensi peramban Anda "
+"dan kami akan melakukan selebihnya). Kami menunggu partisipasi \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span><a href=\"http://blog."
+"universalsubtitles.org/2010/09/13/our-site-is-translateable-looking-for-"
+"translators/\">penterjemah sukarela</a> \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>untuk membantu dan menambah lebih "
+"banyak lagi bahasa-bahasa.\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span>  "
 
 #: templates/faq.html:97
 msgid ""
 "\n"
-"\t      For a single video, use our site. For multiple videos on your website, use \n"
-"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> in your \n"
+"\t      For a single video, use our site. For multiple videos on your "
+"website, use \n"
+"\t\t  <a href=\"http://universalsubtitles.org/en/get-code/\">this code</a> "
+"in your \n"
 "\t\t  website’s template inside the &lt;head&gt; tags.\n"
 "\t\t"
-msgstr "\n<span class=\"whitespace other\" title=\"Tab\">»</span>      Untuk satu video, gunakan situs kami. Untuk banyak video di situs web Anda, gunakan \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  <a href=\"http://universalsubtitles.org/en/get-code/\">kode ini</a> di dalam \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  tag &lt;head&gt; templat situs web Anda.\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
+msgstr ""
+"\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span>      Untuk satu "
+"video, gunakan situs kami. Untuk banyak video di situs web Anda, gunakan \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  <a href=\"http://"
+"universalsubtitles.org/en/get-code/\">kode ini</a> di dalam \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  tag &lt;head&gt; templat situs "
+"web Anda.\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:106
 msgid ""
-"For our subtitling widget and community website, we're using the <a "
-"href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
-msgstr "Untuk pengaya peterjemah dan situs komunitas kami, kami menggunakan <a href=\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+"For our subtitling widget and community website, we're using the <a href="
+"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
+msgstr ""
+"Untuk pengaya peterjemah dan situs komunitas kami, kami menggunakan <a href="
+"\"http://en.wikipedia.org/wiki/Affero_General_Public_License\">AGPL</a>."
 
 #: templates/faq.html:110
 msgid ""
 "Please do! If you're interested in coding and development, please visit our "
 "<a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">developer "
 "center</a>."
-msgstr "Silahkan lakukan hal tsb! Jika Anda tertarik untuk pengembangan dan koding, kunjungi <a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">pusat pengembang</a> kami"
+msgstr ""
+"Silahkan lakukan hal tsb! Jika Anda tertarik untuk pengembangan dan koding, "
+"kunjungi <a href=\"http://wiki.github.com/8planes/unisubs/dev-center\">pusat "
+"pengembang</a> kami"
 
 #: templates/faq.html:115
 msgid ""
 "\n"
 "\t\tIf you're interested in general involvement, please see our \n"
-"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla Drumbeat page</a>. \n"
+"\t\t<a href=\"https://www.drumbeat.org/project/universal-subtitles\">Mozilla "
+"Drumbeat page</a>. \n"
 "\t\tIf you have a specific idea, please get in touch: \n"
-"\t\t<a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
-"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next question for details).\n"
+"\t\t<a href=\"mailto:universalsubtitles@pculture.org"
+"\">universalsubtitles@pculture.org</a> \n"
+"\t\tAnd as a 501c3 non-profit org, we do accept donations (see the next "
+"question for details).\n"
 "\t\t"
-msgstr "\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Jika Anda ingin ikut berpartisipasi, silahkan kunjungi \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"https://www.drumbeat.org/project/universal-subtitles\">halaman Mozilla Drumbeat</a>. \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Jika Anda punya ide, silahkan kirim email: \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span><a href=\"mailto:universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Dan sebagai sebuah organisasi nirlaba 501c3, kami juga menerima sumbangan sukarela (lihat pertanyaan selanjutnya untuk lebih jelas).\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
+msgstr ""
+"\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Jika Anda ingin ikut "
+"berpartisipasi, silahkan kunjungi \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span><a href=\"https://www.drumbeat."
+"org/project/universal-subtitles\">halaman Mozilla Drumbeat</a>. \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Jika Anda punya ide, silahkan "
+"kirim email: \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span><a href=\"mailto:"
+"universalsubtitles@pculture.org\">universalsubtitles@pculture.org</a> \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Dan sebagai sebuah organisasi "
+"nirlaba 501c3, kami juga menerima sumbangan sukarela (lihat pertanyaan "
+"selanjutnya untuk lebih jelas).\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:126
 msgid ""
 "\n"
-"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">donate here</a> (through the Mozilla Drumbeat project).\n"
+"      \t\tYes and yes! You can <a href=\"https://donate.mozilla.org/page/"
+"contribute/universalsubtitles\">donate here</a> (through the Mozilla "
+"Drumbeat project).\n"
 "\t\t"
-msgstr "\n      <span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Ya dan ya! Anda dapat memberikan <a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles\">sumbangan disini</a> (melalui proyek Mozilla Drumbeat).\n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>"
+msgstr ""
+"\n"
+"      <span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Ya dan ya! Anda dapat memberikan "
+"<a href=\"https://donate.mozilla.org/page/contribute/universalsubtitles"
+"\">sumbangan disini</a> (melalui proyek Mozilla Drumbeat).\n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>"
 
 #: templates/faq.html:133
 msgid ""
 "The Mozilla Foundation has provided Amara with seed funding, community "
-"support, and fundraising support through <a "
-"href=\"http://www.drumbeat.org/about\">Drumbeat</a>. Drumbeat is a movement "
-"to keep the web open for the next 100 years, and Amara is a featured "
-"project!"
+"support, and fundraising support through <a href=\"http://www.drumbeat.org/"
+"about\">Drumbeat</a>. Drumbeat is a movement to keep the web open for the "
+"next 100 years, and Amara is a featured project!"
 msgstr ""
 
 #: templates/faq.html:138
 msgid ""
 "\n"
-"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, .TXT, and DFXP.\n"
-"     \t formats on the page for that language (<a href=\"http://universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
-"\t\t Click \"Download Subtitles\" button in the lower right to the left from \"Edit Subtitles\" \n"
+"     \t When subtitles exist, you can download them in .SRT, .SSA, .SBV, ."
+"TXT, and DFXP.\n"
+"     \t formats on the page for that language (<a href=\"http://"
+"universalsubtitles.org/videos/yKsUAgChJlGA/lt/\">example</a>). \n"
+"\t\t Click \"Download Subtitles\" button in the lower right to the left from "
+"\"Edit Subtitles\" \n"
 "\t\t button and choose the desired file format from the drop-down list.\n"
 "       "
 msgstr ""
@@ -2562,61 +2943,138 @@ msgstr ""
 #: templates/faq.html:149
 msgid ""
 "\n"
-"        The system currently only allows one user to edit subtitles for any given video \n"
-"        at a time. So, if someone else is already editing subtitles for the video when \n"
+"        The system currently only allows one user to edit subtitles for any "
+"given video \n"
+"        at a time. So, if someone else is already editing subtitles for the "
+"video when \n"
 "        you try to edit the subtitles, you'll get this message.\n"
 "        "
-msgstr "\n        Saat ini sistem hanya mengizinkan satu pengguna untuk menyunting subtitle satu video \n        pada sekali waktu. Seandainya, seseorang sudah menyunting subtitle video ketika \n        Anda sedang menyunting, Anda akan mendapat pesan ini.\n        "
+msgstr ""
+"\n"
+"        Saat ini sistem hanya mengizinkan satu pengguna untuk menyunting "
+"subtitle satu video \n"
+"        pada sekali waktu. Seandainya, seseorang sudah menyunting subtitle "
+"video ketika \n"
+"        Anda sedang menyunting, Anda akan mendapat pesan ini.\n"
+"        "
 
 #: templates/faq.html:159
 msgid ""
 "\n"
-"        You can. Go to the translation editor and click “Change subtitle timing”. \n"
-"\t\tOnly do this if the timing on the original language really cannot match \n"
-"\t\tthe language you’re translating into. Otherwise, improvements in the original \n"
+"        You can. Go to the translation editor and click “Change subtitle "
+"timing”. \n"
+"\t\tOnly do this if the timing on the original language really cannot "
+"match \n"
+"\t\tthe language you’re translating into. Otherwise, improvements in the "
+"original \n"
 "\t\twill automatically cascade.\n"
 "        "
-msgstr "\n        Anda bisa. Menuju ke bagian penyuntingan terjemahan dan klik “Ubah waktu subtitle”. \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Lakukan apabila penunjuk waktu dari bahasa yang asli tidak sesuai \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>dengan bahasa yang Anda terjemahkan. Diluar itu, pengembangan terjemahan asli \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>akan secara otomatis terangkum jadi satu.\n        "
+msgstr ""
+"\n"
+"        Anda bisa. Menuju ke bagian penyuntingan terjemahan dan klik “Ubah "
+"waktu subtitle”. \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Lakukan apabila penunjuk waktu "
+"dari bahasa yang asli tidak sesuai \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>dengan bahasa yang Anda "
+"terjemahkan. Diluar itu, pengembangan terjemahan asli \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>akan secara otomatis terangkum "
+"jadi satu.\n"
+"        "
 
 #: templates/faq.html:170
 msgid ""
 "\n"
 "        Each set of subtitles or translation has a full revision history. \n"
-"\t\tJust click on the tab on the subtitle page in you will see a list of revisions. \n"
-"\t\tYou can use the checkboxes on the left and the \"compare revisions\" button \n"
-"\t\tto see the difference between two revisions. Or you can click on any one revision, \n"
+"\t\tJust click on the tab on the subtitle page in you will see a list of "
+"revisions. \n"
+"\t\tYou can use the checkboxes on the left and the \"compare revisions\" "
+"button \n"
+"\t\tto see the difference between two revisions. Or you can click on any one "
+"revision, \n"
 "\t\tand edit based on that revision or roll back to that revision.\n"
 "        <br/><br/>\n"
 "        If the current version is blank, but there are older revisions, \n"
-"\t\tit make sense to check those older revisions before starting from scratch, \n"
+"\t\tit make sense to check those older revisions before starting from "
+"scratch, \n"
 "\t\tbecause there could be useful work in an older revision.\n"
 "        "
-msgstr "\n        Masing-masing set subtitle atau terjemahan punya riwayat revisi. \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Klik tab di halaman subtitle untuk melihat riwayat revisi. \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>Anda dapat menggunakan kotak centang disebelah kiri dan tombol \"bandingkan reivisi \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>untuk melihat perbedaan diantara dua revisi. Atau Anda bisa klik pada sembarang revisi, \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>dan sunting berdasarkan revisi tsb atau mengembalikan ke revisi tsb.\n        <br/><br/>\n        Jika revisi terbaru kosong, tapi ada revisi yang lama, \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>silahkan periksa revisi tsb, \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>karena mungkin ada yang berguna disana sebelum memulai yang baru.\n        "
+msgstr ""
+"\n"
+"        Masing-masing set subtitle atau terjemahan punya riwayat revisi. \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Klik tab di halaman subtitle "
+"untuk melihat riwayat revisi. \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>Anda dapat menggunakan kotak "
+"centang disebelah kiri dan tombol \"bandingkan reivisi \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>untuk melihat perbedaan diantara "
+"dua revisi. Atau Anda bisa klik pada sembarang revisi, \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>dan sunting berdasarkan revisi "
+"tsb atau mengembalikan ke revisi tsb.\n"
+"        <br/><br/>\n"
+"        Jika revisi terbaru kosong, tapi ada revisi yang lama, \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>silahkan periksa revisi tsb, \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>karena mungkin ada yang berguna "
+"disana sebelum memulai yang baru.\n"
+"        "
 
 #: templates/faq.html:186
 msgid ""
 "\n"
-"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this page</a> \n"
+"          Go to <a href=\"http://universalsubtitles.org/get-code/\">this "
+"page</a> \n"
 "\t\t  and double click on the code in the white box to select it all.  \n"
-"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your clipboard.  \n"
+"\t\t  Go to Edit > Copy in your browser's menu to copy the code to your "
+"clipboard.  \n"
 "\t\t  Then start editing the headers in your site or blog theme, \n"
-"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/head&gt; \n"
+"\t\t  and paste the script somewhere between the &lt;head&gt; and &lt;/"
+"head&gt; \n"
 "\t\t  tags in your blog theme.  \n"
 "        "
-msgstr "\n          Kunjungi <a href=\"http://universalsubtitles.org/get-code/\">halaman ini</a> \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  dan klik dua kali di kode berkotak putih untuk memilih semuanya.  \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  Lalu ke Sunting > Salin ke menu peramban Anda untuk menyalin ke klip board.  \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  Kemudian mulailah menyunting headers situs atau blog Anda, \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  dan tempelkan skrip diantara tag &lt;head&gt; dan &lt;/head&gt; \n<span class=\"whitespace other\" title=\"Tab\">»</span><span class=\"whitespace other\" title=\"Tab\">»</span>  pada blog Anda.  \n        "
+msgstr ""
+"\n"
+"          Kunjungi <a href=\"http://universalsubtitles.org/get-code/"
+"\">halaman ini</a> \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  dan klik dua kali di kode "
+"berkotak putih untuk memilih semuanya.  \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  Lalu ke Sunting > Salin ke menu "
+"peramban Anda untuk menyalin ke klip board.  \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  Kemudian mulailah menyunting "
+"headers situs atau blog Anda, \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  dan tempelkan skrip diantara "
+"tag &lt;head&gt; dan &lt;/head&gt; \n"
+"<span class=\"whitespace other\" title=\"Tab\">»</span><span class="
+"\"whitespace other\" title=\"Tab\">»</span>  pada blog Anda.  \n"
+"        "
 
 #: templates/faq.html:199
 msgid ""
 "\n"
 "          Sorry about that.  Just contact us and we’ll be happy to add it.\n"
 "        "
-msgstr "\n          Mohon dimaafkan.   Hubungi kami, dan kami akan menambahkannya.\n        "
+msgstr ""
+"\n"
+"          Mohon dimaafkan.   Hubungi kami, dan kami akan menambahkannya.\n"
+"        "
 
 #: templates/feedback_response.html:3
 msgid ""
 "Thanks for getting in touch! We love hearing your ideas, bugs, feedback, "
 "opinions and such."
-msgstr "Terima kasih karena telah menghubungi kami! Senang mendengar ide, bugs, saran, dan opini dari Anda."
+msgstr ""
+"Terima kasih karena telah menghubungi kami! Senang mendengar ide, bugs, "
+"saran, dan opini dari Anda."
 
 #: templates/feedback_response.html:6
 msgid "Stay tuned as the project evolves!"
@@ -2634,7 +3092,9 @@ msgstr "Terbaik"
 msgid ""
 "PS. We do our best to respond to all questions, but please be patient -- we "
 "get a lot of email"
-msgstr "NB. Kami berusaha untuk menjawab semua pertanyaan, mohon bersabar -- karena kami menerima banyak sekali email masuk"
+msgstr ""
+"NB. Kami berusaha untuk menjawab semua pertanyaan, mohon bersabar -- karena "
+"kami menerima banyak sekali email masuk"
 
 #: templates/generic-error.html:7
 msgid "Sorry!"
@@ -2650,7 +3110,8 @@ msgstr ""
 
 #: templates/index.html:18
 msgid "The easiest way to caption and translate any video."
-msgstr "Cara termudah untuk melakukan takarir dan terjemahan ke sembarang video."
+msgstr ""
+"Cara termudah untuk melakukan takarir dan terjemahan ke sembarang video."
 
 #: templates/index.html:19
 msgid "The most powerful and flexible subtitling platform in the world."
@@ -2686,7 +3147,8 @@ msgstr "Tempelkan video dimana saja"
 
 #: templates/index.html:38
 msgid "Add subtitles yourself or ask viewers to help."
-msgstr "Tambah subtitle Anda sendiri atau minta pengunjung untuk membantu Anda."
+msgstr ""
+"Tambah subtitle Anda sendiri atau minta pengunjung untuk membantu Anda."
 
 #: templates/index.html:43
 msgid "Help Create Captions and Subtitles"
@@ -2695,7 +3157,8 @@ msgstr ""
 #: templates/index.html:45
 msgid ""
 "\n"
-"            Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
+"            Help organizations and deaf and hard of hearing viewers make "
+"videos accessible around the world.\n"
 "        "
 msgstr ""
 
@@ -2710,7 +3173,9 @@ msgstr ""
 #: templates/index.html:54
 msgid ""
 "\n"
-"            Revolutionize how you create subtitles and reach viewers. Increase viewership with transcription, captioning, and translation services, and flexible API and integration options.\n"
+"            Revolutionize how you create subtitles and reach viewers. "
+"Increase viewership with transcription, captioning, and translation "
+"services, and flexible API and integration options.\n"
 "        "
 msgstr ""
 
@@ -2850,20 +3315,29 @@ msgstr "Tujuan Rapat"
 msgid ""
 "<strong>Connect</strong> major stakeholders from projects, organizations, "
 "and movements that have open subtitling needs or focus."
-msgstr "<strong>Hubungan</strong> para pemegang saham mayoritas proyek, organisasi, dan pergerakan yang memiliki kepentingan atau fokus kepada penterjemahan terbuka."
+msgstr ""
+"<strong>Hubungan</strong> para pemegang saham mayoritas proyek, organisasi, "
+"dan pergerakan yang memiliki kepentingan atau fokus kepada penterjemahan "
+"terbuka."
 
 #: templates/opensubtitles2010.html:41
 msgid ""
 "<strong>Identify ways</strong> to solve stakeholder subtitling needs and be "
 "aware of existing technology that can be leveraged. Find logical places for "
 "collaboration/cooperation."
-msgstr "<strong>Cara-cara pengenalan</strong> untuk memecahkan masalah kebutuhan menterjemahkan para pemegang saham dan kesadaran akan kehadiran teknologi yang akan diangkat. Temukan tempat-tempat yang masuk akal guna kerjasama/berkolaborasi."
+msgstr ""
+"<strong>Cara-cara pengenalan</strong> untuk memecahkan masalah kebutuhan "
+"menterjemahkan para pemegang saham dan kesadaran akan kehadiran teknologi "
+"yang akan diangkat. Temukan tempat-tempat yang masuk akal guna kerjasama/"
+"berkolaborasi."
 
 #: templates/opensubtitles2010.html:44
 msgid ""
 "<strong>Move towards</strong> standardizing solutions and pushing forward "
 "the state of the art in open subtiting."
-msgstr "<strong>Memajukan</strong> standarisasi solusi dan mendorong seni di dalam penterjemajan terbuka."
+msgstr ""
+"<strong>Memajukan</strong> standarisasi solusi dan mendorong seni di dalam "
+"penterjemajan terbuka."
 
 #: templates/opensubtitles2010.html:53
 msgid "Participants"
@@ -2876,13 +3350,21 @@ msgid ""
 "accessibility advocates, open source developers, educational leaders, and "
 "other individuals and organizations with a stake in the subtitling world. "
 "We'll make a roster available when the event draws closer."
-msgstr "Para peserta meliputi: pembuat video dan produser, pengguna, perwakilan dari penyedia layanan video besar, insinyur, pengacara aksesibilitas, para pengembang open source, pemuka-pemuka dalam bidang pendidikan, dan individu serta organisasi yang berperan dalam dunia penterjemahan. Kami akan membuat daftar kehadiran menjelang acara."
+msgstr ""
+"Para peserta meliputi: pembuat video dan produser, pengguna, perwakilan dari "
+"penyedia layanan video besar, insinyur, pengacara aksesibilitas, para "
+"pengembang open source, pemuka-pemuka dalam bidang pendidikan, dan individu "
+"serta organisasi yang berperan dalam dunia penterjemahan. Kami akan membuat "
+"daftar kehadiran menjelang acara."
 
 #: templates/opensubtitles2010.html:57
 msgid ""
 "Attendees are selected by invitation; however, if you or your organization "
 "would like to participate, please contact:"
-msgstr "Mereka yang akan hadir adalah orang-orang yang dipilih melalui undangan, walau bagaimana pun apabila organisasi Anda ingin berpartisipasi, silahkan hubungi."
+msgstr ""
+"Mereka yang akan hadir adalah orang-orang yang dipilih melalui undangan, "
+"walau bagaimana pun apabila organisasi Anda ingin berpartisipasi, silahkan "
+"hubungi."
 
 #: templates/opensubtitles2010.html:62
 msgid "When"
@@ -2898,10 +3380,19 @@ msgstr "Dimana"
 
 #: templates/opensubtitles2010.html:68
 msgid ""
-"The summit will be held at the beautiful Open Plans penthouse in Soho, which"
-" is located at 148 Lafayette St, Floor 12, New York City. (<a "
-"href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
-msgstr "Pertemuan akan digelar di penthouse Open House Soho yang indah, yang tepatnya berada di 148 Lafayette St, Floor 12, New York City. (<a href=\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor+12,+New+York+City&sll=40.701809,-73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+"The summit will be held at the beautiful Open Plans penthouse in Soho, which "
+"is located at 148 Lafayette St, Floor 12, New York City. (<a href=\"http://"
+"maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette+St,+Floor"
+"+12,+New+York+City&sll=40.701809,-"
+"73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,"
+"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
+msgstr ""
+"Pertemuan akan digelar di penthouse Open House Soho yang indah, yang "
+"tepatnya berada di 148 Lafayette St, Floor 12, New York City. (<a href="
+"\"http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=148+Lafayette"
+"+St,+Floor+12,+New+York+City&sll=40.701809,-"
+"73.92127&sspn=0.009175,0.022724&ie=UTF8&hq=&hnear=148+Lafayette+St,+New+York,"
+"+10013&ll=40.718575,-74.000988&spn=0.03669,0.090895&z=14\">map</a>)"
 
 #: templates/opensubtitles2010.html:73
 msgid "Why"
@@ -2910,15 +3401,35 @@ msgstr "Mengapa"
 #: templates/opensubtitles2010.html:75
 msgid ""
 "\n"
-"            The focus of this summit is increased availability and better usability for captions and subtitles, \n"
+"            The focus of this summit is increased availability and better "
+"usability for captions and subtitles, \n"
 "            which are both sorely needed. It comes at a critical time, \n"
-"            as internet video usage is skyrocketing&mdash;people who rely on captions are threatened to be left behind. \n"
+"            as internet video usage is skyrocketing&mdash;people who rely on "
+"captions are threatened to be left behind. \n"
 "            New users from every culture are coming online en masse; \n"
-"            standardizing and ubiquitizing the technology can make potential audiences exponentially larger and messages can cross cultural boundaries more easily. \n"
-"            More captions will also make it simpler for computers to process, index, \n"
+"            standardizing and ubiquitizing the technology can make potential "
+"audiences exponentially larger and messages can cross cultural boundaries "
+"more easily. \n"
+"            More captions will also make it simpler for computers to "
+"process, index, \n"
 "            and make sense of the ever growing sea of online video.\n"
 "           "
-msgstr "\n            Fokus utama dari pertemuan ini adalah untuk meningkatkan fungsi teks film dan penterjemahan, \n            yang sangat dibutuhkan saat ini. Seiring dengan meroketnya penggunaan video internet, \n            &mdash;dimana orang-orang yang bergantung pada terjemahan video kemungkinan akan tertinggal. \n            Orang-orang dari bermacam latar belakang kebudayaan berdatangan secara massal; \n            standarisasi dan teknologi yang ada dapat memperbesar jumlah penonton lintas kebudayaan. \n            Penulisan teks film pada video juga akan mempermudah proses index komputer, \n            yang akan memperluas perkembangan video online.\n           "
+msgstr ""
+"\n"
+"            Fokus utama dari pertemuan ini adalah untuk meningkatkan fungsi "
+"teks film dan penterjemahan, \n"
+"            yang sangat dibutuhkan saat ini. Seiring dengan meroketnya "
+"penggunaan video internet, \n"
+"            &mdash;dimana orang-orang yang bergantung pada terjemahan video "
+"kemungkinan akan tertinggal. \n"
+"            Orang-orang dari bermacam latar belakang kebudayaan berdatangan "
+"secara massal; \n"
+"            standarisasi dan teknologi yang ada dapat memperbesar jumlah "
+"penonton lintas kebudayaan. \n"
+"            Penulisan teks film pada video juga akan mempermudah proses "
+"index komputer, \n"
+"            yang akan memperluas perkembangan video online.\n"
+"           "
 
 #: templates/opensubtitles2010.html:91
 msgid "Organizers, Facilitators, Sponsors"
@@ -2931,8 +3442,8 @@ msgstr "Penyusun Acara"
 #: templates/opensubtitles2010.html:95
 msgid ""
 "The <a href=\"http://www.participatoryculture.org/\">Participatory Culture "
-"Foundation</a> is organizing the summit. Their most recent project, <a "
-"href=\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
+"Foundation</a> is organizing the summit. Their most recent project, <a href="
+"\"http://universalsubtitles.org/\">Amara</a>, makes open source and "
 "collaborative subtitling and translation easy."
 msgstr ""
 
@@ -2943,10 +3454,14 @@ msgstr "Fasilitator"
 #: templates/opensubtitles2010.html:100
 msgid ""
 "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is providing "
-"facilitation and agenda design. Aspiration believes that face-to-face events"
-" are the most powerful way to facilitate interaction, build networks, and "
+"facilitation and agenda design. Aspiration believes that face-to-face events "
+"are the most powerful way to facilitate interaction, build networks, and "
 "collaborate."
-msgstr "<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is menyediakan fasilitas dan merancang agenda. Aspiration yakin dengan acara pertemuan antar-muka merupakan langkah terkuat untuk mempertemukan interaksi, membangun jaringan, dan berkolaborasi."
+msgstr ""
+"<a href=\"http://www.aspirationtech.org/\">Aspiration</a> is menyediakan "
+"fasilitas dan merancang agenda. Aspiration yakin dengan acara pertemuan "
+"antar-muka merupakan langkah terkuat untuk mempertemukan interaksi, "
+"membangun jaringan, dan berkolaborasi."
 
 #: templates/opensubtitles2010.html:103
 msgid "Sponsors"
@@ -2954,15 +3469,19 @@ msgstr "Sponsor"
 
 #: templates/opensubtitles2010.html:104
 msgid ""
-"The summit has been generously funded by the <a "
-"href=\"http://www.soros.org/\">Open Society Institute</a>."
-msgstr "Pertemuan ini dengan murah hati telah didanai oleh <a href=\"http://www.soros.org/\">Open Society Institute</a>."
+"The summit has been generously funded by the <a href=\"http://www.soros.org/"
+"\">Open Society Institute</a>."
+msgstr ""
+"Pertemuan ini dengan murah hati telah didanai oleh <a href=\"http://www."
+"soros.org/\">Open Society Institute</a>."
 
 #: templates/opensubtitles2010.html:113
 msgid ""
 "Special thanks to <a href=\"http://openplans.org/\">Open Plans</a> for "
 "providing meeting space!"
-msgstr "Sangat berterimakasih kepada <a href=\"http://openplans.org/\">Open Plans</a> karena telah menyediakan tempat pertemuan!"
+msgstr ""
+"Sangat berterimakasih kepada <a href=\"http://openplans.org/\">Open Plans</"
+"a> karena telah menyediakan tempat pertemuan!"
 
 #: templates/admin/base_site.html:4 templates/admin/base_site.html.py:7
 msgid "Amara"
@@ -2994,7 +3513,7 @@ msgstr "Hapus"
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
 #: templates/teams/tasks.html:511 templates/videos/_feedback_form.html:25
-#: templates/videos/subtitle-view.html:372
+#: templates/videos/subtitle-view.html:377
 msgid "Cancel"
 msgstr "Batal"
 
@@ -3051,7 +3570,9 @@ msgstr "Permasalahannya"
 msgid ""
 "Web video is beginning to rival television, but there isn't a good open "
 "resource for subtitling."
-msgstr "Video situs mulai menjadi saingan televisi, namun tidak begitu banyak sumber yang bagus untuk penterjemahan."
+msgstr ""
+"Video situs mulai menjadi saingan televisi, namun tidak begitu banyak sumber "
+"yang bagus untuk penterjemahan."
 
 #: templates/jsdemo/home.html:21
 msgid "Our Mission"
@@ -3061,7 +3582,10 @@ msgstr "Misi Kami"
 msgid ""
 "We're trying to make captioning, subtitling, and translating video publicly "
 "accessible in a way that's free and open, just like the Web."
-msgstr "Kami sedang berusaha membuat penulisan keterangan video, dan penterjemahan video yang dapat diakses secara umum dalam paradigma bebas dan terbuka, sama seperti sebuah situs."
+msgstr ""
+"Kami sedang berusaha membuat penulisan keterangan video, dan penterjemahan "
+"video yang dapat diakses secara umum dalam paradigma bebas dan terbuka, sama "
+"seperti sebuah situs."
 
 #: templates/jsdemo/home.html:21
 msgid "Learn More"
@@ -3073,7 +3597,9 @@ msgstr "Sekarang"
 
 #: templates/jsdemo/home.html:24
 msgid "we're in an alpha stage, building and testing. You can help!"
-msgstr "kami sedang berada dalam tahap alfa, membangun dan menguji. Anda dapat membantu kami!"
+msgstr ""
+"kami sedang berada dalam tahap alfa, membangun dan menguji. Anda dapat "
+"membantu kami!"
 
 #: templates/jsdemo/home.html:25
 msgid "Try our demo"
@@ -3091,7 +3617,9 @@ msgstr "Widget Teks Film"
 msgid ""
 "A simple way to create and add captions to almost any video on the web "
 "(without having to transcode or re-upload videos)."
-msgstr "Cara termudah membuat dan menambahkan keterangan video untuk hampir semua video situs (tanpa harus mengkode ulang atau mengunggah video-video tersebut)"
+msgstr ""
+"Cara termudah membuat dan menambahkan keterangan video untuk hampir semua "
+"video situs (tanpa harus mengkode ulang atau mengunggah video-video tersebut)"
 
 #: templates/jsdemo/home.html:35
 msgid "Community Site"
@@ -3101,7 +3629,9 @@ msgstr "Situs Komunitas"
 msgid ""
 "An online community for collaboratively subtitling and translating the "
 "world's videos (like a Wikipedia for subtitles)."
-msgstr "Sebuah komunitas online untuk kolaborasi teks film dan terjemahan video-video diseluruh dunia (seperti Wikipedia untuk teks film)."
+msgstr ""
+"Sebuah komunitas online untuk kolaborasi teks film dan terjemahan video-"
+"video diseluruh dunia (seperti Wikipedia untuk teks film)."
 
 #: templates/jsdemo/home.html:39
 msgid "Subtitle Lookup Protocol"
@@ -3109,13 +3639,16 @@ msgstr "Protokol Lookup Teks Film"
 
 #: templates/jsdemo/home.html:40
 msgid ""
-"An open standard to let Firefox extensions, desktop video players, websites,"
-" browsers--any client--find and retrieve subtitles for any video."
-msgstr "Sebuah standar terbuka dari ekstensi Firefox, pemutar video desktop, situs, semua jenis peramban dan mendapatkan teks film untuk video."
+"An open standard to let Firefox extensions, desktop video players, websites, "
+"browsers--any client--find and retrieve subtitles for any video."
+msgstr ""
+"Sebuah standar terbuka dari ekstensi Firefox, pemutar video desktop, situs, "
+"semua jenis peramban dan mendapatkan teks film untuk video."
 
 #: templates/jsdemo/home.html:50
 msgid "Get updates and find out first when we launch"
-msgstr "Tetap terkini dan menjadi yang pertama tahu kapan kami mulai diluncurkan"
+msgstr ""
+"Tetap terkini dan menjadi yang pertama tahu kapan kami mulai diluncurkan"
 
 #: templates/jsdemo/home.html:55
 msgid "Get Updates!"
@@ -3159,7 +3692,10 @@ msgid ""
 "\n"
 "        You have %(msg_count)s new messages.\n"
 "    "
-msgstr "\n        Anda mempunyai %(msg_count)s pesan baru.\n    "
+msgstr ""
+"\n"
+"        Anda mempunyai %(msg_count)s pesan baru.\n"
+"    "
 
 #: templates/messages/_messages.html:7 templates/teams/dashboard.html:158
 #: templates/teams/dashboard.html.py:200
@@ -3236,11 +3772,15 @@ msgid ""
 "\n"
 "Thanks for joining Amara!<br/>\n"
 "\n"
-"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, please click the following link to confirm your email address (%(email)s):<br/></p>\n"
+"<p>If you created the \"%(user)s\" user account on universalsubtitles.org, "
+"please click the following link to confirm your email address (%(email)s):"
+"<br/></p>\n"
 "\n"
 "<p><a href=\"%(activate_url)s\">confirm email</a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel "
+"free to ignore it. If you have any concerns, please contact us at "
+"feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -3272,9 +3812,12 @@ msgid ""
 "\n"
 "%(imported_videos)s your videos were successfull imported!<br/>\n"
 "\n"
-"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</a></p>\n"
+"<p>Too see them, you can go to <a href=\"%(my_videos_url)s\">your user page</"
+"a></p>\n"
 "\n"
-"<p>If you believe you've received this message in error, we apologize—feel free to ignore it. If you have any concerns, please contact us at feedback@universalsubtitles.org.</p>\n"
+"<p>If you believe you've received this message in error, we apologize—feel "
+"free to ignore it. If you have any concerns, please contact us at "
+"feedback@universalsubtitles.org.</p>\n"
 "\n"
 "Thanks, <br/>\n"
 "The Amara team\n"
@@ -3289,7 +3832,10 @@ msgstr ""
 msgid ""
 "It looks like you logged in without submitting an email. We need an email "
 "address to notify you (for example, when others edit your work)."
-msgstr "Sepertinya Anda masuk tanpa mendaftarkan email. Kami memerlukan alamat email untuk pemberitahuan pengumuman (contohnya, ketika seseorang menyunting pekerjaan Anda)."
+msgstr ""
+"Sepertinya Anda masuk tanpa mendaftarkan email. Kami memerlukan alamat email "
+"untuk pemberitahuan pengumuman (contohnya, ketika seseorang menyunting "
+"pekerjaan Anda)."
 
 #: templates/profiles/_require_email_dialog.html:8
 msgid "Please enter a valid e-mail address"
@@ -3483,21 +4029,24 @@ msgstr ""
 #: templates/profiles/account.html:171
 msgid ""
 "\n"
-"                                        We automatically <strong>add your YouTube videos to Amara</strong> (and import their subtitles).\n"
+"                                        We automatically <strong>add your "
+"YouTube videos to Amara</strong> (and import their subtitles).\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:176
 msgid ""
 "\n"
-"                                        We <strong>invite your viewers to subtitle</strong> by adding a link to your video descriptions.\n"
+"                                        We <strong>invite your viewers to "
+"subtitle</strong> by adding a link to your video descriptions.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:181
 msgid ""
 "\n"
-"                                        We <strong>send subtitles to YouTube</strong> whenever they're completed on Amara.\n"
+"                                        We <strong>send subtitles to "
+"YouTube</strong> whenever they're completed on Amara.\n"
 "                                    "
 msgstr ""
 
@@ -3508,14 +4057,17 @@ msgstr ""
 #: templates/profiles/account.html:190
 msgid ""
 "\n"
-"                                        The link is <strong>one-way only</strong>. Changes made on YouTube won't be reflected on Amara and may be overwritten. Use Amara to edit subtitles.\n"
+"                                        The link is <strong>one-way only</"
+"strong>. Changes made on YouTube won't be reflected on Amara and may be "
+"overwritten. Use Amara to edit subtitles.\n"
 "                                    "
 msgstr ""
 
 #: templates/profiles/account.html:195
 msgid ""
 "\n"
-"                                        Amara will <strong>append a credit</strong> to the subtitles if space allows.\n"
+"                                        Amara will <strong>append a credit</"
+"strong> to the subtitles if space allows.\n"
 "                                    "
 msgstr ""
 
@@ -3593,9 +4145,9 @@ msgstr ""
 #: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:63
 #: templates/profiles/dashboard.html:87 templates/profiles/dashboard.html:90
 #: templates/teams/dashboard.html:67 templates/teams/dashboard.html.py:71
-#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:46
-#: templates/videos/subtitle-view.html:48
-#: templates/videos/subtitle-view.html:75
+#: templates/teams/videos-list.html:67 templates/videos/subtitle-view.html:51
+#: templates/videos/subtitle-view.html:53
+#: templates/videos/subtitle-view.html:80
 msgid "subtitles"
 msgstr ""
 
@@ -3673,7 +4225,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                            Are you sure you want to remove the %(type)s account\n"
+"                            Are you sure you want to remove the %(type)s "
+"account\n"
 "                        "
 msgstr ""
 
@@ -3735,7 +4288,8 @@ msgstr "Masukkan kata kunci baru"
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Masukkan kata kunci dua kali hingga kami bisa membenarkan ketikan Anda."
+msgstr ""
+"Masukkan kata kunci dua kali hingga kami bisa membenarkan ketikan Anda."
 
 #: templates/registration/password_reset_confirm.html:21
 msgid "New password:"
@@ -3757,7 +4311,9 @@ msgstr "Memasang kembali kata kunci tidak berhasil"
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
-msgstr "Pranala memasang kembali kata kunci tidak benar karena telah digunakan sebelumnya.  Kirimkan pemasangan kembali kata kunci."
+msgstr ""
+"Pranala memasang kembali kata kunci tidak benar karena telah digunakan "
+"sebelumnya.  Kirimkan pemasangan kembali kata kunci."
 
 #: templates/registration/password_reset_done.html:6
 #: templates/registration/password_reset_done.html:12
@@ -3768,11 +4324,14 @@ msgstr "Memasang kembali kata kunci telah berhasil"
 msgid ""
 "We've e-mailed you instructions for setting your password to the e-mail "
 "address you submitted. You should be receiving it shortly."
-msgstr "Kami telah mengirimkan email tentang cara mengatur kata kunci Anda melalui alamat email yang Anda masukkan. Pastikan Anda menerimanya sebentar lagi."
+msgstr ""
+"Kami telah mengirimkan email tentang cara mengatur kata kunci Anda melalui "
+"alamat email yang Anda masukkan. Pastikan Anda menerimanya sebentar lagi."
 
 #: templates/registration/password_reset_email.html:2
 msgid "You're receiving this e-mail because you requested a password reset"
-msgstr "Anda menerima email ini karena Anda meminta pemasangan kembali kata kunci."
+msgstr ""
+"Anda menerima email ini karena Anda meminta pemasangan kembali kata kunci."
 
 #: templates/registration/password_reset_email.html:3
 #, python-format
@@ -3800,7 +4359,9 @@ msgstr "Tim %(site_name)s"
 msgid ""
 "Forgotten your password? Enter your e-mail address below, and we'll e-mail "
 "instructions for setting a new one."
-msgstr "Lupa kata kunci? Masukkan alamat email Anda dibawah ini, kami akan kirimkan email petunjuk tentang cara membuat yang baru."
+msgstr ""
+"Lupa kata kunci? Masukkan alamat email Anda dibawah ini, kami akan kirimkan "
+"email petunjuk tentang cara membuat yang baru."
 
 #: templates/registration/password_reset_form.html:18
 msgid "E-mail address:"
@@ -3833,7 +4394,10 @@ msgid_plural ""
 "\n"
 "              %(number)s languages\n"
 "          "
-msgstr[0] "\n              %(number)s bahasa\n          "
+msgstr[0] ""
+"\n"
+"              %(number)s bahasa\n"
+"          "
 
 #: templates/search/_video_item.html:24
 msgid "lines"
@@ -3853,7 +4417,10 @@ msgid ""
 "\n"
 "                Search Results for %(query)s\n"
 "            "
-msgstr "\n                Hasil Pencarian untuk %(query)s\n            "
+msgstr ""
+"\n"
+"                Hasil Pencarian untuk %(query)s\n"
+"            "
 
 #: templates/search/search.html:150 templates/videos/featured_videos.html:50
 #: templates/videos/popular_videos.html:85
@@ -3958,14 +4525,19 @@ msgstr "Keahlian bahasa"
 #, python-format
 msgid ""
 "\n"
-"                                No formal language training is required to translate for %(team)s. But we do ask that all translators are confident in their translation abilities. Please make sure your language selections are accurate (click \"Select your Languages\" in the blue bar on any page).\n"
+"                                No formal language training is required to "
+"translate for %(team)s. But we do ask that all translators are confident in "
+"their translation abilities. Please make sure your language selections are "
+"accurate (click \"Select your Languages\" in the blue bar on any page).\n"
 "                            "
 msgstr ""
 
 #: templates/teams/_application_form.html:28
 msgid ""
 "\n"
-"                                We request that each new applicant does at least one full set of subtitles within the first week of joining. Aside from that, it’s up to you!\n"
+"                                We request that each new applicant does at "
+"least one full set of subtitles within the first week of joining. Aside from "
+"that, it’s up to you!\n"
 "                            "
 msgstr ""
 
@@ -3973,7 +4545,9 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        Tell us a little bit about yourself and why you’re interested in translating with %(team)s. This should be 3-5 sentences, no longer!\n"
+"                        Tell us a little bit about yourself and why you’re "
+"interested in translating with %(team)s. This should be 3-5 sentences, no "
+"longer!\n"
 "                    "
 msgstr ""
 
@@ -3992,7 +4566,7 @@ msgstr "Halaman Video"
 #: templates/teams/_context_project.html:17
 #: templates/teams/_context_team.html:14 templates/teams/_context_team.html:40
 #: templates/teams/_context_team.html:141
-#: templates/videos/subtitle-view.html:134
+#: templates/videos/subtitle-view.html:139
 #: templates/videos/video-view.html:125
 msgid "Show all"
 msgstr "Tampilkan semua"
@@ -4019,7 +4593,7 @@ msgstr "video"
 
 #: templates/teams/_context_team.html:40
 #: templates/teams/_context_team.html:137
-#: templates/videos/subtitle-view.html:134
+#: templates/videos/subtitle-view.html:139
 #: templates/videos/video-view.html:125
 msgid "Show less"
 msgstr ""
@@ -4086,11 +4660,14 @@ msgstr "tidak muncul video yang dapat Anda terjemahkan."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "But check back soon! There may soon be translations for you to review."
-msgstr "Tapi silahkan cek kembali! Barangkali nanti ada terjemahan yang bisa Anda ulas."
+msgstr ""
+"Tapi silahkan cek kembali! Barangkali nanti ada terjemahan yang bisa Anda "
+"ulas."
 
 #: templates/teams/_invite_friends_to_team.html:4
 msgid "You can also invite friends who speak other languages to help out."
-msgstr "Anda juga dapat mengundang teman yang menggunakan bahasa lain untuk membantu."
+msgstr ""
+"Anda juga dapat mengundang teman yang menggunakan bahasa lain untuk membantu."
 
 #: templates/teams/_join.html:9 templates/teams/_join.html.py:50
 msgid "Join via"
@@ -4194,8 +4771,8 @@ msgstr ""
 
 #: templates/teams/_team_move_video_select.html:32
 msgid ""
-"You are about to move this video to a new team.<br /><strong>If you proceed,"
-" all open tasks will be deleted.</strong>"
+"You are about to move this video to a new team.<br /><strong>If you proceed, "
+"all open tasks will be deleted.</strong>"
 msgstr ""
 
 #: templates/teams/_team_select.html:6
@@ -4390,7 +4967,8 @@ msgstr ""
 #: templates/teams/dashboard.html:93
 msgid ""
 "\n"
-"                            Just find a video that interests you and click the button below it to get started!\n"
+"                            Just find a video that interests you and click "
+"the button below it to get started!\n"
 "                        "
 msgstr ""
 
@@ -4405,7 +4983,8 @@ msgstr ""
 #: templates/teams/dashboard.html:107
 msgid ""
 "\n"
-"                            We've got lots of great content that we'd love your help with.\n"
+"                            We've got lots of great content that we'd love "
+"your help with.\n"
 "                        "
 msgstr ""
 
@@ -4461,13 +5040,19 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"            %(team_name)s needs your help subtitling and translating the following new videos:\n"
+"            %(team_name)s needs your help subtitling and translating the "
+"following new videos:\n"
 "        "
-msgstr "\n            %(team_name)s membutuhkan bantuan Anda untuk menterjemahkan dan melakukan subtitle video berikut:\n        "
+msgstr ""
+"\n"
+"            %(team_name)s membutuhkan bantuan Anda untuk menterjemahkan dan "
+"melakukan subtitle video berikut:\n"
+"        "
 
 #: templates/teams/email_new_video.html:13
 msgid "Or you can visit the team page to see the latest work"
-msgstr "Atau Anda bisa mengunjungi halaman tim untuk melihat hasil kerja terakhir"
+msgstr ""
+"Atau Anda bisa mengunjungi halaman tim untuk melihat hasil kerja terakhir"
 
 #: templates/teams/email_new_video.html:17
 msgid "Stop receiving new notifications when a new video is added."
@@ -4477,10 +5062,17 @@ msgstr "Berhenti menerima pemberitahuan ketika video baru ditambahkan."
 #, python-format
 msgid ""
 "\n"
-"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n"
+"            The <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
+"a> \n"
 "            team has added new videos, and they need your help:\n"
 "        "
-msgstr "\n            Tim <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</a> \n            telah menambahkan video baru, dan mereka membutuhkan bantuan Anda:\n        "
+msgstr ""
+"\n"
+"            Tim <a href=\"http://%(domain)s%(team_url)s\">%(team_name)s</"
+"a> \n"
+"            telah menambahkan video baru, dan mereka membutuhkan bantuan "
+"Anda:\n"
+"        "
 
 #: templates/teams/email_new_videos.html:20
 msgid "Thank you!"
@@ -4528,7 +5120,7 @@ msgid "Filter and Sort"
 msgstr "Saring dan Urutkan"
 
 #: templates/teams/members-list.html:53
-#: templates/videos/subtitle-view.html:184
+#: templates/videos/subtitle-view.html:189
 msgid "Showing"
 msgstr "Menampilkan"
 
@@ -4597,8 +5189,8 @@ msgstr ""
 
 #: templates/teams/settings-guidelines.html:28
 msgid ""
-"Customize the messages sent to your users. The text you enter will accompany"
-" the default system message."
+"Customize the messages sent to your users. The text you enter will accompany "
+"the default system message."
 msgstr ""
 
 #: templates/teams/settings-guidelines.html:31
@@ -4922,8 +5514,8 @@ msgid "You don't have permission to perform this task."
 msgstr ""
 
 #: templates/teams/tasks.html:225 templates/teams/tasks.html.py:241
-#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:146
-#: templates/videos/subtitle-view.html:180
+#: templates/videos/diffing.html:83 templates/videos/subtitle-view.html:151
+#: templates/videos/subtitle-view.html:185
 msgid "Subtitles"
 msgstr "Teks Film"
 
@@ -4935,7 +5527,7 @@ msgstr ""
 msgid "transcribed"
 msgstr ""
 
-#: templates/teams/tasks.html:247 templates/videos/subtitle-view.html:48
+#: templates/teams/tasks.html:247 templates/videos/subtitle-view.html:53
 msgid "translated"
 msgstr ""
 
@@ -4947,8 +5539,8 @@ msgstr ""
 msgid "and edited"
 msgstr ""
 
-#: templates/teams/tasks.html:259 templates/videos/subtitle-view.html:188
-#: templates/videos/subtitle-view.html:304
+#: templates/teams/tasks.html:259 templates/videos/subtitle-view.html:193
+#: templates/videos/subtitle-view.html:309
 msgid "by"
 msgstr ""
 
@@ -4996,8 +5588,8 @@ msgstr ""
 #: templates/teams/tasks.html:366
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
-"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
-" and video description in the onsite editor and to submit the final version."
+"\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title "
+"and video description in the onsite editor and to submit the final version."
 msgstr ""
 
 #: templates/teams/tasks.html:371 templates/videos/_upload_subtitles.html:27
@@ -5134,7 +5726,8 @@ msgstr "Mulai sebuah Tim"
 #: templates/teams/teams-list.html:132
 msgid ""
 "\n"
-"                Want to create your own subtitling team? Contact <a href=\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
+"                Want to create your own subtitling team? Contact <a href="
+"\"mailto:enterprise@pculture.org\">enterprise@pculture.org</a>\n"
 "            "
 msgstr ""
 
@@ -5146,8 +5739,8 @@ msgstr "Tambo Ciek!"
 msgid "Videos in"
 msgstr ""
 
-#: templates/teams/videos-list.html:59 templates/videos/subtitle-view.html:46
-#: templates/videos/subtitle-view.html:48
+#: templates/teams/videos-list.html:59 templates/videos/subtitle-view.html:51
+#: templates/videos/subtitle-view.html:53
 msgid "with"
 msgstr ""
 
@@ -5204,7 +5797,10 @@ msgstr ""
 #, python-format
 msgid ""
 "You are removing this video from the %(team)s team.<br /><br />\n"
-"                                It will remain on Amara but will no longer be subject to the team's permissions and worfklows. Any outstanding tasks will be deleted. Private videos will become available for viewing and editing to the general public. Are you sure you want to proceed?"
+"                                It will remain on Amara but will no longer "
+"be subject to the team's permissions and worfklows. Any outstanding tasks "
+"will be deleted. Private videos will become available for viewing and "
+"editing to the general public. Are you sure you want to proceed?"
 msgstr ""
 
 #: templates/teams/videos-list.html:134
@@ -5230,14 +5826,15 @@ msgid "Delete the video entirely."
 msgstr ""
 
 #: templates/videos/_diffing-subtitle.html:17
-#: templates/videos/subtitle-view.html:220
+#: templates/videos/subtitle-view.html:225
 msgid "Not Synced"
 msgstr "Tidak Sinkron"
 
 #: templates/videos/_error_feedback_form.html:7
-msgid ""
-"Please let us know what you were doing when you encountered this error."
-msgstr "Jelaskan kepada kami apa yang tengah Anda lakukan ketika kesalahan ini muncul."
+msgid "Please let us know what you were doing when you encountered this error."
+msgstr ""
+"Jelaskan kepada kami apa yang tengah Anda lakukan ketika kesalahan ini "
+"muncul."
 
 #: templates/videos/_error_feedback_form.html:9
 msgid "Sorry, the page you requested was not found."
@@ -5256,15 +5853,15 @@ msgid "How are you using Amara?  What would make it better?"
 msgstr ""
 
 #: templates/videos/_feedback_form.html:8
-msgid ""
-"Please let us know if you have any comments, questions, or suggestions!"
+msgid "Please let us know if you have any comments, questions, or suggestions!"
 msgstr "Kirimkan kepada kami komentar Anda, pertanyaan atau saran Anda!"
 
 #: templates/videos/_feedback_form.html:9
 msgid ""
-"Note: we read/speak English best, but try to read/respond to anything we "
-"can."
-msgstr "Pesan: kami baik dalam baca/tulis bahasa Inggris, namun kami juga berusaha sebisa mungkin membaca/merespon kepada semua."
+"Note: we read/speak English best, but try to read/respond to anything we can."
+msgstr ""
+"Pesan: kami baik dalam baca/tulis bahasa Inggris, namun kami juga berusaha "
+"sebisa mungkin membaca/merespon kepada semua."
 
 #: templates/videos/_feedback_form.html:13
 msgid "Your email:"
@@ -5344,7 +5941,9 @@ msgstr ""
 msgid ""
 " subtitles for this video are edited. You can choose to follow again at any "
 "time."
-msgstr " teks film video ini telah disunting. Anda bisa mengikutinya kembali kapan saja."
+msgstr ""
+" teks film video ini telah disunting. Anda bisa mengikutinya kembali kapan "
+"saja."
 
 #: templates/videos/_follow_video_button.html:92
 msgid "Stop following "
@@ -5412,19 +6011,34 @@ msgstr "Kirim Transkrip"
 #: templates/videos/_paste_transcription.html:118
 msgid ""
 "\n"
-"            Paste a transcript into the space below.  How you enter subtitles here \n"
+"            Paste a transcript into the space below.  How you enter "
+"subtitles here \n"
 "            determines how they display on the screen.<br/>\n"
 "            1) Hit enter twice to separate each subtitle;<br/> \n"
 "            2) You cannot submit subtitles longer than 3 lines (2 is best).\n"
 "            "
-msgstr "\n            Tempel transkrip kebawah.  Bagaimana cara Anda memasukkan subtitle disini \n            akan terlihat sama pada layar.<br/>\n            1) Tekan Enter dua kali untuk memisahkan masing-masing subtitle;<br/> \n            2) Anda tidak bisa memasukkan subtitle lebih dari 3 baris (2 lebih baik).\n            "
+msgstr ""
+"\n"
+"            Tempel transkrip kebawah.  Bagaimana cara Anda memasukkan "
+"subtitle disini \n"
+"            akan terlihat sama pada layar.<br/>\n"
+"            1) Tekan Enter dua kali untuk memisahkan masing-masing subtitle;"
+"<br/> \n"
+"            2) Anda tidak bisa memasukkan subtitle lebih dari 3 baris (2 "
+"lebih baik).\n"
+"            "
 
 #: templates/videos/_paste_transcription.html:126
 msgid ""
 "\n"
-"            Some of your subtitles take up more than two lines and will not display correctly.\n"
+"            Some of your subtitles take up more than two lines and will not "
+"display correctly.\n"
 "            "
-msgstr "\n            Beberapa subtitle yang telah Anda lakukan melebihi dua baris dan ini tidak akan tampil sempurna pada layar.\n            "
+msgstr ""
+"\n"
+"            Beberapa subtitle yang telah Anda lakukan melebihi dua baris dan "
+"ini tidak akan tampil sempurna pada layar.\n"
+"            "
 
 #: templates/videos/_paste_transcription.html:136
 msgid "Upload TXT file"
@@ -5460,7 +6074,8 @@ msgstr "Unggah Teks Film"
 msgid ""
 "\n"
 "                    Our site accepts SRT, SSA, SBV, DFXP, and TXT format.\n"
-"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or .xml\n"
+"                    Only files ending in .srt, .ssa, .sbv, .dfxp, .txt or ."
+"xml\n"
 "                    (for dfxp) are accepted.\n"
 "                "
 msgstr ""
@@ -5481,9 +6096,11 @@ msgstr "Unggah"
 
 #: templates/videos/_upload_subtitles.html:70
 msgid ""
-"If you believe your subtitle file is compatible, <a "
-"href='mailto:feedback@universalsubtitles.org'>send it to us</a>"
-msgstr "Jika Anda yakin teks film Anda sesuai, <a href='mailto:feedback@universalsubtitles.org'>kirimkan kepada kami</a>"
+"If you believe your subtitle file is compatible, <a href='mailto:"
+"feedback@universalsubtitles.org'>send it to us</a>"
+msgstr ""
+"Jika Anda yakin teks film Anda sesuai, <a href='mailto:"
+"feedback@universalsubtitles.org'>kirimkan kepada kami</a>"
 
 #: templates/videos/_upload_subtitles.html:72
 msgid "Processing, please be patient..."
@@ -5522,20 +6139,24 @@ msgstr ""
 msgid ""
 "Multiple video URLs let you link multiple videos to a single set of "
 "subtitles. Some example uses:"
-msgstr "Surel video ganda memungkinkan Anda menghubungkan banyak video ke satu set teks film. Contoh penggunaan:"
+msgstr ""
+"Surel video ganda memungkinkan Anda menghubungkan banyak video ke satu set "
+"teks film. Contoh penggunaan:"
 
 #: templates/videos/_video_url_panel.html:48
 msgid ""
 "Two versions of the same video exist on Youtube.  You do not want subtitle "
-"volunteers to duplicate their work, so you add both versions to the multiple"
-" URLs pane."
+"volunteers to duplicate their work, so you add both versions to the multiple "
+"URLs pane."
 msgstr ""
 
 #: templates/videos/_video_url_panel.html:49
 msgid ""
-"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the"
-" subtitles you make to work on all of those versions."
-msgstr "Anda memasang video Anda di Youtube, Vimeo, Blip atau Dailymotion dan Anda ingin teks film yang Anda buat bekerja pada semua versi tersebut."
+"You put your video on Youtube, Vimeo, Blip, and Dailymotion and you want the "
+"subtitles you make to work on all of those versions."
+msgstr ""
+"Anda memasang video Anda di Youtube, Vimeo, Blip atau Dailymotion dan Anda "
+"ingin teks film yang Anda buat bekerja pada semua versi tersebut."
 
 #: templates/videos/_video_url_panel.html:50
 msgid ""
@@ -5543,7 +6164,10 @@ msgid ""
 "(HTML5/Ogg for free software users, or HTML5/h264 to iPad users).  If you "
 "add these URLs, our embed code will automatically fall back to whatever "
 "format is necessary for the browser."
-msgstr "Anda ingin menyimpan video dengan beragam versi ke beragam peramban (HTML5/Ogg bagi pengguna perangkat lunak gratis, atau HTML5/h264 bagi pengguna iPad)."
+msgstr ""
+"Anda ingin menyimpan video dengan beragam versi ke beragam peramban (HTML5/"
+"Ogg bagi pengguna perangkat lunak gratis, atau HTML5/h264 bagi pengguna "
+"iPad)."
 
 #: templates/videos/_video_url_panel.html:52
 msgid "Tip: double check that there are no timing problems."
@@ -5581,7 +6205,10 @@ msgstr "Anda sah"
 msgid ""
 "Delete this URL?  Warning: this cannot be undone. Only delete URLs for non-"
 "matching videos or videos where subtitles fail to display correctly."
-msgstr "Hapus surel ini? Peringatan: tidak dapat dilakukan. Hapuslah surel video yang lain atau video dengan terjemahan yang tidak bisa tampil dengan baik dan benar."
+msgstr ""
+"Hapus surel ini? Peringatan: tidak dapat dilakukan. Hapuslah surel video "
+"yang lain atau video dengan terjemahan yang tidak bisa tampil dengan baik "
+"dan benar."
 
 #: templates/videos/_watch_page.html:13
 msgid "Rebuilding video index. Please try again a bit later"
@@ -5598,13 +6225,25 @@ msgstr "Tidak ada aktifitas."
 #: templates/videos/create.html:10
 msgid ""
 "\n"
-"        \"Sorry, we couldn't identify the video at the link you sent.  Perhaps\n"
+"        \"Sorry, we couldn't identify the video at the link you sent.  "
+"Perhaps\n"
 "        it's a link we don't recognize, or perhaps you've linked to a page\n"
-"        that has multiple videos.  Try entering a different link to the video\n"
+"        that has multiple videos.  Try entering a different link to the "
+"video\n"
 "        you want to submit.  If you think there's been some mistake,\n"
-"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!\"\n"
+"        <a href=\"mailto:feedback@universalsubtitles.org\">contact us</a>!"
+"\"\n"
 "        "
-msgstr "\n        \"Maaf, kami tidak dapat menemukan  video dari tautan yang Anda kirimkan.  Tautan\n        tidak kami kenali, atau mungkin Anda menautkan ke halaman\n        yang punya banyak video.  Coba masukkan tautan yang berbeda\n        ke video yang Anda inginkan.  Apabila Anda temukan kesalahan,\n        <a href=\"mailto:feedback@universalsubtitles.org\">silahkan menghubungi kami</a>!\"\n        "
+msgstr ""
+"\n"
+"        \"Maaf, kami tidak dapat menemukan  video dari tautan yang Anda "
+"kirimkan.  Tautan\n"
+"        tidak kami kenali, atau mungkin Anda menautkan ke halaman\n"
+"        yang punya banyak video.  Coba masukkan tautan yang berbeda\n"
+"        ke video yang Anda inginkan.  Apabila Anda temukan kesalahan,\n"
+"        <a href=\"mailto:feedback@universalsubtitles.org\">silahkan "
+"menghubungi kami</a>!\"\n"
+"        "
 
 #: templates/videos/create.html:22
 msgid "Subtitle a Video"
@@ -5643,7 +6282,8 @@ msgstr "Atau Kirim Multi Video"
 #: templates/videos/create.html:58
 msgid ""
 "\n"
-"        Help organizations and deaf and hard of hearing viewers make videos accessible around the world.\n"
+"        Help organizations and deaf and hard of hearing viewers make videos "
+"accessible around the world.\n"
 "    "
 msgstr ""
 
@@ -5668,12 +6308,12 @@ msgid "Roll back to version"
 msgstr "Kembali ke versi"
 
 #: templates/videos/diffing.html:120 templates/videos/diffing.html.py:167
-#: templates/videos/subtitle-view.html:196
+#: templates/videos/subtitle-view.html:201
 msgid "Title:"
 msgstr ""
 
 #: templates/videos/diffing.html:124 templates/videos/diffing.html.py:171
-#: templates/videos/subtitle-view.html:200
+#: templates/videos/subtitle-view.html:205
 msgid "Description:"
 msgstr ""
 
@@ -5685,7 +6325,9 @@ msgstr "Jangan kirimkan email lagi yang berhubungan dengan video ini."
 msgid ""
 "To stop receiving these emails, go to your preferences page and uncheck "
 "\"notify me by email\":"
-msgstr "Untuk berhenti menerima email ini, kembali ke halaman pengaturan dan centang \"notify me by email\":"
+msgstr ""
+"Untuk berhenti menerima email ini, kembali ke halaman pengaturan dan centang "
+"\"notify me by email\":"
 
 #: templates/videos/email_base.html:106
 msgid "My profile / preferences"
@@ -5703,24 +6345,51 @@ msgstr "Kirim ke Teman!"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n"
-"                These changes went live immediately.  %(text_change)s of the text and\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
+"subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)"
+"s\">%(v)s</a></b> \n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
+"%(u)s</a></b>. \n"
+"                These changes went live immediately.  %(text_change)s of the "
+"text and\n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %(lang)s</a></b> \n                yang Anda lakukan untuk <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n                telah diubah oleh <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. \n                Perubahan ini akan segera ditayangkan.  %(text_change)s teks dan\n                %(time_change)s waktu telah diubah.\n                "
+msgstr ""
+"\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %"
+"(lang)s</a></b> \n"
+"                yang Anda lakukan untuk <b><a href=\"http://%(domain)s%"
+"(video_url)s\">%(v)s</a></b> \n"
+"                telah diubah oleh <b><a href=\"http://%(domain)s%(user_url)s"
+"\">%(u)s</a></b>. \n"
+"                Perubahan ini akan segera ditayangkan.  %(text_change)s teks "
+"dan\n"
+"                %(time_change)s waktu telah diubah.\n"
+"                "
 
 #: templates/videos/email_notification.html:17
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"                you contributed to <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n"
-"                were changed. These changes went live immediately. %(text_change)s of the text and \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
+"subtitles</a></b> \n"
+"                you contributed to <b><a href=\"http://%(domain)s%(video_url)"
+"s\">%(v)s</a></b> \n"
+"                were changed. These changes went live immediately. %"
+"(text_change)s of the text and \n"
 "                %(time_change)s of the timing was changed.\n"
 "                "
-msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %(lang)s</a></b> \n                yang Anda lakukan untuk <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b> \n                telah diubah. Perubahan ini akan segera ditayangkan. %(text_change)s teks dan \n                %(time_change)s waktu yang telah diubah.\n                "
+msgstr ""
+"\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %"
+"(lang)s</a></b> \n"
+"                yang Anda lakukan untuk <b><a href=\"http://%(domain)s%"
+"(video_url)s\">%(v)s</a></b> \n"
+"                telah diubah. Perubahan ini akan segera ditayangkan. %"
+"(text_change)s teks dan \n"
+"                %(time_change)s waktu yang telah diubah.\n"
+"                "
 
 #: templates/videos/email_notification.html:27
 #: templates/videos/email_notification_non_editors.html:23
@@ -5768,21 +6437,45 @@ msgstr "Perubahan-perubahan yang ada pada Tulisan Teks Film"
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
-"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. These changes went live immediately. %(change_percent)s of the timing was changed.  \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
+"subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)"
+"s</a></b>\n"
+"                were changed by <b><a href=\"http://%(domain)s%(user_url)s\">"
+"%(u)s</a></b>. These changes went live immediately. %(change_percent)s of "
+"the timing was changed.  \n"
 "                "
-msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %(lang)s</a></b> \n                video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n                telah diubah oleh <b><a href=\"http://%(domain)s%(user_url)s\">%(u)s</a></b>. Perubahan ini akan segera ditayangkan. %(change_percent)s waktu telah diubah.  \n                "
+msgstr ""
+"\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %"
+"(lang)s</a></b> \n"
+"                video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</"
+"a></b>\n"
+"                telah diubah oleh <b><a href=\"http://%(domain)s%(user_url)s"
+"\">%(u)s</a></b>. Perubahan ini akan segera ditayangkan. %(change_percent)s "
+"waktu telah diubah.  \n"
+"                "
 
 #: templates/videos/email_notification_non_editors.html:15
 #, python-format
 msgid ""
 "\n"
-"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s subtitles</a></b> \n"
-"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n"
-"                were changed. These changes went live immediately. %(change_percent)s of the timing was changed.             \n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">%(lang)s "
+"subtitles</a></b> \n"
+"                to video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)"
+"s</a></b>\n"
+"                were changed. These changes went live immediately. %"
+"(change_percent)s of the timing was changed.             \n"
 "                "
-msgstr "\n                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %(lang)s</a></b> \n                video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</a></b>\n                telah diubah. Perubahan ini akan segera ditayangkan. %(change_percent)s waktu telah diubah.             \n                "
+msgstr ""
+"\n"
+"                <b><a href=\"http://%(domain)s%(language_url)s\">terjemahan %"
+"(lang)s</a></b> \n"
+"                video <b><a href=\"http://%(domain)s%(video_url)s\">%(v)s</"
+"a></b>\n"
+"                telah diubah. Perubahan ini akan segera ditayangkan. %"
+"(change_percent)s waktu telah diubah.             \n"
+"                "
 
 #: templates/videos/email_start_notification.html:7
 msgid "Dear"
@@ -5792,16 +6485,19 @@ msgstr "Dear"
 #, python-format
 msgid ""
 "\n"
-"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has just started a %(language)s \n"
+"    Great news! <a href=\"http://%(domain)s%(user_url)s\">%(user)s</a> has "
+"just started a %(language)s \n"
 "    translation of your video <a href=\"%(video_url)s\">%(video)s</a>\n"
 "\t"
 msgstr ""
 
 #: templates/videos/email_start_notification.html:13
 msgid ""
-"You can review the translation and thank them for their contribution on this"
-" page:"
-msgstr "Anda bisa mengulas terjemahan yang ada dan berterimakasih atas kontribusi mereka melalui:"
+"You can review the translation and thank them for their contribution on this "
+"page:"
+msgstr ""
+"Anda bisa mengulas terjemahan yang ada dan berterimakasih atas kontribusi "
+"mereka melalui:"
 
 #: templates/videos/email_start_notification.html:14
 msgid "Translation homepage"
@@ -5846,9 +6542,14 @@ msgstr "halaman video"
 #: templates/videos/email_title_changed.html:20
 msgid ""
 "\n"
-"    and click 'edit title' to update it. If you're unable to edit the title, click 'Help' in the main menu to submit a support request.\n"
+"    and click 'edit title' to update it. If you're unable to edit the title, "
+"click 'Help' in the main menu to submit a support request.\n"
 "    "
-msgstr "\n    dan klik 'sunting judul' untuk memperbaruinya. Jika Anda tidak bisa menyunting judul, klik 'Bantuan' di menu utama untuk meminta bantuan.\n    "
+msgstr ""
+"\n"
+"    dan klik 'sunting judul' untuk memperbaruinya. Jika Anda tidak bisa "
+"menyunting judul, klik 'Bantuan' di menu utama untuk meminta bantuan.\n"
+"    "
 
 #: templates/videos/email_video_url_add.html:7
 msgid "A new video URL for"
@@ -5866,7 +6567,9 @@ msgstr "Tanpa nama"
 msgid ""
 "Please check to make sure the new URL features the exact same video, and "
 "that subtitle timing is correct:"
-msgstr "Silahkan periksa ulang untuk memastikan surel terbaru mengarah ke video yang sama, dan penandaan waktunya telah benar:"
+msgstr ""
+"Silahkan periksa ulang untuk memastikan surel terbaru mengarah ke video yang "
+"sama, dan penandaan waktunya telah benar:"
 
 #: templates/videos/email_video_url_add.html:21
 msgid "View the new video URL"
@@ -5943,149 +6646,152 @@ msgstr "Pemberitahuna ke %(u)s telah menghentikan %(video)s."
 msgid "Select two revisions to compare, please"
 msgstr "Silahkan memilih dua revisi untuk membandingkan"
 
-#: templates/videos/subtitle-view.html:101 templates/videos/video-view.html:91
+#: templates/videos/subtitle-view.html:106 templates/videos/video-view.html:91
 msgid "Follower"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:107 templates/videos/video-view.html:97
+#: templates/videos/subtitle-view.html:112 templates/videos/video-view.html:97
 msgid "Comment"
 msgstr "Komentar"
 
-#: templates/videos/subtitle-view.html:113
+#: templates/videos/subtitle-view.html:118
 msgid "Line"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:123
+#: templates/videos/subtitle-view.html:128
 #: templates/videos/video-view.html:113
 msgid "View Subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:147
-#: templates/videos/subtitle-view.html:271
+#: templates/videos/subtitle-view.html:152
+#: templates/videos/subtitle-view.html:276
 #: templates/videos/video-view.html:161 templates/videos/video-view.html:213
 msgid "Comments"
 msgstr "Komentar"
 
-#: templates/videos/subtitle-view.html:148
+#: templates/videos/subtitle-view.html:153
 msgid "Revisions"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:153
-#: templates/videos/subtitle-view.html:373
+#: templates/videos/subtitle-view.html:158
+#: templates/videos/subtitle-view.html:378
 msgid "Unpublish"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:156
-#: templates/videos/subtitle-view.html:388
+#: templates/videos/subtitle-view.html:161
+#: templates/videos/subtitle-view.html:393
 msgid "Edit Subtitles"
 msgstr "Sunting Teks Film"
 
-#: templates/videos/subtitle-view.html:163
+#: templates/videos/subtitle-view.html:168
 msgid "Download"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:178
+#: templates/videos/subtitle-view.html:183
 msgid "Draft only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:181
+#: templates/videos/subtitle-view.html:186
 msgid "translated from"
 msgstr "diterjemahkan dari"
 
-#: templates/videos/subtitle-view.html:185
-#: templates/videos/subtitle-view.html:294
-#: templates/videos/subtitle-view.html:296
+#: templates/videos/subtitle-view.html:190
+#: templates/videos/subtitle-view.html:299
+#: templates/videos/subtitle-view.html:301
 msgid "Revision"
 msgstr "Revisi"
 
-#: templates/videos/subtitle-view.html:186
+#: templates/videos/subtitle-view.html:191
 msgid "created"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:232
+#: templates/videos/subtitle-view.html:237
 msgid ""
 "\n"
-"                            The most recent revision for this language is blank, but there are older\n"
+"                            The most recent revision for this language is "
+"blank, but there are older\n"
 "                            revisions that contain subtitles.\n"
 "                            "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:236
+#: templates/videos/subtitle-view.html:241
 msgid "View revision history"
 msgstr "Lihat riwayat perubahan"
 
-#: templates/videos/subtitle-view.html:241
+#: templates/videos/subtitle-view.html:246
 msgid "These subtitles are in progress."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:242
+#: templates/videos/subtitle-view.html:247
 msgid "Make more?"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:244
+#: templates/videos/subtitle-view.html:249
 msgid "No subtitles available yet."
 msgstr ""
 
-#: templates/videos/subtitle-view.html:245
+#: templates/videos/subtitle-view.html:250
 msgid "Make some!"
 msgstr "Buat baru!"
 
-#: templates/videos/subtitle-view.html:253
+#: templates/videos/subtitle-view.html:258
 msgid ""
 "\n"
-"                            This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
+"                            This language contains subtitles that are still "
+"waiting to be moderated.  Check back later.\n"
 "                        "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:259
+#: templates/videos/subtitle-view.html:264
 msgid ""
 "\n"
-"                            No subtitles have been added for this language yet.\n"
+"                            No subtitles have been added for this language "
+"yet.\n"
 "                        "
 msgstr ""
 
-#: templates/videos/subtitle-view.html:269
+#: templates/videos/subtitle-view.html:274
 #: templates/videos/video-view.html:211
 msgid "Leave a comment"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:278
+#: templates/videos/subtitle-view.html:283
 msgid "Compare Revisions"
 msgstr "Perbandingan Revisi"
 
-#: templates/videos/subtitle-view.html:310
+#: templates/videos/subtitle-view.html:315
 msgid "Rollback to version #"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:319
+#: templates/videos/subtitle-view.html:324
 msgid "Timing"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:320
+#: templates/videos/subtitle-view.html:325
 msgid "Text"
 msgstr "Teks"
 
-#: templates/videos/subtitle-view.html:326
+#: templates/videos/subtitle-view.html:331
 msgid "No subtitles for this language."
 msgstr "Tidak ada teks film untuk bahasa ini."
 
-#: templates/videos/subtitle-view.html:335
+#: templates/videos/subtitle-view.html:340
 msgid "Roll back to this version"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:348
+#: templates/videos/subtitle-view.html:353
 msgid "Unpublish subtitles"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:356
+#: templates/videos/subtitle-view.html:361
 msgid "This version only"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:360
+#: templates/videos/subtitle-view.html:365
 msgid "This entire language and all dependent languages"
 msgstr ""
 
-#: templates/videos/subtitle-view.html:362
+#: templates/videos/subtitle-view.html:367
 msgid ""
 "Note: Any dependent languages will be unavailable until this language is "
 "reapproved."
@@ -6116,7 +6822,9 @@ msgstr "Tugas 2"
 
 #: templates/videos/test_form_page.html:30
 msgid "Try fixing errors on the video (or just get back in and make an edit)"
-msgstr "Mencoba memperbaiki kesalahan pada video (atau baru kembali dan membuat penyuntingan)"
+msgstr ""
+"Mencoba memperbaiki kesalahan pada video (atau baru kembali dan membuat "
+"penyuntingan)"
 
 #: templates/videos/test_form_page.html:35
 msgid "Task 3"
@@ -6124,7 +6832,8 @@ msgstr "Tugas 3"
 
 #: templates/videos/test_form_page.html:36
 msgid "Translate the video (fake it if you’re not bilingual!)"
-msgstr "Terjemahkan video (palsukan jika Anda tidak berbicara dalam dua bahasa!)"
+msgstr ""
+"Terjemahkan video (palsukan jika Anda tidak berbicara dalam dua bahasa!)"
 
 #: templates/videos/test_form_page.html:42
 msgid "optional: get updates about Amara"
@@ -6140,7 +6849,8 @@ msgstr "Petunjuk Sederhana"
 
 #: templates/videos/test_form_page.html:73
 msgid "All tasks 2 & 3 are optional (but we recommend trying them all)."
-msgstr "Tugas 2 & 3 adalah pilihan (tapi kami merekomendasikan untuk mencobanya)."
+msgstr ""
+"Tugas 2 & 3 adalah pilihan (tapi kami merekomendasikan untuk mencobanya)."
 
 #: templates/videos/test_form_page.html:74
 msgid "That’s it!"
@@ -6202,8 +6912,8 @@ msgstr ""
 
 #: templates/videos/video-view.html:188
 msgid ""
-"Subtitles for this video are moderated. If it belongs to a team, try joining"
-" the team to contribute."
+"Subtitles for this video are moderated. If it belongs to a team, try joining "
+"the team to contribute."
 msgstr ""
 
 #: templates/videos/video-view.html:202
@@ -6252,8 +6962,8 @@ msgstr ""
 #: unisubs-integration/api/1_0/forms.py:99
 #: unisubs-integration/api/1_0/forms.py:102
 msgid ""
-"Sorry, we can't upload your subtitles because this language is moderated and"
-" you don't have sufficient permission."
+"Sorry, we can't upload your subtitles because this language is moderated and "
+"you don't have sufficient permission."
 msgstr ""
 
 #: unisubs-integration/api/1_0/forms.py:333
@@ -6366,8 +7076,8 @@ msgstr "Terjadi kesalahan internal"
 #: utils/validators.py:13
 #, python-format
 msgid ""
-"Please keep file size under %(required_size)s. Current file size "
-"%(current_size)s"
+"Please keep file size under %(required_size)s. Current file size %"
+"(current_size)s"
 msgstr ""
 
 #: utils/forms/__init__.py:75
@@ -6376,9 +7086,11 @@ msgstr "Masukkan alamat email yang berlaku dipisahkan dengan tanda koma."
 
 #: utils/forms/__init__.py:83
 msgid ""
-"Enter valid usernames separated by commas. Username can contain only a-z, "
-"A-Z and 0-9."
-msgstr "Masukkan nama pengguna yang berlaku dipisahkan dengan koma. Nama pengguna hanya dapat memiliki karakter a-z, A-Z and 0-9."
+"Enter valid usernames separated by commas. Username can contain only a-z, A-"
+"Z and 0-9."
+msgstr ""
+"Masukkan nama pengguna yang berlaku dipisahkan dengan koma. Nama pengguna "
+"hanya dapat memiliki karakter a-z, A-Z and 0-9."
 
 #: utils/forms/unisub_video_form.py:62
 msgid "This URL does not contain video id."
