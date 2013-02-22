@@ -68,3 +68,5 @@ apps/webdriver_testing/Screenshots/*.png
 apps/webdriver_testing/Screenshots/nosetests.xml
 apps/webdriver_testing/Screenshots/results.html
 *.po
+jquery-*.js
+amara-jquery-*.js
