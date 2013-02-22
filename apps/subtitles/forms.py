@@ -177,7 +177,7 @@ class SubtitlesUploadForm(forms.Form):
             from_count = len(from_sl.get_tip(public=True).get_subtitles())
             current_count = len(self._parsed_subtitles.get_subtitles())
 
-            if current_count >= from_count:
+            if current_count > from_count:
                 raise forms.ValidationError(_(
                     u"Sorry, we couldn't upload your file because the number "
                     u"of lines in your translation ({0}) doesn't match the "
