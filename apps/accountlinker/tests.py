@@ -22,7 +22,8 @@ from django.core.exceptions import ImproperlyConfigured
 
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from accountlinker.models import (
-    ThirdPartyAccount, YoutubeSyncRule, check_authorization, can_be_synced
+    ThirdPartyAccount, YoutubeSyncRule, check_authorization, can_be_synced,
+    add_amara_description_credit
 )
 from videos.models import Video, VideoUrl, SubtitleLanguage
 from teams.models import Team, TeamVideo
@@ -30,7 +31,7 @@ from auth.models import CustomUser as User
 from tasks import get_youtube_data
 from apps.testhelpers import views as helpers
 
-from mock import Mock, MagicMock
+from mock import Mock
 
 
 def _set_subtitles(video, language, original, complete, translations=[]):
@@ -304,3 +305,15 @@ class AccountTest(TestCase):
         ThirdPartyAccount.objects.mirror_on_third_party(video, 'en', UPDATE_VERSION_ACTION, version)
 
         youtube_type_mock.update_subtitles.assert_called_once_with(version, tpa)
+
+    def test_credit(self):
+        old = 'abc'
+        url = 'http://test.com'
+        new = add_amara_description_credit(old, url)
+
+        self.assertTrue(new.startswith('abc'))
+        self.assertTrue(new.endswith(url))
+
+        new = add_amara_description_credit(old, url, prepend=True)
+        self.assertTrue(new.startswith('Help us caption and translate'))
+        self.assertTrue(new.endswith('abc'))
