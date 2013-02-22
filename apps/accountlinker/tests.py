@@ -32,6 +32,7 @@ from apps.testhelpers import views as helpers
 
 from mock import Mock, MagicMock
 
+
 def _set_subtitles(video, language, original, complete, translations=[]):
     translations = [{'code': lang, 'is_original': False, 'is_complete': True,
                      'num_subs': 1} for lang in translations]
@@ -41,9 +42,11 @@ def _set_subtitles(video, language, original, complete, translations=[]):
 
     helpers._add_lang_to_video(video, data, None)
 
+
 def assert_update_subtitles(version_or_language, account):
     assert version_or_language != None
     assert account != None
+
 
 class AccountTest(TestCase):
     fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
