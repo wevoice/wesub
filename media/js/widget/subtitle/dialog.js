@@ -675,5 +675,5 @@ unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
 unisubs.subtitle.Dialog.prototype.makeDFXPString =  function (){
-    return this.captionManager_.x.xmlToString()
+    return this.captionManager_.x.xmlToString(true, true);
 };
