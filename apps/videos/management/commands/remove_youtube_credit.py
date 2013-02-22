@@ -106,6 +106,7 @@ class Command(BaseCommand):
     def _fix_video(self, vurl):
         from apps.accountlinker.models import ThirdPartyAccount
         from apps.videos.templatetags.videos_tags import shortlink_for_video
+
         video = vurl.video
         language_code = video.language
 
@@ -142,31 +143,21 @@ class Command(BaseCommand):
         amara_supposed_credit = self._get_supposed_credit(amara_video_url,
                 language_code)
 
-        shortlink_supposed_credit = self._get_supposed_credit(amara_video_url,
-                language_code)
-
-        credits = (amara_supposed_credit, unisubs_supposed_credit,
-                shortlink_supposed_credit)
-
-        self.log(amara_supposed_credit)
-        self.log(unisubs_supposed_credit)
-        self.log(current_description)
+        credits = (amara_supposed_credit, unisubs_supposed_credit,)
 
         if not current_description.startswith(credits):
             self.log("%s doesn't have desc credit" % vurl.url)
             return video.video_id
 
         if current_description.startswith(amara_supposed_credit):
+            self.log("fixing supposed amara credit")
             new_description = current_description.replace(
                     amara_supposed_credit, '')
 
         if current_description.startswith(unisubs_supposed_credit):
+            self.log("fixing supposed unisubs credit")
             new_description = current_description.replace(
                     unisubs_supposed_credit, '')
-
-        if current_description.startswith(shortlink_supposed_credit):
-            new_description = current_description.replace(
-                    shortlink_supposed_credit, '')
 
         entry.media.description.text = new_description
         entry = entry.ToString()
@@ -189,7 +180,7 @@ class Command(BaseCommand):
             translate_string, AMARA_DESCRIPTION_CREDIT
         )
         credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
-        return "%s: %s\n\n" % (credit, vurl)
+        return str("%s: %s\n\n" % (credit, vurl)).strip()
 
     def _load_cache_file(self):
         if os.path.exists(self.CACHE_PATH):
@@ -295,6 +286,7 @@ class Command(BaseCommand):
             # Now, sync all completed languages to Youtube to remove the last
             # sub credit.
 
+            videos = all_team_videos.exclude(video_id__in=self.cache['sub'])
             self.log('%s videos to resync' % len(videos))
 
             for video in videos:
