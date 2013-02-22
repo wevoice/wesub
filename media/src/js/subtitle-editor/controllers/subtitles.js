@@ -120,7 +120,7 @@ var angular = angular || null;
                     SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
-                        window.location = $scope.subtitlesURL;
+                        window.location = $scope.videoURL;
 
                     }, function onError() {
                         $scope.status = 'error';
@@ -149,7 +149,7 @@ var angular = angular || null;
                     SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
-                        window.location = $scope.subtitlesURL;
+                        window.location = $scope.videoURL;
                         
                     }, function onError() {
                         $scope.status = 'error';
@@ -180,7 +180,7 @@ var angular = angular || null;
             var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
 
             $scope.fromOldEditor = window.location.search.indexOf('from-old-editor') !== -1 ? true : false;
-            $scope.subtitlesURL = '/videos/' + subtitleListScope.videoID + '/' + subtitleListScope.languageCode + '/';
+            $scope.videoURL = '/videos/' + subtitleListScope.videoID + '/';
 
             if ($scope.fromOldEditor) {
                 $scope.dialogURL = '/onsite_widget/?config=' + window.location.search.split('config=')[1];
@@ -200,7 +200,7 @@ var angular = angular || null;
 
             buttons.push({
                 'text': 'Exit', 'class': 'no', 'fn': function() {
-                    window.location = $scope.subtitlesURL;
+                    window.location = $scope.videoURL;
                 }
             });
 
