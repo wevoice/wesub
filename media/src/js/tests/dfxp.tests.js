@@ -747,6 +747,17 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#startTimeInSeconds()', function() {
+        it('should get the current start time for a subtitle in seconds', function() {
+
+            // Create a new subtitle with a specific start time.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 1150.000}, '');
+
+            // Verify.
+            expect(parser.startTimeInSeconds(newSubtitle)).toBe('1.150');
+
+        });
+    });
     describe('#subtitlesCount()', function() {
         it('should return the current number of subtitles', function() {
 
