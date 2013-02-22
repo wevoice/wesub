@@ -138,6 +138,11 @@ unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
 
     for (var i = 0; i < this.videoLanguages_.length; i++) {
         var data = this.videoLanguages_[i];
+
+        if(!data.IS_PUBLIC){
+            continue
+        }
+
         var link =
             $d('a', {'href': '#'},
                $d('span', 'unisubs-languageTitle',
