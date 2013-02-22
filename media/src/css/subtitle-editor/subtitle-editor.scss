@@ -184,6 +184,18 @@ button {
         margin-left: 0;
         margin-right: 0;
     }
+    &.last-chance {
+        background: none;
+        color: #4398C5;
+        display: block;
+        font-size: 11px;
+        margin-top: 20px;
+        padding: 0;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 
 .column {

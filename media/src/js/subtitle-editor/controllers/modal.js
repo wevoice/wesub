@@ -58,6 +58,9 @@
             $event.preventDefault();
         };
 
+        $scope.$root.$on('hide-modal', function($event) {
+            $scope.hide($event);
+        });
         $scope.$root.$on('show-loading-modal', function($event, content) {
 
             // Clear out any existing modal.

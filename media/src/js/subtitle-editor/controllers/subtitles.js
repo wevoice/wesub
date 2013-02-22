@@ -204,6 +204,16 @@ var angular = angular || null;
                 }
             });
 
+            if ($scope.status !== 'saved') {
+
+                buttons.push({
+                    'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
+                        $scope.$root.$broadcast('hide-modal');
+                    }
+                });
+
+            }
+
             $scope.$root.$emit('show-modal', {
                 heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
                 buttons: buttons
