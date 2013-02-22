@@ -160,19 +160,31 @@ def get_amara_credit_text(language='en'):
     return translate_string(AMARA_CREDIT, language)
 
 
-def add_amara_description_credit(old_description, video_url, language='en'):
+def add_amara_description_credit(old_description, video_url, language='en',
+        prepend=False):
     """
     Prepend the credit to the existing description.
     """
     credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
 
-    if old_description and old_description.startswith(credit):
+    if prepend:
+
+        if old_description and old_description.startswith(credit):
+            return old_description
+
+        return "%s: %s\n\n%s" % (
+            credit,
+            video_url,
+            old_description or ""
+        )
+
+    if old_description and old_description.endswith(credit):
         return old_description
 
-    return "%s: %s\n\n%s" % (
+    return "%s\n\n%s: %s" % (
+        old_description or "",
         credit,
-        video_url,
-        old_description or ""
+        video_url
     )
 
 
