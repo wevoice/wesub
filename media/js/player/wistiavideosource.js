@@ -73,11 +73,10 @@ unisubs.player.WistiaVideoSource.prototype.getVideoURL = function() {
 unisubs.player.WistiaVideoSource.getMediaSource = function(videoURL, opt_videoConfig) {
    // alert('Vid Source: '+videoURL);
     if (/^\s*https?:\/\/([^\.]+\.)?wistia/.test(videoURL)) {
-        var videoIDExtract = /([wistia.com|wistia.net])\/medias\/iframe\/([0-9,A-Z,a-z]+)/i.exec(videoURL);
-        //alert(videoIDExtract[2]);
+        var videoIDExtract = /([wistia.com|wistia.net])\/(medias|embed\/iframe)?\/([0-9,A-Z,a-z]+)/i.exec(videoURL);
         if (videoIDExtract)
             return new unisubs.player.WistiaVideoSource(
-                videoIDExtract[2], videoURL, opt_videoConfig);
+                videoIDExtract.pop(), videoURL, opt_videoConfig);
     }
     return null;
 }
