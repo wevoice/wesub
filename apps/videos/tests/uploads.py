@@ -330,7 +330,7 @@ class UploadSubtitlesTest(WebUseTest):
         # Uploading a translation with a different number of subs than the
         # original language is not allowed.
         self._upload(video, 'is', 'en', 'en', True, 'test_fewer_subs.srt')
-        self.assertEqual(video.newsubtitlelanguage_set.count(), 1)
+        self.assertEqual(video.newsubtitlelanguage_set.count(), 2)
 
         self._upload(video, 'is', 'en', 'en', True, 'test.srt')
         self.assertEqual(video.newsubtitlelanguage_set.count(), 2)
