@@ -50,11 +50,7 @@ class WistiaVideoType(VideoType):
         return self.videoid
     
     def convert_to_video_url(self):
-        # Not sure what to do here since Wistia's model, in part, involves
-        # customer branded URLs, preventing any sort of canonical URL from
-        # working correctly
-        # return self.linkurl
-        return self.url
+        return "http://fast.wistia.net/embed/iframe/%s" % self.videoid
 
     @classmethod    
     def video_url(cls, obj):
