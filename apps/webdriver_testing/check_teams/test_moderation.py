@@ -289,15 +289,8 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.team.save()
         self.video_pg.log_in(self.member, 'password')
         self.video_pg.open_video_page(self.draft.video_id)
-        self.assertFalse(self.video_pg.displays_add_subtitles())
+        self.assertFalse(self.video_pg.displays_subtitle_me())
 
-        self.menu.new_translation()
-        self.assertTrue(self.create_modal.lang_selection_dialog_present())
-
-    def test_draft__guest_improve(self):
-        """Subtitle policy: members, guest has no improve subtitles in menu."""
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_improve_subtitles())
 
     def test_draft__guest_translate(self):
         """Translate policy: members, guest has no new translation in menu."""
