@@ -166,6 +166,7 @@ unisubs.player.WistiaVideoPlayer.prototype.pauseInternal = function() {
     this.player_['pause']();
     this.paused = true;
     this.timeUpdateTimer_.stop();
+    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PAUSE);
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
@@ -176,6 +177,7 @@ unisubs.player.WistiaVideoPlayer.prototype.playInternal = function() {
     this.player_['play']();
     this.paused = false;
     this.timeUpdateTimer_.start();
+    this.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PLAY);
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.progressTick_ = function(e) {
@@ -258,17 +260,10 @@ unisubs.player.WistiaVideoPlayer.prototype.enterDocument = function() {
 };
 
 unisubs.player.WistiaVideoPlayer.prototype.makePlayer_ = function() {
-    var playerStateChange = goog.bind(this.playerStateChange_, this);
-    this.almostPlayer_ = new window['Wistia']['Player'](
-        this.playerElemID_, {
-            'events': {
-                'onReady': goog.bind(this.playerReady_, this),
-                'onStateChange': function(state) {
-                    playerStateChange(state['data']);
-                }
-            }
-        });
 };
+
+unisubs.player.WistiaVideoPlayer.prototype.playerStateChange_ = function (data) {
+}
 
 unisubs.player.WistiaVideoPlayer.prototype.playerReady_ = function(e) {
     this.player_ = this.almostPlayer_;
