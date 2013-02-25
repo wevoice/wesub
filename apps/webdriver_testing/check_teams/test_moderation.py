@@ -274,14 +274,11 @@ class TestCaseDraftVideos(WebdriverTestCase):
     def test_draft__playback(self):
         """Draft can not be played on the video page."""
         self.video_pg.log_in(self.member, 'password')
-        self.menu.open_menu()
-        self.menu.select_language('English')
-        self.assertEqual('Select Language', self.menu.visible_menu_text())
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
     def test_draft__guest_improve(self):
         """Subtitle policy: members, guest has no improve subtitles in menu."""
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_improve_subtitles())
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
     def test_draft__translate(self):
         """Draft can not be the source for a new translation.
@@ -292,6 +289,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.team.save()
         self.video_pg.log_in(self.member, 'password')
         self.video_pg.open_video_page(self.draft.video_id)
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
         self.menu.new_translation()
         self.assertTrue(self.create_modal.lang_selection_dialog_present())
@@ -305,6 +303,5 @@ class TestCaseDraftVideos(WebdriverTestCase):
         """Translate policy: members, guest has no new translation in menu."""
 
         """Guest can not translate published subtitles."""
-        self.menu.open_menu()
-        self.assertFalse(self.menu.displays_new_translation())
+        self.assertFalse(self.video_pg.displays_add_subtitles())
 
