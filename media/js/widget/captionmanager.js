@@ -33,7 +33,7 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
     var that = this;
 
     this.binaryCompare_ = function(time, caption) {
-        return time - that.x['startTime'](caption);
+        return time - that.x['startTime'](caption.node);
     };
     this.binaryCaptionCompare_ = function(c0, c1) {
         return that.x['startTime'](c0.node) - that.x['startTime'](c1.node);
