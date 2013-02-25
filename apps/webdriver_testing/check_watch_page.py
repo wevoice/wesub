@@ -91,7 +91,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         """Search contents in subtitle text.
 
         """
-        test_text = 'This line should be bold'
+        test_text = '[Zeus]'
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_results())
 

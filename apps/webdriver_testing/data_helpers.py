@@ -122,7 +122,9 @@ class DataHelpers(object):
             data = {'language_code': 'en',
                     'video': video.pk,
                     'primary_audio_language_code': 'en',
-                    'draft':  open('apps/videos/fixtures/test.srt'),
+                    'draft': open('apps/webdriver_testing/subtitle_data/'
+                            'Timed_text.en.srt'),
+                    #'draft':  open('apps/videos/fixtures/test.srt'),
                     'is_complete': True,
                     'complete': 1
                     }
