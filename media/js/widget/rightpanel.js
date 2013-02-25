@@ -286,16 +286,20 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
     // can compare these captions to captions of other languages.
     if (this.serverModel_.captionSet_.languageWasForked) {
 
-        var saveAndOpenInNewEditor = $d(
-            'div', 'unisubs-saveandopeninneweditor',
-            $d('span', null, 'Beta: '),
-            $d('a', {'href': '#'},
-            $d('span', null, 'Save and open in new editor')));
+        var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
 
-        goog.dom.append(stepsDiv, saveAndOpenInNewEditor);
-        this.getHandler().listen(
-            saveAndOpenInNewEditor, goog.events.EventType.CLICK,
-            this.saveAndOpenInNewEditorClicked_);
+        if (['html5', 'vimeo', 'youtube'].indexOf(videoType) !== -1) {
+            var saveAndOpenInNewEditor = $d(
+                'div', 'unisubs-saveandopeninneweditor',
+                $d('span', null, 'Beta: '),
+                $d('a', {'href': '#'},
+                $d('span', null, 'Save and open in new editor')));
+
+            goog.dom.append(stepsDiv, saveAndOpenInNewEditor);
+            this.getHandler().listen(
+                saveAndOpenInNewEditor, goog.events.EventType.CLICK,
+                this.saveAndOpenInNewEditorClicked_);
+        }
     }
 
     goog.dom.append(el, stepsDiv);

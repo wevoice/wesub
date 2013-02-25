@@ -29,4 +29,4 @@ class HtmlFiveVideoType(VideoType):
     @classmethod
     def matches_video_url(cls, url):
         url = cls.format_url(url)
-        return bool(URL_REGEX.match(url.strip()))
+        return bool(URL_REGEX.match(url))

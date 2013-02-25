@@ -189,16 +189,19 @@
                                 {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
                                     {% if translated_from and not translated_from.get_tip %}
                                         class="disabled">
-                                        <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ translated_from.get_language_code_display }}) is finished.</div
+                                        <div class="cannot-perform disabled">Locked until {{ translated_from.get_language_display }} subtitles are completed.</div
                                     {% endif %}
                                 {% endif %}
                                 {% if task.is_blocked %}
                                     class="disabled">
-                                    <div class="cannot-perform disabled">This task cannot be performed until the original language ({{ task.new_subtitle_version.get_language_code_display }}) has been approved.</div
+                                    <div class="cannot-perform disabled">Locked until {{ task.subtitle_version.language }} subtitles have been approved.</div
                                 {% endif %}
-                                {% if not task|can_perform_task:user %}
+                                {% if not task|can_perform_task:user and not task.assignee %}
                                     class="disabled">
                                     <div class="cannot-perform">{% trans "You don't have permission to perform this task." %}</div
+                                {% endif %}
+                                {% if task.assignee and task.assignee != user %}
+                                    class="assigned"
                                 {% endif %}
                                 >
 
@@ -224,7 +227,7 @@
                                 </h3>
                                 <p>
                                     <strong>{% trans "Video" %}:</strong>
-                                    <a href="{{ task.team_video.video.get_absolute_url }}">
+                                    <a href="{{ task.team_video.video.get_absolute_url }}" title="{{ task.team_video.video.get_title_display }}">
                                         {{ task.team_video|truncatewords:12 }}
                                     </a>
                                     {% if task.team_video.video.duration %}

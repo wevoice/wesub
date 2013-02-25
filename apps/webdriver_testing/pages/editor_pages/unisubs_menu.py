@@ -17,6 +17,7 @@ class UnisubsMenu(Page):
     _SUB_HOMEPAGE = '.unisubs-subtitleHomepage a'
     #_EMBED_CODE = ''  #Just links to homepage - not useful.
     _DOWNLOAD_SUBTITLES = '.unisubs-downloadSubtitles a'
+    _MODERATED = 'li.unisubs-moderated'
 
     #CURRENT USER SETTINGS 
     _USER_PAGE = '%s'    #visible text link - provide username
@@ -92,10 +93,13 @@ class UnisubsMenu(Page):
         self.click_by_css(self._NEW_TRANSLATION)
 
     def displays_new_translation(self):
-        return self.is_element_visible(self._NEW_TRANSLATION)
+        return self.is_element_present(self._NEW_TRANSLATION)
 
     def displays_improve_subtitles(self):
         return self.is_element_visible(self._IMPROVE_SUBS)
+
+    def displays_moderated_message(self):
+        return self.is_element_visible(self._MODERATED)
  
     def open_subtitle_homepage(self):
         """Open the subtitle homepage.

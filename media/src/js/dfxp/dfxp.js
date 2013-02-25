@@ -30,6 +30,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
     var DFXP_REPLACE_SEQ = [
+
+        // This first set is to handle malformed DFXP XML.
+        ["span[fontWeight='bold']", "**"],
+        ["span[fontStyle='italic']", "*"],
+        ["span[textDecoration='underline']", "_"],
+
         ["span[tts\\:fontWeight='bold']", "**"],
         ["span[tts\\:fontStyle='italic']", "*"],
         ["span[tts\\:textDecoration='underline']", "_"],
@@ -221,10 +227,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: new subtitle element
          */
 
-        if (typeof after !== 'number') {
+        if (typeof after !== 'object' || after === null) {
 
-            // If we have subtitles, default placement should be at the end.
-            if (this.subtitlesCount()) {
+            // If this is a number, get the subtitle by index.
+            if (typeof after === 'number') {
+                after = this.getSubtitleByIndex(after);
+            } else if (this.subtitlesCount()) {
+                // If we have subtitles, default placement should be at the end.
                 after = this.getLastSubtitle();
 
             // Otherwise, place the first subtitle at the beginning.
@@ -257,7 +266,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         } else {
 
             // First just make sure that the previous subtitle exists.
-            var $previousSubtitle = this.getSubtitle(after);
+            var $previousSubtitle = $(after);
 
             // Then place it.
             $previousSubtitle.after($newSubtitle);
@@ -265,9 +274,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         if (typeof content !== 'undefined') {
             if (content === null) {
-                this.content($newSubtitle, '');
+                this.content($newSubtitle.get(0), '');
             } else {
-                this.content($newSubtitle, content);
+                this.content($newSubtitle.get(0), content);
             }
         }
 
@@ -294,7 +303,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         } else {
 
             // First just make sure that the previous subtitle exists.
-            var $previousSubtitle = this.getSubtitle(after) || $(this.getLastSubtitle());
+            var $previousSubtitle = this.getSubtitleByIndex(after) || $(this.getLastSubtitle());
 
             // Then place it.
             $previousSubtitle.after(newSubtitle);
@@ -343,21 +352,21 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         return parser;
     };
-    this.cloneSubtitle = function (indexOrElement, preserveText){
-        var $subtitle = this.getSubtitle(indexOrElement).clone();
+    this.cloneSubtitle = function (node, preserveText){
+        var $subtitle = $(node).clone();
         if (!preserveText){
             $subtitle.text('');
         }
         return $subtitle;
     };
-    this.content = function(indexOrElement, content) {
+    this.content = function(node, content) {
         /*
          * Either get or set the HTML content for the subtitle.
          *
          * Returns: current content (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(node);
 
         if (typeof content !== 'undefined') {
             $subtitle.text(content);
@@ -387,29 +396,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $('<div>').append(subtitleContents.clone()).remove().html();
     };
-    this.contentRenderedFromNode = function(node) {
-        /*
-         * Pass the actual subtitle node, and get the raw nodeValue parsed
-         * into Markdown-style HTML. Useful when you know you're getting
-         * raw Markdown-style text and you don't want to do the
-         * content -> HTML shakedown as we do in content();
-         */
-
-        var text = '';
-        for (var i = 0; i < node.childNodes.length; i++) {
-            text += node.childNodes[i].nodeValue;
-        }
-
-        return this.markdownToHTML(text);
-    };
-    this.contentRendered = function(indexOrElement) {
+    this.contentRendered = function(node) {
         /*
          * Return the content of the subtitle, rendered with Markdown styles.
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        return this.markdownToHTML(this.content(indexOrElement));
+        return this.markdownToHTML(this.content(node));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
@@ -464,28 +456,26 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return node;
     };
-    this.endTime = function(indexOrElement, endTime) {
+    this.endTime = function(node, endTime) {
         /*
          * Either get or set the end time for the subtitle.
          *
          * Returns: current end time (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        if (!$subtitle ) {
+        if (!node ) {
             return -1;
         }
 
         if (typeof endTime !== 'undefined') {
-            if (parseFloat(endTime) || endTime === 0) {
-                $subtitle.attr('end', endTime);
+            if (parseInt(endTime, 10) || endTime === 0) {
+                $(node).attr('end', endTime);
             } else {
-                $subtitle.attr('end', '');
+                $(node).attr('end', '');
             }
         }
 
-        var val =  parseFloat($subtitle.attr('end')) ;
+        var val =  parseInt(node.getAttribute('end'), 10);
 
         return isNaN(val) ? -1 : val;
     };
@@ -496,7 +486,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: first subtitle element
          */
 
-        return this.getSubtitle(0).get(0);
+        return this.getSubtitles().first().get(0);
     };
     this.getLastSubtitle = function() {
         /*
@@ -505,25 +495,19 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: subtitle element or empty array
          */
 
-        // Cache the selection.
-        var $subtitles = this.getSubtitles();
-
-        return this.getSubtitle($subtitles.length - 1).get(0);
+        return this.getSubtitles().last().get(0);
     };
-    this.getNextSubtitle = function(indexOrElement) {
+    this.getNextSubtitle = function(node) {
         /*
          * Retrieve the subtitle that follows the given subtitle.
          *
          * Returns: subtitle element or null
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(node);
+        var $nextSubtitle = $subtitle.next();
 
-        if (!$subtitle) {
-            return null;
-        }
-
-        return $subtitle.next().length > 0 ? $subtitle.next().eq(0).get(0) : null;
+        return $nextSubtitle.length > 0 ? $nextSubtitle.get(0) : null;
     };
     this.getNonBlankSubtitles = function() {
         /*
@@ -536,19 +520,26 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             return $(this).text() !== '';
         });
     };
-    this.getPreviousSubtitle = function(indexOrElement) {
+    this.getPreviousSubtitle = function(node) {
         /*
          * Retrieve the subtitle that precedes the given subtitle.
          *
          * Returns: subtitle element
          */
 
-        var el = this.getSubtitle(indexOrElement);
+        var $subtitle = $(node);
+        var $prevSubtitle = $subtitle.prev();
 
-        if (!el) {
-            return null;
-        }
-        return el.prev().length > 0 ? el.prev().eq(0).get(0) : null;
+        return $prevSubtitle.length > 0 ? $prevSubtitle.get(0) : null;
+    };
+    this.getSubtitleByIndex = function(index) {
+        /*
+         * Return the subtitle node by the given index.
+         *
+         * Returns: node
+         */
+
+        return this.getSubtitles().eq(index).get(0);
     };
     this.getSubtitleIndex = function(subtitle, subtitles) {
         /*
@@ -559,55 +550,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         subtitles = subtitles || this.getSubtitles();
         return $(subtitles).index(subtitle);
     };
-    this.getSubtitle = function(indexOrElement) {
-        /*
-         * Retrieve the subtitle based on the index given.
-         *
-         * If the given argument is an object, assume it's a DOM node
-         * and check to make sure it exists in the subtitles tree.
-         *
-         * Returns: jQuery selection of element.
-         *
-         */
-
-        // If an index or an object is not provided, throw an error.
-        if (typeof indexOrElement !== 'number' && typeof indexOrElement !== 'object') {
-            throw new Error('DFXP: You must supply either an index or an element.');
-        }
-        var subtitle;
-
-        // If indexOrElement is a number, we'll need to query the DOM to
-        // get the element.
-        //
-        // Note: you should only use this approach for checking one-off
-        // subtitles. If you're checking more than one subtitle, it's much
-        // faster to pass along pre-selected elements instead.
-        //
-        // Note also: if you're performing actions on a larger number of
-        // subtitles, please consider using getSubtitles() and manually
-        // iterating, to avoid performing DOM selection for lots of nodes.
-        if (typeof indexOrElement === 'number') {
-            subtitle = this.getSubtitles().get(indexOrElement);
-
-        // Otherwise, it's an object.
-        } else {
-
-            // If this is already a jQuery selection, we need to extract the
-            // node first.
-            if (indexOrElement instanceof AmarajQuery) {
-                indexOrElement = indexOrElement.get(0);
-            }
-
-            subtitle = indexOrElement;
-
-        }
-
-        if (!subtitle) {
-            return null;
-        }
-
-        return $(subtitle);
-    };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
@@ -617,7 +559,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $('p', this.$xml);
     };
-    this.isShownAt = function(indexOrElement, time) {
+    this.isShownAt = function(node, time) {
         /*
          * Determine whether the given subtitle should be displayed
          * at the given time.
@@ -625,10 +567,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true || false
          */
 
-        var subtitle = this.getSubtitle(indexOrElement).get(0);
-
-        return (time >= this.startTime(subtitle) &&
-                time <= this.endTime(subtitle));
+        return (time >= this.startTime(node) &&
+                time <= this.endTime(node));
     };
     this.markdownToDFXP = function(input) {
         /**
@@ -727,7 +667,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return false;
     };
-    this.needsSyncing = function(indexOrElement) {
+    this.needsSyncing = function(node) {
         /*
          * Given the zero-index or the element of the subtitle to be
          * checked, determine whether the subtitle needs to be synced.
@@ -740,89 +680,81 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true || false
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        var startTime = $subtitle.attr('begin');
-        var endTime = $subtitle.attr('end');
+        var startTime = node.getAttribute('begin');
+        var endTime = node.getAttribute('end');
 
         // If start time is empty, it always needs to be synced.
-        if (startTime === '') {
+        if (startTime === '' || startTime === -1) {
             return true;
         }
 
         // If the end time is empty and this is not the last subtitle,
         // it needs to be synced.
-        if (endTime === '' && ($subtitle.get(0) !== this.getLastSubtitle())) {
+        if ((endTime === '' || endTime === -1) && (node !== this.getLastSubtitle())) {
             return true;
         }
 
         // Otherwise, we're good.
         return false;
     };
-    this.originalContent = function(indexOrElement, content) {
+    this.originalContent = function(node, content) {
         /*
          * Either get or set the original HTML content for the subtitle.
          *
          * Returns: current original content (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
         if (typeof content !== 'undefined') {
-            $subtitle.attr('originalcontent', content);
+            $(node).attr('originalcontent', content);
         }
 
-        return $subtitle.attr('originalcontent');
+        return node.getAttribute('originalcontent');
     };
-    this.originalEndTime = function(indexOrElement, originalEndTime) {
+    this.originalEndTime = function(node, originalEndTime) {
         /*
          * Either get or set the original end time for the subtitle.
          *
          * Returns: current original end time (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
         if (typeof originalEndTime !== 'undefined') {
-            if (parseFloat(originalEndTime)) {
-                $subtitle.attr('originalend', originalEndTime);
+            if (parseInt(originalEndTime, 10)) {
+                $(node).attr('originalend', originalEndTime);
             } else {
-                $subtitle.attr('originalend', '');
+                $(node).attr('originalend', '');
             }
         }
 
-        return $subtitle.attr('originalend');
+        return node.getAttribute('originalend');
     };
-    this.originalStartTime = function(indexOrElement, originalStartTime) {
+    this.originalStartTime = function(node, originalStartTime) {
         /*
          * Either get or set the original start time for the subtitle.
          *
          * Returns: current original start time (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
         if (typeof originalStartTime !== 'undefined') {
-            if (parseFloat(originalStartTime)) {
-                $subtitle.attr('originalbegin', originalStartTime);
+            if (parseInt(originalStartTime, 10)) {
+                $(node).attr('originalbegin', originalStartTime);
             } else {
-                $subtitle.attr('originalbegin', '');
+                $(node).attr('originalbegin', '');
             }
         }
 
-        return $subtitle.attr('originalbegin');
+        return node.getAttribute('originalbegin');
     };
     this.originalXmlToString = function() {
         return this.utils.xmlToString(this.$originalXml.get(0));
     };
-    this.removeSubtitle = function(indexOrElement) {
+    this.removeSubtitle = function(node) {
         /*
          * Remove a subtitle.
          *
          * Returns: true
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(node);
         var $subtitleParent = $subtitle.parent();
 
         // If the parent div has only one child, remove the parent div along with this
@@ -889,7 +821,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             }
         }
     };
-    this.startOfParagraph = function(indexOrElement, startOfParagraph) {
+    this.startOfParagraph = function(node, startOfParagraph) {
         /*
          * Either get or set the startofparagraph for the subtitle.
          *
@@ -901,7 +833,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: current state of startofparagraph (boolean)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
+        var $subtitle = $(node);
 
         // If startOrParagraph was passed, we need to do something.
         //
@@ -961,43 +893,31 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $subtitle.is(':first-child');
     };
-    this.startTime = function(indexOrElement, startTime, inSeconds) {
+    this.startTime = function(node, startTime) {
         /*
          * Either get or set the start time for the subtitle.
          *
          * Returns: current start time (string)
          */
 
-        var $subtitle = this.getSubtitle(indexOrElement);
-
-        if (!$subtitle ) {
+        if (!node) {
             return -1;
         }
 
         if (typeof startTime !== 'undefined') {
-            if (parseFloat(startTime) || startTime === 0) {
-                $subtitle.attr('begin', startTime);
+            if (parseInt(startTime, 10) || startTime === 0) {
+                $(node).attr('begin', startTime);
             } else {
-                $subtitle.attr('begin', '');
+                $(node).attr('begin', '');
             }
         }
 
-        var val =  parseFloat($subtitle.attr('begin')) ;
+        var val =  parseInt(node.getAttribute('begin'), 10);
 
         return isNaN(val) ? -1 : val;
     };
-    this.startTimeFromNode = function(node) {
-        /*
-         * Retrieves the start time from the node, and converts it to seconds.
-         * This is primarily for speed and display in a UI.
-         */
-
-        var startTime = node.getAttribute('begin');
-
-        var val = parseFloat(startTime / 1000);
-
-        return isNaN(val) ? -1 : val;
-
+    this.startTimeInSeconds = function(node) {
+        return parseFloat(this.startTime(node) / 1000).toFixed(3);
     };
     this.subtitlesCount = function() {
         /*

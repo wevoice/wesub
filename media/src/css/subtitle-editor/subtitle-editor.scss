@@ -117,23 +117,6 @@ strong {
 }
 
 // Modules
-.column {
-    float: left;
-
-    // Note: there's a bug in Chrome Linux that prevents proper rendering of
-    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
-    //
-    // Thus, the following does not add up to 100%.
-    &.left {
-        width: 34%;
-    }
-    &.center {
-        width: 40%;
-    }
-    &.right {
-        width: 26%;
-    }
-}
 div.modal {
     background: rgba(black, .6);
     height: 100%;
@@ -177,9 +160,8 @@ button {
     cursor: pointer;
     display: inline-block;
     font: normal 12px $OpenSans;
-    margin: 0 5px;
-    padding: 5px 0;
-    width: 90px;
+    margin: 0 10px;
+    padding: 5px 20px;
 
     @include border-radius(2px);
 
@@ -202,8 +184,39 @@ button {
         margin-left: 0;
         margin-right: 0;
     }
+    &.last-chance {
+        background: none;
+        color: #4398C5;
+        display: block;
+        font-size: 11px;
+        margin-top: 20px;
+        padding: 0;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 
+.column {
+    float: left;
+
+    // Note: there's a bug in Chrome Linux that prevents proper rendering of
+    // percentage-based widths. See https://code.google.com/p/chromium/issues/detail?id=162117
+    //
+    // Thus, the following does not add up to 100%.
+    &.left {
+        min-width: 255px;
+        width: 34%;
+    }
+    &.center {
+        min-width: 255px;
+        width: 40%;
+    }
+    &.right {
+        width: 26%;
+    }
+}
 header.main {
     background: #212223;
     border-bottom: 1px solid #474849;
@@ -321,11 +334,16 @@ header.main {
             }
         }
         div.exit {
+            border-right: none;
             text-align: center;
 
-            > a {
-                background: #126295;
-                color: white;
+            a {
+                display: inline-block;
+
+                &.save {
+                    background: #126295;
+                    color: white;
+                }
             }
         }
     }
@@ -443,6 +461,9 @@ section.main {
                     a.remove {
                         display: block;
                     }
+                    span.start-time {
+                        color: #616263;
+                    }
                 }
                 &.empty {
                     background: #F2DEDE;
@@ -477,7 +498,7 @@ section.main {
             background: #666666;
             color: white;
             font-size: 12px;
-            height: 250px;
+            height: 216px;
             margin: 20px;
             padding: 20px;
             @include border-radius(3px);
@@ -525,6 +546,21 @@ section.main {
                     &:last-of-type {
                         margin-bottom: 0;
                     }
+                }
+            }
+        }
+        div.preview {
+            color: #949596;
+            height: 34px;
+            text-align: center;
+            text-shadow: 0 1px 0 white;
+
+            a {
+                color: #256F9E;
+                text-decoration: none;
+                
+                &:hover {
+                    text-decoration: underline;
                 }
             }
         }

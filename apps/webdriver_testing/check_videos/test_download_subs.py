@@ -96,23 +96,6 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         #and outputs the expected data and file format.
         self._check_download_subtitles(test_video, lang_code, download_format)
 
-    def test_download__ted(self):
-        """Download subs (sv) in a srt file.
-
-        """
-        test_file = 'Timed_text.sv.srt'
-        video_title = 'Swedish subs TED format download'
-        download_format = 'TED'
-        lang_code = 'sv'
-        sub_file = os.path.join(self.subs_data_dir, test_file)
-
-        #Create a video and upload subtitles
-        test_video = self._add_video_and_subs(sub_file, lang_code, video_title)
-
-        #Open the video's language page, and verify the download link is valid 
-        #and outputs the expected data and file format.
-        self._check_download_subtitles(test_video, lang_code, download_format)
-       
 
     def test_download__sbv(self):
         """Download subs (zh-cn) as a sbv file.
@@ -130,24 +113,6 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         #Open the video's language page, and verify the download link is valid 
         #and outputs the expected data and file format.
         self._check_download_subtitles(test_video, lang_code, download_format)
-
-    def test_download__json(self):
-        """Download subs (zh-cn) as a json file.
-
-        """
-        test_file = 'Timed_text.zh-cn.sbv'
-        video_title = 'Chinese subs sbv format download'
-        download_format = 'JSON'
-        lang_code = 'zh-cn'
-        sub_file = os.path.join(self.subs_data_dir, test_file)
-
-        #Create a video and upload subtitles
-        test_video = self._add_video_and_subs(sub_file, lang_code, video_title)
-
-        #Open the video's language page, and verify the download link is valid 
-        #and outputs the expected data and file format.
-        self._check_download_subtitles(test_video, lang_code, download_format)
-
 
 
     def test_download__ssa(self):
@@ -168,42 +133,6 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         #and outputs the expected data and file format.
         self._check_download_subtitles(test_video, lang_code, download_format)
 
-
-    def test_download__ass(self):
-        """Upload timed subs (hu) in an ass file.
-
-        """
-        test_file = 'Timed_text.hu.ssa'
-        video_title = 'Hungarian subs ass format download'
-        sub_file = os.path.join(self.subs_data_dir, test_file)       
-        download_format = 'ASS'
-        lang_code = 'hu'
-        sub_file = os.path.join(self.subs_data_dir, test_file)
-
-        #Create a video and upload subtitles
-        test_video = self._add_video_and_subs(sub_file, lang_code, video_title)
-
-        #Open the video's language page, and verify the download link is valid 
-        #and outputs the expected data and file format.
-        self._check_download_subtitles(test_video, lang_code, download_format)
-
-
-    def test_download__xml(self):
-        """Download subs (hu) in an xml file.
-
-        """
-        test_file = 'Timed_text.hu.ssa'
-        video_title = 'Hungarian subs xml format download'
-        download_format = 'XML'
-        lang_code = 'hu'
-        sub_file = os.path.join(self.subs_data_dir, test_file)       
-
-        #Create a video and upload subtitles
-        test_video = self._add_video_and_subs(sub_file, lang_code, video_title)
-
-        #Open the video's language page, and verify the download link is valid 
-        #and outputs the expected data and file format.
-        self._check_download_subtitles(test_video, lang_code, download_format)
 
 
     def test_timed__dfxp(self):

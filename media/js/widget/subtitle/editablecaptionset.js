@@ -42,6 +42,7 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
 
     this.x = new window['AmaraDFXPParser']();
     this.x['init'](dfxp);
+    window.x = this.x;
 
     this.captions_ = goog.array.map(
         this.x['getSubtitles'](), function(node) {
@@ -135,7 +136,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(originalNode, dfxpWrapper, atIndex) {
     var newNode = dfxpWrapper['cloneSubtitle'](originalNode,false);
-    var c = this.insertCaption(atIndex, newNode)
+    var c = this.insertCaption(atIndex, newNode);
     return c;
 };
 
@@ -170,7 +171,9 @@ unisubs.subtitle.EditableCaptionSet.prototype.insertCaption = function(atIndex, 
     }
     c.setNextCaption(nextSub);
     nextSub.setPreviousCaption(c);
-    this.setTimesOnInsertedSub_(c, prevSub, nextSub);
+    if (c.needsSync()){
+        this.setTimesOnInsertedSub_(c, prevSub, nextSub);
+    }
     c.setParentEventTarget(this);
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaptionSet.CaptionEvent(
@@ -278,10 +281,10 @@ unisubs.subtitle.EditableCaptionSet.prototype.findLastForTime = function(time) {
     var isLast = false;
     var length = captions.length;
     for (i = 0; i < length; i++){
-        currentStartTime = this.x['startTime'](i);
+        currentStartTime = this.x['startTime'](this.x['getSubtitleByIndex'](i));
         isLast = i == length -1;
         if (!isLast){
-            nextStartTime = this.x['startTime'](i+1);
+            nextStartTime = this.x['startTime'](this.x['getSubtitleByIndex'](i+1));
         }else{
             nextStartTime  = undefined;
         }

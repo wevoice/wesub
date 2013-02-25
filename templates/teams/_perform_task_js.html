@@ -33,13 +33,13 @@ $('.perform-task-{{ task.pk }}').click(function(e) {
     {% if task.assignee != request.user %}
     site.Utils.assignTask({{ task.pk }}, function(){
         window.location = $link.attr('href');
-        $link.click();
     });
 
     return false;
     {% else %}
     return true;
     {% endif %}
+
 });
 </script>
 {% endif %}
