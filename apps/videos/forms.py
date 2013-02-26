@@ -37,6 +37,7 @@ from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
+from utils.translation import get_language_choices
 
 ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 KB_SIZELIMIT = 512
