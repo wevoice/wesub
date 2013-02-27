@@ -201,6 +201,16 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
             xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
 
+            // IE special-casing.
+            xmlString = xmlString.replace(/xmlns:NS1=\"\" /g, '');
+            xmlString = xmlString.replace(/NS1:/g, '');
+
+            // If the XML does not have a tts namespace set on the <tt> element, we need to
+            // set it specifically. This is an IE9 issue.
+            if (xmlString.substring(0).search(/\<tt.*xmlns:tts="http:\/\/www.w3.org\/ns\/ttml#styling" /)) {
+                xmlString = xmlString.replace(/\<tt /g, '<tt xmlns:tts="http:\/\/www.w3.org\/ns\/ttml#styling" ');
+            }
+
             // Hey look, more hacks. For some reason, when the XML is spit to a
             // string, the attributes are all lower-cased. Fix them here.
             xmlString = xmlString.replace(/textdecoration/g, 'textDecoration');

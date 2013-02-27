@@ -126,6 +126,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
         """Translate policy: members, guest has no new translation in menu.
 
         """
+        self.video_pg.log_out()
         self.video_pg.open_video_page(self.published.video_id)
         self.menu.open_menu()
         self.assertFalse(self.menu.displays_new_translation())
