@@ -18,6 +18,8 @@
 
 var angular = angular || null;
 var SubtitleListItemController = SubtitleListItemController || null;
+var LOCK_EXPIRATION = 25;
+var USER_IDLE_MINUTES = 5;
 
 (function($) {
 
@@ -30,14 +32,15 @@ var SubtitleListItemController = SubtitleListItemController || null;
             }
         };
     });
-    directives.directive('subtitleEditor', function(SubtitleStorage) {
+
+    directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
         return {
             compile: function compile(elm, attrs, transclude) {
                 return {
                     post: function post(scope, elm, attrs) {
+                        scope.minutesIdle = 0;
 
                         $(elm).on('keydown', function(e) {
-
                             var video = angular.element($('#video').get(0)).scope();
 
                             // Space with shift, toggle play / pause.
@@ -46,8 +49,30 @@ var SubtitleListItemController = SubtitleListItemController || null;
                                 video.togglePlay();
                             }
 
+                            scope.minutesIdle = 0;
                         });
 
+                        $(elm).on('mousemove', function(){
+                            scope.minutesIdle = 0;
+                        });
+
+                        $timeout(function userIdleTimeout(){
+                            scope.minutesIdle++;
+                            if(scope.minutesIdle >= USER_IDLE_MINUTES){
+                                // open modal to warn user
+                                alert('Sorry, you lost your session');
+                                LockService.releaseLock(scope.videoID,
+                                                        scope.languageCode);
+                                window.location = scope.videoURL;
+                            } else {
+                                $timeout(userIdleTimeout, 10 * 1000);
+                            } 
+                        }, 10* 1000);
+
+                        console.log($timeout(function regainLockTimeout(){
+                            LockService.regainLock(scope.videoID, scope.languageCode);
+                            $timeout(regainLockTimeout, 10 * 1000);
+                        }, 10 * 1000));
                     }
                 };
             }
