@@ -15,18 +15,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
-import json
+import simplejson as json
 from django.contrib.auth.decorators import login_required
 
 from videos.models import Video
 from teams.models import Task
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 
+from django.http import HttpResponse
 from django.db.models import Count
 from django.contrib import messages
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.shortcuts import render_to_response, get_object_or_404, redirect
+
 
 from teams.permissions import can_post_edit_subtitles, can_assign_task
 
@@ -128,6 +131,27 @@ def _check_team_video_locking(user, video, language_code, task_id=None):
             return None, task
 
     return None, None
+
+@login_required
+def regain_lock(request, video_id, language_code):
+    video = get_object_or_404(Video, video_id=video_id)
+    language = video.subtitle_langage(language_code)
+
+    if not language.can_writelock(request.browser_id):
+        return HttpResponse(json.dumps({'response': False}))
+
+    language.writelock(request.user, request.browser_id, save=True)
+    return HttpResponse(json.dumps({'response': True}))
+
+@login_required
+def release_lock(request, video_id, language_code):
+    video = get_object_or_404(Video, video_id=video_id)
+    language = video.subtitle_langage(language_code)
+
+    if language.can_writelock(request.browser_id):
+        language.release_writelock()
+
+    return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
 @login_required
 def subtitle_editor(request, video_id, language_code, task_id=None):
