@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import chardet
+from itertools import izip
 
 import babelsubs
 from django import forms
@@ -86,7 +87,7 @@ class SubtitlesUploadForm(forms.Form):
 
     def _verify_no_translation_conflict(self, subtitle_language,
                                         from_language_code):
-        existing_from_language =  subtitle_language.get_translation_source_language()
+        existing_from_language = subtitle_language.get_translation_source_language()
         existing_from_language_code = (
             existing_from_language and existing_from_language.language_code) or ''
 
@@ -172,9 +173,7 @@ class SubtitlesUploadForm(forms.Form):
 
     def _verify_translation_subtitle_counts(self, from_language_code):
         if from_language_code:
-            from_sl = self.video.subtitle_language(from_language_code)
-
-            from_count = len(from_sl.get_tip(public=True).get_subtitles())
+            from_count = len(self.from_sv.get_subtitles())
             current_count = len(self._parsed_subtitles.get_subtitles())
 
             if current_count > from_count:
@@ -233,6 +232,16 @@ class SubtitlesUploadForm(forms.Form):
         from_language_code = self.cleaned_data.get('from_language_code')
         language_code = self.cleaned_data['language_code']
         subtitle_language = self.video.subtitle_language(language_code)
+
+        if from_language_code:
+            # If this is a translation, we'll retrieve the source
+            # language/version here so we can use it later.
+            sl = self.video.subtitle_language(from_language_code)
+            self.from_sl = sl
+            self.from_sv = sl.get_tip(public=True) if sl else None
+        else:
+            self.from_sl = None
+            self.from_sv = None
 
         # If this SubtitleLanguage already exists, we need to verify a few
         # things about it before we let the user upload a set of subtitles to
@@ -334,16 +343,32 @@ class SubtitlesUploadForm(forms.Form):
         from_language_code = self.cleaned_data['from_language_code']
         complete = self.cleaned_data['complete']
 
-        # No matter what, txt cannot be complete because they don't have timing
-        # data.
-        if self.extension == 'txt':
-            complete = False
+
+        if from_language_code:
+            # If this is a translation, its subtitles should use the timing data
+            # from the source.  We know that the source has at least as many
+            # subtitles as the new version, so we can just match them up
+            # first-come, first-serve.
+            source_subtitles = self.from_sv.get_subtitles()
+            new_subtitles = self._parsed_subtitles.subtitle_items()
+            subtitles = []
+            for old, new in izip(source_subtitles, new_subtitles):
+                subtitles.append(new._replace(start_time=old.start_time,
+                                              end_time=old.end_time))
+        else:
+            # Otherwise we can just use the subtitles the user uploaded as-is.
+            subtitles = self._parsed_subtitles
+
+            # No matter what, text files that aren't translations cannot be
+            # complete because they don't have timing data.
+            if self.extension == 'txt':
+                complete = False
 
         title, description = self._find_title_description(language_code)
         parents = self._find_parents(from_language_code)
 
         version = pipeline.add_subtitles(
-            self.video, language_code, self._parsed_subtitles,
+            self.video, language_code, subtitles,
             title=title, description=description, author=self.user,
             parents=parents, committer=self.user, complete=complete,
             origin=ORIGIN_UPLOAD)
