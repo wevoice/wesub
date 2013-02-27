@@ -942,7 +942,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         return parseFloat(this.startTime(node) / 1000).toFixed(3);
     };
     this.startTimeInTimeExpression = function(node) {
-        return this.utils.millisecondsToTimeExpression.call(this, (this.startTime(node)));
+        return this.utils.millisecondsToTimeExpression.call(this, this.startTime(node));
     };
     this.subtitlesCount = function() {
         /*
