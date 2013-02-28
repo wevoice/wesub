@@ -641,6 +641,10 @@ section.main {
             &:before {
                 @include shadow;
             }
+            video {
+                height: 321px;
+                width: 100%;
+            }
         }
     }
 }

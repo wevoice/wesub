@@ -758,6 +758,34 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#startTimeInTimeExpression()', function() {
+        it('should get the current start time for a subtitle in time expression', function() {
+
+            // Create a new subtitle with a specific start time.
+            var newSubtitle = parser.addSubtitle(null, {'begin': 1150.000}, '');
+
+            // Verify.
+            expect(parser.startTimeInTimeExpression.call(parser, newSubtitle)).toBe('00:00:01,150');
+
+        });
+    });
+    describe('#startTimeDisplay()', function() {
+        it('should get the current start time for a subtitle formatted for display', function() {
+
+            // Create a new subtitle with a specific start time.
+            var newSubtitleSeconds = parser.addSubtitle(null, {'begin': 1150.000}, '');
+
+            // Start times of less than 60 seconds should be in seconds.
+            expect(parser.startTimeDisplay(newSubtitleSeconds)).toBe('1.150');
+
+            // Create a new subtitle with a specific start time.
+            var newSubtitleTimeExpression = parser.addSubtitle(null, {'begin': 111150.000}, '');
+
+            // Start times of greater than 60 seconds should be in time expression.
+            expect(parser.startTimeDisplay(newSubtitleTimeExpression)).toBe('00:01:51.150');
+
+        });
+    });
     describe('#subtitlesCount()', function() {
         it('should return the current number of subtitles', function() {
 

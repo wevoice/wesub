@@ -926,8 +926,23 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return isNaN(val) ? -1 : val;
     };
+    this.startTimeDisplay = function(node) {
+        /*
+         * Display the start time in either seconds or time expression, depending on
+         * how large it is.
+         */
+
+        if (this.startTime(node) > 60000) {
+            return this.startTimeInTimeExpression(node).replace(',', '.');
+        } else {
+            return this.startTimeInSeconds(node);
+        }
+    };
     this.startTimeInSeconds = function(node) {
         return parseFloat(this.startTime(node) / 1000).toFixed(3);
+    };
+    this.startTimeInTimeExpression = function(node) {
+        return this.utils.millisecondsToTimeExpression.call(this, this.startTime(node));
     };
     this.subtitlesCount = function() {
         /*
