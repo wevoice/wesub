@@ -1759,8 +1759,40 @@ def update_followers(sender, instance, created, **kwargs):
             # User already follows the video.
             pass
 
+
+def insert_billing_record(sender, instance, created, **kwargs):
+    from teams.models import BillingRecord
+
+    if not created:
+        return
+
+    language = instance.language
+    video = language.video
+    tv = video.get_team_video()
+
+    if not language.is_complete:
+        return
+
+    if not tv:
+        return
+
+    if BillingRecord.objects.filter(video=video,
+            subtitle_version__language=language).exists():
+        return
+
+    is_original = True
+    source = instance.note
+    team = tv.team
+
+    BillingRecord.objects.create(video=video, subtitle_version=instance,
+            subtitle_language=language, is_original=is_original, team=team,
+            created=instance.datetime_started, source=source,
+            user=instance.user)
+
+
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
+post_save.connect(insert_billing_record, SubtitleVersion)
 
 
 def restrict_versions(version_qs, user, subtitle_language):
