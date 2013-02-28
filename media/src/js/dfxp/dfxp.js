@@ -217,10 +217,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xmlString = xmlString.replace(/fontweight/g, 'fontWeight');
             xmlString = xmlString.replace(/fontstyle/g, 'fontStyle');
 
-            // Unescape angle brackets.
-            xmlString = xmlString.replace(/&gt;/g, '>');
-            xmlString = xmlString.replace(/&lt;/g, '<');
-
             return xmlString;
         }
     };
@@ -986,9 +982,12 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 // means we were able to convert some Markdown to DFXP.
                 if (convertedText !== $subtitle.text()) {
 
-                    // Set the subtitle's text. Note that this is going to insert escaped
-                    // angle brackets. We'll unescape them before we deliver the final XML string.
-                    $subtitle.text(convertedText);
+                    var $newObj = $('<div class="removeme">').append(convertedText);
+
+                    $subtitle.text('');
+                    $subtitle.append($newObj);
+
+                    $('div.removeme', $subtitle).children().unwrap();
 
                 }
             }
