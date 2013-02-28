@@ -853,11 +853,14 @@ describe('DFXP', function() {
             
             // Add a mock subtitle with some Markdown styles.
             parser.addSubtitle(null, null, '**Test**');
+            
+            // Add a mock subtitle with some Markdown styles.
+            parser.addSubtitle(null, null, 'This is a **test**, I say.');
 
             // Get the XML string.
             var xmlString = parser.xmlToString(true, true);
 
-            expect(xmlString).toBe('<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace"> <head> <metadata/> <styling xmlns:tts="http://www.w3.org/2006/10/ttaf1#styling"><style tts:textStyle="italic" xml:id="emphasis"/><style tts:fontWeight="bold" xml:id="strong"/><style tts:textDecoration="underline" xml:id="underlined"/></styling> <layout/> </head> <body region="subtitleArea">  <div><p begin="" end=""><span tts:fontWeight="bold">Test</span></p></div></body> </tt>');
+            expect(xmlString).toBe('<tt xmlns="http://www.w3.org/ns/ttml" xmlns:ttp="http://www.w3.org/ns/ttml#parameter" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en" xmlns:xml="http://www.w3.org/XML/1998/namespace"> <head> <metadata/> <styling xmlns:tts="http://www.w3.org/2006/10/ttaf1#styling"><style tts:textStyle="italic" xml:id="emphasis"/><style tts:fontWeight="bold" xml:id="strong"/><style tts:textDecoration="underline" xml:id="underlined"/></styling> <layout/> </head> <body region="subtitleArea">  <div><p begin="" end=""><span tts:fontWeight="bold">Test</span></p><p begin="" end="">This is a <span tts:fontWeight="bold">test</span>, I say.</p></div></body> </tt>');
 
         });
     });
