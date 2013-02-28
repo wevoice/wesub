@@ -1555,6 +1555,8 @@ class BillingTest(TestCase):
                 is_complete=True)
         now = datetime(2013, 1, 2, 0, 0, 0)
 
+        sl.subtitleversion_set.all().delete()
+
         SubtitleVersion.objects.create(language=sl, user=user,
                 datetime_started=now, version_no=0)
 

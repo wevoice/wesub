@@ -94,6 +94,8 @@ VIDEO_META_TYPE_NAMES = {}
 VIDEO_META_TYPE_VARS = {}
 VIDEO_META_TYPE_IDS = {}
 
+BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
+
 
 def update_metadata_choices():
     """Refresh the VIDEO_META_TYPE_* set of constants.
@@ -1778,6 +1780,11 @@ def insert_billing_record(sender, instance, created, **kwargs):
 
     if BillingRecord.objects.filter(video=video,
             subtitle_version__language=language).exists():
+        return
+
+    if SubtitleVersion.objects.filter(language=language,
+            datetime_started__lt=BILLING_CUTOFF).exclude(
+                    pk=instance.pk).exists():
         return
 
     is_original = True
