@@ -982,11 +982,20 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
                 // means we were able to convert some Markdown to DFXP.
                 if (convertedText !== $subtitle.text()) {
 
+                    // Create a new object with this new converted DOM structure.
+                    //
+                    // We have to use a placeholder div otherwise if you try and just append
+                    // the convertedText to the subtitle node, it'll disregard text that is not
+                    // within a child element.
                     var $newObj = $('<div class="removeme">').append(convertedText);
 
+                    // Clear out the subtitle's existing content.
                     $subtitle.text('');
+
+                    // Append the new object to this subtitle.
                     $subtitle.append($newObj);
 
+                    // Kill the placeholder div.
                     $('div.removeme', $subtitle).children().unwrap();
 
                 }
