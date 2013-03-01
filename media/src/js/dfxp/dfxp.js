@@ -933,7 +933,29 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         if (this.startTime(node) > 60000) {
-            return this.startTimeInTimeExpression(node).replace(',', '.');
+
+            var timeExp = this.startTimeInTimeExpression(node).replace(',', '.');
+            var timeExpParts = timeExp.split(':');
+
+            var hours = timeExpParts[0];
+            var minutes = timeExpParts[1];
+            var seconds = timeExpParts[2];
+
+            if (hours === '00') {
+
+                if (minutes === '00') {
+                    return seconds;
+                }
+
+                minutes = parseInt(minutes, 10);
+
+                return [ minutes, seconds ].join(':');
+            }
+
+            hours = parseInt(hours, 10);
+
+            return [ hours, minutes, seconds ].join(':');
+
         } else {
             return this.startTimeInSeconds(node);
         }

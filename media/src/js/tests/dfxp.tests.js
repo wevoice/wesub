@@ -772,17 +772,33 @@ describe('DFXP', function() {
     describe('#startTimeDisplay()', function() {
         it('should get the current start time for a subtitle formatted for display', function() {
 
-            // Create a new subtitle with a specific start time.
-            var newSubtitleSeconds = parser.addSubtitle(null, {'begin': 1150.000}, '');
+            // Verify milliseconds handling.
+            var subtitle = parser.addSubtitle(null, {'begin': 100}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('0.100');
 
-            // Start times of less than 60 seconds should be in seconds.
-            expect(parser.startTimeDisplay(newSubtitleSeconds)).toBe('1.150');
+            // Verify seconds handling.
+            subtitle = parser.addSubtitle(null, {'begin': 1000}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('1.000');
 
-            // Create a new subtitle with a specific start time.
-            var newSubtitleTimeExpression = parser.addSubtitle(null, {'begin': 111150.000}, '');
+            // Verify seconds handling.
+            subtitle = parser.addSubtitle(null, {'begin': 10000}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('10.000');
 
-            // Start times of greater than 60 seconds should be in time expression.
-            expect(parser.startTimeDisplay(newSubtitleTimeExpression)).toBe('00:01:51.150');
+            // Verify minutes handling.
+            subtitle = parser.addSubtitle(null, {'begin': 100000}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('1:40.000');
+
+            // Verify minutes handling.
+            subtitle = parser.addSubtitle(null, {'begin': 1000000}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('16:40.000');
+
+            // Verify hours handling.
+            subtitle = parser.addSubtitle(null, {'begin': 10000000}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('2:46:40.000');
+
+            // Verify hours handling.
+            subtitle = parser.addSubtitle(null, {'begin': 7459599}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('2:04:19.599');
 
         });
     });
