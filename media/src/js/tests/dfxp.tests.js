@@ -773,6 +773,10 @@ describe('DFXP', function() {
         it('should get the current start time for a subtitle formatted for display', function() {
 
             // Verify milliseconds handling.
+            var subtitle = parser.addSubtitle(null, {'begin': '050'}, '');
+            expect(parser.startTimeDisplay(subtitle)).toBe('0.050');
+
+            // Verify milliseconds handling.
             var subtitle = parser.addSubtitle(null, {'begin': 100}, '');
             expect(parser.startTimeDisplay(subtitle)).toBe('0.100');
 
