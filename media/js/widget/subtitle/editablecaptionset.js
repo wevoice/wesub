@@ -227,7 +227,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.deleteCaption = function(caption) 
     var prevSub = sub.getPreviousCaption();
     var nextSub = sub.getNextCaption();
     goog.array.removeAt(this.captions_, index);
-    this.x['removeSubtitle'](index);
+    this.x['removeSubtitle'](caption.node);
     if (prevSub){
         prevSub.setNextCaption(nextSub);
     }
