@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html ng-app="amara.SubtitleEditor" lang="{{ language.language_code }}" subtitle-editor >
+<html ng-app="amara.SubtitleEditor" lang="{{ language.language_code }}" subtitle-editor 
+                                                                        language-code="{{ language.language_code }}"
+                                                                        video-id="{{ video.video_id }}">
+
 <head>
 
     <meta charset="utf-8" />
@@ -238,6 +241,7 @@
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/jquery.autosize.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.3.js"></script>
+    <script src="{{ STATIC_URL }}src/js/third-party/angular-cookies.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
