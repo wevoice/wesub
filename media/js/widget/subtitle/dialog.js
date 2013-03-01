@@ -92,7 +92,7 @@ unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var text;
 
     if (c) {
-        text = this.captionSet_.x['content'](c.node);
+        text = this.captionSet_.x['content'](c.node || c);
     } else {
         text = '';
     }

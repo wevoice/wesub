@@ -32,8 +32,8 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
 
     var that = this;
 
-    this.binaryCompare_ = function(time, caption) {
-        return time - that.x['startTime'](caption.node);
+    this.binaryCompare_ = function(time, node) {
+        return  time - that.x['startTime'](node);
     };
     this.binaryCaptionCompare_ = function(c0, c1) {
         return that.x['startTime'](c0.node) - that.x['startTime'](c1.node);
@@ -67,9 +67,9 @@ unisubs.CaptionManager.prototype.captionSetUpdate_ = function(event) {
     if (event.type == et.CLEAR_ALL ||
         event.type == et.CLEAR_TIMES ||
         event.type == et.RESET_SUBS) {
-	this.captions_ = [];
+	    this.captions_ = [];
         this.currentCaptionIndex_ = -1;
-	this.dispatchCaptionEvent_(null);
+	    this.dispatchCaptionEvent_(null);
     }
     else if (event.type == et.ADD) {
         var caption = event.caption;
@@ -100,6 +100,13 @@ unisubs.CaptionManager.prototype.captionSetUpdate_ = function(event) {
 unisubs.CaptionManager.prototype.timeUpdate_ = function() {
     // players will emit playhead time in seconds
     // the rest of the system will use milliseconds
+    var subs = this.x['getSubtitles']();
+    var lastCaptionIndex = goog.array.binarySearch(subs,
+        this.videoPlayer_.getPlayheadTime()* 1000, this.binaryCompare_);
+    if (lastCaptionIndex < 0)
+        lastCaptionIndex = -lastCaptionIndex - 2;
+
+    this.currentCaptionIndex_ = lastCaptionIndex;
     this.sendEventsForPlayheadTime_(
 	this.videoPlayer_.getPlayheadTime() * 1000);
 };
@@ -108,7 +115,6 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
     var subs = this.x['getSubtitles']();
-
     if (subs.length === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
@@ -118,9 +124,10 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     var curCaption = this.currentCaptionIndex_ > -1 ?
         this.x['getSubtitleByIndex'](this.currentCaptionIndex_) : null;
     if (this.currentCaptionIndex_ > -1 &&
-        curCaption != null &&
-	this.x['isShownAt'](curCaption, playheadTime))
+        curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
+        this.dispatchCaptionEvent_(curCaption, this.currentCaptionIndex_);
         return;
+    }
 
     var nextCaptionIndex =  this.currentCaptionIndex_ < subs.length -1 ?
         this.currentCaptionIndex_ + 1 : null;
@@ -152,6 +159,7 @@ unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
         playheadTime, this.binaryCompare_);
     if (lastCaptionIndex < 0)
         lastCaptionIndex = -lastCaptionIndex - subs.length -1;
+
     this.currentCaptionIndex_ = lastCaptionIndex;
     if (lastCaptionIndex >= 0 &&
 	this.x['isShownAt'](lastCaptionIndex, playheadTime)) {
