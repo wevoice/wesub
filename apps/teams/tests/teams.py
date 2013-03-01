@@ -1543,6 +1543,7 @@ class BillingTest(TestCase):
 
     def test_record_insertion(self):
         from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
         BillingRecord.objects.all().delete()
 
         user = User.objects.all()[0]
@@ -1557,8 +1558,10 @@ class BillingTest(TestCase):
 
         sl.subtitleversion_set.all().delete()
 
-        SubtitleVersion.objects.create(language=sl, user=user,
+        sv = SubtitleVersion.objects.create(language=sl, user=user,
                 datetime_started=now, version_no=0)
+
+        video_changed_tasks(video.pk, sv.pk)
 
         self.assertEquals(1, BillingRecord.objects.all().count())
 
