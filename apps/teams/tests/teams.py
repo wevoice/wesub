@@ -982,9 +982,6 @@ class TeamsDetailQueryTest(TestCase):
             ul.save()
         self.user = User.objects.get(id=self.user.id)
 
-    def _debug_videos(self):
-        from apps.testhelpers.views import debug_video
-        return "\n".join([debug_video(v) for v in self.team.videos.all()])
 
     def _create_rdm_video(self, i):
         video, created = Video.get_or_create_for_url("http://www.example.com/%s.mp4" % i)
