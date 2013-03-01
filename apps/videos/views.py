@@ -730,14 +730,12 @@ def video_staff_delete(request, video_id):
     return HttpResponse("ok")
 
 def video_debug(request, video_id):
-    from apps.testhelpers.views import debug_video
     from apps.widget import video_cache as vc
     from django.core.cache import cache
     from accountlinker.models import youtube_sync
     from videos.models import VIDEO_TYPE_YOUTUBE
 
     video = get_object_or_404(Video, video_id=video_id)
-    lang_info = debug_video(video)
     vid = video.video_id
     get_subtitles_dict = {}
 
@@ -767,7 +765,6 @@ def video_debug(request, video_id):
     return render_to_response("videos/video_debug.html", {
             'video': video,
             'is_youtube': is_youtube,
-            'lang_info': lang_info,
             'tasks': tasks,
             "cache": cache
     }, context_instance=RequestContext(request))
