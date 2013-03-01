@@ -125,11 +125,11 @@ var USER_IDLE_MINUTES = 5;
                                 video.togglePlay();
                             }
 
-                            // minutesIdle = 0;
+                            minutesIdle = 0;
                         });
 
                         $(elm).on('mousemove', function(){
-                            // minutesIdle = 0;
+                            minutesIdle = 0;
                         });
 
                         videoId = attrs.videoId;
