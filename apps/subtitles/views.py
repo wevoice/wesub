@@ -140,10 +140,10 @@ def regain_lock(request, video_id, language_code):
     language = video.subtitle_language(language_code)
 
     if not language.can_writelock(request.browser_id):
-        return HttpResponse(json.dumps({'response': False}))
+        return HttpResponse(json.dumps({'ok': False}))
 
     language.writelock(request.user, request.browser_id, save=True)
-    return HttpResponse(json.dumps({'response': True}))
+    return HttpResponse(json.dumps({'ok': True}))
 
 @login_required
 @require_POST
