@@ -34,12 +34,88 @@ var USER_IDLE_MINUTES = 5;
     });
 
     directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
+
+        var minutesIdle = 0;
+        var secondsUntilClosing = 120;
+        var videoId, languageCode, selectedScope, regainLockTimer;
+
+        function startUserIdleTimer(){
+            var userIdleTimeout = function(){
+                minutesIdle++;
+                if(minutesIdle >= USER_IDLE_MINUTES){
+                    showIdleModal();
+                    $timeout.cancel(regainLockTimer);
+                } else {
+                    $timeout(userIdleTimeout, 60 * 1000);
+                }
+            }
+
+            $timeout(userIdleTimeout, 60 * 1000);
+        }
+
+        function startRegainLockTimer(){
+            var regainLockTimeout = function(){
+                LockService.regainLock(videoId, languageCode);
+                regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
+            }
+
+            regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
+        }
+
+        function showIdleModal(){
+
+            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
+                          "To ensure no work is lost we will close your session in "
+
+            var closeSessionTimeout;
+
+            var closeSession = function(){
+                secondsUntilClosing--;
+                if(secondsUntilClosing == 0){
+                    LockService.releaseLock(videoId, languageCode);
+                    window.location = '/videos/' + videoId + "/";
+                } else {
+                    selectedScope.$root.$emit('change-heading', heading + secondsUntilClosing + " seconds.");
+                    closeSessionTimeout = $timeout(closeSession, 1000);
+                }
+            }
+
+            selectedScope.$root.$emit("show-modal", {
+                heading:  heading + secondsUntilClosing + " seconds.",
+                buttons: [
+                    {'text': 'Try to Resume work', 'class': 'yes', 'fn': function(){
+                        if(closeSessionTimeout){
+                            $timeout.cancel(closeSessionTimeout);
+                        }
+
+                        var promise = LockService.regainLock(videoId, languageCode);
+
+                        promise.then(function onSuccess(response){
+                            if(response.data.ok){
+                                minutesIdle = 0;
+                                selectedScope.$root.$broadcast('hide-modal');
+                                startRegainLockTimer()
+                                startUserIdleTimer()
+                            } else {
+                                alert("Sorry, could not restart your session.");
+                                window.location = '/videos/' + videoId + "/";
+                            }
+                        }, function onError(){
+                            alert("Sorry, could not restart your session.");
+                            window.location = '/videos/' + videoId + "/";
+                        })
+                    }},
+                ]
+            });
+
+            closeSessionTimeout = $timeout(closeSession, 1000);
+
+        }
+
         return {
             compile: function compile(elm, attrs, transclude) {
                 return {
                     post: function post(scope, elm, attrs) {
-                        scope.minutesIdle = 0;
-
                         $(elm).on('keydown', function(e) {
                             var video = angular.element($('#video').get(0)).scope();
 
@@ -49,38 +125,27 @@ var USER_IDLE_MINUTES = 5;
                                 video.togglePlay();
                             }
 
-                            scope.minutesIdle = 0;
+                            // minutesIdle = 0;
                         });
 
                         $(elm).on('mousemove', function(){
-                            scope.minutesIdle = 0;
+                            // minutesIdle = 0;
                         });
 
-                        $timeout(function userIdleTimeout(){
-                            scope.minutesIdle++;
-                            if(scope.minutesIdle >= USER_IDLE_MINUTES){
-                                var promise = LockService.releaseLock(attrs.videoId,
-                                                                      attrs.languageCode);
+                        videoId = attrs.videoId;
+                        languageCode = attrs.languageCode;
+                        selectedScope = scope;
 
-                                promise.then(function onSuccess(){
-                                    // open modal to warn user
-                                    alert('Sorry, you lost your session');
-                                    window.location = '/videos/' + attrs.videoId + "/";
-                                })
-                            } else {
-                                $timeout(userIdleTimeout, 60 * 1000);
-                            } 
-                        }, 60 * 1000);
-
-                        $timeout(function regainLockTimeout(){
-                            LockService.regainLock(attrs.videoId, attrs.languageCode);
-                            $timeout(regainLockTimeout, 20 * 1000);
-                        }, 20 * 1000);
+                        startUserIdleTimer();
+                        startRegainLockTimer()
                     }
                 };
             }
+
+
         };
     });
+
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var activeTextArea,
