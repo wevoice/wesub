@@ -104,6 +104,8 @@ ACTIONS_ON_PAGE = getattr(settings, 'ACTIONS_ON_PAGE', 20)
 DEV = getattr(settings, 'DEV', False)
 DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
+BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
+
 
 # Management
 def index(request, my_teams=False):
@@ -1953,5 +1955,6 @@ def billing(request):
 
     return render_to_response('teams/billing/choose.html', {
         'form': form,
-        'reports': reports
+        'reports': reports,
+        'cutoff': BILLING_CUTOFF
     }, RequestContext(request))
