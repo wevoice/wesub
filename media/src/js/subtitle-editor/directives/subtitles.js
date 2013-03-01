@@ -59,20 +59,23 @@ var USER_IDLE_MINUTES = 5;
                         $timeout(function userIdleTimeout(){
                             scope.minutesIdle++;
                             if(scope.minutesIdle >= USER_IDLE_MINUTES){
-                                // open modal to warn user
-                                alert('Sorry, you lost your session');
-                                LockService.releaseLock(scope.videoID,
-                                                        scope.languageCode);
-                                window.location = scope.videoURL;
-                            } else {
-                                $timeout(userIdleTimeout, 10 * 1000);
-                            } 
-                        }, 10* 1000);
+                                var promise = LockService.releaseLock(attrs.videoId,
+                                                                      attrs.languageCode);
 
-                        console.log($timeout(function regainLockTimeout(){
-                            LockService.regainLock(scope.videoID, scope.languageCode);
-                            $timeout(regainLockTimeout, 10 * 1000);
-                        }, 10 * 1000));
+                                promise.then(function onSuccess(){
+                                    // open modal to warn user
+                                    alert('Sorry, you lost your session');
+                                    window.location = '/videos/' + attrs.videoId + "/";
+                                })
+                            } else {
+                                $timeout(userIdleTimeout, 60 * 1000);
+                            } 
+                        }, 60 * 1000);
+
+                        $timeout(function regainLockTimeout(){
+                            LockService.regainLock(attrs.videoId, attrs.languageCode);
+                            $timeout(regainLockTimeout, 20 * 1000);
+                        }, 20 * 1000);
                     }
                 };
             }
