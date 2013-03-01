@@ -28,6 +28,7 @@ from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 
 
@@ -133,9 +134,10 @@ def _check_team_video_locking(user, video, language_code, task_id=None):
     return None, None
 
 @login_required
+@require_POST
 def regain_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
-    language = video.subtitle_langage(language_code)
+    language = video.subtitle_language(language_code)
 
     if not language.can_writelock(request.browser_id):
         return HttpResponse(json.dumps({'response': False}))
@@ -144,9 +146,10 @@ def regain_lock(request, video_id, language_code):
     return HttpResponse(json.dumps({'response': True}))
 
 @login_required
+@require_POST
 def release_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
-    language = video.subtitle_langage(language_code)
+    language = video.subtitle_language(language_code)
 
     if language.can_writelock(request.browser_id):
         language.release_writelock()
@@ -211,6 +214,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
             'videoURL': video.get_video_url()
         },
         'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
+        'languageCode': request.LANGUAGE_CODE
     }
 
     if task:
