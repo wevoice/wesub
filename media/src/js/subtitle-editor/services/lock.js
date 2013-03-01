@@ -24,24 +24,30 @@ var angular = angular || null;
     root = this;
     module = angular.module('amara.SubtitleEditor.services.lock', []);
 
+    var cachedData = window.editorData;
+    var languageCode = cachedData.languageCode;
+
     getLockingUrl = function(videoId, languageCode, type){
-        return '/editor/' + videoId + '/' + languageCode + '/' + type;
+        return '/' + languageCode + '/subtitles/editor/' + videoId + '/' + languageCode + '/' + type + "/";
     }
 
-    module.factory('LockService', function($http){
+    module.factory('LockService', function($http, $cookies){
         return {
-            regainLock: function(videoId, languageCode){
+
+            makeLockRequest: function(videoId, languageCode, type){
                 return $http({
                     method: 'POST',
-                    url: getLockingUrl(videoId, languageCode, 'regain')
+                    headers: {'X-CSRFToken': $cookies.csrftoken},
+                    url: getLockingUrl(videoId, languageCode, type)
                 });
             },
+
+            regainLock: function(videoId, languageCode){
+                return this.makeLockRequest(videoId, languageCode, 'regain')
+            },
             releaseLock: function(videoId, languageCode){
-                return $http({
-                    method: 'POST',
-                    url: getLockingUrl(videoId, languageCode, 'release')
-                });
-            }
+                return this.makeLockRequest(videoId, languageCode, 'release')
+            },
         }
     });
 
