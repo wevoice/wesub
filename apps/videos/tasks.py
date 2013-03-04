@@ -532,6 +532,11 @@ def gauge_videos():
 def gauge_videos_long():
     Gauge('videos.Subtitle').report(Subtitle.objects.count())
 
+@periodic_task(run_every=timedelta(seconds=60))
+def gague_billing_records():
+    from teams.models import BillingRecord
+    Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
+
 
 @task
 def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
