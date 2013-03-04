@@ -39,6 +39,7 @@
         }
 
         $scope.pop = window.Popcorn.smart('#video', videoURL);
+        $scope.pop.controls(true);
 
         $scope.playChunk = function(start, duration) {
             // Play a specified amount of time in a video, beginning at 'start',
