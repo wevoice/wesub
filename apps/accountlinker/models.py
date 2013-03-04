@@ -160,20 +160,23 @@ def get_amara_credit_text(language='en'):
     return translate_string(AMARA_CREDIT, language)
 
 
-def add_amara_description_credit(old_description, video_url, language='en'):
+def add_amara_description_credit(old_description, video_url, language='en',
+        prepend=False):
     """
     Prepend the credit to the existing description.
     """
-    credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
+    credit = "%s\n\n%s" % (translate_string(AMARA_DESCRIPTION_CREDIT,
+        language), video_url)
 
-    if old_description and old_description.startswith(credit):
+    if credit in old_description:
         return old_description
 
-    return "%s: %s\n\n%s" % (
-        credit,
-        video_url,
-        old_description or ""
-    )
+    temp = "%s\n\n%s"
+
+    if prepend:
+        return temp % (credit, old_description or "")
+    else:
+        return temp % (old_description or "", credit)
 
 
 class ThirdPartyAccountManager(models.Manager):

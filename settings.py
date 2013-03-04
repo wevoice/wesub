@@ -135,6 +135,8 @@ JS_CORE = \
      'js/player/vimeovideosource.js',
      'js/player/vimeovideoplayer.js',
      'js/player/dailymotionvideosource.js',
+     'js/player/wistiavideosource.js',
+     'js/player/wistiavideoplayer.js',
      'js/player/dailymotionvideoplayer.js',
      'js/startdialog/model.js',
      'js/startdialog/videolanguage.js',
@@ -832,7 +834,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'sentry': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'class': 'raven.contrib.django.handlers.SentryHandler',
         },
     },
@@ -856,6 +858,16 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
+        },
+        'api': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
+        },
+        'youtube': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
         }
     },
 }
