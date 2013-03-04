@@ -202,6 +202,15 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
         num_versions=Count('subtitleversion'))
 
+    video_urls = []
+    for v in video.get_video_urls():
+
+        # Force controls for YouTube players.
+        if 'youtube.com' in v.url:
+            v.url = v.url + '&controls=1'
+
+        video_urls.append(v.url)
+
     editor_data = {
         # front end needs this to be able to set the correct
         # api headers for saving subs
@@ -211,7 +220,8 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         },
         'video': {
             'id': video.video_id,
-            'videoURL': video.get_video_url()
+            'primaryVideoURL': video.get_video_url(),
+            'videoURLs': video_urls,
         },
         'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
         'languageCode': request.LANGUAGE_CODE

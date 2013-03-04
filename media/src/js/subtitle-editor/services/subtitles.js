@@ -53,6 +53,24 @@ var angular = angular || null;
         var authHeaders = cachedData.authHeaders;
 
         return {
+            approveTask: function(response, notes) {
+
+                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        complete: true,
+                        notes: notes,
+                        version_number: response.data.version_number
+                    }
+                });
+
+                return promise;
+
+            },
             getCachedData: function() {
                 return cachedData;
             },
@@ -125,27 +143,11 @@ var angular = angular || null;
                     });
                 }
             },
-            getVideoURL: function() {
-                return cachedData.video.videoURL;
+            getPrimaryVideoURL: function() {
+                return cachedData.video.primaryVideoURL;
             },
-
-            approveTask: function(response, notes) {
-
-                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
-
-                var promise = $http({
-                    method: 'PUT',
-                    url: url,
-                    headers: authHeaders,
-                    data:  {
-                        complete: true,
-                        notes: notes,
-                        version_number: response.data.version_number
-                    }
-                });
-
-                return promise;
-
+            getVideoURLs: function() {
+                return cachedData.video.videoURLs;
             },
             sendBackTask: function(response, notes) {
 

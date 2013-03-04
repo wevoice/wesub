@@ -32,13 +32,9 @@
         //
         // If this is a YouTube video, force controls.
 
-        var videoURL = SubtitleStorage.getVideoURL();
+        var videoURLs = SubtitleStorage.getVideoURLs();
 
-        if (videoURL.indexOf('youtube.com') !== -1) {
-            videoURL = videoURL + '&controls=1';
-        }
-
-        $scope.pop = window.Popcorn.smart('#video', videoURL);
+        $scope.pop = window.Popcorn.smart('#video', videoURLs);
         $scope.pop.controls(true);
 
         $scope.playChunk = function(start, duration) {
