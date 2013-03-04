@@ -121,8 +121,6 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 
             if not old_obj.is_complete and obj.is_complete:
                 should_sync_to_youtube = True
-        else:
-            should_sync_to_youtube = True
 
         super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
                 change)
