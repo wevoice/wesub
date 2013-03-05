@@ -657,7 +657,7 @@ class TestRpc(TestCase):
 
         # even if you specify a new original language, we won't change the
         # original language.
-        self.assertEquals('en', video.subtitle_language().language_code)
+        self.assertEquals('en', video.primary_audio_language_code)
 
     def test_only_one_version(self):
         request = RequestMockup(self.user_0)
