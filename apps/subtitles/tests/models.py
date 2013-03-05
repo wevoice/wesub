@@ -236,6 +236,7 @@ class TestSubtitleLanguage(TestCase):
         add_subtitles(self.video, 'en', subtitles_2)
         self.assertFalse(sl_en.is_imported_from_youtube_and_not_worked_on)
 
+
 class TestSubtitleVersion(TestCase):
     def setUp(self):
         self.video = make_video()

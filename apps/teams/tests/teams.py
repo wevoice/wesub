@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
-from django.db.models import ObjectDoesNotExist, Q
+from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 
 from auth.models import CustomUser as User
@@ -19,12 +19,13 @@ from apps.teams.permissions import add_role
 from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
 from apps.teams.models import (
     Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference, Project, Partner, TeamNotificationSetting
+    TeamLanguagePreference, Partner, TeamNotificationSetting
 )
 from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
-from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
+from apps.videos.models import Video, SubtitleVersion
+from apps.subtitles.models import SubtitleLanguage
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
@@ -530,14 +531,13 @@ class TeamsTest(TestCase):
                             not response.context['allow_noone_language'])
 
     def test_detail_contents_unrelated_video(self):
-        from videos.models import SubtitleLanguage
-
         team, new_team_video = self._create_new_team_video()
-        en = SubtitleLanguage(video=new_team_video.video, language='en')
-        en.is_original = True
-        en.is_complete = True
+        en = SubtitleLanguage(video=new_team_video.video, language_code='en')
+        en.subtitles_complete = True
         en.save()
+
         self._set_my_languages('en', 'ru')
+
         # now add a Russian video with no subtitles.
         self._add_team_video(
             team, u'ru',
@@ -1433,9 +1433,9 @@ class BillingTest(TestCase):
 
         team = test_factories.create_team(workflow_enabled=True)
         user = test_factories.create_user()
-        team_member = test_factories.create_team_member(team, user)
+        test_factories.create_team_member(team, user)
         video = test_factories.create_video()
-        team_video = test_factories.create_team_video(team, user, video)
+        test_factories.create_team_video(team, user, video)
 
         Workflow.objects.create(team=team, approve_allowed=20)
 

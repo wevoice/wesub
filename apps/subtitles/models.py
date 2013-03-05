@@ -39,12 +39,13 @@ from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
 from utils.translation import is_rtl
 
+
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
-
 WRITELOCK_EXPIRATION = 30 # 30 seconds
+
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -105,7 +106,6 @@ def graphviz(video):
 def print_graphviz(video_id):
     video = Video.objects.get(video_id=video_id)
     print '\n'.join(graphviz(video))
-
 
 
 # Lineage functions -----------------------------------------------------------
