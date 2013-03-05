@@ -400,6 +400,10 @@ class Video(models.Model):
         vurl = self.get_primary_videourl_obj()
         return vurl.effective_url if vurl else None
 
+    def get_video_urls(self):
+        """Return the video URLs for this video."""
+        return self.videourl_set.all()
+
     @classmethod
     def get_or_create_for_url(cls, video_url=None, vt=None, user=None, timestamp=None, fetch_subs_async=True):
         assert video_url or vt, 'should be video URL or VideoType'
