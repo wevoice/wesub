@@ -1759,6 +1759,7 @@ def update_followers(sender, instance, created, **kwargs):
             # User already follows the video.
             pass
 
+
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
 

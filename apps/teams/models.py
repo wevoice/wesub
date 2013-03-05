@@ -18,6 +18,7 @@
 import datetime
 import logging
 import csv
+from itertools import groupby
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -2626,6 +2627,98 @@ class BillingReport(models.Model):
     @property
     def end_str(self):
         return self.end_date.strftime("%Y%m%d")
+
+
+class BillingRecordManager(models.Manager):
+
+    def data_for_team(self, team, start, end):
+        return self.filter(team=team, created__gte=start, created__lte=end)
+
+    def csv_report_for_team(self, team, start, end, header=True):
+        all_records = self.data_for_team(team, start, end)
+
+        header = [
+            'Video ID',
+            'Language',
+            'Minutes',
+            'Original',
+            'Team',
+            'Created',
+            'Source',
+            'User'
+        ]
+
+        if header:
+            rows = [header]
+        else:
+            rows = []
+
+        for video, records in groupby(all_records, lambda r: r.video):
+            for r in records:
+                rows.append([
+                    video.video_id,
+                    r.subtitle_language.language,
+                    r.minutes,
+                    r.is_original,
+                    r.team.slug,
+                    r.created.strftime('%Y-%m-%d %H:%S:%M'),
+                    r.source,
+                    r.user.username
+                ])
+
+        return rows
+
+
+class BillingRecord(models.Model):
+    video = models.ForeignKey(Video)
+    subtitle_version = models.ForeignKey(SubtitleVersion)
+    subtitle_language = models.ForeignKey(SubtitleLanguage)
+    minutes = models.FloatField(blank=True, null=True)
+    is_original = models.BooleanField()
+    team = models.ForeignKey(Team)
+    created = models.DateTimeField()
+    source = models.CharField(max_length=255)
+    user = models.ForeignKey(User)
+
+    objects = BillingRecordManager()
+
+    class Meta:
+        unique_together = ('video', 'subtitle_language')
+
+    def __unicode__(self):
+        return "%s - %s" % (self.video.video_id,
+                self.subtitle_language.language)
+
+    def save(self, *args, **kwargs):
+        if not self.minutes and self.minutes != 0.0:
+            self.minutes = self.get_minutes()
+
+        assert self.minutes is not None
+
+        return super(BillingRecord, self).save(*args, **kwargs)
+
+    def get_minutes(self):
+        """
+        Return the number of minutes the subtitles specified in `version`
+        cover as a float.
+        """
+        subs = self.subtitle_version.ordered_subtitles()
+
+        if len(subs) == 0:
+            return 0.0
+
+        start = subs[0].start_time
+        end = subs[-1].end_time
+
+        # The -1 value for the end_time isn't allowed anymore but some
+        # legacy data will still have it.
+        if end == -1:
+            end = subs[-1].start_time
+
+        if not end:
+            end = subs[-1].start_time
+
+        return round((float(end) - float(start)) / (60 * 1000), 2)
 
 
 class Partner(models.Model):
