@@ -1228,12 +1228,6 @@ class Rpc(BaseRpc):
             video.primary_audio_language_code = language_code
             video.save()
 
-            if not video.subtitle_language(language_code):
-                subtitle_language = new_models.SubtitleLanguage()
-                subtitle_language.video = video
-                subtitle_language.language_code = language_code
-
-                subtitle_language.save()
 
     def _autoplay_subtitles(self, user, video_id, language_pk, version_number):
         cache =  video_cache.get_subtitles_dict(video_id, language_pk, 
