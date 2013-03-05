@@ -153,7 +153,12 @@ def video_changed_tasks(video_pk, new_version_id=None):
         _check_alarm(new_version_id)
         _detect_language(new_version_id)
         _update_captions_in_original_service(new_version_id)
-        insert_billing_record(new_version_id)
+        try:
+            insert_billing_record(new_version_id)
+        except Exception, e:
+            celery_logger.error("Could not add billing record", extra={
+                "version_pk": new_version_id,
+                "exception": str(e)})
 
     video = Video.objects.get(pk=video_pk)
 
