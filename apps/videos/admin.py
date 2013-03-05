@@ -21,7 +21,6 @@ from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
-from videos.tasks import video_changed_tasks
 
 from django.core.urlresolvers import reverse
 from utils.celery_search_index import update_search_index
@@ -98,21 +97,6 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
         return unicode(obj.video)
     video_title.short_description = 'video'
 
-    def delete_model(self, request, obj):
-        video = obj.video
-        super(SubtitleLanguageAdmin, self).delete_model(request, obj)
-        video_changed_tasks.delay(video.pk)
-
-    def versions(self, obj):
-        version_qs = obj.subtitleversion_set.all()
-        link_tpl = '<a href="%s">#%s</a>'
-        links = []
-        for item in version_qs:
-            url = reverse('admin:videos_subtitleversion_change', args=[item.pk])
-            links.append(link_tpl % (url, item.version_no))
-        return ', '.join(links)
-
-    versions.allow_tags = True
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     # We specifically pull language out into a property to force one query per
@@ -122,9 +106,8 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     #    for some reason.
     # 2. It's only 20 extra queries, so it's not the end of the world.
     list_display = ['video', 'language_title', 'version_no', 'note',
-                    'timeline_changes', 'text_changes', 'datetime_started',
-                    'moderation_status', 'origin']
-    list_filter = []
+                    'datetime_started', 'moderation_status', 'origin',
+                    'new_subtitle_version']
     raw_id_fields = ['language', 'user', 'forked_from']
     search_fields = ['language__video__title', 'language__video__video_id',
                      'language__language']
@@ -140,19 +123,9 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
 
     def video(self, obj):
         if obj.language.video:
-            return obj.language.video.title
+            return unicode(obj.language.video)
         else:
             return None
-
-    def timeline_changes(self, obj):
-        if obj.time_change:
-            return '%s %%' % int(obj.time_change * 100)
-        return "0 %"
-
-    def text_changes(self, obj):
-        if obj.text_change:
-            return '%s %%' % int(obj.text_change * 100)
-        return "0 %"
 
     def origin(self, obj):
         return obj.get_workflow_origin()
@@ -169,7 +142,8 @@ class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
 
 class SubtitleAdmin(admin.ModelAdmin):
     search_fields = ['version_id']
-    list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text', 'start_time', 'end_time']
+    list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text',
+                    'start_time', 'end_time']
 
 class VideoFeedAdmin(admin.ModelAdmin):
     list_display = ['url', 'last_link', 'created', 'user']
