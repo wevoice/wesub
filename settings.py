@@ -138,8 +138,6 @@ JS_CORE = \
      'js/player/vimeovideosource.js',
      'js/player/vimeovideoplayer.js',
      'js/player/dailymotionvideosource.js',
-     'js/player/wistiavideosource.js',
-     'js/player/wistiavideoplayer.js',
      'js/player/dailymotionvideoplayer.js',
      'js/startdialog/model.js',
      'js/startdialog/videolanguage.js',
@@ -266,7 +264,6 @@ JS_WIDGETIZER_CORE.extend([
     "js/widgetizer/wistia.js",
     "js/widgetizer/soundcloud.js",
     'js/player/ooyalaplayer.js', 
-    'js/player/wistiavideoplayer.js', 
     'js/player/brightcoveliteplayer.js', 
     'js/player/soundcloudplayer.js',
     'js/streamer/overlaycontroller.js'])
