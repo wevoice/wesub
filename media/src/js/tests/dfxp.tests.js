@@ -241,6 +241,25 @@ describe('DFXP', function() {
 
         });
     });
+    describe('#cloneSubtitle()', function() {
+        it('should clone a node and return a jquery selection of the new node', function() {
+
+            var newSub1 = parser.addSubtitle(null, {'begin': 100}, 'Some text.');
+            var $clonedNewSub1 = parser.cloneSubtitle(newSub1, false);
+
+            // The cloned sub should have wiped out the text, but preserved attrs.
+            expect($clonedNewSub1.attr('begin')).toBe('100');
+            expect($clonedNewSub1.text()).toBe('');
+
+            var newSub2 = parser.addSubtitle(null, {'begin': 100}, 'Some text.');
+            var $clonedNewSub2 = parser.cloneSubtitle(newSub2, true);
+
+            // The cloned sub should have preserved the text and attrs.
+            expect($clonedNewSub2.attr('begin')).toBe('100');
+            expect($clonedNewSub2.text()).toBe('Some text.');
+
+        });
+    });
     describe('#content()', function() {
         it('should set text content of a subtitle', function() {
 

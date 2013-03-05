@@ -126,6 +126,12 @@ var USER_IDLE_MINUTES = 5;
                             }
 
                             minutesIdle = 0;
+
+                            if (e.keyCode == 40 || e.keyCode == 38){
+                                var scroll = $('.reference').scrollTop();
+                                $('.working, .reference').scrollTop(scroll + (e.keyCode == 40 ? 100 : -100));
+                                e.preventDefault();
+                            }
                         });
 
                         $(elm).on('mousemove', function(){
@@ -261,6 +267,7 @@ var USER_IDLE_MINUTES = 5;
 
             }
         }
+
         function onSubtitleTextKeyUp(e) {
 
             var newText = activeTextArea.val();
