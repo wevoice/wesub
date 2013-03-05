@@ -204,6 +204,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // IE special-casing.
             xmlString = xmlString.replace(/xmlns:NS1=\"\" /g, '');
             xmlString = xmlString.replace(/NS1:/g, '');
+            xmlString = xmlString.replace(/xmlns:NS2=\"\" /g, '');
+            xmlString = xmlString.replace(/NS2:/g, '');
 
             // If the XML does not have a tts namespace set on the <tt> element, we need to
             // set it specifically. This is an IE9 issue.
