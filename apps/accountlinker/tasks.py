@@ -1,9 +1,11 @@
 import logging
-from celery.task import task
-from videos.models import VideoUrl
+from celery.task import task, periodic_task
+from celery.schedules import timedelta
+from videos.models import VideoUrl, VIDEO_TYPE_YOUTUBE
 from videos.types import UPDATE_VERSION_ACTION
 from auth.models import CustomUser as User
 from models import ThirdPartyAccount
+from utils.metrics import Gauge
 
 
 logger = logging.getLogger(__name__)
@@ -52,3 +54,9 @@ def mirror_existing_youtube_videos(user_pk):
     for video, language, version in data:
         ThirdPartyAccount.objects.mirror_on_third_party(video, language,
                 UPDATE_VERSION_ACTION, version)
+
+
+@periodic_task(run_every=timedelta(seconds=60))
+def gauge_tpas():
+    count = ThirdPartyAccount.objects.filter(type=VIDEO_TYPE_YOUTUBE).count()
+    Gauge('youtube.accounts_linked').report(count)

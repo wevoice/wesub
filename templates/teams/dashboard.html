@@ -36,7 +36,7 @@
 
 {% block view_content %}
 
-    <div class="grid_8 view omega">
+    <div class="grid_8 view omega{% if team.get_workflow.requires_review_or_approval %} moderated{% endif %}{% if team.workflow_enabled %} task-enabled{% endif %}">
         {% with "dashboard" as current %}
             {% if not project %}
                 {% include 'teams/_tabs.html' %}
@@ -132,11 +132,11 @@
                     {% for team_video in videos %}
                         <li>
                             <div class="thumb">
-                                <a href="{{ team_video.video.get_absolute_url }}">
+                                <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.get_title_display }}">
                                     <img src="{{ team_video.get_thumbnail }}" alt="{{ video.title }}">
                                 </a>
                                 <h4>
-                                    <a href="{{ team_video.video.get_absolute_url }}">
+                                    <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.get_title_display }}">
                                         {{ team_video.video.title_display|truncatewords:15 }}
                                         {% if team_video.video.duration %}
                                             <span class="duration">{{ team_video.video.duration|format_duration }}</span>

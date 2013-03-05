@@ -1540,3 +1540,44 @@ class BillingTest(TestCase):
         self.assertTrue(sl_fr.pk in imported_pks)
         self.assertTrue(sl_es.pk in imported_pks)
         self.assertTrue(sl_cs.pk in imported_pks)
+
+    def test_record_insertion(self):
+        from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
+        BillingRecord.objects.all().delete()
+
+        user = User.objects.all()[0]
+
+        video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.user = user
+        video.save()
+
+        sl = SubtitleLanguage.objects.create(video=video, language='en',
+                is_complete=True)
+        now = datetime(2013, 1, 2, 0, 0, 0)
+
+        sl.subtitleversion_set.all().delete()
+
+        sv = SubtitleVersion.objects.create(language=sl, user=user,
+                datetime_started=now, version_no=0)
+
+        video_changed_tasks(video.pk, sv.pk)
+
+        self.assertEquals(1, BillingRecord.objects.all().count())
+
+        br = BillingRecord.objects.all()[0]
+
+        self.assertEquals(br.video.pk, video.pk)
+        self.assertEquals(br.team.pk, video.get_team_video().team.pk)
+        self.assertEquals(br.created, now)
+        self.assertEquals(br.user.pk, user.pk)
+        self.assertEquals(br.subtitle_language.pk, sl.pk)
+
+        team = video.get_team_video().team
+        start = datetime(2013, 1, 1, 0, 0)
+        end = datetime(2013, 2, 1, 0, 0, 0)
+
+        csv_data = BillingRecord.objects.csv_report_for_team(team, start, end)
+
+        self.assertEquals(2, len(csv_data))
+        self.assertEquals(8, len(csv_data[1]))

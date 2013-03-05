@@ -846,33 +846,28 @@ div.fix-chosen div.chzn-container {
         padding: 0;
     }
 
+    &.disabled, &.assigned {
+
+        p, a {
+            opacity: .8;
+        }
+        h3, img {
+            opacity: .5;
+        }
+    }
+
     &.disabled {
         padding-right: 0;
 
-        h3, p, a, ul {
-            opacity: .5;
-        }
-        img {
-            opacity: .3;
-        }
-        ul.actions, ul.admin-controls {
-            display: none !important;
-        }
         div.cannot-perform {
             float: right;
             width: 150px;
-            background: $faintest;
-            color: $lighter;
-            border: 1px solid $fainter;
+            margin-top: 2em;
             margin-bottom: 10px;
-            padding: 10px;
-            @include border-radius;
+            text-align: right;
+            color: $lighter;
 
             &.disabled {
-                float: none;
-                width: auto;
-                background: #F2DEDE;
-                border: 1px solid #EED3D7;
                 color: #B94A48;
             }
         }
@@ -1498,6 +1493,11 @@ div#language_picker {
 }
 .profile.v1 .context img.avatar {
     margin: 0 17px;
+}
+.profile.v1 .context a.button {
+    display: block;
+    width: 60%;
+    margin: 1em auto;
 }
 .profile.v1 form {
     padding-top: 3em;
@@ -2251,7 +2251,7 @@ div#rollback-button {
         a:hover {
             color: #35424A;
         }
-        &.last, &:last-child {
+        &.last {
             border: none;
         }
     }
@@ -2262,15 +2262,6 @@ div#rollback-button {
         &:last-child {
             border: none;
         }
-    }
-}
-
-#teams .context .metrics {
-    li:last-child {
-        border-right: 1px solid #eaeaea;
-    }
-    li.last {
-        border: none;
     }
 }
 
@@ -2871,4 +2862,12 @@ a.truncated-expand {
         height: 180px;
         border: none;
     }
+}
+
+#security p {
+    margin-bottom: 1em;
+}
+
+#security h3 {
+    margin-top: 2em;
 }

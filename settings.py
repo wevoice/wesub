@@ -19,6 +19,7 @@
 
 # Django settings for unisubs project.
 import os, sys
+from datetime import datetime
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DEFAULT_PROTOCOL  = 'http'
@@ -66,6 +67,8 @@ P3P_COMPACT = 'CP="CURa ADMa DEVa OUR IND DSP CAO COR"'
 
 DEFAULT_FROM_EMAIL = '"Amara" <feedback@universalsubtitles.org>'
 WIDGET_LOG_EMAIL = 'widget-logs@universalsubtitles.org'
+
+BILLING_CUTOFF = datetime(2013, 3, 1, 0, 0, 0)
 
 DATABASES = {
     'default': {
@@ -261,7 +264,6 @@ JS_WIDGETIZER_CORE.extend([
     "js/widgetizer/wistia.js",
     "js/widgetizer/soundcloud.js",
     'js/player/ooyalaplayer.js', 
-    'js/player/wistiavideoplayer.js', 
     'js/player/brightcoveliteplayer.js', 
     'js/player/soundcloudplayer.js',
     'js/streamer/overlaycontroller.js'])
@@ -832,7 +834,7 @@ LOGGING = {
             'formatter': 'verbose'
         },
         'sentry': {
-            'level': 'WARNING',
+            'level': 'INFO',
             'class': 'raven.contrib.django.handlers.SentryHandler',
         },
     },
@@ -856,6 +858,16 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
+        },
+        'api': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
+        },
+        'youtube': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'console'],
+            'propagate': False
         }
     },
 }

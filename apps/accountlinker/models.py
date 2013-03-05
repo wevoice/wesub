@@ -25,7 +25,9 @@ from django.utils import translation
 
 from videos.models import VIDEO_TYPE, VIDEO_TYPE_YOUTUBE
 from .videos.types import (
-    video_type_registrar, UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
+    video_type_registrar, UPDATE_VERSION_ACTION,
+    DELETE_LANGUAGE_ACTION, VideoTypeError,
+    YoutubeVideoType
 )
 from teams.models import Team
 from teams.moderation_const import APPROVED, UNMODERATED
@@ -71,6 +73,16 @@ def youtube_sync(video, language):
             Meter('youtube.push.request').inc()
 
 
+def get_linked_accounts_for_video(video):
+    yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
+
+    if yt_url.exists():
+        accounts = [ThirdPartyAccount.objects.resolve_ownership(u) for u in yt_url]
+        return filter(None, accounts)
+
+    return None
+
+
 def check_authorization(video):
     """
     Make sure that a video can have its subtitles synced to Youtube.  This
@@ -79,34 +91,25 @@ def check_authorization(video):
     Return a tuple of (is_authorized, ignore_new_syncing_logic).
     """
     team_video = video.get_team_video()
-    ignore_new_syncing_logic = False
 
-    if team_video:
-        team = team_video.team
-        has_linked_youtube_account = team.third_party_accounts.filter(
-                type=VIDEO_TYPE_YOUTUBE).exists()
-        if has_linked_youtube_account:
-            # Ignore the new syncing logic.  Use the linked Youtube account
-            # to publish subtitles to Youtube.
-            ignore_new_syncing_logic = True
-        else:
-            # The assumption is that it's the partner's official Youtube
-            # account and they don't want it messed up with strange subs.
-            return False, None
-    else:
-        # If a video isn't part of a team but the video's Youtube URL is linked
-        # to a team third party account, we don't sync to Youtube.
-        yt_url = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE)
-        if yt_url.exists():
-            usernames = [url.owner_username for url in yt_url]
-            linked_accounts = ThirdPartyAccount.objects.filter(
-                    username__in=usernames)
+    linked_accounts = get_linked_accounts_for_video(video)
 
-            if linked_accounts.exists():
-                if any(a.is_team_account for a in linked_accounts):
-                    return False, None
+    if not linked_accounts:
+        return False, False
 
-    return True, ignore_new_syncing_logic
+    if all([a.is_team_account for a in linked_accounts]):
+        if not team_video:
+            return False, False
+
+        tpas_for_team = team_video.team.third_party_accounts.all()
+
+        if any(tpa in tpas_for_team for tpa in linked_accounts):
+            return True, True
+
+    if all([a.is_individual_account for a in linked_accounts]):
+        return True, True
+
+    return False, False
 
 
 def can_be_synced(version):
@@ -115,6 +118,9 @@ def can_be_synced(version):
 
     A version must be public, synced and complete; it must also be either
     "approved" or "unmoderated".
+
+    We can't sync a version if it's the only version in that language and it
+    has the "From youtube" note.
     """
     if version:
         if not version.is_public or not version.is_synced():
@@ -128,6 +134,9 @@ def can_be_synced(version):
         status = version.moderation_status
 
         if (status != APPROVED) and (status != UNMODERATED):
+            return False
+
+        if version.language.is_imported_from_youtube_and_not_worked_on:
             return False
 
     return True
@@ -151,20 +160,23 @@ def get_amara_credit_text(language='en'):
     return translate_string(AMARA_CREDIT, language)
 
 
-def add_amara_description_credit(old_description, video_url, language='en'):
+def add_amara_description_credit(old_description, video_url, language='en',
+        prepend=False):
     """
     Prepend the credit to the existing description.
     """
-    credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
+    credit = "%s\n\n%s" % (translate_string(AMARA_DESCRIPTION_CREDIT,
+        language), video_url)
 
-    if old_description and old_description.startswith(credit):
+    if credit in old_description:
         return old_description
 
-    return "%s: %s\n\n%s" % (
-        credit,
-        video_url,
-        old_description or ""
-    )
+    temp = "%s\n\n%s"
+
+    if prepend:
+        return temp % (credit, old_description or "")
+    else:
+        return temp % (old_description or "", credit)
 
 
 class ThirdPartyAccountManager(models.Manager):
@@ -174,7 +186,7 @@ class ThirdPartyAccountManager(models.Manager):
         Get the ThirdPartyAccount that is able to push to any video on Youtube.
         Raise ``ImproperlyConfigured`` if it can't be found.
         """
-        username = getattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME')
+        username = getattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME', None)
 
         try:
             return self.get(username=username)
@@ -220,7 +232,16 @@ class ThirdPartyAccountManager(models.Manager):
 
         for vurl in video.videourl_set.all():
             already_updated = False
-            vt = video_type_registrar.video_type_for_url(vurl.url)
+
+            try:
+                vt = video_type_registrar.video_type_for_url(vurl.url)
+            except VideoTypeError, e:
+                logger.error('Getting video from youtube failed.', extra={
+                    'video': video.video_id,
+                    'vurl': vurl.pk,
+                    'gdata_exception': str(e)
+                })
+                return
 
             if should_sync and not ignore_new_syncing_logic:
                 try:
@@ -241,10 +262,11 @@ class ThirdPartyAccountManager(models.Manager):
 
             if not username:
                 continue
-            try:
-                account = ThirdPartyAccount.objects.get(type=vurl.type, username=username)
-            except ThirdPartyAccount.DoesNotExist:
-                continue
+
+            account = self.resolve_ownership(vurl)
+
+            if not account:
+                return
 
             if hasattr(vt, action):
                 if action == UPDATE_VERSION_ACTION and not already_updated:
@@ -252,6 +274,45 @@ class ThirdPartyAccountManager(models.Manager):
                 elif action == DELETE_LANGUAGE_ACTION:
                     vt.delete_subtitles(language, account)
 
+    def resolve_ownership(self, video_url):
+        """ Given a VideoUrl, return the ThirdPartyAccount that is
+        supposed to be the owner of this video.
+        """
+
+        # youtube username is a full name. but sometimes. yeah.
+        if video_url.type == 'Y':
+            return self._resolve_youtube_ownership(video_url)
+        else:
+            try:
+                return ThirdPartyAccount.objects.get(type=video_url.type,
+                                                     username=video_url.owner_username)
+            except ThirdPartyAccount.DoesNotExist:
+                return None
+
+    def _resolve_youtube_ownership(self, video_url):
+        """ Give a youtube video url, returns a TPA that
+        is the owner of the video.
+        We need this because there could be two
+        """
+        try:
+            return ThirdPartyAccount.objects.get(type=video_url.type,
+                                                 full_name=video_url.owner_username)
+        except ThirdPartyAccount.DoesNotExist:
+            return None
+        except ThirdPartyAccount.MultipleObjectsReturned:
+            type = YoutubeVideoType(video_url.url)
+            uri = type.entry.author[0].uri.text
+            # we can easily extract the username from the uri, since it's the last
+            # part of the path. this is much easier than making yet another api
+            # call to youtube to find out.
+            # i.e. https://gdata.youtube.com/feeds/api/users/gdetrez > gdetrez
+            username = uri.split("/")[-1]
+
+            # we want to avoid exception handling inside exception handling
+            tpa = ThirdPartyAccount.objects.filter(type=video_url.type,
+                                                    username=username)[:1]
+
+            return tpa[0] if tpa else None
 
 class ThirdPartyAccount(models.Model):
     """
@@ -263,9 +324,13 @@ class ThirdPartyAccount(models.Model):
     working with others.
     """
     type = models.CharField(max_length=10, choices=ACCOUNT_TYPES)
+
     # this is the third party account user name, eg the youtube user
     username  = models.CharField(max_length=255, db_index=True, 
                                  null=False, blank=False)
+
+    # user's real/full name, like Foo Bar
+    full_name = models.CharField(max_length=255, null=True, blank=True, default='')
     oauth_access_token = models.CharField(max_length=255, db_index=True, 
                                           null=False, blank=False)
     oauth_refresh_token = models.CharField(max_length=255, db_index=True,
@@ -277,7 +342,7 @@ class ThirdPartyAccount(models.Model):
         unique_together = ("type", "username")
 
     def __unicode__(self):
-        return '%s - %s' % (self.get_type_display(), self.username)
+        return '%s - %s' % (self.get_type_display(), self.full_name or self.username)
 
     @property
     def is_team_account(self):
@@ -286,7 +351,6 @@ class ThirdPartyAccount(models.Model):
     @property
     def is_individual_account(self):
         return self.users.exists()
-
 
 class YoutubeSyncRule(models.Model):
     """
