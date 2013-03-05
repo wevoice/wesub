@@ -103,19 +103,23 @@ class AccountTest(TestCase):
         vurl.owner_username = 'test'
         vurl.save()
         video = vurl.video
+
         third = ThirdPartyAccount.objects.all().exists()
         self.assertFalse(third)
+        self.assertEquals(0, ThirdPartyAccount.objects.count())
 
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-        self.assertFalse(ignore)
-
-        ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
-
-        is_authorized, ignore = check_authorization(video)
+        is_authorized, _ = check_authorization(video)
         self.assertFalse(is_authorized)
-        self.assertEquals(None, ignore)
+
+        user = User.objects.get(username='admin')
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                full_name=vurl.owner_username)
+
+        user.third_party_accounts.add(account)
+
+        is_authorized, _ = check_authorization(video)
+        self.assertTrue(is_authorized)
 
     def test_part_of_team(self):
         # Prep stuff
@@ -130,6 +134,8 @@ class AccountTest(TestCase):
         TeamVideo.objects.create(video=video, team=team, added_by=user)
 
         third = ThirdPartyAccount.objects.all().exists()
+        tpa = ThirdPartyAccount.objects.get(username='test')
+        team.third_party_accounts.add(tpa)
         self.assertFalse(third)
 
         # Start testing
@@ -153,10 +159,13 @@ class AccountTest(TestCase):
 
         version.language.is_complete = True
         version.language.save()
+        version.note = ''
+        version.save()
 
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
         self.assertEquals(version.moderation_status, UNMODERATED)
+        self.assertFalse(version.language.is_imported_from_youtube_and_not_worked_on)
 
         self.assertTrue(can_be_synced(version))
 
@@ -180,6 +189,8 @@ class AccountTest(TestCase):
 
         version.language.is_complete = True
         version.language.save()
+        version.note = ''
+        version.save()
 
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
@@ -219,6 +230,8 @@ class AccountTest(TestCase):
         self.assertEquals(len(synced_sl), len(data))
 
         video, language, version = data[0]
+        version.note = ''
+        version.save()
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
         self.assertTrue(language.is_complete)
@@ -236,16 +249,16 @@ class AccountTest(TestCase):
         self.assertFalse(third)
 
         is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
+        self.assertFalse(is_authorized)
         self.assertFalse(ignore)
 
         account = ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
+                full_name=vurl.owner_username)
 
         team = Team.objects.get(slug='volunteer')
 
         is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
+        self.assertFalse(is_authorized)
 
         team.third_party_accounts.add(account)
 
@@ -257,6 +270,46 @@ class AccountTest(TestCase):
         user.third_party_accounts.add(account)
 
         is_authorized, ignore = check_authorization(video)
+        self.assertTrue(is_authorized)
+
+    def test_individual_user_then_submitted_to_team(self):
+        """
+        If a video from a YT account linked to an individual Amara user gets
+        submitted to a task-enabled team and undergoes review and moderation,
+        the subtitles do not get pushed to YT upon approval.
+
+        Expected: open subtitles should be pushed when completed, and moderated
+        ones - when published.
+
+        The assumption is that if an individual amara user enables sync for
+        their Youtube account, they allow anything from Amara to enter their
+        Youtube account.  This means that any community edits will be synced.
+        Including if the video is added to a team.
+        """
+        # Prep stuff
+        vurl = VideoUrl.objects.filter(type='Y')[0]
+        vurl.owner_username = 'admin'
+        vurl.save()
+
+        video = vurl.video
+        user = User.objects.get(username='admin')
+
+        team = Team.objects.all()[0]
+        TeamVideo.objects.create(video=video, team=team, added_by=user)
+
+        self.assertEquals(0, ThirdPartyAccount.objects.count())
+
+        # Start testing
+        is_authorized, ignore = check_authorization(video)
+        self.assertFalse(is_authorized)
+        self.assertFalse(ignore)
+
+        account = ThirdPartyAccount.objects.create(type='Y',
+                full_name=vurl.owner_username)
+
+        user.third_party_accounts.add(account)
+
+        is_authorized, _ = check_authorization(video)
         self.assertTrue(is_authorized)
 
     def test_resolve_ownership(self):
@@ -317,3 +370,8 @@ class AccountTest(TestCase):
         new = add_amara_description_credit(old, url, prepend=True)
         self.assertTrue(new.startswith('Help us caption and translate'))
         self.assertTrue(new.endswith('abc'))
+
+        new = add_amara_description_credit(new, url)
+        self.assertTrue(new.startswith('Help us caption and translate'))
+        self.assertFalse(new.endswith('Help us caption and translate'))
+        self.assertEquals(1, new.count('Help us caption and translate'))
