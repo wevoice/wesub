@@ -2634,7 +2634,7 @@ class BillingRecordManager(models.Manager):
     def data_for_team(self, team, start, end):
         return self.filter(team=team, created__gte=start, created__lte=end)
 
-    def csv_report_for_team(self, team, start, end, header=True):
+    def csv_report_for_team(self, team, start, end, add_header=True):
         all_records = self.data_for_team(team, start, end)
 
         header = [
@@ -2648,7 +2648,7 @@ class BillingRecordManager(models.Manager):
             'User'
         ]
 
-        if header:
+        if add_header:
             rows = [header]
         else:
             rows = []
