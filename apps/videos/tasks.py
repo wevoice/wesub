@@ -625,7 +625,7 @@ def insert_billing_record(version_pk):
         celery_logger.debug('an older version exists')
         return
 
-    is_original = True
+    is_original = language.is_original
     source = instance.note
     team = tv.team
 

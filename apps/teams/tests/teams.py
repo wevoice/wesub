@@ -1554,7 +1554,7 @@ class BillingTest(TestCase):
 
         sl = SubtitleLanguage.objects.create(video=video, language='en',
                 is_complete=True)
-        now = datetime(2013, 1, 2, 0, 0, 0)
+        now = datetime(2013, 4, 2, 0, 0, 0)
 
         sl.subtitleversion_set.all().delete()
 
@@ -1570,14 +1570,102 @@ class BillingTest(TestCase):
         self.assertEquals(br.video.pk, video.pk)
         self.assertEquals(br.team.pk, video.get_team_video().team.pk)
         self.assertEquals(br.created, now)
+        self.assertEquals(br.is_original, sl.is_original)
         self.assertEquals(br.user.pk, user.pk)
         self.assertEquals(br.subtitle_language.pk, sl.pk)
 
         team = video.get_team_video().team
         start = datetime(2013, 1, 1, 0, 0)
-        end = datetime(2013, 2, 1, 0, 0, 0)
+        end = datetime(2013, 5, 1, 0, 0, 0)
 
         csv_data = BillingRecord.objects.csv_report_for_team(team, start, end)
 
         self.assertEquals(2, len(csv_data))
         self.assertEquals(8, len(csv_data[1]))
+
+        # 2
+        sl.is_original = False
+        sl.save()
+        sv = SubtitleVersion.objects.create(language=sl, user=user,
+                datetime_started=now, version_no=1)
+
+        video_changed_tasks(video.pk, sv.pk)
+
+        # A new one shouldn't be created for the same language
+        self.assertEquals(1, BillingRecord.objects.all().count())
+
+    def test_two_languages(self):
+        from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
+        BillingRecord.objects.all().delete()
+
+        user = User.objects.all()[0]
+
+        video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.user = user
+        video.save()
+
+        sl_en = SubtitleLanguage.objects.create(video=video, language='en',
+                is_complete=True)
+        sl_cs = SubtitleLanguage.objects.create(video=video, language='cs',
+                is_complete=True)
+        now = datetime(2013, 4, 2, 0, 0, 0)
+
+        sv_en = SubtitleVersion.objects.create(language=sl_en, user=user,
+                datetime_started=now, version_no=0)
+
+        sv_cs = SubtitleVersion.objects.create(language=sl_cs, user=user,
+                datetime_started=now, version_no=0)
+
+        video_changed_tasks(video.pk, sv_en.pk)
+        video_changed_tasks(video.pk, sv_cs.pk)
+
+        self.assertEquals(2, BillingRecord.objects.all().count())
+
+    def test_incomplete_language(self):
+        from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
+        BillingRecord.objects.all().delete()
+
+        user = User.objects.all()[0]
+
+        video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.user = user
+        video.save()
+
+        sl_en = SubtitleLanguage.objects.create(video=video, language='en',
+                is_complete=False)
+        now = datetime(2013, 4, 2, 0, 0, 0)
+
+        sv_en = SubtitleVersion.objects.create(language=sl_en, user=user,
+                datetime_started=now, version_no=0)
+
+        video_changed_tasks(video.pk, sv_en.pk)
+
+        self.assertEquals(0, BillingRecord.objects.all().count())
+
+    def test_original_language(self):
+        from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
+
+        BillingRecord.objects.all().delete()
+
+        user = User.objects.all()[0]
+
+        video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.user = user
+        video.save()
+
+        sl_en = SubtitleLanguage.objects.create(video=video, language='en',
+                is_original=False, is_complete=True)
+        now = datetime(2013, 4, 2, 0, 0, 0)
+
+        sv_en = SubtitleVersion.objects.create(language=sl_en, user=user,
+                datetime_started=now, version_no=0)
+
+        video_changed_tasks(video.pk, sv_en.pk)
+
+        self.assertEquals(1, BillingRecord.objects.all().count())
+
+        br = BillingRecord.objects.all()[0]
+        self.assertFalse(br.is_original)
