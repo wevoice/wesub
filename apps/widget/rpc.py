@@ -248,9 +248,7 @@ class Rpc(BaseRpc):
         video_languages = [language_summary(l, team_video, request.user) for l
                            in video.newsubtitlelanguage_set.all()]
 
-        original_language = None
-        if video.subtitle_language():
-            original_language = video.subtitle_language().language_code
+        original_language = video.primary_audio_language_code
 
         tv = video.get_team_video()
         writable_langs = list(tv.team.get_writable_langs()) if tv else []
