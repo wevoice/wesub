@@ -15,6 +15,9 @@
 
     <script type="text/javascript">
         var editorData = {{ editor_data|safe }}
+        window.Amara = window.Amara || {};
+        window.Amara.conf = window.Amara.conf || {};
+        window.Amara.conf.STATIC_ROOT_URL = '{{ STATIC_URL }}';
     </script>
 
     <!--[if IE]>
@@ -257,6 +260,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
+    <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.flash-fallback.js"></script>
 
 </body>
 </html>
