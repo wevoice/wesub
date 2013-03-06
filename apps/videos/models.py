@@ -491,10 +491,8 @@ class Video(models.Model):
         Will return None if unknown.
 
         """
-        ol = self._original_subtitle_language()
+        return self.primary_audio_language_code or None
 
-        if ol and ol.language_code:
-            return ol.language_code
 
     @property
     def filename(self):
@@ -1032,6 +1030,7 @@ def update_followers(sender, instance, created, **kwargs):
         except IntegrityError:
             # User already follows the video.
             pass
+
 
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)

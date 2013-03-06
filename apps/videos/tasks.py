@@ -457,7 +457,13 @@ def gauge_videos():
 # @periodic_task(run_every=timedelta(seconds=(60*5)))
 # def gauge_videos_long():
 #     Gauge('videos.Subtitle').report(Subtitle.objects.count())
+@task
+def sync_latest_versions_for_video(video_pk):
+    video = Video.objects.get(pk=video_pk)
 
+    for lang in video.subtitlelanguage_set.all():
+        latest = lang.latest_version()
+        upload_subtitles_to_original_service.delay(latest.pk)
 
 @task
 def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
