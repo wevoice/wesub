@@ -491,7 +491,7 @@ class Video(models.Model):
         Will return None if unknown.
 
         """
-        return self.video.primary_audio_language_code or None
+        return self.primary_audio_language_code or None
 
 
     @property
