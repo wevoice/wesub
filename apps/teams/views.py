@@ -1593,7 +1593,9 @@ def upload_draft(request, slug, video_id):
     if request.POST:
         video = Video.objects.get(video_id=video_id)
         form = TaskUploadForm(request.POST, request.FILES,
-                              user=request.user, video=video)
+                              user=request.user, video=video,
+                              initial={'primary_audio_language_code':video.primary_audio_language_code}
+        )
 
         if form.is_valid():
             form.save()

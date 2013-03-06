@@ -491,10 +491,8 @@ class Video(models.Model):
         Will return None if unknown.
 
         """
-        ol = self._original_subtitle_language()
+        return self.video.primary_audio_language_code or None
 
-        if ol and ol.language_code:
-            return ol.language_code
 
     @property
     def filename(self):
