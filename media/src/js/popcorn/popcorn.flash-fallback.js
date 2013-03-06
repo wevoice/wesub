@@ -127,6 +127,11 @@
                 ],
                 'onLoad': function () {
                     onPlayerReady();
+                },
+                plugins:{
+                    controls:{
+                        fullscreen:false
+                    }
                 }
             };
             player = player = $f(elem, flashEmbedParams, config);
