@@ -1,3 +1,4 @@
+
 /*
  * popcorn.js version d8ab958
  * http://popcornjs.org
@@ -6,6 +7,10 @@
  * Licensed under the MIT license
  */
 
+/* In order for the newstile wrappers to work, the popcorn folks must fix bug
+*  https://webmademovies.lighthouseapp.com/projects/63272/tickets/1450-Expose-a-registry-patter-for-wrappers
+*  Until then see how wrappers must have the fallback one before anyone else
+ */
 (function(global, document) {
 
   // Popcorn.js does not support archaic browsers
@@ -3152,7 +3157,8 @@
         // We leave HTMLVideoElement and HTMLAudioElement wrappers out
         // of the mix, since we'll default to HTML5 video if nothing
         // else works.  Waiting on #1254 before we add YouTube to this.
-        wrappers = "HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
+        // see comment on top of this file
+        wrappers = "HTMLFlashFallbackVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
 
     if ( !node ) {
       Popcorn.error( "Specified target `" + target + "` was not found." );
