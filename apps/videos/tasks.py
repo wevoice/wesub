@@ -457,6 +457,14 @@ def gauge_videos():
 # @periodic_task(run_every=timedelta(seconds=(60*5)))
 # def gauge_videos_long():
 #     Gauge('videos.Subtitle').report(Subtitle.objects.count())
+
+
+@periodic_task(run_every=timedelta(seconds=60))
+def gague_billing_records():
+    from teams.models import BillingRecord
+    Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
+
+
 @task
 def sync_latest_versions_for_video(video_pk):
     video = Video.objects.get(pk=video_pk)
