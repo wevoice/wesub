@@ -628,6 +628,9 @@ class Video(models.Model):
 
         If no version fitting all the criteria is found, None is returned.
 
+        Deleted versions cannot be retrieved with this method.  If you need
+        those you'll need to look them up another way.
+
         """
         language = self.subtitle_language(language_code)
         return None if language is None else language.get_tip(public=public_only)

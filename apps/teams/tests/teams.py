@@ -248,13 +248,13 @@ class TeamVideoTest(TestCase):
         add_subtitles(video, 'en', subs, visibility='private')
 
         self.assertEquals(1, sub_models.SubtitleVersion.objects.count())
-        sub = sub_models.SubtitleVersion.objects.all()[0]
+        sub = sub_models.SubtitleVersion.objects.full()[0]
         self.assertEquals('private', sub.visibility)
 
         tv.delete()
 
         self.assertEquals(1, sub_models.SubtitleVersion.objects.count())
-        sub = sub_models.SubtitleVersion.objects.all()[0]
+        sub = sub_models.SubtitleVersion.objects.full()[0]
         self.assertEquals('public', sub.visibility)
 
 
@@ -432,7 +432,7 @@ class TeamsTest(TestCase):
         for lang in langs:
             l = video.subtitle_language(lang)
             self.assertTrue(l.version())
-            self.assertTrue(l.get_num_versions())
+            self.assertTrue(l.subtitleversion_set.full().count())
         self.assertTrue(video.is_public)
         self.assertEqual(video.moderated_by, None)
 

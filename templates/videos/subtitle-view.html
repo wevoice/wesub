@@ -253,7 +253,7 @@
                     {% endif %}
                 {% endif %}
             {% else %}
-                {% if language.subtitleversion_set.exists %}
+                {% if language.subtitleversion_set.extant.exists %}
                     <p class="empty">
                         {% blocktrans %}
                             This language contains subtitles that are still waiting to be moderated.  Check back later.

@@ -1482,16 +1482,17 @@ def _delete_subtitle_version(version):
     n = version.version_number
 
     # "Delete" this specific version...
-    version.visibility_override = 'private'
+    version.visibility_override = 'deleted'
     version.save()
 
     # We also want to "delete" all draft subs leading up to this version.
-    previous_versions = (sl.subtitleversion_set.filter(version_number__lt=n)
+    previous_versions = (sl.subtitleversion_set.extant()
+                                               .filter(version_number__lt=n)
                                                .order_by('-version_number'))
     for v in previous_versions:
         if v.is_public():
             break
-        v.visibility_override = 'private'
+        v.visibility_override = 'deleted'
         v.save()
 
 

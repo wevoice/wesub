@@ -96,7 +96,7 @@ class BaseNotification(object):
         if self.language_pk:
             self.language = self.video.subtitlelanguage_set.get(pk=self.language_pk)
             if self.version_pk:
-                self.version = self.language.subtitleversion_set.get(pk=self.version_pk)
+                self.version = self.language.subtitleversion_set.full().get(pk=self.version_pk)
         else:
             self.language = None
         self.event_name = event_name

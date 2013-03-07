@@ -426,7 +426,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         # Non-members can only see public versions.
         qs = qs.public()
     else:
-        qs = qs.all()
+        qs = qs.extant()
     qs = qs.select_related('user')
 
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
@@ -535,8 +535,9 @@ def rollback(request, version):
 @get_video_revision
 def diffing(request, first_version, second_pk):
     language = first_version.subtitle_language
-    second_version = get_object_or_404(sub_models.SubtitleVersion,
-            pk=second_pk, subtitle_language=language)
+    second_version = get_object_or_404(
+        sub_models.SubtitleVersion.objects.extant(),
+        pk=second_pk, subtitle_language=language)
 
     if first_version.video != second_version.video:
         # this is either a bad bug, or someone evil

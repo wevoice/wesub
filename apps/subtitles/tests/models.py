@@ -353,59 +353,78 @@ class TestSubtitleVersion(TestCase):
 
         sv = self.sl_en.add_version()
 
+        def _set_vis(vis, vis_over):
+            sv.visibility = vis or ''
+            sv.visibility_override = vis_over or ''
+            sv.save()
+
         def _count_public():
             return self.sl_en.subtitleversion_set.public().count()
 
-        # vis     override
-        # public  null
-        self.assertEqual(1, _count_public())
+        def _count_extant():
+            return self.sl_en.subtitleversion_set.extant().count()
+
+        def _count_full():
+            return self.sl_en.subtitleversion_set.full().count()
+
+        def _assert_counts(public, extant, full):
+            self.assertEqual(public, _count_public())
+            self.assertEqual(extant, _count_extant())
+            self.assertEqual(full, _count_full())
+
+
+        _set_vis('public', None)
+        _assert_counts(1, 1, 1)
         self.assertTrue(sv.is_public())
         self.assertFalse(sv.is_private())
+        self.assertFalse(sv.is_deleted())
 
-        # vis     override
-        # private null
-        sv.visibility = 'private'
-        sv.save()
-        self.assertEqual(0, _count_public())
+        _set_vis('private', None)
+        _assert_counts(0, 1, 1)
         self.assertFalse(sv.is_public())
         self.assertTrue(sv.is_private())
+        self.assertFalse(sv.is_deleted())
 
-        # vis     override
-        # private public
-        sv.visibility_override = 'public'
-        sv.save()
-        self.assertEqual(1, _count_public())
+        _set_vis('private', 'public')
+        _assert_counts(1, 1, 1)
         self.assertTrue(sv.is_public())
         self.assertFalse(sv.is_private())
+        self.assertFalse(sv.is_deleted())
 
-        # vis     override
-        # public  public
-        sv.visibility = 'public'
-        sv.save()
-        self.assertEqual(1, _count_public())
+        _set_vis('public', 'public')
+        _assert_counts(1, 1, 1)
         self.assertTrue(sv.is_public())
         self.assertFalse(sv.is_private())
+        self.assertFalse(sv.is_deleted())
 
-        # vis     override
-        # public  private
-        sv.visibility_override = 'private'
-        sv.save()
-        self.assertEqual(0, _count_public())
+        _set_vis('public', 'private')
+        _assert_counts(0, 1, 1)
         self.assertFalse(sv.is_public())
         self.assertTrue(sv.is_private())
+        self.assertFalse(sv.is_deleted())
 
-        # vis     override
-        # private private
-        sv.visibility = 'private'
-        sv.save()
-        self.assertEqual(0, _count_public())
+        _set_vis('private', 'private')
+        _assert_counts(0, 1, 1)
         self.assertFalse(sv.is_public())
         self.assertTrue(sv.is_private())
+        self.assertFalse(sv.is_deleted())
+
+        _set_vis('public', 'deleted')
+        _assert_counts(0, 0, 1)
+        self.assertFalse(sv.is_public())
+        self.assertFalse(sv.is_private())
+        self.assertTrue(sv.is_deleted())
+
+        _set_vis('private', 'deleted')
+        _assert_counts(0, 0, 1)
+        self.assertFalse(sv.is_public())
+        self.assertFalse(sv.is_private())
+        self.assertTrue(sv.is_deleted())
 
     def test_text_time_change(self):
         from subtitles.pipeline import add_subtitles
 
-        SubtitleVersion.objects.all().delete()
+        SubtitleVersion.objects.full().delete()
         SubtitleLanguage.objects.all().delete()
 
         subtitles_1 = [
@@ -466,7 +485,7 @@ class TestSubtitleVersion(TestCase):
 
     def test_sibling_set(self):
         def _assert_siblings(sv, *vns):
-            siblings = sv.sibling_set.order_by('version_number')
+            siblings = sv.sibling_set.full().order_by('version_number')
 
             for v in siblings:
                 self.assertEqual(sv.subtitle_language_id, v.subtitle_language_id)
@@ -497,10 +516,10 @@ class TestSubtitleVersion(TestCase):
             self.assertEqual(v.is_rollback(), is_rollback)
 
             if get_rollback_source:
-                self.assertEqual(v.get_rollback_source().id,
+                self.assertEqual(v.get_rollback_source(full=True).id,
                                  get_rollback_source.id)
             else:
-                self.assertIsNone(v.get_rollback_source())
+                self.assertIsNone(v.get_rollback_source(full=True))
 
         # Two normal versions.
         v1 = self.sl_en.add_version(subtitles=[])

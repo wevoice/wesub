@@ -48,7 +48,7 @@ class SubtitleUploadFormTest(TestCase):
         fr_version = self.fr.add_version(subtitles=make_subtitle_set('fr'), parents=[de_version])
 
         self.fr = refresh(self.fr)
-        self.assertEqual(self.fr.subtitleversion_set.count(), 1)
+        self.assertEqual(self.fr.subtitleversion_set.full().count(), 1)
         self.assertEqual(self.fr.get_translation_source_language_code(), 'de')
         f = SubtitlesUploadForm(self.user, self.video)
         self.assertRaises(ValidationError, f._verify_no_translation_conflict, self.fr, 'en')

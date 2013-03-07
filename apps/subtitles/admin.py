@@ -75,11 +75,11 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     video_title.short_description = 'video'
 
     def version_count(self, sl):
-        return sl.subtitleversion_set.count()
+        return sl.subtitleversion_set.full().count()
     version_count.short_description = 'number of versions'
 
     def tip(self, sl):
-        ver = sl.get_tip()
+        ver = sl.get_tip(full=True)
         return ver.version_number if ver else None
     tip.short_description = 'tip version'
 
@@ -113,7 +113,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
         return sv.subtitle_language.get_language_code_display()
 
     def parent_ids(self, sv):
-        pids = map(str, sv.parents.values_list('id', flat=True))
+        pids = map(str, sv.parents.full().values_list('id', flat=True))
         return ', '.join(pids) if pids else None
 
     # Hack to generate lineages properly when modifying versions in the admin
@@ -121,13 +121,13 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     # models are hooked up everywhere else?
     def response_change(self, request, obj):
         response = super(SubtitleVersionAdmin, self).response_change(request, obj)
-        obj.lineage = get_lineage(obj.parents.all())
+        obj.lineage = get_lineage(obj.parents.full())
         obj.save()
         return response
 
     def response_add(self, request, obj, *args, **kwargs):
         response = super(SubtitleVersionAdmin, self).response_add(request, obj)
-        obj.lineage = get_lineage(obj.parents.all())
+        obj.lineage = get_lineage(obj.parents.full())
         obj.save()
         return response
 

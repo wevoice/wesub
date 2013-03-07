@@ -269,7 +269,7 @@ class AccountTest(TestCase):
 
         _set_subtitles(video, 'en', True, True, [])
         language = video.subtitle_language('en')
-        version = language.subtitleversion_set.all()[0]
+        version = language.subtitleversion_set.full()[0]
 
         youtube_type_mock = Mock(spec=YoutubeVideoType)
         video_type_registrar.video_type_for_url = Mock()

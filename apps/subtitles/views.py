@@ -185,7 +185,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
 
     editing_language.writelock(request.user, request.browser_id, save=True)
 
-    # if this language is a traslation, show both
+    # if this language is a translation, show both
     editing_version = editing_language.get_tip(public=False)
     translated_from_version = None
     lineage = editing_version and editing_version.get_lineage()

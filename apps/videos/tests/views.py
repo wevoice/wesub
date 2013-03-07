@@ -345,7 +345,7 @@ class TestViews(WebUseTest):
         self.client.get(reverse('videos:rollback', args=[en2.id]))
         _assert_tip_subs([(1, 2, 'foo')])
 
-        self.assertEqual(sl_en.subtitleversion_set.count(), 4)
+        self.assertEqual(sl_en.subtitleversion_set.full().count(), 4)
 
     def test_diffing(self):
         create_langs_and_versions(self.video, ['en'])

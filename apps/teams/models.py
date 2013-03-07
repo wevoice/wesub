@@ -783,7 +783,7 @@ class TeamVideo(models.Model):
         # TODO: Dedupe this and the team video delete signal.
         video = self.video
 
-        video.newsubtitleversion_set.all().update(visibility='public')
+        video.newsubtitleversion_set.extant().update(visibility='public')
         video.is_public = new_team.is_visible
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
@@ -2471,6 +2471,8 @@ class BillingReport(models.Model):
         # the first approved version.  Not sure how to do that yet.
         imported, crowd_created = self._separate_languages(languages)
 
+        # TODO: Are we going to count deleted versions here?  If so, the
+        # get_tip() calls here may need full=True to get deleted tips...
         if workflow.approve_enabled:
             imported_data = [(language, language.get_tip())
                                     for language in imported]
