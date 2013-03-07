@@ -202,10 +202,8 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
 
             // IE special-casing.
-            xmlString = xmlString.replace(/xmlns:NS1=\"\" /g, '');
-            xmlString = xmlString.replace(/NS1:/g, '');
-            xmlString = xmlString.replace(/xmlns:NS2=\"\" /g, '');
-            xmlString = xmlString.replace(/NS2:/g, '');
+            xmlString = xmlString.replace(/xmlns:NS\d+=\"\" /g, '');
+            xmlString = xmlString.replace(/NS\d+:/g, '');
 
             // If the XML does not have a tts namespace set on the <tt> element, we need to
             // set it specifically. This is an IE9 issue.
@@ -242,15 +240,20 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         if (typeof after !== 'object' || after === null) {
 
             // If this is a number, get the subtitle by index.
-            if (typeof after === 'number') {
+            if (typeof after === 'number' && after !== -1) {
+
                 after = this.getSubtitleByIndex(after);
-            } else if (this.subtitlesCount()) {
+
+            } else if (this.subtitlesCount() && after !== -1) {
+
                 // If we have subtitles, default placement should be at the end.
                 after = this.getLastSubtitle();
 
             // Otherwise, place the first subtitle at the beginning.
             } else {
+
                 after = -1;
+
             }
         }
 
@@ -311,7 +314,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             // Prepend the new subtitle to the first div.
             this.$firstDiv.prepend(newSubtitle);
 
-            // Otherwise, place it after the designated subtitle.
+        // Otherwise, place it after the designated subtitle.
         } else {
 
             // First just make sure that the previous subtitle exists.
