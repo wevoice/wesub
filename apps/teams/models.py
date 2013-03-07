@@ -53,16 +53,12 @@ from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from videos.models import Video, SubtitleVersion
+from videos.models import Video, SubtitleVersion, SubtitleLanguage
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage
 )
 from subtitles import pipeline
-from videos.models import Video, SubtitleLanguage, SubtitleVersion
-from subtitles.models import (
-    SubtitleVersion as NewSubtitleVersion,
-)
 
 from functools import partial
 
@@ -2684,8 +2680,17 @@ class BillingRecordManager(models.Manager):
 
 class BillingRecord(models.Model):
     video = models.ForeignKey(Video)
-    subtitle_version = models.ForeignKey(SubtitleVersion)
-    subtitle_language = models.ForeignKey(SubtitleLanguage)
+
+    subtitle_version = models.ForeignKey(SubtitleVersion, null=True,
+            blank=True)
+    new_subtitle_version = models.ForeignKey(NewSubtitleVersion, null=True,
+            blank=True)
+
+    subtitle_language = models.ForeignKey(SubtitleLanguage, null=True,
+            blank=True)
+    new_subtitle_language = models.ForeignKey(NewSubtitleLanguage, null=True,
+            blank=True)
+
     minutes = models.FloatField(blank=True, null=True)
     is_original = models.BooleanField()
     team = models.ForeignKey(Team)
@@ -2715,21 +2720,21 @@ class BillingRecord(models.Model):
         Return the number of minutes the subtitles specified in `version`
         cover as a float.
         """
-        subs = self.subtitle_version.ordered_subtitles()
+        subs = self.new_subtitle_version.get_subtitles()
 
         if len(subs) == 0:
             return 0.0
 
-        start = subs[0].start_time
-        end = subs[-1].end_time
+        start = subs[0][0]
+        end = subs[-1][1]
 
         # The -1 value for the end_time isn't allowed anymore but some
         # legacy data will still have it.
         if end == -1:
-            end = subs[-1].start_time
+            end = subs[-1][0]
 
         if not end:
-            end = subs[-1].start_time
+            end = subs[-1][0]
 
         return round((float(end) - float(start)) / (60 * 1000), 2)
 

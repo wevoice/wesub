@@ -1671,3 +1671,30 @@ class BillingTest(TestCase):
 
         br = BillingRecord.objects.all()[0]
         self.assertFalse(br.is_original)
+
+    def test_get_minutes(self):
+        from apps.teams.models import BillingRecord
+        from apps.videos.tasks import video_changed_tasks
+
+        user = User.objects.all()[0]
+        team = test_factories.create_team()
+        tv = test_factories.create_team_video(team, user)
+        video = tv.video
+
+        self.assertEquals(0, BillingRecord.objects.count())
+
+        sub_models.SubtitleVersion.objects.all().delete()
+        sub_models.SubtitleLanguage.objects.all().delete()
+
+        subs = [
+            (0, 1000, 'Hello',),
+            (1000, 5000, 'world',),
+            (8000, 12 * 1000, 'end',)
+        ]
+        sv = add_subtitles(video, 'en', subs, complete=True)
+        video_changed_tasks(video.pk, sv.pk)
+
+        self.assertEquals(1, BillingRecord.objects.count())
+
+        br = BillingRecord.objects.all()[0]
+        self.assertEquals(br.minutes, 0.2)
