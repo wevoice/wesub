@@ -16,15 +16,14 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
+var Popcorn = window.Popcorn || null;
+var jQuery = window.AmarajQuery || null;
 
 (function (Popcorn, window, document) {
 
     var STATIC_ROOT_URL = window.Amara.conf.STATIC_ROOT_URL;
-    var
-
-        CURRENT_TIME_MONITOR_MS = 16,
-        EMPTY_STRING = "";
-
+    var CURRENT_TIME_MONITOR_MS = 16;
+    var EMPTY_STRING = "";
 
     function HTMLFlashFallbackVideoElement(id) {
 
@@ -33,41 +32,45 @@
             throw "ERROR: HTMLFlashFallbackVideoElement requires window.postMessage";
         }
 
-        var self = this,
-            parent = typeof id === "string" ? Popcorn.dom.find(id) : id,
-            elem = document.createElement("div"),
+        var self = this;
+        var parent = typeof id === "string" ? Popcorn.dom.find(id) : id;
+        var elem = document.createElement("div");
 
-            impl = {
-                src: EMPTY_STRING,
-                networkState: self.NETWORK_EMPTY,
-                readyState: self.HAVE_NOTHING,
-                seeking: false,
-                autoplay: EMPTY_STRING,
-                preload: EMPTY_STRING,
-                controls: true,
-                loop: false,
-                poster: EMPTY_STRING,
-                // FlashFallback seems to use .77 as default
-                volume: 1,
-                // FlashFallback has no concept of muted, store volume values
-                // such that muted===0 is unmuted, and muted>0 is muted.
-                muted: 0,
-                currentTime: 0,
-                duration: NaN,
-                ended: false,
-                paused: true,
-                error: null
-            },
-            playerReady = false,
-            playerUID = Popcorn.guid(),
-            player,
-            playerReadyCallbacks = [],
-            timeUpdateInterval,
-            currentTimeInterval,
-            lastCurrentTime = 0;
+        var impl = {
+            src: EMPTY_STRING,
+            networkState: self.NETWORK_EMPTY,
+            readyState: self.HAVE_NOTHING,
+            seeking: false,
+            autoplay: EMPTY_STRING,
+            preload: EMPTY_STRING,
+            controls: true,
+            loop: false,
+            poster: EMPTY_STRING,
+            // FlashFallback seems to use .77 as default
+            volume: 1,
+            // FlashFallback has no concept of muted, store volume values
+            // such that muted===0 is unmuted, and muted>0 is muted.
+            muted: 0,
+            currentTime: 0,
+            duration: NaN,
+            ended: false,
+            paused: true,
+            error: null
+        };
+
+        var playerReady = false;
+        var playerUID = Popcorn.guid();
+        var player;
+        var playerReadyCallbacks = [];
+        var timeUpdateInterval;
+        var currentTimeInterval;
+        var lastCurrentTime = 0;
 
         elem.id = Popcorn.guid("amara-flowplayer");
+        elem.style.height = '100%';
+
         window.elem = elem;
+
         // Namespace all events we'll produce
         self._eventNamespace = Popcorn.guid("HTMLFlashFallbackVideoElement::");
 
@@ -81,19 +84,11 @@
         }
 
         function onPlayerReady() {
-            // FIXME: for some reason we need to set the width  / height here
-            // this ins't right and will break on window rezise. What's the
-            // best approach here?
             var objEl =  jQuery("object", elem).eq(0);
-            var targetHeight = jQuery(elem).parent().height();
-            var targetWidth =  jQuery(elem).parent().width();
-            jQuery(objEl).width(targetWidth + "");
-            jQuery(objEl).height(targetHeight + "");
 
             var clip = player.getClip(0);
             playerReady = true;
             clip.onResume(function () {
-
                 onPlay();
             });
             clip.onPause(function () {
@@ -115,8 +110,8 @@
             var flashEmbedParams = {
                 'src': STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.7.swf",
                 'wmode': 'opaque',
-                'width':impl.width + '',
-                'height':impl.height + ''
+                'width': '100%',
+                'height': '100%'
             };
             var config = {
                 'playlist': [
@@ -134,7 +129,7 @@
                     }
                 }
             };
-            player = player = $f(elem, flashEmbedParams, config);
+            player = player = window.$f(elem, flashEmbedParams, config);
 
             impl.networkState = self.NETWORK_LOADING;
             self.dispatchEvent("loadstart");
@@ -268,7 +263,6 @@
 
         function loadFlowPlayerJs() {
             var el = document.createElement("script");
-            window.jQuery = AmarajQuery;
             el.src = STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.6.min.js";
             var firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(el, firstScriptTag);
@@ -282,6 +276,7 @@
 
         function changeSrc(aSrc) {
             if (!self._canPlaySrc(aSrc)) {
+                var MediaError = MediaError || null;
                 impl.error = {
                     name: "MediaError",
                     message: "Media Source Not Supported",
@@ -469,15 +464,15 @@
     HTMLFlashFallbackVideoElement.prototype._canPlaySrc = function (url) {
         var isH264 = (/\.mp4$/i.test(url) || /\.m4v$/i.test(url));
         var supportsVideo = !!document.createElement('video').canPlayType;
+
         // does this browser supports the native h264?
         var v = document.createElement("video");
         var canPlayH264 = v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
 
         if (isH264 && (!supportsVideo || !canPlayH264)){
-            return "probably"
+            return "probably";
         }
     };
-
 
     Popcorn.HTMLFlashFallbackVideoElement = function (id) {
         return new HTMLFlashFallbackVideoElement(id);

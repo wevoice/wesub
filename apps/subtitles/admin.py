@@ -83,6 +83,24 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
         return ver.version_number if ver else None
     tip.short_description = 'tip version'
 
+    def save_model(self, request, obj, form, change):
+        from videos.tasks import upload_subtitles_to_original_service
+        should_sync_to_youtube = False
+
+        if change:
+            old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
+
+            if not old_obj.subtitles_complete and obj.subtitles_complete:
+                should_sync_to_youtube = True
+
+        super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
+                change)
+
+        if should_sync_to_youtube:
+            tip = obj.get_tip()
+            if tip:
+                upload_subtitles_to_original_service.delay(tip.pk)
+
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'id', 'language', 'version_num',
