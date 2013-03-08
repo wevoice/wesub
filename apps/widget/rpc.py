@@ -856,7 +856,7 @@ class Rpc(BaseRpc):
 
     def _create_review_or_approve_task(self, subtitle_version):
         team_video = subtitle_version.video.get_team_video()
-        lang = subtitle_version.subtitle_language.language
+        lang = subtitle_version.subtitle_language.language_code
         workflow = Workflow.get_for_team_video(team_video)
 
         if workflow.review_allowed:
