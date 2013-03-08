@@ -115,12 +115,23 @@ unisubs.subtitle.SubtitleList.prototype.enterDocument = function() {
             this.captionInserted_).
         listen(
             this.captionSet_,
+            et.RESET_SUBS,
+            this.captionsReset_).
+        listen(
+            this.captionSet_,
             et.DELETE,
             this.captionDeleted_);
     if (this.addSubtitleButton_ && !this.readOnly_) {
         this.listenForAdd_();
     }
 };
+unisubs.subtitle.SubtitleList.prototype.captionsReset_ = function(event) {
+    this.captionsCleared_(event);
+    for (var i = 0; i < this.captionSet_.count(); i++) {
+        this.addSubtitle( this.captionSet_.captions_[i],  i, false, true );
+    }
+    this.setLastSub_();
+}
 unisubs.subtitle.SubtitleList.prototype.captionsCleared_ = function(event) {
     this.subtitleList_ = [];
     while (this.getChildCount() > 1)

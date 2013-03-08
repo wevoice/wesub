@@ -102,7 +102,11 @@ unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
     return this.x['needsAnyTranscribed']();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
+
     this.x['resetSubtitles']();
+    goog.array.forEach(this.x['getSubtitles'](), function(node, i) {
+            this.captions_[i].node = node;
+    }, this);
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
