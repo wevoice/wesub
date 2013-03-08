@@ -129,6 +129,19 @@ class Migration(SchemaMigration):
             'team': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'applications'", 'to': "orm['teams.Team']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'team_applications'", 'to': "orm['auth.CustomUser']"})
         },
+        'teams.billingrecord': {
+            'Meta': {'unique_together': "(('video', 'subtitle_language'),)", 'object_name': 'BillingRecord'},
+            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_original': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'minutes': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']"}),
+            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleVersion']"}),
+            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"}),
+            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.Video']"})
+        },
         'teams.billingreport': {
             'Meta': {'object_name': 'BillingReport'},
             'csv_file': ('utils.amazon.fields.S3EnabledFileField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
