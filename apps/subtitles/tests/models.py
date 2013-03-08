@@ -800,7 +800,6 @@ class TestSubtitleLanguageHavingQueries(TestCase):
     They contain raw SQL through extra() calls, so need to be carefully tested.
 
     """
-
     def _get(self, qs, video=None):
         if video:
             qs = qs.filter(video=video)
@@ -838,6 +837,21 @@ class TestSubtitleLanguageHavingQueries(TestCase):
     def _get_not_nonempty_tip_langs(self, video=None):
         qs = SubtitleLanguage.objects.not_having_nonempty_tip()
         return self._get(qs, video)
+
+
+    def _get_sv(self, sl, n):
+        return sl.subtitleversion_set.full().get(version_number=n)
+
+    def _del_sv(self, sl, n):
+        sv = self._get_sv(sl, n)
+        sv.visibility_override = 'deleted'
+        sv.save()
+
+    def _set_vis(self, sl, n, vis, vis_over):
+        sv = self._get_sv(sl, n)
+        sv.visibility = vis
+        sv.visibility_override = vis_over
+        sv.save()
 
 
     def setUp(self):
@@ -909,6 +923,45 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_langs(self.video),  ['en', 'fr'])
         self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
 
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # video 1
+        #   en 1 2
+        #   fr 1
+        # video 2
+        #   en 1
+        #   cy 1
+
+        # Deleting the only version should take it out of the "having versions"
+        # list.
+
+        self._del_sv(self.sl_1_fr, 1)
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
+        # Deleting one version out of two should NOT take it out of the list.
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
+        v = self._get_sv(self.sl_1_en, 1)
+        v.visibility_override = ''
+        v.save()
+
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_langs(),            ['cy', 'en', 'en'])
+        self.assertEqual(self._get_langs(self.video),  ['en'])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+        
+        # But deleting all of the versions SHOULD take it out.
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_langs(),            ['cy', 'en'])
+        self.assertEqual(self._get_langs(self.video),  [])
+        self.assertEqual(self._get_langs(self.video2), ['cy', 'en'])
+
     def test_not_having_versions(self):
         # No versions at all.
         self.assertEqual(self._get_not_langs(),            ['cy', 'en', 'en', 'fr'])
@@ -966,6 +1019,35 @@ class TestSubtitleLanguageHavingQueries(TestCase):
 
         self.assertEqual(self._get_not_langs(),            [])
         self.assertEqual(self._get_not_langs(self.video),  [])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # video 1
+        #   en 1 2
+        #   fr 1
+        # video 2
+        #   en 1
+        #   cy 1
+
+        # Deleting the only version should put it in the "not having versions"
+        # list.
+        self._del_sv(self.sl_1_fr, 1)
+        self.assertEqual(self._get_not_langs(),            ['fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+        # Deleting one version out of two should NOT put it into the list.
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_not_langs(),            ['fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_langs(self.video2), [])
+
+        # But deleting both should.
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_not_langs(),            ['en', 'fr'])
+        self.assertEqual(self._get_not_langs(self.video),  ['en', 'fr'])
         self.assertEqual(self._get_not_langs(self.video2), [])
 
 
@@ -1045,6 +1127,35 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_public_langs(self.video),  ['en'])
         self.assertEqual(self._get_public_langs(self.video2), [])
 
+        # Make sure deletion of versions is handled properly.
+
+        # Let's reset all the visibility to something simple.
+        self._set_vis(self.sl_1_en, 1, 'public', '')
+        self._set_vis(self.sl_1_en, 2, 'public', '')
+        self._set_vis(self.sl_1_fr, 1, 'public', '')
+        self._set_vis(self.sl_2_en, 1, 'private', 'public')
+        self._set_vis(self.sl_2_cy, 1, 'private', '')
+
+        self.assertEqual(self._get_public_langs(),            ['en', 'en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_public_langs(self.video2), ['en'])
+
+        # Deleted versions are not considered public.
+        self._del_sv(self.sl_1_fr, 1)
+        self.assertEqual(self._get_public_langs(),            ['en', 'en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), ['en'])
+
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_public_langs(),            ['en', 'en'])
+        self.assertEqual(self._get_public_langs(self.video),  ['en'])
+        self.assertEqual(self._get_public_langs(self.video2), ['en'])
+
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_public_langs(),            ['en'])
+        self.assertEqual(self._get_public_langs(self.video),  [])
+        self.assertEqual(self._get_public_langs(self.video2), ['en'])
+
     def test_not_having_public_versions(self):
         # No versions at all.
         self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'en', 'fr'])
@@ -1121,6 +1232,35 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
         self.assertEqual(self._get_not_public_langs(self.video2), ['cy', 'en'])
 
+        # Make sure deletion of versions is handled properly.
+
+        # Let's reset all the visibility to something simple.
+        self._set_vis(self.sl_1_en, 1, 'public', '')
+        self._set_vis(self.sl_1_en, 2, 'public', '')
+        self._set_vis(self.sl_1_fr, 1, 'public', '')
+        self._set_vis(self.sl_2_en, 1, 'private', 'public')
+        self._set_vis(self.sl_2_cy, 1, 'private', '')
+
+        self.assertEqual(self._get_not_public_langs(),            ['cy'])
+        self.assertEqual(self._get_not_public_langs(self.video),  [])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy'])
+
+        # Deleted versions are not considered public.
+        self._del_sv(self.sl_1_fr, 1)
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy'])
+
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy'])
+
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_not_public_langs(),            ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video),  ['en', 'fr'])
+        self.assertEqual(self._get_not_public_langs(self.video2), ['cy'])
+
 
     def test_having_nonempty_versions(self):
         v1 = self.video
@@ -1153,6 +1293,45 @@ class TestSubtitleLanguageHavingQueries(TestCase):
 
         self.assertEqual(self._get_nonempty_langs(),   ['en', 'fr'])
         self.assertEqual(self._get_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # e: Empty, F: Full
+        #
+        # video 1
+        #   en e F
+        #   fr F e
+        # video 2
+        #   en
+        #   cy e
+
+        # Deleting empty versions should not affect this at all.
+        self._del_sv(self.sl_1_fr, 2)
+        self._del_sv(self.sl_2_cy, 1)
+        self.assertEqual(self._get_nonempty_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # But deleting versions with subtitles might!
+        self._del_sv(self.sl_1_fr, 1)
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_nonempty_langs(),   [])
+        self.assertEqual(self._get_nonempty_langs(v1), [])
+        self.assertEqual(self._get_nonempty_langs(v2), [])
+
+        # Since this only cares about any verions, not tip versions, we can have
+        # a deleted tip but still appear in the list as long as there's
+        # a non-empty, non-deleted version *somewhere*.
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo 2")])
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo 3")])
+
+        self._del_sv(self.sl_1_en, 4)
+
+        # 1/en: e d F d
+        self.assertEqual(self._get_nonempty_langs(),   ['en'])
+        self.assertEqual(self._get_nonempty_langs(v1), ['en'])
         self.assertEqual(self._get_nonempty_langs(v2), [])
 
     def test_not_having_nonempty_versions(self):
@@ -1189,6 +1368,60 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_nonempty_langs(v1), [])
         self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
 
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # e: Empty
+        # F: Full
+        #
+        # video 1
+        #   en e F e
+        #   fr F e
+        # video 2
+        #   en
+        #   cy e
+
+        # Deleting empty versions should not affect this at all.
+        self._del_sv(self.sl_1_fr, 2)
+        self._del_sv(self.sl_2_cy, 1)
+        # video 1
+        #   en e F e
+        #   fr F d
+        # video 2
+        #   en
+        #   cy d
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+        # But deleting versions with subtitles might!
+        self._del_sv(self.sl_1_fr, 1)
+        self._del_sv(self.sl_1_en, 2)
+        # video 1
+        #   en e d e
+        #   fr d d
+        # video 2
+        #   en
+        #   cy d
+        self._del_sv(self.sl_1_fr, 1)
+        self._del_sv(self.sl_1_en, 2)
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
+        # Since this only cares about any verions, not tip versions, we can have
+        # a deleted tip but still NOT appear in the list as long as there's
+        # a non-empty, non-deleted version *somewhere*.
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo 2")])
+        self.sl_1_en.add_version(subtitles=[(None, None, "foo 3")])
+
+        self._del_sv(self.sl_1_en, 4)
+
+        # 1/en: e d F d
+        self.assertEqual(self._get_not_nonempty_langs(),   ['cy', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v1), ['fr'])
+        self.assertEqual(self._get_not_nonempty_langs(v2), ['cy', 'en'])
+
 
     def test_having_nonempty_tip(self):
         v1 = self.video
@@ -1223,6 +1456,90 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_nonempty_tip_langs(v1), ['fr'])
         self.assertEqual(self._get_nonempty_tip_langs(v2), [])
 
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # e: Empty, F: Full
+        #
+        # video 1
+        #   en e F e
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+
+        # Deleting non-tip empty versions should not affect this at all.
+        self._del_sv(self.sl_1_en, 1)
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # Deleting a tip might not affect this, if it doesn't "reveal" a full
+        # tip.
+        self.sl_1_en.add_version(subtitles=[])
+
+        # video 1
+        #   en d F e e
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self._del_sv(self.sl_1_en, 4)
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # But deleting a tip might change things if it "reveals" a non-empty
+        # version as the new tip!
+        self._del_sv(self.sl_1_en, 3)
+
+        # video 1
+        #   en d F d d
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # Deleting a FULL tip might not change anything if there's still another
+        # full version ready to take its place.
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "cats"), (200, 300, "dogs")])
+
+        # video 1
+        #   en d F d d
+        #   fr F F
+        # video 2
+        #   en
+        #   cy e
+        self._del_sv(self.sl_1_fr, 2)
+
+        # video 1
+        #   en d F d d
+        #   fr F d
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_nonempty_tip_langs(),   ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), ['en', 'fr'])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
+        # But deleting a tip to reveal an empty version (or no versions)
+        # underneath WILL change things.
+        self._del_sv(self.sl_1_fr, 1)
+        self._del_sv(self.sl_1_en, 2)
+
+        # video 1
+        #   en d d d d
+        #   fr d d
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_nonempty_tip_langs(),   [])
+        self.assertEqual(self._get_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_nonempty_tip_langs(v2), [])
+
     def test_not_having_nonempty_tip(self):
         v1 = self.video
         v2 = self.video2
@@ -1253,6 +1570,104 @@ class TestSubtitleLanguageHavingQueries(TestCase):
 
         self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en'])
         self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # Make sure deletion of versions is handled properly.
+
+        # Current status looks like this:
+        # e: Empty, F: Full
+        #
+        # video 1
+        #   en e F e
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+
+        # Deleting non-tip empty versions should not affect this at all.
+        self._del_sv(self.sl_1_en, 1)
+
+        # video 1
+        #   en d F e
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # Deleting a tip might not affect this, if it doesn't "reveal" a full
+        # tip.
+        self.sl_1_en.add_version(subtitles=[])
+
+        # video 1
+        #   en d F e e
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self._del_sv(self.sl_1_en, 4)
+
+        # video 1
+        #   en d F e d
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # But deleting a tip might change things if it "reveals" a non-empty
+        # version as the new tip!
+        self._del_sv(self.sl_1_en, 3)
+
+        # video 1
+        #   en d F d d
+        #   fr F
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # Deleting a FULL tip might not change anything if there's still another
+        # full version ready to take its place.
+        self.sl_1_fr.add_version(subtitles=[(100, 200, "cats"), (200, 300, "dogs")])
+
+        # video 1
+        #   en d F d d
+        #   fr F F
+        # video 2
+        #   en
+        #   cy e
+        self._del_sv(self.sl_1_fr, 2)
+
+        # video 1
+        #   en d F d d
+        #   fr F d
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), [])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
+
+        # But deleting a tip to reveal an empty version (or no versions)
+        # underneath WILL change things.
+        self._del_sv(self.sl_1_fr, 1)
+        self._del_sv(self.sl_1_en, 2)
+
+        # video 1
+        #   en d d d d
+        #   fr d d
+        # video 2
+        #   en
+        #   cy e
+        self.assertEqual(self._get_not_nonempty_tip_langs(),   ['cy', 'en', 'en', 'fr'])
+        self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en', 'fr'])
         self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
 
 
