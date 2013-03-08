@@ -1,40 +1,41 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import DataMigration
-from django.core.exceptions import ObjectDoesNotExist
+from south.v2 import SchemaMigration
 from django.db import models
-from utils.chunkediter import chunkediter
 
-def get_new_version(old_sv):
-    if old_sv:
-        return old_sv.new_subtitle_version
-
-class Migration(DataMigration):
-
+class Migration(SchemaMigration):
+    
     def forwards(self, orm):
-        if not db.dry_run:
-            for t in chunkediter(orm.Task.objects.all()):
-                try:
-                    t.new_subtitle_version = get_new_version(t.subtitle_version)
-                    t.new_review_base_version = get_new_version(t.review_base_version)
-                    t.save()
-                except ObjectDoesNotExist:
-                    # Some tasks seem to have bad data in their foreign keys (on
-                    # dev at least).  There's nothing we can do for them, so
-                    # we'll just skip them.
-                    pass
+        
+        # Adding field 'BillingRecord.new_subtitle_version'
+        db.add_column('teams_billingrecord', 'new_subtitle_version', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleVersion'], null=True, blank=True), keep_default=False)
 
+        # Adding field 'BillingRecord.new_subtitle_language'
+        db.add_column('teams_billingrecord', 'new_subtitle_language', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleLanguage'], null=True, blank=True), keep_default=False)
+
+        # Changing field 'BillingRecord.subtitle_language'
+        db.alter_column('teams_billingrecord', 'subtitle_language_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleLanguage'], null=True, blank=True))
+
+        # Changing field 'BillingRecord.subtitle_version'
+        db.alter_column('teams_billingrecord', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion'], null=True, blank=True))
+    
+    
     def backwards(self, orm):
-        # We don't actually need to do anything to migrate backwards, because
-        # we're not clearing out the original pointers.
-        #
-        # Well, it's not quite that simple.  A task could have its
-        # new_subtitle_version set to a new version that doesn't have
-        # a corresponding old version.  But there's really nothing sane we can
-        # do in that case anyway.
-        pass
+        
+        # Deleting field 'BillingRecord.new_subtitle_version'
+        db.delete_column('teams_billingrecord', 'new_subtitle_version_id')
 
+        # Deleting field 'BillingRecord.new_subtitle_language'
+        db.delete_column('teams_billingrecord', 'new_subtitle_language_id')
+
+        # Changing field 'BillingRecord.subtitle_language'
+        db.alter_column('teams_billingrecord', 'subtitle_language_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleLanguage']))
+
+        # Changing field 'BillingRecord.subtitle_version'
+        db.alter_column('teams_billingrecord', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion']))
+    
+    
     models = {
         'accountlinker.thirdpartyaccount': {
             'Meta': {'unique_together': "(('type', 'username'),)", 'object_name': 'ThirdPartyAccount'},
@@ -80,7 +81,7 @@ class Migration(DataMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 2, 12, 13, 33, 16, 30886)'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 3, 8, 14, 52, 16, 310532)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -88,7 +89,7 @@ class Migration(DataMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 2, 12, 13, 33, 16, 30781)'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 3, 8, 14, 52, 16, 310441)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -100,17 +101,6 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'subtitles.collaborator': {
-            'Meta': {'unique_together': "(('user', 'subtitle_language'),)", 'object_name': 'Collaborator'},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
-            'expiration_start': ('django.db.models.fields.DateTimeField', [], {}),
-            'expired': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'signoff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'signoff_is_official': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleLanguage']"}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"})
         },
         'subtitles.subtitlelanguage': {
             'Meta': {'unique_together': "[('video', 'language_code')]", 'object_name': 'SubtitleLanguage'},
@@ -124,6 +114,7 @@ class Migration(DataMigration):
             'pending_signoff_expired_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'pending_signoff_unexpired_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'subtitles_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'subtitles_fetched_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'unofficial_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'video': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'newsubtitlelanguage_set'", 'to': "orm['videos.Video']"}),
             'writelock_owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'writelocked_newlanguages'", 'null': 'True', 'to': "orm['auth.CustomUser']"}),
@@ -138,6 +129,7 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
             'note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
+            'origin': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
             'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),
             'rollback_of_version_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'serialized_lineage': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -150,15 +142,6 @@ class Migration(DataMigration):
             'visibility': ('django.db.models.fields.CharField', [], {'default': "'public'", 'max_length': '10'}),
             'visibility_override': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'})
         },
-        'subtitles.subtitleversionmetadata': {
-            'Meta': {'unique_together': "(('key', 'subtitle_version'),)", 'object_name': 'SubtitleVersionMetadata'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'data': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'key': ('django.db.models.fields.PositiveIntegerField', [], {}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'metadata'", 'to': "orm['subtitles.SubtitleVersion']"})
-        },
         'teams.application': {
             'Meta': {'unique_together': "(('team', 'user', 'status'),)", 'object_name': 'Application'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -169,6 +152,21 @@ class Migration(DataMigration):
             'status': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'team': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'applications'", 'to': "orm['teams.Team']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'team_applications'", 'to': "orm['auth.CustomUser']"})
+        },
+        'teams.billingrecord': {
+            'Meta': {'unique_together': "(('video', 'subtitle_language'),)", 'object_name': 'BillingRecord'},
+            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_original': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'minutes': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'new_subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleLanguage']", 'null': 'True', 'blank': 'True'}),
+            'new_subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
+            'source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']", 'null': 'True', 'blank': 'True'}),
+            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
+            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
+            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"}),
+            'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.Video']"})
         },
         'teams.billingreport': {
             'Meta': {'object_name': 'BillingReport'},
@@ -412,5 +410,5 @@ class Migration(DataMigration):
             'writelock_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True'})
         }
     }
-
-    complete_apps = ['subtitles', 'teams']
+    
+    complete_apps = ['teams']
