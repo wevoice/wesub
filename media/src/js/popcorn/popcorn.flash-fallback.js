@@ -100,9 +100,21 @@ var jQuery = window.AmarajQuery || null;
             clip.onStart(function () {
                 onPlay();
             });
-            clip.onMetaData(function () {
-                self.dispatchEvent("loadedmetadata");
-            });
+            // Popcorn needs this sequence of states to be set,
+            // then the events dispatched so it can hook up
+            // the listeners, don't touch this or bad things
+            // **will happen**.
+            impl.networkState = self.NETWORK_IDLE;
+            impl.readyState = self.HAVE_METADATA;
+            self.dispatchEvent( "loadedmetadata" );
+
+            self.dispatchEvent( "loadeddata" );
+
+            impl.readyState = self.HAVE_FUTURE_DATA;
+            self.dispatchEvent( "canplay" );
+
+            impl.readyState = self.HAVE_ENOUGH_DATA;
+            self.dispatchEvent( "canplaythrough" );
         }
 
         function onPlayerJSReady(event) {
