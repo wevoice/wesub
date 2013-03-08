@@ -375,3 +375,9 @@ class AccountTest(TestCase):
         self.assertTrue(new.startswith('Help us caption and translate'))
         self.assertFalse(new.endswith('Help us caption and translate'))
         self.assertEquals(1, new.count('Help us caption and translate'))
+
+        # And empty description
+        old = ''
+        new = add_amara_description_credit(old, url)
+
+        self.assertFalse(new == '')
