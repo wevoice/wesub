@@ -583,7 +583,9 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          */
 
         return (time >= this.startTime(node) &&
-                time <= this.endTime(node));
+                time <= this.endTime(node)) ||
+            (time >= this.startTime(node) &&
+                this.endTime(node) == -1);
     };
     this.markdownToDFXP = function(input) {
         /**
@@ -819,22 +821,10 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
          * Returns: true
          */
 
-        var $subtitles = this.getSubtitles();
-
-        for (var i = 0; i < $subtitles.length; i++) {
-
-            var $subtitle = $subtitles.eq(i);
-            var content = $('<div>').append($subtitle.contents().clone()).remove().html();
-
-            if (content === '') {
-                $subtitle.remove();
-            } else {
-                $subtitle.text('').attr({
-                    'begin': '',
-                    'end': ''
-                });
-            }
-        }
+        this.$xml = this.$originalXml.clone();
+        // Cache the first div.
+        this.$firstDiv = $('div:first-child', this.$xml);
+        return true;
     };
     this.startOfParagraph = function(node, startOfParagraph) {
         /*

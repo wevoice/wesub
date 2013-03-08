@@ -100,13 +100,6 @@ unisubs.CaptionManager.prototype.captionSetUpdate_ = function(event) {
 unisubs.CaptionManager.prototype.timeUpdate_ = function() {
     // players will emit playhead time in seconds
     // the rest of the system will use milliseconds
-    var subs = this.x['getSubtitles']();
-    var lastCaptionIndex = goog.array.binarySearch(subs,
-        this.videoPlayer_.getPlayheadTime()* 1000, this.binaryCompare_);
-    if (lastCaptionIndex < 0)
-        lastCaptionIndex = -lastCaptionIndex - 2;
-
-    this.currentCaptionIndex_ = lastCaptionIndex;
     this.sendEventsForPlayheadTime_(
 	this.videoPlayer_.getPlayheadTime() * 1000);
 };
