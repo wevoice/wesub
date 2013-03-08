@@ -550,6 +550,9 @@ unisubs.subtitle.Dialog.prototype.togglePause_ = function() {
 };
 unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
+    // make sure we clear the current displayed subtitle
+    this.captionManager_.onPanelChanged();
+
     if (this.state_ == s.TRANSCRIBE) {
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,

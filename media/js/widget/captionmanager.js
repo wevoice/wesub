@@ -35,6 +35,9 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
     this.binaryCompare_ = function(time, node) {
         return  time - that.x['startTime'](node);
     };
+    this.binaryCompareCaptions_ = function(time, caption) {
+        return  time - that.x['startTime'](caption.node);
+    };
     this.binaryCaptionCompare_ = function(c0, c1) {
         return that.x['startTime'](c0.node) - that.x['startTime'](c1.node);
     };
@@ -107,8 +110,7 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    var subs = this.x['getSubtitles']();
-    if (subs.length === 0)
+    if (this.captions_ === 0)
         return;
     if (this.currentCaptionIndex_ == -1 &&
         playheadTime < this.x['startTime'](this.x['getFirstSubtitle']()))
@@ -122,9 +124,9 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         return;
     }
 
-    var nextCaptionIndex =  this.currentCaptionIndex_ < subs.length -1 ?
+    var nextCaptionIndex =  this.currentCaptionIndex_ < this.captions_.length -1 ?
         this.currentCaptionIndex_ + 1 : null;
-    var nextCaption = this.currentCaptionIndex_ < subs.length - 1 ?
+    var nextCaption = this.currentCaptionIndex_ < this.captions_.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
     if (nextCaption != null &&
 	this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
@@ -147,11 +149,10 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
     function(playheadTime)
 {
-    var subs = this.x['getSubtitles']();
-    var lastCaptionIndex = goog.array.binarySearch(subs,
-        playheadTime, this.binaryCompare_);
+    var lastCaptionIndex = goog.array.binarySearch(this.captions_,
+        playheadTime, this.binaryCompareCaptions_);
     if (lastCaptionIndex < 0)
-        lastCaptionIndex = -lastCaptionIndex - subs.length -1;
+        lastCaptionIndex = -lastCaptionIndex - this.captions_ -1;
 
     this.currentCaptionIndex_ = lastCaptionIndex;
     if (lastCaptionIndex >= 0 &&
@@ -163,8 +164,8 @@ unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
     }
 };
 
-unisubs.CaptionManager.prototype.dispatchCaptionEvent_ = function(caption, index) {
-    if (caption == this.lastCaptionDispatched_)
+unisubs.CaptionManager.prototype.dispatchCaptionEvent_ = function(caption, index, forceEvent) {
+    if (caption == this.lastCaptionDispatched_ && !forceEvent)
         return;
     if (this.eventsDisabled_)
         return;
@@ -172,6 +173,15 @@ unisubs.CaptionManager.prototype.dispatchCaptionEvent_ = function(caption, index
     this.dispatchEvent(new unisubs.CaptionManager.CaptionEvent(caption, index));
 };
 
+/**
+ * When we switch panels, we should clear the currently displayed sub
+ */
+unisubs.CaptionManager.prototype.onPanelChanged = function() {
+    this.currentCaptionIndex_ = -1;
+    this.lastCaptionDispatched_ = null;
+    this.dispatchCaptionEvent_(null, null, true)
+
+}
 unisubs.CaptionManager.prototype.disposeInternal = function() {
     unisubs.CaptionManager.superClass_.disposeInternal.call(this);
     this.eventHandler_.dispose();
