@@ -1188,14 +1188,13 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(), HTMLGenerator.MAPPINGS)
-
-
+        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(),
+                                   HTMLGenerator.MAPPINGS)
 
         self._text_change = diff_data['text_changed']
         self._time_change = diff_data['time_changed']
 
-        return  self._time_change, self._text_change
+        return self._time_change, self._text_change
 
     @property
     def time_change(self):

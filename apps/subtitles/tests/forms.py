@@ -22,8 +22,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from babelsubs.storage import SubtitleSet
-
 from apps.auth.models import CustomUser as User
 from apps.subtitles.forms import SubtitlesUploadForm
 from apps.subtitles.tests.utils import (
@@ -45,7 +43,8 @@ class SubtitleUploadFormTest(TestCase):
         # we try to upload French from English, should fail
         en_version = self.en.add_version(subtitles=make_subtitle_set('en'))
         de_version = self.de.add_version(subtitles=make_subtitle_set('ge'))
-        fr_version = self.fr.add_version(subtitles=make_subtitle_set('fr'), parents=[de_version])
+        fr_version = self.fr.add_version(subtitles=make_subtitle_set('fr'),
+                                         parents=[de_version])
 
         self.fr = refresh(self.fr)
         self.assertEqual(self.fr.subtitleversion_set.full().count(), 1)
@@ -53,5 +52,6 @@ class SubtitleUploadFormTest(TestCase):
         f = SubtitlesUploadForm(self.user, self.video)
         self.assertRaises(ValidationError, f._verify_no_translation_conflict, self.fr, 'en')
 
-
+        # Shut up, Pyflakes.
+        assert en_version and de_version and fr_version
 

@@ -447,15 +447,19 @@ class TestSubtitleVersion(TestCase):
         sv2 = add_subtitles(self.video, 'en', subtitles_2)
         sv3 = add_subtitles(self.video, 'en', subtitles_3)
         sv4 = add_subtitles(self.video, 'en', subtitles_4)
-        assert sv4 # Shut up, Pyflakes.
 
         self.assertEquals((1.0, 1.0), sv1.get_changes())
         # 50% of text and 50% of timing is new
         self.assertEquals((0.5, 0.5), sv2.get_changes())
         self.assertEquals((0.0, 0.5), sv3.get_changes())
+        self.assertEquals((0.5, 0.0), sv4.get_changes())
 
-        # TODO: This will break.
-        # self.assertEquals((0.5, 0.0), sv4.get_changes())
+        # Deleting versions should make their children diff against the
+        # still-remaining ones instead of the deleted ones.
+        sv2.visibility_override = 'deleted'
+        sv2.save()
+        sv3 = refresh(sv3)
+        self.assertEquals((0.5, 1.0), sv3.get_changes())
 
     def test_subtitle_count(self):
         s0 = (100, 200, "a")
@@ -1713,6 +1717,11 @@ class TestTeamInteractions(TestCase):
                                           visibility=visibility,
                                           visibility_override=visibility_override)
 
+        def _del(sl, version_number):
+            sv = sl.subtitleversion_set.full().get(version_number=version_number)
+            sv.visibility_override = 'deleted'
+            sv.save()
+
 
         # Alias stuff.
         u1, u2, up = self.user1, self.user2, self.user_public
@@ -1770,6 +1779,30 @@ class TestTeamInteractions(TestCase):
         self.assertEqual(_get_versions(fr2, u1), [1, 5, 6])
         self.assertEqual(_get_versions(fr2, u2), [1, 2, 3, 4, 5, 6])
         self.assertEqual(_get_versions(fr2, up), [1, 5, 6])
+
+        # Deleted versions should never be seen by anyone!
+        _del(enp, 2)
+        _del(enp, 6)
+
+        self.assertEqual(_get_versions(enp, u1), [1, 3, 4, 5])
+        self.assertEqual(_get_versions(enp, u2), [1, 3, 4, 5])
+        self.assertEqual(_get_versions(enp, up), [1, 3, 4, 5])
+
+        _del(en1, 1)
+        _del(en1, 2)
+
+        self.assertEqual(_get_versions(en1, u1), [3, 4, 5, 6])
+        self.assertEqual(_get_versions(en1, u2), [5, 6])
+        self.assertEqual(_get_versions(en1, up), [5, 6])
+
+        _del(fr2, 1)
+        _del(fr2, 4)
+        _del(fr2, 5)
+        _del(fr2, 6)
+
+        self.assertEqual(_get_versions(fr2, u1), [])
+        self.assertEqual(_get_versions(fr2, u2), [2, 3])
+        self.assertEqual(_get_versions(fr2, up), [])
 
 
 class TestSubtitleMetadata(TestCase):
