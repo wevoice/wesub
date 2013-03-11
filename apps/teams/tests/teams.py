@@ -1554,7 +1554,7 @@ class BillingTest(TestCase):
 
         self.assertEquals(0, BillingRecord.objects.count())
 
-        sub_models.SubtitleVersion.objects.all().delete()
+        sub_models.SubtitleVersion.objects.full().delete()
         sub_models.SubtitleLanguage.objects.all().delete()
 
         subs = [
@@ -1578,7 +1578,7 @@ class BillingTest(TestCase):
 
         self.assertEquals(0, BillingRecord.objects.count())
 
-        sub_models.SubtitleVersion.objects.all().delete()
+        sub_models.SubtitleVersion.objects.full().delete()
         sub_models.SubtitleLanguage.objects.all().delete()
 
         subs = [
@@ -1614,7 +1614,7 @@ class BillingTest(TestCase):
 
         self.assertEquals(0, BillingRecord.objects.count())
 
-        sub_models.SubtitleVersion.objects.all().delete()
+        sub_models.SubtitleVersion.objects.full().delete()
         sub_models.SubtitleLanguage.objects.all().delete()
 
         subs = [
