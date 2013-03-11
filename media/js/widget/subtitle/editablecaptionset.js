@@ -102,11 +102,26 @@ unisubs.subtitle.EditableCaptionSet.prototype.needsTranslation = function() {
     return this.x['needsAnyTranscribed']();
 };
 unisubs.subtitle.EditableCaptionSet.prototype.resetSubs = function() {
-
+    var that = this;
     this.x['resetSubtitles']();
+    var caption;
+    var newCaptions = [];
+    // since subtitles might have been removed, we need to recreate
+    // the entire captions_ array, and be sure we have the right
+    // xml node and prev and nex set for each of them.
     goog.array.forEach(this.x['getSubtitles'](), function(node, i) {
-            this.captions_[i].node = node;
+            caption = that.captions_[i];
+            if (!caption){
+                caption = new unisubs.subtitle.EditableCaption(node, that.x);
+                caption.setParentEventTarget(that);
+            }else{
+                that.captions_[i].node = node;
+
+            }
+            newCaptions[i] = caption;
     }, this);
+    this.captions_ = newCaptions;
+    this.setPreviousAndNextCaptions();
     this.dispatchEvent(
         unisubs.subtitle.EditableCaptionSet.EventType.RESET_SUBS);
 };
