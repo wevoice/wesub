@@ -760,9 +760,9 @@ def detail_members(request, slug, role=None):
             qs = qs.filter(role=role)
 
     if sort == 'joined':
-        qs.order_by('created')
+        qs = qs.order_by('created')
     elif sort == '-joined':
-        qs.order_by('-created')
+        qs = qs.order_by('-created')
 
     extra_context = widget.add_onsite_js_files({})
     extra_context['filtered'] = filtered
