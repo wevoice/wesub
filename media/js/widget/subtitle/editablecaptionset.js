@@ -155,7 +155,7 @@ unisubs.subtitle.EditableCaptionSet.prototype.identicalTo = function(otherCaptio
 };
 unisubs.subtitle.EditableCaptionSet.prototype.addNewDependentSubtitle = function(originalNode, dfxpWrapper, atIndex) {
     var $newNode = dfxpWrapper['cloneSubtitle'](originalNode,false);
-    var c = this.insertCaption(atIndex, $newNode.get(0));
+    var c = this.insertCaption(atIndex, $newNode['get'](0));
     return c;
 };
 
