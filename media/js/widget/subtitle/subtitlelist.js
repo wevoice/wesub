@@ -193,6 +193,7 @@ unisubs.subtitle.SubtitleList.prototype.captionInserted_ = function(e) {
     }
     goog.array.insertAt(this.subtitleList_, subtitleWidget, addedCaption.getCaptionIndex());
     subtitleWidget.switchToEditMode();
+    this.updateAllStartTimes();
 };
 unisubs.subtitle.SubtitleList.prototype.setLastSub_ = function() {
     var subWidget = null;
@@ -277,6 +278,11 @@ unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing,
             this.videoPlayer_.playWithNoUpdateEvents(subStartTime, 2);
         }
     }
+};
+unisubs.subtitle.SubtitleList.prototype.updateAllStartTimes = function() {
+    goog.array.forEach(this.subtitleList_, function(w) {
+        goog.dom.setTextContent(w.timeElement_, unisubs.formatTime(w.originalNode_.getStartTime()));
+    });
 };
 unisubs.subtitle.SubtitleList.prototype.isCurrentlyEditing = function() {
     return this.currentlyEditing_;
