@@ -102,7 +102,7 @@
 
             var parser = subtitle.parser;
 
-            var text = subtitle.parser.content(subtitle.subtitle);
+            var text = subtitle.parser.markdownToHTML(AmarajQuery(subtitle.subtitle).text());
             var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
             var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
 
