@@ -136,16 +136,23 @@ unisubs.widget.PlayController.prototype.getSubMap = function() {
 
 unisubs.widget.PlayController.prototype.trackPlay_ = function() {
     var videoURL = this.videoSource_.getVideoURL();
-    if (!this.trackedURLs_.contains(videoURL)) {
-        this.trackedURLs_.add(videoURL);
-        unisubs.Tracker.getInstance().trackEvent(
-            "Subs Played",
-            window.location.href,
-            videoURL);
-        unisubs.Rpc.call(
-            'track_subtitle_play',
-            { 'video_id': this.videoID_ });
+    try{
+        if (!this.trackedURLs_.contains(videoURL)) {
+            this.trackedURLs_.add(videoURL);
+            unisubs.Tracker.getInstance().trackEvent(
+                "Subs Played",
+                window.location.href,
+                videoURL);
+            unisubs.Rpc.call(
+                'track_subtitle_play',
+                { 'video_id': this.videoID_ });
+        }
+    }catch(e){
+        if (console && console.log){
+            console.error("Could not track video", e.stack);
+        }
     }
+
 };
 
 unisubs.widget.PlayController.prototype.languageSelected = function(videoLanguage) {
