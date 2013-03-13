@@ -214,6 +214,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     from videos.models import Video
     from videos.tasks import video_changed_tasks
     from subtitles.pipeline import add_subtitles
+    from subtitles.models import ORIGIN_IMPORTED
 
     yt_lc = lang.get('lang_code')
 
@@ -255,7 +256,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     xml = force_unicode(xml, 'utf-8')
 
     subs = babelsubs.parsers.discover('youtube').parse(xml).to_internal()
-    add_subtitles(video, lc, subs, note="From youtube")
+    add_subtitles(video, lc, subs, note="From youtube", complete=True, origin=ORIGIN_IMPORTED)
 
     video_changed_tasks.delay(video.pk)
 
