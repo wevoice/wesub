@@ -19,7 +19,6 @@ import logging
 import random
 
 import babelsubs
-from django.db import transaction
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -38,7 +37,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import iri_to_uri, force_unicode
 from django.views.generic.list_detail import object_list
 
-import teams.moderation_const as MODERATION
 import widget
 from apps.auth.models import UserLanguage, CustomUser as User
 from apps.videos.templatetags.paginator import paginate
@@ -87,7 +85,6 @@ from videos.tasks import (
     delete_captions_in_original_service_by_code
 )
 from videos.models import Action, VideoUrl, SubtitleLanguage, Video
-from apps.subtitles import models as sub_models
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 from raven.contrib.django.models import client
@@ -1172,7 +1169,6 @@ def _get_task_filters(request):
              'q': request.GET.get('q'), }
 
 def _cache_video_url(tasks):
-    team_video_pks = [t.team_video_id for t in tasks]
     video_pks = [t.team_video.video_id for t in tasks]
 
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
