@@ -73,7 +73,7 @@ $CodePro: 'CodeProLC', $OpenSans;
     content: "";
     display: block;
     height: 40px;
-    right: 15px;
+    right: 16px;
     position: absolute;
     width: 95%;
     z-index: 51;
@@ -569,6 +569,7 @@ section.main {
                 cursor: pointer;
                 display: block;
                 float: left;
+                height: 29px;
                 margin: 0;
                 padding: 8px 10px;
                 position: relative;
