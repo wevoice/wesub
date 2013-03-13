@@ -35,7 +35,7 @@ from apps.teams.permissions import (
 from apps.teams.permissions_const import ROLE_NAMES
 from apps.videos.forms import AddFromFeedForm
 from apps.videos.models import (
-        VideoMetadata, VIDEO_META_TYPE_IDS, SubtitleVersion, Video
+        VideoMetadata, VIDEO_META_TYPE_IDS, Video
 )
 from apps.videos.search_indexes import VideoIndex
 from apps.subtitles import models

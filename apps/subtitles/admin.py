@@ -112,6 +112,12 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     search_fields = ['video__video_id', 'video__title', 'title',
                      'language_code', 'description', 'note']
 
+    # Unfortunately Django uses .all() on related managers instead of
+    # .get_query_set().  We've disabled .all() on SubtitleVersion managers so we
+    # can't let Django do this.  This means we can't edit parents in the admin,
+    # but you should never be doing that anyway.
+    exclude = ['parents', 'serialized_subtitles']
+
     # don't allow deletion
     actions = []
 
