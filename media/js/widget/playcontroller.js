@@ -61,6 +61,7 @@ unisubs.widget.PlayController.LANGUAGE_CHANGED = 'languagechanged';
 unisubs.widget.PlayController.prototype.setSubtitleController =
     function(subController)
 {
+    console.log("this setting controller", subController)
     this.subtitleController_ = subController;
 };
 
@@ -186,10 +187,15 @@ unisubs.widget.PlayController.prototype.finished_ = function() {
 
     var message = !!this.subtitleState_.LANGUAGE ?
         "Improve this Translation" : "Improve these Subtitles";
-    this.videoTab_.updateNudge(
-        message,
-        goog.bind(this.subtitleController_.improveSubtitles,
+    if(this.subtitleController_){
+
+        this.videoTab_.updateNudge(
+            message,
+            goog.bind(this.subtitleController_.improveSubtitles,
                   this.subtitleController_));
+    }else if (console && console.log){
+        console.log("no subtitleController on playcontroller");
+    }
 
     this.videoTab_.showNudge(true);
     this.nudgeShown_ = true;
