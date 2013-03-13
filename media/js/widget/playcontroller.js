@@ -32,6 +32,7 @@ unisubs.widget.PlayController = function(
     this.videoTab_ = videoTab;
     this.dropDown_ = dropDown;
     this.isModerated_ = isModerated;
+    this.trackedURLs_ = new goog.structs.Set();
     if (opt_subtitleState)
         this.setUpSubs_(opt_subtitleState);
     this.menuEventHandler_ = new goog.events.EventHandler(this);
@@ -51,7 +52,6 @@ unisubs.widget.PlayController = function(
      * the cost of many calls to a dom changing function
      */
     this.nudgeShown_ = false;
-    this.trackedURLs_ = new goog.structs.Set();
 };
 
 goog.inherits(unisubs.widget.PlayController, goog.events.EventTarget);
