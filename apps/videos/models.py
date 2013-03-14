@@ -1182,7 +1182,7 @@ class ActionRenderer(object):
         return render_to_string(self.template_name, context)
 
     def _base_kwargs(self, item):
-        data = {}
+        data = {'language_url': ''}
         # deleted videos event have no video obj
         if item.video:
             data['video_url']= item.video.get_absolute_url()
