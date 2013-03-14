@@ -889,10 +889,10 @@ class Rpc(BaseRpc):
                     assignee=assignee, language=lang, type=type)
 
         task.set_expiration()
-        task.subtitle_version = subtitle_version
+        task.new_subtitle_version = subtitle_version
 
         if task.get_type_display() in ['Review', 'Approve']:
-            task.review_base_version = subtitle_version
+            task.new_review_base_version = subtitle_version
 
         task.save()
         
