@@ -681,8 +681,8 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     if version:
         version_url = universal_url("videos:subtitleversion_detail", kwargs={
             'video_id': version.video.video_id,
-            'lang': version.language.language_code,
-            'lang_id': version.language.pk,
+            'lang': version.subtitle_language.language_code,
+            'lang_id': version.subtitle_language.pk,
             'version_id': version.pk,
         })
     else:

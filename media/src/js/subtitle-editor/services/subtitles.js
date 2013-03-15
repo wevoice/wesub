@@ -63,7 +63,7 @@ var angular = angular || null;
                     headers: authHeaders,
                     data:  {
                         complete: true,
-                        notes: notes,
+                        body: notes,
                         version_number: response.data.version_number
                     }
                 });
