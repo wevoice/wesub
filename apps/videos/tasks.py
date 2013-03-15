@@ -479,7 +479,11 @@ def sync_latest_versions_for_video(video_pk):
     video = Video.objects.get(pk=video_pk)
 
     for lang in video.subtitlelanguage_set.all():
-        latest = lang.latest_version()
+        # use full, as the final mirror_to_third party will
+        # take care of checking if this version *should* be uplaoded
+        # Else, we'll re-sync the last public version when new
+        # drafts are saved
+        latest = lang.get_tip(full=True)
         upload_subtitles_to_original_service.delay(latest.pk)
 
 @task
