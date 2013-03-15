@@ -1188,7 +1188,7 @@ class ActionRenderer(object):
             data['video_url']= item.video.get_absolute_url()
             data['video_name'] = unicode(item.video)
         if item.new_language:
-            data['language'] = item.new_language.get_language_code_display()
+            data['new_language'] = item.new_language.get_language_code_display()
             data['language_url'] = item.new_language.get_absolute_url()
         if item.user:
             data["user_url"] = reverse("profiles:profile", kwargs={"user_id":item.user.id})
