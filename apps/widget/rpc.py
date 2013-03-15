@@ -1035,7 +1035,7 @@ class Rpc(BaseRpc):
             base_subtitle_language = language.video.subtitle_language(base_language_code)
 
             if base_language_code:
-                kwargs['parents'] = [base_subtitle_language.get_tip()]
+                kwargs['parents'] = [base_subtitle_language.get_tip(full=True)]
 
         version = pipeline.add_subtitles(**kwargs)
 
