@@ -44,6 +44,7 @@ from videos.feed_parser import FeedParser
 from comments.models import Comment
 from statistic import st_widget_view_statistic
 from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
+from subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
@@ -589,7 +590,7 @@ class Video(models.Model):
 
     def subtitle_languages(self, language_code):
         """Return all SubtitleLanguages for this video with the given language code."""
-        return self.subtitlelanguage_set.filter(language=language_code)
+        return self.newsubtitlelanguage_set.filter(language_code=language_code)
 
     def version(self, version_number=None, language=None, public_only=True):
         """Return the SubtitleVersion for this video matching the given criteria.
@@ -657,8 +658,8 @@ class Video(models.Model):
     def translation_language_codes(self):
         """All iso language codes with finished translations."""
         return set([sl.language for sl
-                    in self.subtitlelanguage_set.filter(
-                    is_complete=True).filter(is_original=False)])
+                    in self.newsubtitlelanguage_set.filter(
+                    subtitles_complete=True).filter(is_forked=False)])
 
     @property
     def writelock_owner_name(self):
@@ -711,7 +712,7 @@ class Video(models.Model):
 
     def notification_list_all(self, exclude=None):
         users = []
-        for language in self.subtitlelanguage_set.all():
+        for language in self.newsubtitlelanguage_set.all():
             for u in language.notification_list(exclude):
                 if not u in users:
                     users.append(u)
@@ -722,13 +723,13 @@ class Video(models.Model):
 
     def subtitle_language_dict(self):
         langs = {}
-        for sl in self.subtitlelanguage_set.all():
+        for sl in self.newsubtitlelanguage_set.all():
             if not sl.language:
                 continue
             if sl.language in langs:
-                langs[sl.language].append(sl)
+                langs[sl.language_code].append(sl)
             else:
-                langs[sl.language] = [sl]
+                langs[sl.language_code] = [sl]
         return langs
 
     @property
@@ -1197,27 +1198,27 @@ class ActionRenderer(object):
 
     def render_REVIEW_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  reviewed <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = _('  reviewed <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_ACCEPT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  accepted <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = _('  accepted <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_REJECT_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  rejected <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = _('  rejected <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_APPROVE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  approved <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = _('  approved <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_DECLINE_VERSION(self, item):
         kwargs = self._base_kwargs(item)
-        msg = _('  declined <a href="%(language_url)s">%(language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
+        msg = _('  declined <a href="%(language_url)s">%(new_language)s</a> subtitles for <a href="%(video_url)s">%(video_name)s</a>') % kwargs
         return msg
 
     def render_DELETE_VIDEO(self, item):
@@ -1252,9 +1253,9 @@ class ActionRenderer(object):
 
         if item.new_language:
             if item.user:
-                msg = _(u'commented on <a href="%(comments_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
+                msg = _(u'commented on <a href="%(comments_url)s">%(new_language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
             else:
-                msg = _(u'Comment added for <a href="%(comments_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
+                msg = _(u'Comment added for <a href="%(comments_url)s">%(new_language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
         else:
             if item.user:
                 msg = _(u'commented on <a href="%(video_url)s">%(video_name)s</a>')
@@ -1267,9 +1268,9 @@ class ActionRenderer(object):
         kwargs = self._base_kwargs(item)
 
         if item.user:
-            msg = _(u'started <a href="%(language_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
+            msg = _(u'started <a href="%(language_url)s">%(new_language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
         else:
-            msg = _(u'<a href="%(language_url)s">%(language)s subtitles</a> started for <a href="%(video_url)s">%(video_name)s</a>')
+            msg = _(u'<a href="%(language_url)s">%(new_language)s subtitles</a> started for <a href="%(video_url)s">%(video_name)s</a>')
 
         return msg % kwargs
 
@@ -1277,9 +1278,9 @@ class ActionRenderer(object):
         kwargs = self._base_kwargs(item)
 
         if item.user:
-            msg = _(u'edited <a href="%(language_url)s">%(language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
+            msg = _(u'edited <a href="%(language_url)s">%(new_language)s subtitles</a> for <a href="%(video_url)s">%(video_name)s</a>')
         else:
-            msg = _(u'<a href="%(language_url)s">%(language)s subtitles</a> edited for <a href="%(video_url)s">%(video_name)s</a>')
+            msg = _(u'<a href="%(language_url)s">%(new_language)s subtitles</a> edited for <a href="%(video_url)s">%(video_name)s</a>')
 
         return msg % kwargs
 
@@ -1517,8 +1518,8 @@ class Action(models.Model):
             obj.action_type = cls.COMMENT
             if issubclass(model_class, Video):
                 obj.video_id = instance.object_pk
-            if issubclass(model_class, SubtitleLanguage):
-                obj.language_id = instance.object_pk
+            if issubclass(model_class, NewSubtitleLanguage):
+                obj.new_language_id = instance.object_pk
                 obj.video = instance.content_object.video
             obj.save()
 
@@ -1585,7 +1586,7 @@ class Action(models.Model):
     @classmethod
     def create_reviewed_video_handler(cls, version, moderator,  **kwargs):
         obj = cls(video=version.video)
-        obj.language = version.language
+        obj.new_language = version.language
         obj.user = moderator
         obj.action_type = cls.REVIEW_VERSION
         obj.created = datetime.now()
