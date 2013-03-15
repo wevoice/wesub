@@ -143,7 +143,7 @@ class SubtitlesUploadForm(forms.Form):
                                                  language_code):
         tasks = team_video.task_set.incomplete_review_or_approve().filter(
             language=language_code
-        )
+        ).exclude(assignee=self.user).exclude(assignee__isnull=True)
 
         if tasks.exists():
             raise forms.ValidationError(_(
