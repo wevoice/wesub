@@ -1511,14 +1511,15 @@ def delete_task(request, slug):
         video = task.team_video.video
         task.deleted = True
 
-        if task.subtitle_version:
+        if task.new_subtitle_version:
             if form.cleaned_data['discard_subs']:
-                _delete_subtitle_version(task.subtitle_version)
+                _delete_subtitle_version(task.new_subtitle_version)
                 task.subtitle_version = None
+                task.new_subtitle_version = None
 
             if task.get_type_display() in ['Review', 'Approve']:
                 # TODO: Handle subtitle/translate tasks here too?
-                if not form.cleaned_data['discard_subs'] and task.subtitle_version:
+                if not form.cleaned_data['discard_subs'] and task.new_subtitle_version:
                     task.new_subtitle_version.visibility_override = 'public'
                     task.new_subtitle_version.save()
                     metadata_manager.update_metadata(video.pk)
