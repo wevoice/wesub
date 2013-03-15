@@ -44,7 +44,6 @@ from videos.feed_parser import FeedParser
 from comments.models import Comment
 from statistic import st_widget_view_statistic
 from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
-from subtitles.models import SubtitleLanguage as NewSubtitleLanguage
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
@@ -1511,6 +1510,7 @@ class Action(models.Model):
     @classmethod
     def create_comment_handler(cls, sender, instance, created, **kwargs):
         if created:
+            from subtitles.models import SubtitleLanguage as NewSubtitleLanguage
             model_class = instance.content_type.model_class()
             obj = cls(user=instance.user)
             obj.comment = instance
