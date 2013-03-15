@@ -70,6 +70,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             self.__class__.create_browser(self.shortDescription())
         
     def tearDown(self):
+        #self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.use_sauce:
             self.logger.info("Link to the job: https://saucelabs.com/jobs/%s"
                              % self.browser.session_id)
@@ -87,7 +88,7 @@ class WebdriverTestCase(LiveServerTestCase, TestCase):
             cls.sauce_user = os.environ.get('SAUCE_USER_NAME')
             test_browser = os.environ.get('SELENIUM_BROWSER', 'Firefox').upper()
             dc = getattr(webdriver.DesiredCapabilities, test_browser)
-
+            dc['selenium-version']: '2.28.0'
             dc['version'] = os.environ.get('SELENIUM_VERSION', '')
             dc['platform'] = os.environ.get('SELENIUM_PLATFORM', 'WINDOWS 2008')
             dc['name'] = suite_or_test 
