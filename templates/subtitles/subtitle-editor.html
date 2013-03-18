@@ -108,14 +108,24 @@
                 Amara editor preview. <a href="#" target="blank">Learn more or leave feedback</a>.
             </div>
             <div class="language-selections group" ng-controller="LanguageSelectorController">
-                <select name="language"
-                        ng-model="language"
-                        ng-options="item.name for item in languages">
-                </select>
-                <select name="version"
-                    ng-options="'Version ' + version.version_no for version in versions"
-                    ng-model="version">
-                </select>
+                <div class="select">
+                    <select name="language"
+                            ng-model="language"
+                            ng-options="item.name for item in languages">
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="version"
+                        ng-options="'Version ' + version.version_no for version in versions"
+                        ng-model="version">
+                    </select>
+                </div>
+                <div class="select">
+                    <select name="version"
+                        ng-options="'Version ' + version.version_no for version in versions"
+                        ng-model="version">
+                    </select>
+                </div>
             </div>
             <div class="subtitles-wrapper">
                 <div class="reference subtitles" ng-controller="SubtitleListController">
