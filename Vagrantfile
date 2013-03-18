@@ -23,10 +23,8 @@ Vagrant::Config.run do |config|
 end
 
 Vagrant.configure("1") do |config|
-  config.vm.provider :virtualbox do |vb|
-    vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/unisubs", "1"]
-    vb.customize ["modifyvm", :id, "--memory", 1024]
-  end
+    config.vm.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/unisubs", "1"]
+    config.vm.customize ["modifyvm", :id, "--memory", 1024]
 end
 
 Vagrant.configure("2") do |config|
