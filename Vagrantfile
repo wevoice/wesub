@@ -22,6 +22,13 @@ Vagrant::Config.run do |config|
   end
 end
 
+Vagrant.configure("1") do |config|
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/unisubs", "1"]
+    vb.customize ["modifyvm", :id, "--memory", 1024]
+  end
+end
+
 Vagrant.configure("2") do |config|
   #config.vm.synced_folder "./puppet", "/tmp/puppet"
   #config.vm.synced_folder ".", "/opt/apps/vagrant/unisubs"
