@@ -562,24 +562,33 @@ section.main {
             &:before {
                 @include shadow;
             }
-            select {
+            div.select {
                 background: transparent url('../../../images/down-arrow-offset.png') center right no-repeat;
-                border: 0;
                 border-right: 1px solid #DADBDC;
-                cursor: pointer;
-                display: block;
                 float: left;
-                height: 29px;
-                margin: 0;
-                padding: 8px 10px;
+                overflow: hidden;
+                padding: 7px 10px;
                 position: relative;
-                text-indent: 0;
                 width: 33%;
-                -webkit-appearance: none;
-                @include border-radius(0);
 
-                &:focus {
-                    outline: none;
+                select {
+                    background: transparent;
+                    border: 0;
+                    cursor: pointer;
+                    height: 15px;
+                    margin: 0;
+                    overflow: hidden;
+                    width: 140%;
+                    text-indent: 0;
+                    -webkit-appearance: none;
+                    @include border-radius(0);
+
+                    &:focus {
+                        outline: none;
+                    }
+                }
+                &:last-of-type {
+                    border-right: 0;
                 }
             }
         }
