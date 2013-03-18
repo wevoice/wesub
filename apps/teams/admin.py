@@ -72,7 +72,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 class TeamMemberAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'team__name', 'user__first_name', 'user__last_name')
-    list_display = ('role', 'team_link', 'user_link')
+    list_display = ('role', 'team_link', 'user_link', 'created',)
     raw_id_fields = ('user', 'team')
 
     def team_link(self, obj):

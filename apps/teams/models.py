@@ -934,6 +934,8 @@ class TeamMember(models.Model):
     team = models.ForeignKey(Team, related_name='members')
     user = models.ForeignKey(User, related_name='team_members')
     role = models.CharField(max_length=16, default=ROLE_CONTRIBUTOR, choices=ROLES, db_index=True)
+    created = models.DateTimeField(default=datetime.datetime.now, null=True,
+            blank=True)
 
     objects = TeamMemberManager()
 
