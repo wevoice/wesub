@@ -406,3 +406,7 @@ unisubs.translate.Dialog.prototype.captionReached_ = function(event) {
 
     this.getVideoPlayerInternal().showCaptionText(caption);
 };
+
+unisubs.translate.Dialog.prototype.makeDFXPString =  function (){
+    return this.serverModel_.captionSet_.x['xmlToString'](true, true)
+};
