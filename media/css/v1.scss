@@ -608,7 +608,7 @@ div.fix-chosen div.chzn-container {
                 padding: .25em 0;
 
                 &:after {
-                    content: ' →';
+                    content: ' &raquo;';
                 }
             }
         }
@@ -975,7 +975,7 @@ p.view-more {
         text-decoration: none;
 
         &:after {
-            content: ' →';
+            content: ' &raquo;';
         }
     }
 }

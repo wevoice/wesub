@@ -400,7 +400,18 @@
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">
             <li>
-                <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit Subtitles' %}</a>
+                <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit These Subtitles' %}</a>
+            </li>
+            <li>
+                <div class="admin-edit-specific-version">
+                    Edit:
+                    <select name="admin-edit-specific-version">
+                        <option value="">-- Select version --</option>
+                        {% for version in revision_list %}
+                            <option value="#">Version #{{ version.version_number }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </li>
         </ul>
     {% endif %}
