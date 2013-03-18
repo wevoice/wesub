@@ -2070,7 +2070,7 @@ class Task(models.Model):
 
         sv = self.get_subtitle_version()
 
-        if not sv:
+        if not sv or sv.subtitle_language.is_forked:
             return False
 
         source_language = sv.subtitle_language.get_translation_source_language()
