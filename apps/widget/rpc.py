@@ -54,7 +54,7 @@ from libs.bulkops import insert_many
 from functools import partial
 from apps.subtitles import pipeline
 from apps.subtitles.models import ORIGIN_LEGACY_EDITOR
-from babelsubs.storage import SubtitleSet
+from babelsubs.storage import SubtitleSet, diff
 
 
 yt_logger = logging.getLogger("youtube-ei-error")
@@ -725,10 +725,14 @@ class Rpc(BaseRpc):
         if subtitle_set:
             subs_length = len(subtitle_set)
 
-        subtitles_changed = (
-            subtitles is not None
-            and subs_length > 0 or previous_version is not None
-        )
+        # subtitles have changed if only one of the version is empty
+        # or if the versions themselves differ
+        if not previous_version and not subtitle_set:
+            subtitles_changed = False
+        elif not previous_version or not subtitle_set:
+            subtitles_changed = True
+        else:
+            subtitles_changed = diff(previous_version.get_subtitles(), subtitle_set)['changed']
 
         should_create_new_version = (
             subtitles_changed or title_changed or desc_changed)

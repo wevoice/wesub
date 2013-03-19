@@ -1152,13 +1152,13 @@ class TestLineageOnRPC(TestCase):
         self.assertEquals(en_v1.lineage, dict())
 
         # create en-v2 with a changed timming
-        en_v2_sset = create_subtitle_set()
+        en_v2_sset = create_subtitle_set(5)
         self._edit_and_save(self.video, 'en', en_v2_sset)
         en_v2 = en.subtitleversion_set.full().get(version_number=2)
         self.assertEquals(en_v2.lineage, {'en':1})
 
         # create ge-v1 from en-v2
-        de_v1_sset = create_subtitle_set()
+        de_v1_sset = create_subtitle_set(3)
         self._edit_and_save(self.video, 'de', de_v1_sset, 'en')
         de = self.video.newsubtitlelanguage_set.get(language_code='de')
         de_v1 = de.subtitleversion_set.full().get(version_number=1)
