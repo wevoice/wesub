@@ -108,8 +108,10 @@ def _check_team_video_locking(user, video, language_code, task_id=None):
 
     language = video.subtitle_language(language_code)
 
-    if (language and language.is_complete_and_synced()
+    # check if this a post publish editing
+    if (language and language.is_complete_and_synced(True)
                  and team.moderates_videos()
+                 and language.get_tip(public=False).is_public()
                  and not can_post_edit_subtitles(team, user)):
         return _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator."), None
 
