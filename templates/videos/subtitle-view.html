@@ -408,7 +408,7 @@
                     <select name="admin-edit-specific-version">
                         <option value="">-- Select version --</option>
                         {% for version in revision_list %}
-                            <option value="#">Version #{{ version.version_number }}</option>
+                            <option value="{% url admin:subtitles_subtitleversion_change version.pk %}">Version #{{ version.version_number }}</option>
                         {% endfor %}
                     </select>
                 </div>
