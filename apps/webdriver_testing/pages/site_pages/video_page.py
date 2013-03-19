@@ -85,10 +85,10 @@ class VideoPage(UnisubsPage):
         self.select_option_by_text(self._SELECT_LANGUAGE, sub_lang)
         #Set the audio language
         if audio_lang:
-            self.select_option_by_text(self._PRIMARY_AUDIO)
+            self.select_option_by_text(self._PRIMARY_AUDIO, audio_lang)
         #Set the translation_from field
         if translated_from:
-            self.select_option_by_text(self._TRANSLATED_FROM)
+            self.select_option_by_text(self._TRANSLATED_FROM, translated_from)
         #Input the subtitle file
         self.type_by_css(self._SUBTITLES_FILE, sub_file)
         #Set complete
@@ -98,7 +98,7 @@ class VideoPage(UnisubsPage):
         self.wait_for_element_present(self._UPLOAD_SUBMIT)
         self.click_by_css(self._UPLOAD_SUBMIT)
         #Get the the response message
-        self.wait_for_element_present(self._FEEDBACK_MESSAGE)
+        self.wait_for_element_present(self._FEEDBACK_MESSAGE, wait_time=10)
         message_text = self.get_text_by_css(self._FEEDBACK_MESSAGE)
         #Close the dialog
         self.click_by_css(self._CLOSE)

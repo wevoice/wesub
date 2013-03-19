@@ -134,6 +134,7 @@ class DataHelpers(object):
         else:
             c.login(**self.super_user())
         response = c.post(reverse('videos:upload_subtitles'), data)
+        return response
 
 
     def create_video_with_subs(self, video_url=None, data=None):
