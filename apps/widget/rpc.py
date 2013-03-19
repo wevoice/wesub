@@ -347,8 +347,9 @@ class Rpc(BaseRpc):
                (not task.assignee and not can_assign_task(task, user)):
                     return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
 
-        if (language and language.is_complete_and_synced()
+        if (language and language.is_complete_and_synced(True)
                      and team.moderates_videos()
+                     and language.get_tip(public=False).is_public()
                      and not can_post_edit_subtitles(team, user)
                      and not task):
             message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
