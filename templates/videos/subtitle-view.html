@@ -194,6 +194,9 @@
                         <a href="{{ last_version.author.profile_url}}" title="View {{ last_version.author }}'s profile">
                             <strong>{{ last_version.author }}</strong>
                         </a>.
+                        {% if user.is_staff and perms.videos.edit_video %}
+                            <a style="float: right; color: #417690; margin-right: 7px; font-weight: bold; display: inline-block;" href="{% url admin:subtitles_subtitleversion_change last_version.pk %}">{% trans "Edit in Django Admin" %}</a>
+                        {% endif %}
                     </p>
 
                     <ol class="subtitles {% if language.is_rtl %}is_rtl{% endif %}">
@@ -323,6 +326,9 @@
                             <ul class="actions">
                                 <li><h4>{% trans "Timing" %}: {{ item.time_change }}</h4></li>
                                 <li><h4>{% trans "Text" %}: {{ item.text_change }}</h4></li>
+                                {% if user.is_staff and perms.videos.edit_video %}
+                                    <li><h4><a style="color: #417690;" href="{% url admin:subtitles_subtitleversion_change item.pk %}">{% trans "Edit in Django Admin" %}</a></h4></li>
+                                {% endif %}
                             </ul>
                         </li>
                     {% endfor %}
