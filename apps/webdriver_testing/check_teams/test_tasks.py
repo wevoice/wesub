@@ -833,7 +833,25 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Translate policy: members, guest has no new translation in menu."""
 
         """Guest can not translate published subtitles."""
-        self.assertFalse(self.video_pg.displays_add_subtitles())
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertFalse(self.video_lang_pg.displays_add_subtitles())
 
     def test_inprogress_locking_forked(self):
         """In-progress translation locked when transcription draft uploaded.
