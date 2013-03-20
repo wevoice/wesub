@@ -292,10 +292,3 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.video_pg.open_video_page(self.draft.video_id)
         self.assertFalse(self.video_pg.displays_subtitle_me())
 
-
-    def test_draft__guest_translate(self):
-        """Translate policy: members, guest has no new translation in menu."""
-
-        """Guest can not translate published subtitles."""
-        self.assertFalse(self.video_pg.displays_add_subtitles())
-

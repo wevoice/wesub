@@ -591,7 +591,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.complete_approve_task(tv, 30)
 
-        #self.logger.info(dir(task))
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
                                  % self.team.slug)
@@ -830,4 +829,96 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertFalse(self.tasks_tab.task_present(
                 'Approve Swedish Subtitles', video.title))
 
+    def test_draft__guest_translate(self):
+        """Translate policy: members, guest has no new translation in menu."""
+
+        """Guest can not translate published subtitles."""
+        self.assertFalse(self.video_pg.displays_add_subtitles())
+
+    def test_inprogress_locking_forked(self):
+        """In-progress translation locked when transcription draft uploaded.
+
+        """
+        self.logger.info('Create a video with an approved "en" transcript')
+        video, tv = self.make_video_with_approved_transcript()
+        #self.upload_translation(video)
+        translation = {'language_code': 'sv',
+                      'video': video.pk,
+                      'is_complete': False,
+                      'draft': open('apps/webdriver_testing/subtitle_data/'
+                                    'Timed_text.sv.dfxp'),
+           }
+        transcription = {'language_code': 'en',
+                     'video': video.pk,
+                     'is_complete': False,
+                     'complete': 0,
+                     'draft': open('apps/webdriver_testing/subtitle_data/'
+                                   'Timed_text.en.srt'),
+                     }
+        self.logger.info('Upload sv subs that are forked')
+        self.data_utils.upload_subs(
+                video, 
+                data=translation,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        sl = video.subtitle_language('en')
+        self.logger.info('Upload a new draft of en subs')
+        r = self.data_utils.upload_subs(video, 
+                                        data=transcription,
+                                        user=dict(username=self.owner.username, 
+                                                  password='password'))
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+                                 % self.team.slug)
+        self.logger.info('Check that incomplete translation task is locked')
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+                                 % self.team.slug)
+        task_text = 'Translate Subtitles into Swedish'
+        disabled = self.tasks_tab.disabled_task(task_text, video.title) 
+        self.assertEqual(disabled, 'Locked until subtitles have been approved.')
+        self.logger.info('Check the perform task is not displayed')
+        task = self.tasks_tab.task_present(task_text, video.title)
+        self.assertEqual(task['perform'], None)
+
+    def test_inprogress_locking_dependant(self):
+        """In-progress translation task locked when transcript is edited and
+           not approved.
+
+        """
+        self.logger.info('Create a video with an approved "en" transcript')
+        video, tv = self.make_video_with_approved_transcript()
+        translation = {'language_code': 'sv',
+                      'video': video.pk,
+                      'from_language_code': 'en',
+                      'is_complete': False,
+                      'draft': open('apps/webdriver_testing/subtitle_data/'
+                                    'Timed_text.sv.dfxp'),
+           }
+
+        self.logger.info('Upload subs, dependant on "en"')
+        self.data_utils.upload_subs(
+                video, 
+                data=translation,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        sl = video.subtitle_language('en')
+        
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.video_lang_pg.set_skiphowto()
+
+        self.tasks_tab.open_page(sl.get_absolute_url()[4:])
+        self.logger.info('Edit the en subs, and save and exit')
+        self.video_lang_pg.edit_subtitles()
+        self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.save_and_exit()
+
+        self.logger.info('Check that incomplete translation task is locked')
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+                                 % self.team.slug)
+        task_text = 'Translate Subtitles into Swedish'
+        disabled = self.tasks_tab.disabled_task(task_text, video.title) 
+        self.assertEqual(disabled, 'Locked until subtitles have been approved.')
+        self.logger.info('Check the perform task is not displayed')
+        task = self.tasks_tab.task_present(task_text, video.title)
+        self.assertEqual(task['perform'], None)
 
