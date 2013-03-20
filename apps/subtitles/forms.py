@@ -161,7 +161,7 @@ class SubtitlesUploadForm(forms.Form):
         try:
             # If a task exist, we should let permissions be checked by _verify_no_blocking_review...
             # so don't bother with assignment
-            team_video.task_set.incomplete_review_or_approve.filter(language_in=possible_task_languages).exists()
+            team_video.task_set.incomplete_review_or_approve().filter(language_in=possible_task_languages).exists()
             return
         except Task.DoesNotExist:
             pass
