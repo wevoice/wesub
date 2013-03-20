@@ -27,6 +27,7 @@ unisubs.CaptionManager = function(videoPlayer, captionSet) {
     goog.events.EventTarget.call(this);
 
     this.captions_ = captionSet.captionsWithTimes();
+    window.manager = this;
     this.x = captionSet.x;
 
     var that = this;
@@ -110,6 +111,8 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
 
+    console.log(playheadTime);
+
     if (this.captions_ === 0) {
         return;
     }
@@ -123,6 +126,7 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
         this.dispatchCaptionEvent_(this.captions_[this.currentCaptionIndex_], this.currentCaptionIndex_);
+        console.log('first');
         return;
     }
 
@@ -134,6 +138,7 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
+        console.log('second');
         return;
     }
 
@@ -142,7 +147,9 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_) {
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
+            console.log('third and finished :(');
         }
+        console.log('third');
         return;
     }
 
