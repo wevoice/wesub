@@ -88,7 +88,7 @@ class VideoPage(UnisubsPage):
             self.select_option_by_text(self._PRIMARY_AUDIO, audio_lang)
         #Set the translation_from field
         if translated_from:
-            self.select_option_by_text(self._TRANSLATED_FROM, translated_from)
+            self.select_option_by_text(self._TRANSLATE_FROM, translated_from)
         #Input the subtitle file
         self.type_by_css(self._SUBTITLES_FILE, sub_file)
         #Set complete
