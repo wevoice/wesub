@@ -27,6 +27,7 @@ from django.utils.translation import ugettext_lazy as _
 from apps.subtitles import pipeline
 from apps.subtitles.shims import is_dependent
 from apps.subtitles.models import ORIGIN_UPLOAD
+from apps.teams.models import Task
 from apps.teams.permissions import (
     can_perform_task, can_create_and_edit_subtitles,
     can_create_and_edit_translations
@@ -152,8 +153,20 @@ class SubtitlesUploadForm(forms.Form):
 
     def _verify_team_policies(self, team_video, language_code,
                               from_language_code):
-        is_transcription = (not from_language_code)
+        # if this is being saved as part of a task, than permissions mean
+        # something else. For example a team might require admins to transcribe
+        # but if it allows managers to review, then saves done as part of a review
+        # task can be done by a manager (nice huh?)
+        possible_task_languages = [language_code, '']
+        try:
+            # If a task exist, we should let permissions be checked by _verify_no_blocking_review...
+            # so don't bother with assignment
+            team_video.task_set.incomplete_review_or_approve.filter(language_in=possible_task_languages).exists()
+            return
+        except Task.DoesNotExist:
+            pass
 
+        is_transcription = (not from_language_code)
         if is_transcription:
             allowed = can_create_and_edit_subtitles(self.user, team_video,
                                                     language_code)
