@@ -1,5 +1,4 @@
-// Amara, universalsubtitles.org
-//
+// Amara, universalsubtitles.org //
 // Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
@@ -110,11 +109,14 @@ unisubs.CaptionManager.prototype.timeUpdate_ = function() {
 unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     function(playheadTime)
 {
-    if (this.captions_ === 0)
+
+    if (this.captions_ === 0) {
         return;
-    if (this.currentCaptionIndex_ == -1 &&
-        playheadTime < this.x['startTime'](this.x['getFirstSubtitle']()))
+    }
+
+    if (this.currentCaptionIndex_ == -1 && playheadTime < this.x['startTime'](this.x['getFirstSubtitle']())){
         return;
+    }
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
         this.x['getSubtitleByIndex'](this.currentCaptionIndex_) : null;
@@ -128,21 +130,22 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         this.currentCaptionIndex_ + 1 : null;
     var nextCaption = this.currentCaptionIndex_ < this.captions_.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
-    if (nextCaption != null &&
-	this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
+
+    if (nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
     }
-    if ((nextCaption == null ||
-         playheadTime < this.x['startTime'](nextCaption.node)) &&
-        (curCaption == null ||
-         playheadTime >= this.x['startTime'](curCaption.node))) {
+
+    if ((nextCaption == null || playheadTime < this.x['startTime'](nextCaption.node)) &&
+        (curCaption == null || playheadTime >= this.x['startTime'](curCaption))) {
         this.dispatchCaptionEvent_(null);
-        if (nextCaption == null && !this.eventsDisabled_)
+        if (nextCaption == null && !this.eventsDisabled_) {
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
+        }
         return;
     }
+
     this.sendEventForRandomPlayheadTime_(playheadTime);
 };
 
@@ -151,15 +154,16 @@ unisubs.CaptionManager.prototype.sendEventForRandomPlayheadTime_ =
 {
     var lastCaptionIndex = goog.array.binarySearch(this.captions_,
         playheadTime, this.binaryCompareCaptions_);
-    if (lastCaptionIndex < 0)
-        lastCaptionIndex = -lastCaptionIndex - this.captions_ -1;
+
+    if (lastCaptionIndex < 0) {
+        lastCaptionIndex = (lastCaptionIndex * -1) - 2
+    }
 
     this.currentCaptionIndex_ = lastCaptionIndex;
-    if (lastCaptionIndex >= 0 &&
-	this.x['isShownAt'](lastCaptionIndex, playheadTime)) {
-        this.dispatchCaptionEvent_(this.captions_[lastCaptionIndex], lastCaptionIndex);
-    }
-    else {
+    var lastCaption = this.captions_[lastCaptionIndex];
+    if (lastCaptionIndex >= 0 && lastCaption && this.x['isShownAt'](lastCaption.node, playheadTime)) {
+        this.dispatchCaptionEvent_(lastCaption, lastCaptionIndex);
+    } else {
         this.dispatchCaptionEvent_(null);
     }
 };
