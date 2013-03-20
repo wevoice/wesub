@@ -1828,7 +1828,7 @@ def _propagate_unpublish_to_external_services(language_pk, language_code, video)
 
     # Find the latest public version to determine what kind of third-party call
     # we need to make.
-    latest_version = language.latest_version(public_only=True)
+    latest_version = language.get_tip(public=True)
 
     if latest_version:
         # There's a latest version that's still public, so third-party services
@@ -1853,7 +1853,7 @@ def _propagate_unpublish_to_tasks(team_video, language_pk, language_code):
     """
     try:
         language = SubtitleLanguage.objects.get(pk=language_pk)
-        if language and language.latest_version(public_only=False):
+        if language and language.get_tip(public=False):
             # Don't kill any tasks if there are still versions remaining.
             return
     except SubtitleLanguage.DoesNotExist:
