@@ -1101,7 +1101,7 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.newsubtitle_version = new_version
+                task.new_subtitle_version = new_version
 
             task.save()
 
@@ -1109,8 +1109,8 @@ class Rpc(BaseRpc):
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.newsubtitle_version.subtitle_language.release_writelock()
-            task.newsubtitle_version.subtitle_language.followers.add(request.user)
+            task.new_subtitle_version.subtitle_language.release_writelock()
+            task.new_subtitle_version.subtitle_language.followers.add(request.user)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
@@ -1139,7 +1139,7 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.newsubtitle_version = new_version
+                task.new_subtitle_version = new_version
 
             task.save()
 
@@ -1147,12 +1147,12 @@ class Rpc(BaseRpc):
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.newsubtitle_version.subtitle_language.release_writelock()
+            task.new_subtitle_version.subtitle_language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                api_subtitles_approved.send(task.newsubtitle_version)
+                api_subtitles_approved.send(task.new_subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                api_subtitles_rejected.send(task.newsubtitle_version)
+                api_subtitles_rejected.send(task.new_subtitle_version)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
