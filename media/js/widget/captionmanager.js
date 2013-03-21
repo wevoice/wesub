@@ -125,12 +125,13 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         this.x['getSubtitleByIndex'](this.currentCaptionIndex_) : null;
 
     console.log('isShowAt current ' + this.x['isShownAt'](curCaption, playheadTime));
-    console.log(this.currentCaptionIndex_ > -1 && curCaption != null && this.x['isShownAt'](curCaption, playheadTime));
 
-    if (this.currentCaptionIndex_ > -1 && curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
+    if (curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
         console.log('first is true');
         this.dispatchCaptionEvent_(this.captions_[this.currentCaptionIndex_], this.currentCaptionIndex_);
         return;
+    } else {
+        console.log(curCaption != null);
     }
 
     var nextCaptionIndex =  this.currentCaptionIndex_ < this.captions_.length -1 ?
@@ -139,13 +140,14 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         this.captions_[this.currentCaptionIndex_ + 1] : null;
 
     console.log('isShowAt next ' + this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime));
-    console.log(nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime));
 
     if (nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         console.log('second is true');
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
         return;
+    } else {
+        console.log(nextCaption != null);
     }
 
     console.log('current ' + this.x['startTime'](curCaption));
