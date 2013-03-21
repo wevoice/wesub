@@ -201,13 +201,17 @@ def markup_to_dfxp(text):
     #
     # gets turned into:
     #
-    #     x &lt; <span tts:textDecoration="underline">10</span>
-    text = BOLD_RE_INNER.sub(r'<span tts:fontWeight="bold">\1</span>', text)
-    text = BOLD_RE_OUTER.sub(r'<span tts:fontWeight="bold">\1</span>', text)
-    text = ITALIC_RE_INNER.sub(r'<span tts:fontStyle="italic">\1</span>', text)
-    text = ITALIC_RE_OUTER.sub(r'<span tts:fontStyle="italic">\1</span>', text)
-    text = UNDER_RE_INNER.sub(r'<span tts:textDecoration="underline">\1</span>', text)
-    text = UNDER_RE_OUTER.sub(r'<span tts:textDecoration="underline">\1</span>', text)
+    #     x &lt; <span textDecoration="underline">10</span>
+    #
+    # Even though we should be using tts:[attr-name] the way etree works
+    # makes it hard to set namespaces there, so we don't set them here
+    # they'll be set on babelsubs properly.
+    text = BOLD_RE_INNER.sub(r'<span fontWeight="bold">\1</span>', text)
+    text = BOLD_RE_OUTER.sub(r'<span fontWeight="bold">\1</span>', text)
+    text = ITALIC_RE_INNER.sub(r'<span fontStyle="italic">\1</span>', text)
+    text = ITALIC_RE_OUTER.sub(r'<span fontStyle="italic">\1</span>', text)
+    text = UNDER_RE_INNER.sub(r'<span textDecoration="underline">\1</span>', text)
+    text = UNDER_RE_OUTER.sub(r'<span textDecoration="underline">\1</span>', text)
 
     return text
 
