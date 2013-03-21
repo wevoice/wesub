@@ -67,6 +67,7 @@ unisubs-integration
 /.ponyrc
 user-data/video
 media/static-cache
+media/admin
 .ropeproject
 /tags
 /tags.bak
