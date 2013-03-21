@@ -123,6 +123,9 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
 
     var curCaption = this.currentCaptionIndex_ > -1 ?
         this.x['getSubtitleByIndex'](this.currentCaptionIndex_) : null;
+
+    console.log('isShowAt current ' + this.x['isShownAt'](curCaption, playheadTime));
+
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
         this.dispatchCaptionEvent_(this.captions_[this.currentCaptionIndex_], this.currentCaptionIndex_);
@@ -133,6 +136,8 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
         this.currentCaptionIndex_ + 1 : null;
     var nextCaption = this.currentCaptionIndex_ < this.captions_.length - 1 ?
         this.captions_[this.currentCaptionIndex_ + 1] : null;
+
+    console.log('isShowAt next ' + this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime));
 
     if (nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
