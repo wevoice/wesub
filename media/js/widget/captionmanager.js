@@ -126,7 +126,6 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (this.currentCaptionIndex_ > -1 &&
         curCaption != null && this.x['isShownAt'](curCaption, playheadTime)){
         this.dispatchCaptionEvent_(this.captions_[this.currentCaptionIndex_], this.currentCaptionIndex_);
-        console.log('first');
         return;
     }
 
@@ -138,18 +137,18 @@ unisubs.CaptionManager.prototype.sendEventsForPlayheadTime_ =
     if (nextCaption != null && this.x['isShownAt'](this.x['getSubtitleByIndex'](nextCaptionIndex), playheadTime)) {
         this.currentCaptionIndex_++;
         this.dispatchCaptionEvent_(nextCaption, nextCaptionIndex);
-        console.log('second');
         return;
     }
+
+    console.log('current ' + this.x['startTime'](curCaption));
+    console.log('next ' + this.x['startTime'](nextCaption.node));
 
     if ((nextCaption == null || playheadTime < this.x['startTime'](nextCaption.node)) &&
         (curCaption == null || playheadTime >= this.x['startTime'](curCaption))) {
         this.dispatchCaptionEvent_(null);
         if (nextCaption == null && !this.eventsDisabled_) {
             this.dispatchEvent(unisubs.CaptionManager.CAPTIONS_FINISHED);
-            console.log('third and finished :(');
         }
-        console.log('third');
         return;
     }
 
