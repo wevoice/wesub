@@ -357,21 +357,22 @@ class SubtitlesUploadForm(forms.Form):
         complete = self.cleaned_data['complete']
 
 
+        subtitles = self._parsed_subtitles
         if from_language_code:
             # If this is a translation, its subtitles should use the timing data
             # from the source.  We know that the source has at least as many
             # subtitles as the new version, so we can just match them up
             # first-come, first-serve.
             source_subtitles = self.from_sv.get_subtitles()
-            new_subtitles = self._parsed_subtitles.subtitle_items()
-            subtitles = []
-            for old, new in izip(source_subtitles, new_subtitles):
-                subtitles.append(new._replace(start_time=old.start_time,
-                                              end_time=old.end_time))
+            i = 0
+            # instead of translating to subtitle_items, we're updating the
+            # dfxp elements in place. This guarantees no monkey business with
+            # escaping / styling
+            for old, new in izip(source_subtitles.subtitle_items(), subtitles.get_subtitles()):
+                subtitles.update(i, from_ms=old.start_time, to_ms=old.end_time)
+                i += 1
         else:
             # Otherwise we can just use the subtitles the user uploaded as-is.
-            subtitles = self._parsed_subtitles
-
             # No matter what, text files that aren't translations cannot be
             # complete because they don't have timing data.
             if self.extension == 'txt':
