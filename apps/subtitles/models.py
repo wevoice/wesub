@@ -753,7 +753,7 @@ class SubtitleLanguage(models.Model):
             return None
 
     def get_dependent_subtitle_languages(self):
-        """Return subtitle languages that are dependents/translations of this.
+        """Return a list of SLs that are dependents/translations of this.
 
         This is a shim for the existing UI.  Once the new one comes this
         monstrosity will be torn out.
@@ -831,10 +831,14 @@ class SubtitleLanguage(models.Model):
 
         return False
 
-    def unpublish(self):
-        """ Unpublishes the last public version for this Subtitle Language """
-        version = self.subtitleversion_set.public().order_by('version_number')[:1]
-        return version[0].unpublish() if version else None
+    def unpublish(self, delete=False):
+        """Unpublishes all public versions for this SL.
+
+        If delete is given, "delete" them entirely.
+
+        """
+        sv = self.subtitleversion_set.public().order_by('version_number')[:1]
+        return sv[0].unpublish_self_and_children(delete=delete) if sv else None
 
     @property
     def is_imported_from_youtube_and_not_worked_on(self):
@@ -1373,9 +1377,13 @@ class SubtitleVersion(models.Model):
     def is_synced(self):
         return self.get_subtitles().fully_synced
 
-    def unpublish(self):
-        """ Unpublishes this version """
 
+    def unpublish(self, delete=False):
+        """Unpublish this version.
+
+        If delete is given, "delete" it entirely (not *really*, of course).
+
+        """
         team_video = self.video.get_team_video()
 
         assert team_video, \
@@ -1384,20 +1392,29 @@ class SubtitleVersion(models.Model):
         assert team_video.team.unpublishing_enabled(), \
                "Cannot unpublish for a team without unpublishing enabled."
 
-        versions = SubtitleVersion.objects.filter(
-            # This filter includes this SubtitleVersion itself
+        self.visibility_override = 'deleted' if delete else 'private'
+        self.save()
+
+        return self
+
+    def unpublish_self_and_children(self, delete=False):
+        """Unpublish this version and all its children.
+
+        If delete is given, "delete" them entirely (not *really*, of course).
+
+        """
+        versions = SubtitleVersion.objects.extant().filter(
             subtitle_language=self.subtitle_language,
-            version_number__gte=self.version_number
+            version_number__gte=self.version_number,
         ).order_by('version_number')
 
         last_version = None
 
         for version in versions:
-            version.visibility_override = 'private'
-            version.save()
-            last_version = version
+            last_version = version.unpublish(delete=delete)
 
         return last_version
+
 
     @models.permalink
     def get_absolute_url(self):

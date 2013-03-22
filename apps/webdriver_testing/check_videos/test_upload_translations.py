@@ -24,10 +24,8 @@ class TestCaseUploadTranslation(WebdriverTestCase):
 
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
-        cls.video_pg.open_page('')
+        cls.video_pg.open_page('videos/create/')
         cls.video_pg.log_in(cls.user.username, 'password')
-        cls.video_pg.set_skiphowto()
-
 
     def setUp(self):
         self.tv = self.data_utils.create_video()
@@ -160,4 +158,4 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         """
         sub_file = os.path.join(self.subs_data_dir, 'xml_entities.en.srt')
         sc = self._upload_and_verify(self.tv, sub_file, 'French', 'fr')
-        self.assertEqual(sc, 72)
+        self.assertEqual(sc, 5)
