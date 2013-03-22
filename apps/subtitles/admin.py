@@ -109,6 +109,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
     list_filter = ['created', 'visibility', 'visibility_override',
                    'language_code']
+    list_editable = ['visibility', 'visibility_override']
     search_fields = ['video__video_id', 'video__title', 'title',
                      'language_code', 'description', 'note']
 
