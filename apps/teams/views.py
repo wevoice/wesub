@@ -1809,6 +1809,36 @@ def _propagate_unpublish_to_external_services(language_pk, language_code, video)
         delete_captions_in_original_service.delay(language_pk)
 
 
+def _add_task_note(task, note):
+    """Add a note to the body of the Task in a nice way.
+
+    Does not save() the Task.
+
+    """
+    task.body = (task.body + u'\n\n' + note).strip()
+
+def _current_task(team_video, language_code):
+    """Return the currently incomplete Task for the given video/language, or None.
+
+    If there are multiple incomplete tasks, something is very wrong.  This
+    function will delete them all and return None in that case.
+
+    """
+    tasks = list(team_video.task_set.incomplete().filter(language=language_code))
+
+    if len(tasks) > 1:
+        # There should only ever be one open task for a given language.  But
+        # we'll be liberal here and deal with multiples.  And by "deal with"
+        # I mean "ruthlessly delete".
+        for task in tasks:
+            task.deleted = True
+            _add_task_note(task, u'Deleted due to duplicate tasks.')
+            task.save()
+
+        return None
+    else:
+        return tasks[0] if tasks else None
+
 def _ensure_trans_task(team_video, subtitle_language):
     """Ensure that a trans[late/scribe] task exists for this (empty) language.
 
@@ -1821,34 +1851,21 @@ def _ensure_trans_task(team_video, subtitle_language):
 
     """
     lc = subtitle_language.language_code
+    task = _current_task(team_video, lc)
 
-    def _get_tasks():
-        return list(team_video.task_set.incomplete().filter(language=lc))
-
-    current_tasks = _get_tasks()
-
-    if current_tasks and len(current_tasks) > 1:
-        # There should only ever be one open task for a given language.  But
-        # we'll be liberal here and deal with multiples.  And by "deal with"
-        # I mean "ruthlessly delete".
-        for task in current_tasks:
-            task.deleted = True
-            task.save()
-        current_tasks = _get_tasks()
-
-    if current_tasks:
+    if task:
         # Okay, at this point we know that we have a single current task.
-        task = current_tasks[0]
-
         if task.type in (Task.TYPE_IDS['Subtitle'], Task.TYPE_IDS['Translate']):
             # If it's a trans[late/scribe] task, we can just update its version
             # and we're done.
             task.new_subtitle_version = None
+            _add_task_note(task, u'Subtitle version unset when unpublishing.')
             task.save()
             return
         else:
             # Otherwise it's a review/approve task that needs to be deleted.
             task.deleted = True
+            _add_task_note(task, u'Deleted when unpublishing.')
             task.save()
 
     # If we've reached this point, we know there are no existing tasks for this
@@ -1928,30 +1945,18 @@ def _ensure_task_exists(team_video, subtitle_language):
     lc = subtitle_language.language_code
     tip = subtitle_language.get_tip(public=False)
 
-    def _get_tasks():
-        return list(team_video.task_set.incomplete().filter(language=lc))
+    task = _current_task(team_video, lc)
 
-    current_tasks = _get_tasks()
-
-    if current_tasks and len(current_tasks) > 1:
-        # There should only ever be one open task for a given language.  But
-        # we'll be liberal here and deal with multiples.  And by "deal with"
-        # I mean "ruthlessly delete".
-        for task in current_tasks:
-            task.deleted = True
-            task.save()
-        current_tasks = _get_tasks()
-
-    if current_tasks:
+    if task:
         # Okay, at this point we know that we have a single current task.
-        task = current_tasks[0]
-
+        #
         # All we need to do now is point that task at the new extant tip and
         # we're done.
         #
         # TODO: We probably also need to handle new_review_base_version here
         # too at some point.
         task.new_subtitle_version = tip
+        _add_task_note(task, u'Subtitle version reset when unpublishing.')
         task.save()
     else:
         # There are no tasks, so we need to create a review/approve task.
