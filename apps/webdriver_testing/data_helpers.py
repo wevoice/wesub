@@ -106,6 +106,7 @@ class DataHelpers(object):
             v = VideoUrlFactory(**kwargs).video
         except IntegrityError:
             v, _ = Video.get_or_create_for_url(video_url = kwargs['url'])
+        self.logger.info('Video: %s' % v.video_id)
         return v
            
 

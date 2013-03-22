@@ -479,7 +479,7 @@ def gague_billing_records():
 def sync_latest_versions_for_video(video_pk):
     video = Video.objects.get(pk=video_pk)
 
-    for lang in video.subtitlelanguage_set.all():
+    for lang in video.newsubtitlelanguage_set.all():
         # use full, as the final mirror_to_third party will
         # take care of checking if this version *should* be uplaoded
         # Else, we'll re-sync the last public version when new

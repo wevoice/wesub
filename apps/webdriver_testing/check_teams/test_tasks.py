@@ -128,13 +128,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
             UserLangFactory(user=cls.contributor, language=lang)
         cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
                                      ), 'oneline.txt')
-
-
-    def setUp(self):
-        self.tasks_tab.open_team_page(self.team.slug)
-        self.tasks_tab.handle_js_alert('accept')
-        self.tasks_tab.set_skiphowto()
-
+        cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
         if self.team.subtitle_policy > 10:
@@ -142,7 +136,9 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
             self.team.save() 
         if self.team.translate_policy > 10:
             self.team.translate_policy = 10
-            self.team.save() 
+            self.team.save()
+        self.tasks_tab.open_team_page(self.team.slug)
+        self.tasks_tab.handle_js_alert('accept')
 
 
     def test_transcription__perform(self):
@@ -357,10 +353,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
-        self.tasks_tab.set_skiphowto()
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_submit_transcript__creates_review_task(self):
         """Review task is created on transcription submission. """
@@ -922,8 +914,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         sl = video.subtitle_language('en')
         
         self.tasks_tab.log_in(self.owner, 'password')
-        self.video_lang_pg.set_skiphowto()
-
         self.tasks_tab.open_page(sl.get_absolute_url()[4:])
         self.logger.info('Edit the en subs, and save and exit')
         self.video_lang_pg.edit_subtitles()

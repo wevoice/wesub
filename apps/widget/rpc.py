@@ -245,8 +245,10 @@ class Rpc(BaseRpc):
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
         video = models.Video.objects.get(video_id=video_id)
         team_video = video.get_team_video()
+        languages = (new_models.SubtitleLanguage.objects.having_public_versions()
+                                                        .filter(video=video))
         video_languages = [language_summary(l, team_video, request.user) for l
-                           in video.newsubtitlelanguage_set.all()]
+                           in languages]
 
         original_language = video.primary_audio_language_code
 

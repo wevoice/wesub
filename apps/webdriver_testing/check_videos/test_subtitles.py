@@ -22,6 +22,7 @@ class TestCaseSubtitles(WebdriverTestCase):
         cls.menu = unisubs_menu.UnisubsMenu(cls)
 
         cls.user = UserFactory.create()
+        cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
@@ -60,5 +61,6 @@ class TestCaseSubtitles(WebdriverTestCase):
 
         #Create a video and upload subtitles
         test_video = self._add_video_and_subs(sub_file, lang_code, video_title)
+        self.video_pg.open_video_page(test_video.video_id)
         self.assertEqual('English', self.menu.visible_menu_text())
 
