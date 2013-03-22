@@ -217,7 +217,7 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
         feed_parser = FeedParser(url)
 
         for vt, info, entry in feed_parser.items():
-            if not vt: 
+            if not vt:
                 continue
 
             videos.append(Video.get_or_create_for_url(vt=vt, user=user))
@@ -415,12 +415,13 @@ def delete_captions_in_original_service(language_pk):
     from .videos.types import DELETE_LANGUAGE_ACTION
     from accountlinker.models import ThirdPartyAccount
     try:
-        language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+        language = (SubtitleLanguage.objects.select_related("video")
+                                            .get(pk=language_pk))
     except SubtitleLanguage.DoesNotExist:
         return
-    
+
     ThirdPartyAccount.objects.mirror_on_third_party(
-        language.video, language.language, DELETE_LANGUAGE_ACTION)
+        language.video, language.language_code, DELETE_LANGUAGE_ACTION)
 
 @task
 def delete_captions_in_original_service_by_code(language_code, video_pk):
