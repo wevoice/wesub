@@ -556,7 +556,7 @@ class ProjectForm(forms.ModelForm):
 
 class UnpublishForm(forms.Form):
     subtitle_version = forms.ModelChoiceField(
-        queryset=models.SubtitleVersion.objects.full())
+        queryset=models.SubtitleVersion.objects.extant())
 
     should_delete = forms.BooleanField(
             label=_(u'Would you like to delete these subtitles completely?'),
