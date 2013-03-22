@@ -137,6 +137,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
 
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
