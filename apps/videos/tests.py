@@ -2966,34 +2966,82 @@ class TimingChangeTest(TestCase):
 
 class CreditTest(TestCase):
 
-    fixtures = ['staging_users.json', 'staging_videos.json', 'staging_teams.json']
+    def test_last_sub_not_synced(self):
+        subs = [
+            {
+                'text': 'text',
+                'start': 2 * 1000,
+                'end': -1,
+                'id': '',
+                'start_of_paragraph': ''
+            }
+        ]
 
-    srt = """
-1
-99:59:59,000 --> 99:59:59,000
-some subtitle
+        duration = 10  # Seconds
 
-2
-99:59:59,000 --> 99:59:59,000
-because video will be invisible
+        last_sub = subs[-1]
 
-3
-00:06:27,000 --> 00:06:30,000
-Subtitles by the Amara.org community
-    """
+        self.assertEquals(last_sub['end'], -1)
 
-    def test_empty(self):
-        from widget.srt_subs import GenerateSubtitlesHandler
+        subs = add_credit(subs, 'en', duration)
+        self.assertEquals(last_sub['text'], subs[-1]['text'])
 
-        sv = SubtitleVersion.objects.all()[0]
+    def test_straight_up_video(self):
+        subs = [
+            {
+                'text': 'text',
+                'start': 2 * 1000,
+                'end': 3 * 1000,
+                'id': '',
+                'start_of_paragraph': ''
+            }
+        ]
 
-        subs = [x.for_generator() for x in sv.ordered_subtitles()]
-        subs = add_credit(sv, subs)
+        duration = 10  # Seconds
 
-        handler = GenerateSubtitlesHandler.get('srt')
-        content = unicode(handler(subs, sv.language.video )).encode('utf-8')
+        subs = add_credit(subs, 'en', duration)
+        last_sub = subs[-1]
+        self.assertEquals(last_sub['text'],
+                "Subtitles by the Amara.org community")
+        self.assertEquals(last_sub['start'], 7000)
+        self.assertEquals(last_sub['end'], 10 * 1000)
 
-        self.assertEquals(content.strip().replace('\r', ''), self.srt.strip())
+    def test_only_a_second_left(self):
+        subs = [
+            {
+                'text': 'text',
+                'start': 2 * 1000,
+                'end': 9 * 1000,
+                'id': '',
+                'start_of_paragraph': ''
+            }
+        ]
+
+        duration = 10  # Seconds
+
+        subs = add_credit(subs, 'en', duration)
+        last_sub = subs[-1]
+        self.assertEquals(last_sub['text'],
+                "Subtitles by the Amara.org community")
+        self.assertEquals(last_sub['start'], 9000)
+        self.assertEquals(last_sub['end'], 10 * 1000)
+
+    def test_no_space_left(self):
+        duration = 10  # Seconds
+        subs = [
+            {
+                'text': 'text',
+                'start': 2 * 1000,
+                'end': duration * 1000,
+                'id': '',
+                'start_of_paragraph': ''
+            }
+        ]
+
+        subs = add_credit(subs, 'en', duration)
+        self.assertEquals(len(subs), 1)
+        last_sub = subs[-1]
+        self.assertEquals(last_sub['text'], 'text')
 
     def test_should_add_credit(self):
         sv = SubtitleVersion.objects.filter(
