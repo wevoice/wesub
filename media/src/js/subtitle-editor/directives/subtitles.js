@@ -40,7 +40,9 @@ var USER_IDLE_MINUTES = 5;
 
         function startUserIdleTimer() {
             var userIdleTimeout = function() {
+
                 minutesIdle++;
+
                 if (minutesIdle >= USER_IDLE_MINUTES) {
                     showIdleModal();
                     $timeout.cancel(regainLockTimer);
@@ -58,6 +60,7 @@ var USER_IDLE_MINUTES = 5;
             };
 
             regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
+
         }
         function showIdleModal() {
 
@@ -67,20 +70,60 @@ var USER_IDLE_MINUTES = 5;
             var closeSessionTimeout;
 
             var closeSession = function() {
+
                 secondsUntilClosing--;
+
                 if (secondsUntilClosing === 0) {
+
                     LockService.releaseLock(videoId, languageCode);
-                    window.location = '/videos/' + videoId + "/";
+
+                    selectedScope.$root.$emit("show-modal", {
+                        heading: 'Your session has ended. You can try to resume, close the editor, or download your subtitles',
+                        buttons: [
+                            {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
+                                // TODO: Remove this duplication from below.
+                                if (closeSessionTimeout) {
+                                    $timeout.cancel(closeSessionTimeout);
+                                }
+
+                                var promise = LockService.regainLock(videoId, languageCode);
+
+                                promise.then(function onSuccess(response) {
+                                    if (response.data.ok) {
+                                        minutesIdle = 0;
+                                        selectedScope.$root.$broadcast('hide-modal');
+                                        startRegainLockTimer();
+                                        startUserIdleTimer();
+                                    } else {
+                                        window.alert("Sorry, could not restart your session.");
+                                        window.location = '/videos/' + videoId + "/";
+                                    }
+                                }, function onError() {
+                                    window.alert("Sorry, could not restart your session.");
+                                    window.location = '/videos/' + videoId + "/";
+                                });
+                            }},
+                            {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
+                                console.log('download');
+                            }},
+                            {'text': 'Close editor', 'class': 'no', 'fn': function() {
+                                window.location = '/videos/' + videoId + "/";
+                            }}
+                        ]
+                    });
+
                 } else {
-                    selectedScope.$root.$emit('change-heading', heading + secondsUntilClosing + " seconds.");
+
+                    selectedScope.$root.$emit('change-modal-heading', heading + secondsUntilClosing + " seconds.");
                     closeSessionTimeout = $timeout(closeSession, 1000);
+
                 }
             };
 
             selectedScope.$root.$emit("show-modal", {
-                heading:  heading + secondsUntilClosing + " seconds.",
+                heading: heading + secondsUntilClosing + " seconds.",
                 buttons: [
-                    {'text': 'Try to Resume work', 'class': 'yes', 'fn': function() {
+                    {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
                         if (closeSessionTimeout) {
                             $timeout.cancel(closeSessionTimeout);
                         }
@@ -101,8 +144,7 @@ var USER_IDLE_MINUTES = 5;
                             window.alert("Sorry, could not restart your session.");
                             window.location = '/videos/' + videoId + "/";
                         });
-                    }
-                    }
+                    }}
                 ]
             });
 
@@ -116,6 +158,10 @@ var USER_IDLE_MINUTES = 5;
                     post: function post(scope, elm, attrs) {
 
                         $(elm).on('keydown', function(e) {
+
+                            // Reset the lock timer.
+                            minutesIdle = 0;
+
                             var video = angular.element($('#video').get(0)).scope();
 
                             // Space with shift, toggle play / pause.
@@ -124,17 +170,17 @@ var USER_IDLE_MINUTES = 5;
                                 video.togglePlay();
                             }
 
-                            minutesIdle = 0;
-
                             if (e.keyCode === 40 || e.keyCode === 38) {
                                 var scroll = $('.reference').scrollTop();
                                 $('.working, .reference').scrollTop(scroll + (e.keyCode === 40 ? 100 : -100));
                                 e.preventDefault();
                             }
                         });
-
                         $(elm).on('mousemove', function() {
+
+                            // Reset the lock timer.
                             minutesIdle = 0;
+
                         });
 
                         videoId = attrs.videoId;

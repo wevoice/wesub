@@ -54,8 +54,8 @@
 
             $scope.content = content;
         });
-        $scope.$root.$on('change-heading', function($event, heading) {
-            if($scope.content){
+        $scope.$root.$on('change-modal-heading', function($event, heading) {
+            if ($scope.content) {
                 $scope.content.heading = heading;
             }
         });
