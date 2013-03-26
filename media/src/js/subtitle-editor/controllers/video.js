@@ -114,7 +114,7 @@
             });
 
         });
-        $scope.$root.$on('subtitleSelected', function($event, subtitle) {
+        $scope.$root.$on('subtitle-selected', function($event, subtitle) {
 
             var parser = subtitle.parser;
             var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;

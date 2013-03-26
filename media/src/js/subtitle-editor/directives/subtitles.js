@@ -32,79 +32,77 @@ var USER_IDLE_MINUTES = 5;
             }
         };
     });
-
     directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
 
         var minutesIdle = 0;
         var secondsUntilClosing = 120;
         var videoId, languageCode, selectedScope, regainLockTimer;
 
-        function startUserIdleTimer(){
-            var userIdleTimeout = function(){
+        function startUserIdleTimer() {
+            var userIdleTimeout = function() {
                 minutesIdle++;
-                if(minutesIdle >= USER_IDLE_MINUTES){
+                if (minutesIdle >= USER_IDLE_MINUTES) {
                     showIdleModal();
                     $timeout.cancel(regainLockTimer);
                 } else {
                     $timeout(userIdleTimeout, 60 * 1000);
                 }
-            }
+            };
 
             $timeout(userIdleTimeout, 60 * 1000);
         }
-
-        function startRegainLockTimer(){
-            var regainLockTimeout = function(){
+        function startRegainLockTimer() {
+            var regainLockTimeout = function() {
                 LockService.regainLock(videoId, languageCode);
                 regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
-            }
+            };
 
             regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
         }
-
-        function showIdleModal(){
+        function showIdleModal() {
 
             var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
-                          "To ensure no work is lost we will close your session in "
+                          "To ensure no work is lost we will close your session in ";
 
             var closeSessionTimeout;
 
-            var closeSession = function(){
+            var closeSession = function() {
                 secondsUntilClosing--;
-                if(secondsUntilClosing == 0){
+                if (secondsUntilClosing === 0) {
                     LockService.releaseLock(videoId, languageCode);
                     window.location = '/videos/' + videoId + "/";
                 } else {
                     selectedScope.$root.$emit('change-heading', heading + secondsUntilClosing + " seconds.");
                     closeSessionTimeout = $timeout(closeSession, 1000);
                 }
-            }
+            };
 
             selectedScope.$root.$emit("show-modal", {
                 heading:  heading + secondsUntilClosing + " seconds.",
                 buttons: [
-                    {'text': 'Try to Resume work', 'class': 'yes', 'fn': function(){
-                        if(closeSessionTimeout){
+                    {'text': 'Try to Resume work', 'class': 'yes', 'fn': function() {
+                        if (closeSessionTimeout) {
                             $timeout.cancel(closeSessionTimeout);
                         }
 
                         var promise = LockService.regainLock(videoId, languageCode);
 
-                        promise.then(function onSuccess(response){
-                            if(response.data.ok){
+                        promise.then(function onSuccess(response) {
+                            if (response.data.ok) {
                                 minutesIdle = 0;
                                 selectedScope.$root.$broadcast('hide-modal');
-                                startRegainLockTimer()
-                                startUserIdleTimer()
+                                startRegainLockTimer();
+                                startUserIdleTimer();
                             } else {
-                                alert("Sorry, could not restart your session.");
+                                window.alert("Sorry, could not restart your session.");
                                 window.location = '/videos/' + videoId + "/";
                             }
-                        }, function onError(){
-                            alert("Sorry, could not restart your session.");
+                        }, function onError() {
+                            window.alert("Sorry, could not restart your session.");
                             window.location = '/videos/' + videoId + "/";
-                        })
-                    }},
+                        });
+                    }
+                    }
                 ]
             });
 
@@ -116,6 +114,7 @@ var USER_IDLE_MINUTES = 5;
             compile: function compile(elm, attrs, transclude) {
                 return {
                     post: function post(scope, elm, attrs) {
+
                         $(elm).on('keydown', function(e) {
                             var video = angular.element($('#video').get(0)).scope();
 
@@ -127,14 +126,14 @@ var USER_IDLE_MINUTES = 5;
 
                             minutesIdle = 0;
 
-                            if (e.keyCode == 40 || e.keyCode == 38){
+                            if (e.keyCode === 40 || e.keyCode === 38) {
                                 var scroll = $('.reference').scrollTop();
-                                $('.working, .reference').scrollTop(scroll + (e.keyCode == 40 ? 100 : -100));
+                                $('.working, .reference').scrollTop(scroll + (e.keyCode === 40 ? 100 : -100));
                                 e.preventDefault();
                             }
                         });
 
-                        $(elm).on('mousemove', function(){
+                        $(elm).on('mousemove', function() {
                             minutesIdle = 0;
                         });
 
@@ -143,15 +142,12 @@ var USER_IDLE_MINUTES = 5;
                         selectedScope = scope;
 
                         startUserIdleTimer();
-                        startRegainLockTimer()
+                        startRegainLockTimer();
                     }
                 };
             }
-
-
         };
     });
-
     directives.directive('subtitleList', function(SubtitleStorage, SubtitleListFinder, $timeout) {
 
         var activeTextArea,
@@ -188,7 +184,7 @@ var USER_IDLE_MINUTES = 5;
                 activeTextArea.focus();
                 activeTextArea.autosize();
 
-                selectedScope.$root.$broadcast('subtitleSelected', selectedScope);
+                selectedScope.$root.$broadcast('subtitle-selected', selectedScope);
             }
         }
         function onSubtitleTextKeyDown(e) {
@@ -267,7 +263,6 @@ var USER_IDLE_MINUTES = 5;
 
             }
         }
-
         function onSubtitleTextKeyUp(e) {
 
             var newText = activeTextArea.val();
