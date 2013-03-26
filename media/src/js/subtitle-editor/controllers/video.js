@@ -119,8 +119,14 @@
             var parser = subtitle.parser;
             var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
 
-            // Set the current time to the start of the subtitle.
-            $scope.pop.currentTime(startTimeSeconds);
+            // If this video is not a Vimeo video, set the current time to
+            // the start of the subtitle.
+            //
+            // We don't do this for Vimeo videos because their player doesn't support
+            // fuzzy-scrubbing to precise keyframes.
+            if ($scope.pop.video._util.type !== 'Vimeo') {
+                $scope.pop.currentTime(startTimeSeconds);
+            }
 
         });
     };
