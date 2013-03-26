@@ -186,7 +186,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                                  % self.team.slug)
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
                                              tv.title)
-        self.create_modal.lang_selection(new_language='English (incomplete)')
+        self.create_modal.lang_selection(new_language='English')
         self.assertEqual('Typing', self.sub_editor.dialog_title())
         
     def test_transcription__permissions(self):
