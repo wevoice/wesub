@@ -2039,7 +2039,6 @@ def unpublish(request, slug):
         errors = '\n'.join(flatten_errorlists(form.errors))
         messages.error(request,
                        _(u'Invalid unpublishing request.\nErrors:\n') + errors)
-
         return HttpResponseRedirect(next_url)
 
     version = form.cleaned_data['subtitle_version']
@@ -2048,6 +2047,7 @@ def unpublish(request, slug):
     scope = form.cleaned_data['scope']
     delete = form.cleaned_data['should_delete']
     subtitle_language = version.subtitle_language
+    translations = subtitle_language.get_dependent_subtitle_languages()
 
     if delete:
         # We can't redirect to the version detail page if we're deleting the
@@ -2068,6 +2068,14 @@ def unpublish(request, slug):
     else:
         assert False, 'Invalid scope.'
 
+    language_empty = not subtitle_language.subtitleversion_set.extant().exists()
+    if scope == 'version' and language_empty:
+        # If we've deleted all the versions in this language (but DIDN'T delete
+        # its translations too) then we'll fork the translations now.
+        for sl in translations:
+            sl.is_forked = True
+            sl.save()
+
     for sl in languages:
         _propagate_unpublish_to_external_services(sl.pk, sl.language_code, video)
         _propagate_unpublish_to_tasks(team_video, sl.pk)
@@ -2077,6 +2085,7 @@ def unpublish(request, slug):
 
     messages.success(request, _(u'Successfully unpublished subtitles.'))
     api_subtitles_rejected.send(version)
+
     return HttpResponseRedirect(next_url)
 
 @login_required
