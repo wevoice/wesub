@@ -12,7 +12,7 @@ class VideoLanguagePage(VideoPage):
     _VIDEO_TITLE = "li.title"
     _VIDEO_DESCRIPTION  = "li.description"
     _SUB_LINES = "div.translation-text"
-
+    _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
 
     #SUBTITLES TAB
@@ -71,4 +71,8 @@ class VideoLanguagePage(VideoPage):
 
     def is_draft(self):
         return self.is_element_visible(self._DRAFT_NOTICE)
+
+    def view_notice(self):
+        return self.get_text_by_css(self._VIEW_NOTICE)
+
         
