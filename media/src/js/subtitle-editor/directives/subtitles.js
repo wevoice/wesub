@@ -19,7 +19,7 @@
 var angular = angular || null;
 var SubtitleListItemController = SubtitleListItemController || null;
 var LOCK_EXPIRATION = 25;
-var USER_IDLE_MINUTES = 1;
+var USER_IDLE_MINUTES = 5;
 
 (function($) {
 
@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 1;
     directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
 
         var minutesIdle = 0;
-        var secondsUntilClosing = 1;
+        var secondsUntilClosing = 120;
         var videoId, languageCode, selectedScope, regainLockTimer;
 
         function startUserIdleTimer() {
