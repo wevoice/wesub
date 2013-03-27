@@ -46,9 +46,7 @@ def feature_video(context, video):
 
 @register.filter
 def is_follower(obj, user):
-    #obj is Video or SubtitleLanguage
-    # FIXME: Update this when follower fields alng on SubtitleLanguage
-    return True
+    # obj is Video or SubtitleLanguage
     if not user.is_authenticated():
         return False
 
