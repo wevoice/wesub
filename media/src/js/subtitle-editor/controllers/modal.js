@@ -20,7 +20,7 @@
 
     var root = this;
 
-    var ModalController = function($scope, SubtitleStorage) {
+    var ModalController = function($scope, SubtitleListFinder, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -53,6 +53,11 @@
             $scope.hide($event);
 
             $scope.content = content;
+        });
+        $scope.$root.$on('show-modal-download', function($event) {
+
+            $scope.content.dfxpString = SubtitleListFinder.get('working-subtitle-set').scope.parser.xmlToString(true, true);
+
         });
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {

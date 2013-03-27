@@ -19,7 +19,7 @@
 var angular = angular || null;
 var SubtitleListItemController = SubtitleListItemController || null;
 var LOCK_EXPIRATION = 25;
-var USER_IDLE_MINUTES = 5;
+var USER_IDLE_MINUTES = 1;
 
 (function($) {
 
@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 5;
     directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
 
         var minutesIdle = 0;
-        var secondsUntilClosing = 120;
+        var secondsUntilClosing = 1;
         var videoId, languageCode, selectedScope, regainLockTimer;
 
         function startUserIdleTimer() {
@@ -64,8 +64,7 @@ var USER_IDLE_MINUTES = 5;
         }
         function showIdleModal() {
 
-            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
-                          "To ensure no work is lost we will close your session in ";
+            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. ";
 
             var closeSessionTimeout;
 
@@ -104,7 +103,7 @@ var USER_IDLE_MINUTES = 5;
                                 });
                             }},
                             {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
-                                console.log('download');
+                                selectedScope.$root.$emit('show-modal-download');
                             }},
                             {'text': 'Close editor', 'class': 'no', 'fn': function() {
                                 window.location = '/videos/' + videoId + "/";

@@ -47,6 +47,10 @@
             ng-cloak>
             <h1 ng-show="content.heading">[[ content.heading ]]</h1>
             <p ng-show="content.text">[[ content.text ]]</p>
+            <div ng-show="content.dfxpString" class="download">
+                <textarea class="download" ng-show="content.dfxpString">[[ content.dfxpString ]]</textarea>
+                <p>Copy the subtitles above and save them to your computer. You can upload them later.</p>
+            </div>
             <div class="content.buttons"
                 ng-show="content.buttons.length">
                 <button ng-repeat="button in content.buttons"
