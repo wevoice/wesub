@@ -47,7 +47,7 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
 
 
     def test_delete_source_forks_translations(self):
-        """Deleting versions
+        """Deleting source forks translations and new source uploads not blocked.
 
         """
         sub_file = os.path.join(self.subs_data_dir, 'Timed_text.en.srt')
@@ -84,8 +84,10 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
         sl.save()
         self.video_language_pg.open_video_lang_page(video.video_id, 'sv')
         sl_sv = video.subtitle_language('sv')
-        self.logger.info(sl_sv.is_forked)
         self.data_utils.upload_subs(video, orig_data)
+        self.logger.info('SV IS_FORKED %s' % sl_sv.is_forked)
+        self.assertTrue(sl_sv.is_forked)
+
 
 
 
