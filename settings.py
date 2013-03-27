@@ -263,7 +263,6 @@ JS_WIDGETIZER_CORE.extend([
     "js/widgetizer/wistia.js",
     "js/widgetizer/soundcloud.js",
     'js/player/ooyalaplayer.js', 
-    'js/player/wistiavideoplayer.js', 
     'js/player/brightcoveliteplayer.js', 
     'js/player/soundcloudplayer.js',
     'js/streamer/overlaycontroller.js'])
