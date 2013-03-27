@@ -67,24 +67,6 @@ logger = logging.getLogger(__name__)
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
-def publicize_version(subtitle_version, author):
-    """Create a new SubtitleVersion that's a public copy of the given version.
-
-    author should be the person making this happen, *not* the author of the
-    original version.
-
-    """
-    pipeline.add_subtitles(
-        video=subtitle_version.video,
-        language_code=subtitle_version.language_code,
-        subtitles=subtitle_version.get_subtitles(),
-        title=subtitle_version.title,
-        description=subtitle_version.description,
-        author=author,
-        visibility='public',
-    )
-
-
 # Teams
 class TeamManager(models.Manager):
     def get_query_set(self):
@@ -1868,7 +1850,7 @@ class Task(models.Model):
         else:
             # Subtitle task is done, and there is no approval or review
             # required, so we mark the version as approved.
-            publicize_version(sv, self.assignee)
+            sv.publish()
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
@@ -1905,7 +1887,7 @@ class Task(models.Model):
                 task.set_expiration()
                 task.save()
         else:
-            publicize_version(sv, self.assignee)
+            sv.publish()
 
             # We need to make sure this is updated correctly here.
             from apps.videos import metadata_manager
@@ -1947,7 +1929,7 @@ class Task(models.Model):
             # determines whether the subtitles go public.
             if approval:
                 # Make these subtitles public!
-                publicize_version(self.new_subtitle_version, self.assignee)
+                self.new_subtitle_version.publish()
 
                 # If the subtitles are okay, go ahead and autocreate translation
                 # tasks if necessary.
@@ -1977,7 +1959,7 @@ class Task(models.Model):
 
         if approval:
             # The subtitles are acceptable, so make them public!
-            publicize_version(self.new_subtitle_version, self.assignee)
+            self.new_subtitle_version.publish()
 
             # Create translation tasks if necessary.
             if self.workflow.autocreate_translate:
