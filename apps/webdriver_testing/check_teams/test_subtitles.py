@@ -79,11 +79,24 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
 
         self.video_language_pg.open_video_lang_page(video.video_id, 'sv')
         self.assertIn('from English', self.video_language_pg.view_notice())
-        sl = video.subtitle_language('en')
-        sl.unpublish(delete=True)
-        sl.save()
-        self.video_language_pg.open_video_lang_page(video.video_id, 'sv')
+        self.video_language_pg.log_in(self.user.username, 'password')
+        self.video_language_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_language_pg.unpublish(delete=True)
+
+        #sl = video.subtitle_language('en')
+        #sl.unpublish(delete=True)
+        #sl.save()
+        #self.video_language_pg.open_video_lang_page(video.video_id, 'sv')
         sl_sv = video.subtitle_language('sv')
+        sub_file = os.path.join(self.subs_data_dir, 'srt-full.srt')
+        video = VideoUrlFactory().video
+        orig_data = {'language_code': 'en',
+                     'video': video.pk,
+                     'draft': open(sub_file),
+                     'is_complete': True,
+                     'complete': 1,
+                    }
+
         self.data_utils.upload_subs(video, orig_data)
         self.logger.info('SV IS_FORKED %s' % sl_sv.is_forked)
         self.assertTrue(sl_sv.is_forked)

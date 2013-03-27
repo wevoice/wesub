@@ -14,6 +14,13 @@ class VideoLanguagePage(VideoPage):
     _SUB_LINES = "div.translation-text"
     _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
+    _UNPUBLISH = 'a[href="#unpublish-modal"]'
+
+    #UNPUBLISH MODAL
+    _VERSION = 'input[value="version"]'
+    _LANGUAGE = 'input[value="dependents"]'
+    _DELETE = 'input[name="should_delete"]'
+    _SUBMIT_UNPUBLISH = 'button.pull-right'
 
     #SUBTITLES TAB
     _EDIT_SUBTITLES = "a#edit_subtitles_button"
@@ -75,4 +82,15 @@ class VideoLanguagePage(VideoPage):
     def view_notice(self):
         return self.get_text_by_css(self._VIEW_NOTICE)
 
+    def unpublish(self, option='VERSION', delete=False):
+        """Unpublish subs "VERSION" or "LANGUAGE"."""
+        self.click_by_css(self._UNPUBLISH)
+        self.wait_for_element_visible(self._VERSION)
+        delete_option = getattr(self, '_%s' % option)
+        self.click_by_css(delete_option)
+        if delete:
+            self.click_by_css(self._DELETE)
+        self.submit_by_css(self._SUBMIT_UNPUBLISH)
+        
+        
         
