@@ -43,10 +43,6 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-
-
     def test_delete_source_forks_translations(self):
         """Deleting source forks translations and new source uploads not blocked.
 

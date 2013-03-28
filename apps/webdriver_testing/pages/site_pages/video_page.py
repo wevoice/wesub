@@ -19,6 +19,10 @@ class VideoPage(UnisubsPage):
     _POST_TWITTER = "a.twittter"
     _EMAIL_FRIENDS = "a.email"
     _FOLLOW = "button.follow-button"
+    #FOLLOW CONFIRMATION
+    _UNFOLLOW_ALL = 'input#unfollow-all-languages-button'
+    _SUBTITLES_OK = 'input#popup_ok'
+
     _EMBED_HELP = "div.unisubs-share h3 a.embed_options_link"
     _EMBED_CODE = ("div#embed-modal.modal div.modal-body form fieldset "
         "textarea")
@@ -156,3 +160,13 @@ class VideoPage(UnisubsPage):
 
     def displays_upload_subtitles(self):
         return self.is_element_visible(self._UPLOAD_SUBTITLES)
+
+    def follow_text(self):
+        return self.get_text_by_css(self._FOLLOW)
+
+    def toggle_follow(self, lang=False):
+        self.click_by_css(self._FOLLOW)
+        if lang:
+            self.click_by_css(self._SUBTITLES_OK)
+        else:
+            self.click_by_css(self._UNFOLLOW_ALL)
