@@ -707,7 +707,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
         entry = entry.to_string()
         entry = gdata.youtube.YouTubeVideoEntryFromString(entry)
 
-        old_description = entry.media.description.text
+        old_description = entry.media.description.text or ''
 
         if old_description:
             old_description = old_description.decode("utf-8")
