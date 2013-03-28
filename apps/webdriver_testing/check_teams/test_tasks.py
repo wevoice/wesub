@@ -131,7 +131,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -323,7 +322,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
             user = cls.owner,
             ).team
 
-        WorkflowFactory.create(
+        cls.workflow = WorkflowFactory.create(
             team = cls.team,
             autocreate_subtitle = True,
             autocreate_translate = True,
@@ -354,6 +353,11 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
+
+    def tearDown(self):
+        if self.workflow.approve_allowed != 10:
+            self.workflow.approve_allowed = 10
+            self.workflow.save()
 
     def test_submit_transcript__creates_review_task(self):
         """Review task is created on transcription submission. """
@@ -644,7 +648,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 user=dict(username=self.contributor.username, 
                           password='password'))
         self.complete_review_task(tv, 20)
-        self.complete_approve_task(tv, 20)
+        if self.workflow.approve_enabled:
+            self.complete_approve_task(tv, 20)
         return video, tv
 
     def upload_translation(self, video):
@@ -661,6 +666,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
+
     def complete_review_task(self, tv, status_code):
         """Complete the review task, 20 for approve, 30 for reject.
  
@@ -930,4 +936,36 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.logger.info('Check the perform task is not displayed')
         task = self.tasks_tab.task_present(task_text, video.title)
         self.assertEqual(task['perform'], None)
+
+
+    def test_unpublish__creates_approve(self):
+        """Unpublishing transcript creates an approve task.
+
+        """
+        self.tasks_tab.log_in(self.owner, 'password')
+        video, tv = self.make_video_with_approved_transcript()
+        self.upload_translation(video)
+        self.complete_review_task(tv, 20)
+        self.complete_approve_task(tv, 30)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.unpublish(delete=False)
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.assertTrue(self.tasks_tab.task_present(
+                'Approve Original English Subtitles', video.title))
+
+#    def test_unpublish__creates_review(self):
+#        """Unpublishing creates a review task when no approve in workflow.
+#
+ #       """
+#        self.workflow.approve_allowed = 0
+#        self.workflow.save()
+#        self.tasks_tab.log_in(self.owner, 'password')
+#        video, tv = self.make_video_with_approved_transcript()
+#        self.upload_translation(video)
+#        self.complete_review_task(tv, 20)
+#        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+#        self.video_lang_pg.unpublish(delete=False)
+#        self.tasks_tab.open_tasks_tab(self.team.slug)
+#        self.assertTrue(self.tasks_tab.task_present(
+#                'Review Original English Subtitles', video.title))
 
