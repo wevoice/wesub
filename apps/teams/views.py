@@ -1963,10 +1963,10 @@ def _ensure_task_exists(team_video, subtitle_language):
         workflow = Workflow.get_for_team_video(team_video)
 
         if workflow.review_enabled or workflow.approve_enabled:
-            # We'll prefer review to approve if it's available.
-            type = Task.TYPE_IDS['Review'
-                                 if workflow.review_enabled
-                                 else 'Approve']
+            # We'll prefer approve to review if it's available.
+            type = Task.TYPE_IDS['Approve'
+                                 if workflow.approve_enabled
+                                 else 'Review']
 
             Task(team=team_video.team, team_video=team_video, assignee=None,
                  language=lc, type=type, new_subtitle_version=tip,
