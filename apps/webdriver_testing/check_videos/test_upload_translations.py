@@ -31,11 +31,9 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         self.tv = self.data_utils.create_video()
         self.data_utils.upload_subs(self.tv)
         self.video_pg.open_video_page(self.tv.video_id)
-
-    def tearDown(self):
-        self.video_pg.open_video_page(self.tv.video_id)
         self.video_pg.handle_js_alert('accept')
-        
+
+
     def _upload_and_verify(self, tv, sub_file, language, lang_code):
         """Upload the subtitle file and confirm subs are stored.
 

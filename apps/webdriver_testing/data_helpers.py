@@ -135,6 +135,7 @@ class DataHelpers(object):
         else:
             c.login(**self.super_user())
         response = c.post(reverse('videos:upload_subtitles'), data)
+        self.logger.info('UPLOAD RESPONSE %s' % response)
         return response
 
 

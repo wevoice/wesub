@@ -36,10 +36,6 @@ class TestCaseFollowing(WebdriverTestCase):
         cls.create_pg.open_create_page()
 
 
-    def tearDown(self):
-        self.create_pg.wait_for_element_present('li#nav_submit')
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-
     def test_default__submitter_following_video(self):
         """Video submitter is following video by default.
 
