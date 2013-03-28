@@ -2079,7 +2079,8 @@ class Task(models.Model):
         if not standard_language:
             return False
 
-        return not standard_language.is_complete_and_synced()
+        complete = standard_language.is_complete_and_synced() and standard_language.version(public_only=False).is_public()
+        return not complete
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
