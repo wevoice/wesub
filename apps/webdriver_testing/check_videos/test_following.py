@@ -118,7 +118,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.assertEqual(self.NOT_FOLLOWING, self.video_language_pg.follow_text())
 
     def test_toggle_video__lang_unchanged(self):
-        """Turn on following for a video, also follows languages.
+        """Turn on following for a video, does not change languages.
 
         """
         follower = UserFactory.create()
