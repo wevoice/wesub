@@ -45,7 +45,7 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
 
     def setUp(self):
         self.video_pg.open_page('/videos/create')
-        self.handle_js_alert('accept')
+        self.video_pg.handle_js_alert('accept')
 
     def test_delete_source_forks_translations(self):
         """Deleting source forks translations and new source uploads not blocked.
