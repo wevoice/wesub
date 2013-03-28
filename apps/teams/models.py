@@ -2079,6 +2079,7 @@ class Task(models.Model):
 
         complete = (source_language and
                     source_language.subtitles_complete and
+                    source_language.get_tip().is_public()
                     source_language.get_tip().get_subtitles().fully_synced)
 
         if complete:
