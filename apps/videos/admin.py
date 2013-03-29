@@ -21,7 +21,9 @@ from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
-from videos.tasks import video_changed_tasks
+from videos.tasks import (
+    video_changed_tasks, upload_subtitles_to_original_service
+)
 
 from django.core.urlresolvers import reverse
 from utils.celery_search_index import update_search_index
@@ -110,6 +112,21 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
         return ', '.join(links)
 
     versions.allow_tags = True
+
+    def save_model(self, request, obj, form, change):
+        should_sync_to_youtube = False
+
+        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
+
+        super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
+                                                      change)
+        if change:
+            should_sync_to_youtube = not old_obj.is_complete and obj.is_complete
+
+        if should_sync_to_youtube:
+            latest = obj.latest_version()
+            upload_subtitles_to_original_service.delay(latest.pk)
+
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     # We specifically pull language out into a property to force one query per

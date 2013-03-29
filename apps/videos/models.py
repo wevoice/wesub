@@ -43,6 +43,7 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User, Awards
 from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
+from videos.types.youtube import FROM_YOUTUBE_MARKER
 from videos.feed_parser import FeedParser
 from comments.models import Comment
 from libs.bulkops import insert_many
@@ -1255,7 +1256,7 @@ class SubtitleLanguage(models.Model):
 
         version = versions[0]
 
-        if version.note == 'From youtube':
+        if version.note == FROM_YOUTUBE_MARKER:
             return True
 
         return False
@@ -1758,6 +1759,7 @@ def update_followers(sender, instance, created, **kwargs):
         except IntegrityError:
             # User already follows the video.
             pass
+
 
 post_save.connect(Awards.on_subtitle_version_save, SubtitleVersion)
 post_save.connect(update_followers, SubtitleVersion)
