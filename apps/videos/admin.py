@@ -116,14 +116,12 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         should_sync_to_youtube = False
 
-        if change:
-            old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
-
-            if not old_obj.is_complete and obj.is_complete:
-                should_sync_to_youtube = True
+        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
 
         super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
-                change)
+                                                      change)
+        if change:
+            should_sync_to_youtube = not old_obj.is_complete and obj.is_complete
 
         if should_sync_to_youtube:
             latest = obj.latest_version()
