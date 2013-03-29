@@ -192,6 +192,8 @@
                                         <div class="cannot-perform disabled">Locked until {{ translated_from.get_language_display }} subtitles are completed.</div
                                     {% endif %}
                                 {% endif %}
+                                {%  comment %} check if this is translate task, else we'll show the locked message
+                                               twice for approve and review tasks {% endcomment %}
                                                                                                                                                               {% comment %} check if translate else review & approve will see the warning twice {% endcomment %}
                                 {% if task.is_blocked and task.get_type_display == 'Translate' %}
                                     class="disabled">
@@ -265,7 +267,7 @@
                                             {% endif %}
                                         </p>
                                     {% endwith %}
-                                {% endif %} 
+                                {% endif %}
 
                                 <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                                 <ul class="actions">
