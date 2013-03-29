@@ -2060,7 +2060,8 @@ class Task(models.Model):
 
         if not hasattr(self, "_subtitle_version"):
             video = Video.objects.get(teamvideo=self.team_video_id)
-            language = video.subtitle_language(self.language)
+            video_subtitle_language = video.subtitle_language(self.language)
+            language = video_subtitle_language
             self._subtitle_version = language.version(public_only=False) if language else None
 
         return self._subtitle_version
@@ -2079,7 +2080,7 @@ class Task(models.Model):
         if not standard_language:
             return False
 
-        complete = standard_language.is_complete_and_synced() and standard_language.version(public_only=False).is_public()
+        complete = standard_language.is_complete_and_synced() and standard_language.version(public_only=False).is_public
         return not complete
 
     def save(self, update_team_video_index=True, *args, **kwargs):
