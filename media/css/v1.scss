@@ -1982,7 +1982,13 @@ ol.subtitles {
 div#rollback-button {
     padding: 20px 12px;
 }
-
+ol.subtitles-diff {
+    border-top: 1px solid #F3F6F8;
+}
+ol.subtitles-diff li{
+    padding: 1em 0;
+    border-bottom: 1px solid #F3F6F8;
+}
 /* Overrides */
 .v1 .sort_button {
     border-color: $fainter;
