@@ -2081,7 +2081,7 @@ class Task(models.Model):
                 # review and approve tasks will be blocked if they're
                 # a translation and they have a draft and the source
                 # language no longer  has published version
-                if not can_perform or standard_language.language:
+                if not can_perform or standard_language.language == self.language:
                     return True
         return not can_perform
 
