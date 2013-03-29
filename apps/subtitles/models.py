@@ -1377,6 +1377,15 @@ class SubtitleVersion(models.Model):
     def is_synced(self):
         return self.get_subtitles().fully_synced
 
+    def publish(self):
+        """Make this version publicly viewable."""
+
+        team_video = self.video.get_team_video()
+
+        assert team_video, \
+               "Cannot unpublish for a video not moderated by a team."
+        self.visibility = 'public'
+        self.save()
 
     def unpublish(self, delete=False):
         """Unpublish this version.
