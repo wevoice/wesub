@@ -2066,22 +2066,24 @@ class Task(models.Model):
 
         return self._subtitle_version
 
+
     def is_blocked(self):
-        if self.get_type_display() != 'Translate':
-            return False
-
         subtitle_version = self.get_subtitle_version()
-
-        if not subtitle_version:
+        standard_language = subtitle_version.language.standard_language if subtitle_version else None
+        can_perform = ( standard_language and
+                        standard_language.is_complete_and_synced() and
+                        standard_language.version(public_only=False).is_public)
+        # if it's not a translation, no blocking ever
+        if not subtitle_version or not standard_language:
             return False
-
-        standard_language = subtitle_version.language.standard_language
-
-        if not standard_language:
-            return False
-
-        complete = standard_language.is_complete_and_synced() and standard_language.version(public_only=False).is_public
-        return not complete
+        if self.get_type_display() != 'Translate':
+            if self.get_type_display() in ('Review', 'Approve'):
+                # review and approve tasks will be blocked if they're
+                # a translation and they have a draft and the source
+                # language no longer  has published version
+                if not can_perform or standard_language.language:
+                    return True
+        return not can_perform
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
