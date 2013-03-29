@@ -303,9 +303,6 @@ var USER_IDLE_MINUTES = 5;
                 // Select the next element.
                 onSubtitleItemSelected(nextSubtitle);
 
-                // Focus on the active textarea.
-                activeTextArea.focus();
-
             }
         }
         function onSubtitleTextKeyUp(e) {
