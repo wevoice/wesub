@@ -641,4 +641,5 @@ def sync_latest_versions_for_video(video_pk):
 
     for lang in video.subtitlelanguage_set.all():
         latest = lang.latest_version()
-        upload_subtitles_to_original_service.delay(latest.pk)
+        if latest:
+            upload_subtitles_to_original_service.delay(latest.pk)

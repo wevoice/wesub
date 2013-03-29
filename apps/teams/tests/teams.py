@@ -25,6 +25,7 @@ from apps.teams.templatetags import teams_tags
 from apps.videos.search_indexes import VideoIndex
 from apps.videos import metadata_manager
 from apps.videos.models import Video, SubtitleLanguage, SubtitleVersion
+from apps.videos.types.youtube import FROM_YOUTUBE_MARKER
 from messages.models import Message
 from widget.tests import create_two_sub_session, RequestMockup
 
@@ -1466,7 +1467,7 @@ class BillingTest(TestCase):
         c = langs[0]
         d = team.created - timedelta(days=5)
         SubtitleVersion.objects.create(language=c, version_no=0,
-                note='From youtube',
+                note=FROM_YOUTUBE_MARKER,
                 datetime_started=d)
 
         self.assertTrue(len(langs) > 0)
@@ -1508,7 +1509,7 @@ class BillingTest(TestCase):
 
         # Imported
         SubtitleVersion.objects.create(language=sl_fr,
-                datetime_started=before_team_created, note='From youtube',
+                datetime_started=before_team_created, note=FROM_YOUTUBE_MARKER,
                 version_no=0)
 
         # Created
@@ -1517,7 +1518,7 @@ class BillingTest(TestCase):
                 version_no=1)
 
         SubtitleVersion.objects.create(language=sl_en,
-                datetime_started=before_team_created, note='From youtube',
+                datetime_started=before_team_created, note=FROM_YOUTUBE_MARKER,
                 version_no=0)
 
         # Imported
@@ -1527,7 +1528,7 @@ class BillingTest(TestCase):
 
         # Imported
         SubtitleVersion.objects.create(language=sl_cs,
-                datetime_started=after_team_created, note='From youtube',
+                datetime_started=after_team_created, note=FROM_YOUTUBE_MARKER,
                 version_no=0)
 
         # Done with setup, let's test things

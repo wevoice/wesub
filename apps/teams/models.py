@@ -2505,6 +2505,7 @@ class BillingReport(models.Model):
         Crowd created language is a language
         * that is not imported
         """
+        from videos.types.youtube import FROM_YOUTUBE_MARKER
         imported = []
         crowd_created = []
 
@@ -2519,7 +2520,7 @@ class BillingReport(models.Model):
                 crowd_created.append(lang)
                 continue
 
-            if v.note == 'From youtube':
+            if v.note == FROM_YOUTUBE_MARKER:
                 imported.append(lang)
                 continue
 

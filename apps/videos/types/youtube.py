@@ -53,7 +53,7 @@ YOUTUBE_ALWAYS_PUSH_USERNAME = getattr(settings,
 _('Private video')
 _('Undefined error')
 
-
+FROM_YOUTUBE_MARKER = u'From youtube'
 class TooManyRecentCallsException(Exception):
     """
     Raised when the Youtube API responds with yt:quota too_many_recent_calls.
@@ -280,7 +280,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     version.version_no = version_no
     version.datetime_started = datetime.now()
     version.user = User.get_anonymous()
-    version.note = u'From youtube'
+    version.note = FROM_YOUTUBE_MARKER
     version.is_forked = True
     version.save()
 
