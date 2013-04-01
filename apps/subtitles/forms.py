@@ -335,7 +335,7 @@ class SubtitlesUploadForm(forms.Form):
 
         if from_language_code:
             from_language = self.video.subtitle_language(from_language_code)
-            from_version = from_language.get_tip(public=True)
+            from_version = from_language.get_tip(full=True)
             parents = [from_version]
 
         return parents
