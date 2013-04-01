@@ -34,6 +34,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
 
 from comments.forms import CommentForm
 from comments.models import Comment
@@ -3094,15 +3095,28 @@ class CreditTest(TestCase):
 class ShortUrlTest(TestCase):
     def setUp(self):
         self.video = Video.get_or_create_for_url("http://example.com/hey.mp4")[0]
+        site = Site.objects.get_current()
+        site.domain = "www.amara.org"
+        site.save()
+        from videos.templatetags.videos_tags import shortlink_for_video
+        # on production our domain might have www,
+        # make sure we have such domain and that
+        # www is not present
+        self.short_url = shortlink_for_video(self.video)
+        Site.objects.clear_cache()
+
+    def tearDown(self):
+        Site.objects.clear_cache()
 
     def test_short_url(self):
-        from videos.templatetags.videos_tags import shortlink_for_video
-        short_url = shortlink_for_video(self.video)
-
-        self.assertFalse('/en/' in short_url)
-
-        response = self.client.get(short_url, follow=True)
+        response = self.client.get(self.short_url, follow=True)
         regular_url = reverse("videos:video", args=(self.video.video_id,))
 
         location = response.redirect_chain[-1][0]
         self.assertTrue(location.endswith(regular_url))
+
+    def test_short_url_no_locale(self):
+        self.assertFalse('/en/' in self.short_url)
+
+    def test_short_url_no_www(self):
+        self.assertTrue(self.short_url.startswith('%s://amara.org' % settings.DEFAULT_PROTOCOL))
