@@ -920,9 +920,14 @@ def main():
 
     if options.sleep:
         ms = int(options.sleep)
+
         print 'Sleeping for %dms...' % ms
+        sys.stdout.flush()
+
         time.sleep(ms / 1000.0)
+
         print 'Waking up...'
+        sys.stdout.flush()
 
     if options.command == 'count':
         count()
