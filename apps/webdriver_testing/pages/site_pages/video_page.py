@@ -42,6 +42,7 @@ class VideoPage(UnisubsPage):
     _UPLOAD_SUBTITLES = "a#upload-subtitles-link"
 
     #SUBTITLES_SIDE_SECTION
+    _SUB_LANGUAGES = "ul#subtitles-menu li a"
     _VIDEO_ORIGINAL = ""
     _VIDEO_LANG = ""
 
@@ -102,10 +103,11 @@ class VideoPage(UnisubsPage):
         self.wait_for_element_present(self._UPLOAD_SUBMIT)
         self.click_by_css(self._UPLOAD_SUBMIT)
         #Get the the response message
-        self.wait_for_element_present(self._FEEDBACK_MESSAGE, wait_time=10)
+        self.wait_for_element_present(self._FEEDBACK_MESSAGE, wait_time=20)
         message_text = self.get_text_by_css(self._FEEDBACK_MESSAGE)
         #Close the dialog
         self.click_by_css(self._CLOSE)
+        self.wait_for_element_not_visible(self._CLOSE)
         return message_text
 
 
@@ -170,3 +172,10 @@ class VideoPage(UnisubsPage):
             self.click_by_css(self._SUBTITLES_OK)
         else:
             self.click_by_css(self._UNFOLLOW_ALL)
+
+    def subtitle_languages(self):
+        langs = []
+        els = self.get_elements_list(self._SUB_LANGUAGES)
+        for el in els:
+            langs.append(el.text)
+        return langs

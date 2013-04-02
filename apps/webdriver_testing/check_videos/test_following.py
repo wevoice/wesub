@@ -1,4 +1,3 @@
-import time 
 import os
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
@@ -8,8 +7,6 @@ from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 
 
 class TestCaseFollowing(WebdriverTestCase):
@@ -23,8 +20,6 @@ class TestCaseFollowing(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseFollowing, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-
         cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
