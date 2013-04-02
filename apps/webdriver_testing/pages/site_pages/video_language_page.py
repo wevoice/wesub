@@ -90,7 +90,7 @@ class VideoLanguagePage(VideoPage):
         self.click_by_css(delete_option)
         if delete:
             self.click_by_css(self._DELETE)
-        self.submit_by_css(self._SUBMIT_UNPUBLISH)
+        #self.submit_by_css(self._SUBMIT_UNPUBLISH)
         
         
         

@@ -1,4 +1,3 @@
-import codecs
 import os
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
@@ -12,7 +11,6 @@ from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
-
 
 class TestCaseTeamSubtitles(WebdriverTestCase):
     """TestSuite for download subtitles from the video's lanugage page   """
@@ -44,8 +42,9 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
             'webdriver_testing', 'subtitle_data')
 
     def setUp(self):
-        self.video_pg.open_page('/videos/create')
+        self.video_pg.open_page('videos/create')
         self.video_pg.handle_js_alert('accept')
+
 
     def test_delete_source_forks_translations(self):
         """Deleting source forks translations and new source uploads not blocked.
@@ -167,8 +166,4 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
         self.video_language_pg.open_video_lang_page(video.video_id, 'sv')
         self.video_language_pg.edit_subtitles()
         self.assertEqual('Typing', self.sub_editor.dialog_title())
-
-
-
-
 

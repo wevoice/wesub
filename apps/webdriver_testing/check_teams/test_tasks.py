@@ -953,19 +953,3 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present(
                 'Approve Original English Subtitles', video.title))
 
-#    def test_unpublish__creates_review(self):
-#        """Unpublishing creates a review task when no approve in workflow.
-#
- #       """
-#        self.workflow.approve_allowed = 0
-#        self.workflow.save()
-#        self.tasks_tab.log_in(self.owner, 'password')
-#        video, tv = self.make_video_with_approved_transcript()
-#        self.upload_translation(video)
-#        self.complete_review_task(tv, 20)
-#        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-#        self.video_lang_pg.unpublish(delete=False)
-#        self.tasks_tab.open_tasks_tab(self.team.slug)
-#        self.assertTrue(self.tasks_tab.task_present(
-#                'Review Original English Subtitles', video.title))
-
