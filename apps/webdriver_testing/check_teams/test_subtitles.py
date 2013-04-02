@@ -96,6 +96,43 @@ class TestCaseTeamSubtitles(WebdriverTestCase):
         self.logger.info('SV IS_FORKED %s' % sl_sv.is_forked)
         self.assertTrue(sl_sv.is_forked)
 
+    def test_delete_source_language(self):
+        """Deleted language no longer displayed in ui languages list.
+        """
+        sub_file = os.path.join(self.subs_data_dir, 'Timed_text.en.srt')
+        video = VideoUrlFactory().video
+        orig_data = {'language_code': 'en',
+                     'video': video.pk,
+                     'primary_audio_language_code': 'en',
+                     'draft': open(sub_file),
+                     'is_complete': True,
+                     'complete': 1,
+                    }
+        self.data_utils.upload_subs(video, orig_data)
+
+        translation = os.path.join(self.subs_data_dir, 'Timed_text.sv.dfxp')
+        trans_data = {'language_code': 'sv',
+                      'video': video.pk,
+                      'from_language_code': 'en',
+                      'draft': open(translation),
+                     }
+        self.data_utils.upload_subs(video, trans_data)
+        TeamVideoFactory.create(
+            team=self.team, 
+            video=video, 
+            added_by=self.user)
+        self.video_language_pg.open_video_lang_page(video.video_id, 'en')
+
+        self.video_language_pg.log_in(self.user.username, 'password')
+        self.video_language_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_language_pg.unpublish(delete=True)
+        self.video_pg.open_video_page(video.video_id)
+        available_langs = self.video_pg.subtitle_languages()
+        self.logger.info(available_langs)
+        self.assertNotIn('English', available_langs)
+
+
+
     def test_delete_source_edit_forked_translation(self):
         """Deleting source forks translations and new source uploads not blocked.
 
