@@ -57,7 +57,9 @@ from videos.models import Video, SubtitleLanguage, SubtitleVersion
 from functools import partial
 
 logger = logging.getLogger(__name__)
+celery_logger = logging.getLogger('celery.task')
 
+BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
@@ -2672,6 +2674,84 @@ class BillingRecordManager(models.Manager):
 
         return rows
 
+    def insert_records_for_translations(self, billing_record):
+        """
+        IF you've translated from an incomplete language, and later on that
+        language is completed, we must check if any translations are now
+        complete and therefore should have billing records with them
+        """
+        translations = SubtitleLanguage.objects.filter(
+            video=billing_record.subtitle_language.video,
+            standard_language=billing_record.subtitle_language,
+            subtitleversion__isnull=False)
+        inserted = []
+        for translation in translations:
+            version = translation.version(public_only=False)
+            if version:
+               inserted.append(self.insert_record(version))
+        return filter(bool, inserted)
+
+    def insert_record(self, version):
+        """
+        Figures out if this version qualifies for a billing record, and
+        if so creates one. This should be self contained, e.g. safe to call
+        for any version. No records should be created if not needed, and it
+        won't create multiples.
+
+        If this language has translations it will check if any of those are now
+        eligible for BillingRecords and create one accordingly.
+        """
+        from teams.models import BillingRecord
+
+        celery_logger.debug('insert billing record')
+
+        language = version.language
+        video = language.video
+        tv = video.get_team_video()
+
+        if not tv:
+            celery_logger.debug('not a team video')
+            return
+
+        if not language.is_complete_and_synced():
+            celery_logger.debug('language not complete')
+            return
+
+
+        try:
+            # we already have a record
+            previous_record = BillingRecord.objects.get(video=video,
+                                                            subtitle_version__language=language)
+            # make sure we update it
+            celery_logger.debug('a billing record for this language exists')
+            previous_record.is_original = video._original_subtitle_language() == language
+            previous_record.save()
+            return
+        except:
+            pass
+
+        if SubtitleVersion.objects.filter(
+                language=language,
+                datetime_started__lt=BILLING_CUTOFF).exclude(
+                pk=version.pk).exists():
+            celery_logger.debug('an older version exists')
+            return
+
+        is_original = language.is_original
+        source = version.note
+        team = tv.team
+
+        new_record = BillingRecord.objects.create(
+            video=video,
+            subtitle_version=version,
+            subtitle_language=language,
+            is_original=is_original, team=team,
+            created=version.datetime_started,
+            source=source,
+            user=version.user)
+        from_translations = self.insert_records_for_translations(new_record)
+        return new_record, from_translations
+
 
 class BillingRecord(models.Model):
     video = models.ForeignKey(Video)
@@ -2723,6 +2803,25 @@ class BillingRecord(models.Model):
             end = subs[-1].start_time
 
         return round((float(end) - float(start)) / (60 * 1000), 2)
+
+    def get_missing_records_translated_from(self):
+        """
+        Checks if any subtitle languages are translations of the one attached
+        to this billing record.
+        If they are, and this language is complete and synced, make sure that
+        all translation from it, as long as they are synced, are included too.
+        """
+        from apps.videos.tasks import insert_billing_record
+        translations =  SubtitleLanguage.objects.filter(
+            video=self.language.video,
+            standard_language=self.subtitle_language,
+            subtitleversion__isnull=False)
+        for translation in translations:
+            version = translation.version(public_only=False)
+            if version:
+                insert_billing_record.run(self.video_pk, version.pk)
+
+
 
 
 class Partner(models.Model):
