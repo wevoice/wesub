@@ -1,16 +1,11 @@
-
 /*
- * popcorn.js version d8ab958
+ * popcorn.js version 88fd572
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
  * Licensed under the MIT license
  */
 
-/* In order for the newstile wrappers to work, the popcorn folks must fix bug
-*  https://webmademovies.lighthouseapp.com/projects/63272/tickets/1450-Expose-a-registry-patter-for-wrappers
-*  Until then see how wrappers must have the fallback one before anyone else
- */
 (function(global, document) {
 
   // Popcorn.js does not support archaic browsers
@@ -105,7 +100,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "d8ab958";
+  Popcorn.version = "88fd572";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -1384,6 +1379,7 @@
 
   // Internal Only - Adds track events to the instance object
   Popcorn.addTrackEvent = function( obj, track ) {
+    var temp;
 
     if ( track instanceof TrackEvent ) {
       return;
@@ -1396,7 +1392,14 @@
     if ( track && track._natives && track._natives.type &&
         ( obj.options.defaults && obj.options.defaults[ track._natives.type ] ) ) {
 
-      track = Popcorn.extend( {}, obj.options.defaults[ track._natives.type ], track );
+      // To ensure that the TrackEvent Invariant Policy is enforced,
+      // First, copy the properties of the newly created track event event
+      // to a temporary holder
+      temp = Popcorn.extend( {}, track );
+
+      // Next, copy the default onto the newly created trackevent, followed by the
+      // temporary holder.
+      Popcorn.extend( track, obj.options.defaults[ track._natives.type ], temp );
     }
 
     if ( track._natives ) {
@@ -3157,8 +3160,7 @@
         // We leave HTMLVideoElement and HTMLAudioElement wrappers out
         // of the mix, since we'll default to HTML5 video if nothing
         // else works.  Waiting on #1254 before we add YouTube to this.
-        // see comment on top of this file
-        wrappers = "HTMLFlashFallbackVideoElement HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
+        wrappers = "HTMLVimeoVideoElement HTMLSoundCloudAudioElement HTMLNullVideoElement".split(" ");
 
     if ( !node ) {
       Popcorn.error( "Specified target `" + target + "` was not found." );
@@ -4266,8 +4268,8 @@
 
       // Parse out the start and duration, if specified
       var fragments = temporalRegex.exec( aSrc ),
-          start = fragments[ 1 ],
-          duration = fragments [ 2 ];
+          start = +fragments[ 1 ],
+          duration = +fragments[ 2 ];
 
       player = new NullPlayer({
         currentTime: start,
@@ -4998,7 +5000,8 @@
           "&sharing=false" +
           "&download=false" +
           "&show_comments=false" +
-          "&show_user=false";
+          "&show_user=false" +
+          "&single_active=false";
       });
     }
 
@@ -5930,6 +5933,9 @@
       player,
       playerPaused = true,
       mediaReadyCallbacks = [],
+      playerState = -1,
+      bufferedInterval,
+      lastLoadedFraction = 0,
       currentTimeInterval,
       timeUpdateInterval,
       firstPlay = true;
@@ -6045,10 +6051,16 @@
             // fake ready event
             firstPlay = false;
 
+            addMediaReadyCallback(function() {
+              bufferedInterval = setInterval( monitorBuffered, 50 );
+            });
+
             // Set initial paused state
             if( impl.autoplay || !impl.paused ) {
               impl.paused = false;
-              addMediaReadyCallback( function() { onPlay(); } );
+              addMediaReadyCallback(function() {
+                onPlay();
+              });
             } else {
               // if a pause happens while seeking, ensure we catch it.
               // in youtube seeks fire pause events, and we don't want to listen to that.
@@ -6113,6 +6125,13 @@
           // XXX: cued doesn't seem to fire reliably, bug in youtube api?
           break;
       }
+
+      if ( event.data !== YT.PlayerState.BUFFERING &&
+           playerState === YT.PlayerState.BUFFERING ) {
+        onProgress();
+      }
+
+      playerState = event.data;
     }
 
     function destroyPlayer() {
@@ -6120,6 +6139,7 @@
         return;
       }
       clearInterval( currentTimeInterval );
+      clearInterval( bufferedInterval );
       player.stopVideo();
       player.clearVideo();
 
@@ -6228,6 +6248,20 @@
       }
     }
 
+    function monitorBuffered() {
+      var fraction = player.getVideoLoadedFraction();
+
+      if ( lastLoadedFraction !== fraction ) {
+        lastLoadedFraction = fraction;
+
+        onProgress();
+
+        if ( fraction >= 1 ) {
+          clearInterval( bufferedInterval );
+        }
+      }
+    }
+
     function getCurrentTime() {
       return impl.currentTime;
     }
@@ -6288,6 +6322,10 @@
         }
         self.dispatchEvent( "playing" );
       }
+    }
+
+    function onProgress() {
+      self.dispatchEvent( "progress" );
     }
 
     self.play = function() {
@@ -6482,6 +6520,45 @@
       error: {
         get: function() {
           return impl.error;
+        }
+      },
+
+      buffered: {
+        get: function () {
+          var timeRanges = {
+            start: function( index ) {
+              if ( index === 0 ) {
+                return 0;
+              }
+
+              //throw fake DOMException/INDEX_SIZE_ERR
+              throw "INDEX_SIZE_ERR: DOM Exception 1";
+            },
+            end: function( index ) {
+              var duration;
+              if ( index === 0 ) {
+                duration = getDuration();
+                if ( !duration ) {
+                  return 0;
+                }
+
+                return duration * player.getVideoLoadedFraction();
+              }
+
+              //throw fake DOMException/INDEX_SIZE_ERR
+              throw "INDEX_SIZE_ERR: DOM Exception 1";
+            }
+          };
+
+          Object.defineProperties( timeRanges, {
+            length: {
+              get: function() {
+                return 1;
+              }
+            }
+          });
+
+          return timeRanges;
         }
       }
     });

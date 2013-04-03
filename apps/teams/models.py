@@ -1861,6 +1861,8 @@ class Task(models.Model):
                 _create_translation_tasks(self.team_video, sv)
 
             upload_subtitles_to_original_service.delay(sv.pk)
+            task = None
+        return task
 
     def _complete_translate(self):
         """Handle the messy details of completing a translate task."""

@@ -345,7 +345,7 @@ var angular = angular || null;
             $scope.isEditingAny = true;
             $scope.$digest();
         });
-        $scope.$root.$on('editingDone', function() {
+        $scope.$root.$on('editing-done', function() {
             $scope.isEditingAny = false;
             $scope.$digest();
         });
@@ -368,7 +368,7 @@ var angular = angular || null;
             $scope.isEditing = false;
 
             // Tell the root scope that we're no longer editing, now.
-            $scope.$root.$emit('editingDone');
+            $scope.$root.$emit('editing-done');
 
             var content = $scope.parser.content($scope.subtitle, newValue);
 
