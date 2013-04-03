@@ -373,14 +373,19 @@ class MessageTest(TestCase):
         video_changed_tasks(v.pk, sv.pk)
         sv = sub_models.SubtitleVersion.objects.get(pk=sv.pk)
         self.assertFalse(sv.is_public())
+        # no emails should be sent before the video is approved
+        self.assertEqual(len(mail.outbox), 0)
         # approve video
         t = Task(type=40, approved=20, team_video=tv, team=team, language='en',
                 new_subtitle_version=sv, assignee=self.author)
         t.save()
         t.complete()
+        self.assertTrue(sv.is_public())
         video_changed_tasks(v.pk, sv.pk)
-
-        self.assertEqual(len(mail.outbox), 1)
+        # Once the video is approved, we should send out the
+        # team-task-approved-published.html email and the
+        # email_notification_non_editors.html to the author
+        self.assertEqual(len(mail.outbox), 2)
 
     def test_send_message_view(self):
         to_user = User.objects.filter(notify_by_email=True)[0]
