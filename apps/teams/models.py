@@ -2804,22 +2804,6 @@ class BillingRecord(models.Model):
 
         return round((float(end) - float(start)) / (60 * 1000), 2)
 
-    def get_missing_records_translated_from(self):
-        """
-        Checks if any subtitle languages are translations of the one attached
-        to this billing record.
-        If they are, and this language is complete and synced, make sure that
-        all translation from it, as long as they are synced, are included too.
-        """
-        from apps.videos.tasks import insert_billing_record
-        translations =  SubtitleLanguage.objects.filter(
-            video=self.language.video,
-            standard_language=self.subtitle_language,
-            subtitleversion__isnull=False)
-        for translation in translations:
-            version = translation.version(public_only=False)
-            if version:
-                insert_billing_record.run(self.video_pk, version.pk)
 
 
 
