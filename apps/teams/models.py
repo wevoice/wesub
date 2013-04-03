@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import datetime
 import logging
+from math import ceil
 import csv
 from itertools import groupby
 
@@ -2424,12 +2425,19 @@ class TeamNotificationSetting(models.Model):
 
 
 class BillingReport(models.Model):
+    TYPE_OLD = 1
+    TYPE_NEW = 2
+    TYPE_CHOICES = (
+        (TYPE_OLD, 'Old model'),
+        (TYPE_NEW, 'New model'),
+    )
     team = models.ForeignKey(Team)
     start_date = models.DateField()
     end_date = models.DateField()
     csv_file = S3EnabledFileField(blank=True, null=True,
             upload_to='teams/billing/')
     processed = models.DateTimeField(blank=True, null=True)
+    type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
 
     def __unicode__(self):
         return "%s (%s - %s)" % (self.team.slug,
@@ -2605,7 +2613,7 @@ class BillingReport(models.Model):
             counter or ''
         ]
 
-    def process(self):
+    def generate_rows_type_old(self):
         domain = Site.objects.get_current().domain
         protocol = getattr(settings, 'DEFAULT_PROTOCOL')
         host = '%s://%s' % (protocol, domain)
@@ -2613,10 +2621,21 @@ class BillingReport(models.Model):
         header = ['Video title', 'Video URL', 'Video language', 'Source',
                 'Billable minutes', 'Version created', 'Language number']
 
-        rows = self._get_row_data(host, header)
-
-        fn = '/tmp/bill-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
-                self.end_str, self.pk)
+        return  self._get_row_data(host, header)
+    def process(self):
+        """
+        Generate the correct rows (including headers), saves it to a tempo file,
+        then set's that file to the csv_file property, which if , using the S3
+        storage will take care of exporting it to s3.
+        """
+        if self.type == BillingReport.TYPE_OLD:
+            rows = self.generate_rows_type_old()
+        elif self.type == BillingReport.TYPE_NEW:
+            rows = BillingRecord.objects.csv_report_for_team(self.team,
+                                                             self.start_date,
+                                                             self.end_date)
+        fn = '/tmp/bill-%s-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str, self.get_type_display(), self.pk)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)
@@ -2625,7 +2644,6 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
-
     @property
     def start_str(self):
         return self.start_date.strftime("%Y%m%d")
@@ -2784,7 +2802,7 @@ class BillingRecord(models.Model):
     def get_minutes(self):
         """
         Return the number of minutes the subtitles specified in `version`
-        cover as a float.
+        cover as an int.
         """
         subs = self.subtitle_version.ordered_subtitles()
 
@@ -2801,8 +2819,9 @@ class BillingRecord(models.Model):
 
         if not end:
             end = subs[-1].start_time
-
-        return round((float(end) - float(start)) / (60 * 1000), 2)
+        duration_seconds =  (end - start) / 1000.0
+        minutes = duration_seconds/60.0
+        return  int(ceil(minutes))
 
 
 

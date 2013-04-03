@@ -25,7 +25,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
 from django.core.files.base import ContentFile
 from auth.models import CustomUser as User
-from teams.models import Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite
+from teams.models import (
+    Team, TeamMember, TeamVideo, Task, Project, Workflow, Invite, BillingReport
+)
 from teams.permissions import (
     roles_user_can_invite, can_delete_task, can_add_video, can_perform_task,
     can_assign_task, can_unpublish_subs, can_remove_video
@@ -771,13 +773,14 @@ class UploadDraftForm(forms.Form):
         video_changed_tasks.delay(video.id, version.id)
 
 
-class ChooseTeamForm(forms.Form):
+class BillingReportForm(forms.Form):
     team = forms.ChoiceField(choices=(), required=False)
     start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
     end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+    type = forms.ChoiceField(required=True, choices=BillingReport.TYPE_CHOICES)
 
     def __init__(self, *args, **kwargs):
-        super(ChooseTeamForm, self).__init__(*args, **kwargs)
+        super(BillingReportForm, self).__init__(*args, **kwargs)
         teams = Team.objects.all()
         self.fields['team'].choices = [(t.pk, t.slug) for t in teams]
 
