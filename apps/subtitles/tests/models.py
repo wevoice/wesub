@@ -449,9 +449,12 @@ class TestSubtitleVersion(TestCase):
         sv4 = add_subtitles(self.video, 'en', subtitles_4)
 
         self.assertEquals((1.0, 1.0), sv1.get_changes())
-        # 50% of text and 50% of timing is new
-        self.assertEquals((0.5, 0.5), sv2.get_changes())
+        # 33% of text and 33% of timing is new
+        self.assertAlmostEqual(1/3.0, sv2.get_changes()[0])
+        self.assertAlmostEqual(1/3.0, sv2.get_changes()[1])
+        # timing is the same, but 50% of the text is new
         self.assertEquals((0.0, 0.5), sv3.get_changes())
+        # text is the same, but 50% of the timing is new
         self.assertEquals((0.5, 0.0), sv4.get_changes())
 
         # Deleting versions should make their children diff against the
@@ -459,7 +462,8 @@ class TestSubtitleVersion(TestCase):
         sv2.visibility_override = 'deleted'
         sv2.save()
         sv3 = refresh(sv3)
-        self.assertEquals((0.5, 1.0), sv3.get_changes())
+        self.assertAlmostEqual(1/3.0, sv3.get_changes()[0])
+        self.assertEquals(1.0, sv3.get_changes()[1])
 
     def test_subtitle_count(self):
         s0 = (100, 200, "a")
