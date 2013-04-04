@@ -72,7 +72,7 @@ var USER_IDLE_MINUTES = 5;
 
                 secondsUntilClosing--;
 
-                if (secondsUntilClosing === 0) {
+                if (secondsUntilClosing <= 0) {
 
                     LockService.releaseLock(videoId, languageCode);
 
