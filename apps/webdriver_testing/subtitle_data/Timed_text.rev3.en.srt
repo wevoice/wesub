@@ -1,6 +1,6 @@
 1
 00:00:00,018 --> 00:00:01,051
-<i>[narrator] Once upon a time,</i>
+<i>This is revision 3</i>
 
 2
 00:00:02,008 --> 00:00:04,099

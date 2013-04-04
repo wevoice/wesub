@@ -938,18 +938,4 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertEqual(task['perform'], None)
 
 
-    def test_unpublish__creates_approve(self):
-        """Unpublishing transcript creates an approve task.
-
-        """
-        self.tasks_tab.log_in(self.owner, 'password')
-        video, tv = self.make_video_with_approved_transcript()
-        self.upload_translation(video)
-        self.complete_review_task(tv, 20)
-        self.complete_approve_task(tv, 30)
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_lang_pg.unpublish(delete=False)
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.assertTrue(self.tasks_tab.task_present(
-                'Approve Original English Subtitles', video.title))
 
