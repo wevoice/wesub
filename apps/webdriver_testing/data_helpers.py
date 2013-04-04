@@ -176,5 +176,27 @@ class DataHelpers(object):
             testdata = simplejson.load(open(testdata))
         videos = _create_videos(testdata, [])
         return videos
-        
 
+    def complete_review_task(self, tv, status_code, assignee):
+        """Complete the review task, 20 for approve, 30 for reject.
+ 
+        Making the assumtion that I have only 1 at a time.
+
+        """
+        task = list(tv.task_set.incomplete_review().all())[0]
+        task.assignee = assignee
+        task.approved = status_code
+        task.save()
+        task.complete()
+
+    def complete_approve_task(self, tv, status_code, assignee):
+        """Complete the approve task, 20 for approve, 30 for reject.
+ 
+        Making the assumtion that I have only 1 at a time.
+
+        """
+        task = list(tv.task_set.incomplete_approve().all())[0]
+        task.assignee = assignee 
+        task.approved = status_code
+        task.save()
+        task.complete()

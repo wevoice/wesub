@@ -12,7 +12,6 @@ from apps.webdriver_testing.data_factories import VideoUrlFactory
 
 class TestCaseRevisionNotifications(WebdriverTestCase):
     NEW_BROWSER_PER_TEST_CASE = False
-    FOLLOWING = u'\u2713 Following'
 
     @classmethod
     def setUpClass(cls):
@@ -97,7 +96,6 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         self.video_pg.log_in(follower.username, 'password')
         self.video_pg.page_refresh()
         self.video_pg.toggle_follow()
-        self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
         mail.outbox = []
 
         self.video_pg.open_video_page(video.video_id)
@@ -141,3 +139,4 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         msg = str(mail.outbox[-1].message())
         self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(follower.email, email_to)
+

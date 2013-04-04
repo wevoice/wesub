@@ -32,7 +32,6 @@ class Page(object):
             self.wait_for_element_present(element)
             return self.browser.find_element_by_css_selector(element)
         else:
-            self.logger.info(element.text)
             return element
 
     def quit(self):
@@ -75,7 +74,7 @@ class Page(object):
             elif action == "reject":
                 a.dismiss()
         except:
-            self.logger.info('Error with handling alert dialog')
+            self.logger.info('no alert dialog')
 
     def check(self, element):
         """Check the box for the element provided by css selector.

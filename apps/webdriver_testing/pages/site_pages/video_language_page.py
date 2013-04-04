@@ -8,7 +8,8 @@ class VideoLanguagePage(VideoPage):
      Video Page contains the common elements in the video page.
     """
 
-    _URL = "videos/{0}/{1}/"  # format(video id, language code) 
+    _URL = "videos/{0}/{1}/"  # format(video id, language code)
+    _REV_URL = "videos/{0}/{1}/{2}/"
     _VIDEO_TITLE = "li.title"
     _VIDEO_DESCRIPTION  = "li.description"
     _SUB_LINES = "div.translation-text"
@@ -31,6 +32,11 @@ class VideoLanguagePage(VideoPage):
         self.logger.info('Opening {0} page for video: {1}'.format(
                          lang_code, video_id))
         self.open_page(self._URL.format(video_id, lang_code))
+
+    def open_lang_revision_page(self, video_id, lang_code, sl_sv):
+        self.logger.info('Opening revision {0} page for video: {1}'.format(
+                         sl_sv, video_id))
+        self.open_page(self._REV_URL.format(video_id, lang_code, sl_sv))
 
     def edit_subtitles(self):
         self.logger.info('Clicking edit subtitles')
