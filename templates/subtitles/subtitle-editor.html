@@ -64,7 +64,11 @@
             <h1>Amara</h1>
         </section>
         <section class="video center column ng-cloak" ng-controller="VideoTitleController" ng-cloak>
-            <span class="video-title">[[ workingSubtitles.videoTitle ]]</span>
+            <span class="video-title">
+                <span class="subtitles-language">[[ workingSubtitles.languageName ]]</span>
+                <span class="sep">•</span>
+                [[ workingSubtitles.videoTitle ]]
+            </span>
         </section>
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">

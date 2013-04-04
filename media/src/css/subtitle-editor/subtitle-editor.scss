@@ -264,6 +264,14 @@ header.main {
             text-overflow: ellipsis;
             white-space: nowrap;
             width: 100%;
+
+            span.subtitles-language {
+                font-weight: bold;
+            }
+            span.sep {
+                display: inline-block;
+                margin: 0 5px;
+            }
         }
     }
     section.status {

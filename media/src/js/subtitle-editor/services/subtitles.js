@@ -91,6 +91,21 @@ var angular = angular || null;
                     callback(cachedData.languages);
                 }
             },
+            getLanguageMap: function(callback) {
+
+                // If the language map doesn't exist in our cached data, ask the API.
+                if (!cachedData.languageMap) {
+                    $http.get('/api2/partners/languages/').success(function(response) {
+                        cachedData.languageMap = response.languages;
+                        callback(cachedData.languageMap);
+                    });
+
+                // If we have a cached language map, just call the callback.
+                } else {
+                    callback(cachedData.languageMap);
+                }
+
+            },
             getSubtitles: function(languageCode, versionNumber, callback){
 
                 // You must supply a language code in order to get subtitles.
