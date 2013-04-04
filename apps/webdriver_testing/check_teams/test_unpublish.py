@@ -144,14 +144,15 @@ class TestCaseDelete(WebdriverTestCase):
         Ref: https://unisubs.sifterapp.com/issues/2162
 
         """
+        self.skipTest('needs https://unisubs.sifterapp.com/issues/2162 resolved')
         self.logger.info('Create a video with an approved "en" transcript')
         video, tv = self._create_video_with_approved_transcript()
         self._unpublish_source_with_delete(video)
         self.logger.info('Check that new translations can not be started.')
         self.tasks_tab.log_in(self.user.username, 'password')
-
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=sv&assignee=anyone'
-                                 % self.team.slug)
+        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
+                                 '&assignee=anyone&lang=sv'.format(
+                                 self.team.slug, tv.pk))
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_and_assign_task(task_text, video.title)
         self.create_modal.lang_selection()
@@ -209,8 +210,10 @@ class TestCaseDelete(WebdriverTestCase):
         self._upload_sv_translation(video)
         self._unpublish_source_with_delete(video)
         self.tasks_tab.log_in(self.team_member.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=sv&assignee=anyone'
-                                 % self.team.slug)
+        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
+                                 '&assignee=anyone&lang=sv'.format(
+                                 self.team.slug, tv.pk))
+
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_assigned_task(task_text, video.title)
         self.create_modal.lang_selection()
@@ -268,9 +271,6 @@ class TestCaseDelete(WebdriverTestCase):
 
         return video, tv
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-
     def upload_translation(self, video, lang):
         data = {'language_code': lang,
                 'video': video.pk,
@@ -293,7 +293,7 @@ class TestCaseDelete(WebdriverTestCase):
         self.logger.info(sv.get_translation_source_language().get_tip(public=True))
         self.tasks_tab.log_in(self.team_member.username, 'password')
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone'.format(
+                                 '&assignee=anyone&lang=sv'.format(
                                  self.team.slug, tv.pk))
 
         self.tasks_tab.perform_assigned_task('Translate Subtitles into Swedish',
@@ -407,6 +407,7 @@ class TestCaseSendBack(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
+        self.video_pg.handle_js_alert('accept')
 
     def _unpublish_source_with_sendback(self, video, rev=None):
         self.video_pg.open_video_page(video.video_id)
@@ -519,7 +520,7 @@ class TestCaseSendBack(WebdriverTestCase):
         self._unpublish_source_with_sendback(video)
         self.logger.info('Check that incomplete translation task is locked')
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone'.format(
+                                 '&assignee=anyone&lang=sv'.format(
                                  self.team.slug, tv.pk))
         task_text = 'Translate Subtitles into Swedish'
         disabled = self.tasks_tab.disabled_task(task_text, video.title) 
@@ -537,6 +538,7 @@ class TestCaseSendBack(WebdriverTestCase):
         Ref: https://unisubs.sifterapp.com/issues/2162
 
         """
+        self.skipTest('needs https://unisubs.sifterapp.com/issues/2162 resolved')
         self.logger.info('Create a video with an approved "en" transcript')
         video, tv = self.make_video_with_approved_transcript()
         self._unpublish_source_with_sendback(video)

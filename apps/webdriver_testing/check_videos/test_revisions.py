@@ -119,6 +119,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Video follower gets an email when first revision of subtitles added.
 
         """
+        self.skipTest('needs https://unisubs.sifterapp.com/issues/2220 fixed')
         video = VideoUrlFactory().video
         follower = UserFactory.create(email='follower@example.com')
         self.video_pg.open_video_page(video.video_id)
