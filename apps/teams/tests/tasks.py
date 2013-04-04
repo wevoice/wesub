@@ -96,6 +96,11 @@ class TranslateTranscribeTestBase(TestCase):
         self.assertEqual(len(tasks), 1)
         return tasks[0]
 
+    def get_incomplete_task(self):
+        tasks = list(self.team_video.task_set.incomplete().all())
+        self.assertEqual(len(tasks), 1)
+        return tasks[0]
+
     def check_incomplete_counts(self, subtitle_count, review_count,
                                 approve_count):
         self.assertEquals(
@@ -158,18 +163,20 @@ class TranslateTranscribeTestBase(TestCase):
         editor.run(language_code=language_code)
 
     def perform_review_task(self, task, notes, base_language_code=None,
-                            language_code='en'):
+                            language_code='en',
+                            approval=Task.APPROVED_IDS['Approved']):
         editor = TestEditor(self.client, self.team_video.video, mode="review",
                             base_language_code=base_language_code)
-        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
+        editor.set_task_data(task, approval, notes)
         editor.run(language_code=language_code)
 
     def perform_approve_task(self, task, notes, base_language_code=None,
-                            language_code='en'):
+                            language_code='en',
+                             approval=Task.APPROVED_IDS['Approved']):
         editor = TestEditor(self.client, self.team_video.video,
                             mode="approve",
                             base_language_code=base_language_code)
-        editor.set_task_data(task, Task.APPROVED_IDS['Approved'], notes)
+        editor.set_task_data(task, approval, notes)
         editor.run(language_code=language_code)
 
     def change_workflow_settings(self, review_allowed, approve_allowed):
@@ -255,6 +262,31 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.check_incomplete_counts(0, 0, 0)
         self.assertEquals(subtitle_language.get_tip().is_public(), True)
 
+    def test_review_send_back(self):
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      DONT_REQUIRE_APPROVAL)
+        member = self.create_member()
+        self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
+        task = self.get_subtitle_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task)
+        # test test that the review is ready to go
+        self.check_incomplete_counts(0, 1, 0)
+        subtitle_language = self.team_video.video.subtitle_language()
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the review
+        review_task = self.get_review_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Note",
+                                 approval=Task.APPROVED_IDS['Rejected'])
+        # The transcription was sent back, we should now have a transcription
+        # task to complete that's assigned to the original transcriber
+        self.check_incomplete_counts(1, 0, 0)
+        task = self.get_incomplete_task()
+        self.assertEquals(task.assignee, member.user)
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+
     def test_approve(self):
         self.change_workflow_settings(DONT_REQUIRE_REVIEW,
                                       ADMIN_MUST_APPROVE)
@@ -278,7 +310,67 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.check_incomplete_counts(0, 0, 0)
         self.assertEquals(subtitle_language.get_tip().is_public(), True)
 
+    def test_approve_send_back(self):
+        self.change_workflow_settings(DONT_REQUIRE_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        self.workflow.save()
+        member = self.create_member()
+        self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
+        task = self.get_subtitle_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task)
+        # test test that the approval task is ready to go
+        self.check_incomplete_counts(0, 0, 1)
+        subtitle_language = self.team_video.video.subtitle_language()
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the approval
+        approve_task = self.get_approve_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, approve_task)
+        self.perform_approve_task(approve_task, "Test Note",
+                                 approval=Task.APPROVED_IDS['Rejected'])
+        # The transcription was sent back, we should now have a transcription
+        # task to complete that's assigned to the original transcriber
+        self.check_incomplete_counts(1, 0, 0)
+        task = self.get_incomplete_task()
+        self.assertEquals(task.assignee, member.user)
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+
     def test_review_and_approve(self):
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        self.workflow.save()
+        member = self.create_member()
+        self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
+        task = self.get_subtitle_task()
+        self.login(member.user)
+        self.perform_subtitle_task(task)
+        # test test that the review task is next
+        self.check_incomplete_counts(0, 1, 0)
+        subtitle_language = self.team_video.video.subtitle_language()
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        # perform the review
+        review_task = self.get_review_task()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Review Note")
+        # check that that worked
+        self.check_incomplete_counts(0, 0, 1)
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.assertEquals(self.get_review_task().body, "Test Review Note")
+        # perform the approval
+        approve_task = self.get_approve_task()
+        self.submit_assign(self.admin, approve_task)
+        self.perform_approve_task(approve_task, "Test Note",
+                                 approval=Task.APPROVED_IDS['Rejected'])
+        # The review was sent back, we should now have a transcription
+        # task to complete that's assigned to the original reviewer
+        self.check_incomplete_counts(0, 1, 0)
+        task = self.get_incomplete_task()
+        self.assertEquals(task.assignee, self.admin.user)
+        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+
+    def test_review_and_approve_send_back(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
                                       ADMIN_MUST_APPROVE)
         self.workflow.save()
