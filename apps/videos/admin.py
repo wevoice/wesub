@@ -127,7 +127,8 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 
         if should_sync_to_youtube:
             latest = obj.latest_version()
-            upload_subtitles_to_original_service.delay(latest.pk)
+            # don't run on a async:
+            upload_subtitles_to_original_service.run(latest.pk)
 
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
