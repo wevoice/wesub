@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import logging
+import re
 from time import sleep
 
 from django.conf import settings
@@ -27,7 +28,7 @@ from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
 from apps.videos.types.youtube import YouTubeApiBridge
 from apps.accountlinker.models import ThirdPartyAccount
 from apps.accountlinker.models import (
-    translate_string, AMARA_DESCRIPTION_CREDIT
+    translate_string, AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT
 )
 
 
@@ -37,6 +38,21 @@ YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 
 logger = logging.getLogger(__name__)
 
+def remove_description_credits(description, language_code):
+    credits_found = False
+    # credits will vary according to locale
+    credits = [translate_string(x, language_code) for x in
+                [AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT]]
+
+
+    for credit_to_check in credits:
+        search_result = re.search(r'[\w\n\s]*(?P<start>%s[\s\n]*http://[^\n\s]*)' % \
+                        re.escape(credit_to_check), description)
+        if search_result:
+            description = description[:search_result.start()] + \
+                                   description[search_result.end():]
+            credits_found = True
+    return credits_found, description
 
 class Remover(object):
     """
@@ -85,8 +101,6 @@ class Remover(object):
                                 account.oauth_refresh_token,
                                 vt.videoid)
 
-        video_url = video.get_absolute_url()
-
         uri = UPLOAD_URI_BASE % bridge.youtube_video_id
         entry = bridge.GetVideoEntry(uri=uri)
         entry = entry.to_string()
@@ -94,33 +108,13 @@ class Remover(object):
 
         current_description = entry.media.description.text
 
-        # For some reason the above video.get_absolute_url() call didn't
-        # include the /en/ prefix.
-        unisubs_video_url = "http://www.universalsubtitles.org/en%s" % video_url
-        amara_video_url = "http://www.amara.org/en%s" % video_url
-
-        unisubs_supposed_credit = self._get_supposed_credit(unisubs_video_url,
-                language_code)
-        amara_supposed_credit = self._get_supposed_credit(amara_video_url,
-                language_code)
-
-        credits = (amara_supposed_credit, unisubs_supposed_credit,)
-
-        if not current_description.startswith(credits):
+        must_update , new_description = remove_description_credits(current_description, language_code)
+        if not must_update:
             logger.info("%s doesn't have desc credit" % vurl.url)
             return video.video_id
 
-        if current_description.startswith(amara_supposed_credit):
-            new_description = current_description.replace(
-                    amara_supposed_credit, '')
-
-        if current_description.startswith(unisubs_supposed_credit):
-            new_description = current_description.replace(
-                    unisubs_supposed_credit, '')
-
         entry.media.description.text = new_description
         entry = entry.ToString()
-
         status_code = bridge._make_update_request(uri, entry)
 
         if status_code == 401:
@@ -133,9 +127,8 @@ class Remover(object):
 
         logger.info('FAIL %s' % vurl.url)
 
-    def _get_supposed_credit(self, vurl, language='en'):
-        credit = translate_string(AMARA_DESCRIPTION_CREDIT, language)
-        return "%s: %s\n\n" % (credit, vurl)
+    def _get_supposed_credit(self,  language='en'):
+        return "%s" % (credit)
 
     def _sleep(self):
         logger.info('Pausing')
@@ -147,7 +140,6 @@ class Remover(object):
         for vurl in vurls:
             logger.info('Starting to process video %s' % vurl.video.video_id)
             try:
-                # video_id = self._fix_video(vurl)
                 self._fix_video(vurl)
                 logger.info('Done processing video')
             except Exception, e:
@@ -188,8 +180,9 @@ class Remover(object):
     def remove_all(self):
         vurls = VideoUrl.objects.filter(
                 type=VIDEO_TYPE_YOUTUBE,
-                video__owner_username=self.tpa.username)
+                owner_username=self.tpa.username)
         self._remove_descs(vurls)
+        self.tpa.delete()
 
     def remove_for_team_videos(self, team_videos):
         vurls = VideoUrl.objects.filter(

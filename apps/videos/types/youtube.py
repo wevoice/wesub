@@ -388,8 +388,11 @@ class YoutubeVideoType(VideoType):
         self.url = url
         self.videoid = self._get_video_id(self.url)
         self.entry = self._get_entry(self.video_id)
-        author = self.entry.author[0]
-        self.username = author.name.text
+
+        # we can't rely on author.name as that might not be unique
+        # and it also won't match what the 3rd party account has
+        username_url = self.entry.author[0].uri.text
+        self.username = username_url[username_url.rfind("/")+ 1:]
 
     @property
     def video_id(self):
