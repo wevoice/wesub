@@ -28,11 +28,12 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
 
     def setUp(self):
+        self.video_pg.open_page('videos/create/')
+        self.video_pg.handle_js_alert('accept')
         self.tv = self.data_utils.create_video()
         self.data_utils.upload_subs(self.tv)
         self.video_pg.open_video_page(self.tv.video_id)
-        self.video_pg.handle_js_alert('accept')
-
+        
 
     def _upload_and_verify(self, tv, sub_file, language, lang_code):
         """Upload the subtitle file and confirm subs are stored.
@@ -47,6 +48,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         subtitle_lang = tv.subtitle_language(lang_code) 
         page_url = 'videos/{0}/{1}/'.format(tv.video_id, lang_code)
         self.video_pg.open_page(page_url)
+        self.video_pg.handle_js_alert('accept')
         return subtitle_lang.get_subtitle_count()
 
 
