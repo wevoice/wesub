@@ -168,7 +168,7 @@ def add_amara_description_credit(old_description, video_url, language='en',
     """
     Prepend the credit to the existing description.
     """
-    credit = "%s\n\n%s" % (translate_string(AMARA_DESCRIPTION_CREDIT,
+    credit = "%s\n\n%s" % (translate_string(AMARA_SHORT_DESCRIPTON_CREDIT,
         language), video_url)
 
     old_description = old_description or u''
