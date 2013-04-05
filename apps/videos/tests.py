@@ -2710,6 +2710,15 @@ class BaseDownloadTest(object):
         self.assertEqual(res['Content-Disposition'] , expected_header)
         return res.content
 
+    def set_subt_title(self):
+        self.language.is_original = True
+        self.language.save()
+        self.sv = self.language.version()
+        self.test_title = "This is a really long title used to make sure we are not truncating file names"
+        self.assertTrue(len(self.test_title) > 60)
+        self.sv.title = self.test_title
+        self.sv.save()
+
 class TestSRT(WebUseTest, BaseDownloadTest):
     fixtures = ['test.json']
 
@@ -2729,12 +2738,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      '*[inside brackets]*',
         ]
         add_subs(self.language,subs_data)
-        self.sv = self.language.version()
-        self.test_title = "This is a really long title used to make sure we are not truncating file names"
-        self.assertTrue(len(self.test_title) > 60)
-        self.sv.title = self.test_title
-        self.sv.save()
-        self.language.is_original = True
+        self.set_subt_title()
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
         self.assertIn('<i>[inside brackets]</i>' , content)
@@ -2792,6 +2796,7 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
     def test_dfxp_serializer(self):
         TTMLSubtitles.use_named_styles = False
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        self.set_subt_title()
         content = self._download_subs(self.language, 'dfxp')
         self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
         self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
@@ -2800,6 +2805,7 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
 
     def test_dfxp_serializer_inline(self):
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        self.set_subt_title()
         content = self._download_subs(self.language, 'dfxp')
         self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
         self.assertTrue(re.findall('<span tts:fontWeight="bold">[\s]*bold[\s]*</span>', content))
