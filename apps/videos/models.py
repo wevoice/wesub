@@ -506,7 +506,7 @@ class Video(models.Model):
         """
         from django.utils.text import get_valid_filename
 
-        return get_valid_filename(self.__unicode__())
+        return get_valid_filename(self.title_display(truncate=False))
 
     def lang_filename(self, language):
         """Return a filename-safe version of this video's string representation with a language code.

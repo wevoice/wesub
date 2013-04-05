@@ -35,6 +35,7 @@ from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.utils.text import get_valid_filename
 
 from comments.forms import CommentForm
 from comments.models import Comment
@@ -2701,6 +2702,12 @@ class BaseDownloadTest(object):
             'lang_pk': language.pk
         })
         self.assertEqual(res.status_code, 200)
+        expected_filename = get_valid_filename(("%s.%s.%s" % (
+            language.version().title,
+            language.language,
+            format)))
+        expected_header = 'attachment; filename=%s' % expected_filename
+        self.assertEqual(res['Content-Disposition'] , expected_header)
         return res.content
 
 class TestSRT(WebUseTest, BaseDownloadTest):
@@ -2709,8 +2716,9 @@ class TestSRT(WebUseTest, BaseDownloadTest):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+
         self.language = SubtitleLanguage.objects.get_or_create(
-            video=self.video, is_forked=True, language='en')[0]
+            video=self.video, is_forked=True, language='en', is_original=True)[0]
 
     def test_download_markup(self):
         subs_data = ['one line',
@@ -2721,6 +2729,12 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      '*[inside brackets]*',
         ]
         add_subs(self.language,subs_data)
+        self.sv = self.language.version()
+        self.test_title = "This is a really long title used to make sure we are not truncating file names"
+        self.assertTrue(len(self.test_title) > 60)
+        self.sv.title = self.test_title
+        self.sv.save()
+        self.language.is_original = True
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
         self.assertIn('<i>[inside brackets]</i>' , content)
