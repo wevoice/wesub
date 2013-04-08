@@ -2731,7 +2731,7 @@ class BillingRecordManager(models.Manager):
             celery_logger.debug('not a team video')
             return
 
-        if not language.is_complete_and_synced():
+        if not language.is_complete_and_synced(public_only=False):
             celery_logger.debug('language not complete')
             return
 
