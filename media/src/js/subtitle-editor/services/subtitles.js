@@ -203,7 +203,6 @@ var angular = angular || null;
 
                 return promise;
             }
-
         };
     });
     module.factory('SubtitleListFinder', function($http) {

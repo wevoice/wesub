@@ -124,7 +124,7 @@ var angular = angular || null;
 
                     }, function onError() {
                         $scope.status = 'error';
-                        window.alert('Sorry, there was an error...');
+                        $scope.showErrorModal();
                     });
                 }
             });
@@ -153,7 +153,7 @@ var angular = angular || null;
                         
                     }, function onError() {
                         $scope.status = 'error';
-                        window.alert('Sorry, there was an error...');
+                        $scope.showErrorModal();
                     });
 
                 }
@@ -169,7 +169,7 @@ var angular = angular || null;
                     $scope.status = 'saved';
                 }, function onError() {
                     $scope.status = 'error';
-                    window.alert('Sorry, there was an error...');
+                    $scope.showErrorModal();
                 });
 
                 return promise;
@@ -186,38 +186,19 @@ var angular = angular || null;
                 $scope.dialogURL = '/onsite_widget/?config=' + window.location.search.split('config=')[1];
             }
         };
-        $scope.showCloseModal = function() {
+        $scope.showErrorModal = function(message) {
 
-            var buttons = [];
+            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
 
-            if ($scope.fromOldEditor) {
-                buttons.push({
-                    'text': 'Back to full editor', 'class': 'yes', 'fn': function() {
-                        window.location = $scope.dialogURL;
-                    }
-                });
-            }
-
-            buttons.push({
-                'text': 'Exit', 'class': 'no', 'fn': function() {
-                    window.location = $scope.primaryVideoURL;
-                }
+            $scope.$root.$emit("show-modal", {
+                heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
+                buttons: [
+                    {'text': 'Close editor', 'class': 'no', 'fn': function() {
+                        window.location = '/videos/' + subtitleListScope.videoId + "/";
+                    }}
+                ]
             });
-
-            if ($scope.status !== 'saved') {
-
-                buttons.push({
-                    'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
-                        $scope.$root.$broadcast('hide-modal');
-                    }
-                });
-
-            }
-
-            $scope.$root.$emit('show-modal', {
-                heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
-                buttons: buttons
-            });
+            $scope.$root.$emit('show-modal-download');
         };
 
         $scope.$root.$on('approve-task', function() {
