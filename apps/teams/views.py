@@ -84,7 +84,7 @@ from videos.tasks import (
     delete_captions_in_original_service_by_code
 )
 from videos.models import Action, VideoUrl, Video
-from subtitles.models import SubtitleLanguage
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from widget.rpc import add_general_settings
 from widget.views import base_widget_params
 
@@ -1995,6 +1995,41 @@ def _ensure_task_exists(team_video, subtitle_language):
             # instead?
             return
 
+def _clean_empty_translation_tasks(team_video):
+    """Delete translation tasks that haven't been started if the source is gone.
+
+    If we've unpublished (or deleted) a language, there may not be any languages
+    to translate from any more.  Existing translation tasks that have already
+    been started will be locked until the subs are reapproved, but empty
+    translation tasks can just be deleted.  They'll get re-autocreated when the
+    source is reapproved.
+
+    """
+    video = team_video.video
+    sources = video.newsubtitlelanguage_set.having_public_versions()
+
+    if sources.exists():
+        # If there are still valid sources for translations, we don't need to
+        # touch empty translation tasks.
+        return
+    else:
+        # There are no sources to translate from yet.  So empty translation
+        # tasks can be deleted.
+        tasks = Task.objects.incomplete_translate().filter(team_video=team_video)
+        for task in tasks:
+            empty = not (
+                SubtitleVersion.objects.extant()
+                                       .filter(video=video,
+                                               language_code=task.language)
+                                       .exists())
+
+            if empty:
+                task.deleted = True
+                _add_task_note(task, u'Deleted empty translation '
+                                     u'task when unpublishing.')
+                task.save()
+
+
 
 def _propagate_unpublish_to_tasks(team_video, language_pk):
     """Push the 'unpublishing' of a language to any tasks applying to it.
@@ -2019,12 +2054,14 @@ def _propagate_unpublish_to_tasks(team_video, language_pk):
         # it's one of the languages the team has on its list.  We may need to
         # delete other existing types of tasks.
         _ensure_trans_task(team_video, sl)
+        _clean_empty_translation_tasks(team_video)
     else:
         # Otherwise we know that there are still some private versions.  In that
         # case we need to make sure there's a task for them.  If there's an
         # existing trans[late/scribe]/review/approve task, we can just update
         # it.  Otherwise we'll create a review/approve task.
         _ensure_task_exists(team_video, sl)
+        _clean_empty_translation_tasks(team_video)
 
 
 def unpublish(request, slug):
@@ -2087,6 +2124,7 @@ def unpublish(request, slug):
     api_subtitles_rejected.send(version)
 
     return HttpResponseRedirect(next_url)
+
 
 @login_required
 def auto_captions_status(request, slug):
