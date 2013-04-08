@@ -186,6 +186,39 @@ var angular = angular || null;
                 $scope.dialogURL = '/onsite_widget/?config=' + window.location.search.split('config=')[1];
             }
         };
+        $scope.showCloseModal = function() {
+
+            var buttons = [];
+
+            if ($scope.fromOldEditor) {
+                buttons.push({
+                    'text': 'Back to full editor', 'class': 'yes', 'fn': function() {
+                        window.location = $scope.dialogURL;
+                    }
+                });
+            }
+
+            buttons.push({
+                'text': 'Exit', 'class': 'no', 'fn': function() {
+                    window.location = $scope.primaryVideoURL;
+                }
+            });
+
+            if ($scope.status !== 'saved') {
+
+                buttons.push({
+                    'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
+                        $scope.$root.$broadcast('hide-modal');
+                    }
+                });
+
+            }
+
+            $scope.$root.$emit('show-modal', {
+                heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
+                buttons: buttons
+            });
+        };
         $scope.showErrorModal = function(message) {
 
             var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
