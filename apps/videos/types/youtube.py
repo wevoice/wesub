@@ -310,9 +310,16 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     language.save()
 
     from videos.tasks import video_changed_tasks
+    # do not pass a version_id else, we'll trigger emails for those edits
     video_changed_tasks.delay(video.pk)
-
     Meter('youtube.lang_imported').inc()
+    from apps.teams.models import BillingRecord
+    # there is a caveat here, if running with CELERY_ALWAYS_EAGER,
+    # this is called before there's a team video, and the billing records won't
+    # be created. On the real world, it should be safe to assume that between
+    # calling the youtube api and the db insertion, we'll get this called
+    # when the video is already part of a team
+    BillingRecord.objects.insert_record(version)
 
 
 def should_add_credit(subtitle_version=None, video=None):
