@@ -1,7 +1,10 @@
 import os
+import string
 
 from django.core import mail
+from django.contrib.sites.models import Site
 
+from localeurl.templatetags.localeurl_tags import rmlocale
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
@@ -81,10 +84,26 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         msg = str(mail.outbox[-1].message())
         self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(follower.email, email_to)
-        wrong_text = ('were changed by <b><a href="http://localhost:8081/'
-                      'profiles/profile/TestUser0/"></a></b>. These changes '
-                      'went live immediately.  of the timing was changed.')
-        self.assertNotIn(wrong_text, msg)
+
+        urlstart = 'http://' + Site.objects.get_current().domain
+        lang = video.subtitle_language('en')
+        # combine whitespace and replace it with " " for easier string
+        # comparisons
+        msg = ' '.join(msg.split())
+        correct_message = string.Template(
+            '<b><a href="${lang_url}">${lang_name} subtitles</a></b> '
+            'to video <b><a href="${video_url}">${video_name}</a></b> '
+            'were changed by <b><a href="${user_url}">${user_name}</a></b>. '
+            'These changes went live immediately. 33% of the timing was '
+            'changed.').substitute({
+                'lang_url': urlstart + rmlocale(lang.get_absolute_url()),
+                'lang_name': lang.get_language_code_display(),
+                'video_url': urlstart + rmlocale(video.get_absolute_url()),
+                'video_name': video.get_title_display(),
+                'user_url': urlstart + rmlocale(self.user.get_absolute_url()),
+                'user_name': self.user.username,
+            })
+        self.assertIn(correct_message, msg)
 
     def test_notify__video_follower_revisions(self):
         """Video follower gets an email when new revision added.
