@@ -795,7 +795,8 @@ class Rpc(BaseRpc):
         error = self._save_tasks_for_save(
                 request, save_for_later, language, new_version, is_complete,
                 task_id, task_type, task_notes, task_approved)
-        BillingRecord.objects.insert_record(new_version or latest)
+        if new_version or latest:
+            BillingRecord.objects.insert_record(new_version or latest)
         if error:
             return error
 
