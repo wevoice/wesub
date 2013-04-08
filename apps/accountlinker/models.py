@@ -300,9 +300,13 @@ class ThirdPartyAccountManager(models.Manager):
         """
         try:
             return ThirdPartyAccount.objects.get(type=video_url.type,
-                                                 full_name=video_url.owner_username)
+                                                 username=video_url.owner_username)
         except ThirdPartyAccount.DoesNotExist:
-            return None
+            try:
+                return ThirdPartyAccount.objects.get(type=video_url.type,
+                                                 full_name=video_url.owner_username)
+            except ThirdPartyAccount.DoesNotExist:
+                None
         except ThirdPartyAccount.MultipleObjectsReturned:
             type = YoutubeVideoType(video_url.url)
             uri = type.entry.author[0].uri.text

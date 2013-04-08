@@ -28,7 +28,7 @@ from apps.videos.types import video_type_registrar, UPDATE_VERSION_ACTION
 from apps.videos.types.youtube import YouTubeApiBridge
 from apps.accountlinker.models import ThirdPartyAccount
 from apps.accountlinker.models import (
-    translate_string, AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT
+    AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT
 )
 
 
@@ -36,22 +36,18 @@ UPLOAD_URI_BASE = 'http://gdata.youtube.com/feeds/api/users/default/uploads/%s'
 YOUTUBE_API_SECRET  = getattr(settings, "YOUTUBE_API_SECRET", None)
 
 
+REMOVE_CREDIT_REGEXES = [re.compile(r'(?P<keep>[\w\n\s]*)(?P<start>%s[\s\n]*http://[^\n\s]*)' % \
+                         re.escape(credit)) for credit in [AMARA_SHORT_DESCRIPTON_CREDIT,
+                                                AMARA_DESCRIPTION_CREDIT]]
+
 logger = logging.getLogger(__name__)
 
-def remove_description_credits(description, language_code):
-    credits_found = False
-    # credits will vary according to locale
-    credits = [translate_string(x, language_code) for x in
-                [AMARA_DESCRIPTION_CREDIT, AMARA_SHORT_DESCRIPTON_CREDIT]]
+def remove_description_credits(description):
+    initial_description = description
 
-
-    for credit_to_check in credits:
-        search_result = re.search(r'[\w\n\s]*(?P<start>%s[\s\n]*http://[^\n\s]*)' % \
-                        re.escape(credit_to_check), description)
-        if search_result:
-            description = description[:search_result.start()] + \
-                                   description[search_result.end():]
-            credits_found = True
+    for regex in REMOVE_CREDIT_REGEXES:
+        description = regex.sub("\g<1>", description)
+    credits_found = description != initial_description
     return credits_found, description
 
 class Remover(object):
@@ -86,10 +82,6 @@ class Remover(object):
 
     def _fix_video(self, vurl):
         video = vurl.video
-        language_code = video.language
-
-        if not language_code:
-            language_code = 'en'
 
         vt = video_type_registrar.video_type_for_url(vurl.url)
 
@@ -108,7 +100,7 @@ class Remover(object):
 
         current_description = entry.media.description.text
 
-        must_update , new_description = remove_description_credits(current_description, language_code)
+        must_update , new_description = remove_description_credits(current_description)
         if not must_update:
             logger.info("%s doesn't have desc credit" % vurl.url)
             return video.video_id
