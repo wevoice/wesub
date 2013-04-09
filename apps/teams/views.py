@@ -2030,7 +2030,6 @@ def _clean_empty_translation_tasks(team_video):
                 task.save()
 
 
-
 def _propagate_unpublish_to_tasks(team_video, language_pk):
     """Push the 'unpublishing' of a language to any tasks applying to it.
 
@@ -2062,6 +2061,37 @@ def _propagate_unpublish_to_tasks(team_video, language_pk):
         # it.  Otherwise we'll create a review/approve task.
         _ensure_task_exists(team_video, sl)
         _clean_empty_translation_tasks(team_video)
+
+
+def _get_languages_to_unpublish(subtitle_language):
+    """Get a list of SubtitleLanguage objects that should be unpublished.
+
+    Basically, this will return a list containing:
+
+    * The given SubtitleLanguage.
+    * Any translations based on it.
+    * Any translations based on *those* translations.
+    * Etc.
+
+    This function does its best to handle bad data as well (like circular
+    translation relationships).
+
+    """
+    languages = [subtitle_language]
+    languages_to_delete = []
+    seen = set()
+
+    while languages:
+        next_sl = languages.pop(0)
+
+        if next_sl.language_code in seen:
+            continue
+
+        languages_to_delete.append(next_sl)
+        languages.extend(next_sl.get_dependent_subtitle_languages())
+        seen.add(next_sl.language_code)
+
+    return languages_to_delete
 
 
 def unpublish(request, slug):
@@ -2097,11 +2127,10 @@ def unpublish(request, slug):
         version.unpublish_self_and_children(delete=delete)
         languages.append(version.subtitle_language)
     elif scope == 'dependents':
-        translations = subtitle_language.get_dependent_subtitle_languages()
+        languages = _get_languages_to_unpublish(subtitle_language)
 
-        for sl in [subtitle_language] + translations:
+        for sl in languages:
             sl.unpublish(delete=delete)
-            languages.append(sl)
     else:
         assert False, 'Invalid scope.'
 
