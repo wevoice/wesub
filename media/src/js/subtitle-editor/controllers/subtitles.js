@@ -124,7 +124,7 @@ var angular = angular || null;
 
                     }, function onError() {
                         $scope.status = 'error';
-                        window.alert('Sorry, there was an error...');
+                        $scope.showErrorModal();
                     });
                 }
             });
@@ -153,7 +153,7 @@ var angular = angular || null;
                         
                     }, function onError() {
                         $scope.status = 'error';
-                        window.alert('Sorry, there was an error...');
+                        $scope.showErrorModal();
                     });
 
                 }
@@ -169,7 +169,7 @@ var angular = angular || null;
                     $scope.status = 'saved';
                 }, function onError() {
                     $scope.status = 'error';
-                    window.alert('Sorry, there was an error...');
+                    $scope.showErrorModal();
                 });
 
                 return promise;
@@ -218,6 +218,20 @@ var angular = angular || null;
                 heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
                 buttons: buttons
             });
+        };
+        $scope.showErrorModal = function(message) {
+
+            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
+
+            $scope.$root.$emit("show-modal", {
+                heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
+                buttons: [
+                    {'text': 'Close editor', 'class': 'no', 'fn': function() {
+                        window.location = '/videos/' + subtitleListScope.videoId + "/";
+                    }}
+                ]
+            });
+            $scope.$root.$emit('show-modal-download');
         };
 
         $scope.$root.$on('approve-task', function() {
