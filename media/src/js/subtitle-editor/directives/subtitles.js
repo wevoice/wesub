@@ -349,6 +349,7 @@ var USER_IDLE_MINUTES = 5;
                                 if ($set.scrollTop() !== newScrollTop) {
                                     $set.scrollTop(newScrollTop);
                                 }
+
                             });
                         });
 
