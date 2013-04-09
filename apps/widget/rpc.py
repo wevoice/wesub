@@ -795,8 +795,16 @@ class Rpc(BaseRpc):
         error = self._save_tasks_for_save(
                 request, save_for_later, language, new_version, is_complete,
                 task_id, task_type, task_notes, task_approved)
-        if new_version or latest:
-            BillingRecord.objects.insert_record(new_version or latest)
+        try:
+           # if this the result of draft upload + review, you might not be
+           # getting a new public version. We however, create billing records
+           # regardless of publishing status
+           version_to_bill = new_version or latest or \
+                             language.subtitleversion_set.order_by('-version_no')[0]
+           BillingRecord.objects.insert_record(version_to_bill)
+        except IndexError:
+           pass
+
         if error:
             return error
 
