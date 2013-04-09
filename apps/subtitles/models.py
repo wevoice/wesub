@@ -837,7 +837,15 @@ class SubtitleLanguage(models.Model):
         If delete is given, "delete" them entirely.
 
         """
-        sv = self.subtitleversion_set.public().order_by('version_number')[:1]
+        base = self.subtitleversion_set
+
+        # If we're deleting an entire language, we should include private
+        # versions.  If we're just unpublishing, we only worry about public
+        # things.
+        base = base.extant() if delete else base.public()
+
+        sv = base.order_by('version_number')[:1]
+
         return sv[0].unpublish_self_and_children(delete=delete) if sv else None
 
     @property
