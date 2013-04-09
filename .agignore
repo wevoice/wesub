@@ -72,3 +72,4 @@ apps/webdriver_testing/Screenshots/results.html
 jquery-*.js
 amara-jquery-*.js
 *.min.js
+tmp.sql
