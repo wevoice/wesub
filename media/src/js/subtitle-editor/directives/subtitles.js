@@ -169,11 +169,6 @@ var USER_IDLE_MINUTES = 5;
                                 video.togglePlay();
                             }
 
-                            if (e.keyCode === 40 || e.keyCode === 38) {
-                                var scroll = $('.reference').scrollTop();
-                                $('.working, .reference').scrollTop(scroll + (e.keyCode === 40 ? 100 : -100));
-                                e.preventDefault();
-                            }
                         });
                         $(elm).on('mousemove', function() {
 
@@ -340,12 +335,29 @@ var USER_IDLE_MINUTES = 5;
                         scope.isEditable = attrs.editable === 'true';
                         scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
 
+                        // Cache the jQuery selection of the element.
+                        var $elm = $(elm);
+
+                        // Handle scroll.
+                        $elm.parent().scroll(function() {
+                            var newScrollTop = $elm.parent().scrollTop();
+
+                            $('div.subtitles').each(function() {
+
+                                var $set = $(this);
+
+                                if ($set.scrollTop() !== newScrollTop) {
+                                    $set.scrollTop(newScrollTop);
+                                }
+                            });
+                        });
+
                         if (scope.isEditable) {
-                            $(elm).click(function(e) {
+                            $elm.click(function(e) {
                                 onSubtitleItemSelected(e.srcElement || e.target);
                             });
-                            $(elm).on('keydown', 'textarea', onSubtitleTextKeyDown);
-                            $(elm).on('keyup', 'textarea', onSubtitleTextKeyUp);
+                            $elm.on('keydown', 'textarea', onSubtitleTextKeyDown);
+                            $elm.on('keyup', 'textarea', onSubtitleTextKeyUp);
 
                             // In order to catch an <esc> key sequence, we need to catch
                             // the keycode on the document, not the list. Also, keyup must
@@ -365,7 +377,7 @@ var USER_IDLE_MINUTES = 5;
                             // if a subtitleListItem is created and its index matches the
                             // focus index that is set when adding the new subtitle from the
                             // controller.
-                            $(elm).on('selectFocusedSubtitle', function() {
+                            $elm.on('selectFocusedSubtitle', function() {
 
                                 var $subtitle = $('li', elm).eq(scope.focusIndex);
 
