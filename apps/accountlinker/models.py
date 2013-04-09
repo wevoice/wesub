@@ -43,6 +43,9 @@ AMARA_CREDIT = translation.ugettext("Subtitles by the Amara.org community")
 AMARA_DESCRIPTION_CREDIT = translation.ugettext(
     "Help us caption and translate this video on Amara.org")
 
+AMARA_SHORT_DESCRIPTON_CREDIT = translation.ugettext(
+    "Help us caption & translate this video!")
+
 
 def youtube_sync(video, language):
     """
@@ -165,18 +168,19 @@ def add_amara_description_credit(old_description, video_url, language='en',
     """
     Prepend the credit to the existing description.
     """
-    credit = "%s\n\n%s" % (translate_string(AMARA_DESCRIPTION_CREDIT,
+    credit = "%s\n\n%s" % (translate_string(AMARA_SHORT_DESCRIPTON_CREDIT,
         language), video_url)
 
+    old_description = old_description or u''
     if credit in old_description:
         return old_description
 
     temp = "%s\n\n%s"
 
     if prepend:
-        return temp % (credit, old_description or "")
+        return temp % (credit, old_description)
     else:
-        return temp % (old_description or "", credit)
+        return temp % (old_description, credit)
 
 
 class ThirdPartyAccountManager(models.Manager):
@@ -296,9 +300,13 @@ class ThirdPartyAccountManager(models.Manager):
         """
         try:
             return ThirdPartyAccount.objects.get(type=video_url.type,
-                                                 full_name=video_url.owner_username)
+                                                 username=video_url.owner_username)
         except ThirdPartyAccount.DoesNotExist:
-            return None
+            try:
+                return ThirdPartyAccount.objects.get(type=video_url.type,
+                                                 full_name=video_url.owner_username)
+            except ThirdPartyAccount.DoesNotExist:
+                None
         except ThirdPartyAccount.MultipleObjectsReturned:
             type = YoutubeVideoType(video_url.url)
             uri = type.entry.author[0].uri.text

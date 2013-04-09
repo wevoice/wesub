@@ -20,6 +20,7 @@ import codecs
 import feedparser
 import json
 import os
+import random
 import re
 import tempfile
 from datetime import datetime
@@ -33,6 +34,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sites.models import Site
+from django.utils.text import get_valid_filename
 
 from comments.forms import CommentForm
 from comments.models import Comment
@@ -2699,7 +2702,22 @@ class BaseDownloadTest(object):
             'lang_pk': language.pk
         })
         self.assertEqual(res.status_code, 200)
+        expected_filename = get_valid_filename(("%s.%s.%s" % (
+            language.version().title,
+            language.language,
+            format)))
+        expected_header = 'attachment; filename=%s' % expected_filename
+        self.assertEqual(res['Content-Disposition'] , expected_header)
         return res.content
+
+    def set_subt_title(self):
+        self.language.is_original = True
+        self.language.save()
+        self.sv = self.language.version()
+        self.test_title = "This is a really long title used to make sure we are not truncating file names"
+        self.assertTrue(len(self.test_title) > 60)
+        self.sv.title = self.test_title
+        self.sv.save()
 
 class TestSRT(WebUseTest, BaseDownloadTest):
     fixtures = ['test.json']
@@ -2707,8 +2725,9 @@ class TestSRT(WebUseTest, BaseDownloadTest):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
         self.video = Video.get_or_create_for_url("http://www.example.com/video.mp4")[0]
+
         self.language = SubtitleLanguage.objects.get_or_create(
-            video=self.video, is_forked=True, language='en')[0]
+            video=self.video, is_forked=True, language='en', is_original=True)[0]
 
     def test_download_markup(self):
         subs_data = ['one line',
@@ -2719,6 +2738,7 @@ class TestSRT(WebUseTest, BaseDownloadTest):
                      '*[inside brackets]*',
         ]
         add_subs(self.language,subs_data)
+        self.set_subt_title()
         content = self._download_subs(self.language, 'srt')
         self.assertIn('<b>with</b>' , content)
         self.assertIn('<i>[inside brackets]</i>' , content)
@@ -2776,6 +2796,7 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
     def test_dfxp_serializer(self):
         TTMLSubtitles.use_named_styles = False
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        self.set_subt_title()
         content = self._download_subs(self.language, 'dfxp')
         self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
         self.assertTrue(re.findall('<span style="strong">[\s]*bold[\s]*</span>', content))
@@ -2784,6 +2805,7 @@ class DFXPTest(WebUseTest, BaseDownloadTest):
 
     def test_dfxp_serializer_inline(self):
         add_subs(self.language, [ 'Here we\ngo! This must be **bold** and this in *italic* and this with _underline_'])
+        self.set_subt_title()
         content = self._download_subs(self.language, 'dfxp')
         self.assertTrue(re.findall('[\s]*Here we[\s]*<br/>[\s]*go', content))
         self.assertTrue(re.findall('<span tts:fontWeight="bold">[\s]*bold[\s]*</span>', content))
@@ -2966,6 +2988,35 @@ class TimingChangeTest(TestCase):
 
 class CreditTest(TestCase):
 
+    def setUp(self):
+        original_video , created = Video.get_or_create_for_url("http://www.example.com/original.mp4")
+        self.original_video = original_video
+        language = SubtitleLanguage.objects.create(video=original_video, language='en', is_original=True, is_forked=True)
+        self.version = SubtitleVersion.objects.create(
+            language=language,
+            version_no=0,
+            datetime_started=datetime.now(),
+            is_forked = language.is_forked
+        )
+
+    def _sub_list_to_sv(self, subs):
+        user = User.objects.all()[0]
+        new_sv = SubtitleVersion.objects.create(
+            language=self.version.language,
+            version_no=self.version.version_no +1,
+            user=user,
+            datetime_started=datetime.now())
+        for i,s in enumerate(subs):
+            Subtitle.objects.create(
+               version=new_sv,
+               subtitle_id = int(random.random()*10e12),
+               subtitle_text = s['text'],
+               subtitle_order = i,
+               start_time = s['start'],
+               end_time = s['end'],
+            )
+        return new_sv
+
     def test_last_sub_not_synced(self):
         subs = [
             {
@@ -2983,7 +3034,7 @@ class CreditTest(TestCase):
 
         self.assertEquals(last_sub['end'], -1)
 
-        subs = add_credit(subs, 'en', duration)
+        subs = add_credit(subs, 'en', duration, self._sub_list_to_sv(subs))
         self.assertEquals(last_sub['text'], subs[-1]['text'])
 
     def test_straight_up_video(self):
@@ -2999,7 +3050,7 @@ class CreditTest(TestCase):
 
         duration = 10  # Seconds
 
-        subs = add_credit(subs, 'en', duration)
+        subs = add_credit(subs, 'en', duration, self._sub_list_to_sv(subs))
         last_sub = subs[-1]
         self.assertEquals(last_sub['text'],
                 "Subtitles by the Amara.org community")
@@ -3019,7 +3070,7 @@ class CreditTest(TestCase):
 
         duration = 10  # Seconds
 
-        subs = add_credit(subs, 'en', duration)
+        subs = add_credit(subs, 'en', duration, self._sub_list_to_sv(subs))
         last_sub = subs[-1]
         self.assertEquals(last_sub['text'],
                 "Subtitles by the Amara.org community")
@@ -3038,7 +3089,7 @@ class CreditTest(TestCase):
             }
         ]
 
-        subs = add_credit(subs, 'en', duration)
+        subs = add_credit(subs, 'en', duration, self._sub_list_to_sv(subs))
         self.assertEquals(len(subs), 1)
         last_sub = subs[-1]
         self.assertEquals(last_sub['text'], 'text')
@@ -3050,7 +3101,7 @@ class CreditTest(TestCase):
         self.assertTrue(should_add_credit(sv))
 
         video = sv.language.video
-        team = Team.objects.all()[0]
+        team, created = Team.objects.get_or_create(name='name', slug='slug')
         user = User.objects.all()[0]
 
         TeamVideo.objects.create(video=video, team=team, added_by=user)
@@ -3064,12 +3115,28 @@ class CreditTest(TestCase):
 class ShortUrlTest(TestCase):
     def setUp(self):
         self.video = Video.get_or_create_for_url("http://example.com/hey.mp4")[0]
+        site = Site.objects.get_current()
+        site.domain = "www.amara.org"
+        site.save()
+        from videos.templatetags.videos_tags import shortlink_for_video
+        # on production our domain might have www,
+        # make sure we have such domain and that
+        # www is not present
+        self.short_url = shortlink_for_video(self.video)
+        Site.objects.clear_cache()
+
+    def tearDown(self):
+        Site.objects.clear_cache()
 
     def test_short_url(self):
-        from videos.templatetags.videos_tags import shortlink_for_video
-        short_url = shortlink_for_video(self.video)
-        response = self.client.get(short_url)
+        response = self.client.get(self.short_url, follow=True)
         regular_url = reverse("videos:video", args=(self.video.video_id,))
-        # short urls have no language path on the url, so take that out
-        regular_url = '/'.join(regular_url.split('/')[2:])
-        self.assertTrue(response['Location'].endswith(regular_url))
+
+        location = response.redirect_chain[-1][0]
+        self.assertTrue(location.endswith(regular_url))
+
+    def test_short_url_no_locale(self):
+        self.assertFalse('/en/' in self.short_url)
+
+    def test_short_url_no_www(self):
+        self.assertTrue(self.short_url.startswith('%s://amara.org' % settings.DEFAULT_PROTOCOL))

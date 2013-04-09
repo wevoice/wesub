@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import datetime
 import logging
+from math import ceil
 import csv
 from itertools import groupby
 
@@ -60,7 +61,9 @@ from subtitles.models import (
 from functools import partial
 
 logger = logging.getLogger(__name__)
+celery_logger = logging.getLogger('celery.task')
 
+BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 ALL_LANGUAGES = [(val, _(name))for val, name in settings.ALL_LANGUAGES]
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
@@ -668,9 +671,6 @@ class TeamVideo(models.Model):
         video_thumb = self.video.get_thumbnail(fallback=False)
         if video_thumb:
             return video_thumb
-
-        if self.team.logo:
-            return self.team.logo_thumbnail()
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL_BASE
 
@@ -2067,26 +2067,30 @@ class Task(models.Model):
 
         if not hasattr(self, "_subtitle_version"):
             video = Video.objects.get(teamvideo=self.team_video_id)
-            language = video.subtitle_language(self.language)
+            video_subtitle_language = video.subtitle_language(self.language)
+            language = video_subtitle_language
             self._subtitle_version = language.version(public_only=False) if language else None
 
         return self._subtitle_version
 
+
     def is_blocked(self):
-        if self.get_type_display() != 'Translate':
-            return False
-
         subtitle_version = self.get_subtitle_version()
-
-        if not subtitle_version:
+        standard_language = subtitle_version.language.standard_language if subtitle_version else None
+        can_perform = ( standard_language and
+                        standard_language.is_complete_and_synced() and
+                        standard_language.version(public_only=False).is_public)
+        # if it's not a translation, no blocking ever
+        if not subtitle_version or not standard_language:
             return False
-
-        standard_language = subtitle_version.language.standard_language
-
-        if not standard_language:
-            return False
-
-        return not standard_language.is_complete_and_synced()
+        if self.get_type_display() != 'Translate':
+            if self.get_type_display() in ('Review', 'Approve'):
+                # review and approve tasks will be blocked if they're
+                # a translation and they have a draft and the source
+                # language no longer  has published version
+                if not can_perform or standard_language.language == self.language:
+                    return True
+        return not can_perform
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         if self.type in (self.TYPE_IDS['Review'], self.TYPE_IDS['Approve']) and not self.deleted:
@@ -2428,12 +2432,19 @@ class TeamNotificationSetting(models.Model):
 
 
 class BillingReport(models.Model):
+    TYPE_OLD = 1
+    TYPE_NEW = 2
+    TYPE_CHOICES = (
+        (TYPE_OLD, 'Old model'),
+        (TYPE_NEW, 'New model'),
+    )
     team = models.ForeignKey(Team)
     start_date = models.DateField()
     end_date = models.DateField()
     csv_file = S3EnabledFileField(blank=True, null=True,
             upload_to='teams/billing/')
     processed = models.DateTimeField(blank=True, null=True)
+    type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
 
     def __unicode__(self):
         return "%s (%s - %s)" % (self.team.slug,
@@ -2508,6 +2519,7 @@ class BillingReport(models.Model):
         Crowd created language is a language
         * that is not imported
         """
+        from videos.types.youtube import FROM_YOUTUBE_MARKER
         imported = []
         crowd_created = []
 
@@ -2522,7 +2534,7 @@ class BillingReport(models.Model):
                 crowd_created.append(lang)
                 continue
 
-            if v.note == 'From youtube':
+            if v.note == FROM_YOUTUBE_MARKER:
                 imported.append(lang)
                 continue
 
@@ -2608,7 +2620,7 @@ class BillingReport(models.Model):
             counter or ''
         ]
 
-    def process(self):
+    def generate_rows_type_old(self):
         domain = Site.objects.get_current().domain
         protocol = getattr(settings, 'DEFAULT_PROTOCOL')
         host = '%s://%s' % (protocol, domain)
@@ -2616,10 +2628,21 @@ class BillingReport(models.Model):
         header = ['Video title', 'Video URL', 'Video language', 'Source',
                 'Billable minutes', 'Version created', 'Language number']
 
-        rows = self._get_row_data(host, header)
-
-        fn = '/tmp/bill-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
-                self.end_str, self.pk)
+        return  self._get_row_data(host, header)
+    def process(self):
+        """
+        Generate the correct rows (including headers), saves it to a tempo file,
+        then set's that file to the csv_file property, which if , using the S3
+        storage will take care of exporting it to s3.
+        """
+        if self.type == BillingReport.TYPE_OLD:
+            rows = self.generate_rows_type_old()
+        elif self.type == BillingReport.TYPE_NEW:
+            rows = BillingRecord.objects.csv_report_for_team(self.team,
+                                                             self.start_date,
+                                                             self.end_date)
+        fn = '/tmp/bill-%s-%s-%s-%s-%s.csv' % (self.team.slug, self.start_str,
+                self.end_str, self.get_type_display(), self.pk)
 
         with open(fn, 'w') as f:
             writer = csv.writer(f)
@@ -2628,7 +2651,6 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
-
     @property
     def start_str(self):
         return self.start_date.strftime("%Y%m%d")
@@ -2677,6 +2699,84 @@ class BillingRecordManager(models.Manager):
 
         return rows
 
+    def insert_records_for_translations(self, billing_record):
+        """
+        IF you've translated from an incomplete language, and later on that
+        language is completed, we must check if any translations are now
+        complete and therefore should have billing records with them
+        """
+        translations = SubtitleLanguage.objects.filter(
+            video=billing_record.subtitle_language.video,
+            standard_language=billing_record.subtitle_language,
+            subtitleversion__isnull=False)
+        inserted = []
+        for translation in translations:
+            version = translation.version(public_only=False)
+            if version:
+               inserted.append(self.insert_record(version))
+        return filter(bool, inserted)
+
+    def insert_record(self, version):
+        """
+        Figures out if this version qualifies for a billing record, and
+        if so creates one. This should be self contained, e.g. safe to call
+        for any version. No records should be created if not needed, and it
+        won't create multiples.
+
+        If this language has translations it will check if any of those are now
+        eligible for BillingRecords and create one accordingly.
+        """
+        from teams.models import BillingRecord
+
+        celery_logger.debug('insert billing record')
+
+        language = version.language
+        video = language.video
+        tv = video.get_team_video()
+
+        if not tv:
+            celery_logger.debug('not a team video')
+            return
+
+        if not language.is_complete_and_synced(public_only=False):
+            celery_logger.debug('language not complete')
+            return
+
+
+        try:
+            # we already have a record
+            previous_record = BillingRecord.objects.get(video=video,
+                                                            subtitle_version__language=language)
+            # make sure we update it
+            celery_logger.debug('a billing record for this language exists')
+            previous_record.is_original = video._original_subtitle_language() == language
+            previous_record.save()
+            return
+        except:
+            pass
+
+        if SubtitleVersion.objects.filter(
+                language=language,
+                datetime_started__lt=BILLING_CUTOFF).exclude(
+                pk=version.pk).exists():
+            celery_logger.debug('an older version exists')
+            return
+
+        is_original = language.is_original
+        source = version.note
+        team = tv.team
+
+        new_record = BillingRecord.objects.create(
+            video=video,
+            subtitle_version=version,
+            subtitle_language=language,
+            is_original=is_original, team=team,
+            created=version.datetime_started,
+            source=source,
+            user=version.user)
+        from_translations = self.insert_records_for_translations(new_record)
+        return new_record, from_translations
+
 
 class BillingRecord(models.Model):
     video = models.ForeignKey(Video)
@@ -2709,7 +2809,7 @@ class BillingRecord(models.Model):
     def get_minutes(self):
         """
         Return the number of minutes the subtitles specified in `version`
-        cover as a float.
+        cover as an int.
         """
         subs = self.subtitle_version.ordered_subtitles()
 
@@ -2726,8 +2826,12 @@ class BillingRecord(models.Model):
 
         if not end:
             end = subs[-1].start_time
+        duration_seconds =  (end - start) / 1000.0
+        minutes = duration_seconds/60.0
+        return  int(ceil(minutes))
 
-        return round((float(end) - float(start)) / (60 * 1000), 2)
+
+
 
 
 class Partner(models.Model):
