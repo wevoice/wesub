@@ -93,7 +93,7 @@ def make_subtitle_lines(count, is_synced=True):
 
 def make_subtitle_version(subtitle_language, subtitles=[], author=None,
                           parents=None, committer=None, complete=None,
-                          title=None, description=None):
+                          title=None, description=None, created=None,note=None):
     committer = committer or author
     return pipeline.add_subtitles(subtitle_language.video,
                                   subtitle_language.language_code,
@@ -103,6 +103,8 @@ def make_subtitle_version(subtitle_language, subtitles=[], author=None,
                                   committer=committer,
                                   complete=complete,
                                   title=title,
+                                  created=created,
+                                  note=note,
                                   description=description)
 
 def make_rollback_to(subtitle_language, version_number):

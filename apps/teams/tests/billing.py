@@ -3,76 +3,81 @@ from datetime import datetime, timedelta, date
 from django.test import TestCase
 
 from apps.auth.models import CustomUser as User
-from apps.teams.models import Team, BillingRecord, BillingReport, Workflow
+from apps.teams.models import (
+    Team, BillingRecord, BillingReport, Workflow, TeamVideo
+)
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.pipeline import add_subtitles
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.types.youtube import FROM_YOUTUBE_MARKER
-from apps.videos.tests.data import make_subtitle_lines
+from apps.videos.tests.data import (
+    make_subtitle_lines, make_subtitle_language, get_video, get_user,
+    make_subtitle_version
+)
 
 
 class BillingTest(TestCase):
     fixtures = [
         "staging_users.json",
-        "staging_videos.json",
         "staging_teams.json"
     ]
 
+    def setUp(self):
+        self.video  = get_video()
+        self.team =Team.objects.all()[0]
+        TeamVideo.objects.get_or_create(video=self.video, team=self.team,
+                                        added_by = get_user()
+        )
     def test_approved(self):
-        from apps.teams.moderation_const import APPROVED
 
         self.assertEquals(0, Workflow.objects.count())
 
-        team = Team.objects.all()[0]
-        team.workflow_enabled = True
-        team.save()
+        self.team.workflow_enabled = True
+        self.team.save()
 
-        Workflow.objects.create(team=team, approve_allowed=20)
+        Workflow.objects.create(team=self.team, approve_allowed=20)
 
         self.assertEquals(1, Workflow.objects.count())
-        self.assertTrue(team.get_workflow().approve_enabled)
+        self.assertTrue(self.team.get_workflow().approve_enabled)
 
-        language = SubtitleLanguage.objects.all()[0]
+        english = make_subtitle_language(self.video, 'en')
+        spanish = make_subtitle_language(self.video, 'es')
 
         for i in range(1, 10):
-            SubtitleVersion.objects.create(language=language,
-                                           created=datetime(2012, 1, i, 0, 0, 0),
-                                           version_number=i)
+            add_subtitles(self.video, english.language_code,[],
+                          created=datetime(2012, 1, i, 0, 0, 0),
+                          visibility='private',
+            )
 
-        v1 = SubtitleVersion.objects.get(subtitle_language=language, version_number=3)
-        v2 = SubtitleVersion.objects.get(subtitle_language=language, version_number=6)
 
-        v1.moderation_status = APPROVED
-        v1.save()
-        v2.moderation_status = APPROVED
-        v2.save()
+        # make two versions public to be sure we're selecting the very first one
+        v1_en = SubtitleVersion.objects.get(subtitle_language=english, version_number=3)
+        v2_en = SubtitleVersion.objects.get(subtitle_language=english, version_number=6)
 
-        b = BillingReport.objects.create(team=team,
+        v1_en.publish()
+        v1_en.save()
+        v2_en.publish()
+        v2_en.save()
+
+        b = BillingReport.objects.create(team=self.team,
                                          start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
 
-        langs = language.video.subtitlelanguage_set.all()
-        c = langs[0]
-        d = team.created - timedelta(days=5)
-        SubtitleVersion.objects.create(language=c, version_no=0,
-                                       note=FROM_YOUTUBE_MARKER,
-                                       datetime_started=d)
+        past_date = self.team.created - timedelta(days=5)
+        make_subtitle_version(spanish, created=past_date, note=FROM_YOUTUBE_MARKER)
 
-        self.assertTrue(len(langs) > 0)
+
+        langs = self.video.newsubtitlelanguage_set.all()
+        self.assertEqual(len(langs) , 2)
         created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
+        print created
 
-        self.assertTrue(len(created) > 0)
+        self.assertEqual(len(created) , 1)
 
         v = created[0][1]
-        self.assertEquals(v.version_no, 3)
+        self.assertEquals(v.version_number, 3)
+        self.assertEqual(v.subtitle_language , english)
 
-        team.workflow_enabled = False
-        team.save()
-
-        created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
-        self.assertEquals(1, len(created))
-        v = created[0][1]
-        self.assertEquals(v.version_no, 9)
 
     def test_get_imported(self):
 
@@ -96,28 +101,14 @@ class BillingTest(TestCase):
         after_team_created = team_created + timedelta(days=10)
 
         # Imported
-        SubtitleVersion.objects.create(subtitle_language=sl_fr,
-                                       created=before_team_created, note=FROM_YOUTUBE_MARKER,
-                                       version_number=0)
-
+        add_subtitles(video, 'fr', [], created=before_team_created, note=FROM_YOUTUBE_MARKER)
         # Created
-        SubtitleVersion.objects.create(subtitle_language=sl_fr,
-                                       created=after_team_created,
-                                       version_number=1)
-
-        SubtitleVersion.objects.create(subtitle_language=sl_en,
-                                       created=before_team_created, note=FROM_YOUTUBE_MARKER,
-                                       version_number=0)
-
+        add_subtitles(video, 'fr', [], created=after_team_created)
+        add_subtitles(video, 'en', [], created=before_team_created, note=FROM_YOUTUBE_MARKER)
         # Imported
-        SubtitleVersion.objects.create(subtitle_language=sl_es,
-                                       created=before_team_created,
-                                       version_number=0)
-
+        add_subtitles(video, 'es', [], created=before_team_created)
         # Imported
-        SubtitleVersion.objects.create(subtitle_language=sl_cs,
-                                       created=after_team_created, note=FROM_YOUTUBE_MARKER,
-                                       version_number=0)
+        add_subtitles(video, 'cs', [], created=after_team_created, note=FROM_YOUTUBE_MARKER)
 
         # Done with setup, let's test things
 
@@ -137,6 +128,7 @@ class BillingTest(TestCase):
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
+        video.primary_audio_language_code = 'en'
         video.user = user
         video.save()
 
@@ -155,7 +147,7 @@ class BillingTest(TestCase):
         self.assertEquals(br.video.pk, video.pk)
         self.assertEquals(br.team.pk, video.get_team_video().team.pk)
         self.assertEquals(br.created, now)
-        self.assertEquals(br.is_original, sl.is_original)
+        self.assertEquals(br.is_original, sl.is_primary_audio_language())
         self.assertEquals(br.user.pk, user.pk)
         self.assertEquals(br.new_subtitle_language.pk, sl.pk)
 
@@ -227,23 +219,26 @@ class BillingTest(TestCase):
 
         translation_version = add_subtitles(
             video, 'pt', make_subtitle_lines(4, is_synced=False),
-                author=user, translated_from='en')
+                author=user, parents=[original_version])
         translation_language = translation_version.subtitle_language
         # no billing for this one, because it isn't synced!
         self.assertEquals(0, BillingRecord.objects.all().count())
 
 
-        # now sync the original language
+        # now sync them
         original_version = add_subtitles(
             video, 'en', make_subtitle_lines(4, is_synced=True),
                 complete=True, author=user)
         original_lang = original_version.subtitle_language
         video_changed_tasks(video.pk, original_version.pk)
-
-        # now that the original version is synced we should bill for both
         bl_original = BillingRecord.objects.filter(new_subtitle_language=original_lang)
-        bl_translation = BillingRecord.objects.filter(new_subtitle_language=translation_language)
         self.assertEquals(1, bl_original.count())
+
+        translation_version = add_subtitles(
+            video, 'pt', make_subtitle_lines(5),
+            author=user, parents=[original_version], complete=True)
+        video_changed_tasks(video.pk, translation_version.pk)
+        bl_translation = BillingRecord.objects.filter(new_subtitle_language=translation_language)
         self.assertEquals(1, bl_translation.count())
 
 

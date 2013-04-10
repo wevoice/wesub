@@ -2453,20 +2453,23 @@ class BillingReport(models.Model):
 
         return True
 
-    def _get_lang_data(self, languages, start_date):
+    def _get_lang_data(self, languages, from_date):
         workflow = self.team.get_workflow()
 
         # TODO:
         # These do the same for now.  If a workflow is enabled, we should get
         # the first approved version.  Not sure how to do that yet.
         imported, crowd_created = self._separate_languages(languages)
+        print imported, crowd_created
 
         # TODO: Are we going to count deleted versions here?  If so, the
         # get_tip() calls here may need full=True to get deleted tips...
+        for l in crowd_created:
+            print "lang%s ; first poublic:%s" % (l, l.first_public_version())
         if workflow.approve_enabled:
-            imported_data = [(language, language.get_tip())
+            imported_data = [(language, language.first_public_version())
                                     for language in imported]
-            crowd_created_data = [(language, language.get_tip())
+            crowd_created_data = [(language, language.first_public_version())
                                     for language in crowd_created]
         else:
             imported_data = [(language, language.get_tip()) for
@@ -2478,8 +2481,10 @@ class BillingReport(models.Model):
 
         created_result = []
 
+        # now make sure we don't have any versions from before the
+        # from_date
         for lang, ver in crowd_created_data:
-            if ver and ver.created < start_date:
+            if ver and ver.created < from_date:
                 old_version_counter += 1
                 continue
 
@@ -2506,24 +2511,18 @@ class BillingReport(models.Model):
 
         for lang in languages:
             try:
-                v = lang.subtitleversion_set.filter(version_number=0)[0]
+                v = lang.subtitleversion_set.order_by('version_number')[0]
             except IndexError:
                 # Throw away languages that don't have a zero version.
                 continue
 
             if lang.language_code == 'en':
                 crowd_created.append(lang)
-                continue
-
-            if v.note == FROM_YOUTUBE_MARKER or v.origin == ORIGIN_IMPORTED:
+            elif v.note == FROM_YOUTUBE_MARKER or v.origin == ORIGIN_IMPORTED or \
+                v.created < self.team.created:
                 imported.append(lang)
-                continue
-
-            if v.created < self.team.created:
-                imported.append(lang)
-                continue
-
-            crowd_created.append(lang)
+            else:
+                crowd_created.append(lang)
 
         return imported, crowd_created
 
@@ -2669,7 +2668,7 @@ class BillingRecordManager(models.Manager):
             for r in records:
                 rows.append([
                     video.video_id,
-                    r.subtitle_language.language,
+                    r.new_subtitle_language.language_code,
                     r.minutes,
                     r.is_original,
                     r.team.slug,

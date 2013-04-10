@@ -504,6 +504,13 @@ class SubtitleLanguage(models.Model):
         """
         return self.get_tip(public=True)
 
+    def first_public_version(self):
+        """Returns the very fist version to be made public of none"""
+        try:
+            return self.subtitleversion_set.public().order_by("version_number")[0]
+        except IndexError:
+            return None
+
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
@@ -1354,6 +1361,7 @@ class SubtitleVersion(models.Model):
 
     def previous_version(self, full=False):
         """Return the previous SubtitleVersion.
+
 
         By default this does not return deleted versions.  If full is given
         deleted versions will be returned.
