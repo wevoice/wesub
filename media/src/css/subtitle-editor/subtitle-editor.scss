@@ -396,17 +396,18 @@ section.main {
 
         a.scroll-lock {
             background: #414243 url('../../../images/editor/icons.png') center center no-repeat;
-            bottom: 10px;
-            height: 20px;
+            bottom: 11px;
+            height: 25px;
             position: absolute;
             right: 20px;
-            width: 20px;
+            width: 25px;
+            @include border-radius(2px);
 
             &.locked {
-                background-position: center -121px;
+                background-position: center -119px;
             }
             &.unlocked {
-                background-position: center -145px;
+                background-position: center -143px;
             }
         }
     }
