@@ -47,7 +47,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, TaskUploadForm, ChooseTeamForm
+    UnpublishForm, MoveTeamVideoForm, TaskUploadForm, BillingReportForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -2188,24 +2188,26 @@ def billing(request):
         raise Http404
 
     if request.method == 'POST':
-        form = ChooseTeamForm(request.POST)
+        form = BillingReportForm(request.POST)
         if form.is_valid():
             team = form.cleaned_data.get('team')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
+            report_type = form.cleaned_data.get('type')
 
             report = BillingReport.objects.create(team=team,
-                    start_date=start_date, end_date=end_date)
+                    start_date=start_date, end_date=end_date, type=report_type)
 
             process_billing_report.delay(report.pk)
 
     else:
-        form = ChooseTeamForm()
+        form = BillingReportForm()
 
     reports = BillingReport.objects.all().order_by('-pk')
 
-    return render_to_response('teams/billing/choose.html', {
+    return render_to_response('teams/billing/reports.html', {
         'form': form,
         'reports': reports,
         'cutoff': BILLING_CUTOFF
     }, RequestContext(request))
+

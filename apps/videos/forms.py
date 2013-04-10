@@ -146,7 +146,6 @@ href="mailto:%s">contact us</a>!""") % settings.FEEDBACK_EMAIL))
             output[key] = '/n'.join([force_unicode(i) for i in value])
         return output
 
-
 class UserTestResultForm(forms.ModelForm):
 
     class Meta:

@@ -342,7 +342,7 @@ class TeamsTest(TestCase):
     def _make_data(self, video_id, lang):
 
         return {
-            'language': lang,
+            'language_code': lang,
             'video': video_id,
             'subtitles': open(os.path.join(settings.PROJECT_ROOT, "apps", 'videos', 'fixtures' ,'test.srt'))
             }
@@ -1404,7 +1404,6 @@ class PartnerTest(TestCase):
         self.assertTrue(partner.is_admin(user))
 
 
-class BillingTest(TestCase):
 
     def setUp(self):
         fix_teams_roles()
@@ -1628,4 +1627,4 @@ class BillingTest(TestCase):
         self.assertEquals(1, BillingRecord.objects.count())
 
         br = BillingRecord.objects.all()[0]
-        self.assertEquals(br.minutes, 0.2)
+        self.assertEquals(br.minutes, 1)

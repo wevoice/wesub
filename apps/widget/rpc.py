@@ -25,7 +25,8 @@ from django.utils.translation import ugettext as _
 
 from statistic.tasks import st_widget_view_statistic_update
 from subtitles import models as new_models
-from teams.models import Task, Workflow, Team
+from teams.models import Task, Workflow, Team, BillingRecord
+from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
     can_publish_edits_immediately, can_review, can_approve, can_assign_task,
@@ -828,6 +829,14 @@ class Rpc(BaseRpc):
         error = self._save_tasks_for_save(
                 request, save_for_later, language, new_version, language.subtitles_complete,
                 task_id, task_type, task_notes, task_approved)
+        try:
+           # if this the result of draft upload + review, you might not be
+           # getting a new public version. We however, create billing records
+           # regardless of publishing status
+           version_to_bill = new_version or language.subtitleversion_set.extant().order_by('-version_number')[0]
+           BillingRecord.objects.insert_record(version_to_bill)
+        except IndexError:
+           pass
 
         if error:
             return error

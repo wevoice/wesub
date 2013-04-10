@@ -34,6 +34,7 @@
 # # https://en.wikipedia.org/wiki/Arctic_Tern
 
 import datetime
+import time
 import csv as csv_module
 import os, sys
 import random
@@ -871,6 +872,10 @@ def build_option_parser():
                  help='django settings module to use',
                  metavar='MODULE_NAME')
 
+    p.add_option('-S', '--sleep', default=None,
+                 help='sleep for N milliseconds before starting',
+                 metavar='N')
+
     g = OptionGroup(p, "Commands")
 
     g.add_option('-C', '--count', dest='command', default=None,
@@ -912,6 +917,17 @@ def main():
 
     setup_path()
     setup_settings(options)
+
+    if options.sleep:
+        ms = int(options.sleep)
+
+        print 'Sleeping for %dms...' % ms
+        sys.stdout.flush()
+
+        time.sleep(ms / 1000.0)
+
+        print 'Waking up...'
+        sys.stdout.flush()
 
     if options.command == 'count':
         count()

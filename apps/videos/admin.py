@@ -21,6 +21,9 @@ from videos.models import (
     Video, SubtitleLanguage, SubtitleVersion, VideoFeed, VideoMetadata,
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
+from videos.tasks import (
+    video_changed_tasks, upload_subtitles_to_original_service
+)
 
 from django.core.urlresolvers import reverse
 from utils.celery_search_index import update_search_index
@@ -96,6 +99,39 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def video_title(self, obj):
         return unicode(obj.video)
     video_title.short_description = 'video'
+
+    def delete_model(self, request, obj):
+        video = obj.video
+        super(SubtitleLanguageAdmin, self).delete_model(request, obj)
+        video_changed_tasks.delay(video.pk)
+
+    def versions(self, obj):
+        version_qs = obj.subtitleversion_set.all()
+        link_tpl = '<a href="%s">#%s</a>'
+        links = []
+        for item in version_qs:
+            url = reverse('admin:videos_subtitleversion_change', args=[item.pk])
+            links.append(link_tpl % (url, item.version_no))
+        return ', '.join(links)
+
+    versions.allow_tags = True
+
+    def save_model(self, request, obj, form, change):
+        should_sync_to_youtube = False
+        # cache the old object
+        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
+        # save it
+        super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
+                                                      change)
+        # refresh new object so that changes are present
+        obj = SubtitleLanguage.objects.get(pk=obj.pk)
+        if change:
+            should_sync_to_youtube = not old_obj.is_complete and obj.is_complete
+
+        if should_sync_to_youtube:
+            latest = obj.latest_version()
+            # don't run on a async:
+            upload_subtitles_to_original_service.run(latest.pk)
 
 
 class SubtitleVersionAdmin(admin.ModelAdmin):

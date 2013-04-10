@@ -118,7 +118,7 @@ class BaseNotification(object):
                 lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
                 url =  lang_klass(self.api_name).get_resource_uri(self.language)
                 if self.version_pk:
-                   url += "subtitles/?version_no=%s"  % self.version.version_no
+                   url += "subtitles/?version_no=%s"  % self.version.version_number
                 return url
             else:
                 return video_klass(self.api_name).get_resource_uri(self.video)

@@ -86,20 +86,20 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         from videos.tasks import upload_subtitles_to_original_service
         should_sync_to_youtube = False
-
-        if change:
-            old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
-
-            if not old_obj.subtitles_complete and obj.subtitles_complete:
-                should_sync_to_youtube = True
-
+        # cache the old object
+        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
+        # save it
         super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
-                change)
+                                                      change)
+        # refresh new object so that changes are present
+        obj = SubtitleLanguage.objects.get(pk=obj.pk)
+        if change:
+            should_sync_to_youtube = not old_obj.subtitles_complete and obj.subtitles_complete
 
         if should_sync_to_youtube:
             tip = obj.get_tip()
-            if tip:
-                upload_subtitles_to_original_service.delay(tip.pk)
+            # don't run on a async:
+            upload_subtitles_to_original_service.run(tip.pk)
 
 
 class SubtitleVersionAdmin(admin.ModelAdmin):

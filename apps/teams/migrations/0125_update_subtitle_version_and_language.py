@@ -159,7 +159,8 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'processed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'start_date': ('django.db.models.fields.DateField', [], {}),
-            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"})
+            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
+            'type': ('django.db.models.fields.IntegerField', [], {'default': '1'})
         },
         'teams.invite': {
             'Meta': {'object_name': 'Invite'},

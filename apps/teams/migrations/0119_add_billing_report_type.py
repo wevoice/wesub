@@ -7,33 +7,13 @@ from django.db import models
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
-        # Adding field 'BillingRecord.new_subtitle_version'
-        db.add_column('teams_billingrecord', 'new_subtitle_version', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleVersion'], null=True, blank=True), keep_default=False)
-
-        # Adding field 'BillingRecord.new_subtitle_language'
-        db.add_column('teams_billingrecord', 'new_subtitle_language', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['subtitles.SubtitleLanguage'], null=True, blank=True), keep_default=False)
-
-        # Changing field 'BillingRecord.subtitle_language'
-        db.alter_column('teams_billingrecord', 'subtitle_language_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleLanguage'], null=True, blank=True))
-
-        # Changing field 'BillingRecord.subtitle_version'
-        db.alter_column('teams_billingrecord', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion'], null=True, blank=True))
+        # Adding field 'BillingReport.type'
+        db.add_column('teams_billingreport', 'type', self.gf('django.db.models.fields.IntegerField')(default=1), keep_default=False)
     
     
     def backwards(self, orm):
-        
-        # Deleting field 'BillingRecord.new_subtitle_version'
-        db.delete_column('teams_billingrecord', 'new_subtitle_version_id')
-
-        # Deleting field 'BillingRecord.new_subtitle_language'
-        db.delete_column('teams_billingrecord', 'new_subtitle_language_id')
-
-        # Changing field 'BillingRecord.subtitle_language'
-        db.alter_column('teams_billingrecord', 'subtitle_language_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleLanguage']))
-
-        # Changing field 'BillingRecord.subtitle_version'
-        db.alter_column('teams_billingrecord', 'subtitle_version_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['videos.SubtitleVersion']))
+        # Deleting field 'BillingReport.type'
+        db.delete_column('teams_billingreport', 'type')
     
     
     models = {
@@ -81,7 +61,7 @@ class Migration(SchemaMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 3, 8, 14, 52, 16, 310532)'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -89,7 +69,7 @@ class Migration(SchemaMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 3, 8, 14, 52, 16, 310441)'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -101,46 +81,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'subtitles.subtitlelanguage': {
-            'Meta': {'unique_together': "[('video', 'language_code')]", 'object_name': 'SubtitleLanguage'},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
-            'followers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'new_followed_languages'", 'blank': 'True', 'to': "orm['auth.CustomUser']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_forked': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'official_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'pending_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'pending_signoff_expired_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'pending_signoff_unexpired_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'subtitles_complete': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'subtitles_fetched_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'unofficial_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'video': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'newsubtitlelanguage_set'", 'to': "orm['videos.Video']"}),
-            'writelock_owner': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'writelocked_newlanguages'", 'null': 'True', 'to': "orm['auth.CustomUser']"}),
-            'writelock_session_key': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
-            'writelock_time': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
-        },
-        'subtitles.subtitleversion': {
-            'Meta': {'unique_together': "[('video', 'subtitle_language', 'version_number'), ('video', 'language_code', 'version_number')]", 'object_name': 'SubtitleVersion'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'newsubtitleversion_set'", 'to': "orm['auth.CustomUser']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'note': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '512', 'blank': 'True'}),
-            'origin': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '255', 'blank': 'True'}),
-            'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),
-            'rollback_of_version_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'serialized_lineage': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'serialized_subtitles': ('django.db.models.fields.TextField', [], {}),
-            'subtitle_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
-            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleLanguage']"}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
-            'version_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': '1'}),
-            'video': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'newsubtitleversion_set'", 'to': "orm['videos.Video']"}),
-            'visibility': ('django.db.models.fields.CharField', [], {'default': "'public'", 'max_length': '10'}),
-            'visibility_override': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '10', 'blank': 'True'})
         },
         'teams.application': {
             'Meta': {'unique_together': "(('team', 'user', 'status'),)", 'object_name': 'Application'},
@@ -159,11 +99,9 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_original': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'minutes': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'new_subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleLanguage']", 'null': 'True', 'blank': 'True'}),
-            'new_subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
             'source': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']", 'null': 'True', 'blank': 'True'}),
-            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
+            'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']"}),
+            'subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleVersion']"}),
             'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"}),
             'video': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.Video']"})
@@ -240,8 +178,6 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '16', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'new_review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on_new'", 'null': 'True', 'to': "orm['subtitles.SubtitleVersion']"}),
-            'new_subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
             'priority': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'db_index': 'True', 'blank': 'True'}),
             'public': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on'", 'null': 'True', 'to': "orm['videos.SubtitleVersion']"}),
@@ -316,6 +252,7 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('team', 'video'),)", 'object_name': 'TeamVideo'},
             'added_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.CustomUser']"}),
             'all_languages': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'completed_languages': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['videos.SubtitleLanguage']", 'symmetrical': 'False', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -349,8 +286,6 @@ class Migration(SchemaMigration):
             'is_forked': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_original': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'}),
-            'needs_sync': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'new_subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'old_subtitle_version'", 'null': 'True', 'to': "orm['subtitles.SubtitleLanguage']"}),
             'percent_done': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'standard_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']", 'null': 'True', 'blank': 'True'}),
             'subtitle_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -369,8 +304,6 @@ class Migration(SchemaMigration):
             'is_forked': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['videos.SubtitleLanguage']"}),
             'moderation_status': ('django.db.models.fields.CharField', [], {'default': "'not__under_moderation'", 'max_length': '32', 'db_index': 'True'}),
-            'needs_sync': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
-            'new_subtitle_version': ('django.db.models.fields.related.OneToOneField', [], {'blank': 'True', 'related_name': "'old_subtitle_version'", 'unique': 'True', 'null': 'True', 'to': "orm['subtitles.SubtitleVersion']"}),
             'note': ('django.db.models.fields.CharField', [], {'max_length': '512', 'blank': 'True'}),
             'notification_sent': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'result_of_rollback': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -396,7 +329,6 @@ class Migration(SchemaMigration):
             'is_subtitled': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'languages_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'db_index': 'True'}),
             'moderated_by': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'moderating'", 'null': 'True', 'to': "orm['teams.Team']"}),
-            'primary_audio_language_code': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '16', 'blank': 'True'}),
             's3_thumbnail': ('utils.amazon.fields.S3EnabledImageField', [], {'thumb_options': "{'upscale': True, 'crop': 'smart'}", 'max_length': '100', 'thumb_sizes': '((290, 165), (120, 90))', 'blank': 'True'}),
             'small_thumbnail': ('django.db.models.fields.CharField', [], {'max_length': '500', 'blank': 'True'}),
             'subtitles_fetched_count': ('django.db.models.fields.IntegerField', [], {'default': '0', 'db_index': 'True'}),

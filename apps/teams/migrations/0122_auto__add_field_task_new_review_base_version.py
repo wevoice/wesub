@@ -8,14 +8,14 @@ class Migration(SchemaMigration):
     
     def forwards(self, orm):
         
-        # Changing field 'Task.new_review_base_version'
-        db.alter_column('teams_task', 'new_review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, null=True, to=orm['subtitles.SubtitleVersion']))
+        # Adding field 'Task.new_review_base_version'
+        db.add_column('teams_task', 'new_review_base_version', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tasks_based_on_new', null=True, to=orm['videos.SubtitleVersion']), keep_default=False)
     
     
     def backwards(self, orm):
         
-        # Changing field 'Task.new_review_base_version'
-        db.alter_column('teams_task', 'new_review_base_version_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['videos.SubtitleVersion'], blank=True))
+        # Deleting field 'Task.new_review_base_version'
+        db.delete_column('teams_task', 'new_review_base_version_id')
     
     
     models = {
@@ -61,7 +61,7 @@ class Migration(SchemaMigration):
         },
         'auth.user': {
             'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 11, 15, 12, 48, 43, 678490)'}),
+            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 10, 4, 10, 44, 34, 416217)'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -69,7 +69,7 @@ class Migration(SchemaMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 11, 15, 12, 48, 43, 678393)'}),
+            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 10, 4, 10, 44, 34, 415988)'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
             'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
@@ -85,9 +85,7 @@ class Migration(SchemaMigration):
         'subtitles.subtitlelanguage': {
             'Meta': {'unique_together': "[('video', 'language_code')]", 'object_name': 'SubtitleLanguage'},
             'created': ('django.db.models.fields.DateTimeField', [], {}),
-            'followers': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'related_name': "'new_followed_languages'", 'blank': 'True', 'to': "orm['auth.CustomUser']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_forked': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'language_code': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
             'official_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'pending_signoff_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
@@ -111,7 +109,7 @@ class Migration(SchemaMigration):
             'parents': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['subtitles.SubtitleVersion']", 'symmetrical': 'False', 'blank': 'True'}),
             'rollback_of_version_number': ('django.db.models.fields.PositiveIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'serialized_lineage': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'serialized_subtitles': ('django.db.models.fields.TextField', [], {}),
+            'serialized_subtitles': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'subtitle_count': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0'}),
             'subtitle_language': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleLanguage']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '2048', 'blank': 'True'}),
@@ -151,7 +149,8 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'processed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'start_date': ('django.db.models.fields.DateField', [], {}),
-            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"})
+            'team': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['teams.Team']"}),
+            'type': ('django.db.models.fields.IntegerField', [], {'default': '1'})
         },
         'teams.invite': {
             'Meta': {'object_name': 'Invite'},
@@ -215,7 +214,7 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'language': ('django.db.models.fields.CharField', [], {'db_index': 'True', 'max_length': '16', 'blank': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'new_review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on_new'", 'null': 'True', 'to': "orm['subtitles.SubtitleVersion']"}),
+            'new_review_base_version': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'tasks_based_on_new'", 'null': 'True', 'to': "orm['videos.SubtitleVersion']"}),
             'new_subtitle_version': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['subtitles.SubtitleVersion']", 'null': 'True', 'blank': 'True'}),
             'priority': ('django.db.models.fields.PositiveIntegerField', [], {'default': '0', 'db_index': 'True', 'blank': 'True'}),
             'public': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
@@ -251,7 +250,7 @@ class Migration(SchemaMigration):
             'subtitle_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'task_assign_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'task_expiration': ('django.db.models.fields.PositiveIntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
-            'third_party_accounts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'teams'", 'symmetrical': 'False', 'to': "orm['accountlinker.ThirdPartyAccount']"}),
+            'third_party_accounts': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'tseams'", 'symmetrical': 'False', 'to': "orm['accountlinker.ThirdPartyAccount']"}),
             'translate_policy': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'teams'", 'symmetrical': 'False', 'through': "orm['teams.TeamMember']", 'to': "orm['auth.CustomUser']"}),
             'video': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'intro_for_teams'", 'null': 'True', 'to': "orm['videos.Video']"}),
