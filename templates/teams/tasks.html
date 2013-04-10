@@ -518,8 +518,7 @@
                                                 {% csrf_token %}
 
                                                 <input type="hidden" name="next"
-                                                       value="
-                                                               {{ request.path }}{% query_string request.GET %}"/>
+                                                       value="{{ request.path }}{% query_string request.GET %}"/>
 
                                                 <input type="hidden" name="task"
                                                        value="{{ task.id }}"/>
@@ -597,8 +596,7 @@
                                                 {% csrf_token %}
 
                                                 <input type="hidden" name="next"
-                                                       value="
-                                                               {{ request.path }}{% query_string request.GET %}"/>
+                                                       value=" {{ request.path }}{% query_string request.GET %}"/>
                                                 <input type="hidden" name="task"
                                                        value="{{ task.pk }}"/>
 
@@ -620,8 +618,7 @@
                               action="{% url teams:assign_task slug=team.slug %}"
                               method="post">
                             {% csrf_token %}
-                            <input type="hidden" name="next" value="
-                                    {{ request.path }}{% query_string request.GET %}"/>
+                            <input type="hidden" name="next" value="{{ request.path }}{% query_string request.GET %}"/>
 
                             <input type="hidden" name="task"
                                    value="{{ task.id }}"/>
