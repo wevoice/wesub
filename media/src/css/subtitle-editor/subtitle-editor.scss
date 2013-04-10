@@ -392,6 +392,23 @@ section.main {
     }
     div.subtitles-wrapper {
         overflow: hidden;
+        position: relative;
+
+        a.scroll-lock {
+            background: #414243 url('../../../images/editor/icons.png') center center no-repeat;
+            bottom: 10px;
+            height: 20px;
+            position: absolute;
+            right: 20px;
+            width: 20px;
+
+            &.locked {
+                background-position: center -121px;
+            }
+            &.unlocked {
+                background-position: center -145px;
+            }
+        }
     }
     div.subtitles {
         overflow: auto;

@@ -158,6 +158,11 @@
                     </ul>
 
                 </div>
+                <a ng-click="scrollingSynced = !scrollingSynced"
+                   ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
+                   href="#"
+                   class="scroll-lock">
+                </a>
             </div>
         </section>
         <section class="center column">

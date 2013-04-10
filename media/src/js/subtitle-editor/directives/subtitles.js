@@ -156,6 +156,8 @@ var USER_IDLE_MINUTES = 5;
                 return {
                     post: function post(scope, elm, attrs) {
 
+                        scope.scrollingSynced = true;
+
                         $(elm).on('keydown', function(e) {
 
                             // Reset the lock timer.
@@ -340,17 +342,21 @@ var USER_IDLE_MINUTES = 5;
 
                         // Handle scroll.
                         $elm.parent().scroll(function() {
-                            var newScrollTop = $elm.parent().scrollTop();
 
-                            $('div.subtitles').each(function() {
+                            // If scroll sync is locked.
+                            if (scope.$root.scrollingSynced) {
+                                var newScrollTop = $elm.parent().scrollTop();
 
-                                var $set = $(this);
+                                $('div.subtitles').each(function() {
 
-                                if ($set.scrollTop() !== newScrollTop) {
-                                    $set.scrollTop(newScrollTop);
-                                }
+                                    var $set = $(this);
 
-                            });
+                                    if ($set.scrollTop() !== newScrollTop) {
+                                        $set.scrollTop(newScrollTop);
+                                    }
+
+                                });
+                            }
                         });
 
                         if (scope.isEditable) {
