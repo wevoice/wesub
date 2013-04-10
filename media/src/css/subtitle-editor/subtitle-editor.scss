@@ -68,6 +68,17 @@ $CodePro: 'CodeProLC', $OpenSans;
     -moz-opacity: $op;
     opacity: $op;
 }
+@mixin shadow {
+    bottom: -41px;
+    content: "";
+    display: block;
+    height: 40px;
+    right: 16px;
+    position: absolute;
+    width: 95%;
+    z-index: 51;
+    @include vertical-gradient(rgba(#F3F4F5, 1), rgba(white, 0));
+}
 
 // Page
 html, body {
@@ -599,14 +610,13 @@ section.main {
             border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
             position: relative;
-            @include box-shadow(0, 5px, 20px, rgba(0, 0, 0, 0.10));
 
             div.select {
                 background: transparent url('../../../images/down-arrow-offset.png') center right no-repeat;
                 border-right: 1px solid #DADBDC;
                 float: left;
                 overflow: hidden;
-                padding: 7px 10px;
+                padding: 10px 10px;
                 position: relative;
                 width: 33%;
 
@@ -629,6 +639,9 @@ section.main {
                 &:last-of-type {
                     border-right: 0;
                 }
+            }
+            &:before {
+                @include shadow();
             }
         }
     }
@@ -680,14 +693,50 @@ section.main {
                 height: 291px;
                 width: 100%;
             }
+            &:before {
+                @include shadow();
+                bottom: -77px;
+            }
         }
         div.workspace-tools {
             background: #E7E8E9;
-            border-bottom: 1px solid #DADBDC;
-            height: 30px;
+            border-bottom: 1px solid #BDBEBF;
+            height: 36px;
             position: relative;
             z-index: 50;
-            @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.20));
+            @include multi-box-shadow(
+                0, -5px, 5px, rgba(#E0E1E2, 1),
+                -7px, 0, 7px, rgba(0, 0, 0, 0.08)
+            );
+
+            div.subtitles-language {
+                color: black;
+                float: left;
+                font-weight: bold;
+                padding: 10px;
+            }
+            div.switches {
+                float: right;
+
+                a {
+                    background: transparent url('../../../images/editor/icons.png') top left no-repeat;
+                    color: #7A7B7C;
+                    display: inline-block;
+                    padding: 10px;
+                    padding-left: 22px;
+                    text-decoration: none;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                    &.timeline-display {
+                        background-position: left -88px;
+                    }
+                    &.video-display {
+                        background-position: left -63px;
+                    }
+                }
+            }
         }
     }
 }

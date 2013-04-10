@@ -19,6 +19,7 @@
 (function() {
 
     var root = this;
+    var $ = root.AmarajQuery;
 
     var VideoController = function($scope, SubtitleStorage) {
         /**
@@ -102,7 +103,7 @@
 
             var parser = subtitle.parser;
 
-            var text = subtitle.parser.markdownToHTML(AmarajQuery(subtitle.subtitle).text());
+            var text = subtitle.parser.markdownToHTML($(subtitle.subtitle).text());
             var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
             var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
 
@@ -130,7 +131,19 @@
 
         });
     };
+    var VideoTitleController = function($scope, SubtitleListFinder) {
+
+        $scope.$root.$on('subtitles-fetched', function() {
+
+            // Reference the actual scope in the template so we can get automatic binding
+            // on the title and description.
+            $scope.workingSubtitles = SubtitleListFinder.get('working-subtitle-set').scope;
+
+        });
+
+    };
 
     root.VideoController = VideoController;
+    root.VideoTitleController = VideoTitleController;
 
 }).call(this);

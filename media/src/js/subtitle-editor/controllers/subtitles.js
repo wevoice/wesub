@@ -423,24 +423,11 @@ var angular = angular || null;
             }
         });
     };
-    var VideoTitleController = function($scope, SubtitleListFinder) {
-
-        // Once the working subtitles have been fetched, set the title and description.
-        $scope.$root.$on('subtitles-fetched', function() {
-
-            // Reference the actual scope in the template so we can get automatic binding
-            // on the title and description.
-            $scope.workingSubtitles = SubtitleListFinder.get('working-subtitle-set').scope;
-
-        });
-
-    };
 
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionController = SaveSessionController;
     root.SubtitleListController = SubtitleListController;
     root.SubtitleListHelperController = SubtitleListHelperController;
     root.SubtitleListItemController = SubtitleListItemController;
-    root.VideoTitleController = VideoTitleController;
 
 }).call(this);

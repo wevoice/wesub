@@ -167,8 +167,14 @@
         </section>
         <section class="center column">
             <div class="video" id="video" ng-controller="VideoController"></div>
-            <div class="workspace-tools" ng-controller="WorkspaceToolsController">
-
+            <div class="workspace-tools group" ng-controller="WorkspaceToolsController">
+                <div class="subtitles-language">
+                    [[ workingSubtitles.languageName ]] subtitles
+                </div>
+                <div class="switches">
+                    <a class="timeline-display" href="#">Show timeline</a>
+                    <a class="video-display" href="#">Hide video</a>
+                </div>
             </div>
             <div class="subtitles-wrapper">
                 <div class="working subtitles" ng-controller="SubtitleListController">
