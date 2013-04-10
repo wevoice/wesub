@@ -194,7 +194,6 @@
                                 {% endif %}
                                 {%  comment %} check if this is translate task, else we'll show the locked message
                                                twice for approve and review tasks {% endcomment %}
-                                                                                                                                                              {% comment %} check if translate else review & approve will see the warning twice {% endcomment %}
                                 {% if task.is_blocked and task.get_type_display == 'Translate' %}
                                     class="disabled">
                                     <div class="cannot-perform disabled">Locked until {{ task.subtitle_version.language }} subtitles have been approved.</div
@@ -264,8 +263,8 @@
                                                 {% endwith %}
                                             {% endif %}
                                         </p>
-                                    {% endwith %}
-                                {% endif %}
+                                    {% endif %}
+                                {% endwith %}
 
                                 <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                                 <ul class="actions">
@@ -420,7 +419,6 @@
                                                 </div>
                                             </div>
                                         {% endif %}
-                                    {% endif %}
                                 </ul>
 
                                 {% with can_delete=task|can_delete_task:user can_assign=task|can_assign_task:user can_decline=task|can_decline_task:user %}
