@@ -23,6 +23,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Count
@@ -47,7 +48,7 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    UnpublishForm, MoveTeamVideoForm, TaskUploadForm, BillingReportForm
+    DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm, BillingReportForm
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -59,7 +60,8 @@ from teams.permissions import (
     can_create_task_translate, can_view_tasks_tab, can_invite,
     roles_user_can_assign, can_join_team, can_edit_video, can_delete_tasks,
     can_perform_task, can_rename_team, can_change_team_settings,
-    can_perform_task_for, can_delete_team, can_delete_video, can_remove_video
+    can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
+    can_delete_language,
 )
 from teams.signals import api_teamvideo_new, api_subtitles_rejected
 from teams.tasks import (
@@ -2030,39 +2032,6 @@ def _clean_empty_translation_tasks(team_video):
                 task.save()
 
 
-def _propagate_unpublish_to_tasks(team_video, language_pk):
-    """Push the 'unpublishing' of a language to any tasks applying to it.
-
-    The unpublishing must be fully complete before this function is called.
-
-    """
-    # We know the language itself still exists because unpublishing doesn't
-    # delete the SubtitleLanguage, it only deletes versions.
-    sl = SubtitleLanguage.objects.get(pk=language_pk)
-
-    # There are a number of different states of tasks we might be in.  We'll
-    # deal with them one at a time.
-
-    if sl.subtitleversion_set.public().exists():
-        # First: if there's still a public version, we don't need to create any
-        # tasks at all.  We can just bail now.
-        pass
-    elif not sl.subtitleversion_set.extant().exists():
-        # Now we know there are no public versions.  If there are no *extant*
-        # versions at all, we may need to create a translate/transcribe task if
-        # it's one of the languages the team has on its list.  We may need to
-        # delete other existing types of tasks.
-        _ensure_trans_task(team_video, sl)
-        _clean_empty_translation_tasks(team_video)
-    else:
-        # Otherwise we know that there are still some private versions.  In that
-        # case we need to make sure there's a task for them.  If there's an
-        # existing trans[late/scribe]/review/approve task, we can just update
-        # it.  Otherwise we'll create a review/approve task.
-        _ensure_task_exists(team_video, sl)
-        _clean_empty_translation_tasks(team_video)
-
-
 def _get_languages_to_unpublish(subtitle_language):
     """Get a list of SubtitleLanguage objects that should be unpublished.
 
@@ -2093,67 +2062,44 @@ def _get_languages_to_unpublish(subtitle_language):
 
     return languages_to_delete
 
-
-def unpublish(request, slug):
+def delete_language(request, slug, lang_id):
     team = get_object_or_404(Team, slug=slug)
-    next_url = request.POST.get('next', team.get_absolute_url())
+    if not can_delete_language(team, request.user):
+        return redirect_to_login(reverse("teams:delete-language",
+                                         kwargs={"slug": team.slug,
+                                                 "lang_id": lang_id}))
+    language = get_object_or_404(SubtitleLanguage, pk=lang_id)
+    next_url = request.POST.get('next', language.video.get_absolute_url())
+    team_video = language.video.get_team_video()
+    if team_video.team.pk != team.pk:
+        raise Http404()
 
-    form = UnpublishForm(request.user, team, request.POST)
+    if request.method == 'POST':
+        form = DeleteLanguageForm(request.user, team, language, request.POST)
 
-    if not form.is_valid():
-        # If the form isn't valid, we'll bail by redirecting somewhere and just
-        # flashing the messages to the user.
-        errors = '\n'.join(flatten_errorlists(form.errors))
-        messages.error(request,
-                       _(u'Invalid unpublishing request.\nErrors:\n') + errors)
-        return HttpResponseRedirect(next_url)
+        if form.is_valid():
+            for sublang in form.languages_to_fork():
+                sublang.is_forked = True
+                sublang.save()
+            language.nuke_language()
+            _propagate_unpublish_to_external_services(language.pk,
+                                                      language.language_code,
+                                                      language.video)
+            metadata_manager.update_metadata(language.video.pk)
+            update_one_team_video(team_video.pk)
 
-    version = form.cleaned_data['subtitle_version']
-    team_video = version.video.get_team_video()
-    video = version.video
-    scope = form.cleaned_data['scope']
-    delete = form.cleaned_data['should_delete']
-    subtitle_language = version.subtitle_language
-    translations = subtitle_language.get_dependent_subtitle_languages()
-
-    if delete:
-        # We can't redirect to the version detail page if we're deleting the
-        # version!
-        next_url = subtitle_language.get_absolute_url()
-
-    languages = []
-
-    if scope == 'version':
-        version.unpublish_self_and_children(delete=delete)
-        languages.append(version.subtitle_language)
-    elif scope == 'dependents':
-        languages = _get_languages_to_unpublish(subtitle_language)
-
-        for sl in languages:
-            sl.unpublish(delete=delete)
+            messages.success(request, _(u'Successfully deleted language.'))
+            return HttpResponseRedirect(next_url)
+        else:
+            for e in flatten_errorlists(form.errors):
+                messages.error(request, e)
     else:
-        assert False, 'Invalid scope.'
+        form = DeleteLanguageForm(request.user, team, language)
 
-    language_empty = not subtitle_language.subtitleversion_set.extant().exists()
-    if scope == 'version' and language_empty:
-        # If we've deleted all the versions in this language (but DIDN'T delete
-        # its translations too) then we'll fork the translations now.
-        for sl in translations:
-            sl.is_forked = True
-            sl.save()
-
-    for sl in languages:
-        _propagate_unpublish_to_external_services(sl.pk, sl.language_code, video)
-        _propagate_unpublish_to_tasks(team_video, sl.pk)
-
-    metadata_manager.update_metadata(team_video.video.pk)
-    update_one_team_video(team_video.pk)
-
-    messages.success(request, _(u'Successfully unpublished subtitles.'))
-    api_subtitles_rejected.send(version)
-
-    return HttpResponseRedirect(next_url)
-
+    return render_to_response('teams/delete-language.html', {
+        'form': form,
+        'language': language,
+    }, RequestContext(request))
 
 @login_required
 def auto_captions_status(request, slug):

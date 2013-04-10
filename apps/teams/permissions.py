@@ -537,16 +537,6 @@ def can_approve(team_video, user, lang=None):
 
     return role in _perms_equal_or_greater(role_req)
 
-def can_delete_subs(team_video, user, lang=None):
-    """Return whether the user has permission to delete subtitles.
-
-    lang should be a language code string.
-
-    """
-    role = get_role_for_target(user, team_video.team, team_video.project, lang)
-    return can_unpublish_subs(team_video, user, lang) and role in [ROLE_ADMIN, ROLE_OWNER]
-
-
 def can_message_all_members(team, user):
     """Return whether the user has permission to message all members of the given team."""
     role = get_role_for_target(user, team)
@@ -611,22 +601,11 @@ def can_post_edit_subtitles(team, user):
     member = get_member(user, team)
     return member.role != ROLE_CONTRIBUTOR
 
-def can_unpublish_subs(team_video, user, lang):
-    """Return whether the user has permission to unpublish subtitles.
-
-    lang should be a language code string.
-
+def can_delete_language(team, user):
+    """Return whether the user has permission to completely delete a language.
     """
-    workflow = Workflow.get_for_team_video(team_video)
-
-    if workflow.approve_allowed:
-        return can_approve(team_video, user, lang)
-
-    if workflow.review_allowed:
-        return can_review(team_video, user, lang, allow_own=True)
-
-    return False
-
+    role = get_role(get_member(user, team))
+    return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
 
 # Task permissions
 def can_create_tasks(team, user, project=None):

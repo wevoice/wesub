@@ -1,0 +1,218 @@
+import mock
+from django.test import TestCase
+from django.test.client import Client
+
+from apps.subtitles import pipeline
+from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
+from apps.teams.forms import DeleteLanguageForm
+from apps.teams.permissions_const import ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR
+from utils import test_factories
+
+class UnpublishTestCase(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team(workflow_enabled=True)
+        self.workflow = test_factories.create_workflow(self.team)
+        self.user = test_factories.create_user(is_staff=True)
+        self.member = test_factories.create_team_member(self.team, self.user,
+                                                        role=ROLE_ADMIN)
+        self.video = test_factories.create_video()
+        self.team_video = test_factories.create_team_video(self.team,
+                                                           self.user,
+                                                           self.video)
+        self.non_team_video = test_factories.create_video()
+        # create a bunch of versions
+        self.versions = [
+            pipeline.add_subtitles(self.video, 'en', None) for i in xrange(5)
+        ]
+        self.language = self.video.get_primary_audio_subtitle_language()
+
+    def check_version_counts(self, extent_count, public_count):
+        subtitleversion_set = self.language.subtitleversion_set
+        self.assertEquals(subtitleversion_set.extant().count(), extent_count)
+        self.assertEquals(subtitleversion_set.public().count(), public_count)
+
+    def update_workflow(self, approve_allowed):
+        if approve_allowed:
+            self.workflow.approve_allowed = 10
+        else:
+            self.workflow.approve_allowed = 0
+        self.workflow.save()
+
+    def make_dependent_language(self, code, parent):
+        sv = pipeline.add_subtitles(self.video, code, None, parents=[parent])
+        return sv.subtitle_language
+
+class DeleteLanguageModelTest(UnpublishTestCase):
+    def check_language_deleted(self, language):
+        self.assertEquals(language.subtitleversion_set.extant().count(), 0)
+
+    def check_language_not_deleted(self, language):
+        self.assertNotEquals(language.subtitleversion_set.extant().count(), 0)
+
+    def test_delete_language(self):
+        self.language.nuke_language()
+        self.check_language_deleted(self.language)
+
+    def test_sublanguages(self):
+        sub_lang1 = self.make_dependent_language('ru', self.versions[0])
+        sub_lang2 = self.make_dependent_language('fr', sub_lang1.get_tip())
+        forked_lang = self.make_dependent_language('de', self.versions[0])
+        forked_lang.is_forked = True
+        forked_lang.save()
+
+        self.language.nuke_language()
+        self.check_language_deleted(self.language)
+        self.check_language_deleted(sub_lang1)
+        self.check_language_deleted(sub_lang2)
+        self.check_language_not_deleted(forked_lang)
+
+class DeleteLanguageFormTest(UnpublishTestCase):
+    def check_form_is_valid(self, verify_text, is_valid):
+        form = DeleteLanguageForm(self.user, self.team, self.language, {
+            'verify_text': verify_text,
+        })
+        self.assertEquals(form.is_valid(), is_valid)
+
+    def test_verification(self):
+        self.check_form_is_valid('', False)
+        self.check_form_is_valid('incorrect phrase', False)
+        self.check_form_is_valid('Yes I want to delete this language', True)
+        self.check_form_is_valid('yes i want to delete this language', False)
+
+    def test_sublanguages(self):
+        sub_lang1 = self.make_dependent_language('ru', self.versions[0])
+        sub_lang2 = self.make_dependent_language('fr', sub_lang1.get_tip())
+        forked_lang = self.make_dependent_language('de', self.versions[0])
+        forked_lang.is_forked = True
+        forked_lang.save()
+        form = DeleteLanguageForm(self.user, self.team, self.language)
+        self.assertEquals(
+            set([f.as_widget() for f in form.sublanguage_fields()]),
+            set([form['delete_ru'].as_widget(),
+                 form['delete_fr'].as_widget()]))
+        bound_form = DeleteLanguageForm(self.user, self.team, self.language, {
+            'verify_text': 'Yes I want to delete this language',
+            'delete_fr': 1,
+        })
+        self.assertEquals(bound_form.errors, {})
+        self.assertEquals(bound_form.is_valid(), True)
+        self.assertEquals(bound_form.languages_to_fork(), [sub_lang1])
+
+    def check_user_perm(self, user, should_have_permission):
+        form = DeleteLanguageForm(user, self.team, self.language, {
+            'verify_text': 'Yes I want to delete this language',
+        })
+        self.assertEquals(form.is_valid(), should_have_permission)
+
+    def test_permissions(self):
+        # only team admins and staff members should be able to submit the form
+        self.check_user_perm(test_factories.create_user(), False)
+        self.check_user_perm(test_factories.create_user(is_staff=True), True)
+        for role in (ROLE_ADMIN, ROLE_OWNER):
+            user = test_factories.create_user()
+            test_factories.create_team_member(self.team, user, role=role)
+            self.check_user_perm(user, True)
+        for role in (ROLE_CONTRIBUTOR, ROLE_MANAGER):
+            user = test_factories.create_user()
+            test_factories.create_team_member(self.team, user, role=role)
+            self.check_user_perm(user, False)
+
+class DeleteLanguageViewTest(UnpublishTestCase):
+    def setUp(self):
+        UnpublishTestCase.setUp(self)
+        self.client = Client()
+        self.client.login(username=self.user.username, password='password')
+        self.url = '/en/teams/%s/delete-language/%s/' % (
+            self.team.slug, self.language.pk)
+
+    @mock.patch('teams.views.update_one_team_video')
+    @mock.patch('videos.metadata_manager.update_metadata')
+    @mock.patch('teams.views._propagate_unpublish_to_external_services')
+    def test_unpublish(self, mock_propagate_unpublish, mock_update_metadata,
+                       mock_update_one_team_video):
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.post(self.url, {
+            'verify_text': 'Yes I want to delete this language',
+        })
+        # check that the language is deleted
+        self.assertEquals(self.language.subtitleversion_set.extant().count(),
+                          0)
+        # check that external services have been updated
+        self.assertEquals(mock_propagate_unpublish.call_count, 1)
+        self.assertEquals(mock_propagate_unpublish.call_args[0],
+                          (self.language.pk, self.language.language_code,
+                           self.video))
+        self.assertEquals(mock_update_metadata.call_count, 1)
+        self.assertEquals(mock_update_metadata.call_args[0], (self.video.pk,))
+        self.assertEquals(mock_update_one_team_video.call_count, 1)
+        self.assertEquals(mock_update_one_team_video.call_args[0],
+                          (self.team_video.pk,))
+        # we shoud redirect back to the video page.
+        self.assertRedirects(response, self.video.get_absolute_url(),
+                             target_status_code=302)
+
+    def test_unpublish_with_forking(self):
+        sub_lang1 = self.make_dependent_language('ru', self.versions[0])
+        sub_lang2 = self.make_dependent_language('fr', sub_lang1.get_tip())
+        forked_lang = self.make_dependent_language('de', self.versions[0])
+        forked_lang.is_forked = True
+        forked_lang.save()
+
+        response = self.client.get(self.url)
+        self.assertEquals(response.status_code, 200)
+
+        response = self.client.post(self.url, {
+            'verify_text': 'Yes I want to delete this language',
+            'delete_ru': 1,
+        })
+        self.assertEquals(self.language.subtitleversion_set.extant().count(),
+                          0)
+        # we should delete russian, but not french or german
+        self.assertEquals(sub_lang1.subtitleversion_set.extant().count(), 0)
+        self.assertNotEquals(sub_lang2.subtitleversion_set.extant().count(),
+                             0)
+        self.assertNotEquals(forked_lang.subtitleversion_set.extant().count(),
+                             0)
+
+    def check_user_perm(self, user, should_have_permission):
+        self.client.login(username=user.username, password='password')
+        response = self.client.get(self.url)
+        if should_have_permission:
+            self.assertEquals(response.status_code, 200)
+        else:
+            self.assertRedirects(response,
+                                 '/auth/login/?next=' + self.url,
+                                 target_status_code=302)
+        self.check_button_present(self.versions[-1], should_have_permission)
+
+    def check_button_present(self, version, should_be_present):
+        url = '/en/videos/%s/%s/%s/' % (
+            version.video.video_id,
+            version.subtitle_language.language_code,
+            version.subtitle_language.pk,
+        )
+        response = self.client.get(url)
+        button_html = '<a class="button" href="%s">' % self.url
+        if should_be_present:
+            self.assert_(button_html in response.content)
+        else:
+            self.assert_(button_html not in response.content)
+
+    def test_permissions(self):
+        self.check_user_perm(test_factories.create_user(), False)
+        self.check_user_perm(test_factories.create_user(is_staff=True), True)
+        for role in (ROLE_ADMIN, ROLE_OWNER):
+            user = test_factories.create_user()
+            test_factories.create_team_member(self.team, user, role=role)
+            self.check_user_perm(user, True)
+        for role in (ROLE_CONTRIBUTOR, ROLE_MANAGER):
+            user = test_factories.create_user()
+            test_factories.create_team_member(self.team, user, role=role)
+            self.check_user_perm(user, False)
+
+    def test_no_button_for_non_team_videos(self):
+        non_team_version = pipeline.add_subtitles(self.non_team_video, 'en',
+                                                  None)
+        self.check_button_present(non_team_version, False)

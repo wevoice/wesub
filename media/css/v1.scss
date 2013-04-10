@@ -1111,6 +1111,10 @@ div.upload-draft-modal {
             }
         }
 
+        label.grouped {
+            padding: 0;
+        }
+
         input[type="text"], input[type="password"], textarea {
             border: 1px solid $faint;
             @include block-level;
@@ -1989,6 +1993,19 @@ ol.subtitles-diff li{
     padding: 1em 0;
     border-bottom: 1px solid #F3F6F8;
 }
+
+/* Delete Language page */
+.v1 .delete-language-warning {
+    margin: 2em 0;
+    h3 {
+        color: #f00;
+    }
+    li {
+        list-style-type: disc;
+        font-size: 1.2em;
+    }
+}
+
 /* Overrides */
 .v1 .sort_button {
     border-color: $fainter;

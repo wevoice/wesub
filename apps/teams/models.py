@@ -516,19 +516,6 @@ class Team(models.Model):
         """
         return TeamLanguagePreference.objects.get_readable(self)
 
-
-    # Unpublishing
-    def unpublishing_enabled(self):
-        '''Return whether unpublishing is enabled for this team.
-
-        At the moment unpublishing is only available if the team has reviewing
-        and/or approving enabled.
-
-        '''
-        w = self.get_workflow()
-        return True if w.review_enabled or w.approve_enabled else False
-
-
 # This needs to be constructed after the model definition since we need a
 # reference to the class itself.
 Team._meta.permissions = TEAM_PERMISSIONS
