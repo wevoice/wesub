@@ -2051,14 +2051,16 @@ class Task(models.Model):
         isn't ready to be translated yet.
         """
         subtitle_version = self.get_subtitle_version()
+        if not subtitle_version:
+            return False
         source_language = subtitle_version.subtitle_language.get_translation_source_language()
+        if not source_language:
+            return False
         can_perform = (source_language and
                     source_language.subtitles_complete and
                     source_language.get_tip().is_public() and
                     source_language.get_tip().get_subtitles().fully_synced)
 
-        if not subtitle_version or not standard_language:
-            return False
         if self.get_type_display() != 'Translate':
             if self.get_type_display() in ('Review', 'Approve'):
                 # review and approve tasks will be blocked if they're
