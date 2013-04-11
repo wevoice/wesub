@@ -1,5 +1,5 @@
 /*
- * popcorn.js version 88fd572
+ * popcorn.js version e72c167
  * http://popcornjs.org
  *
  * Copyright 2011, Mozilla Foundation
@@ -100,7 +100,7 @@
   };
 
   //  Popcorn API version, automatically inserted via build system.
-  Popcorn.version = "88fd572";
+  Popcorn.version = "e72c167";
 
   //  Boolean flag allowing a client to determine if Popcorn can be supported
   Popcorn.isSupported = true;
@@ -4115,7 +4115,7 @@
   // We currently support simple temporal fragments:
   //   #t=,100   -- a null video of 100s (starts at 0s)
   //   #t=5,100  -- a null video of 100s, which starts at 5s (i.e., 95s duration)
-  temporalRegex = /#t=(\d+)?,?(\d+)?/;
+  temporalRegex = /#t=(\d+\.?\d*)?,?(\d+\.?\d*)/;
 
   function NullPlayer( options ) {
     this.startTime = 0;
@@ -4533,7 +4533,7 @@
 
   // Helper for identifying URLs we know how to play.
   HTMLNullVideoElement.prototype._canPlaySrc = function( url ) {
-    return ( /#t=\d*,?\d+?/ ).test( url ) ?
+    return ( temporalRegex ).test( url ) ?
       "probably" :
       EMPTY_STRING;
   };
@@ -6208,7 +6208,7 @@
       impl.controls = playerVars.controls;
 
       // Set wmode to transparent to show video overlays
-      playerVars.wmode = playerVars.wmode || "transparent";
+      playerVars.wmode = playerVars.wmode || "opaque";
 
       // Get video ID out of youtube url
       aSrc = regexYouTube.exec( aSrc )[ 1 ];
