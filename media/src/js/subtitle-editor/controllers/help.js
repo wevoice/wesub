@@ -34,9 +34,7 @@
             { key: 'tab', description: 'move to the next subtitle' }
         ];
 
-        $scope.showAdvancedModal = function($event) {
-
-            $event.preventDefault();
+        $scope.showAdvancedModal = function() {
 
             $scope.$root.$emit('show-modal', {
                 heading: 'Advanced keyboard controls',

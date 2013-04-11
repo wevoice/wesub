@@ -855,3 +855,18 @@ section.collab {
         }
     }
 }
+
+// Timeline mode
+section.timeline {
+    background: #212223;
+    height: 65px;
+    position: absolute;
+    top: 329px;
+    width: 100%;
+    z-index: 51;
+}
+body.timeline-shown {
+    div.workspace-tools, div.language-selections {
+        margin-top: 65px;
+    }
+}

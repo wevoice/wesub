@@ -100,9 +100,8 @@ var angular = angular || null;
     };
     var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
 
-        $scope.discard = function($event) {
+        $scope.discard = function() {
 
-            $event.preventDefault();
             $scope.showCloseModal();
 
         };
@@ -110,7 +109,7 @@ var angular = angular || null;
             var collabScope = angular.element($('section.collab').get(0)).scope();
             return collabScope.notes || '';
         };
-        $scope.saveAndApprove = function($event) {
+        $scope.saveAndApprove = function() {
 
             $scope.saveSession().then(function(response) {
                 if ($scope.status === 'saved') {
@@ -130,9 +129,7 @@ var angular = angular || null;
             });
 
         };
-        $scope.save = function($event) {
-
-            $event.preventDefault();
+        $scope.save = function() {
 
             $scope.saveSession().then(function(response) {
                 if ($scope.status === 'saved') {
@@ -278,7 +275,7 @@ var angular = angular || null;
             $scope.updateParserSubtitles();
         };
         $scope.getSubtitleListHeight = function() {
-            return $(window).height() - 360;
+            return $(window).height() - $scope.$root.subtitlesHeight;
         };
         $scope.getSubtitles = function(languageCode, versionNumber) {
 
