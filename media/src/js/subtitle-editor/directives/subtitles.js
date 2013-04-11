@@ -159,6 +159,15 @@ var USER_IDLE_MINUTES = 5;
 
                         scope.scrollingSynced = true;
                         scope.timelineShown = false;
+                        scope.subtitlesHeight = 366;
+
+                        scope.$watch('timelineShown', function() {
+                            if (scope.timelineShown) {
+                                scope.subtitlesHeight = 431;
+                            } else {
+                                scope.subtitlesHeight = 366;
+                            }
+                        });
 
                         $(elm).on('keydown', function(e) {
 

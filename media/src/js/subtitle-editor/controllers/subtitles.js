@@ -275,7 +275,7 @@ var angular = angular || null;
             $scope.updateParserSubtitles();
         };
         $scope.getSubtitleListHeight = function() {
-            return $(window).height() - 360;
+            return $(window).height() - $scope.$root.subtitlesHeight;
         };
         $scope.getSubtitles = function(languageCode, versionNumber) {
 

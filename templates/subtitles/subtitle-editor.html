@@ -34,7 +34,8 @@
     <![endif]-->
 
 </head>
-<body>
+<body ng-class="{ 'timeline-shown': $root.timelineShown }">
+
     <div class="modal"
         ng-controller="ModalController"
         ng-show="content || loading">
@@ -158,8 +159,8 @@
                     </ul>
 
                 </div>
-                <a ng-click="scrollingSynced = !scrollingSynced"
-                   ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
+                <a ng-click="$root.scrollingSynced = !$root.scrollingSynced"
+                   ng-class="{ locked: $root.scrollingSynced, unlocked: !$root.scrollingSynced }"
                    class="scroll-lock">
                 </a>
             </div>
@@ -171,7 +172,11 @@
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
                 <div class="switches">
-                    <a class="timeline-display" ng-click="timelineShown = !timelineShown">Show timeline</a>
+                    <a class="timeline-display" ng-click="$root.timelineShown = !$root.timelineShown">
+                        <span ng-show="timelineShown">Hide</span>
+                        <span ng-show="!timelineShown">Show</span>
+                        timeline
+                    </a>
                     <a class="video-display">Hide video</a>
                 </div>
             </div>
@@ -259,6 +264,9 @@
                 <div ng-show="error" class="error">[[ error ]]</div>
             </div>
         </section>
+    </section>
+    <section class="timeline ng-cloak" ng-show="$root.timelineShown" ng-cloak>
+
     </section>
 
     {% if DEBUG %}
