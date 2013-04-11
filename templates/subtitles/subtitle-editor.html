@@ -265,8 +265,11 @@
             </div>
         </section>
     </section>
-    <section class="timeline ng-cloak" ng-show="$root.timelineShown" ng-cloak>
-
+    <section ng-controller="TimelineController"
+        class="timeline ng-cloak"
+        ng-show="$root.timelineShown"
+        ng-cloak
+        timeline>
     </section>
 
     {% if DEBUG %}
@@ -282,17 +285,17 @@
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/helper-selector.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/services.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/lock.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/dfxp/dfxp.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitles.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/workspace-tools.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/timeline.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.flash-fallback.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.netflix.js"></script>
 

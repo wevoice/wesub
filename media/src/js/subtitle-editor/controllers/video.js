@@ -21,7 +21,7 @@
     var root = this;
     var $ = root.AmarajQuery;
 
-    var VideoController = function($scope, SubtitleStorage) {
+    var VideoController = function($scope, SubtitleStorage, $timeout) {
         /**
          * Responsible for initializing the video and all video controls.
          * @param $scope
@@ -37,6 +37,14 @@
 
         $scope.pop = window.Popcorn.smart('#video', videoURLs);
         $scope.pop.controls(true);
+
+        // We have to broadcast this in a timeout to make sure the TimelineController has
+        // loaded and registered it's event listener, first.
+        //
+        // There most likely is a better way to do this.
+        $scope.pop.on('canplay', function() {
+            $scope.$root.$broadcast('video-ready', $scope.pop);
+        });
 
         $scope.playChunk = function(start, duration) {
             // Play a specified amount of time in a video, beginning at 'start',
@@ -130,6 +138,7 @@
             }
 
         });
+
     };
     var VideoTitleController = function($scope, SubtitleListFinder) {
 

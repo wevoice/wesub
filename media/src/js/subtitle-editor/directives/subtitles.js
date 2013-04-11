@@ -438,5 +438,16 @@ var USER_IDLE_MINUTES = 5;
             }
         };
     });
+    directives.directive('timeline', function() {
+        return {
+            compile: function compile(elm, attrs, transclude) {
+                return {
+                    post: function post(scope, elm, attrs) {
+
+                    }
+                };
+            }
+        };
+    });
 
 })(window.AmarajQuery);

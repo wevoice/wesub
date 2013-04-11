@@ -17,11 +17,19 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
-    
-    var directives = angular.module('amara.SubtitleEditor.directives.helperSelector', []);
 
-    directives.directive('languageValue', function() {
-        return {};
-    });
+    var root = this;
 
-})();
+    var TimelineController = function($scope, SubtitleStorage) {
+
+        $scope.$root.$on('video-ready', function($event, pop) {
+
+            $scope.duration = pop.duration();
+
+        });
+
+    };
+
+    root.TimelineController = TimelineController;
+
+}).call(this);
