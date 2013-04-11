@@ -64,7 +64,8 @@ var USER_IDLE_MINUTES = 5;
         }
         function showIdleModal() {
 
-            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. ";
+            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
+                "To ensure no work is lost we will close your session in ";
 
             var closeSessionTimeout;
 
@@ -157,6 +158,7 @@ var USER_IDLE_MINUTES = 5;
                     post: function post(scope, elm, attrs) {
 
                         scope.scrollingSynced = true;
+                        scope.timelineShown = false;
 
                         $(elm).on('keydown', function(e) {
 
