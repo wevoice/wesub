@@ -54,7 +54,7 @@
             <div class="content.buttons"
                 ng-show="content.buttons.length">
                 <button ng-repeat="button in content.buttons"
-                    ng-click="button.fn($event)"
+                    ng-click="button.fn()"
                     ng-class="button.class">[[ button.text ]]</button>
             </div>
         </div>
@@ -73,10 +73,10 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
                 <div class="exit dropdown">
-                    <a class="discard" ng-click="discard($event)" href="#">
+                    <a class="discard" ng-click="discard()">
                         Exit
                     </a>
-                    <a class="save" ng-click="save($event)" href="#">
+                    <a class="save" ng-click="save()">
                         Save
                     </a>
                 </div>
@@ -100,7 +100,7 @@
     <section class="main ng-cloak" ng-cloak>
         <section class="left column">
             <div class="help-panel" ng-controller="HelpController">
-                <a href="#" class="advanced" ng-click="showAdvancedModal($event)">Advanced &raquo;</a>
+                <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
                 <h1>Keyboard controls</h1>
                 <ul ng-show="commands">
                     <li ng-repeat="command in commands" class="group">
@@ -160,7 +160,6 @@
                 </div>
                 <a ng-click="scrollingSynced = !scrollingSynced"
                    ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
-                   href="#"
                    class="scroll-lock">
                 </a>
             </div>
@@ -172,8 +171,8 @@
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
                 <div class="switches">
-                    <a class="timeline-display" href="#">Show timeline</a>
-                    <a class="video-display" href="#">Hide video</a>
+                    <a class="timeline-display" ng-click="timelineShown = !timelineShown">Show timeline</a>
+                    <a class="video-display">Hide video</a>
                 </div>
             </div>
             <div class="subtitles-wrapper">
@@ -230,31 +229,29 @@
             </div>
         </section>
         <section class="collab column" ng-controller="CollabController">
-            <a href="#"
-               class="toggle-pane"
-               ng-click="toggleModule($event, 'pane')"
+            <a class="toggle-pane"
+               ng-click="toggleModule('pane')"
                ng-show="modulesEnabled.pane && !modulesOpen.pane">
                 Open Collab
             </a>
             <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
-                <a href="#"
-                   class="toggle-pane"
-                   ng-click="toggleModule($event, 'pane')"
+                <a class="toggle-pane"
+                   ng-click="toggleModule('pane')"
                    ng-show="modulesOpen.pane">
                     Close Collab
                 </a>
                 <div class="notes module"
                      ng-show="modulesEnabled.notes"
                      ng-class="{open: modulesOpen.notes}">
-                    <a href="#" class="title" ng-click="toggleModule($event, 'notes')">Notes</a>
+                    <a class="title" ng-click="toggleModule('notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
                         <textarea ng-model="notes"></textarea>
                     </div>
                 </div>
                 <div class="approval module" ng-show="modulesEnabled.approval">
                     <div class="content">
-                        <button class="send-back" ng-click="sendBack($event)">Send Back</button>
-                        <button class="approve" ng-click="approve($event)">Accept</button>
+                        <button class="send-back" ng-click="sendBack()">Send Back</button>
+                        <button class="approve" ng-click="approve()">Accept</button>
                     </div>
                 </div>
             </aside>

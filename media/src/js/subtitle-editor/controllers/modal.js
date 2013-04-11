@@ -31,26 +31,25 @@
         $scope.loading = false;
         $scope.content = null;
 
-        $scope.hide = function($event) {
+        $scope.hide = function() {
             $scope.content = null;
             $scope.loading = null;
-            $event.preventDefault();
         };
 
         $scope.$root.$on('hide-modal', function($event) {
-            $scope.hide($event);
+            $scope.hide();
         });
         $scope.$root.$on('show-loading-modal', function($event, content) {
 
             // Clear out any existing modal.
-            $scope.hide($event);
+            $scope.hide();
 
             $scope.loading = content;
         });
         $scope.$root.$on('show-modal', function($event, content) {
 
             // Clear out any existing modal.
-            $scope.hide($event);
+            $scope.hide();
 
             $scope.content = content;
         });

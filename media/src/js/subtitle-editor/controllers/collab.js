@@ -49,16 +49,13 @@
             };
         }
 
-        $scope.approve = function($event) {
-            $event.preventDefault();
+        $scope.approve = function() {
             $scope.$root.$emit('approve-task');
         };
-        $scope.toggleModule = function($event, module) {
+        $scope.toggleModule = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
-            $event.preventDefault();
         };
-        $scope.sendBack = function($event) {
-            $event.preventDefault();
+        $scope.sendBack = function() {
             $scope.$root.$emit('send-back-task');
         };
 

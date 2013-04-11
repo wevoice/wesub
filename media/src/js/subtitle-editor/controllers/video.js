@@ -133,7 +133,7 @@
     };
     var VideoTitleController = function($scope, SubtitleListFinder) {
 
-        $scope.$root.$on('subtitles-fetched', function() {
+        $scope.$root.$on('subtitles-fetched', function($event) {
 
             // Reference the actual scope in the template so we can get automatic binding
             // on the title and description.
