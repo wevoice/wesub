@@ -43,6 +43,7 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User, Awards
 from videos import EffectiveSubtitle, is_synced, is_synced_value
 from videos.types import video_type_registrar
+from videos.types.youtube import FROM_YOUTUBE_MARKER
 from videos.feed_parser import FeedParser
 from comments.models import Comment
 from libs.bulkops import insert_many
@@ -505,7 +506,7 @@ class Video(models.Model):
         """
         from django.utils.text import get_valid_filename
 
-        return get_valid_filename(self.__unicode__())
+        return get_valid_filename(self.title_display(truncate=False))
 
     def lang_filename(self, language):
         """Return a filename-safe version of this video's string representation with a language code.
@@ -1255,7 +1256,7 @@ class SubtitleLanguage(models.Model):
 
         version = versions[0]
 
-        if version.note == 'From youtube':
+        if version.note == FROM_YOUTUBE_MARKER:
             return True
 
         return False

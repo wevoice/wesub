@@ -28,7 +28,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from math_captcha.forms import MathCaptchaForm
 
-from teams.models import Task, Workflow
+from teams.models import Task, Workflow, BillingRecord
 from teams.moderation_const import UNMODERATED, WAITING_MODERATION, APPROVED
 from teams.permissions import (
         can_create_and_edit_subtitles, can_assign_task,
@@ -526,6 +526,8 @@ class SubtitlesUploadForm(forms.Form):
 
                 if is_complete:
                     task.complete()
+                    if task.subtitle_version:
+                        BillingRecord.objects.insert_record( task.subtitle_version)
 
 class UserTestResultForm(forms.ModelForm):
 

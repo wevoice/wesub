@@ -44,7 +44,6 @@ from apps.videos.types import VideoTypeError
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
-BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
 
 
@@ -146,7 +145,7 @@ def raise_exception(msg, **kwargs):
 def video_changed_tasks(video_pk, new_version_id=None):
     from videos import metadata_manager
     from videos.models import Video
-    from teams.models import TeamVideo
+    from teams.models import TeamVideo, BillingRecord
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
         _send_notification(new_version_id)
@@ -154,7 +153,8 @@ def video_changed_tasks(video_pk, new_version_id=None):
         _detect_language(new_version_id)
         _update_captions_in_original_service(new_version_id)
         try:
-            insert_billing_record(new_version_id)
+            BillingRecord.objects.insert_record(
+                SubtitleVersion.objects.get(pk=new_version_id))
         except Exception, e:
             celery_logger.error("Could not add billing record", extra={
                 "version_pk": new_version_id,
@@ -595,50 +595,11 @@ def add_amara_description_credit_to_youtube_video(video_id):
     for vurl in youtube_urls:
         _add_amara_description_credit_to_youtube_vurl.delay(vurl.pk)
 
-
-@task
-def insert_billing_record(version_pk):
-    from teams.models import BillingRecord
-    instance = SubtitleVersion.objects.get(pk=version_pk)
-    celery_logger.debug('insert billing record')
-
-    language = instance.language
-    video = language.video
-    tv = video.get_team_video()
-
-    if not language.is_complete:
-        celery_logger.debug('language not complete')
-        return
-
-    if not tv:
-        celery_logger.debug('not a team video')
-        return
-
-    if BillingRecord.objects.filter(video=video,
-            subtitle_version__language=language).exists():
-        celery_logger.debug('a billing record for this language exists')
-        return
-
-    if SubtitleVersion.objects.filter(language=language,
-            datetime_started__lt=BILLING_CUTOFF).exclude(
-                    pk=instance.pk).exists():
-        celery_logger.debug('an older version exists')
-        return
-
-    is_original = language.is_original
-    source = instance.note
-    team = tv.team
-
-    BillingRecord.objects.create(video=video, subtitle_version=instance,
-            subtitle_language=language, is_original=is_original, team=team,
-            created=instance.datetime_started, source=source,
-            user=instance.user)
-
-
 @task
 def sync_latest_versions_for_video(video_pk):
     video = Video.objects.get(pk=video_pk)
 
     for lang in video.subtitlelanguage_set.all():
         latest = lang.latest_version()
-        upload_subtitles_to_original_service.delay(latest.pk)
+        if latest:
+            upload_subtitles_to_original_service.delay(latest.pk)

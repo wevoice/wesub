@@ -10,7 +10,7 @@ from utils.http import url_exists
 
 
 class MaxFileSizeValidator(object):
-    def __init__(self, max_size, message=_(u'Please keep filesize under %(required_size)s. Current filesize %(current_size)s')):
+    def __init__(self, max_size, message=_(u'Please keep file size under %(required_size)s. Current file size %(current_size)s')):
         self.max_size = max_size
         self.message = message
 
