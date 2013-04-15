@@ -2048,9 +2048,7 @@ class Task(models.Model):
         if not source_language:
             return False
         can_perform = (source_language and
-                    source_language.subtitles_complete and
-                    source_language.get_tip().is_public() and
-                    source_language.get_tip().get_subtitles().fully_synced)
+                       source_language.is_complete_and_synced())
 
         if self.get_type_display() != 'Translate':
             if self.get_type_display() in ('Review', 'Approve'):

@@ -47,6 +47,31 @@ class UnpublishTestCase(TestCase):
         sv = pipeline.add_subtitles(self.video, code, None, parents=[parent])
         return sv.subtitle_language
 
+class UnpublishedVersionTest(UnpublishTestCase):
+    # test what happens if the admin unpublishes subtitle versions
+    def test_translation_tasks_not_blocked(self):
+        # test that translation tasks are not blocked if the admin unpublishes
+        # the version
+
+        # make a translation task
+        task = Task(team=self.team, team_video=self.team_video,
+                    assignee=self.user, type=Task.TYPE_IDS['Translate'],
+                     language='ru')
+        task.save()
+        # complete the translation task to create an approval task
+        lang = self.make_dependent_language('ru', self.versions[-1])
+        task.new_subtitle_version = lang.get_tip()
+        approve_task = task.complete()
+        # complete the parent subtitles language, so that that's not an issue
+        # for is_blocked().
+        self.language.subtitles_complete = True
+        self.language.save()
+        # unpublish the last version and check that that doesn't block the
+        # approval task
+        self.versions[-1].visibility_override = 'private'
+        self.versions[-1].save()
+        self.assertEquals(approve_task.is_blocked(), False)
+
 class DeleteLanguageModelTest(UnpublishTestCase):
     def check_language_deleted(self, language):
         self.assertEquals(language.subtitleversion_set.extant().count(), 0)
