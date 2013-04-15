@@ -4,6 +4,7 @@ from django.test.client import Client
 
 from apps.subtitles import pipeline
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
+from apps.teams.models import Task
 from apps.teams.forms import DeleteLanguageForm
 from apps.teams.permissions_const import ROLE_ADMIN, ROLE_OWNER, ROLE_MANAGER, ROLE_CONTRIBUTOR
 from utils import test_factories
@@ -31,6 +32,10 @@ class UnpublishTestCase(TestCase):
         self.assertEquals(subtitleversion_set.extant().count(), extent_count)
         self.assertEquals(subtitleversion_set.public().count(), public_count)
 
+    def check_task_count(self, count):
+        qs = Task.objects.filter(language=self.language.language_code)
+        self.assertEquals(qs.count(), count)
+
     def update_workflow(self, approve_allowed):
         if approve_allowed:
             self.workflow.approve_allowed = 10
@@ -52,6 +57,23 @@ class DeleteLanguageModelTest(UnpublishTestCase):
     def test_delete_language(self):
         self.language.nuke_language()
         self.check_language_deleted(self.language)
+
+    def test_delete_tasks(self):
+        # Add a review task for the last SubtitleVersion
+        Task(team=self.team, team_video=self.team_video, assignee=None,
+             language=self.language.language_code,
+             type=Task.TYPE_IDS['Review'],
+             new_subtitle_version=self.versions[-1]).save()
+        # add a completed review task for the one before that
+        Task(team=self.team, team_video=self.team_video, assignee=None,
+             language=self.language.language_code,
+             type=Task.TYPE_IDS['Review'],
+             approved=Task.APPROVED_IDS['Approved'],
+             new_subtitle_version=self.versions[-1]).save()
+        self.check_task_count(2)
+        # deleting the language should delete both tasks.
+        self.language.nuke_language()
+        self.check_task_count(0)
 
     def test_sublanguages(self):
         sub_lang1 = self.make_dependent_language('ru', self.versions[0])

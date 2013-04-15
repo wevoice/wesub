@@ -28,6 +28,7 @@ from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
 from apps.subtitles import shims
+from apps.subtitles import signals
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
@@ -627,11 +628,11 @@ class SubtitleLanguage(models.Model):
         SubtitleVersions for dependent languages.
         """
         # delete dependent languages first
-        for lang in self.get_dependent_subtitle_languages():
+        languages = [self] + self.get_dependent_subtitle_languages()
+        for lang in languages:
             for sv in lang.subtitleversion_set.extant().all():
                 sv.unpublish(delete=True)
-        for sv in self.subtitleversion_set.extant().all():
-            sv.unpublish(delete=True)
+            signals.language_deleted.send(lang)
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""

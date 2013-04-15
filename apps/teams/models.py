@@ -41,6 +41,7 @@ from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from apps.subtitles import shims
+from apps.subtitles.signals import language_deleted
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,
@@ -869,6 +870,9 @@ def team_video_delete(sender, instance, **kwargs):
     except Video.DoesNotExist:
         pass
 
+def on_language_deleted(sender, **kwargs):
+    """When a language is deleted, delete all tasks associated with it."""
+    Task.objects.filter(language=sender.language_code).delete()
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     """Create subtitle/translation tasks for a newly added TeamVideo, if necessary."""
@@ -897,7 +901,7 @@ post_save.connect(team_video_autocreate_task, TeamVideo, dispatch_uid='teams.tea
 post_save.connect(team_video_add_video_moderation, TeamVideo, dispatch_uid='teams.teamvideo.team_video_add_video_moderation')
 post_delete.connect(team_video_delete, TeamVideo, dispatch_uid="teams.teamvideo.team_video_delete")
 post_delete.connect(team_video_rm_video_moderation, TeamVideo, dispatch_uid="teams.teamvideo.team_video_rm_video_moderation")
-
+language_deleted.connect(on_language_deleted, dispatch_uid="teams.subtitlelanguage.language_deleted")
 
 # TeamMember
 class TeamMemberManager(models.Manager):
