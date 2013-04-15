@@ -46,10 +46,7 @@
             $scope.$root.$broadcast('video-ready', $scope.pop);
         });
         $scope.pop.on('timeupdate', function() {
-            $scope.$root.$broadcast('video-timechanged', $scope.pop.currentTime());
-        });
-        $scope.pop.on('seeked', function() {
-            $scope.$root.$broadcast('video-timechanged', $scope.pop.currentTime());
+            $scope.$root.$broadcast('video-timechanged', $scope.pop);
         });
 
         $scope.playChunk = function(start, duration) {

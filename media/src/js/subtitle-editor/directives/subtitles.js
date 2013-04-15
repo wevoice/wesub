@@ -465,14 +465,25 @@ var USER_IDLE_MINUTES = 5;
                             scope.$apply();
 
                         });
+                        scope.$root.$on('video-timechanged', function($event, pop) {
 
-                        scope.$root.$on('video-timechanged', function($event, currentTime) {
+                            // Stop any running animations.
+                            $timingContainer.stop();
+
+                            var currentTime = pop.currentTime();
 
                             // One second = 100 pixels.
                             var currentTimeInPixels = currentTime * 100 - 100;
 
-                            // We have to account for sub-1 second positions, which is the -100 part.
-                            $timingContainer.css('left', ($body.width() / 2 - 100) - currentTimeInPixels);
+                            var animationLength = 0;
+
+                            if (!pop.paused()) {
+                                animationLength = 250;
+                            }
+
+                            $timingContainer.animate({
+                                'left': ($body.width() / 2 - 100) - currentTimeInPixels
+                            }, animationLength, 'linear');
 
                         });
 
