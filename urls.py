@@ -47,6 +47,8 @@ js_info_dict = {
     'packages': ('unisubs'),
 }
 
+# run monkey patch django
+from utils import urlvalidator
 urlpatterns = patterns('',
     url('^500/$', direct_to_template, { 'template': '500.html' }),
     url('^404/$', direct_to_template, { 'template': '404.html' }),
