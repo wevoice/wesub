@@ -477,18 +477,23 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
                                  if version else None)
     context['next_version'] = version.next_version() if version else None
-    context['can_edit'] = False
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
 
-    if request.user.is_authenticated():
-        # user can only edit a subtitle draft if he
-        # has a subtitle/translate task assigned to him
-        tasks = (Task.objects.incomplete_subtitle_or_translate()
+    if not request.user.is_authenticated():
+        context['can_edit'] = False
+    else:
+        # for in-process tasks, user can only edit a subtitle draft if he has a
+        # subtitle/translate task assigned to him
+        tasks = list(Task.objects.incomplete_subtitle_or_translate()
                              .filter(team_video=team_video,
-                                     assignee=request.user,
                                      language=language.language_code))
-
-        context['can_edit'] = tasks.exists()
+        if tasks:
+            for task in tasks:
+                if task.assignee == request.user:
+                    context['can_edit'] = True
+                    break
+        else:
+            context['can_edit'] = True
 
     return render_to_response("videos/subtitle-view.html", context,
                               context_instance=RequestContext(request))
