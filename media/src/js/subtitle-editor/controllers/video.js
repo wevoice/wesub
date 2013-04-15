@@ -45,6 +45,12 @@
         $scope.pop.on('canplay', function() {
             $scope.$root.$broadcast('video-ready', $scope.pop);
         });
+        $scope.pop.on('timeupdate', function() {
+            $scope.$root.$broadcast('video-timechanged', $scope.pop.currentTime());
+        });
+        $scope.pop.on('seeked', function() {
+            $scope.$root.$broadcast('video-timechanged', $scope.pop.currentTime());
+        });
 
         $scope.playChunk = function(start, duration) {
             // Play a specified amount of time in a video, beginning at 'start',

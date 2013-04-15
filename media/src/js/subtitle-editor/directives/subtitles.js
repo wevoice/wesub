@@ -440,9 +440,41 @@ var USER_IDLE_MINUTES = 5;
     });
     directives.directive('timeline', function() {
         return {
-            compile: function compile(elm, attrs, transclude) {
+            compile: function compile(elem, attrs, transclude) {
                 return {
-                    post: function post(scope, elm, attrs) {
+                    post: function post(scope, elem, attrs) {
+
+                        var $elem = $(elem);
+                        var $timingContainer = $('div.timing-container', elem);
+                        var $body = $('body');
+
+                        scope.$root.$on('video-ready', function($event, pop) {
+
+                            scope.duration = pop.duration();
+                            scope.secondsRoundedUp = Math.ceil(scope.duration * 1) / 1;
+
+                            for (var i = 0; i < scope.secondsRoundedUp; i++) {
+
+                                // Create a new div for this second and append to the timing container.
+                                $timingContainer.append($('<div class="second"><span>' + i + '</span></div>'));
+
+                            }
+
+                            $timingContainer.width(scope.secondsRoundedUp * 100);
+
+                            scope.$apply();
+
+                        });
+
+                        scope.$root.$on('video-timechanged', function($event, currentTime) {
+
+                            // One second = 100 pixels.
+                            var currentTimeInPixels = currentTime * 100 - 100;
+
+                            // We have to account for sub-1 second positions, which is the -100 part.
+                            $timingContainer.css('left', ($body.width() / 2 - 100) - currentTimeInPixels);
+
+                        });
 
                     }
                 };

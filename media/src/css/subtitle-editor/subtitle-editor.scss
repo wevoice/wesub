@@ -1,3 +1,5 @@
+@charset "UTF-8";
+
 // Fonts
 $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
 $OpenSans: 'Open Sans', $Helvetica;
@@ -860,10 +862,57 @@ section.collab {
 section.timeline {
     background: #212223;
     height: 65px;
+    overflow: hidden;
     position: absolute;
     top: 329px;
     width: 100%;
     z-index: 51;
+
+    div.current-time-marker {
+        background: #FC0D1B;
+        content: "";
+        display: block;
+        height: 65px;
+        left: 50%;
+        position: absolute;
+        width: 1px;
+        z-index: 54;
+    }
+    div.timing-container {
+        height: 65px;
+        left: 50%;
+        position: absolute;
+        top: 0;
+
+        div.second {
+            display: block;
+            height: 65px;
+            float: left;
+            position: relative;
+            width: 100px;
+
+            span {
+                background: #212223;
+                bottom: 3px;
+                color: #686868;
+                font-size: 12px;
+                font-weight: bold;
+                left: 0;
+                padding-right: 5px;
+                position: absolute;
+                z-index: 53;
+            }
+            &:after {
+                bottom: 3px;
+                content: "• • • • • • • • •";
+                display: block;
+                font-size: 15px;
+                left: 10px;
+                position: absolute;
+                z-index: 52;
+            }
+        }
+    }
 }
 body.timeline-shown {
     div.workspace-tools, div.language-selections {

@@ -22,12 +22,6 @@
 
     var TimelineController = function($scope, SubtitleStorage) {
 
-        $scope.$root.$on('video-ready', function($event, pop) {
-
-            $scope.duration = pop.duration();
-
-        });
-
     };
 
     root.TimelineController = TimelineController;
