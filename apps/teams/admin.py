@@ -223,16 +223,20 @@ class ApplicationAdmin(admin.ModelAdmin):
 class BillingRecordAdmin(admin.ModelAdmin):
     list_display = (
         'video',
-        'subtitle_language',
+        'new_subtitle_language',
         'minutes',
         'is_original',
         'team',
         'created',
         'source',
         'user',
-        'subtitle_version'
+        'new_subtitle_version'
     )
-    list_filter = ('team', 'created', 'user', 'is_original',)
+    list_filter = ('team', 'created', 'source', 'is_original',)
+    raw_id_fields = ('user', 'subtitle_language',
+                     'new_subtitle_language', 'subtitle_version',
+                    'new_subtitle_version' ,
+    )
 
 
 admin.site.register(TeamMember, TeamMemberAdmin)
