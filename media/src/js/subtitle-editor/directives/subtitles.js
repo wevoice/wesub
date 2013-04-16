@@ -448,12 +448,22 @@ var USER_IDLE_MINUTES = 5;
                         var $timingContainer = $('div.timing-container', elem);
                         var $body = $('body');
 
-                        scope.$root.$on('video-ready', function($event, pop) {
+                        var renderTimelineSubtitles = function(pop) {
 
-                            scope.duration = pop.duration();
-                            scope.secondsRoundedUp = Math.ceil(scope.duration * 1) / 1;
+                        };
+                        var renderTimelineSeconds = function(pop) {
 
-                            for (var i = 0; i < scope.secondsRoundedUp; i++) {
+                            var currentTime = pop.currentTime();
+                            var duration = pop.duration();
+                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
+
+                            var endTime = currentTime + 15;
+                            endTime = endTime > durationRoundedUp ? durationRoundedUp : endTime;
+
+                            var startTime = currentTime - 15;
+                            startTime = startTime < 0 ? 0 : startTime;
+
+                            for (var i = startTime; i < endTime; i++) {
 
                                 // Create a new div for this second and append to the timing container.
                                 $timingContainer.append($('<div class="second"><span>' + i + '</span></div>'));
@@ -462,28 +472,26 @@ var USER_IDLE_MINUTES = 5;
 
                             $timingContainer.width(scope.secondsRoundedUp * 100);
 
-                            scope.$apply();
+                        };
 
+                        scope.$root.$on('video-ready', function($event, pop) {
+
+                            var duration = pop.duration();
+                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
+
+                            $timingContainer.width(durationRoundedUp * 100);
+
+                            renderTimelineSeconds(pop);
+                            renderTimelineSubtitles(pop);
                         });
                         scope.$root.$on('video-timechanged', function($event, pop) {
 
-                            // Stop any running animations.
-                            $timingContainer.stop();
+                            var currentTimeInPixels = pop.currentTime * 100;
+                            var duration = pop.duration();
+                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
 
-                            var currentTime = pop.currentTime();
-
-                            // One second = 100 pixels.
-                            var currentTimeInPixels = currentTime * 100 - 100;
-
-                            var animationLength = 0;
-
-                            if (!pop.paused()) {
-                                animationLength = 250;
-                            }
-
-                            $timingContainer.animate({
-                                'left': ($body.width() / 2 - 100) - currentTimeInPixels
-                            }, animationLength, 'linear');
+                            renderTimelineSeconds(pop);
+                            renderTimelineSubtitles(pop);
 
                         });
 
