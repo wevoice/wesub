@@ -878,9 +878,92 @@ section.timeline {
         width: 1px;
         z-index: 54;
     }
+    div.subtitles-container {
+        height: 65px;
+        left: 30%; // Debug only.
+        position: absolute;
+        top: 0;
+
+        div.subtitle {
+            background: #DADBDC;
+            font-size: 11px;
+            height: 28px;
+            overflow: hidden;
+            padding: 7px 10px 0 10px;
+            position: absolute;
+            top: 10px;
+            @include border-radius(3px);
+
+            span {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 100%;
+                white-space: nowrap;
+            }
+            a.handle {
+                cursor: col-resize;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                width: 4px;
+
+                &.left {
+                    background: #3E8982;
+                    left: 0;
+                    @include multi-border-radius(3px, 0, 0, 3px);
+                    
+                    &:before {
+                        background: #3E8982;
+                        content: "";
+                        display: block;
+                        height: 12px;
+                        left: -5px;
+                        position: absolute;
+                        top: 8px;
+                        width: 12px;
+                        @include border-radius(12px);
+                    }
+                }
+                &.right {
+                    background: #A2A3A4;
+                    right: 0;
+                    @include multi-border-radius(0, 3px, 3px, 0);
+
+                    &:before {
+                        background: #A2A3A4;
+                        content: "";
+                        display: block;
+                        height: 12px;
+                        position: absolute;
+                        right: -5px;
+                        top: 8px;
+                        width: 12px;
+                        @include border-radius(12px);
+                    }
+                }
+            }
+            &.mock-1 {
+                left: 0px;
+                width: 155px;
+            }
+            &.mock-2 {
+                left: 155px;
+                width: 150px;
+            }
+            &.mock-3 {
+                left: 312px;
+                width: 230px;
+            }
+            &.mock-4 {
+                left: 542px;
+                width: 230px;
+            }
+        }
+    }
     div.timing-container {
         height: 65px;
-        left: 50%;
+        left: 30%;
         position: absolute;
         top: 0;
 

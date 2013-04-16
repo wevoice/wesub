@@ -470,29 +470,17 @@ var USER_IDLE_MINUTES = 5;
 
                             }
 
-                            $timingContainer.width(scope.secondsRoundedUp * 100);
+                            //$timingContainer.width(scope.secondsRoundedUp * 100);
 
                         };
 
                         scope.$root.$on('video-ready', function($event, pop) {
-
-                            var duration = pop.duration();
-                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
-
-                            $timingContainer.width(durationRoundedUp * 100);
-
                             renderTimelineSeconds(pop);
                             renderTimelineSubtitles(pop);
                         });
                         scope.$root.$on('video-timechanged', function($event, pop) {
-
-                            var currentTimeInPixels = pop.currentTime * 100;
-                            var duration = pop.duration();
-                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
-
                             renderTimelineSeconds(pop);
                             renderTimelineSubtitles(pop);
-
                         });
 
                     }
