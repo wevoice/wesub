@@ -456,7 +456,9 @@ var USER_IDLE_MINUTES = 5;
                             for (var i = 0; i < scope.secondsRoundedUp; i++) {
 
                                 // Create a new div for this second and append to the timing container.
-                                $timingContainer.append($('<div class="second"><span>' + i + '</span></div>'));
+                                // TODO: We can't append thousands of DOM elems here. We need to only render
+                                // the seconds-blocks as they're needed in the timeline.
+                                //$timingContainer.append($('<div class="second"><span>' + i + '</span></div>'));
 
                             }
 
