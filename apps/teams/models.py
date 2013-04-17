@@ -2442,11 +2442,14 @@ class BillingReport(models.Model):
         if not version:
             return False
 
+        # for moderated team videos we want to be sure that they're published
         if not version.is_public():
             return False
 
-        if version.moderation_status == UNMODERATED:
-            if not language.subtitles_complete:
+        # teams that require no moderation we bill if the user says they're
+        # complete
+        if not self.team.is_moderated:
+            if language.in_progress():
                 return False
 
         if (version.created <= start or
