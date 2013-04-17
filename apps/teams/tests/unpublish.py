@@ -100,6 +100,24 @@ class DeleteLanguageModelTest(UnpublishTestCase):
         self.language.nuke_language()
         self.check_task_count(0)
 
+    def test_delete_translation_tasks(self):
+        # We should delete translation tasks if there are no more languages
+        # with public versions available.
+
+        # make a translation task
+        Task(team=self.team, team_video=self.team_video, assignee=None,
+             language='de', type=Task.TYPE_IDS['Translate']).save()
+        self.assertEquals(Task.objects.filter(language='de').count(), 1)
+        # make a second language.  If we delete that language, we should still
+        # keep translation tasks.
+        other_lang_version = pipeline.add_subtitles(self.video, 'fr', None)
+        other_lang_version.subtitle_language.nuke_language()
+        self.assertEquals(Task.objects.filter(language='de').count(), 1)
+        # but when we delete our original language, then there's no source
+        # languages, so we should delete the translation task
+        self.language.nuke_language()
+        self.assertEquals(Task.objects.filter(language='de').count(), 0)
+
     def test_sublanguages(self):
         sub_lang1 = self.make_dependent_language('ru', self.versions[0])
         sub_lang2 = self.make_dependent_language('fr', sub_lang1.get_tip())

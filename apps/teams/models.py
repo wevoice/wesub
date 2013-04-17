@@ -872,7 +872,14 @@ def team_video_delete(sender, instance, **kwargs):
 
 def on_language_deleted(sender, **kwargs):
     """When a language is deleted, delete all tasks associated with it."""
+    team_video = sender.video.get_team_video()
+    if not team_video:
+        return
     Task.objects.filter(language=sender.language_code).delete()
+    # check if there are no more source languages for the video, and in that
+    # case delete all transcribe tasks
+    if not sender.video.has_public_version():
+        Task.objects.filter(team_video=team_video).delete()
 
 def team_video_autocreate_task(sender, instance, created, raw, **kwargs):
     """Create subtitle/translation tasks for a newly added TeamVideo, if necessary."""

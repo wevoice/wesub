@@ -512,6 +512,9 @@ class SubtitleLanguage(models.Model):
         except IndexError:
             return None
 
+    def has_public_version(self):
+        """Check if there are any public versions for this language."""
+        return self.subtitleversion_set.public().exists()
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""

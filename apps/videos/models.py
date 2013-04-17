@@ -633,6 +633,13 @@ class Video(models.Model):
         language = self.subtitle_language(language_code)
         return None if language is None else language.get_tip(public=public_only)
 
+    def has_public_version(self):
+        """Check if there are any public versions for any language."""
+        for language in self.newsubtitlelanguage_set.all():
+            if language.has_public_version():
+                return True
+        return False
+
     def subtitles(self, version_number=None, language_code=None, language_pk=None):
         if language_pk is None:
             language = self.subtitle_language(language_code)
