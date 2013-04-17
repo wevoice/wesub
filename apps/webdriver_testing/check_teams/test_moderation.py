@@ -119,9 +119,6 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.menu.open_menu()
         self.assertFalse(self.menu.displays_improve_subtitles())
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-
     def test_trans_policy_members__guest(self):
         """Translate policy: members, guest has no new translation in menu.
 

@@ -82,8 +82,6 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.advanced_search()
         self.assertTrue(results_pg.search_has_results())
        
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id()) 
 
     def test_search__sub_content(self):
         """Search contents in subtitle text.
