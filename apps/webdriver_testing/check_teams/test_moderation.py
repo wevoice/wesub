@@ -70,7 +70,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
 
 
     def test_subtitleme(self):
-        """Subtitle Me button displayed  published transcript. """
+        """Subtitle Me button displayed on published transcript. """
         self.video_pg.open_video_page(self.published.video_id)
         self.assertTrue(self.video_pg.displays_subtitle_me())
 
@@ -118,9 +118,6 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.video_pg.open_video_page(self.published.video_id)
         self.menu.open_menu()
         self.assertFalse(self.menu.displays_improve_subtitles())
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_trans_policy_members__guest(self):
         """Translate policy: members, guest has no new translation in menu.

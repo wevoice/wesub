@@ -25,8 +25,6 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.subs_path = os.path.dirname(os.path.abspath(__file__))
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_notify_contributor(self):
         """Subtitle contributor gets an email when new revision added.

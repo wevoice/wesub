@@ -316,35 +316,6 @@ class TestCaseDelete(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_no_results())
 
-    def test_delete_all_public_creates_approve_task(self):
-        """Unpublishing (delete) all public versions creates approve task'
-        
-        v1 - private, v2 - private, v3 - public, v4 - public
-        Delete v3 and all later create approve task at v2
-        Ref: https://unisubs.sifterapp.com/issues/2005
-
-
-        """
-        video, tv = self._create_source_with_multiple_revisions()
-        en = video.subtitle_language('en')
-        self.logger.info(en.pk)
-        self.logger.info(en.version().pk)
-        self.logger.info(en.version(version_number=3).pk)
-        sl_sv = '{0}/{1}'.format(en.pk, en.version(version_number=3).pk)
-        self._unpublish_source_with_delete(video, rev=sl_sv)
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=en'.format(
-                                 self.team.slug, tv.pk))
-        task_text = 'Approve Original English Subtitles'
-        self.assertTrue(self.tasks_tab.task_present(task_text, video.title))
-        self.logger.info(en.get_tip(full=True).version_number)
-        self.tasks_tab.perform_and_assign_task(task_text, video.title)
-        self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
-        self.assertEqual('This is revision 2', 
-                         self.sub_editor.subtitles_list()[0])
-
-
-
 
 class TestCaseSendBack(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
@@ -401,9 +372,6 @@ class TestCaseSendBack(WebdriverTestCase):
                             'webdriver_testing', 'subtitle_data')
 
 
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
