@@ -197,10 +197,17 @@
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
-                            <span ng-show="showStartTime"
-                                  class="start-time">
-                                [[ parser.startTimeDisplay(subtitle) ]]
-                            </span>
+                            <div class="hover">
+                                <span ng-show="showStartTime" class="timing">
+                                    <span>[[ parser.startTimeDisplay(subtitle) ]]</span>
+                                    <a href class="comments"></a>
+                                </span>
+                                <a href class="remove-subtitle"
+                                   ng-click="removeSubtitle(subtitle)">
+                                    Remove
+                                </a>
+                                <a href class="add-subtitle"></a>
+                            </div>
 
                             <span ng-show="!isEditing"
                                   ng-bind-html-unsafe="parser.contentRendered(subtitle)"
@@ -210,12 +217,6 @@
                             <textarea ng-show="isEditing"
                                       style="display: none;">
                             </textarea>
-
-                            <a ng-show="canAddAndRemove"
-                               class="remove"
-                               ng-click="removeSubtitle(subtitle)">
-                                Remove
-                            </a>
 
                         </li>
 

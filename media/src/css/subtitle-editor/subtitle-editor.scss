@@ -427,6 +427,59 @@ section.main {
                 line-height: 25px;
                 position: relative;
 
+                div.hover {
+                    display: none;
+
+                    span.timing {
+                        color: #9A9B9C;
+                        display: block;
+                        font-size: 10px;
+                        position: absolute;
+                        right: 20px;
+                        top: 2px;
+
+                        span {
+                            display: inline-block;
+                        }
+                        a.comments {
+                            background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
+                            display: inline-block;
+                            height: 9px;
+                            margin-left: 3px;
+                            vertical-align: -1px;
+                            width: 10px;
+                        }
+                    }
+                    a.remove-subtitle {
+                        background: transparent url('../../../images/editor/remove-subtitle.gif') top left no-repeat;
+                        bottom: 7px;
+                        display: block;
+                        height: 10px;
+                        position: absolute;
+                        text-indent: -1000em;
+                        right: 20px;
+                        width: 10px;
+                    }
+                    a.add-subtitle {
+                        bottom: -15px;
+                        display: block;
+                        left: 0;
+                        overflow: hidden;
+                        position: absolute;
+                        height: 15px;
+                        width: 100%;
+
+                        &:before {
+                            background: #BABBBC url('../../../images/editor/plus.gif') center 80% no-repeat;
+                            content: "";
+                            display: block;
+                            height: 30px;
+                            margin: -15px auto 0 auto;
+                            width: 30px;
+                            @include border-radius(30px);
+                        }
+                    }
+                }
                 textarea, span.subtitle-text {
                     border: 0;
                     border-top: 1px solid #EBECED;
@@ -490,7 +543,7 @@ section.main {
                     padding: 0;
                 }
                 &:hover {
-                    a.remove {
+                    div.hover {
                         display: block;
                     }
                     span.start-time {
