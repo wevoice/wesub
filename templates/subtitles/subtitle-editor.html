@@ -171,7 +171,7 @@
                 <div class="subtitles-language">
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
-                <div ng-show="false" class="switches">
+                <div class="switches" ng-show="false">
                     <a class="timeline-display" ng-click="$root.timelineShown = !$root.timelineShown">
                         <span ng-show="timelineShown">Hide</span>
                         <span ng-show="!timelineShown">Show</span>
@@ -262,6 +262,20 @@
             </aside>
             <div class="errors">
                 <div ng-show="error" class="error">[[ error ]]</div>
+            </div>
+        </section>
+        <section class="right column">
+            <div class="steps-container">
+                <ul class="steps">
+                    <li class="done">1. Type what you hear</li>
+                    <li>2. Sync timing
+                        <ul>
+                            <li>Not all lines are synced yet.</li>
+                            <li class="highlighted">Highlight unsynced lines</li>
+                        </ul>
+                    </li>
+                    <li>3. Review and endorse</li>
+                </ul>
             </div>
         </section>
     </section>
