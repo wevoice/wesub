@@ -70,7 +70,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
 
 
     def test_subtitleme(self):
-        """Subtitle Me button displayed  published transcript. """
+        """Subtitle Me button displayed on published transcript. """
         self.video_pg.open_video_page(self.published.video_id)
         self.assertTrue(self.video_pg.displays_subtitle_me())
 
