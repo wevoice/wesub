@@ -171,7 +171,7 @@
                 <div class="subtitles-language">
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
-                <div ng-show="false" class="switches">
+                <div class="switches" ng-show="false">
                     <a class="timeline-display" ng-click="$root.timelineShown = !$root.timelineShown">
                         <span ng-show="timelineShown">Hide</span>
                         <span ng-show="!timelineShown">Show</span>
@@ -197,10 +197,17 @@
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
-                            <span ng-show="showStartTime"
-                                  class="start-time">
-                                [[ parser.startTimeDisplay(subtitle) ]]
-                            </span>
+                            <div class="hover">
+                                <span ng-show="showStartTime" class="timing">
+                                    <span>[[ parser.startTimeDisplay(subtitle) ]]</span>
+                                    <a href class="comments"></a>
+                                </span>
+                                <a href class="remove-subtitle"
+                                   ng-click="removeSubtitle(subtitle)">
+                                    Remove
+                                </a>
+                                <a href class="add-subtitle"></a>
+                            </div>
 
                             <span ng-show="!isEditing"
                                   ng-bind-html-unsafe="parser.contentRendered(subtitle)"
@@ -210,12 +217,6 @@
                             <textarea ng-show="isEditing"
                                       style="display: none;">
                             </textarea>
-
-                            <a ng-show="canAddAndRemove"
-                               class="remove"
-                               ng-click="removeSubtitle(subtitle)">
-                                Remove
-                            </a>
 
                         </li>
 
@@ -262,6 +263,20 @@
             </aside>
             <div class="errors">
                 <div ng-show="error" class="error">[[ error ]]</div>
+            </div>
+        </section>
+        <section class="right column">
+            <div class="steps-container">
+                <ul class="steps">
+                    <li class="done">1. Type what you hear</li>
+                    <li>2. Sync timing
+                        <ul>
+                            <li>Not all lines are synced yet.</li>
+                            <li class="highlighted">Highlight unsynced lines</li>
+                        </ul>
+                    </li>
+                    <li>3. Review and endorse</li>
+                </ul>
             </div>
         </section>
     </section>

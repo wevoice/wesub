@@ -2677,7 +2677,7 @@ class BillingRecordManager(models.Manager):
                     r.minutes,
                     r.is_original,
                     r.team.slug,
-                    r.created.strftime('%Y-%m-%d %H:%S:%M'),
+                    r.created.strftime('%Y-%m-%d %H:%M:%S'),
                     r.source,
                     r.user.username
                 ])
