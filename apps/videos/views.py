@@ -479,25 +479,25 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
 
-    if not request.user.is_authenticated():
-        context['can_edit'] = False
-    else:
-        # for in-process tasks, user can only edit a subtitle draft if he has a
-        # subtitle/translate task assigned to him
-        tasks = list(Task.objects.incomplete_subtitle_or_translate()
-                             .filter(team_video=team_video,
-                                     language=language.language_code))
-        if tasks:
-            for task in tasks:
-                if task.assignee == request.user:
-                    context['can_edit'] = True
-                    break
+    # for videos that have tasks assigned to them, users can only edit if:
+    #     a) the video is in the transcribe/subtitle stage
+    #     b) the task is assigned to them.
+    incomplete_tasks = Task.objects.incomplete().filter(
+        team_video=team_video,
+        language=language.language_code)
+    if incomplete_tasks:
+        if Task.objects.incomplete_subtitle_or_translate().filter(
+            team_video=team_video,
+            language=language.language_code,
+            assignee=request.user):
+            context['edit_disabled'] = False
         else:
-            context['can_edit'] = True
+            context['edit_disabled'] = True
+    else:
+        context['edit_disabled'] = False
 
     return render_to_response("videos/subtitle-view.html", context,
                               context_instance=RequestContext(request))
-
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()

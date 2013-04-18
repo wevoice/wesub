@@ -158,7 +158,7 @@
                     <a class="button" href="{% url teams:delete-language video.get_team_video.team.slug language.pk %}">{% trans 'Delete Subtitle Language' %}</a>
                 {% endif %}
                 {% if language.is_original and request.user|can_create_subtitles_for:video or not language.is_original and request.user|can_create_translations_for:video %}
-                    <a id="edit_subtitles_button" class="button{% if not last_version.is_public and not can_edit %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
+                    <a id="edit_subtitles_button" class="button{% if edit_disabled %} disabled" title="Editing drafts is not permitted"{% else %}" href="{{edit_url}}"{% endif %}>{% trans 'Edit Subtitles' %}</a>
                 {% endif %}
                 {% if last_version.has_subtitles %}
                     <div class="sort_button action">
