@@ -42,6 +42,7 @@ import re
 import warnings
 from optparse import OptionGroup, OptionParser
 
+from babelsubs.storage import SubtitleSet
 
 csv = csv_module.writer(sys.stdout)
 single = False
@@ -354,8 +355,11 @@ def _stack_version(sv, nsl):
 
     try:
         subtitles = list(subtitles)
+        # set subtitle set as the pipeline will pass escaping
+        # otherwise and it will break
+        sset = SubtitleSet.from_list(nsl.language_code, subtitles)
         nsv = pipeline.add_subtitles(
-            nsl.video, nsl.language_code, subtitles,
+            nsl.video, nsl.language_code, sset,
             title=sv.title, description=sv.description, parents=[],
             visibility=visibility, author=sv.user,
             created=sv.datetime_started)
