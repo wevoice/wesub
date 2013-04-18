@@ -605,6 +605,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             input = input.replace(MARKUP_REPLACE_SEQ[i][0],
                 MARKUP_REPLACE_SEQ[i][1]);
         }
+        input = input.replace("\n", '<br/>');
         return input;
     };
     this.markdownToHTML = function(text) {
