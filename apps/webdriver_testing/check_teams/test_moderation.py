@@ -175,9 +175,6 @@ class TestCasePublishedVideos(WebdriverTestCase):
         self.assertFalse(self.menu.displays_new_translation())
 
 
-
-
-
 class TestCaseDraftVideos(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
 

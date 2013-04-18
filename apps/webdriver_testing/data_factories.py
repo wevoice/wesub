@@ -14,6 +14,7 @@ from apps.teams.models import Application
 from apps.teams.models import Project
 from apps.teams.models import TeamLanguagePreference
 from apps.teams.models import Workflow 
+from apps.teams.models import BillingReport
 from apps.auth.models import CustomUser as User
 from apps.auth.models import UserLanguage
 from apps.messages.models import Message
@@ -133,5 +134,7 @@ class TaskFactory(factory.Factory):
     FACTORY_FOR = Task 
     team_video = factory.SubFactory(TeamVideoFactory)
 
-
+class BillingFactory(factory.Factory):
+    FACTORY_FOR = BillingReport 
+    type = 2
 
