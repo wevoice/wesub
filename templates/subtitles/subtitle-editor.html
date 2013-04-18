@@ -199,7 +199,7 @@
 
                             <div class="hover">
                                 <span ng-show="showStartTime" class="timing">
-                                    <span>[[ parser.startTimeDisplay(subtitle) ]]</span>
+                                    <span>[[ parser.startTime(subtitle)|displayTime ]]</span>
                                     <a href class="comments"></a>
                                 </span>
                                 <a href class="remove-subtitle"
@@ -312,9 +312,6 @@
         </div>
     </section>
 
-    {% if DEBUG %}
-        <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
-    {% endif %}
 
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/jquery.autosize.js"></script>
@@ -336,6 +333,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/workspace-tools.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/timeline.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/filters/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.flash-fallback.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.netflix.js"></script>
 
