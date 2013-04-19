@@ -17,12 +17,10 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 var angular = angular || null;
-
 (function(){
     var root, module;
-
     root = this;
-    module = angular.module('amara.SubtitleEditor.filters', []);
+    module = angular.module('amara.SubtitleEditor.filters', ['amara.SubtitleEditor']);
 
     function leftPad(number, width, character) {
         /*
@@ -48,7 +46,10 @@ var angular = angular || null;
     * unpaded seconds from the result.
      */
     function _displayTime(milliseconds, showUnused){
-        if (milliseconds === -1 || milliseconds === undefined || milliseconds === null) {
+        if (milliseconds === -1 ||
+            isNaN(Math.floor(milliseconds)) ||
+            milliseconds === undefined ||
+            milliseconds === null) {
                 return "--";
             }
         var time = Math.floor(milliseconds / 1000);
@@ -58,21 +59,20 @@ var angular = angular || null;
         var seconds = time % 60;
         var result = '';
         if (hours || showUnused){
-            result += leftPad(hours, 2) + ':' ;
+            result += (hours > 9? leftPad(hours, 2) : hours ) + ':';
         }
-        if (minutes || showUnused){
+        if ((minutes || hours) || showUnused){
             if (hours){
                 result += leftPad(minutes, 2) + ':';
             }else{
                 result += minutes + ":";
             }
         }
-        if (minutes){
+        if (hours || minutes){
             result += leftPad(seconds, 2) ;
         }else{
             result += seconds;
         }
-
         result += ',' + leftPad(fraction, 2);
         return result
 
@@ -81,6 +81,5 @@ var angular = angular || null;
     module.filter('displayTime', function(){
         return _displayTime;
     });
-    console.log(module)
 
 }).call(this);

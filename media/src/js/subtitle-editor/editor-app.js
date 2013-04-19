@@ -23,10 +23,10 @@
     root = this;
 
     module = angular.module('amara.SubtitleEditor', [
-        'amara.SubtitleEditor.filters',
         'amara.SubtitleEditor.services',
         'amara.SubtitleEditor.services.lock',
         'amara.SubtitleEditor.directives',
+        'amara.SubtitleEditor.filters',
         'ngCookies'
     ]);
 
