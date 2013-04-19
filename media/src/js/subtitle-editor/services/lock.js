@@ -24,8 +24,6 @@ var angular = angular || null;
     root = this;
     module = angular.module('amara.SubtitleEditor.services.lock', []);
 
-    var cachedData = window.editorData;
-    var languageCode = cachedData.languageCode;
 
     getLockingUrl = function(videoId, languageCode, type){
         return '/' + languageCode + '/subtitles/editor/' + videoId + '/' + languageCode + '/' + type + "/";
@@ -47,7 +45,7 @@ var angular = angular || null;
             },
             releaseLock: function(videoId, languageCode){
                 return this.makeLockRequest(videoId, languageCode, 'release')
-            },
+            }
         }
     });
 
