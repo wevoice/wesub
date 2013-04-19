@@ -793,7 +793,8 @@ class Rpc(BaseRpc):
         # but this is cool for now because all those languages should
         # be shown on the transcribe dialog. if there's a base language,
         # that means we should always show the translate dialog.
-        language.is_forked = forked or session.base_language is None
+        if forked or session.base_language is None:
+            language.is_forked = True
 
         language.save()
 
