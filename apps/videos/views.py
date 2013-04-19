@@ -72,7 +72,7 @@ from utils.metrics import Meter
 from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import can_edit_video, can_add_version
+from teams.permissions import can_edit_video, can_add_version, can_rollback_language
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -472,6 +472,8 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         version = None
 
     context['rollback_allowed'] = version.next_version() is not None
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
@@ -508,7 +510,12 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 @get_video_revision
 def rollback(request, version):
     is_writelocked = version.subtitle_language.is_writelocked
-    if is_writelocked:
+    team_video = version.video.get_team_video()
+    if team_video and not can_rollback_language(request.user,
+                                                version.subtitle_language):
+        messages.error(request, _(u"You don't have permission to rollback "
+                                  "this language"))
+    elif is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
     elif not version.next_version():
         messages.error(request, message=u'Can not rollback to the last version')
