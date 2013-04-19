@@ -245,7 +245,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
     except Video.DoesNotExist:
         return
 
-    url = u'http://www.youtube.com/api/timedtext?v=%s&lang=%s&name=%s'
+    url = u'http://www.youtube.com/api/timedtext?v=%s&lang=%s&name=%s&fmt=srt'
     url = url % (youtube_id, yt_lc, urlquote(lang.get('name', u'')))
 
     xml = YoutubeVideoType._get_response_from_youtube(url, return_string=True)
@@ -255,7 +255,7 @@ def save_subtitles_for_lang(lang, video_pk, youtube_id):
 
     xml = force_unicode(xml, 'utf-8')
 
-    subs = babelsubs.parsers.discover('youtube').parse(xml).to_internal()
+    subs = babelsubs.parsers.discover('srt').parse(xml).to_internal()
     version = add_subtitles(video, lc, subs, note="From youtube", complete=True, origin=ORIGIN_IMPORTED)
 
     # do not pass a version_id else, we'll trigger emails for those edits
