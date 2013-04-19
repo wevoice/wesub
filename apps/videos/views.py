@@ -471,7 +471,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     else:
         version = None
 
-    context['rollback_allowed'] = version and not version.video.is_moderated
+    context['rollback_allowed'] = version.next_version() is not None
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
@@ -507,8 +507,6 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 @login_required
 @get_video_revision
 def rollback(request, version):
-    if version.video.is_moderated:
-        return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
     is_writelocked = version.subtitle_language.is_writelocked
     if is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
