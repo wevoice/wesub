@@ -875,7 +875,8 @@ def on_language_deleted(sender, **kwargs):
     team_video = sender.video.get_team_video()
     if not team_video:
         return
-    Task.objects.filter(language=sender.language_code).delete()
+    Task.objects.filter(team_video=team_video,
+                        language=sender.language_code).delete()
     # check if there are no more source languages for the video, and in that
     # case delete all transcribe tasks
     if not sender.video.has_public_version():

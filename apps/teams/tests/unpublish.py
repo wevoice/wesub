@@ -95,10 +95,17 @@ class DeleteLanguageModelTest(UnpublishTestCase):
              type=Task.TYPE_IDS['Review'],
              approved=Task.APPROVED_IDS['Approved'],
              new_subtitle_version=self.versions[-1]).save()
-        self.check_task_count(2)
-        # deleting the language should delete both tasks.
+        # add a task for another video, but with the same language
+        other_team_video = test_factories.create_team_video(self.team,
+                                                            self.user)
+        Task(team=self.team, team_video=other_team_video, assignee=None,
+             language=self.language.language_code,
+             type=Task.TYPE_IDS['Translate']).save()
+        self.check_task_count(3)
+        # deleting the language should delete both tasks for this video, but
+        # not the task for the other video.
         self.language.nuke_language()
-        self.check_task_count(0)
+        self.check_task_count(1)
 
     def test_delete_translation_tasks(self):
         # We should delete translation tasks if there are no more languages
