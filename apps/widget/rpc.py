@@ -29,8 +29,7 @@ from teams.models import Task, Workflow, Team, BillingRecord
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
-    can_publish_edits_immediately, can_review, can_approve, can_assign_task,
-    can_post_edit_subtitles
+    can_publish_edits_immediately, can_review, can_approve, can_add_version,
 )
 from teams.signals import (
     api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
@@ -310,7 +309,7 @@ class Rpc(BaseRpc):
 
 
     # Start Editing
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
+    def _check_team_video_locking(self, user, video_id, language_code):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -318,55 +317,16 @@ class Rpc(BaseRpc):
 
         """
         video = models.Video.objects.get(video_id=video_id)
-        team_video = video.get_team_video()
-
-        if not team_video:
-            # If there's no team video to worry about, just bail early.
-            return None
-        
-        team = team_video.team
-
-        if team.is_visible:
-            message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
-        else:
-            message = _(u"Sorry, these subtitles are privately moderated.")
-
-        if not team_video.video.can_user_see(user):
-             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-
         language = video.subtitle_language(language_code)
-
-        # Check that there are no open tasks for this action.
-        tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
-        task = None
-
-        if tasks:
-            task = tasks[0]
-            # can_assign verify if the user has permission to either
-            # 1. assign the task to himself
-            # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or \
-               (task.assignee and task.assignee != user) or \
-               (not task.assignee and not can_assign_task(task, user)):
-                    return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
-
-        if (language and language.is_complete_and_synced(True)
-                     and team.moderates_videos()
-                     and language.get_tip(public=False).is_public()
-                     and not can_post_edit_subtitles(team, user)
-                     and not task):
-            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
-            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-
-        # Check that the team's policies don't prevent the action.
-        if mode not in ['review', 'approve']:
-            if is_translation:
-                can_edit = can_create_and_edit_translations(user, team_video, language_code)
-            else:
-                can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
-
-            if not can_edit:
-                return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
+        check_result = can_add_version(user, language)
+        if check_result:
+            return None
+        else:
+            return {
+                "can_edit": False,
+                "locked_by": check_result.locked_by,
+                "message": check_result.message
+            }
 
     def _get_version_to_edit(self, language, session):
         """Return a version (and other info) that should be edited.
@@ -412,8 +372,7 @@ class Rpc(BaseRpc):
         # Ensure that the user is not blocked from editing this video by team
         # permissions.
         locked = self._check_team_video_locking(
-            request.user, video_id, language_code, bool(base_language_code), mode, bool(version))
-
+            request.user, video_id, language_code)
         if locked:
             return locked
 

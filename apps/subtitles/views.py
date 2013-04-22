@@ -32,7 +32,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 
 
-from teams.permissions import can_post_edit_subtitles, can_assign_task
+from teams.permissions import can_add_version
 
 
 def _version_data(version):
@@ -83,60 +83,6 @@ def _language_data(language, editing_version, translated_from_version):
         'is_primary_audio_language': language.is_primary_audio_language()
     }
 
-def _check_team_video_locking(user, video, language_code, task_id=None):
-    """Check whether the a team prevents the user from editing the subs.
-
-    Returns a message appropriate for sending back if the user should be
-    prevented from editing them, or None if the user can safely edit.
-
-    """
-    team_video = video.get_team_video()
-
-    if not team_video:
-        # If there's no team video to worry about, just bail early.
-        return None, None
-
-    team = team_video.team
-
-    if team.is_visible:
-        message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
-    else:
-        message = _(u"Sorry, these subtitles are privately moderated.")
-
-    if not team_video.video.can_user_see(user):
-        return message, None
-
-    language = video.subtitle_language(language_code)
-
-    # check if this a post publish editing
-    if (language and language.is_complete_and_synced(True)
-                 and team.moderates_videos()
-                 and language.get_tip(public=False).is_public()
-                 and not can_post_edit_subtitles(team, user)):
-        return _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator."), None
-
-    # Check that there are no open tasks for this action.
-    # todo: make this better.
-    if task_id:
-        task_id = task_id.strip('/')
-        tasks = [Task.objects.get(id=task_id)]
-    else:
-        tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
-
-    if tasks:
-        task = tasks[0]
-        # can_assign verify if the user has permission to either
-        # 1. assign the task to himself
-        # 2. do the task himself (the task is assigned to him)
-        if (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
-            return _("You can't edit because there is a task for this language and you can't complete it."), task
-        else:
-            return None, task
-
-    return None, None
-
-@login_required
-@require_POST
 def regain_lock(request, video_id, language_code):
     video = get_object_or_404(Video, video_id=video_id)
     language = video.subtitle_language(language_code)
@@ -179,10 +125,10 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
-    message, task = _check_team_video_locking(request.user, video, language_code, task_id)
-
-    if message:
-        messages.error(request, message)
+    language = video.subtitle_language(language_code)
+    check_result = can_add_version(request.user, language)
+    if not check_result:
+        messages.error(request, check_result.message)
         return redirect(video)
 
     editing_language.writelock(request.user, request.browser_id, save=True)

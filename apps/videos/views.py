@@ -72,7 +72,7 @@ from utils.metrics import Meter
 from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import  can_edit_video
+from teams.permissions import can_edit_video, can_add_version
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -478,24 +478,9 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
                                  if version else None)
     context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-
-    if team_video is not None:
-        # for videos that have tasks assigned to them, users can only edit if:
-        #     a) the video is in the transcribe/subtitle stage
-        #     b) the task is assigned to them.
-        incomplete_tasks = Task.objects.incomplete().filter(
-            team_video=team_video,
-            language=language.language_code)
-        if incomplete_tasks:
-            if Task.objects.incomplete_subtitle_or_translate().filter(
-                team_video=team_video,
-                language=language.language_code,
-                assignee=request.user):
-                context['edit_disabled'] = False
-            else:
-                context['edit_disabled'] = True
-        else:
-            context['edit_disabled'] = False
+    
+    check_result = can_add_version(request.user, language)
+    context['edit_disabled'] = not check_result
 
     return render_to_response("videos/subtitle-view.html", context,
                               context_instance=RequestContext(request))

@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.utils.translation import ugettext as _
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
@@ -23,6 +24,26 @@ from teams.permissions_const import (
     ROLE_OUTSIDER
 )
 
+class TeamsPermissionsCheck(object):
+    """The result of some functions below.
+
+    TeamsPermissionsCheck can be evaluated as a boolean to test if permission
+    is enabled or disabled.  It also has extra data to determine why
+    permission was disabled.
+
+    Attributes:
+        check_passed - did the permissions check pass?
+        locked_by - string describing the object that prevented the
+        permissions (either the team or the task asignee)
+        message - message to display to the user.
+    """
+    def __init__(self, check_passed, locked_by=None, message=None):
+        self.check_passed = check_passed
+        self.locked_by = str(locked_by)
+        self.message = message
+
+    def __nonzero__(self):
+        return self.check_passed
 
 def _perms_equal_or_lower(role, include_outsiders=False):
     """Return a list of roles equal to or less powerful than the given role.
@@ -598,14 +619,77 @@ def can_publish_edits_immediately(team_video, user, lang):
 
 def can_post_edit_subtitles(team, user):
     """ Returns wheter the user has permission to post edit an original language """
-    member = get_member(user, team)
-    return member.role != ROLE_CONTRIBUTOR
+    return can_create_tasks(team, user)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.
     """
     role = get_role(get_member(user, team))
     return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
+
+def can_add_version(user, language):
+    """Check if a user can add a new version to a SubtitleLanguage
+
+    Returns a TeamsPermissionsCheck object
+    """
+    video = language.video
+    team_video = video.get_team_video()
+    language_code = language.language_code
+
+    if team_video is None:
+        # If there's no team video to worry about, just bail early.
+        return TeamsPermissionsCheck(True)
+
+    team = team_video.team
+
+    if team.is_visible:
+        default_message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
+    else:
+        default_message = _(u"Sorry, these subtitles are privately moderated.")
+
+    # basic check, if the user doesn't have view permission, then they can't
+    # add a new version
+    if not team_video.video.can_user_see(user):
+        return TeamsPermissionsCheck(False, team, default_message)
+
+    # check if the user has permission based on the tasks system
+    tasks = list(team_video.task_set.incomplete().filter(
+        language__in=[language_code, '']))
+
+    if tasks:
+        # assume there is only 1 open task
+        task = tasks[0]
+        # can_assign verify if the user has permission to either
+        # 1. assign the task to himself
+        # 2. do the task himself (the task is assigned to him)
+        if task.assignee is None:
+            if not can_assign_task(task, user):
+                return TeamsPermissionsCheck(False, team, default_message)
+        else:
+            if task.assignee != user:
+                return TeamsPermissionsCheck(False, task.assignee,
+                                             default_message)
+    elif language.is_complete_and_synced(True):
+        # there are no tasks because the language is complete
+        if not can_post_edit_subtitles(team, user):
+            # we use a different message here, probably because this code is
+            # the most likely to fail, so we add info about contacting the
+            # team admin
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
+            return TeamsPermissionsCheck(False, team, message)
+    else:
+        # there are no tasks because the language hasn't been started yet.
+        if language.is_original:
+            if not can_create_and_edit_subtitles(user, team_video,
+                                                 language_code):
+                return TeamsPermissionsCheck(False, team, default_message)
+        else:
+            if not can_create_and_edit_translations(user, team_video,
+                                                    language_code):
+                return TeamsPermissionsCheck(False, team, default_message)
+
+    # all checks passed
+    return TeamsPermissionsCheck(True)
 
 # Task permissions
 def can_create_tasks(team, user, project=None):
