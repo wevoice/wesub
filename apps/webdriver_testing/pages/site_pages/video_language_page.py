@@ -27,6 +27,7 @@ class VideoLanguagePage(VideoPage):
     _EDIT_SUBTITLES = "a#edit_subtitles_button"
     _DOWNLOAD_SUBS = "span.sort_label strong"
     _DOWNLOAD_OPTION = "div.sort_button ul li" 
+    EDIT_INACTIVE_TEXT = 'You do not have permission to edit this version'
 
     def open_video_lang_page(self, video_id, lang_code):
         self.logger.info('Opening {0} page for video: {1}'.format(
@@ -97,6 +98,14 @@ class VideoLanguagePage(VideoPage):
         if delete:
             self.click_by_css(self._DELETE)
         self.submit_by_css(self._SUBMIT_UNPUBLISH)
-        
-        
-        
+
+    def edit_subtitles_exists(self):
+        return self.is_element_present(self._EDIT_SUBTITLES)
+
+    def edit_subtitles_active(self):
+        cls_properties = self.get_element_attribute(self._EDIT_SUBTITLES, 'class')
+        if 'disabled' in cls_properties:
+            return self.get_element_attribute(self._EDIT_SUBTITLES, 'title')
+        else:
+            return 'active'
+
