@@ -708,18 +708,7 @@ class Rpc(BaseRpc):
 
             incomplete = not new_version.is_synced() or save_for_later
 
-            # this is really really hackish.
-            # TODO: clean all this mess on a friday
-            if incomplete:
-                self._moderate_incomplete_version(new_version, user)
-
             # Record the origin of this set of subtitles.
-            #
-            # This has to be done here.  Here's why.
-            #
-            # We need to record the origin *after* creating subtitle/translate
-            # tasks, so that we can tell it originates there.  That happens in
-            # the _moderate_incomplete_version call above.
             #
             # We need to record it *before* creating review/approve tasks (if
             # any) because that means these subs were from a post-publish edit
@@ -872,48 +861,6 @@ class Rpc(BaseRpc):
 
         task.save()
         
-    def _moderate_incomplete_version(self, subtitle_version, user):
-        """ Verifies if it's possible to create a transcribe/translate task (if there's
-        no other transcribe/translate task) and tries to assign to user.
-        Also, if the video belongs to a team, change its status.
-        """
-
-        team_video = subtitle_version.video.get_team_video()
-
-        if not team_video:
-            return
-
-        workflow = Workflow.get_for_team_video(team_video)
-
-        if not workflow.approve_enabled and not workflow.review_enabled:
-            return 'public', False
-
-        language = subtitle_version.subtitle_language.language_code
-
-        # if there's any incomplete task, we can't create yet another.
-        transcribe_task = team_video.task_set.incomplete().filter(language=language)
-
-        if transcribe_task.exists():
-            return
-
-        subtitle_version.visibility = 'private'
-        subtitle_version.save()
-
-        if subtitle_version.subtitle_language.get_translation_source_language_code() != None:
-            task_type = Task.TYPE_IDS['Translate']
-            can_do = can_create_and_edit_translations
-        else:
-            task_type = Task.TYPE_IDS['Subtitle']
-            can_do = can_create_and_edit_subtitles
-
-        task = Task(team=team_video.team, team_video=team_video,
-                    language=language, type=task_type)
-
-        if can_do(user, team_video):
-            task.assignee = user
-
-        task.save()
-
     def _moderate_language(self, language, user):
         """Return the right visibility for a version based on the given session.
 
