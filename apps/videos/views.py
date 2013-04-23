@@ -549,6 +549,7 @@ def diffing(request, first_version, second_pk):
 
     video = first_version.subtitle_language.video
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
+    team_video = video.get_team_video()
 
     context = widget.add_onsite_js_files({})
     context['video'] = video
@@ -557,7 +558,10 @@ def diffing(request, first_version, second_pk):
     context['first_version'] = first_version
     context['second_version'] = second_version
     context['latest_version'] = language.get_tip()
-    context['rollback_allowed'] = not video.is_moderated
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
+    else:
+        context['rollback_allowed'] = True
     context['widget0_params'] = \
         _widget_params(request, video,
                        first_version.version_number)
