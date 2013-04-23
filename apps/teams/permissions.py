@@ -679,7 +679,7 @@ def can_add_version(user, language):
             return TeamsPermissionsCheck(False, team, message)
     else:
         # there are no tasks because the language hasn't been started yet.
-        if language.is_original:
+        if language.is_primary_audio_language:
             if not can_create_and_edit_subtitles(user, team_video,
                                                  language_code):
                 return TeamsPermissionsCheck(False, team, default_message)
