@@ -175,6 +175,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         'languageCode': request.LANGUAGE_CODE
     }
 
+    task = task_id and Task.objects.get(pk=task_id)
     if task:
         editor_data['task_id'] = task.id
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
