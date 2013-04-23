@@ -316,269 +316,156 @@ class TestCaseDelete(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_no_results())
 
-
-class TestCaseSendBack(WebdriverTestCase):    
+class TestCaseEditSubtitlesButton(WebdriverTestCase):
+    """Edit Subtitles button display on a revision after latest version set private. """
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseSendBack, cls).setUpClass()
+        super(TestCaseEditSubtitlesButton, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.tasks_tab = TasksTab(cls)
-        cls.video_pg = video_page.VideoPage(cls)
-        cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
-        cls.watch_pg = watch_page.WatchPage(cls)
-
-        cls.videos_tab = VideosTab(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
-        cls.menu = unisubs_menu.UnisubsMenu(cls)
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.video_pg = video_page.VideoPage(cls)
 
-        #Create a partner user to own the team.
-        cls.owner = UserFactory.create(is_partner=True)
-
-        #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
-        cls.team = TeamMemberFactory.create(
-            team__workflow_enabled = True,
-            user = cls.owner,
-            ).team
-
-        cls.workflow = WorkflowFactory.create(
-            team = cls.team,
-            autocreate_subtitle = True,
-            autocreate_translate = True,
-            review_allowed = 10,
-            approve_allowed = 10)
+        cls.user = UserFactory.create()
+        cls.owner = UserFactory.create()
+        cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
+                                            team__translate_policy=20, #any team
+                                            team__subtitle_policy=20, #any team
+                                            team__task_assign_policy=10, #any team
+                                            user = cls.owner,
+                                            ).team
+        cls.workflow = WorkflowFactory(team = cls.team,
+                                       autocreate_subtitle=True,
+                                       autocreate_translate=True,
+                                       approve_allowed = 10, # manager
+                                       review_allowed = 10, # peer
+                                       )
         lang_list = ['en', 'ru', 'pt-br', 'de', 'sv']
         for language in lang_list:
-            TeamLangPrefFactory.create(
-                team = cls.team,
-                language_code = language,
-                preferred = True)
-        #Create a member of the team
-        cls.contributor = TeamContributorMemberFactory.create(
-                team = cls.team,
-                ).user
+            TeamLangPrefFactory.create(team=cls.team, language_code=language,
+                                       preferred=True)
 
-        user_langs = ['en', 'ru', 'de', 'sv']
-        for lang in user_langs:
-            UserLangFactory(user=cls.contributor, language=lang)
-        cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
-                                     ), 'oneline.txt')
-        cls.member_creds = dict(username=cls.contributor.username, 
-                                password='password')
-        cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
-                            'webdriver_testing', 'subtitle_data')
+        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team).user
+        cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
+                                    'subtitle_data') 
+        cls.video, cls.tv = cls._create_source_with_multiple_revisions()
 
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
+        if self.team.task_assign_policy > 10: #reset to default start value
+            self.team.task_assign_policy = 10
+            self.team.save()
 
-    def setUp(self):
-        self.tasks_tab.open_team_page(self.team.slug)
-        self.video_pg.handle_js_alert('accept')
-
-    def _unpublish_source_with_sendback(self, video, rev=None):
-        self.video_pg.open_video_page(video.video_id)
-        self.video_pg.log_in(self.owner.username, 'password')
-        if rev:
-            self.video_language_pg.open_lang_revision_page(video.video_id, 
-                                                           'en', rev)
-        else:
-            self.video_language_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_language_pg.unpublish()
-        self.logger.info("After unpublish EN full() Revision")
-        self.logger.info(video.subtitle_language('en').get_tip(full=True))
-        self.logger.info("After unpublish EN public() Revision")
-        self.logger.info(video.subtitle_language('en').get_tip(public=True)) 
-
-
-
-    def _upload_en_draft(self, video, subs, complete=False):
+    @classmethod
+    def _upload_en_draft(cls, video, subs, user, complete=False):
+        auth_creds = dict(username=user.username, password='password')
         draft_data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
-                     'draft': open(subs)
+                     'draft': open(subs),
+                     'complete': int(complete),
+                     'is_complete': complete,
                     }
-        if complete:
-            draft_data['complete'] = 1
-            draft_data['is_complete'] = True
-        self.logger.info(draft_data)
-        self.data_utils.upload_subs(video, draft_data, user=self.member_creds)
-        en = video.subtitle_language('en').get_tip(full=True)
-        self.logger.info('EN revision: %s' % en)
-        self.logger.info('EN visibility: %s' % en.visibility)
+        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
 
-    def _create_source_with_multiple_revisions(self):
-        self.logger.info("Create a team video that has this revision structure:")
-        self.logger.info("""
+    @classmethod
+    def _add_team_video(cls):
+        video = cls.data_utils.create_video()
+        tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
+        return video, tv
+
+    @classmethod
+    def _create_source_with_multiple_revisions(cls):
+        cls.logger.info("Create a team video with 4 revisions:")
+        cls.logger.info("""
                             v1: private (draft version only)
                             v2: private (draft version only)
                             v3: public 
                             v4: public 
                         """)
-        video = VideoUrlFactory().video
-        tv = TeamVideoFactory.create(
-            team=self.team, 
-            video=video, 
-            added_by=self.contributor)
+        video, tv = cls._add_team_video()
 
-        #REV1
-        rev1_subs = os.path.join(self.subs_data_dir, 'Timed_text.en.srt')
-        self._upload_en_draft(video, rev1_subs)
+        #REV1 (draft)
+        rev1_subs = os.path.join(cls.subs_dir, 'Timed_text.en.srt')
+        cls._upload_en_draft(video, rev1_subs, user=cls.contributor)
 
-        #REV2
-        rev2_subs = os.path.join(self.subs_data_dir, 'Timed_text.rev2.en.srt')
-        self._upload_en_draft(video, rev2_subs)
+        #REV2 (draft)
+        rev2_subs = os.path.join(cls.subs_dir, 'Timed_text.rev2.en.srt')
+        cls._upload_en_draft(video, rev2_subs, user=cls.contributor, complete=True)
 
-        #REV3
-        rev3_subs = os.path.join(self.subs_data_dir, 'Timed_text.rev3.en.srt')
-        self._upload_en_draft(video, rev3_subs, complete=True)
-        #Rev 3 Review and Approve
-        self.data_utils.complete_review_task(tv, 20, self.owner)
-        self.data_utils.complete_approve_task(tv, 20, self.owner)
-        self.logger.info("POST APPROVE REV3")
-        en = video.subtitle_language('en').get_tip(full=True)
-        self.logger.info(en)
-        self.logger.info('EN visibility: %s' % en.visibility)
-        #REV 4
-        rev4_subs = os.path.join(self.subs_data_dir, 'Timed_text.rev4.en.srt')
-        self._upload_en_draft(video, rev4_subs, complete=True)
-        self.data_utils.complete_review_task(tv, 20, self.owner)
-        self.data_utils.complete_approve_task(tv, 20, self.owner)
-        en = video.subtitle_language('en').get_tip(full=True)
-        self.logger.info(en)
-        self.logger.info('EN visibility: %s' % en.visibility)
+        #REV3, reviewed and approved (public)
+        rev3_subs = os.path.join(cls.subs_dir, 'Timed_text.rev3.en.srt')
+        cls._upload_en_draft(video, rev3_subs, user=cls.admin, complete=True)
+        cls.data_utils.complete_review_task(tv, 20, cls.admin)
+
+        #REV4, reviewed and approved (public)
+        rev4_subs = os.path.join(cls.subs_dir, 'Timed_text.rev4.en.srt')
+        cls._upload_en_draft(video, rev4_subs, user=cls.owner, complete=True)
+        cls.data_utils.complete_approve_task(tv, 20, cls.owner)
+        cls.en = video.subtitle_language('en')
+        en_v4 = cls.en.get_tip(full=True)
+        en_v4.visibility_override = 'private'
+        en_v4.save() 
+        cls.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+
         return video, tv
 
 
-
-    def make_video_with_approved_transcript(self, subs='Timed_text.en.srt'):
-        video = self.data_utils.create_video()
-        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
-                              video=video)
-        rev1_subs = os.path.join(self.subs_data_dir, subs)
-        self._upload_en_draft(video, rev1_subs, complete=True)
-        self.data_utils.complete_review_task(tv, 20, self.owner)
-        if self.workflow.approve_enabled:
-            self.data_utils.complete_approve_task(tv, 20, self.owner)
-        return video, tv
-
-    def upload_translation(self, video, complete=False):
-        data = {'language_code': 'sv',
-                'video': video.pk,
-                'from_language_code': 'en',
-                'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp')
-                }
-        if complete:
-            data['is_complete'] = True
-            data['complete'] = 1
-        self.data_utils.upload_subs(video, data=data, user=self.member_creds)
-
-    def test_unpublish_locks_inprogress(self):
-        """In-progress translation task locked when transcript is unpublished.
-
-        This is the case where the current public version is unpproved and
-        no previous published versions exist to take it's place.
+    def test_unpublished__member_with_create_tasks(self):
+        self.logger.info(self.en.get_tip(full=True).visibility_override)
+        """Unpublished version has Edit Subtitles active for member with permission.
 
         """
-        self.logger.info('Create a video with an approved "en" transcript')
-        video, tv = self.make_video_with_approved_transcript()
-        self.upload_translation(video)
-        self._unpublish_source_with_sendback(video)
-        self.logger.info('Check that incomplete translation task is locked')
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=sv'.format(
-                                 self.team.slug, tv.pk))
-        task_text = 'Translate Subtitles into Swedish'
-        disabled = self.tasks_tab.disabled_task(task_text, video.title) 
-        self.assertEqual(disabled, 'Locked until subtitles have been approved.')
-        self.logger.info('Check the perform task is not displayed')
-        task = self.tasks_tab.task_present(task_text, video.title)
-        self.assertEqual(task['perform'], None)
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
 
-    def test_unpublish_blocks_unstarted(self):
-        """Unstarted translation task blocked when transcript is unpublished.
-
-        This is the case where the current public version is unpproved and
-        no previous published versions exist to take it's place. When user tries
-        to edit they get a dialog that they can't translate incomplete.
-        Ref: https://unisubs.sifterapp.com/issues/2162
+    def test_unpublished__admin(self):
+        """Admin can always edit unpublished version.
 
         """
-        self.skipTest('needs https://unisubs.sifterapp.com/issues/2162 resolved')
-        self.logger.info('Create a video with an approved "en" transcript')
-        video, tv = self.make_video_with_approved_transcript()
-        self._unpublish_source_with_sendback(video)
-        self.logger.info('Check that new translations can not be started.')
-        self.tasks_tab.log_in(self.owner.username, 'password')
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone'.format(
-                                 self.team.slug, tv.pk))
-        task_text = 'Translate Subtitles into German'
-        self.logger.info("Video title: %s" % video.title)
-        self.tasks_tab.perform_and_assign_task(task_text, video.title)
-        self.create_modal.lang_selection()
-        if 'Typing' in self.sub_editor.dialog_title():
-            self.assertFalse('these translations should not be forked')
-        else:
-            self.assertFalse('update test case with correct assertion')
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
 
-    def test_unpublish__creates_approve(self):
-        """Unpublishing transcript creates an approve task.
-
-        REF: https://unisubs.sifterapp.com/issues/2199
-        """
-        self.tasks_tab.log_in(self.owner, 'password')
-        video, tv = self.make_video_with_approved_transcript()
-        self._unpublish_source_with_sendback(video)
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.assertTrue(self.tasks_tab.task_present(
-                'Approve Original English Subtitles', video.title))
-
-    def test_draft_revision_not_searchable(self):
-        """Unpublished (sendback) draft rev text not in search results.
+    def test_unpublished__owner(self):
+        """Owner can always edit unpublished version.
 
         """
-        self.logger.info('Create a video with an approved "en" transcript')
-        video, _ = self.make_video_with_approved_transcript(
-                    subs='srt-full.srt')
-        self._unpublish_source_with_sendback(video)
+        self.video_lang_pg.log_in(self.owner.username, 'password')
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
 
-        self.watch_pg.log_out()
-        management.call_command('update_index', interactive=False)
-
-        self.watch_pg.open_watch_page()
-        test_text = 'Universal Subtitles'
-        results_pg = self.watch_pg.basic_search(test_text)
-        self.assertTrue(results_pg.search_has_no_results())
-
-    def test_unpublish_all_public_creates_approve_task(self):
-        """Unpublishing (send back) all public versions creates approve task'
-
-        v1 - private, v2 - private, v3 - public, v4 - public
-        Send back v3 and all later create approve task at v4
-        Ref: https://unisubs.sifterapp.com/issues/2005
-
+    def test_unpublished__member_with_no_create_tasks(self):
+        """Member can't edit unpublished version when create tasks is manager level.
 
         """
-        video, tv = self._create_source_with_multiple_revisions()
-        en = video.subtitle_language('en')
-        self.logger.info(en.pk)
-        self.logger.info(en.version().pk)
-        self.logger.info(en.version(version_number=3).pk)
-        sl_sv = '{0}/{1}'.format(en.pk, en.version(version_number=3).pk)
-        self._unpublish_source_with_sendback(video, rev=sl_sv)
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=en'.format(
-                                 self.team.slug, tv.pk))
+        self.team.task_assign_policy = 30
+        self.team.save()
+        member2 = TeamContributorMemberFactory(team=self.team).user
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
+                         self.video_lang_pg.edit_subtitles_active())
 
-        task_text = 'Approve Original English Subtitles'
-        self.assertTrue(self.tasks_tab.task_present(task_text, video.title))
-        self.logger.info(en.get_tip(full=True).version_number)
-        self.tasks_tab.perform_and_assign_task(task_text, video.title)
-        self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
-        self.assertEqual('REVISION4-REVISION4', 
-                         self.sub_editor.subtitles_list()[0])
+    def test_unpublished__guest_sees_no_button(self):
+        """Guest sees no Edit Subtitles button after version unpublished.
 
+        """
+        self.video_lang_pg.log_out()
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertFalse(self.video_lang_pg.edit_subtitles_exists())
+
+    def test_unpublished__non_member_sees_no_button(self):
+        """Edit Subtitles not visible for non-member.
+        """
+        siteuser = UserFactory.create()
+        self.video_lang_pg.log_in(siteuser.username, 'password')
+        self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        self.assertFalse(self.video_lang_pg.edit_subtitles_exists())
 
