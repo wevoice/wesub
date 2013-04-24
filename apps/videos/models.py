@@ -941,6 +941,52 @@ class SubtitleLanguage(models.Model):
 
     subtitles_fetched_counter = RedisSimpleField()
 
+
+    def save(self, updates_timestamp=True, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
+        if updates_timestamp:
+            self.created = datetime.now()
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language %s should be a valid code." % self.language
+        super(SubtitleLanguage, self).save(*args, **kwargs)
+    @property
+    def writelock_owner_name(self):
+        if self.writelock_owner == None:
+            return "anonymous"
+        else:
+            return self.writelock_owner.__unicode__()
+
+    @property
+    def is_writelocked(self):
+        if self.writelock_time == None:
+            return False
+        delta = datetime.now() - self.writelock_time
+        seconds = delta.days * 24 * 60 * 60 + delta.seconds
+        return seconds < WRITELOCK_EXPIRATION
+
+    def can_writelock(self, request):
+        return self.writelock_session_key == \
+               request.browser_id or \
+        not self.is_writelocked
+
+
+    def writelock(self, request):
+        if request.user.is_authenticated():
+            self.writelock_owner = request.user
+        else:
+            self.writelock_owner = None
+            self.writelock_session_key = request.browser_id
+            self.writelock_time = datetime.now()
+
+    def release_writelock(self):
+        self.writelock_owner = None
+        self.writelock_session_key = ''
+        self.writelock_time = None
     class Meta:
         unique_together = (('video', 'language', 'standard_language'),)
 
