@@ -942,6 +942,18 @@ class SubtitleLanguage(models.Model):
     subtitles_fetched_counter = RedisSimpleField()
 
 
+    def save(self, updates_timestamp=True, *args, **kwargs):
+        if 'tern_sync' not in kwargs:
+            self.needs_sync = True
+        else:
+            kwargs.pop('tern_sync')
+
+        if updates_timestamp:
+            self.created = datetime.now()
+        if self.language:
+            assert self.language in VALID_LANGUAGE_CODES, \
+                "Subtitle Language %s should be a valid code." % self.language
+        super(SubtitleLanguage, self).save(*args, **kwargs)
     @property
     def writelock_owner_name(self):
         if self.writelock_owner == None:
