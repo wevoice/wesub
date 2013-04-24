@@ -2011,6 +2011,22 @@ class Task(models.Model):
 
         return base_url + "?t=%s" % self.pk
 
+    def needs_start_dialog(self):
+        """Check if this task needs the start dialog.
+
+        The only time we need it is when a user is starting a
+        transcribe/translate task.  We don't need it for review/approval, or
+        if the task is being resumed.
+        """
+        # We use the start dialog for select several things:
+        #   - primary audio language
+        #   - language of the subtitles
+        #   - language to translate from
+        # If we have a SubtitleVersion to use, then we have all the info we
+        # need and can skip the dialog.
+        return (self.new_review_base_version is None and
+                self.new_subtitle_version is None)
+
     def get_reviewer(self):
         """For Approve tasks, return the last user to Review these subtitles.
 
