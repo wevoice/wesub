@@ -637,7 +637,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         if not self.is_always_push_account:
             subs = add_credit(subtitle_version, subs)
-            self.add_credit_to_description(subtitle_version.language.video)
+            self.add_credit_to_description(subtitle_version.subtitle_language.video)
 
         content = babelsubs.generators.discover('srt').generate(subs)
         title = ""
