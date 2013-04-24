@@ -776,7 +776,8 @@ class Video(models.Model):
 
     @property
     def is_moderated(self):
-        return bool(self.moderated_by_id)
+        tv = self.get_team_video()
+        return tv and tv.team.workflow_enabled
 
     def metadata(self):
         '''Return a dict of metadata for this video.

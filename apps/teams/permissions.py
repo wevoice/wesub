@@ -617,6 +617,10 @@ def can_publish_edits_immediately(team_video, user, lang):
 
     return True
 
+def can_rollback_language(user, language):
+    """Can the user rollback a language to a previous version."""
+    return can_add_version(user, language.video, language.language_code)
+
 def can_post_edit_subtitles(team, user):
     """ Returns wheter the user has permission to post edit an original language """
     return can_create_tasks(team, user)
@@ -627,18 +631,20 @@ def can_delete_language(team, user):
     role = get_role(get_member(user, team))
     return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
 
-def can_add_version(user, language):
+def can_add_version(user, video, language_code):
     """Check if a user can add a new version to a SubtitleLanguage
 
     Returns a TeamsPermissionsCheck object
     """
-    video = language.video
     team_video = video.get_team_video()
-    language_code = language.language_code
 
     if team_video is None:
         # If there's no team video to worry about, just bail early.
         return TeamsPermissionsCheck(True)
+
+    # get the language, NOTE: language can be None if we don't have any
+    # subtitles for it yet
+    language = video.subtitle_language(language_code)
 
     team = team_video.team
 
@@ -669,7 +675,7 @@ def can_add_version(user, language):
             if task.assignee != user:
                 return TeamsPermissionsCheck(False, task.assignee,
                                              default_message)
-    elif language.is_complete_and_synced(True):
+    elif language and language.is_complete_and_synced(True):
         # there are no tasks because the language is complete
         if not can_post_edit_subtitles(team, user):
             # we use a different message here, probably because this code is
@@ -679,7 +685,7 @@ def can_add_version(user, language):
             return TeamsPermissionsCheck(False, team, message)
     else:
         # there are no tasks because the language hasn't been started yet.
-        if language.is_primary_audio_language:
+        if video.primary_audio_language_code == language_code:
             if not can_create_and_edit_subtitles(user, team_video,
                                                  language_code):
                 return TeamsPermissionsCheck(False, team, default_message)

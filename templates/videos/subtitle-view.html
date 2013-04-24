@@ -339,14 +339,12 @@
         </div>
     </div>
 
-    {% if next_version and rollback_allowed %}
-        {% if last_version.moderation_status != 'waiting_moderation' %}
-            <div class="tools grid_4 alpha" id="rollback-button">
-                <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
-                    {% trans 'Roll back to this version' %}
-                </a>
-            </div>
-        {% endif %}
+    {% if rollback_allowed %}
+        <div class="tools grid_4 alpha" id="rollback-button">
+            <a href="{% url videos:rollback last_version.pk %}" class="button" id="rollback">
+                {% trans 'Roll back to this version' %}
+            </a>
+        </div>
     {% endif %}
 
 {% endblock %}

@@ -125,8 +125,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
-    language = video.subtitle_language(language_code)
-    check_result = can_add_version(request.user, language)
+    check_result = can_add_version(request.user, video, language_code)
     if not check_result:
         messages.error(request, check_result.message)
         return redirect(video)
