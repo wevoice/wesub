@@ -72,7 +72,7 @@ from utils.metrics import Meter
 from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
 
-from teams.permissions import can_edit_video, can_add_version
+from teams.permissions import can_edit_video, can_add_version, can_rollback_language
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
@@ -471,7 +471,9 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     else:
         version = None
 
-    context['rollback_allowed'] = version and not version.video.is_moderated
+    context['rollback_allowed'] = version.next_version() is not None
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
@@ -479,7 +481,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
     
-    check_result = can_add_version(request.user, language)
+    check_result = can_add_version(request.user, video, language.language_code)
     context['edit_disabled'] = not check_result
 
     return render_to_response("videos/subtitle-view.html", context,
@@ -507,10 +509,13 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 @login_required
 @get_video_revision
 def rollback(request, version):
-    if version.video.is_moderated:
-        return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
     is_writelocked = version.subtitle_language.is_writelocked
-    if is_writelocked:
+    team_video = version.video.get_team_video()
+    if team_video and not can_rollback_language(request.user,
+                                                version.subtitle_language):
+        messages.error(request, _(u"You don't have permission to rollback "
+                                  "this language"))
+    elif is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
     elif not version.next_version():
         messages.error(request, message=u'Can not rollback to the last version')
@@ -544,6 +549,7 @@ def diffing(request, first_version, second_pk):
 
     video = first_version.subtitle_language.video
     diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
+    team_video = video.get_team_video()
 
     context = widget.add_onsite_js_files({})
     context['video'] = video
@@ -552,7 +558,10 @@ def diffing(request, first_version, second_pk):
     context['first_version'] = first_version
     context['second_version'] = second_version
     context['latest_version'] = language.get_tip()
-    context['rollback_allowed'] = not video.is_moderated
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
+    else:
+        context['rollback_allowed'] = True
     context['widget0_params'] = \
         _widget_params(request, video,
                        first_version.version_number)
