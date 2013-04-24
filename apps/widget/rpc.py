@@ -317,8 +317,7 @@ class Rpc(BaseRpc):
 
         """
         video = models.Video.objects.get(video_id=video_id)
-        language = video.subtitle_language(language_code)
-        check_result = can_add_version(user, language)
+        check_result = can_add_version(user, video, language_code)
         if check_result:
             return None
         else:

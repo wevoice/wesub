@@ -479,7 +479,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
     
-    check_result = can_add_version(request.user, language)
+    check_result = can_add_version(request.user, video, language.language_code)
     context['edit_disabled'] = not check_result
 
     return render_to_response("videos/subtitle-view.html", context,
