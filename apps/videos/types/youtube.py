@@ -639,7 +639,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             subs = add_credit(subtitle_version, subs)
             self.add_credit_to_description(subtitle_version.subtitle_language.video)
 
-        content = babelsubs.generators.discover('srt').generate(subs)
+        content = babelsubs.generators.discover('srt').generate(subs).encode('utf-8')
         title = ""
 
         if hasattr(self, "captions") is False:
