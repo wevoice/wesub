@@ -63,7 +63,7 @@ from teams.permissions import (
     can_perform_task_for, can_delete_team, can_delete_video, can_remove_video,
     can_delete_language,
 )
-from teams.signals import api_teamvideo_new, api_subtitles_rejected
+from teams.signals import api_teamvideo_new
 from teams.tasks import (
     invalidate_video_caches, invalidate_video_moderation_caches,
     update_video_moderation, update_one_team_video, update_video_public_field,
@@ -2062,6 +2062,35 @@ def _get_languages_to_unpublish(subtitle_language):
 
     return languages_to_delete
 
+def _writelock_languages_for_delete(request, subtitle_language):
+    """Try to writelock the language and all dependents for deletion.
+
+    Returns (could_lock, locked).  could_lock is a boolean, True if all the
+    required languages were able to be writelocked, False otherwise.  locked is
+    a list of all the languages that were locked in the process.
+
+    Users of this function will need to release the writelock on each item in
+    the locked list themselves.
+
+    """
+    to_lock = [subtitle_language]
+    to_lock.extend(subtitle_language.get_dependent_subtitle_languages())
+
+    locked = []
+
+    for sl in to_lock:
+        if sl.can_writelock(request.browser_id):
+            sl.writelock(request.user, request.browser_id)
+            locked.append(sl)
+        else:
+            messages.error(request,
+                _(u'Someone else is currently editing %s. '
+                  u'Please try again later.')
+                % sl.get_language_code_display())
+            return False, locked
+
+    return True, locked
+
 def delete_language(request, slug, lang_id):
     team = get_object_or_404(Team, slug=slug)
     if not can_delete_language(team, request.user):
@@ -2078,18 +2107,28 @@ def delete_language(request, slug, lang_id):
         form = DeleteLanguageForm(request.user, team, language, request.POST)
 
         if form.is_valid():
-            for sublang in form.languages_to_fork():
-                sublang.is_forked = True
-                sublang.save()
-            language.nuke_language()
-            _propagate_unpublish_to_external_services(language.pk,
-                                                      language.language_code,
-                                                      language.video)
-            metadata_manager.update_metadata(language.video.pk)
-            update_one_team_video(team_video.pk)
+            could_lock, locked = _writelock_languages_for_delete(request,
+                                                                 language)
+            try:
+                if could_lock:
+                    for sublang in form.languages_to_fork():
+                        sublang.is_forked = True
+                        sublang.save()
 
-            messages.success(request, _(u'Successfully deleted language.'))
-            return HttpResponseRedirect(next_url)
+                    language.nuke_language()
+
+                    _propagate_unpublish_to_external_services(
+                        language.pk, language.language_code, language.video)
+
+                    metadata_manager.update_metadata(language.video.pk)
+                    update_one_team_video(team_video.pk)
+
+                    messages.success(request,
+                                     _(u'Successfully deleted language.'))
+                    return HttpResponseRedirect(next_url)
+            finally:
+                for sl in locked:
+                    sl.release_writelock()
         else:
             for e in flatten_errorlists(form.errors):
                 messages.error(request, e)
