@@ -31,7 +31,7 @@ var angular = angular || null;
             '/languages/' + languageCode + '/subtitles/?format=dfxp';
 
         if (versionNumber) {
-            url = url + '&version_no=' + versionNumber;
+            url = url + '&version=' + versionNumber;
         }
         return url;
     };
