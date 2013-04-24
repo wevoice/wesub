@@ -942,6 +942,21 @@ class SubtitleLanguage(models.Model):
     subtitles_fetched_counter = RedisSimpleField()
 
 
+    @property
+    def writelock_owner_name(self):
+        if self.writelock_owner == None:
+            return "anonymous"
+        else:
+            return self.writelock_owner.__unicode__()
+
+    @property
+    def is_writelocked(self):
+        if self.writelock_time == None:
+            return False
+        delta = datetime.now() - self.writelock_time
+        seconds = delta.days * 24 * 60 * 60 + delta.seconds
+        return seconds < WRITELOCK_EXPIRATION
+
     def can_writelock(self, request):
         return self.writelock_session_key == \
                request.browser_id or \
@@ -959,6 +974,7 @@ class SubtitleLanguage(models.Model):
     def release_writelock(self):
         self.writelock_owner = None
         self.writelock_session_key = ''
+        self.writelock_time = None
     class Meta:
         unique_together = (('video', 'language', 'standard_language'),)
 
