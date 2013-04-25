@@ -52,8 +52,9 @@
         $scope.approve = function() {
             $scope.$root.$emit('approve-task');
         };
-        $scope.toggleModule = function(module) {
+        $scope.toggleDocking = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
+            console.warn($scope.modulesOpen);
         };
         $scope.sendBack = function() {
             $scope.$root.$emit('send-back-task');

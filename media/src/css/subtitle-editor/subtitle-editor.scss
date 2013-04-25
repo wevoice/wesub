@@ -839,6 +839,8 @@ section.main {
 }
 section.collab {
     a.toggle-pane {
+        z-index:1000;
+        cursor: pointer;
         background: #333333 url('../../../images/arrow-left.png') center center no-repeat;
         color: transparent;
         display: block;

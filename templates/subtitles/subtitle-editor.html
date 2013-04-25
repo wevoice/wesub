@@ -237,20 +237,20 @@
         </section>
         <section class="collab column" ng-controller="CollabController">
             <a class="toggle-pane"
-               ng-click="toggleModule('pane')"
+               ng-click="toggleDocking('pane')"
                ng-show="modulesEnabled.pane && !modulesOpen.pane">
                 Open Collab
             </a>
             <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
                 <a class="toggle-pane"
-                   ng-click="toggleModule('pane')"
+                   ng-click="toggleDocking('pane')"
                    ng-show="modulesOpen.pane">
                     Close Collab
                 </a>
                 <div class="notes module"
                      ng-show="modulesEnabled.notes"
                      ng-class="{open: modulesOpen.notes}">
-                    <a class="title" ng-click="toggleModule('notes')">Notes</a>
+                    <a class="title" ng-click="toggleDocking('notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
                         <textarea ng-model="notes"></textarea>
                     </div>
