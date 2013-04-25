@@ -244,8 +244,6 @@ class TestCaseBilling(WebdriverTestCase):
                            'Language number']
         self.assertEqual(expected_fields, bill.fieldnames)
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("MYTMP/%s" % self.id())
  
     def test_download__new_model(self):
         """Data range of records downloaded to a csv file for a team.
