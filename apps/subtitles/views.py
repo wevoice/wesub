@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import login_required
 from videos.models import Video
 from teams.models import Task
 from subtitles.models import SubtitleLanguage, SubtitleVersion
+from subtitles.templatetags.new_subtitles_tags import visibility_display
 
 from django.http import HttpResponse
 from django.db.models import Count
@@ -56,16 +57,20 @@ def _language_data(language, editing_version, translated_from_version):
     '''
     versions_data = []
 
-    for version_number in range(1, language.num_versions +1):
-        version_data = {'version_no':version_number}
-        if editing_version and editing_version.version_number == version_number and \
+    for version in language.subtitleversion_set.full():
+        version_data = {
+            'version_no':version.version_number,
+            'visibility': visibility_display(version)
+        }
+        if editing_version and editing_version == version and \
             editing_version.subtitle_language == language:
             version_data.update(_version_data(editing_version))
-        elif translated_from_version and translated_from_version.version_number == version_number and \
+        elif translated_from_version and translated_from_version == version and \
             translated_from_version.subtitle_language == language:
             version_data.update(_version_data(translated_from_version))
 
         versions_data.append(version_data)
+
 
     subtitle_language = editing_version.subtitle_language if editing_version else ''
 

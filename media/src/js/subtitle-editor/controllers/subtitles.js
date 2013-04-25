@@ -74,6 +74,10 @@ var angular = angular || null;
             if (!newVersion) {
                 return;
             }
+            // new version can be the version number of the version object
+            if (!newVersion.version_no){
+                newVersion = $scope.versions[newVersion];
+            }
 
             var subtitlesXML = newVersion.subtitlesXML;
 

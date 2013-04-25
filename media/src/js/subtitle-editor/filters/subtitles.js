@@ -81,5 +81,12 @@ var angular = angular || null;
     module.filter('displayTime', function(){
         return _displayTime;
     });
+    module.filter('versionDropDownDisplay', function(){
+        return function (versionData){
+            var res =  'Version ' + versionData.version_no +
+                (versionData.visibility == 'Deleted' ? " (Deleted)": "");
+            return res;
+        }
+    })
 
 }).call(this);
