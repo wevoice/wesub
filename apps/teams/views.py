@@ -2128,7 +2128,10 @@ def delete_language(request, slug, lang_id):
                     return HttpResponseRedirect(next_url)
             finally:
                 for sl in locked:
-                    sl.release_writelock()
+                    # We need to get a fresh copy of the SL here so that the
+                    # save() in release_writelock doesn't overwrite any other
+                    # changes we've made in the try block.  ORMs are fun.
+                    SubtitleLanguage.objects.get(pk=sl.pk).release_writelock()
         else:
             for e in flatten_errorlists(form.errors):
                 messages.error(request, e)
