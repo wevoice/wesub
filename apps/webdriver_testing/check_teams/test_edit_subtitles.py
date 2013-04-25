@@ -80,7 +80,6 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
             self.data_utils.complete_approve_task(tv, 20, self.owner)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.team.task_assign_policy > 10: #reset to default start value
             self.team.task_assign_policy = 10
             self.team.save()
@@ -488,7 +487,6 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
 
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.team.task_assign_policy > 10: #reset to default start value
             self.team.task_assign_policy = 10
             self.team.save()
@@ -517,8 +515,8 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         cls.logger.info("""
                             v1: private (draft version only)
                             v2: private (draft version only)
-                            v3: private (reviewed)
-                            v4: public (approved)
+                            v3: public (reviewed and approved)
+                            v4: public 
                         """)
         video, tv = cls._add_team_video()
 
@@ -534,11 +532,12 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         rev3_subs = os.path.join(cls.subs_dir, 'Timed_text.rev3.en.srt')
         cls._upload_en_draft(video, rev3_subs, user=cls.admin, complete=True)
         cls.data_utils.complete_review_task(tv, 20, cls.admin)
+        cls.data_utils.complete_approve_task(tv, 20, cls.owner)
+
 
         #REV4, approved (public)
         rev4_subs = os.path.join(cls.subs_dir, 'Timed_text.rev4.en.srt')
         cls._upload_en_draft(video, rev4_subs, user=cls.owner, complete=True)
-        cls.data_utils.complete_approve_task(tv, 20, cls.owner)
         cls.en = video.subtitle_language('en')
         en_v4 = cls.en.get_tip(public=True)
         en_v4.visibility_override = 'private'
@@ -581,24 +580,7 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         """
         self.team.task_assign_policy = 30
         self.team.save()
-        self.logger.info("Task assign policy: %s" % self.team.task_assign_policy)
         team_member = TeamContributorMemberFactory(team=self.team).user
-        p = permissions.can_assign_tasks(self.team, team_member)
-        self.logger.info('Contributor can assign tasks: %s ' % p)
-        p = permissions.can_add_version(team_member, self.video, 'en')
-        self.logger.info('Contributor can add version: %s ' % p.check_passed)
-        # can post edit subtitles
-        p = permissions.can_post_edit_subtitles(self.team, team_member)
-        self.logger.info('Contributor can post edit: %s ' % p)
-
-
-
-        language = self.video.subtitle_language('en')
-        self.logger.info(language.is_complete_and_synced(True))
-        if language and language.is_complete_and_synced(True):
-            self.logger.info('LANG SYNCED %s' %language.is_complete_and_synced(True))
-
-
         self.video_lang_pg.log_in(team_member.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
         

@@ -90,7 +90,6 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
@@ -275,7 +274,6 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
