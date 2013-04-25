@@ -1410,6 +1410,7 @@ class SubtitleVersion(models.Model):
         self.visibility_override = 'deleted' if delete else 'private'
         self.save()
 
+    @models.permalink
     def get_absolute_url(self):
         return ('videos:subtitleversion_detail',
                 [self.video.video_id, self.language_code, self.subtitle_language.pk,
