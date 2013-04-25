@@ -776,8 +776,16 @@ class Video(models.Model):
 
     @property
     def is_moderated(self):
-        tv = self.get_team_video()
-        return tv and tv.team.moderates_videos()
+        '''
+        Delegates check to team.moderates_video to keep logic in one place.
+        This is cached because the widget uses it, and else we'll incurr on
+        extra db calls on each widget view.
+        '''
+        cached_attr_name = '_cache_is_moderated'
+        if not hasattr(self, cached_attr_name):
+            tv = self.get_team_video()
+            setattr(self, cached_attr_name,  tv and tv.team.moderates_videos())
+        return cached_attr_name
 
     def metadata(self):
         '''Return a dict of metadata for this video.
