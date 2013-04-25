@@ -185,7 +185,7 @@
 
                     <ul subtitle-list="working-subtitle-set"
                         editable="true"
-                        can-add-and-remove="false"
+                        can-add-and-remove="allowsSyncing"
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
                         video-id="{{ video.video_id }}"
@@ -198,15 +198,16 @@
                             class="subtitle-list-item">
 
                             <div class="hover">
-                                <span ng-show="showStartTime" class="timing">
+                                <span  class="timing">
                                     <span>[[ parser.startTime(subtitle)|displayTime ]]</span>
-                                    <a href class="comments"></a>
+                                    <a href ng-show='allowsSyncing' class="comments"></a>
                                 </span>
                                 <a href class="remove-subtitle"
+                                   ng-show='allowsSyncing'
                                    ng-click="removeSubtitle(subtitle)">
                                     Remove
                                 </a>
-                                <a href class="add-subtitle"></a>
+                                <a href ng-show='allowsSyncing' class="add-subtitle"></a>
                             </div>
 
                             <span ng-show="!isEditing"
