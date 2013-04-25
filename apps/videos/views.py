@@ -18,6 +18,7 @@
 
 import datetime
 import urllib, urllib2
+from collections import namedtuple
 
 import simplejson as json
 from babelsubs import get_available_formats
@@ -82,6 +83,44 @@ rpc_router = RpcRouter('videos:rpc_router', {
 # We don't want to display all formats we understand to the end user
 # .e.g json, nor include aliases
 AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [ 'dfxp',  'sbv', 'srt', 'ssa', 'txt']
+
+LanguageListItem = namedtuple("LanguageListItem", "name status tags url")
+
+def make_language_list(video):
+    """Get a list of languages for the video pages.
+
+    Returns a list of LanguageListItem tuples
+    """
+    original_languages = []
+    other_languages = []
+    for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
+        name = lang.get_language_code_display()
+        url = lang.get_absolute_url()
+        is_original = False
+        tags = []
+        if lang.language_code == video.primary_audio_language_code:
+            tags.append(ugettext(u'original'))
+            is_original = True
+        if lang.subtitles_complete:
+            if lang.has_public_version():
+                status = 'complete'
+            else:
+                status = 'needs-review'
+                tags.append(ugettext(u'needs review'))
+        else:
+            tags.append(ugettext(u'incomplete'))
+            if lang.get_tip(public=False).timing_complete():
+                status = 'incomplete'
+            else:
+                status = 'needs-timing'
+        item = LanguageListItem(name, status, tags, url)
+        if is_original:
+            original_languages.append(item)
+        else:
+            other_languages.append(item)
+    original_languages.sort(key=lambda li: li.name)
+    other_languages.sort(key=lambda li: li.name)
+    return original_languages + other_languages
 
 def index(request):
     context = widget.add_onsite_js_files({})
@@ -233,7 +272,7 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['translations'] = _get_translations(video)
+    context['language_list'] = make_language_list(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['widget_params'] = _widget_params(
@@ -446,7 +485,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         qs = qs.order_by('-version_number')
 
     context['video'] = video
-    context['translations'] = _get_translations(video)
+    context['language_list'] = make_language_list(video)
     context['user_can_moderate'] = False
     context['widget_params'] = _widget_params(request, video, version_no=None,
                                               language=language, size=(289, 173))
@@ -775,15 +814,6 @@ def reset_metadata(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
-
-def _get_translations(video):
-    original = video.subtitle_language()
-    translations = sub_models.SubtitleLanguage.objects.having_versions().filter(video=video)
-    if original:
-        translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_code_display())
-    return translations
 
 def set_original_language(request, video_id):
     """

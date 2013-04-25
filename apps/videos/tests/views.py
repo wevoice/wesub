@@ -26,15 +26,19 @@ from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db.models import ObjectDoesNotExist
+from django.test import TestCase
 from vidscraper.sites import blip
 
 from apps.auth.models import CustomUser as User
+from apps.subtitles import pipeline
+from apps.teams.permissions_const import ROLE_ADMIN
 from apps.videos.share_utils import _make_email_url
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.templatetags.subtitles_tags import format_sub_time
 from apps.videos.tests.videotestutils import (
     WebUseTest, create_langs_and_versions
 )
+from apps.videos.views import make_language_list, LanguageListItem
 from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
@@ -44,7 +48,7 @@ from apps.videos.tests.data import (
 )
 from apps.widget import video_cache
 from apps.widget.tests import create_two_sub_session, RequestMockup
-
+from utils import test_factories
 
 class TestViews(WebUseTest):
     fixtures = ['test.json', 'subtitle_fixtures.json']
@@ -470,3 +474,121 @@ class TestViews(WebUseTest):
             response = self.client.post(url)
             self.assertEqual(response.status_code, 200)
 
+
+class MakeLanguageListTestCase(TestCase):
+    def setUp(self):
+        self.video = test_factories.create_video(
+            primary_audio_language_code='en')
+
+    def add_completed_subtitles(self, language, subtitles, **kwargs):
+        language = self.add_not_completed_subtitles(language, subtitles,
+                                                    **kwargs)
+        language.subtitles_complete = True
+        language.save()
+        return language
+
+    def add_not_completed_subtitles(self, language, subtitles, **kwargs):
+        v = pipeline.add_subtitles(self.video, language, subtitles, **kwargs)
+        return v.subtitle_language
+
+    def test_original(self):
+        lang = self.add_completed_subtitles('en', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        self.assertEquals(make_language_list(self.video), [
+            ('English', 'complete', ['original'], lang.get_absolute_url()),
+        ])
+
+    def test_original_incomplete(self):
+        lang = self.add_not_completed_subtitles('en', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        self.assertEquals(make_language_list(self.video), [
+            ('English', 'incomplete', ['original', 'incomplete'],
+             lang.get_absolute_url()),
+        ])
+
+    def test_complete(self):
+        lang = self.add_completed_subtitles('ar', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        self.assertEquals(make_language_list(self.video), [
+            ('Arabic', 'complete', [], lang.get_absolute_url()),
+        ])
+
+    def test_not_marked_complete(self):
+        lang = self.add_not_completed_subtitles('fr', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        self.assertEquals(make_language_list(self.video), [
+            ('French', 'incomplete', ['incomplete'], lang.get_absolute_url()),
+        ])
+
+    def test_timing_incomplete(self):
+        lang = self.add_not_completed_subtitles('ja', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (None, None, "World"),
+        ])
+        self.assertEquals(make_language_list(self.video), [
+            ('Japanese', 'needs-timing', ['incomplete'], lang.get_absolute_url()),
+        ])
+
+    def test_needs_review(self):
+        # we simulate a language going through the review process by simply
+        # setting visibility to private. To really simulate it we should
+        # create a team, incomplete tasks, etc.  But this isn't necessary for
+        # the tests at this point.
+        lang = self.add_completed_subtitles('tr', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ], visibility='private')
+        self.assertEquals(make_language_list(self.video), [
+            ('Turkish', 'needs-review', ['needs review'], lang.get_absolute_url()),
+        ])
+
+    def test_no_lines(self):
+        pipeline.add_subtitles(self.video, 'pt', None)
+        self.assertEquals(make_language_list(self.video), [ ])
+
+    def test_multiple_languages(self):
+        # english is the original, completed language
+        en = self.add_completed_subtitles('en', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        # Kurdish is completed
+        ar = self.add_completed_subtitles('ar', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        # french is incomplete
+        fr = self.add_not_completed_subtitles('fr', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ])
+        # japanese is incomplete, and timing is missing
+        ja = self.add_not_completed_subtitles('ja', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (None, None, "World"),
+        ])
+        # turkish needs review
+        tr = self.add_completed_subtitles('tr', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ], visibility='private')
+        # portuguese shouldn't be listed because there are no lines
+        pipeline.add_subtitles(self.video, 'pt', None)
+
+        # make_language_list should return lines for all the languages, with
+        # the original first, then the rest in alphabetical order.
+        self.assertEquals(make_language_list(self.video), [
+            ('English', 'complete', ['original'], en.get_absolute_url()),
+            ('Arabic', 'complete', [], ar.get_absolute_url()),
+            ('French', 'incomplete', ['incomplete'], fr.get_absolute_url()),
+            ('Japanese', 'needs-timing', ['incomplete'], ja.get_absolute_url()),
+            ('Turkish', 'needs-review', ['needs review'], tr.get_absolute_url()),
+        ])

@@ -1082,6 +1082,15 @@ class SubtitleVersion(models.Model):
 
     lineage = property(get_lineage, set_lineage)
 
+    def timing_complete(self):
+        subtitle_items = self.get_subtitles().subtitle_items()
+        if len(subtitle_items) == 0:
+            return False
+        for item in subtitle_items:
+            if item.start_time is None:
+                return False
+        return True
+
     class Meta:
         unique_together = [('video', 'subtitle_language', 'version_number'),
                            ('video', 'language_code', 'version_number')]
