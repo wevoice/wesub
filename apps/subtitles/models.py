@@ -27,6 +27,7 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
+from apps.subtitles import cache
 from apps.subtitles import shims
 from apps.subtitles import signals
 from apps.auth.models import CustomUser as User
@@ -624,7 +625,15 @@ class SubtitleLanguage(models.Model):
         for p in parents:
             sv.parents.add(p)
 
+        cache.invalidate_language_cache(self)
         return sv
+
+    def timing_complete(self, public=True):
+        value = cache.get_timing_complete(self, public)
+        if value is None:
+            value = self.get_tip(public=public).timing_complete()
+            cache.set_timing_complete(self, public, value)
+        return value
 
     def nuke_language(self):
         """Delete all SubtitleVersions for this language, as well as all

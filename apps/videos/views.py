@@ -109,7 +109,7 @@ def make_language_list(video):
                 tags.append(ugettext(u'needs review'))
         else:
             tags.append(ugettext(u'incomplete'))
-            if lang.get_tip(public=False).timing_complete():
+            if lang.timing_complete(public=False):
                 status = 'incomplete'
             else:
                 status = 'needs-timing'
