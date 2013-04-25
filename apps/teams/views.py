@@ -1425,20 +1425,9 @@ def create_task(request, slug, team_video_pk):
             task.set_expiration()
 
             if task.type == Task.TYPE_IDS['Subtitle']:
-                languages_with_versions = list(
-                    task.team_video.video.newsubtitlelanguage_set
-                                         .having_versions())
-
-                if not languages_with_versions:
-                    task.language = ''
-                else:
-                    # There should never be more than one language with
-                    # subtitles for a video eligible for a transcribe task.  If
-                    # for some reason there is, we'll just take the first one
-                    # the DB decides to give us.
-                    sl = languages_with_versions[0]
-                    task.language = sl.language_code
-                    task.new_subtitle_version = sl.get_tip()
+                # For subtitle tasks, let the person who performse the task
+                # choose the language.
+                task.language = ''
 
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
@@ -2128,7 +2117,10 @@ def delete_language(request, slug, lang_id):
                     return HttpResponseRedirect(next_url)
             finally:
                 for sl in locked:
-                    sl.release_writelock()
+                    # We need to get a fresh copy of the SL here so that the
+                    # save() in release_writelock doesn't overwrite any other
+                    # changes we've made in the try block.  ORMs are fun.
+                    SubtitleLanguage.objects.get(pk=sl.pk).release_writelock()
         else:
             for e in flatten_errorlists(form.errors):
                 messages.error(request, e)

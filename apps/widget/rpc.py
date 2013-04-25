@@ -571,7 +571,7 @@ class Rpc(BaseRpc):
         if under_moderation and not _user_can_publish:
             if is_complete:
                 # case 3
-                return message_will_be_submited % language.video.moderated_by.name
+                return message_will_be_submited % team_video.team.name
             else:
                 # case 2
                 return message_incomplete

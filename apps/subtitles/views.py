@@ -159,6 +159,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         video_urls.append(v.url)
 
     editor_data = {
+        'allowsSyncing': bool(request.GET.get('allowsSyncing', False)),
         # front end needs this to be able to set the correct
         # api headers for saving subs
         'authHeaders': {

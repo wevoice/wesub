@@ -246,7 +246,7 @@ var angular = angular || null;
         });
 
     };
-    var SubtitleListController = function($scope, $timeout, SubtitleStorage) {
+    var SubtitleListController = function($window, $scope, $timeout, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -256,6 +256,7 @@ var angular = angular || null;
          * @constructor
          */
 
+        $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.addSubtitle = function(index, attrs, content, focus) {
 
             // Add the subtitle directly to the DFXP instance.

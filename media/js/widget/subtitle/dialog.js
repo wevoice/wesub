@@ -324,8 +324,11 @@ unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event
     if (!this.doneButtonEnabled_) {
         return;
     }
+
+    // if this is related to a task, send the new editor the right task id
+    var taskURLPart = unisubs.task_id ? "/" + unisubs.task_id : "";
     this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
-        this.subtitles_.LANGUAGE + '/?from-old-editor=true&' +
+        this.subtitles_.LANGUAGE + taskURLPart + '/?from-old-editor=true&' +
         window.location.search.replace('?', '');
     this.saveWork(false, true);
 };
