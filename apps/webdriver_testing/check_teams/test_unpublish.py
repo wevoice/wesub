@@ -180,31 +180,6 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                         'Approve German Subtitles', self.video.title))
 
 
-
-    def test_unpublish_last__language_ui(self):
-        """Unpublish last public version,  language not displayed in video page list.
-
-
-        """
-        self.video_pg.log_out()
-        self.video_pg.open_video_page(self.video.video_id)
-        available_langs = self.video_pg.subtitle_languages()
-        self.logger.info(available_langs)
-        self.assertNotIn('English (in progress)', available_langs)
-
-    def test_unpublish_last__team_language_ui(self):
-        """Unpublish last public version, team members see lang on video page.
-
-
-        """
-        self.video_pg.log_in(self.contributor.username, 'password')
-        self.video_pg.open_video_page(self.video.video_id)
-        available_langs = self.video_pg.subtitle_languages()
-        self.logger.info(available_langs)
-        self.assertIn('English (in progress)', available_langs)
-
-
-
     def test_unpublish__edit_forked_translation(self):
         """In-progress translations editable after last source deleted.
 

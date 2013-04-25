@@ -1,5 +1,7 @@
 import os
 
+from apps.teams import permissions
+
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages import watch_page
@@ -260,11 +262,12 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Member can't edit public version when create tasks is manager level.
 
         """
-        self.team.task_assign_policy = 20
+        self.team.task_assign_policy = 30
         self.team.save()
-        self.logger.info(self.team.task_assign_policy)
+        self.logger.info("Task assign policy: %s" % self.team.task_assign_policy)
 
         member2 = TeamContributorMemberFactory(team=self.team).user
+        self.logger.info('Test user: %s' % member2.username)
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
         self._upload_en_draft(video, subs, user=self.contributor, complete=True)
@@ -514,8 +517,8 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         cls.logger.info("""
                             v1: private (draft version only)
                             v2: private (draft version only)
-                            v3: public 
-                            v4: public 
+                            v3: private (reviewed)
+                            v4: public (approved)
                         """)
         video, tv = cls._add_team_video()
 
@@ -523,21 +526,21 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         rev1_subs = os.path.join(cls.subs_dir, 'Timed_text.en.srt')
         cls._upload_en_draft(video, rev1_subs, user=cls.contributor)
 
-        #REV2 (draft)
+        #REV2 (draft - marked complete)
         rev2_subs = os.path.join(cls.subs_dir, 'Timed_text.rev2.en.srt')
         cls._upload_en_draft(video, rev2_subs, user=cls.contributor, complete=True)
 
-        #REV3, reviewed and approved (public)
+        #REV3, reviewed (private)
         rev3_subs = os.path.join(cls.subs_dir, 'Timed_text.rev3.en.srt')
         cls._upload_en_draft(video, rev3_subs, user=cls.admin, complete=True)
         cls.data_utils.complete_review_task(tv, 20, cls.admin)
 
-        #REV4, reviewed and approved (public)
+        #REV4, approved (public)
         rev4_subs = os.path.join(cls.subs_dir, 'Timed_text.rev4.en.srt')
         cls._upload_en_draft(video, rev4_subs, user=cls.owner, complete=True)
         cls.data_utils.complete_approve_task(tv, 20, cls.owner)
         cls.en = video.subtitle_language('en')
-        en_v4 = cls.en.get_tip(full=True)
+        en_v4 = cls.en.get_tip(public=True)
         en_v4.visibility_override = 'private'
         en_v4.save() 
         cls.video_lang_pg.open_video_lang_page(video.video_id, 'en')
@@ -578,9 +581,27 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         """
         self.team.task_assign_policy = 30
         self.team.save()
-        member2 = TeamContributorMemberFactory(team=self.team).user
-        self.video_lang_pg.log_in(member2.username, 'password')
+        self.logger.info("Task assign policy: %s" % self.team.task_assign_policy)
+        team_member = TeamContributorMemberFactory(team=self.team).user
+        p = permissions.can_assign_tasks(self.team, team_member)
+        self.logger.info('Contributor can assign tasks: %s ' % p)
+        p = permissions.can_add_version(team_member, self.video, 'en')
+        self.logger.info('Contributor can add version: %s ' % p.check_passed)
+        # can post edit subtitles
+        p = permissions.can_post_edit_subtitles(self.team, team_member)
+        self.logger.info('Contributor can post edit: %s ' % p)
+
+
+
+        language = self.video.subtitle_language('en')
+        self.logger.info(language.is_complete_and_synced(True))
+        if language and language.is_complete_and_synced(True):
+            self.logger.info('LANG SYNCED %s' %language.is_complete_and_synced(True))
+
+
+        self.video_lang_pg.log_in(team_member.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
+        
         self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
                          self.video_lang_pg.edit_subtitles_active())
 

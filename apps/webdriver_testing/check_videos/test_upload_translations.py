@@ -133,20 +133,19 @@ class TestCaseUploadTranslation(WebdriverTestCase):
 
 class TestCaseEditUploaded(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.  """
-    NEW_BROWSER_PER_TEST_CASE = False
+    NEW_BROWSER_PER_TEST_CASE = True 
 
-    @classmethod 
-    def setUpClass(cls):
-        super(TestCaseEditUploaded, cls).setUpClass()
-        cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create(username = 'user')
-        cls.video_pg = video_page.VideoPage(cls)
-        cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
+    def setUp(self):
+        super(TestCaseEditUploaded, self).setUp()
+        self.data_utils = data_helpers.DataHelpers()
+        self.user = UserFactory.create(username = 'user')
+        self.video_pg = video_page.VideoPage(self)
+        self.video_language_pg = video_language_page.VideoLanguagePage(self)
 
-        cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
+        self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
-        cls.video_pg.open_page('videos/create/')
-        cls.video_pg.log_in(cls.user.username, 'password')
+        self.video_pg.open_page('videos/create/')
+        self.video_pg.log_in(self.user.username, 'password')
 
     def _upload_and_verify(self, video, sub_file, language, lang_code):
         """Upload the subtitle file and confirm subs are stored.
@@ -166,6 +165,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
 
 
     def test_edit__large(self):
+        """Upload a large set of subtitles then open for editing. """
         self.video_pg.page_refresh()
         video =  self.data_utils.create_video()
         data = {'language_code': 'en',
