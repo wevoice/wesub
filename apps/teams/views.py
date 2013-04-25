@@ -1425,20 +1425,9 @@ def create_task(request, slug, team_video_pk):
             task.set_expiration()
 
             if task.type == Task.TYPE_IDS['Subtitle']:
-                languages_with_versions = list(
-                    task.team_video.video.newsubtitlelanguage_set
-                                         .having_versions())
-
-                if not languages_with_versions:
-                    task.language = ''
-                else:
-                    # There should never be more than one language with
-                    # subtitles for a video eligible for a transcribe task.  If
-                    # for some reason there is, we'll just take the first one
-                    # the DB decides to give us.
-                    sl = languages_with_versions[0]
-                    task.language = sl.language_code
-                    task.new_subtitle_version = sl.get_tip()
+                # For subtitle tasks, let the person who performse the task
+                # choose the language.
+                task.language = ''
 
             if task.type in [Task.TYPE_IDS['Review'], Task.TYPE_IDS['Approve']]:
                 task.approved = Task.APPROVED_IDS['In Progress']
