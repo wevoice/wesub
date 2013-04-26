@@ -15,7 +15,7 @@ class VideoLanguagePage(VideoPage):
     _SUB_LINES = "div.translation-text"
     _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
-    _UNPUBLISH = 'a[href="#unpublish-modal"]'
+    _DELETE_SUBTITLE_LANGUAGE = 'a[href*="delete-language"]'
 
     #UNPUBLISH MODAL
     _VERSION = 'input[value="version"]'
@@ -28,6 +28,7 @@ class VideoLanguagePage(VideoPage):
     _DOWNLOAD_SUBS = "span.sort_label strong"
     _DOWNLOAD_OPTION = "div.sort_button ul li" 
     EDIT_INACTIVE_TEXT = 'You do not have permission to edit this version'
+    _ROLLBACK = "a#rollback" 
 
     def open_video_lang_page(self, video_id, lang_code):
         self.logger.info('Opening {0} page for video: {1}'.format(
@@ -89,9 +90,11 @@ class VideoLanguagePage(VideoPage):
     def view_notice(self):
         return self.get_text_by_css(self._VIEW_NOTICE)
 
-    def unpublish(self, option='VERSION', delete=False):
-        """Unpublish subs "VERSION" or "LANGUAGE"."""
-        self.click_by_css(self._UNPUBLISH)
+    def delete_subtitle_language(self, languages=None):
+        """Completely delete a subtitle language, and optional dependents.
+
+        """
+        self.click_by_css(self._DELETE_SUBTITLE_LANGUAGE)
         self.wait_for_element_visible(self._VERSION)
         delete_option = getattr(self, '_%s' % option)
         self.click_by_css(delete_option)
@@ -108,4 +111,12 @@ class VideoLanguagePage(VideoPage):
             return self.get_element_attribute(self._EDIT_SUBTITLES, 'title')
         else:
             return 'active'
+
+    def rollback_exists(self):
+        return self.is_element_present(self._ROLLBACK)
+
+    def rollback(self):
+        self.click_by_css(self._ROLLBACK)
+        self.handle_js_alert('accept')
+        return self.success_message_present('Rollback successful')
 

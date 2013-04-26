@@ -353,6 +353,359 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
                          self.video_lang_pg.edit_subtitles_active())
 
 
+
+class TestCaseNoReviews(WebdriverTestCase):
+    """TestSuite for display of Edit Subtitles button on a revision. """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseNoReviews, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+
+        cls.user = UserFactory.create()
+        cls.owner = UserFactory.create()
+        cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
+                                            team__translate_policy=20, #any team
+                                            team__subtitle_policy=20, #any team
+                                            team__task_assign_policy=10, #any team
+                                            user = cls.owner,
+                                            ).team
+        cls.workflow = WorkflowFactory(team = cls.team,
+                                       autocreate_subtitle=True,
+                                       autocreate_translate=True,
+                                       )
+        lang_list = ['en', 'ru', 'pt-br', 'de', 'sv']
+        for language in lang_list:
+            TeamLangPrefFactory.create(team=cls.team, language_code=language,
+                                       preferred=True)
+
+        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team).user
+        cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
+                                    'subtitle_data') 
+
+
+    def _upload_en_draft(self, video, subs, user, complete=False):
+        auth_creds = dict(username=user.username, password='password')
+        draft_data = {'language_code': 'en',
+                     'video': video.pk,
+                     'primary_audio_language_code': 'en',
+                     'draft': open(subs),
+                     'complete': int(complete),
+                     'is_complete': complete,
+                    }
+        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+
+    def _add_team_video(self):
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        return video, tv
+
+    def tearDown(self):
+        if self.team.task_assign_policy > 10: #reset to default start value
+            self.team.task_assign_policy = 10
+            self.team.save()
+        
+
+    def test_draft__task_assignee(self):
+        """Edit Subtitles active for task assignee.
+
+        """
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+
+    def test_draft__not_task_assignee(self):
+        """Edit Subtitles not active for member not assigned with task.
+
+        """
+        member2 = TeamContributorMemberFactory(team=self.team).user
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT, 
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_draft__team_admin(self):
+        """Edit Subtitles not active for admin when task started by member.
+
+        """
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,  
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__non_member(self):
+        """Guest user will not see Edit Subtitles for published version.
+
+        """
+        siteuser = UserFactory.create()
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(siteuser.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertFalse(self.video_lang_pg.edit_subtitles_exists())
+
+
+    def test_public__member_with_create_tasks(self):
+        """Member can edit public version when create tasks is any team member.
+
+        """
+        member2 = TeamContributorMemberFactory(team=self.team).user
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__member_with_no_create_tasks(self):
+        """Member can't edit public version when create tasks is manager level.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info("Task assign policy: %s" % self.team.task_assign_policy)
+
+        member2 = TeamContributorMemberFactory(team=self.team).user
+        self.logger.info('Test user: %s' % member2.username)
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__manager_with_create_tasks(self):
+        """Manager can edit public version when create tasks is manager level.
+
+        """
+        self.team.task_assign_policy = 20
+        self.team.save()
+        self.logger.info(self.team.task_assign_policy)
+
+        teammanager = TeamManagerMemberFactory(team=self.team).user
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(teammanager.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
+
+
+    def test_public__manager_with_no_create_tasks(self):
+        """Manager can't edit public version when create tasks is admin level.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info('TASK POLICY is %s' % self.team.task_assign_policy)
+        tm = TeamManagerMemberFactory(team=self.team).user
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_pg.log_out()
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(tm.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__admin_always(self):
+        """Admin can always edit public version.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info(self.team.task_assign_policy)
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self._review_and_approve(tv)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__owner_always(self):
+        """Owner can always edit public version.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info(self.team.task_assign_policy)
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self._review_and_approve(tv)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(self.owner.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
+
+
+
+class TestCaseNoWorkflow(WebdriverTestCase):
+    """TestSuite for display of Edit Subtitles button on a revision. """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseNoWorkflow, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+
+        cls.user = UserFactory.create()
+        cls.owner = UserFactory.create()
+        cls.team = TeamMemberFactory.create(team__translate_policy=20, #any team
+                                            team__subtitle_policy=20, #any team
+                                            user = cls.owner,
+                                            ).team
+        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team).user
+        cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
+                                    'subtitle_data') 
+
+
+    def _upload_en_draft(self, video, subs, user, complete=False):
+        auth_creds = dict(username=user.username, password='password')
+        draft_data = {'language_code': 'en',
+                     'video': video.pk,
+                     'primary_audio_language_code': 'en',
+                     'draft': open(subs),
+                     'complete': int(complete),
+                     'is_complete': complete,
+                    }
+        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+
+    def _add_team_video(self):
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        return video, tv
+
+    def test_draft__task_assignee(self):
+        """Edit Subtitles active for task assignee.
+
+        """
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+
+    def test_draft__not_task_assignee(self):
+        """Edit Subtitles not active for member not assigned with task.
+
+        """
+        member2 = TeamContributorMemberFactory(team=self.team).user
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT, 
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_draft__team_admin(self):
+        """Edit Subtitles not active for admin when task started by member.
+
+        """
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,  
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__non_member(self):
+        """Guest user will not see Edit Subtitles for published version.
+
+        """
+        siteuser = UserFactory.create()
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(siteuser.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertFalse(self.video_lang_pg.edit_subtitles_exists())
+
+
+    def test_public__admin_always(self):
+        """Admin can always edit public version.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info(self.team.task_assign_policy)
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
+
+    def test_public__owner_always(self):
+        """Owner can always edit public version.
+
+        """
+        self.team.task_assign_policy = 30
+        self.team.save()
+        self.logger.info(self.team.task_assign_policy)
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor, complete=True)
+        self.video_pg.open_video_page(video.video_id)
+        self.video_lang_pg.log_in(self.owner.username, 'password')
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.assertEqual('active',
+                         self.video_lang_pg.edit_subtitles_active())
+
+
+
+
+
+
+
 class TestCaseClickEdit(WebdriverTestCase):
     """TestSuite for clicking EditSubtitles button on a revision. """
     NEW_BROWSER_PER_TEST_CASE = False

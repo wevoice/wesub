@@ -34,6 +34,13 @@ class Page(object):
         else:
             return element
 
+    def _safe_find_elements(self, element):
+        if isinstance(element, basestring):
+            self.wait_for_element_present(element)
+            return self.browser.find_elements_by_css_selector(element)
+        else:
+            return elements
+
     def quit(self):
         """Quit the browser.
 
@@ -312,15 +319,14 @@ class Page(object):
 
         """
         try:
-            elements_found = self.browser.find_elements_by_css_selector(
-                element)
+            els = self._safe_find_elements(element)
         except NoSuchElementException:
             return False
-        for elem in elements_found:
+        for elem in els:
             if text == elem.text:
                 return True
-            else:
-                return False
+        else:
+            return False
 
     def verify_text_present(self, element, text):
         """Verify element (by css) text is present.
@@ -435,6 +441,8 @@ class Page(object):
         """
         if url.startswith("http"):
             full_url = url
+        elif url.startswith("/"):
+            full_url = str(self.base_url) + url[1:]
         else:
             full_url = str(self.base_url) + url
         return full_url
