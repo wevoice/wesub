@@ -312,7 +312,7 @@
                             {% endif %}
                             {% if item.origin == 'rollback' and item.rollback_of_version_number %}
                                 <p>{%  trans "Rollback to version #" %}{{ item.rollback_of_version_number }}</p>
-                             {% elif item.origin == 'upload' %}
+                            {% elif item.origin == 'upload' %}
                                 <p>{%  trans "Uploaded" %}</p>
                             {% elif item.origin == 'api' %}
                                 <p>{%  trans "API" %}</p>
