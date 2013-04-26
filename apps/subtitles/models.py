@@ -628,11 +628,11 @@ class SubtitleLanguage(models.Model):
         cache.invalidate_language_cache(self)
         return sv
 
-    def timing_complete(self, public=True):
-        value = cache.get_timing_complete(self, public)
+    def is_synced(self, public=True):
+        value = cache.get_is_synced(self, public)
         if value is None:
-            value = self.get_tip(public=public).timing_complete()
-            cache.set_timing_complete(self, public, value)
+            value = self.get_tip(public=public).is_synced()
+            cache.set_is_synced(self, public, value)
         return value
 
     def nuke_language(self):
@@ -1090,15 +1090,6 @@ class SubtitleVersion(models.Model):
         self._lineage = lineage
 
     lineage = property(get_lineage, set_lineage)
-
-    def timing_complete(self):
-        subtitle_items = self.get_subtitles().subtitle_items()
-        if len(subtitle_items) == 0:
-            return False
-        for item in subtitle_items:
-            if item.start_time is None:
-                return False
-        return True
 
     class Meta:
         unique_together = [('video', 'subtitle_language', 'version_number'),

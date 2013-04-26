@@ -113,7 +113,7 @@ class LanguageList(object):
             else:
                 return 'needs-review'
         else:
-            if lang.timing_complete(public=False):
+            if lang.is_synced(public=False):
                 return 'incomplete'
             else:
                 return 'needs-timing'
