@@ -190,7 +190,6 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_assigned_task(task_text, self.video.title)
-        self.create_modal.lang_selection()
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
 
@@ -387,7 +386,6 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
         task_text = 'Translate Subtitles into Swedish'
         self.tasks_tab.perform_assigned_task(task_text, self.video.title)
-        self.create_modal.lang_selection()
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
 

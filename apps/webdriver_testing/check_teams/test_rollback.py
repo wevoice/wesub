@@ -488,7 +488,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.assertTrue(self.video_lang_pg.rollback_exists())
 
     def test_draft__not_task_assignee(self):
-        """Rollback not active for member not assigned with task.
+        """Rollback active for member when task not started.
 
         """
         member2 = TeamContributorMemberFactory(team=self.team).user
@@ -498,21 +498,8 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
-        self.assertFalse(self.video_lang_pg.rollback_exists())
+        self.assertTrue(self.video_lang_pg.rollback_exists())
 
-
-    def test_draft__team_admin(self):
-        """Rollback not active for admin when task started by member.
-
-        """
-        video, tv = self._add_team_video()
-        v1, _ = self._create_two_drafts(video, self.contributor)
-
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_lang_pg.log_in(self.admin.username, 'password')
-
-        self.video_lang_pg.open_page(v1.get_absolute_url())
-        self.assertFalse(self.video_lang_pg.rollback_exists())
 
 
     def test_public__2nd_member(self):
@@ -674,7 +661,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
-        self.assertFalse(self.video_lang_pg.rollback_exists())
+        self.assertTrue(self.video_lang_pg.rollback_exists())
 
 
     def test_incomplete__team_admin(self):
@@ -688,7 +675,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
         self.video_lang_pg.log_in(self.admin.username, 'password')
 
         self.video_lang_pg.open_page(v1.get_absolute_url())
-        self.assertFalse(self.video_lang_pg.rollback_exists())
+        self.assertTrue(self.video_lang_pg.rollback_exists())
 
     def test_public__2nd_member(self):
         """Rollback active for 2nd team member on published version
