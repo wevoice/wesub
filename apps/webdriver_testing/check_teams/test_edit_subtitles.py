@@ -422,7 +422,7 @@ class TestCaseNoReviews(WebdriverTestCase):
 
 
     def test_draft__not_task_assignee(self):
-        """Edit Subtitles not active for member not assigned with task.
+        """Edit Subtitles active for member when task not assigned.
 
         """
         member2 = TeamContributorMemberFactory(team=self.team).user
@@ -433,21 +433,9 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT, 
+        self.assertEqual('active', 
                          self.video_lang_pg.edit_subtitles_active())
 
-    def test_draft__team_admin(self):
-        """Edit Subtitles not active for admin when task started by member.
-
-        """
-        video, tv = self._add_team_video()
-        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
-        self._upload_en_draft(video, subs, user=self.contributor)
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_lang_pg.log_in(self.admin.username, 'password')
-        self.video_lang_pg.page_refresh()
-        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT,  
-                         self.video_lang_pg.edit_subtitles_active())
 
     def test_public__non_member(self):
         """Guest user will not see Edit Subtitles for published version.
@@ -543,7 +531,6 @@ class TestCaseNoReviews(WebdriverTestCase):
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
         self._upload_en_draft(video, subs, user=self.contributor, complete=True)
-        self._review_and_approve(tv)
         self.video_pg.open_video_page(video.video_id)
         self.video_lang_pg.log_in(self.admin.username, 'password')
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
@@ -561,7 +548,6 @@ class TestCaseNoReviews(WebdriverTestCase):
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
         self._upload_en_draft(video, subs, user=self.contributor, complete=True)
-        self._review_and_approve(tv)
         self.video_pg.open_video_page(video.video_id)
         self.video_lang_pg.log_in(self.owner.username, 'password')
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
