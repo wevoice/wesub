@@ -24,7 +24,9 @@ files = [
     'src/js/third-party/underscore.min.js',
     'src/js/third-party/popcorn.js',
     'src/js/dfxp/dfxp.js',
+    'src/js/uri.js',
     'src/js/third-party/*.js',
+    'src/js/subtitle-editor/*.js',
     'src/js/subtitle-editor/**/*.js',
     'src/js/subtitle-editor/tests/*Spec.js'
 ];
