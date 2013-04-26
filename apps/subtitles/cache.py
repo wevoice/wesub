@@ -21,20 +21,20 @@ from django.core.cache import cache
 TIMEOUT = 60 * 60 * 24 * 5 # 5 days
 
 
-def _lang_timing_complete_id(language, public):
+def _lang_is_synced_id(language, public):
     if public:
         return u"language-%s-timing-complete-public" % (language.pk,)
     else:
         return u"language-%s-timing-complete-private" % (language.pk,)
 
 def invalidate_language_cache(language):
-    cache.delete(_lang_timing_complete_id(language, True))
-    cache.delete(_lang_timing_complete_id(language, False))
+    cache.delete(_lang_is_synced_id(language, True))
+    cache.delete(_lang_is_synced_id(language, False))
 
-def get_timing_complete(language, public):
-    cache_key = _lang_timing_complete_id(language, public)
+def get_is_synced(language, public):
+    cache_key = _lang_is_synced_id(language, public)
     return cache.get(cache_key)
 
-def set_timing_complete(language, public, value):
-    cache_key = _lang_timing_complete_id(language, public)
+def set_is_synced(language, public, value):
+    cache_key = _lang_is_synced_id(language, public)
     cache.set(cache_key, value, TIMEOUT)
