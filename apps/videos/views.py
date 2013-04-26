@@ -86,41 +86,60 @@ AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [ 'dfxp',  'sbv', 'srt', 'ssa', 'txt']
 
 LanguageListItem = namedtuple("LanguageListItem", "name status tags url")
 
-def make_language_list(video):
-    """Get a list of languages for the video pages.
+class LanguageList(object):
+    """List of languages for the video pages."""
 
-    Returns a list of LanguageListItem tuples
-    """
-    original_languages = []
-    other_languages = []
-    for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
-        name = lang.get_language_code_display()
-        url = lang.get_absolute_url()
-        is_original = False
-        tags = []
-        if lang.language_code == video.primary_audio_language_code:
-            tags.append(ugettext(u'original'))
-            is_original = True
+    def __init__(self, video):
+        original_languages = []
+        other_languages = []
+        for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
+
+            item = LanguageListItem(lang.get_language_code_display(),
+                                    self._calc_status(lang),
+                                    self._calc_tags(lang),
+                                    lang.get_absolute_url())
+            if lang.language_code == video.primary_audio_language_code:
+                original_languages.append(item)
+            else:
+                other_languages.append(item)
+        original_languages.sort(key=lambda li: li.name)
+        other_languages.sort(key=lambda li: li.name)
+        self.items = original_languages + other_languages
+
+    def _calc_status(self, lang):
         if lang.subtitles_complete:
             if lang.has_public_version():
-                status = 'complete'
+                return 'complete'
             else:
-                status = 'needs-review'
-                tags.append(ugettext(u'needs review'))
+                return 'needs-review'
         else:
-            tags.append(ugettext(u'incomplete'))
             if lang.timing_complete(public=False):
-                status = 'incomplete'
+                return 'incomplete'
             else:
-                status = 'needs-timing'
-        item = LanguageListItem(name, status, tags, url)
-        if is_original:
-            original_languages.append(item)
-        else:
-            other_languages.append(item)
-    original_languages.sort(key=lambda li: li.name)
-    other_languages.sort(key=lambda li: li.name)
-    return original_languages + other_languages
+                return 'needs-timing'
+
+    def _calc_tags(self, lang):
+        tags = []
+        if lang.is_primary_audio_language():
+            tags.append(ugettext(u'original'))
+
+        team_video = lang.video.get_team_video()
+
+        if not lang.subtitles_complete:
+            tags.append(ugettext(u'incomplete'))
+        elif team_video is not None:
+            # subtiltes are complete, check if they are under review/approval.
+            for t in Task.objects.incomplete().filter(team_video=team_video):
+                if t.type == Task.TYPE_IDS['Review']:
+                    tags.append(ugettext(u'needs review'))
+                    break
+                elif t.type == Task.TYPE_IDS['Approve']:
+                    tags.append(ugettext(u'needs approval'))
+                    break
+        return tags
+
+    def __iter__(self):
+        return iter(self.items)
 
 def index(request):
     context = widget.add_onsite_js_files({})
@@ -272,7 +291,7 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['language_list'] = make_language_list(video)
+    context['language_list'] = LanguageList(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['widget_params'] = _widget_params(
@@ -485,7 +504,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         qs = qs.order_by('-version_number')
 
     context['video'] = video
-    context['language_list'] = make_language_list(video)
+    context['language_list'] = LanguageList(video)
     context['user_can_moderate'] = False
     context['widget_params'] = _widget_params(request, video, version_no=None,
                                               language=language, size=(289, 173))

@@ -31,6 +31,7 @@ from vidscraper.sites import blip
 
 from apps.auth.models import CustomUser as User
 from apps.subtitles import pipeline
+from apps.teams.models import Task
 from apps.teams.permissions_const import ROLE_ADMIN
 from apps.videos.share_utils import _make_email_url
 from apps.videos.tasks import video_changed_tasks
@@ -38,7 +39,7 @@ from apps.videos.templatetags.subtitles_tags import format_sub_time
 from apps.videos.tests.videotestutils import (
     WebUseTest, create_langs_and_versions
 )
-from apps.videos.views import make_language_list, LanguageListItem
+from apps.videos.views import LanguageList, LanguageListItem
 from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
@@ -480,6 +481,17 @@ class MakeLanguageListTestCase(TestCase):
         self.video = test_factories.create_video(
             primary_audio_language_code='en')
 
+    def setup_team(self):
+        self.team = test_factories.create_team(workflow_enabled=True)
+        workflow = self.team.get_workflow()
+        workflow.review_allowed = workflow.REVIEW_IDS['Admin must review']
+        workflow.approve_allowed = workflow.APPROVE_IDS['Admin must approve']
+        workflow.save()
+        self.user = test_factories.create_team_member(self.team).user
+        self.team_video = test_factories.create_team_video(self.team,
+                                                           self.user,
+                                                           self.video)
+
     def add_completed_subtitles(self, language, subtitles, **kwargs):
         language = self.add_not_completed_subtitles(language, subtitles,
                                                     **kwargs)
@@ -496,7 +508,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('English', 'complete', ['original'], lang.get_absolute_url()),
         ])
 
@@ -505,7 +517,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('English', 'incomplete', ['original', 'incomplete'],
              lang.get_absolute_url()),
         ])
@@ -515,7 +527,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('Arabic', 'complete', [], lang.get_absolute_url()),
         ])
 
@@ -524,7 +536,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('French', 'incomplete', ['incomplete'], lang.get_absolute_url()),
         ])
 
@@ -533,26 +545,54 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (None, None, "World"),
         ])
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('Japanese', 'needs-timing', ['incomplete'], lang.get_absolute_url()),
         ])
 
     def test_needs_review(self):
-        # we simulate a language going through the review process by simply
-        # setting visibility to private. To really simulate it we should
-        # create a team, incomplete tasks, etc.  But this isn't necessary for
-        # the tests at this point.
+        self.setup_team()
+        # go through the subtitle task phase
+        task = Task(team=self.team, team_video=self.team_video,
+             language='tr', type=Task.TYPE_IDS['Subtitle'],
+             assignee=self.user)
         lang = self.add_completed_subtitles('tr', [
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ], visibility='private')
-        self.assertEquals(make_language_list(self.video), [
+        task.new_subtitle_version = lang.get_tip(public=False)
+        review_task = task.complete()
+        # now in the review phase
+        self.assertEquals(review_task.type, Task.TYPE_IDS['Review'])
+        self.assertEquals(LanguageList(self.video).items, [
             ('Turkish', 'needs-review', ['needs review'], lang.get_absolute_url()),
+        ])
+
+    def test_needs_approval(self):
+        self.setup_team()
+        # go through the subtitle task phase
+        task = Task(team=self.team, team_video=self.team_video,
+             language='tr', type=Task.TYPE_IDS['Subtitle'],
+             assignee=self.user)
+        lang = self.add_completed_subtitles('tr', [
+            (0, 1000, "Hello, ", {'new_paragraph':True}),
+            (1500, 2500, "World"),
+        ], visibility='private')
+        task.new_subtitle_version = lang.get_tip(public=False)
+        review_task = task.complete()
+        # go through the review phase
+        self.assertEquals(review_task.type, Task.TYPE_IDS['Review'])
+        review_task.assignee = self.user
+        review_task.approved = Task.APPROVED_IDS['Approved']
+        approve_task = review_task.complete()
+        # now in the approval phase
+        self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
+        self.assertEquals(LanguageList(self.video).items, [
+            ('Turkish', 'needs-review', ['needs approval'], lang.get_absolute_url()),
         ])
 
     def test_no_lines(self):
         pipeline.add_subtitles(self.video, 'pt', None)
-        self.assertEquals(make_language_list(self.video), [ ])
+        self.assertEquals(LanguageList(self.video).items, [ ])
 
     def test_multiple_languages(self):
         # english is the original, completed language
@@ -575,20 +615,14 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (None, None, "World"),
         ])
-        # turkish needs review
-        tr = self.add_completed_subtitles('tr', [
-            (0, 1000, "Hello, ", {'new_paragraph':True}),
-            (1500, 2500, "World"),
-        ], visibility='private')
         # portuguese shouldn't be listed because there are no lines
         pipeline.add_subtitles(self.video, 'pt', None)
 
-        # make_language_list should return lines for all the languages, with
+        # LanguageList should return lines for all the languages, with
         # the original first, then the rest in alphabetical order.
-        self.assertEquals(make_language_list(self.video), [
+        self.assertEquals(LanguageList(self.video).items, [
             ('English', 'complete', ['original'], en.get_absolute_url()),
             ('Arabic', 'complete', [], ar.get_absolute_url()),
             ('French', 'incomplete', ['incomplete'], fr.get_absolute_url()),
             ('Japanese', 'needs-timing', ['incomplete'], ja.get_absolute_url()),
-            ('Turkish', 'needs-review', ['needs review'], tr.get_absolute_url()),
         ])
