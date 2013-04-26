@@ -2,9 +2,9 @@ import os
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages import diffing_page
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
@@ -13,7 +13,6 @@ from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
 
 
 class TestCaseApprovalWorkflow(WebdriverTestCase):
@@ -26,7 +25,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
         cls.video_pg = video_page.VideoPage(cls)
-
+        cls.diffing_pg = diffing_page.DiffingPage(cls)
         cls.user = UserFactory.create()
         cls.owner = UserFactory.create()
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -116,6 +115,17 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback_exists())
 
+    def test_diffing_rollback_draft__assignee(self):
+        """Rollback available for task assignee.
+
+        """
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_two_drafts(video, self.contributor)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback_exists())
+
     def test_review_reject__assignee(self):
         """Rollback available for assignee after transcript fails review.
 
@@ -129,6 +139,21 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.log_in(self.contributor.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback_exists())
+
+    def test_diffing_rollback_review_reject__assignee(self):
+        """Rollback on diffing page for assignee, if transcript fails review.
+
+        """
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_complete_rev(video, self.contributor)
+
+        #Reject transcript in review phase
+        self.data_utils.complete_review_task(tv, 30, self.admin)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback_exists())
+
 
     def test_approve_reject__assignee(self):
         """Rollback NOT available for transcriber when approve fails.
@@ -157,6 +182,18 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.log_in(self.contributor.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback_exists())
+
+    def test_diffing_rollback_review_unstarted__transcriber(self):
+        """Rollback on diffing page for transcriber when waiting review.
+
+        """
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_complete_rev(video, self.contributor)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback_exists())
 
 
     def test_approver_sent_back__reviewer(self):
@@ -191,6 +228,20 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertFalse(self.video_lang_pg.rollback_exists())
+
+    def test_diffing_page__not_task_assignee(self):
+        """Rollback not active for member not assigned with task.
+
+        """
+        member2 = TeamContributorMemberFactory(team=self.team).user
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_two_drafts(video, self.contributor)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(member2.username, 'password')
+
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertFalse(self.diffing_pg.rollback_exists())
 
 
     def test_draft__team_admin(self):
@@ -398,7 +449,6 @@ class TestCaseNoReviews(WebdriverTestCase):
         return video, tv
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.team.task_assign_policy > 10: #reset to default start value
             self.team.task_assign_policy = 10
             self.team.save()
@@ -578,8 +628,6 @@ class TestCaseNoWorkflow(WebdriverTestCase):
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
         return video, tv
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
 
     def _create_two_drafts(self, video, user):
         rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -708,10 +756,8 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         super(TestCaseRollbackRevision, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
-        cls.watch_pg = watch_page.WatchPage(cls)
+        cls.diffing_pg = diffing_page.DiffingPage(cls)
         cls.video_pg = video_page.VideoPage(cls)
-
         cls.user = UserFactory.create()
 
         cls.owner = UserFactory.create()
@@ -795,6 +841,24 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.assertTrue(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
 
+    def test_unstarted_review__diffing_page_rollback(self):
+        """Transcriber can rollback while waiting review.
+
+        """
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_complete_rev(video, self.contributor)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.contributor.username, 'password')
+
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.is_draft())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
     def test_failed_approve__reviewer_rollback(self):
         """Reviewer can rollback after transcript fails approve.
 
@@ -839,6 +903,30 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.assertFalse(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
 
+    def test_diffing_page_rolledback_draft_is_public(self):
+        """Post-approval diffing page rollback to draft produces public 
+
+           version.
+
+        """
+        video, tv = self._add_team_video()
+        v1, v2 = self._create_complete_rev(video, self.contributor)
+        #Accept transcript in review phase
+        self.data_utils.complete_review_task(tv, 20, self.admin)
+        #Reject transcript in the approve phase
+        self.data_utils.complete_approve_task(tv, 20, self.owner)
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+
+        self.diffing_pg.open_diffing_page(v1.id, v2.id)
+        self.assertTrue(self.diffing_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertFalse(self.video_lang_pg.is_draft())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
+
 
     def test_unpublished__rollback(self):
         """Rollback to unpublished version produce new public version.
@@ -868,6 +956,41 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.video_lang_pg.open_page(en_v5.get_absolute_url())
         self.assertFalse(self.video_lang_pg.is_draft())
         self.assertIn('Revision 5', self.video_lang_pg.view_notice())
+
+    def test_diffing_page_unpublished__rollback(self):
+        """Rollback to unpublished version (diffing page) => new public version.
+        
+        """
+        video, tv = self._add_team_video()
+        self._create_complete_rev(video, self.contributor)
+        rev3 = os.path.join(self.subs_dir, 'Timed_text.rev3.en.srt')
+        self._upload_en_draft(video, rev3, self.admin, complete=True)
+        #Accept transcript in review phase
+        self.data_utils.complete_review_task(tv, 20, self.admin)
+        #Reject transcript in the approve phase
+        self.data_utils.complete_approve_task(tv, 20, self.owner)
+        rev4 = os.path.join(self.subs_dir, 'Timed_text.rev4.en.srt')
+        self._upload_en_draft(video, rev4, self.admin, complete=True)
+
+        #set v3 visibilility_override to private
+        en_v3 = video.subtitle_language('en').version(version_number=3)
+        en_v3.visibility_override = 'private'
+        en_v3.save() 
+        en_v4 = video.subtitle_language('en').version(version_number=4)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.admin.username, 'password')
+
+        self.diffing_pg.open_diffing_page(en_v3.id, en_v4.id)
+        self.assertTrue(self.diffing_pg.rollback())
+
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback())
+        en_v5 = video.subtitle_language('en').version(version_number=5)
+        self.video_lang_pg.open_page(en_v5.get_absolute_url())
+        self.assertFalse(self.video_lang_pg.is_draft())
+        self.assertIn('Revision 5', self.video_lang_pg.view_notice())
+
 
 
 
