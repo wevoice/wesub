@@ -48,9 +48,9 @@
 
 {% block title %}
     {% if language.is_primary_audio_language %}
-        "{{ last_version.title }}" {% trans "with" %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
+        "{% firstof last_version.title video.title_display_unabridged %}" {% trans "with" %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% else %}
-        "{{ last_version.title }}" {% trans "with" %} {% if language.get_translation_source_language_code %}{% trans 'translated' %}{% endif %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
+        "{% firstof last_version.title video.title_display_unabridged %}" {% trans "with" %} {% if language.get_translation_source_language_code %}{% trans 'translated' %}{% endif %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
     {% endif %}
 {% endblock %}
 
@@ -85,7 +85,7 @@
                 {% if not language.is_rtl %}
                 ←
                 {% endif %}
-                {{ last_version.title }}
+                {% firstof last_version.title video.title_display_unabridged %}
             </a>
         </h2>
         {% widget widget_params %}
