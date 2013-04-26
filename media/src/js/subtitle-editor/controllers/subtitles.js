@@ -228,7 +228,7 @@ var angular = angular || null;
                 heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
                 buttons: [
                     {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                        window.location = '/videos/' + subtitleListScope.videoId + "/";
+                        window.location = '/videos/' + subtitleListScope.videoID + "/";
                     }}
                 ]
             });
