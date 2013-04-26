@@ -529,7 +529,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     else:
         version = None
 
-    context['rollback_allowed'] = version.next_version() is not None
+    context['rollback_allowed'] = version and version.next_version() is not None
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
     context['last_version'] = version
