@@ -1779,6 +1779,12 @@ body.account {
             color: #B6464D;
         }
     }
+
+    ul#subtitles-menu {
+        img, a, span {
+            vertical-align: middle;
+        }
+    }
 }
 .v1 .context {
     border-left: none;

@@ -18,6 +18,7 @@
 
 import datetime
 import urllib, urllib2
+from collections import namedtuple
 
 import simplejson as json
 from babelsubs import get_available_formats
@@ -82,6 +83,63 @@ rpc_router = RpcRouter('videos:rpc_router', {
 # We don't want to display all formats we understand to the end user
 # .e.g json, nor include aliases
 AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [ 'dfxp',  'sbv', 'srt', 'ssa', 'txt']
+
+LanguageListItem = namedtuple("LanguageListItem", "name status tags url")
+
+class LanguageList(object):
+    """List of languages for the video pages."""
+
+    def __init__(self, video):
+        original_languages = []
+        other_languages = []
+        for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
+
+            item = LanguageListItem(lang.get_language_code_display(),
+                                    self._calc_status(lang),
+                                    self._calc_tags(lang),
+                                    lang.get_absolute_url())
+            if lang.language_code == video.primary_audio_language_code:
+                original_languages.append(item)
+            else:
+                other_languages.append(item)
+        original_languages.sort(key=lambda li: li.name)
+        other_languages.sort(key=lambda li: li.name)
+        self.items = original_languages + other_languages
+
+    def _calc_status(self, lang):
+        if lang.subtitles_complete:
+            if lang.has_public_version():
+                return 'complete'
+            else:
+                return 'needs-review'
+        else:
+            if lang.timing_complete(public=False):
+                return 'incomplete'
+            else:
+                return 'needs-timing'
+
+    def _calc_tags(self, lang):
+        tags = []
+        if lang.is_primary_audio_language():
+            tags.append(ugettext(u'original'))
+
+        team_video = lang.video.get_team_video()
+
+        if not lang.subtitles_complete:
+            tags.append(ugettext(u'incomplete'))
+        elif team_video is not None:
+            # subtiltes are complete, check if they are under review/approval.
+            for t in Task.objects.incomplete().filter(team_video=team_video):
+                if t.type == Task.TYPE_IDS['Review']:
+                    tags.append(ugettext(u'needs review'))
+                    break
+                elif t.type == Task.TYPE_IDS['Approve']:
+                    tags.append(ugettext(u'needs approval'))
+                    break
+        return tags
+
+    def __iter__(self):
+        return iter(self.items)
 
 def index(request):
     context = widget.add_onsite_js_files({})
@@ -233,7 +291,7 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['translations'] = _get_translations(video)
+    context['language_list'] = LanguageList(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['widget_params'] = _widget_params(
@@ -446,7 +504,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         qs = qs.order_by('-version_number')
 
     context['video'] = video
-    context['translations'] = _get_translations(video)
+    context['language_list'] = LanguageList(video)
     context['user_can_moderate'] = False
     context['widget_params'] = _widget_params(request, video, version_no=None,
                                               language=language, size=(289, 173))
@@ -775,15 +833,6 @@ def reset_metadata(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
-
-def _get_translations(video):
-    original = video.subtitle_language()
-    translations = sub_models.SubtitleLanguage.objects.having_versions().filter(video=video)
-    if original:
-        translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_code_display())
-    return translations
 
 def set_original_language(request, video_id):
     """
