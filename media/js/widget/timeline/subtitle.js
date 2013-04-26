@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -56,12 +56,12 @@ unisubs.timeline.Subtitle.prototype.captionChanged_ = function(e) {
 };
 unisubs.timeline.Subtitle.prototype.updateTimes_ = function() {
     if (this.isLoneUnsynced_()) {
-        var prevSubtitleEndTime =
-            this.editableCaption_.getPreviousCaption() == null ?
-            -1 : this.editableCaption_.getPreviousCaption().getEndTime();
+        var previousCaption = this.editableCaption_.getPreviousCaption();
+        var prevSubtitleEndTime = previousCaption == null ? -1 :
+                                  previousCaption.getEndTime();
         this.startTime_ =
             Math.max(prevSubtitleEndTime,
-                     this.videoPlayer_.getPlayheadTime() * 1000)  +
+                     parseInt(this.videoPlayer_.getPlayheadTime() * 1000))  +
             unisubs.timeline.Subtitle.UNASSIGNED_SPACING;
     }
     else {
@@ -80,7 +80,7 @@ unisubs.timeline.Subtitle.prototype.updateTimes_ = function() {
             this.endTime_ = Math.max(
                 this.startTime_ +
                     unisubs.timeline.Subtitle.MIN_UNASSIGNED_LENGTH,
-                this.videoPlayer_.getPlayheadTime() + 1000);
+                parseInt(this.videoPlayer_.getPlayheadTime() + 1000));
             if (this.nextSubtitle_)
                 this.nextSubtitle_.bumpUnsyncedTimes(this.endTime_);
         }
@@ -98,9 +98,10 @@ unisubs.timeline.Subtitle.prototype.updateTimes_ = function() {
     }
 };
 unisubs.timeline.Subtitle.prototype.isLoneUnsynced_ = function() {
-    return this.editableCaption_.getStartTime() == -1 &&
-        (this.editableCaption_.getPreviousCaption() == null ||
-         this.editableCaption_.getPreviousCaption().getEndTime() != -1);
+    var previous = this.editableCaption_.getPreviousCaption();
+    var isLone =  this.editableCaption_.getStartTime() == -1 &&
+        ( !previous || previous.getEndTime() != -1);
+    return isLone;
 };
 unisubs.timeline.Subtitle.prototype.isNextToBeSynced = function() {
     return this.editableCaption_.getStartTime() == -1;
@@ -108,15 +109,15 @@ unisubs.timeline.Subtitle.prototype.isNextToBeSynced = function() {
 unisubs.timeline.Subtitle.prototype.setNextSubtitle = function(sub) {
     this.nextSubtitle_ = sub;
     if (sub && this.editableCaption_.hasStartTimeOnly())
-        this.nextSubtitle_.bumpUnsyncedTimes(this.endTime_);
+        this.nextSubtitle_.bumpUnsyncedTimes(this.getEndTime());
 };
 unisubs.timeline.Subtitle.prototype.videoTimeUpdate_ = function(e) {
     if (this.editableCaption_.hasStartTimeOnly()) {
         var prevEndTime = this.endTime_;
         this.endTime_ = Math.max(
             this.startTime_ + unisubs.timeline.Subtitle.MIN_UNASSIGNED_LENGTH,
-            this.videoPlayer_.getPlayheadTime() * 1000);
-        if (prevEndTime != this.endTime_) {
+            parseInt(this.videoPlayer_.getPlayheadTime() * 1000));
+        if (prevEndTime != this.getEndTime()) {
             this.dispatchEvent(unisubs.timeline.Subtitle.CHANGE);
             if (this.nextSubtitle_)
                 this.nextSubtitle_.bumpUnsyncedTimes(this.endTime_);
@@ -124,11 +125,14 @@ unisubs.timeline.Subtitle.prototype.videoTimeUpdate_ = function(e) {
     }
     else {
         if (this.editableCaption_.getPreviousCaption() == null)
-            this.bumpUnsyncedTimes(this.videoPlayer_.getPlayheadTime() * 1000);
-        else
-            this.bumpUnsyncedTimes(Math.max(
-                this.videoPlayer_.getPlayheadTime() * 1000,
-                this.editableCaption_.getPreviousCaption().getEndTime()));
+            this.bumpUnsyncedTimes(parseInt(this.videoPlayer_.getPlayheadTime() * 1000));
+        else{
+            var previousEndTime = this.editableCaption_.getPreviousCaption().getEndTime();
+            var bumpTo = Math.max( this.videoPlayer_.getPlayheadTime() * 1000, previousEndTime || 0);
+            this.bumpUnsyncedTimes(bumpTo);
+
+        }
+
     }
 };
 unisubs.timeline.Subtitle.prototype.bumpUnsyncedTimes = function(time) {

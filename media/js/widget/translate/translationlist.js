@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -34,13 +34,9 @@ unisubs.translate.TranslationList = function(captionSet, baseLanguageSubtitles, 
     /**
      * Array of subtitles in json format
      */
-    this.baseLanguageSubtitles_ = baseLanguageSubtitles;
+    this.originalWrapper = new window['AmaraDFXPParser']();
+    this.originalWrapper['init'](baseLanguageSubtitles);
 
-    goog.array.sort(
-        this.baseLanguageSubtitles_,
-        function(a, b) {
-            return goog.array.defaultCompare(a['sub_order'], b['sub_order']);
-        });
     /**
      * @type {Array.<unisubs.translate.TranslationWidget>}
      */
@@ -56,15 +52,16 @@ unisubs.translate.TranslationList.prototype.createDom = function() {
     var w;
 
     var map = this.captionSet_.makeMap();
-
     goog.array.forEach(
-        this.baseLanguageSubtitles_,
-        function(subtitle) {
-            var editableCaption = map[subtitle['subtitle_id']];
-            if (!editableCaption)
-                editableCaption = this.captionSet_.addNewDependentTranslation(subtitle);
+        this.originalWrapper['getSubtitles'](),
+        function(originalNode, i) {
+            var editableCaption = map[i] || this.captionSet_.x['getSubtitleByIndex'](i);
+            if (!editableCaption){
+                editableCaption = this.captionSet_.addNewDependentSubtitle(
+                    originalNode, this.originalWrapper, i);
+            }
             w = new unisubs.translate.TranslationWidget(
-                subtitle, editableCaption, this.dialog_);
+                originalNode, editableCaption, this.dialog_, this.originalWrapper);
             this.addChild(w, true);
             this.translationWidgets_.push(w);
         },

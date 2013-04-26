@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
 from utils.metrics import Meter
-from libs.unilangs import LanguageCode
+from unilangs import LanguageCode
 from videos.models import Video
 
 import logging
@@ -96,7 +96,7 @@ class BaseNotification(object):
         if self.language_pk:
             self.language = self.video.subtitlelanguage_set.get(pk=self.language_pk)
             if self.version_pk:
-                self.version = self.language.subtitleversion_set.get(pk=self.version_pk)
+                self.version = self.language.subtitleversion_set.full().get(pk=self.version_pk)
         else:
             self.language = None
         self.event_name = event_name
@@ -118,7 +118,7 @@ class BaseNotification(object):
                 lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
                 url =  lang_klass(self.api_name).get_resource_uri(self.language)
                 if self.version_pk:
-                   url += "subtitles/?version_no=%s"  % self.version.version_no
+                   url += "subtitles/?version_no=%s"  % self.version.version_number
                 return url
             else:
                 return video_klass(self.api_name).get_resource_uri(self.video)

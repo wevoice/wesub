@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,6 +25,8 @@ class VideoType(object):
     name = None    
 
     CAN_IMPORT_SUBTITLES = False
+
+    requires_url_exists = True
     def __init__(self, url):
         self.url = url
 
@@ -57,7 +59,7 @@ class VideoType(object):
     
     @classmethod
     def format_url(cls, url):
-        parsed_url = urlparse(url)
+        parsed_url = urlparse(url.strip())
         return '%s://%s%s' % (parsed_url.scheme or 'http', parsed_url.netloc, parsed_url.path)    
     
 class VideoTypeRegistrar(dict):

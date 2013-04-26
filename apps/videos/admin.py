@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -36,9 +36,12 @@ class VideoUrlInline(admin.StackedInline):
 
 class VideoAdmin(admin.ModelAdmin):
     actions = None
-    list_display = ['__unicode__', 'video_thumbnail', 'languages', 'languages_count', 'is_subtitled']
+    list_display = ['__unicode__', 'video_thumbnail', 'languages',
+                    'languages_count', 'is_subtitled',
+                    'primary_audio_language_code']
     search_fields = ['video_id', 'title', 'videourl__url', 'user__username']
-    readonly_fields = ['subtitles_fetched_count', 'widget_views_count', 'view_count']
+    readonly_fields = ['subtitles_fetched_count', 'widget_views_count',
+                       'view_count']
     raw_id_fields = ['user', 'moderated_by']
     inlines = [VideoUrlInline]
 
@@ -139,9 +142,8 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     #    for some reason.
     # 2. It's only 20 extra queries, so it's not the end of the world.
     list_display = ['video', 'language_title', 'version_no', 'note',
-                    'timeline_changes', 'text_changes', 'datetime_started',
-                    'moderation_status', 'origin']
-    list_filter = []
+                    'datetime_started', 'moderation_status', 'origin',
+                    'new_subtitle_version']
     raw_id_fields = ['language', 'user', 'forked_from']
     search_fields = ['language__video__title', 'language__video__video_id',
                      'language__language']
@@ -157,19 +159,9 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
 
     def video(self, obj):
         if obj.language.video:
-            return obj.language.video.title
+            return unicode(obj.language.video)
         else:
             return None
-
-    def timeline_changes(self, obj):
-        if obj.time_change:
-            return '%s %%' % int(obj.time_change * 100)
-        return "0 %"
-
-    def text_changes(self, obj):
-        if obj.text_change:
-            return '%s %%' % int(obj.text_change * 100)
-        return "0 %"
 
     def origin(self, obj):
         return obj.get_workflow_origin()
@@ -185,7 +177,9 @@ class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
         return obj.subtitle_version.language.video.title
 
 class SubtitleAdmin(admin.ModelAdmin):
-    list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text', 'start_time', 'end_time']
+    search_fields = ['version_id']
+    list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text',
+                    'start_time', 'end_time']
 
 class VideoFeedAdmin(admin.ModelAdmin):
     list_display = ['url', 'last_link', 'created', 'user']

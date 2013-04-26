@@ -8,18 +8,9 @@ from apps.teams.forms import CreateTeamForm
 class BaseMembershipTests(TestCase):
     def setUp(self):
         self.auth = dict(username='admin', password='admin')
-        self.team  = Team.objects.get(pk=1)
-        self.team.video_policy = Team.VP_MEMBER
-        self.video = self.team.videos.all()[0]
         self.user = User.objects.all()[0]
 
-        self.owner, c= TeamMember.objects.get_or_create(
-            user= User.objects.all()[2], role=TeamMember.ROLE_OWNER, team=self.team)
-
-
 class MembershipTests(BaseMembershipTests):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def _login(self):
         self.client.login(**self.auth)
 

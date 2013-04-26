@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -53,7 +53,7 @@ urlpatterns = patterns('teams.views',
     url(r'^(?P<slug>[-\w]+)/tasks/$', 'team_tasks', name='team_tasks'),
     url(r'^(?P<slug>[-\w]+)/create-task/(?P<team_video_pk>\d+)/$', 'create_task', name='create_task'),
     url(r'^(?P<slug>[-\w]+)/delete-task/$', 'delete_task', name='delete_task'),
-    url(r'^(?P<slug>[-\w]+)/upload-draft/$', 'upload_draft', name='upload_draft'),
+    url(r'^(?P<slug>[-\w]+)/upload-draft/(?P<video_id>\w+)/$', 'upload_draft', name='upload_draft'),
     url(r'^(?P<slug>[-\w]+)/(?P<task_pk>\d+)/download/(?P<type>[-\w]+)/$', 'download_draft', name='download_draft'),
     url(r'^(?P<slug>[-\w]+)/assign-task/$', 'assign_task', name='assign_task'),
     url(r'^(?P<slug>[-\w]+)/assign-task/a/$', 'assign_task_ajax', name='assign_task_ajax'),
@@ -71,7 +71,7 @@ urlpatterns = patterns('teams.views',
     url(r'^(?P<slug>[-\w]+)/p/(?P<project_slug>[-\w]+)/tasks/?$', 'team_tasks', name='project_tasks'),
     url(r'^(?P<slug>[-\w]+)/third-party-accounts/$', 'third_party_accounts', name='third-party-accounts'),
     url(r'^(?P<slug>[-\w]+)/third-party-accounts/sync/(?P<account_id>[-\w]+)$', 'sync_third_party_account', name='sync-third-party-account'),
-    url(r'^(?P<slug>[-\w]+)/unpublish/$', 'unpublish', name='unpublish'),
+    url(r'^(?P<slug>[-\w]+)/delete-language/(?P<lang_id>[\w\-]+)/', 'delete_language', name='delete-language'),
     url(r'^(?P<slug>[-\w]+)/auto-captions-status/$', 'auto_captions_status', name='auto-captions-status'),
 )
 

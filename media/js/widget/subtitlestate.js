@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -42,7 +42,7 @@ unisubs.widget.SubtitleState = function(json, opt_subs) {
     this.SUBTITLES = json['subtitles'] || opt_subs;
     this.FORKED = json['forked'];
     this.BASE_LANGUAGE = json['base_language'];
-    this.BASE_LANGUAGE_PK = json['base_language_pk'];
+    this.BASE_LANGUAGE_CODE = json['base_language_code'];
     this.IS_LATEST = json['is_latest'];
     this.TITLE = json['title'];
     this.DESCRIPTION = json['description'];
@@ -67,5 +67,5 @@ unisubs.widget.SubtitleState.prototype.baseParams = function() {
 unisubs.widget.SubtitleState.prototype.fork = function() {
     this.FORKED = true;
     this.BASE_LANGUAGE = null;
-    this.BASE_LANGUAGE_PK = null;
+    this.BASE_LANGUAGE_CODE = null;
 };

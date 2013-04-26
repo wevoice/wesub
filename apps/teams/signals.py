@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -78,7 +78,7 @@ def _execute_language_task(language, event_name):
  
 def _execute_version_task(version, event_name):
     from teams import tasks as team_tasks
-    video = version.language.video
+    video = version.video
     teams = _teams_to_notify(video)
     for team in teams:
         team_tasks.api_notify_on_subtitles_activity.delay(

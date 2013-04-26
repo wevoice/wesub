@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -113,6 +113,8 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
         if (halt === true) {
             alert('You have untranslated captions. You must translate all captions in order to submit.');
             return false;
+        } else {
+            this.translationPanel_.captionSet_.completed = true;
         }
 
         this.saveWork(true, false);
@@ -353,7 +355,7 @@ unisubs.translate.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
 unisubs.translate.Dialog.prototype.makeJsonSubs =  function (){
-    return this.serverModel_.getCaptionSet().makeJsonSubs();
+    return this.serverModel_.getCaptionSet().x['xmlToString'](true, true);
 };
 unisubs.translate.Dialog.prototype.forkAndClose = function() {
     var dialog = new unisubs.translate.ForkDialog(
@@ -403,4 +405,8 @@ unisubs.translate.Dialog.prototype.captionReached_ = function(event) {
     }
 
     this.getVideoPlayerInternal().showCaptionText(caption);
+};
+
+unisubs.translate.Dialog.prototype.makeDFXPString =  function (){
+    return this.serverModel_.captionSet_.x['xmlToString'](true, true)
 };

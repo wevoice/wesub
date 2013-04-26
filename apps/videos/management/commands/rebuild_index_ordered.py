@@ -25,7 +25,7 @@ REMAINING_APPS = list(OrderedSet(a for a in _get_app_labels(settings.INSTALLED_A
 
 class Command(BaseCommand):
     help = "Rebuilds the search index from scratch in a useful order."
-    option_list = BaseCommand.option_list + ClearCommand.base_options + UpdateCommand.base_options
+    option_list = BaseCommand.option_list + ClearCommand.base_options
 
     def handle(self, **options):
         verbose = options.get('verbosity', 1) >= 1

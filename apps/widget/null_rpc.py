@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@ from videos import models
 from videos.types import video_type_registrar
 from videos.types.bliptv import BlipTvVideoType
 from widget.base_rpc import BaseRpc
+from subtitles import models as subs_models
 
 
 ALL_LANGUAGES = settings.ALL_LANGUAGES
@@ -77,7 +78,7 @@ class NullRpc(BaseRpc):
                       original_language_code=None,
                       mode=None):
         return { "can_edit": True,
-                 "subtitles": self._subtitles_dict() }
+                 "subtitles": self._subtitles_dict(video_id) }
 
     def release_lock(self, request, session_pk):
         return { 'response': 'ok' }
@@ -100,5 +101,6 @@ class NullRpc(BaseRpc):
     def _initial_languages(self, video_id):
         return []
 
-    def _subtitles_dict(self):
-        return self._make_subtitles_dict([], 'en', 1, True, False, 1, True, True, None, "what", "About me", False, False)
+    def _subtitles_dict(self, video_id):
+        language = subs_models.SubtitleLanguage( language_code='en')
+        return self._make_subtitles_dict([], language, 1, True, False, 1, True, None, "what", "About me", False, False)

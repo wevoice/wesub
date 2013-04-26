@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -44,10 +44,12 @@ unisubs.widget.SubtitleDialogOpener.prototype.showLoading_ = function(loading) {
 unisubs.widget.SubtitleDialogOpener.prototype.getResumeEditingRecord_ = function(openDialogArgs) {
     var resumeEditingRecord = unisubs.widget.ResumeEditingRecord.fetch();
     if (resumeEditingRecord && resumeEditingRecord.matches(
-        this.videoID_, openDialogArgs))
+        this.videoID_, openDialogArgs)) {
         return resumeEditingRecord;
-    else
+    }
+    else {
         return null;
+    }
 };
 unisubs.widget.SubtitleDialogOpener.prototype.saveResumeEditingRecord_ = function(sessionPK, openDialogArgs) {
     var resumeEditingRecord = new unisubs.widget.ResumeEditingRecord(
@@ -82,7 +84,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditing_ = function(openDialo
         'video_id': this.videoID_,
         'language_code': openDialogArgs.LANGUAGE,
         'subtitle_language_pk': openDialogArgs.SUBLANGUAGE_PK || null,
-        'base_language_pk': openDialogArgs.BASELANGUAGE_PK || null,
+        'base_language_code': openDialogArgs.BASELANGUAGE_CODE || null,
         'original_language_code': openDialogArgs.ORIGINAL_LANGUAGE || null,
         'mode': unisubs.mode || null };
     var that = this;
@@ -111,8 +113,8 @@ unisubs.widget.SubtitleDialogOpener.prototype.resumeEditing_ = function(savedSub
             if (result['response'] == 'ok') {
                 // FIXME: ouch, kinda hacky.
                 result['subtitles']['subtitles'] = 
-                    savedSubtitles.CAPTION_SET.makeJsonSubs();
-                if (savedSubtitles.CAPTION_SET.title && savedSubtitles.CAPTION_SET.title.length){
+                    savedSubtitles.CAPTION_SET.makeDFXPString();
+                if (savedSubtitles.CAPTION_SET.title && savedSubtitles.CAPTION_SET.title.length) {
                     result['subtitles']['title'] = 
                         savedSubtitles.CAPTION_SET.title;
                 }
@@ -174,7 +176,7 @@ unisubs.widget.SubtitleDialogOpener.prototype.openDialogOrRedirect = function(op
             'languageCode': openDialogArgs.LANGUAGE,
             'originalLanguageCode': openDialogArgs.ORIGINAL_LANGUAGE || null,
             'subLanguagePK': openDialogArgs.SUBLANGUAGE_PK || null,
-            'baseLanguagePK': openDialogArgs.BASELANGUAGE_PK || null
+            'baseLanguageCode': openDialogArgs.BASELANGUAGE_CODE || null
         };
         if (unisubs.IS_NULL)
             config['nullWidget'] = true;
@@ -201,10 +203,22 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         }
         var originalSubtitles = unisubs.widget.SubtitleState.fromJSON(
             result['original_subtitles']);
+        // if this is a translation that's beginning, that is
+        // empty, we want the dfxp to be a clone of the original
+        // but with empty texts. Ideally this would be done further down
+        // the processing, when the actual wrappers are created, however
+        // at that time, we don't have access to both subtitle states
+        // so we're wastefully creating this now, oh well.
+        var dfxpString = subtitles.SUBTITLES;
+        var AmaraDFXPParser = window['AmaraDFXPParser'];
+        if (result['original_subtitles'] &&
+            new AmaraDFXPParser()['init'](dfxpString)['getSubtitles']().length ===0){
+            dfxpString = new AmaraDFXPParser()['init'](result['original_subtitles']['subtitles'])['clone']()['xmlToString'](true);
+        }
         var captionSet = new unisubs.subtitle.EditableCaptionSet(
-            subtitles.SUBTITLES, subtitles.IS_COMPLETE, 
+            dfxpString, subtitles.IS_COMPLETE,
             subtitles.TITLE,  opt_wasForkedDuringEditing, subtitles.DESCRIPTION,
-            subtitles.LANGUAGE_NAME, subtitles.LANGUAGE_IS_RTL, subtitles.IS_MODERATED);
+            subtitles.LANGUAGE_NAME, subtitles.LANGUAGE_IS_RTL, subtitles.IS_MODERATED, subtitles.FORKED);
         if (!fromResuming) {
             this.saveInitialSubs_(sessionPK, captionSet);
         }
@@ -217,11 +231,11 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         } else if (unisubs.mode == 'approve') {
             dialog = this.openSubtitleModerationDialog(serverModel, subtitles, originalSubtitles, 
                                                       unisubs.Dialog.REVIEW_OR_APPROVAL.APPROVAL);
-        } else if (subtitles.IS_ORIGINAL || subtitles.FORKED) {
-            dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
-        } else {
+        } else if (result['original_subtitles']) {
             dialog = this.openDependentTranslationDialog_(
                 serverModel, subtitles, originalSubtitles);
+        } else {
+            dialog = this.openSubtitlingDialog(serverModel, subtitles, originalSubtitles);
         }
 
         // TODO: This is an ugly hack for NF.  We should remove it once we
@@ -236,7 +250,9 @@ unisubs.widget.SubtitleDialogOpener.prototype.startEditingResponseHandler_ = fun
         this.onDialogOpened_(dialog);
     }
     else {
-        if(!result['message']){
+        if (result['error']){
+            alert("Something is wrong, we're looking right into it");
+        } else if(result['locked_by']){
             var username =  (result['locked_by'] == 'anonymous' ? 'Someone else' : ('The user ' + result['locked_by']));
             alert(username + ' is currently editing these subtitles. Please wait and try again later.');
         } else {

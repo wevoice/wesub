@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -64,6 +64,9 @@ urlpatterns = patterns('',
         include('messages.urls', namespace='messages')),
     url(r'^rosetta/',
         include('rosetta.urls')),
+    # TODO: Not sure what this is.  It's breaking the app under Django 1.4
+    # url(r'^pcf-targetter/',
+    #     include('targetter.urls', namespace='targetter')),
     url(r'^logout/',
         'django.contrib.auth.views.logout', name='logout'),
     url(r'^admin/billing/$', 'teams.views.billing', name='billing'),
@@ -79,6 +82,8 @@ urlpatterns = patterns('',
         include('socialauth.urls')),
     url(r'^admin/',
         include(admin.site.urls)),
+    url(r'^subtitles/',
+        include('subtitles.urls', namespace='subtitles')),
     url(r'^embed(?P<version_no>\d+)?.js$', 'widget.views.embed',
         name="widget-embed"),
     url(r'^widget_demo/$',
@@ -107,6 +112,10 @@ urlpatterns = patterns('',
         'videos.views.counter', name="counter"),
     url(r'^uslogging/',
         include('uslogging.urls', 'uslogging')),
+    url(r'^enterprise/[\w-]*$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'enterprise.html'}, 'enterprise_page'),
+    url(r'^dfxp-wrapper-test/$', 'django.views.generic.simple.direct_to_template',
+        {'template': 'dfxp-wrapper-test.html'}, 'dfxp-wrapper-test'),
     url(r'^embedder/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'embedder.html'}, 'embedder_page'),
     url(r'^embedder-offsite/$', 'django.views.generic.simple.direct_to_template',
@@ -117,8 +126,6 @@ urlpatterns = patterns('',
         {'template': 'p3p.xml'}),
     url(r'^w3c/Policies.xml$', 'django.views.generic.simple.direct_to_template',
         {'template': 'Policies.xml'}, 'policy_page'),
-    url(r'^demo/$',
-        'videos.views.demo', name="demo"),
     url(r'^about$',  'django.views.generic.simple.direct_to_template',
         {'template': 'about.html'}, 'about_page'),
     url(r'^security', 'django.views.generic.simple.direct_to_template',
@@ -155,33 +162,23 @@ urlpatterns = patterns('',
     url(r'^v/(?P<encoded_pk>\w+)/$', 'videos.views.shortlink', name='shortlink')
 )
 
-try:
+if settings.USE_INTEGRATION:
     from services import urls
     urlpatterns += patterns('',
         (r'^unisubservices/', include('services.urls', namespace='services')),
     )
-except ImportError:
-    pass
 
-try:
     from servicesauth import urls
     urlpatterns += patterns('', (r'^unisubservicesauth/',
         include('servicesauth.urls', namespace='servicesauth')),)
-except ImportError:
-    pass
+    # FIXME: api v1 is not being imported until we're sure it needs to be
+    # ported to DRM
+    #from api import urls
+    #urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
 
-try:
-    from api import urls
-    urlpatterns += patterns('', url(r'^api/', include('api.urls', 'api')),)
-except ImportError:
-    pass
-
-try:
     from apiv2 import urls as api2urls
     urlpatterns += patterns('', url(r'^api2/', include('apiv2.urls',
         namespace=api2urls.URL_NAMESPACE),),)
-except ImportError:
-    pass
 
 if settings.DEBUG:
     urlpatterns += patterns('',

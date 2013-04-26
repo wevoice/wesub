@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,7 @@ def rel(*x):
 
 # Rebuild the language dicts to support more languages.
 from django.conf import global_settings
-from libs.unilangs import get_language_code_mapping
+from unilangs import get_language_code_mapping
 
 # We use a custom format for our language labels:
 # Translated Language Name (Native Name)
@@ -287,6 +287,8 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-dependencies.js',
     'js/swfobject.js',
     'flowplayer/flowplayer-3.2.6.min.js',
+    'src/js/third-party/amara-jquery.min.js',
+    'src/js/dfxp/dfxp.js',
 ]
 
 # Local time zone for this installation. Choices can be found here:
@@ -310,11 +312,6 @@ USE_I18N = True
 # Example: "/home/media/media.lawrence.com/"
 STATIC_ROOT = rel('media')+'/'
 MEDIA_ROOT  = rel('user-data')+'/'
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -480,6 +477,7 @@ ACCOUNT_ACTIVATION_DAYS = 9999 # we are using registration only to verify emails
 SESSION_COOKIE_AGE = 2419200 # 4 weeks
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_COOKIE_HTTPONLY = False
 
 RECENT_ACTIVITIES_ONPAGE = 10
 ACTIVITIES_ONPAGE = 20
@@ -772,8 +770,8 @@ MEDIA_BUNDLES = {
             'src/js/third-party/zepto.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
-            'src/js/embedder/popcorn.amaratranscript.js',
-            'src/js/embedder/popcorn.amarasubtitle.js',
+            'src/js/popcorn/popcorn.amaratranscript.js',
+            'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),

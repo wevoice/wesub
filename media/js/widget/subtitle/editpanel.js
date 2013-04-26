@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@ unisubs.subtitle.EditPanel.prototype.createRightPanelInternal =
     function()
 {
     return new unisubs.subtitle.EditRightPanel(
-        this.serverModel, null, null,
+        this.serverModel_, null, null,
         this.makeKeySpecsInternal(), false, "Done?",
         "Submit your work");
 }

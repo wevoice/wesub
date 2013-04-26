@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,26 +16,23 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-#  Based on: http://www.djangosnippets.org/snippets/73/
-#
-#  Modified by Sean Reifschneider to be smarter about surrounding page
-#  link context.  For usage documentation see:
-#
-#     http://www.tummy.com/Community/Articles/django-pagination/
-from videos.models import Video, SubtitleLanguage, Action
-from django.utils.translation import ugettext as _
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs
-from utils.translation import get_user_languages_from_request
-from django.template.loader import render_to_string
-from django.template import RequestContext
+import datetime
+
 from django.conf import settings
-from videos.search_indexes import VideoIndex
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.template import RequestContext
+from django.template.defaultfilters import slugify
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
+
+from apps.subtitles.models import SubtitleLanguage
+from apps.videos.models import Video, Action
+from apps.videos.search_indexes import VideoIndex
+from apps.videos.tasks import send_change_title_email
 from utils.celery_search_index import update_search_index
 from utils.multi_query_set import MultiQuerySet
-from videos.tasks import send_change_title_email
-from django.template.defaultfilters import slugify
-import datetime
+from utils.rpc import Error, Msg, RpcExceptionEvent, add_request_to_kwargs
+from utils.translation import get_user_languages_from_request
 
 VIDEOS_ON_PAGE = VideoIndex.IN_ROW*5
 
@@ -99,22 +96,22 @@ class VideosApiClass(object):
 
         user_langs = get_user_languages_from_request(request)
 
-        langs = list(video.subtitlelanguage_set.filter(subtitle_count__gt=0, has_version=True).order_by('-subtitle_count'))
+        langs = list(video.newsubtitlelanguage_set.having_nonempty_tip())
 
         first_languages = [] #user languages and original
         other_languages = [] #other languages already ordered by subtitle_count
 
-        for l in langs:
-            if l.language in user_langs or l.is_original:
-                first_languages.append(l)
+        for language in langs:
+            if language.language_code in user_langs or language.is_primary_audio_language():
+                first_languages.append(language)
             else:
-                other_languages.append(l)
+                other_languages.append(language)
 
         def _cmp_first_langs(lang1, lang2):
             """
             languages should original in user_langs
             """
-            in_user_language_cmp = cmp(lang1.language in user_langs, lang2.language in user_langs)
+            in_user_language_cmp = cmp(lang1.language_code in user_langs, lang2.language_code in user_langs)
 
             #one is not in user language
             if in_user_language_cmp != 0:
@@ -122,7 +119,7 @@ class VideosApiClass(object):
 
             if lang1.language in user_langs:
                 #both in user's language, sort alphabetically
-                return cmp(lang2.get_language_display(), lang1.get_language_display())
+                return cmp(lang2.get_language_code_display(), lang1.get_language_code_display())
 
             #one should be original
             return cmp(lang1.is_original, lang2.is_original)
@@ -132,7 +129,7 @@ class VideosApiClass(object):
         #fill first languages to LANGS_COUNT
         if len(first_languages) < LANGS_COUNT:
             other_languages = other_languages[:(LANGS_COUNT-len(first_languages))]
-            other_languages.sort(lambda l1, l2: cmp(l1.get_language_display(), l2.get_language_display()))
+            other_languages.sort(lambda l1, l2: cmp(l1.get_language_code_display(), l2.get_language_code_display()))
             langs = first_languages + other_languages
         else:
             langs = first_languages[:LANGS_COUNT]
@@ -141,6 +138,7 @@ class VideosApiClass(object):
             'video': video,
             'languages': langs
         }
+
         return {
             'content': render_to_string('videos/_video_languages.html', context)
         }
@@ -331,26 +329,6 @@ class VideosApiClass(object):
             return Error(_(u'Video does not exist'))
 
         return Msg(_(u'Title was changed success'))
-
-    def change_title_translation(self, language_id, title, user):
-        if not user.is_authenticated():
-            return Error(self.authentication_error_msg)
-
-        if not title:
-            return Error(_(u'Title can\'t be empty'))
-
-        try:
-            sl = SubtitleLanguage.objects.filter(is_original=False).get(id=language_id)
-        except SubtitleLanguage.DoesNotExist:
-            return Error(_(u'Subtitle language does not exist'))
-
-        if not sl.standard_language_id:
-            sl.title = title
-            sl.save()
-            update_search_index.delay(Video, sl.video_id)
-            return Msg(_(u'Title was changed success'))
-        else:
-            return Error(_(u'This is not forked translation'))
 
     def follow(self, video_id, user):
         if not user.is_authenticated():

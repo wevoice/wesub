@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -30,33 +30,24 @@ goog.provide('unisubs.subtitle.EditableCaption');
  *     we're operating. Provide this parameter iff the caption exists
  *     already in the unisubs system.
  */
-unisubs.subtitle.EditableCaption = function(opt_subOrder, opt_jsonCaption) {
+unisubs.subtitle.EditableCaption = function(node, x) {
     goog.events.EventTarget.call(this);
-    this.json = opt_jsonCaption ||
-        {
-            'subtitle_id' : unisubs.randomString(),
-            'text' : '',
-            'start_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            'end_time' : unisubs.subtitle.EditableCaption.TIME_UNDEFINED,
-            'sub_order' : opt_subOrder,
-            'start_of_paragraph': false
-        };
-    this.json['original_start_time'] = this.json['start_time'];
-    this.json['original_end_time'] = this.json['end_time'];
-    this.json['original_text'] = this.json['text'];
-    this.json['start_of_paragraph'] = this.json['start_of_paragraph'] || false;
     this.previousCaption_ = null;
     this.nextCaption_ = null;
+
+    this.node = node;
+    this.x = x;
+
 };
 
 goog.inherits(unisubs.subtitle.EditableCaption, goog.events.EventTarget);
 
-unisubs.subtitle.EditableCaption.prototype.fork = function(jsonSub) {
-    this.json['sub_order'] = jsonSub['sub_order'];
-    this.json['start_time'] = jsonSub['start_time'];
-    this.json['end_time'] = jsonSub['end_time'];
-    this.json['start_of_paragraph'] = jsonSub['start_of_paragraph'];
-};
+unisubs.subtitle.EditableCaption.prototype.fork = function(otherSub) {
+    // FIXME:
+    this.setStartTime(otherSub.getStarTime());
+    this.setEndTime(otherSub.getEndTime());
+    this.setText(otherSub.getText());
+}
 unisubs.subtitle.EditableCaption.orderCompare = function(a, b) {
     return a.getSubOrder() - b.getSubOrder();
 };
@@ -107,37 +98,41 @@ unisubs.subtitle.EditableCaption.prototype.identicalTo = function(other) {
         this.getTrimmedText() == other.getTrimmedText() &&
         this.getStartTime() == other.getStartTime() &&
         this.getEndTime() == other.getEndTime() &&
-        this.getCaptionID() == other.getCaptionID() &&
+        this.getCaptionIndex() == other.getCaptionIndex() &&
         this.getStartOfParagraph() == other.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.getSubOrder = function() {
-    return this.json['sub_order'];
+    return this.x['getSubtitleIndex'](this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.setText = function(text, opt_dontTrack) {
-    this.json['text'] = text;
+    this.x['content'](this.node, text);
     this.changed_(false, opt_dontTrack);
 };
 unisubs.subtitle.EditableCaption.prototype.getOriginalText = function() {
     return this.json['original_text'];
 };
+unisubs.subtitle.EditableCaption.prototype.getHTML = function() {
+    var rawText = this.x['content'](this.node);
+    return this.x['markdownToHTML'](rawText);
+};
 unisubs.subtitle.EditableCaption.prototype.getText = function() {
-    return this.json['text'];
+    return this.x['content'](this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.getStartOfParagraph = function(){
-    return this.json['start_of_paragraph'];
+    return Boolean(this.x['startOfParagraph'](this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartOfParagraph = function(val, opt_dontTrack){
-    if (this.json['start_of_paragraph'] != Boolean(val)){
-        this.json['start_of_paragraph'] = Boolean(val);
+    if (this.getStartOfParagraph() != Boolean(val)){
+        this.x['startOfParagraph'](this.node, Boolean(val));
         this.changed_(false, opt_dontTrack);
     }
-    return this.json['start_of_paragraph'];
+    return this.getStartOfParagraph();
 };
 unisubs.subtitle.EditableCaption.prototype.toggleStartOfParagraph = function(){
     return this.setStartOfParagraph(!this.getStartOfParagraph(), true);
 };
 unisubs.subtitle.EditableCaption.prototype.getTrimmedText = function() {
-    return goog.string.trim(this.json['text']);
+    return goog.string.trim(this.x['content'](this.node));
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
     var previousStartTime = this.getStartTime();
@@ -146,8 +141,9 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime = function(startTime) {
                   unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 };
 unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
+    var previousValue = this.x['startTime'](this.node);
     startTime = Math.max(startTime, this.getMinStartTime());
-    this.json['start_time'] = startTime;
+    this.x['startTime'](this.node, startTime);
     if (this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED &&
         this.getEndTime() < startTime +
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
@@ -156,12 +152,14 @@ unisubs.subtitle.EditableCaption.prototype.setStartTime_ = function(startTime) {
     if (this.previousCaption_ &&
         (this.previousCaption_.getEndTime() == 
          unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
-         this.previousCaption_.getEndTime() > startTime))
+         this.previousCaption_.getEndTime() > startTime)){
          this.previousCaption_.setEndTime(startTime);
+    }
 };
 unisubs.subtitle.EditableCaption.prototype.getStartTime = function() {
-    if (goog.isDefAndNotNull(this.json['start_time'])) {
-        return this.json['start_time'];
+    var val = this.x['startTime'](this.node);
+    if (goog.isDefAndNotNull(val)) {
+        return val;
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -172,7 +170,7 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime = function(endTime) {
     this.changed_(false);
 };
 unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
-    this.json['end_time'] = endTime;
+    this.x['endTime'](this.node, endTime);
     if (this.getStartTime() > endTime -
         unisubs.subtitle.EditableCaption.MIN_LENGTH)
         this.setStartTime_(
@@ -190,30 +188,31 @@ unisubs.subtitle.EditableCaption.prototype.setEndTime_ = function(endTime) {
 unisubs.subtitle.EditableCaption.prototype.clearTimes = function() {
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
-        this.json['start_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
-        this.json['end_time'] = unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
+        this.x['startTime'](this.node, '');
+        this.x['endTime'](this.node, '');
     }
 };
 
 unisubs.subtitle.EditableCaption.prototype.resetSub = function() {
 
-    this.setText(this.json['original_text']);
+    this.x['content'](this.node, this.x['originalContent'](this.node));
 
     if (this.getStartTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED ||
         this.getEndTime() != unisubs.subtitle.EditableCaption.TIME_UNDEFINED) {
 
-        var previousStartTime = this.json['start_time'];
-        this.setStartTime_(this.json['original_start_time']);
+        var previousStartTime = this.x['startTime'](this.node);
+        this.setStartTime_(this.x['originalStartTime'](this.node));
         this.changed_(previousStartTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
 
-        var previousEndTime = this.json['end_time'];
-        this.setEndTime_(this.json['original_end_time']);
+        var previousEndTime = this.x['endTime'](this.node);
+        this.setEndTime_(this.x['originalEndTime'](this.node));
         this.changed_(previousEndTime == unisubs.subtitle.EditableCaption.TIME_UNDEFINED);
     }
 };
 unisubs.subtitle.EditableCaption.prototype.getEndTime = function() {
-    if (goog.isDefAndNotNull(this.json['end_time'])) {
-        return this.json['end_time'];
+    var val = this.x['endTime'](this.node);
+    if (goog.isDefAndNotNull(val)) {
+        return val;
     }
     else {
         return unisubs.subtitle.EditableCaption.TIME_UNDEFINED;
@@ -240,8 +239,8 @@ unisubs.subtitle.EditableCaption.prototype.getMaxEndTime = function() {
         (this.nextCaption_.getEndTime() -
          unisubs.subtitle.EditableCaption.MIN_LENGTH) : 99999;
 };
-unisubs.subtitle.EditableCaption.prototype.getCaptionID = function() {
-    return this.json['subtitle_id'];
+unisubs.subtitle.EditableCaption.prototype.getCaptionIndex = function() {
+    return this.x['getSubtitles']().index(this.node);
 };
 unisubs.subtitle.EditableCaption.prototype.isShownAt = function(time) {
     return this.getStartTime() <= time &&
@@ -263,7 +262,7 @@ unisubs.subtitle.EditableCaption.prototype.needsSync = function() {
 
 unisubs.subtitle.EditableCaption.prototype.changed_ = function(timesFirstAssigned, opt_dontTrack) {
     if (!opt_dontTrack)
-        unisubs.SubTracker.getInstance().trackEdit(this.getCaptionID());
+        unisubs.SubTracker.getInstance().trackEdit(this.getCaptionIndex());
     this.dispatchEvent(
         new unisubs.subtitle.EditableCaption.ChangeEvent(
             timesFirstAssigned));
@@ -288,10 +287,13 @@ unisubs.subtitle.EditableCaption.toIDArray = function(editableCaptions) {
     return goog.array.map(
         editableCaptions,
         function(ec) {
-            return ec.getCaptionID();
+            return ec.getCaptionIndex();
         });
 };
 
+unisubs.subtitle.EditableCaption.prototype.toString = function() {
+    return "EditableCaption: "  + this.getText()
+}
 /**
  * @constructor
  */

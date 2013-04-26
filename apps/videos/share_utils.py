@@ -85,7 +85,7 @@ def _add_share_panel_context_for_history(context, video, language=None):
     }
     
     if language:
-        base_state = {'language': language.language}
+        base_state = {'language': language.language_code}
     else:
         base_state = {}
     

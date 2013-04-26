@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -210,7 +210,7 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
             fromLanguageContents = goog.array.map(
                 this.model_.fromLanguages(),
                 function(l) {
-                    return [l.PK + '', l.toString(), null, l.DISABLED_FROM];
+                    return [l.LANGUAGE + '', l.toString(), null, l.DISABLED_FROM];
                 });
         }
 
@@ -356,8 +356,9 @@ unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
     var warning = null;
     if (this.fromLanguageDropdown_ &&
         this.fromLanguageDropdown_.value !=
-        unisubs.startdialog.Dialog.FORK_VALUE)
+        unisubs.startdialog.Dialog.FORK_VALUE) {
         warning = this.warningMessage_();
+    }
     this.showWarning_(warning);
 };
 unisubs.startdialog.Dialog.prototype.showWarning_ = function(warning) {
@@ -372,8 +373,8 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
     /**
      * @type {unisubs.startdialog.VideoLanguageLanguage}
      */
-    var fromLanguage = this.model_.findFromForPK(
-        parseInt(this.fromLanguageDropdown_.value, 0));
+    var fromLanguage = this.fromLanguageDropdown_.value;
+
     if (toLanguage.translationStartsFromScratch(fromLanguage)) {
         var message = "";
         if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
@@ -388,11 +389,16 @@ unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
             message += "There is a better choice for translating into " +
                 toLanguage.LANGUAGE_NAME + " from " +
                 fromLanguage.languageName() + ". ";
-        }
-        else {
-            message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
-                " from " + fromLanguage.languageName() + ", you'll need to " +
-                "start from scratch.";
+        } else {
+            // TODO: I don't really know if this is right.  Hopefully we can
+            // toss this stuff out once the new editor is completely finished.
+            // I'm sorry.
+            var source_language_code = toLanguage.VIDEO_LANGUAGE.getStandardLang().LANGUAGE;
+            if (source_language_code !== fromLanguage) {
+                message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
+                    " from " + fromLanguage + ", you'll need to " +
+                    "start from scratch.";
+            }
         }
         return message;
     }
@@ -403,11 +409,11 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
     if (this.okHasBeenClicked_)
         return;
     this.okHasBeenClicked_ = true;
-    var fromLanguageID = null;
+    var fromLanguageCode = null;
     if (this.fromLanguageDropdown_ &&
         this.fromLanguageDropdown_.value !=
             unisubs.startdialog.Dialog.FORK_VALUE)
-        fromLanguageID = parseInt(this.fromLanguageDropdown_.value, 0);
+        fromLanguageCode = this.fromLanguageDropdown_.value;
     var toLanguage = this.model_.toLanguageForKey(
         this.toLanguageDropdown_.value);
     var that = this;
@@ -425,7 +431,7 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
             this.originalLangDropdown_.value : null,
         toLanguage.LANGUAGE,
         toLanguage.VIDEO_LANGUAGE ? toLanguage.VIDEO_LANGUAGE.PK : null,
-        fromLanguageID,
+        fromLanguageCode,
         function() { that.setVisible(false); });
     goog.dom.setTextContent(this.okButton_, "Loading...");
     goog.dom.classes.add(this.okButton_, "unisubs-button-disabled");

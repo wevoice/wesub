@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -77,7 +77,8 @@ unisubs.RightPanel.EventType = {
     DONE : 'done',
     BACK : 'back',
     GOTOSTEP : 'gotostep',
-    SAVEANDEXIT: 'saveandexit'
+    SAVEANDEXIT: 'saveandexit',
+    SAVEANDOPENINNEWEDITOR: 'saveandopeninneweditor'
 };
 unisubs.RightPanel.prototype.createDom = function() {
     unisubs.RightPanel.superClass_.createDom.call(this);
@@ -280,6 +281,27 @@ unisubs.RightPanel.prototype.appendStepsContents_ = function($d, el) {
             this.saveAndExitClicked_);
     }
 
+    // If this subtitle version was created from a base language that was forked from a
+    // translation, we need to display a link to get into the new editor so that the user
+    // can compare these captions to captions of other languages.
+    if (this.serverModel_.captionSet_.languageWasForked) {
+
+        var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
+
+        if (['vimeo', 'youtube', 'html5'].indexOf(videoType) !== -1) {
+            var saveAndOpenInNewEditor = $d(
+                'div', 'unisubs-saveandopeninneweditor',
+                $d('span', null, 'Beta: '),
+                $d('a', {'href': '#'},
+                $d('span', null, 'Save and open in new editor')));
+
+            goog.dom.append(stepsDiv, saveAndOpenInNewEditor);
+            this.getHandler().listen(
+                saveAndOpenInNewEditor, goog.events.EventType.CLICK,
+                this.saveAndOpenInNewEditorClicked_);
+        }
+    }
+
     goog.dom.append(el, stepsDiv);
     this.updateLoginState();
 };
@@ -314,6 +336,10 @@ unisubs.RightPanel.prototype.doneClicked_ = function(event) {
 unisubs.RightPanel.prototype.saveAndExitClicked_ = function(e) {
     e.preventDefault();
     this.dispatchEvent(unisubs.RightPanel.EventType.SAVEANDEXIT);
+};
+unisubs.RightPanel.prototype.saveAndOpenInNewEditorClicked_ = function(e) {
+    e.preventDefault();
+    this.dispatchEvent(unisubs.RightPanel.EventType.SAVEANDOPENINNEWEDITOR);
 };
 unisubs.RightPanel.prototype.getDoneAnchor = function() {
     return this.doneAnchor_;

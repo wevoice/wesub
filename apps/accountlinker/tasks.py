@@ -37,7 +37,9 @@ def get_youtube_data(user_pk):
         languages = video.completed_subtitle_languages()
 
         for language in languages:
-            version = language.latest_version()
+            # mirror_on_third_party should be verifying that
+            # we only send public versions
+            version = language.get_tip(public=False)
             data.append((video, language, version,))
 
     return data

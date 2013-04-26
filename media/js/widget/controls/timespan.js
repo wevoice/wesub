@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -61,6 +61,6 @@ unisubs.controls.TimeSpan.prototype.videoTimeUpdate_ = function() {
         this.currentlyDisplayedSecond_ = playheadSecs;
         goog.dom.setTextContent(
             this.timeElapsedLabel_,
-            unisubs.formatTime(playheadSecs * 1000, true));
+            unisubs.formatTime(parseInt(playheadSecs * 1000), true));
     }
 };
