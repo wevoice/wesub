@@ -179,3 +179,23 @@ class VideoPage(UnisubsPage):
         for el in els:
             langs.append(el.text)
         return langs
+
+    def language_status(self, language):
+        els =  self.get_elements_list(self._SUB_LANGUAGES)
+        try:
+            lang_el = [el for el in els if language in el.text][0]
+        except IndexError:
+            self.logger.info('language not in list')
+            return None
+        self.logger.info(dir(lang_el.parent))
+        lang_properties = lang_el.get_attribute('class')
+        self.logger.info(lang_properties)
+        if 'language-is-not-complete' in lang_properties:
+            return 'incomplete'
+        elif 'languge-is-complete' in lang_properties:
+            return 'complete'
+        else:
+            self.logger.info('not sure what state is language: %s' 
+                             % lang_el.text)
+            return None
+

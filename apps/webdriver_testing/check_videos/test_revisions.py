@@ -158,3 +158,151 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(follower.email, email_to)
 
+
+class TestCaseRevisionEdits(WebdriverTestCase):
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseRevisionEdits, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+        cls.user1 = UserFactory.create()
+        cls.user2 = UserFactory.create()
+        cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
+                                    'subtitle_data')  
+
+    def _add_video(self):
+        video = self.data_utils.create_video()
+        return video
+
+    def _upload_en_draft(self, video, subs, user, complete=False):
+        auth_creds = dict(username=user.username, password='password')
+        draft_data = {'language_code': 'en',
+                     'video': video.pk,
+                     'primary_audio_language_code': 'en',
+                     'draft': open(subs),
+                     'complete': int(complete),
+                     'is_complete': complete,
+                    }
+        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+
+    def _create_two_incomplete(self, video, user):
+        rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        rev2 = os.path.join(self.subs_dir, 'Timed_text.rev2.en.srt')
+
+        self._upload_en_draft(video, rev1, user)
+        en = video.subtitle_language('en')
+        en_v1 = en.get_tip()
+        self._upload_en_draft(video, rev2, user)
+        en_v2 = en.get_tip()
+        return en_v1, en_v2
+
+    def _create_complete_rev(self, video, user):
+        rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        rev2 = os.path.join(self.subs_dir, 'Timed_text.rev2.en.srt')
+
+        self._upload_en_draft(video, rev1, user)
+        en = video.subtitle_language('en')
+        en_v1 = en.get_tip()
+        self._upload_en_draft(video, rev2, user, complete=True)
+        en_v2 = en.get_tip()
+        return en_v1, en_v2
+
+    def test_rollback(self):
+        """Rollback completed rev to incomplete, lang is complete.
+
+        """
+        video = self._add_video()
+        v1, _ = self._create_complete_rev(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user1, 'password')
+
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
+
+    def test_rollback_incomplete(self):
+        """Rollback incomplete version to incomplete, remains incomplete.
+
+        """
+        video = self._add_video()
+        v1, _ = self._create_two_incomplete(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user1, 'password')
+
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
+
+    def test_rollback_2nd_user(self):
+        """User can rollback videos created by another user.
+
+        """
+        video = self._add_video()
+        v1, _ = self._create_two_incomplete(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user2, 'password')
+
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
+
+
+    def test_edit_incomplete_2nd_user(self):
+        """User can edit incomplete subtitles created by another user.
+
+        """
+        video = self._add_video()
+        v1, v2 = self._create_two_incomplete(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user2, 'password')
+
+        self.video_lang_pg.open_page(v2.get_absolute_url())
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+    def test_edit_complete_2nd_user(self):
+        """User can edit complete subtitles created by another user.
+
+        """
+        video = self._add_video()
+        _, v2 = self._create_complete_rev(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user2, 'password')
+
+        self.video_lang_pg.open_page(v2.get_absolute_url())
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+    def test_edit_subtitles(self):
+        """User sees edit subtitles button on language rev pages.
+        """
+        video = self._add_video()
+        v1, v2 = self._create_complete_rev(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user1, 'password')
+
+        self.video_lang_pg.open_page(v2.get_absolute_url())
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+
+
