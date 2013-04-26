@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from localeurl.templatetags.localeurl_tags import rmlocale
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import video_page
+from apps.webdriver_testing.pages.site_pages import diffing_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
@@ -22,6 +23,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
+        cls.diffing_pg = diffing_page.DiffingPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.subs_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -216,6 +218,23 @@ class TestCaseRevisionEdits(WebdriverTestCase):
         """
         video = self._add_video()
         v1, _ = self._create_complete_rev(video, self.user1)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(self.user1, 'password')
+
+        self.video_lang_pg.open_page(v1.get_absolute_url())
+        self.assertTrue(self.video_lang_pg.rollback())
+        
+        en_v3 = video.subtitle_language('en').get_tip()
+        self.video_lang_pg.open_page(en_v3.get_absolute_url())
+        self.assertIn('Revision 3', self.video_lang_pg.view_notice())
+
+    def test_diffing_page_rollback(self):
+        """Rollback completed rev to incomplete, lang is complete.
+
+        """
+        video = self._add_video()
+        v1, v2 = self._create_complete_rev(video, self.user1)
 
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.user1, 'password')

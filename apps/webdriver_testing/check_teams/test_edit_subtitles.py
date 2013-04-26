@@ -1,7 +1,5 @@
 import os
 
-from apps.teams import permissions
-
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages import watch_page

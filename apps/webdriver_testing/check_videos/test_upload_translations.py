@@ -145,6 +145,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
         self.video_pg.open_page('videos/create/')
+        self.video_pg.handle_js_alert('accept')
         self.video_pg.log_in(self.user.username, 'password')
 
     def _upload_and_verify(self, video, sub_file, language, lang_code):
