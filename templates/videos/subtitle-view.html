@@ -258,6 +258,12 @@
                             This language contains subtitles that are still waiting to be moderated.  Check back later.
                         {% endblocktrans %}
                     </p>
+                {% elif language.subtitleversion_set.full.exists %}
+                    <p class="empty">
+                        {% blocktrans %}
+                            Sorry, this language has been removed by Amara staff members or authorized users.
+                        {% endblocktrans %}
+                    </p>
                 {% else %}
                     <p class="empty">
                         {% blocktrans %}
