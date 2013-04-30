@@ -309,7 +309,7 @@ var angular = angular || null;
             $scope.videoTitle = subtitleData.title;
             $scope.videoDescription = subtitleData.description;
 
-            if ( subtitleData.visbility == 'Public' || $scope.isEditable){
+            if ( subtitleData.visibility == 'Public' || $scope.isEditable){
                 // Set up a new parser instance with this DFXP XML set.
                this.dfxpWrapper = new root.AmaraDFXPParser();
                this.dfxpWrapper.init(subtitleData.subtitlesXML);
