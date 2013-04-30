@@ -148,21 +148,8 @@ class TestCaseEditUploaded(WebdriverTestCase):
         self.video_pg.handle_js_alert('accept')
         self.video_pg.log_in(self.user.username, 'password')
 
-    def _upload_and_verify(self, video, sub_file, language, lang_code):
-        """Upload the subtitle file and confirm subs are stored.
-
-        Checking the subtitle count of the expected value vs the
-        value in the database for the latest version of the lang.
-
-        """
-        message = self.video_pg.upload_subtitles(language, sub_file, 
-                                       translated_from='English')
-        self.logger.info("MESSAGE: %s" %message)
-        subtitle_lang = video.subtitle_language(lang_code) 
-        page_url = 'videos/{0}/{1}/'.format(video.video_id, lang_code)
-        self.video_pg.open_page(page_url)
-        self.video_pg.handle_js_alert('accept')
-        return subtitle_lang.get_subtitle_count()
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("MYTMP/%s" % self.id())
 
 
     def test_edit__large(self):
@@ -187,7 +174,9 @@ class TestCaseEditUploaded(WebdriverTestCase):
         self.video_pg.open_video_page(video.video_id)
 
         sub_file = os.path.join(self.subs_data_dir, 'srt-full.srt')
-        self._upload_and_verify(video, sub_file, 'French', 'fr')
+        self.video_pg.upload_subtitles('French', sub_file, 
+                                       translated_from='English')
+
         self.video_language_pg.open_video_lang_page(video.video_id, 'fr')
         self.video_language_pg.edit_subtitles()
         sub_editor = subtitle_editor.SubtitleEditor(self)
