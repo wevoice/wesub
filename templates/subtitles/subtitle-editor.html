@@ -130,7 +130,7 @@
                         <option
                                 ng-repeat='thisVersion in versions'
                                 ng-selected='version == thisVersion'
-                                ng-disabled='thisVersion.visibility == "Deleted"'
+                                ng-disabled='thisVersion.visibility != "Public"'
                                 ng-model='thisVersion'
                                 value="[[$index]]">
                             [[thisVersion|versionDropDownDisplay]]</option>

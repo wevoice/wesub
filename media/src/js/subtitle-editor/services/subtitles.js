@@ -113,7 +113,7 @@ var angular = angular || null;
                     throw Error('You must supply a language code to getSubtitles().');
                 }
 
-                var subtitles;
+                var subtitleData;
 
                 // Loop through all of our cached languages to find the correct subtitle version.
                 for (var i=0; i < cachedData.languages.length; i++){
@@ -128,8 +128,8 @@ var angular = angular || null;
                             // We've found the version.
                             if (language.versions[j].version_no === parseInt(versionNumber, 10)){
 
-                                subtitles = language.versions[j];
-                                if (subtitles.subtitlesXML) {
+                                subtitleData = language.versions[j];
+                                if (subtitleData.subtitlesXML) {
                                     break;
                                 }
 
@@ -141,8 +141,8 @@ var angular = angular || null;
                 }
 
                 // If we found subtitles, call the callback with them.
-                if (subtitles.subtitlesXML !== undefined){
-                   callback(subtitles);
+                if (subtitleData.subtitlesXML !== undefined){
+                   callback(subtitleData);
 
                 // Otherwise, ask the API for this version.
                 } else {
@@ -152,8 +152,8 @@ var angular = angular || null;
                     $http.get(url).success(function(response) {
 
                         // Cache these subtitles on the cached data object.
-                        subtitles.subtitlesXML = response;
-                        callback(subtitles);
+                        subtitleData.subtitlesXML = response;
+                        callback(subtitleData);
 
                     });
                 }

@@ -343,10 +343,12 @@ var USER_IDLE_MINUTES = 5;
                 return {
                     post: function post(scope, elm, attrs) {
 
-                        scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-
+                        // set these *before* calling get subtitle since if
+                        // the subs are bootstrapped it will return right away
                         scope.isEditable = attrs.editable === 'true';
                         scope.canAddAndRemove = attrs.canAddAndRemove === 'true';
+                        scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+
 
                         // Cache the jQuery selection of the element.
                         var $elm = $(elm);

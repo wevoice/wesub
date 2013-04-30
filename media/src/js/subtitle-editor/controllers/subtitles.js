@@ -63,11 +63,11 @@ var angular = angular || null;
                 $scope.version = $scope.versions[0];
             }
         };
-        $scope.setReferenceSubs = function(subtitles) {
+        $scope.setReferenceSubs = function(subtitleData) {
             if (!$scope.refSubList) {
                 $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
             }
-            $scope.refSubList.scope.onSubtitlesFetched(subtitles);
+            $scope.refSubList.scope.onSubtitlesFetched(subtitleData);
         };
         $scope.versionChanged = function(newVersion) {
 
@@ -82,10 +82,13 @@ var angular = angular || null;
             var subtitlesXML = newVersion.subtitlesXML;
 
             if (!subtitlesXML) {
-                SubtitleStorage.getSubtitles($scope.language.code, newVersion.version_no, function(subtitles) {
-                    $scope.version.subtitlesXML = subtitles.subtitlesXML;
-                    $scope.setReferenceSubs(subtitles);
-                });
+                SubtitleStorage.getSubtitles(
+                    $scope.language.code,
+                    newVersion.version_no,
+                    function(subtitleData) {
+                        $scope.version.subtitlesXML = subtitleData.subtitlesXML;
+                        $scope.setReferenceSubs(subtitleData);
+                    });
             } else {
                 $scope.setReferenceSubs(newVersion);
             }
@@ -294,27 +297,31 @@ var angular = angular || null;
 
             $scope.status = 'loading';
 
-            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitles) {
-                $scope.onSubtitlesFetched(subtitles);
+            var that = this;
+            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitleData) {
+                $scope.onSubtitlesFetched.call(that, subtitleData);
             });
 
         };
-        $scope.onSubtitlesFetched = function (subtitles) {
+        $scope.onSubtitlesFetched = function (subtitleData) {
 
             // Save the title and description to this scope.
-            $scope.videoTitle = subtitles.title;
-            $scope.videoDescription = subtitles.description;
+            $scope.videoTitle = subtitleData.title;
+            $scope.videoDescription = subtitleData.description;
 
-            // Set up a new parser instance with this DFXP XML set.
-            this.dfxpWrapper = new root.AmaraDFXPParser();
-            this.dfxpWrapper.init(subtitles.subtitlesXML);
+            if ( subtitleData.visbility == 'Public' || $scope.isEditable){
+                // Set up a new parser instance with this DFXP XML set.
+               this.dfxpWrapper = new root.AmaraDFXPParser();
+               this.dfxpWrapper.init(subtitleData.subtitlesXML);
 
-            // Reference the parser and instance on the scope so we can access it via
-            // the templates.
-            $scope.parser = this.dfxpWrapper;
-            $scope.subtitles = $scope.parser.getSubtitles().get();
+                // Reference the parser and instance on the scope so we can access it via
+                // the templates.
+                $scope.parser = this.dfxpWrapper;
+                $scope.subtitles = $scope.parser.getSubtitles().get();
 
-            $scope.status = 'ready';
+                $scope.status = 'ready';
+            }
+
 
             // When we have subtitles for an editable set, broadcast it.
             $timeout(function() {
