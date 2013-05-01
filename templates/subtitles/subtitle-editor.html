@@ -117,11 +117,15 @@
             <div class="preview">
                 Amara editor preview. <a href="#" target="blank">Learn more or leave feedback</a>.
             </div>
-            <div class="language-selections group" ng-controller="LanguageSelectorController">
+            <div class="language-selections group"
+                language-selector
+                 initial-version-number="{{ translated_from_version.version_number }}"
+                 initial-language-code="{% firstof translated_from_version.subtitle_language.language_code language.language_code %}"                        ng-model="language"
+                 ng-controller="LanguageSelectorController">
                 <div class="select">
                     <select name="language"
-                            ng-model="language"
-                            ng-options="item.name for item in languages">
+                        ng-model='language'
+                        ng-options="item.name for item in languages">
                     </select>
                 </div>
                 <div class="select">
@@ -142,8 +146,6 @@
 
                     <ul subtitle-list="reference-subtitle-set"
                         editable="false"
-                        version-number="{{ translated_from_version.version_number }}"
-                        language-code="{{ translated_from_version.subtitle_language.language_code }}"
                         video-id="{{ video.video_id }}">
 
                         <li ng-repeat="subtitle in subtitles"

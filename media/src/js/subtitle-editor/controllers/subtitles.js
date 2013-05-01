@@ -40,7 +40,7 @@ var angular = angular || null;
          * side panel.
          */
 
-        $scope.languageChanged = function(lang) {
+        $scope.languageChanged = function(lang, versionNumber) {
             var vers, language;
 
             if (lang) {
@@ -60,7 +60,13 @@ var angular = angular || null;
             $scope.versions = vers.reverse();
 
             if (vers.length && vers.length > 0) {
-                $scope.version = $scope.versions[0];
+                if (isNaN(parseInt(versionNumber))){
+                    $scope.version = $scope.versions[0];
+                }else{
+                    $scope.version = _.find($scope.versions, function(version){
+                        return version.version_no == versionNumber;
+                    });
+                }
             }
         };
         $scope.setReferenceSubs = function(subtitleData) {
@@ -94,13 +100,14 @@ var angular = angular || null;
             }
         };
 
-        SubtitleStorage.getLanguages(function(languages) {
-            $scope.languages = languages;
-            $scope.language = _.find(languages, function(item) {
-                return item.editingLanguage;
+        $scope.setInitialDisplayLanguage = function(allLanguages, languageCode, versionNumber){
+
+            $scope.languages = allLanguages;
+            $scope.language = _.find(allLanguages, function(item) {
+                return item.code == languageCode;
             });
-            $scope.languageChanged($scope.language);
-        });
+            $scope.languageChanged($scope.language, versionNumber);
+        }
 
         $scope.$watch('language', $scope.languageChanged);
         $scope.$watch('version', $scope.versionChanged);
