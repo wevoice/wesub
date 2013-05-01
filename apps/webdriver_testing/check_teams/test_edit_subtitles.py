@@ -620,7 +620,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual('active'
+        self.assertEqual('active',
                          self.video_lang_pg.edit_subtitles_active())
 
     def test_draft__team_admin(self):

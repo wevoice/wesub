@@ -770,6 +770,9 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')  
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
     def _add_team_video(self):
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
