@@ -149,7 +149,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
         self.video_pg.log_in(self.user.username, 'password')
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file("MYTMP/%s" % self.id())
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
 
     def test_edit__large(self):
