@@ -129,7 +129,10 @@ class LanguageList(object):
             tags.append(ugettext(u'incomplete'))
         elif team_video is not None:
             # subtiltes are complete, check if they are under review/approval.
-            for t in Task.objects.incomplete().filter(team_video=team_video):
+            incomplete_tasks = (Task.objects.incomplete()
+                                            .filter(team_video=team_video,
+                                                    language=lang.language_code))
+            for t in incomplete_tasks:
                 if t.type == Task.TYPE_IDS['Review']:
                     tags.append(ugettext(u'needs review'))
                     break
