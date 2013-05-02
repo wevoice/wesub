@@ -197,10 +197,6 @@
 
                                     {% endif %}
                                 {% endif %}                                                                                                  
-                                {% if task.is_blocked and task.get_type_display == 'Translate' %}
-                                    class="disabled">
-                                    <div class="cannot-perform disabled">Locked until {{ task.subtitle_version.language }} subtitles have been approved.</div
-                                {% endif %}
                                 {% if not task|can_perform_task:user and not task.assignee %}
                                     class="disabled">
                                     <div class="cannot-perform">{% trans "You don't have permission to perform this task." %}</div
