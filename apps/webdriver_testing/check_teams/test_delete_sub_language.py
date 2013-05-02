@@ -453,6 +453,9 @@ class TestCaseDeletion(WebdriverTestCase):
                                  '&assignee=anyone'.format(
                                  self.team.slug, tv.pk))
         self.tasks_tab.add_task(task_type='Translate', task_language='Swedish')
+        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
+                                 '&assignee=anyone&lang=sv'.format(
+                                 self.team.slug, tv.pk))
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Swedish', video.title))
 
@@ -491,7 +494,7 @@ class TestCaseDeletion(WebdriverTestCase):
         #Delete English subtitle language + Swedish for video 1
         self.video_lang_pg.delete_subtitle_language(['Swedish'])
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone'.format(
+                                 '&assignee=anyone&lang=sv'.format(
                                  self.team.slug, tv2.pk))
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Swedish', video2.title))

@@ -86,7 +86,7 @@ class VideoPage(UnisubsPage):
         #Open the dialog
         self.click_by_css(self._UPLOAD_SUBTITLES)
         #Choose the language
-        self.wait_for_element_present(self._SELECT_LANGUAGE)
+        self.wait_for_element_visible(self._SELECT_LANGUAGE)
         self.select_option_by_text(self._SELECT_LANGUAGE, sub_lang)
         #Set the audio language
         if audio_lang:
