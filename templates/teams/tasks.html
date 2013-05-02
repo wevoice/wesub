@@ -184,7 +184,7 @@
             <ul class="tasks listing">
                 {% with member.has_max_tasks as has_max_tasks %}
                     {% for task in tasks %}
-                        {% with task.subtitle_version.language.standard_language as translated_from %}
+                        {% with task.get_subtitle_version.language.standard_language as translated_from %}
                             <li
                                 {% if task.is_blocked  %}
                                     {%if  task.get_type_display == 'Translate' %}
@@ -212,7 +212,7 @@
                                     {% else %}
                                         {{ task.get_type_display }}
                                         {% if task.get_type_display == 'Review' or task.get_type_display == 'Approve' %}
-                                            {% if task.subtitle_version.language.is_original %}
+                                            {% if task.get_subtitle_version.language.is_original %}
                                                 {% trans 'Original' %}
                                             {% endif %}
                                         {% endif %}
