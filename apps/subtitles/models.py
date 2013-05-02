@@ -739,17 +739,22 @@ class SubtitleLanguage(models.Model):
             return None
 
 
-    def get_translation_source_language_code(self):
+    def get_translation_source_language_code(self, ignore_forking=False):
         """
         Returns the language code of the language that served as the
         source language for this translation, or None if no languages
         are found on the lineage.
 
+        In some cases, you might want to ignore the is_forked attribute. For
+        example, on the new editor, you want to see the language this was
+        translated from, even if it was forked. Unless that's your very specific
+        use case, just leave `ignore_forking` as False.
+
         Right now, we're only allowing for 1 source language, but that
         could be revisited in the future.
 
         """
-        if self.is_forked:
+        if not ignore_forking and self.is_forked:
             return None
 
         tip_version = self.get_tip()
@@ -761,7 +766,7 @@ class SubtitleLanguage(models.Model):
 
         return source_codes[0] if source_codes else None
 
-    def get_translation_source_language(self):
+    def get_translation_source_language(self, ignore_forking=False):
         """
         Returns the new SubtitleLanguage object that served as the
         source language for this translation, or None if no languages
@@ -771,7 +776,8 @@ class SubtitleLanguage(models.Model):
         could be revisited in the future.
 
         """
-        source_lc = self.get_translation_source_language_code()
+        source_lc = self.get_translation_source_language_code(
+            ignore_forking=ignore_forking)
 
         if not source_lc:
             return None
