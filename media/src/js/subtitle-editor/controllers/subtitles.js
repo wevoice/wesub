@@ -396,6 +396,10 @@ var angular = angular || null;
         $scope.empty = false;
         $scope.isEditing = false;
         $scope.showStartTime = $scope.parser.startTime($scope.subtitle) !== -1;
+        $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
+        // convert to markdown at init time, then never again to avoid
+        // double scaping
+        initialText = $scope.parser.dfxpToMarkdown($scope.subtitle, true);
 
         $scope.finishEditingMode = function(newValue) {
 
@@ -404,9 +408,14 @@ var angular = angular || null;
             // Tell the root scope that we're no longer editing, now.
             $scope.$root.$emit('editing-done');
 
-            var content = $scope.parser.content($scope.subtitle, newValue);
 
-            if (content !== initialText) {
+            if (newValue !== initialText) {
+                // we can store markdown content directly on the node
+                // then on serialization it will get converted correctly
+                // to dfxp
+                $scope.parser.content($scope.subtitle, newValue);
+                $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
+                initialText = $scope.parser.content($scope.subtitle);
                 $scope.$root.$emit('work-done');
             }
         };
@@ -415,7 +424,6 @@ var angular = angular || null;
         };
         $scope.startEditingMode = function() {
 
-            initialText = $scope.parser.content($scope.subtitle);
 
             $scope.isEditing = true;
 
