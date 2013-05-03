@@ -141,6 +141,10 @@ class LanguageList(object):
     def __iter__(self):
         return iter(self.items)
 
+    def __len__(self):
+        return len(self.items)
+
+
 def index(request):
     context = widget.add_onsite_js_files({})
     context['all_videos'] = Video.objects.count()
