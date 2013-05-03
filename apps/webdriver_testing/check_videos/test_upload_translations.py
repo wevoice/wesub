@@ -141,15 +141,13 @@ class TestCaseEditUploaded(WebdriverTestCase):
         self.user = UserFactory.create(username = 'user')
         self.video_pg = video_page.VideoPage(self)
         self.video_language_pg = video_language_page.VideoLanguagePage(self)
-
+        self.sub_editor = subtitle_editor.SubtitleEditor(self)
         self.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
         self.video_pg.open_page('videos/create/')
         self.video_pg.handle_js_alert('accept')
         self.video_pg.log_in(self.user.username, 'password')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("MYTMP/%s" % self.id())
 
 
     def test_edit__large(self):
@@ -171,14 +169,20 @@ class TestCaseEditUploaded(WebdriverTestCase):
                           password='password'))
         self.logger.info('RESPONSE: %s' % r)
 
-        self.video_pg.open_video_page(video.video_id)
-
         sub_file = os.path.join(self.subs_data_dir, 'srt-full.srt')
-        self.video_pg.upload_subtitles('French', sub_file, 
-                                       translated_from='English')
+
+        fr_data = {'language_code': 'fr',
+                     'video': video.pk,
+                     'from_language_code': 'en',
+                     'draft': open(sub_file),
+                    }
+        r = self.data_utils.upload_subs(video, 
+                                        data=fr_data,
+                                        user=dict(username=self.user.username,
+                                                  password='password'))
+        self.logger.info('RESPONSE: %s' % r)
 
         self.video_language_pg.open_video_lang_page(video.video_id, 'fr')
         self.video_language_pg.edit_subtitles()
-        sub_editor = subtitle_editor.SubtitleEditor(self)
         self.assertEqual('Adding a New Translation', 
-                         sub_editor.dialog_title())
+                         self.sub_editor.dialog_title())

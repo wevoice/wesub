@@ -317,7 +317,7 @@ class SubtitlesUploadForm(forms.Form):
         title, description = self.video.title, self.video.description
 
         if subtitle_language:
-            previous_version = subtitle_language.get_tip(public=True)
+            previous_version = subtitle_language.get_tip()
             if previous_version:
                 title = previous_version.title
                 description = previous_version.description
