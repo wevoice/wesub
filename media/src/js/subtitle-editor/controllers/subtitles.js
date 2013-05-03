@@ -40,8 +40,21 @@ var angular = angular || null;
          * side panel.
          */
 
-        $scope.languageChanged = function(lang, versionNumber) {
-            var vers, language;
+        /**
+         * The second param will be either an int or the version data object,
+         * depending if this is being set from the bootstrapped value or later
+         * fetches.
+         */
+        $scope.languageChanged = function(lang, versionOrVersionNumber, another) {
+            // this gets called both on setInitialDisplayLanguage manually at
+            // the first start up, or through the changes to the scope.language.
+            // in the later cases, angular sends (newLang, oldLang) so we can
+            // detect if anything is actually changed. In this case, we just bail
+            // out, because nothing has actually changed.
+            if (lang == versionOrVersionNumber){
+                return;
+            }
+            var vers, language, versionNumber;
 
             if (lang) {
                 language = lang;
@@ -59,6 +72,13 @@ var angular = angular || null;
 
             $scope.versions = vers.reverse();
 
+            if (versionOrVersionNumber !== undefined ){
+                if (!isNaN(parseInt(versionOrVersionNumber.version_no))){
+                    versionNumber = parseInt(versionOrVersionNumber.version_no);
+                }else if(!isNaN(parseInt(versionOrVersionNumber))){
+                    versionNumber = parseInt(versionOrVersionNumber);
+                }
+            }
             if (vers.length && vers.length > 0) {
                 if (isNaN(parseInt(versionNumber))){
                     $scope.version = $scope.versions[0];
