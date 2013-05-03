@@ -498,7 +498,6 @@ var USER_IDLE_MINUTES = 5;
             compile: function compile(elm, attrs, transclude) {
                 return {
                     post: function post(scope, elm, attrs) {
-                        console.warn('on directive', scope);
                         SubtitleStorage.getLanguages(function(languages){
                             scope.setInitialDisplayLanguage(
                                 languages,
