@@ -1744,7 +1744,7 @@ class Task(models.Model):
             assignee = None
 
         task = Task(team=self.team, team_video=self.team_video,
-                    language=self.language, type=type, 
+                    language=self.language, type=type,
                     assignee=assignee)
 
         task.new_subtitle_version = self.new_subtitle_version
@@ -1786,7 +1786,7 @@ class Task(models.Model):
                 subtitle_version and
                 subtitle_version.previous_version() and
                 subtitle_version.previous_version().is_public() and
-                subtitle_version.subtitle_language.is_complete_and_synced() and 
+                subtitle_version.subtitle_language.is_complete_and_synced() and
                 tasks.exists())
 
     def _find_previous_assignee(self, type):
@@ -1873,7 +1873,7 @@ class Task(models.Model):
 
         # TL;DR take a look at #1206 to know why i did this
         if self.workflow.requires_review_or_approval and not self._can_publish_directly(sv):
-            
+
             if self.workflow.review_enabled:
                 task = Task(team=self.team, team_video=self.team_video,
                             new_subtitle_version=sv,
@@ -2060,8 +2060,16 @@ class Task(models.Model):
             self.expiration_date = datetime.datetime.now() + limit
 
     def get_subtitle_version(self):
-        """Return the NewSubtitleVersion for this task."""
-        return self.new_subtitle_version
+        """Return the NewSubtitleVersion for this task.
+
+        Something, somewhere, is setting new_subtitle_version (and the old
+        subtitle_version) to the *source* version for translations.  This breaks
+        stuff, so we're filtering that out here in this method as a temporary
+        fix until the tasks system gets ripped out entirely.
+
+        """
+        sv = self.new_subtitle_version
+        return sv if (sv and sv.language_code == self.language) else None
 
     def is_blocked(self):
         """Return whether this task is "blocked".
