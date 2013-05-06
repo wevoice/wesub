@@ -754,17 +754,11 @@ class SubtitleLanguage(models.Model):
         could be revisited in the future.
 
         """
-        if not ignore_forking and self.is_forked:
-            return None
+        source_language = self.get_translation_source_language(
+            ignore_forking=ignore_forking
+        )
+        return source_language.language_code if source_language else None
 
-        tip_version = self.get_tip()
-        if not tip_version:
-            return None
-
-        lineage = tip_version.lineage
-        source_codes = [lc for lc in lineage.keys() if lc != self.language_code]
-
-        return source_codes[0] if source_codes else None
 
     def get_translation_source_language(self, ignore_forking=False):
         """
@@ -776,17 +770,11 @@ class SubtitleLanguage(models.Model):
         could be revisited in the future.
 
         """
-        source_lc = self.get_translation_source_language_code(
+        source_version = self.get_translation_source_version(
             ignore_forking=ignore_forking)
 
-        if not source_lc:
-            return None
+        return source_version.subtitle_language if source_version else None
 
-        try:
-            return SubtitleLanguage.objects.get(
-                video=self.video, language_code=source_lc)
-        except (SubtitleLanguage.DoesNotExist, IndexError):
-            return None
 
     def get_translation_source_version(self, ignore_forking=False):
         '''
@@ -800,22 +788,29 @@ class SubtitleLanguage(models.Model):
         if  not ignore_forking and self.is_forked:
             return None
 
-        tip_version = self.get_tip()
-        if not tip_version:
+        current_version = self.get_tip()
+        if not current_version:
             return None
 
-        lineage = tip_version.lineage
+        parent_found = False
+        while not parent_found:
+            parents = current_version.parents.full().order_by('-pk')
+            # parents can be on the same language, try other languages at first
+            other_languages = parents.exclude(subtitle_language=self)
+            try:
+                return other_languages[0]
+            except IndexError:
+                if current_version.version_number > 1:
+                    try:
+                        # previous versions might have parents in other languages
+                        # so set the current version to the same language, and
+                        # check that out
+                        current_version = parents[0]
+                    except IndexError:
+                        return None
+                else:
+                    return None
 
-        try:
-            source_pair = [(lc, version_no) for lc,version_no in lineage.items()\
-                           if lc != self.language_code][0]
-            return SubtitleVersion.objects.get(
-                language_code = source_pair[0],
-                version_number = source_pair[1],
-                video__id = self.video.id)
-        except (SubtitleVersion.DoesNotExist, IndexError):
-            return None
-        return None
 
     def get_dependent_subtitle_languages(self):
         """Return a list of SLs that are dependents/translations of this.
