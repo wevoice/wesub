@@ -792,8 +792,7 @@ class SubtitleLanguage(models.Model):
         if not current_version:
             return None
 
-        parent_found = False
-        while not parent_found:
+        while True:
             parents = current_version.parents.full().order_by('-pk')
             # parents can be on the same language, try other languages at first
             other_languages = parents.exclude(subtitle_language=self)
