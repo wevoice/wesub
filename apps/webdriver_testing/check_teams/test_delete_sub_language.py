@@ -559,9 +559,6 @@ class TestCaseDeletion(WebdriverTestCase):
                         'Approve Italian Subtitles', self.video.title))
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-
     def test_perform_forked_approve_task(self):
         """Approve tasks for forked translations open in timed dialog.
 
