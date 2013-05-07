@@ -26,7 +26,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from apps.subtitles import pipeline
 from apps.subtitles.shims import is_dependent
-from apps.subtitles.models import ORIGIN_UPLOAD, SubtitleVersion
+from apps.subtitles.models import ORIGIN_UPLOAD, SubtitleLanguage
 from apps.teams.models import Task
 from apps.teams.permissions import (
     can_perform_task, can_create_and_edit_subtitles,
@@ -67,10 +67,11 @@ class SubtitlesUploadForm(forms.Form):
         self.fields['language_code'].choices = all_languages
         self.fields['primary_audio_language_code'].choices = all_languages
 
-        version_qs = SubtitleVersion.objects.public().filter(video=video)
+        language_qs = (SubtitleLanguage.objects.having_public_versions()
+                       .filter(video=video))
         choices = [
             (sl.language_code, sl.get_language_code_display())
-            for sl in version_qs
+            for sl in language_qs
         ]
         if allow_transcription:
             choices.append(('', 'None (Direct from Video)'))
