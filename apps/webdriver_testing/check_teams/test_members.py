@@ -187,6 +187,7 @@ class TestCaseManageMembers(WebdriverTestCase):
         self.members_tab.open_members_page(self.team.slug)
         self.assertFalse(self.members_tab.displays_invite())
 
+ 
     def test_admin_invite__member(self):
         """Admin invite team, member does not see invite button."""
 
@@ -274,7 +275,7 @@ class TestCaseManageMembers(WebdriverTestCase):
         """In application-only team only member does not see invite button. """
         self.team.membership_policy = 1
         self.team.save()
-        self.members_tab.log_in(self.admin.username, 'password')
+        self.members_tab.log_in(self.member.username, 'password')
         self.members_tab.open_members_page(self.team.slug)
         self.assertFalse(self.members_tab.displays_invite())
 
