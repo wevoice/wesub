@@ -2115,13 +2115,6 @@ class Task(models.Model):
             assert self.language in VALID_LANGUAGE_CODES, \
                 "Subtitle Language should be a valid code."
 
-            if self.new_subtitle_version:
-                assert (self.new_subtitle_version.language_code == self.language), \
-                    ("The task language for task %s (%s) does not match the "
-                     "language of its subtitle version (%s)."
-                     % (self.id, self.language,
-                        self.new_subtitle_version.language_code))
-
         result = super(Task, self).save(*args, **kwargs)
 
         if update_team_video_index:
