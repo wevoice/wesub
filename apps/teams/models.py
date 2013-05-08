@@ -2066,16 +2066,27 @@ class Task(models.Model):
             self.expiration_date = datetime.datetime.now() + limit
 
     def get_subtitle_version(self):
-        """Return the NewSubtitleVersion for this task.
+        """ Gets the subtitle version related to this task.
+        If the task has a subtitle_version attached, return it and
+        if not, try to find it throught the subtitle language of the video.
 
-        Something, somewhere, is setting new_subtitle_version (and the old
-        subtitle_version) to the *source* version for translations.  This breaks
-        stuff, so we're filtering that out here in this method as a temporary
-        fix until the tasks system gets ripped out entirely.
-
+        Note: we need this since we don't attach incomplete subtitle_version
+        to the task (and if we do we need to set the status to unmoderated and
+        that causes the version to get published).
         """
-        sv = self.new_subtitle_version
-        return sv if (sv and sv.language_code == self.language) else None
+
+        # autocreate sets the subtitle_version to another
+        # language's subtitle_version and that was breaking
+        # not only the interface but the new upload method.
+        if (self.new_subtitle_version and
+            self.new_subtitle_version.language_code == self.language):
+            return self.new_subtitle_version
+
+        if not hasattr(self, "_subtitle_version"):
+            language = self.team_video.video.subtitle_language(self.language)
+            self._subtitle_version = (language.get_tip(public=False)
+                                      if language else None)
+        return self._subtitle_version
 
     def is_blocked(self):
         """Return whether this task is "blocked".
@@ -2109,13 +2120,6 @@ class Task(models.Model):
         if self.language:
             assert self.language in VALID_LANGUAGE_CODES, \
                 "Subtitle Language should be a valid code."
-
-            if self.new_subtitle_version:
-                assert (self.new_subtitle_version.language_code == self.language), \
-                    ("The task language for task %s (%s) does not match the "
-                     "language of its subtitle version (%s)."
-                     % (self.id, self.language,
-                        self.new_subtitle_version.language_code))
 
         result = super(Task, self).save(*args, **kwargs)
 
