@@ -21,7 +21,6 @@ import urllib, urllib2
 from collections import namedtuple
 
 import simplejson as json
-from babelsubs import get_available_formats
 from babelsubs.storage import diff as diff_subs
 from babelsubs.generators import HTMLGenerator
 from django.conf import settings
@@ -451,10 +450,9 @@ def legacy_history(request, video, lang=None):
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None, version_id=None):
-    from teams.models import Task
-
     if not lang:
-        return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
+        return HttpResponseRedirect(
+            video.get_absolute_url(video_id=video._video_id_used))
     elif lang == 'unknown':
         # A hacky workaround for now.
         # This should go away when we stop allowing for blank SubtitleLanguages.
@@ -519,7 +517,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
-    context['task'] =  _get_related_task(request)
+    context['task'] = _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
 
     versions = list(qs)
@@ -545,9 +543,22 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
                                  if version else None)
     context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-    
-    check_result = can_add_version(request.user, video, language.language_code)
-    context['edit_disabled'] = not check_result
+
+    user_can_add_version = can_add_version(request.user, video,
+                                           language.language_code)
+    context['edit_disabled'] = not user_can_add_version
+
+    # If there are tasks for this language, the user has to go through the tasks
+    # panel to edit things instead of doing it directly from here.
+    if user_can_add_version and team_video:
+        has_open_task = (Task.objects.incomplete()
+                                     .filter(team_video=team_video,
+                                             language=language.language_code)
+                                     .exists())
+        if has_open_task:
+            context['edit_disabled'] = True
+            context['must_use_tasks'] = True
+
 
     return render_to_response("videos/subtitle-view.html", context,
                               context_instance=RequestContext(request))
