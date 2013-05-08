@@ -638,7 +638,10 @@ class TaskUploadForm(SubtitlesUploadForm):
     def clean(self):
         super(TaskUploadForm, self).clean()
 
-        task = self.cleaned_data['task']
+        try:
+            task = self.cleaned_data['task']
+        except KeyError:
+            raise forms.ValidationError(_(u'Task has been deleted'))
         language_code = self.cleaned_data['language_code']
         from_language_code = self.cleaned_data['from_language_code']
 
