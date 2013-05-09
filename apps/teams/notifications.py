@@ -94,7 +94,7 @@ class BaseNotification(object):
         self.application_pk = kwargs.pop('application_pk', None)
         self.version_pk = kwargs.pop('version_pk', None)
         if self.language_pk:
-            self.language = self.video.subtitlelanguage_set.get(pk=self.language_pk)
+            self.language = self.video.newsubtitlelanguage_set.get(pk=self.language_pk)
             if self.version_pk:
                 self.version = self.language.subtitleversion_set.full().get(pk=self.version_pk)
         else:
