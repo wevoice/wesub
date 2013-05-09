@@ -1762,6 +1762,7 @@ class Task(models.Model):
         if sends_notification:
             # notify original submiter (assignee of self)
             notifier.reviewed_and_sent_back.delay(self.pk)
+        return task
 
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
@@ -1934,7 +1935,7 @@ class Task(models.Model):
                 notifier.reviewed_and_pending_approval.delay(self.pk)
             else:
                 # Otherwise we send the subtitles back for improvement.
-                self._send_back()
+                task = self._send_back()
         else:
             # Approval isn't enabled, so the ruling of this Review task
             # determines whether the subtitles go public.
@@ -1952,7 +1953,7 @@ class Task(models.Model):
                 upload_subtitles_to_original_service.delay(sv.pk)
             else:
                 # Send the subtitles back for improvement.
-                self._send_back()
+                task = self._send_back()
 
         # Before we go, we need to record who reviewed these subtitles, so if
         # necessary we can "send back" to them later.
@@ -1980,7 +1981,7 @@ class Task(models.Model):
             upload_subtitles_to_original_service.delay(sv.pk)
         else:
             # Send the subtitles back for improvement.
-            self._send_back()
+            task = self._send_back()
 
         # Before we go, we need to record who approved these subtitles, so if
         # necessary we can "send back" to them later.
