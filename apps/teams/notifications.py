@@ -19,6 +19,10 @@
 from httplib2 import Http
 from urllib import urlencode
 
+from django.conf import settings
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
+
+from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
@@ -161,7 +165,9 @@ class BaseNotification(object):
         data = urlencode(data)
         url = "%s?%s" % (url , data)
         try:
-            resp, content = h.request(url, method="POST", body=data)
+            resp, content = h.request(url, method="POST", body=data, headers={
+                'referer': '%s://%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain)
+            })
             success = 200 <= resp.status < 400
             if success is False:
                 logger.error("Failed to notify team %s " % (self.team),
