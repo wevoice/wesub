@@ -138,6 +138,11 @@ class LanguageList(object):
                 elif t.type == Task.TYPE_IDS['Approve']:
                     tags.append(ugettext(u'needs approval'))
                     break
+                else:
+                    # subtitles are complete, but there's a subtitle/translate
+                    # task for them.  They must have gotten sent back.
+                    tags.append(ugettext(u'needs editing'))
+                    break
         return tags
 
     def __iter__(self):
