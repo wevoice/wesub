@@ -167,7 +167,7 @@ class BaseNotification(object):
         try:
             resp, content = h.request(url, method="POST", body=data, headers={
                 'referer': '%s://%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain)
-            })
+            }, verify=False)
             success = 200 <= resp.status < 400
             if success is False:
                 logger.error("Failed to notify team %s " % (self.team),
