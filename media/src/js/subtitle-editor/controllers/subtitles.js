@@ -132,7 +132,7 @@ var angular = angular || null;
         $scope.$watch('language', $scope.languageChanged);
         $scope.$watch('version', $scope.versionChanged);
     };
-    var SaveSessionController = function($scope, SubtitleListFinder, SubtitleStorage) {
+    var SaveSessionController = function($scope, $q, SubtitleListFinder, SubtitleStorage) {
 
         $scope.discard = function() {
 
@@ -145,12 +145,12 @@ var angular = angular || null;
         };
         $scope.saveAndApprove = function() {
 
-            $scope.saveSession().then(function(response) {
+            $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
 
                     $scope.status = 'approving';
 
-                    SubtitleStorage.approveTask(response, $scope.getNotes()).then(function onSuccess(response) {
+                    SubtitleStorage.approveTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
                         window.location = $scope.primaryVideoURL;
@@ -165,19 +165,19 @@ var angular = angular || null;
         };
         $scope.save = function() {
 
-            $scope.saveSession().then(function(response) {
+            $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
                     $scope.showCloseModal();
                 }
             });
         };
         $scope.saveAndSendBack = function() {
-            $scope.saveSession().then(function(response) {
+            $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
 
                     $scope.status = 'sending-back';
 
-                    SubtitleStorage.sendBackTask(response, $scope.getNotes()).then(function onSuccess(response) {
+                    SubtitleStorage.sendBackTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
                         $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
                         window.location = $scope.primaryVideoURL;
@@ -191,19 +191,36 @@ var angular = angular || null;
             });
         };
         $scope.saveSession = function() {
+            // Save the current session
+            //
+            // Returns a promise that will be resolved with the version number
+            // of the new version when the save is complete.  If nothing has
+            // changed, then we don't save anything and return the current
+            // version number.
             if ($scope.status !== 'saving') {
-                $scope.status = 'saving';
+                var subtitleList = SubtitleListFinder.get('working-subtitle-set').scope;
 
-                var promise = SubtitleListFinder.get('working-subtitle-set').scope.saveSubtitles();
+                var deferred = $q.defer();
 
-                promise.then(function onSuccess(response) {
+                if(subtitleList.changesMade()) {
+                    // changes have been made, we need to save the subtitles
+                    $scope.status = 'saving';
+                    var promise = subtitleList.saveSubtitles();
+                    promise.then(function onSuccess(response) {
+                        $scope.status = 'saved';
+                        deferred.resolve(response.data.version_number);
+                    }, function onError(e) {
+                        $scope.status = 'error';
+                        $scope.showErrorModal();
+                        deferred.reject(e);
+                    });
+                } else {
+                    // no changes made, just return the current version
                     $scope.status = 'saved';
-                }, function onError() {
-                    $scope.status = 'error';
-                    $scope.showErrorModal();
-                });
+                    deferred.resolve(subtitleList.versionNumber);
+                }
 
-                return promise;
+                return deferred.promise;
             }
         };
         $scope.setCloseStates = function() {
@@ -332,7 +349,8 @@ var angular = angular || null;
         };
         $scope.onSubtitlesFetched = function (subtitleData) {
 
-            // Save the title and description to this scope.
+            // Save subtitle data to this scope
+            $scope.versionNumber = subtitleData.version_no;
             $scope.videoTitle = subtitleData.title;
             $scope.videoDescription = subtitleData.description;
 
@@ -368,6 +386,9 @@ var angular = angular || null;
                                           $scope.parser.xmlToString(true, true),
                                           $scope.videoTitle,
                                           $scope.videoDescription);
+        };
+        $scope.changesMade = function() {
+            return $scope.parser.changesMade();
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
