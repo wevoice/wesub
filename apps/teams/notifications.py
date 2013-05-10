@@ -137,7 +137,7 @@ class BaseNotification(object):
     @property
     def language_code(self):
         if self.language:
-            return  self.from_internal_lang(self.language.language)
+            return  self.from_internal_lang(self.language.language_code)
 
     def send_http_request(self, url, basic_auth_username, basic_auth_password):
         h = Http()
