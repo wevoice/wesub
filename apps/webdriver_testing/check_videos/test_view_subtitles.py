@@ -116,6 +116,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         _, ar_status = self.video_pg.language_status('Arabic')
         self.assertIn('status-incomplete', ar_status)
 
+
     def test_no_primary_audio_lang(self):
         """Language list displays when no subs for primary audio lang exists.
 
@@ -125,7 +126,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         #Upload en, primary audio = de
         complete = True
         data = {'language_code': 'en',
-                'video': self.video.pk,
+                'video': vid.pk,
                 'primary_audio_language_code': 'de',
                 'draft': open(os.path.join(self.subs_dir, 'Timed_text.en.srt')), 
                 'is_complete': complete,

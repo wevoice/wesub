@@ -103,9 +103,9 @@
             });
         }
         $scope.$root.$on('subtitle-key-up', function($event, options) {
-
-            var subtitle = options.subtitle;
-            $scope.updateSubtitleOverlay(subtitle, options.value)
+            $scope.updateSubtitleOverlay(options.subtitle.parser,
+                                         options.subtitle,
+                                         options.value)
 
 
         });
