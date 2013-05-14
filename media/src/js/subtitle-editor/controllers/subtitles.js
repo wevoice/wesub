@@ -145,6 +145,11 @@ var angular = angular || null;
             return collabScope.notes || '';
         };
         $scope.saveAndApprove = function() {
+            if($scope.changesMade) {
+                var message = 'Subtitles saved, task approved. Redirecting…';
+            } else {
+                var message = 'Task approved. Redirecting…';
+            }
 
             $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
@@ -153,7 +158,7 @@ var angular = angular || null;
 
                     SubtitleStorage.approveTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task approved. Redirecting…');
+                        $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
 
                     }, function onError() {
@@ -176,6 +181,11 @@ var angular = angular || null;
             });
         };
         $scope.saveAndSendBack = function() {
+            if($scope.changesMade) {
+                var message = 'Subtitles saved, task sent back. Redirecting…';
+            } else {
+                var message = 'Task sent back. Redirecting…';
+            }
             $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
 
@@ -183,7 +193,7 @@ var angular = angular || null;
 
                     SubtitleStorage.sendBackTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        $scope.$root.$emit('show-loading-modal', 'Subtitles saved, task sent back. Redirecting…');
+                        $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
                         
                     }, function onError() {
@@ -266,8 +276,16 @@ var angular = angular || null;
 
             }
 
+            if($scope.status === 'saved') {
+                var heading = 'Your changes have been saved.';
+            } else if($scope.changesMade) {
+                var heading = 'Your changes will be discarded.';
+            } else {
+                var heading = 'You are leaving the editor';
+            }
+
             $scope.$root.$emit('show-modal', {
-                heading: ($scope.status === 'saved' ? 'Your changes have been saved.' : 'Your changes will be discarded.'),
+                heading: heading,
                 buttons: buttons
             });
         };
