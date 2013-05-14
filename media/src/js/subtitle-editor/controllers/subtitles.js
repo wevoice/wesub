@@ -45,6 +45,7 @@ var angular = angular || null;
          * depending if this is being set from the bootstrapped value or later
          * fetches.
          */
+        $scope.changesMade = false;
         $scope.languageChanged = function(lang, versionOrVersionNumber, another) {
             // this gets called both on setInitialDisplayLanguage manually at
             // the first start up, or through the changes to the scope.language.
@@ -164,6 +165,9 @@ var angular = angular || null;
 
         };
         $scope.save = function() {
+            if(!$scope.changesMade) {
+                return;
+            }
 
             $scope.saveSession().then(function(versionNumber) {
                 if ($scope.status === 'saved') {
@@ -199,15 +203,15 @@ var angular = angular || null;
             // version number.
             if ($scope.status !== 'saving') {
                 var subtitleList = SubtitleListFinder.get('working-subtitle-set').scope;
-
                 var deferred = $q.defer();
 
-                if(subtitleList.changesMade()) {
+                if($scope.changesMade) {
                     // changes have been made, we need to save the subtitles
                     $scope.status = 'saving';
                     var promise = subtitleList.saveSubtitles();
                     promise.then(function onSuccess(response) {
                         $scope.status = 'saved';
+                        $scope.changesMade = false;
                         deferred.resolve(response.data.version_number);
                     }, function onError(e) {
                         $scope.status = 'error';
@@ -290,9 +294,10 @@ var angular = angular || null;
         });
         $scope.$root.$on('subtitles-fetched', function() {
             $scope.setCloseStates();
+            $scope.changesMade = false;
         });
         $scope.$root.$on('work-done', function() {
-            $scope.canSave = '';
+            $scope.changesMade = true;
             $scope.$digest();
         });
 
@@ -386,9 +391,6 @@ var angular = angular || null;
                                           $scope.parser.xmlToString(true, true),
                                           $scope.videoTitle,
                                           $scope.videoDescription);
-        };
-        $scope.changesMade = function() {
-            return $scope.parser.changesMade();
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
