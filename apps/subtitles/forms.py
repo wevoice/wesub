@@ -407,10 +407,6 @@ class SubtitlesUploadForm(forms.Form):
         if not from_language_code and is_dependent(sl):
             sl.fork()
 
-        # Fork immediate dependents, all the time.  For now.
-        for tsl in sl.get_dependent_subtitle_languages(direct=True):
-            tsl.fork()
-
         # TODO: Pipeline this.
         video_changed_tasks.delay(sl.video_id, version.id)
 
