@@ -337,6 +337,16 @@ var USER_IDLE_MINUTES = 5;
 
             }
 
+            // enter without shift
+            if (e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault();
+                if (selectedScope && selectedScope.isEditing) {
+                    selectedScope.finishEditingMode(activeTextArea.val());
+                    selectedScope.$digest();
+                }
+
+            }
+
             if (nextSubtitle) {
 
                 // Select the next element.
