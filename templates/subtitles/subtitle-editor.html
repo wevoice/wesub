@@ -183,13 +183,13 @@
                 <div class="subtitles-language">
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
-                <div class="switches" ng-show="false">
-                    <a class="timeline-display" ng-click="$root.timelineShown = !$root.timelineShown">
+                <div class="switches">
+                    <a class="timeline-display" href="#" ng-click="$root.timelineShown = !$root.timelineShown">
                         <span ng-show="timelineShown">Hide</span>
                         <span ng-show="!timelineShown">Show</span>
                         timeline
                     </a>
-                    <a class="video-display">Hide video</a>
+                    <a ng-show="false" href="#" class="video-display">Hide video</a>
                 </div>
             </div>
             <div class="subtitles-wrapper">
@@ -295,13 +295,12 @@
     </section>
     <section ng-controller="TimelineController"
         class="timeline ng-cloak"
-        ng-show="false"
         ng-show="$root.timelineShown"
         ng-cloak
         timeline>
         <div class="current-time-marker"></div>
-        <div class="timing-container"></div>
-        <div class="subtitles-container">
+        <canvas class="timing-container"></canvas>
+        <div ng-show="false" class="subtitles-container">
             <div class="subtitle mock-1">
                 <a href class="handle left"></a>
                 <span>This is mock subtitle one.</span>

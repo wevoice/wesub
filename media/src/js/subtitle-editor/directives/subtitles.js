@@ -176,7 +176,7 @@ var USER_IDLE_MINUTES = 5;
                     post: function post(scope, elm, attrs) {
 
                         scope.scrollingSynced = true;
-                        scope.timelineShown = false;
+                        scope.timelineShown = true;
                         scope.subtitlesHeight = 366;
 
                         scope.$watch('timelineShown', function() {
@@ -472,54 +472,21 @@ var USER_IDLE_MINUTES = 5;
         };
     });
     directives.directive('timeline', function() {
-        return {
-            compile: function compile(elem, attrs, transclude) {
-                return {
-                    post: function post(scope, elem, attrs) {
-
-                        var $elem = $(elem);
-                        var $timingContainer = $('div.timing-container', elem);
-                        var $body = $('body');
-
-                        var renderTimelineSubtitles = function(pop) {
-
-                        };
-                        var renderTimelineSeconds = function(pop) {
-
-                            var currentTime = pop.currentTime();
-                            var duration = pop.duration();
-                            var durationRoundedUp = Math.ceil(duration * 1) / 1;
-
-                            var endTime = currentTime + 15;
-                            endTime = endTime > durationRoundedUp ? durationRoundedUp : endTime;
-
-                            var startTime = currentTime - 15;
-                            startTime = startTime < 0 ? 0 : startTime;
-
-                            for (var i = startTime; i < endTime; i++) {
-
-                                // Create a new div for this second and append to the timing container.
-                                $timingContainer.append($('<div class="second"><span>' + i + '</span></div>'));
-
-                            }
-
-                            //$timingContainer.width(scope.secondsRoundedUp * 100);
-
-                        };
-
-                        scope.$root.$on('video-ready', function($event, pop) {
-                            renderTimelineSeconds(pop);
-                            renderTimelineSubtitles(pop);
-                        });
-                        scope.$root.$on('video-timechanged', function($event, pop) {
-                            renderTimelineSeconds(pop);
-                            renderTimelineSubtitles(pop);
-                        });
-
-                    }
-                };
-            }
-        };
+        function widthPerSecond($scope) {
+            return Math.floor($scope.scale * 65);
+        }
+        return function link(scope, elem, attrs) {
+            scope.$watch('currentTime + ":" + duration',
+                function(newValue, oldValue) {
+                text = scope.currentTime + " / " + scope.duration;
+                var timingContainer = $(".timing-container", $(elem));
+                var ctx = timingContainer.get(0).getContext("2d"); 
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                ctx.font = '40px sans';
+                ctx.fillStyle = 'white';
+                ctx.fillText(text, 50, 60);
+            });
+        }
     });
     directives.directive('languageSelector', function(SubtitleStorage) {
 

@@ -977,7 +977,6 @@ section.timeline {
     }
     div.subtitles-container {
         height: 65px;
-        left: 30%; // Debug only.
         position: absolute;
         top: 0;
 
@@ -1058,40 +1057,10 @@ section.timeline {
             }
         }
     }
-    div.timing-container {
+    canvas.timing-container {
         height: 65px;
-        left: 30%;
         position: absolute;
         top: 0;
-
-        div.second {
-            display: block;
-            height: 65px;
-            float: left;
-            position: relative;
-            width: 100px;
-
-            span {
-                background: #212223;
-                bottom: 3px;
-                color: #686868;
-                font-size: 12px;
-                font-weight: bold;
-                left: 0;
-                padding-right: 5px;
-                position: absolute;
-                z-index: 53;
-            }
-            &:after {
-                bottom: 3px;
-                content: "• • • • • • • • •";
-                display: block;
-                font-size: 15px;
-                left: 10px;
-                position: absolute;
-                z-index: 52;
-            }
-        }
     }
 }
 body.timeline-shown {
