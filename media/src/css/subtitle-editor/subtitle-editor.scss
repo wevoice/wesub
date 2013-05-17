@@ -139,7 +139,9 @@ div.modal {
         @include box-shadow(0, 0, 30px, rgba(black, .4));
 
         h1 {
-            font: normal 17px $OpenSans;
+            /* The preloader should not use custom font, else some browsers
+                will display blank text until that font has loaded */
+            font: normal 17px $Helvetica;
             margin-bottom: 20px;
             
             &.loading {

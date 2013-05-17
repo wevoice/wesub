@@ -11,8 +11,6 @@
     <meta charset="utf-8" />
     <title>Editing {{ language.get_language_code_display }} subtitles for &ldquo;{{ video }}&rdquo; - Amara</title>
 
-    {# include bold style too #}
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/third-party/reset.css" type="text/css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
@@ -42,10 +40,9 @@
 
     <div class="modal"
         ng-controller="ModalController"
-        ng-show="content || loading">
-        <div class="loading inner"
-            ng-show="loading">
-            <h1 class="loading" ng-bind="loading">Loading subtitle editor&hellip;</h1>
+        ng-show="isVisible">
+        <div class="loading inner" ng-show='!content' >
+            <h1 class="loading"  >Loading subtitle editor&hellip;</h1>
         </div>
         <div class="content inner ng-cloak"
             ng-show="content"
@@ -383,5 +380,8 @@
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.flash-fallback.js"></script>
     <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.netflix.js"></script>
 
+
+    {# include bold style too #}
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
 </body>
 </html>

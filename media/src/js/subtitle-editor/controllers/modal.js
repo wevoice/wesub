@@ -28,30 +28,29 @@
          * @constructor
          */
 
-        $scope.loading = false;
+        $scope.isVisible = true;
         $scope.content = null;
 
         $scope.hide = function() {
+
             $scope.content = null;
-            $scope.loading = null;
+            $scope.isVisible = false;
         };
 
         $scope.$root.$on('hide-modal', function($event) {
             $scope.hide();
         });
         $scope.$root.$on('show-loading-modal', function($event, content) {
-
             // Clear out any existing modal.
             $scope.hide();
-
-            $scope.loading = content;
+            $scope.content = content;
+            $scope.isVisible = true;
         });
         $scope.$root.$on('show-modal', function($event, content) {
-
             // Clear out any existing modal.
             $scope.hide();
-
             $scope.content = content;
+            $scope.isVisible = true;
         });
         $scope.$root.$on('show-modal-download', function($event) {
 
@@ -60,9 +59,9 @@
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
                 $scope.content.heading = heading;
+                $scope.isVisible = true;
             }
         });
-
     };
 
     root.ModalController = ModalController;
