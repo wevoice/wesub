@@ -475,16 +475,37 @@ var USER_IDLE_MINUTES = 5;
         function widthPerSecond($scope) {
             return Math.floor($scope.scale * 65);
         }
+        function resizeCanvas(elem) {
+            // Resize the canvas so that it's width matches the
+            // width of its container, but also make sure that it's a whole
+            // number of pixels.
+            var timingContainer = $(".timing-container", $(elem));
+            var canvas = timingContainer.get(0);
+            var width = Math.floor($(elem).width());
+            canvas.width = width;
+            timingContainer.css('width', width + 'px');
+        }
+        function trackWindowResize(scope, elem) {
+            $(window).resize(function() {
+                resizeCanvas(elem);
+                drawCanvas(scope, elem);
+            });
+        }
+        function drawCanvas(scope, elem) {
+            text = scope.currentTime + " / " + scope.duration;
+            var timingContainer = $(".timing-container", $(elem));
+            var ctx = timingContainer.get(0).getContext("2d"); 
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.font = '40px sans';
+            ctx.fillStyle = 'white';
+            ctx.fillText(text, 50, 50);
+        }
         return function link(scope, elem, attrs) {
+            resizeCanvas(elem);
+            trackWindowResize(scope, elem);
             scope.$watch('currentTime + ":" + duration',
                 function(newValue, oldValue) {
-                text = scope.currentTime + " / " + scope.duration;
-                var timingContainer = $(".timing-container", $(elem));
-                var ctx = timingContainer.get(0).getContext("2d"); 
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                ctx.font = '40px sans';
-                ctx.fillStyle = 'white';
-                ctx.fillText(text, 50, 60);
+                    drawCanvas(scope, elem);
             });
         }
     });

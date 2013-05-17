@@ -1058,9 +1058,11 @@ section.timeline {
         }
     }
     canvas.timing-container {
-        height: 65px;
         position: absolute;
         top: 0;
+        left: 0;
+        height: 65px;
+        width: 100px;
     }
 }
 body.timeline-shown {
