@@ -471,7 +471,7 @@ var USER_IDLE_MINUTES = 5;
             }
         };
     });
-    directives.directive('timeline', function() {
+    directives.directive('timelineTiming', function() {
         var startTime = 0.0; // time when x = 0
         var width=0, height=65; // dimensions of the canvas
         var widthPerSecond = 100; // width of 1 seconds with of time
@@ -480,10 +480,9 @@ var USER_IDLE_MINUTES = 5;
             // Resize the canvas so that it's width matches the
             // width of its container, but also make sure that it's a whole
             // number of pixels.
-            var timingContainer = $(".timing-container", $(elem));
-            var canvas = timingContainer.get(0);
-            width = canvas.width = Math.floor($(elem).width());
-            timingContainer.css('width', width + 'px');
+            var canvas = elem[0];
+            width = canvas.width = Math.floor($(elem).parent().width());
+            $(elem).css('width', width + 'px');
         }
         function recalcTimeVars(scope) {
             widthPerSecond = Math.floor(scope.scale * 100);
@@ -533,8 +532,7 @@ var USER_IDLE_MINUTES = 5;
         }
         function drawCanvas(scope, elem) {
             recalcTimeVars(scope);
-            var timingContainer = $(".timing-container", $(elem));
-            var ctx = timingContainer.get(0).getContext("2d"); 
+            var ctx = elem[0].getContext("2d");
             ctx.clearRect(0, 0, width, height);
             ctx.font = 'bold ' + (height / 5) + 'px sans';
 
