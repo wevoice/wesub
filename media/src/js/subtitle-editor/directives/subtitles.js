@@ -472,18 +472,31 @@ var USER_IDLE_MINUTES = 5;
         };
     });
     directives.directive('timeline', function() {
-        function widthPerSecond($scope) {
-            return Math.floor($scope.scale * 65);
-        }
+        var startTime = 0.0; // time when x = 0
+        var width=0, height=65; // dimensions of the canvas
+        var widthPerSecond = 100; // width of 1 seconds with of time
+
         function resizeCanvas(elem) {
             // Resize the canvas so that it's width matches the
             // width of its container, but also make sure that it's a whole
             // number of pixels.
             var timingContainer = $(".timing-container", $(elem));
             var canvas = timingContainer.get(0);
-            var width = Math.floor($(elem).width());
-            canvas.width = width;
+            width = canvas.width = Math.floor($(elem).width());
             timingContainer.css('width', width + 'px');
+        }
+        function recalcTimeVars(scope) {
+            widthPerSecond = Math.floor(scope.scale * 100);
+            // put startTime in the middle of the canvas, unless we are
+            // at the very begining/end of the timeline.
+            startTime = scope.currentTime - (width / 2) / widthPerSecond;
+            var maxStartTime = scope.duration - (width / widthPerSecond);
+            if(startTime > maxStartTime) {
+                startTime = maxStartTime;
+            }
+            if(startTime < 0) {
+                startTime = 0;
+            }
         }
         function trackWindowResize(scope, elem) {
             $(window).resize(function() {
@@ -491,14 +504,48 @@ var USER_IDLE_MINUTES = 5;
                 drawCanvas(scope, elem);
             });
         }
+        function drawSecond(ctx, xPos, t) {
+            // draw the second text on the timeline
+            ctx.fillStyle = '#686868';
+            var metrics = ctx.measureText(t);
+            var x = xPos - (metrics.width / 2);
+            ctx.fillText(t, x, 60);
+        }
+        function drawTics(ctx, xPos) {
+            // draw the tic marks between seconds
+            ctx.strokeStyle = '#686868';
+            var divisions = 4;
+            var step = widthPerSecond / divisions;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for(var i = 1; i < divisions; i++) {
+                var x = Math.floor(0.5 + xPos + step * i);
+                x += 0.5;
+                ctx.moveTo(x, 60);
+                if(i == divisions / 2) {
+                    // draw an extra long tic for the 50% mark;
+                    ctx.lineTo(x, 45);
+                } else {
+                    ctx.lineTo(x, 50);
+                }
+            }
+            ctx.stroke();
+        }
         function drawCanvas(scope, elem) {
-            text = scope.currentTime + " / " + scope.duration;
+            recalcTimeVars(scope);
             var timingContainer = $(".timing-container", $(elem));
             var ctx = timingContainer.get(0).getContext("2d"); 
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            ctx.font = '40px sans';
-            ctx.fillStyle = 'white';
-            ctx.fillText(text, 50, 50);
+            ctx.clearRect(0, 0, width, height);
+            ctx.font = 'bold ' + (height / 5) + 'px sans';
+
+            var endTime = startTime + (width / widthPerSecond);
+            for(t = Math.floor(startTime); t < endTime; t++) {
+                var xPos = (t - startTime) * widthPerSecond;
+                if(t > 0) {
+                    drawSecond(ctx, xPos, t);
+                }
+                drawTics(ctx, xPos);
+            }
         }
         return function link(scope, elem, attrs) {
             resizeCanvas(elem);
