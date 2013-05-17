@@ -25,6 +25,28 @@ var USER_IDLE_MINUTES = 5;
 
     var directives = angular.module('amara.SubtitleEditor.directives', []);
 
+    function calcTimelineView(scope, width) {
+        // Calculate the portion of the video time that is displayed in the
+        // timeline
+
+        var widthPerSecond = Math.floor(scope.scale * 100);
+        // put startTime in the middle of the canvas, unless we are
+        // at the very begining/end of the timeline.
+        var startTime = scope.currentTime - (width / 2) / widthPerSecond;
+        var maxStartTime = scope.duration - (width / widthPerSecond);
+        if(startTime > maxStartTime) {
+            startTime = maxStartTime;
+        }
+        if(startTime < 0) {
+            startTime = 0;
+        }
+        return {
+            'startTime': startTime,
+            'widthPerSecond': widthPerSecond,
+            'endTime': startTime + (width / widthPerSecond),
+        }
+    }
+
     function setCaretPosition(elem, caretPos) {
         /** Move the caret to the specified position.
          * This will work, except for text areas with user inserted line breaks
@@ -472,9 +494,8 @@ var USER_IDLE_MINUTES = 5;
         };
     });
     directives.directive('timelineTiming', function() {
-        var startTime = 0.0; // time when x = 0
         var width=0, height=65; // dimensions of the canvas
-        var widthPerSecond = 100; // width of 1 seconds with of time
+        var view = null;
 
         function resizeCanvas(elem) {
             // Resize the canvas so that it's width matches the
@@ -483,19 +504,6 @@ var USER_IDLE_MINUTES = 5;
             var canvas = elem[0];
             width = canvas.width = Math.floor($(elem).parent().width());
             $(elem).css('width', width + 'px');
-        }
-        function recalcTimeVars(scope) {
-            widthPerSecond = Math.floor(scope.scale * 100);
-            // put startTime in the middle of the canvas, unless we are
-            // at the very begining/end of the timeline.
-            startTime = scope.currentTime - (width / 2) / widthPerSecond;
-            var maxStartTime = scope.duration - (width / widthPerSecond);
-            if(startTime > maxStartTime) {
-                startTime = maxStartTime;
-            }
-            if(startTime < 0) {
-                startTime = 0;
-            }
         }
         function trackWindowResize(scope, elem) {
             $(window).resize(function() {
@@ -514,7 +522,7 @@ var USER_IDLE_MINUTES = 5;
             // draw the tic marks between seconds
             ctx.strokeStyle = '#686868';
             var divisions = 4;
-            var step = widthPerSecond / divisions;
+            var step = view.widthPerSecond / divisions;
             ctx.lineWidth = 1;
             ctx.beginPath();
             for(var i = 1; i < divisions; i++) {
@@ -531,14 +539,14 @@ var USER_IDLE_MINUTES = 5;
             ctx.stroke();
         }
         function drawCanvas(scope, elem) {
-            recalcTimeVars(scope);
+            view = calcTimelineView(scope, width);
             var ctx = elem[0].getContext("2d");
             ctx.clearRect(0, 0, width, height);
             ctx.font = 'bold ' + (height / 5) + 'px sans';
 
-            var endTime = startTime + (width / widthPerSecond);
-            for(t = Math.floor(startTime); t < endTime; t++) {
-                var xPos = (t - startTime) * widthPerSecond;
+            var endTime = view.startTime + (width / view.widthPerSecond);
+            for(t = Math.floor(view.startTime); t < endTime; t++) {
+                var xPos = (t - view.startTime) * view.widthPerSecond;
                 if(t > 0) {
                     drawSecond(ctx, xPos, t);
                 }
@@ -551,6 +559,37 @@ var USER_IDLE_MINUTES = 5;
             scope.$watch('currentTime + ":" + duration',
                 function(newValue, oldValue) {
                     drawCanvas(scope, elem);
+            });
+        }
+    });
+    directives.directive('timelineSubtitles', function() {
+        var view = null;
+        function placeSubtitle(subtitle, container) {
+            var sub = $('<div/>', {class: 'subtitle'});
+            var text = $('<span/>');
+            text.text(subtitle.text);
+            sub.append('<a href class="handle left"></a>');
+            sub.append(text);
+            sub.append('<a href class="handle right"></a>');
+            var x = Math.floor((subtitle.startTime - view.startTime) *
+                view.widthPerSecond);
+            var width = Math.floor((subtitle.endTime - subtitle.startTime) *
+                view.widthPerSecond);
+            sub.css({left: x, width: width});
+            container.append(sub);
+        }
+        function placeSubtitles(scope, elem) {
+            $(elem).empty();
+            var subtitles = scope.getSubtitles(view.startTime, view.endTime);
+            for(var i = 0; i < subtitles.length; i++) {
+                placeSubtitle(subtitles[i], elem);
+            }
+        }
+        return function link(scope, elem, attrs) {
+            scope.$watch('currentTime + ":" + duration',
+                function(newValue, oldValue) {
+                    view = calcTimelineView(scope, $(elem).width());
+                    placeSubtitles(scope, elem);
             });
         }
     });

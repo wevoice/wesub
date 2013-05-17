@@ -24,6 +24,15 @@
         $scope.scale = 1.0;
         $scope.currentTime = $scope.duration = null;
 
+        $scope.getSubtitles = function(startTime, endTime) {
+            return [
+                {text: 'subtitle 1', startTime: 1.0, endTime: 2.0},
+                {text: 'subtitle 2', startTime: 4.0, endTime: 5.0},
+                {text: 'subtitle 3', startTime: 10.0, endTime: 13.0},
+                {text: 'subtitle 4', startTime: 15.0, endTime: 20.0},
+            ];
+        }
+
         $scope.$root.$on('video-ready', function($event, pop) {
             console.log("video-ready");
             $scope.currentTime = pop.currentTime();

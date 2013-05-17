@@ -979,6 +979,7 @@ section.timeline {
         height: 65px;
         position: absolute;
         top: 0;
+        width: 100%;
 
         div.subtitle {
             background: #DADBDC;
@@ -1038,22 +1039,6 @@ section.timeline {
                         @include border-radius(12px);
                     }
                 }
-            }
-            &.mock-1 {
-                left: 0px;
-                width: 155px;
-            }
-            &.mock-2 {
-                left: 155px;
-                width: 150px;
-            }
-            &.mock-3 {
-                left: 312px;
-                width: 230px;
-            }
-            &.mock-4 {
-                left: 542px;
-                width: 230px;
             }
         }
     }
