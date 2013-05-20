@@ -16,7 +16,11 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var AmaraDFXPParser = function(AmaraDFXPParser) {
+
+var dfxp = (function() {
+var $ = AmarajQuery;
+
+var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
      * The front end app needs all timming data to be
@@ -559,15 +563,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return this.getSubtitles().eq(index).get(0);
     };
-    this.getSubtitleIndex = function(subtitle, subtitles) {
-        /*
-         * Retrieve the index of the given subtitle within the given subtitle set.
-         *
-         * Returns: integer
-         */
-        subtitles = subtitles || this.getSubtitles();
-        return $(subtitles).index(subtitle);
-    };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
@@ -1033,3 +1028,24 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
 };
+
+var SubtitleList = function(dfxpParser) {
+    // Manages a list of subtitles.
+    if(dfxpParser) {
+        this.subtitlesQuery = dfxpParser.getSubtitles();
+    } else {
+        this.subtitlesQuery = $([]);
+    }
+    this.subtitles = this.subtitlesQuery.get();
+}
+
+SubtitleList.prototype.getIndex = function(subtitle) {
+    return $(this.subtitlesQuery).index(subtitle);
+}
+
+return {
+    AmaraDFXPParser: AmaraDFXPParser,
+    SubtitleList: SubtitleList,
+}
+
+})();

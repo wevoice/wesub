@@ -152,7 +152,7 @@
                         editable="false"
                         video-id="{{ video.video_id }}">
 
-                        <li ng-repeat="subtitle in subtitles"
+                        <li ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
                             class="subtitle-list-item">
 
@@ -204,7 +204,7 @@
                         id="working-subtitle-set">
 
                         <li subtitle-list-item
-                            ng-repeat="subtitle in subtitles"
+                            ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">

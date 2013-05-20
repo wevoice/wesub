@@ -293,6 +293,7 @@ var angular = angular || null;
          */
 
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
+        $scope.subtitleList = dfxp.SubtitleList();
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
@@ -304,7 +305,7 @@ var angular = angular || null;
             // If we want to focus the subtitle after it's been added, set
             // the index here.
             if (focus) {
-                $scope.focusIndex = $scope.parser.getSubtitleIndex(newSubtitle, $scope.parser.getSubtitles().get());
+                $scope.focusIndex = $scope.subtitleList.getIndex(newSubtitle);
 
             // Otherwise, reset the focusIndex.
             } else {
@@ -343,13 +344,13 @@ var angular = angular || null;
 
             if ( subtitleData.visibility == 'Public' || $scope.isEditable){
                 // Set up a new parser instance with this DFXP XML set.
-               this.dfxpWrapper = new root.AmaraDFXPParser();
+               this.dfxpWrapper = new dfxp.AmaraDFXPParser();
                this.dfxpWrapper.init(subtitleData.subtitlesXML);
 
                 // Reference the parser and instance on the scope so we can access it via
                 // the templates.
                 $scope.parser = this.dfxpWrapper;
-                $scope.subtitles = $scope.parser.getSubtitles().get();
+                $scope.updateParserSubtitles();
 
                 $scope.status = 'ready';
             }
@@ -387,7 +388,7 @@ var angular = angular || null;
             $scope.videoID = videoID;
         };
         $scope.updateParserSubtitles = function() {
-            $scope.subtitles = $scope.parser.getSubtitles().get();
+            $scope.subtitleList = new dfxp.SubtitleList($scope.parser);
         };
 
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
@@ -447,7 +448,7 @@ var angular = angular || null;
             }
         };
         $scope.getSubtitleIndex = function() {
-            return $scope.parser.getSubtitleIndex($scope.subtitle, $scope.subtitles);
+            return $scope.subtitleList.getIndex($scope.subtitle);
         };
         $scope.startEditingMode = function() {
 
