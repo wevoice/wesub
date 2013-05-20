@@ -1029,18 +1029,53 @@ var AmaraDFXPParser = function() {
 
 };
 
+
 var SubtitleList = function(dfxpParser) {
-    // Manages a list of subtitles.
+    /*
+     * Manages a list of subtitles.
+     *
+     * For functions that return subtitle items, each item is a dict with the
+     * following properties:
+     *   - startTime -- start time in seconds
+     *   - endTime -- end time in seconds
+     *   - content -- string of html for the subtitle content
+     *
+     */
+
     if(dfxpParser) {
         this.subtitlesQuery = dfxpParser.getSubtitles();
+        this.parser = dfxpParser;
     } else {
         this.subtitlesQuery = $([]);
     }
     this.subtitles = this.subtitlesQuery.get();
 }
 
+SubtitleList.prototype.makeItem = function(node) {
+    return {
+        startTime: this.parser.startTime(node) / 1000,
+        endTime: this.parser.endTime(node) / 1000,
+        content: this.parser.contentRendered(node),
+    }
+}
+
 SubtitleList.prototype.getIndex = function(subtitle) {
     return $(this.subtitlesQuery).index(subtitle);
+}
+
+SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
+    var rv = [];
+    // FIXME: we should do a binary search to determine where to start looking
+    // for subtitles, this approach will be slow if the subtitles array is
+    // long.
+    for(var i = 0; i < this.subtitles.length; i++) {
+        var node = this.subtitles[i];
+        if(this.parser.startTime(node) / 1000 < endTime &&
+           this.parser.endTime(node) / 1000 > startTime) {
+            rv.push(this.makeItem(node));
+        }
+    }
+    return rv;
 }
 
 return {

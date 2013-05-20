@@ -566,10 +566,10 @@ var USER_IDLE_MINUTES = 5;
         var view = null;
         function placeSubtitle(subtitle, container) {
             var sub = $('<div/>', {class: 'subtitle'});
-            var text = $('<span/>');
-            text.text(subtitle.text);
+            var span = $('<span/>');
+            span.html(subtitle.content);
             sub.append('<a href class="handle left"></a>');
-            sub.append(text);
+            sub.append(span);
             sub.append('<a href class="handle right"></a>');
             var x = Math.floor((subtitle.startTime - view.startTime) *
                 view.widthPerSecond);
@@ -580,7 +580,11 @@ var USER_IDLE_MINUTES = 5;
         }
         function placeSubtitles(scope, elem) {
             $(elem).empty();
-            var subtitles = scope.getSubtitles(view.startTime, view.endTime);
+            if(!scope.workingSubtitles) {
+                return;
+            }
+            var subtitles = scope.workingSubtitles.subtitleList.getSubtitlesForTime(
+                view.startTime, view.endTime );
             for(var i = 0; i < subtitles.length; i++) {
                 placeSubtitle(subtitles[i], elem);
             }
