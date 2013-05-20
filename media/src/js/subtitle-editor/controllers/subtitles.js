@@ -293,6 +293,9 @@ var angular = angular || null;
          */
 
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
+        $scope.isWorkingSubtitles = function() {
+            return $scope.isEditable;
+        }
         $scope.addSubtitle = function(index, attrs, content, focus) {
 
             // Add the subtitle directly to the DFXP instance.
@@ -354,7 +357,9 @@ var angular = angular || null;
 
             // When we have subtitles for an editable set, broadcast it.
             $timeout(function() {
-                if ($scope.isEditable) {
+                if ($scope.isWorkingSubtitles()) {
+                    $scope.$root.workingSubtitles = $scope;
+                    $scope.$root.$apply();
                     $scope.$root.$broadcast('subtitles-fetched');
                 }
             });
