@@ -406,7 +406,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'video': video.pk,
                 'primary_audio_language_code': 'en',
                 'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.en.srt'),
+                              'How-to.en.srt'),
                 'is_complete': True,
                 'complete': 1
                }
