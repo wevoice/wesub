@@ -313,7 +313,7 @@ var angular = angular || null;
             }
 
             // Update the subtitles on the list scope.
-            $scope.updateParserSubtitles();
+            $scope.updateSubtitleList();
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.$root.subtitlesHeight;
@@ -350,7 +350,7 @@ var angular = angular || null;
                 // Reference the parser and instance on the scope so we can access it via
                 // the templates.
                 $scope.parser = this.dfxpWrapper;
-                $scope.updateParserSubtitles();
+                $scope.updateSubtitleList();
 
                 $scope.status = 'ready';
             }
@@ -367,7 +367,7 @@ var angular = angular || null;
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.parser.removeSubtitle(subtitle);
-            $scope.updateParserSubtitles();
+            $scope.updateSubtitleList();
         };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
@@ -387,7 +387,7 @@ var angular = angular || null;
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };
-        $scope.updateParserSubtitles = function() {
+        $scope.updateSubtitleList = function() {
             $scope.subtitleList = new dfxp.SubtitleList($scope.parser);
         };
 
@@ -442,6 +442,7 @@ var angular = angular || null;
                 // then on serialization it will get converted correctly
                 // to dfxp
                 $scope.parser.content($scope.subtitle, newValue);
+                $scope.updateSubtitleList();
                 $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
                 initialText = $scope.parser.content($scope.subtitle);
                 $scope.$root.$emit('work-done');

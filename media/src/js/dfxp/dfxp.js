@@ -1029,6 +1029,12 @@ var AmaraDFXPParser = function() {
 
 };
 
+var SubtitleItem = function(parser, node) {
+    this.startTime = parser.startTime(node) / 1000;
+    this.endTime = parser.endTime(node) / 1000;
+    this.content = parser.contentRendered(node);
+    this.node = node;
+}
 
 var SubtitleList = function(dfxpParser) {
     /*
@@ -1039,6 +1045,7 @@ var SubtitleList = function(dfxpParser) {
      *   - startTime -- start time in seconds
      *   - endTime -- end time in seconds
      *   - content -- string of html for the subtitle content
+     *   - node -- DOM node from the DFXP XML
      *
      */
 
@@ -1049,18 +1056,21 @@ var SubtitleList = function(dfxpParser) {
         this.subtitlesQuery = $([]);
     }
     this.subtitles = this.subtitlesQuery.get();
-}
-
-SubtitleList.prototype.makeItem = function(node) {
-    return {
-        startTime: this.parser.startTime(node) / 1000,
-        endTime: this.parser.endTime(node) / 1000,
-        content: this.parser.contentRendered(node),
-    }
+    this.length = this.subtitles.length;
+    this.cachedItems = [];
+    this.cachedItems.length = this.length;
 }
 
 SubtitleList.prototype.getIndex = function(subtitle) {
     return $(this.subtitlesQuery).index(subtitle);
+}
+
+SubtitleList.prototype.getSubtitle = function(index) {
+    if(this.cachedItems[index] === undefined) {
+        this.cachedItems[index] = new SubtitleItem(this.parser,
+                this.subtitles[index]);
+    }
+    return this.cachedItems[index];
 }
 
 SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
@@ -1068,11 +1078,10 @@ SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     // FIXME: we should do a binary search to determine where to start looking
     // for subtitles, this approach will be slow if the subtitles array is
     // long.
-    for(var i = 0; i < this.subtitles.length; i++) {
-        var node = this.subtitles[i];
-        if(this.parser.startTime(node) / 1000 < endTime &&
-           this.parser.endTime(node) / 1000 > startTime) {
-            rv.push(this.makeItem(node));
+    for(var i = 0; i < this.length; i++) {
+        var subtitle = this.getSubtitle(i);
+        if(subtitle.startTime < endTime && subtitle.endTime > startTime) {
+            rv.push(subtitle);
         }
     }
     return rv;
