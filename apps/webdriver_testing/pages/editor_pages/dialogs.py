@@ -85,7 +85,7 @@ class EditorDialogs(Page):
                 self.logger.info('Marking subs as complete')
                 if not self.is_element_present(self._CHECKBOX_CHECKED):
                     self.click_by_css(self._CHECKBOX)
-        self.click_saved_ok()
+        self.click_by_css(self._SAVED_OK)
         
 
     def incomplete_alert_text(self):
