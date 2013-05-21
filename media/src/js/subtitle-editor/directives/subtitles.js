@@ -567,21 +567,79 @@ var USER_IDLE_MINUTES = 5;
         // Map XML subtitle nodes to the div we created to show them
         var timelineDivs = {}
 
+        function handleDragLeft(context, deltaSecs) {
+            context.startTime = context.subtitle.startTime + deltaSecs;
+        }
+
+        function handleDragRight(context, deltaSecs) {
+            context.endTime = context.subtitle.endTime + deltaSecs;
+        }
+
+        function handleDragMiddle(context, deltaSecs) {
+            context.startTime = context.subtitle.startTime + deltaSecs;
+            context.endTime = context.subtitle.endTime + deltaSecs;
+        }
+
+        function handleMouseDown(evt, dragHandler) {
+            var subtitle = evt.data.subtitle;
+            var dragHandler = evt.data.dragHandler;
+
+            context = {
+                subtitle: subtitle,
+                startTime: subtitle.startTime,
+                endTime: subtitle.endTime,
+            }
+
+            var div = timelineDivs[context.subtitle.id];
+            if(div === undefined) {
+                return;
+            }
+            var container = div.parent();
+            var initialPageX = evt.pageX;
+            container.on('mousemove.timelinedrag', function(evt) {
+                var deltaX = evt.pageX - initialPageX;
+                var deltaSecs = deltaX / view.widthPerSecond;
+                dragHandler(context, deltaSecs);
+                placeSubtitle(context.startTime, context.endTime, div);
+            }).on('mouseup.timelinedrag', function(evt) {
+                container.off('.timelinedrag');
+                console.log('update time: ' + newStartTime);
+            }).on('mouseleave.timelinedrag', function(evt) {
+                container.off('.timelinedrag');
+                placeSubtitle(subtitle.startTime, subtitle.endTime, div);
+            });
+            // need to prevent the default event from happening so that the
+            // browser's DnD code doesn't mess with us.
+            evt.preventDefault();
+            return false;
+        }
+
         function makeDivForSubtitle(subtitle, container) {
             var div = $('<div/>', {class: 'subtitle'});
             var span = $('<span/>');
             span.html(subtitle.content);
-            div.append('<a href class="handle left"></a>');
+            var left = $('<a href class="handle left"></a>');
+            var right = $('<a href class="handle right"></a>');
+            left.on('mousedown',
+                    {subtitle: subtitle, dragHandler: handleDragLeft},
+                    handleMouseDown);
+            right.on('mousedown',
+                    {subtitle: subtitle, dragHandler: handleDragRight},
+                    handleMouseDown);
+            span.on('mousedown',
+                    {subtitle: subtitle, dragHandler: handleDragMiddle},
+                    handleMouseDown);
+            div.append(left);
             div.append(span);
-            div.append('<a href class="handle right"></a>');
+            div.append(right);
             container.append(div);
             return div;
         }
 
-        function placeSubtitle(subtitle, div) {
-            var x = Math.floor((subtitle.startTime - view.startTime) *
+        function placeSubtitle(startTime, endTime, div) {
+            var x = Math.floor((startTime - view.startTime) *
                 view.widthPerSecond);
-            var width = Math.floor((subtitle.endTime - subtitle.startTime) *
+            var width = Math.floor((endTime - startTime) *
                 view.widthPerSecond);
             div.css({left: x, width: width});
         }
@@ -606,7 +664,8 @@ var USER_IDLE_MINUTES = 5;
                     var div = makeDivForSubtitle(subtitle, elem);
                     timelineDivs[subtitle.id] = div;
                 }
-                placeSubtitle(subtitle, timelineDivs[subtitle.id]);
+                placeSubtitle(subtitle.startTime, subtitle.endTime,
+                        timelineDivs[subtitle.id]);
             }
             // remove divs no longer in the timeline
             for(var subId in oldTimelineDivs) {
