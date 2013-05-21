@@ -564,29 +564,53 @@ var USER_IDLE_MINUTES = 5;
     });
     directives.directive('timelineSubtitles', function() {
         var view = null;
-        function placeSubtitle(subtitle, container) {
-            var sub = $('<div/>', {class: 'subtitle'});
+        // Map XML subtitle nodes to the div we created to show them
+        var timelineDivs = {}
+
+        function makeDivForSubtitle(subtitle, container) {
+            var div = $('<div/>', {class: 'subtitle'});
             var span = $('<span/>');
             span.html(subtitle.content);
-            sub.append('<a href class="handle left"></a>');
-            sub.append(span);
-            sub.append('<a href class="handle right"></a>');
+            div.append('<a href class="handle left"></a>');
+            div.append(span);
+            div.append('<a href class="handle right"></a>');
+            container.append(div);
+            return div;
+        }
+
+        function placeSubtitle(subtitle, div) {
             var x = Math.floor((subtitle.startTime - view.startTime) *
                 view.widthPerSecond);
             var width = Math.floor((subtitle.endTime - subtitle.startTime) *
                 view.widthPerSecond);
-            sub.css({left: x, width: width});
-            container.append(sub);
+            div.css({left: x, width: width});
         }
+
         function placeSubtitles(scope, elem) {
-            $(elem).empty();
             if(!scope.workingSubtitles) {
                 return;
             }
             var subtitles = scope.workingSubtitles.subtitleList.getSubtitlesForTime(
                 view.startTime, view.endTime );
+
+
+            var oldTimelineDivs = timelineDivs;
+            timelineDivs = {}
+
             for(var i = 0; i < subtitles.length; i++) {
-                placeSubtitle(subtitles[i], elem);
+                var subtitle = subtitles[i];
+                if(oldTimelineDivs.hasOwnProperty(subtitle.id)) {
+                    timelineDivs[subtitle.id] = oldTimelineDivs[subtitle.id];
+                    delete oldTimelineDivs[subtitle.id];
+                } else {
+                    var div = makeDivForSubtitle(subtitle, elem);
+                    timelineDivs[subtitle.id] = div;
+                }
+                placeSubtitle(subtitle, timelineDivs[subtitle.id]);
+            }
+            // remove divs no longer in the timeline
+            for(var subId in oldTimelineDivs) {
+                oldTimelineDivs[subId].remove();
             }
         }
         return function link(scope, elem, attrs) {

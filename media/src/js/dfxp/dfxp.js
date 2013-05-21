@@ -1029,11 +1029,21 @@ var AmaraDFXPParser = function() {
 
 };
 
-var SubtitleItem = function(parser, node) {
+var SubtitleItem = function(parser, node, id) {
+    /* Subtitle element in SubtitleList.
+     *
+     * SubtitleItem has the following properties:
+     *   - startTime -- start time in seconds
+     *   - endTime -- end time in seconds
+     *   - content -- string of html for the subtitle content
+     *   - node -- DOM node from the DFXP XML
+     *   - id -- unique string to identify this item in the list
+     */
     this.startTime = parser.startTime(node) / 1000;
     this.endTime = parser.endTime(node) / 1000;
     this.content = parser.contentRendered(node);
     this.node = node;
+    this.id = id;
 }
 
 var SubtitleList = function(dfxpParser) {
@@ -1059,6 +1069,7 @@ var SubtitleList = function(dfxpParser) {
     this.length = this.subtitles.length;
     this.cachedItems = [];
     this.cachedItems.length = this.length;
+    this.idCounter = 0;
 }
 
 SubtitleList.prototype.getIndex = function(subtitle) {
@@ -1067,21 +1078,50 @@ SubtitleList.prototype.getIndex = function(subtitle) {
 
 SubtitleList.prototype.getSubtitle = function(index) {
     if(this.cachedItems[index] === undefined) {
+        var idKey = (this.idCounter++).toString(16);
         this.cachedItems[index] = new SubtitleItem(this.parser,
-                this.subtitles[index]);
+                this.subtitles[index], idKey);
     }
     return this.cachedItems[index];
 }
 
+SubtitleList.prototype.firstSubtitleAfter = function(time) {
+    /* Get the first subtitle whose end is after time
+     *
+     * returns index of the subtitle, or -1 if none are found.
+     */
+
+    // First check that we are going to fine one subtitle
+    if(this.length == 0 || this.getSubtitle(this.length-1).endTime <= time) {
+        return -1;
+    }
+
+    // Do a binary search to find the sub
+    var left = 0;
+    var right = this.length - 1;
+    while(left < right) {
+        var index = Math.floor((left + right) / 2);
+        if(this.getSubtitle(index).endTime > time) {
+            right = index;
+        } else {
+            left = index + 1;
+        }
+    }
+    return left;
+}
+
 SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     var rv = [];
-    // FIXME: we should do a binary search to determine where to start looking
-    // for subtitles, this approach will be slow if the subtitles array is
-    // long.
-    for(var i = 0; i < this.length; i++) {
+    var i = this.firstSubtitleAfter(startTime);
+    if(i == -1) {
+        return rv;
+    }
+    for(; i < this.length; i++) {
         var subtitle = this.getSubtitle(i);
-        if(subtitle.startTime < endTime && subtitle.endTime > startTime) {
+        if(subtitle.startTime < endTime) {
             rv.push(subtitle);
+        } else {
+            break;
         }
     }
     return rv;
