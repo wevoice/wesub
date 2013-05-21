@@ -360,6 +360,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
