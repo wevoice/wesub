@@ -426,7 +426,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
         task = list(tv.task_set.all_approve().all())[0]
-        self.logger.info(dir(task))
 
     def test_review_accept__removes_review_task(self):
         """Review task removed after reviewer accepts transcription. """
