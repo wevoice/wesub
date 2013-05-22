@@ -75,10 +75,10 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
                 <div class="exit dropdown">
-                    <a class="discard" ng-click="discard()">
+                    <a class="discard" href="#" ng-click="discard()">
                         Exit
                     </a>
-                    <a class="save" ng-click="save()">
+                    <a class="save" href="#" ng-class="{ disabled: !changesMade }" ng-click="save()">
                         Save
                     </a>
                 </div>
