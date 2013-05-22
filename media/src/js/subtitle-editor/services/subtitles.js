@@ -53,7 +53,7 @@ var angular = angular || null;
         var authHeaders = cachedData.authHeaders;
 
         return {
-            approveTask: function(response, notes) {
+            approveTask: function(versionNumber, notes) {
 
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
 
@@ -64,7 +64,7 @@ var angular = angular || null;
                     data:  {
                         complete: true,
                         body: notes,
-                        version_number: response.data.version_number
+                        version_number: versionNumber,
                     }
                 });
 
@@ -164,7 +164,7 @@ var angular = angular || null;
             getVideoURLs: function() {
                 return cachedData.video.videoURLs;
             },
-            sendBackTask: function(response, notes) {
+            sendBackTask: function(versionNumber, notes) {
 
                 var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
 
@@ -176,7 +176,7 @@ var angular = angular || null;
                         complete: true,
                         notes: notes,
                         send_back: true,
-                        version_number: response.data.version_number
+                        version_number: versionNumber,
                     }
                 });
 
