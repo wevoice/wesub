@@ -278,7 +278,6 @@ var angular = angular || null;
         });
         $scope.$root.$on('work-done', function() {
             $scope.canSave = '';
-            $scope.$digest();
         });
 
     };
@@ -293,7 +292,13 @@ var angular = angular || null;
          */
 
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
-        $scope.subtitleList = dfxp.SubtitleList();
+        $scope.subtitleList = new dfxp.SubtitleList();
+        $scope.$on('timeline-drag', function(evt, dragInfo) {
+            $scope.subtitleList.updateSubtitleTime(dragInfo.subtitle,
+                dragInfo.startTime, dragInfo.endTime);
+            $scope.updateSubtitleList();
+
+        });
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
@@ -388,7 +393,8 @@ var angular = angular || null;
             $scope.videoID = videoID;
         };
         $scope.updateSubtitleList = function() {
-            $scope.subtitleList = new dfxp.SubtitleList($scope.parser);
+            $scope.subtitleList.recalculateItems($scope.parser);
+            $scope.$root.$emit('work-done');
         };
 
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
@@ -446,6 +452,7 @@ var angular = angular || null;
                 $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
                 initialText = $scope.parser.content($scope.subtitle);
                 $scope.$root.$emit('work-done');
+                $scope.$root.$digest();
             }
         };
         $scope.getSubtitleIndex = function() {

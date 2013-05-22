@@ -604,7 +604,8 @@ var USER_IDLE_MINUTES = 5;
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
                     container.off('.timelinedrag');
-                    console.log('update time: ' + context.startTime);
+                    scope.$root.$broadcast('timeline-drag', context);
+                    scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
                     container.off('.timelinedrag');
                     placeSubtitle(subtitle.startTime, subtitle.endTime, div);
@@ -619,8 +620,8 @@ var USER_IDLE_MINUTES = 5;
                 var div = $('<div/>', {class: 'subtitle'});
                 var span = $('<span/>');
                 span.html(subtitle.content);
-                var left = $('<a href class="handle left"></a>');
-                var right = $('<a href class="handle right"></a>');
+                var left = $('<a href="#" class="handle left"></a>');
+                var right = $('<a href="#" class="handle right"></a>');
                 left.on('mousedown',
                         {subtitle: subtitle, dragHandler: handleDragLeft},
                         handleMouseDown);
@@ -677,6 +678,12 @@ var USER_IDLE_MINUTES = 5;
                 function(newValue, oldValue) {
                     view = calcTimelineView(scope, container.width());
                     placeSubtitles();
+            });
+            scope.$root.$on('work-done', function() {
+                placeSubtitles();
+            });
+            scope.$root.$on('subtitles-fetched', function() {
+                placeSubtitles();
             });
         }
     });

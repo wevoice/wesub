@@ -490,7 +490,7 @@ var AmaraDFXPParser = function() {
         }
 
         if (typeof endTime !== 'undefined') {
-            if (parseInt(endTime, 10) || endTime === 0) {
+            if (endTime >= 0) {
                 $(node).attr('end', endTime);
             } else {
                 $(node).attr('end', '');
@@ -909,7 +909,7 @@ var AmaraDFXPParser = function() {
         }
 
         if (typeof startTime !== 'undefined') {
-            if (parseInt(startTime, 10) || startTime === 0) {
+            if (startTime >= 0) {
                 $(node).attr('begin', startTime);
             } else {
                 $(node).attr('begin', '');
@@ -1059,17 +1059,26 @@ var SubtitleList = function(dfxpParser) {
      *
      */
 
+    this.refetchList(dfxpParser);
+    this.idCounter = 0;
+}
+
+SubtitleList.prototype.refetchList = function(dfxpParser) {
     if(dfxpParser) {
         this.subtitlesQuery = dfxpParser.getSubtitles();
         this.parser = dfxpParser;
     } else {
+        this.parser = null;
         this.subtitlesQuery = $([]);
     }
     this.subtitles = this.subtitlesQuery.get();
     this.length = this.subtitles.length;
     this.cachedItems = [];
     this.cachedItems.length = this.length;
-    this.idCounter = 0;
+}
+
+SubtitleList.prototype.recalculateItems = function(dfxpParser) {
+    this.refetchList(dfxpParser);
 }
 
 SubtitleList.prototype.getIndex = function(subtitle) {
@@ -1083,6 +1092,15 @@ SubtitleList.prototype.getSubtitle = function(index) {
                 this.subtitles[index], idKey);
     }
     return this.cachedItems[index];
+}
+
+SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
+    if(subtitle.startTime != startTime) {
+        this.parser.startTime(subtitle.node, startTime * 1000);
+    }
+    if(subtitle.endTime != endTime) {
+        this.parser.endTime(subtitle.node, endTime * 1000);
+    }
 }
 
 SubtitleList.prototype.firstSubtitleAfter = function(time) {
