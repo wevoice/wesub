@@ -190,7 +190,9 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 class BillingReportAdmin(admin.ModelAdmin):
-    list_display = ('team', 'start_date', 'end_date', 'processed')
+    def get_teams(self, obj):
+        ",".join([x.slug for x in obj.teams.all()])
+    list_display = ('get_teams', 'start_date', 'end_date', 'processed')
 
 
 class InviteAdmin(admin.ModelAdmin):

@@ -2167,13 +2167,14 @@ def billing(request):
     if request.method == 'POST':
         form = BillingReportForm(request.POST)
         if form.is_valid():
-            team = form.cleaned_data.get('team')
+            teams = form.cleaned_data.get('teams')
             start_date = form.cleaned_data.get('start_date')
             end_date = form.cleaned_data.get('end_date')
             report_type = form.cleaned_data.get('type')
 
-            report = BillingReport.objects.create(team=team,
-                    start_date=start_date, end_date=end_date, type=report_type)
+            report = BillingReport.objects.create( start_date=start_date, end_date=end_date, type=report_type)
+            for team in teams:
+                report.teams.add(team)
 
             process_billing_report.delay(report.pk)
 
