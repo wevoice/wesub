@@ -45,7 +45,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                 video_data = {'language_code': vid[1],
                               'video_language': vid[2],
                               'video': video.pk,
-                              'draft': open('apps/videos/fixtures/test.srt'),
+                              'draft': open('apps/webdriver_testing/subtitle_data/'
+                                            'Timed_text.sv.dfxp'),
                               'is_complete': True
                               }
                 cls.data_utils.upload_subs(video, video_data)
@@ -297,6 +298,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         super(TestCaseTasksEnabledDashboard, self).setUp()
         self.dashboard_tab.open_team_page(self.team.slug)
         self.dashboard_tab.handle_js_alert(action='accept')
+
 
     def test_members__assigned_tasks(self):
         """Members see “Videos you're working on” with  assigned languages.
