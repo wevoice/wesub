@@ -1077,7 +1077,20 @@ SubtitleList.prototype.refetchList = function(dfxpParser) {
 }
 
 SubtitleList.prototype.recalculateItems = function(dfxpParser) {
+    /* Recalculate all items in the list.
+     *
+     * Call this method when subtitles have been added/removed and we need to
+     */
     this.refetchList(dfxpParser);
+}
+
+SubtitleList.prototype.updateItems = function() {
+    /* Update items in the list.
+     *
+     * Call this method when subtitles have been changed, but not
+     * added/removed. 
+     */
+    this.cachedItems = [];
 }
 
 SubtitleList.prototype.getIndex = function(subtitle) {

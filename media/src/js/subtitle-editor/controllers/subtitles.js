@@ -318,7 +318,7 @@ var angular = angular || null;
             }
 
             // Update the subtitles on the list scope.
-            $scope.updateSubtitleList();
+            $scope.updateSubtitleList(true);
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.$root.subtitlesHeight;
@@ -355,7 +355,7 @@ var angular = angular || null;
                 // Reference the parser and instance on the scope so we can access it via
                 // the templates.
                 $scope.parser = this.dfxpWrapper;
-                $scope.updateSubtitleList();
+                $scope.updateSubtitleList(true);
 
                 $scope.status = 'ready';
             }
@@ -372,7 +372,7 @@ var angular = angular || null;
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.parser.removeSubtitle(subtitle);
-            $scope.updateSubtitleList();
+            $scope.updateSubtitleList(true);
         };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
@@ -392,8 +392,12 @@ var angular = angular || null;
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };
-        $scope.updateSubtitleList = function() {
-            $scope.subtitleList.recalculateItems($scope.parser);
+        $scope.updateSubtitleList = function(recalculate_needed=false) {
+            if(recalculate_needed) {
+                $scope.subtitleList.recalculateItems($scope.parser);
+            } else {
+                $scope.subtitleList.updateItems();
+            }
             $scope.$root.$emit('work-done');
         };
 
