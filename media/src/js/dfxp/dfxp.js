@@ -17,8 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 
-var dfxp = (function() {
-var $ = AmarajQuery;
+var dfxp = (function($) {
 
 var AmaraDFXPParser = function() {
     /*
@@ -1150,4 +1149,4 @@ return {
     SubtitleList: SubtitleList,
 }
 
-})();
+})(window.AmarajQuery);
