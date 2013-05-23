@@ -2689,6 +2689,7 @@ class BillingRecordManager(models.Manager):
         all_records = self.data_for_team(team, start, end)
 
         header = [
+            'Video Title'
             'Video ID',
             'Language',
             'Minutes',
@@ -2707,6 +2708,7 @@ class BillingRecordManager(models.Manager):
         for video, records in groupby(all_records, lambda r: r.video):
             for r in records:
                 rows.append([
+                    video.title_display_unabridged().encode('utf-8'),
                     video.video_id,
                     r.new_subtitle_language.language_code,
                     r.minutes,
