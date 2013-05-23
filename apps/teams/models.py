@@ -2689,7 +2689,7 @@ class BillingRecordManager(models.Manager):
         all_records = self.data_for_team(team, start, end)
 
         header = [
-            'Video Title'
+            'Video Title',
             'Video ID',
             'Language',
             'Minutes',
