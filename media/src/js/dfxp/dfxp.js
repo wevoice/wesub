@@ -1163,3 +1163,6 @@ return {
 }
 
 })(window.AmarajQuery);
+
+/* Set window.AmaraDFXPParser for compatibility with the old editor */
+window.AmaraDFXPParser = dfxp.AmaraDFXPParser;
