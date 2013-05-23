@@ -691,10 +691,14 @@ class BillingReportForm(forms.Form):
 
 
     def clean_teams(self):
-        slugs = [s.trim() for s in self.cleaned_data('teams', '').split(',')]
-        teams = Team.objects.filter(slug__in=slugs)
-        if not teams.exists():
+        try:
+            teams = [Team.objects.get(slug=s.strip()) for s in self.cleaned_data.get('teams', '').split(',') if s]
+
+        except Team.DoesNotExist:
+            raise forms.ValidationError(u"There is no team with slug %s" % s)
+        if not teams:
             raise forms.ValidationError(u"You need at least one valid team slug")
-        self.cleaned_data.set('teams', teams)
+        self.cleaned_data['teams'] =  teams
+        return teams
 
 
