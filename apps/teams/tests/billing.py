@@ -60,8 +60,9 @@ class BillingTest(TestCase):
         v2_en.publish()
         v2_en.save()
 
-        b = BillingReport.objects.create(team=self.team,
-                                         start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+        b = BillingReport.objects.create( start_date=date(2012, 1, 1),
+                                          end_date=date(2012, 1, 2))
+        b.teams.add(self.team)
 
         past_date = self.team.created - timedelta(days=5)
         make_subtitle_version(spanish, created=past_date, note=FROM_YOUTUBE_MARKER)
@@ -86,8 +87,9 @@ class BillingTest(TestCase):
 
         team_created = team.created
 
-        b = BillingReport.objects.create(team=team,
-                                         start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+        b = BillingReport.objects.create( start_date=date(2012, 1, 1),
+                                          end_date=date(2012, 1, 2))
+        b.teams.add(team)
 
         SubtitleLanguage.objects.all().delete()
 
