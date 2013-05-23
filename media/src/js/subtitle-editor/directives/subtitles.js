@@ -43,13 +43,6 @@ var USER_IDLE_MINUTES = 5;
             }
         }
     }
-    directives.directive('saveSessionButton', function(SubtitleStorage) {
-        return {
-            link: function link(scope, elm, attrs) {
-                scope.canSave = '';
-            }
-        };
-    });
     directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
 
         var minutesIdle = 0;
@@ -246,7 +239,7 @@ var USER_IDLE_MINUTES = 5;
             var controller = angular.element(elm).controller();
             var scope = angular.element(elm).scope();
             // make sure we're actually changing the editing sub
-            if (scope == selectedScope){
+            if (scope == selectedScope && scope.isEditing){
                 return;
             }
 
@@ -378,6 +371,17 @@ var USER_IDLE_MINUTES = 5;
 
         }
 
+        function onSubtitleFocusOut(e) {
+            cancelEditing();
+        }
+
+        function cancelEditing() {
+            if (selectedScope && selectedScope.isEditing) {
+                selectedScope.finishEditingMode(activeTextArea.val());
+                selectedScope.$digest();
+            }
+        }
+
         return {
             compile: function compile(elm, attrs, transclude) {
                 rootEl = elm;
@@ -419,16 +423,14 @@ var USER_IDLE_MINUTES = 5;
                             });
                             $elm.on('keydown', 'textarea', onSubtitleTextKeyDown);
                             $elm.on('keyup', 'textarea', onSubtitleTextKeyUp);
+                            $elm.on('focusout', 'textarea', onSubtitleFocusOut);
 
                             // In order to catch an <esc> key sequence, we need to catch
                             // the keycode on the document, not the list. Also, keyup must
                             // be used instead of keydown.
                             $(document).on('keyup', function(e) {
                                 if (e.keyCode === 27) {
-                                    if (selectedScope) {
-                                        selectedScope.finishEditingMode(activeTextArea.val());
-                                        selectedScope.$digest();
-                                    }
+                                    cancelEditing();
                                 }
                             });
 

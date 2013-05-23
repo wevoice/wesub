@@ -2694,7 +2694,7 @@ class BillingRecordManager(models.Manager):
     def csv_report_for_team(self, team, start, end, add_header=True):
 
         header = [
-            'Video Title'
+            'Video Title',
             'Video ID',
             'Language',
             'Minutes',
