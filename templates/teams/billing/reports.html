@@ -41,7 +41,7 @@
 
         {% for report in reports %}
         <tr>
-            <td>{% for team in report.teams.all %}{{ team.name }}{% endfor %}</td>
+            <td>{{ report.teams.all|join:', ' }}</td>
             <td>{{ report.start_date }}</td>
             <td>{{ report.end_date }}</td>
             <td>{{ report.get_type_display }}</td>

@@ -2494,43 +2494,39 @@ class BillingReport(models.Model):
 
         return True
 
-    def _get_lang_data(self, languages, from_date):
-        for team in self.teams.all():
-            workflow = team.get_workflow()
+    def _get_lang_data(self, languages, from_date, team):
+        workflow = team.get_workflow()
 
-            # TODO:
-            # These do the same for now.  If a workflow is enabled, we should get
-            # the first approved version.  Not sure how to do that yet.
-            imported, crowd_created = self._separate_languages(languages)
-            print imported, crowd_created
+        # TODO:
+        # These do the same for now.  If a workflow is enabled, we should get
+        # the first approved version.  Not sure how to do that yet.
+        imported, crowd_created = self._separate_languages(languages)
 
-            # TODO: Are we going to count deleted versions here?  If so, the
-            # get_tip() calls here may need full=True to get deleted tips...
-            for l in crowd_created:
-                print "lang%s ; first poublic:%s" % (l, l.first_public_version())
-            if workflow.approve_enabled:
-                imported_data = [(language, language.first_public_version())
-                                        for language in imported]
-                crowd_created_data = [(language, language.first_public_version())
-                                        for language in crowd_created]
-            else:
-                imported_data = [(language, language.get_tip()) for
-                                                    language in imported]
-                crowd_created_data = [(language, language.get_tip()) for
-                                                    language in crowd_created]
+        # TODO: Are we going to count deleted versions here?  If so, the
+        # get_tip() calls here may need full=True to get deleted tips...
+        if workflow.approve_enabled:
+            imported_data = [(language, language.first_public_version())
+                             for language in imported]
+            crowd_created_data = [(language, language.first_public_version())
+                                  for language in crowd_created]
+        else:
+            imported_data = [(language, language.get_tip()) for
+                             language in imported]
+            crowd_created_data = [(language, language.get_tip()) for
+                                  language in crowd_created]
 
-            old_version_counter = 1
+        old_version_counter = 1
 
-            created_result = []
+        created_result = []
 
-            # now make sure we don't have any versions from before the
-            # from_date
-            for lang, ver in crowd_created_data:
-                if ver and ver.created < from_date:
-                    old_version_counter += 1
-                    continue
+        # now make sure we don't have any versions from before the
+        # from_date
+        for lang, ver in crowd_created_data:
+            if ver and ver.created < from_date:
+                old_version_counter += 1
+                continue
 
-                created_result.append((lang, ver))
+            created_result.append((lang, ver))
 
         return created_result, imported_data, old_version_counter
 
@@ -2561,12 +2557,12 @@ class BillingReport(models.Model):
             tv = lang.video.get_team_video()
             team = tv and tv.team
             if lang.language_code == 'en':
-                crowd_created.append(lang)
+                crowd_created.add(lang)
             elif v.note == FROM_YOUTUBE_MARKER or v.origin == ORIGIN_IMPORTED or \
                     (not tv or v.created < team.created):
-                imported.append(lang)
+                imported.add(lang)
             else:
-                crowd_created.append(lang)
+                crowd_created.add(lang)
 
         return imported, crowd_created
 
@@ -2579,21 +2575,22 @@ class BillingReport(models.Model):
         start_date = self.start_datetime()
         end_date = self.end_datetime()
 
-        tvs = TeamVideo.objects.filter(team=self.team).order_by('video__title')
+        for team in self.teams.all():
+            tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
 
-        for tv in tvs:
-            languages = tv.video.newsubtitlelanguage_set.all()
+            for tv in tvs:
+                languages = tv.video.newsubtitlelanguage_set.all()
 
-            created_data, imported_data, old_version_counter = \
-                    self._get_lang_data(languages, start_date)
+                created_data, imported_data, old_version_counter = \
+                        self._get_lang_data(languages, start_date, team)
 
-            created_rows = self._loop(created_data, 'created', start_date,
-                    end_date, tv, host, old_version_counter)
+                created_rows = self._loop(created_data, 'created', start_date,
+                        end_date, tv, host, old_version_counter)
 
-            imported_rows = self._loop(imported_data, 'imported', start_date,
-                    end_date, tv, host)
+                imported_rows = self._loop(imported_data, 'imported', start_date,
+                        end_date, tv, host)
 
-            rows = rows + created_rows + imported_rows
+                rows = rows + created_rows + imported_rows
 
         return rows
 
@@ -2651,7 +2648,9 @@ class BillingReport(models.Model):
         host = '%s://%s' % (protocol, domain)
 
         header = ['Video title', 'Video URL', 'Video language', 'Source',
-                'Billable minutes', 'Version created', 'Language number']
+                'Billable minutes', 'Version created', 'Language number',
+                'Team'
+        ]
 
         return  self._get_row_data(host, header)
     def process(self):
@@ -2663,8 +2662,10 @@ class BillingReport(models.Model):
         if self.type == BillingReport.TYPE_OLD:
             rows = self.generate_rows_type_old()
         elif self.type == BillingReport.TYPE_NEW:
-            rows = BillingRecord.objects.csv_report_for_team( self.start_date,
-                                                             self.end_date)
+            rows = []
+            for i,team in enumerate(self.teams.all()):
+                rows = rows + BillingRecord.objects.csv_report_for_team(team,
+                    self.start_date, self.end_date, add_header=i == 0)
         fn = '/tmp/bill-%s-%s-%s-%s-%s.csv' % ("-".join([x.slug for x in self.teams.all()]),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)
@@ -2690,7 +2691,7 @@ class BillingRecordManager(models.Manager):
     def data_for_team(self, team, start, end):
         return self.filter(team=team, created__gte=start, created__lte=end)
 
-    def csv_report_for_team(self, start, end, add_header=True):
+    def csv_report_for_team(self, team, start, end, add_header=True):
 
         header = [
             'Video ID',
@@ -2701,7 +2702,6 @@ class BillingRecordManager(models.Manager):
             'Created',
             'Source',
             'User',
-            'Team',
         ]
 
         if add_header:
@@ -2709,20 +2709,19 @@ class BillingRecordManager(models.Manager):
         else:
             rows = []
 
-        for team in self.teams.all():
-            all_records = self.data_for_team(team, start, end)
-            for video, records in groupby(all_records, lambda r: r.video):
-                for r in records:
-                    rows.append([
-                        video.video_id,
-                        r.new_subtitle_language.language_code,
-                        r.minutes,
-                        r.is_original,
-                        r.team.slug,
-                        r.created.strftime('%Y-%m-%d %H:%M:%S'),
-                        r.source,
-                        r.user.username
-                    ])
+        all_records = self.data_for_team(team, start, end)
+        for video, records in groupby(all_records, lambda r: r.video):
+            for r in records:
+                rows.append([
+                    video.video_id,
+                    r.new_subtitle_language.language_code,
+                    r.minutes,
+                    r.is_original,
+                    r.team.slug,
+                    r.created.strftime('%Y-%m-%d %H:%M:%S'),
+                    r.source,
+                    r.user.username
+                ])
 
         return rows
 
