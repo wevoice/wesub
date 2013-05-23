@@ -2694,6 +2694,7 @@ class BillingRecordManager(models.Manager):
     def csv_report_for_team(self, team, start, end, add_header=True):
 
         header = [
+            'Video Title'
             'Video ID',
             'Language',
             'Minutes',
@@ -2713,6 +2714,7 @@ class BillingRecordManager(models.Manager):
         for video, records in groupby(all_records, lambda r: r.video):
             for r in records:
                 rows.append([
+                    video.title_display_unabridged().encode('utf-8'),
                     video.video_id,
                     r.new_subtitle_language.language_code,
                     r.minutes,
