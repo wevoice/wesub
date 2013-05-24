@@ -40,6 +40,7 @@ var angular = angular || null;
         return {
             'startTime': startTime,
             'widthPerSecond': widthPerSecond,
+            'widthPerMillisecond': widthPerSecond / 1000,
             'endTime': startTime + (width / widthPerSecond),
         }
     }
@@ -120,17 +121,17 @@ var angular = angular || null;
             // Map XML subtitle nodes to the div we created to show them
             var timelineDivs = {}
 
-            function handleDragLeft(context, deltaSecs) {
-                context.startTime = context.subtitle.startTime + deltaSecs;
+            function handleDragLeft(context, deltaMSecs) {
+                context.startTime = context.subtitle.startTime + deltaMSecs;
             }
 
-            function handleDragRight(context, deltaSecs) {
-                context.endTime = context.subtitle.endTime + deltaSecs;
+            function handleDragRight(context, deltaMSecs) {
+                context.endTime = context.subtitle.endTime + deltaMSecs;
             }
 
-            function handleDragMiddle(context, deltaSecs) {
-                context.startTime = context.subtitle.startTime + deltaSecs;
-                context.endTime = context.subtitle.endTime + deltaSecs;
+            function handleDragMiddle(context, deltaMSecs) {
+                context.startTime = context.subtitle.startTime + deltaMSecs;
+                context.endTime = context.subtitle.endTime + deltaMSecs;
             }
 
             function handleMouseDown(evt, dragHandler) {
@@ -150,12 +151,14 @@ var angular = angular || null;
                 var initialPageX = evt.pageX;
                 container.on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
-                    var deltaSecs = deltaX / view.widthPerSecond;
-                    dragHandler(context, deltaSecs);
+                    var deltaMSecs = deltaX / view.widthPerMillisecond;
+                    dragHandler(context, deltaMSecs);
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
                     container.off('.timelinedrag');
-                    scope.$root.$broadcast('timeline-drag', context);
+                    var subtitleList = scope.workingSubtitles.subtitleList;
+                    subtitleList.updateSubtitleTime(context.subtitle,
+                        context.startTime, context.endTime);
                     scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
                     container.off('.timelinedrag');
@@ -190,10 +193,10 @@ var angular = angular || null;
             }
 
             function placeSubtitle(startTime, endTime, div) {
-                var x = Math.floor((startTime - view.startTime) *
+                var x = Math.floor((startTime / 1000 - view.startTime) *
                     view.widthPerSecond);
                 var width = Math.floor((endTime - startTime) *
-                    view.widthPerSecond);
+                    view.widthPerMillisecond);
                 div.css({left: x, width: width});
             }
 
@@ -202,7 +205,7 @@ var angular = angular || null;
                     return;
                 }
                 var subtitles = scope.workingSubtitles.subtitleList.getSubtitlesForTime(
-                    view.startTime, view.endTime );
+                    view.startTime * 1000, view.endTime * 1000);
 
 
                 var oldTimelineDivs = timelineDivs;

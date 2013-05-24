@@ -61,7 +61,7 @@
         };
 
         $scope.$root.$on('subtitle-key-up', function($event, options) {
-            if (options.parser.needsAnyTranscribed(options.subtitles)) {
+            if (options.subtitleList.needsAnyTranscribed()) {
                 $scope.error = 'You have empty subtitles.';
             } else {
                 $scope.error = null;

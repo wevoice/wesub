@@ -333,32 +333,21 @@ var angular = angular || null;
 
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.subtitleList = new dfxp.SubtitleList();
-        $scope.$on('timeline-drag', function(evt, dragInfo) {
-            $scope.subtitleList.updateSubtitleTime(dragInfo.subtitle,
-                dragInfo.startTime, dragInfo.endTime);
-            $scope.updateSubtitleList();
-
-        });
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
-        $scope.addSubtitle = function(index, attrs, content, focus) {
-
+        $scope.addSubtitleAtEnd  = function(focus) {
             // Add the subtitle directly to the DFXP instance.
-            var newSubtitle = $scope.parser.addSubtitle(index, attrs, content);
+            var newSubtitle = $scope.subtitleList.addSubtitleAtEnd();
 
             // If we want to focus the subtitle after it's been added, set
             // the index here.
             if (focus) {
-                $scope.focusIndex = $scope.subtitleList.getIndex(newSubtitle);
-
+                $scope.focusIndex = $scope.subtitleList.length() - 1;
             // Otherwise, reset the focusIndex.
             } else {
                 $scope.focusIndex = null;
             }
-
-            // Update the subtitles on the list scope.
-            $scope.updateSubtitleList(true);
         };
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.$root.subtitlesHeight;
@@ -389,15 +378,7 @@ var angular = angular || null;
             $scope.videoDescription = subtitleData.description;
 
             if ( subtitleData.visibility == 'Public' || $scope.isEditable){
-                // Set up a new parser instance with this DFXP XML set.
-               this.dfxpWrapper = new dfxp.AmaraDFXPParser();
-               this.dfxpWrapper.init(subtitleData.subtitlesXML);
-
-                // Reference the parser and instance on the scope so we can access it via
-                // the templates.
-                $scope.parser = this.dfxpWrapper;
-                $scope.updateSubtitleList(true);
-
+                $scope.subtitleList.loadXML(subtitleData.subtitlesXML);
                 $scope.status = 'ready';
             }
 
@@ -411,15 +392,11 @@ var angular = angular || null;
                 }
             });
         };
-        $scope.removeSubtitle = function(subtitle) {
-            $scope.parser.removeSubtitle(subtitle);
-            $scope.updateSubtitleList(true);
-        };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
                                           $scope.languageCode,
-                                          $scope.parser.xmlToString(true, true),
+                                          $scope.subtitleList.toXMLString(),
                                           $scope.videoTitle,
                                           $scope.videoDescription);
         };
@@ -432,14 +409,6 @@ var angular = angular || null;
         };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
-        };
-        $scope.updateSubtitleList = function(recalculate_needed=false) {
-            if(recalculate_needed) {
-                $scope.subtitleList.recalculateItems($scope.parser);
-            } else {
-                $scope.subtitleList.updateItems();
-            }
-            $scope.$root.$emit('work-done');
         };
 
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
@@ -474,11 +443,8 @@ var angular = angular || null;
 
         $scope.empty = false;
         $scope.isEditing = false;
-        $scope.showStartTime = $scope.parser.startTime($scope.subtitle) !== -1;
-        $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
-        // convert to markdown at init time, then never again to avoid
-        // double scaping
-        initialText = $scope.parser.dfxpToMarkdown($scope.subtitle, true);
+        $scope.showStartTime = $scope.subtitle.startTime >= 0;
+        initialText = $scope.subtitle.markdown;
 
         $scope.finishEditingMode = function(newValue) {
 
@@ -492,10 +458,9 @@ var angular = angular || null;
                 // we can store markdown content directly on the node
                 // then on serialization it will get converted correctly
                 // to dfxp
-                $scope.parser.content($scope.subtitle, newValue);
-                $scope.updateSubtitleList();
-                $scope.contentAsHTML = $scope.parser.contentRendered($scope.subtitle);
-                initialText = $scope.parser.content($scope.subtitle);
+                $scope.subtitleList.updateSubtitleContent($scope.subtitle,
+                        newValue);
+                initialText = newValue;
                 $scope.$root.$emit('work-done');
                 $scope.$root.$digest();
             }
@@ -513,20 +478,6 @@ var angular = angular || null;
 
             return initialText;
         };
-
-        $scope.$root.$on('subtitles-fetched', function() {
-            // When subtitles are first retrieved, we need to set up the amarasubtitle
-            // on the video and bind to this scope.
-            //
-            // This will happen on the video controller. Just throw an event stating that
-            // we're ready.
-
-            // Only emit the event on editable subtitles. We don't want to initialize
-            // Popcorn subtitles for the non-editable set.
-            if ($scope.$parent.isEditable) {
-                $scope.$root.$emit('subtitle-ready', $scope);
-            }
-        });
     };
 
     root.LanguageSelectorController = LanguageSelectorController;

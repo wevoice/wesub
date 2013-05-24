@@ -285,20 +285,14 @@ var USER_IDLE_MINUTES = 5;
                 // Prevent an additional newline from being added to the next subtitle.
                 e.preventDefault();
 
+                // Save the current subtitle.
+                selectedScope.finishEditingMode(activeTextArea.val());
+
                 // If canAddAndRemove is true and this is the last subtitle in the set,
                 // save the current subtitle and create a new subtitle at the end.
                 if (selectedScope.canAddAndRemove) {
                     if ($currentSubtitle.next().length === 0) {
-
-                        // Save the current subtitle.
-                        selectedScope.finishEditingMode(activeTextArea.val());
-
-                        // Passing true as the last argument indicates that we want
-                        // to select this subtitle after it is created.
-                        selectedScope.addSubtitle(null, {}, '', true);
-
-                        // Apply the current scope.
-                        selectedScope.$apply();
+                        selectedScope.addSubtitleAtEnd(true);
 
                     }
                 }
@@ -352,7 +346,8 @@ var USER_IDLE_MINUTES = 5;
             var newText = activeTextArea.val();
 
             // Save the content to the DFXP wrapper.
-            selectedScope.parser.content(selectedScope.subtitle, newText);
+            selectedScope.subtitleList.updateSubtitleContent(
+                    selectedScope.subtitle, newText);
 
             // Cache the value for a negligible performance boost.
             value = activeTextArea.val();
@@ -361,10 +356,8 @@ var USER_IDLE_MINUTES = 5;
             selectedScope.characterCount = value.length;
 
             selectedScope.$root.$emit('subtitle-key-up', {
-                parser: selectedScope.parser,
-                subtitles: $(selectedScope.subtitles),
-                subtitle: selectedScope,
-                value: value
+                subtitleList: selectedScope.subtitleList,
+                subtitle: selectedScope.subtitle,
             });
 
             selectedScope.$digest();

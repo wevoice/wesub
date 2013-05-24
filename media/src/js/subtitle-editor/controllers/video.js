@@ -96,42 +96,19 @@
 
         };
 
-        $scope.updateSubtitleOverlay = function(parser, subtitle, value){
+        $scope.updateSubtitleOverlay = function(subtitle) {
            // Update the Popcorn subtitle instance's text.
             $scope.pop.amarasubtitle(subtitle.$id, {
-                text: parser.markdownToHTML(value)
+                text: subtitle.content,
             });
         }
         $scope.$root.$on('subtitle-key-up', function($event, options) {
-            $scope.updateSubtitleOverlay(options.subtitle.parser,
-                                         options.subtitle,
-                                         options.value)
-
-
-        });
-        $scope.$root.$on('subtitle-ready', function($event, subtitle) {
-            // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
-            // video's Popcorn instance.
-
-            var parser = subtitle.parser;
-
-            var text = subtitle.parser.markdownToHTML($(subtitle.subtitle).text());
-            var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
-            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
-
-            // Create the amarasubtitle instance.
-            $scope.pop.amarasubtitle(subtitle.$id, {
-                end:   endTimeSeconds,
-                start: startTimeSeconds,
-                text:  text
-            });
-
+            $scope.updateSubtitleOverlay(options.subtitle);
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 
-            var parser = scope.parser;
-            var startTimeSeconds = parser.startTime(scope.subtitle) / 1000;
-            var endTimeSeconds = parser.endTime(scope.subtitle) / 1000;
+            var startTimeSeconds = scope.subtitle.startTimeSeconds();
+            var endTimeSeconds = scope.subtitle.endTimeSeconds();
             if (!isNaN(endTimeSeconds)){
                 $scope.playChunk(startTimeSeconds, endTimeSeconds- startTimeSeconds);
             }else{
@@ -146,7 +123,7 @@
 
             }
 
-            $scope.updateSubtitleOverlay(parser, scope.subtitle, parser.content(scope.subtitle));
+            $scope.updateSubtitleOverlay(scope.subtitle);
         });
 
     };

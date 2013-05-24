@@ -1034,18 +1034,40 @@ var SubtitleItem = function(parser, node, id) {
      * SubtitleItem has the following properties:
      *   - startTime -- start time in seconds
      *   - endTime -- end time in seconds
-     *   - content -- string of html for the subtitle content
+     *   - content -- subtitle content in HTML format
+     *   - markdown -- subtitle content in our markdown-style format
      *   - node -- DOM node from the DFXP XML
      *   - id -- unique string to identify this item in the list
      */
-    this.startTime = parser.startTime(node) / 1000;
-    this.endTime = parser.endTime(node) / 1000;
+    this.startTime = parser.startTime(node);
+    this.endTime = parser.endTime(node);
     this.content = parser.contentRendered(node);
+    this.markdown = parser.dfxpToMarkdown(node, true);
     this.node = node;
     this.id = id;
 }
 
-var SubtitleList = function(dfxpParser) {
+SubtitleItem.prototype.isSynced = function() {
+    return this.startTime > 0 && this.endTime > 0;
+}
+
+SubtitleItem.prototype.startTimeSeconds = function() {
+    if(this.startTime >= 0) {
+        return this.startTime / 1000;
+    } else {
+        return -1;
+    }
+}
+
+SubtitleItem.prototype.endTimeSeconds = function() {
+    if(this.endTime >= 0) {
+        return this.endTime / 1000;
+    } else {
+        return -1;
+    }
+}
+
+var SubtitleList = function() {
     /*
      * Manages a list of subtitles.
      *
@@ -1058,61 +1080,77 @@ var SubtitleList = function(dfxpParser) {
      *
      */
 
-    this.refetchList(dfxpParser);
+    this.parser = new AmaraDFXPParser();
     this.idCounter = 0;
+    this.subtitles = [];
+    this.syncedCount = 0;
 }
 
-SubtitleList.prototype.refetchList = function(dfxpParser) {
-    if(dfxpParser) {
-        this.subtitlesQuery = dfxpParser.getSubtitles();
-        this.parser = dfxpParser;
-    } else {
-        this.parser = null;
-        this.subtitlesQuery = $([]);
+SubtitleList.prototype.loadXML = function(subtitlesXML) {
+    this.parser.init(subtitlesXML);
+    var syncedSubs = [];
+    var unsyncedSubs = [];
+    // Needed because each() changes the value of this
+    var self = this;
+    this.parser.getSubtitles().each(function(index, node) {
+        var idKey = (self.idCounter++).toString(16);
+        var subtitle = new SubtitleItem(self.parser, node, idKey);
+        if(subtitle.isSynced()) {
+            syncedSubs.push(subtitle);
+        } else {
+            unsyncedSubs.push(subtitle);
+        }
+    });
+    syncedSubs.sort(function(s1, s2) {
+        return s1.startTime - s2.startTime;
+    });
+    this.syncedCount = syncedSubs.length;
+    // Start with synced subs to the list
+    this.subtitles = syncedSubs;
+    // append all unsynced subs to the list
+    this.subtitles.push.apply(this.subtitles, unsyncedSubs);
+}
+
+SubtitleList.prototype.length = function() {
+    return this.subtitles.length;
+}
+
+SubtitleList.prototype.needsAnyTranscribed = function() {
+    for(var i=0; i < this.length; i++) {
+        if(this.subtitles[i].content == '') return true;
     }
-    this.subtitles = this.subtitlesQuery.get();
-    this.length = this.subtitles.length;
-    this.cachedItems = [];
-    this.cachedItems.length = this.length;
+    return false;
 }
 
-SubtitleList.prototype.recalculateItems = function(dfxpParser) {
-    /* Recalculate all items in the list.
-     *
-     * Call this method when subtitles have been added/removed and we need to
-     */
-    this.refetchList(dfxpParser);
-}
-
-SubtitleList.prototype.updateItems = function() {
-    /* Update items in the list.
-     *
-     * Call this method when subtitles have been changed, but not
-     * added/removed. 
-     */
-    this.cachedItems = [];
+SubtitleList.prototype.toXMLString = function() {
+    return this.parser.xmlToString(true, true);
 }
 
 SubtitleList.prototype.getIndex = function(subtitle) {
-    return $(this.subtitlesQuery).index(subtitle);
-}
-
-SubtitleList.prototype.getSubtitle = function(index) {
-    if(this.cachedItems[index] === undefined) {
-        var idKey = (this.idCounter++).toString(16);
-        this.cachedItems[index] = new SubtitleItem(this.parser,
-                this.subtitles[index], idKey);
-    }
-    return this.cachedItems[index];
+    // Maybe a binary search would be faster, but I think Array.indexOf should
+    // be pretty optimized on most browsers.
+    return this.subtitles.indexOf(subtitle);
 }
 
 SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
     if(subtitle.startTime != startTime) {
-        this.parser.startTime(subtitle.node, startTime * 1000);
+        this.parser.startTime(subtitle.node, startTime);
+        subtitle.startTime = startTime;
     }
     if(subtitle.endTime != endTime) {
-        this.parser.endTime(subtitle.node, endTime * 1000);
+        this.parser.endTime(subtitle.node, endTime);
+        subtitle.endTime = endTime;
     }
+}
+
+SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
+    /* Update subtilte content
+     *
+     * content is a string in our markdown-style format.
+     */
+    this.parser.content(subtitle.node, content);
+    subtitle.markdown = content;
+    subtitle.content = this.parser.contentRendered(subtitle.node);
 }
 
 SubtitleList.prototype.firstSubtitleAfter = function(time) {
@@ -1121,17 +1159,18 @@ SubtitleList.prototype.firstSubtitleAfter = function(time) {
      * returns index of the subtitle, or -1 if none are found.
      */
 
-    // First check that we are going to fine one subtitle
-    if(this.length == 0 || this.getSubtitle(this.length-1).endTime <= time) {
+    // First check that we are going to find any subtitle
+    if(this.length() == 0 ||
+            this.subtitles[this.length()-1].endTime <= time) {
         return -1;
     }
 
     // Do a binary search to find the sub
     var left = 0;
-    var right = this.length - 1;
+    var right = this.length() - 1;
     while(left < right) {
         var index = Math.floor((left + right) / 2);
-        if(this.getSubtitle(index).endTime > time) {
+        if(this.subtitles[index].endTime > time) {
             right = index;
         } else {
             left = index + 1;
@@ -1146,8 +1185,8 @@ SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     if(i == -1) {
         return rv;
     }
-    for(; i < this.length; i++) {
-        var subtitle = this.getSubtitle(i);
+    for(; i < this.length(); i++) {
+        var subtitle = this.subtitles[i];
         if(subtitle.startTime < endTime) {
             rv.push(subtitle);
         } else {

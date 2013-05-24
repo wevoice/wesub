@@ -158,11 +158,11 @@
 
                             <span ng-show="showStartTime"
                                   class="start-time">
-                                    [[ parser.startTime(subtitle)|displayTime ]]
+                                    [[ subtitle.startTime|displayTime ]]
                             </span>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="contentAsHTML"
+                                  ng-bind-html-unsafe="subtitle.content"
                                   class="subtitle-text">
                             </span>
 
@@ -211,7 +211,7 @@
 
                             <div class="hover">
                                 <span  class="timing">
-                                    <span>[[ parser.startTime(subtitle)|displayTime ]]</span>
+                                    <span>[[ subtitle.startTime|displayTime ]]</span>
                                     <a href ng-show='allowsSyncing' class="comments"></a>
                                 </span>
                                 <a href class="remove-subtitle"
@@ -223,7 +223,7 @@
                             </div>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="contentAsHTML"
+                                  ng-bind-html-unsafe="subtitle.content"
                                   class="subtitle-text">
                             </span>
 
@@ -323,7 +323,6 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/workspace-tools.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/timeline.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/filters/subtitles.js"></script>
