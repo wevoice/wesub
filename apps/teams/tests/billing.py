@@ -70,8 +70,9 @@ class BillingTest(TestCase):
 
         langs = self.video.newsubtitlelanguage_set.all()
         self.assertEqual(len(langs) , 2)
-        created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
-        print created
+        created, imported, _ = b._get_lang_data(langs,
+                                                datetime(2012, 1, 1, 13, 30, 0),
+                                                self.team )
 
         self.assertEqual(len(created) , 1)
 
@@ -160,7 +161,7 @@ class BillingTest(TestCase):
         csv_data = BillingRecord.objects.csv_report_for_team(team, start, end)
 
         self.assertEquals(2, len(csv_data))
-        self.assertEquals(8, len(csv_data[1]))
+        self.assertEquals(9, len(csv_data[1]))
 
         # 2
         sv = add_subtitles(video, 'en', make_subtitle_lines(4), author=user, created=now)
