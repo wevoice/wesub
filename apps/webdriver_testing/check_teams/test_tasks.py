@@ -662,7 +662,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'video': video.pk,
                 'from_language_code': 'en',
                 'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp'),
+                              'Timed_text.en.srt'),
                 'is_complete': True,
                 'complete': 1
            }
