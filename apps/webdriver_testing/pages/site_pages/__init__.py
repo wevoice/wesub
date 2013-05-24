@@ -30,6 +30,8 @@ class UnisubsPage(Page):
     _ERROR_MESSAGE = "div#messages h2.error"
     _SUCCESS_MESSAGE = "div#messages h2.success"
 
+    _FORM_ERROR = "ul.errorlist li"
+
     _MODAL_DIALOG = "div.modal"
     _MODAL_CLOSE = "div a.close"
     _SEARCHING_INDICATOR = "img.placeholder"
@@ -44,6 +46,10 @@ class UnisubsPage(Page):
         self.wait_for_element_present(self._MESSAGE, wait_time=15)
         if self.is_text_present(self._SUCCESS_MESSAGE, message):
             return True
+
+    def form_error_present(self):
+        if self.check_if_element_present(self._FORM_ERROR, 3):
+            return self.get_text_by_css(self._FORM_ERROR)
 
     def open_amara(self):
         self.logger.info('Open amara home page')
