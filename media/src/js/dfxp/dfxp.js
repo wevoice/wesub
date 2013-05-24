@@ -1046,13 +1046,21 @@ var SubtitleItem = function(parser, node, id) {
     this.id = id;
 }
 
+SubtitleItem.prototype.duration = function() {
+    if(this.isSynced()) {
+        return this.endTime - this.startTime;
+    } else {
+        return -1;
+    }
+}
+
 SubtitleItem.prototype.content = function() {
     /* Get the content of this subtitle as HTML */
     return markdownToHTML(this.markdown);
 }
 
 SubtitleItem.prototype.isSynced = function() {
-    return this.startTime > 0 && this.endTime > 0;
+    return this.startTime >= 0 && this.endTime >= 0;
 }
 
 SubtitleItem.prototype.startTimeSeconds = function() {
@@ -1134,6 +1142,22 @@ SubtitleList.prototype.getIndex = function(subtitle) {
     // Maybe a binary search would be faster, but I think Array.indexOf should
     // be pretty optimized on most browsers.
     return this.subtitles.indexOf(subtitle);
+}
+
+SubtitleList.prototype.nextSubtitle = function(subtitle) {
+    if(subtitle === this.subtitles[this.length() - 1]) {
+        return null;
+    } else {
+        return this.subtitles[this.getIndex(subtitle) + 1];
+    }
+}
+
+SubtitleList.prototype.prevSubtitle = function(subtitle) {
+    if(subtitle === this.subtitles[0]) {
+        return null;
+    } else {
+        return this.subtitles[this.getIndex(subtitle) - 1];
+    }
 }
 
 SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {

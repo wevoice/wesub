@@ -19,6 +19,7 @@
 var angular = angular || null;
 
 (function($) {
+    var MIN_DURATION = 250; // 0.25 seconds
 
     var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
@@ -121,25 +122,62 @@ var angular = angular || null;
 
             function handleDragLeft(context, deltaMSecs) {
                 context.startTime = context.subtitle.startTime + deltaMSecs;
+                if(context.startTime < context.minStartTime) {
+                    context.startTime = context.minStartTime;
+                }
+                if(context.startTime > context.endTime - MIN_DURATION) {
+                    context.startTime = context.endTime - MIN_DURATION;
+                }
             }
 
             function handleDragRight(context, deltaMSecs) {
                 context.endTime = context.subtitle.endTime + deltaMSecs;
+                if(context.maxEndTime !== null &&
+                    context.endTime > context.maxEndTime) {
+                    context.endTime = context.maxEndTime;
+                }
+                if(context.endTime < context.startTime + MIN_DURATION) {
+                    context.endTime = context.startTime + MIN_DURATION;
+                }
             }
 
             function handleDragMiddle(context, deltaMSecs) {
                 context.startTime = context.subtitle.startTime + deltaMSecs;
                 context.endTime = context.subtitle.endTime + deltaMSecs;
+
+                if(context.startTime < context.minStartTime) {
+                    context.startTime = context.minStartTime;
+                    context.endTime = (context.startTime +
+                            context.subtitle.duration());
+                }
+                if(context.endTime > context.maxEndTime) {
+                    context.endTime = context.maxEndTime;
+                    context.startTime = (context.endTime -
+                            context.subtitle.duration());
+                }
+
             }
 
             function handleMouseDown(evt, dragHandler) {
                 var subtitle = evt.data.subtitle;
                 var dragHandler = evt.data.dragHandler;
-
-                context = {
+                var context = {
                     subtitle: subtitle,
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
+                }
+                var subtitleList = scope.workingSubtitles.subtitleList;
+                var nextSubtitle = subtitleList.nextSubtitle(subtitle);
+                if(nextSubtitle && nextSubtitle.isSynced()) {
+                    context.maxEndTime = nextSubtitle.startTime;
+                } else {
+                    context.maxEndTime = scope.duration * 1000;
+                }
+                var prevSubtitle = subtitleList.prevSubtitle(subtitle);
+                if(prevSubtitle) {
+                    context.minStartTime = prevSubtitle.endTime;
+                } else {
+                    context.minStartTime = 0;
                 }
 
                 var div = timelineDivs[context.subtitle.id];
