@@ -30,13 +30,6 @@ var angular = angular || null;
         // put startTime in the middle of the canvas, unless we are
         // at the very begining/end of the timeline.
         var startTime = scope.currentTime - (width / 2) / widthPerSecond;
-        var maxStartTime = scope.duration - (width / widthPerSecond);
-        if(startTime > maxStartTime) {
-            startTime = maxStartTime;
-        }
-        if(startTime < 0) {
-            startTime = 0;
-        }
         return {
             'startTime': startTime,
             'widthPerSecond': widthPerSecond,
@@ -91,17 +84,22 @@ var angular = angular || null;
             ctx.stroke();
         }
         function drawCanvas(scope, elem) {
-            view = calcTimelineView(scope, width);
             var ctx = elem[0].getContext("2d");
             ctx.clearRect(0, 0, width, height);
             ctx.font = 'bold ' + (height / 5) + 'px sans';
 
-            var endTime = view.startTime + (width / view.widthPerSecond);
-            for(t = Math.floor(view.startTime); t < endTime; t++) {
+            view = calcTimelineView(scope, width);
+            var startTime = Math.floor(Math.max(view.startTime, 0));
+            if(scope.duration !== null) {
+                var endTime = Math.floor(Math.min(view.endTime,
+                            scope.duration));
+            } else {
+                var endTime = Math.floor(view.endTime);
+            }
+
+            for(var t = startTime; t < endTime; t++) {
                 var xPos = (t - view.startTime) * view.widthPerSecond;
-                if(t > 0) {
-                    drawSecond(ctx, xPos, t);
-                }
+                drawSecond(ctx, xPos, t);
                 drawTics(ctx, xPos);
             }
         }
