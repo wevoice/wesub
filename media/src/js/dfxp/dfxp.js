@@ -19,6 +19,30 @@
 
 var dfxp = (function($) {
 
+function markdownToHTML(text) {
+    /*
+     * Convert text to Markdown-style rendered HTML with bold, italic,
+     * underline, etc.
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+        { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
+        { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
 var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
@@ -419,7 +443,7 @@ var AmaraDFXPParser = function() {
          * Return the content of the subtitle, rendered with Markdown styles.
          */
 
-        return this.markdownToHTML(this.content(node));
+        return markdownToHTML(this.content(node));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
@@ -604,29 +628,6 @@ var AmaraDFXPParser = function() {
         }
         input = input.replace("\n", '<br/>');
         return input;
-    };
-    this.markdownToHTML = function(text) {
-        /*
-         * Convert text to Markdown-style rendered HTML with bold, italic,
-         * underline, etc.
-         */
-
-        var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
-            { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
-            { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
-        ];
-
-        for (var i = 0; i < replacements.length; i++) {
-            var match = replacements[i].match;
-            var replaceWith = replacements[i].replaceWith;
-
-            text = text.replace(match, replaceWith);
-        }
-
-        return text;
     };
     this.needsAnySynced = function() {
         /*
@@ -1034,17 +1035,20 @@ var SubtitleItem = function(parser, node, id) {
      * SubtitleItem has the following properties:
      *   - startTime -- start time in seconds
      *   - endTime -- end time in seconds
-     *   - content -- subtitle content in HTML format
      *   - markdown -- subtitle content in our markdown-style format
      *   - node -- DOM node from the DFXP XML
      *   - id -- unique string to identify this item in the list
      */
     this.startTime = parser.startTime(node);
     this.endTime = parser.endTime(node);
-    this.content = parser.contentRendered(node);
     this.markdown = parser.dfxpToMarkdown(node, true);
     this.node = node;
     this.id = id;
+}
+
+SubtitleItem.prototype.content = function() {
+    /* Get the content of this subtitle as HTML */
+    return markdownToHTML(this.markdown);
 }
 
 SubtitleItem.prototype.isSynced = function() {
@@ -1117,7 +1121,7 @@ SubtitleList.prototype.length = function() {
 
 SubtitleList.prototype.needsAnyTranscribed = function() {
     for(var i=0; i < this.length; i++) {
-        if(this.subtitles[i].content == '') return true;
+        if(this.subtitles[i].markdown == '') return true;
     }
     return false;
 }
@@ -1150,7 +1154,6 @@ SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
      */
     this.parser.content(subtitle.node, content);
     subtitle.markdown = content;
-    subtitle.content = this.parser.contentRendered(subtitle.node);
 }
 
 SubtitleList.prototype.firstSubtitleAfter = function(time) {

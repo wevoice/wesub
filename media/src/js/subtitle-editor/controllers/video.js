@@ -99,7 +99,7 @@
         $scope.updateSubtitleOverlay = function(subtitle) {
            // Update the Popcorn subtitle instance's text.
             $scope.pop.amarasubtitle(subtitle.$id, {
-                text: subtitle.content,
+                text: subtitle.content(),
             });
         }
         $scope.$root.$on('subtitle-key-up', function($event, options) {

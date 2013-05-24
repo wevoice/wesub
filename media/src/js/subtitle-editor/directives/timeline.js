@@ -173,7 +173,7 @@ var angular = angular || null;
             function makeDivForSubtitle(subtitle) {
                 var div = $('<div/>', {class: 'subtitle'});
                 var span = $('<span/>');
-                span.html(subtitle.content);
+                span.html(subtitle.content());
                 var left = $('<a href="#" class="handle left"></a>');
                 var right = $('<a href="#" class="handle right"></a>');
                 left.on('mousedown',
