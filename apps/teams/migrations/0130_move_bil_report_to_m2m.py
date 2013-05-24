@@ -5,7 +5,8 @@ from south.v2 import DataMigration
 from django.db import models
 
 class Migration(DataMigration):
-    
+    no_dry_run = True
+
     def forwards(self, orm):
         BillingReport = orm['teams.BillingReport']
         for report in BillingReport.objects.all() :
