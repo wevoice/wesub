@@ -339,17 +339,25 @@ var angular = angular || null;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.addSubtitleAtEnd  = function(focus) {
             // Add the subtitle directly to the DFXP instance.
-            var newSubtitle = $scope.subtitleList.addSubtitleAtEnd();
+            $scope.insertSubtitleBefore(null, focus);
+        }
+        $scope.insertSubtitleBefore = function(otherSubtitle, focus) {
+            var insertPos = $scope.subtitleList.insertSubtitleBefore(
+                    otherSubtitle);
 
             // If we want to focus the subtitle after it's been added, set
             // the index here.
             if (focus) {
-                $scope.focusIndex = $scope.subtitleList.length() - 1;
+                $scope.focusIndex = insertPos;
             // Otherwise, reset the focusIndex.
             } else {
                 $scope.focusIndex = null;
             }
         };
+        $scope.removeSubtitle = function(subtitle) {
+            $scope.subtitleList.removeSubtitle(subtitle);
+            $scope.focusIndex = null;
+        }
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.$root.subtitlesHeight;
         };
@@ -478,6 +486,9 @@ var angular = angular || null;
             $scope.$root.$emit('editing');
 
             return initialText;
+        };
+        $scope.lastItem = function() {
+            return $scope.$last;
         };
     };
 

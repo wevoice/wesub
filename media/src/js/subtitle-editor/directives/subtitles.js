@@ -275,43 +275,7 @@ var USER_IDLE_MINUTES = 5;
              * Any other key: do nothing.
              */
 
-            var nextSubtitle;
-
             var $currentSubtitle = $(e.currentTarget).parent();
-
-            // Tab without shift.
-            if (e.keyCode === 9 && !e.shiftKey) {
-
-                // Prevent an additional newline from being added to the next subtitle.
-                e.preventDefault();
-
-                // Save the current subtitle.
-                selectedScope.finishEditingMode(activeTextArea.val());
-
-                // If canAddAndRemove is true and this is the last subtitle in the set,
-                // save the current subtitle and create a new subtitle at the end.
-                if (selectedScope.canAddAndRemove) {
-                    if ($currentSubtitle.next().length === 0) {
-                        selectedScope.addSubtitleAtEnd(true);
-
-                    }
-                }
-
-                // Set the next subtitle to be the one after this.
-                nextSubtitle = $currentSubtitle.next().get(0);
-
-            }
-
-            // Tab with shift.
-            if (e.keyCode === 9 && e.shiftKey) {
-
-                // Keep the cursor in the current subtitle.
-                e.preventDefault();
-
-                // Set the next subtitle to be the one before this.
-                nextSubtitle = $currentSubtitle.prev().get(0);
-
-            }
 
             // Space with shift.
             if (e.keyCode === 32 && e.shiftKey) {
@@ -329,16 +293,13 @@ var USER_IDLE_MINUTES = 5;
                 e.preventDefault();
                 if (selectedScope && selectedScope.isEditing) {
                     selectedScope.finishEditingMode(activeTextArea.val());
-                    selectedScope.$digest();
+                    if(selectedScope.lastItem()) {
+                        selectedScope.addSubtitleAtEnd(true);
+                        selectedScope.$root.$digest();
+                    } else {
+                        selectedScope.$digest();
+                    }
                 }
-
-            }
-
-            if (nextSubtitle) {
-
-                // Select the next element.
-                onSubtitleItemSelected(nextSubtitle);
-
             }
         }
         function onSubtitleTextKeyUp(e) {

@@ -1109,8 +1109,7 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
     // Needed because each() changes the value of this
     var self = this;
     this.parser.getSubtitles().each(function(index, node) {
-        var idKey = (self.idCounter++).toString(16);
-        var subtitle = new SubtitleItem(self.parser, node, idKey);
+        var subtitle = self.makeItem(node);
         if(subtitle.isSynced()) {
             syncedSubs.push(subtitle);
         } else {
@@ -1125,6 +1124,11 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
     this.subtitles = syncedSubs;
     // append all unsynced subs to the list
     this.subtitles.push.apply(this.subtitles, unsyncedSubs);
+}
+
+SubtitleList.prototype.makeItem = function(node) {
+    var idKey = (this.idCounter++).toString(16);
+    return new SubtitleItem(this.parser, node, idKey);
 }
 
 SubtitleList.prototype.length = function() {
@@ -1165,6 +1169,7 @@ SubtitleList.prototype.prevSubtitle = function(subtitle) {
 }
 
 SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
+    var wasSynced = subtitle.isSynced();
     if(subtitle.startTime != startTime) {
         this.parser.startTime(subtitle.node, startTime);
         subtitle.startTime = startTime;
@@ -1172,6 +1177,9 @@ SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTim
     if(subtitle.endTime != endTime) {
         this.parser.endTime(subtitle.node, endTime);
         subtitle.endTime = endTime;
+    }
+    if(subtitle.isSynced() && !wasSynced) {
+        this.syncedCount++;
     }
 }
 
@@ -1184,21 +1192,81 @@ SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
     subtitle.markdown = content;
 }
 
+SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
+    if(otherSubtitle !== null) {
+        var pos = this.getIndex(otherSubtitle);
+    } else {
+        var pos = this.subtitles.length;
+    }
+    // We insert the subtitle before the reference point, but AmaraDFXPParser
+    // wants to insert it after, so we need to adjust things a bit.
+    if(pos > 0) {
+        var after = this.subtitles[pos-1].node;
+    } else {
+        var after = -1;
+    }
+    if(otherSubtitle && otherSubtitle.isSynced()) {
+        // If we are inserting between 2 synced subtitles, then we can set the
+        // time
+        if(pos > 0) {
+            // Inserting a subtitle between two others.  Make it so each
+            // subtitle takes up 1/3 of the time available
+            var firstSubtitle = this.prevSubtitle(otherSubtitle);
+            var totalTime = otherSubtitle.endTime - firstSubtitle.startTime;
+            var durationSplit = Math.floor(totalTime / 3);
+            var startTime = firstSubtitle.startTime + durationSplit;
+            var endTime = startTime + durationSplit;
+            this.updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
+                    startTime);
+            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+        } else {
+            // Inserting a subtitle as the start of the list.  position the
+            // subtitle to start at time=0 and take up half the space
+            // available to the two subtitles
+            var startTime = 0;
+            var endTime = Math.floor(otherSubtitle.endTime / 2);
+            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+        }
+        attrs = {
+            begin: startTime,
+            end: endTime,
+        }
+    } else {
+        attrs = {}
+    }
+    var node = this.parser.addSubtitle(after, attrs);
+    var subtitle = this.makeItem(node);
+    if(otherSubtitle != null) {
+        this.subtitles.splice(pos, 0, subtitle);
+    } else {
+        this.subtitles.push(subtitle);
+    }
+    if(subtitle.isSynced()) {
+        this.syncedCount++;
+    }
+    return pos;
+}
+
+SubtitleList.prototype.removeSubtitle = function(subtitle) {
+    var pos = this.getIndex(subtitle);
+    this.parser.removeSubtitle(subtitle.node);
+    this.subtitles.splice(pos, 1);
+}
+
 SubtitleList.prototype.firstSubtitleAfter = function(time) {
     /* Get the first subtitle whose end is after time
      *
      * returns index of the subtitle, or -1 if none are found.
      */
 
-    // First check that we are going to find any subtitle
-    if(this.length() == 0 ||
-            this.subtitles[this.length()-1].endTime <= time) {
-        return -1;
-    }
-
     // Do a binary search to find the sub
     var left = 0;
-    var right = this.length() - 1;
+    var right = this.syncedCount-1;
+    // First check that we are going to find any subtitle
+    if(this.length() == 0 || this.subtitles[right].endTime <= time) {
+        return -1;
+    }
+    // Now do the binary search
     while(left < right) {
         var index = Math.floor((left + right) / 2);
         if(this.subtitles[index].endTime > time) {

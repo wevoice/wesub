@@ -213,12 +213,14 @@
                                     <span>[[ subtitle.startTime|displayTime ]]</span>
                                     <a href ng-show='false' class="comments"></a>
                                 </span>
-                                <a href class="remove-subtitle"
+                                <a href="#" class="remove-subtitle"
                                    ng-show='canAddAndRemove'
                                    ng-click="removeSubtitle(subtitle)">
                                     Remove
                                 </a>
-                                <a href ng-show='canAddAndRemove' class="add-subtitle"></a>
+                                <a href="#" class="add-subtitle"
+                                    ng-show='canAddAndRemove'
+                                    ng-click="insertSubtitleBefore(subtitle, true)"></a>
                             </div>
 
                             <span ng-show="!isEditing"
@@ -237,7 +239,7 @@
                     <a class="end"
                        ng-show="canAddAndRemove"
                        ng-controller="SubtitleListHelperController"
-                       ng-click="addSubtitle(null, {}, '', true)">
+                       ng-click="addSubtitleAtEnd(true)">
                         <span ng-show="!isEditingAny">+ New subtitle</span>
                         <span ng-show="isEditingAny">
                             Press ENTER to save subtitle and move to next.<br />
