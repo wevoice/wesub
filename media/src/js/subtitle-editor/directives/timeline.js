@@ -165,6 +165,10 @@ var angular = angular || null;
             }
 
             function handleMouseDown(evt, dragHandler) {
+                if(!scope.workingSubtitles.allowsSyncing) {
+                    evt.preventDefault();
+                    return false;
+                }
                 var subtitle = evt.data.subtitle;
                 var dragHandler = evt.data.dragHandler;
                 var context = {

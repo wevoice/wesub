@@ -331,11 +331,12 @@ var angular = angular || null;
          * @constructor
          */
 
-        $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.subtitleList = new dfxp.SubtitleList();
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
+        $scope.allowsSyncing = $window.editorData.allowsSyncing;
+        $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.addSubtitleAtEnd  = function(focus) {
             // Add the subtitle directly to the DFXP instance.
             var newSubtitle = $scope.subtitleList.addSubtitleAtEnd();
