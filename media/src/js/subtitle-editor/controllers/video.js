@@ -107,6 +107,15 @@
         $scope.$root.$on('subtitle-key-up', function($event, options) {
             $scope.updateSubtitleOverlay(options.subtitle);
         });
+        $scope.$root.$on('play-video', function($event) {
+            $scope.pop.play();
+        });
+        $scope.$root.$on('pause-video', function($event) {
+            $scope.pop.pause();
+        });
+        $scope.$root.$on('seek-video', function($event, time) {
+            $scope.pop.currentTime(time);
+        });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 
             var startTimeSeconds = scope.subtitle.startTimeSeconds();

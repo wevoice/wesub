@@ -23,7 +23,7 @@ var angular = angular || null;
 
     var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
-    function calcTimelineView(scope, width) {
+    function calcTimelineView(scope, width, deltaMSecs) {
         // Calculate the portion of the video time that is displayed in the
         // timeline
 
@@ -31,6 +31,9 @@ var angular = angular || null;
         // put startTime in the middle of the canvas
         var timelineDuration = width * 1000 / widthPerSecond;
         var startTime = scope.currentTime - timelineDuration / 2;
+        if(deltaMSecs) {
+            startTime += deltaMSecs;
+        }
         return {
             'startTime': startTime,
             'widthPerSecond': widthPerSecond,
@@ -109,6 +112,10 @@ var angular = angular || null;
                 function(newValue, oldValue) {
                     view = calcTimelineView(scope, width);
                     drawCanvas();
+            });
+            scope.$on('timeline-drag', function(evt, deltaMSecs) {
+                view = calcTimelineView(scope, width, deltaMSecs);
+                drawCanvas();
             });
         }
     });
@@ -226,6 +233,29 @@ var angular = angular || null;
                 container.append(div);
                 return div;
             }
+            function handleMouseDownInTimeline(evt) {
+                var initialPageX = evt.pageX;
+                container.on('mousemove.timelinedrag', function(evt) {
+                    scope.$root.$emit('pause-video');
+                    var deltaX = initialPageX - evt.pageX;
+                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
+                    view = calcTimelineView(scope, container.width(),
+                        deltaMSecs);
+                    placeSubtitles();
+                    scope.$emit('timeline-drag', deltaMSecs);
+                }).on('mouseup.timelinedrag', function(evt) {
+                    container.off('.timelinedrag');
+                    var deltaX = initialPageX - evt.pageX;
+                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
+                    scope.$root.$emit('seek-video', 
+                        (scope.currentTime + deltaMSecs) / 1000);
+                }).on('mouseleave.timelinedrag', function(evt) {
+                    container.off('.timelinedrag');
+                    view = calcTimelineView(scope, container.width());
+                    placeSubtitles();
+                    scope.$emit('timeline-drag', 0);
+                });
+            }
 
             function placeSubtitle(startTime, endTime, div) {
                 var x = Math.floor((startTime - view.startTime) *
@@ -289,6 +319,7 @@ var angular = angular || null;
             scope.$root.$on('subtitles-fetched', function() {
                 placeSubtitles();
             });
+            container.on('mousedown', handleMouseDownInTimeline);
         }
     });
 
