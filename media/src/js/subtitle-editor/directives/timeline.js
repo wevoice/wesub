@@ -262,6 +262,21 @@ var angular = angular || null;
                 for(var subId in oldTimelineDivs) {
                     oldTimelineDivs[subId].remove();
                 }
+
+                // Check if a new subtitle is displayed
+                var shownSubtitle = null;
+                for(var i = 0; i < subtitles.length; i++) {
+                    if(subtitles[i].isAt(scope.currentTime)) {
+                        shownSubtitle = subtitles[i];
+                    }
+                }
+                if(shownSubtitle != scope.subtitle) {
+                    scope.subtitle = shownSubtitle;
+                    if(shownSubtitle !== null) {
+                        scope.$root.$emit('timeline-subtitle-shown',
+                                shownSubtitle);
+                    }
+                }
             }
             scope.$watch('currentTime + ":" + duration',
                 function(newValue, oldValue) {

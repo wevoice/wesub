@@ -23,6 +23,7 @@
     var TimelineController = function($scope, SubtitleStorage) {
         $scope.scale = 1.0;
         $scope.currentTime = $scope.duration = null;
+        $scope.subtitle = null;
 
         function updateTime(pop) {
             $scope.currentTime = Math.floor(pop.currentTime() * 1000);

@@ -100,6 +100,8 @@
            // Update the Popcorn subtitle instance's text.
             $scope.pop.amarasubtitle(subtitle.$id, {
                 text: subtitle.content(),
+                start: subtitle.startTime / 1000,
+                end: subtitle.endTime / 1000,
             });
         }
         $scope.$root.$on('subtitle-key-up', function($event, options) {
@@ -124,6 +126,9 @@
             }
 
             $scope.updateSubtitleOverlay(scope.subtitle);
+        });
+        $scope.$root.$on('timeline-subtitle-shown', function(evt, subtitle) {
+            $scope.updateSubtitleOverlay(subtitle);
         });
 
     };

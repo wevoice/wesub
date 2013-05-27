@@ -1063,6 +1063,10 @@ SubtitleItem.prototype.isSynced = function() {
     return this.startTime >= 0 && this.endTime >= 0;
 }
 
+SubtitleItem.prototype.isAt = function(time) {
+    return this.isSynced() && this.startTime <= time && this.endTime > time;
+}
+
 SubtitleItem.prototype.startTimeSeconds = function() {
     if(this.startTime >= 0) {
         return this.startTime / 1000;
