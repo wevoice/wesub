@@ -28,14 +28,13 @@ var angular = angular || null;
         // timeline
 
         var widthPerSecond = Math.floor(scope.scale * 100);
-        // put startTime in the middle of the canvas, unless we are
-        // at the very begining/end of the timeline.
-        var startTime = scope.currentTime - (width / 2) / widthPerSecond;
+        // put startTime in the middle of the canvas
+        var timelineDuration = width * 1000 / widthPerSecond;
+        var startTime = scope.currentTime - timelineDuration / 2;
         return {
             'startTime': startTime,
             'widthPerSecond': widthPerSecond,
-            'widthPerMillisecond': widthPerSecond / 1000,
-            'endTime': startTime + (width / widthPerSecond),
+            'endTime': startTime + timelineDuration,
         }
     }
 
@@ -90,16 +89,16 @@ var angular = angular || null;
             ctx.font = 'bold ' + (height / 5) + 'px sans';
 
             view = calcTimelineView(scope, width);
-            var startTime = Math.floor(Math.max(view.startTime, 0));
+            var startTime = Math.floor(Math.max(view.startTime / 1000, 0));
             if(scope.duration !== null) {
-                var endTime = Math.floor(Math.min(view.endTime,
-                            scope.duration));
+                var endTime = Math.floor(Math.min(view.endTime / 1000,
+                            scope.duration / 1000));
             } else {
-                var endTime = Math.floor(view.endTime);
+                var endTime = Math.floor(view.endTime / 1000);
             }
 
             for(var t = startTime; t < endTime; t++) {
-                var xPos = (t - view.startTime) * view.widthPerSecond;
+                var xPos = (t - (view.startTime / 1000)) * view.widthPerSecond;
                 drawSecond(ctx, xPos, t);
                 drawTics(ctx, xPos);
             }
@@ -171,7 +170,7 @@ var angular = angular || null;
                 if(nextSubtitle && nextSubtitle.isSynced()) {
                     context.maxEndTime = nextSubtitle.startTime;
                 } else {
-                    context.maxEndTime = scope.duration * 1000;
+                    context.maxEndTime = scope.duration;
                 }
                 var prevSubtitle = subtitleList.prevSubtitle(subtitle);
                 if(prevSubtitle) {
@@ -187,7 +186,7 @@ var angular = angular || null;
                 var initialPageX = evt.pageX;
                 container.on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
-                    var deltaMSecs = deltaX / view.widthPerMillisecond;
+                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
                     dragHandler(context, deltaMSecs);
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
@@ -229,10 +228,10 @@ var angular = angular || null;
             }
 
             function placeSubtitle(startTime, endTime, div) {
-                var x = Math.floor((startTime / 1000 - view.startTime) *
-                    view.widthPerSecond);
+                var x = Math.floor((startTime - view.startTime) *
+                    view.widthPerSecond / 1000);
                 var width = Math.floor((endTime - startTime) *
-                    view.widthPerMillisecond);
+                    view.widthPerSecond / 1000);
                 div.css({left: x, width: width});
             }
 
@@ -241,7 +240,7 @@ var angular = angular || null;
                     return;
                 }
                 var subtitles = scope.workingSubtitles.subtitleList.getSubtitlesForTime(
-                    view.startTime * 1000, view.endTime * 1000);
+                    view.startTime, view.endTime);
 
 
                 var oldTimelineDivs = timelineDivs;

@@ -24,18 +24,19 @@
         $scope.scale = 1.0;
         $scope.currentTime = $scope.duration = null;
 
+        function updateTime(pop) {
+            $scope.currentTime = Math.floor(pop.currentTime() * 1000);
+            $scope.duration = Math.floor(pop.duration() * 1000);
+            $scope.$digest();
+        }
+
         $scope.$root.$on('video-ready', function($event, pop) {
             console.log("video-ready");
-            $scope.currentTime = pop.currentTime();
-            $scope.duration = pop.duration();
-            $scope.$digest();
-
+            updateTime(pop);
         });
         $scope.$root.$on('video-timechanged', function($event, pop) {
             console.log("video-timechanged");
-            $scope.currentTime = pop.currentTime();
-            $scope.duration = pop.duration();
-            $scope.$digest();
+            updateTime(pop);
         });
     };
 
