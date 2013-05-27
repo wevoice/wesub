@@ -10,7 +10,7 @@ class BillingPage(UnisubsPage):
     """
 
     _URL = "admin/billing/"
-    _TEAM = "select#id_team"
+    _TEAM = "input#id_teams"
     _START = "input#id_start_date"
     _END = "input#id_end_date"
     _TYPE = "select#id_type"
@@ -22,7 +22,7 @@ class BillingPage(UnisubsPage):
 
 
     def submit_billing_parameters(self, team, start, end, bill_type):
-        self.select_option_by_text(self._TEAM, team)
+        self.type_by_css(self._TEAM, team)
         self.type_by_css(self._START, start)
         self.type_by_css(self._END, end)
         self.select_option_by_text(self._TYPE, bill_type)
