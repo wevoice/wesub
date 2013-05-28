@@ -251,6 +251,10 @@ var USER_IDLE_MINUTES = 5;
         return function link(scope, elem, attrs) {
             var textarea = $('textarea', elem);
 
+            scope.nextScope = function() {
+                return angular.element(elem.next()).scope();
+            }
+
             scope.showTextArea = function(fromClick) {
                 if(fromClick) {
                     var caretPos = window.getSelection().anchorOffset;
@@ -276,6 +280,14 @@ var USER_IDLE_MINUTES = 5;
                         scope.finishEditingMode(true);
                         if(scope.lastItem()) {
                             scope.addSubtitleAtEnd();
+                            // Have to use a timeout in this case because the
+                            // scope for the new subtitle won't be created
+                            // until apply() finishes
+                            $timeout(function() {
+                                scope.nextScope().startEditingMode();
+                            });
+                        } else {
+                            scope.nextScope().startEditingMode();
                         }
                         evt.preventDefault();
                     } else if (evt.keyCode === 27) {
