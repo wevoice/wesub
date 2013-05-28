@@ -438,6 +438,7 @@ var AmaraDFXPParser = function() {
 
         return $('<div>').append(subtitleContents.clone()).remove().text();
     };
+    this.markdownToHTML = markdownToHTML;
     this.contentRendered = function(node) {
         /*
          * Return the content of the subtitle, rendered with Markdown styles.
