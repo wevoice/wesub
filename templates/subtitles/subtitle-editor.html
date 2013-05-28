@@ -238,15 +238,15 @@
 
                     </ul>
 
-                    <a class="end"
-                       ng-show="canAddAndRemove"
-                       ng-controller="SubtitleListHelperController"
-                       ng-click="addSubtitleAtEnd()">
-                        <span ng-show="!isEditingAny">+ New subtitle</span>
-                        <span ng-show="isEditingAny">
+                    <div ng-controller="SubtitleListHelperController">
+                        <a class="end"
+                            href="#"
+                            ng-show="canAddAndRemove && !isEditingAny"
+                            ng-click="addSubtitleAtEnd()">+ New subtitle</a>
+                        <span ng-show="isEditingAny" class="end">
                             Press ENTER to save subtitle and move to next.<br />
                         </span>
-                    </a>
+                    </div>
                 </div>
             </div>
         </section>
