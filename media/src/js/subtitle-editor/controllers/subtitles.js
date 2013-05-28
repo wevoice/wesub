@@ -337,26 +337,16 @@ var angular = angular || null;
         }
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
-        $scope.addSubtitleAtEnd  = function(focus) {
+        $scope.addSubtitleAtEnd  = function() {
             // Add the subtitle directly to the DFXP instance.
-            $scope.insertSubtitleBefore(null, focus);
+            $scope.insertSubtitleBefore(null);
         }
-        $scope.insertSubtitleBefore = function(otherSubtitle, focus) {
+        $scope.insertSubtitleBefore = function(otherSubtitle) {
             var insertPos = $scope.subtitleList.insertSubtitleBefore(
                     otherSubtitle);
-
-            // If we want to focus the subtitle after it's been added, set
-            // the index here.
-            if (focus) {
-                $scope.focusIndex = insertPos;
-            // Otherwise, reset the focusIndex.
-            } else {
-                $scope.focusIndex = null;
-            }
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.subtitleList.removeSubtitle(subtitle);
-            $scope.focusIndex = null;
         }
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.$root.subtitlesHeight;
@@ -434,11 +424,9 @@ var angular = angular || null;
 
         $scope.$root.$on('editing', function() {
             $scope.isEditingAny = true;
-            $scope.$digest();
         });
         $scope.$root.$on('editing-done', function() {
             $scope.isEditingAny = false;
-            $scope.$digest();
         });
     };
     var SubtitleListItemController = function($scope) {
@@ -448,45 +436,46 @@ var angular = angular || null;
          * @constructor
          */
 
-        var initialText;
-
-        $scope.empty = false;
+        $scope.empty = $scope.subtitle.isEmpty();
+        $scope.characterCount = $scope.subtitle.characterCount;
         $scope.isEditing = false;
         $scope.showStartTime = $scope.subtitle.startTime >= 0;
-        initialText = $scope.subtitle.markdown;
 
-        $scope.finishEditingMode = function(newValue) {
-
+        $scope.finishEditingMode = function(commitChanges) {
             $scope.isEditing = false;
+            $scope.hideTextArea();
 
             // Tell the root scope that we're no longer editing, now.
-            $scope.$root.$emit('editing-done');
+            $scope.$root.$emit('editing-done', $scope);
 
-
-            if (newValue !== initialText) {
-                // we can store markdown content directly on the node
-                // then on serialization it will get converted correctly
-                // to dfxp
+            if(commitChanges &&
+                    $scope.editText !== $scope.subtitle.markdown) {
                 $scope.subtitleList.updateSubtitleContent($scope.subtitle,
-                        newValue);
-                initialText = newValue;
+                        $scope.editText);
+                $scope.empty = $scope.subtitle.isEmpty();
+                $scope.characterCount = $scope.subtitle.characterCount();
                 $scope.$root.$emit('work-done');
-                $scope.$root.$digest();
             }
         };
         $scope.getSubtitleIndex = function() {
             return $scope.subtitleList.getIndex($scope.subtitle);
         };
-        $scope.startEditingMode = function() {
-
-
+        $scope.startEditingMode = function(fromClick) {
             $scope.isEditing = true;
+            $scope.editText = $scope.subtitle.markdown;
+            $scope.showTextArea(fromClick);
 
             // Tell the root scope that we're editing, now.
             $scope.$root.$emit('editing');
-
-            return initialText;
         };
+        $scope.onClick = function(event) {
+            if($scope.isWorkingSubtitles() && !$scope.isEditing) {
+                $scope.startEditingMode(true);
+                event.stopPropagation();
+                return false;
+            }
+            return true;
+        }
         $scope.lastItem = function() {
             return $scope.$last;
         };

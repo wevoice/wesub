@@ -60,15 +60,13 @@
             $scope.$root.$emit('send-back-task');
         };
 
-        $scope.$root.$on('subtitle-key-up', function($event, options) {
-            if (options.subtitleList.needsAnyTranscribed()) {
+        $scope.$root.$on('editing-done', function($event, $editScope) {
+            if ($editScope.subtitleList.needsAnyTranscribed()) {
                 $scope.error = 'You have empty subtitles.';
             } else {
                 $scope.error = null;
             }
-            $scope.$digest();
         });
-        
     };
 
     root.CollabController = CollabController;

@@ -1060,6 +1060,15 @@ SubtitleItem.prototype.content = function() {
     return markdownToHTML(this.markdown);
 }
 
+SubtitleItem.prototype.isEmpty = function() {
+    return this.markdown == '';
+}
+
+SubtitleItem.prototype.characterCount = function() {
+    // FIXME: We should not count markup characters in this count
+    return this.markdown.length;
+}
+
 SubtitleItem.prototype.isSynced = function() {
     return this.startTime >= 0 && this.endTime >= 0;
 }
@@ -1101,6 +1110,10 @@ var SubtitleList = function() {
     this.idCounter = 0;
     this.subtitles = [];
     this.syncedCount = 0;
+}
+
+SubtitleList.prototype.contentForMarkdown = function(markdown) {
+    return markdownToHTML(markdown);
 }
 
 SubtitleList.prototype.loadXML = function(subtitlesXML) {

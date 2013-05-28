@@ -99,10 +99,6 @@
 
         };
 
-        $scope.$root.$on('subtitle-key-up', function($event, options) {
-            $scope.overlayText = options.subtitle.content();
-            $scope.showOverlay = true;
-        });
         $scope.$root.$on('play-video', function($event) {
             $scope.pop.play();
         });
@@ -111,6 +107,13 @@
         });
         $scope.$root.$on('seek-video', function($event, time) {
             $scope.pop.currentTime(time);
+        });
+        $scope.$root.$on('subtitle-edit', function($event, content) {
+            $scope.overlayText = content;
+            $scope.showOverlay = true;
+        });
+        $scope.$root.$on('editing-done', function($event, content) {
+            $scope.showOverlay = false;
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 

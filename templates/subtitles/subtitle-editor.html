@@ -154,6 +154,7 @@
 
                         <li ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
+                            ng-click="onClick($event)"
                             class="subtitle-list-item">
 
                             <span ng-show="showStartTime"
@@ -207,6 +208,7 @@
                         <li subtitle-list-item
                             ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
+                            ng-click="onClick($event)"
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
@@ -222,7 +224,7 @@
                                 </a>
                                 <a href="#" class="add-subtitle"
                                     ng-show='canAddAndRemove'
-                                    ng-click="insertSubtitleBefore(subtitle, true)"></a>
+                                    ng-click="insertSubtitleBefore(subtitle)"></a>
                             </div>
 
                             <span ng-show="!isEditing"
@@ -230,9 +232,7 @@
                                   class="subtitle-text">
                             </span>
 
-                            <textarea ng-show="isEditing"
-                                      style="display: none;">
-                            </textarea>
+                            <textarea></textarea>
 
                         </li>
 
@@ -241,7 +241,7 @@
                     <a class="end"
                        ng-show="canAddAndRemove"
                        ng-controller="SubtitleListHelperController"
-                       ng-click="addSubtitleAtEnd(true)">
+                       ng-click="addSubtitleAtEnd()">
                         <span ng-show="!isEditingAny">+ New subtitle</span>
                         <span ng-show="isEditingAny">
                             Press ENTER to save subtitle and move to next.<br />
