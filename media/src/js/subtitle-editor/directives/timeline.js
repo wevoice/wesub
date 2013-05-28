@@ -283,7 +283,9 @@ var angular = angular || null;
                 for(var i = 0; i < subtitles.length; i++) {
                     var subtitle = subtitles[i];
                     if(oldTimelineDivs.hasOwnProperty(subtitle.id)) {
-                        timelineDivs[subtitle.id] = oldTimelineDivs[subtitle.id];
+                        var div = oldTimelineDivs[subtitle.id];
+                        timelineDivs[subtitle.id] = div;
+                        $('span', div).html(subtitle.content());
                         delete oldTimelineDivs[subtitle.id];
                     } else {
                         var div = makeDivForSubtitle(subtitle);
