@@ -178,7 +178,9 @@
             </div>
         </section>
         <section class="center column">
-            <div class="video" id="video" ng-controller="VideoController"></div>
+        <div class="video" id="video" ng-controller="VideoController">
+            <div class="subtitle-overlay" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+        </div>
             <div class="workspace-tools group">
                 <div class="subtitles-language">
                     [[ workingSubtitles.languageName ]] subtitles
@@ -311,7 +313,6 @@
     <script src="{{ STATIC_URL }}src/js/third-party/angular-cookies.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
-    <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/timeline.js"></script>

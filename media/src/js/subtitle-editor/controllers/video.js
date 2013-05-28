@@ -35,6 +35,9 @@
 
         var videoURLs = SubtitleStorage.getVideoURLs();
 
+        $scope.overlayText = null;
+        $scope.showOverlay = false;
+
         $scope.pop = window.Popcorn.smart('#video', videoURLs);
         $scope.pop.controls(true);
 
@@ -96,16 +99,9 @@
 
         };
 
-        $scope.updateSubtitleOverlay = function(subtitle) {
-           // Update the Popcorn subtitle instance's text.
-            $scope.pop.amarasubtitle(subtitle.$id, {
-                text: subtitle.content(),
-                start: subtitle.startTime / 1000,
-                end: subtitle.endTime / 1000,
-            });
-        }
         $scope.$root.$on('subtitle-key-up', function($event, options) {
-            $scope.updateSubtitleOverlay(options.subtitle);
+            $scope.overlayText = options.subtitle.content();
+            $scope.showOverlay = true;
         });
         $scope.$root.$on('play-video', function($event) {
             $scope.pop.play();
@@ -134,10 +130,16 @@
 
             }
 
-            $scope.updateSubtitleOverlay(scope.subtitle);
+            $scope.overlayText = scope.subtitle.content();
+            $scope.showOverlay = true;
         });
         $scope.$root.$on('timeline-subtitle-shown', function(evt, subtitle) {
-            $scope.updateSubtitleOverlay(subtitle);
+            if(subtitle !== null) {
+                $scope.overlayText = subtitle.content();
+                $scope.showOverlay = true;
+            } else {
+                $scope.showOverlay = false;
+            }
         });
 
     };

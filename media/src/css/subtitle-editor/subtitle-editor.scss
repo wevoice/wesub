@@ -715,11 +715,12 @@ section.main {
             height: 291px;
             position: relative;
 
-            div.amara-popcorn-subtitles {
+            div.subtitle-overlay {
+                position: absolute;
                 bottom: 63px;
                 left: 0;
+                width: 100%;
                 padding: 0 20px;
-                position: absolute;
                 text-align: center;
 
                 div {

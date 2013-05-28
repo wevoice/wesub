@@ -306,10 +306,8 @@ var angular = angular || null;
                 }
                 if(shownSubtitle != scope.subtitle) {
                     scope.subtitle = shownSubtitle;
-                    if(shownSubtitle !== null) {
-                        scope.$root.$emit('timeline-subtitle-shown',
-                                shownSubtitle);
-                    }
+                    scope.$root.$emit('timeline-subtitle-shown',
+                            shownSubtitle);
                 }
             }
             scope.$watch('currentTime + ":" + duration',
