@@ -208,6 +208,7 @@ var angular = angular || null;
                     var subtitleList = scope.workingSubtitles.subtitleList;
                     subtitleList.updateSubtitleTime(context.subtitle,
                         context.startTime, context.endTime);
+                    scope.$root.$emit("work-done");
                     scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
                     container.off('.timelinedrag');

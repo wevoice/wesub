@@ -58,6 +58,7 @@
                 // The first unsynced subtitle needs a start time, set it
                 subtitleList.updateSubtitleTime(firstUnsynced,
                     $scope.currentTime, firstUnsynced.endTime);
+                $scope.$root.$emit("work-done");
             } else {
                 // Set both the first unsynced subtitle's end time and the
                 // second unsynced subtitle's start time to the current time.
@@ -67,6 +68,7 @@
                     subtitleList.updateSubtitleTime(nextUnsynced,
                             $scope.currentTime, nextUnsynced.endTime);
                 }
+                $scope.$root.$emit("work-done");
             }
         });
         $scope.$root.$on('sync-next-end-time', function($event) {
@@ -87,6 +89,7 @@
                 firstUnsynced.endTime < 0) {
                 subtitleList.updateSubtitleTime(firstUnsynced,
                     firstUnsynced.startTime, $scope.currentTime);
+                $scope.$root.$emit("work-done");
             }
         });
     };
