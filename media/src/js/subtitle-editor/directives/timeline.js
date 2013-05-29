@@ -20,6 +20,7 @@ var angular = angular || null;
 
 (function($) {
     var MIN_DURATION = 250; // 0.25 seconds
+    var DEFAULT_DURATION = 4000; // 4.0 seconds
 
     var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
@@ -314,7 +315,7 @@ var angular = angular || null;
                 var timelineSubtitle = unsynced.clone();
                 if(timelineSubtitle.startTime < 0) {
                     timelineSubtitle.startTime = scope.currentTime;
-                    timelineSubtitle.endTime = scope.currentTime + 5000;
+                    timelineSubtitle.endTime = scope.currentTime + DEFAULT_DURATION;
                 } else {
                     timelineSubtitle.endTime = Math.max(scope.currentTime,
                             timelineSubtitle.startTime + MIN_DURATION);
