@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html ng-app="amara.SubtitleEditor" lang="{{ language.language_code }}" subtitle-editor 
-                                                                        language-code="{{ language.language_code }}"
-                                                                        video-id="{{ video.video_id }}">
-
+<html ng-app="amara.SubtitleEditor"
+    subtitle-editor
+    ng-controller="AppController"
+    lang="{{ language.language_code }}"
+    language-code="{{ language.language_code }}"
+    ng-mousemove="handleAppMouseMove($event)"
+    video-id="{{ video.video_id }}">
 <head>
 
     <meta charset="utf-8" />
@@ -35,7 +38,7 @@
     <![endif]-->
 
 </head>
-<body ng-class="{ 'timeline-shown': $root.timelineShown }">
+<body ng-class="{ 'timeline-shown': timelineShown }">
 
     <div class="modal"
         ng-controller="ModalController"
@@ -172,8 +175,8 @@
                     </ul>
 
                 </div>
-                <a ng-click="$root.scrollingSynced = !$root.scrollingSynced"
-                   ng-class="{ locked: $root.scrollingSynced, unlocked: !$root.scrollingSynced }"
+                <a ng-click="toggleScrollingSynced()"
+                   ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
                    class="scroll-lock">
                 </a>
             </div>
@@ -187,7 +190,7 @@
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
                 <div class="switches">
-                    <a class="timeline-display" href="#" ng-click="$root.timelineShown = !$root.timelineShown">
+                    <a class="timeline-display" href="#" ng-click="toggleTimelineShown()">
                         <span ng-show="timelineShown">Hide</span>
                         <span ng-show="!timelineShown">Show</span>
                         timeline
@@ -298,7 +301,7 @@
     </section>
     <section ng-controller="TimelineController"
         class="timeline ng-cloak"
-        ng-show="$root.timelineShown"
+        ng-show="timelineShown"
         ng-cloak>
         <div class="current-time-marker"></div>
         <canvas class="timing" width="100" height="65" timeline-timing></canvas>
@@ -321,6 +324,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/dfxp/dfxp.js"></script>
     <script src="{{ STATIC_URL }}src/js/uri.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>

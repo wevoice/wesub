@@ -46,10 +46,10 @@
         //
         // There most likely is a better way to do this.
         $scope.pop.on('canplay', function() {
-            $scope.$root.$broadcast('video-ready', $scope.pop);
+            $scope.$root.$emit('video-ready', $scope.pop);
         });
         $scope.pop.on('timeupdate', function() {
-            $scope.$root.$broadcast('video-timechanged', $scope.pop);
+            $scope.$root.$emit('video-timechanged', $scope.pop);
         });
 
         $scope.playChunk = function(start, duration) {

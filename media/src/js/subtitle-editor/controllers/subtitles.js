@@ -272,7 +272,7 @@ var angular = angular || null;
 
                 buttons.push({
                     'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
-                        $scope.$root.$broadcast('hide-modal');
+                        $scope.$root.$emit('hide-modal');
                     }
                 });
 
@@ -349,7 +349,7 @@ var angular = angular || null;
             $scope.subtitleList.removeSubtitle(subtitle);
         }
         $scope.getSubtitleListHeight = function() {
-            return $(window).height() - $scope.$root.subtitlesHeight;
+            return $(window).height() - $scope.subtitlesHeight;
         };
         $scope.getSubtitles = function(languageCode, versionNumber) {
 
@@ -382,12 +382,12 @@ var angular = angular || null;
             }
 
 
-            // When we have subtitles for an editable set, broadcast it.
+            // When we have subtitles for an editable set, emit it.
             $timeout(function() {
                 if ($scope.isWorkingSubtitles()) {
                     $scope.$root.workingSubtitles = $scope;
                     $scope.$root.$apply();
-                    $scope.$root.$broadcast('subtitles-fetched');
+                    $scope.$root.$emit('subtitles-fetched');
                 }
             });
         };
@@ -410,6 +410,7 @@ var angular = angular || null;
             $scope.videoID = videoID;
         };
 
+        $('div.subtitles').height($scope.getSubtitleListHeight());
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
             $($('div.subtitles').height(newHeight));
         });

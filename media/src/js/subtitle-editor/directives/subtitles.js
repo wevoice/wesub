@@ -42,182 +42,17 @@ var USER_IDLE_MINUTES = 5;
             }
         }
     }
-    directives.directive('subtitleEditor', function(SubtitleStorage, LockService, $timeout) {
-
-        var minutesIdle = 0;
-        var secondsUntilClosing = 120;
-        var videoId, languageCode, selectedScope, regainLockTimer;
-
-        function startUserIdleTimer() {
-            var userIdleTimeout = function() {
-
-                minutesIdle++;
-
-                if (minutesIdle >= USER_IDLE_MINUTES) {
-                    showIdleModal();
-                    $timeout.cancel(regainLockTimer);
-                } else {
-                    $timeout(userIdleTimeout, 60 * 1000);
-                }
-            };
-
-            $timeout(userIdleTimeout, 60 * 1000);
-        }
-        function startRegainLockTimer() {
-            var regainLockTimeout = function() {
-                LockService.regainLock(videoId, languageCode);
-                regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
-            };
-
-            regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
-
-        }
-        function showIdleModal() {
-
-            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
-                "To ensure no work is lost we will close your session in ";
-
-            var closeSessionTimeout;
-
-            var closeSession = function() {
-
-                secondsUntilClosing--;
-
-                if (secondsUntilClosing <= 0) {
-
-                    LockService.releaseLock(videoId, languageCode);
-
-                    selectedScope.$root.$emit("show-modal", {
-                        heading: 'Your session has ended. You can try to resume, close the editor, or download your subtitles',
-                        buttons: [
-                            {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                                // TODO: Remove this duplication from below.
-                                if (closeSessionTimeout) {
-                                    $timeout.cancel(closeSessionTimeout);
-                                }
-
-                                var promise = LockService.regainLock(videoId, languageCode);
-
-                                promise.then(function onSuccess(response) {
-                                    if (response.data.ok) {
-                                        minutesIdle = 0;
-                                        selectedScope.$root.$broadcast('hide-modal');
-                                        startRegainLockTimer();
-                                        startUserIdleTimer();
-                                    } else {
-                                        window.alert("Sorry, could not restart your session.");
-                                        window.location = '/videos/' + videoId + "/";
-                                    }
-                                }, function onError() {
-                                    window.alert("Sorry, could not restart your session.");
-                                    window.location = '/videos/' + videoId + "/";
-                                });
-                            }},
-                            {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
-                                selectedScope.$root.$emit('show-modal-download');
-                            }},
-                            {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                                window.location = '/videos/' + videoId + "/";
-                            }}
-                        ]
-                    });
-
-                } else {
-
-                    selectedScope.$root.$emit('change-modal-heading', heading + secondsUntilClosing + " seconds.");
-                    closeSessionTimeout = $timeout(closeSession, 1000);
-
-                }
-            };
-
-            selectedScope.$root.$emit("show-modal", {
-                heading: heading + secondsUntilClosing + " seconds.",
-                buttons: [
-                    {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                        if (closeSessionTimeout) {
-                            $timeout.cancel(closeSessionTimeout);
-                        }
-
-                        var promise = LockService.regainLock(videoId, languageCode);
-
-                        promise.then(function onSuccess(response) {
-                            if (response.data.ok) {
-                                minutesIdle = 0;
-                                selectedScope.$root.$broadcast('hide-modal');
-                                startRegainLockTimer();
-                                startUserIdleTimer();
-                            } else {
-                                window.alert("Sorry, could not restart your session.");
-                                window.location = '/videos/' + videoId + "/";
-                            }
-                        }, function onError() {
-                            window.alert("Sorry, could not restart your session.");
-                            window.location = '/videos/' + videoId + "/";
-                        });
-                    }}
-                ]
+    directives.directive('subtitleEditor', function() {
+        return function link(scope, elm, attrs) {
+            scope.videoId = attrs.videoId;
+            scope.languageCode = attrs.languageCode;
+            // For some reason using ng-keydown at the HTML tag doesn't work.
+            // Use jquery instead.
+            $(document).keydown(function(evt) {
+                scope.$apply(function(scope) {
+                    scope.handleAppKeyDown(evt);
+                });
             });
-
-            closeSessionTimeout = $timeout(closeSession, 1000);
-
-        }
-
-        return {
-            compile: function compile(elm, attrs, transclude) {
-                return {
-                    post: function post(scope, elm, attrs) {
-
-                        scope.scrollingSynced = true;
-                        scope.timelineShown = true;
-                        scope.subtitlesHeight = 366;
-
-                        scope.$watch('timelineShown', function() {
-                            if (scope.timelineShown) {
-                                scope.subtitlesHeight = 431;
-                            } else {
-                                scope.subtitlesHeight = 366;
-                            }
-                        });
-
-                        $(elm).on('keydown', function(e) {
-
-                            // Reset the lock timer.
-                            minutesIdle = 0;
-
-                            var video = angular.element($('#video').get(0)).scope();
-
-                            if (e.keyCode === 32 && e.shiftKey) {
-                                // Space with shift, toggle play / pause.
-                                e.preventDefault();
-                                video.togglePlay();
-                            } else if(e.keyCode == 40) {
-                                // Down error, set the start time of the first
-                                // unsynced sub
-                                scope.$root.$emit("sync-next-start-time");
-                                e.preventDefault();
-                            } else if(e.keyCode == 38) {
-                                // Up arrow, set the end time of the first
-                                // unsynced sub
-                                scope.$root.$emit("sync-next-end-time");
-                                e.preventDefault();
-                            }
-                        });
-                        $(elm).on('mousemove', function() {
-
-                            // Reset the lock timer.
-                            minutesIdle = 0;
-
-                        });
-
-                        videoId = attrs.videoId;
-                        languageCode = attrs.languageCode;
-                        selectedScope = scope;
-
-                        startUserIdleTimer();
-                        startRegainLockTimer();
-                    }
-                };
-            }
         };
     });
     directives.directive('subtitleList', function(SubtitleListFinder) {
@@ -235,7 +70,7 @@ var USER_IDLE_MINUTES = 5;
             $elm.parent().scroll(function() {
 
                 // If scroll sync is locked.
-                if (scope.$root.scrollingSynced) {
+                if (scope.scrollingSynced) {
                     var newScrollTop = $elm.parent().scrollTop();
 
                     $('div.subtitles').each(function() {

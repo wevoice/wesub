@@ -41,7 +41,7 @@
                 text: 'Full list of keyboard shortcuts to go here.',
                 buttons: [{
                     'text': 'Close', 'class': 'yes', 'fn': function() {
-                        $scope.$root.$broadcast('hide-modal');
+                        $scope.$root.$emit('hide-modal');
                     }
                 }]
             });
