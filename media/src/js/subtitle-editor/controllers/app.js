@@ -163,6 +163,9 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             minutesIdle = 0;
+            if(evt.target.type == 'textarea') {
+                return;
+            }
 
             if (evt.keyCode === 32 && evt.shiftKey) {
                 // Space with shift, toggle play / pause.
