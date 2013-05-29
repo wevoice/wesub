@@ -160,9 +160,10 @@
                             ng-click="onClick($event)"
                             class="subtitle-list-item">
 
-                            <span ng-show="showStartTime"
-                                  class="start-time">
-                                    [[ subtitle.startTime|displayTime ]]
+                            <span class="timing" ng-switch on="subtitle.isSynced()">
+                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
+                                <span ng-switch-when="false">unsynced</span>
+                                <a href ng-show='false' class="comments"></a>
                             </span>
 
                             <span ng-show="!isEditing"
@@ -215,11 +216,13 @@
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
+                            <span class="timing" ng-switch on="subtitle.isSynced()">
+                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
+                                <span ng-switch-when="false">unsynced</span>
+                                <a href ng-show='false' class="comments"></a>
+                            </span>
+
                             <div class="hover">
-                                <span  class="timing">
-                                    <span>[[ subtitle.startTime|displayTime ]]</span>
-                                    <a href ng-show='false' class="comments"></a>
-                                </span>
                                 <a href="#" class="remove-subtitle"
                                    ng-show='canAddAndRemove'
                                    ng-click="removeSubtitle(subtitle)">

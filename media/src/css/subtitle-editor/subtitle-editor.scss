@@ -432,29 +432,30 @@ section.main {
                 line-height: 25px;
                 position: relative;
 
+            span.timing {
+                color: #9A9B9C;
+                display: block;
+                font-size: 10px;
+                position: absolute;
+                right: 20px;
+                top: 2px;
+
+                span {
+                    display: inline-block;
+                }
+                a.comments {
+                    background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
+                    display: inline-block;
+                    height: 9px;
+                    margin-left: 3px;
+                    vertical-align: -1px;
+                    width: 10px;
+                }
+            }
+
                 div.hover {
                     display: none;
 
-                    span.timing {
-                        color: #9A9B9C;
-                        display: block;
-                        font-size: 10px;
-                        position: absolute;
-                        right: 20px;
-                        top: 2px;
-
-                        span {
-                            display: inline-block;
-                        }
-                        a.comments {
-                            background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
-                            display: inline-block;
-                            height: 9px;
-                            margin-left: 3px;
-                            vertical-align: -1px;
-                            width: 10px;
-                        }
-                    }
                     a.remove-subtitle {
                         background: transparent url('../../../images/editor/remove-subtitle.gif') top left no-repeat;
                         bottom: 7px;
