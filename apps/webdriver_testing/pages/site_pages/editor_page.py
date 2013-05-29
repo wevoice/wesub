@@ -89,6 +89,7 @@ class EditorPage(UnisubsPage):
         self.select_option_by_text(self._VERSION_SELECT, version_no)
 
     def sub_overlayed_text(self):
+        self.wait_for_element_present(self._VIDEO_SUBTITLE, wait_time=20)
         return self.get_text_by_css(self._VIDEO_SUBTITLE)
 
     def save_disabled(self):
@@ -101,6 +102,27 @@ class EditorPage(UnisubsPage):
         for el in els:
             subs.append(el.text)
         return subs
+
+    def working_text(self, position=None):
+        els = self.get_elements_list(' '.join([self._WORKING_LIST, 
+                                                 self._SUB_TEXT]))
+        subs = []
+        for el in els:
+            subs.append(el.text)
+        if position:
+            return subs[position]
+        else:
+            return subs
+
+
+    def click_working_sub_line(self, position):
+        els = self.get_elements_list(' '.join([self._WORKING_LIST, 
+                                                 self._SUB_TEXT]))
+        sub_text = els[position].text
+        els[position].click()
+        return sub_text
+
+        
            
 
 

@@ -8,13 +8,10 @@ from apps.videos.models import Video
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.pages.site_pages import editor_page
-from apps.webdriver_testing.pages.editor_pages import dialogs
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 from apps.webdriver_testing.data_factories import UserFactory
 
-class TestCaseEditor(WebdriverTestCase):
+class TestCaseLeftSide(WebdriverTestCase):
     fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
                 'apps/webdriver_testing/fixtures/editor_videos.json',
                 'apps/webdriver_testing/fixtures/editor_subtitles.json']
@@ -22,7 +19,7 @@ class TestCaseEditor(WebdriverTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseEditor, cls).setUpClass()
+        super(TestCaseLeftSide, cls).setUpClass()
         cls.logger.info("""Default Test Data
 
                         English, source primary v2 -> v6
@@ -90,28 +87,46 @@ class TestCaseEditor(WebdriverTestCase):
         self.assertEqual(u'\xe7\xf6zmekte olan g\xfcc\xfcn\xfc hep hissettim.', 
                          self.editor_pg.reference_text()[2])
 
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/editor_page.png')
-        
-
-
-
-class TestCaseEntryExit(WebdriverTestCase):
-    """Entry and Exit points to New Editor. """
+class TestCaseCenter(WebdriverTestCase):
+    fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
+                'apps/webdriver_testing/fixtures/editor_videos.json',
+                'apps/webdriver_testing/fixtures/editor_subtitles.json']
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseEntryExit, cls).setUpClass()
+        super(TestCaseCenter, cls).setUpClass()
+        cls.logger.info("""Default Test Data
 
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
-        cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
+                        English, source primary v2 -> v6
+                                 v1 -> deleted
+
+                        Chinese v1 -> v3
+                                v3 {"zh-cn": 2, "en": 6}
+
+                        Danish v1 --> v4
+                               v4 {"en": 5, "da": 3}
+                               
+                        Swedish v1 --> v3 FORKED
+                                v3 {"sv": 2}
+                                v1 --> private
+
+                        Turkish (tr) v1 incomplete {"en": 5}
+                       """)
+        cls.editor_pg = editor_page.EditorPage(cls)
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create()
+        cls.video_pg = video_page.VideoPage(cls)
+        cls.video_pg.open_page('videos/watch/')
+        cls.video_pg.log_in(cls.user, 'password')
+
+    def test_selected_subs_on_video(self):
+        """Clicking a working subs displays it on the video."""
+        self.skipTest('incomplete')
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        sub_text = self.editor_pg.click_working_sub_line(3)
+        self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
 
 
-    def test_open_via_url(self):
-        pass
 
-
-       
