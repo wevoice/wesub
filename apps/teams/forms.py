@@ -683,17 +683,21 @@ class TaskUploadForm(SubtitlesUploadForm):
 
 
 class BillingReportForm(forms.Form):
-    team = forms.ChoiceField(choices=(), required=False)
+    teams = forms.CharField( required=False, help_text="slugs, comma separated")
     start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
     end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
     type = forms.ChoiceField(required=True, choices=BillingReport.TYPE_CHOICES)
 
-    def __init__(self, *args, **kwargs):
-        super(BillingReportForm, self).__init__(*args, **kwargs)
-        teams = Team.objects.all()
-        self.fields['team'].choices = [(t.pk, t.slug) for t in teams]
 
-    def clean(self):
-        cd = self.cleaned_data
-        cd['team'] = Team.objects.get(pk=cd['team'])
-        return cd
+
+    def clean_teams(self):
+        try:
+            teams = [Team.objects.get(slug=s.strip()) for s in self.cleaned_data.get('teams', '').split(',') if s]
+        except Team.DoesNotExist:
+            raise forms.ValidationError(u"There is no team with slug %s" % s)
+        if not teams:
+            raise forms.ValidationError(u"You need at least one valid team slug")
+        self.cleaned_data['teams'] =  teams
+        return teams
+
+

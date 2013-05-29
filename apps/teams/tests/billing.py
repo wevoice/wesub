@@ -60,8 +60,9 @@ class BillingTest(TestCase):
         v2_en.publish()
         v2_en.save()
 
-        b = BillingReport.objects.create(team=self.team,
-                                         start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+        b = BillingReport.objects.create( start_date=date(2012, 1, 1),
+                                          end_date=date(2012, 1, 2))
+        b.teams.add(self.team)
 
         past_date = self.team.created - timedelta(days=5)
         make_subtitle_version(spanish, created=past_date, note=FROM_YOUTUBE_MARKER)
@@ -69,8 +70,9 @@ class BillingTest(TestCase):
 
         langs = self.video.newsubtitlelanguage_set.all()
         self.assertEqual(len(langs) , 2)
-        created, imported, _ = b._get_lang_data(langs, datetime(2012, 1, 1, 13, 30, 0))
-        print created
+        created, imported, _ = b._get_lang_data(langs,
+                                                datetime(2012, 1, 1, 13, 30, 0),
+                                                self.team )
 
         self.assertEqual(len(created) , 1)
 
@@ -86,8 +88,9 @@ class BillingTest(TestCase):
 
         team_created = team.created
 
-        b = BillingReport.objects.create(team=team,
-                                         start_date=date(2012, 1, 1), end_date=date(2012, 1, 2))
+        b = BillingReport.objects.create( start_date=date(2012, 1, 1),
+                                          end_date=date(2012, 1, 2))
+        b.teams.add(team)
 
         SubtitleLanguage.objects.all().delete()
 
@@ -158,7 +161,7 @@ class BillingTest(TestCase):
         csv_data = BillingRecord.objects.csv_report_for_team(team, start, end)
 
         self.assertEquals(2, len(csv_data))
-        self.assertEquals(8, len(csv_data[1]))
+        self.assertEquals(9, len(csv_data[1]))
 
         # 2
         sv = add_subtitles(video, 'en', make_subtitle_lines(4), author=user, created=now)

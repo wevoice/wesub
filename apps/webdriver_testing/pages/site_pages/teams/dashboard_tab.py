@@ -61,7 +61,8 @@ class DashboardTab(ATeamPage):
         for el in video_els:
             try:
                 title_el = el.find_element_by_css_selector(self._VIDEO_TITLE)
-                if video in title_el.text:
+                self.logger.info(title_el.get_attribute('title'))
+                if video in title_el.get_attribute('title'):
                     return el
             except:
                 continue
