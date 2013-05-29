@@ -125,6 +125,9 @@ var angular = angular || null;
             var container = $(elem);
             // Map XML subtitle nodes to the div we created to show them
             var timelineDivs = {}
+            // id of the next unsynced subtitle, if we placed it on
+            // the timeline.
+            var unsyncedId = null;
 
             function handleDragLeft(context, deltaMSecs) {
                 context.startTime = context.subtitle.startTime + deltaMSecs;
@@ -139,9 +142,9 @@ var angular = angular || null;
             function handleDragRight(context, deltaMSecs) {
                 context.endTime = context.subtitle.endTime + deltaMSecs;
                 if(context.maxEndTime !== null &&
-                    context.endTime > context.maxEndTime) {
-                    context.endTime = context.maxEndTime;
-                }
+                        context.endTime > context.maxEndTime) {
+                            context.endTime = context.maxEndTime;
+                        }
                 if(context.endTime < context.startTime + MIN_DURATION) {
                     context.endTime = context.startTime + MIN_DURATION;
                 }
@@ -217,7 +220,11 @@ var angular = angular || null;
             }
 
             function makeDivForSubtitle(subtitle) {
-                var div = $('<div/>', {class: 'subtitle'});
+                if(subtitle.id != unsyncedId) {
+                    var div = $('<div/>', {class: 'subtitle'});
+                } else {
+                    var div = $('<div/>', {class: 'subtitle unsynced'});
+                }
                 var span = $('<span/>');
                 span.html(subtitle.content());
                 var left = $('<a href="#" class="handle left"></a>');
@@ -237,6 +244,14 @@ var angular = angular || null;
                 container.append(div);
                 return div;
             }
+
+            function updateDivForSubtitle(div, subtitle) {
+                $('span', div).html(subtitle.content());
+                if(subtitle.isSynced()) {
+                    div.removeClass('unsynced');
+                }
+            }
+
             function handleMouseDownInTimeline(evt) {
                 var initialPageX = evt.pageX;
                 container.on('mousemove.timelinedrag', function(evt) {
@@ -263,29 +278,83 @@ var angular = angular || null;
 
             function placeSubtitle(startTime, endTime, div) {
                 var x = Math.floor((startTime - view.startTime) *
-                    view.widthPerSecond / 1000);
+                        view.widthPerSecond / 1000);
                 var width = Math.floor((endTime - startTime) *
-                    view.widthPerSecond / 1000);
+                        view.widthPerSecond / 1000);
                 div.css({left: x, width: width});
+            }
+
+            function addUnsyncedSubtitle(subtitleList, subtitles) {
+                /* Add the first unsynced subtitle to the list of subtitles on
+                 * the timeline.
+                 *
+                 * If we should display the subtitle, it will be pushed to the
+                 * end of subtitles.
+                 */
+                var lastSynced = subtitleList.lastSyncedSubtitle();
+                if(lastSynced !== null &&
+                    lastSynced.endTime > scope.currentTime) {
+                    // Not past the end of the synced subtitles
+                    return;
+                }
+                var unsynced = subtitleList.firstUnsyncedSubtitle();
+                if(unsynced === null) {
+                    return;
+                }
+                if(unsynced.startTime >= 0 && unsynced.startTime >
+                        view.endTime) {
+                    // unsynced subtitle has its start time set, and it's past
+                    // the end of the timeline.
+                    return;
+                }
+                // Ok, we want to show the unsynced subtitle.  We make a clone
+                // of the SubtitleItem and set its start/end times
+                // dynamically.
+                var timelineSubtitle = unsynced.clone();
+                if(timelineSubtitle.startTime < 0) {
+                    timelineSubtitle.startTime = scope.currentTime;
+                    timelineSubtitle.endTime = scope.currentTime + 5000;
+                } else {
+                    timelineSubtitle.endTime = Math.max(scope.currentTime,
+                            timelineSubtitle.startTime + MIN_DURATION);
+                }
+                unsyncedId = timelineSubtitle.id;
+                subtitles.push(timelineSubtitle);
+            }
+
+            function checkShownSubtitle(subtitles) {
+                // Check if a new subtitle is displayed
+                var shownSubtitle = null;
+                for(var i = 0; i < subtitles.length; i++) {
+                    if(subtitles[i].isAt(scope.currentTime)) {
+                        shownSubtitle = subtitles[i];
+                    }
+                }
+                if(shownSubtitle != scope.subtitle) {
+                    scope.subtitle = shownSubtitle;
+                    scope.$root.$emit('timeline-subtitle-shown',
+                            shownSubtitle);
+                }
             }
 
             function placeSubtitles() {
                 if(!scope.workingSubtitles) {
                     return;
                 }
-                var subtitles = scope.workingSubtitles.subtitleList.getSubtitlesForTime(
-                    view.startTime, view.endTime);
-
-
+                var subtitleList = scope.workingSubtitles.subtitleList;
+                var subtitles = subtitleList.getSubtitlesForTime(
+                        view.startTime, view.endTime);
                 var oldTimelineDivs = timelineDivs;
                 timelineDivs = {}
+
+                addUnsyncedSubtitle(subtitleList, subtitles);
 
                 for(var i = 0; i < subtitles.length; i++) {
                     var subtitle = subtitles[i];
                     if(oldTimelineDivs.hasOwnProperty(subtitle.id)) {
                         var div = oldTimelineDivs[subtitle.id];
                         timelineDivs[subtitle.id] = div;
-                        $('span', div).html(subtitle.content());
+                        updateDivForSubtitle(div, subtitle);
                         delete oldTimelineDivs[subtitle.id];
                     } else {
                         var div = makeDivForSubtitle(subtitle);
@@ -299,18 +368,7 @@ var angular = angular || null;
                     oldTimelineDivs[subId].remove();
                 }
 
-                // Check if a new subtitle is displayed
-                var shownSubtitle = null;
-                for(var i = 0; i < subtitles.length; i++) {
-                    if(subtitles[i].isAt(scope.currentTime)) {
-                        shownSubtitle = subtitles[i];
-                    }
-                }
-                if(shownSubtitle != scope.subtitle) {
-                    scope.subtitle = shownSubtitle;
-                    scope.$root.$emit('timeline-subtitle-shown',
-                            shownSubtitle);
-                }
+                checkShownSubtitle(subtitles);
             }
             scope.$watch('currentTime + ":" + duration',
                 function(newValue, oldValue) {

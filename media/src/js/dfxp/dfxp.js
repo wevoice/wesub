@@ -1030,7 +1030,7 @@ var AmaraDFXPParser = function() {
 
 };
 
-var SubtitleItem = function(parser, node, id) {
+var SubtitleItem = function(node, id, startTime, endTime, markdown) {
     /* Subtitle element in SubtitleList.
      *
      * SubtitleItem has the following properties:
@@ -1040,11 +1040,16 @@ var SubtitleItem = function(parser, node, id) {
      *   - node -- DOM node from the DFXP XML
      *   - id -- unique string to identify this item in the list
      */
-    this.startTime = parser.startTime(node);
-    this.endTime = parser.endTime(node);
-    this.markdown = parser.dfxpToMarkdown(node, true);
     this.node = node;
     this.id = id;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.markdown = markdown;
+}
+
+SubtitleItem.prototype.clone = function() {
+    return new SubtitleItem(this.node, this.id, this.startTime, this.endTime,
+            this.markdown);
 }
 
 SubtitleItem.prototype.duration = function() {
@@ -1142,7 +1147,11 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
 
 SubtitleList.prototype.makeItem = function(node) {
     var idKey = (this.idCounter++).toString(16);
-    return new SubtitleItem(this.parser, node, idKey);
+
+    return new SubtitleItem(node, idKey,
+            this.parser.startTime(node),
+            this.parser.endTime(node),
+            this.parser.dfxpToMarkdown(node, true));
 }
 
 SubtitleList.prototype.length = function() {
@@ -1267,6 +1276,30 @@ SubtitleList.prototype.removeSubtitle = function(subtitle) {
     this.subtitles.splice(pos, 1);
 }
 
+SubtitleList.prototype.lastSyncedSubtitle = function() {
+    if(this.syncedCount > 0) {
+        return this.subtitles[this.syncedCount - 1];
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.firstUnsyncedSubtitle = function() {
+    if(this.syncedCount < this.subtitles.length) {
+        return this.subtitles[this.syncedCount];
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.secondUnsyncedSubtitle = function() {
+    if(this.syncedCount + 1 < this.subtitles.length) {
+        return this.subtitles[this.syncedCount + 1];
+    } else {
+        return null;
+    }
+}
+
 SubtitleList.prototype.firstSubtitleAfter = function(time) {
     /* Get the first subtitle whose end is after time
      *
@@ -1298,7 +1331,7 @@ SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     if(i == -1) {
         return rv;
     }
-    for(; i < this.length(); i++) {
+    for(; i < this.syncedCount; i++) {
         var subtitle = this.subtitles[i];
         if(subtitle.startTime < endTime) {
             rv.push(subtitle);

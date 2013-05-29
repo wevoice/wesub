@@ -186,12 +186,21 @@ var USER_IDLE_MINUTES = 5;
 
                             var video = angular.element($('#video').get(0)).scope();
 
-                            // Space with shift, toggle play / pause.
                             if (e.keyCode === 32 && e.shiftKey) {
+                                // Space with shift, toggle play / pause.
                                 e.preventDefault();
                                 video.togglePlay();
+                            } else if(e.keyCode == 40) {
+                                // Down error, set the start time of the first
+                                // unsynced sub
+                                scope.$root.$emit("sync-next-start-time");
+                                e.preventDefault();
+                            } else if(e.keyCode == 38) {
+                                // Up arrow, set the end time of the first
+                                // unsynced sub
+                                scope.$root.$emit("sync-next-end-time");
+                                e.preventDefault();
                             }
-
                         });
                         $(elm).on('mousemove', function() {
 

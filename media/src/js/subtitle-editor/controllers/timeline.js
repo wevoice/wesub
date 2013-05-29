@@ -39,6 +39,56 @@
             console.log("video-timechanged");
             updateTime(pop);
         });
+        $scope.$root.$on('sync-next-start-time', function($event) {
+            if($scope.currentTime === null) {
+                return;
+            }
+            var subtitleList = $scope.workingSubtitles.subtitleList;
+            var lastSynced = subtitleList.lastSyncedSubtitle();
+            var firstUnsynced = subtitleList.firstUnsyncedSubtitle();
+            var nextUnsynced = subtitleList.secondUnsyncedSubtitle();
+
+            if($scope.currentTime < lastSynced.endTime) {
+                // We haven't moved past the last synced subtitle, just ignore
+                // the event.
+                return;
+            }
+            if(firstUnsynced !== null &&
+                firstUnsynced.startTime < 0) {
+                // The first unsynced subtitle needs a start time, set it
+                subtitleList.updateSubtitleTime(firstUnsynced,
+                    $scope.currentTime, firstUnsynced.endTime);
+            } else {
+                // Set both the first unsynced subtitle's end time and the
+                // second unsynced subtitle's start time to the current time.
+                subtitleList.updateSubtitleTime(firstUnsynced,
+                    firstUnsynced.startTime, $scope.currentTime);
+                if(nextUnsynced !== null) {
+                    subtitleList.updateSubtitleTime(nextUnsynced,
+                            $scope.currentTime, nextUnsynced.endTime);
+                }
+            }
+        });
+        $scope.$root.$on('sync-next-end-time', function($event) {
+            if($scope.currentTime === null) {
+                return;
+            }
+            var subtitleList = $scope.workingSubtitles.subtitleList;
+            var lastSynced = subtitleList.lastSyncedSubtitle();
+            var firstUnsynced = subtitleList.firstUnsyncedSubtitle();
+
+            if($scope.currentTime < lastSynced.endTime) {
+                // We haven't moved past the last synced subtitle, just ignore
+                // the event.
+                return;
+            }
+            if(firstUnsynced !== null &&
+                firstUnsynced.startTime >= 0 &&
+                firstUnsynced.endTime < 0) {
+                subtitleList.updateSubtitleTime(firstUnsynced,
+                    firstUnsynced.startTime, $scope.currentTime);
+            }
+        });
     };
 
     root.TimelineController = TimelineController;
