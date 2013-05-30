@@ -87,7 +87,7 @@ var angular = angular || null;
             function drawCanvas() {
                 var ctx = canvasElt.getContext("2d");
                 ctx.clearRect(0, 0, width, height);
-                ctx.font = 'bold ' + (height / 5) + 'px sans';
+                ctx.font = 'bold ' + (height / 5) + 'px Open Sans';
 
                 var startTime = Math.floor(Math.max(view.startTime / 1000, 0));
                 if(scope.duration !== null) {
