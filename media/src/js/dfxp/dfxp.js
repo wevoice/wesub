@@ -1047,11 +1047,6 @@ var SubtitleItem = function(node, id, startTime, endTime, markdown) {
     this.markdown = markdown;
 }
 
-SubtitleItem.prototype.clone = function() {
-    return new SubtitleItem(this.node, this.id, this.startTime, this.endTime,
-            this.markdown);
-}
-
 SubtitleItem.prototype.duration = function() {
     if(this.isSynced()) {
         return this.endTime - this.startTime;
