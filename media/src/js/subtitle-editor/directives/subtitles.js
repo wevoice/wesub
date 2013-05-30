@@ -126,7 +126,7 @@ var USER_IDLE_MINUTES = 5;
                 } else {
                     var caretPos = scope.editText.length;
                 }
-                textarea.val(scope.editText);
+                textarea.val(scope.editText).trigger('autosize');
                 textarea.show();
                 textarea.focus();
                 setCaretPosition(textarea.get(0), caretPos);
