@@ -258,7 +258,7 @@ var angular = angular || null;
 
             function handleMouseDownInTimeline(evt) {
                 var initialPageX = evt.pageX;
-                container.on('mousemove.timelinedrag', function(evt) {
+                $(document).on('mousemove.timelinedrag', function(evt) {
                     scope.$root.$emit('pause-video');
                     var deltaX = initialPageX - evt.pageX;
                     var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
@@ -267,17 +267,18 @@ var angular = angular || null;
                     placeSubtitles();
                     scope.$emit('timeline-drag', deltaMSecs);
                 }).on('mouseup.timelinedrag', function(evt) {
-                    container.off('.timelinedrag');
+                    $(document).off('.timelinedrag');
                     var deltaX = initialPageX - evt.pageX;
                     var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
                     scope.$root.$emit('seek-video', 
                         (scope.currentTime + deltaMSecs) / 1000);
                 }).on('mouseleave.timelinedrag', function(evt) {
-                    container.off('.timelinedrag');
+                    $(document).off('.timelinedrag');
                     view = calcTimelineView(scope, container.width());
                     placeSubtitles();
                     scope.$emit('timeline-drag', 0);
                 });
+                evt.preventDefault();
             }
 
             function placeSubtitle(startTime, endTime, div) {
