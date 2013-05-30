@@ -344,6 +344,9 @@ var angular = angular || null;
         $scope.insertSubtitleBefore = function(otherSubtitle) {
             var insertPos = $scope.subtitleList.insertSubtitleBefore(
                     otherSubtitle);
+            $timeout(function() {
+                $scope.nthChildScope(insertPos).startEditingMode();
+            });
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.subtitleList.removeSubtitle(subtitle);

@@ -56,22 +56,19 @@ var USER_IDLE_MINUTES = 5;
         };
     });
     directives.directive('subtitleList', function(SubtitleListFinder) {
-        return function link(scope, elm, attrs) {
+        return function link(scope, elem, attrs) {
             // set these *before* calling get subtitle since if
             // the subs are bootstrapped it will return right away
             scope.isEditable = attrs.editable === 'true';
             scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
 
 
-            // Cache the jQuery selection of the element.
-            var $elm = $(elm);
-
             // Handle scroll.
-            $elm.parent().scroll(function() {
+            $(elem).parent().scroll(function() {
 
                 // If scroll sync is locked.
                 if (scope.scrollingSynced) {
-                    var newScrollTop = $elm.parent().scrollTop();
+                    var newScrollTop = $(elem).parent().scrollTop();
 
                     $('div.subtitles').each(function() {
 
@@ -84,11 +81,19 @@ var USER_IDLE_MINUTES = 5;
                     });
                 }
             });
+            scope.nthChildScope = function(index) {
+                var children = elem.children();
+                if(0 <= index && index < children.length) {
+                    return angular.element(children[index]).scope();
+                } else {
+                    return null;
+                }
+            }
 
             scope.setVideoID(attrs.videoId);
             scope.setLanguageCode(attrs.languageCode);
-            SubtitleListFinder.register(attrs.subtitleList, elm,
-                    angular.element(elm).controller(), scope);
+            SubtitleListFinder.register(attrs.subtitleList, elem,
+                    elem.controller(), scope);
         }
     });
     directives.directive('subtitleListItem', function($timeout) {
