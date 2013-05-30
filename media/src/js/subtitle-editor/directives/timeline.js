@@ -199,20 +199,20 @@ var angular = angular || null;
                     return;
                 }
                 var initialPageX = evt.pageX;
-                container.on('mousemove.timelinedrag', function(evt) {
+                $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
                     var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
                     dragHandler(context, deltaMSecs);
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
-                    container.off('.timelinedrag');
+                    $(document).off('.timelinedrag');
                     var subtitleList = scope.workingSubtitles.subtitleList;
                     subtitleList.updateSubtitleTime(context.subtitle,
                         context.startTime, context.endTime);
                     scope.$root.$emit("work-done");
                     scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
-                    container.off('.timelinedrag');
+                    $(document).off('.timelinedrag');
                     placeSubtitle(subtitle.startTime, subtitle.endTime, div);
                 });
                 // need to prevent the default event from happening so that the
