@@ -117,6 +117,7 @@ var angular = angular || null;
     var SaveSessionController = function($scope, $q, SubtitleListFinder,
                                          SubtitleStorage, OldEditorConfig) {
 
+        $scope.changesMade = false;
         $scope.discard = function() {
 
             $scope.showCloseModal();
