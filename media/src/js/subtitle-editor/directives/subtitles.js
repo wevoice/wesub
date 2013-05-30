@@ -96,7 +96,23 @@ var USER_IDLE_MINUTES = 5;
             var textarea = $('textarea', elem);
 
             scope.nextScope = function() {
-                return angular.element(elem.next()).scope();
+                var next = elem.next();
+                if(next.length > 0) {
+                    return next.scope();
+                } else {
+                    return null;
+                }
+            }
+
+            scope.prevScope = function() {
+                // need to wrap in jquery, since angular's jqLite doesn't
+                // support prev()
+                var prev = $(elem).prev();
+                if(prev.length > 0) {
+                    return angular.element(prev).scope();
+                } else {
+                    return null;
+                }
             }
 
             scope.showTextArea = function(fromClick) {
@@ -138,6 +154,19 @@ var USER_IDLE_MINUTES = 5;
                         // Escape cancels editing
                         scope.finishEditingMode(false);
                         evt.preventDefault();
+                    } else if (evt.keyCode == 9) {
+                        // Tab navigates to other subs
+                        scope.finishEditingMode(true);
+                        if(!evt.shiftKey) {
+                            var tabTarget = scope.nextScope();
+                        } else {
+                            var tabTarget = scope.prevScope();
+                        }
+                        if(tabTarget !== null) {
+                            tabTarget.startEditingMode();
+                        }
+                        evt.preventDefault();
+
                     }
                 });
             });
@@ -151,9 +180,11 @@ var USER_IDLE_MINUTES = 5;
                 });
             });
             textarea.on('focusout', function(evt) {
-                scope.$apply(function() {
-                    scope.finishEditingMode(true);
-                });
+                if(scope.isEditing) {
+                    scope.$apply(function() {
+                        scope.finishEditingMode(true);
+                    });
+                }
             });
         }
     });
