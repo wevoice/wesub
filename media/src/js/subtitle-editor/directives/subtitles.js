@@ -199,6 +199,18 @@ var USER_IDLE_MINUTES = 5;
             compile: function compile(elm, attrs, transclude) {
                 return {
                     post: function post(scope, elm, attrs) {
+                        /* For some reason, if we use ng-select angular
+                         * creates an extra option because it thinks
+                         * scope.versionNumber is an invalid value for the
+                         * options, even though it isn't.  I think it has to
+                         * do with the fact that we manually create options
+                         * with ng-repeat.  In any case, we handle the
+                         * select ourself.
+                         */
+                        $('select.version-select', elm).change(function(evt) {
+                            scope.versionNumber = this.value;
+                            scope.$digest();
+                        });
                         SubtitleStorage.getLanguages(function(languages){
                             scope.setInitialDisplayLanguage(
                                 languages,

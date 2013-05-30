@@ -136,14 +136,12 @@
                     </select>
                 </div>
                 <div class="select">
-                    <select name="version"
-                        ng-model="version">
+                    <select name="version" class="version-select">
                         <option
                                 ng-repeat='thisVersion in versions'
                                 ng-selected='version == thisVersion'
                                 ng-disabled='thisVersion.visibility != "Public"'
-                                ng-model='thisVersion'
-                                value="[[$index]]">
+                                value="[[thisVersion.version_no]]">
                             [[thisVersion|versionDropDownDisplay]]</option>
                     </select>
                 </div>

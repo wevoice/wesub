@@ -46,49 +46,25 @@ var angular = angular || null;
          * fetches.
          */
         $scope.changesMade = false;
-        $scope.languageChanged = function(lang, versionOrVersionNumber, another) {
-            // this gets called both on setInitialDisplayLanguage manually at
-            // the first start up, or through the changes to the scope.language.
-            // in the later cases, angular sends (newLang, oldLang) so we can
-            // detect if anything is actually changed. In this case, we just bail
-            // out, because nothing has actually changed.
-            if (lang == versionOrVersionNumber){
-                return;
-            }
-            var vers, language, versionNumber;
-
-            if (lang) {
-                language = lang;
-            } else {
-                language = $scope.language;
-            }
-
+        $scope.versionNumber = null;
+        $scope.versions = [];
+        $scope.languageChanged = function(language, versionNumber) {
             if (!language) {
                 return;
             }
 
-            vers =_.sortBy(language.versions, function(item) {
+            $scope.versions = _.sortBy(language.versions, function(item) {
                 return item.version_no;
-            });
+            }).reverse();
 
-            $scope.versions = vers.reverse();
+            if (isNaN(parseInt(versionNumber))) {
+                // No version number given, select the last version (AKA first
+                // verison in the dropdown)
+                versionNumber = $scope.versions[0].version_no;
+            }
 
-            if (versionOrVersionNumber !== undefined ){
-                if (!isNaN(parseInt(versionOrVersionNumber.version_no))){
-                    versionNumber = parseInt(versionOrVersionNumber.version_no);
-                }else if(!isNaN(parseInt(versionOrVersionNumber))){
-                    versionNumber = parseInt(versionOrVersionNumber);
-                }
-            }
-            if (vers.length && vers.length > 0) {
-                if (isNaN(parseInt(versionNumber))){
-                    $scope.version = $scope.versions[0];
-                }else{
-                    $scope.version = _.find($scope.versions, function(version){
-                        return version.version_no == versionNumber;
-                    });
-                }
-            }
+            $scope.versionNumber = versionNumber.toString();
+            $scope.version = $scope.findVersion(versionNumber);
         };
         $scope.setReferenceSubs = function(subtitleData) {
             if (!$scope.refSubList) {
@@ -96,25 +72,27 @@ var angular = angular || null;
             }
             $scope.refSubList.scope.onSubtitlesFetched(subtitleData);
         };
-        $scope.versionChanged = function(newVersion) {
-
-            if (!newVersion) {
+        $scope.findVersion = function(versionNumber) {
+            for(var i = 0; i < $scope.versions.length; i++) {
+                if($scope.versions[i].version_no == versionNumber) {
+                    return $scope.versions[i];
+                }
+            }
+            return null;
+        }
+        $scope.versionNumberChanged = function(newValue, oldValue) {
+            var newVersion = $scope.findVersion(newValue);
+            if(!newVersion) {
                 return;
             }
-            // new version can be the version number of the version object
-            if (!newVersion.version_no){
-                newVersion = $scope.versions[newVersion];
-            }
 
-            var subtitlesXML = newVersion.subtitlesXML;
-
-            if (!subtitlesXML) {
+            if (!newVersion.subtitlesXML) {
                 SubtitleStorage.getSubtitles(
                     $scope.language.code,
                     newVersion.version_no,
                     function(subtitleData) {
-                        $scope.version.subtitlesXML = subtitleData.subtitlesXML;
-                        $scope.setReferenceSubs(subtitleData);
+                        newVersion.subtitlesXML = subtitleData.subtitlesXML;
+                        $scope.setReferenceSubs(newVersion);
                     });
             } else {
                 $scope.setReferenceSubs(newVersion);
@@ -130,9 +108,12 @@ var angular = angular || null;
             $scope.languageChanged($scope.language, versionNumber);
         }
 
-        $scope.$watch('language', $scope.languageChanged);
-        $scope.$watch('version', $scope.versionChanged);
+        $scope.$watch('language', function(newValue, oldValue) {
+            $scope.languageChanged(newValue, "");
+        });
+        $scope.$watch('versionNumber', $scope.versionNumberChanged);
     };
+
     var SaveSessionController = function($scope, $q, SubtitleListFinder,
                                          SubtitleStorage, OldEditorConfig) {
 
