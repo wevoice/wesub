@@ -23,7 +23,7 @@ var angular = angular || null;
     var root = this;
     var $ = root.AmarajQuery;
 
-    function AppController($scope, $timeout, LockService) {
+    function AppController($scope, $timeout, LockService, VideoPlayer) {
         var minutesIdle = 0;
         var secondsUntilClosing = 120;
         var regainLockTimer;
@@ -169,9 +169,8 @@ var angular = angular || null;
 
             if (evt.keyCode === 32 && evt.shiftKey) {
                 // Space with shift, toggle play / pause.
-                var video = angular.element($('#video').get(0)).scope();
                 evt.preventDefault();
-                video.togglePlay();
+                VideoPlayer.togglePlay();
             } else if(evt.keyCode == 40) {
                 // Down arrow, set the start time of the first
                 // unsynced sub

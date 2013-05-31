@@ -16,4 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-angular.module('amara.SubtitleEditor.services', []);
+angular.module('amara.SubtitleEditor.services', [
+        'amara.SubtitleEditor.services.lock',
+        'amara.SubtitleEditor.services.subtitles',
+        'amara.SubtitleEditor.services.video',
+        ]);

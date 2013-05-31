@@ -120,7 +120,7 @@ var angular = angular || null;
             });
         }
     });
-    directives.directive('timelineSubtitles', function() {
+    directives.directive('timelineSubtitles', function(VideoPlayer) {
         return function link(scope, elem, attrs) {
             var view = null;
             var container = $(elem);
@@ -170,6 +170,7 @@ var angular = angular || null;
                     evt.preventDefault();
                     return false;
                 }
+                VideoPlayer.pause();
                 var subtitle = evt.data.subtitle;
                 var dragHandler = evt.data.dragHandler;
                 var context = {
@@ -259,7 +260,7 @@ var angular = angular || null;
             function handleMouseDownInTimeline(evt) {
                 var initialPageX = evt.pageX;
                 $(document).on('mousemove.timelinedrag', function(evt) {
-                    scope.$root.$emit('pause-video');
+                    VideoPlayer.pause();
                     var deltaX = initialPageX - evt.pageX;
                     var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
                     view = calcTimelineView(scope, container.width(),
@@ -270,8 +271,7 @@ var angular = angular || null;
                     $(document).off('.timelinedrag');
                     var deltaX = initialPageX - evt.pageX;
                     var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
-                    scope.$root.$emit('seek-video', 
-                        (scope.currentTime + deltaMSecs) / 1000);
+                    VideoPlayer.seek(scope.currentTime + deltaMSecs);
                 }).on('mouseleave.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     view = calcTimelineView(scope, container.width());

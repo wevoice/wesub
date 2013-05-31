@@ -21,93 +21,10 @@
     var root = this;
     var $ = root.AmarajQuery;
 
-    var VideoController = function($scope, SubtitleStorage, $timeout) {
-        /**
-         * Responsible for initializing the video and all video controls.
-         * @param $scope
-         * @param SubtitleStorage
-         * @constructor
-         */
-
-        // The Popcorn instance.
-        //
-        // If this is a YouTube video, force controls.
-
-        var videoURLs = SubtitleStorage.getVideoURLs();
-
+    var VideoController = function($scope, VideoPlayer) {
         $scope.overlayText = null;
         $scope.showOverlay = false;
 
-        $scope.pop = window.Popcorn.smart('#video', videoURLs);
-        $scope.pop.controls(true);
-
-        // We have to broadcast this in a timeout to make sure the TimelineController has
-        // loaded and registered it's event listener, first.
-        //
-        // There most likely is a better way to do this.
-        $scope.pop.on('canplay', function() {
-            $scope.$root.$emit('video-ready', $scope.pop);
-        });
-        $scope.pop.on('timeupdate', function() {
-            $scope.$root.$emit('video-timechanged', $scope.pop);
-        });
-
-        $scope.playChunk = function(start, duration) {
-            // Play a specified amount of time in a video, beginning at 'start',
-            // and then pause.
-
-            // Pause the video, first.
-            $scope.pop.play();
-
-            // Remove any existing cues that may interfere.
-            $scope.removeAllTrackEvents();
-
-            if (start < 0) {
-                start = 0;
-            }
-
-            // Set the new start time.
-            $scope.pop.currentTime(start);
-
-            // Set a new cue to pause the video at the end of the chunk.
-            $scope.pop.cue(start + duration, function() {
-                $scope.pop.pause();
-            });
-
-            // Play the video.
-            $scope.pop.play();
-
-        };
-        $scope.removeAllTrackEvents = function() {
-
-            var trackEvents = $scope.pop.getTrackEvents();
-            for (var i = 0; i < trackEvents.length; i++) {
-                $scope.pop.removeTrackEvent(trackEvents[i].id);
-            }
-
-        };
-        $scope.togglePlay = function() {
-
-            // If the video is paused, play it.
-            if ($scope.pop.paused()) {
-                $scope.pop.play();
-
-            // Otherwise, pause it.
-            } else {
-                $scope.pop.pause();
-            }
-
-        };
-
-        $scope.$root.$on('play-video', function($event) {
-            $scope.pop.play();
-        });
-        $scope.$root.$on('pause-video', function($event) {
-            $scope.pop.pause();
-        });
-        $scope.$root.$on('seek-video', function($event, time) {
-            $scope.pop.currentTime(time);
-        });
         $scope.$root.$on('subtitle-edit', function($event, content) {
             $scope.overlayText = content;
             $scope.showOverlay = true;
@@ -117,22 +34,9 @@
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 
-            var startTimeSeconds = scope.subtitle.startTimeSeconds();
-            var endTimeSeconds = scope.subtitle.endTimeSeconds();
-            if (!isNaN(endTimeSeconds)){
-                $scope.playChunk(startTimeSeconds, endTimeSeconds- startTimeSeconds);
-            }else{
-            // If this video is not a Vimeo video, set the current time to
-            // the start of the subtitle.
-            //
-            // We don't do this for Vimeo videos because their player doesn't support
-            // fuzzy-scrubbing to precise keyframes.
-            if ($scope.pop.video._util.type !== 'Vimeo') {
-                $scope.pop.currentTime(startTimeSeconds);
+            if(scope.subtitle.isSynced()) {
+                VideoPlayer.playChunk(scope.startTime, scope.duration());
             }
-
-            }
-
             $scope.overlayText = scope.subtitle.content();
             $scope.showOverlay = true;
         });
