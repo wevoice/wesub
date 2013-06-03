@@ -107,16 +107,14 @@ var angular = angular || null;
             resizeCanvas();
             $(window).resize(function() {
                 resizeCanvas();
+                scope.redrawCanvas();
+            });
+            scope.redrawCanvas = function() {
+                view = calcTimelineView(scope, width);
                 drawCanvas();
-            });
-            scope.$watch('currentTime + ":" + duration',
-                function(newValue, oldValue) {
-                    view = calcTimelineView(scope, width);
-                    drawCanvas();
-            });
+            };
             scope.$on('timeline-drag', function(evt, deltaMSecs) {
-                view = calcTimelineView(scope, width, deltaMSecs);
-                drawCanvas();
+                scope.redrawCanvas();
             });
         }
     });
@@ -347,6 +345,7 @@ var angular = angular || null;
                     scope.subtitle = shownSubtitle;
                     scope.$root.$emit('timeline-subtitle-shown',
                             shownSubtitle);
+                    scope.$root.$digest();
                 }
             }
 
@@ -383,16 +382,15 @@ var angular = angular || null;
 
                 checkShownSubtitle(subtitles);
             }
-            scope.$watch('currentTime + ":" + duration',
-                function(newValue, oldValue) {
-                    view = calcTimelineView(scope, container.width());
-                    placeSubtitles();
-            });
-            scope.$root.$on('work-done', function() {
+            scope.redrawSubtitles = function() {
+                view = calcTimelineView(scope, container.width());
                 placeSubtitles();
+            };
+            scope.$root.$on('work-done', function() {
+                scope.redrawSubtitles();
             });
             scope.$root.$on('subtitles-fetched', function() {
-                placeSubtitles();
+                scope.redrawSubtitles();
             });
             container.on('mousedown', handleMouseDownInTimeline);
         }

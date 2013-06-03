@@ -20,25 +20,81 @@
 
     var root = this;
 
-    var TimelineController = function($scope, SubtitleStorage) {
+    var TimelineController = function($scope, $timeout, SubtitleStorage, VideoPlayer) {
         $scope.scale = 1.0;
         $scope.currentTime = $scope.duration = null;
         $scope.subtitle = null;
+        var lastTimeReturned = null;
+        var lastTimeReturnedAt = null;
+        var lastTime = null;
 
-        function updateTime(pop) {
-            $scope.currentTime = Math.floor(pop.currentTime() * 1000);
-            $scope.duration = Math.floor(pop.duration() * 1000);
-            $scope.$digest();
+        // Handle animating the timeline.  We don't use the timeupdate event
+        // from popcorn because it doesn't fire granularly enough.
+        var timeoutPromise = null;
+        function startTimer() {
+            if(timeoutPromise === null) {
+                var delay = 30; // aim for 30 FPS or so
+                timeoutPromise = $timeout(handleTimeout, delay, false);
+            }
         }
 
-        $scope.$root.$on('video-ready', function($event, pop) {
-            console.log("video-ready");
-            updateTime(pop);
+        function cancelTimer() {
+            if(timeoutPromise !== null) {
+                $timeout.cancel(timeoutPromise);
+                timeoutPromise = null;
+            }
+        }
+
+        function handleTimeout() {
+            updateTimeline();
+            timeoutPromise = null;
+            startTimer();
+        }
+
+        function updateTime() {
+            var newTime = VideoPlayer.currentTime();
+            $scope.currentTime = newTime;
+            // On the youtube player, popcorn only updates the time every 250
+            // ms, which is not enough granularity for our animation.  Try to
+            // get more granularity by starting a timer of our own.
+            if(VideoPlayer.isPlaying() && lastTimeReturned === newTime) {
+                var timePassed = Date.now() - lastTimeReturnedAt;
+                // If lots of time has bassed since the last new time, it's
+                // possible that the video is slowing down for some reason.
+                // Don't adjust the time too much.
+                timePassed = Math.min(timePassed, 250);
+                $scope.currentTime = newTime + timePassed;
+            }
+            lastTimeReturned = newTime;
+            lastTimeReturnedAt = Date.now();
+
+            // If we adjust the time with the code above, then get a new time
+            // from popcorn, it's possible that the time given will be less
+            // that our adjusted time.  Try to fudge things a little so that
+            // time doesn't go backwards while we're playing.
+            if(lastTime !== null && $scope.currentTime < lastTime &&
+                $scope.currentTime > lastTime - 250) {
+                $scope.currentTime = lastTime;
+            }
+            lastTime = $scope.currentTime;
+        }
+
+        function updateTimeline() {
+            updateTime();
+            $scope.redrawCanvas();
+            $scope.redrawSubtitles();
+        }
+
+        $scope.$root.$on('video-update', function() {
+            $scope.duration = VideoPlayer.duration();
+            updateTimeline();
+            if(VideoPlayer.isPlaying()) {
+                startTimer();
+            } else {
+                cancelTimer();
+            }
         });
-        $scope.$root.$on('video-timechanged', function($event, pop) {
-            console.log("video-timechanged");
-            updateTime(pop);
-        });
+
         $scope.$root.$on('sync-next-start-time', function($event) {
             if($scope.currentTime === null) {
                 return;

@@ -25,13 +25,24 @@ var angular = angular || null;
     module.factory('VideoPlayer', function($rootScope, SubtitleStorage) {
         var videoURLs = SubtitleStorage.getVideoURLs();
         var pop = window.Popcorn.smart('#video', videoURLs);
+        var playing = false;
         pop.controls(true);
 
         // Handle popcorn events
-        pop.on('canplay', function() {
-            $rootScope.$emit('video-ready', pop);
-        }).on('timeupdate', function() {
-            $rootScope.$emit('video-timechanged', pop);
+        pop.on('playing', function() {
+            playing = true;
+            $rootScope.$emit('video-update');
+        }).on('pause', function() {
+            playing = false;
+            $rootScope.$emit('video-update');
+        }).on('ended', function() {
+            playing = false;
+            $rootScope.$emit('video-update');
+        }).on('durationchange', function() {
+            $rootScope.$emit('video-update');
+        }).on('seeked', function() {
+            console.log("seeked");
+            $rootScope.$emit('video-update');
         });
 
         // private methods
