@@ -31,7 +31,12 @@ var angular = angular || null;
         var widthPerSecond = Math.floor(scope.scale * 100);
         // put startTime in the middle of the canvas
         var timelineDuration = width * 1000 / widthPerSecond;
-        var startTime = scope.currentTime - timelineDuration / 2;
+        if(scope.currentTime !== null) {
+            var currentTime = scope.currentTime;
+        } else {
+            currentTime = 0;
+        }
+        var startTime = currentTime - timelineDuration / 2;
         if(deltaMSecs) {
             startTime += deltaMSecs;
         }
@@ -104,7 +109,6 @@ var angular = angular || null;
                 }
             }
 
-            resizeCanvas();
             $(window).resize(function() {
                 resizeCanvas();
                 scope.redrawCanvas();
@@ -116,6 +120,8 @@ var angular = angular || null;
             scope.$on('timeline-drag', function(evt, deltaMSecs) {
                 scope.redrawCanvas();
             });
+            resizeCanvas();
+            scope.redrawCanvas();
         }
     });
     directives.directive('timelineSubtitles', function(VideoPlayer) {
@@ -393,6 +399,9 @@ var angular = angular || null;
                 scope.redrawSubtitles();
             });
             container.on('mousedown', handleMouseDownInTimeline);
+            $(window).resize(function() {
+                scope.redrawSubtitles();
+            });
         }
     });
 
