@@ -21,47 +21,90 @@ var angular = angular || null;
 (function($) {
     var MIN_DURATION = 250; // 0.25 seconds
     var DEFAULT_DURATION = 4000; // 4.0 seconds
+    
+    /*
+     * Define a couple of helper classes to handle updating the timeline
+     * elements.  Our basic strategy is to make a really wide div, so that we
+     * have a bit of a buffer, then scroll the div instead of re-rendering
+     * everything.
+     */
+    function durationToPixels(duration, scale) {
+        // by default 1 pixel == 10 ms.  scope.scale can adjusts that,
+        // although there isn't any interface for it.
+        return Math.floor(scale * duration / 10);
+    }
 
-    var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
+    function pixelsToDuration(width, scale) {
+        return width * 10 / scale;
+    }
 
-    function calcTimelineView(scope, width, deltaMSecs) {
-        // Calculate the portion of the video time that is displayed in the
-        // timeline
-
-        var widthPerSecond = Math.floor(scope.scale * 100);
-        // put startTime in the middle of the canvas
-        var timelineDuration = width * 1000 / widthPerSecond;
+    function BufferTimespan(scope) {
+        /* Stores the time range of the entire div.*/
+        this.duration = 60000; // Buffer 1 minute of subtitles.
+        // Position the buffer so that most of it is in front of the current
+        // time.
         if(scope.currentTime !== null) {
             var currentTime = scope.currentTime;
         } else {
-            currentTime = 0;
+            var currentTime = 0;
         }
-        var startTime = currentTime - timelineDuration / 2;
-        if(deltaMSecs) {
-            startTime += deltaMSecs;
+        this.startTime = currentTime - this.duration / 4;
+        // We don't want to buffer negative times, but do let startTime go to
+        // -0.5 seconds because the left side of the "0" is slightly left of
+        // time=0.
+        if(this.startTime < -500) {
+            this.startTime = -500;
         }
-        return {
-            'startTime': startTime,
-            'widthPerSecond': widthPerSecond,
-            'endTime': startTime + timelineDuration,
-        }
+        this.endTime = this.startTime + this.duration;
+        this.width = durationToPixels(this.duration, scope.scale);
     }
+
+    function VisibleTimespan(scope, width, deltaMSecs) {
+        /* Stores the portion of the video time that is displayed in the
+         * timeline.
+         */
+
+        this.scale = scope.scale;
+        this.duration = pixelsToDuration(width, this.scale);
+        if(scope.currentTime !== null) {
+            var currentTime = scope.currentTime;
+        } else {
+            var currentTime = 0;
+        }
+        this.startTime = currentTime - this.duration / 2;
+        if(deltaMSecs) {
+            this.startTime += deltaMSecs;
+        }
+        this.endTime = this.startTime + this.duration;
+    }
+
+    VisibleTimespan.prototype.fitsInBuffer = function(bufferTimespan) {
+        if(this.startTime >= 0 && this.startTime < bufferTimespan.startTime) {
+            return false;
+        }
+        if(this.endTime > bufferTimespan.endTime) {
+            return false;
+        }
+        return true;
+    }
+
+    VisibleTimespan.prototype.positionDiv = function(bufferTimespan, div) {
+        var deltaTime = this.startTime - bufferTimespan.startTime;
+        div.css('left', -durationToPixels(deltaTime, this.scale) + 'px');
+    }
+
+    var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
     directives.directive('timelineTiming', function() {
         return function link(scope, elem, attrs) {
-            var width=0, height=65; // dimensions of the canvas
-            var view = null;
             var canvas = $(elem);
             var canvasElt = elem[0];
             var container = canvas.parent();
+            var width=0, height=65; // dimensions of the canvas
+            var containerWidth = container.width();
+            var bufferTimespan = null;
+            var visibleTimespan = null;
 
-            function resizeCanvas() {
-                // Resize the canvas so that it's width matches the
-                // width of its container, but also make sure that it's a whole
-                // number of pixels.
-                width = canvasElt.width = Math.floor(container.width());
-                canvas.css('width', width + 'px');
-            }
             function drawSecond(ctx, xPos, t) {
                 // draw the second text on the timeline
                 ctx.fillStyle = '#686868';
@@ -73,7 +116,7 @@ var angular = angular || null;
                 // draw the tic marks between seconds
                 ctx.strokeStyle = '#686868';
                 var divisions = 4;
-                var step = view.widthPerSecond / divisions;
+                var step = durationToPixels(1000/divisions, scope.scale);
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 for(var i = 1; i < divisions; i++) {
@@ -94,40 +137,67 @@ var angular = angular || null;
                 ctx.clearRect(0, 0, width, height);
                 ctx.font = 'bold ' + (height / 5) + 'px Open Sans';
 
-                var startTime = Math.floor(Math.max(view.startTime / 1000, 0));
-                if(scope.duration !== null) {
-                    var endTime = Math.floor(Math.min(view.endTime / 1000,
-                                scope.duration / 1000));
-                } else {
-                    var endTime = Math.floor(view.endTime / 1000);
+                var startTime = Math.floor(bufferTimespan.startTime / 1000);
+                var endTime = Math.floor(bufferTimespan.endTime / 1000);
+                if(startTime < 0) {
+                    startTime = 0;
+                }
+                if(scope.duration !== null && endTime > scope.duration / 1000) {
+                    endTime = Math.floor(scope.duration / 1000);
                 }
 
                 for(var t = startTime; t < endTime; t++) {
-                    var xPos = (t - (view.startTime / 1000)) * view.widthPerSecond;
+                    var ms = t * 1000;
+                    var xPos = durationToPixels(ms - bufferTimespan.startTime,
+                            scope.scale);
                     drawSecond(ctx, xPos, t);
                     drawTics(ctx, xPos);
                 }
             }
 
-            $(window).resize(function() {
-                resizeCanvas();
-                scope.redrawCanvas();
-            });
-            scope.redrawCanvas = function() {
-                view = calcTimelineView(scope, width);
+            function makeNewBuffer() {
+                bufferTimespan = new BufferTimespan(scope);
+                if(bufferTimespan.width != width) {
+                    // Resize the width of the canvas to match the buffer
+                    width = bufferTimespan.width;
+                    canvasElt.width = width;
+                    canvas.css('width', width + 'px');
+                }
                 drawCanvas();
+            }
+
+            // Put redrawCanvas in the scope, so that the controller can call
+            // it.
+            scope.redrawCanvas = function(deltaMSecs) {
+                visibleTimespan = new VisibleTimespan(scope, containerWidth,
+                        deltaMSecs);
+                if(bufferTimespan === null ||
+                    !visibleTimespan.fitsInBuffer(bufferTimespan)) {
+                    makeNewBuffer();
+                }
+                visibleTimespan.positionDiv(bufferTimespan, canvas);
             };
-            scope.$on('timeline-drag', function(evt, deltaMSecs) {
+            $(window).resize(function() {
+                containerWidth = container.width();
                 scope.redrawCanvas();
             });
-            resizeCanvas();
+            scope.$on('timeline-drag', function(evt, deltaMSecs) {
+                scope.redrawCanvas(deltaMSecs);
+            });
+
+            // Okay, finally done defining functions, let's draw the canvas.
             scope.redrawCanvas();
         }
     });
+
     directives.directive('timelineSubtitles', function(VideoPlayer) {
         return function link(scope, elem, attrs) {
-            var view = null;
-            var container = $(elem);
+            var timelineDiv = $(elem);
+            var container = timelineDiv.parent();
+            var containerWidth = container.width();
+            var timelineDivWidth = 0;
+            var bufferTimespan = null;
+            var visibleTimespan = null;
             // Map XML subtitle nodes to the div we created to show them
             var timelineDivs = {}
 
@@ -208,7 +278,7 @@ var angular = angular || null;
                 var initialPageX = evt.pageX;
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
-                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
+                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
                     dragHandler(context, deltaMSecs);
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
@@ -250,7 +320,7 @@ var angular = angular || null;
                 div.append(left);
                 div.append(span);
                 div.append(right);
-                container.append(div);
+                timelineDiv.append(div);
                 return div;
             }
 
@@ -266,30 +336,29 @@ var angular = angular || null;
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     VideoPlayer.pause();
                     var deltaX = initialPageX - evt.pageX;
-                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
-                    view = calcTimelineView(scope, container.width(),
-                        deltaMSecs);
-                    placeSubtitles();
+                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
+                    scope.redrawSubtitles({
+                        deltaMSecs: deltaMSecs,
+                    });
                     scope.$emit('timeline-drag', deltaMSecs);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     var deltaX = initialPageX - evt.pageX;
-                    var deltaMSecs = deltaX * 1000 / view.widthPerSecond;
+                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
                     VideoPlayer.seek(scope.currentTime + deltaMSecs);
                 }).on('mouseleave.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
-                    view = calcTimelineView(scope, container.width());
-                    placeSubtitles();
+                    scope.redrawSubtitles();
                     scope.$emit('timeline-drag', 0);
                 });
                 evt.preventDefault();
             }
 
             function placeSubtitle(startTime, endTime, div) {
-                var x = Math.floor((startTime - view.startTime) *
-                        view.widthPerSecond / 1000);
-                var width = Math.floor((endTime - startTime) *
-                        view.widthPerSecond / 1000);
+                var x = durationToPixels(startTime - bufferTimespan.startTime,
+                        scope.scale);
+                var width = durationToPixels(endTime - startTime,
+                        scope.scale);
                 div.css({left: x, width: width});
             }
 
@@ -311,7 +380,7 @@ var angular = angular || null;
                     return;
                 }
                 if(unsynced.startTime >= 0 && unsynced.startTime >
-                        view.endTime) {
+                        bufferTimespan.endTime) {
                     // unsynced subtitle has its start time set, and it's past
                     // the end of the timeline.
                     return;
@@ -361,7 +430,7 @@ var angular = angular || null;
                 }
                 var subtitleList = scope.workingSubtitles.subtitleList;
                 var subtitles = subtitleList.getSubtitlesForTime(
-                        view.startTime, view.endTime);
+                        bufferTimespan.startTime, bufferTimespan.endTime);
                 var oldTimelineDivs = timelineDivs;
                 timelineDivs = {}
 
@@ -388,21 +457,40 @@ var angular = angular || null;
 
                 checkShownSubtitle(subtitles);
             }
-            scope.redrawSubtitles = function() {
-                view = calcTimelineView(scope, container.width());
-                placeSubtitles();
+            // Put redrawSubtitles in the scope so that the controller can
+            // call it.
+            scope.redrawSubtitles = function(options) {
+                if(options === undefined) {
+                    options = {};
+                }
+                visibleTimespan = new VisibleTimespan(scope, containerWidth,
+                        options.deltaMSecs);
+                if(bufferTimespan === null ||
+                    !visibleTimespan.fitsInBuffer(bufferTimespan)) {
+                        bufferTimespan = new BufferTimespan(scope);
+                    if(bufferTimespan.width != timelineDivWidth) {
+                        timelineDivWidth = bufferTimespan.width;
+                        timelineDiv.css('width', bufferTimespan.width + 'px');
+                    }
+                    placeSubtitles();
+                } else if(options.forcePlace) {
+                    placeSubtitles();
+                }
+                visibleTimespan.positionDiv(bufferTimespan, timelineDiv);
             };
+            // Update the timeline subtitles when the underlying data changes.
             scope.$root.$on('work-done', function() {
-                scope.redrawSubtitles();
+                scope.redrawSubtitles({forcePlace: true});
             });
             scope.$root.$on('subtitles-fetched', function() {
-                scope.redrawSubtitles();
+                scope.redrawSubtitles({forcePlace: true});
             });
-            container.on('mousedown', handleMouseDownInTimeline);
+            // Handle drag and drop.
+            timelineDiv.on('mousedown', handleMouseDownInTimeline);
             $(window).resize(function() {
+                containerWidth = container.width();
                 scope.redrawSubtitles();
             });
         }
     });
-
 })(window.AmarajQuery);
