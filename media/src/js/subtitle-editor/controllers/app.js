@@ -163,24 +163,30 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             minutesIdle = 0;
-            if(evt.target.type == 'textarea') {
-                return;
-            }
 
+            // Shortcuts that should work while editing a subtitle
             if (evt.keyCode === 32 && evt.shiftKey) {
                 // Space with shift, toggle play / pause.
                 evt.preventDefault();
+                evt.stopPropagation();
                 VideoPlayer.togglePlay();
-            } else if(evt.keyCode == 40) {
+            }
+            else if(evt.target.type == 'textarea') {
+                return;
+            }
+            // Shortcuts that should be disabled while editing a subtitle
+            else if(evt.keyCode == 40) {
                 // Down arrow, set the start time of the first
                 // unsynced sub
                 $scope.$root.$emit("sync-next-start-time");
                 evt.preventDefault();
+                evt.stopPropagation();
             } else if(evt.keyCode == 38) {
                 // Up arrow, set the end time of the first
                 // unsynced sub
                 $scope.$root.$emit("sync-next-end-time");
                 evt.preventDefault();
+                evt.stopPropagation();
             }
         };
 
