@@ -360,7 +360,6 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_team_page(self.team.slug)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
@@ -662,7 +661,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 'video': video.pk,
                 'from_language_code': 'en',
                 'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp'),
+                              'Timed_text.en.srt'),
                 'is_complete': True,
                 'complete': 1
            }
