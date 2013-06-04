@@ -1269,6 +1269,9 @@ SubtitleList.prototype.removeSubtitle = function(subtitle) {
     var pos = this.getIndex(subtitle);
     this.parser.removeSubtitle(subtitle.node);
     this.subtitles.splice(pos, 1);
+    if(subtitle.isSynced()) {
+        this.syncedCount--;
+    }
 }
 
 SubtitleList.prototype.lastSyncedSubtitle = function() {
