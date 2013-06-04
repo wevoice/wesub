@@ -41,11 +41,10 @@ class TestCaseVideoResource(WebdriverTestCase):
             team=cls.open_team,
             name='team project two',
             workflow_enabled=True)
-
         cls.video_pg = video_page.VideoPage(cls)
 
     def test_video__list(self):
-        """List the available videos.
+        """List the available videos that are in teams.
 
         GET /api2/partners/videos/
         video_url 
@@ -57,6 +56,9 @@ class TestCaseVideoResource(WebdriverTestCase):
             created: older videos first
             -created : newer videos
         """
+        tv = self.data_utils.create_video()
+        TeamVideoFactory.create(team=self.open_team, video=tv, 
+                                added_by=self.user)
         for x in range(5):
             TeamVideoFactory.create(team=self.open_team, 
                 added_by=self.user,
@@ -68,7 +70,8 @@ class TestCaseVideoResource(WebdriverTestCase):
         for k, v in itertools.groupby(video_objects, 
             operator.itemgetter('id')):
                 videos_list.append(k)
-        self.assertIn(self.test_video.video_id, videos_list)
+        self.assertIn(tv.video_id, videos_list)
+
 
     def test_query__project(self):
         """List the available videos.
