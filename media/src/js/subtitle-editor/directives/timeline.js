@@ -135,7 +135,7 @@ var angular = angular || null;
             function drawCanvas() {
                 var ctx = canvasElt.getContext("2d");
                 ctx.clearRect(0, 0, width, height);
-                ctx.font = 'bold ' + (height / 5) + 'px Open Sans';
+                ctx.font = (height / 5) + 'px Open Sans';
 
                 var startTime = Math.floor(bufferTimespan.startTime / 1000);
                 var endTime = Math.floor(bufferTimespan.endTime / 1000);
