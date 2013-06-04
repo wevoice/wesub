@@ -332,6 +332,7 @@ var angular = angular || null;
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.subtitleList.removeSubtitle(subtitle);
+            $scope.$root.$emit('work-done');
         }
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.subtitlesHeight;
