@@ -587,6 +587,15 @@ var AmaraDFXPParser = function() {
 
         return this.getSubtitles().eq(index).get(0);
     };
+    this.getSubtitleIndex = function(subtitle, subtitles) {
+        /*
+         * Retrieve the index of the given subtitle within the given subtitle s
+         *
+         * Returns: integer
+         */
+        subtitles = subtitles || this.getSubtitles();
+        return $(subtitles).index(subtitle);
+    };
     this.getSubtitles = function() {
         /*
          * Retrieve the current set of subtitles.
