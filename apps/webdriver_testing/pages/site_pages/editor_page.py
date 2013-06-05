@@ -4,7 +4,6 @@ import time
 
 from apps.webdriver_testing.pages.site_pages import UnisubsPage
 
-
 class EditorPage(UnisubsPage):
     """
      This is the NEW subtitle editor.
@@ -49,7 +48,7 @@ class EditorPage(UnisubsPage):
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
                        '"reference-subtitle-set"]')
-    _WORKING_LIST = 'div.reference ul#working-subtitle-set'
+    _WORKING_LIST = 'ul#working-subtitle-set'
     _SUBTITLE_ITEM = 'li.subtitle-list-item'
     _SUB_TIME = 'span.start-time'
     _SUB_TEXT = 'span.subtitle-text'
@@ -103,9 +102,14 @@ class EditorPage(UnisubsPage):
             subs.append(el.text)
         return subs
 
+
+    def working_language(self):
+        return self.get_text_by_css(self._WORKING_LANGUAGE)
+
     def working_text(self, position=None):
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
-                                                 self._SUB_TEXT]))
+                                               self._SUBTITLE_ITEM, 
+                                               self._SUB_TEXT]))
         subs = []
         for el in els:
             subs.append(el.text)
@@ -115,15 +119,18 @@ class EditorPage(UnisubsPage):
             return subs
 
 
+    def video_title(self):
+        return self.get_text_by_css(self._VIDEO_TITLE)
+
     def click_working_sub_line(self, position):
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
-                                                 self._SUB_TEXT]))
+                                               self._SUBTITLE_ITEM,
+                                               self._SUB_TEXT]))
         sub_text = els[position].text
         els[position].click()
         return sub_text
 
-        
-           
+    def exit_to_full_editor(self):
+        self.click_by_css(self._EXIT)
+        self.click_by_css(self._BACK_TO_FULL)
 
-
-   
