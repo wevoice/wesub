@@ -95,6 +95,14 @@
             }
         });
 
+        // Update the timeline subtitles when the underlying data changes.
+        $scope.$root.$on('work-done', function() {
+            $scope.redrawSubtitles({forcePlace: true});
+        });
+        $scope.$root.$on('subtitles-fetched', function() {
+            $scope.redrawSubtitles({forcePlace: true});
+        });
+
         $scope.$root.$on('sync-next-start-time', function($event) {
             if($scope.currentTime === null) {
                 return;

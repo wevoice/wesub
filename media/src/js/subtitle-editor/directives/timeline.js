@@ -506,13 +506,6 @@ var angular = angular || null;
                 visibleTimespan.positionDiv(bufferTimespan, timelineDiv);
             };
 
-            // Update the timeline subtitles when the underlying data changes.
-            scope.$root.$on('work-done', function() {
-                scope.redrawSubtitles({forcePlace: true});
-            });
-            scope.$root.$on('subtitles-fetched', function() {
-                scope.redrawSubtitles({forcePlace: true});
-            });
             // Handle drag and drop.
             timelineDiv.on('mousedown', handleMouseDownInTimeline);
             $(window).resize(function() {
