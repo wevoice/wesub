@@ -206,35 +206,35 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
 
         """
         tv = self.data_utils.create_video()
-        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        t = TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         video_data = {'language_code': 'en',
                 'video': tv.pk,
                 'primary_audio_language_code': 'en',
                 'draft': open('apps/webdriver_testing/subtitle_data/'
                               'less_lines.ssa'),
-                'is_complete': False,
-                'complete': 0
                }
 
         self.data_utils.upload_subs(
-                tv,
+                tv, 
                 data=video_data, 
                 user=dict(username=self.contributor.username, 
                 password='password'))
-
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
         self.create_modal.lang_selection(
-               # video_language='English',
                 new_language='English (incomplete)')
+        sub_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
+                                'oneline.txt')
+        self.sub_editor.edit_subs(sub_file)
         self.sub_editor.continue_to_next_step() #to syncing
         self.sub_editor.continue_to_next_step() #to description
         self.sub_editor.continue_to_next_step() #to review
         self.sub_editor.submit(complete=True)
-
+        self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
                                  % self.team.slug)
+
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Russian', tv.title))
 
