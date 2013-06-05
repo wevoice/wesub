@@ -380,8 +380,6 @@ class TestCaseViewSubtitles(WebdriverTestCase):
     def setUp(self):
         self.video_pg.open_video_page(self.video.video_id)
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
 
     def test_status_img__original_complete(self):
         """Orignal lang complete, shows complete status button.

@@ -21,6 +21,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
+
     def _add_video_and_subs(self, sub_file, lang_code, title):
         """Create the test videos and add subtitles to it.
   
