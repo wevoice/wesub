@@ -20,7 +20,7 @@ class TestCaseLeftSide(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseLeftSide, cls).setUpClass()
-        cls.logger.info("""Default Test Data
+        cls.logger.info("""Default Test Data loaded from fixtures
 
                         English, source primary v2 -> v6
                                  v1 -> deleted
@@ -120,13 +120,25 @@ class TestCaseCenter(WebdriverTestCase):
         cls.video_pg.open_page('videos/watch/')
         cls.video_pg.log_in(cls.user, 'password')
 
+
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
-        self.skipTest('incomplete')
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
         sub_text = self.editor_pg.click_working_sub_line(3)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
 
+    def test_working_language(self):
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual('English subtitles', self.editor_pg.working_language())
+        self.editor_pg.open_editor_page(video.video_id, 'tr')
+        self.assertEqual('Turkish subtitles', self.editor_pg.working_language())
+
+    def test_page_title(self):
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual(u'English \u2022 Open Source Philosophy',
+                         self.editor_pg.video_title())
 
 

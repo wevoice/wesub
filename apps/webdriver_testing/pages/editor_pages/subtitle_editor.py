@@ -38,6 +38,7 @@ class SubtitleEditor(EditorDialogs):
     _SAVE_AND_EXIT = 'div.unisubs-saveandexit a span'
     _DOWNLOAD_SUBTITLES = 'a.unisubs-download-subs'
     _DOWNLOAD_FORMAT = 'select.copy-dialog-select'
+    _NEW_EDITOR_BETA = 'div.unisubs-saveandopeninneweditor a span'
 
     #REVIEW DIALOG
     _REVIEW_DONE = 'a.unisubs-done'
@@ -224,3 +225,10 @@ class SubtitleEditor(EditorDialogs):
             if el.text == result:
                 el.click()
                 return
+
+    def open_in_beta_editor(self):
+        self.click_by_css(self._NEW_EDITOR_BETA)
+        self.mark_subs_complete(complete=True)
+        self.click_saved_ok()
+
+        

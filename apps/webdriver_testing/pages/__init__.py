@@ -138,15 +138,8 @@ class Page(object):
         mouseAction = (webdriver.ActionChains(self.browser)
                        .move_to_element(menu_element)
                        .perform())
-        #self.wait_for_element_visible(menu_item_el)
         el = self.is_element_visible(menu_item_el)
         el.click()
-        #menu_element.find_element_by_css_selector(menu_item_el).click()
-        
-        #mouseAction = (webdriver.ActionChains(self.browser)
-        #               .move_to_element(menu_item_element)
-        #               .click(menu_item_element)
-        #               .perform())
 
 
     def hover_by_element(self, webdriver_object, page_element):
