@@ -146,8 +146,9 @@
                     </select>
                 </div>
             </div>
-            <div class="subtitles-wrapper">
-                <div class="reference subtitles" ng-controller="SubtitleListController">
+            <div class="subtitles-wrapper"
+                ng-controller="SubtitleListController">
+                <div class="reference subtitles">
 
                     <ul subtitle-list="reference-subtitle-set"
                         editable="false"
@@ -197,9 +198,28 @@
                     <a ng-show="false" href="#" class="video-display">Hide video</a>
                 </div>
             </div>
-            <div class="subtitles-wrapper">
-                <div class="working subtitles" ng-controller="SubtitleListController">
+            <div class="subtitles-wrapper"
+                ng-controller="SubtitleListController"
+                working-subtitles-wrapper>
+                <div class="sync-help end">
+                    <span class="key">
+                        <span>
+                            &uarr;
+                        </span>
+                    </span>
+                    <div class="text">End now</div>
+                </div>
 
+                <div class="sync-help begin">
+                    <span class="key">
+                        <span>
+                            &darr;
+                        </span>
+                    </span>
+                    <div class="text">Begin now</div>
+                </div>
+
+                <div class="working subtitles">
                     <ul subtitle-list="working-subtitle-set"
                         editable="true"
                         version-number="{{ version.version_number }}"

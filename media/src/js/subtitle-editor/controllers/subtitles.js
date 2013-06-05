@@ -313,6 +313,24 @@ var angular = angular || null;
          * @constructor
          */
 
+        var willSync = null;
+
+        function subtitlesAddedOrRemoved() {
+            $scope.$root.$emit('work-done');
+            updateSyncHelpers();
+        }
+
+        function updateSyncHelpers() {
+            var startIndex = null, endIndex = null;
+            if(willSync.start !== null) {
+                startIndex = $scope.subtitleList.getIndex(willSync.start);
+            }
+            if(willSync.end !== null) {
+                endIndex = $scope.subtitleList.getIndex(willSync.end);
+            }
+            $scope.positionSyncHelpers(startIndex, endIndex);
+        }
+
         $scope.subtitleList = new dfxp.SubtitleList();
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
@@ -326,13 +344,14 @@ var angular = angular || null;
         $scope.insertSubtitleBefore = function(otherSubtitle) {
             var insertPos = $scope.subtitleList.insertSubtitleBefore(
                     otherSubtitle);
+            subtitlesAddedOrRemoved();
             $timeout(function() {
                 $scope.nthChildScope(insertPos).startEditingMode();
             });
         };
         $scope.removeSubtitle = function(subtitle) {
             $scope.subtitleList.removeSubtitle(subtitle);
-            $scope.$root.$emit('work-done');
+            subtitlesAddedOrRemoved();
         }
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.subtitlesHeight;
@@ -401,11 +420,12 @@ var angular = angular || null;
             $($('div.subtitles').height(newHeight));
         });
 
-        if($scope.isWorkingSubtitles) {
-            $scope.$root.$on('will-sync-changed', function(evt, willSync) {
-                var foo = 1;
-            });
-        }
+        $scope.$root.$on('will-sync-changed', function(evt, newWillSync) {
+            if($scope.isWorkingSubtitles()) {
+                willSync = newWillSync;
+                updateSyncHelpers();
+            };
+        });
 
         window.onresize = function() {
             $scope.$digest();

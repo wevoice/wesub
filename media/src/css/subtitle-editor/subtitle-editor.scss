@@ -397,8 +397,27 @@ section.main {
         float: none;
         vertical-align: top;
     }
+    span.key {
+        background: white;
+        display: block;
+        height: 32px;
+        float: left;
+        margin-right: 10px;
+        position: relative;
+        @include border-radius(3px);
+
+        span {
+            bottom: 2px;
+            color: #5A5758;
+            diplay: block;
+            font-size: 9px;
+            font-weight: bold;
+            left: 4px;
+            position: absolute;
+        }
+    }
     div.subtitles-wrapper {
-        overflow: hidden;
+        overflow: visible;
         position: relative;
 
         a.scroll-lock {
@@ -417,6 +436,61 @@ section.main {
                 background-position: center -143px;
             }
         }
+
+        div.sync-help {
+            position: absolute;
+            display: none;
+            width: 120px;
+            height: 65px;
+            color: #ffffff;
+            z-index: 100;
+
+            div.text {
+                line-height: 65px;
+                vertical-align: middle;
+            }
+
+            span.key {
+                margin-left: 14px;
+                margin-top: 16px;
+                width: 32px;
+                span {
+                    color: #000;
+                    font-size: 12px;
+                    bottom: 5px;
+                }
+            }
+            &:before {
+                /* Draws a triangle in the middle of the box.
+                 */
+                position: absolute;
+                top: 17px;
+                content: "";
+                display: block;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+            }
+        }
+        div.sync-help.end {
+            background: #a2a3a4;
+            left: 100%;
+            &:before {
+                left: -15px;
+                border-right: 15px solid #a2a3a4;
+            }
+        }
+
+        div.sync-help.begin {
+            background: #398982;
+            right: 100%;
+            &:before {
+                right: -15px;
+                border-left: 15px solid #398982;
+            }
+        }
+
     }
     div.subtitles {
         overflow: auto;
@@ -595,6 +669,10 @@ section.main {
             padding: 20px;
             @include border-radius(3px);
 
+            span.key {
+                width: 20%;
+            }
+
             a.advanced {
                 color: white;
                 float: right;
@@ -620,26 +698,6 @@ section.main {
                 li {
                     margin: 10px 0;
 
-                    span.key {
-                        background: white;
-                        display: block;
-                        height: 32px;
-                        float: left;
-                        margin-right: 10px;
-                        position: relative;
-                        width: 20%;
-                        @include border-radius(3px);
-
-                        span {
-                            bottom: 2px;
-                            color: #5A5758;
-                            diplay: block;
-                            font-size: 9px;
-                            font-weight: bold;
-                            left: 4px;
-                            position: absolute;
-                        }
-                    }
                     span.description {
                         display: block;
                         float: left;

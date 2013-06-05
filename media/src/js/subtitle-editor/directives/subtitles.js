@@ -55,6 +55,35 @@ var USER_IDLE_MINUTES = 5;
             });
         };
     });
+    directives.directive('workingSubtitlesWrapper', function() {
+        return function link(scope, elem, attrs) {
+            var startHelper = $('div.sync-help.begin', elem);
+            var endHelper = $('div.sync-help.end', elem);
+            var subtitleList = $('.subtitles ul', elem);
+            var wrapper = $(elem);
+
+            function getSubtitleTop(index) {
+                var li = $('li', subtitleList).eq(index);
+                return li.offset().top - wrapper.offset().top;
+            }
+
+            scope.positionSyncHelpers = function(startIndex, endIndex) {
+                if(startIndex !== null) {
+                    startHelper.css('top', getSubtitleTop(startIndex) + 'px');
+                    startHelper.show();
+                } else {
+                    startHelper.hide();
+                }
+                if(endIndex !== null) {
+                    endHelper.css('top', getSubtitleTop(endIndex) + 'px');
+                    endHelper.show();
+                } else {
+                    endHelper.hide();
+                }
+            }
+        }
+    });
+
     directives.directive('subtitleList', function(SubtitleListFinder) {
         return function link(scope, elem, attrs) {
             // set these *before* calling get subtitle since if
