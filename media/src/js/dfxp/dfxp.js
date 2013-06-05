@@ -1307,7 +1307,7 @@ SubtitleList.prototype.secondUnsyncedSubtitle = function() {
     }
 }
 
-SubtitleList.prototype.firstSubtitleAfter = function(time) {
+SubtitleList.prototype.indexOfFirstSubtitleAfter = function(time) {
     /* Get the first subtitle whose end is after time
      *
      * returns index of the subtitle, or -1 if none are found.
@@ -1337,7 +1337,7 @@ SubtitleList.prototype.subtitleAt = function(time) {
      *
      * returns a SubtitleItem, or null if no subtitle occupies the time.
      */
-    var i = this.firstSubtitleAfter(time);
+    var i = this.indexOfFirstSubtitleAfter(time);
     if(i == -1) {
         return null;
     }
@@ -1351,7 +1351,7 @@ SubtitleList.prototype.subtitleAt = function(time) {
 
 SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     var rv = [];
-    var i = this.firstSubtitleAfter(startTime);
+    var i = this.indexOfFirstSubtitleAfter(startTime);
     if(i == -1) {
         return rv;
     }

@@ -422,16 +422,18 @@ var angular = angular || null;
 
                 var shownSubtitle = subtitleList().subtitleAt(
                         scope.currentTime);
-                if(shownSubtitle === null &&
-                    unsyncedSubtitle !== null &&
-                    unsyncedSubtitle.isAt(scope.currentTime)) {
-                    shownSubtitle = unsyncedSubtitle;
+                if(shownSubtitle === null && unsyncedSubtitle !== null &&
+                        unsyncedSubtitle.startTime <= scope.currentTime) {
+                    shownSubtitle = unsyncedSubtitle.realSubtitle;
                 }
                 if(shownSubtitle != scope.subtitle) {
                     scope.subtitle = shownSubtitle;
                     scope.$root.$emit('timeline-subtitle-shown',
                             shownSubtitle);
-                    scope.$root.$digest();
+                    var phase = scope.$root.$$phase;
+                    if(phase != '$apply' && phase != '$digest') {
+                        scope.$root.$digest();
+                    }
                 }
             }
 
