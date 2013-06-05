@@ -24,13 +24,18 @@
     var VideoController = function($scope, VideoPlayer) {
         $scope.overlayText = null;
         $scope.showOverlay = false;
+        $scope.timelineOverlayText = null;
 
         $scope.$root.$on('subtitle-edit', function($event, content) {
             $scope.overlayText = content;
             $scope.showOverlay = true;
         });
         $scope.$root.$on('editing-done', function($event, content) {
-            $scope.showOverlay = false;
+            if($scope.timelineOverlayText !== null) {
+                $scope.overlayText = $scope.timelineOverlayText;
+            } else {
+                $scope.showOverlay = false;
+            }
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 
@@ -44,8 +49,10 @@
             if(subtitle !== null) {
                 $scope.overlayText = subtitle.content();
                 $scope.showOverlay = true;
+                $scope.timelineOverlayText = $scope.overlayText;
             } else {
                 $scope.showOverlay = false;
+                $scope.timelineOverlayText = null;
             }
         });
 
