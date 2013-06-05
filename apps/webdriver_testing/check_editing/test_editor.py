@@ -20,7 +20,7 @@ class TestCaseLeftSide(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseLeftSide, cls).setUpClass()
-        cls.logger.info("""Default Test Data
+        cls.logger.info("""Default Test Data loaded from fixtures
 
                         English, source primary v2 -> v6
                                  v1 -> deleted
@@ -120,8 +120,6 @@ class TestCaseCenter(WebdriverTestCase):
         cls.video_pg.open_page('videos/watch/')
         cls.video_pg.log_in(cls.user, 'password')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('new_editor.png')
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
