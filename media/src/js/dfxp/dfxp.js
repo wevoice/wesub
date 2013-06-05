@@ -1323,6 +1323,23 @@ SubtitleList.prototype.firstSubtitleAfter = function(time) {
     return left;
 }
 
+SubtitleList.prototype.subtitleAt = function(time) {
+    /* Find the subtitle that occupies a given time.
+     *
+     * returns a SubtitleItem, or null if no subtitle occupies the time.
+     */
+    var i = this.firstSubtitleAfter(time);
+    if(i == -1) {
+        return null;
+    }
+    var subtitle = this.subtitles[i];
+    if(subtitle.isAt(time)) {
+        return subtitle;
+    } else {
+        return null;
+    }
+}
+
 SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
     var rv = [];
     var i = this.firstSubtitleAfter(startTime);

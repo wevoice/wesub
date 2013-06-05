@@ -200,6 +200,9 @@ var angular = angular || null;
             var visibleTimespan = null;
             // Map XML subtitle nodes to the div we created to show them
             var timelineDivs = {}
+            // Store the DIV for the unsynced subtitle
+            var unsyncedDiv = null;
+            var unsyncedSubtitle = null;
 
             function handleDragLeft(context, deltaMSecs) {
                 context.startTime = context.subtitle.startTime + deltaMSecs;
@@ -239,6 +242,10 @@ var angular = angular || null;
 
             }
 
+            function subtitleList() {
+                return scope.workingSubtitles.subtitleList;
+            }
+
             function handleMouseDown(evt, dragHandler) {
                 if(!scope.workingSubtitles.allowsSyncing) {
                     evt.preventDefault();
@@ -252,19 +259,18 @@ var angular = angular || null;
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
                 }
-                if(subtitle.realSubtitle === undefined) {
+                if(subtitle !== unsyncedSubtitle) {
                     var realSubtitle = subtitle;
                 } else {
                     var realSubtitle = subtitle.realSubtitle;
                 }
-                var subtitleList = scope.workingSubtitles.subtitleList;
-                var nextSubtitle = subtitleList.nextSubtitle(realSubtitle);
+                var nextSubtitle = subtitleList().nextSubtitle(realSubtitle);
                 if(nextSubtitle && nextSubtitle.isSynced()) {
                     context.maxEndTime = nextSubtitle.startTime;
                 } else {
                     context.maxEndTime = scope.duration;
                 }
-                var prevSubtitle = subtitleList.prevSubtitle(realSubtitle);
+                var prevSubtitle = subtitleList().prevSubtitle(realSubtitle);
                 if(prevSubtitle) {
                     context.minStartTime = prevSubtitle.endTime;
                 } else {
@@ -283,8 +289,7 @@ var angular = angular || null;
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
-                    var subtitleList = scope.workingSubtitles.subtitleList;
-                    subtitleList.updateSubtitleTime(realSubtitle,
+                    subtitleList().updateSubtitleTime(realSubtitle,
                         context.startTime, context.endTime);
                     scope.$root.$emit("work-done");
                     scope.$root.$digest();
@@ -299,11 +304,7 @@ var angular = angular || null;
             }
 
             function makeDivForSubtitle(subtitle) {
-                if(subtitle.realSubtitle === undefined) {
-                    var div = $('<div/>', {class: 'subtitle'});
-                } else {
-                    var div = $('<div/>', {class: 'subtitle unsynced'});
-                }
+                var div = $('<div/>', {class: 'subtitle'});
                 var span = $('<span/>');
                 span.html(subtitle.content());
                 var left = $('<a href="#" class="handle left"></a>');
@@ -362,28 +363,31 @@ var angular = angular || null;
                 div.css({left: x, width: width});
             }
 
-            function addUnsyncedSubtitle(subtitleList, subtitles) {
-                /* Add the first unsynced subtitle to the list of subtitles on
+            function getUnsyncedSubtitle() {
+                /* Sometimes we want to show the first unsynced subtitle for
                  * the timeline.
                  *
-                 * If we should display the subtitle, it will be pushed to the
-                 * end of subtitles.
+                 * This method calculates if we want to show the subtitle, and
+                 * if so, it returns an object that mimics the SubtitleItem
+                 * API for the unsynced subtitle.
+                 *
+                 * If we shouldn't show the subtitle, it returns null.
                  */
-                var lastSynced = subtitleList.lastSyncedSubtitle();
+                var lastSynced = subtitleList().lastSyncedSubtitle();
                 if(lastSynced !== null &&
                     lastSynced.endTime > scope.currentTime) {
                     // Not past the end of the synced subtitles
-                    return;
+                    return null;
                 }
-                var unsynced = subtitleList.firstUnsyncedSubtitle();
+                var unsynced = subtitleList().firstUnsyncedSubtitle();
                 if(unsynced === null) {
-                    return;
+                    return null;
                 }
                 if(unsynced.startTime >= 0 && unsynced.startTime >
                         bufferTimespan.endTime) {
                     // unsynced subtitle has its start time set, and it's past
                     // the end of the timeline.
-                    return;
+                    return null;
                 }
                 if(unsynced.startTime < 0) {
                     var startTime = scope.currentTime;
@@ -394,7 +398,7 @@ var angular = angular || null;
                             unsynced.startTime + MIN_DURATION);
                 }
                 // Make a fake subtitle to show on the timeline.
-                subtitles.push({
+                return {
                     realSubtitle: unsynced,
                     id: unsynced.id,
                     startTime: startTime,
@@ -405,16 +409,23 @@ var angular = angular || null;
                     duration: function() { return endTime - startTime; },
                     content: function() { return unsynced.content() },
                     isSynced: function() { return false; }
-                });
+                };
             }
 
-            function checkShownSubtitle(subtitles) {
-                // Check if a new subtitle is displayed
-                var shownSubtitle = null;
-                for(var i = 0; i < subtitles.length; i++) {
-                    if(subtitles[i].isAt(scope.currentTime)) {
-                        shownSubtitle = subtitles[i];
-                    }
+            function checkShownSubtitle() {
+                // First check if the current subtitle is still shown, this is
+                // the most common case, and it's fast
+                if(scope.subtitle !== null &&
+                    scope.subtitle.isAt(scope.currentTime)) {
+                    return;
+                }
+
+                var shownSubtitle = subtitleList().subtitleAt(
+                        scope.currentTime);
+                if(shownSubtitle === null &&
+                    unsyncedSubtitle !== null &&
+                    unsyncedSubtitle.isAt(scope.currentTime)) {
+                    shownSubtitle = unsyncedSubtitle;
                 }
                 if(shownSubtitle != scope.subtitle) {
                     scope.subtitle = shownSubtitle;
@@ -428,13 +439,10 @@ var angular = angular || null;
                 if(!scope.workingSubtitles) {
                     return;
                 }
-                var subtitleList = scope.workingSubtitles.subtitleList;
-                var subtitles = subtitleList.getSubtitlesForTime(
+                var subtitles = subtitleList().getSubtitlesForTime(
                         bufferTimespan.startTime, bufferTimespan.endTime);
                 var oldTimelineDivs = timelineDivs;
                 timelineDivs = {}
-
-                addUnsyncedSubtitle(subtitleList, subtitles);
 
                 for(var i = 0; i < subtitles.length; i++) {
                     var subtitle = subtitles[i];
@@ -454,8 +462,22 @@ var angular = angular || null;
                 for(var subId in oldTimelineDivs) {
                     oldTimelineDivs[subId].remove();
                 }
-
-                checkShownSubtitle(subtitles);
+            }
+            function placeUnsyncedSubtitle() {
+                unsyncedSubtitle = getUnsyncedSubtitle();
+                if(unsyncedSubtitle !== null) {
+                    if(unsyncedDiv === null) {
+                        unsyncedDiv = makeDivForSubtitle(unsyncedSubtitle);
+                        unsyncedDiv.addClass('unsynced')
+                    } else {
+                        updateDivForSubtitle(unsyncedDiv, unsyncedSubtitle);
+                    }
+                    placeSubtitle(unsyncedSubtitle.startTime,
+                            unsyncedSubtitle.endTime, unsyncedDiv);
+                } else if(unsyncedDiv !== null) {
+                    unsyncedDiv.remove();
+                    unsyncedDiv = null;
+                }
             }
             // Put redrawSubtitles in the scope so that the controller can
             // call it.
@@ -476,8 +498,14 @@ var angular = angular || null;
                 } else if(options.forcePlace) {
                     placeSubtitles();
                 }
+                // always need to place the unsynced subtitle, since it
+                // changes with the current time.
+                placeUnsyncedSubtitle();
+                checkShownSubtitle();
+
                 visibleTimespan.positionDiv(bufferTimespan, timelineDiv);
             };
+
             // Update the timeline subtitles when the underlying data changes.
             scope.$root.$on('work-done', function() {
                 scope.redrawSubtitles({forcePlace: true});
