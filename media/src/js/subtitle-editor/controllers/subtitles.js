@@ -401,6 +401,12 @@ var angular = angular || null;
             $($('div.subtitles').height(newHeight));
         });
 
+        if($scope.isWorkingSubtitles) {
+            $scope.$root.$on('will-sync-changed', function(evt, willSync) {
+                var foo = 1;
+            });
+        }
+
         window.onresize = function() {
             $scope.$digest();
         };

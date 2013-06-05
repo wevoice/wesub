@@ -90,9 +90,11 @@
             lastTime = $scope.currentTime;
         }
 
-        function updateWillSync() {
+        function calcWillSync() {
+            var rv = { start: null, end: null};
+
             if($scope.currentTime === null) {
-                return;
+                return rv;
             }
             var time = $scope.currentTime;
             var subtitleList = $scope.workingSubtitles.subtitleList;
@@ -100,15 +102,15 @@
             if(nextIndex >= 0) {
                 /* We are in the range of synced subtitles */
                 var next = subtitleList.subtitles[nextIndex];
-                willSync.start = next;
+                rv.start = next;
                 if(next.isAt(time)) {
-                    willSync.end = next;
+                    rv.end = next;
                 } else if(nextIndex > 0) {
-                    willSync.end = subtitleList.subtitles[nextIndex-1];
+                    rv.end = subtitleList.subtitles[nextIndex-1];
                 } else {
-                    willSync.end = null;
+                    rv.end = null;
                 }
-                return;
+                return rv;
             }
 
             var firstUnsynced = subtitleList.firstUnsyncedSubtitle();
@@ -116,26 +118,36 @@
                 /* We are past the last synced subtitle, but there are no
                  * unsynced ones.
                  */
-                willSync.start = null;
-                willSync.end = subtitleList.lastSyncedSubtitle();
-                return;
+                rv.start = null;
+                rv.end = subtitleList.lastSyncedSubtitle();
+                return rv;
             }
 
             if(firstUnsynced.startTime < 0) {
                 // The first unsynced subtitle needs a start time
-                willSync.start = firstUnsynced;
-                willSync.end = subtitleList.lastSyncedSubtitle();
+                rv.start = firstUnsynced;
+                rv.end = subtitleList.lastSyncedSubtitle();
             } else {
                 // The first unsynced subtitle has a start time set.  If the
                 // user syncs the start time, then we will set the start time
                 // for the second unsynced subtitle.
-                willSync.end = firstUnsynced;
+                rv.end = firstUnsynced;
                 var nextUnsynced = subtitleList.secondUnsyncedSubtitle();
                 if(nextUnsynced == null) {
-                    willSync.start = null;
+                    rv.start = null;
                 } else {
-                    willSync.start = nextUnsynced;
+                    rv.start = nextUnsynced;
                 }
+            }
+            return rv;
+        }
+
+        function updateWillSync() {
+            var newWillSync = calcWillSync();
+            if(willSync.start != newWillSync.start ||
+                willSync.end != newWillSync.end) {
+                willSync = newWillSync;
+                $scope.$root.$emit('will-sync-changed', willSync);
             }
         }
 
@@ -159,9 +171,11 @@
         // Update the timeline subtitles when the underlying data changes.
         $scope.$root.$on('work-done', function() {
             $scope.redrawSubtitles({forcePlace: true});
+            updateWillSync();
         });
         $scope.$root.$on('subtitles-fetched', function() {
             $scope.redrawSubtitles({forcePlace: true});
+            updateWillSync();
         });
 
         $scope.$root.$on('sync-next-start-time', function($event) {
