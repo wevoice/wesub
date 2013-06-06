@@ -121,7 +121,7 @@ var angular = angular || null;
                     var language = cachedData.languages[i];
 
                     // Once we find the language we're looking for, find the version.
-                    if (language.code === languageCode){
+                    if (language.language_code === languageCode){
 
                         for (var j = 0; j < language.versions.length; j++){
 

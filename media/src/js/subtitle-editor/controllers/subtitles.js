@@ -88,7 +88,7 @@ var angular = angular || null;
 
             if (!newVersion.subtitlesXML) {
                 SubtitleStorage.getSubtitles(
-                    $scope.language.code,
+                    $scope.language.language_code,
                     newVersion.version_no,
                     function(subtitleData) {
                         newVersion.subtitlesXML = subtitleData.subtitlesXML;
@@ -103,7 +103,7 @@ var angular = angular || null;
 
             $scope.languages = allLanguages;
             $scope.language = _.find(allLanguages, function(item) {
-                return item.code == languageCode;
+                return item.language_code == languageCode;
             });
             $scope.languageChanged($scope.language, versionNumber);
         }

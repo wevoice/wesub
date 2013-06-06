@@ -81,7 +81,7 @@ def _language_data(language, editing_version, translated_from_version):
             'version_number': translated_from_version.version_number,
         },
         'editingLanguage': language == subtitle_language,
-        'code': language.language_code,
+        'language_code': language.language_code,
         'name': language.get_language_code_display(),
         'pk': language.pk,
         'numVersions': language.num_versions,
