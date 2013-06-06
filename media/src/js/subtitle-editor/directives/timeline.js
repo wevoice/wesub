@@ -59,7 +59,7 @@ var angular = angular || null;
         this.width = durationToPixels(this.duration, scope.scale);
     }
 
-    function VisibleTimespan(scope, width, deltaMSecs) {
+    function VisibleTimespan(scope, width, deltaMS) {
         /* Stores the portion of the video time that is displayed in the
          * timeline.
          */
@@ -72,8 +72,8 @@ var angular = angular || null;
             var currentTime = 0;
         }
         this.startTime = currentTime - this.duration / 2;
-        if(deltaMSecs) {
-            this.startTime += deltaMSecs;
+        if(deltaMS) {
+            this.startTime += deltaMS;
         }
         this.endTime = this.startTime + this.duration;
     }
@@ -168,9 +168,9 @@ var angular = angular || null;
 
             // Put redrawCanvas in the scope, so that the controller can call
             // it.
-            scope.redrawCanvas = function(deltaMSecs) {
+            scope.redrawCanvas = function(deltaMS) {
                 visibleTimespan = new VisibleTimespan(scope, containerWidth,
-                        deltaMSecs);
+                        deltaMS);
                 if(bufferTimespan === null ||
                     !visibleTimespan.fitsInBuffer(bufferTimespan)) {
                     makeNewBuffer();
@@ -181,8 +181,8 @@ var angular = angular || null;
                 containerWidth = container.width();
                 scope.redrawCanvas();
             });
-            scope.$on('timeline-drag', function(evt, deltaMSecs) {
-                scope.redrawCanvas(deltaMSecs);
+            scope.$on('timeline-drag', function(evt, deltaMS) {
+                scope.redrawCanvas(deltaMS);
             });
 
             // Okay, finally done defining functions, let's draw the canvas.
@@ -204,8 +204,8 @@ var angular = angular || null;
             var unsyncedDiv = null;
             var unsyncedSubtitle = null;
 
-            function handleDragLeft(context, deltaMSecs) {
-                context.startTime = context.subtitle.startTime + deltaMSecs;
+            function handleDragLeft(context, deltaMS) {
+                context.startTime = context.subtitle.startTime + deltaMS;
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
                 }
@@ -214,8 +214,8 @@ var angular = angular || null;
                 }
             }
 
-            function handleDragRight(context, deltaMSecs) {
-                context.endTime = context.subtitle.endTime + deltaMSecs;
+            function handleDragRight(context, deltaMS) {
+                context.endTime = context.subtitle.endTime + deltaMS;
                 if(context.maxEndTime !== null &&
                         context.endTime > context.maxEndTime) {
                             context.endTime = context.maxEndTime;
@@ -225,9 +225,9 @@ var angular = angular || null;
                 }
             }
 
-            function handleDragMiddle(context, deltaMSecs) {
-                context.startTime = context.subtitle.startTime + deltaMSecs;
-                context.endTime = context.subtitle.endTime + deltaMSecs;
+            function handleDragMiddle(context, deltaMS) {
+                context.startTime = context.subtitle.startTime + deltaMS;
+                context.endTime = context.subtitle.endTime + deltaMS;
 
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
@@ -284,8 +284,8 @@ var angular = angular || null;
                 var initialPageX = evt.pageX;
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
-                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
-                    dragHandler(context, deltaMSecs);
+                    var deltaMS = pixelsToDuration(deltaX, scope.scale);
+                    dragHandler(context, deltaMS);
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
@@ -334,19 +334,31 @@ var angular = angular || null;
 
             function handleMouseDownInTimeline(evt) {
                 var initialPageX = evt.pageX;
+                var maxDeltaX = 0;
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     VideoPlayer.pause();
                     var deltaX = initialPageX - evt.pageX;
-                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
+                    var deltaMS = pixelsToDuration(deltaX, scope.scale);
+                    maxDeltaX = Math.max(Math.abs(deltaX), maxDeltaX);
                     scope.redrawSubtitles({
-                        deltaMSecs: deltaMSecs,
+                        deltaMS: deltaMS,
                     });
-                    scope.$emit('timeline-drag', deltaMSecs);
+                    scope.$emit('timeline-drag', deltaMS);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
-                    var deltaX = initialPageX - evt.pageX;
-                    var deltaMSecs = pixelsToDuration(deltaX, scope.scale);
-                    VideoPlayer.seek(scope.currentTime + deltaMSecs);
+                    if(maxDeltaX < 3) {
+                        // mouse didn't move that much.  Interpret this as a
+                        // click rather than a drag and seek to the current
+                        // time.
+                        var deltaX = event.pageX - container.offset().left;
+                        var deltaMS = pixelsToDuration(deltaX, scope.scale);
+                        var seekTo = visibleTimespan.startTime + deltaMS;
+                    } else {
+                        var deltaX = initialPageX - evt.pageX;
+                        var deltaMS = pixelsToDuration(deltaX, scope.scale);
+                        var seekTo = scope.currentTime + deltaMS;
+                    }
+                    VideoPlayer.seek(seekTo);
                 }).on('mouseleave.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     scope.redrawSubtitles();
@@ -488,7 +500,7 @@ var angular = angular || null;
                     options = {};
                 }
                 visibleTimespan = new VisibleTimespan(scope, containerWidth,
-                        options.deltaMSecs);
+                        options.deltaMS);
                 if(bufferTimespan === null ||
                     !visibleTimespan.fitsInBuffer(bufferTimespan)) {
                         bufferTimespan = new BufferTimespan(scope);
