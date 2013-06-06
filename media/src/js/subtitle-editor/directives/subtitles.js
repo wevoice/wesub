@@ -131,6 +131,7 @@ var USER_IDLE_MINUTES = 5;
     });
     directives.directive('subtitleListItem', function($timeout) {
         return function link(scope, elem, attrs) {
+            var elem = $(elem);
             var textarea = $('textarea', elem);
 
             scope.nextScope = function() {
@@ -164,10 +165,14 @@ var USER_IDLE_MINUTES = 5;
                 textarea.focus();
                 setCaretPosition(textarea.get(0), caretPos);
                 scope.$root.$emit('subtitle-edit', scope.subtitle.content());
+                // set line-height to 0 because we don't want the whitespace
+                // inside the element to add extra space below the textarea
+                elem.css('line-height', '0');
             }
 
             scope.hideTextArea = function() {
                 textarea.hide();
+                elem.css('line-height', '');
             }
 
             textarea.autosize();
