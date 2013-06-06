@@ -89,8 +89,15 @@ var USER_IDLE_MINUTES = 5;
             // set these *before* calling get subtitle since if
             // the subs are bootstrapped it will return right away
             scope.isEditable = attrs.editable === 'true';
-            scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-
+            scope.setVideoID(attrs.videoId);
+            SubtitleListFinder.register(attrs.subtitleList, elem,
+                    elem.controller(), scope);
+            if(attrs.languageCode != "") {
+                scope.setLanguageCode(attrs.languageCode);
+                if(attrs.versionNumber != "") {
+                    scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+                }
+            }
 
             // Handle scroll.
             $(elem).parent().scroll(function() {
@@ -118,11 +125,6 @@ var USER_IDLE_MINUTES = 5;
                     return null;
                 }
             }
-
-            scope.setVideoID(attrs.videoId);
-            scope.setLanguageCode(attrs.languageCode);
-            SubtitleListFinder.register(attrs.subtitleList, elem,
-                    elem.controller(), scope);
         }
     });
     directives.directive('subtitleListItem', function($timeout) {
@@ -240,11 +242,17 @@ var USER_IDLE_MINUTES = 5;
                             scope.versionNumber = this.value;
                             scope.$digest();
                         });
+                        if(attrs.initialVersionNumber != "") {
+                            var versionNumber = attrs.initialVersionNumber;
+                        } else {
+                            var versionNumber = null;
+                        }
+
                         SubtitleStorage.getLanguages(function(languages){
                             scope.setInitialDisplayLanguage(
                                 languages,
                                 attrs.initialLanguageCode,
-                                attrs.initialVersionNumber);
+                                versionNumber);
                         });
                     }
                 };

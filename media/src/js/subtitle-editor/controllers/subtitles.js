@@ -64,7 +64,6 @@ var angular = angular || null;
             }
 
             $scope.versionNumber = versionNumber.toString();
-            $scope.version = $scope.findVersion(versionNumber);
         };
         $scope.setReferenceSubs = function(subtitleData) {
             if (!$scope.refSubList) {
@@ -105,7 +104,9 @@ var angular = angular || null;
             $scope.language = _.find(allLanguages, function(item) {
                 return item.language_code == languageCode;
             });
-            $scope.languageChanged($scope.language, versionNumber);
+            if(versionNumber !== null) {
+                $scope.languageChanged($scope.language, versionNumber);
+            }
         }
 
         $scope.$watch('language', function(newValue, oldValue) {
@@ -377,7 +378,6 @@ var angular = angular || null;
         $scope.onSubtitlesFetched = function (subtitleData) {
 
             // Save subtitle data to this scope
-            $scope.versionNumber = subtitleData.version_no;
             $scope.videoTitle = subtitleData.title;
             $scope.videoDescription = subtitleData.description;
 
@@ -386,15 +386,11 @@ var angular = angular || null;
                 $scope.status = 'ready';
             }
 
-
             // When we have subtitles for an editable set, emit it.
-            $timeout(function() {
-                if ($scope.isWorkingSubtitles()) {
-                    $scope.$root.workingSubtitles = $scope;
-                    $scope.$root.$apply();
-                    $scope.$root.$emit('subtitles-fetched');
-                }
-            });
+            if ($scope.isWorkingSubtitles()) {
+                $scope.$root.workingSubtitles = $scope;
+                $scope.$root.$emit('subtitles-fetched');
+            }
         };
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
