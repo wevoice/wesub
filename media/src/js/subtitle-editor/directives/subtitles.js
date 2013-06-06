@@ -64,22 +64,45 @@ var USER_IDLE_MINUTES = 5;
 
             function getSubtitleTop(index) {
                 var li = $('li', subtitleList).eq(index);
-                return li.offset().top - wrapper.offset().top;
+                var top = li.offset().top - wrapper.offset().top;
+                if(top < 0 || top + startHelper.height() >= wrapper.height()) {
+                    return null;
+                }
+                return top;
             }
 
+            var lastSyncStartIndex = null;
+            var lastSyncEndIndex = null;
+
             scope.positionSyncHelpers = function(startIndex, endIndex) {
+                if(startIndex === undefined) {
+                    startIndex = lastSyncStartIndex;
+                }
+                if(endIndex === undefined) {
+                    endIndex = lastSyncEndIndex;
+                }
+                var startTop = null;
+                var endTop = null;
                 if(startIndex !== null) {
-                    startHelper.css('top', getSubtitleTop(startIndex) + 'px');
+                    startTop = getSubtitleTop(startIndex);
+                }
+                if(endIndex !== null) {
+                    endTop = getSubtitleTop(endIndex);
+                }
+                if(startTop !== null) {
+                    startHelper.css('top', startTop + 'px');
                     startHelper.show();
                 } else {
                     startHelper.hide();
                 }
-                if(endIndex !== null) {
-                    endHelper.css('top', getSubtitleTop(endIndex) + 'px');
+                if(endTop !== null) {
+                    endHelper.css('top', endTop + 'px');
                     endHelper.show();
                 } else {
                     endHelper.hide();
                 }
+                lastSyncStartIndex = startIndex;
+                lastSyncEndIndex = endIndex;
             }
         }
     });
@@ -117,6 +140,10 @@ var USER_IDLE_MINUTES = 5;
                         }
 
                     });
+                }
+
+                if(scope.isWorkingSubtitles()) {
+                    scope.positionSyncHelpers();
                 }
             });
             scope.nthChildScope = function(index) {
