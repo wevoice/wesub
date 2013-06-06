@@ -43,6 +43,29 @@ function markdownToHTML(text) {
     return text;
 };
 
+function emptyDFXP() {
+    /* Get a DFXP string for an empty subtitle set */
+    return '<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en">\
+    <head>\
+        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">\
+            <ttm:title/>\
+            <ttm:description/>\
+            <ttm:copyright/>\
+        </metadata>\
+        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>\
+        </styling>\
+        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>\
+        </layout>\
+    </head>\
+    <body region="amara-subtitle-area">\
+        <div></div>\
+    </body>\
+</tt>';
+};
+
+
 var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
@@ -1126,6 +1149,9 @@ SubtitleList.prototype.contentForMarkdown = function(markdown) {
 }
 
 SubtitleList.prototype.loadXML = function(subtitlesXML) {
+    if(subtitlesXML === null) {
+        subtitlesXML = emptyDFXP();
+    }
     this.parser.init(subtitlesXML);
     var syncedSubs = [];
     var unsyncedSubs = [];
@@ -1317,7 +1343,7 @@ SubtitleList.prototype.indexOfFirstSubtitleAfter = function(time) {
     var left = 0;
     var right = this.syncedCount-1;
     // First check that we are going to find any subtitle
-    if(this.length() == 0 || this.subtitles[right].endTime <= time) {
+    if(right < 0 || this.subtitles[right].endTime <= time) {
         return -1;
     }
     // Now do the binary search

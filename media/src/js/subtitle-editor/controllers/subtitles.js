@@ -60,6 +60,10 @@ var angular = angular || null;
             if (isNaN(parseInt(versionNumber))) {
                 // No version number given, select the last version (AKA first
                 // verison in the dropdown)
+                if($scope.versions.length == 0) {
+                    $scope.versionNumber = null;
+                    return;
+                }
                 versionNumber = $scope.versions[0].version_no;
             }
 
@@ -314,7 +318,7 @@ var angular = angular || null;
          * @constructor
          */
 
-        var willSync = null;
+        var willSync = {start: null, end:null};
 
         function subtitlesAddedOrRemoved() {
             $scope.$root.$emit('work-done');
@@ -385,6 +389,20 @@ var angular = angular || null;
                 $scope.subtitleList.loadXML(subtitleData.subtitlesXML);
                 $scope.status = 'ready';
             }
+
+            // When we have subtitles for an editable set, emit it.
+            if ($scope.isWorkingSubtitles()) {
+                $scope.$root.workingSubtitles = $scope;
+                $scope.$root.$emit('subtitles-fetched');
+            }
+        };
+        $scope.initEmptySubtitles = function() {
+            // Save subtitle data to this scope
+            $scope.videoTitle = '';
+            $scope.videoDescription = '';
+
+            $scope.subtitleList.loadXML(null);
+            $scope.status = 'ready';
 
             // When we have subtitles for an editable set, emit it.
             if ($scope.isWorkingSubtitles()) {

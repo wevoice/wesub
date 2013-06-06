@@ -96,6 +96,8 @@ var USER_IDLE_MINUTES = 5;
                 scope.setLanguageCode(attrs.languageCode);
                 if(attrs.versionNumber != "") {
                     scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+                } else {
+                    scope.initEmptySubtitles();
                 }
             }
 
