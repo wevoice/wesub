@@ -50,21 +50,8 @@ var angular = angular || null;
         }
 
         function regainLock() {
-            LockService.regainLock($scope.videoId, $scope.languageCode)
-                .then(function onSuccess(response) {
-                if (response.data.ok) {
-                    minutesIdle = 0;
-                    $scope.$root.$emit('hide-modal');
-                    startRegainLockTimer();
-                    startUserIdleTimer();
-                } else {
-                    window.alert("Sorry, could not restart your session.");
-                    window.location = '/videos/' + $scope.videoId + "/";
-                }
-            }, function onError() {
-                window.alert("Sorry, could not restart your session.");
-                window.location = '/videos/' + $scope.videoId + "/";
-            });
+            return LockService.regainLock($scope.videoId,
+                    $scope.languageCode);
         }
 
         function startUserIdleTimer() {
@@ -91,6 +78,23 @@ var angular = angular || null;
             regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
 
         }
+
+        function regainLockAfterIdle() {
+            regainLock().then(function onSuccess(response) {
+                if (response.data.ok) {
+                    minutesIdle = 0;
+                    $scope.$root.$emit('hide-modal');
+                    startRegainLockTimer();
+                    startUserIdleTimer();
+                } else {
+                    window.alert("Sorry, could not restart your session.");
+                    window.location = '/videos/' + $scope.videoId + "/";
+                }
+            }, function onError() {
+                window.alert("Sorry, could not restart your session.");
+                window.location = '/videos/' + $scope.videoId + "/";
+            });
+        }
         function showIdleModal() {
 
             var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
@@ -115,7 +119,7 @@ var angular = angular || null;
                                     $timeout.cancel(closeSessionTimeout);
                                 }
 
-                                regainLock();
+                                regainLockAfterIdle();
                             }},
                             {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
                                 $scope.$root.$emit('show-modal-download');
@@ -142,7 +146,7 @@ var angular = angular || null;
                             $timeout.cancel(closeSessionTimeout);
                         }
 
-                        regainLock();
+                        regainLockAfterIdle();
                     }}
                 ]
             });
