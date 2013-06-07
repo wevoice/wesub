@@ -355,6 +355,13 @@ var angular = angular || null;
             $scope.changesMade = true;
         });
 
+        window.onbeforeunload = function() {
+            if($scope.changesMade) {
+              return "You have unsaved work";
+            } else {
+              return null;
+            }
+        };
     };
 
     var SubtitleListController = function($window, $scope, $timeout, SubtitleStorage) {
