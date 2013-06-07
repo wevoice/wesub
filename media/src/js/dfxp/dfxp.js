@@ -1083,24 +1083,20 @@ var AmaraDFXPParser = function() {
 
 };
 
-var SubtitleItem = function(node, id, startTime, endTime, markdown) {
-    /* Subtitle element in SubtitleList.
+function Subtitle(startTime, endTime, markdown) {
+    /* Represents a subtitle in our system
      *
-     * SubtitleItem has the following properties:
+     * Subtitle has the following properties:
      *   - startTime -- start time in seconds
      *   - endTime -- end time in seconds
      *   - markdown -- subtitle content in our markdown-style format
-     *   - node -- DOM node from the DFXP XML
-     *   - id -- unique string to identify this item in the list
      */
-    this.node = node;
-    this.id = id;
     this.startTime = startTime;
     this.endTime = endTime;
     this.markdown = markdown;
 }
 
-SubtitleItem.prototype.duration = function() {
+Subtitle.prototype.duration = function() {
     if(this.isSynced()) {
         return this.endTime - this.startTime;
     } else {
@@ -1108,20 +1104,20 @@ SubtitleItem.prototype.duration = function() {
     }
 }
 
-SubtitleItem.prototype.content = function() {
+Subtitle.prototype.content = function() {
     /* Get the content of this subtitle as HTML */
     return markdownToHTML(this.markdown);
 }
 
-SubtitleItem.prototype.isEmpty = function() {
+Subtitle.prototype.isEmpty = function() {
     return this.markdown == '';
 }
 
-SubtitleItem.prototype.characterCount = function() {
+Subtitle.prototype.characterCount = function() {
     return markdownToPlaintext(this.markdown).length;
 }
 
-SubtitleItem.prototype.characterRate = function() {
+Subtitle.prototype.characterRate = function() {
     if(this.isSynced()) {
         return (this.characterCount() * 1000 / this.duration()).toFixed(1);
     } else {
@@ -1129,11 +1125,11 @@ SubtitleItem.prototype.characterRate = function() {
     }
 }
 
-SubtitleItem.prototype.lineCount = function() {
+Subtitle.prototype.lineCount = function() {
     return this.markdown.split("\n").length;
 }
 
-SubtitleItem.prototype.characterCountPerLine = function() {
+Subtitle.prototype.characterCountPerLine = function() {
     var lines = this.markdown.split("\n");
     var counts = [];
     for(var i = 0; i < lines.length; i++) {
@@ -1143,15 +1139,15 @@ SubtitleItem.prototype.characterCountPerLine = function() {
     
 }
 
-SubtitleItem.prototype.isSynced = function() {
+Subtitle.prototype.isSynced = function() {
     return this.startTime >= 0 && this.endTime >= 0;
 }
 
-SubtitleItem.prototype.isAt = function(time) {
+Subtitle.prototype.isAt = function(time) {
     return this.isSynced() && this.startTime <= time && this.endTime > time;
 }
 
-SubtitleItem.prototype.startTimeSeconds = function() {
+Subtitle.prototype.startTimeSeconds = function() {
     if(this.startTime >= 0) {
         return this.startTime / 1000;
     } else {
@@ -1159,13 +1155,46 @@ SubtitleItem.prototype.startTimeSeconds = function() {
     }
 }
 
-SubtitleItem.prototype.endTimeSeconds = function() {
+Subtitle.prototype.endTimeSeconds = function() {
     if(this.endTime >= 0) {
         return this.endTime / 1000;
     } else {
         return -1;
     }
 }
+
+function StoredSubtitle(parser, node, id) {
+    /* Subtitle stored in a SubtitleList
+     *
+     * You should never change the proporties on a stored subtitle directly.
+     * Instead use the updateSubtitleContent() and updateSubtitleTime()
+     * methods of SubtitleList.
+     *
+     * If you want a subtitle object that you can change the times/content
+     * without saving them to the DFXP store, use the draftSubtitle() method
+     * to get a DraftSubtitle.
+     * */
+    Subtitle.call(this, parser.startTime(node), parser.endTime(node),
+            parser.dfxpToMarkdown(node, true));
+    this.node = node;
+    this.id = id;
+}
+
+StoredSubtitle.prototype = Object.create(Subtitle.prototype);
+StoredSubtitle.prototype.draftSubtitle = function() {
+    return new DraftSubtitle(this);
+}
+StoredSubtitle.prototype.isDraft = false;
+
+function DraftSubtitle(storedSubtitle) {
+    /* Subtitle that we are currently changing */
+    Subtitle.call(this, storedSubtitle.startTime, storedSubtitle.endTime,
+            storedSubtitle.markdown);
+    this.storedSubtitle = storedSubtitle;
+}
+
+DraftSubtitle.prototype = Object.create(Subtitle.prototype);
+StoredSubtitle.prototype.isDraft = true;
 
 var SubtitleList = function() {
     /*
@@ -1220,10 +1249,7 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
 SubtitleList.prototype.makeItem = function(node) {
     var idKey = (this.idCounter++).toString(16);
 
-    return new SubtitleItem(node, idKey,
-            this.parser.startTime(node),
-            this.parser.endTime(node),
-            this.parser.dfxpToMarkdown(node, true));
+    return new StoredSubtitle(this.parser, node, idKey);
 }
 
 SubtitleList.prototype.length = function() {
@@ -1403,7 +1429,7 @@ SubtitleList.prototype.indexOfFirstSubtitleAfter = function(time) {
 SubtitleList.prototype.subtitleAt = function(time) {
     /* Find the subtitle that occupies a given time.
      *
-     * returns a SubtitleItem, or null if no subtitle occupies the time.
+     * returns a StoredSubtitle, or null if no subtitle occupies the time.
      */
     var i = this.indexOfFirstSubtitleAfter(time);
     if(i == -1) {

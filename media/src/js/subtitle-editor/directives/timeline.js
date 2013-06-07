@@ -259,18 +259,18 @@ var angular = angular || null;
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
                 }
-                if(subtitle !== unsyncedSubtitle) {
-                    var realSubtitle = subtitle;
+                if(!subtitle.isDraft) {
+                    var storedSubtitle = subtitle;
                 } else {
-                    var realSubtitle = subtitle.realSubtitle;
+                    var storedSubtitle = subtitle.storedSubtitle;
                 }
-                var nextSubtitle = subtitleList().nextSubtitle(realSubtitle);
+                var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
                 if(nextSubtitle && nextSubtitle.isSynced()) {
                     context.maxEndTime = nextSubtitle.startTime;
                 } else {
                     context.maxEndTime = scope.duration;
                 }
-                var prevSubtitle = subtitleList().prevSubtitle(realSubtitle);
+                var prevSubtitle = subtitleList().prevSubtitle(storedSubtitle);
                 if(prevSubtitle) {
                     context.minStartTime = prevSubtitle.endTime;
                 } else {
@@ -289,7 +289,7 @@ var angular = angular || null;
                     placeSubtitle(context.startTime, context.endTime, div);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
-                    subtitleList().updateSubtitleTime(realSubtitle,
+                    subtitleList().updateSubtitleTime(storedSubtitle,
                         context.startTime, context.endTime);
                     scope.$root.$emit("work-done");
                     scope.$root.$digest();
@@ -401,27 +401,19 @@ var angular = angular || null;
                     // the end of the timeline.
                     return null;
                 }
+
+                // Okay, we have an unsynced subtitle to use.  Make a draft
+                // version since we are want to adjust the start/end times
+                // before we actuall have that data saved
+                var draft = unsynced.draftSubtitle();
                 if(unsynced.startTime < 0) {
-                    var startTime = scope.currentTime;
-                    var endTime = scope.currentTime + DEFAULT_DURATION;
+                    draft.startTime = scope.currentTime;
+                    draft.endTime = scope.currentTime + DEFAULT_DURATION;
                 } else {
-                    var startTime = unsynced.startTime;
-                    var endTime = Math.max(scope.currentTime,
+                    draft.endTime = Math.max(scope.currentTime,
                             unsynced.startTime + MIN_DURATION);
                 }
-                // Make a fake subtitle to show on the timeline.
-                return {
-                    realSubtitle: unsynced,
-                    id: unsynced.id,
-                    startTime: startTime,
-                    endTime: endTime,
-                    isAt: function(time) {
-                        return startTime <= time && time < endTime;
-                    },
-                    duration: function() { return endTime - startTime; },
-                    content: function() { return unsynced.content() },
-                    isSynced: function() { return false; }
-                };
+                return draft;
             }
 
             function checkShownSubtitle() {
@@ -436,7 +428,7 @@ var angular = angular || null;
                         scope.currentTime);
                 if(shownSubtitle === null && unsyncedSubtitle !== null &&
                         unsyncedSubtitle.startTime <= scope.currentTime) {
-                    shownSubtitle = unsyncedSubtitle.realSubtitle;
+                    shownSubtitle = unsyncedSubtitle.storedSubtitle;
                 }
                 if(shownSubtitle != scope.subtitle) {
                     scope.subtitle = shownSubtitle;
