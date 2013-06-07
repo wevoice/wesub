@@ -64,20 +64,28 @@
 
         function updateTime() {
             var newTime = VideoPlayer.currentTime();
-            $scope.currentTime = newTime;
             // On the youtube player, popcorn only updates the time every 250
             // ms, which is not enough granularity for our animation.  Try to
             // get more granularity by starting a timer of our own.
-            if(VideoPlayer.isPlaying() && lastTimeReturned === newTime) {
-                var timePassed = Date.now() - lastTimeReturnedAt;
-                // If lots of time has bassed since the last new time, it's
-                // possible that the video is slowing down for some reason.
-                // Don't adjust the time too much.
-                timePassed = Math.min(timePassed, 250);
-                $scope.currentTime = newTime + timePassed;
+            if(VideoPlayer.isPlaying()) {
+                if(lastTimeReturned === newTime) {
+                    var timePassed = Date.now() - lastTimeReturnedAt;
+                    // If lots of time has bassed since the last new time, it's
+                    // possible that the video is slowing down for some reason.
+                    // Don't adjust the time too much.
+                    timePassed = Math.min(timePassed, 500);
+                    $scope.currentTime = newTime + timePassed;
+                } else {
+                    $scope.currentTime = newTime;
+                    lastTimeReturnedAt = Date.now();
+                    lastTimeReturned = newTime;
+                }
+            } else {
+                $scope.currentTime = newTime;
+                // Unset lastTimeReturned and lastTimeReturnedAt, we don't
+                // want to tweak the time when the video is paused
+                lastTimeReturned = lastTimeReturnedAt = null;
             }
-            lastTimeReturned = newTime;
-            lastTimeReturnedAt = Date.now();
 
             // If we adjust the time with the code above, then get a new time
             // from popcorn, it's possible that the time given will be less
