@@ -291,9 +291,7 @@ unisubs.RightPanel.prototype.createSaveAndOpenInNewEditor = function(stepsDiv) {
    // If this subtitle version was created from a base language that was forked from a
     // translation, we need to display a link to get into the new editor so that the user
     // can compare these captions to captions of other languages.
-    if (this.serverModel_.captionSet_.languageWasForked ||
-        this.serverModel_.captionSet_.wasForkedDuringEdits() &&
-        !this.saveAndOpenInNewEditor) {
+    if (!this.saveAndOpenInNewEditor) {
 
         var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
         var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
