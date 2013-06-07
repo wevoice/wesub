@@ -42,8 +42,14 @@ class EditorPage(UnisubsPage):
     _VIDEO_LANG = "section.video span.subtitles-language"
 
     _EMBEDDED_VIDEO = "div#video"
-    _VIDEO_SUBTITLE = 'div.amara-popcorn-subtitles div'
+    _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
     _WORKING_LANGUAGE = 'section.center div.subtitles-language'
+    _REMOVE_SUBTITLE = 'a.remove-subtitle'
+    _ADD_SUBTITLE = 'a.add-subtitle'
+    _SYNC_HELP = 'div.sync-help'
+    _INFO_TRAY = 'div.info-tray'
+    _INFO_DETAILS = 'div.info-tray tr td'
+    _ADD_SUB_TO_END = 'a.end'
 
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
@@ -65,36 +71,53 @@ class EditorPage(UnisubsPage):
         pass
 
     def default_ref_language(self):
+        """return the value for the default reference language. """
+
         return self.get_element_attribute(self._REFERENCE_SELECT, 
                                         'initial-language-code')
 
     def default_ref_version(self):
+        """Return the value for the default reference version. """
+
         return self.get_element_attribute(self._REFERENCE_SELECT, 
                                         'initial-version-number')
 
     def selected_ref_language(self):
+        """Return the currently selected reference language. """
+
         return self.get_text_by_css(self._REFERENCE_SELECT + (' option'
                                     '[selected="selected"]'))
 
     def selected_ref_version(self):
+        """Return the currently selected reference version number. """
+
         return self.get_text_by_css(self._VERSION_SELECT + (' option'
                                     '[selected="selected"]'))
 
     def select_ref_language(self, language):
+        """Choose a reference language from the list. """
+
         self.select_option_by_text(self._REFERENCE_SELECT, language)
         time.sleep(2)
 
     def select_ref_version(self, version_no):
+        """Choose a reference version from the list. """
+
         self.select_option_by_text(self._VERSION_SELECT, version_no)
 
     def sub_overlayed_text(self):
+        """Return the text overlayed on the video. """
+
         self.wait_for_element_present(self._VIDEO_SUBTITLE, wait_time=20)
         return self.get_text_by_css(self._VIDEO_SUBTITLE)
 
     def save_disabled(self):
+        """Return whether the Save button is disabled. """
+
         return ('disabled' in self.get_element_attribute(self._SAVE, 'class'))
 
     def reference_text(self):
+        """Return the list of subtitles for the reference language."""
         els = self.get_elements_list(' '.join([self._REFERENCE_LIST, 
                                                  self._SUB_TEXT]))
         subs = []
@@ -104,33 +127,86 @@ class EditorPage(UnisubsPage):
 
 
     def working_language(self):
+        """Return the curren working language displayed. """
+
         return self.get_text_by_css(self._WORKING_LANGUAGE)
 
     def working_text(self, position=None):
+        """Return the list of working subtitles. 
+
+        If position is supplied, just return that line of text.
+        """
+
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
                                                self._SUBTITLE_ITEM, 
                                                self._SUB_TEXT]))
-        subs = []
-        for el in els:
-            subs.append(el.text)
         if position:
-            return subs[position]
+            return els[position].text
         else:
+            subs = []
+            for el in els:
+                subs.append(el.text)
             return subs
 
 
     def video_title(self):
+        """Return the text displayed for the video title. """
+
         return self.get_text_by_css(self._VIDEO_TITLE)
 
     def click_working_sub_line(self, position):
+        """Click in a sublie of the working text. """
+
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
-                                               self._SUBTITLE_ITEM,
-                                               self._SUB_TEXT]))
-        sub_text = els[position].text
-        els[position].click()
-        return sub_text
+                                               self._SUBTITLE_ITEM]))
+
+        try:
+            subline = els[position].find_element_by_css_selector(self._SUB_TEXT)
+        except:
+            self.record_error('subtitle text element not found')
+
+        sub_text = subline.text
+        subline.click()
+        return sub_text, els[position]
+
+    def remove_active_subtitle(self, position):
+        """Click on a subtitle and delete it. """
+
+        removed_text, el = self.click_working_sub_line(position)
+        try:
+            rem = el.find_element_by_css_selector(self._REMOVE_SUBTITLE)
+        except:
+            self.record_error('remove button not found')
+        rem.click()
+        return removed_text
+
+    def add_subs_to_the_end(self, subs):
+        """Click Add subtitles at the end and add new lines"""
+        
+        self.browser.execute_script("window.location.hash='add-sub-at-end'")
+        self.click_by_css(self._ADD_SUB_TO_END)
+        for line in subs:
+            els = self.browser.find_elements_by_css_selector(' '.join(
+                    [self._WORKING_LIST, self._SUBTITLE_ITEM, 'textarea']))
+            el = els[-1]
+            el.send_keys(line + '\n')
 
     def exit_to_full_editor(self):
+        """Click exit and return to the full editor. """
+
         self.click_by_css(self._EXIT)
         self.click_by_css(self._BACK_TO_FULL)
+
+    def subtitle_info(self, position):
+        """Return the info tray values of the selected subtitle. """
+        
+        self.click_working_sub_line(position)
+        self.wait_for_element_visible(self._INFO_TRAY)
+        fields = ['start', 'stop', 'char_count', 'char_rate']
+        els = self.get_elements_list(self._INFO_DETAILS)
+        values = []
+        for el in els:
+            values.append(el.text)
+        return dict(zip(fields, values))
+        
 

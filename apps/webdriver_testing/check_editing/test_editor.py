@@ -120,13 +120,29 @@ class TestCaseCenter(WebdriverTestCase):
         cls.video_pg.open_page('videos/watch/')
         cls.video_pg.log_in(cls.user, 'password')
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/subeditor.png')
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        sub_text = self.editor_pg.click_working_sub_line(3)
+        sub_text, _ = self.editor_pg.click_working_sub_line(3)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
+
+    def test_remove_active_subtitle(self):
+        """Remove the selected subtitle line.
+ 
+        from i2441
+        """
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        subtext = self.editor_pg.working_text()
+        removed_text = self.editor_pg.remove_active_subtitle(2)
+        self.assertEqual(subtext[2], removed_text)
+        subtext = self.editor_pg.working_text()
+        self.assertNotEqual(subtext[2], removed_text)
+        
 
     def test_working_language(self):
         video = Video.objects.all()[0]
@@ -141,4 +157,30 @@ class TestCaseCenter(WebdriverTestCase):
         self.assertEqual(u'English \u2022 Open Source Philosophy',
                          self.editor_pg.video_title())
 
+
+    def test_info_tray(self):
+        """Info tray displays start, stop, char count, chars/second."""
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        sub_info = (self.editor_pg.subtitle_info(3))
+        self.assertEqual('9,24', sub_info['start'], 
+                         'start time is not expected value')
+        self.assertEqual('12,83', sub_info['stop'], 
+                         'stop time is not expected value')
+        self.assertEqual('70', sub_info['char_count'], 
+                         'character count is not expected value')
+        self.assertEqual('19.5', sub_info['char_rate'], 
+                         'character rate is not expected value')
+
+    def test_add_lines_to_end(self):
+        """Add sub to the end of the subtitle list, enter adds new active sub."""
+
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'tr')
+
+        subs = ['third to last', 'pentulitmate subtitle', 'THE END']
+        self.editor_pg.add_subs_to_the_end(subs)
+        new_subs = self.editor_pg.working_text()[-4:]
+        subs.append('')
+        self.assertEqual(subs, new_subs)
 
