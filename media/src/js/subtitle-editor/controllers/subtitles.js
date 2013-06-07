@@ -336,6 +336,7 @@ var angular = angular || null;
             $scope.positionSyncHelpers(startIndex, endIndex);
         }
 
+        $scope.infoTray = {};
         $scope.subtitleList = new dfxp.SubtitleList();
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
@@ -428,6 +429,15 @@ var angular = angular || null;
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };
+        $scope.infoTrayLineCounts = function() {
+            if(!$scope.infoTray.subtitle ||
+               $scope.infoTray.subtitle.lineCount() < 2) {
+                // Only show the line counts if there are 2 or more lines
+               return null;
+           } else {
+               return $scope.infoTray.subtitle.characterCountPerLine();
+           }
+        }
 
         $('div.subtitles').height($scope.getSubtitleListHeight());
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {

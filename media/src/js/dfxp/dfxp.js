@@ -43,6 +43,27 @@ function markdownToHTML(text) {
     return text;
 };
 
+function markdownToPlaintext(text) {
+    /*
+     * Convert text to Markdown-style to plain text
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "$2" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" },
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
 function emptyDFXP() {
     /* Get a DFXP string for an empty subtitle set */
     return '<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en">\
@@ -1097,8 +1118,29 @@ SubtitleItem.prototype.isEmpty = function() {
 }
 
 SubtitleItem.prototype.characterCount = function() {
-    // FIXME: We should not count markup characters in this count
-    return this.markdown.length;
+    return markdownToPlaintext(this.markdown).length;
+}
+
+SubtitleItem.prototype.characterRate = function() {
+    if(this.isSynced()) {
+        return (this.characterCount() * 1000 / this.duration()).toFixed(1);
+    } else {
+        return "0.0";
+    }
+}
+
+SubtitleItem.prototype.lineCount = function() {
+    return this.markdown.split("\n").length;
+}
+
+SubtitleItem.prototype.characterCountPerLine = function() {
+    var lines = this.markdown.split("\n");
+    var counts = [];
+    for(var i = 0; i < lines.length; i++) {
+        counts.push(markdownToPlaintext(lines[i]).length);
+    }
+    return counts;
+    
 }
 
 SubtitleItem.prototype.isSynced = function() {

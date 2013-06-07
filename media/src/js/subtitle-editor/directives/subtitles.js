@@ -59,6 +59,7 @@ var USER_IDLE_MINUTES = 5;
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
+            var infoTray = $('div.info-tray', elem);
             var subtitleList = $('.subtitles ul', elem);
             var wrapper = $(elem);
 
@@ -104,7 +105,17 @@ var USER_IDLE_MINUTES = 5;
                 lastSyncStartIndex = startIndex;
                 lastSyncEndIndex = endIndex;
             }
-        }
+
+            scope.positionInfoTray = function() {
+                var li = scope.infoTray.LI
+                if(li) {
+                    var top = li.offset().top - wrapper.offset().top;
+                    infoTray.css('top', top + 'px');
+                }
+            }
+
+            scope.$watch("infoTray.LI", scope.positionInfoTray);
+        };
     });
 
     directives.directive('subtitleList', function(SubtitleListFinder) {
@@ -144,6 +155,7 @@ var USER_IDLE_MINUTES = 5;
 
                 if(scope.isWorkingSubtitles()) {
                     scope.positionSyncHelpers();
+                    scope.positionInfoTray();
                 }
             });
             scope.nthChildScope = function(index) {
@@ -195,11 +207,14 @@ var USER_IDLE_MINUTES = 5;
                 // set line-height to 0 because we don't want the whitespace
                 // inside the element to add extra space below the textarea
                 elem.css('line-height', '0');
+                scope.infoTray.LI = elem;
+                scope.infoTray.subtitle = scope.subtitle;
             }
 
             scope.hideTextArea = function() {
                 textarea.hide();
                 elem.css('line-height', '');
+                scope.infoTray.subtitle = scope.infoTray.LI = null;
             }
 
             textarea.autosize();

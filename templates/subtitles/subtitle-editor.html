@@ -218,6 +218,31 @@
                     </span>
                     <div class="text">Begin now</div>
                 </div>
+                <div class="info-tray" ng-show="infoTray.subtitle">
+                    <table>
+                        <tr>
+                            <th>Start</th>
+                            <td><em>[[ infoTray.subtitle.startTime|displayTime ]]</em></td>
+                        </tr>
+                        <tr>
+                            <th>End</th>
+                            <td><em>[[ infoTray.subtitle.endTime|displayTime ]]</em></td>
+                        </tr>
+                        <tr>
+                            <th>Characters</th>
+                            <td>[[ infoTray.subtitle.characterCount() ]]</td>
+                        </tr>
+                        <tr class="child"
+                            ng-repeat="count in infoTrayLineCounts()">
+                            <th>Line [[ $index + 1 ]]</td>
+                            <td>[[ count ]]
+                        </tr>
+                        <tr class="char-rate" ng-show="infoTray.subtitle.isSynced()">
+                            <th>Chars/sec</th>
+                            <td>[[ infoTray.subtitle.characterRate() ]]</td>
+                        </tr>
+                    </table>
+                </div>
 
                 <div class="working subtitles">
                     <ul subtitle-list="working-subtitle-set"
