@@ -235,6 +235,7 @@ var USER_IDLE_MINUTES = 5;
                 } else {
                     var caretPos = initialText.length;
                 }
+                textarea.autosize();
                 textarea.val(initialText).trigger('autosize');
                 textarea.show();
                 textarea.focus();
@@ -261,7 +262,6 @@ var USER_IDLE_MINUTES = 5;
                 elem.css('line-height', '');
             }
 
-            textarea.autosize();
             textarea.on('keydown', function(evt) {
                 scope.$apply(function() {
                     if (evt.keyCode === 13 && !evt.shiftKey) {
