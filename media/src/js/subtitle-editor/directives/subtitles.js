@@ -140,8 +140,10 @@ var USER_IDLE_MINUTES = 5;
             if(attrs.languageCode != "") {
                 scope.setLanguageCode(attrs.languageCode);
                 if(attrs.versionNumber != "") {
+                    scope.versionNumber = parseInt(attrs.versionNumber);
                     scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
                 } else {
+                    scope.versionNumber = null;
                     scope.initEmptySubtitles();
                 }
             }

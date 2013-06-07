@@ -171,10 +171,9 @@ var angular = angular || null;
                                          SubtitleStorage, OldEditorConfig) {
 
         $scope.changesMade = false;
+        $scope.nextVersionNumber = null;
         $scope.discard = function() {
-
-            $scope.showCloseModal();
-
+            $scope.showCloseModal(false);
         };
         $scope.getNotes = function() {
             var collabScope = angular.element($('section.collab').get(0)).scope();
@@ -211,9 +210,8 @@ var angular = angular || null;
             }
 
             $scope.saveSession().then(function(versionNumber) {
-                if ($scope.status === 'saved') {
-                    $scope.showCloseModal();
-                }
+                $scope.nextVersionNumber = versionNumber;
+                $scope.showCloseModal(true);
             });
         };
         $scope.saveAndSendBack = function() {
@@ -285,9 +283,26 @@ var angular = angular || null;
                 $scope.dialogURL = oldEditorURL;
             }
         };
-        $scope.showCloseModal = function() {
+        function resumeEditing() {
+            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
+            $scope.status = '';
+            subtitleListScope.versionNumber = $scope.nextVersionNumber;
+            $scope.nextVersionNumber = null;
+        }
+        $scope.showCloseModal = function(allowResume) {
 
             var buttons = [];
+
+            if (allowResume && $scope.nextVersionNumber)  {
+                buttons.push({
+                    text: 'Resume editing',
+                    class: 'yes',
+                    fn: function() {
+                        $scope.$root.$emit('hide-modal');
+                        resumeEditing();
+                    },
+                });
+            }
 
             if ($scope.fromOldEditor) {
                 buttons.push({
@@ -314,7 +329,7 @@ var angular = angular || null;
             }
 
             if($scope.status === 'saved') {
-                var heading = 'Your changes have been saved.';
+                var heading = "You've saved a new revision!";
             } else if($scope.changesMade) {
                 var heading = 'Your changes will be discarded.';
             } else {
