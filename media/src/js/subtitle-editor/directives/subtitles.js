@@ -110,7 +110,12 @@ var USER_IDLE_MINUTES = 5;
                 var li = scope.currentEdit.LI;
                 if(li) {
                     var top = li.offset().top - wrapper.offset().top;
-                    infoTray.css('top', top + 'px');
+                    if(top >= 0 && top < wrapper.height()) {
+                        infoTray.css('top', top + 'px');
+                        infoTray.show();
+                    } else {
+                        infoTray.hide();
+                    }
                 }
             }
 
