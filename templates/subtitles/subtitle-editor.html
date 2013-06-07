@@ -218,28 +218,28 @@
                     </span>
                     <div class="text">Begin now</div>
                 </div>
-                <div class="info-tray" ng-show="infoTray.subtitle">
+                <div class="info-tray" ng-show="currentEdit.draft">
                     <table>
                         <tr>
                             <th>Start</th>
-                            <td><em>[[ infoTray.subtitle.startTime|displayTime ]]</em></td>
+                            <td><em>[[ currentEdit.draft.startTime|displayTime ]]</em></td>
                         </tr>
                         <tr>
                             <th>End</th>
-                            <td><em>[[ infoTray.subtitle.endTime|displayTime ]]</em></td>
+                            <td><em>[[ currentEdit.draft.endTime|displayTime ]]</em></td>
                         </tr>
                         <tr>
                             <th>Characters</th>
-                            <td>[[ infoTray.subtitle.characterCount() ]]</td>
+                            <td>[[ currentEdit.draft.characterCount() ]]</td>
                         </tr>
                         <tr class="child"
-                            ng-repeat="count in infoTrayLineCounts()">
+                            ng-repeat="count in currentEdit.lineCounts()">
                             <th>Line [[ $index + 1 ]]</td>
                             <td>[[ count ]]
                         </tr>
-                        <tr class="char-rate" ng-show="infoTray.subtitle.isSynced()">
+                        <tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
                             <th>Chars/sec</th>
-                            <td>[[ infoTray.subtitle.characterRate() ]]</td>
+                            <td>[[ currentEdit.draft.characterRate() ]]</td>
                         </tr>
                     </table>
                 </div>

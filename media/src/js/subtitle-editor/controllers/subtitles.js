@@ -24,6 +24,55 @@ var angular = angular || null;
     var _ = root._.noConflict();
     var $ = root.AmarajQuery;
 
+    /* CurrentEditManager manages in-progress edits for SubtitleListController
+     */
+    function CurrentEditManager() {
+        this.draft = null;
+        this.LI = null;
+    }
+
+    CurrentEditManager.prototype.start = function(subtitle, LI) {
+        this.draft = subtitle.draftSubtitle();
+        this.LI = LI;
+    }
+
+    CurrentEditManager.prototype.finish = function(commitChanges, subtitleList) {
+        var updateNeeded = (commitChanges && this.changed());
+        if(updateNeeded) {
+            subtitleList.updateSubtitleContent(this.draft.storedSubtitle,
+                    this.currentMarkdown());
+        }
+        this.draft = this.LI = null;
+        return updateNeeded;
+    }
+
+    CurrentEditManager.prototype.sourceMarkdown = function() {
+        return this.draft.storedSubtitle.markdown;
+    }
+
+    CurrentEditManager.prototype.currentMarkdown = function() {
+        return this.draft.markdown;
+    }
+
+    CurrentEditManager.prototype.changed = function() {
+        return this.sourceMarkdown() != this.currentMarkdown();
+    }
+
+    CurrentEditManager.prototype.update = function(markdown) {
+        if(this.draft !== null) {
+            this.draft.markdown = markdown;
+        }
+    }
+
+    CurrentEditManager.prototype.lineCounts = function() {
+        if(this.draft === null || this.draft.lineCount() < 2) {
+            // Only show the line counts if there are 2 or more lines
+           return null;
+       } else {
+           return this.draft.characterCountPerLine();
+       }
+    }
+
     var LanguageSelectorController = function($scope, SubtitleStorage, SubtitleListFinder) {
         /**
          * This controller is responsible for the language and version selector
@@ -308,6 +357,7 @@ var angular = angular || null;
         });
 
     };
+
     var SubtitleListController = function($window, $scope, $timeout, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
@@ -336,7 +386,7 @@ var angular = angular || null;
             $scope.positionSyncHelpers(startIndex, endIndex);
         }
 
-        $scope.infoTray = {};
+        $scope.currentEdit = new CurrentEditManager();
         $scope.subtitleList = new dfxp.SubtitleList();
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
@@ -429,15 +479,6 @@ var angular = angular || null;
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;
         };
-        $scope.infoTrayLineCounts = function() {
-            if(!$scope.infoTray.subtitle ||
-               $scope.infoTray.subtitle.lineCount() < 2) {
-                // Only show the line counts if there are 2 or more lines
-               return null;
-           } else {
-               return $scope.infoTray.subtitle.characterCountPerLine();
-           }
-        }
 
         $('div.subtitles').height($scope.getSubtitleListHeight());
         $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
@@ -474,7 +515,6 @@ var angular = angular || null;
          */
 
         $scope.empty = $scope.subtitle.isEmpty();
-        $scope.characterCount = $scope.subtitle.characterCount;
         $scope.isEditing = false;
         $scope.showStartTime = $scope.subtitle.startTime >= 0;
 
@@ -485,12 +525,9 @@ var angular = angular || null;
             // Tell the root scope that we're no longer editing, now.
             $scope.$root.$emit('editing-done', $scope);
 
-            if(commitChanges &&
-                    $scope.editText !== $scope.subtitle.markdown) {
-                $scope.subtitleList.updateSubtitleContent($scope.subtitle,
-                        $scope.editText);
+            if($scope.currentEdit.finish(commitChanges,
+                        $scope.subtitleList)) {
                 $scope.empty = $scope.subtitle.isEmpty();
-                $scope.characterCount = $scope.subtitle.characterCount();
                 $scope.$root.$emit('work-done');
             }
         };
@@ -499,7 +536,7 @@ var angular = angular || null;
         };
         $scope.startEditingMode = function(fromClick) {
             $scope.isEditing = true;
-            $scope.editText = $scope.subtitle.markdown;
+            $scope.currentEdit.start($scope.subtitle, $scope.LI);
             $scope.showTextArea(fromClick);
 
             // Tell the root scope that we're editing, now.

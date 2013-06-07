@@ -107,14 +107,14 @@ var USER_IDLE_MINUTES = 5;
             }
 
             scope.positionInfoTray = function() {
-                var li = scope.infoTray.LI
+                var li = scope.currentEdit.LI;
                 if(li) {
                     var top = li.offset().top - wrapper.offset().top;
                     infoTray.css('top', top + 'px');
                 }
             }
 
-            scope.$watch("infoTray.LI", scope.positionInfoTray);
+            scope.$watch("currentEdit.LI", scope.positionInfoTray);
         };
     });
 
@@ -173,6 +173,7 @@ var USER_IDLE_MINUTES = 5;
             var elem = $(elem);
             var textarea = $('textarea', elem);
 
+            scope.LI = elem;
             scope.nextScope = function() {
                 var next = elem.next();
                 if(next.length > 0) {
@@ -193,13 +194,15 @@ var USER_IDLE_MINUTES = 5;
                 }
             }
 
+
             scope.showTextArea = function(fromClick) {
+                var initialText = scope.currentEdit.sourceMarkdown();
                 if(fromClick) {
                     var caretPos = window.getSelection().anchorOffset;
                 } else {
-                    var caretPos = scope.editText.length;
+                    var caretPos = initialText.length;
                 }
-                textarea.val(scope.editText).trigger('autosize');
+                textarea.val(initialText).trigger('autosize');
                 textarea.show();
                 textarea.focus();
                 setCaretPosition(textarea.get(0), caretPos);
@@ -207,8 +210,6 @@ var USER_IDLE_MINUTES = 5;
                 // set line-height to 0 because we don't want the whitespace
                 // inside the element to add extra space below the textarea
                 elem.css('line-height', '0');
-                scope.infoTray.LI = elem;
-                scope.infoTray.subtitle = scope.subtitle;
                 $(document).on('mousedown.subtitle-edit', function(evt) {
                     var clicked = $(evt.target);
                     if(clicked[0] != textarea[0] &&
@@ -225,7 +226,6 @@ var USER_IDLE_MINUTES = 5;
                 textarea.hide();
                 $(document).off('mousedown.subtitle-edit');
                 elem.css('line-height', '');
-                scope.infoTray.subtitle = scope.infoTray.LI = null;
             }
 
             textarea.autosize();
@@ -268,11 +268,9 @@ var USER_IDLE_MINUTES = 5;
             });
             textarea.on('keyup', function(evt) {
                 scope.$apply(function() {
-                    // Update editText and emit the subtitle-edit event
-                    scope.editText = textarea.val();
-                    var content = scope.subtitleList.contentForMarkdown(
-                        scope.editText);
-                    scope.$root.$emit('subtitle-edit', content);
+                    scope.currentEdit.update(textarea.val());
+                    scope.$root.$emit('subtitle-edit',
+                        scope.currentEdit.currentMarkdown());
                 });
             });
         }
