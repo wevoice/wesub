@@ -514,10 +514,13 @@ var angular = angular || null;
 
             // Handle drag and drop.
             timelineDiv.on('mousedown', handleMouseDownInTimeline);
+            // Redraw the subtitles on window resize
             $(window).resize(function() {
                 containerWidth = container.width();
                 scope.redrawSubtitles();
             });
+            // Redraw them now as well
+            scope.redrawSubtitles();
         }
     });
 })(window.AmarajQuery);
