@@ -21,148 +21,42 @@
     var root = this;
     var $ = root.AmarajQuery;
 
-    var VideoController = function($scope, SubtitleStorage, $timeout) {
-        /**
-         * Responsible for initializing the video and all video controls.
-         * @param $scope
-         * @param SubtitleStorage
-         * @constructor
-         */
+    var VideoController = function($scope, VideoPlayer) {
+        $scope.overlayText = null;
+        $scope.showOverlay = false;
+        $scope.timelineOverlayText = null;
 
-        // The Popcorn instance.
-        //
-        // If this is a YouTube video, force controls.
-
-        var videoURLs = SubtitleStorage.getVideoURLs();
-
-        $scope.pop = window.Popcorn.smart('#video', videoURLs);
-        $scope.pop.controls(true);
-
-        // We have to broadcast this in a timeout to make sure the TimelineController has
-        // loaded and registered it's event listener, first.
-        //
-        // There most likely is a better way to do this.
-        $scope.pop.on('canplay', function() {
-            $scope.$root.$broadcast('video-ready', $scope.pop);
+        $scope.$root.$on('subtitle-edit', function($event, content) {
+            $scope.overlayText = content;
+            $scope.showOverlay = true;
         });
-        $scope.pop.on('timeupdate', function() {
-            $scope.$root.$broadcast('video-timechanged', $scope.pop);
-        });
-
-        $scope.playChunk = function(start, duration) {
-            // Play a specified amount of time in a video, beginning at 'start',
-            // and then pause.
-
-            // Pause the video, first.
-            $scope.pop.play();
-
-            // Remove any existing cues that may interfere.
-            $scope.removeAllTrackEvents();
-
-            if (start < 0) {
-                start = 0;
-            }
-
-            // Set the new start time.
-            $scope.pop.currentTime(start);
-
-            // Set a new cue to pause the video at the end of the chunk.
-            $scope.pop.cue(start + duration, function() {
-                $scope.pop.pause();
-            });
-
-            // Play the video.
-            $scope.pop.play();
-
-        };
-        $scope.removeAllTrackEvents = function() {
-
-            var trackEvents = $scope.pop.getTrackEvents();
-            for (var i = 0; i < trackEvents.length; i++) {
-                $scope.pop.removeTrackEvent(trackEvents[i].id);
-            }
-
-        };
-        $scope.togglePlay = function() {
-
-            // If the video is paused, play it.
-            if ($scope.pop.paused()) {
-                $scope.pop.play();
-
-            // Otherwise, pause it.
+        $scope.$root.$on('editing-done', function($event, content) {
+            if($scope.timelineOverlayText !== null) {
+                $scope.overlayText = $scope.timelineOverlayText;
             } else {
-                $scope.pop.pause();
+                $scope.showOverlay = false;
             }
-
-        };
-
-        $scope.updateSubtitleOverlay = function(parser, subtitle, value){
-           // Update the Popcorn subtitle instance's text.
-            $scope.pop.amarasubtitle(subtitle.$id, {
-                text: parser.markdownToHTML(value)
-            });
-        }
-        $scope.$root.$on('subtitle-key-up', function($event, options) {
-            $scope.updateSubtitleOverlay(options.subtitle.parser,
-                                         options.subtitle,
-                                         options.value)
-
-
-        });
-        $scope.$root.$on('subtitle-ready', function($event, subtitle) {
-            // When a subtitle is ready, we need to create a Popcorn subtitle bound to the
-            // video's Popcorn instance.
-
-            var parser = subtitle.parser;
-
-            var text = subtitle.parser.markdownToHTML($(subtitle.subtitle).text());
-            var endTimeSeconds = parser.endTime(subtitle.subtitle) / 1000;
-            var startTimeSeconds = parser.startTime(subtitle.subtitle) / 1000;
-
-            // Create the amarasubtitle instance.
-            $scope.pop.amarasubtitle(subtitle.$id, {
-                end:   endTimeSeconds,
-                start: startTimeSeconds,
-                text:  text
-            });
-
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
 
-            var parser = scope.parser;
-            var startTimeSeconds = parser.startTime(scope.subtitle) / 1000;
-            var endTimeSeconds = parser.endTime(scope.subtitle) / 1000;
-            if (!isNaN(endTimeSeconds)){
-                $scope.playChunk(startTimeSeconds, endTimeSeconds- startTimeSeconds);
-            }else{
-            // If this video is not a Vimeo video, set the current time to
-            // the start of the subtitle.
-            //
-            // We don't do this for Vimeo videos because their player doesn't support
-            // fuzzy-scrubbing to precise keyframes.
-            if ($scope.pop.video._util.type !== 'Vimeo') {
-                $scope.pop.currentTime(startTimeSeconds);
+            if(scope.subtitle.isSynced()) {
+                VideoPlayer.playChunk(scope.startTime, scope.duration());
             }
-
+            $scope.overlayText = scope.subtitle.content();
+            $scope.showOverlay = true;
+        });
+        $scope.$root.$on('timeline-subtitle-shown', function(evt, subtitle) {
+            if(subtitle !== null) {
+                $scope.overlayText = subtitle.content();
+                $scope.showOverlay = true;
+                $scope.timelineOverlayText = $scope.overlayText;
+            } else {
+                $scope.showOverlay = false;
+                $scope.timelineOverlayText = null;
             }
-
-            $scope.updateSubtitleOverlay(parser, scope.subtitle, parser.content(scope.subtitle));
         });
 
     };
-    var VideoTitleController = function($scope, SubtitleListFinder) {
-
-        $scope.$root.$on('subtitles-fetched', function($event) {
-
-            // Reference the actual scope in the template so we can get automatic binding
-            // on the title and description.
-            $scope.workingSubtitles = SubtitleListFinder.get('working-subtitle-set').scope;
-
-        });
-
-    };
-
     root.VideoController = VideoController;
-    root.VideoTitleController = VideoTitleController;
 
 }).call(this);

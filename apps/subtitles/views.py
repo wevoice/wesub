@@ -81,7 +81,7 @@ def _language_data(language, editing_version, translated_from_version):
             'version_number': translated_from_version.version_number,
         },
         'editingLanguage': language == subtitle_language,
-        'code': language.language_code,
+        'language_code': language.language_code,
         'name': language.get_language_code_display(),
         'pk': language.pk,
         'numVersions': language.num_versions,
@@ -158,7 +158,8 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         video_urls.append(v.url)
 
     editor_data = {
-        'allowsSyncing': bool(request.GET.get('allowsSyncing', False)),
+        'allowsSyncing': bool(request.GET.get('allowsSyncing', True)),
+        'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
         # front end needs this to be able to set the correct
         # api headers for saving subs
         'authHeaders': {

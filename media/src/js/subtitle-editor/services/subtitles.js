@@ -24,7 +24,7 @@ var angular = angular || null;
     var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
 
     var root = this;
-    var module = angular.module('amara.SubtitleEditor.services', []);
+    var module = angular.module('amara.SubtitleEditor.services.subtitles', []);
 
     var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
         var url = API_BASE_PATH_VIDEOS + videoId +
@@ -121,7 +121,7 @@ var angular = angular || null;
                     var language = cachedData.languages[i];
 
                     // Once we find the language we're looking for, find the version.
-                    if (language.code === languageCode){
+                    if (language.language_code === languageCode){
 
                         for (var j = 0; j < language.versions.length; j++){
 

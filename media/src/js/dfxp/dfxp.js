@@ -16,7 +16,78 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var AmaraDFXPParser = function(AmaraDFXPParser) {
+
+var dfxp = (function($) {
+
+function markdownToHTML(text) {
+    /*
+     * Convert text to Markdown-style rendered HTML with bold, italic,
+     * underline, etc.
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+        { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
+        { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
+function markdownToPlaintext(text) {
+    /*
+     * Convert text to Markdown-style to plain text
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "$2" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" },
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
+function emptyDFXP() {
+    /* Get a DFXP string for an empty subtitle set */
+    return '<tt xmlns="http://www.w3.org/ns/ttml" xmlns:tts="http://www.w3.org/ns/ttml#styling" xml:lang="en">\
+    <head>\
+        <metadata xmlns:ttm="http://www.w3.org/ns/ttml#metadata">\
+            <ttm:title/>\
+            <ttm:description/>\
+            <ttm:copyright/>\
+        </metadata>\
+        <styling xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <style xml:id="amara-style" tts:color="white" tts:fontFamily="proportionalSansSerif" tts:fontSize="18px" tts:textAlign="center"/>\
+        </styling>\
+        <layout xmlns:tts="http://www.w3.org/ns/ttml#styling">\
+            <region xml:id="amara-subtitle-area" style="amara-style" tts:extent="560px 62px" tts:padding="5px 3px" tts:backgroundColor="black" tts:displayAlign="after"/>\
+        </layout>\
+    </head>\
+    <body region="amara-subtitle-area">\
+        <div></div>\
+    </body>\
+</tt>';
+};
+
+
+var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
      * The front end app needs all timming data to be
@@ -411,12 +482,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $('<div>').append(subtitleContents.clone()).remove().text();
     };
+    this.markdownToHTML = markdownToHTML;
     this.contentRendered = function(node) {
         /*
          * Return the content of the subtitle, rendered with Markdown styles.
          */
 
-        return this.markdownToHTML(this.content(node));
+        return markdownToHTML(this.content(node));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
@@ -486,7 +558,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof endTime !== 'undefined') {
-            if (parseInt(endTime, 10) || endTime === 0) {
+            if (endTime >= 0) {
                 $(node).attr('end', endTime);
             } else {
                 $(node).attr('end', '');
@@ -561,7 +633,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.getSubtitleIndex = function(subtitle, subtitles) {
         /*
-         * Retrieve the index of the given subtitle within the given subtitle set.
+         * Retrieve the index of the given subtitle within the given subtitle s
          *
          * Returns: integer
          */
@@ -610,29 +682,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         input = input.replace("\n", '<br/>');
         return input;
-    };
-    this.markdownToHTML = function(text) {
-        /*
-         * Convert text to Markdown-style rendered HTML with bold, italic,
-         * underline, etc.
-         */
-
-        var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
-            { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
-            { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
-        ];
-
-        for (var i = 0; i < replacements.length; i++) {
-            var match = replacements[i].match;
-            var replaceWith = replacements[i].replaceWith;
-
-            text = text.replace(match, replaceWith);
-        }
-
-        return text;
     };
     this.needsAnySynced = function() {
         /*
@@ -914,7 +963,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof startTime !== 'undefined') {
-            if (parseInt(startTime, 10) || startTime === 0) {
+            if (startTime >= 0) {
                 $(node).attr('begin', startTime);
             } else {
                 $(node).attr('begin', '');
@@ -1033,3 +1082,364 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
 };
+
+var SubtitleItem = function(node, id, startTime, endTime, markdown) {
+    /* Subtitle element in SubtitleList.
+     *
+     * SubtitleItem has the following properties:
+     *   - startTime -- start time in seconds
+     *   - endTime -- end time in seconds
+     *   - markdown -- subtitle content in our markdown-style format
+     *   - node -- DOM node from the DFXP XML
+     *   - id -- unique string to identify this item in the list
+     */
+    this.node = node;
+    this.id = id;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.markdown = markdown;
+}
+
+SubtitleItem.prototype.duration = function() {
+    if(this.isSynced()) {
+        return this.endTime - this.startTime;
+    } else {
+        return -1;
+    }
+}
+
+SubtitleItem.prototype.content = function() {
+    /* Get the content of this subtitle as HTML */
+    return markdownToHTML(this.markdown);
+}
+
+SubtitleItem.prototype.isEmpty = function() {
+    return this.markdown == '';
+}
+
+SubtitleItem.prototype.characterCount = function() {
+    return markdownToPlaintext(this.markdown).length;
+}
+
+SubtitleItem.prototype.characterRate = function() {
+    if(this.isSynced()) {
+        return (this.characterCount() * 1000 / this.duration()).toFixed(1);
+    } else {
+        return "0.0";
+    }
+}
+
+SubtitleItem.prototype.lineCount = function() {
+    return this.markdown.split("\n").length;
+}
+
+SubtitleItem.prototype.characterCountPerLine = function() {
+    var lines = this.markdown.split("\n");
+    var counts = [];
+    for(var i = 0; i < lines.length; i++) {
+        counts.push(markdownToPlaintext(lines[i]).length);
+    }
+    return counts;
+    
+}
+
+SubtitleItem.prototype.isSynced = function() {
+    return this.startTime >= 0 && this.endTime >= 0;
+}
+
+SubtitleItem.prototype.isAt = function(time) {
+    return this.isSynced() && this.startTime <= time && this.endTime > time;
+}
+
+SubtitleItem.prototype.startTimeSeconds = function() {
+    if(this.startTime >= 0) {
+        return this.startTime / 1000;
+    } else {
+        return -1;
+    }
+}
+
+SubtitleItem.prototype.endTimeSeconds = function() {
+    if(this.endTime >= 0) {
+        return this.endTime / 1000;
+    } else {
+        return -1;
+    }
+}
+
+var SubtitleList = function() {
+    /*
+     * Manages a list of subtitles.
+     *
+     * For functions that return subtitle items, each item is a dict with the
+     * following properties:
+     *   - startTime -- start time in seconds
+     *   - endTime -- end time in seconds
+     *   - content -- string of html for the subtitle content
+     *   - node -- DOM node from the DFXP XML
+     *
+     */
+
+    this.parser = new AmaraDFXPParser();
+    this.idCounter = 0;
+    this.subtitles = [];
+    this.syncedCount = 0;
+}
+
+SubtitleList.prototype.contentForMarkdown = function(markdown) {
+    return markdownToHTML(markdown);
+}
+
+SubtitleList.prototype.loadXML = function(subtitlesXML) {
+    if(subtitlesXML === null) {
+        subtitlesXML = emptyDFXP();
+    }
+    this.parser.init(subtitlesXML);
+    var syncedSubs = [];
+    var unsyncedSubs = [];
+    // Needed because each() changes the value of this
+    var self = this;
+    this.parser.getSubtitles().each(function(index, node) {
+        var subtitle = self.makeItem(node);
+        if(subtitle.isSynced()) {
+            syncedSubs.push(subtitle);
+        } else {
+            unsyncedSubs.push(subtitle);
+        }
+    });
+    syncedSubs.sort(function(s1, s2) {
+        return s1.startTime - s2.startTime;
+    });
+    this.syncedCount = syncedSubs.length;
+    // Start with synced subs to the list
+    this.subtitles = syncedSubs;
+    // append all unsynced subs to the list
+    this.subtitles.push.apply(this.subtitles, unsyncedSubs);
+}
+
+SubtitleList.prototype.makeItem = function(node) {
+    var idKey = (this.idCounter++).toString(16);
+
+    return new SubtitleItem(node, idKey,
+            this.parser.startTime(node),
+            this.parser.endTime(node),
+            this.parser.dfxpToMarkdown(node, true));
+}
+
+SubtitleList.prototype.length = function() {
+    return this.subtitles.length;
+}
+
+SubtitleList.prototype.needsAnyTranscribed = function() {
+    for(var i=0; i < this.length; i++) {
+        if(this.subtitles[i].markdown == '') return true;
+    }
+    return false;
+}
+
+SubtitleList.prototype.toXMLString = function() {
+    return this.parser.xmlToString(true, true);
+}
+
+SubtitleList.prototype.getIndex = function(subtitle) {
+    // Maybe a binary search would be faster, but I think Array.indexOf should
+    // be pretty optimized on most browsers.
+    return this.subtitles.indexOf(subtitle);
+}
+
+SubtitleList.prototype.nextSubtitle = function(subtitle) {
+    if(subtitle === this.subtitles[this.length() - 1]) {
+        return null;
+    } else {
+        return this.subtitles[this.getIndex(subtitle) + 1];
+    }
+}
+
+SubtitleList.prototype.prevSubtitle = function(subtitle) {
+    if(subtitle === this.subtitles[0]) {
+        return null;
+    } else {
+        return this.subtitles[this.getIndex(subtitle) - 1];
+    }
+}
+
+SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
+    var wasSynced = subtitle.isSynced();
+    if(subtitle.startTime != startTime) {
+        this.parser.startTime(subtitle.node, startTime);
+        subtitle.startTime = startTime;
+    }
+    if(subtitle.endTime != endTime) {
+        this.parser.endTime(subtitle.node, endTime);
+        subtitle.endTime = endTime;
+    }
+    if(subtitle.isSynced() && !wasSynced) {
+        this.syncedCount++;
+    }
+}
+
+SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
+    /* Update subtilte content
+     *
+     * content is a string in our markdown-style format.
+     */
+    this.parser.content(subtitle.node, content);
+    subtitle.markdown = content;
+}
+
+SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
+    if(otherSubtitle !== null) {
+        var pos = this.getIndex(otherSubtitle);
+    } else {
+        var pos = this.subtitles.length;
+    }
+    // We insert the subtitle before the reference point, but AmaraDFXPParser
+    // wants to insert it after, so we need to adjust things a bit.
+    if(pos > 0) {
+        var after = this.subtitles[pos-1].node;
+    } else {
+        var after = -1;
+    }
+    if(otherSubtitle && otherSubtitle.isSynced()) {
+        // If we are inserting between 2 synced subtitles, then we can set the
+        // time
+        if(pos > 0) {
+            // Inserting a subtitle between two others.  Make it so each
+            // subtitle takes up 1/3 of the time available
+            var firstSubtitle = this.prevSubtitle(otherSubtitle);
+            var totalTime = otherSubtitle.endTime - firstSubtitle.startTime;
+            var durationSplit = Math.floor(totalTime / 3);
+            var startTime = firstSubtitle.startTime + durationSplit;
+            var endTime = startTime + durationSplit;
+            this.updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
+                    startTime);
+            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+        } else {
+            // Inserting a subtitle as the start of the list.  position the
+            // subtitle to start at time=0 and take up half the space
+            // available to the two subtitles
+            var startTime = 0;
+            var endTime = Math.floor(otherSubtitle.endTime / 2);
+            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+        }
+        attrs = {
+            begin: startTime,
+            end: endTime,
+        }
+    } else {
+        attrs = {}
+    }
+    var node = this.parser.addSubtitle(after, attrs);
+    var subtitle = this.makeItem(node);
+    if(otherSubtitle != null) {
+        this.subtitles.splice(pos, 0, subtitle);
+    } else {
+        this.subtitles.push(subtitle);
+    }
+    if(subtitle.isSynced()) {
+        this.syncedCount++;
+    }
+    return pos;
+}
+
+SubtitleList.prototype.removeSubtitle = function(subtitle) {
+    var pos = this.getIndex(subtitle);
+    this.parser.removeSubtitle(subtitle.node);
+    this.subtitles.splice(pos, 1);
+    if(subtitle.isSynced()) {
+        this.syncedCount--;
+    }
+}
+
+SubtitleList.prototype.lastSyncedSubtitle = function() {
+    if(this.syncedCount > 0) {
+        return this.subtitles[this.syncedCount - 1];
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.firstUnsyncedSubtitle = function() {
+    if(this.syncedCount < this.subtitles.length) {
+        return this.subtitles[this.syncedCount];
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.secondUnsyncedSubtitle = function() {
+    if(this.syncedCount + 1 < this.subtitles.length) {
+        return this.subtitles[this.syncedCount + 1];
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.indexOfFirstSubtitleAfter = function(time) {
+    /* Get the first subtitle whose end is after time
+     *
+     * returns index of the subtitle, or -1 if none are found.
+     */
+
+    // Do a binary search to find the sub
+    var left = 0;
+    var right = this.syncedCount-1;
+    // First check that we are going to find any subtitle
+    if(right < 0 || this.subtitles[right].endTime <= time) {
+        return -1;
+    }
+    // Now do the binary search
+    while(left < right) {
+        var index = Math.floor((left + right) / 2);
+        if(this.subtitles[index].endTime > time) {
+            right = index;
+        } else {
+            left = index + 1;
+        }
+    }
+    return left;
+}
+
+SubtitleList.prototype.subtitleAt = function(time) {
+    /* Find the subtitle that occupies a given time.
+     *
+     * returns a SubtitleItem, or null if no subtitle occupies the time.
+     */
+    var i = this.indexOfFirstSubtitleAfter(time);
+    if(i == -1) {
+        return null;
+    }
+    var subtitle = this.subtitles[i];
+    if(subtitle.isAt(time)) {
+        return subtitle;
+    } else {
+        return null;
+    }
+}
+
+SubtitleList.prototype.getSubtitlesForTime = function(startTime, endTime) {
+    var rv = [];
+    var i = this.indexOfFirstSubtitleAfter(startTime);
+    if(i == -1) {
+        return rv;
+    }
+    for(; i < this.syncedCount; i++) {
+        var subtitle = this.subtitles[i];
+        if(subtitle.startTime < endTime) {
+            rv.push(subtitle);
+        } else {
+            break;
+        }
+    }
+    return rv;
+}
+
+return {
+    AmaraDFXPParser: AmaraDFXPParser,
+    SubtitleList: SubtitleList,
+}
+
+})(window.AmarajQuery);
+
+/* Set window.AmaraDFXPParser for compatibility with the old editor */
+window.AmaraDFXPParser = dfxp.AmaraDFXPParser;

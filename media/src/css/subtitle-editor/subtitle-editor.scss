@@ -85,6 +85,7 @@ $CodePro: 'CodeProLC', $OpenSans;
 // Page
 html, body {
     background: #F3F4F5;
+    overflow: hidden;
 }
 body {
     color: #565758;
@@ -396,8 +397,27 @@ section.main {
         float: none;
         vertical-align: top;
     }
+    span.key {
+        background: white;
+        display: block;
+        height: 32px;
+        float: left;
+        margin-right: 10px;
+        position: relative;
+        @include border-radius(3px);
+
+        span {
+            bottom: 2px;
+            color: #5A5758;
+            diplay: block;
+            font-size: 9px;
+            font-weight: bold;
+            left: 4px;
+            position: absolute;
+        }
+    }
     div.subtitles-wrapper {
-        overflow: hidden;
+        overflow: visible;
         position: relative;
 
         a.scroll-lock {
@@ -416,6 +436,109 @@ section.main {
                 background-position: center -143px;
             }
         }
+
+        div.sync-help {
+            position: absolute;
+            display: none;
+            width: 120px;
+            height: 65px;
+            color: #ffffff;
+            z-index: 100;
+
+            div.text {
+                line-height: 65px;
+                vertical-align: middle;
+            }
+
+            span.key {
+                margin-left: 14px;
+                margin-top: 16px;
+                width: 32px;
+                span {
+                    color: #000;
+                    font-size: 12px;
+                    bottom: 5px;
+                }
+            }
+            &:before {
+                /* Draws a triangle in the middle of the box.
+                 */
+                position: absolute;
+                top: 17px;
+                content: "";
+                display: block;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+            }
+        }
+        div.sync-help.end {
+            background: #a2a3a4;
+            left: 100%;
+            &:before {
+                left: -15px;
+                border-right: 15px solid #a2a3a4;
+            }
+        }
+
+        div.sync-help.begin {
+            background: #398982;
+            right: 100%;
+            &:before {
+                right: -15px;
+                border-left: 15px solid #398982;
+            }
+        }
+
+        div.info-tray {
+            position: absolute;
+            left: 100%;
+            top: 45px;
+            width: 200px;
+            z-index: 101;
+
+            background: #e4e5e6;
+            border-top: 1px solid #e6e7e8;
+            border-right: 1px solid #e6e7e8;
+            border-bottom: 1px solid #e6e7e8;
+            table {
+                width: 100%;
+                margin: 0px 15px 25px 15px;
+            }
+            td, th {
+                text-align: left;
+                width: 50%;
+                font-size: 12px;
+                padding-top: 15px;
+                color: #a3a4a5;
+                em {
+                    color: #838485;
+                }
+            }
+            tr.child {
+                td, th {
+                    padding-top: 8px;
+                }
+                th {
+                    padding-left: 20px;
+                }
+            }
+            &:before {
+                /* Draws a triangle in the middle of the box.
+                 */
+                position: absolute;
+                top: 8px;
+                right: 100%;
+                content: "";
+                display: block;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+                border-right: 15px solid #e4e5e6;
+            }
+        }
     }
     div.subtitles {
         overflow: auto;
@@ -431,29 +554,31 @@ section.main {
                 line-height: 25px;
                 position: relative;
 
+            span.timing {
+                color: #9A9B9C;
+                display: block;
+                font-size: 10px;
+                position: absolute;
+                right: 20px;
+                top: 2px;
+                line-height: 25px;
+
+                span {
+                    display: inline-block;
+                }
+                a.comments {
+                    background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
+                    display: inline-block;
+                    height: 9px;
+                    margin-left: 3px;
+                    vertical-align: -1px;
+                    width: 10px;
+                }
+            }
+
                 div.hover {
                     display: none;
 
-                    span.timing {
-                        color: #9A9B9C;
-                        display: block;
-                        font-size: 10px;
-                        position: absolute;
-                        right: 20px;
-                        top: 2px;
-
-                        span {
-                            display: inline-block;
-                        }
-                        a.comments {
-                            background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
-                            display: inline-block;
-                            height: 9px;
-                            margin-left: 3px;
-                            vertical-align: -1px;
-                            width: 10px;
-                        }
-                    }
                     a.remove-subtitle {
                         background: transparent url('../../../images/editor/remove-subtitle.gif') top left no-repeat;
                         bottom: 7px;
@@ -465,13 +590,14 @@ section.main {
                         width: 10px;
                     }
                     a.add-subtitle {
-                        bottom: -15px;
+                        top: 0px;
                         display: block;
-                        left: 0;
+                        left: 50%;
+                        margin-left: -15px;
                         overflow: hidden;
                         position: absolute;
                         height: 15px;
-                        width: 100%;
+                        width: 30px;
 
                         &:before {
                             background: #BABBBC url('../../../images/editor/plus.gif') center 80% no-repeat;
@@ -493,7 +619,7 @@ section.main {
                 textarea {
                     font: normal 12px $OpenSans;
                     line-height: 25px;
-                    display: block;
+                    display: none;
                     height: 46px;
                     margin: 0;
                     resize: none;
@@ -555,11 +681,10 @@ section.main {
                     }
                 }
                 &.empty {
-                    background: #F2DEDE;
+                    background: #fdfdea;
 
                     textarea, span {
-                        background: #F2DEDE;
-                        border-top: 1px solid #EED3D7;
+                        background: #fdfdea;
                     }
                 }
             }
@@ -569,7 +694,7 @@ section.main {
                 }
             }
         }
-        a.end {
+        .end {
             color: #3C3C3D;
             display: block;
             line-height: 20px;
@@ -591,6 +716,10 @@ section.main {
             margin: 20px;
             padding: 20px;
             @include border-radius(3px);
+
+            span.key {
+                width: 20%;
+            }
 
             a.advanced {
                 color: white;
@@ -617,26 +746,6 @@ section.main {
                 li {
                     margin: 10px 0;
 
-                    span.key {
-                        background: white;
-                        display: block;
-                        height: 32px;
-                        float: left;
-                        margin-right: 10px;
-                        position: relative;
-                        width: 20%;
-                        @include border-radius(3px);
-
-                        span {
-                            bottom: 2px;
-                            color: #5A5758;
-                            diplay: block;
-                            font-size: 9px;
-                            font-weight: bold;
-                            left: 4px;
-                            position: absolute;
-                        }
-                    }
                     span.description {
                         display: block;
                         float: left;
@@ -714,11 +823,12 @@ section.main {
             height: 291px;
             position: relative;
 
-            div.amara-popcorn-subtitles {
+            div.subtitle-overlay {
+                position: absolute;
                 bottom: 63px;
                 left: 0;
+                width: 100%;
                 padding: 0 20px;
-                position: absolute;
                 text-align: center;
 
                 div {
@@ -981,9 +1091,9 @@ section.timeline {
     }
     div.subtitles-container {
         height: 65px;
-        left: 30%; // Debug only.
         position: absolute;
         top: 0;
+        width: 100%;
 
         div.subtitle {
             background: #DADBDC;
@@ -1001,6 +1111,7 @@ section.timeline {
                 text-overflow: ellipsis;
                 width: 100%;
                 white-space: nowrap;
+                cursor: move;
             }
             a.handle {
                 cursor: col-resize;
@@ -1044,58 +1155,18 @@ section.timeline {
                     }
                 }
             }
-            &.mock-1 {
-                left: 0px;
-                width: 155px;
-            }
-            &.mock-2 {
-                left: 155px;
-                width: 150px;
-            }
-            &.mock-3 {
-                left: 312px;
-                width: 230px;
-            }
-            &.mock-4 {
-                left: 542px;
-                width: 230px;
-            }
+        }
+
+        div.unsynced {
+            background: #FEFFE2;
         }
     }
-    div.timing-container {
-        height: 65px;
-        left: 30%;
+    canvas.timing {
         position: absolute;
         top: 0;
-
-        div.second {
-            display: block;
-            height: 65px;
-            float: left;
-            position: relative;
-            width: 100px;
-
-            span {
-                background: #212223;
-                bottom: 3px;
-                color: #686868;
-                font-size: 12px;
-                font-weight: bold;
-                left: 0;
-                padding-right: 5px;
-                position: absolute;
-                z-index: 53;
-            }
-            &:after {
-                bottom: 3px;
-                content: "• • • • • • • • •";
-                display: block;
-                font-size: 15px;
-                left: 10px;
-                position: absolute;
-                z-index: 52;
-            }
-        }
+        left: 0;
+        height: 65px;
+        width: 100px;
     }
 }
 body.timeline-shown {

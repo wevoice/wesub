@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html ng-app="amara.SubtitleEditor" lang="{{ language.language_code }}" subtitle-editor 
-                                                                        language-code="{{ language.language_code }}"
-                                                                        video-id="{{ video.video_id }}">
-
+<html ng-app="amara.SubtitleEditor"
+    subtitle-editor
+    ng-controller="AppController"
+    lang="{{ language.language_code }}"
+    language-code="{{ language.language_code }}"
+    ng-mousemove="handleAppMouseMove($event)"
+    video-id="{{ video.video_id }}">
 <head>
 
     <meta charset="utf-8" />
@@ -35,7 +38,7 @@
     <![endif]-->
 
 </head>
-<body ng-class="{ 'timeline-shown': $root.timelineShown }">
+<body ng-class="{ 'timeline-shown': timelineShown }">
 
     <div class="modal"
         ng-controller="ModalController"
@@ -65,7 +68,7 @@
         <section class="site left column">
             <h1>Amara</h1>
         </section>
-        <section class="video center column ng-cloak" ng-controller="VideoTitleController" ng-cloak>
+        <section class="video center column ng-cloak">
             <span class="video-title">
                 <span class="subtitles-language">[[ workingSubtitles.languageName ]]</span>
                 <span class="sep">•</span>
@@ -133,36 +136,37 @@
                     </select>
                 </div>
                 <div class="select">
-                    <select name="version"
-                        ng-model="version">
+                    <select name="version" class="version-select">
                         <option
                                 ng-repeat='thisVersion in versions'
                                 ng-selected='version == thisVersion'
                                 ng-disabled='thisVersion.visibility != "Public"'
-                                ng-model='thisVersion'
-                                value="[[$index]]">
+                                value="[[thisVersion.version_no]]">
                             [[thisVersion|versionDropDownDisplay]]</option>
                     </select>
                 </div>
             </div>
-            <div class="subtitles-wrapper">
-                <div class="reference subtitles" ng-controller="SubtitleListController">
+            <div class="subtitles-wrapper"
+                ng-controller="SubtitleListController">
+                <div class="reference subtitles">
 
                     <ul subtitle-list="reference-subtitle-set"
                         editable="false"
                         video-id="{{ video.video_id }}">
 
-                        <li ng-repeat="subtitle in subtitles"
+                        <li ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
+                            ng-click="onClick($event)"
                             class="subtitle-list-item">
 
-                            <span ng-show="showStartTime"
-                                  class="start-time">
-                                    [[ parser.startTime(subtitle)|displayTime ]]
+                            <span class="timing" ng-switch on="subtitle.isSynced()">
+                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
+                                <span ng-switch-when="false">unsynced</span>
+                                <a href ng-show='false' class="comments"></a>
                             </span>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="contentAsHTML"
+                                  ng-bind-html-unsafe="subtitle.content()"
                                   class="subtitle-text">
                             </span>
 
@@ -171,79 +175,127 @@
                     </ul>
 
                 </div>
-                <a ng-click="$root.scrollingSynced = !$root.scrollingSynced"
-                   ng-class="{ locked: $root.scrollingSynced, unlocked: !$root.scrollingSynced }"
+                <a ng-click="toggleScrollingSynced()"
+                   ng-class="{ locked: scrollingSynced, unlocked: !scrollingSynced }"
                    class="scroll-lock">
                 </a>
             </div>
         </section>
         <section class="center column">
-            <div class="video" id="video" ng-controller="VideoController"></div>
-            <div class="workspace-tools group" ng-controller="WorkspaceToolsController">
+        <div class="video" id="video" ng-controller="VideoController">
+            <div class="subtitle-overlay" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+        </div>
+            <div class="workspace-tools group">
                 <div class="subtitles-language">
                     [[ workingSubtitles.languageName ]] subtitles
                 </div>
-                <div class="switches" ng-show="false">
-                    <a class="timeline-display" ng-click="$root.timelineShown = !$root.timelineShown">
+                <div class="switches">
+                    <a class="timeline-display" href="#" ng-click="toggleTimelineShown()">
                         <span ng-show="timelineShown">Hide</span>
                         <span ng-show="!timelineShown">Show</span>
                         timeline
                     </a>
-                    <a class="video-display">Hide video</a>
+                    <a ng-show="false" href="#" class="video-display">Hide video</a>
                 </div>
             </div>
-            <div class="subtitles-wrapper">
-                <div class="working subtitles" ng-controller="SubtitleListController">
+            <div class="subtitles-wrapper"
+                ng-controller="SubtitleListController"
+                working-subtitles-wrapper>
+                <div class="sync-help end">
+                    <span class="key">
+                        <span>
+                            &uarr;
+                        </span>
+                    </span>
+                    <div class="text">End now</div>
+                </div>
 
+                <div class="sync-help begin">
+                    <span class="key">
+                        <span>
+                            &darr;
+                        </span>
+                    </span>
+                    <div class="text">Begin now</div>
+                </div>
+                <div class="info-tray" ng-show="infoTray.subtitle">
+                    <table>
+                        <tr>
+                            <th>Start</th>
+                            <td><em>[[ infoTray.subtitle.startTime|displayTime ]]</em></td>
+                        </tr>
+                        <tr>
+                            <th>End</th>
+                            <td><em>[[ infoTray.subtitle.endTime|displayTime ]]</em></td>
+                        </tr>
+                        <tr>
+                            <th>Characters</th>
+                            <td>[[ infoTray.subtitle.characterCount() ]]</td>
+                        </tr>
+                        <tr class="child"
+                            ng-repeat="count in infoTrayLineCounts()">
+                            <th>Line [[ $index + 1 ]]</td>
+                            <td>[[ count ]]
+                        </tr>
+                        <tr class="char-rate" ng-show="infoTray.subtitle.isSynced()">
+                            <th>Chars/sec</th>
+                            <td>[[ infoTray.subtitle.characterRate() ]]</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="working subtitles">
                     <ul subtitle-list="working-subtitle-set"
                         editable="true"
-                        can-add-and-remove="allowsSyncing"
                         version-number="{{ version.version_number }}"
                         language-code="{{ language.language_code }}"
                         video-id="{{ video.video_id }}"
                         id="working-subtitle-set">
 
                         <li subtitle-list-item
-                            ng-repeat="subtitle in subtitles"
+                            ng-repeat="subtitle in subtitleList.subtitles"
                             ng-controller="SubtitleListItemController"
+                            ng-click="onClick($event)"
                             ng-class="{editing: isEditing, empty: empty}"
                             class="subtitle-list-item">
 
+                            <span class="timing" ng-switch on="subtitle.isSynced()">
+                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
+                                <span ng-switch-when="false">unsynced</span>
+                                <a href ng-show='false' class="comments"></a>
+                            </span>
+
                             <div class="hover">
-                                <span  class="timing">
-                                    <span>[[ parser.startTime(subtitle)|displayTime ]]</span>
-                                    <a href ng-show='allowsSyncing' class="comments"></a>
-                                </span>
-                                <a href class="remove-subtitle"
-                                   ng-show='allowsSyncing'
+                                <a href="#" class="remove-subtitle"
+                                   ng-show='canAddAndRemove'
                                    ng-click="removeSubtitle(subtitle)">
                                     Remove
                                 </a>
-                                <a href ng-show='allowsSyncing' class="add-subtitle"></a>
+                                <a href="#" class="add-subtitle"
+                                    ng-show='canAddAndRemove'
+                                    ng-click="insertSubtitleBefore(subtitle)"></a>
                             </div>
 
                             <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="contentAsHTML"
+                                  ng-bind-html-unsafe="subtitle.content()"
                                   class="subtitle-text">
                             </span>
 
-                            <textarea ng-show="isEditing"
-                                      style="display: none;">
-                            </textarea>
+                            <textarea></textarea>
 
                         </li>
 
                     </ul>
 
-                    <a class="end"
-                       ng-show="canAddAndRemove"
-                       ng-controller="SubtitleListHelperController"
-                       ng-click="addSubtitle(null, {}, '', true)">
-                        <span ng-show="!isEditingAny">+ New subtitle</span>
-                        <span ng-show="isEditingAny">
+                    <div ng-controller="SubtitleListHelperController">
+                        <a class="end"
+                            href="#"
+                            ng-show="canAddAndRemove && !isEditingAny"
+                            ng-click="addSubtitleAtEnd()">+ New subtitle</a>
+                        <span ng-show="isEditingAny" class="end">
                             Press ENTER to save subtitle and move to next.<br />
                         </span>
-                    </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -280,7 +332,7 @@
         </section>
         <section class="right column">
             <div class="steps-container">
-                <ul class="steps" ng-show='allowsSyncing'>
+                <ul class="steps" ng-show='false'>
                     <li class="done">1. Type what you hear</li>
                     <li>2. Sync timing
                         <ul>
@@ -295,33 +347,11 @@
     </section>
     <section ng-controller="TimelineController"
         class="timeline ng-cloak"
-        ng-show="false"
-        ng-show="$root.timelineShown"
-        ng-cloak
-        timeline>
+        ng-show="timelineShown"
+        ng-cloak>
         <div class="current-time-marker"></div>
-        <div class="timing-container"></div>
-        <div class="subtitles-container">
-            <div class="subtitle mock-1">
-                <a href class="handle left"></a>
-                <span>This is mock subtitle one.</span>
-                <a href class="handle right"></a>
-            </div>
-            <div class="subtitle mock-2">
-                <a href class="handle left"></a>
-                <span>I mock subtitle, two.</span>
-                <a href class="handle right"></a>
-            </div>
-            <div class="subtitle mock-3">
-                <a href class="handle left"></a>
-                <span>The third mock subtitle is a longer one.</span>
-                <a href class="handle right"></a>
-            </div>
-            <div class="subtitle mock-4">
-                <a href class="handle left"></a>
-                <span>The fourth mock subtitle is a longer one but with less length.</span>
-                <a href class="handle right"></a>
-            </div>
+        <canvas class="timing" width="100" height="65" timeline-timing></canvas>
+        <div class="subtitles-container" timeline-subtitles>
         </div>
     </section>
 
@@ -332,19 +362,20 @@
     <script src="{{ STATIC_URL }}src/js/third-party/angular-cookies.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
-    <script src="{{ STATIC_URL }}src/js/popcorn/popcorn.amarasubtitle.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/editor-app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/timeline.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/services.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/lock.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/dfxp/dfxp.js"></script>
     <script src="{{ STATIC_URL }}src/js/uri.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/app.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/help.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/collab.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/modal.js"></script>
-    <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/workspace-tools.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/timeline.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/controllers/video.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/filters/subtitles.js"></script>

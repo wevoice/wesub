@@ -55,8 +55,7 @@
         });
         $scope.$root.$on('show-modal-download', function($event) {
 
-            $scope.content.dfxpString = SubtitleListFinder.get('working-subtitle-set').scope.parser.xmlToString(true, true);
-
+            $scope.content.dfxpString = SubtitleListFinder.get('working-subtitle-set').scope.subtitleList.toXMLString();
         });
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
