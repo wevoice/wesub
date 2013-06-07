@@ -55,7 +55,7 @@ var USER_IDLE_MINUTES = 5;
             });
         };
     });
-    directives.directive('workingSubtitlesWrapper', function() {
+    directives.directive('workingSubtitlesWrapper', function($timeout) {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
@@ -114,7 +114,13 @@ var USER_IDLE_MINUTES = 5;
                 }
             }
 
-            scope.$watch("currentEdit.LI", scope.positionInfoTray);
+            scope.$watch("currentEdit.LI", function() {
+                // When we finish an edit, we do a bunch of CSS tricks to
+                // re-show the text and hide the textarea.  Use a timeout to
+                // make sure that positionInfoTray() gets called after those
+                // are done.
+                $timeout(scope.positionInfoTray);
+            });
         };
     });
 
