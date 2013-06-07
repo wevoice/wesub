@@ -209,10 +209,21 @@ var USER_IDLE_MINUTES = 5;
                 elem.css('line-height', '0');
                 scope.infoTray.LI = elem;
                 scope.infoTray.subtitle = scope.subtitle;
+                $(document).on('mousedown.subtitle-edit', function(evt) {
+                    var clicked = $(evt.target);
+                    if(clicked[0] != textarea[0] &&
+                        !clicked.hasClass('info-tray') &&
+                        clicked.parents('.info-tray').length == 0) {
+                        scope.$apply(function() {
+                            scope.finishEditingMode(true);
+                        });
+                    }
+                });
             }
 
             scope.hideTextArea = function() {
                 textarea.hide();
+                $(document).off('mousedown.subtitle-edit');
                 elem.css('line-height', '');
                 scope.infoTray.subtitle = scope.infoTray.LI = null;
             }
@@ -263,13 +274,6 @@ var USER_IDLE_MINUTES = 5;
                         scope.editText);
                     scope.$root.$emit('subtitle-edit', content);
                 });
-            });
-            textarea.on('focusout', function(evt) {
-                if(scope.isEditing) {
-                    scope.$apply(function() {
-                        scope.finishEditingMode(true);
-                    });
-                }
             });
         }
     });
