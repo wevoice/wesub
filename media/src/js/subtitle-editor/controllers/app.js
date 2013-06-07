@@ -45,6 +45,28 @@ var angular = angular || null;
             }
         }
 
+        function releaseLock() {
+            LockService.releaseLock($scope.videoId, $scope.languageCode);
+        }
+
+        function regainLock() {
+            LockService.regainLock($scope.videoId, $scope.languageCode)
+                .then(function onSuccess(response) {
+                if (response.data.ok) {
+                    minutesIdle = 0;
+                    $scope.$root.$emit('hide-modal');
+                    startRegainLockTimer();
+                    startUserIdleTimer();
+                } else {
+                    window.alert("Sorry, could not restart your session.");
+                    window.location = '/videos/' + $scope.videoId + "/";
+                }
+            }, function onError() {
+                window.alert("Sorry, could not restart your session.");
+                window.location = '/videos/' + $scope.videoId + "/";
+            });
+        }
+
         function startUserIdleTimer() {
             var userIdleTimeout = function() {
 
@@ -62,7 +84,7 @@ var angular = angular || null;
         }
         function startRegainLockTimer() {
             var regainLockTimeout = function() {
-                LockService.regainLock($scope.videoId, $scope.languageCode);
+                regainLock();
                 regainLockTimer = $timeout(regainLockTimeout, 15 * 1000);
             };
 
@@ -82,7 +104,7 @@ var angular = angular || null;
 
                 if (secondsUntilClosing <= 0) {
 
-                    LockService.releaseLock($scope.videoId, $scope.languageCode);
+                    releaseLock();
 
                     $scope.$root.$emit("show-modal", {
                         heading: 'Your session has ended. You can try to resume, close the editor, or download your subtitles',
@@ -93,23 +115,7 @@ var angular = angular || null;
                                     $timeout.cancel(closeSessionTimeout);
                                 }
 
-                                var promise =
-                        LockService.regainLock($scope.videoId, $scope.languageCode);
-
-                                promise.then(function onSuccess(response) {
-                                    if (response.data.ok) {
-                                        minutesIdle = 0;
-                                        $scope.$root.$emit('hide-modal');
-                                        startRegainLockTimer();
-                                        startUserIdleTimer();
-                                    } else {
-                                        window.alert("Sorry, could not restart your session.");
-                                        window.location = '/videos/' + $scope.videoId + "/";
-                                    }
-                                }, function onError() {
-                                    window.alert("Sorry, could not restart your session.");
-                                    window.location = '/videos/' + $scope.videoId + "/";
-                                });
+                                regainLock();
                             }},
                             {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
                                 $scope.$root.$emit('show-modal-download');
@@ -136,23 +142,7 @@ var angular = angular || null;
                             $timeout.cancel(closeSessionTimeout);
                         }
 
-                        var promise = LockService.regainLock($scope.videoId,
-                            $scope.languageCode);
-
-                        promise.then(function onSuccess(response) {
-                            if (response.data.ok) {
-                                minutesIdle = 0;
-                                $scope.$root.$emit('hide-modal');
-                                startRegainLockTimer();
-                                startUserIdleTimer();
-                            } else {
-                                window.alert("Sorry, could not restart your session.");
-                                window.location = '/videos/' + $scope.videoId + "/";
-                            }
-                        }, function onError() {
-                            window.alert("Sorry, could not restart your session.");
-                            window.location = '/videos/' + $scope.videoId + "/";
-                        });
+                        regainLock();
                     }}
                 ]
             });
@@ -197,6 +187,10 @@ var angular = angular || null;
 
         startUserIdleTimer();
         startRegainLockTimer();
+
+        window.onunload = function() {
+            releaseLock();
+        }
     };
 
     root.AppController = AppController;
