@@ -494,10 +494,8 @@ var angular = angular || null;
         };
         $scope.setLanguageCode = function(languageCode) {
             $scope.languageCode = languageCode;
-
-            SubtitleStorage.getLanguageMap(function(languageMap) {
-                $scope.languageName = languageMap[$scope.languageCode];
-            });
+            $scope.languageName = SubtitleStorage.getLanguageName(
+                    languageCode);
         };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;

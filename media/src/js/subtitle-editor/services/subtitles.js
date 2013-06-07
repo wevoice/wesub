@@ -47,9 +47,9 @@ var angular = angular || null;
         return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
 
-    module.factory('SubtitleStorage', function($http) {
+    module.factory('SubtitleStorage', function($window, $http) {
 
-        var cachedData = window.editorData;
+        var cachedData = $window.editorData;
         var authHeaders = cachedData.authHeaders;
 
         return {
@@ -91,20 +91,16 @@ var angular = angular || null;
                     callback(cachedData.languages);
                 }
             },
-            getLanguageMap: function(callback) {
-
-                // If the language map doesn't exist in our cached data, ask the API.
-                if (!cachedData.languageMap) {
-                    $http.get('/api2/partners/languages/').success(function(response) {
-                        cachedData.languageMap = response.languages;
-                        callback(cachedData.languageMap);
-                    });
-
-                // If we have a cached language map, just call the callback.
-                } else {
-                    callback(cachedData.languageMap);
+            getLanguageName: function(languageCode) {
+                if (!cachedData.languageMap){
+                    var langMap = {}, item;
+                    for (var i=0; i< cachedData.languages.length; i++){
+                        item  = cachedData.languages[i];
+                        langMap[item.code] = item.name;
+                    }
+                    cachedData.languageMap = langMap;
                 }
-
+                return cachedData.languageMap[languageCode] ;
             },
             getSubtitles: function(languageCode, versionNumber, callback){
 
