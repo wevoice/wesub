@@ -23,29 +23,30 @@ var angular = angular || null;
     var module = angular.module('amara.SubtitleEditor.services.video', []);
 
     module.factory('VideoPlayer', function($rootScope, SubtitleStorage) {
-        var videoURLs = SubtitleStorage.getVideoURLs();
-        var pop = window.Popcorn.smart('#video', videoURLs);
+        var videoURLs = [];
+        var pop = null;
         var playing = false;
-        pop.controls(true);
 
-        // Handle popcorn events
-        pop.on('canplay', function() {
-            $rootScope.$emit('video-update');
-        }).on('playing', function() {
-            playing = true;
-            $rootScope.$emit('video-update');
-        }).on('pause', function() {
-            playing = false;
-            $rootScope.$emit('video-update');
-        }).on('ended', function() {
-            playing = false;
-            $rootScope.$emit('video-update');
-        }).on('durationchange', function() {
-            $rootScope.$emit('video-update');
-        }).on('seeked', function() {
-            console.log("seeked");
-            $rootScope.$emit('video-update');
-        });
+        function handlePopcornEvents() {
+            // Handle popcorn events
+            pop.on('canplay', function() {
+                $rootScope.$emit('video-update');
+            }).on('playing', function() {
+                playing = true;
+                $rootScope.$emit('video-update');
+            }).on('pause', function() {
+                playing = false;
+                $rootScope.$emit('video-update');
+            }).on('ended', function() {
+                playing = false;
+                $rootScope.$emit('video-update');
+            }).on('durationchange', function() {
+                $rootScope.$emit('video-update');
+            }).on('seeked', function() {
+                console.log("seeked");
+                $rootScope.$emit('video-update');
+            });
+        }
 
         // private methods
         function removeAllTrackEvents() {
@@ -57,6 +58,12 @@ var angular = angular || null;
 
         // Public methods
         return {
+            init: function() {
+                videoURLs = SubtitleStorage.getVideoURLs();
+                pop = window.Popcorn.smart('#video', videoURLs);
+                pop.controls(true);
+                handlePopcornEvents();
+            },
             play: function() {
                 pop.play();
             },

@@ -55,6 +55,9 @@
                 $scope.timelineOverlayText = null;
             }
         });
+        $scope.$watch('subtitles-fetched', function(){
+              VideoPlayer.init();
+        });
 
     };
     root.VideoController = VideoController;
