@@ -176,7 +176,7 @@ var USER_IDLE_MINUTES = 5;
             scope.nextScope = function() {
                 var next = elem.next();
                 if(next.length > 0) {
-                    return next.scope();
+                    return angular.element(next).scope();
                 } else {
                     return null;
                 }
