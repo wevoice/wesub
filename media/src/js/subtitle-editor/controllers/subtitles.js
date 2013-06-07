@@ -94,7 +94,6 @@ var angular = angular || null;
          * depending if this is being set from the bootstrapped value or later
          * fetches.
          */
-        $scope.changesMade = false;
         $scope.versionNumber = null;
         $scope.versions = [];
         $scope.languageChanged = function(language, versionNumber) {
