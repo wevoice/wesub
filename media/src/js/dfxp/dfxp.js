@@ -1194,7 +1194,7 @@ function DraftSubtitle(storedSubtitle) {
 }
 
 DraftSubtitle.prototype = Object.create(Subtitle.prototype);
-StoredSubtitle.prototype.isDraft = true;
+DraftSubtitle.prototype.isDraft = true;
 
 var SubtitleList = function() {
     /*
