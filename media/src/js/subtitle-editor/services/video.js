@@ -29,7 +29,9 @@ var angular = angular || null;
         pop.controls(true);
 
         // Handle popcorn events
-        pop.on('playing', function() {
+        pop.on('canplay', function() {
+            $rootScope.$emit('video-update');
+        }).on('playing', function() {
             playing = true;
             $rootScope.$emit('video-update');
         }).on('pause', function() {

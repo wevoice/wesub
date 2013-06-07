@@ -261,14 +261,21 @@ var angular = angular || null;
                 }
                 if(!subtitle.isDraft) {
                     var storedSubtitle = subtitle;
+                    var div = timelineDivs[storedSubtitle.id];
                 } else {
                     var storedSubtitle = subtitle.storedSubtitle;
+                    var div = unsyncedDiv;
+                }
+                if(!div) {
+                    return;
                 }
                 var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
                 if(nextSubtitle && nextSubtitle.isSynced()) {
                     context.maxEndTime = nextSubtitle.startTime;
-                } else {
+                } else if(scope.duration !== null) {
                     context.maxEndTime = scope.duration;
+                } else {
+                    context.maxEndTime = 10000000000000;
                 }
                 var prevSubtitle = subtitleList().prevSubtitle(storedSubtitle);
                 if(prevSubtitle) {
@@ -277,10 +284,6 @@ var angular = angular || null;
                     context.minStartTime = 0;
                 }
 
-                var div = timelineDivs[context.subtitle.id];
-                if(div === undefined) {
-                    return;
-                }
                 var initialPageX = evt.pageX;
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
