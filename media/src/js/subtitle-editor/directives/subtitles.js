@@ -169,6 +169,10 @@ var USER_IDLE_MINUTES = 5;
                     scope.positionInfoTray();
                 }
             });
+            scope.scrollToSubtitle = function(subtitle) {
+                var pos = scope.subtitleList.getIndex(subtitle);
+                scope.nthChildScope(pos).scrollTo();
+            }
             scope.nthChildScope = function(index) {
                 var children = elem.children();
                 if(0 <= index && index < children.length) {
@@ -182,6 +186,7 @@ var USER_IDLE_MINUTES = 5;
     directives.directive('subtitleListItem', function($timeout) {
         return function link(scope, elem, attrs) {
             var elem = $(elem);
+            var scroller = elem.closest('div.subtitles');
             var textarea = $('textarea', elem);
 
             scope.LI = elem;
@@ -197,7 +202,7 @@ var USER_IDLE_MINUTES = 5;
             scope.prevScope = function() {
                 // need to wrap in jquery, since angular's jqLite doesn't
                 // support prev()
-                var prev = $(elem).prev();
+                var prev = elem.prev();
                 if(prev.length > 0) {
                     return angular.element(prev).scope();
                 } else {
@@ -205,6 +210,21 @@ var USER_IDLE_MINUTES = 5;
                 }
             }
 
+            scope.scrollTo = function() {
+                // Scroll so that this subtitle is visible.
+                //
+                // Note: to give the user a bit more context, this method
+                // scrolls so that the previous subtitle is on top of the
+                // list.
+                var prev = elem.prev();
+                if(prev) {
+                    var target = prev;
+                } else {
+                    var target = elem;
+                }
+                scroller.scrollTop(scroller.scrollTop() +
+                        target.offset().top - scroller.offset().top);
+            }
 
             scope.showTextArea = function(fromClick) {
                 var initialText = scope.currentEdit.sourceMarkdown();

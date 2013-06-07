@@ -188,6 +188,7 @@
                      */
                     subtitleList.updateSubtitleTime(willSync.end,
                         willSync.end.startTime, $scope.currentTime);
+                    $scope.workingSubtitles.scrollToSubtitle(willSync.end);
                     $scope.$root.$emit("work-done");
                 }
                 return;
@@ -205,6 +206,7 @@
                 subtitleList.updateSubtitleTime(prev, prev.startTime,
                     $scope.currentTime);
             }
+            $scope.workingSubtitles.scrollToSubtitle(willSync.start);
             $scope.$root.$emit("work-done");
         });
         $scope.$root.$on('sync-next-end-time', function($event) {
@@ -214,6 +216,7 @@
             }
             subtitleList.updateSubtitleTime(willSync.end,
                 willSync.end.startTime, $scope.currentTime);
+            $scope.workingSubtitles.scrollToSubtitle(willSync.end);
             $scope.$root.$emit("work-done");
         });
     };
