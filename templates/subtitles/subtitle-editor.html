@@ -356,7 +356,11 @@
 
     <script src="{{ STATIC_URL }}src/js/third-party/amara-jquery.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/jquery.autosize.js"></script>
-    <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.6.min.js"></script>
+    {% if DEBUG %}
+    <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.7.js"></script>
+    {% else %}
+    <script src="{{ STATIC_URL }}src/js/third-party/angular.1.0.7.min.js"></script>
+    {% endif %}
     <script src="{{ STATIC_URL }}src/js/third-party/angular-cookies.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/underscore.min.js"></script>
     <script src="{{ STATIC_URL }}src/js/third-party/popcorn.js"></script>
