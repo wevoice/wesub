@@ -621,7 +621,6 @@ section.main {
                 textarea {
                     font: normal 12px $OpenSans;
                     line-height: 25px;
-                    display: none;
                     height: 46px;
                     margin: 0;
                     resize: none;
@@ -644,6 +643,9 @@ section.main {
                     i {
                         font-style: italic;
                     }
+                }
+                &.edit span.subtitle-text {
+                    display: none;
                 }
                 span.start-time {
                     color: #CCC;

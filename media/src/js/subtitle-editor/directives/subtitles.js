@@ -24,24 +24,6 @@ var USER_IDLE_MINUTES = 5;
 
     var directives = angular.module('amara.SubtitleEditor.directives.subtitles', []);
 
-    function setCaretPosition(elem, caretPos) {
-        /** Move the caret to the specified position.
-         * This will work, except for text areas with user inserted line breaks
-         */
-        if (elem != null) {
-            if (elem.createTextRange) {
-                var range = elem.createTextRange();
-                range.move('character', caretPos);
-                range.select();
-            }
-            else {
-                if (elem.selectionStart !== undefined) {
-                    elem.focus();
-                    elem.setSelectionRange(caretPos, caretPos);
-                }
-            }
-        }
-    }
     directives.directive('subtitleEditor', function() {
         return function link(scope, elm, attrs) {
             scope.videoId = attrs.videoId;
@@ -55,13 +37,26 @@ var USER_IDLE_MINUTES = 5;
             });
         };
     });
-    directives.directive('workingSubtitlesWrapper', function($timeout) {
+    directives.directive('workingSubtitles', function($timeout) {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
             var infoTray = $('div.info-tray', elem);
             var subtitleList = $('.subtitles ul', elem);
             var wrapper = $(elem);
+
+            scope.isEditable = true;
+            scope.setVideoID(attrs.videoId);
+            if(attrs.languageCode != "") {
+                scope.setLanguageCode(attrs.languageCode);
+                if(attrs.versionNumber != "") {
+                    scope.versionNumber = parseInt(attrs.versionNumber);
+                    scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
+                } else {
+                    scope.versionNumber = null;
+                    scope.initEmptySubtitles();
+                }
+            }
 
             function getSubtitleTop(index) {
                 var li = $('li', subtitleList).eq(index);
@@ -107,6 +102,7 @@ var USER_IDLE_MINUTES = 5;
             }
 
             scope.positionInfoTray = function() {
+                return;
                 var li = scope.currentEdit.LI;
                 if(li) {
                     var top = li.offset().top - wrapper.offset().top;
@@ -131,25 +127,14 @@ var USER_IDLE_MINUTES = 5;
 
     directives.directive('subtitleList', function(SubtitleListFinder) {
         return function link(scope, elem, attrs) {
+            var scroller = $(elem).parent();
             // set these *before* calling get subtitle since if
             // the subs are bootstrapped it will return right away
-            scope.isEditable = attrs.editable === 'true';
-            scope.setVideoID(attrs.videoId);
             SubtitleListFinder.register(attrs.subtitleList, elem,
                     elem.controller(), scope);
-            if(attrs.languageCode != "") {
-                scope.setLanguageCode(attrs.languageCode);
-                if(attrs.versionNumber != "") {
-                    scope.versionNumber = parseInt(attrs.versionNumber);
-                    scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-                } else {
-                    scope.versionNumber = null;
-                    scope.initEmptySubtitles();
-                }
-            }
 
             // Handle scroll.
-            $(elem).parent().scroll(function() {
+            scroller.scroll(function() {
 
                 // If scroll sync is locked.
                 if (scope.scrollingSynced) {
@@ -171,148 +156,19 @@ var USER_IDLE_MINUTES = 5;
                     scope.positionInfoTray();
                 }
             });
-            scope.scrollToSubtitle = function(subtitle) {
-                scopeForSubtitle(subtitle).scrollTo();
-            }
-            scope.scopeForSubtitle = function(subtitle) {
-                var pos = scope.subtitleList.getIndex(subtitle);
-                return scope.nthChildScope(pos);
-            }
-            scope.nthChildScope = function(index) {
-                var children = elem.children();
-                if(0 <= index && index < children.length) {
-                    return angular.element(children[index]).scope();
-                } else {
-                    return null;
+
+            scope.$on('scroll-to-subtitle', function(evt, subtitle) {
+                var target = scope.getSubtitleRepeatItem(subtitle);
+                if(target) {
+                    scroller.scrollTop(scroller.scrollTop() +
+                            target.offset().top - scroller.offset().top);
                 }
-            }
-        }
-    });
-    directives.directive('subtitleListItem', function($timeout) {
-        return function link(scope, elem, attrs) {
-            var elem = $(elem);
-            var scroller = elem.closest('div.subtitles');
-            var textarea = $('textarea', elem);
-
-            scope.LI = elem;
-            scope.nextScope = function() {
-                var next = elem.next();
-                if(next.length > 0) {
-                    return angular.element(next).scope();
-                } else {
-                    return null;
-                }
-            }
-
-            scope.prevScope = function() {
-                // need to wrap in jquery, since angular's jqLite doesn't
-                // support prev()
-                var prev = elem.prev();
-                if(prev.length > 0) {
-                    return angular.element(prev).scope();
-                } else {
-                    return null;
-                }
-            }
-
-            scope.scrollTo = function() {
-                // Scroll so that this subtitle is visible.
-                //
-                // Note: to give the user a bit more context, this method
-                // scrolls so that the previous subtitle is on top of the
-                // list.
-                var prev = elem.prev();
-                if(prev) {
-                    var target = prev;
-                } else {
-                    var target = elem;
-                }
-                scroller.scrollTop(scroller.scrollTop() +
-                        target.offset().top - scroller.offset().top);
-            }
-
-            scope.showTextArea = function(fromClick) {
-                var initialText = scope.currentEdit.sourceMarkdown();
-                if(fromClick) {
-                    var caretPos = window.getSelection().anchorOffset;
-                } else {
-                    var caretPos = initialText.length;
-                }
-                textarea.autosize();
-                textarea.val(initialText).trigger('autosize');
-                textarea.show();
-                textarea.focus();
-                setCaretPosition(textarea.get(0), caretPos);
-                scope.$root.$emit('subtitle-edit', scope.subtitle.content());
-                // set line-height to 0 because we don't want the whitespace
-                // inside the element to add extra space below the textarea
-                elem.css('line-height', '0');
-                $(document).on('mousedown.subtitle-edit', function(evt) {
-                    var clicked = $(evt.target);
-                    if(clicked[0] != textarea[0] &&
-                        !clicked.hasClass('info-tray') &&
-                        clicked.parents('.info-tray').length == 0) {
-                        scope.$apply(function() {
-                            scope.finishEditingMode(true);
-                        });
-                    }
-                });
-            }
-
-            scope.hideTextArea = function() {
-                textarea.hide();
-                $(document).off('mousedown.subtitle-edit');
-                elem.css('line-height', '');
-            }
-
-            textarea.on('keydown', function(evt) {
-                scope.$apply(function() {
-                    if (evt.keyCode === 13 && !evt.shiftKey) {
-                        // Enter without shift finishes editing
-                        scope.finishEditingMode(true);
-                        if(scope.lastItem()) {
-                            scope.addSubtitleAtEnd();
-                            // Have to use a timeout in this case because the
-                            // scope for the new subtitle won't be created
-                            // until apply() finishes
-                            $timeout(function() {
-                                scope.nextScope().startEditingMode();
-                            });
-                        } else {
-                            scope.nextScope().startEditingMode();
-                        }
-                        evt.preventDefault();
-                    } else if (evt.keyCode === 27) {
-                        // Escape cancels editing
-                        scope.finishEditingMode(false);
-                        evt.preventDefault();
-                    } else if (evt.keyCode == 9) {
-                        // Tab navigates to other subs
-                        scope.finishEditingMode(true);
-                        if(!evt.shiftKey) {
-                            var tabTarget = scope.nextScope();
-                        } else {
-                            var tabTarget = scope.prevScope();
-                        }
-                        if(tabTarget !== null) {
-                            tabTarget.startEditingMode();
-                        }
-                        evt.preventDefault();
-
-                    }
-                });
             });
-            textarea.on('keyup', function(evt) {
-                scope.$apply(function() {
-                    scope.currentEdit.update(textarea.val());
-                    scope.$root.$emit('subtitle-edit',
-                        scope.currentEdit.currentMarkdown());
-                });
-            });
+
         }
     });
 
-    directives.directive('subtitleRepeat', function($interpolate) {
+    directives.directive('subtitleRepeat', function($interpolate, DomUtil) {
         /* Specialized repeat directive to work with subtitleList
          *
          * Because we need to deal potentially thousands of subtitles,
@@ -402,8 +258,12 @@ var USER_IDLE_MINUTES = 5;
                         node.replaceWith(createNodeForSubtitle(subtitle));
                         break;
                     case 'insert':
-                        var node = subtitleMap[change.before.id];
-                        node.before(createNodeForSubtitle(subtitle));
+                        if(change.before !== null) {
+                            var node = subtitleMap[change.before.id];
+                            node.before(createNodeForSubtitle(subtitle));
+                        } else {
+                            parent.append(createNodeForSubtitle(subtitle));
+                        }
                         break;
                 }
             }
@@ -414,6 +274,14 @@ var USER_IDLE_MINUTES = 5;
                 var textarea = $('<textarea class="subtitle-edit" />');
                 textarea.val(draft.markdown);
                 li.append(textarea);
+                textarea.autosize();
+                textarea.focus();
+                if(draft.initialCaretPos === undefined) {
+                    var caretPos = draft.markdown.length;
+                } else {
+                    var caretPos = draft.initialCaretPos;
+                }
+                DomUtil.setSelectionRange(textarea[0], caretPos, caretPos);
                 textarea.on('keyup', function(evt) {
                     $scope.$apply(function() {
                         draft.markdown = textarea.val();
@@ -430,8 +298,10 @@ var USER_IDLE_MINUTES = 5;
             }
             function stopEditOn(draft) {
                 var li = subtitleMap[draft.storedSubtitle.id];
-                li.removeClass('edit');
-                $('textarea.subtitle-edit', li).remove();
+                if(li) {
+                    li.removeClass('edit');
+                    $('textarea.subtitle-edit', li).remove();
+                }
             }
 
             $scope.reloadSubtitleRepeat = function() {
@@ -440,6 +310,14 @@ var USER_IDLE_MINUTES = 5;
                 for(var i=0; i < subtitleList.length(); i++) {
                     var subtitle = subtitleList.subtitles[i];
                     parent.append(createNodeForSubtitle(subtitle));
+                }
+            }
+            $scope.getSubtitleRepeatItem = function(subtitle) {
+                var rv = subtitleMap[subtitle.id];
+                if(rv !== undefined) {
+                    return rv;
+                } else {
+                    return null;
                 }
             }
 
@@ -477,7 +355,9 @@ var USER_IDLE_MINUTES = 5;
                 var action = findSubtitleClickValue(evt.target);
                 var subtitle = findSubtitleData(evt.target);
                 if(action !== null) {
-                    $scope.onSubtitleClick(evt, subtitle, action);
+                    $scope.$apply(function() {
+                        $scope.onSubtitleClick(evt, subtitle, action);
+                    });
                 }
             });
         }

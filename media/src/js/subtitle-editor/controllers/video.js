@@ -26,13 +26,13 @@
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
 
-        $scope.$root.$on('subtitle-edit', function($event, content) {
-            $scope.overlayText = content;
-            $scope.showOverlay = true;
-        });
-        $scope.$root.$on('editing-done', function($event, content) {
-            if($scope.timelineOverlayText !== null) {
+        $scope.$root.$watch('workingSubtitles.currentEdit.draft.content()', function(newValue) {
+            if(newValue !== null && newValue !== undefined) {
+                $scope.overlayText = newValue;
+                $scope.showOverlay = true;
+            } else if($scope.timelineOverlayText !== null) {
                 $scope.overlayText = $scope.timelineOverlayText;
+                $scope.showOverlay = true;
             } else {
                 $scope.showOverlay = false;
             }

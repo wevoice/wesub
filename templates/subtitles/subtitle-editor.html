@@ -151,22 +151,15 @@
                         editable="false"
                         video-id="{{ video.video_id }}">
 
-                        <li ng-repeat="subtitle in subtitleList.subtitles"
-                            ng-controller="SubtitleListItemController"
-                            ng-click="onClick($event)"
+<!-- 
+subtitle-repeat directive, see the working subtitles for more info
+-->
+                        <li subtitle-repeat="subtitleList"
                             class="subtitle-list-item">
-
-                            <span class="timing" ng-switch on="subtitle.isSynced()">
-                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
-                                <span ng-switch-when="false">unsynced</span>
-                                <a href ng-show='false' class="comments"></a>
+                            <span class="timing">
+                                [[ subtitle.timingString() ]]
                             </span>
-
-                            <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="subtitle.content()"
-                                  class="subtitle-text">
-                            </span>
-
+                            <span class="subtitle-text">[[ subtitle.content() ]]</span>
                         </li>
 
                     </ul>
@@ -197,7 +190,10 @@
             </div>
             <div class="subtitles-wrapper"
                 ng-controller="SubtitleListController"
-                working-subtitles-wrapper>
+                working-subtitles
+                version-number="{{ version.version_number }}"
+                language-code="{{ language.language_code }}"
+                video-id="{{ video.video_id }}">
                 <div class="sync-help end">
                     <span class="key">
                         <span>
@@ -241,56 +237,50 @@
                     </table>
                 </div>
 
-                <div class="working subtitles">
+                <div class="working subtitles"
+                    ng-controller="WorkingSubtitleItemsController">
                     <ul subtitle-list="working-subtitle-set"
-                        editable="true"
-                        version-number="{{ version.version_number }}"
-                        language-code="{{ language.language_code }}"
-                        video-id="{{ video.video_id }}"
                         id="working-subtitle-set">
 
-                        <li subtitle-list-item
-                            ng-repeat="subtitle in subtitleList.subtitles"
-                            ng-controller="SubtitleListItemController"
-                            ng-click="onClick($event)"
-                            ng-class="{editing: isEditing, empty: empty}"
-                            class="subtitle-list-item">
+<!--
+subtitle-repeat directive:
 
-                            <span class="timing" ng-switch on="subtitle.isSynced()">
-                                <span ng-switch-when="true">[[ subtitle.startTime|displayTime ]]</span>
-                                <span ng-switch-when="false">unsynced</span>
-                                <a href ng-show='false' class="comments"></a>
+We use this instead of ng-repeat because it's performs much better with large
+subtitle sets.  However, that performance comes at the cost of flexibility.
+We don't support arbitrary angular directives inside the element.  To see
+what is supported, check out tests/subtitleRepeatDirective.spec.
+-->
+                        <li subtitle-repeat="subtitleList"
+                            class="subtitle-list-item"
+                            bind-to-edit="currentEdit.draft"
+                            edit-keydown="onEditKeydown"
+                            subtitle-click="edit">
+
+                            <span class="timing">
+                                [[ subtitle.timingString() ]]
                             </span>
 
                             <div class="hover">
                                 <a href="#" class="remove-subtitle"
-                                   ng-show='canAddAndRemove'
-                                   ng-click="removeSubtitle(subtitle)">
+                                    subtitle-click="remove">
                                     Remove
                                 </a>
                                 <a href="#" class="add-subtitle"
-                                    ng-show='canAddAndRemove'
-                                    ng-click="insertSubtitleBefore(subtitle)"></a>
+                                    subtitle-click="insert"></a>
                             </div>
 
-                            <span ng-show="!isEditing"
-                                  ng-bind-html-unsafe="subtitle.content()"
-                                  class="subtitle-text">
-                            </span>
-
-                            <textarea></textarea>
-
+                            <span class="subtitle-text">[[ subtitle.content() ]]</span>
                         </li>
 
                     </ul>
 
-                    <div ng-controller="SubtitleListHelperController">
+                    <div>
                         <a class="end"
                             id="add-sub-at-end"
                             href="#"
-                            ng-show="canAddAndRemove && !isEditingAny"
-                            ng-click="addSubtitleAtEnd()">+ New subtitle</a>
-                        <span ng-show="isEditingAny" class="end">
+                            ng-show="canAddAndRemove && !workingSubtitles.currentEdit.inProgress()"
+                            ng-click="newSubtitleClicked($event)">+ New subtitle</a>
+                        <span ng-show="workingSubtitles.currentEdit.inProgress()" class="end">
                             Press ENTER to save subtitle and move to next.<br />
                         </span>
                     </div>
@@ -368,6 +358,7 @@
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/directives/timeline.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/services.js"></script>
+    <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/domutil.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/lock.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/subtitles.js"></script>
     <script src="{{ STATIC_URL }}src/js/subtitle-editor/services/video.js"></script>

@@ -24,7 +24,7 @@ var angular = angular || null;
     var _ = root._.noConflict();
     var $ = root.AmarajQuery;
 
-    /* CurrentEditManager manages in-progress edits for SubtitleListController
+    /* CurrentEditManager manages in-progress edits of subtitles
      */
     function CurrentEditManager() {
         this.draft = null;
@@ -62,6 +62,14 @@ var angular = angular || null;
         if(this.draft !== null) {
             this.draft.markdown = markdown;
         }
+    }
+
+    CurrentEditManager.prototype.isForSubtitle = function(subtitle) {
+        return (this.draft !== null && this.draft.storedSubtitle == subtitle);
+    }
+
+    CurrentEditManager.prototype.inProgress = function() {
+        return this.draft !== null;
     }
 
     CurrentEditManager.prototype.lineCounts = function() {
@@ -381,7 +389,7 @@ var angular = angular || null;
         };
     };
 
-    var SubtitleListController = function($window, $scope, $timeout, SubtitleStorage) {
+    var SubtitleListController = function($scope, $window, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -392,11 +400,6 @@ var angular = angular || null;
          */
 
         var willSync = {start: null, end:null};
-
-        function subtitlesAddedOrRemoved() {
-            $scope.$root.$emit('work-done');
-            updateSyncHelpers();
-        }
 
         function updateSyncHelpers() {
             var startIndex = null, endIndex = null;
@@ -411,27 +414,12 @@ var angular = angular || null;
 
         $scope.currentEdit = new CurrentEditManager();
         $scope.subtitleList = new dfxp.SubtitleList();
+        $scope.isEditable = false;
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
-        $scope.addSubtitleAtEnd  = function() {
-            // Add the subtitle directly to the DFXP instance.
-            $scope.insertSubtitleBefore(null);
-        }
-        $scope.insertSubtitleBefore = function(otherSubtitle) {
-            var subtitle = $scope.subtitleList.insertSubtitleBefore(
-                    otherSubtitle);
-            subtitlesAddedOrRemoved();
-            $timeout(function() {
-                $scope.scopeForSubtitle(subtitle).startEditingMode();
-            });
-        };
-        $scope.removeSubtitle = function(subtitle) {
-            $scope.subtitleList.removeSubtitle(subtitle);
-            subtitlesAddedOrRemoved();
-        }
         $scope.getSubtitleListHeight = function() {
             return $(window).height() - $scope.subtitlesHeight;
         };
@@ -513,73 +501,130 @@ var angular = angular || null;
             };
         });
 
-        window.onresize = function() {
+        $scope.subtitleList.addChangeCallback(function(change) {
+            if(change == 'insert' || change == 'remove') {
+                updateSyncHelpers();
+            }
+        });
+
+        $window.onresize = function() {
             $scope.$digest();
         };
     };
-    var SubtitleListHelperController = function($scope) {
 
-        $scope.isEditingAny = false;
+    var WorkingSubtitleItemsController = function($scope, $window) {
+        var document = $($window.document);
 
-        $scope.$root.$on('editing', function() {
-            $scope.isEditingAny = true;
-        });
-        $scope.$root.$on('editing-done', function() {
-            $scope.isEditingAny = false;
-        });
-    };
-    var SubtitleListItemController = function($scope) {
-        /**
-         * Responsible for actions on one subtitle: editing, selecting.
-         * @param $scope
-         * @constructor
-         */
+        function startEdit(subtitle, caretPos) {
+            var li = $scope.getSubtitleRepeatItem(subtitle);
+            $scope.currentEdit.start(subtitle, li);
+            if(caretPos === undefined) {
+                caretPos = subtitle.markdown.length;
+            }
+            $scope.currentEdit.draft.initialCaretPos = caretPos;
+            document.on('mousedown.subtitle-edit', function(evt) {
+                var clicked = $(evt.target);
+                var textarea = $('textarea.subtitle-edit', li);
+                if(clicked[0] != textarea[0] &&
+                    !clicked.hasClass('info-tray') &&
+                    clicked.parents('.info-tray').length == 0) {
+                    $scope.$apply(function() {
+                        finishEdit(true);
+                    });
+                }
+            });
+        }
 
-        $scope.empty = $scope.subtitle.isEmpty();
-        $scope.isEditing = false;
-        $scope.showStartTime = $scope.subtitle.startTime >= 0;
-
-        $scope.finishEditingMode = function(commitChanges) {
-            $scope.isEditing = false;
-            $scope.hideTextArea();
-
+        function finishEdit(commitChanges) {
             // Tell the root scope that we're no longer editing, now.
-            $scope.$root.$emit('editing-done', $scope);
-
+            document.off('mousedown.subtitle-edit');
             if($scope.currentEdit.finish(commitChanges,
                         $scope.subtitleList)) {
-                $scope.empty = $scope.subtitle.isEmpty();
                 $scope.$root.$emit('work-done');
             }
         };
-        $scope.getSubtitleIndex = function() {
-            return $scope.subtitleList.getIndex($scope.subtitle);
-        };
-        $scope.startEditingMode = function(fromClick) {
-            $scope.isEditing = true;
-            $scope.currentEdit.start($scope.subtitle, $scope.LI);
-            $scope.showTextArea(fromClick);
 
-            // Tell the root scope that we're editing, now.
-            $scope.$root.$emit('editing');
-        };
-        $scope.onClick = function(event) {
-            if($scope.isWorkingSubtitles() && !$scope.isEditing) {
-                $scope.startEditingMode(true);
-                event.stopPropagation();
-                return false;
-            }
-            return true;
+        function insertAndStartEdit(before) {
+            var newSub = $scope.subtitleList.insertSubtitleBefore(before);
+            startEdit(newSub);
         }
-        $scope.lastItem = function() {
-            return $scope.$last;
-        };
-    };
+
+        $scope.onSubtitleClick = function(evt, subtitle, action) {
+            var madeChange = false;
+            switch(action) {
+                case 'insert':
+                    insertAndStartEdit(subtitle);
+                    madeChange = true;
+                    break;
+
+                case 'remove':
+                    if($scope.currentEdit.isForSubtitle(subtitle)) {
+                        $scope.currentEdit.finish(false);
+                    }
+                    $scope.subtitleList.removeSubtitle(subtitle);
+                    madeChange = true;
+                    break;
+
+                case 'edit':
+                    if(!$scope.currentEdit.isForSubtitle(subtitle)) {
+                        var caretPos = $window.getSelection().anchorOffset;
+                        startEdit(subtitle, caretPos);
+                        madeChange = true;
+                    }
+                    break;
+            }
+            if(madeChange) {
+                evt.preventDefault();
+                $scope.$root.$emit('work-done');
+            }
+        }
+
+        $scope.newSubtitleClicked = function(evt) {
+            insertAndStartEdit(null);
+            evt.preventDefault();
+            $scope.$root.$emit('work-done');
+        }
+
+        $scope.onEditKeydown = function(evt) {
+            var subtitle = $scope.currentEdit.draft.storedSubtitle;
+
+            if (evt.keyCode === 13 && !evt.shiftKey) {
+                // Enter without shift finishes editing
+                var nextSubtitle = $scope.subtitleList.nextSubtitle(subtitle);
+                finishEdit(true);
+                if(nextSubtitle === null) {
+                    insertAndStartEdit(null);
+                } else {
+                    startEdit(nextSubtitle);
+                }
+                evt.preventDefault();
+            } else if (evt.keyCode === 27) {
+                // Escape cancels editing
+                finishEdit(false);
+                evt.preventDefault();
+            } else if (evt.keyCode == 9) {
+                // Tab navigates to other subs
+                finishEdit(true);
+                if(!evt.shiftKey) {
+                    var targetSub = $scope.subtitleList.nextSubtitle(subtitle);
+                } else {
+                    var targetSub = $scope.subtitleList.prevSubtitle(subtitle);
+                }
+                if(targetSub !== null) {
+                    startEdit(targetSub);
+                }
+                evt.preventDefault();
+            }
+        }
+
+        $scope.$root.$on('subtitles-fetched', function() {
+            $scope.reloadSubtitleRepeat();
+        });
+    }
 
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionController = SaveSessionController;
     root.SubtitleListController = SubtitleListController;
-    root.SubtitleListHelperController = SubtitleListHelperController;
-    root.SubtitleListItemController = SubtitleListItemController;
+    root.WorkingSubtitleItemsController = WorkingSubtitleItemsController;
 
 }).call(this);

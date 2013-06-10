@@ -7,6 +7,7 @@ describe('Test the subtitle-repeat directive', function() {
 
     beforeEach(function() {
         module('amara.SubtitleEditor.directives.subtitles');
+        module('amara.SubtitleEditor.services.domutil');
         subtitles = [];
         subtitleList = new dfxp.SubtitleList();
         subtitleList.loadXML(null);
@@ -83,6 +84,9 @@ describe('Test the subtitle-repeat directive', function() {
         var newSub = subtitleList.insertSubtitleBefore(subtitles[1]);
         expect(childLIs().length).toEqual(5);
         expect(childLIs()[0]).toMatchSubtitle(newSub);
+        var newSubAtBack = subtitleList.insertSubtitleBefore(null);
+        expect(childLIs().length).toEqual(6);
+        expect(childLIs()[5]).toMatchSubtitle(newSubAtBack);
     });
 
     it('handles clicks', function() {
@@ -124,6 +128,48 @@ describe('Test the subtitle-repeat directive', function() {
         expect($('textarea', childLIs()[1]).length).toEqual(0);
     });
 
+    it('sets the caret position to the end of the text',
+            inject(function(DomUtil) {
+        spyOn(DomUtil, 'setSelectionRange');
+        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.$digest();
+        var textarea = $('textarea', elm)[0];
+        expect(DomUtil.setSelectionRange).toHaveBeenCalledWith(textarea,
+            subtitles[0].markdown.length, subtitles[0].markdown.length);
+
+    }));
+
+    it('sets the caret position to initialCaretPos if set',
+            inject(function(DomUtil) {
+        spyOn(DomUtil, 'setSelectionRange');
+        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.editingSub.initialCaretPos = 2;
+        scope.$digest();
+        var textarea = $('textarea', elm)[0];
+        expect(DomUtil.setSelectionRange).
+            toHaveBeenCalledWith(textarea, 2, 2);
+    }));
+
+    it('calls focus on edits', function() {
+        spyOn($.fn, 'focus').andCallFake(function() {
+            expect(this.length).toEqual(1);
+            expect(this[0]).toEqual($('textarea', elm)[0]);
+        });
+        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.$digest();
+        expect($.fn.focus.callCount).toEqual(1);
+    });
+
+    it('calls autosize on edits', function() {
+        spyOn($.fn, 'autosize').andCallFake(function() {
+            expect(this.length).toEqual(1);
+            expect(this[0]).toEqual($('textarea', elm)[0]);
+        });
+        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.$digest();
+        expect($.fn.autosize.callCount).toEqual(1);
+    });
+
     it('adds the edit class based on bind-to-edit', function() {
         scope.editingSub = subtitles[0].draftSubtitle();
         scope.$digest();
@@ -157,5 +203,11 @@ describe('Test the subtitle-repeat directive', function() {
         textarea.keydown();
         expect(spy.callCount).toEqual(1);
     });
+
+    it('fetches list items for subtitles', function() {
+        expect(scope.getSubtitleRepeatItem(subtitles[0]).get(0)).
+            toEqual(childLIs().get(0));
+    });
+
 
 });

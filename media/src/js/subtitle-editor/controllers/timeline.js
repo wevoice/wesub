@@ -166,6 +166,10 @@
             $scope.redrawSubtitles();
         }
 
+        function scrollToSubtitle(subtitle) {
+            $scope.workingSubtitles.$broadcast('scroll-to-subtitle', subtitle);
+        }
+
         $scope.$root.$on('video-update', function() {
             $scope.duration = VideoPlayer.duration();
             updateTimeline();
@@ -189,14 +193,14 @@
         $scope.$root.$on('sync-next-start-time', function($event) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
             if(willSync.start === null) {
-                if(!willSync.end.isSynced()) {
+                if(willSync.end !== null && !willSync.end.isSynced()) {
                     /* Special case: the user hit the down arrow when only 1
                      * subtitle was left and it had a start time set.  In this
                      * case, set the end time for that subtile
                      */
                     subtitleList.updateSubtitleTime(willSync.end,
                         willSync.end.startTime, $scope.currentTime);
-                    $scope.workingSubtitles.scrollToSubtitle(willSync.end);
+                    scrollToSubtitle(willSync.end);
                     $scope.$root.$emit("work-done");
                 }
                 return;
@@ -214,7 +218,7 @@
                 subtitleList.updateSubtitleTime(prev, prev.startTime,
                     $scope.currentTime);
             }
-            $scope.workingSubtitles.scrollToSubtitle(willSync.start);
+            scrollToSubtitle(willSync.start);
             $scope.$root.$emit("work-done");
         });
         $scope.$root.$on('sync-next-end-time', function($event) {
@@ -224,7 +228,7 @@
             }
             subtitleList.updateSubtitleTime(willSync.end,
                 willSync.end.startTime, $scope.currentTime);
-            $scope.workingSubtitles.scrollToSubtitle(willSync.end);
+            scrollToSubtitle(willSync.end);
             $scope.$root.$emit("work-done");
         });
     };
