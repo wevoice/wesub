@@ -86,6 +86,78 @@ function emptyDFXP() {
 </tt>';
 };
 
+function leftPad(number, width, character) {
+    /*
+     * Left Pad a number to the given width, with zeros.
+     * From: http://stackoverflow.com/a/1267338/22468
+     *
+     * Returns: string
+     */
+
+    character = character || '0';
+    width -= number.toString().length;
+
+    if (width > 0) {
+        return new Array(width + (/\./.test(number) ? 2 : 1))
+                        .join(character) + number;
+    }
+    return number.toString();
+}
+
+function rightPad(number, width, character) {
+    /*
+     * Right Pad a number to the given width, with zeros.
+     * From: http://stackoverflow.com/a/1267338/22468
+     *
+     * Returns: string
+     */
+
+    character = character || '0';
+    width -= number.toString().length;
+
+    if (width > 0) {
+        return number + new Array(width + (/\./.test(number) ? 2 : 1))
+            .join(character);
+    }
+    return number.toString();
+}
+
+/*
+* Display a human friendly format.
+* If showUnused if false, we truncate everything up to
+* unpaded seconds from the result.
+ */
+function displayTime(milliseconds, showUnused){
+    if (milliseconds === -1 ||
+        isNaN(Math.floor(milliseconds)) ||
+        milliseconds === undefined ||
+        milliseconds === null) {
+            return "--";
+        }
+    var time = Math.floor(milliseconds / 1000);
+    var hours = ~~(time / 3600);
+    var minutes = ~~((time % 3600) / 60);
+    var fraction = String(milliseconds % 1000).substring(0,2);
+    var seconds = time % 60;
+    var result = '';
+    if (hours || showUnused){
+        result += (hours > 9? leftPad(hours, 2) : hours ) + ':';
+    }
+    if ((minutes || hours) || showUnused){
+        if (hours){
+            result += leftPad(minutes, 2) + ':';
+        }else{
+            result += minutes + ":";
+        }
+    }
+    if (hours || minutes){
+        result += leftPad(seconds, 2) ;
+    }else{
+        result += seconds;
+    }
+    result += ',' + leftPad(fraction, 2);
+    return result
+}
 
 var AmaraDFXPParser = function() {
     /*
@@ -163,23 +235,6 @@ var AmaraDFXPParser = function() {
     };
 
     this.utils = {
-        leftPad: function(number, width, character) {
-            /*
-             * Left Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            character = character || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join(character) + number;
-            }
-            return number.toString();
-        },
         millisecondsToTimeExpression: function(milliseconds) {
             /*
              * Parses milliseconds into a time expression.
@@ -192,29 +247,11 @@ var AmaraDFXPParser = function() {
             var hours = ~~(time / 3600);
             var minutes = ~~((time % 3600) / 60);
             var fraction = milliseconds % 1000;
-            var p = this.utils.leftPad;
             var seconds = time % 60;
-            return p(hours, 2) + ':' +
-                p(minutes, 2) + ':' +
-                p(seconds, 2) +  ',' +
-                p(fraction, 3);
-        },
-        rightPad: function(number, width, character) {
-            /*
-             * Right Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            character = character || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return number + new Array(width + (/\./.test(number) ? 2 : 1))
-                    .join(character);
-            }
-            return number.toString();
+            return leftPad(hours, 2) + ':' +
+                leftPad(minutes, 2) + ':' +
+                leftPad(seconds, 2) +  ',' +
+                leftPad(fraction, 3);
         },
         timeExpressionToMilliseconds: function(timeExpression) {
             /*
@@ -231,7 +268,7 @@ var AmaraDFXPParser = function() {
             var millisecondsInHours    = components[1] * (3600 * 1000);
             var millisecondsInMinutes  = components[2] * (60 * 1000);
             var millisecondsInSeconds  = components[3] * (1000);
-            var millisecondsInFraction = parseInt(this.utils.rightPad(components[4], 3), 10);
+            var millisecondsInFraction = parseInt(rightPad(components[4], 3), 10);
 
             return parseInt(millisecondsInHours +
                             millisecondsInMinutes +
@@ -1143,6 +1180,14 @@ Subtitle.prototype.isSynced = function() {
     return this.startTime >= 0 && this.endTime >= 0;
 }
 
+Subtitle.prototype.timingString = function() {
+    if(this.isSynced()) {
+        return displayTime(this.startTime);
+    } else {
+        return 'unsynced';
+    }
+}
+
 Subtitle.prototype.isAt = function(time) {
     return this.isSynced() && this.startTime <= time && this.endTime > time;
 }
@@ -1313,7 +1358,7 @@ SubtitleList.prototype.prevSubtitle = function(subtitle) {
     }
 }
 
-SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
+SubtitleList.prototype._updateSubtitleTime = function(subtitle, startTime, endTime) {
     var wasSynced = subtitle.isSynced();
     if(subtitle.startTime != startTime) {
         this.parser.startTime(subtitle.node, startTime);
@@ -1326,16 +1371,24 @@ SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTim
     if(subtitle.isSynced() && !wasSynced) {
         this.syncedCount++;
     }
+}
+
+SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {
+    this._updateSubtitleTime(subtitle, startTime, endTime);
     this.emitChange('update', subtitle);
 }
 
-SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
+SubtitleList.prototype._updateSubtitleContent = function(subtitle, content) {
     /* Update subtilte content
      *
      * content is a string in our markdown-style format.
      */
     this.parser.content(subtitle.node, content);
     subtitle.markdown = content;
+}
+
+SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
+    this._updateSubtitleContent(subtitle, content);
     this.emitChange('update', subtitle);
 }
 
@@ -1363,16 +1416,16 @@ SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
             var durationSplit = Math.floor(totalTime / 3);
             var startTime = firstSubtitle.startTime + durationSplit;
             var endTime = startTime + durationSplit;
-            this.updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
+            this._updateSubtitleTime(firstSubtitle, firstSubtitle.startTime,
                     startTime);
-            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+            this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
         } else {
             // Inserting a subtitle as the start of the list.  position the
             // subtitle to start at time=0 and take up half the space
             // available to the two subtitles
             var startTime = 0;
             var endTime = Math.floor(otherSubtitle.endTime / 2);
-            this.updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
+            this._updateSubtitleTime(otherSubtitle, endTime, otherSubtitle.endTime);
         }
         attrs = {
             begin: startTime,

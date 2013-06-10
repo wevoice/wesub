@@ -312,6 +312,177 @@ var USER_IDLE_MINUTES = 5;
         }
     });
 
+    directives.directive('subtitleRepeat', function($interpolate) {
+        /* Specialized repeat directive to work with subtitleList
+         *
+         * Because we need to deal potentially thousands of subtitles,
+         * ng-repeat is not ideal.  subtitleRepeat does a couple things to
+         * speed up performance:
+         *
+         *   - it hooks up to the change callback of subtitleList to calculate
+         *   changes quickly.
+         *
+         *   - it doesn't create a child scope for each subtitle.  This means
+         *   that it doesn't support the full angular templating language.
+         *   However simple string interpolation is supported.
+         */
+        return function link($scope, elm, attrs) {
+            function createNodeForSubtitle(subtitle) {
+                var context = {
+                    subtitle: subtitle
+                };
+                for(var i=0; i < interpolations.length; i++) {
+                    var interp = interpolations[i];
+                    interp.node.textContent = interp.func(context);
+                }
+                var rv = elm.clone();
+                subtitleMap[subtitle.id] = rv;
+                rv.data('subtitle', subtitle);
+                return rv;
+            }
+
+            function findInterpolations() {
+                // Jquery doesn't have a great way of finding text nodes, use
+                // the plain DOM API instead
+                var toSearch = [elm[0]];
+                var rv = [];
+                while(toSearch.length > 0) {
+                    var node = toSearch.pop();
+                    if(node.nodeType == 3) {
+                        // Text node
+                        var func = $interpolate(node.textContent, true);
+                        if(func != null) {
+                            rv.push({node: node, func: func});
+                        }
+                    } else {
+                        toSearch.push.apply(toSearch, node.childNodes);
+                    }
+                }
+                return rv;
+            }
+
+            function findSubtitleClickValue(node) {
+                // Find the value of the subtitle-click attribute, starting
+                // with node and moving up the DOM tree
+                var parentNode = parent[0];
+                while(node && node != parentNode) {
+                    if(node.hasAttribute("subtitle-click")) {
+                        return node.getAttribute("subtitle-click");
+                    } else {
+                        node = node.parentNode;
+                    }
+                }
+                return null;
+            }
+            function findSubtitleData(node) {
+                // Find the value of the subtitle-click attribute, starting
+                // with node and moving up the DOM tree
+                var parentNode = parent[0];
+                while(node && node != parent) {
+                    var subtitle = $(node).data('subtitle');
+                    if(subtitle) {
+                        return subtitle;
+                    } else {
+                        node = node.parentNode;
+                    }
+                }
+                return null;
+            }
+
+            function onChange(change) {
+                var subtitle = change.subtitle;
+                switch(change.type) {
+                    case 'remove':
+                        var node = subtitleMap[subtitle.id];
+                        node.remove();
+                        delete subtitleMap[subtitle.id];
+                        break;
+                    case 'update':
+                        var node = subtitleMap[subtitle.id];
+                        node.replaceWith(createNodeForSubtitle(subtitle));
+                        break;
+                    case 'insert':
+                        var node = subtitleMap[change.before.id];
+                        node.before(createNodeForSubtitle(subtitle));
+                        break;
+                }
+            }
+
+            function startEditOn(draft) {
+                var li = subtitleMap[draft.storedSubtitle.id];
+                li.addClass('edit');
+                var textarea = $('<textarea class="subtitle-edit" />');
+                textarea.val(draft.markdown);
+                li.append(textarea);
+                textarea.on('keyup', function(evt) {
+                    $scope.$apply(function() {
+                        draft.markdown = textarea.val();
+                    });
+                });
+                if(attrs.editKeydown) {
+                    textarea.on('keydown', function(evt) {
+                        $scope.$apply(function() {
+                            var handler = $scope[attrs.editKeydown];
+                            handler(evt);
+                        });
+                    });
+                }
+            }
+            function stopEditOn(draft) {
+                var li = subtitleMap[draft.storedSubtitle.id];
+                li.removeClass('edit');
+                $('textarea.subtitle-edit', li).remove();
+            }
+
+            $scope.reloadSubtitleRepeat = function() {
+                parent.empty();
+                subtitleMap = {}
+                for(var i=0; i < subtitleList.length(); i++) {
+                    var subtitle = subtitleList.subtitles[i];
+                    parent.append(createNodeForSubtitle(subtitle));
+                }
+            }
+
+            // On our first pass we remove the element from its parent, then
+            // add a copy for each subtitle
+            elm = $(elm);
+            var subtitleList = $scope[attrs.subtitleRepeat];
+            var parent = elm.parent();
+            var interpolations = findInterpolations();
+            // Map subtitle ID to node for that subtitle
+            var subtitleMap = {};
+
+            elm.remove();
+            $scope.reloadSubtitleRepeat();
+
+            subtitleList.addChangeCallback(onChange);
+
+            if(attrs.bindToEdit) {
+                $scope.$watch(attrs.bindToEdit, function(newValue, oldValue) {
+                    if(oldValue) {
+                        stopEditOn(oldValue);
+                    }
+                    if(newValue) {
+                        startEditOn(newValue);
+                    }
+                });
+            }
+            // We connect to the click event of the parent element.  If we
+            // have many subtitles, creating a handler for each <li> isn't
+            // good.
+            parent.on('click', function(evt) {
+                if(!$scope.onSubtitleClick) {
+                    return;
+                }
+                var action = findSubtitleClickValue(evt.target);
+                var subtitle = findSubtitleData(evt.target);
+                if(action !== null) {
+                    $scope.onSubtitleClick(evt, subtitle, action);
+                }
+            });
+        }
+    });
+
     directives.directive('languageSelector', function(SubtitleStorage) {
         return {
             compile: function compile(elm, attrs, transclude) {
