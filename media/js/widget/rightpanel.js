@@ -295,8 +295,9 @@ unisubs.RightPanel.prototype.createSaveAndOpenInNewEditor = function(stepsDiv) {
 
         var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
         var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
+        var supportedTypes = ['vimeo', 'youtube', 'html5', 'flv'];
 
-        if (['vimeo', 'youtube', 'html5'].indexOf(videoType) !== -1) {
+        if (supportedTypes.indexOf(videoType) !== -1) {
             this.saveAndOpenInNewEditor = $d(
                 'div', 'unisubs-saveandopeninneweditor',
                 $d('span', null, 'Beta: '),
