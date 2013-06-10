@@ -421,11 +421,11 @@ var angular = angular || null;
             $scope.insertSubtitleBefore(null);
         }
         $scope.insertSubtitleBefore = function(otherSubtitle) {
-            var insertPos = $scope.subtitleList.insertSubtitleBefore(
+            var subtitle = $scope.subtitleList.insertSubtitleBefore(
                     otherSubtitle);
             subtitlesAddedOrRemoved();
             $timeout(function() {
-                $scope.nthChildScope(insertPos).startEditingMode();
+                $scope.scopeForSubtitle(subtitle).startEditingMode();
             });
         };
         $scope.removeSubtitle = function(subtitle) {

@@ -172,8 +172,11 @@ var USER_IDLE_MINUTES = 5;
                 }
             });
             scope.scrollToSubtitle = function(subtitle) {
+                scopeForSubtitle(subtitle).scrollTo();
+            }
+            scope.scopeForSubtitle = function(subtitle) {
                 var pos = scope.subtitleList.getIndex(subtitle);
-                scope.nthChildScope(pos).scrollTo();
+                return scope.nthChildScope(pos);
             }
             scope.nthChildScope = function(index) {
                 var children = elem.children();

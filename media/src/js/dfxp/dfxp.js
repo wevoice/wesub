@@ -1213,6 +1213,7 @@ var SubtitleList = function() {
     this.idCounter = 0;
     this.subtitles = [];
     this.syncedCount = 0;
+    this.changeCallbacks = [];
 }
 
 SubtitleList.prototype.contentForMarkdown = function(markdown) {
@@ -1244,6 +1245,29 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
     this.subtitles = syncedSubs;
     // append all unsynced subs to the list
     this.subtitles.push.apply(this.subtitles, unsyncedSubs);
+}
+
+SubtitleList.prototype.addChangeCallback = function(callback) {
+    this.changeCallbacks.push(callback);
+}
+
+SubtitleList.prototype.removeChangeCallback = function(callback) {
+    var pos = this.changeCallbacks.indexOf(callback);
+    if(pos >= 0) {
+        this.changeCallbacks.splice(pos, 1);
+    }
+}
+
+SubtitleList.prototype.emitChange = function(type, subtitle, extraProps) {
+    changeObj = { type: type, subtitle: subtitle };
+    if(extraProps) {
+        for(key in extraProps) {
+            changeObj[key] = extraProps[key];
+        }
+    }
+    for(var i=0; i < this.changeCallbacks.length; i++) {
+        this.changeCallbacks[i](changeObj);
+    }
 }
 
 SubtitleList.prototype.makeItem = function(node) {
@@ -1302,6 +1326,7 @@ SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTim
     if(subtitle.isSynced() && !wasSynced) {
         this.syncedCount++;
     }
+    this.emitChange('update', subtitle);
 }
 
 SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
@@ -1311,6 +1336,7 @@ SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
      */
     this.parser.content(subtitle.node, content);
     subtitle.markdown = content;
+    this.emitChange('update', subtitle);
 }
 
 SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
@@ -1365,7 +1391,8 @@ SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
     if(subtitle.isSynced()) {
         this.syncedCount++;
     }
-    return pos;
+    this.emitChange('insert', subtitle, { 'before': otherSubtitle});
+    return subtitle;
 }
 
 SubtitleList.prototype.removeSubtitle = function(subtitle) {
@@ -1375,6 +1402,7 @@ SubtitleList.prototype.removeSubtitle = function(subtitle) {
     if(subtitle.isSynced()) {
         this.syncedCount--;
     }
+    this.emitChange('remove', subtitle);
 }
 
 SubtitleList.prototype.lastSyncedSubtitle = function() {
