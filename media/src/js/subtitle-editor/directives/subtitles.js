@@ -283,6 +283,8 @@ var USER_IDLE_MINUTES = 5;
                             parent.append(createNodeForSubtitle(subtitle));
                         }
                         break;
+                    case 'reload':
+                        reloadSubtitles();
                 }
             }
 
@@ -322,7 +324,7 @@ var USER_IDLE_MINUTES = 5;
                 }
             }
 
-            $scope.reloadSubtitleRepeat = function() {
+            function reloadSubtitles() {
                 parent.empty();
                 subtitleMap = {}
                 for(var i=0; i < subtitleList.length(); i++) {
@@ -350,7 +352,7 @@ var USER_IDLE_MINUTES = 5;
             var subtitleMap = {};
 
             elm.remove();
-            $scope.reloadSubtitleRepeat();
+            reloadSubtitles();
 
             subtitleList.addChangeCallback(onChange);
 

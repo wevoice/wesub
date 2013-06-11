@@ -616,10 +616,6 @@ var angular = angular || null;
                 evt.preventDefault();
             }
         }
-
-        $scope.$root.$on('subtitles-fetched', function() {
-            $scope.reloadSubtitleRepeat();
-        });
     }
 
     root.LanguageSelectorController = LanguageSelectorController;

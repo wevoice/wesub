@@ -1290,6 +1290,7 @@ SubtitleList.prototype.loadXML = function(subtitlesXML) {
     this.subtitles = syncedSubs;
     // append all unsynced subs to the list
     this.subtitles.push.apply(this.subtitles, unsyncedSubs);
+    this.emitChange('reload', null);
 }
 
 SubtitleList.prototype.addChangeCallback = function(callback) {
