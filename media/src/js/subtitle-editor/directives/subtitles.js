@@ -168,7 +168,7 @@ var USER_IDLE_MINUTES = 5;
         }
     });
 
-    directives.directive('subtitleRepeat', function($interpolate, DomUtil) {
+    directives.directive('subtitleRepeat', function($interpolate, $parse, DomUtil) {
         /* Specialized repeat directive to work with subtitleList
          *
          * Because we need to deal potentially thousands of subtitles,
@@ -183,18 +183,36 @@ var USER_IDLE_MINUTES = 5;
          *   However simple string interpolation is supported.
          */
         return function link($scope, elm, attrs) {
+            elm = $(elm);
             function createNodeForSubtitle(subtitle) {
                 var context = {
                     subtitle: subtitle
                 };
-                for(var i=0; i < interpolations.length; i++) {
-                    var interp = interpolations[i];
-                    interp.node.textContent = interp.func(context);
+                for(var i=0; i < updateFuncs.length; i++) {
+                    updateFuncs[i](context);
                 }
                 var rv = elm.clone();
                 subtitleMap[subtitle.id] = rv;
                 rv.data('subtitle', subtitle);
                 return rv;
+            }
+
+            function interpolateFunc(node, func) {
+                return function(context) {
+                    node.textContent = func(context);
+                }
+            }
+
+            function conditionalClassFunc(expr, className) {
+                var condition = $parse(expr);
+
+                return function(context) {
+                    if(condition(context)) {
+                        elm.addClass(className);
+                    } else {
+                        elm.removeClass(className);
+                    }
+                }
             }
 
             function findInterpolations() {
@@ -208,7 +226,7 @@ var USER_IDLE_MINUTES = 5;
                         // Text node
                         var func = $interpolate(node.textContent, true);
                         if(func != null) {
-                            rv.push({node: node, func: func});
+                            updateFuncs.push(interpolateFunc(node, func));
                         }
                     } else {
                         toSearch.push.apply(toSearch, node.childNodes);
@@ -326,7 +344,8 @@ var USER_IDLE_MINUTES = 5;
             elm = $(elm);
             var subtitleList = $scope[attrs.subtitleRepeat];
             var parent = elm.parent();
-            var interpolations = findInterpolations();
+            var updateFuncs = []
+            findInterpolations();
             // Map subtitle ID to node for that subtitle
             var subtitleMap = {};
 
@@ -344,6 +363,10 @@ var USER_IDLE_MINUTES = 5;
                         startEditOn(newValue);
                     }
                 });
+            }
+            if(attrs.conditionalClass) {
+                var split = attrs.conditionalClass.split(":", 2);
+                updateFuncs.push(conditionalClassFunc(split[0], split[1]));
             }
             // We connect to the click event of the parent element.  If we
             // have many subtitles, creating a handler for each <li> isn't

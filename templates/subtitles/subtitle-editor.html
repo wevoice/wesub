@@ -155,6 +155,7 @@
 subtitle-repeat directive, see the working subtitles for more info
 -->
                         <li subtitle-repeat="subtitleList"
+                            conditional-class="subtitle.isEmpty():empty"
                             class="subtitle-list-item">
                             <span class="timing">
                                 [[ subtitle.timingString() ]]
@@ -252,6 +253,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 -->
                         <li subtitle-repeat="subtitleList"
                             class="subtitle-list-item"
+                            conditional-class="subtitle.isEmpty():empty"
                             bind-to-edit="currentEdit.draft"
                             edit-keydown="onEditKeydown"
                             subtitle-click="edit">

@@ -23,6 +23,7 @@ describe('Test the subtitle-repeat directive', function() {
       '<ul>' +
         '<li subtitle-repeat="subtitleList" ' +
              'bind-to-edit="editingSub" ' +
+             'conditional-class="subtitle.isEmpty():empty" ' +
              'edit-keydown="onEditKeyDown">' +
           '<span class="timing">{{ subtitle.timingString() }}</span>' +
           '<span class="text">{{ subtitle.content() }}</span>' +
@@ -66,6 +67,14 @@ describe('Test the subtitle-repeat directive', function() {
         for(var i=0; i < subtitles.length; i++) {
             expect(lis[i]).toMatchSubtitle(subtitles[i]);
         }
+    });
+
+    it('adds conditional classes', function() {
+        for(var i=0; i < subtitles.length; i++) {
+            expect(childLIs().eq(i).hasClass('empty')).toBeFalsy();
+        }
+        subtitleList.updateSubtitleContent(subtitles[0], '');
+        expect(childLIs().eq(0).hasClass('empty')).toBeTruthy();
     });
 
     it('updates the DOM on changes', function() {
