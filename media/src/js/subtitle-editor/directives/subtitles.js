@@ -48,13 +48,12 @@ var USER_IDLE_MINUTES = 5;
             scope.isEditable = true;
             scope.setVideoID(attrs.videoId);
             if(attrs.languageCode != "") {
-                scope.setLanguage(attrs.languageCode);
                 if(attrs.versionNumber != "") {
                     scope.versionNumber = parseInt(attrs.versionNumber);
                     scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
                 } else {
                     scope.versionNumber = null;
-                    scope.initEmptySubtitles();
+                    scope.initEmptySubtitles(attrs.languageCode);
                 }
             }
 

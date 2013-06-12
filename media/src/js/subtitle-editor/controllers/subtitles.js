@@ -130,14 +130,6 @@ var angular = angular || null;
             $scope.versionNumber = versionNumber.toString();
             loadSubtitles();
         };
-        $scope.setReferenceSubs = function() {
-            if (!$scope.refSubList) {
-                $scope.refSubList = SubtitleListFinder.get(
-                        'reference-subtitle-set').scope;
-            }
-            $scope.refSubList.onSubtitlesFetched($scope.currentVersion);
-            $scope.refSubList.setLanguage($scope.currentLanguage.language_code);
-        };
         $scope.findVersion = function(versionNumber) {
             for(var i = 0; i < $scope.versions.length; i++) {
                 if($scope.versions[i].version_no == versionNumber) {
@@ -162,17 +154,12 @@ var angular = angular || null;
                 }
 
                 $scope.currentVersion = newVersion;
-                if (!newVersion.subtitlesXML) {
-                    SubtitleStorage.getSubtitles(
-                        $scope.language.language_code,
-                        newVersion.version_no,
-                        function(subtitleData) {
-                            newVersion.subtitlesXML = subtitleData.subtitlesXML;
-                            $scope.setReferenceSubs();
-                        });
-                } else {
-                    $scope.setReferenceSubs();
+                if (!$scope.refSubList) {
+                    $scope.refSubList = SubtitleListFinder.get(
+                            'reference-subtitle-set').scope;
                 }
+                $scope.refSubList.getSubtitles($scope.language.language_code,
+                        newVersion.version_no);
             });
         }
 
@@ -442,6 +429,7 @@ var angular = angular || null;
             return $(window).height() - $scope.subtitlesHeight;
         };
         $scope.getSubtitles = function(languageCode, versionNumber) {
+            $scope.setLanguage(languageCode);
 
             // If this version has no default source translation language
             // it will be empty, in which case we want to wait for user
@@ -453,9 +441,8 @@ var angular = angular || null;
 
             $scope.status = 'loading';
 
-            var that = this;
             SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitleData) {
-                $scope.onSubtitlesFetched.call(that, subtitleData);
+                $scope.onSubtitlesFetched(subtitleData);
             });
 
         };
@@ -476,7 +463,8 @@ var angular = angular || null;
                 $scope.$root.$emit('subtitles-fetched');
             }
         };
-        $scope.initEmptySubtitles = function() {
+        $scope.initEmptySubtitles = function(languageCode) {
+            $scope.setLanguage(languageCode);
             // Save subtitle data to this scope
             $scope.videoTitle = '';
             $scope.videoDescription = '';
