@@ -151,11 +151,6 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
 
     video_urls = []
     for v in video.get_video_urls():
-
-        # Force controls for YouTube players.
-        if 'youtube.com' in v.url:
-            v.url = v.url + '&controls=1'
-
         video_urls.append(v.url)
 
     editor_data = {

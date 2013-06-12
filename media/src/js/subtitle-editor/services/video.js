@@ -60,8 +60,9 @@ var angular = angular || null;
         return {
             init: function() {
                 videoURLs = SubtitleStorage.getVideoURLs();
-                pop = window.Popcorn.smart('#video', videoURLs);
-                pop.controls(true);
+                pop = window.Popcorn.smart('#video', videoURLs, {
+                    controls: false,
+                });
                 handlePopcornEvents();
             },
             play: function() {
