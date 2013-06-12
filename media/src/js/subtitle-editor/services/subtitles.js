@@ -96,7 +96,7 @@ var angular = angular || null;
                     var langMap = {}, item;
                     for (var i=0; i< cachedData.languages.length; i++){
                         item  = cachedData.languages[i];
-                        langMap[item.code] = item.name;
+                        langMap[item.language_code] = item.name;
                     }
                     cachedData.languageMap = langMap;
                 }
