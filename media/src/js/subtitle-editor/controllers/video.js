@@ -26,16 +26,6 @@
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
 
-        function updateOverlayTextDir() {
-            if($scope.workingSubtitles && $scope.workingSubtitles.languageIsRTL) {
-                $scope.overlayTextDir = 'rtl';
-            } else {
-                $scope.overlayTextDir = 'ltr';
-            }
-        }
-        $scope.$watch('workingSubtitles.languageIsRTL', updateOverlayTextDir);
-        updateOverlayTextDir();
-
         $scope.$watch('workingSubtitles.currentEdit.draft.content()', function(newValue) {
             if(newValue !== null && newValue !== undefined) {
                 $scope.overlayText = newValue;

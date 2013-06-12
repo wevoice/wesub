@@ -67,7 +67,7 @@
         </section>
         <section class="video center column ng-cloak">
             <span class="video-title">
-                <span class="subtitles-language">[[ workingSubtitles.languageName ]]</span>
+                <span class="subtitles-language">[[ workingSubtitles.language.name ]]</span>
                 <span class="sep">•</span>
                 [[ workingSubtitles.videoTitle ]]
             </span>
@@ -149,6 +149,7 @@
 
                     <ul subtitle-list="reference-subtitle-set"
                         editable="false"
+                        dir="[[ language.dir ]]"
                         video-id="{{ video.video_id }}">
 
 <!-- 
@@ -174,11 +175,11 @@ subtitle-repeat directive, see the working subtitles for more info
         </section>
         <section class="center column">
         <div class="video" id="video" ng-controller="VideoController">
-            <div class="subtitle-overlay" dir="[[ overlayTextDir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+            <div class="subtitle-overlay" dir="[[ workingSubtitles.language.dir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
         </div>
             <div class="workspace-tools group">
                 <div class="subtitles-language">
-                    [[ workingSubtitles.languageName ]] subtitles
+                    [[ workingSubtitles.language.name ]] subtitles
                 </div>
                 <div class="switches">
                     <a class="timeline-display" href="#" ng-click="toggleTimelineShown()">
@@ -241,6 +242,7 @@ subtitle-repeat directive, see the working subtitles for more info
                 <div class="working subtitles"
                     ng-controller="WorkingSubtitleItemsController">
                     <ul subtitle-list="working-subtitle-set"
+                        dir="[[ language.dir ]]"
                         id="working-subtitle-set">
 
 <!--
@@ -341,7 +343,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
         ng-cloak>
         <div class="current-time-marker"></div>
         <canvas class="timing" width="100" height="65" timeline-timing></canvas>
-        <div class="subtitles-container" timeline-subtitles>
+        <div class="subtitles-container" dir="[[ workingSubtitles.language.dir ]]" timeline-subtitles>
         </div>
     </section>
 

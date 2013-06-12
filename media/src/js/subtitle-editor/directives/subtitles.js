@@ -48,7 +48,7 @@ var USER_IDLE_MINUTES = 5;
             scope.isEditable = true;
             scope.setVideoID(attrs.videoId);
             if(attrs.languageCode != "") {
-                scope.setLanguageCode(attrs.languageCode);
+                scope.setLanguage(attrs.languageCode);
                 if(attrs.versionNumber != "") {
                     scope.versionNumber = parseInt(attrs.versionNumber);
                     scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
@@ -164,15 +164,6 @@ var USER_IDLE_MINUTES = 5;
                             target.offset().top - scroller.offset().top);
                 }
             });
-
-            scope.$watch('languageIsRTL', function(newValue) {
-                if(newValue) {
-                    elem.attr('dir', 'rtl');
-                } else {
-                    elem.attr('dir', 'ltr');
-                }
-            });
-
         }
     });
 

@@ -136,8 +136,7 @@ var angular = angular || null;
                         'reference-subtitle-set').scope;
             }
             $scope.refSubList.onSubtitlesFetched($scope.currentVersion);
-            $scope.refSubList.setLanguageCode(
-                    $scope.currentLanguage.language_code);
+            $scope.refSubList.setLanguage($scope.currentLanguage.language_code);
         };
         $scope.findVersion = function(versionNumber) {
             for(var i = 0; i < $scope.versions.length; i++) {
@@ -494,15 +493,13 @@ var angular = angular || null;
         $scope.saveSubtitles = function() {
             $scope.status = 'saving';
             return SubtitleStorage.saveSubtitles($scope.videoID,
-                                          $scope.languageCode,
+                                          $scope.language.code,
                                           $scope.subtitleList.toXMLString(),
                                           $scope.videoTitle,
                                           $scope.videoDescription);
         };
-        $scope.setLanguageCode = function(code) {
-            $scope.languageCode = code;
-            $scope.languageName = SubtitleStorage.getLanguageName(code);
-            $scope.languageIsRTL = SubtitleStorage.getLanguageIsRTL(code);
+        $scope.setLanguage = function(code) {
+            $scope.language = SubtitleStorage.getLanguage(code);
         };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;

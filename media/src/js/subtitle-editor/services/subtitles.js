@@ -47,6 +47,30 @@ var angular = angular || null;
         return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
 
+    /*
+     * Language object that we return from getLanguage()
+     */
+    function Language(responseData) {
+        /*
+         * Create a new Language object
+         *
+         * responseData is either:
+         *   - data that we got back from the API
+         *   - or data from the editor_data variable
+         *
+         * This means that editor_data should be formated exactly as the
+         * response data is.
+         */
+        this.responseData = responseData;
+        this.name = responseData.name;
+        this.code = responseData.language_code;
+        if(responseData.is_rtl) {
+            this.dir = 'rtl';
+        } else {
+            this.dir = 'ltr';
+        }
+    }
+
     module.factory('SubtitleStorage', function($window, $http) {
 
         var cachedData = $window.editorData;
@@ -102,6 +126,10 @@ var angular = angular || null;
                 } else {
                     callback(cachedData.languages);
                 }
+            },
+            getLanguage: function(languageCode) {
+                ensureLanguageMap();
+                return new Language(cachedData.languageMap[languageCode]);
             },
             getLanguageName: function(languageCode) {
                 ensureLanguageMap();
