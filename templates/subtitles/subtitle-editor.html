@@ -174,7 +174,7 @@ subtitle-repeat directive, see the working subtitles for more info
         </section>
         <section class="center column">
         <div class="video" id="video" ng-controller="VideoController">
-            <div class="subtitle-overlay" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+            <div class="subtitle-overlay" dir="[[ overlayTextDir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
         </div>
             <div class="workspace-tools group">
                 <div class="subtitles-language">
