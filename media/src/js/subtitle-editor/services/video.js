@@ -27,24 +27,31 @@ var angular = angular || null;
         var pop = null;
         var playing = false;
 
+        function emitSignal(signalName) {
+            $rootScope.$apply(function() {
+                $rootScope.$emit(signalName);
+            });
+        }
+
         function handlePopcornEvents() {
             // Handle popcorn events
             pop.on('canplay', function() {
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
             }).on('playing', function() {
                 playing = true;
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
             }).on('pause', function() {
                 playing = false;
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
             }).on('ended', function() {
                 playing = false;
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
             }).on('durationchange', function() {
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
+            }).on('timeupdate', function() {
+                emitSignal('video-time-update');
             }).on('seeked', function() {
-                console.log("seeked");
-                $rootScope.$emit('video-update');
+                emitSignal('video-update');
             });
         }
 

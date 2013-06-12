@@ -868,10 +868,15 @@ section.main {
             ul.video-controls {
                 height: 33px;
                 background: url('../../../images/editor/player-background.png');
+                color: #fff;
+
                 li {
                     display: block;
                     float: left;
                     height: 33px;
+                    line-height: 33px;
+                    vertical-align: middle;
+                    text-align: center;
                 }
                 li a {
                     display: block;
@@ -882,6 +887,10 @@ section.main {
                     float: left;
                 }
 
+                li.time {
+                    float: right;
+                }
+
                 li.play-pause a {
                     width: 48px;
                     background: url('../../../images/editor/play-button.png') center center no-repeat;
@@ -889,6 +898,10 @@ section.main {
 
                 li.play-pause.playing a {
                     background-image: url('../../../images/editor/pause-button.png');
+                }
+
+                li.time {
+                   width: 85px;
                 }
             }
             &:before {

@@ -181,6 +181,9 @@ subtitle-repeat directive, see the working subtitles for more info
                 <li class="play-pause" ng-class="{'playing': playing }">
                     <a href="#" ng-click="togglePlay($event)"></a>
                 </li>
+                <li class="time" ng-show="duration > 0">
+                    [[ currentTime|displayTimeSeconds]] / [[ duration|displayTimeSeconds]]
+                </li>
             </ul>
         </div>
             <div class="workspace-tools group">

@@ -26,10 +26,16 @@
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
         $scope.playing = false;
-
+        $scope.currentTime = 0;
+        $scope.duration = -1;
 
         $scope.$root.$on("video-update", function() {
             $scope.playing = VideoPlayer.isPlaying();
+            $scope.currentTime = VideoPlayer.currentTime();
+            $scope.duration = VideoPlayer.duration();
+        });
+        $scope.$root.$on("video-time-update", function() {
+            $scope.currentTime = VideoPlayer.currentTime();
         });
 
         $scope.togglePlay = function(event) {
