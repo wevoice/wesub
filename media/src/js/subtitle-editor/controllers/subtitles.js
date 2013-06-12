@@ -103,6 +103,7 @@ var angular = angular || null;
          * fetches.
          */
         $scope.versionNumber = null;
+        $scope.currentVersion = null;
         $scope.versions = [];
         $scope.languageChanged = function(language, versionNumber) {
             if (!language) {
@@ -124,6 +125,7 @@ var angular = angular || null;
             }
 
             $scope.versionNumber = versionNumber.toString();
+            loadSubtitles();
         };
         $scope.setReferenceSubs = function(subtitleData) {
             if (!$scope.refSubList) {
@@ -139,24 +141,35 @@ var angular = angular || null;
             }
             return null;
         }
-        $scope.versionNumberChanged = function(newValue, oldValue) {
-            var newVersion = $scope.findVersion(newValue);
-            if(!newVersion) {
-                return;
-            }
-
-            if (!newVersion.subtitlesXML) {
-                SubtitleStorage.getSubtitles(
-                    $scope.language.language_code,
-                    newVersion.version_no,
-                    function(subtitleData) {
-                        newVersion.subtitlesXML = subtitleData.subtitlesXML;
-                        $scope.setReferenceSubs(newVersion);
-                    });
-            } else {
-                $scope.setReferenceSubs(newVersion);
-            }
+        $scope.versionNumberChanged = function() {
+            loadSubtitles();
         };
+
+        function loadSubtitles() {
+            /* loadSubtitles gets called a bunch of times as we are populating
+             * the dropdowns.  Wrap it in a $evalAsync so that we wait for things
+             * to settle before actually trying to load them.
+             */
+            $scope.$evalAsync(function() {
+                var newVersion = $scope.findVersion($scope.versionNumber);
+                if(!newVersion || newVersion == $scope.currentVersion) {
+                    return;
+                }
+
+                $scope.currentVersion = newVersion;
+                if (!newVersion.subtitlesXML) {
+                    SubtitleStorage.getSubtitles(
+                        $scope.language.language_code,
+                        newVersion.version_no,
+                        function(subtitleData) {
+                            newVersion.subtitlesXML = subtitleData.subtitlesXML;
+                            $scope.setReferenceSubs(newVersion);
+                        });
+                } else {
+                    $scope.setReferenceSubs(newVersion);
+                }
+            });
+        }
 
         $scope.setInitialDisplayLanguage = function(allLanguages, languageCode, versionNumber){
 
