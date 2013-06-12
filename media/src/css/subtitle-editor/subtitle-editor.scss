@@ -822,9 +822,6 @@ section.main {
         @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
 
         div.video {
-            border-bottom: 1px solid #88898B;
-            border-left: 1px solid #88898B;
-            border-right: 1px solid #88898B;
             height: 291px;
             position: relative;
 
@@ -859,13 +856,40 @@ section.main {
                     }
                 }
             }
-            iframe {
-                height: 290px;
+            div.video-container {
+                height: 258px;
                 width: 100%;
+                iframe, video {
+                    height: 258px;
+                    width: 100%;
+                }
             }
-            video {
-                height: 291px;
-                width: 100%;
+
+            ul.video-controls {
+                height: 33px;
+                background: url('../../../images/editor/player-background.png');
+                li {
+                    display: block;
+                    float: left;
+                    height: 33px;
+                }
+                li a {
+                    display: block;
+                    height: 33px;
+                }
+
+                li.play-pause {
+                    float: left;
+                }
+
+                li.play-pause a {
+                    width: 48px;
+                    background: url('../../../images/editor/play-button.png') center center no-repeat;
+                }
+
+                li.play-pause.playing a {
+                    background-image: url('../../../images/editor/pause-button.png');
+                }
             }
             &:before {
                 @include shadow();

@@ -25,6 +25,17 @@
         $scope.overlayText = null;
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
+        $scope.playing = false;
+
+
+        $scope.$root.$on("video-update", function() {
+            $scope.playing = VideoPlayer.isPlaying();
+        });
+
+        $scope.togglePlay = function(event) {
+            VideoPlayer.togglePlay();
+            event.preventDefault();
+        };
 
         $scope.$watch('workingSubtitles.currentEdit.draft.content()', function(newValue) {
             if(newValue !== null && newValue !== undefined) {

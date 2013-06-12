@@ -174,8 +174,14 @@ subtitle-repeat directive, see the working subtitles for more info
             </div>
         </section>
         <section class="center column">
-        <div class="video" id="video" ng-controller="VideoController">
+        <div class="video" ng-controller="VideoController">
+            <div class="video-container" id="video"></div>
             <div class="subtitle-overlay" dir="[[ workingSubtitles.language.dir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+            <ul class="video-controls group">
+                <li class="play-pause" ng-class="{'playing': playing }">
+                    <a href="#" ng-click="togglePlay($event)"></a>
+                </li>
+            </ul>
         </div>
             <div class="workspace-tools group">
                 <div class="subtitles-language">
