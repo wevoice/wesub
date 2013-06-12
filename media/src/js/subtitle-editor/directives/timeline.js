@@ -522,6 +522,11 @@ var angular = angular || null;
                 containerWidth = container.width();
                 scope.redrawSubtitles();
             });
+            if(scope.workingSubtitles.languageIsRTL) {
+                timelineDiv.attr('dir', 'rtl');
+            } else {
+                timelineDiv.attr('dir', 'ltr');
+            }
             // Redraw them now as well
             scope.redrawSubtitles();
         }

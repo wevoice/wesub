@@ -103,12 +103,15 @@ var angular = angular || null;
          * fetches.
          */
         $scope.versionNumber = null;
+        $scope.currentLanguage = null;
         $scope.currentVersion = null;
         $scope.versions = [];
         $scope.languageChanged = function(language, versionNumber) {
             if (!language) {
                 return;
             }
+
+            $scope.currentLanguage = language;
 
             $scope.versions = _.sortBy(language.versions, function(item) {
                 return item.version_no;
@@ -127,11 +130,14 @@ var angular = angular || null;
             $scope.versionNumber = versionNumber.toString();
             loadSubtitles();
         };
-        $scope.setReferenceSubs = function(subtitleData) {
+        $scope.setReferenceSubs = function() {
             if (!$scope.refSubList) {
-                $scope.refSubList = SubtitleListFinder.get('reference-subtitle-set');
+                $scope.refSubList = SubtitleListFinder.get(
+                        'reference-subtitle-set').scope;
             }
-            $scope.refSubList.scope.onSubtitlesFetched(subtitleData);
+            $scope.refSubList.onSubtitlesFetched($scope.currentVersion);
+            $scope.refSubList.setLanguageCode(
+                    $scope.currentLanguage.language_code);
         };
         $scope.findVersion = function(versionNumber) {
             for(var i = 0; i < $scope.versions.length; i++) {
@@ -163,10 +169,10 @@ var angular = angular || null;
                         newVersion.version_no,
                         function(subtitleData) {
                             newVersion.subtitlesXML = subtitleData.subtitlesXML;
-                            $scope.setReferenceSubs(newVersion);
+                            $scope.setReferenceSubs();
                         });
                 } else {
-                    $scope.setReferenceSubs(newVersion);
+                    $scope.setReferenceSubs();
                 }
             });
         }
@@ -493,10 +499,10 @@ var angular = angular || null;
                                           $scope.videoTitle,
                                           $scope.videoDescription);
         };
-        $scope.setLanguageCode = function(languageCode) {
-            $scope.languageCode = languageCode;
-            $scope.languageName = SubtitleStorage.getLanguageName(
-                    languageCode);
+        $scope.setLanguageCode = function(code) {
+            $scope.languageCode = code;
+            $scope.languageName = SubtitleStorage.getLanguageName(code);
+            $scope.languageIsRTL = SubtitleStorage.getLanguageIsRTL(code);
         };
         $scope.setVideoID = function(videoID) {
             $scope.videoID = videoID;

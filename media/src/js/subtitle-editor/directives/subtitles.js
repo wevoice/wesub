@@ -165,6 +165,14 @@ var USER_IDLE_MINUTES = 5;
                 }
             });
 
+            scope.$watch('languageIsRTL', function(newValue) {
+                if(newValue) {
+                    elem.attr('dir', 'rtl');
+                } else {
+                    elem.attr('dir', 'ltr');
+                }
+            });
+
         }
     });
 

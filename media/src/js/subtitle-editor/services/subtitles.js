@@ -52,6 +52,18 @@ var angular = angular || null;
         var cachedData = $window.editorData;
         var authHeaders = cachedData.authHeaders;
 
+        function ensureLanguageMap() {
+            if (cachedData.languageMap) {
+                return;
+            }
+            var langMap = {};
+            for (var i=0; i < cachedData.languages.length; i++){
+                var language = cachedData.languages[i];
+                langMap[language.language_code] = language;
+            }
+            cachedData.languageMap = langMap;
+        }
+
         return {
             approveTask: function(versionNumber, notes) {
 
@@ -92,15 +104,12 @@ var angular = angular || null;
                 }
             },
             getLanguageName: function(languageCode) {
-                if (!cachedData.languageMap){
-                    var langMap = {}, item;
-                    for (var i=0; i< cachedData.languages.length; i++){
-                        item  = cachedData.languages[i];
-                        langMap[item.language_code] = item.name;
-                    }
-                    cachedData.languageMap = langMap;
-                }
-                return cachedData.languageMap[languageCode] ;
+                ensureLanguageMap();
+                return cachedData.languageMap[languageCode].name;
+            },
+            getLanguageIsRTL: function(languageCode) {
+                ensureLanguageMap();
+                return cachedData.languageMap[languageCode].is_rtl;
             },
             getSubtitles: function(languageCode, versionNumber, callback){
 
