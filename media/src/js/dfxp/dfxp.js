@@ -122,43 +122,6 @@ function rightPad(number, width, character) {
     return number.toString();
 }
 
-/*
-* Display a human friendly format.
-* If showUnused if false, we truncate everything up to
-* unpaded seconds from the result.
- */
-function displayTime(milliseconds, showUnused){
-    if (milliseconds === -1 ||
-        isNaN(Math.floor(milliseconds)) ||
-        milliseconds === undefined ||
-        milliseconds === null) {
-            return "--";
-        }
-    var time = Math.floor(milliseconds / 1000);
-    var hours = ~~(time / 3600);
-    var minutes = ~~((time % 3600) / 60);
-    var fraction = String(milliseconds % 1000).substring(0,2);
-    var seconds = time % 60;
-    var result = '';
-    if (hours || showUnused){
-        result += (hours > 9? leftPad(hours, 2) : hours ) + ':';
-    }
-    if ((minutes || hours) || showUnused){
-        if (hours){
-            result += leftPad(minutes, 2) + ':';
-        }else{
-            result += minutes + ":";
-        }
-    }
-    if (hours || minutes){
-        result += leftPad(seconds, 2) ;
-    }else{
-        result += seconds;
-    }
-    result += ',' + leftPad(fraction, 2);
-    return result
-}
-
 var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
@@ -1178,14 +1141,6 @@ Subtitle.prototype.characterCountPerLine = function() {
 
 Subtitle.prototype.isSynced = function() {
     return this.startTime >= 0 && this.endTime >= 0;
-}
-
-Subtitle.prototype.timingString = function() {
-    if(this.isSynced()) {
-        return displayTime(this.startTime);
-    } else {
-        return 'unsynced';
-    }
 }
 
 Subtitle.prototype.isAt = function(time) {

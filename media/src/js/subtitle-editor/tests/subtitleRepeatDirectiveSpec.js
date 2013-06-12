@@ -25,7 +25,7 @@ describe('Test the subtitle-repeat directive', function() {
              'bind-to-edit="editingSub" ' +
              'conditional-class="subtitle.isEmpty():empty" ' +
              'edit-keydown="onEditKeyDown">' +
-          '<span class="timing">{{ subtitle.timingString() }}</span>' +
+          '<span class="timing">{{ subtitle.startTime }}</span>' +
           '<span class="text">{{ subtitle.content() }}</span>' +
           '<a href="#" class="add" subtitle-click="add">add</a>' +
           '<a href="#" class="remove" subtitle-click="remove">remove</a>' +
@@ -46,7 +46,7 @@ describe('Test the subtitle-repeat directive', function() {
                 if($('.text', li).html() != subtitle.content()) {
                     return false;
                 }
-                if($('.timing', li).html() != subtitle.timingString()) {
+                if($('.timing', li).html() != subtitle.startTime) {
                     return false;
                 }
                 return true;
