@@ -167,7 +167,7 @@
         }
 
         function scrollToSubtitle(subtitle) {
-            $scope.workingSubtitles.$broadcast('scroll-to-subtitle', subtitle);
+            $scope.$root.$emit('scroll-to-subtitle', subtitle);
         }
 
         $scope.$root.$on('video-update', function() {

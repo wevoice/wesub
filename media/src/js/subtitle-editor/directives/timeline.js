@@ -248,7 +248,7 @@ var angular = angular || null;
             }
 
             function handleMouseDown(evt, dragHandler) {
-                if(!scope.workingSubtitles.allowsSyncing) {
+                if(!scope.canSync) {
                     evt.preventDefault();
                     return false;
                 }

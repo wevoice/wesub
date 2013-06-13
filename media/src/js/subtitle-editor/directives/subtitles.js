@@ -157,18 +157,6 @@ var USER_IDLE_MINUTES = 5;
                 }
             });
 
-            scope.$on('scroll-to-subtitle', function(evt, subtitle) {
-                var target = scope.getSubtitleRepeatItem(subtitle);
-                var prev = target.prev();
-                if(prev) {
-                    target = prev;
-                }
-                if(target) {
-                    scroller.scrollTop(scroller.scrollTop() +
-                            target.offset().top - scroller.offset().top);
-                }
-            });
-
             function resizeScroller() {
                 if (scope.timelineShown) {
                     var scrollerTop = 431;
@@ -181,6 +169,20 @@ var USER_IDLE_MINUTES = 5;
             scope.$watch('timelineShown', resizeScroller);
             $window.on('resize', resizeScroller);
             resizeScroller();
+
+            if (attrs.subtitleList == "working-subtitle-set") {
+                scope.$root.$on('scroll-to-subtitle', function(evt, subtitle) {
+                    var target = scope.getSubtitleRepeatItem(subtitle);
+                    var prev = target.prev();
+                    if(prev.length > 0) {
+                        target = prev;
+                    }
+                    if(target) {
+                        scroller.scrollTop(scroller.scrollTop() +
+                                target.offset().top - scroller.offset().top);
+                    }
+                });
+            }
         }
     });
 

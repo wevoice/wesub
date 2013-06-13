@@ -24,63 +24,6 @@ var angular = angular || null;
     var _ = root._.noConflict();
     var $ = root.AmarajQuery;
 
-    /* CurrentEditManager manages in-progress edits of subtitles
-     */
-    function CurrentEditManager() {
-        this.draft = null;
-        this.LI = null;
-    }
-
-    CurrentEditManager.prototype.start = function(subtitle, LI) {
-        this.draft = subtitle.draftSubtitle();
-        this.LI = LI;
-    }
-
-    CurrentEditManager.prototype.finish = function(commitChanges, subtitleList) {
-        var updateNeeded = (commitChanges && this.changed());
-        if(updateNeeded) {
-            subtitleList.updateSubtitleContent(this.draft.storedSubtitle,
-                    this.currentMarkdown());
-        }
-        this.draft = this.LI = null;
-        return updateNeeded;
-    }
-
-    CurrentEditManager.prototype.sourceMarkdown = function() {
-        return this.draft.storedSubtitle.markdown;
-    }
-
-    CurrentEditManager.prototype.currentMarkdown = function() {
-        return this.draft.markdown;
-    }
-
-    CurrentEditManager.prototype.changed = function() {
-        return this.sourceMarkdown() != this.currentMarkdown();
-    }
-
-    CurrentEditManager.prototype.update = function(markdown) {
-        if(this.draft !== null) {
-            this.draft.markdown = markdown;
-        }
-    }
-
-    CurrentEditManager.prototype.isForSubtitle = function(subtitle) {
-        return (this.draft !== null && this.draft.storedSubtitle == subtitle);
-    }
-
-    CurrentEditManager.prototype.inProgress = function() {
-        return this.draft !== null;
-    }
-
-    CurrentEditManager.prototype.lineCounts = function() {
-        if(this.draft === null || this.draft.lineCount() < 2) {
-            // Only show the line counts if there are 2 or more lines
-           return null;
-       } else {
-           return this.draft.characterCountPerLine();
-       }
-    }
-
     var LanguageSelectorController = function($scope, SubtitleStorage, SubtitleListFinder) {
         /**
          * This controller is responsible for the language and version selector
@@ -417,14 +360,11 @@ var angular = angular || null;
             $scope.positionSyncHelpers(startIndex, endIndex);
         }
 
-        $scope.currentEdit = new CurrentEditManager();
         $scope.subtitleList = new dfxp.SubtitleList();
         $scope.isEditable = false;
         $scope.isWorkingSubtitles = function() {
             return $scope.isEditable;
         }
-        $scope.allowsSyncing = $window.editorData.allowsSyncing;
-        $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.getSubtitles = function(languageCode, versionNumber) {
             $scope.setLanguage(languageCode);
 
@@ -589,7 +529,7 @@ var angular = angular || null;
                     insertAndStartEdit(null);
                 } else {
                     startEdit(nextSubtitle);
-                    $scope.$broadcast('scroll-to-subtitle', nextSubtitle);
+                    $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
             } else if (evt.keyCode === 27) {
@@ -606,7 +546,7 @@ var angular = angular || null;
                 }
                 if(targetSub !== null) {
                     startEdit(targetSub);
-                    $scope.$broadcast('scroll-to-subtitle', targetSub);
+                    $scope.$root.$emit('scroll-to-subtitle', targetSub);
                 }
                 evt.preventDefault();
             }

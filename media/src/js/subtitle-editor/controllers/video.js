@@ -59,7 +59,7 @@
             event.preventDefault();
         };
 
-        $scope.$watch('workingSubtitles.currentEdit.draft.content()', function(newValue) {
+        $scope.$watch('currentEdit.draft.content()', function(newValue) {
             if(newValue !== null && newValue !== undefined) {
                 $scope.overlayText = newValue;
                 $scope.showOverlay = true;

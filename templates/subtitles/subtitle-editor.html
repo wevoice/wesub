@@ -1,3 +1,4 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html ng-app="amara.SubtitleEditor"
     subtitle-editor
@@ -9,7 +10,11 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>Editing {{ language.get_language_code_display }} subtitles for &ldquo;{{ video }}&rdquo; - Amara</title>
+    <title>
+        {% blocktrans with language.get_language_code_display as language %}
+            Editing {{ language }} subtitles for &ldquo;{{ video }}&rdquo; - Amara
+        {% endblocktrans %}
+    </title>
 
 
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/third-party/reset.css" type="text/css" media="screen" charset="utf-8">
@@ -67,7 +72,7 @@
         </section>
         <section class="video center column ng-cloak">
             <span class="video-title">
-                <span class="subtitles-language">[[ workingSubtitles.language.name ]]</span>
+                <span class="subtitles-language">{{ language.get_language_code_display }}</span>
                 <span class="sep">•</span>
                 [[ workingSubtitles.videoTitle ]]
             </span>
@@ -176,7 +181,7 @@ subtitle-repeat directive, see the working subtitles for more info
         <section class="center column">
         <div class="video" ng-controller="VideoController">
             <div class="video-container" id="video"></div>
-            <div class="subtitle-overlay" dir="[[ workingSubtitles.language.dir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+            <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
             <ul class="video-controls group">
                 <li class="play-pause" ng-class="{'playing': videoState.playing}">
                     <a href="#" ng-click="playPauseClicked($event)"></a>
@@ -206,7 +211,9 @@ subtitle-repeat directive, see the working subtitles for more info
         </div>
             <div class="workspace-tools group">
                 <div class="subtitles-language">
-                    [[ workingSubtitles.language.name ]] subtitles
+                    {% blocktrans with language.get_language_code_display as language %}
+                    {{ language }} subtitles
+                    {% endblocktrans %}
                 </div>
                 <div class="switches">
                     <a class="timeline-display" href="#" ng-click="toggleTimelineShown()">
@@ -309,9 +316,9 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                         <a class="end"
                             id="add-sub-at-end"
                             href="#"
-                            ng-show="canAddAndRemove && !workingSubtitles.currentEdit.inProgress()"
+                            ng-show="canAddAndRemove && !currentEdit.inProgress()"
                             ng-click="newSubtitleClicked($event)">+ New subtitle</a>
-                        <span ng-show="workingSubtitles.currentEdit.inProgress()" class="end">
+                        <span ng-show="currentEdit.inProgress()" class="end">
                             Press ENTER to save subtitle and move to next.<br />
                         </span>
                     </div>
@@ -370,7 +377,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
         ng-cloak>
         <div class="current-time-marker"></div>
         <canvas class="timing" width="100" height="65" timeline-timing></canvas>
-        <div class="subtitles-container" dir="[[ workingSubtitles.language.dir ]]" timeline-subtitles>
+        <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
         </div>
     </section>
 

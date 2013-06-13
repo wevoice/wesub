@@ -23,13 +23,69 @@ var angular = angular || null;
     var root = this;
     var $ = root.AmarajQuery;
 
-    function AppController($scope, $timeout, LockService, VideoPlayer) {
+    /* CurrentEditManager manages the current in-progress edit
+     */
+    function CurrentEditManager() {
+        this.draft = null;
+        this.LI = null;
+    }
+
+    CurrentEditManager.prototype = {
+        start: function(subtitle, LI) {
+            this.draft = subtitle.draftSubtitle();
+            this.LI = LI;
+        },
+        finish: function(commitChanges, subtitleList) {
+            var updateNeeded = (commitChanges && this.changed());
+            if(updateNeeded) {
+                subtitleList.updateSubtitleContent(this.draft.storedSubtitle,
+                        this.currentMarkdown());
+            }
+            this.draft = this.LI = null;
+            return updateNeeded;
+        },
+        sourceMarkdown: function() {
+            return this.draft.storedSubtitle.markdown;
+        },
+        currentMarkdown: function() {
+            return this.draft.markdown;
+        },
+        changed: function() {
+            return this.sourceMarkdown() != this.currentMarkdown();
+        },
+         update: function(markdown) {
+            if(this.draft !== null) {
+                this.draft.markdown = markdown;
+            }
+         },
+         isForSubtitle: function(subtitle) {
+            return (this.draft !== null && this.draft.storedSubtitle == subtitle);
+         },
+         inProgress: function() {
+            return this.draft !== null;
+         },
+         lineCounts: function() {
+             if(this.draft === null || this.draft.lineCount() < 2) {
+                 // Only show the line counts if there are 2 or more lines
+                 return null;
+             } else {
+                 return this.draft.characterCountPerLine();
+             }
+         },
+    }
+
+
+    function AppController($scope, $timeout, $window, LockService, VideoPlayer) {
         var minutesIdle = 0;
         var secondsUntilClosing = 120;
         var regainLockTimer;
 
+        $scope.canSync = $window.editorData.canSync;
+        $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.timelineShown = true;
+
+        $scope.currentEdit = new CurrentEditManager();
 
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;

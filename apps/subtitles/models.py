@@ -446,6 +446,11 @@ class SubtitleLanguage(models.Model):
     def is_rtl(self):
         return is_rtl(self.language_code)
 
+    def dir(self):
+        if self.is_rtl():
+            return 'rtl'
+        else:
+            return 'ltr'
 
     def __unicode__(self):
         return 'SubtitleLanguage %s / %s / %s' % (
