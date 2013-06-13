@@ -34,7 +34,8 @@ var angular = angular || null;
             var slices = $('div', elem);
 
             function drawBar() {
-                var drawHeight = Math.round($scope.volume * barHeight);
+                var drawHeight = Math.round($scope.videoState.volume *
+                    barHeight);
                 if(drawHeight <= bottomHeight) {
                     slices.eq(0).height(0);
                     slices.eq(1).height(0);
@@ -57,13 +58,13 @@ var angular = angular || null;
                         (barHeight - drawHeight) + 'px');
             }
 
-            $scope.$watch('volume', drawBar);
+            $scope.$watch('videoState.volume', drawBar);
 
             function setVolumeFromPageY(pageY) {
                 var barBottom = elem.offset().top + barHeight + paddingTop;
-                var volume = (barBottom - pageY) / barHeight;
-                volume = Math.max(0.0, Math.min(1, volume));
-                $scope.setVolume(volume);
+                var newVolume = (barBottom - pageY) / barHeight;
+                newVolume = Math.max(0.0, Math.min(1, newVolume));
+                $scope.videoState.setVolume(newVolume);
             }
 
             $scope.onVolumeMouseDown = function(event) {

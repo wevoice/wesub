@@ -25,31 +25,36 @@
         $scope.overlayText = null;
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
-        $scope.playing = false;
-        $scope.currentTime = 0;
-        $scope.duration = -1;
-        $scope.volumeBarVisible = false;
-        $scope.volume = -1.0;
+
+        $scope.videoState = {
+            loaded: false,
+            playing: false,
+            currentTime: 0,
+            duration: -1,
+            volumeBarVisible: false,
+            volume: 0.0,
+
+            setVolume: function(volume) {
+                this.volume = volume;
+                VideoPlayer.setVolume(volume);
+            }
+        }
 
         $scope.$root.$on("video-update", function() {
-            $scope.playing = VideoPlayer.isPlaying();
-            $scope.currentTime = VideoPlayer.currentTime();
-            $scope.duration = VideoPlayer.duration();
-            $scope.volume = VideoPlayer.getVolume();
+            $scope.videoState.loaded = true;
+            $scope.videoState.playing = VideoPlayer.isPlaying();
+            $scope.videoState.currentTime = VideoPlayer.currentTime();
+            $scope.videoState.duration = VideoPlayer.duration();
+            $scope.videoState.volume = VideoPlayer.getVolume();
         });
         $scope.$root.$on("video-time-update", function() {
-            $scope.currentTime = VideoPlayer.currentTime();
+            $scope.videoState.currentTime = VideoPlayer.currentTime();
         });
 
         $scope.playPauseClicked = function(event) {
             VideoPlayer.togglePlay();
             event.preventDefault();
         };
-
-        $scope.setVolume = function(volume) {
-            $scope.volume = volume;
-            VideoPlayer.setVolume(volume);
-        }
 
         $scope.volumeToggleClicked = function(event) {
             $scope.volumeBarVisible = !$scope.volumeBarVisible;

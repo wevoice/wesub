@@ -178,15 +178,15 @@ subtitle-repeat directive, see the working subtitles for more info
             <div class="video-container" id="video"></div>
             <div class="subtitle-overlay" dir="[[ workingSubtitles.language.dir ]]" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
             <ul class="video-controls group">
-                <li class="play-pause" ng-class="{'playing': playing }">
+                <li class="play-pause" ng-class="{'playing': videoState.playing}">
                     <a href="#" ng-click="playPauseClicked($event)"></a>
                 </li>
                 <li class="time">
-                    <span ng-show="duration > 0">
-                        [[ currentTime|displayTimeSeconds]] / [[ duration|displayTimeSeconds]]
+                    <span ng-show="videoState.loaded">
+                        [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
                     </span>
                 </li>
-                <li class="volume" ng-show="volume >= 0">
+                <li class="volume" ng-show="videoState.loaded">
                     <a href="#" ng-click="volumeToggleClicked($event)"></a>
                 </li>
             </ul>
