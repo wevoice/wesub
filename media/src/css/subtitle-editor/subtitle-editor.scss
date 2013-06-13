@@ -866,21 +866,23 @@ section.main {
             }
 
             ul.video-controls {
-                height: 33px;
-                background: url('../../../images/editor/player-background.png');
+                height: 32px;
+                background: #212223;
+                border-bottom: 1px solid #19191a;
                 color: #fff;
 
                 li {
                     display: block;
                     float: left;
-                    height: 33px;
-                    line-height: 33px;
+                    padding-top: 2px;
+                    height: 30px;
+                    line-height: 30px;
                     vertical-align: middle;
                     text-align: center;
                 }
                 li a {
                     display: block;
-                    height: 33px;
+                    height: 30px;
                 }
 
                 li.play-pause {
@@ -913,9 +915,10 @@ section.main {
                     float: none;
                     margin-left: 48px;
                     margin-right: 135px;
+                    padding-top: 2px;
 
                     div {
-                        height: 33px;
+                        height: 28px;
                         background: center center repeat-x;
                     }
 

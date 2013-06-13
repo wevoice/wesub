@@ -105,12 +105,12 @@ var angular = angular || null;
                     sliceMid.width(0);
                     sliceRight.width(0);
                 } else if(drawWidth <= barWidth - leftWidth) {
-                    sliceLeft.width(leftWidth);
+                    sliceLeft.css('width', '100%');
                     sliceMid.width(drawWidth - leftWidth);
                     sliceRight.width(0);
                 } else {
-                    sliceLeft.width(leftWidth);
-                    sliceMid.width(barWidth - leftWidth - rightWidth);
+                    sliceLeft.css('width', '100%');
+                    sliceMid.css('width', '100%');
                     sliceRight.width(drawWidth - (barWidth - leftWidth));
                 }
             }
