@@ -73,12 +73,76 @@ var angular = angular || null;
                     setVolumeFromPageY(event.pageY);
                 }).on('mouseup.volume-track', function(event) {
                     $(document).off('.volume-track');
+                }).on('mouseleave.volume-track', function(event) {
+                    $(document).off('.volume-track');
                 });
                 event.preventDefault();
             };
 
             drawBar();
         }
+    });
+    directives.directive('progressBar', function(VideoPlayer) {
+        return function link($scope, elem, attrs) {
+            elem = $(elem);
+            var sliceLeft = $('div.slice-left div', elem);
+            var sliceRight = $('div.slice-right div', elem);
+            var sliceMid = $('div.slice-mid div', elem);
+            var leftWidth = 14;
+            var rightWidth = 14;
+
+            function drawBar() {
+                if($scope.videoState.currentTime === null ||
+                    $scope.videoState.duration === null) {
+                    return;
+                }
+                var progress = ($scope.videoState.currentTime /
+                    $scope.videoState.duration);
+                var barWidth = Math.round(elem.width())
+                var drawWidth = Math.round(barWidth * progress);
+                if(drawWidth <= leftWidth) {
+                    sliceLeft.width(drawWidth);
+                    sliceMid.width(0);
+                    sliceRight.width(0);
+                } else if(drawWidth <= barWidth - leftWidth) {
+                    sliceLeft.width(leftWidth);
+                    sliceMid.width(drawWidth - leftWidth);
+                    sliceRight.width(0);
+                } else {
+                    sliceLeft.width(leftWidth);
+                    sliceMid.width(barWidth - leftWidth - rightWidth);
+                    sliceRight.width(drawWidth - (barWidth - leftWidth));
+                }
+            }
+
+            drawBar();
+            $scope.$watch('videoState.currentTime', drawBar);
+            $scope.$watch('videoState.duration', drawBar);
+
+            function setProgressFromPageX(pageX) {
+                if($scope.videoState.duration === null) {
+                    return;
+                }
+                var deltaX = pageX - elem.offset().left;
+                var progress = deltaX / elem.width();
+                progress = Math.max(0, Math.min(1, progress));
+
+                VideoPlayer.seek(progress * $scope.videoState.duration);
+            }
+
+            $scope.onProgressMouseDown = function(event) {
+                setProgressFromPageX(event.pageX);
+                $(document).on('mousemove.progress-track', function(event) {
+                    setProgressFromPageX(event.pageX);
+                }).on('mouseup.progress-track', function(event) {
+                    $(document).off('.progress-track');
+                }).on('mouseleave.progress-track', function(event) {
+                    $(document).off('.progress-track');
+                });
+                event.preventDefault();
+            };
+        }
+
     });
 })(window.AmarajQuery);
 

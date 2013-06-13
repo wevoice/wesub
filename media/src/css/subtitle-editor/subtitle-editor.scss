@@ -908,6 +908,51 @@ section.main {
                     width: 40px;
                     background: url('../../../images/editor/volume-icon.png') center center no-repeat;
                 }
+                
+                li.progress {
+                    float: none;
+                    margin-left: 48px;
+                    margin-right: 135px;
+
+                    div {
+                        height: 33px;
+                        background: center center repeat-x;
+                    }
+
+                    // This is kindof tricky because we want to display a
+                    // sliced image on top of another sliced image.  We create
+                    // 3 div for the slices and put the background on them,
+                    // then create an inner div inside each of them and put
+                    // the forground on them
+
+                    .slice-left {
+                        float: left;
+                        width: 14px;
+                        background-image: url('../../../images/editor/progress-background-left.png');
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-left.png');
+                            width: 0px;
+                        }
+                    }
+                    .slice-right {
+                        float: right;
+                        width: 14px;
+                        background-image: url('../../../images/editor/progress-background-right.png');
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-right.png');
+                            width: 0px;
+                        }
+                    }
+                    .slice-mid {
+                        float: none;
+                        background-image: url('../../../images/editor/progress-background-middle.png');
+                        margin: 0px 14px;
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-middle.png');
+                            width: 0px;
+                        }
+                    }
+                }
             }
             div.volume-bar {
                 position: absolute;

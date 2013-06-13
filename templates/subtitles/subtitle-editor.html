@@ -189,6 +189,12 @@ subtitle-repeat directive, see the working subtitles for more info
                 <li class="volume" ng-show="videoState.loaded">
                     <a href="#" ng-click="volumeToggleClicked($event)"></a>
                 </li>
+                <li class="progress" progress-bar
+                    ng-mousedown="onProgressMouseDown($event)">
+                    <div class="slice-left"><div></div></div>
+                    <div class="slice-right"><div></div></div>
+                    <div class="slice-mid"><div></div></div>
+                </li>
             </ul>
             <div volume-bar class="volume-bar"
                 ng-mousedown="onVolumeMouseDown($event)"

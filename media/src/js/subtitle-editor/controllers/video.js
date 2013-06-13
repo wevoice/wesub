@@ -29,8 +29,8 @@
         $scope.videoState = {
             loaded: false,
             playing: false,
-            currentTime: 0,
-            duration: -1,
+            currentTime: null,
+            duration: null,
             volumeBarVisible: false,
             volume: 0.0,
 
