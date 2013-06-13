@@ -146,7 +146,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     translated_from_version = editing_language.\
         get_translation_source_version(ignore_forking=True)
 
-    languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
+    languages = video.newsubtitlelanguage_set.annotate(
         num_versions=Count('subtitleversion'))
 
     video_urls = []
