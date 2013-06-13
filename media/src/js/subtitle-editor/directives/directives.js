@@ -16,24 +16,8 @@
 // along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-(function() {
-
-    var root, module;
-
-    root = this;
-
-    module = angular.module('amara.SubtitleEditor', [
-        'amara.SubtitleEditor.services',
-        'amara.SubtitleEditor.directives',
-        'amara.SubtitleEditor.filters',
-        'ngCookies'
-    ]);
-
-    // instead of using {{ }} for variables, use [[ ]]
-    // so as to avoid conflict with django templating
-    module.config(function($interpolateProvider) {
-        $interpolateProvider.startSymbol('[[');
-        $interpolateProvider.endSymbol(']]');
-    });
-
-}).call(this);
+angular.module('amara.SubtitleEditor.directives', [
+        'amara.SubtitleEditor.directives.subtitles',
+        'amara.SubtitleEditor.directives.timeline',
+        'amara.SubtitleEditor.directives.video',
+]);

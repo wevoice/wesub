@@ -887,7 +887,7 @@ section.main {
                     float: left;
                 }
 
-                li.time {
+                li.time, li.volume {
                     float: right;
                 }
 
@@ -902,6 +902,34 @@ section.main {
 
                 li.time {
                    width: 85px;
+                }
+
+                li.volume a {
+                    width: 40px;
+                    background: url('../../../images/editor/volume-icon.png') center center no-repeat;
+                }
+            }
+            div.volume-bar {
+                position: absolute;
+                width: 40px;
+                height: 110px;
+                bottom: 33px;
+                right: 85px;
+                background: url('../../../images/editor/volume-background.png') center center no-repeat;
+                padding: 10px 0 5px;
+                div {
+                    width: 40px;
+                    height: 0px;
+                    background: transparent center top repeat-y;
+                }
+                div.slice1 {
+                    background-image: url('../../../images/editor/volume-bar-top.png');
+                }
+                div.slice2 {
+                    background-image: url('../../../images/editor/volume-bar-middle.png');
+                }
+                div.slice3 {
+                    background-image: url('../../../images/editor/volume-bar-bottom.png');
                 }
             }
             &:before {

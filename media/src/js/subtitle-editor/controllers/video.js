@@ -28,18 +28,31 @@
         $scope.playing = false;
         $scope.currentTime = 0;
         $scope.duration = -1;
+        $scope.volumeBarVisible = false;
+        $scope.volume = -1.0;
 
         $scope.$root.$on("video-update", function() {
             $scope.playing = VideoPlayer.isPlaying();
             $scope.currentTime = VideoPlayer.currentTime();
             $scope.duration = VideoPlayer.duration();
+            $scope.volume = VideoPlayer.getVolume();
         });
         $scope.$root.$on("video-time-update", function() {
             $scope.currentTime = VideoPlayer.currentTime();
         });
 
-        $scope.togglePlay = function(event) {
+        $scope.playPauseClicked = function(event) {
             VideoPlayer.togglePlay();
+            event.preventDefault();
+        };
+
+        $scope.setVolume = function(volume) {
+            $scope.volume = volume;
+            VideoPlayer.setVolume(volume);
+        }
+
+        $scope.volumeToggleClicked = function(event) {
+            $scope.volumeBarVisible = !$scope.volumeBarVisible;
             event.preventDefault();
         };
 

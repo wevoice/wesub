@@ -97,6 +97,12 @@ var angular = angular || null;
             isPlaying: function() {
                 return playing;
             },
+            getVolume: function() {
+                return pop.volume();
+            },
+            setVolume: function(volume) {
+                return pop.volume(volume);
+            },
             playChunk: function(start, duration) {
                 // Play a specified amount of time in a video, beginning at
                 // 'start', and then pause.
