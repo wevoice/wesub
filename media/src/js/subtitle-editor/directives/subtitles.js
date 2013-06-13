@@ -158,6 +158,10 @@ var USER_IDLE_MINUTES = 5;
 
             scope.$on('scroll-to-subtitle', function(evt, subtitle) {
                 var target = scope.getSubtitleRepeatItem(subtitle);
+                var prev = target.prev();
+                if(prev) {
+                    target = prev;
+                }
                 if(target) {
                     scroller.scrollTop(scroller.scrollTop() +
                             target.offset().top - scroller.offset().top);

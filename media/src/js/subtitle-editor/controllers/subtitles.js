@@ -600,6 +600,7 @@ var angular = angular || null;
                     insertAndStartEdit(null);
                 } else {
                     startEdit(nextSubtitle);
+                    $scope.$broadcast('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
             } else if (evt.keyCode === 27) {
@@ -616,6 +617,7 @@ var angular = angular || null;
                 }
                 if(targetSub !== null) {
                     startEdit(targetSub);
+                    $scope.$broadcast('scroll-to-subtitle', targetSub);
                 }
                 evt.preventDefault();
             }
