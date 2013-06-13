@@ -27,9 +27,9 @@ var angular = angular || null;
         var pop = null;
         var playing = false;
 
-        function emitSignal(signalName) {
+        function emitSignal(signalName, data) {
             $rootScope.$apply(function() {
-                $rootScope.$emit(signalName);
+                $rootScope.$emit(signalName, data);
             });
         }
 
@@ -48,10 +48,13 @@ var angular = angular || null;
                 emitSignal('video-update');
             }).on('durationchange', function() {
                 emitSignal('video-update');
-            }).on('timeupdate', function() {
-                emitSignal('video-time-update');
             }).on('seeked', function() {
                 emitSignal('video-update');
+            }).on('timeupdate', function() {
+                emitSignal('video-time-update',
+                    Math.round(pop.currentTime() * 1000));
+            }).on('volumeupdate', function() {
+                emitSignal('video-volume-update', pop.volume());
             });
         }
 
@@ -89,10 +92,10 @@ var angular = angular || null;
                 }
             },
             currentTime: function() {
-                return Math.floor(pop.currentTime() * 1000);
+                return Math.round(pop.currentTime() * 1000);
             },
             duration: function() {
-                return Math.floor(pop.duration() * 1000);
+                return Math.round(pop.duration() * 1000);
             },
             isPlaying: function() {
                 return playing;
@@ -101,7 +104,10 @@ var angular = angular || null;
                 return pop.volume();
             },
             setVolume: function(volume) {
-                return pop.volume(volume);
+                pop.volume(volume);
+                // For some players (vimeo), popcorn doesn't send the
+                // volumeupdate event.  So let's send it manually here.
+                $rootScope.$emit('video-volume-update', volume);
             },
             playChunk: function(start, duration) {
                 // Play a specified amount of time in a video, beginning at

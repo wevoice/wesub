@@ -33,11 +33,6 @@
             duration: null,
             volumeBarVisible: false,
             volume: 0.0,
-
-            setVolume: function(volume) {
-                this.volume = volume;
-                VideoPlayer.setVolume(volume);
-            }
         }
 
         $scope.$root.$on("video-update", function() {
@@ -47,8 +42,11 @@
             $scope.videoState.duration = VideoPlayer.duration();
             $scope.videoState.volume = VideoPlayer.getVolume();
         });
-        $scope.$root.$on("video-time-update", function() {
-            $scope.videoState.currentTime = VideoPlayer.currentTime();
+        $scope.$root.$on("video-time-update", function(evt, currentTime) {
+            $scope.videoState.currentTime = currentTime;
+        });
+        $scope.$root.$on("video-volume-update", function(evt, volume) {
+            $scope.videoState.volume = volume;
         });
 
         $scope.playPauseClicked = function(event) {

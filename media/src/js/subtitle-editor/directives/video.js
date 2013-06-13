@@ -21,7 +21,7 @@ var angular = angular || null;
 (function($) {
     var directives = angular.module('amara.SubtitleEditor.directives.video', []);
 
-    directives.directive('volumeBar', function() {
+    directives.directive('volumeBar', function(VideoPlayer) {
         return function link($scope, elem, attrs) {
             elem = $(elem);
             var canvas = elem[0];
@@ -62,9 +62,9 @@ var angular = angular || null;
 
             function setVolumeFromPageY(pageY) {
                 var barBottom = elem.offset().top + barHeight + paddingTop;
-                var newVolume = (barBottom - pageY) / barHeight;
-                newVolume = Math.max(0.0, Math.min(1, newVolume));
-                $scope.videoState.setVolume(newVolume);
+                var volume = (barBottom - pageY) / barHeight;
+                volume = Math.max(0.0, Math.min(1, volume));
+                VideoPlayer.setVolume(volume);
             }
 
             $scope.onVolumeMouseDown = function(event) {
