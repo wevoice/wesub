@@ -5,6 +5,7 @@
     ng-controller="AppController"
     lang="{{ language.language_code }}"
     language-code="{{ language.language_code }}"
+    version-number="{{ version.version_number }}"
     ng-mousemove="handleAppMouseMove($event)"
     video-id="{{ video.video_id }}">
 <head>
@@ -148,19 +149,16 @@
                     </select>
                 </div>
             </div>
-            <div class="subtitles-wrapper"
-                ng-controller="SubtitleListController">
+            <div class="subtitles-wrapper">
                 <div class="reference subtitles">
 
                     <ul subtitle-list="reference-subtitle-set"
-                        editable="false"
-                        dir="[[ language.dir ]]"
-                        video-id="{{ video.video_id }}">
+                        dir="[[ referenceSubtitles.language.dir ]]">
 
 <!-- 
 subtitle-repeat directive, see the working subtitles for more info
 -->
-                        <li subtitle-repeat="subtitleList"
+                        <li subtitle-repeat="referenceSubtitles.subtitleList"
                             conditional-class="subtitle.isEmpty():empty"
                             class="subtitle-list-item">
                             <span class="timing">
@@ -225,11 +223,8 @@ subtitle-repeat directive, see the working subtitles for more info
                 </div>
             </div>
             <div class="subtitles-wrapper"
-                ng-controller="SubtitleListController"
-                working-subtitles
-                version-number="{{ version.version_number }}"
-                language-code="{{ language.language_code }}"
-                video-id="{{ video.video_id }}">
+                ng-controller="WorkingSubtitlesController"
+                working-subtitles>
                 <div class="sync-help end">
                     <span class="key">
                         <span>
@@ -273,12 +268,10 @@ subtitle-repeat directive, see the working subtitles for more info
                     </table>
                 </div>
 
-                <div class="working subtitles"
-                    ng-controller="WorkingSubtitleItemsController">
+                <div class="working subtitles">
                     <ul subtitle-list="working-subtitle-set"
-                        dir="[[ language.dir ]]"
+                        dir="[[ workingSubtitles.language.dir ]]"
                         id="working-subtitle-set">
-
 <!--
 subtitle-repeat directive:
 
@@ -287,7 +280,7 @@ subtitle sets.  However, that performance comes at the cost of flexibility.
 We don't support arbitrary angular directives inside the element.  To see
 what is supported, check out tests/subtitleRepeatDirective.spec.
 -->
-                        <li subtitle-repeat="subtitleList"
+                        <li subtitle-repeat="workingSubtitles.subtitleList"
                             class="subtitle-list-item"
                             conditional-class="subtitle.isEmpty():empty"
                             bind-to-edit="currentEdit.draft"

@@ -72,10 +72,56 @@ var angular = angular || null;
                  return this.draft.characterCountPerLine();
              }
          },
+    };
+
+    /*
+     * SubtitleVersionManager: handle the active subtitle version for the
+     * reference and working subs.
+     *
+     */
+
+    function SubtitleVersionManager(SubtitleStorage) {
+        this.SubtitleStorage = SubtitleStorage;
+        this.subtitleList = new dfxp.SubtitleList();
+        this.versionNumber = null;
+        this.language = null;
+        this.title = null;
+        this.description = null;
+        this.state = 'waiting';
     }
 
+    SubtitleVersionManager.prototype = {
+        getSubtitles: function(languageCode, versionNumber) {
+            this.setLanguage(languageCode);
+            this.versionNumber = versionNumber;
+            this.state = 'loading';
 
-    function AppController($scope, $timeout, $window, LockService, VideoPlayer) {
+            var that = this;
+
+            this.SubtitleStorage.getSubtitles(languageCode, versionNumber,
+                    function(subtitleData) {
+                that.state = 'loaded';
+                that.title = subtitleData.title;
+                that.description = subtitleData.description;
+                that.subtitleList.loadXML(subtitleData.subtitlesXML);
+            });
+        },
+        initEmptySubtitles: function(languageCode) {
+            this.setLanguage(languageCode);
+            this.versionNumber = null;
+            this.title = this.description = '';
+            this.subtitleList.loadXML(null);
+            this.state = 'loaded';
+        },
+        setLanguage: function(code) {
+            this.language = this.SubtitleStorage.getLanguage(code);
+        },
+    };
+
+
+
+    function AppController($scope, $timeout, $window, LockService,
+            VideoPlayer, SubtitleStorage) {
         var minutesIdle = 0;
         var secondsUntilClosing = 120;
         var regainLockTimer;
@@ -84,8 +130,9 @@ var angular = angular || null;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.scrollingSynced = true;
         $scope.timelineShown = true;
-
         $scope.currentEdit = new CurrentEditManager();
+        $scope.workingSubtitles = new SubtitleVersionManager(SubtitleStorage);
+        $scope.referenceSubtitles = new SubtitleVersionManager(SubtitleStorage);
 
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
@@ -94,6 +141,16 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
+
+        $scope.saveSubtitles = function() {
+            return SubtitleStorage.saveSubtitles(
+                    $scope.videoId,
+                    $scope.workingSubtitles.language.code,
+                    $scope.workingSubtitles.subtitleList.toXMLString(),
+                    $scope.workingSubtitles.title,
+                    $scope.workingSubtitles.description);
+        };
+
 
         function releaseLock() {
             LockService.releaseLock($scope.videoId, $scope.languageCode);

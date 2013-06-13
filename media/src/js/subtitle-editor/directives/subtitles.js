@@ -28,6 +28,12 @@ var USER_IDLE_MINUTES = 5;
         return function link(scope, elm, attrs) {
             scope.videoId = attrs.videoId;
             scope.languageCode = attrs.languageCode;
+            if(attrs.versionNumber != "") {
+                scope.workingSubtitles.getSubtitles(scope.languageCode,
+                    attrs.versionNumber);
+            } else {
+                scope.workingSubtitles.initEmptySubtitles(scope.languageCode);
+            }
             // For some reason using ng-keydown at the HTML tag doesn't work.
             // Use jquery instead.
             $(document).keydown(function(evt) {
@@ -44,18 +50,6 @@ var USER_IDLE_MINUTES = 5;
             var infoTray = $('div.info-tray', elem);
             var subtitleList = $('.subtitles ul', elem);
             var wrapper = $(elem);
-
-            scope.isEditable = true;
-            scope.setVideoID(attrs.videoId);
-            if(attrs.languageCode != "") {
-                if(attrs.versionNumber != "") {
-                    scope.versionNumber = parseInt(attrs.versionNumber);
-                    scope.getSubtitles(attrs.languageCode, attrs.versionNumber);
-                } else {
-                    scope.versionNumber = null;
-                    scope.initEmptySubtitles(attrs.languageCode);
-                }
-            }
 
             function getSubtitleTop(index) {
                 var li = $('li', subtitleList).eq(index);
@@ -120,22 +114,22 @@ var USER_IDLE_MINUTES = 5;
                 // are done.
                 $timeout(scope.positionInfoTray);
             });
+
+            scope.$root.$on('working-subtitles-scrolled', function() {
+                scope.positionSyncHelpers();
+                scope.positionInfoTray();
+            });
         };
     });
 
-    directives.directive('subtitleList', function($window, SubtitleListFinder) {
+    directives.directive('subtitleList', function($window) {
         // Use jquery, not jqLite for $window
         $window = $($window);
         return function link(scope, elem, attrs) {
             var scroller = $(elem).parent();
-            // set these *before* calling get subtitle since if
-            // the subs are bootstrapped it will return right away
-            SubtitleListFinder.register(attrs.subtitleList, elem,
-                    elem.controller(), scope);
-
+            var isWorkingSet = (attrs.subtitleList == "working-subtitle-set");
             // Handle scroll.
             scroller.scroll(function() {
-
                 // If scroll sync is locked.
                 if (scope.scrollingSynced) {
                     var newScrollTop = $(elem).parent().scrollTop();
@@ -150,10 +144,8 @@ var USER_IDLE_MINUTES = 5;
 
                     });
                 }
-
-                if(scope.isWorkingSubtitles()) {
-                    scope.positionSyncHelpers();
-                    scope.positionInfoTray();
+                if(isWorkingSet) {
+                    scope.$root.$emit("working-subtitles-scrolled");
                 }
             });
 
@@ -170,7 +162,7 @@ var USER_IDLE_MINUTES = 5;
             $window.on('resize', resizeScroller);
             resizeScroller();
 
-            if (attrs.subtitleList == "working-subtitle-set") {
+            if (isWorkingSet) {
                 scope.$root.$on('scroll-to-subtitle', function(evt, subtitle) {
                     var target = scope.getSubtitleRepeatItem(subtitle);
                     var prev = target.prev();
@@ -362,7 +354,7 @@ var USER_IDLE_MINUTES = 5;
             // On our first pass we remove the element from its parent, then
             // add a copy for each subtitle
             elm = $(elm);
-            var subtitleList = $scope[attrs.subtitleRepeat];
+            var subtitleList = $scope.$eval(attrs.subtitleRepeat);
             var parent = elm.parent();
             var updateFuncs = []
             findInterpolations();

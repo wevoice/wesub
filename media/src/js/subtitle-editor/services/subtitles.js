@@ -238,45 +238,6 @@ var angular = angular || null;
             }
         };
     });
-    module.factory('SubtitleListFinder', function($http) {
-        /**
-         * A sevice to cache and retrieve instances of the subtitle-list directive.
-         *
-         * TODO: We don't really need this service. We can simply use angular.element to retrieve
-         * subtitle-list instances and access the scope / controller from there.
-         */
-        var registry = {};
-
-        return {
-            register: function(name, elm, controller, scope) {
-                /**
-                 * @param name  String to identify this subtitle list by, this is taken from the
-                 * value of the 'subtitle-list' attribute on the SubtitleList directive.
-                 * @param elm The wrapped element for the subtitle list.
-                 * @param controller Controller for the the subtitle list
-                 * @param scope The scope for the list
-                 */
-
-                // Registering the same name more than once will throw an error.
-                if (registry[name]){
-                   throw new Error('Already registred a subtitle list component with name"' + name + '".') ;
-                }
-
-                registry[name] = {
-                    name: name,
-                    elm: elm,
-                    controller: controller,
-                    scope: scope
-                };
-
-                return this;
-            },
-            get: function(name) {
-                return registry[name];
-            }
-        };
-    });
-
     module.factory('OldEditorConfig', function($window) {
         /**
          * A sevice to cache and retrieve instances of the subtitle-list directive.

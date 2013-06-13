@@ -185,10 +185,6 @@
             $scope.redrawSubtitles({forcePlace: true});
             updateWillSync();
         });
-        $scope.$root.$on('subtitles-fetched', function() {
-            $scope.redrawSubtitles({forcePlace: true});
-            updateWillSync();
-        });
 
         $scope.$root.$on('sync-next-start-time', function($event) {
             var subtitleList = $scope.workingSubtitles.subtitleList;

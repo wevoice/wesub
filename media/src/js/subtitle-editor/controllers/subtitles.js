@@ -24,7 +24,7 @@ var angular = angular || null;
     var _ = root._.noConflict();
     var $ = root.AmarajQuery;
 
-    var LanguageSelectorController = function($scope, SubtitleStorage, SubtitleListFinder) {
+    var LanguageSelectorController = function($scope) {
         /**
          * This controller is responsible for the language and version selector
          * widget.  The widget allows the user to select a reference language and
@@ -97,12 +97,8 @@ var angular = angular || null;
                 }
 
                 $scope.currentVersion = newVersion;
-                if (!$scope.refSubList) {
-                    $scope.refSubList = SubtitleListFinder.get(
-                            'reference-subtitle-set').scope;
-                }
-                $scope.refSubList.getSubtitles($scope.language.language_code,
-                        newVersion.version_no);
+                $scope.referenceSubtitles.getSubtitles(
+                    $scope.language.language_code, newVersion.version_no);
             });
         }
 
@@ -125,8 +121,8 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     };
 
-    var SaveSessionController = function($scope, $q, SubtitleListFinder,
-                                         SubtitleStorage, OldEditorConfig) {
+    var SaveSessionController = function($scope, $q, SubtitleStorage,
+            OldEditorConfig) {
 
         $scope.changesMade = false;
         $scope.nextVersionNumber = null;
@@ -204,13 +200,12 @@ var angular = angular || null;
             // changed, then we don't save anything and return the current
             // version number.
             if ($scope.status !== 'saving') {
-                var subtitleList = SubtitleListFinder.get('working-subtitle-set').scope;
                 var deferred = $q.defer();
 
                 if($scope.changesMade) {
                     // changes have been made, we need to save the subtitles
                     $scope.status = 'saving';
-                    var promise = subtitleList.saveSubtitles();
+                    var promise = $scope.saveSubtitles();
                     promise.then(function onSuccess(response) {
                         $scope.status = 'saved';
                         $scope.changesMade = false;
@@ -223,7 +218,7 @@ var angular = angular || null;
                 } else {
                     // no changes made, just return the current version
                     $scope.status = 'saved';
-                    deferred.resolve(subtitleList.versionNumber);
+                    deferred.resolve($scope.workingSubtitles.versionNumber);
                 }
 
                 return deferred.promise;
@@ -231,20 +226,17 @@ var angular = angular || null;
         };
         $scope.setCloseStates = function() {
 
-            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
-
             var oldEditorURL = OldEditorConfig.get()
             $scope.fromOldEditor = Boolean(oldEditorURL);
-            $scope.primaryVideoURL = '/videos/' + subtitleListScope.videoID + '/';
+            $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
 
             if ($scope.fromOldEditor) {
                 $scope.dialogURL = oldEditorURL;
             }
         };
         function resumeEditing() {
-            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
             $scope.status = '';
-            subtitleListScope.versionNumber = $scope.nextVersionNumber;
+            $scope.workingSubtitles.versionNumber = $scope.nextVersionNumber;
             $scope.nextVersionNumber = null;
         }
         $scope.showCloseModal = function(allowResume) {
@@ -301,13 +293,11 @@ var angular = angular || null;
         };
         $scope.showErrorModal = function(message) {
 
-            var subtitleListScope = SubtitleListFinder.get('working-subtitle-set').scope;
-
             $scope.$root.$emit("show-modal", {
                 heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
                 buttons: [
                     {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                        window.location = '/videos/' + subtitleListScope.videoID + "/";
+                        window.location = '/videos/' + $scope.videoId + "/";
                     }}
                 ]
             });
@@ -320,9 +310,8 @@ var angular = angular || null;
         $scope.$root.$on('send-back-task', function() {
             $scope.saveAndSendBack();
         });
-        $scope.$root.$on('subtitles-fetched', function() {
+        $scope.$watch('videoId != null', function() {
             $scope.setCloseStates();
-            $scope.changesMade = false;
         });
         $scope.$root.$on('work-done', function() {
             $scope.changesMade = true;
@@ -337,116 +326,35 @@ var angular = angular || null;
         };
     };
 
-    var SubtitleListController = function($scope, SubtitleStorage) {
+    var WorkingSubtitlesController = function($scope, $window, SubtitleStorage) {
         /**
-         * Responsible for everything that touches subtitles as a group,
-         * souch as populating the list with actual data, removing subs,
-         * adding subs.
-         * @param $scope
-         * @param SubtitleStorage
-         * @constructor
+         * Handles the subtitles the user is working on.
          */
-
+        var document = $($window.document);
         var willSync = {start: null, end:null};
+        var subtitleList = $scope.workingSubtitles.subtitleList;
 
         function updateSyncHelpers() {
             var startIndex = null, endIndex = null;
             if(willSync.start !== null) {
-                startIndex = $scope.subtitleList.getIndex(willSync.start);
+                startIndex = subtitleList.getIndex(willSync.start);
             }
             if(willSync.end !== null) {
-                endIndex = $scope.subtitleList.getIndex(willSync.end);
+                endIndex = subtitleList.getIndex(willSync.end);
             }
             $scope.positionSyncHelpers(startIndex, endIndex);
         }
 
-        $scope.subtitleList = new dfxp.SubtitleList();
-        $scope.isEditable = false;
-        $scope.isWorkingSubtitles = function() {
-            return $scope.isEditable;
-        }
-        $scope.getSubtitles = function(languageCode, versionNumber) {
-            $scope.setLanguage(languageCode);
-
-            // If this version has no default source translation language
-            // it will be empty, in which case we want to wait for user
-            // interaction to request a reference subtitle set.
-            if (!languageCode || !versionNumber) {
-                $scope.status = 'idle';
-                return;
-            }
-
-            $scope.status = 'loading';
-
-            SubtitleStorage.getSubtitles(languageCode, versionNumber, function(subtitleData) {
-                $scope.onSubtitlesFetched(subtitleData);
-            });
-
-        };
-        $scope.onSubtitlesFetched = function (subtitleData) {
-
-            // Save subtitle data to this scope
-            $scope.videoTitle = subtitleData.title;
-            $scope.videoDescription = subtitleData.description;
-
-            if ( subtitleData.visibility == 'Public' || $scope.isEditable){
-                $scope.subtitleList.loadXML(subtitleData.subtitlesXML);
-                $scope.status = 'ready';
-            }
-
-            // When we have subtitles for an editable set, emit it.
-            if ($scope.isWorkingSubtitles()) {
-                $scope.$root.workingSubtitles = $scope;
-                $scope.$root.$emit('subtitles-fetched');
-            }
-        };
-        $scope.initEmptySubtitles = function(languageCode) {
-            $scope.setLanguage(languageCode);
-            // Save subtitle data to this scope
-            $scope.videoTitle = '';
-            $scope.videoDescription = '';
-
-            $scope.subtitleList.loadXML(null);
-            $scope.status = 'ready';
-
-            // When we have subtitles for an editable set, emit it.
-            if ($scope.isWorkingSubtitles()) {
-                $scope.$root.workingSubtitles = $scope;
-                $scope.$root.$emit('subtitles-fetched');
-            }
-        };
-        $scope.saveSubtitles = function() {
-            $scope.status = 'saving';
-            return SubtitleStorage.saveSubtitles($scope.videoID,
-                                          $scope.language.code,
-                                          $scope.subtitleList.toXMLString(),
-                                          $scope.videoTitle,
-                                          $scope.videoDescription);
-        };
-        $scope.setLanguage = function(code) {
-            $scope.language = SubtitleStorage.getLanguage(code);
-        };
-        $scope.setVideoID = function(videoID) {
-            $scope.videoID = videoID;
-        };
-
         $scope.$root.$on('will-sync-changed', function(evt, newWillSync) {
-            if($scope.isWorkingSubtitles()) {
-                willSync = newWillSync;
-                updateSyncHelpers();
-            };
+            willSync = newWillSync;
+            updateSyncHelpers();
         });
 
-        $scope.subtitleList.addChangeCallback(function(change) {
+        subtitleList.addChangeCallback(function(change) {
             if(change == 'insert' || change == 'remove') {
                 updateSyncHelpers();
             }
         });
-
-    };
-
-    var WorkingSubtitleItemsController = function($scope, $window) {
-        var document = $($window.document);
 
         function startEdit(subtitle, caretPos) {
             var li = $scope.getSubtitleRepeatItem(subtitle);
@@ -471,14 +379,13 @@ var angular = angular || null;
         function finishEdit(commitChanges) {
             // Tell the root scope that we're no longer editing, now.
             document.off('mousedown.subtitle-edit');
-            if($scope.currentEdit.finish(commitChanges,
-                        $scope.subtitleList)) {
+            if($scope.currentEdit.finish(commitChanges, subtitleList)) {
                 $scope.$root.$emit('work-done');
             }
         };
 
         function insertAndStartEdit(before) {
-            var newSub = $scope.subtitleList.insertSubtitleBefore(before);
+            var newSub = subtitleList.insertSubtitleBefore(before);
             startEdit(newSub);
         }
 
@@ -494,7 +401,7 @@ var angular = angular || null;
                     if($scope.currentEdit.isForSubtitle(subtitle)) {
                         $scope.currentEdit.finish(false);
                     }
-                    $scope.subtitleList.removeSubtitle(subtitle);
+                    subtitleList.removeSubtitle(subtitle);
                     madeChange = true;
                     break;
 
@@ -523,7 +430,7 @@ var angular = angular || null;
 
             if (evt.keyCode === 13 && !evt.shiftKey) {
                 // Enter without shift finishes editing
-                var nextSubtitle = $scope.subtitleList.nextSubtitle(subtitle);
+                var nextSubtitle = subtitleList.nextSubtitle(subtitle);
                 finishEdit(true);
                 if(nextSubtitle === null) {
                     insertAndStartEdit(null);
@@ -540,9 +447,9 @@ var angular = angular || null;
                 // Tab navigates to other subs
                 finishEdit(true);
                 if(!evt.shiftKey) {
-                    var targetSub = $scope.subtitleList.nextSubtitle(subtitle);
+                    var targetSub = subtitleList.nextSubtitle(subtitle);
                 } else {
-                    var targetSub = $scope.subtitleList.prevSubtitle(subtitle);
+                    var targetSub = subtitleList.prevSubtitle(subtitle);
                 }
                 if(targetSub !== null) {
                     startEdit(targetSub);
@@ -555,7 +462,6 @@ var angular = angular || null;
 
     root.LanguageSelectorController = LanguageSelectorController;
     root.SaveSessionController = SaveSessionController;
-    root.SubtitleListController = SubtitleListController;
-    root.WorkingSubtitleItemsController = WorkingSubtitleItemsController;
+    root.WorkingSubtitlesController = WorkingSubtitlesController;
 
 }).call(this);

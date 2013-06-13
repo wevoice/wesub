@@ -88,7 +88,10 @@
                 $scope.timelineOverlayText = null;
             }
         });
-        $scope.$watch('subtitles-fetched', function(){
+
+        // use evalAsync so that the video player gets loaded after we've
+        // rendered all of the subtitles.
+        $scope.$evalAsync(function() {
               VideoPlayer.init();
         });
 
