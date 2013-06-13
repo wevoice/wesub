@@ -101,7 +101,6 @@ var USER_IDLE_MINUTES = 5;
             }
 
             scope.positionInfoTray = function() {
-                return;
                 var li = scope.currentEdit.LI;
                 if(li) {
                     var top = li.offset().top - wrapper.offset().top;
