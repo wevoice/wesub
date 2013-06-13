@@ -95,7 +95,7 @@ var angular = angular || null;
 
     var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
-    directives.directive('timelineTiming', function() {
+    directives.directive('timelineTiming', function(displayTimeSecondsFilter) {
         return function link(scope, elem, attrs) {
             var canvas = $(elem);
             var canvasElt = elem[0];
@@ -108,9 +108,10 @@ var angular = angular || null;
             function drawSecond(ctx, xPos, t) {
                 // draw the second text on the timeline
                 ctx.fillStyle = '#686868';
-                var metrics = ctx.measureText(t);
+                var text = displayTimeSecondsFilter(t * 1000);
+                var metrics = ctx.measureText(text);
                 var x = xPos - (metrics.width / 2);
-                ctx.fillText(t, x, 60);
+                ctx.fillText(text, x, 60);
             }
             function drawTics(ctx, xPos) {
                 // draw the tic marks between seconds
