@@ -394,7 +394,7 @@ var angular = angular || null;
         };
     };
 
-    var SubtitleListController = function($scope, $window, SubtitleStorage) {
+    var SubtitleListController = function($scope, SubtitleStorage) {
         /**
          * Responsible for everything that touches subtitles as a group,
          * souch as populating the list with actual data, removing subs,
@@ -425,9 +425,6 @@ var angular = angular || null;
         }
         $scope.allowsSyncing = $window.editorData.allowsSyncing;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
-        $scope.getSubtitleListHeight = function() {
-            return $(window).height() - $scope.subtitlesHeight;
-        };
         $scope.getSubtitles = function(languageCode, versionNumber) {
             $scope.setLanguage(languageCode);
 
@@ -493,11 +490,6 @@ var angular = angular || null;
             $scope.videoID = videoID;
         };
 
-        $('div.subtitles').height($scope.getSubtitleListHeight());
-        $scope.$watch($scope.getSubtitleListHeight, function(newHeight) {
-            $($('div.subtitles').height(newHeight));
-        });
-
         $scope.$root.$on('will-sync-changed', function(evt, newWillSync) {
             if($scope.isWorkingSubtitles()) {
                 willSync = newWillSync;
@@ -511,9 +503,6 @@ var angular = angular || null;
             }
         });
 
-        $window.onresize = function() {
-            $scope.$digest();
-        };
     };
 
     var WorkingSubtitleItemsController = function($scope, $window) {

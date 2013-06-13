@@ -123,7 +123,9 @@ var USER_IDLE_MINUTES = 5;
         };
     });
 
-    directives.directive('subtitleList', function(SubtitleListFinder) {
+    directives.directive('subtitleList', function($window, SubtitleListFinder) {
+        // Use jquery, not jqLite for $window
+        $window = $($window);
         return function link(scope, elem, attrs) {
             var scroller = $(elem).parent();
             // set these *before* calling get subtitle since if
@@ -166,6 +168,19 @@ var USER_IDLE_MINUTES = 5;
                             target.offset().top - scroller.offset().top);
                 }
             });
+
+            function resizeScroller() {
+                if (scope.timelineShown) {
+                    var scrollerTop = 431;
+                } else {
+                    var scrollerTop = 366;
+                }
+                scroller.height($window.height() - scrollerTop);
+            }
+
+            scope.$watch('timelineShown', resizeScroller);
+            $window.on('resize', resizeScroller);
+            resizeScroller();
         }
     });
 

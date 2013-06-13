@@ -30,7 +30,6 @@ var angular = angular || null;
 
         $scope.scrollingSynced = true;
         $scope.timelineShown = true;
-        $scope.subtitlesHeight = 431;
 
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
@@ -38,11 +37,6 @@ var angular = angular || null;
 
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
-            if ($scope.timelineShown) {
-                $scope.subtitlesHeight = 431;
-            } else {
-                $scope.subtitlesHeight = 366;
-            }
         }
 
         function releaseLock() {
