@@ -85,6 +85,6 @@ amara-fabric/
 babelsubs/
 tmp.sql
 node_modules/
-buildout
-src
+/buildout
+/src
 frontend-unit-tests-results.xml
