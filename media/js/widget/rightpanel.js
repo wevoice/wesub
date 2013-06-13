@@ -295,20 +295,16 @@ unisubs.RightPanel.prototype.createSaveAndOpenInNewEditor = function(stepsDiv) {
 
         var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
         var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
-        var supportedTypes = ['vimeo', 'youtube', 'html5', 'flv'];
+        this.saveAndOpenInNewEditor = $d(
+            'div', 'unisubs-saveandopeninneweditor',
+            $d('span', null, 'Beta: '),
+            $d('a', {'href': '#'},
+            $d('span', null, 'Save and open in new editor')));
 
-        if (supportedTypes.indexOf(videoType) !== -1) {
-            this.saveAndOpenInNewEditor = $d(
-                'div', 'unisubs-saveandopeninneweditor',
-                $d('span', null, 'Beta: '),
-                $d('a', {'href': '#'},
-                $d('span', null, 'Save and open in new editor')));
-
-            goog.dom.append(stepsDiv, this.saveAndOpenInNewEditor);
-            this.getHandler().listen(
-                this.saveAndOpenInNewEditor, goog.events.EventType.CLICK,
-                this.saveAndOpenInNewEditorClicked_);
-        }
+        goog.dom.append(stepsDiv, this.saveAndOpenInNewEditor);
+        this.getHandler().listen(
+            this.saveAndOpenInNewEditor, goog.events.EventType.CLICK,
+            this.saveAndOpenInNewEditorClicked_);
     }
 }
 unisubs.RightPanel.prototype.legendKeyClicked_ = function(keyCode, modifiers, event) {
