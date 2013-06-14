@@ -214,7 +214,7 @@ var angular = angular || null;
             if ($scope.status !== 'saving') {
                 var deferred = $q.defer();
 
-                if($scope.changesMade) {
+                if($scope.changesMade || markComplete !== undefined) {
                     // changes have been made, we need to save the subtitles
                     $scope.status = 'saving';
                     var promise = $scope.saveSubtitles(markComplete);
