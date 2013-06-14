@@ -623,7 +623,11 @@ def can_rollback_language(user, language):
 
 def can_post_edit_subtitles(team, user):
     """ Returns wheter the user has permission to post edit an original language """
-    return can_create_tasks(team, user)
+    # check tasks only if workflow is enabled
+    if team.workflow_enabled:
+        return can_create_tasks(team, user)
+    else:
+        return TeamsPermissionsCheck(True)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.
@@ -722,7 +726,6 @@ def can_assign_tasks(team, user, project=None, lang=None):
         20: ROLE_MANAGER,
         30: ROLE_ADMIN,
     }[team.task_assign_policy]
-
     return role in _perms_equal_or_greater(role_required)
 
 

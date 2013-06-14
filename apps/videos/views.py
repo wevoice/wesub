@@ -564,7 +564,6 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
             context['edit_disabled'] = True
             context['must_use_tasks'] = True
 
-
     return render_to_response("videos/subtitle-view.html", context,
                               context_instance=RequestContext(request))
 
