@@ -7,7 +7,7 @@ describe('Test the subtitle-repeat directive', function() {
 
     beforeEach(function() {
         module('amara.SubtitleEditor.directives.subtitles');
-        module('amara.SubtitleEditor.services.domutil');
+        module('amara.SubtitleEditor.services.dom');
         subtitles = [];
         subtitleList = new dfxp.SubtitleList();
         subtitleList.loadXML(null);

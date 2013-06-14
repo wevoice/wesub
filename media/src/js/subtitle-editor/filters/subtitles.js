@@ -20,7 +20,7 @@ var angular = angular || null;
 (function(){
     var root, module;
     root = this;
-    module = angular.module('amara.SubtitleEditor.filters', ['amara.SubtitleEditor']);
+    module = angular.module('amara.SubtitleEditor.filters.subtitles', []);
     var HIDES_ON = ['Deleted', 'Private']
 
     function leftPad(number, width, character) {

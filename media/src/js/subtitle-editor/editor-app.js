@@ -24,9 +24,14 @@
 
     module = angular.module('amara.SubtitleEditor', [
         'amara.SubtitleEditor.controllers.app',
-        'amara.SubtitleEditor.services',
-        'amara.SubtitleEditor.directives',
-        'amara.SubtitleEditor.filters',
+        'amara.SubtitleEditor.services.dom',
+        'amara.SubtitleEditor.services.lock',
+        'amara.SubtitleEditor.services.subtitles',
+        'amara.SubtitleEditor.services.video',
+        'amara.SubtitleEditor.directives.subtitles',
+        'amara.SubtitleEditor.directives.timeline',
+        'amara.SubtitleEditor.directives.video',
+        'amara.SubtitleEditor.filters.subtitles',
         'ngCookies'
     ]);
 
