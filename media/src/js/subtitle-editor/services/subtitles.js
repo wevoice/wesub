@@ -216,9 +216,14 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(videoID, languageCode, dfxpString, title, description){
-
+            saveSubtitles: function(videoID, languageCode, dfxpString, title,
+                                   description, isComplete) {
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
+                // if isComplete is not specified as true or false, we send
+                // null, which means keep the complete flag the same as before
+                if(isComplete !== true && isComplete !== false) {
+                    isComplete = null;
+                }
 
                 var promise = $http({
                     method: 'POST',
@@ -230,7 +235,8 @@ var angular = angular || null;
                         subtitles: dfxpString,
                         sub_format: 'dfxp',
                         title: title,
-                        description: description
+                        description: description,
+                        is_complete: isComplete,
                     }
                 });
 

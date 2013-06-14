@@ -243,13 +243,14 @@ var angular = angular || null;
                     editingVersion.languageCode);
         }
 
-        $scope.saveSubtitles = function() {
+        $scope.saveSubtitles = function(markComplete) {
             return SubtitleStorage.saveSubtitles(
                     $scope.videoId,
                     $scope.workingSubtitles.language.code,
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
-                    $scope.workingSubtitles.description);
+                    $scope.workingSubtitles.description,
+                    markComplete);
         };
     });
 
@@ -267,7 +268,10 @@ var angular = angular || null;
         $scope.endorse = function() {
             if(EditorData.task_id === undefined || 
                     EditorData.task_id === null) {
-                $scope.$root.$emit('save', false);
+                $scope.$root.$emit('save', {
+                    allowResume: false,
+                    markComplete: true,
+                });
             } else {
                 $scope.$root.$emit('approve-task');
             }

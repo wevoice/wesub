@@ -147,7 +147,7 @@ var angular = angular || null;
                 var message = 'Task approved. Redirecting…';
             }
 
-            $scope.saveSession().then(function(versionNumber) {
+            $scope.saveSession(true).then(function(versionNumber) {
                 if ($scope.status === 'saved') {
 
                     $scope.status = 'approving';
@@ -165,17 +165,19 @@ var angular = angular || null;
             });
 
         };
-        $scope.save = function(allowResume) {
-            if(!$scope.changesMade) {
-                return;
-            }
-            if(allowResume === undefined) {
-                allowResume = true;
+        $scope.save = function(options) {
+            if(options === undefined) {
+                options = {}
             }
 
-            $scope.saveSession().then(function(versionNumber) {
+            if(!$scope.changesMade && !options.markComplete &&!options.force) {
+                return;
+            }
+
+            $scope.saveSession(options.markComplete)
+                .then(function(versionNumber) {
                 $scope.nextVersionNumber = versionNumber;
-                $scope.showCloseModal(allowResume);
+                $scope.showCloseModal(options.allowResume);
             });
         };
         $scope.saveAndSendBack = function() {
@@ -202,7 +204,7 @@ var angular = angular || null;
                 }
             });
         };
-        $scope.saveSession = function() {
+        $scope.saveSession = function(markComplete) {
             // Save the current session
             //
             // Returns a promise that will be resolved with the version number
@@ -215,7 +217,7 @@ var angular = angular || null;
                 if($scope.changesMade) {
                     // changes have been made, we need to save the subtitles
                     $scope.status = 'saving';
-                    var promise = $scope.saveSubtitles();
+                    var promise = $scope.saveSubtitles(markComplete);
                     promise.then(function onSuccess(response) {
                         $scope.status = 'saved';
                         $scope.changesMade = false;
@@ -311,8 +313,8 @@ var angular = angular || null;
         $scope.$root.$on('approve-task', function() {
             $scope.saveAndApprove();
         });
-        $scope.$root.$on('save', function(evt, allowResume) {
-            $scope.save(allowResume);
+        $scope.$root.$on('save', function(evt, options) {
+            $scope.save(options);
         });
         $scope.$root.$on('send-back-task', function() {
             $scope.saveAndSendBack();

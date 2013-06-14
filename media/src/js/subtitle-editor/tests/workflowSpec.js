@@ -112,8 +112,10 @@ describe('WorkflowProgressionController', function() {
             $scope.endorse();
             // should send the false paramater to not allow resuming after an
             // endoresment
-            expect($scope.$emit).toHaveBeenCalledWith('save', false);
-            // FIXME: should test that we mark the language complete
+            expect($scope.$emit).toHaveBeenCalledWith('save', {
+                'markComplete': true,
+                'allowResume': false
+            });
         });
 
         it('approves a task if we have one', inject(function(EditorData) {
