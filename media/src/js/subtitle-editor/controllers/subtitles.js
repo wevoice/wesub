@@ -447,6 +447,9 @@ var angular = angular || null;
             } else if (evt.keyCode === 27) {
                 // Escape cancels editing
                 finishEdit(false);
+                if(subtitle.markdown == '') {
+                    subtitleList.removeSubtitle(subtitle);
+                }
                 evt.preventDefault();
             } else if (evt.keyCode == 9) {
                 // Tab navigates to other subs
