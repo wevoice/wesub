@@ -203,12 +203,32 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     goog.style.showElement(
         this.fromLanguageSection_, enabledFromLanguages.length > 0);
 
+    var targetLanguageCode = this.toLanguageDropdown_.value;
+    var videoLanguages = this.model_.videoLanguages_.videoLanguages_;
+    var targetLanguage;
+
+    for (var l in videoLanguages) {
+        var lang = videoLanguages[l];
+        // account for language codes having the PK attached if they are
+        // incomplete
+        if (lang.LANGUAGE == targetLanguageCode || lang.LANGUAGE+lang.PK == targetLanguageCode) {
+            targetLanguage = lang;
+            break;
+        }
+    }
+    if (targetLanguage && !targetLanguage.IS_COMPLETE) {
+        enabledFromLanguages = goog.array.filter(fromLanguages, function(l) {
+            return targetLanguage.TRANSLATED_FROM == l.LANGUAGE;
+        });
+    }
+
     if (enabledFromLanguages.length > 0) {
         var fromLanguageContents = [];
 
         if (this.translateAllowed_) {
             fromLanguageContents = goog.array.map(
-                this.model_.fromLanguages(),
+                //this.model_.fromLanguages(),
+                enabledFromLanguages,
                 function(l) {
                     return [l.LANGUAGE + '', l.toString(), null, l.DISABLED_FROM];
                 });
