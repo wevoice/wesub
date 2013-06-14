@@ -361,14 +361,21 @@ var angular = angular || null;
             }
         });
 
-        function startEdit(subtitle, caretPos) {
-            var li = $scope.getSubtitleRepeatItem(subtitle);
-            $scope.currentEdit.start(subtitle);
-            if(caretPos === undefined) {
-                caretPos = subtitle.markdown.length;
+        $scope.$watch('currentEdit.inProgress()', function(value) {
+            if(value) {
+                trackMouseDown();
+            } else {
+                DomWindow.offDocumentEvent('mousedown.subtitle-edit');
             }
-            $scope.currentEdit.draft.initialCaretPos = caretPos;
+
+        });
+
+        function trackMouseDown() {
+            // Disconnect any previous handlers to keep sanity
+            DomWindow.offDocumentEvent('mousedown.subtitle-edit');
             DomWindow.onDocumentEvent('mousedown.subtitle-edit', function(evt) {
+                var subtitle = $scope.currentEdit.draft.storedSubtitle;
+                var li = $scope.getSubtitleRepeatItem(subtitle);
                 var clicked = $(evt.target);
                 var textarea = $('textarea.subtitle-edit', li);
                 if(clicked[0] != textarea[0] &&
@@ -383,7 +390,6 @@ var angular = angular || null;
 
         function finishEdit(commitChanges) {
             // Tell the root scope that we're no longer editing, now.
-            DomWindow.offDocumentEvent('mousedown.subtitle-edit');
             if($scope.currentEdit.finish(commitChanges, subtitleList)) {
                 $scope.$root.$emit('work-done');
             }
@@ -391,7 +397,7 @@ var angular = angular || null;
 
         function insertAndStartEdit(before) {
             var newSub = subtitleList.insertSubtitleBefore(before);
-            startEdit(newSub);
+            $scope.currentEdit.start(newSub);
         }
 
         $scope.onSubtitleClick = function(evt, subtitle, action) {
@@ -412,7 +418,9 @@ var angular = angular || null;
 
                 case 'edit':
                     if(!$scope.currentEdit.isForSubtitle(subtitle)) {
-                        startEdit(subtitle, DomWindow.caretPos());
+                        var caret = DomWindow.caretPos();
+                        $scope.currentEdit.start(subtitle);
+                        $scope.currentEdit.draft.initialCaretPos = caret;
                         madeChange = true;
                     }
                     break;
@@ -441,7 +449,7 @@ var angular = angular || null;
                         insertAndStartEdit(null);
                     }
                 } else {
-                    startEdit(nextSubtitle);
+                    $scope.currentEdit.start(nextSubtitle);
                     $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
@@ -461,7 +469,7 @@ var angular = angular || null;
                     var targetSub = subtitleList.prevSubtitle(subtitle);
                 }
                 if(targetSub !== null) {
-                    startEdit(targetSub);
+                    $scope.currentEdit.start(targetSub);
                     $scope.$root.$emit('scroll-to-subtitle', targetSub);
                 }
                 evt.preventDefault();
