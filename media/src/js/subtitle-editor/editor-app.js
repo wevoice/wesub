@@ -24,6 +24,12 @@
 
     module = angular.module('amara.SubtitleEditor', [
         'amara.SubtitleEditor.controllers.app',
+        'amara.SubtitleEditor.controllers.collab',
+        'amara.SubtitleEditor.controllers.help',
+        'amara.SubtitleEditor.controllers.modal',
+        'amara.SubtitleEditor.controllers.subtitles',
+        'amara.SubtitleEditor.controllers.timeline',
+        'amara.SubtitleEditor.controllers.video',
         'amara.SubtitleEditor.services.dom',
         'amara.SubtitleEditor.services.lock',
         'amara.SubtitleEditor.services.subtitles',

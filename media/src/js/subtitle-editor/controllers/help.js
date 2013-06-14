@@ -18,9 +18,9 @@
 
 (function() {
 
-    var root = this;
+    var module = angular.module('amara.SubtitleEditor.controllers.help', []);
 
-    var HelpController = function($scope, SubtitleStorage) {
+    module.controller('HelpController', function($scope, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the help panel.
          * @param $scope
@@ -48,8 +48,5 @@
 
         };
 
-    };
-
-    root.HelpController = HelpController;
-
+    });
 }).call(this);

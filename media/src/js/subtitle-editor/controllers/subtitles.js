@@ -20,11 +20,12 @@ var angular = angular || null;
 
 (function() {
 
-    var root = this;
-    var _ = root._.noConflict();
-    var $ = root.AmarajQuery;
+    var module = angular.module('amara.SubtitleEditor.controllers.subtitles', []);
 
-    var LanguageSelectorController = function($scope) {
+    var _ = this._.noConflict();
+    var $ = this.AmarajQuery;
+
+    module.controller('LanguageSelectorController', function($scope) {
         /**
          * This controller is responsible for the language and version selector
          * widget.  The widget allows the user to select a reference language and
@@ -119,9 +120,9 @@ var angular = angular || null;
             $scope.languageChanged(newValue, "");
         });
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
-    };
+    });
 
-    var SaveSessionController = function($scope, $q, SubtitleStorage, EditorData) {
+    module.controller('SaveSessionController', function($scope, $q, SubtitleStorage, EditorData) {
 
         $scope.changesMade = false;
         $scope.nextVersionNumber = null;
@@ -327,9 +328,9 @@ var angular = angular || null;
               return null;
             }
         };
-    };
+    });
 
-    var WorkingSubtitlesController = function($scope, $window) {
+    module.controller('WorkingSubtitlesController', function($scope, $window) {
         /**
          * Handles the subtitles the user is working on.
          */
@@ -476,10 +477,5 @@ var angular = angular || null;
                 return 'type-shortcuts-help'
             }
         }
-    }
-
-    root.LanguageSelectorController = LanguageSelectorController;
-    root.SaveSessionController = SaveSessionController;
-    root.WorkingSubtitlesController = WorkingSubtitlesController;
-
+    });
 }).call(this);

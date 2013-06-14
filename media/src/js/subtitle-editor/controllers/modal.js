@@ -17,10 +17,9 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
+    var module = angular.module('amara.SubtitleEditor.controllers.modal', []);
 
-    var root = this;
-
-    var ModalController = function($scope, SubtitleStorage) {
+    module.controller('ModalController', function($scope, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -62,8 +61,5 @@
                 $scope.isVisible = true;
             }
         });
-    };
-
-    root.ModalController = ModalController;
-
+    });
 }).call(this);

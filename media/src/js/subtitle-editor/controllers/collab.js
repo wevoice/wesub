@@ -18,9 +18,9 @@
 
 (function() {
 
-    var root = this;
+    var module = angular.module('amara.SubtitleEditor.controllers.collab', []);
 
-    var CollabController = function($scope, $timeout, SubtitleStorage) {
+    module.controller('CollabController', function($scope, $timeout, SubtitleStorage) {
 
         $scope.notes = SubtitleStorage.getCachedData().savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
@@ -67,8 +67,5 @@
                 $scope.error = null;
             }
         });
-    };
-
-    root.CollabController = CollabController;
-
+    });
 }).call(this);

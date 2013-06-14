@@ -184,7 +184,11 @@ describe('when the enter key creates a new subtitle', function() {
     var subtitleList;
     var $scope;
 
-    beforeEach(inject(function($rootScope, Workflow, CurrentEditManager) {
+    beforeEach(function() {
+        module('amara.SubtitleEditor.controllers.subtitles');
+    });
+
+    beforeEach(inject(function($rootScope, $controller, CurrentEditManager) {
         $scope = $rootScope;
         subtitleList = new dfxp.SubtitleList();
         subtitleList.loadXML(null);
@@ -199,7 +203,10 @@ describe('when the enter key creates a new subtitle', function() {
         subtitleList.insertSubtitleBefore(null);
         // FIXME: we should mock window, but that's tricky to do.  Especially
         // since we wrap it in jquery.
-        WorkingSubtitlesController($scope, window);
+        $controller('WorkingSubtitlesController', {
+            $scope: $scope,
+            window: window,
+        });
         spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
     }));
 

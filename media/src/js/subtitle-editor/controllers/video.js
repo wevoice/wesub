@@ -18,10 +18,11 @@
 
 (function() {
 
-    var root = this;
-    var $ = root.AmarajQuery;
+    var $ = this.AmarajQuery;
 
-    var VideoController = function($scope, VideoPlayer) {
+    var module = angular.module('amara.SubtitleEditor.controllers.video', []);
+
+    module.controller('VideoController', function($scope, VideoPlayer) {
         $scope.overlayText = null;
         $scope.showOverlay = false;
         $scope.timelineOverlayText = null;
@@ -95,7 +96,5 @@
               VideoPlayer.init();
         });
 
-    };
-    root.VideoController = VideoController;
-
+    });
 }).call(this);
