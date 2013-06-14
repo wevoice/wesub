@@ -361,7 +361,7 @@ var angular = angular || null;
 
         function startEdit(subtitle, caretPos) {
             var li = $scope.getSubtitleRepeatItem(subtitle);
-            $scope.currentEdit.start(subtitle, li);
+            $scope.currentEdit.start(subtitle);
             if(caretPos === undefined) {
                 caretPos = subtitle.markdown.length;
             }
@@ -436,7 +436,7 @@ var angular = angular || null;
                 var nextSubtitle = subtitleList.nextSubtitle(subtitle);
                 finishEdit(true);
                 if(nextSubtitle === null) {
-                    if($scope.workflow.stage == 'type') {
+                    if(!$scope.timelineShown) {
                         insertAndStartEdit(null);
                     }
                 } else {
@@ -461,6 +461,16 @@ var angular = angular || null;
                     $scope.$root.$emit('scroll-to-subtitle', targetSub);
                 }
                 evt.preventDefault();
+            }
+        }
+        
+        $scope.bottomState = function() {
+            if($scope.currentEdit.inProgress()) {
+                return 'edit-help'
+            } else if($scope.timelineShown) {
+                return 'add-button'
+            } else {
+                return 'type-shortcuts-help'
             }
         }
     }

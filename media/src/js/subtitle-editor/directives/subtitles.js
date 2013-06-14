@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 5;
             });
         };
     });
-    directives.directive('workingSubtitles', function($timeout) {
+    directives.directive('workingSubtitles', function() {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
@@ -56,6 +56,11 @@ var USER_IDLE_MINUTES = 5;
             var lastSyncEndIndex = null;
 
             scope.positionSyncHelpers = function(startIndex, endIndex) {
+                if(!scope.timelineShown) {
+                    startHelper.hide();
+                    endHelper.hide();
+                    return;
+                }
                 if(startIndex === undefined) {
                     startIndex = lastSyncStartIndex;
                 }
@@ -87,7 +92,12 @@ var USER_IDLE_MINUTES = 5;
             }
 
             scope.positionInfoTray = function() {
-                var li = scope.currentEdit.LI;
+                var subtitle = scope.currentEdit.storedSubtitle();
+                if(subtitle === null) {
+                    infoTray.hide();
+                    return;
+                }
+                var li = scope.getSubtitleRepeatItem(subtitle);
                 if(li) {
                     var top = li.offset().top - wrapper.offset().top;
                     if(top >= 0 && top < wrapper.height()) {
@@ -99,12 +109,12 @@ var USER_IDLE_MINUTES = 5;
                 }
             }
 
-            scope.$watch("currentEdit.LI", function() {
-                // When we finish an edit, we do a bunch of CSS tricks to
-                // re-show the text and hide the textarea.  Use a timeout to
-                // make sure that positionInfoTray() gets called after those
-                // are done.
-                $timeout(scope.positionInfoTray);
+            scope.$watch("currentEdit.draft", function() {
+                scope.positionInfoTray();
+            });
+
+            scope.$watch("timelineShown", function() {
+                scope.positionSyncHelpers();
             });
 
             scope.$root.$on('working-subtitles-scrolled', function() {

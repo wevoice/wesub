@@ -96,6 +96,7 @@ describe('WorkflowProgressionController', function() {
         subtitleList = new dfxp.SubtitleList();
         $scope = $rootScope;
         $scope.timelineShown = false;
+        $scope.toggleTimelineShown = jasmine.createSpy();
         subtitleList.loadXML(null);
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = new Workflow(subtitleList);
@@ -138,9 +139,10 @@ describe('WorkflowProgressionController', function() {
         });
 
         it('shows the timeline for the sync step', inject(function(MockEvents) {
+            expect($scope.toggleTimelineShown.callCount).toBe(0);
             $scope.onNextClicked(MockEvents.click());
             expect($scope.workflow.stage).toBe('sync')
-            expect($scope.timelineShown).toBeTruthy();
+            expect($scope.toggleTimelineShown.callCount).toBe(1);
         }));
 
         it('restarts video playback when switching steps', inject(function(MockEvents, VideoPlayer) {
@@ -151,30 +153,25 @@ describe('WorkflowProgressionController', function() {
     });
 });
 
-describe('up and down keys with workflows', function() {
-    var subtitleList;
+describe('when up and down sync subtitles', function() {
     var $scope;
 
     beforeEach(inject(function($rootScope, $controller, Workflow) {
-        var VideoPlayer = {};
         $scope = $rootScope;
-        subtitleList = new dfxp.SubtitleList();
-        subtitleList.loadXML(null);
-        $scope.workflow = new Workflow(subtitleList);
+        $scope.timelineShown = false;
         $controller("AppControllerEvents", {
             $scope: $scope,
-            VideoPlayer: VideoPlayer,
         });
         spyOn($scope, '$emit');
     }));
 
-    it('syncs during the sync stage', inject(function(MockEvents) {
+    it('syncs when the timeline is shown', inject(function(MockEvents) {
         $scope.handleAppKeyDown(MockEvents.keydown(40));
         expect($scope.$root.$emit).not.toHaveBeenCalled();
         $scope.handleAppKeyDown(MockEvents.keydown(38));
         expect($scope.$root.$emit).not.toHaveBeenCalled();
 
-        $scope.workflow.switchStage('sync');
+        $scope.timelineShown = true;
         $scope.handleAppKeyDown(MockEvents.keydown(40));
         expect($scope.$root.$emit).toHaveBeenCalledWith("sync-next-start-time");
         $scope.handleAppKeyDown(MockEvents.keydown(38));
@@ -182,7 +179,8 @@ describe('up and down keys with workflows', function() {
     }));
 });
 
-describe('enter key in the last text area with workflows', function() {
+describe('when the enter key creates a new subtitle', function() {
+    var keyCodeForEnter = 13;
     var subtitleList;
     var $scope;
 
@@ -190,10 +188,10 @@ describe('enter key in the last text area with workflows', function() {
         $scope = $rootScope;
         subtitleList = new dfxp.SubtitleList();
         subtitleList.loadXML(null);
-        $scope.workflow = new Workflow(subtitleList);
         $scope.workingSubtitles = {
             subtitleList: subtitleList,
         }
+        $scope.timelineShown = false;
         $scope.currentEdit = new CurrentEditManager();
         $scope.getSubtitleRepeatItem = function() {
             return null;
@@ -205,14 +203,69 @@ describe('enter key in the last text area with workflows', function() {
         spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
     }));
 
-    it('creates a new subtitle during the type stage',
+    it('creates a new subtitle when the timeline is hidden',
             inject(function(MockEvents) {
         $scope.currentEdit.start(subtitleList.subtitles[0]);
-        $scope.onEditKeydown(MockEvents.keydown(13));
+        var evt = MockEvents.keydown(keyCodeForEnter);
+        $scope.onEditKeydown(evt);
         expect(subtitleList.insertSubtitleBefore).toHaveBeenCalled();
+        expect(evt.preventDefault).toHaveBeenCalled();
 
-        $scope.workflow.switchStage('sync');
-        $scope.onEditKeydown(MockEvents.keydown(13));
+        $scope.timelineShown = true;
+        $scope.onEditKeydown(MockEvents.keydown(keyCodeForEnter));
         expect(subtitleList.insertSubtitleBefore.callCount).toBe(1);
     }));
+});
+
+describe('when enter creates a new subtitle', function() {
+    var keyCodeForEnter = 13;
+    var $scope;
+    var subtitleList;
+    var MockEvents;
+
+    beforeEach(inject(function($rootScope, $controller, $injector,
+                CurrentEditManager) {
+        MockEvents = $injector.get('MockEvents');
+        $scope = $rootScope;
+        $scope.timelineShown = false;
+        $scope.currentEdit = new CurrentEditManager();
+        subtitleList = new dfxp.SubtitleList();
+        subtitleList.loadXML(null);
+        $scope.workingSubtitles = { subtitleList: subtitleList };
+        $controller("AppControllerEvents", {
+            $scope: $scope,
+        });
+        spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
+    }));
+
+    it('creates a new subtitle', function() {
+        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
+        expect(subtitleList.insertSubtitleBefore).toHaveBeenCalled();
+    });
+
+    it('calls preventDefault', function() {
+        var evt = MockEvents.keydown(keyCodeForEnter);
+        $scope.handleAppKeyDown(evt);
+        expect(evt.preventDefault).toHaveBeenCalled();
+    });
+
+    it('starts editing the new subtitle', function() {
+        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
+        expect($scope.currentEdit.draft).not.toBe(null);
+    });
+
+    it('does not creates a new subtitle if its inside a textarea', function() {
+        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter, {
+            'target': {
+                'type': 'textarea',
+            },
+        }));
+        expect(subtitleList.insertSubtitleBefore).not.toHaveBeenCalled();
+    });
+
+    it('does not creates a new subtitle if the timeline is shown', function() {
+        $scope.timelineShown = true;
+        $scope.handleAppKeyDown(MockEvents.keydown(keyCodeForEnter));
+        expect(subtitleList.insertSubtitleBefore).not.toHaveBeenCalled();
+    });
 });

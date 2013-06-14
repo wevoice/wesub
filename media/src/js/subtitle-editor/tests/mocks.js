@@ -19,25 +19,34 @@
     });
 
     module.factory('MockEvents', function() {
-        function makeEvent(type) {
-            return {
+        function makeEvent(type, attrs) {
+            evt = {
                 type: type,
                 preventDefault: jasmine.createSpy(),
                 stopPropagation: jasmine.createSpy(),
             }
+            return overrideEventAttributes(evt, attrs);
+        }
+        function overrideEventAttributes(evt, attrs) {
+            if(attrs !== undefined) {
+                for(key in attrs) {
+                    evt[key] = attrs[key];
+                }
+            }
+            return evt;
         }
         return {
-            keydown: function(keyCode) {
+            keydown: function(keyCode, attrs) {
                 var evt = makeEvent('keydown');
                 evt.keyCode = keyCode;
                 evt.shiftKey = false;
                 evt.ctrlKey = false;
                 evt.altKey = false;
                 evt.target = { type: 'div' };
-                return evt;
+                return overrideEventAttributes(evt, attrs);
             },
-            click: function() {
-                return makeEvent('click');
+            click: function(attrs) {
+                return makeEvent('click', attrs);
             },
         }
     });

@@ -33,8 +33,8 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
-        $scope.timelineShown = true;
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+        $scope.timelineShown = !($scope.workflow.stage == 'type');
 
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
@@ -175,6 +175,11 @@ var angular = angular || null;
     });
 
     module.controller("AppControllerEvents", function($scope, VideoPlayer) {
+        function insertAndEditSubtitle() {
+            var sub = $scope.workingSubtitles.subtitleList.insertSubtitleBefore(null);
+            $scope.currentEdit.start(sub);
+        }
+
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
@@ -193,7 +198,7 @@ var angular = angular || null;
             else if(evt.keyCode == 40) {
                 // Down arrow, set the start time of the first
                 // unsynced sub
-                if($scope.workflow.stage == 'sync') {
+                if($scope.timelineShown) {
                     $scope.$root.$emit("sync-next-start-time");
                     evt.preventDefault();
                     evt.stopPropagation();
@@ -201,11 +206,17 @@ var angular = angular || null;
             } else if(evt.keyCode == 38) {
                 // Up arrow, set the end time of the first
                 // unsynced sub
-                if($scope.workflow.stage == 'sync') {
+                if($scope.timelineShown) {
                     $scope.$root.$emit("sync-next-end-time");
                     evt.preventDefault();
                     evt.stopPropagation();
                 }
+            } else if(evt.keyCode == 13) {
+                if(!$scope.timelineShown) {
+                    insertAndEditSubtitle();
+                    evt.preventDefault();
+                }
+
             }
         };
 
@@ -265,7 +276,9 @@ var angular = angular || null;
         $scope.onNextClicked = function(evt) {
             if($scope.workflow.stage == 'type') {
                 $scope.workflow.switchStage('sync');
-                $scope.timelineShown = true;
+                if(!$scope.timelineShown) {
+                    $scope.toggleTimelineShown();
+                }
                 rewindPlayback();
             } else if ($scope.workflow.stage == 'sync') {
                 $scope.workflow.switchStage('review');
@@ -295,6 +308,13 @@ var angular = angular || null;
             }
             this.draft = this.LI = null;
             return updateNeeded;
+        },
+        storedSubtitle: function() {
+            if(this.draft !== null) {
+                return this.draft.storedSubtitle;
+            } else {
+                return null;
+            }
         },
         sourceMarkdown: function() {
             return this.draft.storedSubtitle.markdown;

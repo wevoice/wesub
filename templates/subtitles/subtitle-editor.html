@@ -239,7 +239,7 @@ subtitle-repeat directive, see the working subtitles for more info
                     </span>
                     <div class="text">Begin now</div>
                 </div>
-                <div class="info-tray" ng-show="currentEdit.draft">
+                <div class="info-tray">
                     <table>
                         <tr>
                             <th>Start</th>
@@ -302,14 +302,17 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 
                     </ul>
 
-                    <div>
+                    <div ng-switch="bottomState()">
                         <a class="end"
                             id="add-sub-at-end"
                             href="#"
-                            ng-show="canAddAndRemove && !currentEdit.inProgress()"
+                            ng-switch-when="add-button"
                             ng-click="newSubtitleClicked($event)">+ New subtitle</a>
-                        <span ng-show="currentEdit.inProgress()" class="end">
+                        <span ng-switch-when="edit-help" class="end">
                             Press ENTER to save subtitle and move to next.<br />
+                        </span>
+                        <span ng-switch-when="type-shortcuts-help" class="end">
+                            Press ENTER to add a new subtitle<br />
                         </span>
                     </div>
                 </div>

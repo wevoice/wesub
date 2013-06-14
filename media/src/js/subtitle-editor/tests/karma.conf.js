@@ -29,8 +29,8 @@ files = [
     'src/js/third-party/*.js',
     'src/js/subtitle-editor/*.js',
     'src/js/subtitle-editor/**/*.js',
-    'src/js/subtitle-editor/tests/*Spec.js'
-    'src/js/subtitle-editor/tests/mocks.js'
+    'src/js/subtitle-editor/tests/*Spec.js',
+    'src/js/subtitle-editor/tests/mocks.js',
 ];
 
 // list of files to exclude
