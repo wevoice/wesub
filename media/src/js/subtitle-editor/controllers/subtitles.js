@@ -330,11 +330,10 @@ var angular = angular || null;
         };
     });
 
-    module.controller('WorkingSubtitlesController', function($scope, $window) {
+    module.controller('WorkingSubtitlesController', function($scope, DomWindow) {
         /**
          * Handles the subtitles the user is working on.
          */
-        var document = $($window.document);
         var willSync = {start: null, end:null};
         var subtitleList = $scope.workingSubtitles.subtitleList;
 
@@ -367,7 +366,7 @@ var angular = angular || null;
                 caretPos = subtitle.markdown.length;
             }
             $scope.currentEdit.draft.initialCaretPos = caretPos;
-            document.on('mousedown.subtitle-edit', function(evt) {
+            DomWindow.onDocumentEvent('mousedown.subtitle-edit', function(evt) {
                 var clicked = $(evt.target);
                 var textarea = $('textarea.subtitle-edit', li);
                 if(clicked[0] != textarea[0] &&
@@ -382,7 +381,7 @@ var angular = angular || null;
 
         function finishEdit(commitChanges) {
             // Tell the root scope that we're no longer editing, now.
-            document.off('mousedown.subtitle-edit');
+            DomWindow.offDocumentEvent('mousedown.subtitle-edit');
             if($scope.currentEdit.finish(commitChanges, subtitleList)) {
                 $scope.$root.$emit('work-done');
             }
@@ -411,8 +410,7 @@ var angular = angular || null;
 
                 case 'edit':
                     if(!$scope.currentEdit.isForSubtitle(subtitle)) {
-                        var caretPos = $window.getSelection().anchorOffset;
-                        startEdit(subtitle, caretPos);
+                        startEdit(subtitle, DomWindow.caretPos());
                         madeChange = true;
                     }
                     break;

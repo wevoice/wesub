@@ -205,7 +205,6 @@ describe('when the enter key creates a new subtitle', function() {
         // since we wrap it in jquery.
         $controller('WorkingSubtitlesController', {
             $scope: $scope,
-            window: window,
         });
         spyOn(subtitleList, 'insertSubtitleBefore').andCallThrough();
     }));

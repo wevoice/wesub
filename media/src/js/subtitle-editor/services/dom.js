@@ -37,5 +37,26 @@ var angular = angular || null;
             }
         };
     });
+    
+    /*
+     * Interface to the window object.  We avoid doing that directly in the
+     * controllers because it makes them hard to test.
+     */
+
+    module.factory('DomWindow', function($window) {
+        // Use real JQuery, not jqLite
+        var document = $window.AmarajQuery($window.document);
+        return {
+            caretPos: function() {
+                return $window.getSelection().anchorOffset;
+            },
+            onDocumentEvent: function(eventName, func) {
+                document.on(eventName, func);
+            },
+            offDocumentEvent: function(eventName) {
+                document.off(eventName);
+            },
+        };
+    });
 }).call(this);
 

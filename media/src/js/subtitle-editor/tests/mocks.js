@@ -18,6 +18,15 @@
         ]);
     });
 
+    module.factory('DomWindow', function() {
+        var mockObject = jasmine.createSpyObj('DomWindow', [
+            'onDocumentEvent',
+            'offDocumentEvent'
+        ]);
+        mockObject.caretPos = jasmine.createSpy('caretPos').andReturn(0);
+        return mockObject;
+    });
+
     module.factory('MockEvents', function() {
         function makeEvent(type, attrs) {
             evt = {
