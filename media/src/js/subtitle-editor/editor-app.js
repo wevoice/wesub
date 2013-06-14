@@ -23,6 +23,7 @@
     root = this;
 
     module = angular.module('amara.SubtitleEditor', [
+        'amara.SubtitleEditor.controllers.app',
         'amara.SubtitleEditor.services',
         'amara.SubtitleEditor.directives',
         'amara.SubtitleEditor.filters',

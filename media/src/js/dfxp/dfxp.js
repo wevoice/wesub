@@ -1282,10 +1282,16 @@ SubtitleList.prototype.length = function() {
 }
 
 SubtitleList.prototype.needsAnyTranscribed = function() {
-    for(var i=0; i < this.length; i++) {
-        if(this.subtitles[i].markdown == '') return true;
+    for(var i=0; i < this.length(); i++) {
+        if(this.subtitles[i].markdown == '') {
+            return true;
+        }
     }
     return false;
+}
+
+SubtitleList.prototype.needsAnySynced = function() {
+    return this.syncedCount < this.length();
 }
 
 SubtitleList.prototype.toXMLString = function() {

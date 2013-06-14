@@ -1043,20 +1043,26 @@ section.main {
                     padding: 12px 0 12px 10px;
                     width: 200px;
 
-                    ul {
-                        li {
+                    div.substeps {
+                        margin: 10px 0 0 16px;
+                        p {
                             color: #767879;
                             font-size: 11px;
-                            margin: 10px 0 10px 16px;
-
-                            &.highlighted {
-                                color: #39838B;
+                        }
+                        button {
+                            margin-top: 10px;
+                            color: #FFFFFF;
+                            padding: 12px 10px;
+                            &.next-step {
+                                background: #29B0BF;
                             }
-                            &:last-of-type {
-                                margin-bottom: 0;
+                            &.endorse {
+                                background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
+                                padding-left: 40px;
                             }
                         }
                     }
+
                     &.done {
                         background: transparent url('../../../images/checkmark.gif') center right no-repeat;
                         color: #949596;

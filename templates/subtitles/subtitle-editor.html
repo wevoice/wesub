@@ -347,16 +347,45 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
             </div>
         </section>
         <section class="right column">
-            <div class="steps-container">
-                <ul class="steps" ng-show='false'>
-                    <li class="done">1. Type what you hear</li>
-                    <li>2. Sync timing
-                        <ul>
-                            <li>Not all lines are synced yet.</li>
-                            <li class="highlighted">Highlight unsynced lines</li>
-                        </ul>
+            <div class="steps-container"
+                ng-controller="WorkflowProgressionController">
+                <ul class="steps">
+                    <li ng-class="{done: workflow.stageDone('type')}">
+                    1. Type what you hear
+                        <div class="substeps"
+                            ng-show="workflow.stage == 'type'">
+                            <p ng-show="!workflow.canMoveToReview()">
+                                {% trans "Is all the content subtitled?" %}
+                            </p>
+                            <button class="next-step"
+                                ng-click="onNextClicked($event)">
+                                {% trans "Yes, start syncing" %}
+                            </button>
+                    </div>
                     </li>
-                    <li>3. Review and endorse</li>
+                    <li ng-class="{done: workflow.stageDone('sync')}">
+                        2. Sync timing
+                        <div class="substeps"
+                            ng-show="workflow.stage == 'sync'">
+                            <p ng-show="!workflow.canMoveToReview()">
+                                {% trans "Not all lines are synced yet." %}
+                            </p>
+                            <div ng-show="workflow.canMoveToReview()">
+                                <p>{% trans "All lines are synced." %}</p>
+                                <button class="next-step"
+                                    ng-click="onNextClicked($event)">
+                                    {% trans "Start reviewing" %}
+                                </button>
+                        </div>
+                    </li>
+                    <li>3. Review and endorse
+                    <div class="substeps"
+                        ng-show="workflow.stage == 'review'">
+                        <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
+                        <button class="endorse" ng-click="endorse()">
+                            {% trans "Endorse" %}
+                        </button>
+                    </li>
                 </ul>
             </div>
         </section>

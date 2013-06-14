@@ -164,14 +164,17 @@ var angular = angular || null;
             });
 
         };
-        $scope.save = function() {
+        $scope.save = function(allowResume) {
             if(!$scope.changesMade) {
                 return;
+            }
+            if(allowResume === undefined) {
+                allowResume = true;
             }
 
             $scope.saveSession().then(function(versionNumber) {
                 $scope.nextVersionNumber = versionNumber;
-                $scope.showCloseModal(true);
+                $scope.showCloseModal(allowResume);
             });
         };
         $scope.saveAndSendBack = function() {
@@ -275,7 +278,11 @@ var angular = angular || null;
             }
 
             if($scope.status === 'saved') {
-                var heading = "You've saved a new revision!";
+                if(allowResume) {
+                    var heading = "You've saved a new revision!";
+                } else {
+                    var heading = "Subtitles saved";
+                }
             } else if($scope.changesMade) {
                 var heading = 'Your changes will be discarded.';
             } else {
@@ -303,6 +310,9 @@ var angular = angular || null;
         $scope.$root.$on('approve-task', function() {
             $scope.saveAndApprove();
         });
+        $scope.$root.$on('save', function(evt, allowResume) {
+            $scope.save(allowResume);
+        });
         $scope.$root.$on('send-back-task', function() {
             $scope.saveAndSendBack();
         });
@@ -319,7 +329,7 @@ var angular = angular || null;
         };
     };
 
-    var WorkingSubtitlesController = function($scope, $window, SubtitleStorage) {
+    var WorkingSubtitlesController = function($scope, $window) {
         /**
          * Handles the subtitles the user is working on.
          */
@@ -426,7 +436,9 @@ var angular = angular || null;
                 var nextSubtitle = subtitleList.nextSubtitle(subtitle);
                 finishEdit(true);
                 if(nextSubtitle === null) {
-                    insertAndStartEdit(null);
+                    if($scope.workflow.stage == 'type') {
+                        insertAndStartEdit(null);
+                    }
                 } else {
                     startEdit(nextSubtitle);
                     $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
