@@ -26,14 +26,6 @@ var USER_IDLE_MINUTES = 5;
 
     directives.directive('subtitleEditor', function() {
         return function link(scope, elm, attrs) {
-            scope.videoId = attrs.videoId;
-            scope.languageCode = attrs.languageCode;
-            if(attrs.versionNumber != "") {
-                scope.workingSubtitles.getSubtitles(scope.languageCode,
-                    attrs.versionNumber);
-            } else {
-                scope.workingSubtitles.initEmptySubtitles(scope.languageCode);
-            }
             // For some reason using ng-keydown at the HTML tag doesn't work.
             // Use jquery instead.
             $(document).keydown(function(evt) {

@@ -167,6 +167,11 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
             'primaryVideoURL': video.get_video_url(),
             'videoURLs': video_urls,
         },
+        'editingVersion': {
+            'languageCode': editing_language.language_code,
+            'versionNumber': (editing_version.version_number
+                              if editing_version else None),
+        },
         'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
         'oldEditorURL': get_widget_url(editing_language),

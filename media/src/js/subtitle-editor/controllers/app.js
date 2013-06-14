@@ -120,12 +120,13 @@ var angular = angular || null;
 
 
 
-    function AppController($scope, $timeout, $window, LockService,
+    function AppController($scope, $timeout, $window, EditorData, LockService,
             VideoPlayer, SubtitleStorage) {
         var minutesIdle = 0;
         var secondsUntilClosing = 120;
         var regainLockTimer;
 
+        $scope.videoId = EditorData.video.id;
         $scope.canSync = $window.editorData.canSync;
         $scope.canAddAndRemove = $window.editorData.canAddAndRemove;
         $scope.scrollingSynced = true;
@@ -133,6 +134,15 @@ var angular = angular || null;
         $scope.currentEdit = new CurrentEditManager();
         $scope.workingSubtitles = new SubtitleVersionManager(SubtitleStorage);
         $scope.referenceSubtitles = new SubtitleVersionManager(SubtitleStorage);
+
+        var editingVersion = EditorData.editingVersion;
+        if(editingVersion.versionNumber) {
+            $scope.workingSubtitles.getSubtitles(editingVersion.languageCode,
+                    editingVersion.versionNumber);
+        } else {
+            $scope.workingSubtitles.initEmptySubtitles(
+                    editingVersion.languageCode);
+        }
 
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
@@ -153,12 +163,13 @@ var angular = angular || null;
 
 
         function releaseLock() {
-            LockService.releaseLock($scope.videoId, $scope.languageCode);
+            LockService.releaseLock($scope.videoId, 
+                    EditorData.editingVersion.languageCode);
         }
 
         function regainLock() {
             return LockService.regainLock($scope.videoId,
-                    $scope.languageCode);
+                    EditorData.editingVersion.languageCode);
         }
 
         function startUserIdleTimer() {

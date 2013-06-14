@@ -121,11 +121,17 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     };
 
-    var SaveSessionController = function($scope, $q, SubtitleStorage,
-            OldEditorConfig) {
+    var SaveSessionController = function($scope, $q, SubtitleStorage, EditorData) {
 
         $scope.changesMade = false;
         $scope.nextVersionNumber = null;
+        $scope.fromOldEditor = Boolean(EditorData.oldEditorURL);
+        $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
+
+        if ($scope.fromOldEditor) {
+            $scope.dialogURL = EditorData.oldEditorURL;
+        }
+
         $scope.discard = function() {
             $scope.showCloseModal(false);
         };
@@ -224,16 +230,6 @@ var angular = angular || null;
                 return deferred.promise;
             }
         };
-        $scope.setCloseStates = function() {
-
-            var oldEditorURL = OldEditorConfig.get()
-            $scope.fromOldEditor = Boolean(oldEditorURL);
-            $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
-
-            if ($scope.fromOldEditor) {
-                $scope.dialogURL = oldEditorURL;
-            }
-        };
         function resumeEditing() {
             $scope.status = '';
             $scope.workingSubtitles.versionNumber = $scope.nextVersionNumber;
@@ -309,9 +305,6 @@ var angular = angular || null;
         });
         $scope.$root.$on('send-back-task', function() {
             $scope.saveAndSendBack();
-        });
-        $scope.$watch('videoId != null', function() {
-            $scope.setCloseStates();
         });
         $scope.$root.$on('work-done', function() {
             $scope.changesMade = true;
