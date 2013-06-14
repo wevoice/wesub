@@ -50,7 +50,7 @@ var angular = angular || null;
      */
 
     module.controller("AppControllerLocking", function($scope, $timeout,
-                $window, EditorData, LockService) {
+                EditorData, LockService) {
         var secondsUntilClosing = 120;
         var regainLockTimer;
 
