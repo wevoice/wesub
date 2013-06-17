@@ -24,10 +24,12 @@ var angular = angular || null;
     module.directive('autosizeBind', function($parse) {
         return function link(scope, elm, attrs) {
             var getter = $parse(attrs.autosizeBind);
+            // set the value before calling autosize, otherwise we don't size
+            // correctly on the first pass
+            elm.val(getter(scope));
             elm.autosize();
             scope.$watch(attrs.autosizeBind, function(newVal) {
-                elm.val(newVal);
-                elm.trigger('autosize');
+                elm.val(newVal).trigger('autosize');
             });
             elm.on('change', function() {
                 getter.assign(scope, elm.val());
