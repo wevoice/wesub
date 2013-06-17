@@ -20,6 +20,22 @@ var angular = angular || null;
 
 (function() {
     var module = angular.module('amara.SubtitleEditor.dom', []);
+    var $ = window.AmarajQuery;
+
+    module.directive('autosizeBind', function($parse) {
+        return function link(scope, elm, attrs) {
+            var getter = $parse(attrs.autosizeBind);
+            var elm = $(elm);
+            elm.autosize();
+            scope.$watch(attrs.autosizeBind, function(newVal) {
+                elm.val(newVal);
+                elm.trigger('autosize');
+            });
+            elm.on('change', function() {
+                getter.assign(scope, elm.val());
+            });
+        }
+    });
 
     module.factory('DomUtil', function() {
         return {

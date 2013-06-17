@@ -555,15 +555,16 @@ var angular = angular || null;
             this.SubtitleStorage.getSubtitles(languageCode, versionNumber,
                     function(subtitleData) {
                 that.state = 'loaded';
-                that.title = subtitleData.title;
-                that.description = subtitleData.description;
+                that.title = subtitleData.title || that.video.title;
+                that.description = subtitleData.description || that.video.description;
                 that.subtitleList.loadXML(subtitleData.subtitlesXML);
             });
         },
         initEmptySubtitles: function(languageCode) {
             this.setLanguage(languageCode);
             this.versionNumber = null;
-            this.title = this.description = '';
+            this.title = this.video.title;
+            this.description = this.video.description;
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
         },

@@ -555,14 +555,23 @@ section.main {
                 background: #c5c5c5;
                 padding: 20px 42px;
                 color: white;
-                margin-bottom: 24px;
             }
-            h3 {
-               margin: 0 42px;
-            }
-            p {
-               padding: 16px 42px 30px;
-               line-height: 140%;
+            div.content {
+                padding: 24px 42px;
+
+                p {
+                    padding: 16px 0 30px;
+                    line-height: 140%;
+                }
+                textarea {
+                    margin: 16px 0 30px;
+                    line-height: 140%;
+                    width: 100%;
+                    border: 0;
+                    color: #565758;
+                    font-size: 12px;
+                    resize: none;
+                }
             }
             a.expander {
                 position: absolute;

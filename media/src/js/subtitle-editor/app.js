@@ -284,6 +284,17 @@ var angular = angular || null;
                     $scope.workingSubtitles.description,
                     markComplete);
         };
+        $scope.$watch('workingSubtitles.title', function(newValue, oldValue) {
+            if(newValue != oldValue) {
+                $scope.$root.$emit('work-done');
+            }
+        })
+        $scope.$watch('workingSubtitles.description', function(newValue,
+                    oldValue) {
+            if(newValue != oldValue) {
+                $scope.$root.$emit('work-done');
+            }
+        })
     });
 
 }).call(this);
