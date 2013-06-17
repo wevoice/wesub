@@ -276,7 +276,7 @@ class Rpc(BaseRpc):
         return {
             'video_id': video_id,
             'is_original_language_subtitled': is_original_language_subtitled,
-            'general_settings': general_settings 
+            'general_settings': general_settings
         }
 
 
@@ -699,8 +699,8 @@ class Rpc(BaseRpc):
             subtitles_changed or title_changed or desc_changed)
 
         if should_create_new_version:
-            new_version, should_create_task = self._create_version(session.language, user, 
-                                                                   new_title=new_title, 
+            new_version, should_create_task = self._create_version(session.language, user,
+                                                                   new_title=new_title,
                                                                    new_description=new_description,
                                                                    subtitles=subtitles,
                                                                    session=session)
@@ -859,7 +859,7 @@ class Rpc(BaseRpc):
             task.new_review_base_version = subtitle_version
 
         task.save()
-        
+
     def _moderate_language(self, language, user):
         """Return the right visibility for a version based on the given session.
 
@@ -979,7 +979,7 @@ class Rpc(BaseRpc):
 
     def _make_subtitling_session(self, request, language, base_language_code, video_id, version=None):
         try:
-            base_language = new_models.SubtitleLanguage.objects.get(video__video_id=video_id, 
+            base_language = new_models.SubtitleLanguage.objects.get(video__video_id=video_id,
                                                             language_code=base_language_code)
         except new_models.SubtitleLanguage.DoesNotExist:
             base_language = None
@@ -1150,7 +1150,7 @@ class Rpc(BaseRpc):
 
 
     def _autoplay_subtitles(self, user, video_id, language_pk, version_number):
-        cache =  video_cache.get_subtitles_dict(video_id, language_pk, 
+        cache =  video_cache.get_subtitles_dict(video_id, language_pk,
                                                 version_number,
                                                 lambda version: self._subtitles_dict(version=version))
 
@@ -1243,6 +1243,7 @@ def language_summary(language, team_video=-1, user=None):
 
     if is_translation:
         summary['standard_pk'] = translation_source.pk
+        summary['translated_from'] = translation_source.language_code
     summary['is_complete'] = language.subtitles_complete
     summary['is_public'] = True if language.get_public_tip() else False
 

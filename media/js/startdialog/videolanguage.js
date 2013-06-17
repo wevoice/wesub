@@ -33,6 +33,7 @@ unisubs.startdialog.VideoLanguage = function(json) {
     this.DISABLED_FROM = json['disabled_from'];
     this.DISABLED_TO = json['disabled_to'];
     this.IS_PUBLIC = json['is_public'];
+    this.TRANSLATED_FROM = json['translated_from'];
 };
 
 unisubs.startdialog.VideoLanguage.prototype.languageName = function() {
