@@ -533,7 +533,8 @@ var angular = angular || null;
      *
      */
 
-    SubtitleVersionManager = function(SubtitleStorage) {
+    SubtitleVersionManager = function(video, SubtitleStorage) {
+        this.video = video;
         this.SubtitleStorage = SubtitleStorage;
         this.subtitleList = new SubtitleList();
         this.versionNumber = null;
@@ -568,6 +569,12 @@ var angular = angular || null;
         },
         setLanguage: function(code) {
             this.language = this.SubtitleStorage.getLanguage(code);
+        },
+        getTitle: function() {
+            return this.title || this.video.title;
+        },
+        getDescription: function() {
+            return this.description || this.video.description;
         },
     };
 

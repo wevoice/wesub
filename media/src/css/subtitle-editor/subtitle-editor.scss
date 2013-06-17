@@ -546,8 +546,43 @@ section.main {
         overflow: auto;
         position: relative;
 
+        div.metadata {
+            background: #fff;
+            font-size: 12px;
+            position: relative;
+            h2 {
+                font-size: 14px;
+                background: #c5c5c5;
+                padding: 20px 42px;
+                color: white;
+                margin-bottom: 24px;
+            }
+            h3 {
+               margin: 0 42px;
+            }
+            p {
+               padding: 16px 42px 30px;
+               line-height: 140%;
+            }
+            a.expander {
+                position: absolute;
+                left: 24px;
+                top: 20px;
+                height: 0px;
+                width: 0px;
+                border-top: 10px solid #fff;
+                border-right: 5px solid transparent;
+                border-left: 5px solid transparent;
+
+                &.collapsed {
+                    border-left: 10px solid #fff;
+                    border-top: 5px solid transparent;
+                    border-bottom: 5px solid transparent;
+                }
+            }
+        }
+
         ul {
-            margin-top: 25px;
             overflow: hidden;
 
             li {
@@ -780,7 +815,6 @@ section.main {
         }
         div.language-selections {
             background: #ECECEC;
-            border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
             position: relative;
 
@@ -795,9 +829,11 @@ section.main {
 
                 select {
                     background: transparent;
+                    font-size: 12px;
+                    line-height: 134%;
+                    height: 1.33em;
                     border: 0;
                     cursor: pointer;
-                    height: 15px;
                     margin: 0;
                     overflow: hidden;
                     width: 140%;
@@ -813,16 +849,13 @@ section.main {
                     border-right: 0;
                 }
             }
-            &:before {
-                @include shadow();
-            }
         }
     }
     section.center {
         @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
 
         div.video {
-            height: 291px;
+            height: 290px;
             position: relative;
 
             div.subtitle-overlay {
@@ -980,15 +1013,10 @@ section.main {
                     background-image: url('../../../images/editor/volume-bar-bottom.png');
                 }
             }
-            &:before {
-                @include shadow();
-                bottom: -77px;
-            }
         }
         div.workspace-tools {
             background: #E7E8E9;
-            border-bottom: 1px solid #BDBEBF;
-            height: 36px;
+            border-top: 1px solid #DADBDC;
             position: relative;
             z-index: 50;
             @include multi-box-shadow(
@@ -1001,6 +1029,8 @@ section.main {
                 float: left;
                 font-weight: bold;
                 padding: 10px;
+                font-size: 12px;
+                line-height: 1.34em;
             }
             div.switches {
                 float: right;
@@ -1028,7 +1058,7 @@ section.main {
     }
     section.right {
         div.steps-container {
-            height: 291px;
+            height: 290px;
             position: relative;
 
             ul.steps {

@@ -486,4 +486,12 @@ var angular = angular || null;
             }
         }
     });
+
+    module.controller("SubtitleMetadataController", function($scope) {
+        $scope.collapsed = true;
+        $scope.onExpanderClicked = function($event) {
+            $scope.collapsed = !$scope.collapsed;
+            $event.preventDefault();
+        }
+    });
 }).call(this);

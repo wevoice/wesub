@@ -258,10 +258,12 @@ var angular = angular || null;
 
     module.controller("AppControllerSubtitles", function($scope, EditorData,
                 SubtitleStorage, CurrentEditManager, SubtitleVersionManager) {
+        var video = EditorData.video;
         $scope.currentEdit = new CurrentEditManager();
-        $scope.workingSubtitles = new SubtitleVersionManager(SubtitleStorage);
+        $scope.workingSubtitles = new SubtitleVersionManager(
+            video, SubtitleStorage);
         $scope.referenceSubtitles = new SubtitleVersionManager(
-                SubtitleStorage);
+            video, SubtitleStorage);
 
         var editingVersion = EditorData.editingVersion;
 

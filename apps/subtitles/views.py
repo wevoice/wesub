@@ -164,6 +164,8 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         },
         'video': {
             'id': video.video_id,
+            'title': video.title,
+            'description': video.description,
             'primaryVideoURL': video.get_video_url(),
             'videoURLs': video_urls,
         },
