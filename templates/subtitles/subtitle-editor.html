@@ -311,9 +311,13 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                         <span ng-switch-when="edit-help" class="end">
                             Press ENTER to save subtitle and move to next.<br />
                         </span>
-                        <span ng-switch-when="type-shortcuts-help" class="end">
-                            Press ENTER to add a new subtitle<br />
-                        </span>
+                        <a class="end"
+                            id="add-sub-at-end"
+                            href="#"
+                            ng-switch-when="type-shortcuts-help" 
+                            ng-click="newSubtitleClicked($event)">
+                            Press ENTER to add a new subtitle
+                        </a>
                     </div>
                 </div>
             </div>
