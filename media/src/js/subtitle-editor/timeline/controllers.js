@@ -18,7 +18,7 @@
 
 (function() {
 
-    var module = angular.module('amara.SubtitleEditor.controllers.timeline', []);
+    var module = angular.module('amara.SubtitleEditor.timeline.controllers', []);
 
     module.controller('TimelineController', function($scope, $timeout, SubtitleStorage, VideoPlayer) {
         // Controls the scale of the timeline, currently we just set this to

@@ -1,7 +1,12 @@
 describe('Test the SubtitleList class', function() {
     var subtitleList = null;
+
     beforeEach(function() {
-        subtitleList = new dfxp.SubtitleList();
+        module('amara.SubtitleEditor.subtitles.models');
+    });
+
+    beforeEach(inject(function(SubtitleList) {
+        subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
 
         this.addMatchers({
@@ -10,7 +15,7 @@ describe('Test the SubtitleList class', function() {
                     this.actual.endTime == endTime);
             },
         });
-    });
+    }));
 
     it('should start empty', function() {
         expect(subtitleList.subtitles).toEqual([]);

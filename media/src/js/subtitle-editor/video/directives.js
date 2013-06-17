@@ -19,9 +19,9 @@
 var angular = angular || null;
 
 (function($) {
-    var directives = angular.module('amara.SubtitleEditor.directives.video', []);
+    var module = angular.module('amara.SubtitleEditor.video.directives', []);
 
-    directives.directive('volumeBar', function(VideoPlayer) {
+    module.directive('volumeBar', function(VideoPlayer) {
         return function link($scope, elem, attrs) {
             elem = $(elem);
             var canvas = elem[0];
@@ -82,7 +82,7 @@ var angular = angular || null;
             drawBar();
         }
     });
-    directives.directive('progressBar', function(VideoPlayer) {
+    module.directive('progressBar', function(VideoPlayer) {
         return function link($scope, elem, attrs) {
             elem = $(elem);
             var sliceLeft = $('div.slice-left div', elem);

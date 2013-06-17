@@ -20,7 +20,7 @@
 
     var $ = this.AmarajQuery;
 
-    var module = angular.module('amara.SubtitleEditor.controllers.video', []);
+    var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
     module.controller('VideoController', function($scope, VideoPlayer) {
         $scope.overlayText = null;

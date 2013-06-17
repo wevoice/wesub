@@ -1,5 +1,5 @@
 describe('Test display time filter', function() {
-    beforeEach(module('amara.SubtitleEditor.filters.subtitles'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.filters'));
     var minuteInMilliseconds = 60 * 1000;
     var hourInMilliseconds = 60 * minuteInMilliseconds;
     describe('displayTime', function() {
@@ -50,7 +50,7 @@ describe('Test display time filter', function() {
 });
 
 describe('Drop down shows the right labels', function() {
-    beforeEach(module('amara.SubtitleEditor.filters.subtitles'));
+    beforeEach(module('amara.SubtitleEditor.subtitles.filters'));
     describe('versionDropDownDisplay', function() {
 
         var versionData = {

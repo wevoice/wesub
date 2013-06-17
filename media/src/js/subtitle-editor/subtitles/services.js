@@ -23,8 +23,7 @@ var angular = angular || null;
     var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
     var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
 
-    var root = this;
-    var module = angular.module('amara.SubtitleEditor.services.subtitles', []);
+    var module = angular.module('amara.SubtitleEditor.subtitles.services', []);
 
     var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
         var url = API_BASE_PATH_VIDEOS + videoId +

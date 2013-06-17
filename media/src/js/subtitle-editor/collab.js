@@ -18,7 +18,7 @@
 
 (function() {
 
-    var module = angular.module('amara.SubtitleEditor.controllers.collab', []);
+    var module = angular.module('amara.SubtitleEditor.collab', []);
 
     module.controller('CollabController', function($scope, $timeout, SubtitleStorage) {
 

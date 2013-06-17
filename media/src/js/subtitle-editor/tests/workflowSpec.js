@@ -4,18 +4,19 @@ function insertSyncedAndCompletedSubtitle(subtitleList) {
     subtitleList.updateSubtitleTime(sub, 500, 1000);
 }
 
-beforeEach(function() {
-    module('amara.SubtitleEditor.controllers.app');
-    module('amara.SubtitleEditor.mocks');
-});
-
 
 describe('The Workflow class', function() {
     var subtitleList = null;
     var workflow = null;
 
-    beforeEach(inject(function(Workflow) {
-        subtitleList = new dfxp.SubtitleList();
+    beforeEach(function() {
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.workflow');
+        module('amara.SubtitleEditor.mocks');
+    });
+
+    beforeEach(inject(function(SubtitleList, Workflow) {
+        subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
         workflow = new Workflow(subtitleList);
     }));
@@ -92,8 +93,14 @@ describe('WorkflowProgressionController', function() {
     var $scope = null;
     var subtitleList = null;
 
-    beforeEach(inject(function ($controller, $rootScope, Workflow) {
-        subtitleList = new dfxp.SubtitleList();
+    beforeEach(function() {
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.workflow');
+        module('amara.SubtitleEditor.mocks');
+    });
+
+    beforeEach(inject(function ($controller, $rootScope, SubtitleList, Workflow) {
+        subtitleList = new SubtitleList();
         $scope = $rootScope;
         $scope.timelineShown = false;
         $scope.toggleTimelineShown = jasmine.createSpy();
@@ -158,6 +165,12 @@ describe('WorkflowProgressionController', function() {
 describe('when up and down sync subtitles', function() {
     var $scope;
 
+    beforeEach(function() {
+        module('amara.SubtitleEditor');
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.mocks');
+    });
+
     beforeEach(inject(function($rootScope, $controller, Workflow) {
         $scope = $rootScope;
         $scope.timelineShown = false;
@@ -187,12 +200,14 @@ describe('when the enter key creates a new subtitle', function() {
     var $scope;
 
     beforeEach(function() {
-        module('amara.SubtitleEditor.controllers.subtitles');
+        module('amara.SubtitleEditor.subtitles.controllers');
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.mocks');
     });
 
-    beforeEach(inject(function($rootScope, $controller, CurrentEditManager) {
+    beforeEach(inject(function($rootScope, $controller, CurrentEditManager, SubtitleList) {
         $scope = $rootScope;
-        subtitleList = new dfxp.SubtitleList();
+        subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
         $scope.workingSubtitles = {
             subtitleList: subtitleList,
@@ -231,13 +246,19 @@ describe('when enter creates a new subtitle', function() {
     var subtitleList;
     var MockEvents;
 
+    beforeEach(function() {
+        module('amara.SubtitleEditor');
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.mocks');
+    });
+
     beforeEach(inject(function($rootScope, $controller, $injector,
-                CurrentEditManager) {
+                CurrentEditManager, SubtitleList) {
         MockEvents = $injector.get('MockEvents');
         $scope = $rootScope;
         $scope.timelineShown = false;
         $scope.currentEdit = new CurrentEditManager();
-        subtitleList = new dfxp.SubtitleList();
+        subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $controller("AppControllerEvents", {

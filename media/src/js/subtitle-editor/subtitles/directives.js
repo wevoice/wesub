@@ -22,9 +22,9 @@ var USER_IDLE_MINUTES = 5;
 
 (function($) {
 
-    var directives = angular.module('amara.SubtitleEditor.directives.subtitles', []);
+    var module = angular.module('amara.SubtitleEditor.subtitles.directives', []);
 
-    directives.directive('subtitleEditor', function() {
+    module.directive('subtitleEditor', function() {
         return function link(scope, elm, attrs) {
             // For some reason using ng-keydown at the HTML tag doesn't work.
             // Use jquery instead.
@@ -35,7 +35,7 @@ var USER_IDLE_MINUTES = 5;
             });
         };
     });
-    directives.directive('workingSubtitles', function() {
+    module.directive('workingSubtitles', function() {
         return function link(scope, elem, attrs) {
             var startHelper = $('div.sync-help.begin', elem);
             var endHelper = $('div.sync-help.end', elem);
@@ -124,7 +124,7 @@ var USER_IDLE_MINUTES = 5;
         };
     });
 
-    directives.directive('subtitleList', function($window) {
+    module.directive('subtitleList', function($window) {
         // Use jquery, not jqLite for $window
         $window = $($window);
         return function link(scope, elem, attrs) {
@@ -180,7 +180,7 @@ var USER_IDLE_MINUTES = 5;
         }
     });
 
-    directives.directive('subtitleRepeat', function($interpolate, $parse, DomUtil) {
+    module.directive('subtitleRepeat', function($interpolate, $parse, DomUtil) {
         /* Specialized repeat directive to work with subtitleList
          *
          * Because we need to deal potentially thousands of subtitles,
@@ -400,7 +400,7 @@ var USER_IDLE_MINUTES = 5;
         }
     });
 
-    directives.directive('languageSelector', function(SubtitleStorage) {
+    module.directive('languageSelector', function(SubtitleStorage) {
         return {
             compile: function compile(elm, attrs, transclude) {
                 return {

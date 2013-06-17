@@ -19,9 +19,11 @@
 var angular = angular || null;
 
 (function($) {
+    var module = angular.module('amara.SubtitleEditor.timeline.directives', []);
+
     var MIN_DURATION = 250; // 0.25 seconds
     var DEFAULT_DURATION = 4000; // 4.0 seconds
-    
+
     /*
      * Define a couple of helper classes to handle updating the timeline
      * elements.  Our basic strategy is to make a really wide div, so that we
@@ -93,9 +95,8 @@ var angular = angular || null;
         div.css('left', -durationToPixels(deltaTime, this.scale) + 'px');
     }
 
-    var directives = angular.module('amara.SubtitleEditor.directives.timeline', []);
 
-    directives.directive('timelineTiming', function(displayTimeSecondsFilter) {
+    module.directive('timelineTiming', function(displayTimeSecondsFilter) {
         return function link(scope, elem, attrs) {
             var canvas = $(elem);
             var canvasElt = elem[0];
@@ -191,7 +192,7 @@ var angular = angular || null;
         }
     });
 
-    directives.directive('timelineSubtitles', function(VideoPlayer) {
+    module.directive('timelineSubtitles', function(VideoPlayer) {
         return function link(scope, elem, attrs) {
             var timelineDiv = $(elem);
             var container = timelineDiv.parent();

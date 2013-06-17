@@ -20,7 +20,7 @@ var angular = angular || null;
 
 (function() {
 
-    var module = angular.module('amara.SubtitleEditor.services.video', []);
+    var module = angular.module('amara.SubtitleEditor.video.services', []);
 
     module.factory('VideoPlayer', function($rootScope, SubtitleStorage) {
         var videoURLs = [];

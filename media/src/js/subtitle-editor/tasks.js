@@ -18,15 +18,11 @@
 
 (function(){
 
-    var root, module, API_BASE_PATH;
-    var getUpdateTaskAPIUrl;
-
-    API_BASE_PATH = '/api2/partners/teams/';
+    var API_BASE_PATH = '/api2/partners/teams/';
     //               /api2/partners/teams/volunteer/tasks/1/
-    root = this;
-    module = angular.module('amara.SubtitleEditor.services', []);
+    var module = angular.module('amara.SubtitleEditor.services', []);
 
-    getUpdateTaskAPIUrl = function(taskId, teamSlug){
+    function getUpdateTaskAPIUrl(taskId, teamSlug){
         return API_BASE_PATH + teamSlug + "/tasks/" + taskId; 
     }
 

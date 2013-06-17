@@ -17,7 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
-    var module = angular.module('amara.SubtitleEditor.controllers.modal', []);
+    var module = angular.module('amara.SubtitleEditor.modal', []);
 
     module.controller('ModalController', function($scope, SubtitleStorage) {
         /**

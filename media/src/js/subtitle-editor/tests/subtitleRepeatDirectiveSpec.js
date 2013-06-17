@@ -6,10 +6,14 @@ describe('Test the subtitle-repeat directive', function() {
     var $ = AmarajQuery;
 
     beforeEach(function() {
-        module('amara.SubtitleEditor.directives.subtitles');
-        module('amara.SubtitleEditor.services.dom');
+        module('amara.SubtitleEditor.subtitles.directives');
+        module('amara.SubtitleEditor.subtitles.models');
+        module('amara.SubtitleEditor.dom');
+    });
+
+    beforeEach(inject(function(SubtitleList) {
         subtitles = [];
-        subtitleList = new dfxp.SubtitleList();
+        subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
         for(var i = 0; i < 5; i++) {
             var sub = subtitleList.insertSubtitleBefore(null);
@@ -18,11 +22,11 @@ describe('Test the subtitle-repeat directive', function() {
             subtitles.push(sub);
         }
         inject(function($rootScope, $compile) {
-            elm = angular.element(
-    '<div>' +
-      '<ul>' +
-        '<li subtitle-repeat="subtitleList" ' +
-             'bind-to-edit="editingSub" ' +
+                elm = angular.element(
+                '<div>' +
+                '<ul>' +
+                '<li subtitle-repeat="subtitleList" ' +
+                'bind-to-edit="editingSub" ' +
              'conditional-class="subtitle.isEmpty():empty" ' +
              'edit-keydown="onEditKeyDown">' +
           '<span class="timing">{{ subtitle.startTime }}</span>' +
@@ -52,7 +56,7 @@ describe('Test the subtitle-repeat directive', function() {
                 return true;
             },
         });
-    });
+    }));
 
     function childLIs() {
         return $('ul', elm).children();

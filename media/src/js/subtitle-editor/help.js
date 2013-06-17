@@ -18,7 +18,7 @@
 
 (function() {
 
-    var module = angular.module('amara.SubtitleEditor.controllers.help', []);
+    var module = angular.module('amara.SubtitleEditor.help', []);
 
     module.controller('HelpController', function($scope, SubtitleStorage) {
         /**

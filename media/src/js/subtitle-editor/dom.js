@@ -19,7 +19,7 @@
 var angular = angular || null;
 
 (function() {
-    var module = angular.module('amara.SubtitleEditor.services.dom', []);
+    var module = angular.module('amara.SubtitleEditor.dom', []);
 
     module.factory('DomUtil', function() {
         return {
