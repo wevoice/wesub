@@ -18,7 +18,7 @@
 
 var angular = angular || null;
 
-(function($) {
+(function() {
     var module = angular.module('amara.SubtitleEditor.timeline.directives', []);
 
     var MIN_DURATION = 250; // 0.25 seconds
@@ -528,4 +528,4 @@ var angular = angular || null;
             scope.redrawSubtitles();
         }
     });
-})(window.AmarajQuery);
+})();

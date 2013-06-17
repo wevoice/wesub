@@ -20,12 +20,10 @@ var angular = angular || null;
 
 (function() {
     var module = angular.module('amara.SubtitleEditor.dom', []);
-    var $ = window.AmarajQuery;
 
     module.directive('autosizeBind', function($parse) {
         return function link(scope, elm, attrs) {
             var getter = $parse(attrs.autosizeBind);
-            var elm = $(elm);
             elm.autosize();
             scope.$watch(attrs.autosizeBind, function(newVal) {
                 elm.val(newVal);
@@ -60,8 +58,7 @@ var angular = angular || null;
      */
 
     module.factory('DomWindow', function($window) {
-        // Use real JQuery, not jqLite
-        var document = $window.AmarajQuery($window.document);
+        var document = $($window.document);
         return {
             caretPos: function() {
                 return $window.getSelection().anchorOffset;

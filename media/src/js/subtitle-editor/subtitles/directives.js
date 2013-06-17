@@ -20,7 +20,7 @@ var angular = angular || null;
 var LOCK_EXPIRATION = 25;
 var USER_IDLE_MINUTES = 5;
 
-(function($) {
+(function() {
 
     var module = angular.module('amara.SubtitleEditor.subtitles.directives', []);
 
@@ -125,8 +125,7 @@ var USER_IDLE_MINUTES = 5;
     });
 
     module.directive('subtitleList', function($window) {
-        // Use jquery, not jqLite for $window
-        $window = $($window);
+        var window = $($window);
         return function link(scope, elem, attrs) {
             var scroller = $(elem).parent();
             var isWorkingSet = (attrs.subtitleList == "working-subtitle-set");
@@ -157,11 +156,11 @@ var USER_IDLE_MINUTES = 5;
                 } else {
                     var scrollerTop = 366;
                 }
-                scroller.height($window.height() - scrollerTop);
+                scroller.height(window.height() - scrollerTop);
             }
 
             scope.$watch('timelineShown', resizeScroller);
-            $window.on('resize', resizeScroller);
+            window.on('resize', resizeScroller);
             resizeScroller();
 
             if (isWorkingSet) {
@@ -195,7 +194,6 @@ var USER_IDLE_MINUTES = 5;
          *   However simple string interpolation is supported.
          */
         return function link($scope, elm, attrs) {
-            elm = $(elm);
             function createNodeForSubtitle(subtitle) {
                 var context = {
                     subtitle: subtitle
@@ -355,7 +353,6 @@ var USER_IDLE_MINUTES = 5;
 
             // On our first pass we remove the element from its parent, then
             // add a copy for each subtitle
-            elm = $(elm);
             var subtitleList = $scope.$eval(attrs.subtitleRepeat);
             var parent = elm.parent();
             var updateFuncs = []
@@ -434,4 +431,4 @@ var USER_IDLE_MINUTES = 5;
             }
         };
     });
-})(window.AmarajQuery);
+})();

@@ -3,7 +3,6 @@ describe('Test the subtitle-repeat directive', function() {
     var scope = null;
     var elm = null;
     var subtitles = null;
-    var $ = AmarajQuery;
 
     beforeEach(function() {
         module('amara.SubtitleEditor.subtitles.directives');
@@ -41,7 +40,6 @@ describe('Test the subtitle-repeat directive', function() {
             scope.subtitleList = subtitleList;
             $compile(elm)(scope);
             scope.$digest();
-            elm = $(elm);
         })
 
         this.addMatchers({

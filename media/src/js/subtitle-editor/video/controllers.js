@@ -18,8 +18,6 @@
 
 (function() {
 
-    var $ = this.AmarajQuery;
-
     var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
     module.controller('VideoController', function($scope, VideoPlayer) {

@@ -1,7 +1,6 @@
 describe('DFXP', function() {
 
     var parser = new AmaraDFXPParser();
-    var $ = AmarajQuery;
 
     describe('#init()', function() {
         it('should initialize a set of mock subtitles', function() {

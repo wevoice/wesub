@@ -18,7 +18,7 @@
 
 var angular = angular || null;
 
-(function($) {
+(function() {
     var module = angular.module('amara.SubtitleEditor.video.directives', []);
 
     module.directive('volumeBar', function(VideoPlayer) {
@@ -144,5 +144,5 @@ var angular = angular || null;
         }
 
     });
-})(window.AmarajQuery);
+})();
 

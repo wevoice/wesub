@@ -23,7 +23,6 @@ var angular = angular || null;
     var module = angular.module('amara.SubtitleEditor.subtitles.controllers', []);
 
     var _ = this._.noConflict();
-    var $ = this.AmarajQuery;
 
     module.controller('LanguageSelectorController', function($scope) {
         /**

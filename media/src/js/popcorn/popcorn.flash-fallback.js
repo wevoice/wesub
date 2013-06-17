@@ -17,7 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 var Popcorn = window.Popcorn || null;
-var jQuery = window.AmarajQuery || null;
+var jQuery = window.jQuery || null;
 
 (function (Popcorn, window, document) {
 
