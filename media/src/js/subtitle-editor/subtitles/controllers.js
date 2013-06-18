@@ -165,9 +165,15 @@ var angular = angular || null;
 
         };
         $scope.save = function(options) {
-            if(options === undefined) {
-                options = {}
+            var defaults = {
+                force: false,
+                markComplete: null,
+                allowResume: true,
             }
+            if(options !== undefined) {
+                angular.extend(defaults, options);
+            }
+            options = defaults;
 
             if(!$scope.changesMade && !options.markComplete &&!options.force) {
                 return;
@@ -241,7 +247,6 @@ var angular = angular || null;
             $scope.nextVersionNumber = null;
         }
         $scope.showCloseModal = function(allowResume) {
-
             var buttons = [];
 
             if (allowResume && $scope.nextVersionNumber)  {
