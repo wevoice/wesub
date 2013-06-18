@@ -43,7 +43,7 @@ var jQuery = window.jQuery || null;
             seeking: false,
             autoplay: EMPTY_STRING,
             preload: EMPTY_STRING,
-            controls: true,
+            controls: false,
             loop: false,
             poster: EMPTY_STRING,
             // FlashFallback seems to use .77 as default
@@ -135,9 +135,7 @@ var jQuery = window.jQuery || null;
                     onPlayerReady();
                 },
                 plugins:{
-                    controls:{
-                        fullscreen:false
-                    }
+                    controls: null,
                 }
             };
             player = player = window.$f(elem, flashEmbedParams, config);
