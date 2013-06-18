@@ -52,7 +52,6 @@ var jQuery = window.jQuery || null;
             // such that muted===0 is unmuted, and muted>0 is muted.
             muted: 0,
             currentTime: 0,
-            duration: NaN,
             ended: false,
             paused: true,
             error: null
@@ -150,10 +149,7 @@ var jQuery = window.jQuery || null;
 
         function getDuration() {
             if (!playerReady) {
-                // Queue a getDuration() call so we have correct duration info for loadedmetadata
-                addPlayerReadyCallback(function () {
-                    getDuration();
-                });
+                return NaN;
             }
             return player.getClip().duration;
         }
@@ -405,7 +401,7 @@ var jQuery = window.jQuery || null;
 
             duration: {
                 get: function () {
-                    return impl.duration;
+                    return getDuration();
                 }
             },
 
