@@ -140,7 +140,7 @@ class BaseNotification(object):
             return  self.from_internal_lang(self.language.language_code)
 
     def send_http_request(self, url, basic_auth_username, basic_auth_password):
-        h = Http()
+        h = Http(disable_ssl_certificate_validation=True)
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
 
@@ -167,7 +167,7 @@ class BaseNotification(object):
         try:
             resp, content = h.request(url, method="POST", body=data, headers={
                 'referer': '%s://%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain)
-            }, verify=False)
+            })
             success = 200 <= resp.status < 400
             if success is False:
                 logger.error("Failed to notify team %s " % (self.team),
