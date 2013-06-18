@@ -17,7 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 
-var dfxp = (function() {
+var dfxp = (function($) {
 
 function markdownToHTML(text) {
     /*
@@ -1065,7 +1065,7 @@ return {
     markdownToPlaintext: markdownToPlaintext,
 }
 
-})();
+})(window.AmarajQuery || window.jQuery);
 
 /* Set window.AmaraDFXPParser for compatibility with the old editor */
 window.AmaraDFXPParser = dfxp.AmaraDFXPParser;
