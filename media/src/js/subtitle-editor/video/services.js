@@ -28,9 +28,14 @@ var angular = angular || null;
         var playing = false;
 
         function emitSignal(signalName, data) {
-            $rootScope.$apply(function() {
+            var phase = $rootScope.$$phase;
+            if(phase != '$apply' && phase != '$digest') {
+                $rootScope.$apply(function() {
+                    $rootScope.$emit(signalName, data);
+                });
+            } else {
                 $rootScope.$emit(signalName, data);
-            });
+            }
         }
 
         function handlePopcornEvents() {
