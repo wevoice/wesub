@@ -46,15 +46,12 @@ var angular = angular || null;
          * fetches.
          */
         $scope.versionNumber = null;
-        $scope.currentLanguage = null;
         $scope.currentVersion = null;
         $scope.versions = [];
         $scope.languageChanged = function(language, versionNumber) {
             if (!language) {
                 return;
             }
-
-            $scope.currentLanguage = language;
 
             $scope.versions = _.sortBy(language.versions, function(item) {
                 return item.version_no;
@@ -63,11 +60,19 @@ var angular = angular || null;
             if (isNaN(parseInt(versionNumber))) {
                 // No version number given, select the last version (AKA first
                 // verison in the dropdown)
-                if($scope.versions.length == 0) {
+                versionNumber = null;
+                for(var i=0; i < $scope.versions.length; i++) {
+                    if($scope.versions[i].visibility == 'Public') {
+                        versionNumber = $scope.versions[i].version_no;
+                        break;
+                    }
+                }
+
+                if(versionNumber === null) {
                     $scope.versionNumber = null;
+                    loadEmptySubtitles();
                     return;
                 }
-                versionNumber = $scope.versions[0].version_no;
             }
 
             $scope.versionNumber = versionNumber.toString();
@@ -96,10 +101,20 @@ var angular = angular || null;
                     return;
                 }
 
-                $scope.currentVersion = newVersion;
-                $scope.referenceSubtitles.getSubtitles(
-                    $scope.language.language_code, newVersion.version_no);
+                if(newVersion.visibility == 'Public') {
+                    $scope.currentVersion = newVersion;
+                    $scope.referenceSubtitles.getSubtitles(
+                        $scope.language.language_code, newVersion.version_no);
+                } else {
+                    loadEmptySubtitles();
+                }
             });
+        }
+
+        function loadEmptySubtitles() {
+            $scope.currentVersion = null;
+            $scope.referenceSubtitles.initEmptySubtitles(
+                    $scope.language.language_code);
         }
 
         $scope.setInitialDisplayLanguage = function(allLanguages, languageCode, versionNumber){
