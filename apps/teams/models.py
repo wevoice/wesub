@@ -1997,8 +1997,8 @@ class Task(models.Model):
 
         mode = Task.TYPE_NAMES[self.type].lower()
 
-        if self.new_subtitle_version:
-            sl = self.new_subtitle_version.subtitle_language
+        if self.get_subtitle_version():
+            sl = self.get_subtitle_version().subtitle_language
             base_url = shims.get_widget_url(sl, mode=mode, task_id=self.pk)
         else:
             video = self.team_video.video
@@ -2035,7 +2035,7 @@ class Task(models.Model):
         # If we have a SubtitleVersion to use, then we have all the info we
         # need and can skip the dialog.
         return (self.new_review_base_version is None and
-                self.new_subtitle_version is None)
+                self.get_subtitle_version() is None)
 
     def get_reviewer(self):
         """For Approve tasks, return the last user to Review these subtitles.
