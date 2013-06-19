@@ -626,8 +626,10 @@ def can_post_edit_subtitles(team, user):
     # check tasks only if workflow is enabled
     if team.workflow_enabled:
         return can_create_tasks(team, user)
-    else:
+    elif team.is_member(user) and not team.moderates_videos():
         return TeamsPermissionsCheck(True)
+    else:
+        return TeamsPermissionsCheck(False)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.
