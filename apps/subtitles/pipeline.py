@@ -430,6 +430,9 @@ def _rollback_to(video, language_code, version_number, rollback_author):
     if current.subtitle_count != target.subtitle_count:
         _fork_dependents(version.subtitle_language)
 
+    from teams.signals import api_subtitles_edited
+    api_subtitles_edited.send(version)
+
     return version
 
 

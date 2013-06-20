@@ -645,6 +645,8 @@ class SubtitleLanguage(models.Model):
             for sv in lang.subtitleversion_set.extant().all():
                 sv.unpublish(delete=True)
             signals.language_deleted.send(lang)
+            from teams.signals import api_language_deleted
+            api_language_deleted.send(lang)
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""

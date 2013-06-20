@@ -2387,6 +2387,7 @@ class TeamNotificationSetting(models.Model):
     EVENT_VIDEO_EDITED = "video-edited"
     EVENT_LANGUAGE_NEW = "language-new"
     EVENT_LANGUAGE_EDITED = "language-edit"
+    EVENT_LANGUAGE_DELETED = "language-deleted"
     EVENT_SUBTITLE_NEW = "subs-new"
     EVENT_SUBTITLE_APPROVED = "subs-approved"
     EVENT_SUBTITLE_REJECTED = "subs-rejected"
