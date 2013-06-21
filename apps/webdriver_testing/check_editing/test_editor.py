@@ -3,7 +3,10 @@
 
 import os
 
+from datetime import datetime as dt
+
 from apps.videos.models import Video
+
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
@@ -42,8 +45,11 @@ class TestCaseLeftSide(WebdriverTestCase):
         cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_pg.open_page('videos/watch/')
-        cls.video_pg.log_in(cls.user, 'password')
-        
+        cls.video_pg.log_in(cls.user.username, 'password')
+
+    def tearDown(self):
+        if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
+            self.editor_pg.exit()
         
     def test_reference_lang__forked(self):
         """Default reference lang for forked translation is the same lang. """
@@ -70,7 +76,7 @@ class TestCaseLeftSide(WebdriverTestCase):
         self.editor_pg.open_editor_page(video.video_id, 'zh-cn')
         self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
         self.editor_pg.open_editor_page(video.video_id, 'da')
-        self.assertEqual('Version 5', self.editor_pg.selected_ref_version())
+        self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
 
     def test_reference_text_displayed(self):
         """Reference language text updated when language and version changed.
@@ -79,13 +85,35 @@ class TestCaseLeftSide(WebdriverTestCase):
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'da')
         self.assertEqual('Tangible problems.', 
-                         self.editor_pg.reference_text()[0])
+                         self.editor_pg.reference_text(1))
         self.editor_pg.select_ref_language('Danish')
         self.assertEqual('Konkrete problemer', 
-                         self.editor_pg.reference_text()[0])
+                         self.editor_pg.reference_text(1))
         self.editor_pg.select_ref_language('Turkish')
         self.assertEqual(u'\xe7\xf6zmekte olan g\xfcc\xfcn\xfc hep hissettim.', 
-                         self.editor_pg.reference_text()[2])
+                         self.editor_pg.reference_text(3))
+        #Switch from a version 1 to a version 1 lang.
+        self.logger.info('Check text switching from lang1 v1, to lang2 v1')
+        self.editor_pg.select_ref_version('Version 1')
+        self.editor_pg.select_ref_language('Chinese, Simplified')
+        self.logger.info(self.editor_pg.reference_text(3))
+        self.assertEqual(u'可以来解决各种迫切的问题。', 
+                         self.editor_pg.reference_text(3))
+
+    def test_reference_private_versions(self):
+        """Reference version has no default when all versions are private
+
+        """
+        video = Video.objects.all()[0]
+        sl_tr = video.en = video.subtitle_language('tr').get_tip(full=True)
+        sl_tr.visibility_override = 'private'
+        sl_tr.save()
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.select_ref_language('Turkish')
+        self.assertEqual(None, self.editor_pg.default_ref_version())
+        self.assertEqual(None, 
+                         self.editor_pg.reference_text(1))
+
 
 class TestCaseCenter(WebdriverTestCase):
     fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
@@ -98,30 +126,40 @@ class TestCaseCenter(WebdriverTestCase):
         super(TestCaseCenter, cls).setUpClass()
         cls.logger.info("""Default Test Data
 
-                        English, source primary v2 -> v6
-                                 v1 -> deleted
+                        video[0]:
+                         English, source primary v2 -> v6
+                                  v1 -> deleted
 
-                        Chinese v1 -> v3
-                                v3 {"zh-cn": 2, "en": 6}
+                         Chinese v1 -> v3
+                                 v3 {"zh-cn": 2, "en": 6}
 
-                        Danish v1 --> v4
-                               v4 {"en": 5, "da": 3}
+                         Danish v1 --> v4
+                                v4 {"en": 5, "da": 3}
                                
-                        Swedish v1 --> v3 FORKED
-                                v3 {"sv": 2}
-                                v1 --> private
+                         Swedish v1 --> v3 FORKED
+                                 v3 {"sv": 2}
+                                 v1 --> private
 
-                        Turkish (tr) v1 incomplete {"en": 5}
+                         Turkish (tr) v1 incomplete {"en": 5}
+                       video[1]: No subs - about amara video
+                       video[2]: No subs youtube
+                       video[3]: en original 1 version complete.
+                       video[4]: nl unsynced, not original
                        """)
         cls.editor_pg = editor_page.EditorPage(cls)
         cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
-        cls.video_pg.open_page('videos/watch/')
-        cls.video_pg.log_in(cls.user, 'password')
+
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.video_pg.open_page('videos/watch/')
+        self.video_pg.log_in(self.user.username, 'password')
+
+        
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/subeditor.png')
+        if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
+            self.editor_pg.exit()
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
@@ -138,7 +176,7 @@ class TestCaseCenter(WebdriverTestCase):
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
         subtext = self.editor_pg.working_text()
-        removed_text = self.editor_pg.remove_active_subtitle(2)
+        removed_text = self.editor_pg.remove_active_subtitle(3)
         self.assertEqual(subtext[2], removed_text)
         subtext = self.editor_pg.working_text()
         self.assertNotEqual(subtext[2], removed_text)
@@ -162,25 +200,151 @@ class TestCaseCenter(WebdriverTestCase):
         """Info tray displays start, stop, char count, chars/second."""
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        sub_info = (self.editor_pg.subtitle_info(3))
-        self.assertEqual('9,24', sub_info['start'], 
+        sub_info = (self.editor_pg.subtitle_info(4))
+        self.assertEqual('0:09.24', sub_info['Start'], 
                          'start time is not expected value')
-        self.assertEqual('12,83', sub_info['stop'], 
+        self.assertEqual('0:12.84', sub_info['End'], 
                          'stop time is not expected value')
-        self.assertEqual('70', sub_info['char_count'], 
+        self.assertEqual('70', sub_info['Characters'], 
                          'character count is not expected value')
-        self.assertEqual('19.5', sub_info['char_rate'], 
+        self.assertEqual('19.5', sub_info['Chars/sec'], 
                          'character rate is not expected value')
+
+    def test_info_tray__multiline(self):
+        """Info tray displays start, stop, char count, chars/second."""
+        video = Video.objects.all()[3]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        line1 = 'This is the first line '
+        line2 = 'This is the much longer second line'
+        self.editor_pg.edit_sub_line([line1, 'br', line2], 1)
+        sub_info  = (self.editor_pg.subtitle_info(1))
+        self.assertEqual('23', sub_info['Line 1'], 
+                         'Line 1 is not expected value')
+        self.assertEqual('35', sub_info['Line 2'], 
+                         'Line 2 is not expected value')
+        self.assertEqual('59', sub_info['Characters'], 
+                         'character count is not expected value')
+
+    def test_info_tray__char_updates(self):
+        """Info tray character counts updates dynamically"""
+        video = Video.objects.all()[3]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.edit_sub_line('12345 chars', 1, enter=False)
+        sub_info  = (self.editor_pg.subtitle_info(1, active=True))
+        self.assertEqual('11', sub_info['Characters'], 
+                         'character count is not expected value')
+
 
     def test_add_lines_to_end(self):
         """Add sub to the end of the subtitle list, enter adds new active sub."""
 
-        video = Video.objects.all()[0]
-        self.editor_pg.open_editor_page(video.video_id, 'tr')
+        video = Video.objects.all()[4]
+        self.editor_pg.open_editor_page(video.video_id, 'nl')
 
         subs = ['third to last', 'pentulitmate subtitle', 'THE END']
         self.editor_pg.add_subs_to_the_end(subs)
-        new_subs = self.editor_pg.working_text()[-4:]
-        subs.append('')
+        new_subs = self.editor_pg.working_text()[-3:]
         self.assertEqual(subs, new_subs)
+
+    def test_one_version__original(self):
+        """Video with only 1 version displays subs in working section.
+
+        """
+        video = Video.objects.all()[3]
+        self.logger.info('checking subs on en-original')
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.assertEqual(5, len(self.editor_pg.working_text()))
+        self.assertEqual(5, len(self.editor_pg.reference_text()))
+
+    def test_one_version__forked(self):
+        """Video with only 1 version displays subs in working section.
+
+        """
+        video = Video.objects.all()[4]
+        self.logger.info('checking subs on single version forked')
+        self.editor_pg.open_editor_page(video.video_id, 'nl')
+        self.assertEqual(6, len(self.editor_pg.working_text()))
+        self.assertEqual(6, len(self.editor_pg.reference_text()))
+
+    def test_sync_subs(self):
+        """Sync subtitles """
+        video = Video.objects.all()[4]
+        self.editor_pg.open_editor_page(video.video_id, 'nl')
+        self.editor_pg.buffer_up_subs()
+        self.editor_pg.toggle_playback()
+        self.editor_pg.sync(8, 6)
+        self.editor_pg.toggle_playback()
+        times = self.editor_pg.start_times()
+        times = [x for x in times if x != '--']
+        diffs = [(dt.strptime(x, '%M:%S.%f') - dt.strptime(y, '%M:%S.%f')) 
+                  for (x, y) in zip(times[1:], times[:-1])]
+        self.logger.info(diffs)
+        for x in diffs:
+            self.assertGreater(x.seconds, 4)   
+
+    def test_syncing_scroll(self):
+        """Scroll sub list while syncing so sub text is always in view.
+
+        """
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'tr')
+        text = self.editor_pg.working_text()
+        self.editor_pg.buffer_up_subs()
+        self.editor_pg.toggle_playback()
+        text_els = self.editor_pg.working_text_elements()[:25]
+        for x in range(0, 20):
+            el = self.editor_pg.working_text_elements()[x]
+            self.assertTrue(el.is_displayed())
+            self.editor_pg.sync(1, sub_length=1, sub_space=.05)
+
+    def test_helper_syncing(self):
+        """Sync helper stays in view while syncing subs.
+
+        """
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'tr')
+        text = self.editor_pg.working_text()
+        self.editor_pg.buffer_up_subs()
+        self.editor_pg.toggle_playback()
+        self.editor_pg.sync(1, sub_length=2, sub_space=2)
+
+        for x in range(0, 20):
+            self.editor_pg.sync(1, sub_length=1, sub_space=.05)
+            self.assertTrue(self.editor_pg.sync_help_displayed())
+
+    def test_helper_scrolling(self):
+        """Sync helper not in view after manually scrolling subs.
+
+        """
+        video = Video.objects.all()[0]
+        self.editor_pg.open_editor_page(video.video_id, 'tr')
+        text = self.editor_pg.working_text()
+        self.editor_pg.buffer_up_subs()
+        self.editor_pg.toggle_playback()
+        self.editor_pg.sync(1, sub_length=2, sub_space=2)
+        for x in range(0, 3):
+            self.editor_pg.sync(1, sub_length=1, sub_space=.05)
+            self.assertTrue(self.editor_pg.sync_help_displayed())
+        self.editor_pg.toggle_playback()
+        self.browser.execute_script("window.location.hash='add-sub-at-end'")
+        self.assertFalse(self.editor_pg.sync_help_displayed())
+
+
+    def test_rtl(self):
+        video = Video.objects.all()[3]
+        #video = self.data_utils.create_video()
+        test_user = UserFactory.create()
+        sub_file = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
+                                'subtitle_data', 'Timed_text.ar.xml')
+        self.video_pg.log_in(test_user.username, 'password')
+        self.video_pg.open_video_page(video.video_id)
+        self.video_pg.upload_subtitles('Arabic', sub_file)
+        self.editor_pg.open_editor_page(video.video_id, 'ar')
+        expected_text = (u'\u0623\u0648\u062f \u0623\u0646 \u0623\u0628\u062f'
+                         u'\u0623 \u0628\u0623\u0631\u0628\u0639\u0629 \u0623'
+                         u'\u0633\u0626\u0644\u0629.')
+        sub_text, _ = self.editor_pg.click_working_sub_line(3)
+        self.assertEqual(expected_text, sub_text)
+        self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
+        self.assertEqual(expected_text, sub_text)
 
