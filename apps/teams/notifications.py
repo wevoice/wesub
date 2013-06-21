@@ -159,8 +159,11 @@ class BaseNotification(object):
             data['video_id'] = self.video_id
         if self.application_pk:
             data['application_id'] = self.application_pk
-        if self.language_code:
-            data.update({"language_code":self.language_code} )
+        if self.language:
+            data.update({
+                "language_code": self.language_code,
+                "language_id": self.language.pk,
+            })
         data_sent = data
         data = urlencode(data)
         url = "%s?%s" % (url , data)
