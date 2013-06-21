@@ -37,7 +37,7 @@ class TestCaseFollowing(WebdriverTestCase):
         """
         self.create_pg.open_create_page()
         self.create_pg.log_in(self.user, 'password')
-        url = 'https://www.youtube.com/watch?v=2JWUhW5yRdI'
+        url = 'http://www.youtube.com/watch?v=5EVhiBGvVFc'
         self.create_pg.submit_video(url)
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
 
