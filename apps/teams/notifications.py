@@ -140,7 +140,7 @@ class BaseNotification(object):
             return  self.from_internal_lang(self.language.language_code)
 
     def send_http_request(self, url, basic_auth_username, basic_auth_password):
-        h = Http()
+        h = Http(disable_ssl_certificate_validation=True)
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
 
@@ -159,15 +159,18 @@ class BaseNotification(object):
             data['video_id'] = self.video_id
         if self.application_pk:
             data['application_id'] = self.application_pk
-        if self.language_code:
-            data.update({"language_code":self.language_code} )
+        if self.language:
+            data.update({
+                "language_code": self.language_code,
+                "language_id": self.language.pk,
+            })
         data_sent = data
         data = urlencode(data)
         url = "%s?%s" % (url , data)
         try:
             resp, content = h.request(url, method="POST", body=data, headers={
                 'referer': '%s://%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain)
-            }, verify=False)
+            })
             success = 200 <= resp.status < 400
             if success is False:
                 logger.error("Failed to notify team %s " % (self.team),
