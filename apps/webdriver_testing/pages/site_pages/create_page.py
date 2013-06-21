@@ -36,7 +36,7 @@ class CreatePage(UnisubsPage):
         self.clear_text(self._SINGLE_URL_ENTRY_BOX)
         self.type_by_css(self._SINGLE_URL_ENTRY_BOX, video_url)
         self.click_by_css(self._SUBMIT_BUTTON)
-        time.sleep(3)
+        self.check_if_element_present('div#messages', wait_time=15)
 
     def _open_multi_submit(self):
         self.logger.info('Displaying the multi-submit form')

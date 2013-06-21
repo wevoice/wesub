@@ -2456,7 +2456,7 @@
             "is_active": true,
             "is_superuser": true,
             "is_staff": true,
-            "last_login": "2013-05-28T05:08:05",
+            "last_login": "2013-06-10T01:59:10",
             "groups": [],
             "user_permissions": [],
             "password": "pbkdf2_sha256$10000$NNqJthwKjdtM$ALtrKZhPK1R5o9H0tq2y0uVWnBajiItF+jLftEpKf7Q=",
@@ -2559,7 +2559,11 @@
         "model": "auth.customuser",
         "fields": {
             "picture": "",
-            "videos": [],
+            "videos": [
+                3,
+                4,
+                6
+            ],
             "notify_by_email": true,
             "groups": [],
             "preferred_language": "",
@@ -2600,6 +2604,15 @@
             "partner": null,
             "homepage": "",
             "biography": ""
+        }
+    },
+    {
+        "pk": 2,
+        "model": "auth.emailconfirmation",
+        "fields": {
+            "user": 10001,
+            "sent": "2013-06-10T01:57:48",
+            "confirmation_key": "65d8c3802d7d4515b537ffd55276b77468be6b83"
         }
     }
 ]

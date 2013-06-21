@@ -222,14 +222,17 @@ class Page(object):
         elem = self.wait_for_element_present(element)
         elem.send_keys(text)
 
-    def type_special_key(self, key_name, element="body"):
+    def type_special_key(self, key_name, modifier=None, element="body"):
         """Type a special key -see selenium/webdriver/common/keys.py.
    
         ex: ARROR_DOWN, TAB, ENTER, SPACE, DOWN... 
         If no element is specified, just send the key press to the body.
         """
         elem = self._safe_find(element)
-        elem.send_keys(key_name)
+        if modifier:
+            elem.send_keys(getattr(Keys, modifier) + getattr(Keys, key_name))
+        else:
+            elem.send_keys(getattr(Keys, key_name))
 
 
     def get_text_by_css(self, element):
@@ -457,7 +460,8 @@ class Page(object):
         """Return the list of elements (webdriver objects).
   
         """
-        self.wait_for_element_present(element)
+        if not self.check_if_element_present(element, wait_time=5):
+            return None
         elements_found = self.browser.find_elements_by_css_selector(element)
         return elements_found
 

@@ -10,7 +10,7 @@ class VideoPage(UnisubsPage):
     """
 
     _URL = "videos/%s"  # %s is the unique onsite video id
-    _VIDEO_TITLE = "div.content h2.main-title a.title-container"
+    _VIDEO_TITLE = "h2.main-title a"
     _DESCRIPTION = "div#description"
     _EMBEDDED_VIDEO = "div.unisubs-widget div.unisubs-videoTab-container"
     _SUBTITLE_MENU = "a.unisubs-subtitleMeLink span.unisubs-tabTextchoose"
@@ -73,6 +73,9 @@ class VideoPage(UnisubsPage):
     def open_video_page(self, video_id):
         self.open_page(self._URL % video_id)
 
+    def video_title(self):
+        return self.get_text_by_css(self._VIDEO_TITLE)
+
     def add_translation(self):
         self.click_by_css(self._ADD_TRANSLATION)
 
@@ -83,6 +86,7 @@ class VideoPage(UnisubsPage):
                          translated_from = None, 
                          is_complete = True):
         #Open the dialog
+        self.wait_for_element_visible(self._UPLOAD_SUBTITLES)
         self.click_by_css(self._UPLOAD_SUBTITLES)
         #Choose the language
         self.wait_for_element_visible(self._SELECT_LANGUAGE)
