@@ -629,7 +629,8 @@ def can_post_edit_subtitles(team, user):
     elif team.is_member(user) and not team.moderates_videos():
         return TeamsPermissionsCheck(True)
     else:
-        return TeamsPermissionsCheck(False)
+        role = get_role(get_member(user, team))
+        return user.is_staff or role in _perms_equal_or_greater(ROLE_CONTRIBUTOR)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.
