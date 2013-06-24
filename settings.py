@@ -87,8 +87,6 @@ PREVIOUS_EMBED_JS_VERSIONS = []
 
 CSS_USE_COMPILED = True
 
-USE_BUNDLED_MEDIA = not DEBUG
-
 COMPRESS_YUI_BINARY = "java -jar ./css-compression/yuicompressor-2.4.6.jar"
 COMPRESS_OUTPUT_DIRNAME = "static-cache"
 
@@ -628,14 +626,17 @@ MEDIA_BUNDLES = {
     "unisubs-offsite-compiled":{
         "type": "js",
         "files": JS_OFFSITE,
+        "use_closure": True,
         },
 
     "unisubs-onsite-compiled":{
         "type": "js",
         "files": JS_ONSITE,
+        "use_closure": True,
      },
     "unisubs-widgetizer":{
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "files": ["js/config.js"] + JS_WIDGETIZER,
         "bootloader": { 
@@ -646,6 +647,7 @@ MEDIA_BUNDLES = {
     },
     "unisubs-widgetizer-sumo": {
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "files": ["js/config.js"] + JS_WIDGETIZER,
         "extra_defines": {"unisubs.REPORT_ANALYTICS": "false"},
@@ -658,6 +660,7 @@ MEDIA_BUNDLES = {
     "unisubs-widgetizer-debug": {
         "type": "js",
         "files": ["js/config.js" ] + JS_WIDGETIZER  ,
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "debug": True,
         "bootloader": { 
@@ -668,6 +671,7 @@ MEDIA_BUNDLES = {
      },
     "unisubs-statwidget":{
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-stat-dependencies.js",
         "include_flash_deps": False,
         "files": [
@@ -680,6 +684,7 @@ MEDIA_BUNDLES = {
 
     "unisubs-api":{
         "type": "js",
+        "use_closure": True,
         "files": ["js/config.js"] + JS_API,
         "bootloader": { 
             "gatekeeper": "UnisubsApiLoaded", 
@@ -688,16 +693,17 @@ MEDIA_BUNDLES = {
      },
     "js-base-dependencies":{
         "type":"js",
+        "use_closure": True,
         "optimizations": "WHITESPACE_ONLY",
         "files": JS_BASE_DEPENDENCIES,
      },
     "js-onsite-dialog": {
         "type":"js",
+        "use_closure": True,
         "files": ["js/config.js"]  + JS_DIALOG  ,
     },
     "site_base_js":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
+        "type": "js",
         "files":[
               "js/jquery-1.4.3.js",
               "js/jquery-ui-1.8.16.custom.min.js",
@@ -715,19 +721,15 @@ MEDIA_BUNDLES = {
               "js/libs/jquery.cookie.js",
               "js/unisubs.site.js",
             ],
-        "closure_deps": "",
-        "include_flash_deps": False,
         },
     "js-jqueryui-datepicker":{
         "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
         "files":[
               "js/jquery-ui-1.8.16.custom.datepicker.min.js",
             ],
-        "include_js_base_dependencies": False,
         },
     "js-testing-base":{
-        "type":"js",
+        "type": "js",
         "files": [
                  'js/widget/testing/stubvideoplayer.js',
                  'js/widget/testing/events.js',
@@ -745,9 +747,7 @@ MEDIA_BUNDLES = {
          ),
     },
     "js-teams":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "",
+        "type": "js",
         "files": (
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",
@@ -757,11 +757,10 @@ MEDIA_BUNDLES = {
             "js/jquery.mod.js",
             "js/teams/create-task.js",
          ),
-        "include_js_base_dependencies": False,
-        "include_flash_deps": False,
     },
     "embedder":{
         "type":"js",
+		"use_closure": True,
         "optimizations": "SIMPLE_OPTIMIZATIONS",
         "closure_deps": "",
         "files": (
@@ -778,7 +777,6 @@ MEDIA_BUNDLES = {
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
         #"output": 'release/public/embedder.js',
-        "ignore_closure": True,
         "release_url": True,
         "bootloader": { 
             "gatekeeper": "_amaraEmbedderLoaded", 
@@ -797,6 +795,7 @@ MEDIA_BUNDLES = {
     },
     "debug-embed-js": {
         "type": "js",
+        "use_closure": True,
         "optimizations": "WHITESPACE_ONLY",
         "files": JS_BASE_DEPENDENCIES + JS_OFFSITE[:-1]
     }

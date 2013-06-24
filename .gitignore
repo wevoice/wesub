@@ -21,6 +21,7 @@ settings_local.py
 dev_settings_test_local.py
 commit.py
 media/embed.js
+media/js/cogi_send_request.js
 media/js/config.js
 media/js/statwidget/statwidgetconfig.js
 media/src/js/embedder/conf.js
