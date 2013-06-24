@@ -289,6 +289,36 @@ JS_BASE_DEPENDENCIES = [
     'src/js/dfxp/dfxp.js',
 ]
 
+SUBTITLE_EDITOR_JS = [
+    'src/js/third-party/jquery-1.10.1.js',
+    'src/js/third-party/jquery.autosize.js',
+    'src/js/third-party/angular.1.0.7.js',
+    'src/js/third-party/angular-cookies.js',
+    'src/js/third-party/underscore.min.js',
+    'src/js/third-party/popcorn.js',
+    'src/js/dfxp/dfxp.js',
+    'src/js/uri.js',
+    'src/js/popcorn/popcorn.flash-fallback.js',
+    #'src/js/popcorn/popcorn.netflix.js',
+    'src/js/subtitle-editor/app.js',
+    'src/js/subtitle-editor/collab.js',
+    'src/js/subtitle-editor/dom.js',
+    'src/js/subtitle-editor/help.js',
+    'src/js/subtitle-editor/lock.js',
+    'src/js/subtitle-editor/modal.js',
+    'src/js/subtitle-editor/workflow.js',
+    'src/js/subtitle-editor/subtitles/controllers.js',
+    'src/js/subtitle-editor/subtitles/directives.js',
+    'src/js/subtitle-editor/subtitles/filters.js',
+    'src/js/subtitle-editor/subtitles/models.js',
+    'src/js/subtitle-editor/subtitles/services.js',
+    'src/js/subtitle-editor/timeline/controllers.js',
+    'src/js/subtitle-editor/timeline/directives.js',
+    'src/js/subtitle-editor/video/controllers.js',
+    'src/js/subtitle-editor/video/directives.js',
+    'src/js/subtitle-editor/video/services.js',
+]
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -798,7 +828,11 @@ MEDIA_BUNDLES = {
         "use_closure": True,
         "optimizations": "WHITESPACE_ONLY",
         "files": JS_BASE_DEPENDENCIES + JS_OFFSITE[:-1]
-    }
+    },
+    'subtitle-editor':  {
+        'type': 'js',
+        'files': SUBTITLE_EDITOR_JS,
+    },
 }
 
 
