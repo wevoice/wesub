@@ -33,6 +33,8 @@ class TestCaseBilling(WebdriverTestCase):
         cls._upload_sv_translation(cls.video, cls.user, complete=True)
 
         cls.bill_dict = cls.create_team_bill()
+        cls.billing_pg.open_billing_page()
+        cls.billing_pg.log_in(cls.terri.username, 'password')
 
 
     @classmethod

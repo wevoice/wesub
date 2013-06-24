@@ -17,18 +17,19 @@ files = [
     JASMINE_ADAPTER,
     //ANGULAR_SCENARIO,
     //ANGULAR_SCENARIO_ADAPTER,
-    'src/js/third-party/amara-jquery.min.js',
-    'src/js/third-party/angular.1.0.6.min.js',
+    'src/js/third-party/jquery-1.10.1.js',
+    'src/js/third-party/angular.1.0.7.min.js',
     'src/js/third-party/angular-mocks.js',
     'src/js/third-party/angular-cookies.js',
+    'src/js/third-party/jquery.autosize.js',
     'src/js/third-party/underscore.min.js',
     'src/js/third-party/popcorn.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',
-    'src/js/third-party/*.js',
     'src/js/subtitle-editor/*.js',
     'src/js/subtitle-editor/**/*.js',
-    'src/js/subtitle-editor/tests/*Spec.js'
+    'src/js/subtitle-editor/tests/*Spec.js',
+    'src/js/subtitle-editor/tests/mocks.js',
 ];
 
 // list of files to exclude
@@ -78,7 +79,7 @@ autoWatch = true;
 // - PhantomJS
 // - IE (only Windows)
 // CLI --browsers Chrome,Firefox,Safari
-browsers = ['Chrome'];
+browsers = [];
 
 // If browser does not capture in given timeout [ms], kill it
 // CLI --capture-timeout 5000

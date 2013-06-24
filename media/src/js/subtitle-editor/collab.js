@@ -18,9 +18,9 @@
 
 (function() {
 
-    var root = this;
+    var module = angular.module('amara.SubtitleEditor.collab', []);
 
-    var CollabController = function($scope, $timeout, SubtitleStorage) {
+    module.controller('CollabController', function($scope, $timeout, SubtitleStorage) {
 
         $scope.notes = SubtitleStorage.getCachedData().savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
@@ -60,17 +60,12 @@
             $scope.$root.$emit('send-back-task');
         };
 
-        $scope.$root.$on('subtitle-key-up', function($event, options) {
-            if (options.parser.needsAnyTranscribed(options.subtitles)) {
+        $scope.$root.$on('editing-done', function($event, $editScope) {
+            if ($editScope.subtitleList.needsAnyTranscribed()) {
                 $scope.error = 'You have empty subtitles.';
             } else {
                 $scope.error = null;
             }
-            $scope.$digest();
         });
-        
-    };
-
-    root.CollabController = CollabController;
-
+    });
 }).call(this);

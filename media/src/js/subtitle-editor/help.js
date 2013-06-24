@@ -18,9 +18,9 @@
 
 (function() {
 
-    var root = this;
+    var module = angular.module('amara.SubtitleEditor.help', []);
 
-    var HelpController = function($scope, SubtitleStorage) {
+    module.controller('HelpController', function($scope, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the help panel.
          * @param $scope
@@ -41,15 +41,12 @@
                 text: 'Full list of keyboard shortcuts to go here.',
                 buttons: [{
                     'text': 'Close', 'class': 'yes', 'fn': function() {
-                        $scope.$root.$broadcast('hide-modal');
+                        $scope.$root.$emit('hide-modal');
                     }
                 }]
             });
 
         };
 
-    };
-
-    root.HelpController = HelpController;
-
+    });
 }).call(this);

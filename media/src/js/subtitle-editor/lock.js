@@ -19,13 +19,9 @@
 var angular = angular || null;
 
 (function(){
-    var root, module, getLockingUrl;
+    var module = angular.module('amara.SubtitleEditor.lock', []);
 
-    root = this;
-    module = angular.module('amara.SubtitleEditor.services.lock', []);
-
-
-    getLockingUrl = function(videoId, languageCode, type){
+    function getLockingUrl(videoId, languageCode, type){
         return '/' + languageCode + '/subtitles/editor/' + videoId + '/' + languageCode + '/' + type + "/";
     }
 

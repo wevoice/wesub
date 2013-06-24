@@ -30,6 +30,7 @@ import optparse
 from deploy.git_helpers import get_current_commit_hash
 
 from apps import widget
+from apps.unisubs_compressor.contrib.rjsmin import jsmin
 
 # on vagrant .git is a symlink and this needts to be ran before media compilation ;(
 LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID.split('/')[-1]
@@ -48,8 +49,8 @@ def _make_version_debug_string():
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
 
-def to_static_root(*paths):
-    return os.path.join(settings.STATIC_ROOT, *paths)
+def to_static_root(*path_components):
+    return os.path.join(settings.STATIC_ROOT, *path_components)
 JS_LIB = os.path.join(settings.PROJECT_ROOT, "media")
 CLOSURE_LIB = os.path.join(JS_LIB, "js", "closure-library")
 FLOWPLAYER_JS = os.path.join(
@@ -165,7 +166,7 @@ class Command(BaseCommand):
             """
         descriptor.write(_make_version_debug_string())
 
-    def compile_css_bundle(self, bundle_name, bundle_type, files):
+    def compile_css_bundle(self, bundle_name, files):
         bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         file_list = [os.path.join(settings.STATIC_ROOT, x) for x in files]
         for f in file_list:
@@ -177,15 +178,15 @@ class Command(BaseCommand):
             dir_path = os.path.dirname(concatenated_path)
         else:
             dir_path = os.path.join(self.temp_dir, "css-compressed")
-            concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
+            concatenated_path =  os.path.join(dir_path,
+                                              "%s.css" % bundle_name)
         if os.path.exists(dir_path) is False:
             os.makedirs(dir_path)
         out = open(concatenated_path, 'w')
         out.write("".join(buffer))
         out.close()
-        if bundle_type == "css":
-            filename = "%s.css" % ( bundle_name)
-            cmd_str = "%s --type=%s %s" % (settings.COMPRESS_YUI_BINARY, bundle_type, concatenated_path)
+        filename = "%s.css" % ( bundle_name)
+        cmd_str = "%s --type=css %s" % (settings.COMPRESS_YUI_BINARY, concatenated_path)
         if self.verbosity > 1:
             logging.info( "calling %s" % cmd_str)
         output, err_data  = call_command(cmd_str)
@@ -198,7 +199,27 @@ class Command(BaseCommand):
         #os.remove(concatenated_path)
         return  filename
 
-    def compile_js_bundle(self, bundle_name, bundle_type, files):
+    def compile_js_bundle(self, bundle_name, files):
+        self.ensure_js_dir_exists()
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
+        if bundle_settings.get('use_closure'):
+            return self.compile_js_closure_bundle(bundle_name, files)
+
+        output_file_name = bundle_name + '.js'
+        output_path = os.path.join(self.temp_dir, "js" , output_file_name)
+        with open(output_path, 'w') as output:
+            for input_filename in files:
+                input_path = to_static_root(input_filename)
+                minified = jsmin(open(input_path).read());
+                output.write('/* %s */\n' % input_filename);
+                output.write("%s;\n" % (minified,))
+
+    def ensure_js_dir_exists(self):
+        temp_js_dir = os.path.join(self.temp_dir, 'js')
+        if not os.path.exists(temp_js_dir):
+            os.makedirs(temp_js_dir)
+
+    def compile_js_closure_bundle(self, bundle_name, files):
         bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         if 'bootloader' in bundle_settings:
             output_file_name = "{0}-inner.js".format(bundle_name)
@@ -208,10 +229,7 @@ class Command(BaseCommand):
         debug = bundle_settings.get("debug", False)
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
-        if hasattr(bundle_settings, 'ignore_closure'):
-            closure_dep_file = ""
-        else:
-            closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
+        closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
         optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
@@ -224,8 +242,6 @@ class Command(BaseCommand):
             compiled_js = os.path.join(self.temp_dir, name)
         else:
             compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
-        if not os.path.exists(os.path.dirname(compiled_js)):
-            os.makedirs(os.path.dirname(compiled_js))
         compiler_jar = COMPILER_PATH
 
         logging.info("Calculating closure dependencies")
@@ -340,7 +356,7 @@ class Command(BaseCommand):
         os.remove(uncompiled_file_name)
 
     def compile_media_bundle(self, bundle_name, bundle_type, files):
-        getattr(self, "compile_%s_bundle" % bundle_type)(bundle_name, bundle_type, files)
+        getattr(self, "compile_%s_bundle" % bundle_type)(bundle_name, files)
 
     def _create_temp_dir(self):
         commit_hash = LAST_COMMIT_GUID
@@ -454,9 +470,9 @@ class Command(BaseCommand):
         for bundle_name, data in bundles.items():
             if restrict_bundles and bundle_name not in args:
                 continue
+            print "compiling %s: %s" % (data['type'], bundle_name)
             self.compile_media_bundle(
                 bundle_name, data['type'], data["files"])
-            print "Compiled %s"  % bundle_name
 
     def _remove_cache_dirs_before(self, num_to_keep):
         """

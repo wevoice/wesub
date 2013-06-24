@@ -115,6 +115,73 @@
         }
     },
     {
+        "pk": 6,
+        "model": "subtitles.subtitlelanguage",
+        "fields": {
+            "writelock_owner": 10001,
+            "subtitles_complete": true,
+            "official_signoff_count": 0,
+            "created": "2013-06-10T02:34:13",
+            "writelock_session_key": "a4b6ee3ea60a60f2bb6b3e6fc22e24bb053bfba8",
+            "unofficial_signoff_count": 0,
+            "pending_signoff_expired_count": 0,
+            "pending_signoff_count": 0,
+            "is_forked": true,
+            "writelock_time": "2013-06-10T03:05:12",
+            "video": 4,
+            "language_code": "en",
+            "followers": [
+                10001
+            ],
+            "pending_signoff_unexpired_count": 0,
+            "subtitles_fetched_count": 0
+        }
+    },
+    {
+        "pk": 7,
+        "model": "subtitles.subtitlelanguage",
+        "fields": {
+            "writelock_owner": 10001,
+            "subtitles_complete": false,
+            "official_signoff_count": 0,
+            "created": "2013-06-10T02:46:00",
+            "writelock_session_key": "a4b6ee3ea60a60f2bb6b3e6fc22e24bb053bfba8",
+            "unofficial_signoff_count": 0,
+            "pending_signoff_expired_count": 0,
+            "pending_signoff_count": 0,
+            "is_forked": true,
+            "writelock_time": "2013-06-10T03:06:25",
+            "video": 6,
+            "language_code": "nl",
+            "followers": [
+                10001
+            ],
+            "pending_signoff_unexpired_count": 0,
+            "subtitles_fetched_count": 0
+        }
+    },
+    {
+        "pk": 8,
+        "model": "subtitles.subtitlelanguage",
+        "fields": {
+            "writelock_owner": null,
+            "subtitles_complete": false,
+            "official_signoff_count": 0,
+            "created": "2013-06-10T03:04:22",
+            "writelock_session_key": "",
+            "unofficial_signoff_count": 0,
+            "pending_signoff_expired_count": 0,
+            "pending_signoff_count": 0,
+            "is_forked": false,
+            "writelock_time": null,
+            "video": 6,
+            "language_code": "en",
+            "followers": [],
+            "pending_signoff_unexpired_count": 0,
+            "subtitles_fetched_count": 0
+        }
+    },
+    {
         "pk": 1,
         "model": "subtitles.subtitleversion",
         "fields": {
@@ -537,6 +604,52 @@
             ],
             "subtitle_language": 4,
             "serialized_subtitles": "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\n",
+            "rollback_of_version_number": null
+        }
+    },
+    {
+        "pk": 18,
+        "model": "subtitles.subtitleversion",
+        "fields": {
+            "origin": "web-legacy-editor",
+            "note": "",
+            "version_number": 1,
+            "description": "An online video promotion for Italo Calvino's novel Cosmicomics by Sheri Prather for a motion graphics course at DePaul University's School of Cinema & Interactive Media in Chicago. The requirements for this final project were to embody the spirit of the novel and inspire viewers to find out more.",
+            "subtitle_count": 5,
+            "author": 10001,
+            "title": "Italo Calvino's Cosmicomics by Sheri Prather",
+            "serialized_lineage": "{}",
+            "visibility": "public",
+            "created": "2013-06-10T02:37:25",
+            "visibility_override": "",
+            "video": 4,
+            "language_code": "en",
+            "parents": [],
+            "subtitle_language": 6,
+            "serialized_subtitles": "eJydUk2PmzAQvedXWO6VDR9ZNtkIkKpKlXrOserBYIdYa2zLDCX013cwhIrVFqmVfBg/zzy/NzMZ\nALk3Src5vQHYcxj2fb/vD3vj6lC3IUCj6JRxBtjK+tTCoKSuffZZMV3nVGha7AjJboLxMcCwEcA4\nA7ZwNlucj2w6VWM9wmeQoES4grhoKyctSKPXD5Wxg5P1DWY4Cx+c832W/W8ely9GQHjHkueUNcyx\nJ49RglT4uzIup/1NwoxcjYavrJFqyKl1xho3ambqwnR7EU5e/6Rd5C+R0/hk7xMG4g6flax1Tiuh\nQTi6eJp1zVfFBtPBfzpyokZB7y11pW/6E3OCUeIdfmAXBaKwnKYvkb2Tl+Sh3DLO5bgQKcKHB1qy\n6q12ptP8y9SmUiEyvXHZWrQx22XXldvJn9+s8LFaWWn4QCbxH6ueq7n8uXi1pMQCzI+isz9BHEWU\nCM0XKA2eT8+0+N50rax+ZKH9a/GUuSp+DRJfXCnZlOOSwU0Qhc0QjoDxt8YYvUn7GqRJvKKN0+CQ\nRLT4RnrWklYJYZE7IDX2Xg2E4xIBAhukI8NxrTU+Bcf0RAvs7ShUaq9uHBExV8JIxdwGYRIFabru\nXHIMkjimRW/eBOkswUE5LxNn50iLIZ79fr+wZuE8miwcZ1nsMtzQYvcbTapu9w==\n",
+            "rollback_of_version_number": null
+        }
+    },
+    {
+        "pk": 19,
+        "model": "subtitles.subtitleversion",
+        "fields": {
+            "origin": "web-legacy-editor",
+            "note": "",
+            "version_number": 1,
+            "description": "An online video promotion for Italo Calvino's novel Cosmicomics by Dennis Coveyou for a motion graphics course at DePaul University's School of Cinema & Interactive Media in Chicago. The requirements for this final project were to embody the spirit of the novel and inspire viewers to find out more. \n\nThanks Scott Butwina, Joe Gondolfi, Sam Gondolfi, and Sloan Gretencord for superb acting.",
+            "subtitle_count": 6,
+            "author": 10001,
+            "title": "Italo Calvino's Cosmicomics by Dennis Coveyou",
+            "serialized_lineage": "{}",
+            "visibility": "public",
+            "created": "2013-06-10T02:46:28",
+            "visibility_override": "",
+            "video": 6,
+            "language_code": "nl",
+            "parents": [],
+            "subtitle_language": 7,
+            "serialized_subtitles": "eJydktFugyAYhe/7FIRdt2xr2iyNmixL9gJ9gl9BJUMg+Fu1Tz9UtOmy2Gx3cjj/4XxIhEi6Suk6\npiWiPTHWtu2u3e+MK5iuGWKl6OQ4Ia65nmrsldTF6D4p0EVMtaLJhpCoFMCHD/9ZCQQOCEtmtZY5\nu+k07ee9fEKJSrA7iYs6c9KiNPp+IzO2d7IoMcgRmzPDOtT+G+NyxCCIkVjymEIFDrajRomP8qcr\n42LalhKDkhuNn1BJ1cfUOmONGzqDOoOuz8LJ/GY7y6uI6cub7SYNRYfvShY6ppnQKBxdmEKvsFTQ\nmwb/SeRE4Qv9RGrS8dK34ARQMhL+gusL+mIxPRyfbUeOr3NzC5zL4UEcvLyf1RSyr8KZRvOP6ZpS\n5ZVpj8vaeoyAC/kd7cQ3viw2P60oNbwnU/nfW4dpLi8LqyWpH/B+SoT2sDS5CmciZlccRot1A7YP\nErB04kFGbhr3wCEvt4yIBaqIDdeQbCL/c5PNN1gpORQ=\n",
             "rollback_of_version_number": null
         }
     }

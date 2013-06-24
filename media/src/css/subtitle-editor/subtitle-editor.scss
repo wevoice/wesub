@@ -85,6 +85,7 @@ $CodePro: 'CodeProLC', $OpenSans;
 // Page
 html, body {
     background: #F3F4F5;
+    overflow: hidden;
 }
 body {
     color: #565758;
@@ -138,7 +139,9 @@ div.modal {
         @include box-shadow(0, 0, 30px, rgba(black, .4));
 
         h1 {
-            font: normal 17px $OpenSans;
+            /* The preloader should not use custom font, else some browsers
+                will display blank text until that font has loaded */
+            font: normal 17px $Helvetica;
             margin-bottom: 20px;
             
             &.loading {
@@ -396,8 +399,27 @@ section.main {
         float: none;
         vertical-align: top;
     }
+    span.key {
+        background: white;
+        display: block;
+        height: 32px;
+        float: left;
+        margin-right: 10px;
+        position: relative;
+        @include border-radius(3px);
+
+        span {
+            bottom: 2px;
+            color: #5A5758;
+            diplay: block;
+            font-size: 9px;
+            font-weight: bold;
+            left: 4px;
+            position: absolute;
+        }
+    }
     div.subtitles-wrapper {
-        overflow: hidden;
+        overflow: visible;
         position: relative;
 
         a.scroll-lock {
@@ -416,13 +438,160 @@ section.main {
                 background-position: center -143px;
             }
         }
+
+        div.sync-help {
+            position: absolute;
+            display: none;
+            width: 120px;
+            height: 65px;
+            color: #ffffff;
+            z-index: 100;
+
+            div.text {
+                line-height: 65px;
+                vertical-align: middle;
+            }
+
+            span.key {
+                margin-left: 14px;
+                margin-top: 16px;
+                width: 32px;
+                span {
+                    color: #000;
+                    font-size: 12px;
+                    bottom: 5px;
+                }
+            }
+            &:before {
+                /* Draws a triangle in the middle of the box.
+                 */
+                position: absolute;
+                top: 17px;
+                content: "";
+                display: block;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+            }
+        }
+        div.sync-help.end {
+            background: #126295;
+            left: 100%;
+            &:before {
+                left: -15px;
+                border-right: 15px solid #126295;
+            }
+        }
+
+        div.sync-help.begin {
+            background: #15998e;
+            right: 100%;
+            &:before {
+                right: -15px;
+                border-left: 15px solid #15998e;
+            }
+        }
+
+        div.info-tray {
+            position: absolute;
+            left: 100%;
+            top: 45px;
+            width: 200px;
+            z-index: 101;
+
+            background: #e4e5e6;
+            border-top: 1px solid #e6e7e8;
+            border-right: 1px solid #e6e7e8;
+            border-bottom: 1px solid #e6e7e8;
+            table {
+                width: 100%;
+                margin: 0px 15px 25px 15px;
+            }
+            td, th {
+                text-align: left;
+                width: 50%;
+                font-size: 12px;
+                padding-top: 15px;
+                color: #a3a4a5;
+                em {
+                    color: #838485;
+                }
+            }
+            tr.child {
+                td, th {
+                    padding-top: 8px;
+                }
+                th {
+                    padding-left: 20px;
+                }
+            }
+            &:before {
+                /* Draws a triangle in the middle of the box.
+                 */
+                position: absolute;
+                top: 8px;
+                right: 100%;
+                content: "";
+                display: block;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+                border-right: 15px solid #e4e5e6;
+            }
+        }
     }
     div.subtitles {
         overflow: auto;
         position: relative;
 
+        div.metadata {
+            background: #fff;
+            font-size: 12px;
+            position: relative;
+            h2 {
+                font-size: 14px;
+                background: #c5c5c5;
+                padding: 20px 42px;
+                color: white;
+            }
+            div.content {
+                padding: 24px 42px;
+
+                p {
+                    padding: 16px 0 30px;
+                    line-height: 140%;
+                }
+                textarea {
+                    margin: 16px 0 30px;
+                    line-height: 140%;
+                    width: 100%;
+                    border: 0;
+                    color: #565758;
+                    font-size: 12px;
+                    resize: none;
+                }
+            }
+            a.expander {
+                position: absolute;
+                left: 24px;
+                top: 20px;
+                height: 0px;
+                width: 0px;
+                border-top: 10px solid #fff;
+                border-right: 5px solid transparent;
+                border-left: 5px solid transparent;
+
+                &.collapsed {
+                    border-left: 10px solid #fff;
+                    border-top: 5px solid transparent;
+                    border-bottom: 5px solid transparent;
+                }
+            }
+        }
+
         ul {
-            margin-top: 25px;
             overflow: hidden;
 
             li {
@@ -431,29 +600,31 @@ section.main {
                 line-height: 25px;
                 position: relative;
 
+            span.timing {
+                color: #9A9B9C;
+                display: block;
+                font-size: 10px;
+                position: absolute;
+                right: 20px;
+                top: 2px;
+                line-height: 25px;
+
+                span {
+                    display: inline-block;
+                }
+                a.comments {
+                    background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
+                    display: inline-block;
+                    height: 9px;
+                    margin-left: 3px;
+                    vertical-align: -1px;
+                    width: 10px;
+                }
+            }
+
                 div.hover {
                     display: none;
 
-                    span.timing {
-                        color: #9A9B9C;
-                        display: block;
-                        font-size: 10px;
-                        position: absolute;
-                        right: 20px;
-                        top: 2px;
-
-                        span {
-                            display: inline-block;
-                        }
-                        a.comments {
-                            background: transparent url('../../../images/editor/comments.gif') top left no-repeat;
-                            display: inline-block;
-                            height: 9px;
-                            margin-left: 3px;
-                            vertical-align: -1px;
-                            width: 10px;
-                        }
-                    }
                     a.remove-subtitle {
                         background: transparent url('../../../images/editor/remove-subtitle.gif') top left no-repeat;
                         bottom: 7px;
@@ -465,13 +636,14 @@ section.main {
                         width: 10px;
                     }
                     a.add-subtitle {
-                        bottom: -15px;
+                        top: 0px;
                         display: block;
-                        left: 0;
+                        left: 50%;
+                        margin-left: -15px;
                         overflow: hidden;
                         position: absolute;
                         height: 15px;
-                        width: 100%;
+                        width: 30px;
 
                         &:before {
                             background: #BABBBC url('../../../images/editor/plus.gif') center 80% no-repeat;
@@ -493,9 +665,9 @@ section.main {
                 textarea {
                     font: normal 12px $OpenSans;
                     line-height: 25px;
-                    display: block;
                     height: 46px;
                     margin: 0;
+                    display: block;
                     resize: none;
                     padding: 10px 50px 10px 40px;
                     width: 100%;
@@ -516,6 +688,9 @@ section.main {
                     i {
                         font-style: italic;
                     }
+                }
+                &.edit span.subtitle-text {
+                    display: none;
                 }
                 span.start-time {
                     color: #CCC;
@@ -555,11 +730,10 @@ section.main {
                     }
                 }
                 &.empty {
-                    background: #F2DEDE;
+                    background: #fdfdea;
 
                     textarea, span {
-                        background: #F2DEDE;
-                        border-top: 1px solid #EED3D7;
+                        background: #fdfdea;
                     }
                 }
             }
@@ -569,7 +743,7 @@ section.main {
                 }
             }
         }
-        a.end {
+        .end {
             color: #3C3C3D;
             display: block;
             line-height: 20px;
@@ -584,13 +758,17 @@ section.main {
     }
     section.left {
         div.help-panel {
-            background: #666666;
+            background: #0C3F70;
             color: white;
             font-size: 12px;
             height: 216px;
             margin: 20px;
             padding: 20px;
             @include border-radius(3px);
+
+            span.key {
+                width: 20%;
+            }
 
             a.advanced {
                 color: white;
@@ -617,26 +795,6 @@ section.main {
                 li {
                     margin: 10px 0;
 
-                    span.key {
-                        background: white;
-                        display: block;
-                        height: 32px;
-                        float: left;
-                        margin-right: 10px;
-                        position: relative;
-                        width: 20%;
-                        @include border-radius(3px);
-
-                        span {
-                            bottom: 2px;
-                            color: #5A5758;
-                            diplay: block;
-                            font-size: 9px;
-                            font-weight: bold;
-                            left: 4px;
-                            position: absolute;
-                        }
-                    }
                     span.description {
                         display: block;
                         float: left;
@@ -666,7 +824,6 @@ section.main {
         }
         div.language-selections {
             background: #ECECEC;
-            border-bottom: 1px solid #DADBDC;
             border-top: 1px solid #DADBDC;
             position: relative;
 
@@ -681,9 +838,11 @@ section.main {
 
                 select {
                     background: transparent;
+                    font-size: 12px;
+                    line-height: 134%;
+                    height: 1.33em;
                     border: 0;
                     cursor: pointer;
-                    height: 15px;
                     margin: 0;
                     overflow: hidden;
                     width: 140%;
@@ -699,26 +858,21 @@ section.main {
                     border-right: 0;
                 }
             }
-            &:before {
-                @include shadow();
-            }
         }
     }
     section.center {
         @include box-shadow(0, 0, 20px, rgba(0, 0, 0, 0.23));
 
         div.video {
-            border-bottom: 1px solid #88898B;
-            border-left: 1px solid #88898B;
-            border-right: 1px solid #88898B;
-            height: 291px;
+            height: 290px;
             position: relative;
 
-            div.amara-popcorn-subtitles {
+            div.subtitle-overlay {
+                position: absolute;
                 bottom: 63px;
                 left: 0;
+                width: 100%;
                 padding: 0 20px;
-                position: absolute;
                 text-align: center;
 
                 div {
@@ -744,23 +898,134 @@ section.main {
                     }
                 }
             }
-            iframe {
-                height: 290px;
+            div.video-container {
+                height: 258px;
                 width: 100%;
+                iframe, video {
+                    height: 258px;
+                    width: 100%;
+                }
             }
-            video {
-                height: 291px;
-                width: 100%;
+
+            ul.video-controls {
+                height: 32px;
+                background: #212223;
+                border-bottom: 1px solid #19191a;
+                color: #fff;
+
+                li {
+                    display: block;
+                    float: left;
+                    padding-top: 2px;
+                    height: 30px;
+                    line-height: 30px;
+                    vertical-align: middle;
+                    text-align: center;
+                }
+                li a {
+                    display: block;
+                    height: 30px;
+                }
+
+                li.play-pause {
+                    float: left;
+                }
+
+                li.time, li.volume {
+                    float: right;
+                }
+
+                li.play-pause a {
+                    width: 48px;
+                    background: url('../../../images/editor/play-button.png') center center no-repeat;
+                }
+
+                li.play-pause.playing a {
+                    background-image: url('../../../images/editor/pause-button.png');
+                }
+
+                li.time {
+                   width: 85px;
+                }
+
+                li.volume a {
+                    width: 40px;
+                    background: url('../../../images/editor/volume-icon.png') center center no-repeat;
+                }
+                
+                li.progress {
+                    float: none;
+                    margin-left: 48px;
+                    margin-right: 135px;
+                    padding-top: 2px;
+
+                    div {
+                        height: 28px;
+                        background: center center repeat-x;
+                    }
+
+                    // This is kindof tricky because we want to display a
+                    // sliced image on top of another sliced image.  We create
+                    // 3 div for the slices and put the background on them,
+                    // then create an inner div inside each of them and put
+                    // the forground on them
+
+                    .slice-left {
+                        float: left;
+                        width: 14px;
+                        background-image: url('../../../images/editor/progress-background-left.png');
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-left.png');
+                            width: 0px;
+                        }
+                    }
+                    .slice-right {
+                        float: right;
+                        width: 14px;
+                        background-image: url('../../../images/editor/progress-background-right.png');
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-right.png');
+                            width: 0px;
+                        }
+                    }
+                    .slice-mid {
+                        float: none;
+                        background-image: url('../../../images/editor/progress-background-middle.png');
+                        margin: 0px 14px;
+                        div {
+                            background-image: url('../../../images/editor/progress-bar-middle.png');
+                            width: 0px;
+                        }
+                    }
+                }
             }
-            &:before {
-                @include shadow();
-                bottom: -77px;
+            div.volume-bar {
+                position: absolute;
+                width: 40px;
+                height: 110px;
+                bottom: 33px;
+                right: 85px;
+                background: url('../../../images/editor/volume-background.png') center center no-repeat;
+                padding: 10px 0 5px;
+                div {
+                    width: 40px;
+                    height: 0px;
+                    background: transparent center top repeat-y;
+                }
+                div.slice1 {
+                    background-image: url('../../../images/editor/volume-bar-top.png');
+                }
+                div.slice2 {
+                    background-image: url('../../../images/editor/volume-bar-middle.png');
+                }
+                div.slice3 {
+                    background-image: url('../../../images/editor/volume-bar-bottom.png');
+                }
             }
         }
         div.workspace-tools {
             background: #E7E8E9;
-            border-bottom: 1px solid #BDBEBF;
-            height: 36px;
+            border-top: 1px solid #DADBDC;
             position: relative;
             z-index: 50;
             @include multi-box-shadow(
@@ -773,6 +1038,8 @@ section.main {
                 float: left;
                 font-weight: bold;
                 padding: 10px;
+                font-size: 12px;
+                line-height: 1.34em;
             }
             div.switches {
                 float: right;
@@ -800,7 +1067,7 @@ section.main {
     }
     section.right {
         div.steps-container {
-            height: 291px;
+            height: 290px;
             position: relative;
 
             ul.steps {
@@ -815,20 +1082,26 @@ section.main {
                     padding: 12px 0 12px 10px;
                     width: 200px;
 
-                    ul {
-                        li {
+                    div.substeps {
+                        margin: 10px 0 0 16px;
+                        p {
                             color: #767879;
                             font-size: 11px;
-                            margin: 10px 0 10px 16px;
-
-                            &.highlighted {
-                                color: #39838B;
+                        }
+                        button {
+                            margin-top: 10px;
+                            color: #FFFFFF;
+                            padding: 12px 10px;
+                            &.next-step {
+                                background: #29B0BF;
                             }
-                            &:last-of-type {
-                                margin-bottom: 0;
+                            &.endorse {
+                                background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
+                                padding-left: 40px;
                             }
                         }
                     }
+
                     &.done {
                         background: transparent url('../../../images/checkmark.gif') center right no-repeat;
                         color: #949596;
@@ -981,9 +1254,9 @@ section.timeline {
     }
     div.subtitles-container {
         height: 65px;
-        left: 30%; // Debug only.
         position: absolute;
         top: 0;
+        width: 100%;
 
         div.subtitle {
             background: #DADBDC;
@@ -1001,6 +1274,7 @@ section.timeline {
                 text-overflow: ellipsis;
                 width: 100%;
                 white-space: nowrap;
+                cursor: move;
             }
             a.handle {
                 cursor: col-resize;
@@ -1044,58 +1318,18 @@ section.timeline {
                     }
                 }
             }
-            &.mock-1 {
-                left: 0px;
-                width: 155px;
-            }
-            &.mock-2 {
-                left: 155px;
-                width: 150px;
-            }
-            &.mock-3 {
-                left: 312px;
-                width: 230px;
-            }
-            &.mock-4 {
-                left: 542px;
-                width: 230px;
-            }
+        }
+
+        div.unsynced {
+            background: #FEFFE2;
         }
     }
-    div.timing-container {
-        height: 65px;
-        left: 30%;
+    canvas.timing {
         position: absolute;
         top: 0;
-
-        div.second {
-            display: block;
-            height: 65px;
-            float: left;
-            position: relative;
-            width: 100px;
-
-            span {
-                background: #212223;
-                bottom: 3px;
-                color: #686868;
-                font-size: 12px;
-                font-weight: bold;
-                left: 0;
-                padding-right: 5px;
-                position: absolute;
-                z-index: 53;
-            }
-            &:after {
-                bottom: 3px;
-                content: "• • • • • • • • •";
-                display: block;
-                font-size: 15px;
-                left: 10px;
-                position: absolute;
-                z-index: 52;
-            }
-        }
+        left: 0;
+        height: 65px;
+        width: 100px;
     }
 }
 body.timeline-shown {

@@ -17,7 +17,7 @@
             "followers": [],
             "moderated_by": null,
             "widget_views_count": 0,
-            "edited": "2013-05-28T06:58:41",
+            "edited": "2013-06-10T01:58:08",
             "description": "Open Source Ecology founder Dr. Marcin Jakubowski and the OSE team explain the philosophy behind their work. Special thanks to our remote collaborators Tom Griffing, Zach Dwiel and William Neal.\n\nJoin us in building the future.\n\nopensourceecology.org",
             "primary_audio_language_code": "en",
             "languages_count": 5,
@@ -50,7 +50,7 @@
             "followers": [],
             "moderated_by": null,
             "widget_views_count": 0,
-            "edited": "2013-05-28T07:42:36",
+            "edited": "2013-06-10T01:58:08",
             "description": "Amara is the easiest way to caption and translate any video.",
             "primary_audio_language_code": "",
             "languages_count": 0,
@@ -63,6 +63,191 @@
             "writelock_time": null,
             "thumbnail": "http://b.vimeocdn.com/ts/274/180/274180940_640.jpg",
             "allow_video_urls_edit": true
+        }
+    },
+    {
+        "pk": 3,
+        "model": "videos.video",
+        "fields": {
+            "is_subtitled": false,
+            "writelock_owner": null,
+            "writelock_session_key": "",
+            "featured": null,
+            "is_public": true,
+            "duration": 62,
+            "was_subtitled": false,
+            "view_count": 0,
+            "title": "Italo Calvino's Cosmicomics by Ashley Ruhl",
+            "s3_thumbnail": "video/thumbnail/1e856b4d3545c3e869e3bea337da46f6b4f34047.jpg",
+            "small_thumbnail": "http://i.ytimg.com/vi/FVcUdmGTkEI/default.jpg",
+            "followers": [
+                10001
+            ],
+            "moderated_by": null,
+            "widget_views_count": 0,
+            "edited": "2013-06-10T02:31:56",
+            "description": "An online video promotion for Italo Calvino's novel Cosmicomics by Ashley Ruhl for a motion graphics course at DePaul University's School of Cinema & Interactive Media in Chicago.  The requirements for this final project were to embody the spirit of the novel and inspire viewers to find out more.",
+            "primary_audio_language_code": "",
+            "languages_count": 0,
+            "user": 10001,
+            "complete_date": null,
+            "allow_community_edits": false,
+            "subtitles_fetched_count": 0,
+            "created": "2013-06-10T02:27:54",
+            "video_id": "RJvfoTGFuUyR",
+            "writelock_time": null,
+            "thumbnail": "https://i.ytimg.com/vi/FVcUdmGTkEI/0.jpg",
+            "allow_video_urls_edit": true
+        }
+    },
+    {
+        "pk": 4,
+        "model": "videos.video",
+        "fields": {
+            "is_subtitled": true,
+            "writelock_owner": null,
+            "writelock_session_key": "",
+            "featured": null,
+            "is_public": true,
+            "duration": 61,
+            "was_subtitled": true,
+            "view_count": 0,
+            "title": "Italo Calvino's Cosmicomics by Sheri Prather",
+            "s3_thumbnail": "video/thumbnail/9d783305e587b7310486ee7f8dba47622045057c.jpg",
+            "small_thumbnail": "http://i.ytimg.com/vi/p7Dul0kTo2I/default.jpg",
+            "followers": [
+                10001
+            ],
+            "moderated_by": null,
+            "widget_views_count": 0,
+            "edited": "2013-06-10T02:37:25",
+            "description": "An online video promotion for Italo Calvino's novel Cosmicomics by Sheri Prather for a motion graphics course at DePaul University's School of Cinema & Interactive Media in Chicago. The requirements for this final project were to embody the spirit of the novel and inspire viewers to find out more.",
+            "primary_audio_language_code": "en",
+            "languages_count": 1,
+            "user": 10001,
+            "complete_date": "2013-06-10T02:37:25",
+            "allow_community_edits": false,
+            "subtitles_fetched_count": 0,
+            "created": "2013-06-10T02:29:04",
+            "video_id": "s8mdKnEeuYpJ",
+            "writelock_time": null,
+            "thumbnail": "https://i.ytimg.com/vi/p7Dul0kTo2I/0.jpg",
+            "allow_video_urls_edit": true
+        }
+    },
+    {
+        "pk": 6,
+        "model": "videos.video",
+        "fields": {
+            "is_subtitled": false,
+            "writelock_owner": null,
+            "writelock_session_key": "",
+            "featured": null,
+            "is_public": true,
+            "duration": 82,
+            "was_subtitled": false,
+            "view_count": 0,
+            "title": "Italo Calvino's Cosmicomics by Dennis Coveyou",
+            "s3_thumbnail": "video/thumbnail/ee38510e589d1a8532ec0cadd63d411d403c7226.jpg",
+            "small_thumbnail": "http://i.ytimg.com/vi/jvG1K_2GxEc/default.jpg",
+            "followers": [
+                10001
+            ],
+            "moderated_by": null,
+            "widget_views_count": 0,
+            "edited": "2013-06-10T02:46:28",
+            "description": "An online video promotion for Italo Calvino's novel Cosmicomics by Dennis Coveyou for a motion graphics course at DePaul University's School of Cinema & Interactive Media in Chicago. The requirements for this final project were to embody the spirit of the novel and inspire viewers to find out more. \n\nThanks Scott Butwina, Joe Gondolfi, Sam Gondolfi, and Sloan Gretencord for superb acting.",
+            "primary_audio_language_code": "en",
+            "languages_count": 1,
+            "user": 10001,
+            "complete_date": null,
+            "allow_community_edits": false,
+            "subtitles_fetched_count": 0,
+            "created": "2013-06-10T02:38:25",
+            "video_id": "xE0fYjqOwK5K",
+            "writelock_time": null,
+            "thumbnail": "https://i.ytimg.com/vi/jvG1K_2GxEc/0.jpg",
+            "allow_video_urls_edit": true
+        }
+    },
+    {
+        "pk": 33,
+        "model": "videos.action",
+        "fields": {
+            "comment": null,
+            "language": null,
+            "created": "2013-06-10T02:46:28",
+            "new_video_title": "",
+            "member": null,
+            "video": 6,
+            "user": 10001,
+            "action_type": 4,
+            "team": null,
+            "new_language": 7
+        }
+    },
+    {
+        "pk": 32,
+        "model": "videos.action",
+        "fields": {
+            "comment": null,
+            "language": null,
+            "created": "2013-06-10T02:38:25",
+            "new_video_title": "",
+            "member": null,
+            "video": 6,
+            "user": 10001,
+            "action_type": 1,
+            "team": null,
+            "new_language": null
+        }
+    },
+    {
+        "pk": 31,
+        "model": "videos.action",
+        "fields": {
+            "comment": null,
+            "language": null,
+            "created": "2013-06-10T02:37:25",
+            "new_video_title": "",
+            "member": null,
+            "video": 4,
+            "user": 10001,
+            "action_type": 4,
+            "team": null,
+            "new_language": 6
+        }
+    },
+    {
+        "pk": 29,
+        "model": "videos.action",
+        "fields": {
+            "comment": null,
+            "language": null,
+            "created": "2013-06-10T02:29:04",
+            "new_video_title": "",
+            "member": null,
+            "video": 4,
+            "user": 10001,
+            "action_type": 1,
+            "team": null,
+            "new_language": null
+        }
+    },
+    {
+        "pk": 28,
+        "model": "videos.action",
+        "fields": {
+            "comment": null,
+            "language": null,
+            "created": "2013-06-10T02:27:54",
+            "new_video_title": "",
+            "member": null,
+            "video": 3,
+            "user": 10001,
+            "action_type": 1,
+            "team": null,
+            "new_language": null
         }
     },
     {
@@ -525,6 +710,51 @@
             "type": "V",
             "original": true,
             "added_by": null
+        }
+    },
+    {
+        "pk": 3,
+        "model": "videos.videourl",
+        "fields": {
+            "created": "2013-06-10T02:31:57",
+            "url": "http://www.youtube.com/watch?v=FVcUdmGTkEI",
+            "videoid": "FVcUdmGTkEI",
+            "primary": true,
+            "video": 3,
+            "owner_username": "DePaulCinema",
+            "type": "Y",
+            "original": true,
+            "added_by": 10001
+        }
+    },
+    {
+        "pk": 4,
+        "model": "videos.videourl",
+        "fields": {
+            "created": "2013-06-10T02:33:14",
+            "url": "http://www.youtube.com/watch?v=p7Dul0kTo2I",
+            "videoid": "p7Dul0kTo2I",
+            "primary": true,
+            "video": 4,
+            "owner_username": "DePaulCinema",
+            "type": "Y",
+            "original": true,
+            "added_by": 10001
+        }
+    },
+    {
+        "pk": 5,
+        "model": "videos.videourl",
+        "fields": {
+            "created": "2013-06-10T02:42:26",
+            "url": "http://www.youtube.com/watch?v=jvG1K_2GxEc",
+            "videoid": "jvG1K_2GxEc",
+            "primary": true,
+            "video": 6,
+            "owner_username": "DePaulCinema",
+            "type": "Y",
+            "original": true,
+            "added_by": 10001
         }
     }
 ]

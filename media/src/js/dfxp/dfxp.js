@@ -16,7 +16,91 @@
 // along with this program.  If not, see 
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
-var AmaraDFXPParser = function(AmaraDFXPParser) {
+
+var dfxp = (function($) {
+
+function markdownToHTML(text) {
+    /*
+     * Convert text to Markdown-style rendered HTML with bold, italic,
+     * underline, etc.
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
+        { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
+        { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
+function markdownToPlaintext(text) {
+    /*
+     * Convert text to Markdown-style to plain text
+     */
+
+    var replacements = [
+        { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "$2" },
+        { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" },
+    ];
+
+    for (var i = 0; i < replacements.length; i++) {
+        var match = replacements[i].match;
+        var replaceWith = replacements[i].replaceWith;
+
+        text = text.replace(match, replaceWith);
+    }
+
+    return text;
+};
+
+function leftPad(number, width, character) {
+    /*
+     * Left Pad a number to the given width, with zeros.
+     * From: http://stackoverflow.com/a/1267338/22468
+     *
+     * Returns: string
+     */
+
+    character = character || '0';
+    width -= number.toString().length;
+
+    if (width > 0) {
+        return new Array(width + (/\./.test(number) ? 2 : 1))
+                        .join(character) + number;
+    }
+    return number.toString();
+}
+
+function rightPad(number, width, character) {
+    /*
+     * Right Pad a number to the given width, with zeros.
+     * From: http://stackoverflow.com/a/1267338/22468
+     *
+     * Returns: string
+     */
+
+    character = character || '0';
+    width -= number.toString().length;
+
+    if (width > 0) {
+        return number + new Array(width + (/\./.test(number) ? 2 : 1))
+            .join(character);
+    }
+    return number.toString();
+}
+
+var AmaraDFXPParser = function() {
     /*
      * A utility for working with DFXP subs.
      * The front end app needs all timming data to be
@@ -50,8 +134,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     ];
 
     var that = this;
-    var $ = window.AmarajQuery? window.AmarajQuery.noConflict(): window.$;
-    var AmarajQuery = window.AmarajQuery || null;
 
     this.init = function(xml) {
 
@@ -92,23 +174,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
     this.utils = {
-        leftPad: function(number, width, character) {
-            /*
-             * Left Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            character = character || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return new Array(width + (/\./.test(number) ? 2 : 1))
-                                .join(character) + number;
-            }
-            return number.toString();
-        },
         millisecondsToTimeExpression: function(milliseconds) {
             /*
              * Parses milliseconds into a time expression.
@@ -121,29 +186,11 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             var hours = ~~(time / 3600);
             var minutes = ~~((time % 3600) / 60);
             var fraction = milliseconds % 1000;
-            var p = this.utils.leftPad;
             var seconds = time % 60;
-            return p(hours, 2) + ':' +
-                p(minutes, 2) + ':' +
-                p(seconds, 2) +  ',' +
-                p(fraction, 3);
-        },
-        rightPad: function(number, width, character) {
-            /*
-             * Right Pad a number to the given width, with zeros.
-             * From: http://stackoverflow.com/a/1267338/22468
-             *
-             * Returns: string
-             */
-
-            character = character || '0';
-            width -= number.toString().length;
-
-            if (width > 0) {
-                return number + new Array(width + (/\./.test(number) ? 2 : 1))
-                    .join(character);
-            }
-            return number.toString();
+            return leftPad(hours, 2) + ':' +
+                leftPad(minutes, 2) + ':' +
+                leftPad(seconds, 2) +  ',' +
+                leftPad(fraction, 3);
         },
         timeExpressionToMilliseconds: function(timeExpression) {
             /*
@@ -160,7 +207,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
             var millisecondsInHours    = components[1] * (3600 * 1000);
             var millisecondsInMinutes  = components[2] * (60 * 1000);
             var millisecondsInSeconds  = components[3] * (1000);
-            var millisecondsInFraction = parseInt(this.utils.rightPad(components[4], 3), 10);
+            var millisecondsInFraction = parseInt(rightPad(components[4], 3), 10);
 
             return parseInt(millisecondsInHours +
                             millisecondsInMinutes +
@@ -411,12 +458,13 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
 
         return $('<div>').append(subtitleContents.clone()).remove().text();
     };
+    this.markdownToHTML = markdownToHTML;
     this.contentRendered = function(node) {
         /*
          * Return the content of the subtitle, rendered with Markdown styles.
          */
 
-        return this.markdownToHTML(this.content(node));
+        return markdownToHTML(this.content(node));
     };
     this.convertTimes = function(toFormat, $subtitles) {
         /*
@@ -486,7 +534,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof endTime !== 'undefined') {
-            if (parseInt(endTime, 10) || endTime === 0) {
+            if (endTime >= 0) {
                 $(node).attr('end', endTime);
             } else {
                 $(node).attr('end', '');
@@ -561,7 +609,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
     this.getSubtitleIndex = function(subtitle, subtitles) {
         /*
-         * Retrieve the index of the given subtitle within the given subtitle set.
+         * Retrieve the index of the given subtitle within the given subtitle s
          *
          * Returns: integer
          */
@@ -610,29 +658,6 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
         input = input.replace("\n", '<br/>');
         return input;
-    };
-    this.markdownToHTML = function(text) {
-        /*
-         * Convert text to Markdown-style rendered HTML with bold, italic,
-         * underline, etc.
-         */
-
-        var replacements = [
-            { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "<b>$2</b>" },
-            { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "<i>$2</i>" },
-            { match: /(_)([^_]+)(_{1})/g, replaceWith: "<u>$2</u>" },
-            { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
-            { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
-        ];
-
-        for (var i = 0; i < replacements.length; i++) {
-            var match = replacements[i].match;
-            var replaceWith = replacements[i].replaceWith;
-
-            text = text.replace(match, replaceWith);
-        }
-
-        return text;
     };
     this.needsAnySynced = function() {
         /*
@@ -914,7 +939,7 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
         }
 
         if (typeof startTime !== 'undefined') {
-            if (parseInt(startTime, 10) || startTime === 0) {
+            if (startTime >= 0) {
                 $(node).attr('begin', startTime);
             } else {
                 $(node).attr('begin', '');
@@ -1033,3 +1058,14 @@ var AmaraDFXPParser = function(AmaraDFXPParser) {
     };
 
 };
+
+return {
+    AmaraDFXPParser: AmaraDFXPParser,
+    markdownToHTML: markdownToHTML,
+    markdownToPlaintext: markdownToPlaintext,
+}
+
+})(window.AmarajQuery || window.jQuery);
+
+/* Set window.AmaraDFXPParser for compatibility with the old editor */
+window.AmaraDFXPParser = dfxp.AmaraDFXPParser;

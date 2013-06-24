@@ -17,10 +17,9 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
+    var module = angular.module('amara.SubtitleEditor.modal', []);
 
-    var root = this;
-
-    var ModalController = function($scope, SubtitleListFinder, SubtitleStorage) {
+    module.controller('ModalController', function($scope, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -28,44 +27,39 @@
          * @constructor
          */
 
-        $scope.loading = false;
+        $scope.isVisible = true;
         $scope.content = null;
 
         $scope.hide = function() {
+
             $scope.content = null;
-            $scope.loading = null;
+            $scope.isVisible = false;
         };
 
         $scope.$root.$on('hide-modal', function($event) {
             $scope.hide();
         });
         $scope.$root.$on('show-loading-modal', function($event, content) {
-
             // Clear out any existing modal.
             $scope.hide();
-
-            $scope.loading = content;
+            $scope.content = content;
+            $scope.isVisible = true;
         });
         $scope.$root.$on('show-modal', function($event, content) {
-
             // Clear out any existing modal.
             $scope.hide();
-
             $scope.content = content;
+            $scope.isVisible = true;
         });
         $scope.$root.$on('show-modal-download', function($event) {
 
-            $scope.content.dfxpString = SubtitleListFinder.get('working-subtitle-set').scope.parser.xmlToString(true, true);
-
+            $scope.content.dfxpString = $scope.workingSubtitles.subtitleList.toXMLString();
         });
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
                 $scope.content.heading = heading;
+                $scope.isVisible = true;
             }
         });
-
-    };
-
-    root.ModalController = ModalController;
-
+    });
 }).call(this);

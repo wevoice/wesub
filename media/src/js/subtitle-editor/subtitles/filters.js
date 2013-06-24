@@ -18,9 +18,7 @@
 
 var angular = angular || null;
 (function(){
-    var root, module;
-    root = this;
-    module = angular.module('amara.SubtitleEditor.filters', ['amara.SubtitleEditor']);
+    var module = angular.module('amara.SubtitleEditor.subtitles.filters', []);
     var HIDES_ON = ['Deleted', 'Private']
 
     function leftPad(number, width, character) {
@@ -43,10 +41,8 @@ var angular = angular || null;
 
     /*
     * Display a human friendly format.
-    * If showUnused if false, we truncate everything up to
-    * unpaded seconds from the result.
      */
-    function _displayTime(milliseconds, showUnused){
+    function displayTime(milliseconds, showFraction) {
         if (milliseconds === -1 ||
             isNaN(Math.floor(milliseconds)) ||
             milliseconds === undefined ||
@@ -56,31 +52,35 @@ var angular = angular || null;
         var time = Math.floor(milliseconds / 1000);
         var hours = ~~(time / 3600);
         var minutes = ~~((time % 3600) / 60);
-        var fraction = String(milliseconds % 1000).substring(0,2);
         var seconds = time % 60;
-        var result = '';
-        if (hours || showUnused){
-            result += (hours > 9? leftPad(hours, 2) : hours ) + ':';
+
+        var components = [];
+        if(hours) {
+            components.push(hours);
+            components.push(leftPad(minutes, 2));
+        } else {
+            components.push(minutes);
         }
-        if ((minutes || hours) || showUnused){
-            if (hours){
-                result += leftPad(minutes, 2) + ':';
-            }else{
-                result += minutes + ":";
-            }
+        components.push(leftPad(seconds, 2));
+        var result = components.join(":");
+
+        if(showFraction) {
+            var fraction = Math.round((milliseconds % 1000) / 10);
+            result += '.' + leftPad(fraction, 2);
         }
-        if (hours || minutes){
-            result += leftPad(seconds, 2) ;
-        }else{
-            result += seconds;
-        }
-        result += ',' + leftPad(fraction, 2);
         return result
 
     };
 
     module.filter('displayTime', function(){
-        return _displayTime;
+        return function(milliseconds) {
+            return displayTime(milliseconds, true);
+        }
+    });
+    module.filter('displayTimeSeconds', function(){
+        return function(milliseconds) {
+            return displayTime(milliseconds, false);
+        }
     });
     module.filter('versionDropDownDisplay', function(){
         return function (versionData){

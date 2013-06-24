@@ -17,7 +17,7 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 var Popcorn = window.Popcorn || null;
-var jQuery = window.AmarajQuery || null;
+var jQuery = window.jQuery || null;
 
 (function (Popcorn, window, document) {
 
@@ -43,7 +43,7 @@ var jQuery = window.AmarajQuery || null;
             seeking: false,
             autoplay: EMPTY_STRING,
             preload: EMPTY_STRING,
-            controls: true,
+            controls: false,
             loop: false,
             poster: EMPTY_STRING,
             // FlashFallback seems to use .77 as default
@@ -52,7 +52,6 @@ var jQuery = window.AmarajQuery || null;
             // such that muted===0 is unmuted, and muted>0 is muted.
             muted: 0,
             currentTime: 0,
-            duration: NaN,
             ended: false,
             paused: true,
             error: null
@@ -87,6 +86,12 @@ var jQuery = window.AmarajQuery || null;
             var objEl =  jQuery("object", elem).eq(0);
 
             var clip = player.getClip(0);
+            player.onVolume(function(newVolume) {
+                if (impl.volume !== aValue) {
+                    impl.volume = aValue;
+                    self.dispatchEvent("volumechange");
+                }
+            });
             playerReady = true;
             clip.onResume(function () {
                 onPlay();
@@ -136,9 +141,7 @@ var jQuery = window.AmarajQuery || null;
                     onPlayerReady();
                 },
                 plugins:{
-                    controls:{
-                        fullscreen:false
-                    }
+                    controls: null,
                 }
             };
             player = player = window.$f(elem, flashEmbedParams, config);
@@ -150,12 +153,9 @@ var jQuery = window.AmarajQuery || null;
 
         function getDuration() {
             if (!playerReady) {
-                // Queue a getDuration() call so we have correct duration info for loadedmetadata
-                addPlayerReadyCallback(function () {
-                    getDuration();
-                });
+                return NaN;
             }
-            return player.getClip().duration;
+            return player.getClip(0).duration;
         }
 
         function destroyPlayer() {
@@ -302,15 +302,8 @@ var jQuery = window.AmarajQuery || null;
             return;
         }
 
-        function onVolume(aValue) {
-            if (impl.volume !== aValue) {
-                impl.volume = aValue;
-                self.dispatchEvent("volumechange");
-            }
-        }
-
         function setVolume(aValue) {
-            impl.volume = aValue;
+            impl.volume = aValue * 100;
 
             if (!playerReady) {
                 addPlayerReadyCallback(function () {
@@ -318,13 +311,12 @@ var jQuery = window.AmarajQuery || null;
                 });
                 return;
             }
-            player.setVolume(aValue);
-            self.dispatchEvent("volumechange");
+            player.setVolume(impl.volume);
         }
 
         function getVolume() {
             // If we're muted, the volume is cached on impl.muted.
-            return impl.muted > 0 ? impl.muted : impl.volume;
+            return impl.muted > 0 ? impl.muted : impl.volume / 100;
         }
 
         function setMuted(aMute) {
@@ -405,7 +397,7 @@ var jQuery = window.AmarajQuery || null;
 
             duration: {
                 get: function () {
-                    return impl.duration;
+                    return getDuration();
                 }
             },
 

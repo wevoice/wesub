@@ -23,8 +23,7 @@ var angular = angular || null;
     var API_BASE_PATH_TEAMS = '/api2/partners/teams/';
     var API_BASE_PATH_VIDEOS = '/api2/partners/videos/';
 
-    var root = this;
-    var module = angular.module('amara.SubtitleEditor.services', []);
+    var module = angular.module('amara.SubtitleEditor.subtitles.services', []);
 
     var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
         var url = API_BASE_PATH_VIDEOS + videoId +
@@ -47,10 +46,46 @@ var angular = angular || null;
         return API_BASE_PATH_VIDEOS + videoId + '/languages/';
     };
 
-    module.factory('SubtitleStorage', function($http) {
+    /*
+     * Language object that we return from getLanguage()
+     */
+    function Language(responseData) {
+        /*
+         * Create a new Language object
+         *
+         * responseData is either:
+         *   - data that we got back from the API
+         *   - or data from the editor_data variable
+         *
+         * This means that editor_data should be formated exactly as the
+         * response data is.
+         */
+        this.responseData = responseData;
+        this.name = responseData.name;
+        this.code = responseData.language_code;
+        if(responseData.is_rtl) {
+            this.dir = 'rtl';
+        } else {
+            this.dir = 'ltr';
+        }
+    }
 
-        var cachedData = window.editorData;
+    module.factory('SubtitleStorage', function($window, $http) {
+
+        var cachedData = $window.editorData;
         var authHeaders = cachedData.authHeaders;
+
+        function ensureLanguageMap() {
+            if (cachedData.languageMap) {
+                return;
+            }
+            var langMap = {};
+            for (var i=0; i < cachedData.languages.length; i++){
+                var language = cachedData.languages[i];
+                langMap[language.language_code] = language;
+            }
+            cachedData.languageMap = langMap;
+        }
 
         return {
             approveTask: function(versionNumber, notes) {
@@ -91,20 +126,17 @@ var angular = angular || null;
                     callback(cachedData.languages);
                 }
             },
-            getLanguageMap: function(callback) {
-
-                // If the language map doesn't exist in our cached data, ask the API.
-                if (!cachedData.languageMap) {
-                    $http.get('/api2/partners/languages/').success(function(response) {
-                        cachedData.languageMap = response.languages;
-                        callback(cachedData.languageMap);
-                    });
-
-                // If we have a cached language map, just call the callback.
-                } else {
-                    callback(cachedData.languageMap);
-                }
-
+            getLanguage: function(languageCode) {
+                ensureLanguageMap();
+                return new Language(cachedData.languageMap[languageCode]);
+            },
+            getLanguageName: function(languageCode) {
+                ensureLanguageMap();
+                return cachedData.languageMap[languageCode].name;
+            },
+            getLanguageIsRTL: function(languageCode) {
+                ensureLanguageMap();
+                return cachedData.languageMap[languageCode].is_rtl;
             },
             getSubtitles: function(languageCode, versionNumber, callback){
 
@@ -121,7 +153,7 @@ var angular = angular || null;
                     var language = cachedData.languages[i];
 
                     // Once we find the language we're looking for, find the version.
-                    if (language.code === languageCode){
+                    if (language.language_code === languageCode){
 
                         for (var j = 0; j < language.versions.length; j++){
 
@@ -183,9 +215,14 @@ var angular = angular || null;
                 return promise;
 
             },
-            saveSubtitles: function(videoID, languageCode, dfxpString, title, description){
-
+            saveSubtitles: function(videoID, languageCode, dfxpString, title,
+                                   description, isComplete) {
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
+                // if isComplete is not specified as true or false, we send
+                // null, which means keep the complete flag the same as before
+                if(isComplete !== true && isComplete !== false) {
+                    isComplete = null;
+                }
 
                 var promise = $http({
                     method: 'POST',
@@ -197,7 +234,8 @@ var angular = angular || null;
                         subtitles: dfxpString,
                         sub_format: 'dfxp',
                         title: title,
-                        description: description
+                        description: description,
+                        is_complete: isComplete,
                     }
                 });
 
@@ -205,57 +243,11 @@ var angular = angular || null;
             }
         };
     });
-    module.factory('SubtitleListFinder', function($http) {
+    module.factory('EditorData', function($window) {
         /**
-         * A sevice to cache and retrieve instances of the subtitle-list directive.
+         * Get the editor data that was passed to us from python
          *
-         * TODO: We don't really need this service. We can simply use angular.element to retrieve
-         * subtitle-list instances and access the scope / controller from there.
          */
-        var registry = {};
-
-        return {
-            register: function(name, elm, controller, scope) {
-                /**
-                 * @param name  String to identify this subtitle list by, this is taken from the
-                 * value of the 'subtitle-list' attribute on the SubtitleList directive.
-                 * @param elm The wrapped element for the subtitle list.
-                 * @param controller Controller for the the subtitle list
-                 * @param scope The scope for the list
-                 */
-
-                // Registering the same name more than once will throw an error.
-                if (registry[name]){
-                   throw new Error('Already registred a subtitle list component with name"' + name + '".') ;
-                }
-
-                registry[name] = {
-                    name: name,
-                    elm: elm,
-                    controller: controller,
-                    scope: scope
-                };
-
-                return this;
-            },
-            get: function(name) {
-                return registry[name];
-            }
-        };
+        return $window.editorData;
     });
-
-    module.factory('OldEditorConfig', function($window) {
-        /**
-         * A sevice to cache and retrieve instances of the subtitle-list directive.
-         *
-         * TODO: We don't really need this service. We can simply use angular.element to retrieve
-         * subtitle-list instances and access the scope / controller from there.
-         */
-        var oldEditorURL = window.editorData.oldEditorURL;
-
-        return {
-            get: function() {
-                return oldEditorURL;
-            }
-        };
-    });}).call(this);
+}).call(this);

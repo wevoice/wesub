@@ -81,11 +81,12 @@ def _language_data(language, editing_version, translated_from_version):
             'version_number': translated_from_version.version_number,
         },
         'editingLanguage': language == subtitle_language,
-        'code': language.language_code,
+        'language_code': language.language_code,
         'name': language.get_language_code_display(),
         'pk': language.pk,
         'numVersions': language.num_versions,
         'versions': versions_data,
+        'is_rtl': language.is_rtl(),
         'is_primary_audio_language': language.is_primary_audio_language()
     }
 
@@ -145,20 +146,16 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
     translated_from_version = editing_language.\
         get_translation_source_version(ignore_forking=True)
 
-    languages = video.newsubtitlelanguage_set.having_nonempty_versions().annotate(
+    languages = video.newsubtitlelanguage_set.annotate(
         num_versions=Count('subtitleversion'))
 
     video_urls = []
     for v in video.get_video_urls():
-
-        # Force controls for YouTube players.
-        if 'youtube.com' in v.url:
-            v.url = v.url + '&controls=1'
-
         video_urls.append(v.url)
 
     editor_data = {
-        'allowsSyncing': bool(request.GET.get('allowsSyncing', False)),
+        'canSync': bool(request.GET.get('canSync', True)),
+        'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
         # front end needs this to be able to set the correct
         # api headers for saving subs
         'authHeaders': {
@@ -167,8 +164,15 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         },
         'video': {
             'id': video.video_id,
+            'title': video.title,
+            'description': video.description,
             'primaryVideoURL': video.get_video_url(),
             'videoURLs': video_urls,
+        },
+        'editingVersion': {
+            'languageCode': editing_language.language_code,
+            'versionNumber': (editing_version.version_number
+                              if editing_version else None),
         },
         'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
         'languageCode': request.LANGUAGE_CODE,

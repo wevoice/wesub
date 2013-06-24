@@ -169,9 +169,121 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.exit_to_full_editor()
         self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
 
+    def test_review_to_new_approve(self):
+        """Start Review task, switch to new editor and endorse 
+
+        """
+
+        video = Video.objects.all()[0]
+        #Add video to team and create a review task
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        translate_task = TaskFactory.build(type = 20, 
+                           team = self.team, 
+                           team_video = tv, 
+                           language = 'sv', 
+                           assignee = self.user)
+        translate_task.new_subtitle_version = translate_task.get_subtitle_version()
+        translate_task.save()
+        task = translate_task.complete()
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles', 
+                                               video.title)
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual('Swedish', self.editor_pg.selected_ref_language())
+        self.assertEqual('Version 3', self.editor_pg.selected_ref_version())
+        self.editor_pg.approve_task()
+        self.assertEqual(video.title, 
+                         self.video_pg.video_title())
+        self.assertEqual(1, list(tv.task_set.all_approve().all()))
 
 
+    def test_edit_approve_version(self):
+        """Edit then and approve review task save new version.
 
+        """
+
+        video = Video.objects.all()[0]
+        #Add video to team and create a review task
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        translate_task = TaskFactory.build(type = 20, 
+                           team = self.team, 
+                           team_video = tv, 
+                           language = 'sv', 
+                           assignee = self.user)
+        translate_task.new_subtitle_version = translate_task.get_subtitle_version()
+        translate_task.save()
+        task = translate_task.complete()
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles', 
+                                               video.title)
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual('Swedish', self.editor_pg.selected_ref_language())
+        self.assertEqual('Version 3', self.editor_pg.selected_ref_version())
+        self.editor_pg.edit_sub_line('12345 chars', 1)
+        self.editor_pg.save('Resume editing')
+        self.editor_pg.approve_task()
+        sv = video.subtitle_language('sv').get_tip(full=True)
+        self.assertEqual(4, sv.version_number)
+
+
+    def test_review_to_new_send_back(self):
+        """Start Review task, switch to new editor and endorse 
+
+        """
+
+        video = Video.objects.all()[0]
+        #Add video to team and create a review task
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        translate_task = TaskFactory.build(type = 20, 
+                           team = self.team, 
+                           team_video = tv, 
+                           language = 'sv', 
+                           assignee = self.user)
+        translate_task.new_subtitle_version = translate_task.get_subtitle_version()
+        translate_task.save()
+        task = translate_task.complete()
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles', 
+                                               video.title)
+        self.sub_editor.continue_to_next_step()
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual('Swedish', self.editor_pg.selected_ref_language())
+        self.assertEqual('Version 3', self.editor_pg.selected_ref_version())
+        self.editor_pg.send_back_task()
+        self.assertEqual(video.title, 
+                         self.video_pg.video_title())
+        self.assertEqual(2, list(tv.task_set.all_translate().all()))
+
+
+    def test_save_back_to_old(self):
+        """Open in new editor, then save and go back to old editor.
+
+        """
+        video = Video.objects.all()[3]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.edit_sub_line('12345 chars', 1)
+        self.editor_pg.save('Back to full editor')
+        self.assertEqual('Typing', self.sub_editor.dialog_title())
+
+    def test_save_resume(self):
+        """Open in new editor, then save and go back to old editor.
+
+        """
+        video = Video.objects.all()[3]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.edit_sub_line('12345 chars', 1)
+        self.editor_pg.save('Resume editing')
+        self.assertEqual(u"English \u2022 Italo Calvino's Cosmicomics by Sheri Prather",
+                         self.editor_pg.video_title())
+
+
+    def test_save_exit(self):
+        video = Video.objects.all()[3]
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.edit_sub_line('12345 chars', 1)
+        self.editor_pg.save('Exit')
+        self.assertEqual("Italo Calvino's Cosmicomics by Sheri Prather", 
+                         self.video_pg.video_title())
         
-        
-

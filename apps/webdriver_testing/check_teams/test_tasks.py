@@ -358,6 +358,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
+        self.tasks_tab.handle_js_alert(action='accept')
 
     def tearDown(self):
         if self.workflow.approve_allowed != 10:
