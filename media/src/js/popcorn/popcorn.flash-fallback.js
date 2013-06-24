@@ -86,6 +86,12 @@ var jQuery = window.jQuery || null;
             var objEl =  jQuery("object", elem).eq(0);
 
             var clip = player.getClip(0);
+            player.onVolume(function(newVolume) {
+                if (impl.volume !== aValue) {
+                    impl.volume = aValue;
+                    self.dispatchEvent("volumechange");
+                }
+            });
             playerReady = true;
             clip.onResume(function () {
                 onPlay();
@@ -149,7 +155,7 @@ var jQuery = window.jQuery || null;
             if (!playerReady) {
                 return NaN;
             }
-            return player.getClip().duration;
+            return player.getClip(0).duration;
         }
 
         function destroyPlayer() {
@@ -296,15 +302,8 @@ var jQuery = window.jQuery || null;
             return;
         }
 
-        function onVolume(aValue) {
-            if (impl.volume !== aValue) {
-                impl.volume = aValue;
-                self.dispatchEvent("volumechange");
-            }
-        }
-
         function setVolume(aValue) {
-            impl.volume = aValue;
+            impl.volume = aValue * 100;
 
             if (!playerReady) {
                 addPlayerReadyCallback(function () {
@@ -312,13 +311,12 @@ var jQuery = window.jQuery || null;
                 });
                 return;
             }
-            player.setVolume(aValue);
-            self.dispatchEvent("volumechange");
+            player.setVolume(impl.volume);
         }
 
         function getVolume() {
             // If we're muted, the volume is cached on impl.muted.
-            return impl.muted > 0 ? impl.muted : impl.volume;
+            return impl.muted > 0 ? impl.muted : impl.volume / 100;
         }
 
         function setMuted(aMute) {
