@@ -148,6 +148,8 @@ def mock_youtube_get_entry(video_id):
         'tKTZoB2Vjuk': ('Google Python Class Day 1 Part 1',
                         'GoogleDevelopers', '3097'),
         'osexbB_hX4g': ('DO YOU SEE THAT??!!', 'otherijustine', '90'),
+        'hPbYnNRw4UM': ('ONN | Documentary - Beginning',
+                        'OccupyNewsNetworkUK', '1971'),
     }
     try:
         title, author, duration = video_id_map[video_id]
