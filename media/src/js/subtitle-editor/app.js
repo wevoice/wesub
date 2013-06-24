@@ -47,6 +47,9 @@ var angular = angular || null;
         $interpolateProvider.endSymbol(']]');
     });
 
+    module.constant('MIN_DURATION', 250); // 0.25 seconds
+    module.constant('DEFAULT_DURATION', 4000); // 4 seconds
+
     module.controller("AppController", function($scope, $controller,
             EditorData, Workflow) {
 

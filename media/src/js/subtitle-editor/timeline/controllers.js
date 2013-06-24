@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.timeline.controllers', []);
 
-    module.controller('TimelineController', function($scope, $timeout, SubtitleStorage, VideoPlayer) {
+    module.controller('TimelineController', function($scope, $timeout, VideoPlayer, MIN_DURATION) {
         // Controls the scale of the timeline, currently we just set this to
         // 1.0 and leave it.
         $scope.scale = 1.0;
@@ -188,6 +188,7 @@
 
         $scope.$root.$on('sync-next-start-time', function($event) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
+            var syncTime = $scope.currentTime;
             if(willSync.start === null) {
                 if(willSync.end !== null && !willSync.end.isSynced()) {
                     /* Special case: the user hit the down arrow when only 1
@@ -195,15 +196,12 @@
                      * case, set the end time for that subtile
                      */
                     subtitleList.updateSubtitleTime(willSync.end,
-                        willSync.end.startTime, $scope.currentTime);
+                        willSync.end.startTime, syncTime);
                     scrollToSubtitle(willSync.end);
                     $scope.$root.$emit("work-done");
                 }
                 return;
             }
-            subtitleList.updateSubtitleTime(willSync.start,
-                $scope.currentTime, willSync.start.endTime);
-
             /* Check to see if we're setting the start time for the second
              * unsynced subtitle.  In this case, we should also set the end
              * time for the first.
@@ -211,9 +209,15 @@
 
             var prev = subtitleList.prevSubtitle(willSync.start);
             if(prev !== null && !prev.isSynced()) {
+                // Ensure that we give the previous subtitle MIN_DURATION
+                syncTime = Math.max(syncTime, prev.startTime + MIN_DURATION);
                 subtitleList.updateSubtitleTime(prev, prev.startTime,
-                    $scope.currentTime);
+                    syncTime);
             }
+
+            subtitleList.updateSubtitleTime(willSync.start,
+                syncTime, willSync.start.endTime);
+
             scrollToSubtitle(willSync.start);
             $scope.$root.$emit("work-done");
         });
