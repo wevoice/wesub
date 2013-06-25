@@ -189,7 +189,8 @@
         $scope.$root.$on('sync-next-start-time', function($event) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
             var syncTime = $scope.currentTime;
-            if(willSync.start === null) {
+            var subtitle = willSync.start;
+            if(subtitle === null) {
                 if(willSync.end !== null && !willSync.end.isSynced()) {
                     /* Special case: the user hit the down arrow when only 1
                      * subtitle was left and it had a start time set.  In this
@@ -207,28 +208,34 @@
              * time for the first.
              */
 
-            var prev = subtitleList.prevSubtitle(willSync.start);
+            var prev = subtitleList.prevSubtitle(subtitle);
             if(prev !== null && !prev.isSynced()) {
                 // Ensure that we give the previous subtitle MIN_DURATION
                 syncTime = Math.max(syncTime, prev.startTime + MIN_DURATION);
                 subtitleList.updateSubtitleTime(prev, prev.startTime,
                     syncTime);
+            } else if(subtitle.endTime != -1) {
+                syncTime = Math.min(syncTime, subtitle.endTime -
+                        MIN_DURATION);
             }
 
-            subtitleList.updateSubtitleTime(willSync.start,
-                syncTime, willSync.start.endTime);
+            subtitleList.updateSubtitleTime(subtitle, syncTime,
+                subtitle.endTime);
 
-            scrollToSubtitle(willSync.start);
+            scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
         });
         $scope.$root.$on('sync-next-end-time', function($event) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
-            if(willSync.end === null) {
+            var subtitle = willSync.end;
+            if(subtitle === null) {
                 return;
             }
-            subtitleList.updateSubtitleTime(willSync.end,
-                willSync.end.startTime, $scope.currentTime);
-            scrollToSubtitle(willSync.end);
+            var syncTime = Math.max($scope.currentTime, subtitle.startTime +
+                MIN_DURATION);
+            subtitleList.updateSubtitleTime(subtitle, subtitle.startTime,
+                syncTime);
+            scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
         });
     });

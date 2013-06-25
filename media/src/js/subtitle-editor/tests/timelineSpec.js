@@ -106,6 +106,23 @@ describe('TimelineController', function() {
             expect(subtitleList.subtitles[1].endTime).toBe(1800);
         });
 
+        it("respects MIN_DURATION when syncing start time", function() {
+            $scope.currentTime = subtitles[2].endTime-1;
+            $scope.$emit('work-done');
+            expect(willSyncChangedSpy).toHaveStartSub(subtitles[2]);
+            $scope.$emit("sync-next-start-time");
+            expect(subtitleList.subtitles[2].startTime)
+                .toBe(subtitles[2].endTime - MIN_DURATION);
+        });
+
+        it("respects MIN_DURATION when syncing end time", function() {
+            $scope.currentTime = subtitles[2].startTime;
+            $scope.$emit('work-done');
+            expect(willSyncChangedSpy).toHaveStartSub(subtitles[2]);
+            $scope.$emit("sync-next-end-time");
+            expect(subtitleList.subtitles[2].endTime)
+                .toBe(subtitles[2].startTime + MIN_DURATION);
+        });
     });
 
     describe('Subtitle syncing after the end of synced subs', function() {
@@ -148,7 +165,19 @@ describe('TimelineController', function() {
             expect(subtitles[firstIndex + 1].startTime).toBe(50500);
         });
 
-        it("respects MIN_DURATION", function() {
+        it("respects MIN_DURATION when syncing end time", function() {
+            var firstIndex = subtitleList.getIndex(
+                subtitleList.firstUnsyncedSubtitle());
+            $scope.currentTime = 50000
+            $scope.$emit('work-done');
+            expect(willSyncChangedSpy).toHaveStartSub(subtitles[firstIndex]);
+            $scope.$emit('sync-next-start-time');
+            $scope.$emit('sync-next-end-time');
+            expect(subtitles[firstIndex].startTime).toBe(50000);
+            expect(subtitles[firstIndex].endTime).toBe(50000 + MIN_DURATION);
+        });
+
+        it("respects MIN_DURATION when syncing start time", function() {
             var firstIndex = subtitleList.getIndex(
                 subtitleList.firstUnsyncedSubtitle());
             $scope.currentTime = 50000
