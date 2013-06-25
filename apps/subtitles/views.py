@@ -159,15 +159,17 @@ def subtitle_editor(request, video_id, language_code):
         return redirect(video)
 
     task = get_task_for_editor(video)
-    if task.assignee is None and can_assign_task(task, request.user):
-        task.assignee = request.user
-        task.save()
+    if task is not None:
+        if task.assignee is None and can_assign_task(task, request.user):
+            task.assignee = request.user
+            task.save()
 
-    if task.assignee != request.user:
-        messages.error(request, _("Another user is currently performing "
-                                  "the %s task for these subtitles" %
-                                  task.get_type_display()))
-        return redirect(video)
+        if task.assignee != request.user:
+            msg = _("Another user is currently performing "
+                    "the %s task for these subtitles" %
+                    task.get_type_display())
+            messages.error(request, msg)
+            return redirect(video)
 
     check_result = can_add_version(request.user, video, language_code)
     if not check_result:
