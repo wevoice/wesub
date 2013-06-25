@@ -330,6 +330,7 @@ unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event
             encodeURIComponent(this.getNotesContent_(this.currentSubtitlePanel_)): '';
     this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
         this.subtitles_.LANGUAGE + '/?from-old-editor=true' + notesURLPart;
+    this.forceSave_ = true;
     this.saveWork(false, true);
 };
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
