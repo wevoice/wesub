@@ -1,19 +1,19 @@
 // Amara, universalsubtitles.org
-// 
+//
 // Copyright (C) 2013 Participatory Culture Foundation
-// 
+//
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU Affero General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see 
+// along with this program.  If not, see
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 
@@ -51,7 +51,7 @@ function markdownToPlaintext(text) {
     var replacements = [
         { match: /(\*\*)([^\*]+)(\*\*)/g, replaceWith: "$2" },
         { match: /(\*)([^\*]+)(\*{1})/g, replaceWith: "$2" },
-        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" },
+        { match: /(_)([^_]+)(_{1})/g, replaceWith: "$2" }
     ];
 
     for (var i = 0; i < replacements.length; i++) {
@@ -445,7 +445,7 @@ var AmaraDFXPParser = function() {
         var subtitleContents = $subtitle.contents();
 
         for (var i = 0; i < subtitleContents.length; i++) {
-            
+
             // Single newlines in subtitle text nodes will report as two newlines
             // when we use contents().
             //
@@ -810,7 +810,7 @@ var AmaraDFXPParser = function() {
             // If the parent div is the first div, only remove the subtitle.
             if ($subtitleParent.get(0) === this.$firstDiv.get(0)) {
                 $subtitle.remove();
-            
+
             // Otherwise, remove the parent.
             } else {
                 $subtitleParent.remove();
@@ -859,7 +859,7 @@ var AmaraDFXPParser = function() {
         /*
          * Either get or set the startofparagraph for the subtitle.
          *
-         * A <div> element marks the start of a new paragraph, 
+         * A <div> element marks the start of a new paragraph,
          * therefore all first subtitles are start of paragraphs.
          * When we want to set it to true, we wrap that <p> inside
          * a <div> (checking that we're not already a first paragraph ).
@@ -901,7 +901,7 @@ var AmaraDFXPParser = function() {
                     // Move the new containing div after the original parent div.
                     $parentDiv.after($newDiv);
                 }
-            
+
             // startOfParagraph is false. Check to see if this is a valid subtitle to unmark
             // as a start of a paragraph. We can't unmark any non-first-children, or if the
             // subtitle is the first-child of the first div.
@@ -1062,7 +1062,7 @@ var AmaraDFXPParser = function() {
 return {
     AmaraDFXPParser: AmaraDFXPParser,
     markdownToHTML: markdownToHTML,
-    markdownToPlaintext: markdownToPlaintext,
+    markdownToPlaintext: markdownToPlaintext
 }
 
 })(window.AmarajQuery || window.jQuery);
