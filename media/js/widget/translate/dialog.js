@@ -232,7 +232,12 @@ unisubs.translate.Dialog.prototype.onWorkSaved = function() {
     unisubs.widget.ResumeEditingRecord.clear();
     this.getRightPanelInternal().showLoading(false);
     this.saved_ = true;
-    this.setVisible(false);
+    if(!this.exitURL || unisubs.isFromDifferentDomain()) {
+        this.setVisible(false);
+    } else {
+        // Hack to make open in the new editor work
+        window.location = this.exitURL;
+    }
 };
 unisubs.translate.Dialog.prototype.disposeInternal = function() {
     unisubs.translate.Dialog.superClass_.disposeInternal.call(this);
