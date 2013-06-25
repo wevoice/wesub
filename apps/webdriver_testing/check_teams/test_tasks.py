@@ -18,8 +18,9 @@ from apps.webdriver_testing.pages.editor_pages import unisubs_menu
 from apps.webdriver_testing.pages.editor_pages import dialogs
 from apps.webdriver_testing.pages.editor_pages import subtitle_editor
 from apps.webdriver_testing import data_helpers
-
+from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
+
 
 class TestCaseManualTasks(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
@@ -93,6 +94,8 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.menu = unisubs_menu.UnisubsMenu(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+
 
         #Create a partner user to own the team.
         cls.owner = UserFactory.create(is_partner=True)
@@ -131,6 +134,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -186,7 +190,11 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
                                              tv.title)
         self.assertEqual('Typing', self.sub_editor.dialog_title())
-        
+        self.video_pg.open_video_page(tv.video_id)
+        self.tasks_tab.handle_js_alert(action='accept')
+        en_tag, _ = self.video_pg.language_status('English')
+        self.assertEqual('original | incomplete', en_tag) 
+
     def test_transcription__permissions(self):
         """User must have permission to start a transcription task. 
         """
@@ -220,10 +228,10 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                 user=dict(username=self.contributor.username, 
                 password='password'))
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
-        self.create_modal.lang_selection(
-                new_language='English (incomplete)')
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+                                 % self.team.slug)
+
+        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', tv.title)
         sub_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
                                 'oneline.txt')
         self.sub_editor.edit_subs(sub_file)
@@ -313,10 +321,12 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.tasks_tab = TasksTab(cls)
         cls.videos_tab = VideosTab(cls)
-        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+
         cls.menu = unisubs_menu.UnisubsMenu(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
 
         #Create a partner user to own the team.
         cls.owner = UserFactory.create(is_partner=True)
@@ -856,3 +866,24 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                           password='password'))
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.assertFalse(self.video_lang_pg.displays_add_subtitles())
+
+    def test_transcription__resume_original_lang(self):
+        """Resuming task does not reset originl language. """
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
+        self.create_modal.lang_selection(video_language='English')
+        self.logger.info(dir(tv))
+        self.sub_editor.type_subs(self.subs_file)
+        self.sub_editor.save_and_exit()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all'
+                                 % self.team.slug)
+        self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
+                                             tv.title)
+        self.assertEqual('Typing', self.sub_editor.dialog_title())
+        self.video_pg.open_video_page(tv.video_id)
+        self.tasks_tab.handle_js_alert(action='accept')
+        en_tag, _ = self.video_pg.language_status('English')
+        self.assertEqual('original | incomplete', en_tag) 
