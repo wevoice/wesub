@@ -317,13 +317,17 @@ var angular = angular || null;
             });
         };
         $scope.showErrorModal = function(message) {
+            function onClose() {
+                // set changesMade to false to prevent the beforeunload code
+                // from double-checking with the user to close the page.
+                $scope.changesMade = false;
+                window.location = '/videos/' + $scope.videoId + "/";
+            }
 
             $scope.$root.$emit("show-modal", {
                 heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
                 buttons: [
-                    {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                        window.location = '/videos/' + $scope.videoId + "/";
-                    }}
+                    {'text': 'Close editor', 'class': 'no', 'fn': onClose}
                 ]
             });
             $scope.$root.$emit('show-modal-download');
