@@ -15,7 +15,9 @@ class VideoLanguagePage(VideoPage):
     _SUB_LINES = "div.translation-text"
     _VIEW_NOTICE = 'p.view-notice'
     _DRAFT_NOTICE = 'p.view-notice.draft'
-    
+    _NO_SUBS = 'p.empty'   
+
+ 
     #DELETE SUBTITLE LANGUAGE
      
     _DELETE_SUBTITLE_LANGUAGE = 'a[href*="delete-language"]'
@@ -81,11 +83,11 @@ class VideoLanguagePage(VideoPage):
         return r.headers
 
     def displays_subtitles(self):
-        try:
-            self.get_elements_list(self._SUB_LINES)
-            return True
-        except:
-            return None
+        subs =  self.get_elements_list(self._SUB_LINES)
+        if subs == None:
+            return self.get_text_by_css(self._NO_SUBS)
+        else:
+            return subs
 
     def is_draft(self):
         return self.is_element_visible(self._DRAFT_NOTICE)
