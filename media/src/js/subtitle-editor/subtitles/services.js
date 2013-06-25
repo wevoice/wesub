@@ -207,7 +207,7 @@ var angular = angular || null;
                     headers: authHeaders,
                     data:  {
                         complete: true,
-                        notes: notes,
+                        body: notes,
                         send_back: true,
                         version_number: versionNumber,
                     }
