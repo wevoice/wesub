@@ -107,11 +107,15 @@ class TestCaseVideoLangResource(WebdriverTestCase):
 
     def test_response__reviewer(self):
         team, owner = self._create_team()
+        member = TeamMemberFactory(team=team).user
+
         video, tv = self._create_video_with_complete_transcript(team, owner)
-        self.data_utils.complete_review_task(tv, 20, owner)
+        self.data_utils.complete_review_task(tv, 20, member)
+        self.data_utils.complete_approve_task(tv, 20, owner)
+
         url_part = ('videos/%s/languages/' % video.video_id)
         _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
-        self.assertIn(owner.username, response['objects'][0]['reviewer'])
+        self.assertIn(member.username, response['objects'][0]['reviewer'])
 
     def test_response__approver(self):
         team, owner = self._create_team()
