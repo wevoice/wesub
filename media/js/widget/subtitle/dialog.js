@@ -330,7 +330,6 @@ unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event
             encodeURIComponent(this.getNotesContent_(this.currentSubtitlePanel_)): '';
     this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
         this.subtitles_.LANGUAGE + '/?from-old-editor=true' + notesURLPart;
-    this.forceSave_ = true;
     this.saveWork(false, true);
 };
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
@@ -401,6 +400,18 @@ unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave, sa
     var notes = this.getNotesContent_(this.currentSubtitlePanel_);
     if (notes !== '') {
         this.serverModel_.setTaskNotes(notes);
+    }
+
+    if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles()) &&
+        !this.captionSet_.hasTitleChanged() &&
+        !this.captionSet_.hasDescriptionChanged() &&
+        this.exitURL) {
+        // No changes, but we want to go to the new subtitle editor.  Special
+        // case this and just to a redirect
+        this.saved_ = true;
+        window.location = this.exitURL;
+        return;
     }
 
     if (this.captionSet_.needsSync()) {
