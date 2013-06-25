@@ -27,6 +27,7 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
     unisubs.SubTracker.getInstance().start(true);
     this.opener_ = opener;
     this.subtitleState_ = subtitleState;
+    this.subtitles_ = subtitleState;
     this.standardSubState_ = standardSubState;
     this.serverModel_ = serverModel;
     this.serverModel_.init();
@@ -37,6 +38,7 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
             new unisubs.subtitle.EditableCaptionSet(this.standardSubState_.SUBTITLES));
 
     this.saved_ = false;
+    this.doneButtonEnabled_ = true;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.reviewOrApprovalType_ = reviewOrApprovalType;
     // if this is a review approve dialog, we must fetch saved notes for this task if available
@@ -281,6 +283,8 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.DONE, this.handleDoneKeyPress_).
         listen(
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
+        listen(
+            rightPanel, et.SAVEANDOPENINNEWEDITOR, this.handleSaveAndOpenInNewEditor_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
     var backButtonText = null;
