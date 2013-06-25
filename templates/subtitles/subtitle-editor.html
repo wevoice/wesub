@@ -154,9 +154,9 @@
                         <h2>{% trans "TITLE AND DESCRIPTION" %}</h2>
                         <div class="content" ng-show="!collapsed">
                             <h3>{% trans "TITLE" %}</h3>
-                            <p ng-bind="referenceSubtitles.title"></p>
+                            <p ng-bind="referenceSubtitles.getTitle()"></p>
                             <h3>{% trans "DESCRIPTION" %}</h3>
-                            <p ng-bind="referenceSubtitles.description"></p>
+                            <p ng-bind="referenceSubtitles.getDescription()"></p>
                         </div>
                     </div>
 

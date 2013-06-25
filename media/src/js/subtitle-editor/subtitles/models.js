@@ -572,10 +572,10 @@ var angular = angular || null;
             this.language = this.SubtitleStorage.getLanguage(code);
         },
         getTitle: function() {
-            return this.title;
+            return this.title || this.video.title;
         },
         getDescription: function() {
-            return this.description;
+            return this.description || this.video.description;
         },
     };
 
