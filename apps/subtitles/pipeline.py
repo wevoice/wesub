@@ -149,6 +149,19 @@ def _user_can_bypass_moderation(team_video, version, committer):
 
     return subtitles_are_complete and is_post_publish_edit and user_can_bypass
 
+def _set_language_for_subtitle_tasks(team_video, saved_version):
+    """Set the language attribute for subtitle tasks.
+
+    When tasks are created, we don't know the primary language, so subtitle
+    tasks might not have their language set.  We should set it when we save
+    the primary audio-language
+    """
+    if saved_version.subtitle_language.is_primary_audio_language():
+        subtitle_tasks = team_video.task_set.incomplete_subtitle()
+        for task in subtitle_tasks.filter(language=''):
+            task.language = saved_version.language_code
+            task.save()
+
 def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
                               complete):
     """Handle any existing tasks for this subtitle addition."""
@@ -184,6 +197,7 @@ def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
             # Also, if the subtitles are complete, we can mark that outstanding
             # subtitle/translate task as complete.
             if complete:
+                task.new_subtitle_version = version
                 task.complete()
 
     # Outstanding review/approve tasks will need to be handled elsewhere.
@@ -272,6 +286,8 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
         if workflow.review_allowed or workflow.approve_allowed:
             version.visibility = 'private'
             version.save()
+
+    _set_language_for_subtitle_tasks(team_video, version)
 
     # Okay, so now we have an appropriately-visibile version.  Next we see if
     # there are any outstanding tasks for this version/language.

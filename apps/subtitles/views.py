@@ -111,6 +111,24 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
+def assign_task_for_editor(video, user):
+    team_video = video.get_team_video()
+    if team_video is None:
+        return None
+    task_set = team_video.task_set.incomplete()
+    tasks = list(task_set[:1])
+    if tasks:
+        task = tasks[0]
+        if task.assignee is None and can_assign_task(task, user):
+            task.assignee = user
+            task.save()
+
+        if task.assignee != user:
+            return _("Another user is currently performing "
+                     "the %s task for these subtitles" %
+                     task.get_type_display())
+
+
 def get_task_for_editor(video):
     team_video = video.get_team_video()
     if team_video is None:
@@ -158,19 +176,11 @@ def subtitle_editor(request, video_id, language_code):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
+    error_message = assign_task_for_editor(video, request.user)
+    if error_message:
+        messages.error(request, error_message)
+        return redirect(video)
     task = get_task_for_editor(video)
-    if task is not None:
-        if task.assignee is None and can_assign_task(task, request.user):
-            task.assignee = request.user
-            task.save()
-
-        if task.assignee != request.user:
-            msg = _("Another user is currently performing "
-                    "the %s task for these subtitles" %
-                    task.get_type_display())
-            messages.error(request, msg)
-            return redirect(video)
-
     check_result = can_add_version(request.user, video, language_code)
     if not check_result:
         messages.error(request, check_result.message)
