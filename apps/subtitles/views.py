@@ -34,7 +34,7 @@ from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 
 
-from teams.permissions import can_add_version
+from teams.permissions import can_add_version, can_assign_task
 
 
 def _version_data(version):
@@ -111,11 +111,11 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
-def get_task_for_editor(video, user):
+def get_task_for_editor(video):
     team_video = video.get_team_video()
     if team_video is None:
         return None
-    task_set = user.task_set.incomplete().filter(team_video=team_video)
+    task_set = team_video.task_set.incomplete()
     # 2533: We can get 2 review tasks if we include translate/transcribe tasks
     # in the results.  This is because when we have a task id and the user
     # clicks endorse, we do the following:
@@ -128,6 +128,9 @@ def get_task_for_editor(video, user):
     # safest to just not send task_id in that case
     task_set = task_set.filter(type__in=(Task.TYPE_IDS['Review'],
                                          Task.TYPE_IDS['Approve']))
+    # This assumes there is only 1 incomplete tasks at once, hopefully that's
+    # a good enough assumption to hold until we dump tasks for the collae
+    # model.
     tasks = list(task_set[:1])
     if tasks:
         return tasks[0]
@@ -153,6 +156,17 @@ def subtitle_editor(request, video_id, language_code):
 
     if not editing_language.can_writelock(request.browser_id):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
+        return redirect(video)
+
+    task = get_task_for_editor(video)
+    if task.assignee is None and can_assign_task(task, request.user):
+        task.assignee = request.user
+        task.save()
+
+    if task.assignee != request.user:
+        messages.error(request, _("Another user is currently performing "
+                                  "the %s task for these subtitles" %
+                                  task.get_type_display()))
         return redirect(video)
 
     check_result = can_add_version(request.user, video, language_code)
@@ -203,7 +217,6 @@ def subtitle_editor(request, video_id, language_code):
         'savedNotes': request.GET.get('saved-notes', '')
     }
 
-    task = get_task_for_editor(video, request.user)
     if task:
         editor_data['task_id'] = task.id
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
