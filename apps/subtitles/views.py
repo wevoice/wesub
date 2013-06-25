@@ -87,7 +87,7 @@ def _language_data(language, editing_version, translated_from_version):
         'numVersions': language.num_versions,
         'versions': versions_data,
         'is_rtl': language.is_rtl(),
-        'is_primary_audio_language': language.is_primary_audio_language()
+        'is_original': language.is_primary_audio_language()
     }
 
 def regain_lock(request, video_id, language_code):

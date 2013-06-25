@@ -507,7 +507,11 @@ var angular = angular || null;
     });
 
     module.controller("SubtitleMetadataController", function($scope) {
-        $scope.collapsed = true;
+        // We should expand the section by default if we are not working with
+        // the original language.  That way translators will know that they
+        // should fill something out there.
+        var language = $scope.workingSubtitles.language;
+        $scope.collapsed = language.isPrimaryAudioLanguage;
         $scope.onExpanderClicked = function($event) {
             $scope.collapsed = !$scope.collapsed;
             $event.preventDefault();

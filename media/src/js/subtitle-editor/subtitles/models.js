@@ -555,16 +555,16 @@ var angular = angular || null;
             this.SubtitleStorage.getSubtitles(languageCode, versionNumber,
                     function(subtitleData) {
                 that.state = 'loaded';
-                that.title = subtitleData.title || that.video.title;
-                that.description = subtitleData.description || that.video.description;
+                that.title = subtitleData.title;
+                that.description = subtitleData.description;
                 that.subtitleList.loadXML(subtitleData.subtitlesXML);
             });
         },
         initEmptySubtitles: function(languageCode) {
             this.setLanguage(languageCode);
             this.versionNumber = null;
-            this.title = this.video.title;
-            this.description = this.video.description;
+            this.title = '';
+            this.description = '';
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
         },
@@ -572,10 +572,10 @@ var angular = angular || null;
             this.language = this.SubtitleStorage.getLanguage(code);
         },
         getTitle: function() {
-            return this.title || this.video.title;
+            return this.title;
         },
         getDescription: function() {
-            return this.description || this.video.description;
+            return this.description;
         },
     };
 

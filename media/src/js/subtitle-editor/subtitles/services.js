@@ -68,6 +68,7 @@ var angular = angular || null;
         } else {
             this.dir = 'ltr';
         }
+        this.isPrimaryAudioLanguage = responseData.is_original;
     }
 
     module.factory('SubtitleStorage', function($window, $http) {
