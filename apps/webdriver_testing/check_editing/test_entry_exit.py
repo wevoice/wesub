@@ -79,7 +79,6 @@ class TestCaseEntryExit(WebdriverTestCase):
 
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         self.video_pg.open_page('videos/watch/')
         self.video_pg.handle_js_alert('accept')
 
