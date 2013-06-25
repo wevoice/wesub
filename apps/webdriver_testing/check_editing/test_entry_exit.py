@@ -195,7 +195,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.approve_task()
         self.assertEqual(video.title, 
                          self.video_pg.video_title())
-        self.assertEqual(1, list(tv.task_set.all_approve().all()))
+        self.assertEqual(1, len(list(tv.task_set.all_approve().all())))
 
 
     def test_edit_approve_version(self):
@@ -254,7 +254,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.send_back_task()
         self.assertEqual(video.title, 
                          self.video_pg.video_title())
-        self.assertEqual(2, list(tv.task_set.all_translate().all()))
+        self.assertEqual(2, len(list(tv.task_set.all_translate().all())))
 
 
     def test_save_back_to_old(self):

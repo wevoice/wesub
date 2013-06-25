@@ -255,13 +255,13 @@ class TestCaseDraftVideos(WebdriverTestCase):
     def test_draft__guest_display(self):
         """Draft is not visible to guests in subtitle view."""
         self.video_lang_pg.open_video_lang_page(self.draft.video_id, 'en')
-        self.assertFalse(self.video_lang_pg.displays_subtitles())
+        self.assertIn('waiting to be moderated', self.video_lang_pg.displays_subtitles())
 
     def test_draft__nonmember_display(self):
         """Draft is not visible to non-members in subtitle view."""
         self.video_pg.log_in(self.nonmember.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.draft.video_id, 'en')
-        self.assertFalse(self.video_lang_pg.displays_subtitles())
+        self.assertIn('waiting to be moderated', self.video_lang_pg.displays_subtitles())
 
     def test_draft__member_display(self):
         """Draft is visible to members in subtitle view."""
