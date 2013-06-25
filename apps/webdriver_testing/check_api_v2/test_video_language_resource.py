@@ -126,6 +126,13 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
         self.assertIn(owner.username, response['objects'][0]['approver'])
 
-
+    def test_response__published(self):
+        team, owner = self._create_team()
+        video, tv = self._create_video_with_complete_transcript(team, owner)
+        self.data_utils.complete_review_task(tv, 20, owner)
+        self.data_utils.complete_approve_task(tv, 20, owner)
+        url_part = ('videos/%s/languages/' % video.video_id)
+        _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
+        self.assertTrue(response['objects'][0]['versions'][0]['published'])
 
  
