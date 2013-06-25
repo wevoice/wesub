@@ -111,8 +111,31 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
+def get_task_for_editor(video, user):
+    team_video = video.get_team_video()
+    if team_video is None:
+        return None
+    task_set = user.task_set.incomplete().filter(team_video=team_video)
+    # 2533: We can get 2 review tasks if we include translate/transcribe tasks
+    # in the results.  This is because when we have a task id and the user
+    # clicks endorse, we do the following:
+    #    - save the subtitles
+    #    - save the task, setting subtitle_version to the version that we just
+    #    saved
+    #
+    # However, the task code creates a task on both of those steps.  I'm not
+    # sure exactly what the old editor does to make this not happen, but it's
+    # safest to just not send task_id in that case
+    task_set = task_set.filter(type__in=(Task.TYPE_IDS['Review'],
+                                         Task.TYPE_IDS['Approve']))
+    tasks = list(task_set[:1])
+    if tasks:
+        return tasks[0]
+    else:
+        return None
+
 @login_required
-def subtitle_editor(request, video_id, language_code, task_id=None):
+def subtitle_editor(request, video_id, language_code):
     '''
     Renders the subtitle-editor page, with all data neeeded for the UI
     as a json object on the html document.
@@ -180,7 +203,7 @@ def subtitle_editor(request, video_id, language_code, task_id=None):
         'savedNotes': request.GET.get('saved-notes', '')
     }
 
-    task = task_id and Task.objects.get(pk=task_id)
+    task = get_task_for_editor(video, request.user)
     if task:
         editor_data['task_id'] = task.id
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
