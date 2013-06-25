@@ -1134,6 +1134,8 @@ section.collab {
         position: fixed;
         right: 0;
         min-width: 250px;
+        width: 26%;
+        border-left: 1px solid #DADBDC;
         z-index: 52;
 
         a.toggle-pane {

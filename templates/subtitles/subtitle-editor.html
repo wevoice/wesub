@@ -351,11 +351,15 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                 Open Collab
             </a>
             <aside ng-show="modulesEnabled.pane && modulesOpen.pane">
+            <!--
+            2534: always keep the collab panel open when we use it.
+            We should uncomment this when the collab code gets integrated
                 <a class="toggle-pane"
                    ng-click="toggleDocking('pane')"
                    ng-show="modulesOpen.pane">
                     Close Collab
                 </a>
+                -->
                 <div class="notes module"
                      ng-show="modulesEnabled.notes"
                      ng-class="{open: modulesOpen.notes}">
