@@ -414,17 +414,8 @@ var USER_IDLE_MINUTES = 5;
                             scope.versionNumber = this.value;
                             scope.$digest();
                         });
-                        if(attrs.initialVersionNumber != "") {
-                            var versionNumber = attrs.initialVersionNumber;
-                        } else {
-                            var versionNumber = null;
-                        }
-
-                        SubtitleStorage.getLanguages(function(languages){
-                            scope.setInitialDisplayLanguage(
-                                languages,
-                                attrs.initialLanguageCode,
-                                versionNumber);
+                        SubtitleStorage.getLanguages(function(languages) {
+                            scope.setInitialDisplayLanguage(languages);
                         });
                     }
                 };

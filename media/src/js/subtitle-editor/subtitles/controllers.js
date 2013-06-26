@@ -117,17 +117,28 @@ var angular = angular || null;
                     $scope.language.language_code);
         }
 
-        $scope.setInitialDisplayLanguage = function(allLanguages, languageCode, versionNumber){
+        function pickInitialLanguage() {
+            if(!$scope.languages) {
+                return null;
+            }
+            // try to pick the primary audio language
+            for(var i = 0; i < $scope.languages.length; i++) {
+                var language = $scope.languages[i];
+                if(language.is_original) {
+                    return language;
+                }
+            }
+            // fall back on picking the first language
+            return $scope.languages[0];
+        }
+
+        $scope.setInitialDisplayLanguage = function(allLanguages) {
 
             // Hide the loading modal
             $scope.$root.$emit('hide-modal');
             $scope.languages = allLanguages;
-            $scope.language = _.find(allLanguages, function(item) {
-                return item.language_code == languageCode;
-            });
-            if(versionNumber !== null) {
-                $scope.languageChanged($scope.language, versionNumber);
-            }
+            $scope.language = pickInitialLanguage();
+            $scope.languageChanged($scope.language, versionNumber);
         }
 
         $scope.$watch('language', function(newValue, oldValue) {

@@ -126,8 +126,6 @@
             </div>
             <div class="language-selections group"
                 language-selector
-                 initial-version-number="{{ translated_from_version.version_number }}"
-                 initial-language-code="{% firstof translated_from_version.subtitle_language.language_code language.language_code %}"                        ng-model="language"
                  ng-controller="LanguageSelectorController">
                 <div class="select">
                     <select name="language"
