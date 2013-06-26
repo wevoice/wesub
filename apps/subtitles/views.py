@@ -111,11 +111,11 @@ def release_lock(request, video_id, language_code):
 
     return HttpResponse(json.dumps({'url': reverse('videos:video', args=(video_id,))}))
 
-def assign_task_for_editor(video, user):
+def assign_task_for_editor(video, language_code, user):
     team_video = video.get_team_video()
     if team_video is None:
         return None
-    task_set = team_video.task_set.incomplete()
+    task_set = team_video.task_set.incomplete().filter(language=language_code)
     tasks = list(task_set[:1])
     if tasks:
         task = tasks[0]
@@ -129,11 +129,11 @@ def assign_task_for_editor(video, user):
                      task.get_type_display())
 
 
-def get_task_for_editor(video):
+def get_task_for_editor(video, language_code):
     team_video = video.get_team_video()
     if team_video is None:
         return None
-    task_set = team_video.task_set.incomplete()
+    task_set = team_video.task_set.incomplete().filter(language=language_code)
     # 2533: We can get 2 review tasks if we include translate/transcribe tasks
     # in the results.  This is because when we have a task id and the user
     # clicks endorse, we do the following:
@@ -176,11 +176,11 @@ def subtitle_editor(request, video_id, language_code):
         messages.error(request, _("You can't edit this subtitle because it's locked"))
         return redirect(video)
 
-    error_message = assign_task_for_editor(video, request.user)
+    error_message = assign_task_for_editor(video, language_code, request.user)
     if error_message:
         messages.error(request, error_message)
         return redirect(video)
-    task = get_task_for_editor(video)
+    task = get_task_for_editor(video, language_code)
     check_result = can_add_version(request.user, video, language_code)
     if not check_result:
         messages.error(request, check_result.message)
