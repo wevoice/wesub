@@ -160,6 +160,7 @@ class TestCaseCenter(WebdriverTestCase):
     def tearDown(self):
         if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
             self.editor_pg.exit()
+        self.wait_for_element_present('body')
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
