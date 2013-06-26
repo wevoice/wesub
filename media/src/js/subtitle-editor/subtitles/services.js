@@ -63,6 +63,7 @@ var angular = angular || null;
         this.responseData = responseData;
         this.name = responseData.name;
         this.code = responseData.language_code;
+        this.versions = responseData.versions;
         if(responseData.is_rtl) {
             this.dir = 'rtl';
         } else {
@@ -111,6 +112,11 @@ var angular = angular || null;
                 return cachedData;
             },
             getLanguages: function(callback) {
+                function invokeCallback(languagesData) {
+                    callback(_.map(languagesData, function(langData) {
+                        return new Language(langData);
+                    }));
+                }
 
                 // If there are no languages in our cached data, ask the API.
                 if (cachedData.languages && cachedData.languages.length === 0) {
@@ -119,12 +125,12 @@ var angular = angular || null;
 
                     $http.get(url).success(function(response) {
                         cachedData.languages = response.objects;
-                        callback(response.objects);
+                        invokeCallback(response.objects);
                     });
 
                 // If we have cached languages, just call the callback.
                 } else {
-                    callback(cachedData.languages);
+                    invokeCallback(cachedData.languages);
                 }
             },
             getLanguage: function(languageCode) {
