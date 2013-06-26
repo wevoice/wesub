@@ -39,6 +39,7 @@ class EditorPage(UnisubsPage):
     _REFERENCE_SELECT = "div.language-selections div select[name='language']"
     _VERSION_SELECT = "div.language-selections select[name='version']"
     _REF_SUB_ITEM = 'div.reference ul li.subtitle-list-item'
+    _REF_METADATA_EXPANDER = 'div.reference div.metadata a'
 
     #CENTER COLUMN
     _VIDEO_TITLE = "section.video span.video-title"
@@ -54,6 +55,7 @@ class EditorPage(UnisubsPage):
     _INFO_DETAILS = 'div.info-tray tr'
     _ADD_SUB_TO_END = 'a.end'
     _TIMELINE_DISPLAY = 'a.timeline-display span'
+    _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
 
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
@@ -71,8 +73,10 @@ class EditorPage(UnisubsPage):
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
 
-    def open_editor_page(self, video_id, lang):
+    def open_editor_page(self, video_id, lang, close_metadata=True):
         self.open_page(self._URL.format(video_id, lang))
+        if close_metadata:
+            self.close_metadata()
 
     def keyboard_controls_help(self):
         pass
@@ -160,6 +164,15 @@ class EditorPage(UnisubsPage):
                 subs.append(el.text)
         return subs
 
+    def close_metadata(self):
+        self.logger.info('closing the metadata')
+        work_el = self.is_element_present(self._WORKING_METADATA_EXPANDER)
+        if 'collapsed' not in work_el.get_attribute('class'):
+            work_el.click()
+
+        ref_el = self.is_element_present(self._REF_METADATA_EXPANDER)
+        if 'collapsed' not in ref_el.get_attribute('class'):
+            ref_el.click()
 
     def working_language(self):
         """Return the curren working language displayed. """
