@@ -415,7 +415,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         
 
     def test_draft__task_assignee(self):
-        """Edit Subtitles active for task assignee.
+        """Edit Subtitles inactive for task assignee, edit via tasks panel.
 
         """
         video, tv = self._add_team_video()
@@ -424,11 +424,31 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(self.contributor.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual('active', self.video_lang_pg.edit_subtitles_active())
+        self.assertEqual(self.video_lang_pg.EDIT_VIA_TASK_TEXT,
+                         self.video_lang_pg.edit_subtitles_active())
+
+
+    def test_draft__task_unassigned(self):
+        """Edit Subtitles inactive for unassigned task, edit via tasks panel.
+
+        """
+        member2 = TeamContributorMemberFactory(team=self.team).user
+
+        video, tv = self._add_team_video()
+        subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
+        self._upload_en_draft(video, subs, user=self.contributor)
+        task = list(tv.task_set.incomplete_subtitle().filter(language='en'))[0]
+        task.assignee = None
+        task.save()
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.log_in(member2.username, 'password')
+        self.video_lang_pg.page_refresh()
+        self.assertEqual(self.video_lang_pg.EDIT_VIA_TASK_TEXT, 
+                         self.video_lang_pg.edit_subtitles_active())
 
 
     def test_draft__not_task_assignee(self):
-        """Edit Subtitles active for member when task not assigned.
+        """Edit Subtitles inactive for member not assigned task, no permission.
 
         """
         member2 = TeamContributorMemberFactory(team=self.team).user
@@ -439,7 +459,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.page_refresh()
-        self.assertEqual('active', 
+        self.assertEqual(self.video_lang_pg.EDIT_INACTIVE_TEXT, 
                          self.video_lang_pg.edit_subtitles_active())
 
 
