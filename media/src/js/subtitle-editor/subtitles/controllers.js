@@ -131,9 +131,6 @@ var angular = angular || null;
         }
 
         $scope.setInitialDisplayLanguage = function(allLanguages) {
-
-            // Hide the loading modal
-            $scope.$root.$emit('hide-modal');
             $scope.languages = allLanguages;
             $scope.language = pickInitialLanguage();
             $scope.languageChanged($scope.language, "");
