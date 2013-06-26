@@ -138,7 +138,7 @@ var angular = angular || null;
             $scope.$root.$emit('hide-modal');
             $scope.languages = allLanguages;
             $scope.language = pickInitialLanguage();
-            $scope.languageChanged($scope.language, versionNumber);
+            $scope.languageChanged($scope.language, "");
         }
 
         $scope.$watch('language', function(newValue, oldValue) {
