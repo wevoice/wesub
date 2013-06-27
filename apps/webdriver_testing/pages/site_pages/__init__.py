@@ -41,6 +41,9 @@ class UnisubsPage(Page):
         if self.is_text_present(self._ERROR_MESSAGE, message):
             return True
 
+    def get_message(self):
+        return self.get_text_by_css(self._MESSAGE)
+
     def success_message_present(self, message):
         self.logger.info('Check if success message present')
         self.wait_for_element_present(self._MESSAGE, wait_time=15)
