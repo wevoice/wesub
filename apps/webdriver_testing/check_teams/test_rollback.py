@@ -498,7 +498,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.log_in(member2.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
-        self.assertTrue(self.video_lang_pg.rollback_exists())
+        self.assertFalse(self.video_lang_pg.rollback_exists())
 
 
 
