@@ -68,8 +68,8 @@ class EditorPage(UnisubsPage):
 
     #RIGHT COLUMN
 
-    _NEXT_STEP = 'button.next-step'
-
+    _NEXT_STEP = 'div.substeps div button.next-step'
+    _ENDORSE = 'div.substeps button.endorse'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
 
@@ -306,10 +306,12 @@ class EditorPage(UnisubsPage):
 
     def approve_task(self):
         self.click_by_css(self._APPROVE)
+        self.wait_for_element_not_present(self._APPROVE)
 
 
     def send_back_task(self): 
-        self.click_by_css(self._SEND_BACK)       
+        self.click_by_css(self._SEND_BACK)
+        self.wait_for_element_not_present(self._SEND_BACK)       
 
     def exit_to_full_editor(self):
         """Click exit and return to the full editor. """
@@ -343,9 +345,22 @@ class EditorPage(UnisubsPage):
         time.sleep(10)
 
     def start_next_step(self):
-        self.click_by_css(self._NEXT_STEP)
+        els = self.get_elements_list(self._NEXT_STEP)
+        for el in els:
+            if el.is_displayed():
+                el.click()
+                return
+
+    def endorse_subs(self):
+        self.click_by_css(self._ENDORSE, self._EXIT_BUTTON)
+        self.click_by_css(self._EXIT_BUTTON)
 
     def next_step(self):
+        els = self.get_elements_list(self._NEXT_STEP)
+        for el in els:
+            if el.is_displayed():
+                return el.text
+
         return self.get_text_by_css(self._NEXT_STEP)
 
     def sync(self, num_subs, sub_length=3, sub_space=None):
