@@ -1,61 +1,140 @@
-# -*- coding: utf-8 -*-
-# Amara, universalsubtitles.org
-#
-# Copyright (C) 2013 Participatory Culture Foundation
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as
-# published by the Free Software Foundation, either version 3 of the
-# License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with this program. If not, see
-# http://www.gnu.org/licenses/agpl-3.0.html.
+from __future__ import absolute_import
 
 from django.test import TestCase
+import mock
 
-from apps.videos import metadata_manager
-from apps.videos.models import Video
-from apps.videos.tests.data import (
-    get_video, make_subtitle_language, make_subtitle_version
-)
+from utils import test_factories, test_utils
+from videos.models import Video
+from videos.search_indexes import VideoIndex
+from subtitles import pipeline
 
+class MetadataFieldsTest(TestCase):
+    def setUp(self):
+        TestCase.setUp(self)
+        self.video = test_factories.create_video()
+    
+    def test_metadata_starts_blank(self):
+        version = pipeline.add_subtitles(self.video, 'en', None)
+        self.assertEquals(self.video.get_metadata(), [])
+        self.assertEquals(version.get_metadata(), [])
 
-class TestMetadataManager(TestCase):
-    def test_language_count(self):
-        video = get_video()
-        video_pk = video.pk
+    def test_add_metadata(self):
+        metadata=[
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata)
+        self.assertEquals(version.get_metadata(),  metadata)
+        # should also add the fields to the video
+        self.assertEquals(self.video.get_metadata(),  metadata)
 
-        def _assert_count(n):
-            metadata_manager.update_metadata(video_pk)
-            video = Video.objects.get(pk=video_pk)
-            self.assertEqual(video.languages_count, n)
+    def test_add_metadata_twice(self):
+        metadata_1 = [
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        metadata_2 = [
+                ('speaker-name', 'Santa2'),
+                ('location', 'North Pole2'),
+        ]
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_1)
+        version2 = pipeline.add_subtitles(self.video, 'en', None,
+                                          metadata=metadata_2)
+        self.assertEquals(version2.get_metadata(),  metadata_2)
+        self.assertEquals(version.get_metadata(),  metadata_1)
+        # video should have the values given the first time
+        self.assertEquals(self.video.get_metadata(),  metadata_1)
 
-        _assert_count(0)
+    def test_new_languages_get_metadata(self):
+        metadata = [
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata)
+        version2 = pipeline.add_subtitles(self.video, 'fr', None,
+                                          metadata=None)
+        self.assertEquals(version2.get_metadata(),  metadata)
 
-        # Empty languages do not count toward the language count!
-        sl_en = make_subtitle_language(video, 'en')
-        _assert_count(0)
+    def test_additional_field_in_update(self):
+        metadata_1 = [
+                ('speaker-name', 'Santa'),
+        ]
+        metadata_2 = [
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        # version 1 only has 1 field
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_1)
+        # version 2 only has 2 fields
+        version2 = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_2)
+        # we should add the additional field to both the version and the video
+        updated_video = Video.objects.get(pk=self.video.pk)
+        self.assertEquals(version2.get_metadata(),  metadata_2)
+        self.assertEquals(updated_video.get_metadata(),  metadata_2)
 
-        # Neither do empty versions.
-        make_subtitle_version(sl_en, subtitles=[])
-        _assert_count(0)
+    def test_field_missing_in_update(self):
+        metadata_1 = [
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        metadata_2 = [
+                ('location', 'Workshop'),
+        ]
+        # version 1 only has 2 fields
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_1)
+        # version 2 only has 1 field
+        version2 = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_2)
+        # version2 should inherit the value for speaker name from the
+        # video/version 1 and override the value for location
+        self.assertEquals(version2.get_metadata(), [
+            ('speaker-name', 'Santa'),
+            ('location', 'Workshop'),
+        ])
 
-        # But languages with non-empty versions do.
-        make_subtitle_version(sl_en, subtitles=[(100, 200, 'foo')])
-        _assert_count(1)
+    def test_order_different_in_update(self):
+        metadata_1 = [
+                ('speaker-name', 'Santa'),
+                ('location', 'North Pole'),
+        ]
+        metadata_2 = [
+                ('location', 'North Pole'),
+                ('speaker-name', 'Santa'),
+        ]
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_1)
+        version2 = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=metadata_2)
+        # We should order fields in the order the were first added in
+        self.assertEquals(version2.get_metadata(),  metadata_1)
 
-        # One more for good measure.
-        sl_fr = make_subtitle_language(video, 'fr')
-        _assert_count(1)
+    def test_metadata_labels(self):
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=[
+                                             ('speaker-name', 'Santa'),
+                                             ('location', 'North Pole'),
+                                         ])
+        self.assertEquals(version.get_metadata().convert_for_display(), [
+            ('Speaker Name', 'Santa'),
+            ('Location', 'North Pole'),
+        ])
 
-        make_subtitle_version(sl_fr, subtitles=[])
-        _assert_count(1)
-
-        make_subtitle_version(sl_fr, subtitles=[(100, 200, 'bar')])
-        _assert_count(2)
+    def test_metadata_labels_are_translated(self):
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=[
+                                             ('speaker-name', 'Santa'),
+                                             ('location', 'North Pole'),
+                                         ])
+        with mock.patch('apps.videos.metadata._') as mock_gettext:
+            mock_gettext.return_value = 'Mock Translation'
+            metadata = version.get_metadata()
+            self.assertEquals(metadata.convert_for_display(), [
+                ('Mock Translation', 'Santa'),
+                ('Mock Translation', 'North Pole'),
+            ])
