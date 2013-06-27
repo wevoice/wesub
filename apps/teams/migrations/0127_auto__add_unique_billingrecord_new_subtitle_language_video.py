@@ -7,7 +7,32 @@ from django.db import models
 class Migration(SchemaMigration):
     
     def forwards(self, orm):
-        
+
+        # clean up data before migrating
+        # WARNING!  This is a destructive operation, you should definitely
+        # back up before running this one
+
+        # Delete data with NULL values that makes it not useful
+        db.execute("DELETE FROM teams_billingrecord "
+                   "WHERE video_id IS NULL OR "
+                   "new_subtitle_language_id IS NULL")
+
+        # if we have data that violates the unique constraint below, then only
+        # keep the first record.  Note the crazy double-subquery to bypass
+        # MySQL's limitations on deletes and subqueries
+        db.execute("""\
+DELETE FROM teams_billingrecord WHERE id in (SELECT id FROM (
+SELECT id from teams_billingrecord tb 
+JOIN (SELECT video_id, new_subtitle_language_id, MIN(id) AS min_id
+      FROM teams_billingrecord
+      GROUP BY new_subtitle_language_id, video_id
+      HAVING count(*) > 1) subquery
+ON tb.video_id = subquery.video_id AND
+   tb.new_subtitle_language_id = subquery.new_subtitle_language_id AND
+   tb.id != subquery.min_id
+   ) x)""")
+
+
         # Adding unique constraint on 'BillingRecord', fields ['new_subtitle_language', 'video']
         db.create_unique('teams_billingrecord', ['new_subtitle_language_id', 'video_id'])
     
