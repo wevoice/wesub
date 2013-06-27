@@ -226,9 +226,11 @@ class SubtitleEditor(EditorDialogs):
                 el.click()
                 return
 
-    def open_in_beta_editor(self):
+    def open_in_beta_editor(self, mark_complete=True, click_saved=True):
         self.click_by_css(self._NEW_EDITOR_BETA)
-        self.mark_subs_complete(complete=True)
-        self.click_saved_ok()
+        if mark_complete:
+            self.mark_subs_complete(complete=False)
+        if click_saved:
+            self.click_saved_ok()
 
         
