@@ -55,7 +55,7 @@ class TestCaseLeftSide(WebdriverTestCase):
         """Default reference lang for forked translation is the same lang. """
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'sv')
-        self.assertEqual('Swedish', self.editor_pg.selected_ref_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
 
 
     def test_reference_lang__primary(self):
@@ -160,7 +160,7 @@ class TestCaseCenter(WebdriverTestCase):
     def tearDown(self):
         if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
             self.editor_pg.exit()
-        self.wait_for_element_present('body')
+        self.editor_pg.wait_for_element_present('body')
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
