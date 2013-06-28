@@ -13,7 +13,7 @@ class Migration(DataMigration):
             # use raw SQL to make this go much faster
             db.execute("UPDATE videos_action va "
                        "SET va.new_language_id = "
-                       "(SELECT new_language_id "
+                       "(SELECT new_subtitle_language_id "
                        " FROM videos_subtitlelanguage sl "
                        " WHERE sl.id = va.language_id)")
     
