@@ -4,28 +4,18 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
-from utils.chunkediter import chunkediter
-
-def get_new_language(old_sl):
-    if old_sl:
-        return old_sl.new_subtitle_language
 
 class Migration(DataMigration):
     
     def forwards(self, orm):
         "Write your forwards methods here."
         if not db.dry_run:
-            for a in chunkediter(orm.Action.objects.all()):
-                if a.language:
-                    try:
-                        a.new_language = get_new_language(a.language)
-                        a.save()
-                    except ObjectDoesNotExist:
-                        # Some actions seem to have bad data in their foreign keys (on
-                        # dev at least).  There's nothing we can do for them, so
-                        # we'll just skip them.
-                        pass
-    
+            # use raw SQL to make this go much faster
+            db.execute("UPDATE videos_action va "
+                       "SET va.new_language_id = "
+                       "(SELECT new_language_id "
+                       " FROM videos_subtitlelanguage sl "
+                       " WHERE sl.id = va.language_id)")
     
     def backwards(self, orm):
         "Write your backwards methods here."
