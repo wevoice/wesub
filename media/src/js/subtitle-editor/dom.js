@@ -32,7 +32,9 @@ var angular = angular || null;
                 elm.val(newVal).trigger('autosize');
             });
             elm.on('change', function() {
-                getter.assign(scope, elm.val());
+                scope.$apply(function() {
+                    getter.assign(scope, elm.val());
+                });
             });
         }
     });

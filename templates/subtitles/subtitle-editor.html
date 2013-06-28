@@ -288,6 +288,10 @@ subtitle-repeat directive, see the working subtitles for more info
                             <textarea placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
                             <h3>{% trans "DESCRIPTION" %}</h3>
                             <textarea placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
+                            <div ng-repeat="field in workingSubtitles.metadata">
+                                <h3>[[ field[0] | metadataTypeName ]]</h2>
+                                <textarea autosize-bind="workingSubtitles.metadata[$index][1]"></textarea>
+                            </div>
                         </div>
                     </div>
                     <ul subtitle-list="working-subtitle-set"

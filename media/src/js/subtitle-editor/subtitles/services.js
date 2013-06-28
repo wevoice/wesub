@@ -207,7 +207,7 @@ var angular = angular || null;
 
             },
             saveSubtitles: function(videoID, languageCode, dfxpString, title,
-                                   description, isComplete) {
+                                   description, metadata, isComplete) {
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
                 // if isComplete is not specified as true or false, we send
                 // null, which means keep the complete flag the same as before
@@ -226,6 +226,7 @@ var angular = angular || null;
                         sub_format: 'dfxp',
                         title: title,
                         description: description,
+                        metadata: metadata,
                         is_complete: isComplete,
                     }
                 });
