@@ -148,8 +148,6 @@ class TestCaseEntryExit(WebdriverTestCase):
         return video, tv
 
 
-
-
     def test_review_to_new(self):
         self._old_to_new_sv_review()
         self.assertEqual('English', self.editor_pg.selected_ref_language())
@@ -192,16 +190,6 @@ class TestCaseEntryExit(WebdriverTestCase):
         sv = video.subtitle_language('sv').get_tip(full=True)
         self.assertEqual(5, sv.version_number)
 
-
-    def test_review_to_new_send_back(self):
-        """Start Review task, switch to new editor and endorse 
-
-        """
-        video, tv = self._old_to_new_sv_review()
-        self.editor_pg.send_back_task()
-        self.assertEqual(video.title, 
-                         self.video_pg.video_title())
-        self.assertEqual(2, len(list(tv.task_set.all_translate().all())))
 
 
     def test_save_back_to_old(self):

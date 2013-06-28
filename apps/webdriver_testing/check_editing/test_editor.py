@@ -158,9 +158,9 @@ class TestCaseCenter(WebdriverTestCase):
         
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
         if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
             self.editor_pg.exit()
-        self.editor_pg.wait_for_element_present('body')
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
@@ -265,7 +265,6 @@ class TestCaseCenter(WebdriverTestCase):
         self.logger.info('checking subs on single version forked')
         self.editor_pg.open_editor_page(video.video_id, 'nl')
         self.assertEqual(6, len(self.editor_pg.working_text()))
-        self.assertEqual(6, len(self.editor_pg.reference_text()))
 
     def test_sync_subs(self):
         """Sync subtitles """
