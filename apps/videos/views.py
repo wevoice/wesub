@@ -301,6 +301,7 @@ def video(request, video, video_url=None, title=None):
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
+    context['metadata'] = video.get_metadata().convert_for_display()
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
     context['language_list'] = LanguageList(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
@@ -542,6 +543,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['rollback_allowed'] = version and version.next_version() is not None
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
+    context['metadata'] = version.get_metadata().convert_for_display()
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)

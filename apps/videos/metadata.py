@@ -94,9 +94,15 @@ class MetadataContentField(models.CharField):
 
 class MetadataFieldList(list):
     def convert_for_display(self):
-        """Convert the types in this list to human-friendly labels."""
-        return [(_(name_to_label[name]), content)
-                for name, content in self]
+        """Convert the types in this list to human-friendly labels.
+
+        Also converts the tuples to a dict for easy use in the template system
+        """
+
+        return [{
+            'label': _(name_to_label[name]),
+            'content': content,
+        } for name, content in self]
 
 def get_fields_for_video(video):
     """Get a list of metadata for a video

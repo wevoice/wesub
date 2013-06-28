@@ -114,18 +114,18 @@ class MetadataFieldsTest(TestCase):
         # We should order fields in the order the were first added in
         self.assertEquals(version2.get_metadata(),  metadata_1)
 
-    def test_metadata_labels(self):
+    def test_metadata_display(self):
         version = pipeline.add_subtitles(self.video, 'en', None,
                                          metadata=[
                                              ('speaker-name', 'Santa'),
                                              ('location', 'North Pole'),
                                          ])
         self.assertEquals(version.get_metadata().convert_for_display(), [
-            ('Speaker Name', 'Santa'),
-            ('Location', 'North Pole'),
+            { 'label': 'Speaker Name', 'content': 'Santa'},
+            { 'label': 'Location', 'content': 'North Pole'},
         ])
 
-    def test_metadata_labels_are_translated(self):
+    def test_metadata_display_is_translated(self):
         version = pipeline.add_subtitles(self.video, 'en', None,
                                          metadata=[
                                              ('speaker-name', 'Santa'),
@@ -135,6 +135,6 @@ class MetadataFieldsTest(TestCase):
             mock_gettext.return_value = 'Mock Translation'
             metadata = version.get_metadata()
             self.assertEquals(metadata.convert_for_display(), [
-                ('Mock Translation', 'Santa'),
-                ('Mock Translation', 'North Pole'),
+                { 'label': 'Mock Translation', 'content': 'Santa'},
+                { 'label': 'Mock Translation', 'content': 'North Pole'},
             ])

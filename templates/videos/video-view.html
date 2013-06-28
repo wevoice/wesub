@@ -74,6 +74,11 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display_unabridged }}</a>
         </h2>
+        <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
+            {% for field in metadata %}
+                <h4>{{ field.label}}: {{ field.content}} </h4>
+            {% endfor %}
+        </div>
         {% with video.description as description %}
             <div id="description"{% if description|length > 300 %} class="abbr collapsed"{% endif %}>
                 <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
