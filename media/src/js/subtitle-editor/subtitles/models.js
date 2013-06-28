@@ -542,6 +542,7 @@ var angular = angular || null;
         this.title = null;
         this.description = null;
         this.state = 'waiting';
+        this.metadata = [];
     }
 
     SubtitleVersionManager.prototype = {
@@ -556,8 +557,9 @@ var angular = angular || null;
                     function(subtitleData) {
                 that.state = 'loaded';
                 that.title = subtitleData.title;
+                that.metadata = subtitleData.metadata;
                 that.description = subtitleData.description;
-                that.subtitleList.loadXML(subtitleData.subtitlesXML);
+                that.subtitleList.loadXML(subtitleData.subtitles);
             });
         },
         initEmptySubtitles: function(languageCode) {

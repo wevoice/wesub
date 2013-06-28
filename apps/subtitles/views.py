@@ -43,8 +43,8 @@ def _version_data(version):
     into json and bootstrapping the editor.
     '''
     return {
-        'number': version.version_number,
-        'subtitlesXML': version.get_subtitles().to_xml(),
+        'metadata': version.get_metadata(),
+        'subtitles': version.get_subtitles().to_xml(),
         'title': version.title,
         'description': version.description,
     }
@@ -61,7 +61,7 @@ def _language_data(language, editing_version, translated_from_version):
     for version in language.subtitleversion_set.full():
         version_data = {
             'version_no':version.version_number,
-            'visibility': visibility_display(version)
+            'visibility': visibility_display(version),
         }
         if editing_version and editing_version == version and \
             editing_version.subtitle_language == language:
