@@ -156,7 +156,7 @@
                             <h3>{% trans "description" %}</h3>
                             <p ng-bind="referenceSubtitles.getDescription()"></p>
                             <div ng-repeat="field in referenceSubtitles.metadata">
-                                <h3>[[ field[0] ]]</h2>
+                                <h3>[[ field[0] | metadataTypeName ]]</h2>
                                 <p>[[ field[1] ]]</p>
                             </div>
                         </div>

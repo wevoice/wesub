@@ -91,5 +91,19 @@ var angular = angular || null;
             return res;
         }
     })
+    module.filter('metadataTypeName', function(){
+        // FIXME: the labels should be localized
+        var typeNameMap = {
+            'speaker-name': 'Speaker Name',
+            'location': 'Location',
+        };
+        return function metadataTypeName(typeName) {
+            if(typeName in typeNameMap) {
+                return typeNameMap[typeName];
+            } else {
+                return typeName;
+            }
+        }
+    })
 
 }).call(this);
