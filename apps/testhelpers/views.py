@@ -1,4 +1,4 @@
-import os, json,  time, datetime
+import os, json
 from random import shuffle
 from django.http import HttpResponse
 from django.conf import settings
@@ -6,23 +6,21 @@ from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 
 from apps.teams.models import Team, TeamVideo
-from apps.videos.models import Video, VideoUrl, SubtitleLanguage, SubtitleVersion, Subtitle
-from videos.types import video_type_registrar
+from apps.videos.models import Video
 from django.contrib.admin.views.decorators import staff_member_required
 from apps.auth.models import  CustomUser
 from django.db import transaction
 
+from subtitles import pipeline
+from subtitles import models as sub_models
+
+import babelsubs
+from babelsubs.storage import SubtitleSet
 
 import logging
 logger = logging.getLogger("test-fixture-loading")
 
 from utils.decorators import never_in_prod
-
-def debug_lang(sl):
-    return " Language:%9s, is original: %5s, is_forked: %5s, is complete: %5s, percent done: %3s, translated from: %9s, num_subs: %7s" % (sl.language, sl.is_original, sl.is_forked, sl.is_complete, sl.percent_done, sl.standard_language, len(sl.latest_subtitles()))
-
-def debug_video(v):
-    return "%s :: %s\n" % (v.title_display(), v.pk) + "\n".join([debug_lang(x) for x in v.subtitlelanguage_set.all()])
 
 def _get_fixture_path(model_name):
     return os.path.join(settings.PROJECT_ROOT, "apps", "testhelpers", "fixtures", "%s-fixtures.json" % model_name)
@@ -31,88 +29,51 @@ def _get_fixture_file(model_name):
     return file(_get_fixture_path(model_name))
 
 
-def _append_subs(version, num_subs= 2, include_timing=False, make_new_version=True):
-    if make_new_version:
-        version = SubtitleVersion(version_no=version.version_no+1,
-        language=version.language)
-    if include_timing:
-        last = version.ordered_subtitles()[-1]
-        start_time = last.end_time + 1000
-    for i in range(0, num_subs):
-        subtitle = Subtitle(version=version,
-                            subtitle_id="%s" % i,
-                            subtitle_order=i,
-             subtitle_text = "Sub %s for lang (%s)" % (i, version.language.language))
-        if include_timing:
-             subtitle.start_time=i * 1000 + start_time
-             subtitle.end_time =i + 800 + start_time
+def _add_subtitles(sub_lang, num_subs, video, translated_from=None):
+    subtitle_set = SubtitleSet(sub_lang.language_code)
 
-
-        
-    
-def _add_subtitles(sub_lang, num_subs, translated_from=None):
-    version = SubtitleVersion(language=sub_lang, note="Automagically-created")
-    version.datetime_started = datetime.datetime.now()
-    version.is_forked = True
-    version.save()
     for i in xrange(0, num_subs):
-        subtitle = Subtitle(version=version,
-                            subtitle_id="%s" % i,
-                            subtitle_order=i,
-             subtitle_text = "Sub %s for lang (%s)" % (i, sub_lang.language))
-        if not translated_from:
-             subtitle.start_time=i * 1000
-             subtitle.end_time =i + 800
+        start_time=i * 1000
+        end_time =i + 800
+        subtitle_text = 'hey jude %s' % i
+        subtitle_set.append_subtitle(start_time, end_time, subtitle_text)
 
-        else:
-            subtitle.subtitle_text += " translated from (%s)" % (translated_from)
-        subtitle.save()
-    return version
+    parents = []
 
-def _copy_subtitles(fromlang, tolang, maxout=None):
-    version = SubtitleVersion(language=tolang, note="Automagically-copied")
+    if translated_from:
+        parents.append(translated_from.get_tip())
 
-    version.datetime_started = datetime.datetime.now()
-    version.save()
-    i = 0
-    for x in fromlang.version().subtitle_set.all():
-        s = x.duplicate_for(version=version)
-        s.subtitle_text = "Sub %s for lang (%s)" % (i, tolang.language)
-        s.save()
-        i += 1
-        if maxout and maxout  == i:
-            break
+    return pipeline.add_subtitles(video, sub_lang.language_code, subtitle_set, parents=parents)
 
 def _add_lang_to_video(video, props,  translated_from=None):
     if props.get('is_original', False):
-        sl = video.subtitle_language()
-        sl and sl.delete()
-    sub_lang = SubtitleLanguage(
-        video=video,
-        is_original = props.get('is_original', False),
-        is_complete = props.get('is_complete', False),
-        language = props.get('code'),
-        has_version=True,
-        had_version=True,
-        is_forked=True,
-    )
-    sub_lang.save()
+        video.newsubtitlelanguage_set.all().delete()
+
+    sub_lang = video.subtitle_language(props.get('code', ''))
+
+    if not video.primary_audio_language_code:
+        video.primary_audio_language_code = props.get('code', '')
+        video.save()
+
+    if not sub_lang:
+        sub_lang = sub_models.SubtitleLanguage(
+            video=video,
+            subtitles_complete=props.get('is_complete', False),
+            language_code=props.get('code'),
+            is_forked=True,
+        )
+
+        sub_lang.save()
+
     num_subs = props.get("num_subs", 0)
 
-    if not translated_from:
-        _add_subtitles(sub_lang, num_subs)
-    else:
-        sub_lang.is_original = False
-        sub_lang.is_forked = False
-        sub_lang.standard_language = translated_from
-        sub_lang.save()
-        _copy_subtitles(translated_from, sub_lang, num_subs)
+    _add_subtitles(sub_lang, num_subs, video, translated_from)
 
     for translation_prop in props.get("translations", []):
         _add_lang_to_video(video, translation_prop, translated_from=sub_lang)
 
-    sub_lang.is_complete = props.get("is_complete", False)
     sub_lang.save()
+
     from videos.tasks import video_changed_tasks
     video_changed_tasks(sub_lang.video.id)
     return sub_lang
@@ -121,6 +82,13 @@ def _add_langs_to_video(video, props):
     for prop in props:
         _add_lang_to_video(video, prop)
 
+SRT = u"""1
+00:00:00,004 --> 00:00:02,093
+We\n started <b>Universal Subtitles</b> <i>because</i> we <u>believe</u>
+"""
+def _add_language_via_pipeline(video, lang):
+    subtitles = babelsubs.load_from(SRT, type='srt', language='en').to_internal()
+    return pipeline.add_subtitles(video, lang, subtitles)
 
 def _create_videos(video_data, users):
     videos = []
@@ -185,7 +153,7 @@ def load_team_fixtures(request ):
     load_from = request.GET.get("load_from", None)
     videos = _do_it(load_from)
     return HttpResponse( "created %s videos" % len(videos))
-    
+
 @csrf_exempt
 def echo_json(request):
     data   = getattr(request, request.method).copy()

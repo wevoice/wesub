@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -53,6 +53,7 @@ unisubs.subtitle.SyncPanel = function(subtitles, videoPlayer, serverModel, capti
         this.currentStep_ = 1;
     }
 
+    this.captionManager_.currentCaptionIndex_ = -1;
 };
 
 goog.inherits(unisubs.subtitle.SyncPanel, goog.ui.Component);
@@ -240,7 +241,7 @@ unisubs.subtitle.SyncPanel.prototype.downReleased_ = function() {
             nextSub = this.downSub_.getNextCaption();
         }
         if (nextSub != null) {
-            nextSub.setStartTime(startTime);
+            nextSub.setStartTime(startTime)
         }
     } else {
         if (this.downSub_.isShownAt(startTime) &&
@@ -285,8 +286,9 @@ unisubs.subtitle.SyncPanel.prototype.currentlyEditingSubtitle_ = function() {
 unisubs.subtitle.SyncPanel.prototype.captionReached_ = function(event) {
     var editableCaption = event.caption;
     this.subtitleList_.clearActiveWidget();
-    if (editableCaption != null)
-        this.subtitleList_.setActiveWidget(editableCaption.getCaptionID());
+    if (editableCaption != null) {
+        this.subtitleList_.setActiveWidget(editableCaption, event.index);
+    }
 };
 unisubs.subtitle.SyncPanel.prototype.disposeInternal = function() {
     unisubs.subtitle.SyncPanel.superClass_.disposeInternal.call(this);

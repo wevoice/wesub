@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -32,6 +32,7 @@ from templatetag_sugar.parser import Name, Variable, Constant
 
 from teams.models import Application
 
+from apps.teams.forms import TaskUploadForm
 from apps.teams.permissions import (
     can_view_settings_tab as _can_view_settings_tab,
     can_edit_video as _can_edit_video,
@@ -44,7 +45,7 @@ from apps.teams.permissions import (
     can_delete_video as _can_delete_video,
     can_delete_video_in_team as _can_delete_video_in_team,
     can_approve as _can_approve,
-    can_delete_subs as _can_delete_subs,
+    can_delete_language as _can_delete_language,
 )
 from apps.teams.permissions import (
     can_invite, can_add_video_somewhere,
@@ -511,52 +512,24 @@ def can_create_translations_for(user, video):
         return can_create_and_edit_translations(user, team_video)
 
 @register.filter
-def can_unpublish(user, video):
-    """Return True if the user can unpublish subtitles for this video.
-
-    Safe to use with anonymous users as well as non-team videos.
-
-    Usage:
-
-        {% if request.user|can_unpublish:video %}
-            ...
-        {% endif %}
-
-    """
-    team_video = video.get_team_video()
-
-    if not team_video:
-        return False
-
-    workflow = Workflow.get_for_team_video(team_video)
-    if not workflow:
-        return False
-
-    if workflow.approve_enabled:
-        return _can_approve(team_video, user)
-
-    return False
-
-@register.filter
-def can_delete_subtitles_for(user, video):
-    """Return True if the user can delete subtitles for this video.
-
-    Usage:
-
-        {% if request.user|can_delete_subtitles_for:video %}
-            ...
-        {% endif %}
-
-    """
-    team_video = video.get_team_video()
-
-    if not team_video:
-        return False
-
-    return _can_delete_subs(team_video, user)
+def can_delete_language(user, language):
+    team_video = language.video.get_team_video()
+    return (team_video is not None and
+            _can_delete_language(team_video.team, user))
 
 @register.filter
 def sync_third_party_account(account, team):
     return reverse('teams:sync-third-party-account',
             kwargs={'slug': team.slug, 'account_id': account.pk})
 
+
+@register.filter
+def get_upload_form(task, user):
+    """Return a TaskUploadForm for the given Task and User.
+
+        {% with task|get_upload_form:request.user as form %}
+            ...
+        {% endif %}
+
+    """
+    return TaskUploadForm(user=user, video=task.team_video.video)

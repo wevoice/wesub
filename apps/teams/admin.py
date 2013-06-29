@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -106,15 +106,17 @@ class WorkflowAdmin(admin.ModelAdmin):
     ordering = ('-created',)
 
 class TaskAdmin(admin.ModelAdmin):
-    # We specifically pull assignee, team_video, team, and language out into
-    # properties to force extra queries per row.  This sounds like a bad idea,
-    # but:
+    # We specifically pull old/new subtitle version, assignee, team_video, team,
+    # and language out into properties to force extra queries per row.
     #
-    # 1. MySQL was performing a full table scan when using the select_related()
-    #    for some reason.
-    # 2. It's only a few extra queries, so it's not the end of the world.
+    # This sounds like a bad idea, but when we allow Django to use the
+    # select_related to add the INNER JOIN clauses MySQL decides to do horrible
+    # things.
+    #
+    # It's only a hundred little queries or so, so it's not a super big deal.
     list_display = ('id', 'type', 'team_title', 'team_video_title',
-                    'language_title', 'assignee_name', 'is_complete', 'deleted', 'created')
+                    'language_title', 'assignee_name', 'is_complete', 'deleted',
+                    'old_subtitle_version_str', 'new_subtitle_version_str',)
     list_filter = ('type', 'deleted', 'created', 'modified', 'completed')
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__video__title')
@@ -124,6 +126,14 @@ class TaskAdmin(admin.ModelAdmin):
     readonly_fields = ('created', 'modified')
     ordering = ('-id',)
     list_per_page = 20
+
+    def old_subtitle_version_str(self, o):
+        return unicode(o.subtitle_version) if o.subtitle_version else ''
+    old_subtitle_version_str.short_description = 'old subtitle version'
+
+    def new_subtitle_version_str(self, o):
+        return unicode(o.new_subtitle_version) if o.new_subtitle_version else ''
+    new_subtitle_version_str.short_description = 'new subtitle version'
 
     def is_complete(self, o):
         return True if o.completed else False
@@ -180,7 +190,9 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 class BillingReportAdmin(admin.ModelAdmin):
-    list_display = ('team', 'start_date', 'end_date', 'processed')
+    def get_teams(self, obj):
+        ",".join([x.slug for x in obj.teams.all()])
+    list_display = ('get_teams', 'start_date', 'end_date', 'processed')
 
 
 class InviteAdmin(admin.ModelAdmin):
@@ -222,16 +234,20 @@ class ApplicationAdmin(admin.ModelAdmin):
 class BillingRecordAdmin(admin.ModelAdmin):
     list_display = (
         'video',
-        'subtitle_language',
+        'new_subtitle_language',
         'minutes',
         'is_original',
         'team',
         'created',
         'source',
         'user',
-        'subtitle_version'
+        'new_subtitle_version'
     )
-    list_filter = ('team', 'created', 'user', 'is_original',)
+    list_filter = ('team', 'created', 'source', 'is_original',)
+    raw_id_fields = ('user', 'subtitle_language',
+                     'new_subtitle_language', 'subtitle_version',
+                    'new_subtitle_version', 'video' ,
+    )
 
 
 admin.site.register(TeamMember, TeamMemberAdmin)

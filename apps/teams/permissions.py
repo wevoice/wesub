@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,6 +16,7 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from django.utils.translation import ugettext as _
 from teams.models import Team, MembershipNarrowing, Workflow, TeamMember, Task
 
 from teams.permissions_const import (
@@ -23,6 +24,26 @@ from teams.permissions_const import (
     ROLE_OUTSIDER
 )
 
+class TeamsPermissionsCheck(object):
+    """The result of some functions below.
+
+    TeamsPermissionsCheck can be evaluated as a boolean to test if permission
+    is enabled or disabled.  It also has extra data to determine why
+    permission was disabled.
+
+    Attributes:
+        check_passed - did the permissions check pass?
+        locked_by - string describing the object that prevented the
+        permissions (either the team or the task asignee)
+        message - message to display to the user.
+    """
+    def __init__(self, check_passed, locked_by=None, message=None):
+        self.check_passed = check_passed
+        self.locked_by = str(locked_by)
+        self.message = message
+
+    def __nonzero__(self):
+        return self.check_passed
 
 def _perms_equal_or_lower(role, include_outsiders=False):
     """Return a list of roles equal to or less powerful than the given role.
@@ -510,11 +531,12 @@ def can_review(team_video, user, lang=None, allow_own=False):
 
     # Users usually cannot review their own subtitles.
     if not hasattr(team_video, '_cached_version_for_review'):
-        team_video._cached_version_for_review = team_video.video.latest_version(language_code=lang, public_only=False)
+        team_video._cached_version_for_review = team_video.video.latest_version(
+            language_code=lang, public_only=False)
 
     subtitle_version = team_video._cached_version_for_review
 
-    if lang and subtitle_version.user_id == user.id:
+    if lang and subtitle_version and subtitle_version.author_id == user.id:
         if can_review_own_subtitles(role, team_video):
             return True
         else:
@@ -535,16 +557,6 @@ def can_approve(team_video, user, lang=None):
     }[workflow.approve_allowed]
 
     return role in _perms_equal_or_greater(role_req)
-
-def can_delete_subs(team_video, user, lang=None):
-    """Return whether the user has permission to delete subtitles.
-
-    lang should be a language code string.
-
-    """
-    role = get_role_for_target(user, team_video.team, team_video.project, lang)
-    return can_unpublish_subs(team_video, user, lang) and role in [ROLE_ADMIN, ROLE_OWNER]
-
 
 def can_message_all_members(team, user):
     """Return whether the user has permission to message all members of the given team."""
@@ -605,27 +617,110 @@ def can_publish_edits_immediately(team_video, user, lang):
 
     return True
 
+def can_rollback_language(user, language):
+    """Can the user rollback a language to a previous version."""
+    return can_add_version(user, language.video, language.language_code)
+
 def can_post_edit_subtitles(team, user):
     """ Returns wheter the user has permission to post edit an original language """
-    member = get_member(user, team)
-    return member.role != ROLE_CONTRIBUTOR
+    # check tasks only if workflow is enabled
+    if team.workflow_enabled:
+        return can_create_tasks(team, user)
+    elif team.is_member(user) and not team.moderates_videos():
+        return TeamsPermissionsCheck(True)
+    else:
+        role = get_role(get_member(user, team))
+        return user.is_staff or role in _perms_equal_or_greater(ROLE_CONTRIBUTOR)
 
-def can_unpublish_subs(team_video, user, lang):
-    """Return whether the user has permission to unpublish subtitles.
-
-    lang should be a language code string.
-
+def can_delete_language(team, user):
+    """Return whether the user has permission to completely delete a language.
     """
-    workflow = Workflow.get_for_team_video(team_video)
+    role = get_role(get_member(user, team))
+    return user.is_staff or role in _perms_equal_or_greater(ROLE_ADMIN)
 
-    if workflow.approve_allowed:
-        return can_approve(team_video, user, lang)
+def can_add_version(user, video, language_code):
+    """Check if a user can add a new version to a SubtitleLanguage
 
-    if workflow.review_allowed:
-        return can_review(team_video, user, lang, allow_own=True)
+    Returns a TeamsPermissionsCheck object
+    """
+    team_video = video.get_team_video()
 
-    return False
+    if team_video is None:
+        # If there's no team video to worry about, just bail early.
+        return TeamsPermissionsCheck(True)
 
+    # get the language, NOTE: language can be None if we don't have any
+    # subtitles for it yet
+    language = video.subtitle_language(language_code)
+
+    team = team_video.team
+
+    if team.is_visible:
+        default_message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
+    else:
+        default_message = _(u"Sorry, these subtitles are privately moderated.")
+
+    # basic check, if the user doesn't have view permission, then they can't
+    # add a new version
+    if not team_video.video.can_user_see(user):
+        return TeamsPermissionsCheck(False, team, default_message)
+
+    # check if the user has permission based on the tasks system
+    tasks = list(team_video.task_set.incomplete().filter(
+        language__in=[language_code, '']))
+
+    if tasks:
+        # assume there is only 1 open task
+        task = tasks[0]
+        # can_assign verify if the user has permission to either
+        # 1. assign the task to himself
+        # 2. do the task himself (the task is assigned to him)
+        if task.assignee is None:
+            if not can_assign_task(task, user):
+                return TeamsPermissionsCheck(False, team, default_message)
+        else:
+            if task.assignee != user:
+                return TeamsPermissionsCheck(False, task.assignee,
+                                             default_message)
+    elif language and language.is_complete_and_synced(True):
+        # there are no tasks because the language is complete
+        if not can_post_edit_subtitles(team, user):
+            # we use a different message here, probably because this code is
+            # the most likely to fail, so we add info about contacting the
+            # team admin
+            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
+            return TeamsPermissionsCheck(False, team, message)
+    else:
+        # there are no tasks because the language hasn't been started yet.
+        if video.primary_audio_language_code == language_code:
+            if not can_create_and_edit_subtitles(user, team_video,
+                                                 language_code):
+                return TeamsPermissionsCheck(False, team, default_message)
+        else:
+            if not can_create_and_edit_translations(user, team_video,
+                                                    language_code):
+                return TeamsPermissionsCheck(False, team, default_message)
+
+    # all checks passed
+    return TeamsPermissionsCheck(True)
+
+def can_view_version(user, subtitle_version):
+    if not subtitle_version.video.can_user_see(user):
+        return False
+    if subtitle_version.is_public():
+        return True
+    else:
+        return can_view_private_versions(user,
+                                         subtitle_version.subtitle_language)
+
+def can_view_private_versions(user, language):
+    if not language.video.can_user_see(user):
+        return False
+    team_video = language.video.get_team_video()
+    if team_video is None:
+        return True
+    else:
+        return get_member(user, team_video.team) != None
 
 # Task permissions
 def can_create_tasks(team, user, project=None):
@@ -652,7 +747,6 @@ def can_assign_tasks(team, user, project=None, lang=None):
         20: ROLE_MANAGER,
         30: ROLE_ADMIN,
     }[team.task_assign_policy]
-
     return role in _perms_equal_or_greater(role_required)
 
 
@@ -770,15 +864,19 @@ def can_create_task_subtitle(team_video, user=None, workflows=None):
 
     A subtitle task can be created iff:
 
-    * There are no subtitles for the video already.
+    * There are no public subtitles for the video already.
     * There are no subtitle tasks for it already.
     * The user has permission to create subtitle tasks.
 
     """
+    from subtitles.models import SubtitleLanguage
+
     if user and not _user_can_create_task_subtitle(user, team_video):
         return False
 
-    if team_video.subtitles_started():
+    if (SubtitleLanguage.objects.having_public_versions()
+                                .filter(video=team_video.video)
+                                .exists()):
         return False
 
     if team_video.task_set.all_subtitle().exists():
@@ -825,7 +923,7 @@ def can_create_task_translate(team_video, user=None, workflows=None):
         existing_languages = set(team_video.completed_langs)
     else:
         existing_languages = set(
-                sl.language for sl in team_video.video.completed_subtitle_languages())
+                sl.language_code for sl in team_video.video.completed_subtitle_languages())
 
     # TODO: Order this for individual users?
     return list(candidate_languages - existing_translate_languages - existing_languages)

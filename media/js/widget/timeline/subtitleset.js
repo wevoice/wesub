@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -59,8 +59,7 @@ unisubs.timeline.SubtitleSet.prototype.createSubsToDisplay_ = function() {
     this.subsToDisplay_ = goog.array.map(
         this.editableCaptionSet_.timelineCaptions(),
         function(c) {
-            return new unisubs.timeline.Subtitle(
-                c, that.videoPlayer_);
+            return new unisubs.timeline.Subtitle(c, that.videoPlayer_);
         });
     var i;
     for (i = 0; i < this.subsToDisplay_.length - 1; i++)
@@ -81,17 +80,13 @@ unisubs.timeline.SubtitleSet.prototype.subsEdited_ = function(e) {
         this.insertCaption_(e.caption);
     }
     else if (e.type == et.DELETE) {
-        this.deleteCaption_(e.caption);
+        this.deleteCaption_(e.caption, e.index);
     }else{
         this.dispatchEvent(unisubs.timeline.SubtitleSet.RENDER_NEW);
 
     }
 };
-unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
-    var subOrder = caption.getSubOrder();
-    var index = goog.array.binarySearch(
-        this.subsToDisplay_, 42,
-        function(x, sub) { return subOrder - sub.getEditableCaption().getSubOrder(); });
+unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption, index) {
     if (index >= 0) {
         var sub = this.subsToDisplay_[index];
         var previousSub = index > 0 ?
@@ -100,7 +95,7 @@ unisubs.timeline.SubtitleSet.prototype.deleteCaption_ = function(caption) {
         var nextSub = index < this.subsToDisplay_.length - 1 ?
             this.subsToDisplay_[index + 1] : null;
         goog.array.removeAt(this.subsToDisplay_, index);
-        this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(sub));
+        this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(sub, index));
         if (sub.getEditableCaption().getStartTime() == -1) {
             // we just removed the last unsynced subtitle.
             var nextCaption = caption.getNextCaption();
@@ -137,7 +132,7 @@ unisubs.timeline.SubtitleSet.prototype.insertCaption_ = function(caption) {
     if (nextSub != null) {
         if (caption.getStartTime() == -1) {
             goog.array.removeAt(this.subsToDisplay_, insertionPoint);
-            this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(nextSub));
+            this.dispatchEvent(new unisubs.timeline.SubtitleSet.RemoveEvent(nextSub, insertionPoint));
             nextSub.dispose();
         }
         else
@@ -155,8 +150,10 @@ unisubs.timeline.SubtitleSet.prototype.isInsertable_ = function(caption) {
 };
 unisubs.timeline.SubtitleSet.prototype.captionChange_ = function(e) {
     if (e.timesFirstAssigned && e.target.getNextCaption() != null) {
+        var editableCaption = this.editableCaptionSet_.captions_[
+            goog.array.indexOf(this.editableCaptionSet_.captions_, e.target)];
         var newSub = new unisubs.timeline.Subtitle(
-            e.target.getNextCaption(), this.videoPlayer_);
+            editableCaption.getNextCaption(), this.videoPlayer_);
         var lastSub = null;
         if (this.subsToDisplay_.length > 0)
             lastSub = this.subsToDisplay_[this.subsToDisplay_.length - 1];
@@ -192,7 +189,8 @@ unisubs.timeline.SubtitleSet.DisplayNewEvent = function(subtitle) {
 * @constructor
 *
 */
-unisubs.timeline.SubtitleSet.RemoveEvent = function(subtitle) {
+unisubs.timeline.SubtitleSet.RemoveEvent = function(subtitle, index) {
     this.type = unisubs.timeline.SubtitleSet.REMOVE;
     this.subtitle = subtitle;
+    this.index = index;
 };

@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@ unisubs.widget.ResumeEditingRecord = function(videoID, sessionPK, openDialogArgs
 };
 
 unisubs.widget.ResumeEditingRecord.STORAGE_KEY_ = "_unisubs_editing";
-unisubs.widget.ResumeEditingRecord.VERSION_ = 1;
+unisubs.widget.ResumeEditingRecord.VERSION_ = 2;
 
 unisubs.widget.ResumeEditingRecord.prototype.getVideoID = function() {
     return this.videoID_;

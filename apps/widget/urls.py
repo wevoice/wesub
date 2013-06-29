@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,10 +17,6 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 from django.conf.urls.defaults import url, patterns
 
-from widget.srt_subs import (
-    TTMLSubtitles, TXTSubtitles, SRTSubtitles, SBVSubtitles, DFXPSubtitles
-)
-
 urlpatterns = patterns(
     'widget.views',
     url(r'^rpc/xd/(\w+)$', 'xd_rpc'),
@@ -36,18 +32,7 @@ urlpatterns = patterns(
     url(r'^widgetize_demo/(\w+)$', 'widgetize_demo'),
     url(r'^statwidget_demo.html$', 'statwidget_demo'),
     url(r'^video_demo/(\w+)$', 'video_demo'),
-    url(r'^download_srt/$', 'download_subtitles',
-        {'handler': SRTSubtitles}, name='download_srt'),
-    url(r'^download_ssa/$', 'download_subtitles', name='download_ssa'),
-    url(r'^download_ttml/$', 'download_subtitles',
-        {'handler': TTMLSubtitles}, name='download_ttml'),
-    url(r'^download_txt/$', 'download_subtitles',
-        {'handler': TXTSubtitles}, name='download_txt'),
-    url(r'^download_sbv/$', 'download_subtitles',
-        {'handler': SBVSubtitles}, name='download_sbv'),
-    url(r'^download_dfxp/$', 'download_subtitles',
-        {'handler': DFXPSubtitles}, name='download_dfxp'),
-    url(r'^download_null_srt/$', 'null_srt'),
+    url(r'^download-subs/(?P<format>[\w]{3,})/$', 'download_subtitles',name='download'),
     url(r'^save_emailed_translations/$',
         'save_emailed_translations'),
 )

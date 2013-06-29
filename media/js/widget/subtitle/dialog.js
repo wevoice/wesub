@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -47,6 +47,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel, subtitles, opt_open
     this.currentSubtitlePanel_ = null;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.doneButtonEnabled_ = true;
+    this.exitURL = null;
 
     /**
      * @type {unisubs.widget.SubtitleState}
@@ -88,7 +89,14 @@ unisubs.subtitle.Dialog.END_TIME_PADDING = 4000;
 
 unisubs.subtitle.Dialog.prototype.captionReached_ = function(event) {
     var c = event.caption;
-    this.getVideoPlayerInternal().showCaptionText(c ? c.getText() : '');
+    var text;
+
+    if (c) {
+        text = this.captionSet_.x['content'](c.node || c);
+    } else {
+        text = '';
+    }
+    this.getVideoPlayerInternal().showCaptionText(text);
 };
 unisubs.subtitle.Dialog.prototype.createDom = function() {
     unisubs.subtitle.Dialog.superClass_.createDom.call(this);
@@ -102,7 +110,7 @@ unisubs.subtitle.Dialog.prototype.showDownloadLink_ = function() {
     var that = this;
     this.getRightPanelInternal().showDownloadLink(
         function() {
-            return that.makeJsonSubs();
+            return that.makeDFXPString();
         });
 };
 unisubs.subtitle.Dialog.prototype.enterDocument = function() {
@@ -188,6 +196,8 @@ unisubs.subtitle.Dialog.prototype.setState_ = function(state) {
         listen(
             rightPanel, et.DONE, this.handleDoneKeyPress_).
         listen(
+            rightPanel, et.SAVEANDOPENINNEWEDITOR, this.handleSaveAndOpenInNewEditor_).
+        listen(
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
@@ -232,7 +242,12 @@ unisubs.subtitle.Dialog.prototype.setFinishedState_ = function() {
     if (this.skipFinished_)
         this.setVisible(false);
     if (!unisubs.isFromDifferentDomain()) {
-        window.location.assign(this.serverModel_.getPermalink() + '?saved=true');
+
+        if (this.exitURL) {
+            window.location = this.exitURL;
+        } else {
+            window.location.assign(this.serverModel_.getPermalink() + '?saved=true');
+        }
         return;
     }
     this.state_ = unisubs.subtitle.Dialog.State_.FINISHED;
@@ -305,6 +320,18 @@ unisubs.subtitle.Dialog.prototype.handleLegendKeyPress_ = function(event) {
             this.togglePause_();
     }
 };
+unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event) {
+    if (!this.doneButtonEnabled_) {
+        return;
+    }
+
+    // if this is related to a task, send the new editor the right task id
+    var notesURLPart = unisubs.task_id?  "&saved-notes=" + 
+            encodeURIComponent(this.getNotesContent_(this.currentSubtitlePanel_)): '';
+    this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
+        this.subtitles_.LANGUAGE + '/?from-old-editor=true' + notesURLPart;
+    this.saveWork(false, true);
+};
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
     if (!this.doneButtonEnabled_) {
         return;
@@ -373,6 +400,18 @@ unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave, sa
     var notes = this.getNotesContent_(this.currentSubtitlePanel_);
     if (notes !== '') {
         this.serverModel_.setTaskNotes(notes);
+    }
+
+    if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles()) &&
+        !this.captionSet_.hasTitleChanged() &&
+        !this.captionSet_.hasDescriptionChanged() &&
+        this.exitURL) {
+        // No changes, but we want to go to the new subtitle editor.  Special
+        // case this and just to a redirect
+        this.saved_ = true;
+        window.location = this.exitURL;
+        return;
     }
 
     if (this.captionSet_.needsSync()) {
@@ -526,6 +565,9 @@ unisubs.subtitle.Dialog.prototype.togglePause_ = function() {
 };
 unisubs.subtitle.Dialog.prototype.makeCurrentStateSubtitlePanel_ = function() {
     var s = unisubs.subtitle.Dialog.State_;
+    // make sure we clear the current displayed subtitle
+    this.captionManager_.onPanelChanged();
+
     if (this.state_ == s.TRANSCRIBE) {
         return new unisubs.subtitle.TranscribePanel(
             this.captionSet_,
@@ -650,6 +692,6 @@ unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
-unisubs.subtitle.Dialog.prototype.makeJsonSubs =  function (){
-    return this.captionSet_.makeJsonSubs();
+unisubs.subtitle.Dialog.prototype.makeDFXPString =  function (){
+    return this.captionManager_.x['xmlToString'](true, true);
 };

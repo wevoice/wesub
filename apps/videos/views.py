@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,57 +16,140 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import datetime
+import urllib, urllib2
+from collections import namedtuple
+
+import simplejson as json
+from babelsubs.storage import diff as diff_subs
+from babelsubs.generators import HTMLGenerator
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
+from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.db.models import Sum
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
-from django.views.generic.list_detail import object_list
-from django.views.decorators.http import require_POST
-from videos.models import Video, Action, SubtitleLanguage, SubtitleVersion,  \
-    VideoUrl, AlreadyEditingException, restrict_versions
-from videos.forms import VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm, \
-    SubtitlesUploadForm, CreateVideoUrlForm, TranscriptionFileForm, \
-    AddFromFeedForm, ChangeVideoOriginalLanguageForm
-import widget
-from django.contrib.sites.models import Site
-from django.conf import settings
-import simplejson as json
-from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
-from widget.views import base_widget_params
-from vidscraper.errors import Error as VidscraperError
-from auth.models import CustomUser as User
-from utils import send_templated_email
-from django.contrib.auth import logout
-from videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
-from gdata.service import RequestError
-from django.db.models import Sum
-from django.db import transaction
-from django.utils.translation import ugettext
 from django.utils.encoding import force_unicode
-from statistic.models import EmailShareStatistic
-import urllib, urllib2
-from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
-from django.core.cache import cache
-from videos.rpc import VideosApiClass
-from utils.rpc import RpcRouter
+from django.utils.http import urlquote_plus
+from django.utils.translation import ugettext, ugettext_lazy as _
+from django.views.decorators.http import require_POST
+from django.views.generic.list_detail import object_list
+from gdata.service import RequestError
+from vidscraper.errors import Error as VidscraperError
+
+import widget
+from apps.auth.models import CustomUser as User
+from apps.statistic.models import EmailShareStatistic
+from apps.subtitles import models as sub_models
+from apps.subtitles.forms import SubtitlesUploadForm
+from apps.subtitles.pipeline import rollback_to
+from apps.teams.models import Task
+from apps.videos import permissions
+from apps.videos.decorators import get_video_revision, get_video_from_code
+from apps.videos.forms import (
+    VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
+    CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm,
+    ChangeVideoOriginalLanguageForm
+)
+from apps.videos.models import (
+    Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException
+)
+from apps.videos.rpc import VideosApiClass
+from apps.videos.search_indexes import VideoIndex
+from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
+from apps.videos.tasks import video_changed_tasks
+from apps.widget.views import base_widget_params
+from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
 from utils.metrics import Meter
+from utils.rpc import RpcRouter
 from utils.translation import get_user_languages_from_request
-from django.utils.http import urlquote_plus
-from videos import permissions
-from videos.tasks import video_changed_tasks
-from videos.search_indexes import VideoIndex
-import datetime
-from videos.decorators import get_video_revision, get_video_from_code
-from apps.teams.models import Task
-from teams.permissions import  can_edit_video
+
+from teams.permissions import can_edit_video, can_add_version, can_rollback_language
 
 rpc_router = RpcRouter('videos:rpc_router', {
     'VideosApi': VideosApiClass()
 })
+
+
+# We don't want to display all formats we understand to the end user
+# .e.g json, nor include aliases
+AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [ 'dfxp',  'sbv', 'srt', 'ssa', 'txt']
+
+LanguageListItem = namedtuple("LanguageListItem", "name status tags url")
+
+class LanguageList(object):
+    """List of languages for the video pages."""
+
+    def __init__(self, video):
+        original_languages = []
+        other_languages = []
+        for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
+
+            item = LanguageListItem(lang.get_language_code_display(),
+                                    self._calc_status(lang),
+                                    self._calc_tags(lang),
+                                    lang.get_absolute_url())
+            if lang.language_code == video.primary_audio_language_code:
+                original_languages.append(item)
+            else:
+                other_languages.append(item)
+        original_languages.sort(key=lambda li: li.name)
+        other_languages.sort(key=lambda li: li.name)
+        self.items = original_languages + other_languages
+
+    def _calc_status(self, lang):
+        if lang.subtitles_complete:
+            if lang.has_public_version():
+                return 'complete'
+            else:
+                return 'needs-review'
+        else:
+            if lang.is_synced(public=False):
+                return 'incomplete'
+            else:
+                return 'needs-timing'
+
+    def _calc_tags(self, lang):
+        tags = []
+        if lang.is_primary_audio_language():
+            tags.append(ugettext(u'original'))
+
+        team_video = lang.video.get_team_video()
+
+        if not lang.subtitles_complete:
+            tags.append(ugettext(u'incomplete'))
+        elif team_video is not None:
+            # subtiltes are complete, check if they are under review/approval.
+            incomplete_tasks = (Task.objects.incomplete()
+                                            .filter(team_video=team_video,
+                                                    language=lang.language_code))
+            for t in incomplete_tasks:
+                if t.type == Task.TYPE_IDS['Review']:
+                    tags.append(ugettext(u'needs review'))
+                    break
+                elif t.type == Task.TYPE_IDS['Approve']:
+                    tags.append(ugettext(u'needs approval'))
+                    break
+                else:
+                    # subtitles are complete, but there's a subtitle/translate
+                    # task for them.  They must have gotten sent back.
+                    tags.append(ugettext(u'needs editing'))
+                    break
+        return tags
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __len__(self):
+        return len(self.items)
 
 
 def index(request):
@@ -219,7 +302,7 @@ def video(request, video, video_url=None, title=None):
     context = widget.add_onsite_js_files({})
     context['video'] = video
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['translations'] = _get_translations(video)
+    context['language_list'] = LanguageList(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
     context['widget_params'] = _widget_params(
@@ -268,45 +351,34 @@ def actions_list(request, video_id):
                        extra_context=extra_context)
 
 @login_required
-@transaction.commit_manually
 def upload_subtitles(request):
-    output = dict(success=False)
+    output = {'success': False}
     video = Video.objects.get(id=request.POST['video'])
-    form = SubtitlesUploadForm(request.user, video, request.POST, request.FILES)
+    form = SubtitlesUploadForm(request.user, video, True, request.POST,
+                               request.FILES, initial={'primary_audio_language_code':video.primary_audio_language_code})
+
+    response = lambda s: HttpResponse('<textarea>%s</textarea>' % json.dumps(s))
 
     try:
-        valid = form.is_valid()
-    except Exception, e:
-        output['errors'] = {"_all__":[force_unicode(e)]}
-        return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
-
-    if valid:
-        try:
-            language = form.save()
+        if form.is_valid():
+            version = form.save()
             output['success'] = True
-            if form._sl_created:
-                output['msg'] = ugettext(u'Thank you for uploading. It will take a minute or so for your subtitles to appear.')
-            else:
-                output['msg'] = ugettext(u'Your changes have been saved.')
-            output['next'] = language.get_absolute_url()
-            transaction.commit()
-        except AlreadyEditingException, e:
-            output['errors'] = {"_all__":[force_unicode(e.msg)]}
-            transaction.rollback()
-        except Exception, e:
-            output['errors'] = {"_all__":[force_unicode(e)]}
-            transaction.rollback()
-            from raven.contrib.django.models import client
-            client.create_from_exception()
+            output['next'] = version.subtitle_language.get_absolute_url()
+            output['msg'] = ugettext(
+                u'Thank you for uploading. '
+                u'It may take a minute or so for your subtitles to appear.')
+        else:
+            output['errors'] = form.get_errors()
+    except AlreadyEditingException, e:
+        output['errors'] = {'__all__': [force_unicode(e.msg)]}
+    except Exception, e:
+        import traceback
+        traceback.print_exc()
+        from raven.contrib.django.models import client
+        client.create_from_exception()
+        output['errors'] = {'__all__': [force_unicode(e)]}
 
-    else:
-        output['errors'] = form.get_errors()
-        transaction.rollback()
-
-    if transaction.is_dirty():
-        transaction.rollback()
-
-    return HttpResponse(u'<textarea>%s</textarea>'  % json.dumps(output))
+    return response(output)
 
 @login_required
 def upload_transcription_file(request):
@@ -358,13 +430,9 @@ def email_friend(request):
     return render_to_response('videos/email_friend.html', context,
                               context_instance=RequestContext(request))
 
-def demo(request):
-    context = widget.add_onsite_js_files({})
-    return render_to_response('demo.html', context,
-                              context_instance=RequestContext(request))
 
 @get_video_from_code
-def legacy_history(request ,video, lang=None):
+def legacy_history(request, video, lang=None):
     """
     In the old days we allowed only one translation per video.
     Therefore video urls looked like /vfjdh2/en/
@@ -375,22 +443,21 @@ def legacy_history(request ,video, lang=None):
         language = video.subtitle_language(lang)
         if language is None:
             raise SubtitleLanguage.DoesNotExist("No such language")
-    except SubtitleLanguage.DoesNotExist:
+    except sub_models.SubtitleLanguage.DoesNotExist:
         raise Http404()
 
     return HttpResponseRedirect(reverse("videos:translation_history", kwargs={
             'video_id': video.video_id,
             'lang_id': language.pk,
-            'lang': language.language,
+            'lang': language.language_code,
             }))
 
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None, version_id=None):
-    from teams.models import Task
-
     if not lang:
-        return HttpResponseRedirect(video.get_absolute_url(video_id=video._video_id_used))
+        return HttpResponseRedirect(
+            video.get_absolute_url(video_id=video._video_id_used))
     elif lang == 'unknown':
         # A hacky workaround for now.
         # This should go away when we stop allowing for blank SubtitleLanguages.
@@ -402,8 +469,8 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
 
     if lang_id:
         try:
-            language = video.subtitlelanguage_set.get(pk=lang_id)
-        except SubtitleLanguage.DoesNotExist:
+            language = video.newsubtitlelanguage_set.get(pk=lang_id)
+        except sub_models.SubtitleLanguage.DoesNotExist:
             raise Http404
     else:
         language = video.subtitle_language(lang)
@@ -413,14 +480,24 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
             config = {}
             config["videoID"] = video.video_id
             config["languageCode"] = lang
-            url = reverse('onsite_widget')+'?config='+urlquote_plus(json.dumps(config))
+            url = (reverse('onsite_widget')
+                   + '?config='
+                   + urlquote_plus(json.dumps(config)))
             return redirect(url)
-        elif video.subtitlelanguage_set.count() > 0:
-            language = video.subtitlelanguage_set.all()[0]
+        elif video.newsubtitlelanguage_set.count() > 0:
+            language = video.newsubtitlelanguage_set.all()[0]
         else:
             raise Http404
 
-    qs = language.subtitleversion_set.select_related('user')
+    qs = language.subtitleversion_set
+    team_video = video.get_team_video()
+    if team_video and not team_video.team.is_member(request.user):
+        # Non-members can only see public versions.
+        qs = qs.public()
+    else:
+        qs = qs.extant()
+    qs = qs.select_related('user')
+
     ordering, order_type = request.GET.get('o'), request.GET.get('ot')
     order_fields = {
         'date': 'datetime_started',
@@ -430,21 +507,25 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         'text': 'text_change'
     }
     if ordering in order_fields and order_type in ['asc', 'desc']:
-        qs = qs.order_by(('-' if order_type == 'desc' else '')+order_fields[ordering])
+        order_prefix = '-' if order_type == 'desc' else ''
+        qs = qs.order_by(order_prefix + order_fields[ordering])
         context['ordering'], context['order_type'] = ordering, order_type
+    else:
+        qs = qs.order_by('-version_number')
 
     context['video'] = video
-    context['translations'] = _get_translations(video)
+    context['language_list'] = LanguageList(video)
     context['user_can_moderate'] = False
-    context['widget_params'] = _widget_params(request, video, version_no=None, language=language, size=(289,173))
+    context['widget_params'] = _widget_params(request, video, version_no=None,
+                                              language=language, size=(289, 173))
     context['language'] = language
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 
-    context['task'] =  _get_related_task(request)
+    context['task'] = _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
 
-    versions = restrict_versions(qs, request.user, language)
+    versions = list(qs)
     context['revision_list'] = versions
 
     if versions:
@@ -458,21 +539,33 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     else:
         version = None
 
-    context['rollback_allowed'] = version and not version.video.is_moderated
+    context['rollback_allowed'] = version and version.next_version() is not None
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
     context['last_version'] = version
+    context['subtitle_lines'] = (version.get_subtitles()
+                                        .subtitle_items(HTMLGenerator.MAPPINGS)
+                                 if version else None)
     context['next_version'] = version.next_version() if version else None
-    context['can_edit'] = False
+    context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
 
-    if request.user.is_authenticated():
-        # user can only edit a subtitle draft if he
-        # has a subtitle/translate task assigned to him
-        tasks = Task.objects.incomplete_subtitle_or_translate()\
-                            .filter(team_video=video.get_team_video(), assignee=request.user, language=language.language)
+    user_can_add_version = can_add_version(request.user, video,
+                                           language.language_code)
+    context['edit_disabled'] = not user_can_add_version
 
-        context['can_edit'] = tasks.exists()
+    # If there are tasks for this language, the user has to go through the tasks
+    # panel to edit things instead of doing it directly from here.
+    if user_can_add_version and team_video:
+        has_open_task = (Task.objects.incomplete()
+                                     .filter(team_video=team_video,
+                                             language=language.language_code)
+                                     .exists())
+        if has_open_task:
+            context['edit_disabled'] = True
+            context['must_use_tasks'] = True
 
-    return render_to_response("videos/subtitle-view.html", context, context_instance=RequestContext(request))
-
+    return render_to_response("videos/subtitle-view.html", context,
+                              context_instance=RequestContext(request))
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()
@@ -486,7 +579,7 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
         params['base_state']['revision'] = version_no
 
     if language:
-        params['base_state']['language_code'] = language.language
+        params['base_state']['language_code'] = language.language_code
         params['base_state']['language_pk'] = language.pk
     if size:
         params['video_config'] = {"width":size[0], "height":size[1]}
@@ -496,83 +589,65 @@ def _widget_params(request, video, version_no=None, language=None, video_url=Non
 @login_required
 @get_video_revision
 def rollback(request, version):
-    if version.video.is_moderated:
-        return HttpResponseForbidden("Moderated videos cannot be rollbacked, they need to be unpublished")
-    is_writelocked = version.language.is_writelocked
-    if is_writelocked:
+    is_writelocked = version.subtitle_language.is_writelocked
+    team_video = version.video.get_team_video()
+    if team_video and not can_rollback_language(request.user,
+                                                version.subtitle_language):
+        messages.error(request, _(u"You don't have permission to rollback "
+                                  "this language"))
+    elif is_writelocked:
         messages.error(request, u'Can not rollback now, because someone is editing subtitles.')
     elif not version.next_version():
         messages.error(request, message=u'Can not rollback to the last version')
     else:
         messages.success(request, message=u'Rollback successful')
-        version = version.rollback(request.user)
+        version = rollback_to(version.video,
+                version.subtitle_language.language_code,
+                version_number=version.version_number,
+                rollback_author=request.user)
         video_changed_tasks.delay(version.video.id, version.id)
-        return redirect(version.language.get_absolute_url()+'#revisions')
+        return redirect(version.subtitle_language.get_absolute_url()+'#revisions')
     return redirect(version)
 
 @get_video_revision
 def diffing(request, first_version, second_pk):
-    language = first_version.language
-    second_version = get_object_or_404(SubtitleVersion, pk=second_pk, language=language)
+    language = first_version.subtitle_language
+    second_version = get_object_or_404(
+        sub_models.SubtitleVersion.objects.extant(),
+        pk=second_pk, subtitle_language=language)
+
     if first_version.video != second_version.video:
         # this is either a bad bug, or someone evil
         raise "Revisions for diff videos"
-    video = first_version.language.video
-    if second_version.version_no > first_version.version_no:
+
+    if first_version.pk < second_version.pk:
+        # this is just stupid Instead of first, second meaning
+        # chronological order (first cames before second)
+        # it means  the opposite, so make sure the first version
+        # has a larger version no than the second
         first_version, second_version = second_version, first_version
 
-    second_captions = dict([(item.subtitle_id, item) for item in second_version.ordered_subtitles()])
-    first_captions = dict([(item.subtitle_id, item) for item in first_version.ordered_subtitles()])
-
-    subtitles = {}
-
-    for id, item in first_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    for id, item in second_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    subtitles = [item for item in subtitles.items()]
-    subtitles.sort(key=lambda item: item[1])
-
-    captions = []
-    for subtitle_id, t in subtitles:
-        try:
-            scaption = second_captions[subtitle_id]
-        except KeyError:
-            scaption = None
-        try:
-            fcaption = first_captions[subtitle_id]
-        except KeyError:
-            fcaption = None
-
-        if fcaption is None or scaption is None:
-            changed = dict(text=True, time=True)
-        else:
-            changed = {
-                'text': (not fcaption.text == scaption.text),
-                'time': (not fcaption.start_time == scaption.start_time),
-                'end_time': (not fcaption.end_time == scaption.end_time)
-            }
-        data = [fcaption, scaption, changed]
-        captions.append(data)
+    video = first_version.subtitle_language.video
+    diff_data = diff_subs(first_version.get_subtitles(), second_version.get_subtitles())
+    team_video = video.get_team_video()
 
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    context['captions'] = captions
+    context['diff_data'] = diff_data
     context['language'] = language
     context['first_version'] = first_version
     context['second_version'] = second_version
-    context['latest_version'] = language.latest_version()
-    context['rollback_allowed'] = not video.is_moderated
+    context['latest_version'] = language.get_tip()
+    if team_video and not can_rollback_language(request.user, language):
+        context['rollback_allowed'] = False
+    else:
+        context['rollback_allowed'] = True
     context['widget0_params'] = \
         _widget_params(request, video,
-                       first_version.version_no)
+                       first_version.version_number)
     context['widget1_params'] = \
         _widget_params(request, video,
-                       second_version.version_no)
+                       second_version.version_number)
     return render_to_response('videos/diffing.html', context,
                               context_instance=RequestContext(request))
 
@@ -737,19 +812,19 @@ def video_staff_delete(request, video_id):
     return HttpResponse("ok")
 
 def video_debug(request, video_id):
-    from apps.testhelpers.views import debug_video
     from apps.widget import video_cache as vc
     from django.core.cache import cache
     from accountlinker.models import youtube_sync
     from videos.models import VIDEO_TYPE_YOUTUBE
 
     video = get_object_or_404(Video, video_id=video_id)
-    lang_info = debug_video(video)
     vid = video.video_id
     get_subtitles_dict = {}
-    for l in video.subtitlelanguage_set.all():
+
+    for l in video.newsubtitlelanguage_set.all():
         cache_key = vc._subtitles_dict_key(vid, l.pk, None)
-        get_subtitles_dict[l.language] = cache.get(cache_key)
+        get_subtitles_dict[l.language_code] = cache.get(cache_key)
+
     cache = {
         "get_video_urls": cache.get(vc._video_urls_key(vid)),
         "get_subtitles_dict": get_subtitles_dict,
@@ -758,6 +833,7 @@ def video_debug(request, video_id):
         "get_video_languages_verbose": cache.get(vc._video_languages_verbose_key(vid)),
         "writelocked_langs": cache.get(vc._video_writelocked_langs_key(vid)),
     }
+
     tasks = Task.objects.filter(team_video=video)
 
     is_youtube = video.videourl_set.filter(type=VIDEO_TYPE_YOUTUBE).count() != 0
@@ -771,7 +847,6 @@ def video_debug(request, video_id):
     return render_to_response("videos/video_debug.html", {
             'video': video,
             'is_youtube': is_youtube,
-            'lang_info': lang_info,
             'tasks': tasks,
             "cache": cache
     }, context_instance=RequestContext(request))
@@ -780,15 +855,6 @@ def reset_metadata(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
     video_changed_tasks.delay(video.id)
     return HttpResponse('ok')
-
-def _get_translations(video):
-    original = video.subtitle_language()
-    translations = video.subtitlelanguage_set.exclude(subtitle_count=0)
-    if original:
-        translations = translations.exclude(pk=original.pk)
-    translations = list(translations)
-    translations.sort(key=lambda f: f.get_language_display())
-    return translations
 
 def set_original_language(request, video_id):
     """
@@ -799,10 +865,11 @@ def set_original_language(request, video_id):
     if not (can_edit_video(video.get_team_video(), request.user) or video.user == request.user):
         return HttpResponseForbidden("Can't touch this.")
     form = ChangeVideoOriginalLanguageForm(request.POST or None, initial={
-        'language_code': video._original_subtitle_language()
+        'language_code': video.primary_audio_language_code
     })
     if request.method == "POST" and form.is_valid():
-        video.set_original_language(form.cleaned_data['language_code'], user=request.user)
+        video.primary_audio_language_code = form.cleaned_data['language_code']
+        video.save()
         messages.success(request, _(u'The language for %s has been changed' % (video)))
         return HttpResponseRedirect(reverse("videos:set_original_language", args=(video_id,)))
     return render_to_response("videos/set-original-language.html", {

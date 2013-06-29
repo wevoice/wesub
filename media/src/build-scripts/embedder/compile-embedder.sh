@@ -7,8 +7,8 @@ cat media/src/js/third-party/json2.min.js \
     media/src/js/third-party/zepto.min.js \
     media/src/js/third-party/backbone.min.js \
     media/src/js/third-party/popcorn.js \
-    media/src/js/embedder/popcorn.amaratranscript.js \
-    media/src/js/embedder/popcorn.amarasubtitle.js \
+    media/src/js/popcorn/popcorn.amaratranscript.js \
+    media/src/js/popcorn/popcorn.amarasubtitle.js \
     media/src/js/embedder/conf-dev.js \
     media/src/js/embedder/embedder.js \
   > media/release/public/embedder.js

@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -21,13 +21,13 @@ goog.provide('unisubs.widget.DropLockDialog');
 /**
  * @constructor
  */
-unisubs.widget.DropLockDialog = function(serverModel, jsonSubs) {
+unisubs.widget.DropLockDialog = function(serverModel, dfxpString) {
     goog.ui.Dialog.call(this, 'unisubs-modal-lang', true);
     this.setButtonSet(null);
     this.setDisposeOnHide(true);
     this.didLoseSession_ = false;
     this.serverModel_ = serverModel;
-    this.jsonSubs_ = jsonSubs;
+    this.dfxpString_ = dfxpString;
     this.sessionReallyIdleTimer_ = new goog.Timer(1000);
     this.sessionReallyIdleTimer_.start();
     this.secondsIdle_ = 0;
@@ -155,7 +155,7 @@ unisubs.widget.DropLockDialog.prototype.backToEditing_ = function(e) {
 
 unisubs.widget.DropLockDialog.prototype.downloadWork_ = function(e) {
     e.preventDefault();
-    unisubs.finishfaildialog.CopyDialog.showForSubs(this.jsonSubs_);
+    unisubs.finishfaildialog.CopyDialog.showForSubs(this.dfxpString_);
 };
 
 unisubs.widget.DropLockDialog.prototype.tryToResume_ = function(e) {

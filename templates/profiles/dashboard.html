@@ -82,7 +82,7 @@
                                             });
                                         </script>
                                     {% else %}
-                                        <a class="perform" href="{{ task.get_widget_url }}">
+                                        <a class="perform" href="{{ task.get_perform_url }}">
                                             {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
                                                 {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
                                             {% else %}
@@ -152,7 +152,7 @@
                     {% with user.teams.all as user_teams %}
                         {% if user_teams %}
                             {% blocktrans %}
-                                All's quiet in your teams so far. 
+                                All's quiet in your teams so far.
                             {% endblocktrans %}
                         {% else %}
                             {% blocktrans %}

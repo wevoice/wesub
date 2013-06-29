@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,7 @@ import re
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 
@@ -29,6 +30,7 @@ import optparse
 from deploy.git_helpers import get_current_commit_hash
 
 from apps import widget
+from apps.unisubs_compressor.contrib.rjsmin import jsmin
 
 # on vagrant .git is a symlink and this needts to be ran before media compilation ;(
 LAST_COMMIT_GUID = get_current_commit_hash() or settings.LAST_COMMIT_GUID.split('/')[-1]
@@ -47,8 +49,8 @@ def _make_version_debug_string():
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s')
 
-def to_static_root(*paths):
-    return os.path.join(settings.STATIC_ROOT, *paths)
+def to_static_root(*path_components):
+    return os.path.join(settings.STATIC_ROOT, *path_components)
 JS_LIB = os.path.join(settings.PROJECT_ROOT, "media")
 CLOSURE_LIB = os.path.join(JS_LIB, "js", "closure-library")
 FLOWPLAYER_JS = os.path.join(
@@ -164,7 +166,7 @@ class Command(BaseCommand):
             """
         descriptor.write(_make_version_debug_string())
 
-    def compile_css_bundle(self, bundle_name, bundle_type, files):
+    def compile_css_bundle(self, bundle_name, files):
         bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         file_list = [os.path.join(settings.STATIC_ROOT, x) for x in files]
         for f in file_list:
@@ -176,15 +178,15 @@ class Command(BaseCommand):
             dir_path = os.path.dirname(concatenated_path)
         else:
             dir_path = os.path.join(self.temp_dir, "css-compressed")
-            concatenated_path =  os.path.join(dir_path, "%s.%s" % (bundle_name, bundle_type))
+            concatenated_path =  os.path.join(dir_path,
+                                              "%s.css" % bundle_name)
         if os.path.exists(dir_path) is False:
             os.makedirs(dir_path)
         out = open(concatenated_path, 'w')
         out.write("".join(buffer))
         out.close()
-        if bundle_type == "css":
-            filename = "%s.css" % ( bundle_name)
-            cmd_str = "%s --type=%s %s" % (settings.COMPRESS_YUI_BINARY, bundle_type, concatenated_path)
+        filename = "%s.css" % ( bundle_name)
+        cmd_str = "%s --type=css %s" % (settings.COMPRESS_YUI_BINARY, concatenated_path)
         if self.verbosity > 1:
             logging.info( "calling %s" % cmd_str)
         output, err_data  = call_command(cmd_str)
@@ -197,7 +199,27 @@ class Command(BaseCommand):
         #os.remove(concatenated_path)
         return  filename
 
-    def compile_js_bundle(self, bundle_name, bundle_type, files):
+    def compile_js_bundle(self, bundle_name, files):
+        self.ensure_js_dir_exists()
+        bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
+        if bundle_settings.get('use_closure'):
+            return self.compile_js_closure_bundle(bundle_name, files)
+
+        output_file_name = bundle_name + '.js'
+        output_path = os.path.join(self.temp_dir, "js" , output_file_name)
+        with open(output_path, 'w') as output:
+            for input_filename in files:
+                input_path = to_static_root(input_filename)
+                minified = jsmin(open(input_path).read());
+                output.write('/* %s */\n' % input_filename);
+                output.write("%s;\n" % (minified,))
+
+    def ensure_js_dir_exists(self):
+        temp_js_dir = os.path.join(self.temp_dir, 'js')
+        if not os.path.exists(temp_js_dir):
+            os.makedirs(temp_js_dir)
+
+    def compile_js_closure_bundle(self, bundle_name, files):
         bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
         if 'bootloader' in bundle_settings:
             output_file_name = "{0}-inner.js".format(bundle_name)
@@ -207,10 +229,7 @@ class Command(BaseCommand):
         debug = bundle_settings.get("debug", False)
         extra_defines = bundle_settings.get("extra_defines", None)
         include_flash_deps = bundle_settings.get("include_flash_deps", True)
-        if hasattr(bundle_settings, 'ignore_closure'):
-            closure_dep_file = ""
-        else:
-            closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
+        closure_dep_file = bundle_settings.get("closure_deps",'js/closure-dependencies.js' )
         optimization_type = bundle_settings.get("optimizations", self.compilation_level)
 
         logging.info("Starting {0}".format(output_file_name))
@@ -223,8 +242,6 @@ class Command(BaseCommand):
             compiled_js = os.path.join(self.temp_dir, name)
         else:
             compiled_js = os.path.join(self.temp_dir, "js" , output_file_name)
-        if not os.path.exists(os.path.dirname(compiled_js)):
-            os.makedirs(os.path.dirname(compiled_js))
         compiler_jar = COMPILER_PATH
 
         logging.info("Calculating closure dependencies")
@@ -286,6 +303,13 @@ class Command(BaseCommand):
             compiled_js_text = compiled_js_file.read()
 
         with open(compiled_js, 'w') as compiled_js_file:
+
+            # Include dependencies needed for DFXP parsing.
+            with open(os.path.join(JS_LIB, 'src', 'js', 'third-party', 'amara-jquery.min.js'), 'r') as jqueryjs_file:
+                compiled_js_file.write(jqueryjs_file.read())
+            with open(os.path.join(JS_LIB, 'src', 'js', 'dfxp', 'dfxp.js'), 'r') as dfxpjs_file:
+                compiled_js_file.write(dfxpjs_file.read())
+
             if include_flash_deps:
                 with open(os.path.join(JS_LIB, 'js', 'swfobject.js'), 'r') as swfobject_file:
                     compiled_js_file.write(swfobject_file.read())
@@ -332,7 +356,7 @@ class Command(BaseCommand):
         os.remove(uncompiled_file_name)
 
     def compile_media_bundle(self, bundle_name, bundle_type, files):
-        getattr(self, "compile_%s_bundle" % bundle_type)(bundle_name, bundle_type, files)
+        getattr(self, "compile_%s_bundle" % bundle_type)(bundle_name, files)
 
     def _create_temp_dir(self):
         commit_hash = LAST_COMMIT_GUID
@@ -344,6 +368,20 @@ class Command(BaseCommand):
         mr = settings.STATIC_ROOT
         for dirname in os.listdir(mr):
             original_path = os.path.join(mr, dirname)
+            if os.path.isdir(original_path) and dirname not in SKIP_COPING_ON :
+                dest =  os.path.join(self.temp_dir, dirname)
+                if os.path.exists(dest):
+                    shutil.rmtree(dest)
+                shutil.copytree(original_path,
+                         dest,
+                         ignore=shutil.ignore_patterns(*SKIP_COPING_ON))
+
+    def _copy_admin_media_to_cache_dir(self):
+        # temporary until we switch to staticfiles
+        # find admin media
+        admin_media_dir = os.path.join(os.path.dirname(admin.__file__), 'static')
+        for dirname in os.listdir(admin_media_dir):
+            original_path = os.path.join(admin_media_dir, dirname)
             if os.path.isdir(original_path) and dirname not in SKIP_COPING_ON :
                 dest =  os.path.join(self.temp_dir, dirname)
                 if os.path.exists(dest):
@@ -432,9 +470,9 @@ class Command(BaseCommand):
         for bundle_name, data in bundles.items():
             if restrict_bundles and bundle_name not in args:
                 continue
+            print "compiling %s: %s" % (data['type'], bundle_name)
             self.compile_media_bundle(
                 bundle_name, data['type'], data["files"])
-            print "Compiled %s"  % bundle_name
 
     def _remove_cache_dirs_before(self, num_to_keep):
         """
@@ -517,6 +555,7 @@ class Command(BaseCommand):
             self._copy_integration_root_to_temp_dir()
         self._compile_conf_and_embed_js()
         self._compile_media_bundles(restrict_bundles, args)
+        self._copy_admin_media_to_cache_dir()
 
         if not self.keeps_previous:
             self._remove_cache_dirs_before(1)

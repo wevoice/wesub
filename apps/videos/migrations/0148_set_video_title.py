@@ -11,7 +11,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         if not db.dry_run:
             for video in orm.Video.objects.all():
-                video.title = self.calc_title_for_video(video)
+                new_title = self.calc_title_for_video(video).strip() or video.title.strip()
+                video.title = new_title
                 video.save()
 
     def calc_title_for_video(self, video):

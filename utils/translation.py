@@ -10,7 +10,7 @@ from django.utils.translation import (
 )
 from django.utils.translation.trans_real import parse_accept_lang_header
 
-from libs.unilangs import get_language_name_mapping, LanguageCode
+from unilangs import get_language_name_mapping, LanguageCode
 
 
 # A set of all language codes we support.

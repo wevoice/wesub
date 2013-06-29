@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -203,14 +203,34 @@ unisubs.startdialog.Dialog.prototype.setFromContents_ = function() {
     goog.style.showElement(
         this.fromLanguageSection_, enabledFromLanguages.length > 0);
 
+    var targetLanguageCode = this.toLanguageDropdown_.value;
+    var videoLanguages = this.model_.videoLanguages_.videoLanguages_;
+    var targetLanguage;
+
+    for (var l in videoLanguages) {
+        var lang = videoLanguages[l];
+        // account for language codes having the PK attached if they are
+        // incomplete
+        if (lang.LANGUAGE == targetLanguageCode || lang.LANGUAGE+lang.PK == targetLanguageCode) {
+            targetLanguage = lang;
+            break;
+        }
+    }
+    if (targetLanguage && !targetLanguage.IS_COMPLETE) {
+        enabledFromLanguages = goog.array.filter(fromLanguages, function(l) {
+            return targetLanguage.TRANSLATED_FROM == l.LANGUAGE;
+        });
+    }
+
     if (enabledFromLanguages.length > 0) {
         var fromLanguageContents = [];
 
         if (this.translateAllowed_) {
             fromLanguageContents = goog.array.map(
-                this.model_.fromLanguages(),
+                //this.model_.fromLanguages(),
+                enabledFromLanguages,
                 function(l) {
-                    return [l.PK + '', l.toString(), null, l.DISABLED_FROM];
+                    return [l.LANGUAGE + '', l.toString(), null, l.DISABLED_FROM];
                 });
         }
 
@@ -354,60 +374,25 @@ unisubs.startdialog.Dialog.prototype.fromLanguageChanged_ = function(e) {
 };
 unisubs.startdialog.Dialog.prototype.maybeShowWarning_ = function() {
     var warning = null;
-    if (this.fromLanguageDropdown_ &&
-        this.fromLanguageDropdown_.value !=
-        unisubs.startdialog.Dialog.FORK_VALUE)
-        warning = this.warningMessage_();
+    // We used to have code that showed a warning under certain circumstances,
+    // but now we don't need it.  However, this method seems good to keep
+    // around if we need it in the future.
     this.showWarning_(warning);
 };
 unisubs.startdialog.Dialog.prototype.showWarning_ = function(warning) {
     goog.dom.setTextContent(this.warningElem_, warning || '');
     goog.style.showElement(this.warningElem_, !!warning);
 };
-unisubs.startdialog.Dialog.prototype.warningMessage_ = function() {
-    /**
-     * @type {unisubs.startdialog.ToLanguage}
-     */
-    var toLanguage = this.model_.getSelectedLanguage();
-    /**
-     * @type {unisubs.startdialog.VideoLanguageLanguage}
-     */
-    var fromLanguage = this.model_.findFromForPK(
-        parseInt(this.fromLanguageDropdown_.value, 0));
-    if (toLanguage.translationStartsFromScratch(fromLanguage)) {
-        var message = "";
-        if (toLanguage.VIDEO_LANGUAGE.DEPENDENT) {
-            message = "The " + toLanguage.LANGUAGE_NAME +
-                " subtitles you selected were translated from " +
-                toLanguage.VIDEO_LANGUAGE.getStandardLang().languageName() +
-                ". ";
-        }
-        var bestLanguages = this.model_.bestLanguages(
-            toLanguage.LANGUAGE, fromLanguage.LANGUAGE);
-        if (bestLanguages !== null) {
-            message += "There is a better choice for translating into " +
-                toLanguage.LANGUAGE_NAME + " from " +
-                fromLanguage.languageName() + ". ";
-        }
-        else {
-            message += "If you're translating into " + toLanguage.LANGUAGE_NAME +
-                " from " + fromLanguage.languageName() + ", you'll need to " +
-                "start from scratch.";
-        }
-        return message;
-    }
-    return null;
-};
 unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
     e.preventDefault();
     if (this.okHasBeenClicked_)
         return;
     this.okHasBeenClicked_ = true;
-    var fromLanguageID = null;
+    var fromLanguageCode = null;
     if (this.fromLanguageDropdown_ &&
         this.fromLanguageDropdown_.value !=
             unisubs.startdialog.Dialog.FORK_VALUE)
-        fromLanguageID = parseInt(this.fromLanguageDropdown_.value, 0);
+        fromLanguageCode = this.fromLanguageDropdown_.value;
     var toLanguage = this.model_.toLanguageForKey(
         this.toLanguageDropdown_.value);
     var that = this;
@@ -425,7 +410,7 @@ unisubs.startdialog.Dialog.prototype.okClicked_ = function(e) {
             this.originalLangDropdown_.value : null,
         toLanguage.LANGUAGE,
         toLanguage.VIDEO_LANGUAGE ? toLanguage.VIDEO_LANGUAGE.PK : null,
-        fromLanguageID,
+        fromLanguageCode,
         function() { that.setVisible(false); });
     goog.dom.setTextContent(this.okButton_, "Loading...");
     goog.dom.classes.add(this.okButton_, "unisubs-button-disabled");

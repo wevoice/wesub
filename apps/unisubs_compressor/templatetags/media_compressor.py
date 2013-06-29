@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,6 +25,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 should_compress = None
+
+def should_include_js_base_dependencies(bundle_type, bundle):
+    return (bundle_type == "js" and
+            bundle.get('use_closure') and
+            bundle.get('include_js_base_dependencies', True))
 
 def _urls_for(bundle_name, should_compress):
     # if we want to turn off compilation at runtime (eg/ on javascript unit tests)
@@ -56,7 +61,7 @@ def _urls_for(bundle_name, should_compress):
                 suffix = "-inner"
         urls += ["%s%s%s.%s" % ( base, bundle_name, suffix, bundle_type)]
     else:
-        if bundle_type == "js" and bundle.get('include_js_base_dependencies', True):
+        if should_include_js_base_dependencies(bundle_type, bundle):
             urls = list(settings.JS_BASE_DEPENDENCIES)
         urls += settings.MEDIA_BUNDLES.get(bundle_name)["files"]
         

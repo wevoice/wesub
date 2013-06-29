@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -31,7 +31,7 @@ unisubs.widget.OpenDialogArgs = function(
     subLanguageCode, 
     opt_originalLanguageCode, 
     opt_subLanguagePK,
-    opt_baseLanguagePK)
+    opt_baseLanguageCode)
 {
     /**
      * The language code we are subtitling into.
@@ -59,14 +59,14 @@ unisubs.widget.OpenDialogArgs = function(
      * @type {?number}
      * @const
      */
-    this.BASELANGUAGE_PK = opt_baseLanguagePK;
+    this.BASELANGUAGE_CODE = opt_baseLanguageCode;
 };
 
 unisubs.widget.OpenDialogArgs.prototype.matches = function(other) {
     return this.LANGUAGE == other.LANGUAGE &&
         this.ORIGINAL_LANGUAGE == other.ORIGINAL_LANGUAGE &&
         this.SUBLANGUAGE_PK == other.SUBLANGUAGE_PK &&
-        this.BASELANGUAGE_PK == other.BASELANGUAGE_PK;
+        this.BASELANGUAGE_CODE == other.BASELANGUAGE_CODE;
 };
 
 unisubs.widget.OpenDialogArgs.prototype.toObject = function() {
@@ -74,7 +74,7 @@ unisubs.widget.OpenDialogArgs.prototype.toObject = function() {
         'l': this.LANGUAGE,
         'o': this.ORIGINAL_LANGUAGE,
         's': this.SUBLANGUAGE_PK,
-        'b': this.BASELANGUAGE_PK
+        'b': this.BASELANGUAGE_CODE
     };
 };
 

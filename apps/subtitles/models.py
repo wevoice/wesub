@@ -27,7 +27,9 @@ from django.db import models
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
+from apps.subtitles import cache
 from apps.subtitles import shims
+from apps.subtitles import signals
 from apps.auth.models import CustomUser as User
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
@@ -39,12 +41,13 @@ from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
 from utils.translation import is_rtl
 
+
 ALL_LANGUAGES = sorted([(val, _(name)) for val, name in settings.ALL_LANGUAGES],
                        key=lambda v: v[1])
 VALID_LANGUAGE_CODES = [unicode(x[0]) for x in ALL_LANGUAGES]
 
-
 WRITELOCK_EXPIRATION = 30 # 30 seconds
+
 
 # Utility functions -----------------------------------------------------------
 def mapcat(fn, iterable):
@@ -90,12 +93,12 @@ def graphviz(video):
         return '%s%d' % (sv.language_code, sv.version_number)
 
     for sl in video.newsubtitlelanguage_set.all():
-        for sv in sl.subtitleversion_set.all():
+        for sv in sl.subtitleversion_set.full():
             lines.append('%s[label="%s"];' % (_name(sv), _name(sv)))
 
     for sl in video.newsubtitlelanguage_set.all():
-        for sv in sl.subtitleversion_set.all():
-            for pv in sv.parents.all():
+        for sv in sl.subtitleversion_set.full():
+            for pv in sv.parents.full():
                 lines.append("%s -> %s;" % (_name(pv), _name(sv)))
 
     lines.append("}")
@@ -105,7 +108,6 @@ def graphviz(video):
 def print_graphviz(video_id):
     video = Video.objects.get(video_id=video_id)
     print '\n'.join(graphviz(video))
-
 
 
 # Lineage functions -----------------------------------------------------------
@@ -163,10 +165,12 @@ class SubtitleLanguageManager(models.Manager):
         """
         return self.get_query_set().extra(where=[
             """
-            EXISTS
-            (SELECT 1
-               FROM subtitles_subtitleversion AS sv
-              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id)
+            EXISTS (
+                SELECT 1
+                  FROM subtitles_subtitleversion AS sv
+                 WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+               AND NOT sv.visibility_override = 'deleted'
+            )
             """,
         ])
 
@@ -180,10 +184,12 @@ class SubtitleLanguageManager(models.Manager):
         """
         return self.get_query_set().extra(where=[
             """
-            NOT EXISTS
-            (SELECT 1
-               FROM subtitles_subtitleversion AS sv
-              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id)
+            NOT EXISTS (
+                SELECT 1
+                  FROM subtitles_subtitleversion AS sv
+                 WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+               AND NOT sv.visibility_override = 'deleted'
+            )
             """,
         ])
 
@@ -196,6 +202,7 @@ class SubtitleLanguageManager(models.Manager):
             (SELECT 1
                FROM subtitles_subtitleversion AS sv
               WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            AND NOT sv.visibility_override = 'deleted'
                 AND sv.subtitle_count > 0)
             """,
         ])
@@ -208,6 +215,7 @@ class SubtitleLanguageManager(models.Manager):
             (SELECT 1
                FROM subtitles_subtitleversion AS sv
               WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+            AND NOT sv.visibility_override = 'deleted'
                 AND sv.subtitle_count > 0)
             """,
         ])
@@ -220,10 +228,11 @@ class SubtitleLanguageManager(models.Manager):
             EXISTS (
                SELECT 1 FROM subtitles_subtitleversion AS sv
                 INNER JOIN (
-                   SELECT subtitle_language_id,
-                          MAX(version_number) AS tip_version_number
-                   FROM subtitles_subtitleversion AS subver
-                   GROUP BY subtitle_language_id
+                     SELECT subtitle_language_id,
+                            MAX(version_number) AS tip_version_number
+                       FROM subtitles_subtitleversion AS subver
+                      WHERE NOT subver.visibility_override = 'deleted'
+                      GROUP BY subtitle_language_id
                 ) AS tip_versions ON (
                     sv.subtitle_language_id = tip_versions.subtitle_language_id
                     AND sv.version_number = tip_versions.tip_version_number
@@ -241,10 +250,11 @@ class SubtitleLanguageManager(models.Manager):
             NOT EXISTS (
                SELECT 1 FROM subtitles_subtitleversion AS sv
                 INNER JOIN (
-                   SELECT subtitle_language_id,
-                          MAX(version_number) AS tip_version_number
-                   FROM subtitles_subtitleversion AS subver
-                   GROUP BY subtitle_language_id
+                     SELECT subtitle_language_id,
+                            MAX(version_number) AS tip_version_number
+                       FROM subtitles_subtitleversion AS subver
+                      WHERE NOT subver.visibility_override = 'deleted'
+                      GROUP BY subtitle_language_id
                 ) AS tip_versions ON (
                     sv.subtitle_language_id = tip_versions.subtitle_language_id
                     AND sv.version_number = tip_versions.tip_version_number
@@ -266,13 +276,14 @@ class SubtitleLanguageManager(models.Manager):
         """
         return self.get_query_set().extra(where=[
             """
-            EXISTS
-            (SELECT 1
-               FROM subtitles_subtitleversion AS sv
-              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
-            AND NOT (    sv.visibility = 'private'
-                     AND sv.visibility_override = '')
-            AND NOT (sv.visibility_override = 'private'))
+            EXISTS (
+                SELECT 1
+                  FROM subtitles_subtitleversion AS sv
+                 WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+               AND NOT sv.visibility_override = 'deleted'
+               AND NOT sv.visibility_override = 'private'
+               AND NOT (sv.visibility = 'private' AND sv.visibility_override = '')
+            )
             """,
         ])
 
@@ -286,15 +297,17 @@ class SubtitleLanguageManager(models.Manager):
         """
         return self.get_query_set().extra(where=[
             """
-            NOT EXISTS
-            (SELECT 1
-               FROM subtitles_subtitleversion AS sv
-              WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
-            AND NOT (    sv.visibility = 'private'
-                     AND sv.visibility_override = '')
-            AND NOT (sv.visibility_override = 'private'))
+            NOT EXISTS (
+                SELECT 1
+                  FROM subtitles_subtitleversion AS sv
+                 WHERE sv.subtitle_language_id = subtitles_subtitlelanguage.id
+               AND NOT sv.visibility_override = 'deleted'
+               AND NOT sv.visibility_override = 'private'
+               AND NOT (sv.visibility = 'private' AND sv.visibility_override = '')
+            )
             """,
         ])
+
 
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.
@@ -352,6 +365,7 @@ class SubtitleLanguage(models.Model):
             related_name='new_followed_languages', editable=False)
 
     # Statistics
+    subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     subtitles_fetched_counter = RedisSimpleField()
 
     # Manager
@@ -432,6 +446,11 @@ class SubtitleLanguage(models.Model):
     def is_rtl(self):
         return is_rtl(self.language_code)
 
+    def dir(self):
+        if self.is_rtl():
+            return 'rtl'
+        else:
+            return 'ltr'
 
     def __unicode__(self):
         return 'SubtitleLanguage %s / %s / %s' % (
@@ -451,17 +470,25 @@ class SubtitleLanguage(models.Model):
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
 
-    def get_tip(self, public=False):
+    def get_tip(self, public=False, full=False):
         """Return the tipmost version of this language (if any).
 
         If public is given, returns the tipmost version that is visible to the
         general public (if any).
 
+        If full is given, select from ALL versions (public, private, AND
+        deleted).  Giving both public and full will result in an error.
+
         """
+        if public and full:
+            assert False, "Cannot specify public and full in get_tip()!"
+
         if public:
             versions = SubtitleVersion.objects.public()
+        elif full:
+            versions = SubtitleVersion.objects.full()
         else:
-            versions = SubtitleVersion.objects.all()
+            versions = SubtitleVersion.objects.extant()
 
         versions = versions.filter(subtitle_language=self)
         versions = versions.order_by('-version_number')
@@ -473,14 +500,27 @@ class SubtitleLanguage(models.Model):
             return None
 
     def get_public_tip(self):
-        """ Returns the latest public tip for a particular version
-        This is currently being used on the search templates for videos,
-        since we can't specify parameters when calling get_tip + we don't
-        have template tags (afaik).
+        """Return the latest public tip for a particular version.
+
+        This is currently being used on the search templates for videos, since
+        we can't specify parameters when calling get_tip + we don't have
+        template tags (afaik).
 
         TODO: see if we can remove this somehow.
+
         """
         return self.get_tip(public=True)
+
+    def first_public_version(self):
+        """Returns the very fist version to be made public of none"""
+        try:
+            return self.subtitleversion_set.public().order_by("version_number")[0]
+        except IndexError:
+            return None
+
+    def has_public_version(self):
+        """Check if there are any public versions for this language."""
+        return self.subtitleversion_set.public().exists()
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
@@ -564,7 +604,7 @@ class SubtitleLanguage(models.Model):
         kwargs['language_code'] = self.language_code
         kwargs['video'] = self.video
 
-        tip = self.get_tip()
+        tip = self.get_tip(full=True)
 
         version_number = ((tip.version_number + 1) if tip else 1)
         kwargs['version_number'] = version_number
@@ -590,8 +630,28 @@ class SubtitleLanguage(models.Model):
         for p in parents:
             sv.parents.add(p)
 
+        cache.invalidate_language_cache(self)
         return sv
 
+    def is_synced(self, public=True):
+        value = cache.get_is_synced(self, public)
+        if value is None:
+            value = self.get_tip(public=public).is_synced()
+            cache.set_is_synced(self, public, value)
+        return value
+
+    def nuke_language(self):
+        """Delete all SubtitleVersions for this language, as well as all
+        SubtitleVersions for dependent languages.
+        """
+        # delete dependent languages first
+        languages = [self] + self.get_dependent_subtitle_languages()
+        for lang in languages:
+            for sv in lang.subtitleversion_set.extant().all():
+                sv.unpublish(delete=True)
+            signals.language_deleted.send(lang)
+            from teams.signals import api_language_deleted
+            api_language_deleted.send(lang)
 
     def update_signoff_counts(self):
         """Update the denormalized signoff count fields and save."""
@@ -631,8 +691,6 @@ class SubtitleLanguage(models.Model):
 
         return self.video.title
 
-    def get_num_versions(self):
-        return self.subtitleversion_set.count()
 
     def get_subtitle_count(self):
         tip = self.get_tip()
@@ -661,18 +719,21 @@ class SubtitleLanguage(models.Model):
             if not member:
                 return self.subtitleversion_set.public()
 
-        return self.subtitleversion_set.all()
+        return self.subtitleversion_set.extant()
 
     def version(self, public_only=True, version_number=None):
         """Return a SubtitleVersion of this language matching the arguments.
 
         Returns None if no versions match.
 
+        Cannot return deleted versions.  If you need a deleted version you need
+        to look it up another way.
+
         """
         assert self.pk, "Can't find a version for a language that hasn't been saved"
 
         qs = self.subtitleversion_set
-        qs = qs.public() if public_only else qs.all()
+        qs = qs.public() if public_only else qs.extant()
 
         if version_number != None:
             qs = qs.filter(version_number=version_number)
@@ -685,29 +746,28 @@ class SubtitleLanguage(models.Model):
             return None
 
 
-    def get_translation_source_language_code(self):
+    def get_translation_source_language_code(self, ignore_forking=False):
         """
         Returns the language code of the language that served as the
         source language for this translation, or None if no languages
         are found on the lineage.
 
+        In some cases, you might want to ignore the is_forked attribute. For
+        example, on the new editor, you want to see the language this was
+        translated from, even if it was forked. Unless that's your very specific
+        use case, just leave `ignore_forking` as False.
+
         Right now, we're only allowing for 1 source language, but that
         could be revisited in the future.
 
         """
-        if self.is_forked:
-            return None
+        source_language = self.get_translation_source_language(
+            ignore_forking=ignore_forking
+        )
+        return source_language.language_code if source_language else None
 
-        tip_version = self.get_tip()
-        if not tip_version:
-            return None
 
-        lineage = tip_version.lineage
-        source_codes = [lc for lc in lineage.keys() if lc != self.language_code]
-
-        return source_codes[0] if source_codes else None
-
-    def get_translation_source_language(self):
+    def get_translation_source_language(self, ignore_forking=False):
         """
         Returns the new SubtitleLanguage object that served as the
         source language for this translation, or None if no languages
@@ -717,19 +777,63 @@ class SubtitleLanguage(models.Model):
         could be revisited in the future.
 
         """
-        source_lc = self.get_translation_source_language_code()
+        source_version = self.get_translation_source_version(
+            ignore_forking=ignore_forking)
 
-        if not source_lc:
+        return source_version.subtitle_language if source_version else None
+
+
+    def get_translation_source_version(self, ignore_forking=False):
+        '''
+        Returns the new SubtitleVersion object that served as the
+        source for this translation, or None if no versions
+        are found on the lineage.
+
+        Right now, we're only allowing for 1 version, but that
+        could be revisited in the future.
+        '''
+        if  not ignore_forking and self.is_forked:
             return None
 
-        try:
-            return SubtitleLanguage.objects.get(
-                video=self.video, language_code=source_lc)
-        except (SubtitleLanguage.DoesNotExist, IndexError):
+        current_version = self.get_tip()
+        if not current_version:
             return None
 
-    def get_dependent_subtitle_languages(self):
-        """Return subtitle languages that are dependents/translations of this.
+        while True:
+            parents = current_version.parents.full().order_by('-pk')
+            # parents can be on the same language, try other languages at first
+            other_languages = parents.exclude(subtitle_language=self)
+            try:
+                return other_languages[0]
+            except IndexError:
+                if current_version.version_number > 1:
+                    try:
+                        # previous versions might have parents in other languages
+                        # so set the current version to the same language, and
+                        # check that out
+                        current_version = parents[0]
+                    except IndexError:
+                        return None
+                else:
+                    return None
+
+
+    def get_dependent_subtitle_languages(self, direct=False):
+        """Return a list of SLs that are dependents/translations of this.
+
+        If direct is given, only direct dependents will be returned.  Direct
+        dependents are languages that were directly translated from this one.
+        Indirect dependents have a language in between.  For example:
+
+            en -> fr -> de
+
+            >>> en.get_dsl(direct=False)
+            [fr, de]
+
+            >>> en.get_dsl(direct=True)
+            [fr]
+
+        Note that this is NOT going to be very performant.
 
         This is a shim for the existing UI.  Once the new one comes this
         monstrosity will be torn out.
@@ -756,7 +860,21 @@ class SubtitleLanguage(models.Model):
             if tip and self.language_code in tip.lineage:
                 results.append(sl)
 
+        # Direct translations are restricted to those that come directly from
+        # the source language (this).
+        if direct:
+            lc = self.language_code
+            results = [sl for sl in results
+                       if sl.get_translation_source_language_code() == lc]
+
         return results
+
+
+    def fork(self):
+        """Fork this language."""
+
+        self.is_forked = True
+        self.save()
 
 
     def get_widget_url(self, mode=None, task_id=None):
@@ -786,7 +904,8 @@ class SubtitleLanguage(models.Model):
         return qs
 
     def in_progress(self):
-        """
+        """Return whether this SubtitleLanguage is "in progress".
+
         Moderated teams:
 
             It's in progress if it has an unapproved draft
@@ -794,6 +913,7 @@ class SubtitleLanguage(models.Model):
         Unmoderated teams:
 
             It's in progress if it has subs but not marked as complete
+
         """
         if self.video.is_moderated:
             if self.get_tip().is_private():
@@ -805,19 +925,84 @@ class SubtitleLanguage(models.Model):
 
         return False
 
-    def unpublish(self):
-        """ Unpublishes the last public version for this Subtitle Language """
-        tip = self.get_tip(public=True)
-        return tip.unpublish() if tip else None
+    @property
+    def is_imported_from_youtube_and_not_worked_on(self):
+        versions = self.subtitleversion_set.full()
+        if versions.count() > 1 or versions.count() == 0:
+            return False
+
+        version = versions[0]
+
+        if version.note == 'From youtube':
+            return True
+
+        return False
 
 
 # SubtitleVersions ------------------------------------------------------------
 class SubtitleVersionManager(models.Manager):
+    use_for_related_fields = True
+
+    # ---------------------------- IMPORTANT ----------------------------------
+    #
+    # Django Managers contain proxy methods to querysets like .filter() and
+    # such.  DO NOT USE THEM.  They will bypass the full/extant/public methods
+    # that perform the appropriate filtering.
+    #
+    # So instead of:
+    #
+    #     sl.subtitleversion_set.filter(...)
+    #
+    # You should do:
+    #
+    #     sl.subtitleversion_set.full().filter(...)
+    #
+    # Normally we'd disable all these proxy methods so we could find all the
+    # places where they're used, and it would be safe and break loudly instead
+    # of silently doing unsafe things.  Unfortunately Django's Model class uses
+    # these proxy methods instead of going through get_query_set(), so we're out
+    # of luck.
+
+    # These three methods are your main entry point into SubtitleVersion querysets.
+    def full(self):
+        """Return a queryset of ALL versions (including deleted ones)."""
+        return self.get_query_set()
+
+    def extant(self):
+        """Return a queryset of all non-deleted versions."""
+        return (self.get_query_set()
+                    .exclude(visibility_override='deleted'))
+
     def public(self):
         """Return a queryset of all publicly-visible versions."""
         return (self.get_query_set()
                     .exclude(visibility='private', visibility_override='')
-                    .exclude(visibility_override='private'))
+                    .exclude(visibility_override='private')
+                    .exclude(visibility_override='deleted'))
+
+    def all(self):
+        assert False, ('all() is disabled on SubtitleVersion sets.  '
+                       'Use full(), extant(), or public() instead.')
+
+ORIGIN_API = 'api'
+ORIGIN_IMPORTED = 'imported'
+ORIGIN_LEGACY_EDITOR = 'web-legacy-editor'
+ORIGIN_ROLLBACK = 'rollback'
+ORIGIN_SCRIPTED = 'scripted'
+ORIGIN_TERN = 'tern'
+ORIGIN_UPLOAD = 'upload'
+ORIGIN_WEB_EDITOR = 'web-editor'
+
+SUBTITLE_VERSION_ORIGINS = (
+    (ORIGIN_API, _("API")),
+    (ORIGIN_LEGACY_EDITOR, _("Subtitle Editor")),
+    (ORIGIN_IMPORTED, _("Imported")),
+    (ORIGIN_ROLLBACK, _("Rollback")),
+    (ORIGIN_SCRIPTED, _("Scripted")),
+    (ORIGIN_TERN, _("Tern")),
+    (ORIGIN_UPLOAD, _("Uploaded")),
+    (ORIGIN_WEB_EDITOR, _("Through web editor")),
+)
 
 class SubtitleVersion(models.Model):
     """SubtitleVersions are the equivalent of a 'changeset' in a VCS.
@@ -852,7 +1037,7 @@ class SubtitleVersion(models.Model):
     # logic of visibility + visibility_override.
     visibility = models.CharField(max_length=10,
                                   choices=(('public', 'public'),
-                                           ('private', 'private')),
+                                           ('private', 'private'),),
                                   default='public')
 
     # Visibility override can be used by team admins to force a specific type of
@@ -860,7 +1045,8 @@ class SubtitleVersion(models.Model):
     # affect, the main visibility field.
     visibility_override = models.CharField(max_length=10, blank=True,
                                            choices=(('public', 'public'),
-                                                    ('private', 'private')),
+                                                    ('private', 'private'),
+                                                    ('deleted', 'deleted'),),
                                            default='')
 
     version_number = models.PositiveIntegerField(default=1)
@@ -885,6 +1071,9 @@ class SubtitleVersion(models.Model):
                                                              blank=True,
                                                              default=None)
 
+    # Keeps tab of how this SV was originated (uploads, api, etc)
+    origin = models.CharField(max_length=255, choices=SUBTITLE_VERSION_ORIGINS,
+                              blank=True, default='')
     # Denormalized count of the number of subtitles this version contains, for
     # easier filtering later.
     subtitle_count = models.PositiveIntegerField(default=0)
@@ -1057,9 +1246,9 @@ class SubtitleVersion(models.Model):
 
         """
         def _ancestors(version):
-            return [version] + list(mapcat(_ancestors, version.parents.all()))
+            return [version] + list(mapcat(_ancestors, version.parents.full()))
 
-        return set(mapcat(_ancestors, self.parents.all()))
+        return set(mapcat(_ancestors, self.parents.full()))
 
     def get_subtitle_count(self):
         # TODO: babelsubs now supports len() on SubtitleSet instances
@@ -1088,14 +1277,13 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(), HTMLGenerator.MAPPINGS)
-
-
+        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(),
+                                   HTMLGenerator.MAPPINGS)
 
         self._text_change = diff_data['text_changed']
         self._time_change = diff_data['time_changed']
 
-        return  self._time_change, self._text_change
+        return self._time_change, self._text_change
 
     @property
     def time_change(self):
@@ -1117,8 +1305,9 @@ class SubtitleVersion(models.Model):
         else:
             return '%.0f%%' % (self._text_change * 100)
 
+
     def is_private(self):
-        if self.visibility_override == 'public':
+        if self.visibility_override in ('public', 'deleted'):
             return False
         elif self.visibility_override == 'private':
             return True
@@ -1128,26 +1317,38 @@ class SubtitleVersion(models.Model):
     def is_public(self):
         if self.visibility_override == 'public':
             return True
-        elif self.visibility_override == 'private':
+        elif self.visibility_override in ('private', 'deleted'):
             return False
         else:
             return self.visibility == 'public'
 
+    def is_deleted(self):
+        return self.visibility_override == 'deleted'
 
     def is_rollback(self):
         """Return whether this version is a rollback of another version."""
 
         return self.rollback_of_version_number != None
 
-    def get_rollback_source(self):
-        """Return the SubtitleVersion that is the source for this rollback, or None."""
+    def get_rollback_source(self, full):
+        """Return the SubtitleVersion that is the source for this rollback, or None.
 
+        If full is given, deleted source versions will be returned.  Otherwise
+        None will be returned if the source version has been deleted.
+
+        """
         n = self.rollback_of_version_number
         if n == 0 or n == None:
             # Non-rollbacks and legacy rollbacks have no source.
             return None
         else:
-            return self.sibling_set.get(version_number=n)
+            qs = self.sibling_set.full() if full else self.sibling_set.extant()
+            try:
+                return qs.get(version_number=n)
+            except SubtitleVersion.DoesNotExist:
+                # This can occur when full=False and the source version is
+                # deleted.  In this case we just return None.
+                return None
 
 
     @property
@@ -1213,19 +1414,32 @@ class SubtitleVersion(models.Model):
         """Set the step of the workflow that this version originated in."""
         self._set_metadata('workflow_origin', origin)
 
-    def next_version(self):
+    def next_version(self, full=False):
+        """Return the next SubtitleVersion.
+
+        By default this does not return deleted versions.  If full is given
+        deleted versions will be returned.
+
+        """
+        qs = self.sibling_set.full() if full else self.sibling_set.extant()
         try:
-            return self.sibling_set.filter(
-                    version_number__gt=self.version_number).order_by(
-                        'version_number')[0]
+            return (qs.filter(version_number__gt=self.version_number)
+                      .order_by('version_number')[0])
         except IndexError:
             return None
 
-    def previous_version(self):
+    def previous_version(self, full=False):
+        """Return the previous SubtitleVersion.
+
+
+        By default this does not return deleted versions.  If full is given
+        deleted versions will be returned.
+
+        """
+        qs = self.sibling_set.full() if full else self.sibling_set.extant()
         try:
-            return self.sibling_set.filter(
-                    version_number__lt=self.version_number).order_by(
-                        '-version_number')[0]
+            return (qs.filter(version_number__lt=self.version_number)
+                      .order_by('-version_number')[0])
         except IndexError:
             return None
 
@@ -1248,21 +1462,26 @@ class SubtitleVersion(models.Model):
     def is_synced(self):
         return self.get_subtitles().fully_synced
 
-    def unpublish(self):
-        """ Unpublishes this version """
+    def publish(self):
+        """Make this version publicly viewable."""
 
         team_video = self.video.get_team_video()
 
         assert team_video, \
                "Cannot unpublish for a video not moderated by a team."
-
-        assert team_video.team.unpublishing_enabled(), \
-               "Cannot unpublish for a team without unpublishing enabled."
-
-        self.visibility_override = 'private'
+        self.visibility = 'public'
         self.save()
 
-        return self
+    def unpublish(self, delete=False):
+        """Unpublish this version.
+
+        If delete is given, "delete" it entirely (not *really*, of course).
+
+        """
+        team_video = self.video.get_team_video()
+
+        self.visibility_override = 'deleted' if delete else 'private'
+        self.save()
 
     @models.permalink
     def get_absolute_url(self):

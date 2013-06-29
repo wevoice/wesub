@@ -29,7 +29,7 @@
     <table>
 
         <thead>
-            <th>Team name</th>
+            <th>Team names</th>
             <th>Start date</th>
             <th>End date</th>
             <th>Report type</th>
@@ -41,7 +41,7 @@
 
         {% for report in reports %}
         <tr>
-            <td>{{ report.team.name }}</td>
+            <td>{{ report.teams.all|join:', ' }}</td>
             <td>{{ report.start_date }}</td>
             <td>{{ report.end_date }}</td>
             <td>{{ report.get_type_display }}</td>

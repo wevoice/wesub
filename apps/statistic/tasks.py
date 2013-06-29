@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -36,7 +36,12 @@ def gauge_statistic():
     Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
     Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())
     Gauge('statistic.shares.email').report(EmailShareStatistic.objects.count())
-    Gauge('statistic.views.subtitles').report(int(st_sub_fetch_handler.total_key.get()))
+    total_key = st_sub_fetch_handler.total_key.get()
+    if total_key:
+        total_key = int(total_key)
+    else:
+        total_key = 0
+    Gauge('statistic.views.subtitles').report(total_key)
 
 def graphite_slugify(s):
     for c in ' -.,:':
@@ -75,7 +80,12 @@ def st_sub_fetch_handler_update(**kwargs):
 
 @task
 def st_video_view_handler_update(**kwargs):
-    st_video_view_handler.update(**kwargs)
+    try:
+        st_video_view_handler.update(**kwargs)
+    except:
+        # Don't worry if we can't reach Redis for this -- it's only a view
+        # counter.
+        pass
 
 
 @task

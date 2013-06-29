@@ -23,6 +23,7 @@
         window.WIDGET_SETTINGS = {{ widget_settings|to_json|safe }};
         window.REQUEST_GET_LANG = '{{ request.GET.lang }}';
         window.ASSIGN_TASK_AJAX_URL = '{% url teams:assign_task_ajax slug=team.slug %}';
+        window.ASSIGNEE = '{% firstof request.user.id -1 %}';
         window.CURRENT_USER_ID = {% firstof request.user.id -1 %};
         window.TEAM_SLUG = '{{ team.slug }}';
         window.USER_LANGS = {{ user.get_languages.count }};
@@ -61,10 +62,11 @@
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
                                 <li>
-                                    <a href="{{ task.get_widget_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                         {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+                                            <a href="{{ task.get_perform_url}}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                             {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% else %}
+                                            <a href="{{ task.get_perform_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
                                             {{ task.get_type_display }}
                                             {{ task.get_language_display }} {% trans "subtitles" %}
                                         {% endif %}
@@ -157,7 +159,7 @@
                                                 <ul>
                                                     {% for task in team_video.tasks %}
                                                         <li>
-                                                            <a class="perform-task-{{ task.pk }}" href="{{ task.get_widget_url }}" title="Get started now">
+                                                            <a class="perform-task-{{ task.pk }}" href="{{ task.get_perform_url }}" title="Get started now">
                                                                 {% if task.get_type_display == 'Subtitle' %}
                                                                     {% trans "Create Subtitles" %}
                                                                 {% else %}
@@ -174,7 +176,7 @@
                                             </div>
                                         {% else %} {# there is only one task for this video #}
                                             {% with task=team_video.tasks|first %}
-                                            <a href="{{ task.get_widget_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
+                                            <a href="{{ task.get_perform_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
                                                     {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
                                                         Create {{ task.get_language_display }} subtitles
                                                     {% else %}
@@ -187,7 +189,7 @@
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
                                         {% if team_video.video.languages_count < 1 or not user.get_languages %}
-                                            <a href="#" class="video-{{ team_video.id }}" title="Get started now">{% trans 'Create subtitles' %}</a>
+                                            <a href="#" class="video-{{ team_video.id }}" title="Get started now">{% trans 'Create Subtitles' %}</a>
                                         {% else %} {# this video already has languages #}
                                             {% if team_video.languages|length > 1 %}
                                                 <a href="#" class="dropdown">

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -38,8 +38,9 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
+from subtitles.models import SubtitleLanguage
 from videos.models import (
-    Action, SubtitleLanguage, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
+    Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
 )
 
 
@@ -137,10 +138,12 @@ def videos(request, user_id=None):
 
     if q:
         qs = qs.filter(Q(title__icontains=q)|Q(description__icontains=q))
+
     context = {
         'user_info': user,
         'query': q
     }
+
     qs = qs._clone(OptimizedQuerySet)
 
     return object_list(request, queryset=qs,

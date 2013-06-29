@@ -66,13 +66,9 @@
 {% block main_content %}
     <h2 class="main-title">
         {% if second_version.next_version %}
-            {% blocktrans with first_version.version_no as version_no and second_version.version_no as second_version_no %}
-            Comparing revision (#{{ second_version_no }}) to revision (#{{ version_no }})
-            {% endblocktrans %}
+            Comparing revision (#{{ second_version.version_number }}) to revision (#{{ first_version.version_number }})
         {% else %}
-            {% blocktrans with first_version.version_no as version_no and second_version.version_no as second_version_no %}
-            Comparing revision (#{{ second_version_no }}) to current revision (#{{ version_no }})
-            {% endblocktrans %}
+            Comparing revision (#{{ second_version.version_number }}) to current revision (#{{ first_version.version_number }})
         {% endif %}
     </h2>
 
@@ -84,7 +80,7 @@
       </li>
       <li>
           <a href="{{ language.get_absolute_url }}">
-              {{ language.language_display }} {% trans 'Subtitles' %}
+              {{ language.get_language_code_display }} {% trans 'Subtitles' %}
           </a>
       </li>
       <li>
@@ -93,7 +89,7 @@
           </a>
       </li>
       <li>
-          <a href="#" class="nohover">{% trans 'Comparing Revision' %} #{{ first_version.version_no }} & #{{ second_version.version_no }}</a>
+          <a href="#" class="nohover">{% trans 'Comparing Revision' %} #{{ first_version.version_number }} & #{{ second_version.version_number }}</a>
       </li>
     </ul>
 
@@ -101,10 +97,8 @@
 
     <div class="left_column">
         <h3 class="diff_title">
-            {% blocktrans with second_version.version_no as version_no and second_version.user as user %}
-            Revision #{{ version_no }} by {{ user }}
-            {% endblocktrans %}
-            <span class="small">{{ second_version.datetime_started|timesince }} {% trans "ago" %}</span>
+            Revision #{{ second_version.version_number }} by {{ second_version.author }}
+            <span class="small">{{ second_version.created|timesince }} {% trans "ago" %}</span>
         </h3>
 
         <div class="clear">&nbsp;</div>
@@ -115,7 +109,7 @@
         <div class="revision_buttons">
             {% if second_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback second_version.pk %}" class="roll_back">
-                    {% trans 'Roll back to version' %} (#{{ second_version.version_no }})
+                    {% trans 'Roll back to version' %} (#{{ second_version.version_number }})
                 </a>
             {% endif %}
 
@@ -134,42 +128,12 @@
             </div>
         </div>
 
-        <table cellpadding="0" cellspacing="0">
-          {% for item in captions %}
-            <tr {% cycle 'class="even"' '' %}>
-                  <td>
-                    {% if item.1.has_start_time %}
-                    <span class="time-span time_link">
-                        <span class="data">{{item.1.start_time|format_sub_time}}</span>
-                        <span class="badgy start">
-                            <span class="stamp_text">{{item.1.start_time|format_sub_time}}</span>
-                        </span>
-                        {% if item.1.has_end_time %}
-                          <span class="connector"></span>
-                          <span class="badgy end">
-                              <span class="stamp_text">{{ item.1.end_time|format_sub_time }}</span>
-                          </span>
-                        {% endif %}
-                    </span>
-
-                {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
-                {% endif %}
-                  <span {% if item.2.text %}class="time_change"{% endif %}>
-                    {{ item.1.text|display_subtitle|safe }}
-                  </span>
-                  </td>
-            </tr>
-          {% endfor %}
-        </table>
     </div>
 
     <div class="right_column">
         <h3 class="diff_title">
-            {% blocktrans with first_version.version_no as version_no and first_version.user as user %}
-            Revision #{{ version_no }} by {{ user }}
-            {% endblocktrans %}
-             <span class="small">{{ first_version.datetime_started|timesince }} {% trans "ago" %}</span>
+            Revision #{{ first_version.version_number }} by {{ first_version.author }}
+             <span class="small">{{ first_version.created|timesince }} {% trans "ago" %}</span>
         </h3>
 
 
@@ -182,7 +146,7 @@
         <div class="revision_buttons">
             {% if first_version.next_version and rollback_allowed %}
                 <a href="{% url videos:rollback first_version.pk %}" class="roll_back">
-                    {% trans 'Roll back to version' %} (#{{ first_version.version_no }})
+                    {% trans 'Roll back to version' %} (#{{ first_version.version_number }})
                 </a>
             {% endif %}
          </div>
@@ -200,34 +164,19 @@
              </div>
          </div>
 
-        <table cellpadding="0" cellspacing="0">
-
-          {% for item in captions %}
-            <tr {% cycle 'class="even"' '' %}>
-                  <td>
-
-                {% if item.0.has_start_time %}
-                    <span class="time-span time_link">
-                        <span class="data">{{item.0.start_time|format_sub_time}}</span>
-                        <span class="badgy start">
-                           <span class="stamp_text">{{ item.0.start_time|format_sub_time }}</span>
-                        </span>
-                        {% if item.0.has_end_time %}
-                          <span class="connector"></span>
-                          <span class="badgy end">
-                              <span class="stamp_text">{{ item.0.end_time|format_sub_time }}</span>
-                          </span>
-                        {% endif %}
-                    </span>
-                {% else %}
-                <span class="time-span"><span class="badgy no-sync">{% trans 'Not Synced' %}</span></span>
-                {% endif %}
-                  <span {% if item.2.text %}class="time_change"{% endif %}>
-                    {{ item.0.text|display_subtitle|safe }}
-                  </span>
-                  </td>
-            </tr>
-          {% endfor %}
-        </table>
     </div>
+    <div style="clear: both"></div>
+    <ol class="subtitles-diff">
+    {% for item in diff_data.subtitle_data %}
+      <li>
+        <div class="left_column">
+                  {% render_subtitle_diff item 0 %}
+        </div>
+        <div class="right_column">
+                  {% render_subtitle_diff item 1 %}
+        </div>
+        <div style="clear: both"></div>
+      </li>
+    {% endfor %}
+    </ol>
 {% endblock %}

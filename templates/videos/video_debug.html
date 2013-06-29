@@ -189,6 +189,10 @@ jQuery(function($) {
         <td>urls</td>
         <td>{{video.videourl_set.all}}</td>
     </tr>
+    <tr>
+        <td>Primary Audio language</td>
+        <td>{{video.primary_audio_language_code}}</td>
+    </tr>
 </table>
 
 <h2>Languages</h2>
@@ -198,20 +202,18 @@ jQuery(function($) {
     <th>Is Original</th>
     <th>Is Forked</th>
     <th>Is complete</th>
-    <th>Percent done</th>
     <th>Num Subs</th>
-    <th>translated from</th>
-    <th>has versio</th>
+    <th>Translated from</th>
+    <th>Has version</th>
   </tr>
-  {% for x in video.subtitlelanguage_set.all %}
+  {% for x in video.newsubtitlelanguage_set.all %}
   <tr>
-    <td>{{x.language}}</td>
-    <td>{{x.is_original}}</td>
+    <td>{{x.language_code}}</td>
+    <td>{{x.is_primary_audio_language}}</td>
     <td>{{x.is_forked}}</td>
-    <td>{{x.is_complete}}</td>
-    <td>{{x.percent_done}}</td>
-    <td>{{x.subtitle_count}}</td>
-    <td>{{x.standard_language}}</td>
+    <td>{{x.subtitles_complete}}</td>
+    <td>{{x.get_subtitle_count}}</td>
+    <td>{{x.get_translation_source_language_code}}</td>
     <td>{{x.has_version}}</td>
   </tr>
   {% endfor %}

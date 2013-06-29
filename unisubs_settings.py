@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -58,7 +58,13 @@ elif INSTALLATION == PRODUCTION:
     )
     # only send actual email on the production server
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+elif INSTALLATION == DEMO:
+    DEBUG = True
+    REDIS_DB = "4"
+    SENTRY_TESTING = True
 elif INSTALLATION == LOCAL:
+    SITE_ID = 14
+    SITE_NAME = 'unisubsstaging'
     ADMINS = (
         ('Evan', 'ehazlett@pculture.org'),
     )

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -189,15 +189,16 @@ def team_application_denied(application_pk):
         "url_base": get_url_base(),
         "note": application.note,
     }
+    subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
     if application.user.notify_by_message:
         msg = Message()
-        msg.subject = ugettext(u'Your application to join the %s team has been declined' % application.team.name)
+        msg.subject = subject
         msg.content = render_to_string("messages/team-application-denied.txt", context)
         msg.user = application.user
         msg.object = application.team
         msg.save()
     Meter('templated-emails-sent-by-type.teams.application-declined').inc()
-    send_templated_email(msg.user, msg.subject, template_name, context)
+    send_templated_email(application.user, subject, template_name, context)
 
 @task()
 def team_member_new(member_pk):
@@ -423,7 +424,7 @@ def _reviewed_notification(task_pk, status):
     if task.review_base_version:
         user = task.review_base_version.user
     else:
-        user = task.subtitle_version.user
+        user = task.new_subtitle_version.author
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -431,7 +432,7 @@ def _reviewed_notification(task_pk, status):
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.subtitle_version.language.pk,
+        'lang_id': task.new_subtitle_version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -445,7 +446,7 @@ def _reviewed_notification(task_pk, status):
 
     context = {
         "team":task.team,
-        "title": task.subtitle_version.language.get_title(),
+        "title": task.new_subtitle_version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -476,13 +477,13 @@ def _reviewed_notification(task_pk, status):
 
     if status == REVIEWED_AND_SENT_BACK:
         if task.type == Task.TYPE_IDS['Review']:
-            Action.create_declined_video_handler(task.subtitle_version, reviewer)
+            Action.create_declined_video_handler(task.new_subtitle_version, reviewer)
         else:
-            Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+            Action.create_rejected_video_handler(task.new_subtitle_version, reviewer)
     elif status == REVIEWED_AND_PUBLISHED:
-        Action.create_approved_video_handler(task.subtitle_version, reviewer)
+        Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
     elif status == REVIEWED_AND_PENDING_APPROVAL:
-        Action.create_accepted_video_handler(task.subtitle_version, reviewer)
+        Action.create_accepted_video_handler(task.new_subtitle_version, reviewer)
 
     return msg, email_res
 
@@ -517,7 +518,7 @@ def approved_notification(task_pk, published=False):
         return False
     # some tasks are being created without subtitles version, see
     # https://unisubs.sifterapp.com/projects/12298/issues/552092/comments
-    if not task.subtitle_version:
+    if not task.new_subtitle_version:
         return False
 
     if published:
@@ -528,14 +529,14 @@ def approved_notification(task_pk, published=False):
         template_txt = "messages/team-task-approved-sentback.txt"
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
-    user = task.subtitle_version.user
+    user = task.new_subtitle_version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.subtitle_version.language.pk,
+        'lang_id': task.new_subtitle_version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -543,7 +544,7 @@ def approved_notification(task_pk, published=False):
 
     context = {
         "team":task.team,
-        "title": task.subtitle_version.language.get_title(),
+        "title": task.new_subtitle_version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -566,7 +567,7 @@ def approved_notification(task_pk, published=False):
     template_name = template_html
     Meter('templated-emails-sent-by-type.teams.approval-result').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_approved_video_handler(task.subtitle_version, reviewer)
+    Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
     return msg, email_res
 
 @task
@@ -583,14 +584,14 @@ def send_reject_notification(task_pk, sent_back):
         return False
 
     subject = ugettext(u"Your subtitles were not accepted")
-    user = task.subtitle_version.user
+    user = task.new_subtitle_version.user
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.subtitle_version.language.pk,
+        'lang_id': task.new_subtitle_version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -598,7 +599,7 @@ def send_reject_notification(task_pk, sent_back):
 
     context = {
         "team":task.team,
-        "title": task.subtitle_version.language.get_title(),
+        "title": task.new_subtitle_version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -622,7 +623,7 @@ def send_reject_notification(task_pk, sent_back):
     template_name = "messages/email/team-task-rejected.html"
     Meter('templated-emails-sent-by-type.teams.task-rejected').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_rejected_video_handler(task.subtitle_version, reviewer)
+    Action.create_rejected_video_handler(task.new_subtitle_version, reviewer)
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
@@ -636,7 +637,8 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
 
     """
     from comments.models import Comment
-    from videos.models import Video, SubtitleLanguage, SubtitleVersion
+    from videos.models import Video
+    from subtitles.models import SubtitleLanguage, SubtitleVersion
 
     if not isinstance(comment_pk_or_instance, Comment):
         try:
@@ -670,7 +672,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     if language:
         language_url = universal_url("videos:translation_history", kwargs={
             "video_id": video.video_id,
-            "lang": language.language,
+            "lang": language.language_code,
             "lang_id": language.pk,
         })
     else:
@@ -679,8 +681,8 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     if version:
         version_url = universal_url("videos:subtitleversion_detail", kwargs={
             'video_id': version.video.video_id,
-            'lang': version.language.language,
-            'lang_id': version.language.pk,
+            'lang': version.subtitle_language.language_code,
+            'lang_id': version.subtitle_language.pk,
             'version_id': version.pk,
         })
     else:
@@ -689,9 +691,6 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
     subject = SUBJECT_EMAIL_VIDEO_COMMENTED  % dict(user=unicode(comment.user), title=video.title_display())
 
     followers = set(video.notification_list(comment.user))
-
-    if language:
-        followers.update(language.notification_list(comment.user))
 
     for user in followers:
         Meter('templated-emails-sent-by-type.new-comment-notification').inc()
@@ -719,7 +718,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
         obj = language
         object_pk = language.pk
         content_type = ContentType.objects.get_for_model(language)
-        exclude = list(language.followers.filter(notify_by_message=False))
+        exclude = [c.user for c in language.followers.filter(notify_by_message=False)]
         exclude.append(comment.user)
         message_followers = language.notification_list(exclude)
     else:

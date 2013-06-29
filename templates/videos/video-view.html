@@ -74,7 +74,7 @@
         <h2 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display_unabridged }}</a>
         </h2>
-        {% with video.get_description_display as description %}
+        {% with video.description as description %}
             <div id="description"{% if description|length > 300 %} class="abbr collapsed"{% endif %}>
                 <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
                     {{ description|urlize|linebreaks }}
@@ -115,19 +115,15 @@
                 ({{ video.languages_count }})
             {% endif %}
         </h3>
-        {% if video.subtitle_language or translations %}
-            <div>
-                <div>
-                    <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
-                        {% include 'videos/_left_navigation.html' %}
-                        {% if video.languages_count > 14 %}
-                            <li class="expand">
-                                <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
+        {% if language_list %}
+            <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
+                {% include 'videos/_left_navigation.html' %}
+                {% if video.languages_count > 14 %}
+                    <li class="expand">
+                        <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                    </li>
+                {% endif %}
+            </ul>
         {% else %}
             {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
                 {% with video.get_team_video as team_video %}
@@ -136,7 +132,7 @@
                             {% if team_video.task_set.incomplete.exists %}
                                 <p>{% trans "No subtitles yet." %} <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">{% trans "View tasks for this video." %}</a></p>
                             {% else %}
-                                {% trans "This video doesn't have any subtitles or tasks yet" %}
+                                {% trans "This video doesn't have any subtitles or tasks yet." %}
                             {% endif %}
                         {% else %}
                             <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
@@ -147,7 +143,7 @@
                 {% endwith %}
             {% else %}
                 <p>
-                    {% trans "This video doesn't have any subtitles yet" %}
+                    {% trans "This video doesn't have any subtitles yet." %}
                 </p>
             {% endif %}
         {% endif %}
@@ -231,6 +227,11 @@
             </li>
             <li>
                 <a href="{% url admin:videos_video_change video.pk %}" target="blank">{% trans 'Edit video' %}</a>
+            </li>
+            <li>
+                <a href="{% url subtitles:subtitle-editor video.video_id 'en' %}" target="_blank">New editor</a>
+            </li>
+            <li>
             </li>
             <li>{% feature_video video %}</li>
             {% if task %}<li> <a href="">task id={{task.pk}}</a></li>{% endif %}

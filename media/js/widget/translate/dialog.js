@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -27,6 +27,7 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
     unisubs.SubTracker.getInstance().start(true);
     this.opener_ = opener;
     this.subtitleState_ = subtitleState;
+    this.subtitles_ = subtitleState;
     this.standardSubState_ = standardSubState;
     this.serverModel_ = serverModel;
     this.serverModel_.init();
@@ -37,6 +38,7 @@ unisubs.translate.Dialog = function(opener, serverModel, videoSource, subtitleSt
             new unisubs.subtitle.EditableCaptionSet(this.standardSubState_.SUBTITLES));
 
     this.saved_ = false;
+    this.doneButtonEnabled_ = true;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.reviewOrApprovalType_ = reviewOrApprovalType;
     // if this is a review approve dialog, we must fetch saved notes for this task if available
@@ -113,6 +115,8 @@ unisubs.translate.Dialog.prototype.handleDoneKeyPress_ = function(event) {
         if (halt === true) {
             alert('You have untranslated captions. You must translate all captions in order to submit.');
             return false;
+        } else {
+            this.translationPanel_.captionSet_.completed = true;
         }
 
         this.saveWork(true, false);
@@ -172,6 +176,18 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, s
     }
 
     if (goog.array.isEmpty(
+        this.serverModel_.captionSet_.nonblankSubtitles()) &&
+        !this.serverModel_.captionSet_.hasTitleChanged() &&
+        !this.serverModel_.captionSet_.hasDescriptionChanged() &&
+        this.exitURL) {
+        // No changes, but we want to go to the new subtitle editor.  Special
+        // case this and just to a redirect
+        this.saved_ = true;
+        window.location = this.exitURL;
+        return;
+    }
+
+    if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) && !this.forceSave_){
         this.alreadySaving_ = false;
         if((this.captionSet_.hasTitleChanged() && this.captionSet_.originalTitle == "") ||
@@ -228,7 +244,12 @@ unisubs.translate.Dialog.prototype.onWorkSaved = function() {
     unisubs.widget.ResumeEditingRecord.clear();
     this.getRightPanelInternal().showLoading(false);
     this.saved_ = true;
-    this.setVisible(false);
+    if(!this.exitURL || unisubs.isFromDifferentDomain()) {
+        this.setVisible(false);
+    } else {
+        // Hack to make open in the new editor work
+        window.location = this.exitURL;
+    }
 };
 unisubs.translate.Dialog.prototype.disposeInternal = function() {
     unisubs.translate.Dialog.superClass_.disposeInternal.call(this);
@@ -279,6 +300,8 @@ unisubs.translate.Dialog.prototype.setState_ = function(state) {
             rightPanel, et.DONE, this.handleDoneKeyPress_).
         listen(
             rightPanel, et.SAVEANDEXIT, this.handleSaveAndExitKeyPress_).
+        listen(
+            rightPanel, et.SAVEANDOPENINNEWEDITOR, this.handleSaveAndOpenInNewEditor_).
         listen(
             rightPanel, et.GOTOSTEP, this.handleGoToStep_);
     var backButtonText = null;
@@ -353,7 +376,7 @@ unisubs.translate.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
 };
 unisubs.translate.Dialog.prototype.makeJsonSubs =  function (){
-    return this.serverModel_.getCaptionSet().makeJsonSubs();
+    return this.serverModel_.getCaptionSet().x['xmlToString'](true, true);
 };
 unisubs.translate.Dialog.prototype.forkAndClose = function() {
     var dialog = new unisubs.translate.ForkDialog(
@@ -387,10 +410,10 @@ unisubs.translate.Dialog.prototype.captionReached_ = function(event) {
 
     if (c) {
 
-        var captionID = c.getCaptionID();
+        var captionID = c.getCaptionIndex();
 
         var translatedCaptionSet = this.translationPanel_.getTranslationList().captionSet_;
-        var translatedCaption = translatedCaptionSet.captionByID(captionID);
+        var translatedCaption = translatedCaptionSet.caption(captionID);
 
         if (translatedCaption.getText() !== '') {
             caption = translatedCaption.getText();
@@ -403,4 +426,8 @@ unisubs.translate.Dialog.prototype.captionReached_ = function(event) {
     }
 
     this.getVideoPlayerInternal().showCaptionText(caption);
+};
+
+unisubs.translate.Dialog.prototype.makeDFXPString =  function (){
+    return this.serverModel_.captionSet_.x['xmlToString'](true, true)
 };

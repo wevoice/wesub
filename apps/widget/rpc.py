@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -24,12 +24,12 @@ from django.utils import translation
 from django.utils.translation import ugettext as _
 
 from statistic.tasks import st_widget_view_statistic_update
+from subtitles import models as new_models
 from teams.models import Task, Workflow, Team, BillingRecord
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
 from teams.permissions import (
     can_create_and_edit_subtitles, can_create_and_edit_translations,
-    can_publish_edits_immediately, can_review, can_approve, can_assign_task,
-    can_post_edit_subtitles
+    can_publish_edits_immediately, can_review, can_approve, can_add_version,
 )
 from teams.signals import (
     api_subtitles_edited, api_subtitles_approved, api_subtitles_rejected,
@@ -40,10 +40,10 @@ from utils import send_templated_email
 from utils.forms import flatten_errorlists
 from utils.metrics import Meter
 from utils.translation import get_user_languages_from_request
-from videos import models, is_synced_value
+from videos import models
 from videos.models import record_workflow_origin, Subtitle
 from videos.tasks import (
-    video_changed_tasks, upload_subtitles_to_original_service
+    video_changed_tasks, subtitles_complete_changed
 )
 from widget import video_cache
 from widget.base_rpc import BaseRpc
@@ -52,6 +52,9 @@ from widget.models import SubtitlingSession
 from libs.bulkops import insert_many
 
 from functools import partial
+from apps.subtitles import pipeline
+from apps.subtitles.models import ORIGIN_LEGACY_EDITOR
+from babelsubs.storage import SubtitleSet, diff
 
 
 yt_logger = logging.getLogger("youtube-ei-error")
@@ -242,12 +245,12 @@ class Rpc(BaseRpc):
         my_languages.extend([l[:l.find('-')] for l in my_languages if l.find('-') > -1])
         video = models.Video.objects.get(video_id=video_id)
         team_video = video.get_team_video()
+        languages = (new_models.SubtitleLanguage.objects.having_public_versions()
+                                                        .filter(video=video))
         video_languages = [language_summary(l, team_video, request.user) for l
-                           in video.subtitlelanguage_set.all()]
+                           in languages]
 
-        original_language = None
-        if video.subtitle_language():
-            original_language = video.subtitle_language().language
+        original_language = video.primary_audio_language_code
 
         tv = video.get_team_video()
         writable_langs = list(tv.team.get_writable_langs()) if tv else []
@@ -273,7 +276,7 @@ class Rpc(BaseRpc):
         return {
             'video_id': video_id,
             'is_original_language_subtitled': is_original_language_subtitled,
-            'general_settings': general_settings 
+            'general_settings': general_settings
         }
 
 
@@ -306,7 +309,7 @@ class Rpc(BaseRpc):
 
 
     # Start Editing
-    def _check_team_video_locking(self, user, video_id, language_code, is_translation=None, mode=None, is_edit=None):
+    def _check_team_video_locking(self, user, video_id, language_code):
         """Check whether the a team prevents the user from editing the subs.
 
         Returns a dict appropriate for sending back if the user should be
@@ -314,50 +317,15 @@ class Rpc(BaseRpc):
 
         """
         video = models.Video.objects.get(video_id=video_id)
-        team_video = video.get_team_video()
-
-        if not team_video:
-            # If there's no team video to worry about, just bail early.
+        check_result = can_add_version(user, video, language_code)
+        if check_result:
             return None
-        
-        team = team_video.team
-
-        if team.is_visible:
-            message = _(u"These subtitles are moderated. See the %s team page for information on how to contribute." % str(team_video.team))
         else:
-            message = _(u"Sorry, these subtitles are privately moderated.")
-
-        if not team_video.video.can_user_see(user):
-             return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-
-        language = video.subtitle_language(language_code)
-
-        if (language and language.is_complete_and_synced()
-                     and team.moderates_videos()
-                     and not can_post_edit_subtitles(team, user)):
-            message = _("Sorry, you do not have the permission to edit these subtitles. If you believe that they need correction, please contact the team administrator.")
-            return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
-            
-        # Check that there are no open tasks for this action.
-        tasks = team_video.task_set.incomplete().filter(language__in=[language_code, ''])
-
-        if tasks:
-            task = tasks[0]
-            # can_assign verify if the user has permission to either
-            # 1. assign the task to himself
-            # 2. do the task himself (the task is assigned to him)
-            if not user.is_authenticated() or (task.assignee and task.assignee != user) or (not task.assignee and not can_assign_task(task, user)):
-                    return { "can_edit": False, "locked_by": str(task.assignee or task.team), "message": message }
-
-        # Check that the team's policies don't prevent the action.
-        if mode not in ['review', 'approve']:
-            if is_translation:
-                can_edit = can_create_and_edit_translations(user, team_video, language_code)
-            else:
-                can_edit = can_create_and_edit_subtitles(user, team_video, language_code)
-
-            if not can_edit:
-                return { "can_edit": False, "locked_by": str(team_video.team), "message": message }
+            return {
+                "can_edit": False,
+                "locked_by": check_result.locked_by,
+                "message": check_result.message
+            }
 
     def _get_version_to_edit(self, language, session):
         """Return a version (and other info) that should be edited.
@@ -368,30 +336,19 @@ class Rpc(BaseRpc):
         is an edit (as opposed to a brand new set of subtitles).
 
         """
-        version_for_subs = language.version(public_only=False)
+        version_for_subs = language.get_tip(public=False)
 
         if not version_for_subs:
-            version_for_subs, _ = self._create_version_from_session(session)
-            version_no = 0
+            version_for_subs = None
+            version_number = 0
         else:
-            version_no = version_for_subs.version_no + 1
+            version_number = version_for_subs.version_number + 1
 
-        return version_for_subs, version_no
+        return version_for_subs, version_number
 
-    def _get_base_language(self, language_code, original_language_code, base_language_pk):
-        """Return the subtitle language to use as a base (and its pk), if any."""
-        if language_code == original_language_code:
-            base_language_pk = None
-
-        if base_language_pk is not None:
-            base_language = models.SubtitleLanguage.objects.get(pk=base_language_pk)
-        else:
-            base_language = None
-
-        return base_language, base_language_pk
 
     def start_editing(self, request, video_id, language_code,
-                      subtitle_language_pk=None, base_language_pk=None,
+                      subtitle_language_pk=None, base_language_code=None,
                       original_language_code=None, mode=None):
         """Called by subtitling widget when subtitling or translation is to commence on a video.
 
@@ -401,38 +358,59 @@ class Rpc(BaseRpc):
         """
 
         # TODO: remove whenever blank SubtitleLanguages become illegal.
-        self._fix_blank_original(video_id)
-
-        # Find the subtitle language to use as a base for these edits, if any.
-        base_language, base_language_pk = self._get_base_language(
-            language_code, original_language_code, base_language_pk)
 
         # Find the subtitle language we'll be editing (if available).
         language, locked = self._get_language_for_editing(
-            request, video_id, language_code, subtitle_language_pk, base_language)
+            request, video_id, language_code, subtitle_language_pk, base_language_code)
 
         if locked:
             return locked
+
+        version = language.get_tip(public=False)
 
         # Ensure that the user is not blocked from editing this video by team
         # permissions.
         locked = self._check_team_video_locking(
-            request.user, video_id, language_code, bool(base_language_pk),
-            mode, bool(language.version(public_only=False)))
-
+            request.user, video_id, language_code)
         if locked:
             return locked
 
         # just lock the video *after* we verify if team moderation happened
-        language.writelock(request)
+        language.writelock(request.user, request.browser_id)
         language.save()
 
         # Create the subtitling session and subtitle version for these edits.
-        session = self._make_subtitling_session(request, language, base_language)
-        version_for_subs, version_no = self._get_version_to_edit(language, session)
 
-        subtitles = self._subtitles_dict(
-            version_for_subs, version_no, base_language_pk is None)
+        # we determine that a it's a translation if:
+        # - the front end specifically said to translate from (base_language_code)
+        # - The language has another source in it's lineage and it is not marked as forking
+        translated_from_code  = None
+        translated_from = None
+
+        if base_language_code:
+            translated_from_code = base_language_code
+        elif language.is_forked == False:
+            translated_from_code = language.get_translation_source_language_code()
+
+        if translated_from_code:
+            translated_from = language.video.subtitle_language(translated_from_code)
+
+        session = self._make_subtitling_session(request, language, translated_from_code, video_id)
+        version_for_subs, version_number = self._get_version_to_edit(language, session)
+
+        args = {'session': session}
+
+        if version_for_subs:
+            args['version'] = version_for_subs
+            session.parent = version_for_subs
+            session.save()
+        else:
+            args['language'] = language
+
+        subtitles = self._subtitles_dict(**args)
+        # this is basically how it worked before. don't ask.
+        subtitles['forked'] = base_language_code is None
+
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
                         "caption_display_mode": self.get_caption_display_mode(language),
@@ -440,13 +418,13 @@ class Rpc(BaseRpc):
                         "subtitles": subtitles }
 
         # If this is a translation, include the subtitles it's based on in the response.
-        if base_language:
-            version = base_language.latest_version()
+        if translated_from:
+            version = translated_from.get_tip(public=True)
 
             if not version:
                 return { "can_edit": False, "locked_by": "", "message": "You cannot translate from a version that is incomplete" }
 
-            original_subtitles = self._subtitles_dict(version)
+            original_subtitles = self._subtitles_dict(version=version)
             return_dict['original_subtitles'] = original_subtitles
 
         # If we know the original language code for this video, make sure it's
@@ -458,7 +436,7 @@ class Rpc(BaseRpc):
             self._save_original_language(video_id, original_language_code)
 
         # Writelock this language for this video before we successfully return.
-        video_cache.writelock_add_lang(video_id, language.language)
+        video_cache.writelock_add_lang(video_id, language.language_code)
 
         return return_dict
 
@@ -470,31 +448,39 @@ class Rpc(BaseRpc):
         except SubtitlingSession.DoesNotExist:
             return {'response': 'cannot_resume'}
 
-        error = self._check_team_video_locking(request.user, session.video.video_id, session.language.language)
+        language = session.language
+        error = self._check_team_video_locking(request.user, session.video.video_id, language.language_code)
 
         if error:
             return {'response': 'cannot_resume'}
 
-        if session.language.can_writelock(request) and \
-                session.parent_version == session.language.version():
-            session.language.writelock(request)
-            # FIXME: Duplication between this and start_editing.
-            version_for_subs = session.language.version()
-            if not version_for_subs:
-                version_for_subs, _ = self._create_version_from_session(session)
-                version_no = 0
+        if language.can_writelock(request.browser_id) and \
+                session.parent_version == language.version():
+
+            language.writelock(request.user, request.browser_id)
+
+            version_for_subs, version_number = self._get_version_to_edit(language, session)
+
+            args = {'session': session}
+
+            if version_for_subs is None:
+                args['language'] = language
             else:
-                version_no = version_for_subs.version_no + 1
-            subtitles = self._subtitles_dict(version_for_subs, version_no)
+                args['version'] = version_for_subs
+
+            subtitles = self._subtitles_dict(**args)
+
             return_dict = { "response": "ok",
                             "can_edit" : True,
                             "session_pk" : session.pk,
                             "caption_display_mode": self.get_caption_display_mode(session.language),
                             "timing_mode": self.get_timing_mode(session.language, request.user),
                             "subtitles" : subtitles }
+
             if session.base_language:
                 return_dict['original_subtitles'] = \
-                    self._subtitles_dict(session.base_language.latest_version())
+                    self._subtitles_dict(version=session.base_language.get_tip())
+
             return return_dict
         else:
             return { 'response': 'cannot_resume' }
@@ -503,7 +489,7 @@ class Rpc(BaseRpc):
     # Locking
     def release_lock(self, request, session_pk):
         language = SubtitlingSession.objects.get(pk=session_pk).language
-        if language.can_writelock(request):
+        if language.can_writelock(request.browser_id):
             language.release_writelock()
             language.save()
             video_cache.writelocked_langs_clear(language.video.video_id)
@@ -511,13 +497,13 @@ class Rpc(BaseRpc):
 
     def regain_lock(self, request, session_pk):
         language = SubtitlingSession.objects.get(pk=session_pk).language
-        if not language.can_writelock(request):
+        if not language.can_writelock(request.browser_id):
             return { 'response': 'unlockable' }
         else:
-            language.writelock(request)
+            language.writelock(request.user, request.browser_id)
             language.save()
             video_cache.writelock_add_lang(
-                language.video.video_id, language.language)
+                language.video.video_id, language.language_code)
             return { 'response': 'ok' }
 
 
@@ -579,13 +565,13 @@ class Rpc(BaseRpc):
         team_video = language.video.get_team_video()
         if under_moderation and team_video:
             # videos are only supposed to have one team video
-            _user_can_publish = can_publish_edits_immediately(team_video, user, language.language)
+            _user_can_publish = can_publish_edits_immediately(team_video, user, language.language_code)
 
         # this is case 1
         if under_moderation and not _user_can_publish:
             if is_complete:
                 # case 3
-                return message_will_be_submited % language.video.moderated_by.name
+                return message_will_be_submited % team_video.team.name
             else:
                 # case 2
                 return message_incomplete
@@ -612,7 +598,7 @@ class Rpc(BaseRpc):
                     tasks = team_video.task_set.incomplete().filter(
                         type__in=(Task.TYPE_IDS['Subtitle'],
                                 Task.TYPE_IDS['Translate']),
-                        language=language.language
+                        language=language.language_code
                     )
                     for task in tasks:
                         task.complete()
@@ -632,6 +618,7 @@ class Rpc(BaseRpc):
 
     def _save_subtitles(self, version, json_subs, forked):
         """Create Subtitle objects into the version from the JSON subtitles."""
+
         subtitles = []
         for s in json_subs:
             if not forked:
@@ -642,9 +629,10 @@ class Rpc(BaseRpc):
                 # doesn't call that.
                 start_time = s['start_time']
                 end_time = s['end_time']
-                if not is_synced_value(start_time):
+                # this will go way in the DRM anyways
+                if not start_time or start_time == -1:
                     start_time = None
-                if not is_synced_value(end_time):
+                if not end_time or end_time == -1:
                     end_time = None
 
                 s = Subtitle(subtitle_id=s['subtitle_id'],
@@ -674,11 +662,11 @@ class Rpc(BaseRpc):
             for s in source_version.subtitle_set.all():
                 s.duplicate_for(dest_version).save()
 
-    def _get_new_version_for_save(self, subtitles, language, session, user, forked, new_title, new_description, save_for_later=None):
+    def _get_new_version_for_save(self, subtitles, language, session, user, new_title, new_description, save_for_later=None):
         """Return a new subtitle version for this save, or None if not needed."""
 
         new_version = None
-        previous_version = language.latest_version(public_only=False)
+        previous_version = language.get_tip(public=False)
 
         if previous_version:
             title_changed = (new_title is not None
@@ -689,40 +677,37 @@ class Rpc(BaseRpc):
             title_changed = new_title is not None
             desc_changed = new_description is not None
 
-        subtitles_changed = (
-            subtitles is not None
-            and (len(subtitles) > 0 or previous_version is not None)
-        )
+        subtitle_set = None
+        subs_length = 0
+        if isinstance(subtitles, basestring):
+            subtitle_set = SubtitleSet(language.language_code, subtitles)
+        elif isinstance(subtitles, SubtitleSet):
+            subtitle_set = subtitles
+        if subtitle_set:
+            subs_length = len(subtitle_set)
+
+        # subtitles have changed if only one of the version is empty
+        # or if the versions themselves differ
+        if not previous_version and not subtitle_set:
+            subtitles_changed = False
+        elif not previous_version or not subtitle_set:
+            subtitles_changed = True
+        else:
+            subtitles_changed = diff(previous_version.get_subtitles(), subtitle_set)['changed']
 
         should_create_new_version = (
             subtitles_changed or title_changed or desc_changed)
 
         if should_create_new_version:
-            new_version, should_create_task = self._create_version_from_session(
-                session, user, forked, new_title, new_description)
-
-            new_version.save()
-
-            if subtitles_changed:
-                self._save_subtitles(
-                    new_version, subtitles, new_version.is_forked)
-            else:
-                self._copy_subtitles(previous_version, new_version)
+            new_version, should_create_task = self._create_version(session.language, user,
+                                                                   new_title=new_title,
+                                                                   new_description=new_description,
+                                                                   subtitles=subtitles,
+                                                                   session=session)
 
             incomplete = not new_version.is_synced() or save_for_later
 
-            # this is really really hackish.
-            # TODO: clean all this mess on a friday
-            if incomplete:
-                self._moderate_incomplete_version(new_version, user)
-
             # Record the origin of this set of subtitles.
-            #
-            # This has to be done here.  Here's why.
-            #
-            # We need to record the origin *after* creating subtitle/translate
-            # tasks, so that we can tell it originates there.  That happens in
-            # the _moderate_incomplete_version call above.
             #
             # We need to record it *before* creating review/approve tasks (if
             # any) because that means these subs were from a post-publish edit
@@ -738,7 +723,7 @@ class Rpc(BaseRpc):
 
         return new_version
 
-    def _update_language_attributes_for_save(self, language, completed, forked=False):
+    def _update_language_attributes_for_save(self, language, completed, session, forked):
         """Update the attributes of the language as necessary and save it.
 
         Will also send the appropriate API notification if needed.
@@ -747,15 +732,20 @@ class Rpc(BaseRpc):
         must_trigger_api_language_edited = False
 
         if completed is not None:
-            if language.is_complete != completed:
+            if language.subtitles_complete != completed:
                 must_trigger_api_language_edited = True
-            language.is_complete = completed
+            language.subtitles_complete = completed
 
-        if forked:
-            language.standard_language = None
+        # this means all 'original languages' will be marked as forks
+        # but this is cool for now because all those languages should
+        # be shown on the transcribe dialog. if there's a base language,
+        # that means we should always show the translate dialog.
+        if forked or session.base_language is None:
             language.is_forked = True
 
         language.save()
+        if forked:
+            pipeline._fork_dependents(language)
 
         if must_trigger_api_language_edited:
             language.video.save()
@@ -770,12 +760,14 @@ class Rpc(BaseRpc):
         language = session.language
 
         new_version = self._get_new_version_for_save(
-            subtitles, language, session, user, forked, new_title,
+            subtitles, language, session, user, new_title,
             new_description, save_for_later)
 
         language.release_writelock()
 
-        self._update_language_attributes_for_save(language, completed, forked=forked)
+        # do this here, before _update_language_a... changes it ;)
+        complete_changed = bool(completed ) != language.subtitles_complete
+        self._update_language_attributes_for_save(language, completed, session, forked)
 
         if new_version:
             video_changed_tasks.delay(language.video.id, new_version.id)
@@ -783,27 +775,16 @@ class Rpc(BaseRpc):
         else:
             video_changed_tasks.delay(language.video.id)
             api_video_edited.send(language.video)
+            if completed and complete_changed:
+                # not a new version, but if this just got marked as complete
+                # we want to push this to the third parties:
+                subtitles_complete_changed(language.pk)
 
-            latest = language.latest_version()
-
-            if latest:
-                upload_subtitles_to_original_service.delay(latest.pk)
-
-        is_complete = language.is_complete or language.calculate_percent_done() == 100
-        user_message = self._get_user_message_for_save(user, language, is_complete)
+        user_message = self._get_user_message_for_save(user, language, language.subtitles_complete)
 
         error = self._save_tasks_for_save(
-                request, save_for_later, language, new_version, is_complete,
+                request, save_for_later, language, new_version, language.subtitles_complete,
                 task_id, task_type, task_notes, task_approved)
-        try:
-           # if this the result of draft upload + review, you might not be
-           # getting a new public version. We however, create billing records
-           # regardless of publishing status
-           version_to_bill = new_version or latest or \
-                             language.subtitleversion_set.order_by('-version_no')[0]
-           BillingRecord.objects.insert_record(version_to_bill)
-        except IndexError:
-           pass
 
         if error:
             return error
@@ -824,7 +805,7 @@ class Rpc(BaseRpc):
 
         if not request.user.is_authenticated():
             return { 'response': 'not_logged_in' }
-        if not session.language.can_writelock(request):
+        if not session.language.can_writelock(request.browser_id):
             return { "response" : "unlockable" }
         if not session.matches_request(request):
             return { "response" : "does not match request" }
@@ -837,10 +818,9 @@ class Rpc(BaseRpc):
             forked, new_description, task_id, task_notes, task_approved,
             task_type, save_for_later)
 
-
     def _create_review_or_approve_task(self, subtitle_version):
         team_video = subtitle_version.video.get_team_video()
-        lang = subtitle_version.language.language
+        lang = subtitle_version.subtitle_language.language_code
         workflow = Workflow.get_for_team_video(team_video)
 
         if workflow.review_allowed:
@@ -873,57 +853,15 @@ class Rpc(BaseRpc):
                     assignee=assignee, language=lang, type=type)
 
         task.set_expiration()
-        task.subtitle_version = subtitle_version
+        task.new_subtitle_version = subtitle_version
 
         if task.get_type_display() in ['Review', 'Approve']:
-            task.review_base_version = subtitle_version
-
-        task.save()
-        
-    def _moderate_incomplete_version(self, subtitle_version, user):
-        """ Verifies if it's possible to create a transcribe/translate task (if there's
-        no other transcribe/translate task) and tries to assign to user.
-        Also, if the video belongs to a team, change its status.
-        """
-
-        team_video = subtitle_version.video.get_team_video()
-
-        if not team_video:
-            return
-
-        workflow = Workflow.get_for_team_video(team_video)
-
-        if not workflow.approve_enabled and not workflow.review_enabled:
-            return UNMODERATED, False
-
-        language = subtitle_version.language.language
-
-        # if there's any incomplete task, we can't create yet another.
-        transcribe_task = team_video.task_set.incomplete().filter(language=language)
-
-        if transcribe_task.exists():
-            return
-
-        subtitle_version.moderation_status = WAITING_MODERATION
-        subtitle_version.save()
-
-        if subtitle_version.is_dependent():
-            task_type = Task.TYPE_IDS['Translate']
-            can_do = can_create_and_edit_translations
-        else:
-            task_type = Task.TYPE_IDS['Subtitle']
-            can_do = can_create_and_edit_subtitles
-
-        task = Task(team=team_video.team, team_video=team_video,
-                    language=language, type=task_type)
-
-        if can_do(user, team_video):
-            task.assignee = user
+            task.new_review_base_version = subtitle_version
 
         task.save()
 
-    def _moderate_session(self, session, user):
-        """Return the right moderation_status for a version based on the given session.
+    def _moderate_language(self, language, user):
+        """Return the right visibility for a version based on the given session.
 
         Also may possibly return a Task object that needs to be saved once the
         subtitle_version is ready.
@@ -934,11 +872,10 @@ class Rpc(BaseRpc):
         Also :(
 
         """
-        sl = session.language
-        team_video = sl.video.get_team_video()
+        team_video = language.video.get_team_video()
 
         if not team_video:
-            return UNMODERATED, False
+            return 'public', False
 
         team = team_video.team
         workflow = team.get_workflow()
@@ -946,76 +883,90 @@ class Rpc(BaseRpc):
         # If there are any open team tasks for this video/language, it needs to
         # be kept under moderation.
         tasks = team_video.task_set.incomplete().filter(
-                Q(language=sl.language)
+                Q(language=language.language_code)
               | Q(type=Task.TYPE_IDS['Subtitle'])
         )
+
         if tasks:
             for task in tasks:
                 if task.type == Task.TYPE_IDS['Subtitle']:
                     if not task.language:
-                        task.language = sl.language
+                        task.language = language.language_code
                         task.save()
 
-            return (UNMODERATED, False) if not team.workflow_enabled else (WAITING_MODERATION, False)
+            return ('public', False) if not team.workflow_enabled else ('private', False)
 
         if not workflow.requires_tasks:
-            return UNMODERATED, False
-        elif sl.has_version:
+            return 'public', False
+        elif language.has_version:
             # If there are already active subtitles for this language, we're
             # dealing with an edit.
-            if can_publish_edits_immediately(team_video, user, sl.language):
+            if can_publish_edits_immediately(team_video, user, language.language_code):
                 # The user may have the rights to immediately publish edits to
                 # subtitles.  If that's the case we mark them as approved and
                 # don't need a task.
-                return APPROVED, False
+                return 'public', False
             else:
                 # Otherwise it's an edit that needs to be reviewed/approved.
-                return WAITING_MODERATION, True
+                return 'private', True
         else:
             # Otherwise we're dealing with a new set of subtitles for this
             # language.
-            return WAITING_MODERATION, True
+            return 'private', True
 
-    def _create_version_from_session(self, session, user=None, forked=False, new_title=None, new_description=None):
-        latest_version = session.language.version(public_only=False)
-        forked_from = (forked and latest_version) or None
+    def _create_version(self, language, user=None, new_title=None, new_description=None, subtitles=None, session=None):
+        latest_version = language.get_tip(public=False)
 
-        moderation_status, should_create_task = self._moderate_session(session, user)
+        visibility, should_create_task = self._moderate_language(language, user)
 
-        kwargs = dict(language=session.language,
-                      version_no=(0 if latest_version is None
-                                  else latest_version.version_no + 1),
-                      is_forked=(session.base_language is
-                                 None or forked == True),
-                      forked_from=forked_from,
-                      datetime_started=session.datetime_started,
-                      moderation_status=moderation_status)
+        kwargs = dict(visibility=visibility)
+
+        # it's a title/description update
+        # we can do this better btw
+        # TODO: improve-me plz
+        if (new_title or new_description) and not subtitles and latest_version:
+            subtitles = latest_version.get_subtitles()
 
         if user is not None:
-            kwargs['user'] = user
+            kwargs['author'] = user
 
         if new_title is not None:
             kwargs['title'] = new_title
         elif latest_version:
             kwargs['title'] = latest_version.title
         else:
-            kwargs['title'] = session.language.video.title
+            kwargs['title'] = language.video.title
 
         if new_description is not None:
             kwargs['description'] = new_description
         elif latest_version:
             kwargs['description'] = latest_version.description
         else:
-            kwargs['description'] = session.language.video.description
+            kwargs['description'] = language.video.description
 
-        version = models.SubtitleVersion(**kwargs)
+        if subtitles is None:
+            subtitles = []
+
+        kwargs['video'] = language.video
+        kwargs['language_code'] = language.language_code
+        kwargs['subtitles'] = subtitles
+        kwargs['origin'] = ORIGIN_LEGACY_EDITOR
+
+        if session and session.base_language:
+            base_language_code = session.base_language.language_code
+            base_subtitle_language = language.video.subtitle_language(base_language_code)
+
+            if base_language_code:
+                kwargs['parents'] = [base_subtitle_language.get_tip(full=True)]
+
+        version = pipeline.add_subtitles(**kwargs)
 
         return version, should_create_task
 
     def fetch_subtitles(self, request, video_id, language_pk):
         cache = video_cache.get_subtitles_dict(
             video_id, language_pk, None,
-            lambda version: self._subtitles_dict(version))
+            lambda version: self._subtitles_dict(version=version))
         return cache
 
     def get_widget_info(self, request):
@@ -1026,17 +977,24 @@ class Rpc(BaseRpc):
             'translations_count': models.SubtitleLanguage.objects.filter(is_original=False).count()
         }
 
-    def _make_subtitling_session(self, request, language, base_language):
+    def _make_subtitling_session(self, request, language, base_language_code, video_id, version=None):
+        try:
+            base_language = new_models.SubtitleLanguage.objects.get(video__video_id=video_id,
+                                                            language_code=base_language_code)
+        except new_models.SubtitleLanguage.DoesNotExist:
+            base_language = None
+
         session = SubtitlingSession(
             language=language,
             base_language=base_language,
-            parent_version=language.version(),
+            parent_version=version,
             browser_id=request.browser_id)
+
         if request.user.is_authenticated():
             session.user = request.user
+
         session.save()
         return session
-
 
     # Review
     def fetch_review_data(self, request, task_id):
@@ -1060,7 +1018,7 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.subtitle_version = new_version
+                task.new_subtitle_version = new_version
 
             task.save()
 
@@ -1068,8 +1026,8 @@ class Rpc(BaseRpc):
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.subtitle_version.language.release_writelock()
-            task.subtitle_version.language.followers.add(request.user)
+            task.new_subtitle_version.subtitle_language.release_writelock()
+            task.new_subtitle_version.subtitle_language.followers.add(request.user)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
@@ -1098,19 +1056,20 @@ class Rpc(BaseRpc):
 
             # If there is a new version, update the task's version.
             if new_version:
-                task.subtitle_version = new_version
+                task.new_subtitle_version = new_version
+
             task.save()
 
             if not save_for_later:
                 if task.approved in Task.APPROVED_FINISHED_IDS:
                     task.complete()
 
-            task.subtitle_version.language.release_writelock()
+            task.new_subtitle_version.subtitle_language.release_writelock()
 
             if form.cleaned_data['approved'] == Task.APPROVED_IDS['Approved']:
-                api_subtitles_approved.send(task.subtitle_version)
+                api_subtitles_approved.send(task.new_subtitle_version)
             elif form.cleaned_data['approved'] == Task.APPROVED_IDS['Rejected']:
-                api_subtitles_rejected.send(task.subtitle_version)
+                api_subtitles_rejected.send(task.new_subtitle_version)
 
             video_changed_tasks.delay(task.team_video.video_id)
         else:
@@ -1140,120 +1099,108 @@ class Rpc(BaseRpc):
             return language.standard_language != base_language
 
     def _get_language_for_editing(self, request, video_id, language_code,
-                                  subtitle_language_pk=None, base_language=None):
+                                  subtitle_language_pk=None, base_language_code=None):
         """Return the subtitle language to edit or a lock response."""
 
         video = models.Video.objects.get(video_id=video_id)
 
         editable = False
-        create_new = False
+        created  = False
 
         if subtitle_language_pk is not None:
-            language = models.SubtitleLanguage.objects.get(pk=subtitle_language_pk)
-            if self._needs_new_sub_language(language, base_language):
-                create_new = True
-            else:
-                editable = language.can_writelock(request)
+            language = new_models.SubtitleLanguage.objects.get(pk=subtitle_language_pk)
         else:
-            create_new = True
+            # we can tell which language it is from the language code
+            candidates = video.newsubtitlelanguage_set.filter(language_code=language_code)
+            if not candidates.exists():
+                # no languages with the language code, we must create one
+                language = new_models.SubtitleLanguage(
+                    video=video, language_code=language_code,
+                    created=datetime.now())
 
-        if create_new:
-            standard_language = self._find_base_language(base_language)
-            forked = standard_language is None
-            language, created = models.SubtitleLanguage.objects.get_or_create(
-                video=video,
-                language=language_code,
-                standard_language=standard_language,
-                defaults={
-                    'created': datetime.now(),
-                    'is_forked': forked,
-                    'writelock_session_key': '' })
-            editable = created or language.can_writelock(request)
+                language.is_forked = not base_language_code and video.newsubtitlelanguage_set.exists()
+
+                language.save()
+                created = True
+            else:
+                for candidate in candidates:
+                    if base_language_code == candidate.get_translation_source_language_code():
+                        # base language matches, break me
+                        language = candidate
+                        break
+                # if we reached this point, we have no good matches
+                language = candidates[0]
+
+        editable = language.can_writelock(request.browser_id)
 
         if editable:
-            if create_new:
+            if created:
                 api_language_new.send(language)
-
             return language, None
         else:
             return None, { "can_edit": False,
-                           "locked_by": language.writelock_owner_name }
-
-    def _fix_blank_original(self, video_id):
-        # TODO: remove this method as soon as blank SubtitleLanguages
-        # become illegal
-        video = models.Video.objects.get(video_id=video_id)
-        originals = video.subtitlelanguage_set.filter(is_original=True, language='')
-        to_delete = []
-        if len(originals) > 0:
-            for original in originals:
-                if not original.latest_version():
-                    # result of weird practice of saving SL with is_original=True
-                    # and blank language code on Video creation.
-                    to_delete.append(original)
-                else:
-                    # decided to mark authentic blank originals as English.
-                    original.language = 'en'
-                    original.save()
-        for sl in to_delete:
-            sl.delete()
+                           "locked_by": unicode(language.writelock_owner) }
 
     def _save_original_language(self, video_id, language_code):
         video = models.Video.objects.get(video_id=video_id)
-        has_original = False
-        for sl in video.subtitlelanguage_set.all():
-            if sl.is_original and sl.language != language_code:
-                sl.is_original = False
-                sl.save()
-            elif not sl.is_original and sl.language == language_code:
-                sl.is_original = True
-                sl.save()
-            if sl.is_original:
-                has_original = True
-        if not has_original:
-            sl = models.SubtitleLanguage(
-                video=video,
-                language=language_code,
-                is_forked=True,
-                is_original=True,
-                writelock_session_key='')
-            sl.save()
 
-    def _autoplay_subtitles(self, user, video_id, language_pk, version_no):
-        cache =  video_cache.get_subtitles_dict(
-            video_id, language_pk, version_no,
-            lambda version: self._subtitles_dict(version))
+        if not video.primary_audio_language_code:
+            video.primary_audio_language_code = language_code
+            video.save()
+
+
+    def _autoplay_subtitles(self, user, video_id, language_pk, version_number):
+        cache =  video_cache.get_subtitles_dict(video_id, language_pk,
+                                                version_number,
+                                                lambda version: self._subtitles_dict(version=version))
+
         if cache and cache.get("language", None) is not None:
             cache['language_code'] = cache['language'].language
             cache['language_pk'] = cache['language'].pk
+
         return cache
 
-    def _subtitles_dict(self, version, forced_version_no=None, force_forked=False):
-        language = version.language
-        base_language = None
-        if language.is_dependent() and not version.is_forked and not force_forked:
-            base_language = language.standard_language
-        version_no = version.version_no if forced_version_no is None else forced_version_no
+    def _subtitles_dict(self, version=None, language=None, session=None):
+        if not language and not version:
+            raise ValueError("You need to specify either language or version")
+
+        latest_version = language.get_tip() if language else None
         is_latest = False
-        latest_version = language.latest_version()
-        if latest_version is None or version_no >= latest_version.version_no:
+
+        if not version and not latest_version:
+            version_number = 0
+            language_code = language.language_code
+            subtitles = SubtitleSet(language_code).to_xml()
             is_latest = True
+        else:
+            version = version or latest_version
+            version_number = version.version_number
+            subtitles = version.get_subtitles().to_xml()
+            language = version.subtitle_language
+            language_code = language.language_code
+
+        if latest_version is None or version_number >= latest_version.version_number:
+            is_latest = True
+
+        if session:
+            translated_from = session.base_language
+        else:
+           translated_from = language.get_translation_source_language()
+
         return self._make_subtitles_dict(
-            [s.__dict__ for s in version.subtitles()],
-            language.language,
+            subtitles,
+            language,
             language.pk,
-            language.is_original,
-            None if base_language is not None else language.is_complete,
-            version_no,
+            language.is_primary_audio_language(),
+            None if translated_from is not None else language.subtitles_complete,
+            version_number,
             is_latest,
-            version.is_forked or force_forked,
-            base_language,
-            language.get_title(public_only=False),
-            language.get_description(public_only=False),
+            translated_from,
+            language.get_title(public=False),
+            language.get_description(public=False),
             language.is_rtl(),
             language.video.is_moderated,
         )
-
 
 def language_summary(language, team_video=-1, user=None):
     """Return a dictionary of info about the given SubtitleLanguage.
@@ -1264,39 +1211,40 @@ def language_summary(language, team_video=-1, user=None):
     if team_video == -1:
         team_video = language.video.get_team_video()
 
+    translation_source = language.get_translation_source_language()
+    is_translation = bool(translation_source)
     summary = {
         'pk': language.pk,
-        'language': language.language,
-        'dependent': language.is_dependent(),
-        'subtitle_count': language.subtitle_count,
+        'language': language.language_code,
+        'dependent': is_translation,
+        'subtitle_count': language.get_subtitle_count(),
         'in_progress': language.is_writelocked,
         'disabled_from': False }
 
     if team_video:
-        tasks = team_video.task_set.incomplete().filter(language=language.language)
+        tasks = team_video.task_set.incomplete().filter(language=language.language_code)
         if tasks:
             task = tasks[0]
             summary['disabled_to'] = user and user != task.assignee
 
-    latest_version = language.latest_version()
+    latest_version = language.get_tip()
 
     if latest_version and language.is_complete_and_synced() and 'disabled_to' not in summary:
         # Languages with existing subtitles cannot be selected as a "to"
         # language in the "add new translation" dialog.  If you want to work on
         # that language, select it and hit "Improve these Subtitles" instead.
         summary['disabled_to'] = True
-    elif not latest_version or not latest_version.subtitles():
+    elif not latest_version or not latest_version.has_subtitles:
         # Languages with *no* existing subtitles cannot be selected as a "from"
         # language in the "add new translation" dialog.  There's nothing to work
         # from!
         summary['disabled_from'] = True
 
 
-    if language.is_dependent():
-        summary['percent_done'] = language.percent_done
-        if language.standard_language:
-            summary['standard_pk'] = language.standard_language.pk
-    else:
-        summary['is_complete'] = language.is_complete
+    if is_translation:
+        summary['standard_pk'] = translation_source.pk
+        summary['translated_from'] = translation_source.language_code
+    summary['is_complete'] = language.subtitles_complete
+    summary['is_public'] = True if language.get_public_tip() else False
 
     return summary

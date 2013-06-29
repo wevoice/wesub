@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -47,7 +47,8 @@ unisubs.timeline.Timeline.prototype.createDom = function() {
     this.timelineInner_ = new unisubs.timeline.TimelineInner(
         this, this.spacing_, this.subtitleSet_, this.readOnly_);
     this.addChild(this.timelineInner_, true);
-    el.appendChild($d('div', 'marker'));
+    this.markerEl = $d('div', 'marker')
+    el.appendChild(this.markerEl);
 };
 
 /**

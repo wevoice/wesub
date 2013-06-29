@@ -1,9 +1,123 @@
 # encoding: utf-8
 import datetime
-from south.db import db
 from south.v2 import DataMigration
-from django.db import models
-from videos import EffectiveSubtitle
+
+# This migration makes use of code in the regular app that went away
+# therefore, we're copy and pasting this horror
+
+UNSYNCED_MARKER = -1
+MAX_SUB_TIME = (60 * 60 * 100 * 1000) - 1000
+def is_synced_value(v):
+    return v != UNSYNCED_MARKER and v != None and v < MAX_SUB_TIME
+
+
+def is_synced(obj):
+    if obj.start_time is None or obj.end_time is None:
+        return False
+    return is_synced_value(obj.start_time) and is_synced_value(obj.start_time)
+
+
+def format_time(milliseconds):
+    if not is_synced_value(milliseconds):
+        return ""
+    t = int(round(milliseconds / 1000.0))
+    s = t % 60
+    s = s > 9 and s or '0%s' % s
+    return '%s:%s' % (t / 60, s)
+
+
+class EffectiveSubtitle:
+    def __init__(self, subtitle_id, text, start_time, end_time, sub_order, pk, start_of_paragraph=False):
+        self.subtitle_id = subtitle_id
+        self.text = text
+        if start_time is None:
+            start_time = UNSYNCED_MARKER
+        self.start_time = start_time
+        if end_time is None:
+            end_time = UNSYNCED_MARKER
+
+        self.end_time = end_time
+        self.sub_order = sub_order
+        self.pk = pk
+        self.start_of_paragraph = start_of_paragraph
+
+    def as_dict(self):
+        return {
+            'subtitle_id': self.subtitle_id,
+            'text': self.text,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'start_of_paragraph': self.start_of_paragraph,
+            'sub_order': self.sub_order
+        }
+
+    def has_complete_timing(self):
+        return is_synced(self)
+
+    def for_generator(self):
+        """
+        This is used in serializers for download (srt, dfxp)
+        """
+        return {
+            'text': self.text,
+            'start': self.start_time,
+            'end': self.end_time,
+            'id': self.pk,
+            'start_of_paragraph': self.start_of_paragraph,
+        }
+
+    def has_same_timing(self, subtitle):
+        return self.start_time == subtitle.start_time and\
+               self.end_time == subtitle.end_time
+
+    @classmethod
+    def for_subtitle(cls, subtitle):
+        return EffectiveSubtitle(
+            subtitle.subtitle_id,
+            subtitle.subtitle_text,
+            subtitle.start_time,
+            subtitle.end_time,
+            subtitle.subtitle_order,
+            subtitle.pk,
+            subtitle.start_of_paragraph,
+        )
+
+    @classmethod
+    def for_dependent_translation(cls, original, translation):
+        """
+        Return a EffectiveSubtitle from a pair of
+        videos.Subtitle instance with the id borrowed from the original
+        """
+        return EffectiveSubtitle(
+            original.subtitle_id,
+            translation.subtitle_text,
+            original.start_time,
+            original.end_time,
+            original.subtitle_order,
+            original.pk,
+            original.start_of_paragraph,
+        )
+
+    def duplicate_for(self):
+        from videos.models import Subtitle
+
+        return Subtitle(
+            subtitle_id=self.subtitle_id,
+            subtitle_order=self.sub_order,
+            subtitle_text=self.text,
+            start_time=self.start_time,
+            end_time=self.end_time,
+            start_of_paragraph=self.start_of_paragraph,
+        )
+
+    @property
+    def has_start_time(self):
+        return self.start_time != UNSYNCED_MARKER
+
+    @property
+    def has_end_time(self):
+        return self.end_time != UNSYNCED_MARKER
+
 
 class Migration(DataMigration):
     

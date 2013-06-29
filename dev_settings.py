@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -22,6 +22,12 @@ import logging
 
 SITE_ID = 4
 SITE_NAME = 'unisubs-dev'
+
+BROKER_BACKEND = 'amqplib'
+BROKER_HOST = 'localhost'
+BROKER_USER = 'usrmquser'
+BROKER_PASSWORD = 'usrmqpassword'
+BROKER_PORT = 5672
 
 JS_USE_COMPILED = True
 

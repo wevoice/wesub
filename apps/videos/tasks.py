@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-import urllib
 from urllib import urlopen
 
 from celery.decorators import periodic_task
@@ -27,25 +26,22 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
-from django.utils import simplejson as json
-from django.utils.http import urlquote_plus
 from haystack import site
 from raven.contrib.django.models import client
 
+from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
-from videos.models import (
-    VideoFeed, SubtitleLanguage, Video, Subtitle, SubtitleVersion,
-    VIDEO_TYPE_YOUTUBE, VideoUrl
+from videos.models import VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl
+from subtitles.models import (
+    SubtitleLanguage, SubtitleVersion
 )
 from videos.types import video_type_registrar
 from apps.videos.types import VideoTypeError
 from videos.feed_parser import FeedParser
 
 celery_logger = logging.getLogger('celery.task')
-
-
 
 def process_failure_signal(exception, traceback, sender, task_id,
                            signal, args, kwargs, einfo, **kw):
@@ -128,7 +124,6 @@ def test_task(n):
         print '.'
 
     from time import sleep
-
     for i in xrange(n):
         print '.',
         sleep(0.5)
@@ -138,20 +133,19 @@ def raise_exception(msg, **kwargs):
     print "TEST TASK FOR CELERY. RAISE EXCEPTION WITH MESSAGE: %s" % msg
     logger = raise_exception.get_logger()
     logger.error('Test error logging to Sentry from Celery')
-
     raise TypeError(msg)
 
 @task()
-def video_changed_tasks(video_pk, new_version_id=None):
+def video_changed_tasks(video_pk, new_version_id=None, skip_third_party_sync=False):
     from videos import metadata_manager
     from videos.models import Video
+
     from teams.models import TeamVideo, BillingRecord
     metadata_manager.update_metadata(video_pk)
     if new_version_id is not None:
-        _send_notification(new_version_id)
-        _check_alarm(new_version_id)
-        _detect_language(new_version_id)
-        _update_captions_in_original_service(new_version_id)
+        send_new_version_notification(new_version_id)
+        if not skip_third_party_sync:
+            _update_captions_in_original_service(new_version_id)
         try:
             BillingRecord.objects.insert_record(
                 SubtitleVersion.objects.get(pk=new_version_id))
@@ -163,11 +157,31 @@ def video_changed_tasks(video_pk, new_version_id=None):
     video = Video.objects.get(pk=video_pk)
 
     tv = video.get_team_video()
+
     if tv:
         tv_search_index = site.get_index(TeamVideo)
         tv_search_index.backend.update(tv_search_index, [tv])
 
     video.update_search_index()
+
+@task
+def subtitles_complete_changed(language_pk):
+    """
+    On the editor, if you don't actually change the subs, but still change
+    it to completed, then there's a bunch of things we want to do, namelly
+    check if billing records should be created and if we should push the subtitle
+    to youtube
+    """
+    from teams.models import TeamVideo, BillingRecord
+    language = SubtitleLanguage.objects.get(pk=language_pk)
+    version = language.get_tip()
+    _update_captions_in_original_service(version.pk)
+    try:
+        BillingRecord.objects.insert_record(version)
+    except Exception, e:
+        celery_logger.error("Could not add billing record", extra={
+            "version_pk": version.pk,
+            "exception": str(e)})
 
 @task()
 def send_change_title_email(video_id, user_id, old_title, new_title):
@@ -221,7 +235,7 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
         feed_parser = FeedParser(url)
 
         for vt, info, entry in feed_parser.items():
-            if not vt: 
+            if not vt:
                 continue
 
             videos.append(Video.get_or_create_for_url(vt=vt, user=user))
@@ -258,64 +272,29 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
 def upload_subtitles_to_original_service(version_pk):
     _update_captions_in_original_service(version_pk)
 
-def _send_notification(version_id):
+def send_new_version_notification(version_id):
     try:
         version = SubtitleVersion.objects.get(id=version_id)
     except SubtitleVersion.DoesNotExist:
-        return
+        return False
 
-    if version.result_of_rollback or not version.is_public:
-        return
+    # if version.result_of_rollback or not version.is_public:
+    if version.is_private():
+        return False
 
-    version.notification_sent = True
-    version.save()
-    if version.version_no == 0 and not version.language.is_original:
-        _send_letter_translation_start(version)
+    if version.version_number == 0 and not version.language.is_primary_audio_language():
+        return send_new_translation_notification(version)
     else:
-        if version.text_change or version.time_change:
-            _send_letter_caption(version)
+        time_change, text_change = version.get_changes()
+        if text_change or time_change:
+            return notify_for_version(version)
+    return None
 
-def _check_alarm(version_id):
-    from videos.models import SubtitleVersion
-    from videos import alarms
-
-    try:
-        version = SubtitleVersion.objects.get(id=version_id)
-    except SubtitleVersion.DoesNotExist:
-        return
-
-    alarms.check_other_languages_changes(version)
-    alarms.check_language_name(version)
-
-def _detect_language(version_id):
-    from videos.models import SubtitleVersion, SubtitleLanguage
-
-    try:
-        version = SubtitleVersion.objects.get(id=version_id)
-    except SubtitleVersion.DoesNotExist:
-        return
-
-    language = version.language
-    if language.is_original and not language.language:
-        url = 'http://ajax.googleapis.com/ajax/services/language/detect?v=1.0&q=%s'
-        text = ''
-        for item in version.subtitles():
-            text += ' %s' % item.text
-            if len(text) >= 300:
-                break
-        r = json.loads(urllib.urlopen(url % urlquote_plus(text)).read())
-        status = r['responseStatus']
-        if r and not 'error' in r and status != 403:
-            try:
-                SubtitleLanguage.objects.get(video=language.video, language=r['responseData']['language'])
-            except SubtitleLanguage.DoesNotExist:
-                language.language = r['responseData']['language']
-                language.save()
-
-def _send_letter_translation_start(translation_version):
+def send_new_translation_notification(translation_version):
     domain = Site.objects.get_current().domain
     video = translation_version.language.video
     language = translation_version.language
+
     for user in video.notification_list(translation_version.user):
         context = {
             'version': translation_version,
@@ -333,113 +312,81 @@ def _send_letter_translation_start(translation_version):
         send_templated_email(user, subject,
                              'videos/email_start_notification.html',
                              context, fail_silently=not settings.DEBUG)
+    return True
 
 def _make_caption_data(new_version, old_version):
-    second_captions = dict([(item.subtitle_id, item) for item in old_version.ordered_subtitles()])
-    first_captions = dict([(item.subtitle_id, item) for item in new_version.ordered_subtitles()])
+    raise Exception("This function is deprecated. "
+            "babelsubs.storage.diff")
 
-    subtitles = {}
 
-    for id, item in first_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    for id, item in second_captions.items():
-        if not id in subtitles:
-            subtitles[id] = item.start_time
-
-    subtitles = [item for item in subtitles.items()]
-    subtitles.sort(key=lambda item: item[1])
-
-    captions = []
-    for subtitle_id, t in subtitles:
-        try:
-            scaption = second_captions[subtitle_id]
-        except KeyError:
-            scaption = None
-        try:
-            fcaption = first_captions[subtitle_id]
-        except KeyError:
-            fcaption = None
-
-        if fcaption is None or scaption is None:
-            changed = dict(text=True, time=True)
-        else:
-            changed = {
-                'text': (not fcaption.text == scaption.text),
-                'time': (not fcaption.start_time == scaption.start_time),
-                'end_time': (not fcaption.end_time == scaption.end_time)
-            }
-        data = [fcaption, scaption, changed]
-        captions.append(data)
-    return captions
-
-def _send_letter_caption(caption_version):
-    from videos.models import SubtitleVersion
-
+def notify_for_version(version):
     domain = Site.objects.get_current().domain
 
-    language = caption_version.language
+    language = version.subtitle_language
     video = language.video
-    qs = SubtitleVersion.objects.filter(language=language) \
-        .filter(version_no__lt=caption_version.version_no).order_by('-version_no')
+
+    qs = SubtitleVersion.objects.filter(
+            subtitle_language=language).filter(
+            version_number__lt=version.version_number).order_by(
+                    '-version_number')
+
     if qs.count() == 0:
         return
 
     most_recent_version = qs[0]
-    captions = _make_caption_data(caption_version, most_recent_version)
+    diff_data = diff_subtitles(version.get_subtitles(), most_recent_version.get_subtitles())
 
     title = {
-        'new_title': caption_version.title,
+        'new_title': version.title,
         'old_title': most_recent_version.title,
-        'has_changed': caption_version.title != most_recent_version.title
+        'has_changed': version.title != most_recent_version.title
     }
 
     description = {
-        'new_description': caption_version.description,
+        'new_description': version.description,
         'old_description': most_recent_version.description,
-        'has_changed': caption_version.description !=
+        'has_changed': version.description !=
             most_recent_version.description
     }
 
     context = {
         'title': title,
         'description': description,
-        'version': caption_version,
+        'version': version,
         'domain': domain,
-        'translation': not language.is_original,
-        'video': caption_version.video,
+        'translation': not language.is_primary_audio_language(),
+        'video': version.video,
         'language': language,
         'last_version': most_recent_version,
-        'captions': captions,
+        'diff_data': diff_data,
         'video_url': video.get_absolute_url(),
         'language_url': language.get_absolute_url(),
-        'user_url': caption_version.user and caption_version.user.get_absolute_url(),
+        'user_url': version.author and version.author.get_absolute_url(),
         "STATIC_URL": settings.STATIC_URL,
     }
 
-    subject = u'New edits to "%s" by %s on Amara' % (language.video, caption_version.user)
+    subject = u'New edits to "%s" by %s on Amara' % (language.video,
+            version.author)
 
-    followers = set(video.notification_list(caption_version.user))
-    followers.update(language.notification_list(caption_version.user))
+    followers = set(video.notification_list(version.author))
+    followers.update(language.notification_list(version.author))
 
     for item in qs:
-        if item.user and item.user in followers:
-            if item.user.notify_by_email:
+        if item.author and item.author in followers:
+            if item.author.notify_by_email:
                 context['your_version'] = item
-                context['user'] = item.user
-                context['hash'] = item.user.hash_for_video(context['video'].video_id)
-                context['user_is_rtl'] = item.user.guess_is_rtl()
+                context['user'] = item.author
+                context['hash'] = item.author.hash_for_video(context['video'].video_id)
+                context['user_is_rtl'] = item.author.guess_is_rtl()
                 Meter('templated-emails-sent-by-type.videos.new-edits').inc()
-                send_templated_email(item.user, subject,
+                send_templated_email(item.author, subject,
                                  'videos/email_notification.html',
                                  context, fail_silently=not settings.DEBUG)
-            if item.user.notify_by_message:
+            if item.author.notify_by_message:
                 # TODO: Add body
-                Message.objects.create(user=item.user, subject=subject,
+                Message.objects.create(user=item.author, subject=subject,
                         content='')
-
-            followers.discard(item.user)
+            followers.discard(item.author)
 
     for user in followers:
         context['user'] = user
@@ -449,8 +396,7 @@ def _send_letter_caption(caption_version):
         send_templated_email(user, subject,
                              'videos/email_notification_non_editors.html',
                              context, fail_silently=not settings.DEBUG)
-
-
+    return True
 
 def _update_captions_in_original_service(version_pk):
     """Push the latest caption set for this version to the original video provider.
@@ -462,7 +408,7 @@ def _update_captions_in_original_service(version_pk):
     the username for the video url.
 
     """
-    from videos.models import SubtitleVersion
+    from subtitles.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
     from .videos.types import UPDATE_VERSION_ACTION
     try:
@@ -470,7 +416,7 @@ def _update_captions_in_original_service(version_pk):
     except SubtitleVersion.DoesNotExist:
         return
     ThirdPartyAccount.objects.mirror_on_third_party(
-        version.video, version.language, UPDATE_VERSION_ACTION, version)
+        version.video, version.subtitle_language, UPDATE_VERSION_ACTION, version)
 
 @task
 def delete_captions_in_original_service(language_pk):
@@ -483,16 +429,17 @@ def delete_captions_in_original_service(language_pk):
     video url.
 
     """
-    from videos.models import SubtitleLanguage
+    from subtitles.models import SubtitleLanguage
     from .videos.types import DELETE_LANGUAGE_ACTION
     from accountlinker.models import ThirdPartyAccount
     try:
-        language = SubtitleLanguage.objects.select_related("video").get(pk=language_pk)
+        language = (SubtitleLanguage.objects.select_related("video")
+                                            .get(pk=language_pk))
     except SubtitleLanguage.DoesNotExist:
         return
-    
+
     ThirdPartyAccount.objects.mirror_on_third_party(
-        language.video, language.language, DELETE_LANGUAGE_ACTION)
+        language.video, language.language_code, DELETE_LANGUAGE_ACTION)
 
 @task
 def delete_captions_in_original_service_by_code(language_code, video_pk):
@@ -529,19 +476,34 @@ def _save_video_feed(feed_url, last_entry_url, user):
 @periodic_task(run_every=timedelta(seconds=60))
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
-    Gauge('videos.Video-captioned').report(Video.objects.exclude(subtitlelanguage=None).count())
+    Gauge('videos.Video-captioned').report(Video.objects.exclude(newsubtitlelanguage_set=None).count())
     Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
 
-@periodic_task(run_every=timedelta(seconds=(60*5)))
-def gauge_videos_long():
-    Gauge('videos.Subtitle').report(Subtitle.objects.count())
+
+# FIXME:
+# @periodic_task(run_every=timedelta(seconds=(60*5)))
+# def gauge_videos_long():
+#     Gauge('videos.Subtitle').report(Subtitle.objects.count())
+
 
 @periodic_task(run_every=timedelta(seconds=60))
 def gague_billing_records():
     from teams.models import BillingRecord
     Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
 
+
+@task
+def sync_latest_versions_for_video(video_pk):
+    video = Video.objects.get(pk=video_pk)
+
+    for lang in video.newsubtitlelanguage_set.all():
+        # use full, as the final mirror_to_third party will
+        # take care of checking if this version *should* be uplaoded
+        # Else, we'll re-sync the last public version when new
+        # drafts are saved
+        latest = lang.get_tip(full=True)
+        upload_subtitles_to_original_service.delay(latest.pk)
 
 @task
 def _add_amara_description_credit_to_youtube_vurl(vurl_pk):
@@ -595,11 +557,3 @@ def add_amara_description_credit_to_youtube_video(video_id):
     for vurl in youtube_urls:
         _add_amara_description_credit_to_youtube_vurl.delay(vurl.pk)
 
-@task
-def sync_latest_versions_for_video(video_pk):
-    video = Video.objects.get(pk=video_pk)
-
-    for lang in video.subtitlelanguage_set.all():
-        latest = lang.latest_version()
-        if latest:
-            upload_subtitles_to_original_service.delay(latest.pk)

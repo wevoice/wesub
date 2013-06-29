@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -34,10 +34,22 @@ CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
 DEFAULT_PROTOCOL = 'https'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
+
+# Use MD5 password hashing, other algorithms are purposefully slow to increase
+# security.  Also include the SHA1 hasher since some of the tests use it.
+PASSWORD_HASHERS = (
+        'django.contrib.auth.hashers.MD5PasswordHasher',
+        'django.contrib.auth.hashers.SHA1PasswordHasher',
+)
 
 import logging
 logging.getLogger('pysolr').setLevel(logging.ERROR)
+logging.getLogger('requests').setLevel(logging.ERROR)
+logging.getLogger('http').setLevel(logging.ERROR)
+logging.disable(logging.INFO)
+logging.disable(logging.DEBUG)
 
 try:
     from dev_settings_test_local import *

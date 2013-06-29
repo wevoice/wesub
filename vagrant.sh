@@ -18,12 +18,12 @@ echo "- vagrant\n" > /etc/system_roles.yml
 # clone the puppet modules
 git clone https://github.com/pculture/amara-puppet 2>&1 > /dev/null
 if [ "$1" != "" ]; then
-  echo "Checking out $1..."
+  echo "Checking out $1 branch of Amara Puppet..."
   cd amara-puppet ; git checkout $1
   cd ..
 else
   # checkout production
-  echo "Checking out production..."
+  echo "Checking out production branch of Amara Puppet..."
   cd amara-puppet ; git checkout production
   cd ..
 fi

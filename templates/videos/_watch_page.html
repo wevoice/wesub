@@ -25,11 +25,11 @@
             var $this = $(this);
             var $lang_menu = $(this).find('.lang_menu');
 
-            if ( ! $lang_menu.length){
+            if(!$lang_menu.length){
                 VideosApi.load_video_languages($this.attr('video_id'), function(r){
                     $this.html(r.content);
                 });
-            }else{
+            } else {
                 $lang_menu.show();
             }
         };

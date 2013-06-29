@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -34,7 +34,7 @@ unisubs.subtitle.SubtitleWidget = function(subtitle,
                                            readOnly,
                                            displayParagraphMarker) {
     goog.ui.Component.call(this);
-    this.subtitle_ = subtitle;
+    this.originalNode_ = subtitle;
     this.subtitleSet_ = subtitleSet;
     this.editingFn_ = editingFn;
     this.displayTimes_ = displayTimes;
@@ -86,17 +86,18 @@ unisubs.subtitle.SubtitleWidget.prototype.createDom = function() {
     if (!this.displayTimes_) {
         goog.dom.classes.add(this.titleElem_, 'unisubs-title-notime');
         unisubs.style.showElement(this.contentElement_, false);
-        if(this.subtitle_.getStartTime() > -1){
-            var timeElement = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
-                                unisubs.formatTime(this.subtitle_.getStartTime()));
-            this.titleElem_.appendChild(timeElement);
+        var startTime = this.subtitleSet_.x['startTime'](this.originalNode_.node);
+        if (parseFloat(startTime) > -1) {
+            this.timeElement_ = $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
+                                unisubs.formatTime(startTime));
+            this.titleElem_.appendChild(this.timeElement_);
         }
     }
     else {
         this.timeSpinner_ = new unisubs.Spinner(
-            this.subtitle_.getStartTime(),
-            goog.bind(this.subtitle_.getMinStartTime, this.subtitle_),
-            goog.bind(this.subtitle_.getMaxStartTime, this.subtitle_),
+            this.originalNode_.getStartTime(),
+            goog.bind(this.originalNode_.getMinStartTime, this.originalNode_),
+            goog.bind(this.originalNode_.getMaxStartTime, this.originalNode_),
             unisubs.formatTime);
         this.addChild(this.timeSpinner_, true);
     }
@@ -129,7 +130,7 @@ unisubs.subtitle.SubtitleWidget.prototype.enterDocument = function() {
                          .listen(this.getElement(),
                                 [et.MOUSEOVER, et.MOUSEOUT],
                                 this.mouseOverOut_)
-                         .listen(this.subtitle_,
+                         .listen(this.originalNode_,
                                  unisubs.subtitle.EditableCaption.CHANGE,
                                  this.updateValues_);
     }
@@ -144,11 +145,11 @@ unisubs.subtitle.SubtitleWidget.prototype.setActive = function(active) {
     goog.dom.classes.enable(this.getElement(), 'active', active);
 };
 unisubs.subtitle.SubtitleWidget.prototype.deleteClicked_ = function(e) {
-    this.subtitleSet_.deleteCaption(this.subtitle_);
+    this.subtitleSet_.deleteCaption(this.originalNode_);
 };
 
 unisubs.subtitle.SubtitleWidget.prototype.updateParagraphMarkerButton_ = function() {
-    if (this.subtitle_.getStartOfParagraph()){
+    if (this.subtitleSet_.x['startOfParagraph'](this.originalNode_.node)){
         goog.dom.classes.add(this.paragraphMarkerButton_, "selected")
     }else{
         
@@ -158,14 +159,14 @@ unisubs.subtitle.SubtitleWidget.prototype.updateParagraphMarkerButton_ = functio
 }
 unisubs.subtitle.SubtitleWidget.prototype.paragraphMarkerClicked_ = function(e) {
     e.stopPropagation();
-    this.subtitle_.toggleStartOfParagraph();
+    this.originalNode_.toggleStartOfParagraph();
     this.updateParagraphMarkerButton_();
 };
 
 unisubs.subtitle.SubtitleWidget.prototype.insertClicked_ = function(e) {
     e.stopPropagation();
     this.showInsertDeleteButtons_(false);
-    this.subtitleSet_.insertCaption(this.subtitle_.getSubOrder());
+    this.subtitleSet_.insertCaption(this.originalNode_.getSubOrder());
 };
 unisubs.subtitle.SubtitleWidget.prototype.timeSpinnerListener_ =
     function(event)
@@ -174,7 +175,7 @@ unisubs.subtitle.SubtitleWidget.prototype.timeSpinnerListener_ =
     if (event.type == et.ARROW_PRESSED)
         this.setEditing_(true, true);
     else if (event.type == et.VALUE_CHANGED) {
-        this.subtitle_.setStartTime(event.value);
+        this.originalNode_.setStartTime(event.value);
         this.setEditing_(false, true);
     }
 };
@@ -189,7 +190,7 @@ unisubs.subtitle.SubtitleWidget.prototype.setEditing_ = function(editing, timeCh
  * @return {mirosub.subtitle.EditableCaption} The subtitle for this widget.
  */
 unisubs.subtitle.SubtitleWidget.prototype.getSubtitle = function() {
-    return this.subtitle_;
+    return this.originalNode_;
 };
 unisubs.subtitle.SubtitleWidget.prototype.mouseOverOut_ = function(e) {
     if (e.type == goog.events.EventType.MOUSEOVER &&
@@ -240,7 +241,7 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToEditMode = function() {
     this.textareaElem_ = this.getDomHelper().createDom(
         'textarea', 'unisubs-subedit');
     goog.dom.append(this.titleElem_, this.textareaElem_);
-    this.textareaElem_.value = this.subtitle_.getText();
+    this.textareaElem_.value = this.originalNode_.getText();
     this.textareaElem_.focus();
     this.keyHandler_ = new goog.events.KeyHandler(this.textareaElem_);
     this.getHandler().listen(this.keyHandler_,
@@ -261,7 +262,7 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToView_ = function() {
     unisubs.subtitle.SubtitleWidget.editing_ = null;
     this.getHandler().unlisten(this.keyHandler_);
     this.disposeEventHandlers_();
-    this.subtitle_.setText(this.textareaElem_.value);
+    this.originalNode_.setText(this.textareaElem_.value);
     goog.dom.removeNode(this.textareaElem_);
     this.titleElem_.appendChild(this.titleElemInner_);
     this.showingTextarea_ = false;
@@ -274,13 +275,18 @@ unisubs.subtitle.SubtitleWidget.prototype.updateValues_ = function() {
     if (this.editing_)
         return;
     if (this.displayTimes_) {
-        var time = this.subtitle_.getStartTime();
+        var time = this.subtitleSet_.x['startTime'](this.originalNode_.node);
         this.contentElement_.style.visibility =
             time == -1 ? 'hidden' : 'visible';
         if (time != -1)
             this.timeSpinner_.setValue(time);
     }
-    this.titleElemInner_.innerHTML = unisubs.html.markdownToHtml(goog.string.newLineToBr(this.subtitle_.getText()));
+    // FIXME: Sanitize / wrap to the right elements (<em>... etc)
+    this.titleElemInner_.innerHTML = goog.string.newLineToBr(
+        this.subtitleSet_.x['contentRendered'](
+            this.originalNode_.node
+        )
+    );
 
 };
 unisubs.subtitle.SubtitleWidget.prototype.disposeEventHandlers_ = function() {

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -26,19 +26,19 @@ LANGUAGES_MAP = dict(LANGUAGES)
 LANGUAGES_MAP[''] = u'Original'
 
 class BaseRpc:
-    def _make_subtitles_dict(self, subtitles, language_code, language_pk, is_original, is_complete, version, is_latest, is_forked, base_language, title, description, language_is_rtl, is_moderated):
+    def _make_subtitles_dict(self, subtitles, language, language_pk, is_original, is_complete, version, is_latest,  base_language, title, description, language_is_rtl, is_moderated):
         return {
             'subtitles': subtitles,
-            'language_code': language_code,
-            'language_name': LANGUAGES_MAP[language_code],
+            'language_code': language.language_code,
+            'language_name': LANGUAGES_MAP[language.language_code],
             'language_pk': language_pk,
             'is_original': is_original,
             'is_complete': is_complete,
             'version': version,
             'is_latest': is_latest,
-            'forked': is_forked,
-            'base_language': base_language and base_language.language,
+            'base_language': base_language and base_language.language_code,
             'base_language_pk': base_language and base_language.pk,
+            'forked': language.is_forked,
             'title': title,
             'description': description,
             'language_is_rtl': language_is_rtl,

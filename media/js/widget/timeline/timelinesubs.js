@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -37,8 +37,9 @@ unisubs.timeline.TimelineSubs.prototype.createDom = function() {
     this.getElement().className = 'unisubs-timeline-subs';
     var subsToDisplay = this.subtitleSet_.getSubsToDisplay();
     var i;
-    for (i = 0; i < subsToDisplay.length; i++)
+    for (i = 0; i < subsToDisplay.length; i++) {
         this.addSub_(subsToDisplay[i]);
+    }
 };
 unisubs.timeline.TimelineSubs.prototype.enterDocument = function() {
     unisubs.timeline.TimelineSubs.superClass_.enterDocument.call(this);
@@ -59,15 +60,27 @@ unisubs.timeline.TimelineSubs.prototype.displayNewListener_ =
 {
     this.addSub_(event.subtitle);
 };
+
 unisubs.timeline.TimelineSubs.prototype.removeListener_ = function(event) {
-    var captionID = event.subtitle.getEditableCaption().getCaptionID();
-    var timelineSub = this.subs_[captionID];
-    this.removeChild(timelineSub, true);
-    delete this.subs_[captionID];
+    var timelineSub = null;
+    var timelineIndex = null;
+    // no need to keep the indexes updated, just cycle through them and
+    // find the right el:
+    goog.object.forEach(this.subs_, function(el, index, obj){
+        if (el.subtitle_ == event.subtitle){
+           timelineSub = el;
+            timelineIndex = index;
+        }
+    });
+    if (timelineSub){
+        this.removeChild(timelineSub, true);
+        delete this.subs_[timelineIndex];
+        return;
+    }
 };
 unisubs.timeline.TimelineSubs.prototype.addSub_ = function(sub) {
     var timelineSub = new unisubs.timeline.TimelineSub(
         sub, this.pixelsPerSecond_, 0, this.readOnly_);
     this.addChild(timelineSub, true);
-    this.subs_[sub.getEditableCaption().getCaptionID()] = timelineSub;
+    this.subs_[sub.editableCaption_.x['getSubtitleIndex'](sub.editableCaption_.node)] = timelineSub;
 };

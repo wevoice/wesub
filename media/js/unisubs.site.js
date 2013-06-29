@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 // 
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 // 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -506,6 +506,14 @@ var Site = function(Site) {
                 $.cookie('hide-yt-prompt', 'yes', { path: '/', expires: 365 });
                 return false;
             });
+
+            if ($('select[name="admin-edit-specific-version"]').length) {
+                var $versionSelect = $('select[name="admin-edit-specific-version"]');
+
+                $versionSelect.change(function() {
+                    window.location = $versionSelect.val();
+                });
+            }
         },
 
         // Public
@@ -582,6 +590,18 @@ var Site = function(Site) {
             }
 
             that.Utils.truncateTextBlocks($('div.description'), 90);
+
+            // Display rendered subtitles instead of raw Markdown.
+            var dfxpInstance = new window.AmaraDFXPParser();
+            var $subtitles = $('ol.subtitles li.subtitle-item div.translation-text p');
+            for (var i = 0; i < $subtitles.length; i++) {
+
+                var $subtitle = $subtitles.eq(i);
+                dfxpInstance.dfxpToMarkdown($subtitle.get(0));
+                var html = dfxpInstance.markdownToHTML($subtitle.text());
+
+                $subtitle.html(html);
+            }
         },
         video_view: function() {
             $('.add_subtitles').click(function() {

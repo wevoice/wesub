@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -18,6 +18,8 @@
 import re
 import time
 import traceback
+
+import babelsubs
 
 import simplejson as json
 from django.conf import settings
@@ -43,13 +45,10 @@ from teams.permissions import get_member
 from uslogging.models import WidgetDialogCall
 from utils import DEFAULT_PROTOCOL
 from utils.metrics import Meter
-from utils.html import unescape as unescape_html
-from utils.unisubsmarkup import markup_to_html
 from videos import models
 from widget.models import SubtitlingSession
 from widget.null_rpc import NullRpc
 from widget.rpc import add_general_settings, Rpc
-from widget.srt_subs import captions_and_translations_to_srt, captions_to_srt, SSASubtitles, GenerateSubtitlesHandler
 
 
 rpc_views = Rpc()
@@ -78,53 +77,39 @@ def widget_public_demo(request):
 
 @csrf_exempt
 def convert_subtitles(request):
+    # FIXME: front end needs to send the DFXP for the subs
     data = {}
     errors = None
     if request.POST:
         if 'subtitles' and 'format' and 'language_code' in request.POST:
 
-            subtitles = json.loads(request.POST['subtitles'])
+            subtitles = request.POST['subtitles']
             format = request.POST['format']
-            available_formats = "ttml dfxp srt ssa sbv".split()
+            available_formats = babelsubs.get_available_formats()
             if format not in available_formats:
                 errors = {"errors":{
                     'format': 'You must pass a suitable format. Available formats are %s' % available_formats
                 }}
-
-            cleaned_subs = []
-            for s in subtitles:
-                cleaned_subs.append({
-                    'text': markup_to_html(s['text']),
-                    'start': s['start_time'],
-                    'end': s['end_time'],
-                    'id': s['subtitle_id'],
-                    'start_of_paragraph': s['start_of_paragraph'],
-                })
-
-            # TODO: Serialize these subtitles into the format given.
-
+            subs = babelsubs.storage.SubtitleSet(initial_data=subtitles,language_code=request.POST.get('language_code'))
             # When we have newly serialized subtitles, put a stringified version of them
             # into this object. This object is what gets dumped into the textarea on the
             # front-end. If there are errors, also dump to result (the error would be displayed
             # to the user in the textarea.
-            handler = GenerateSubtitlesHandler[request.POST['format']]
-            subs = handler(cleaned_subs, None, sl=models.SubtitleLanguage(language=request.POST['language_code']))
-                                               
-            data['result'] = unicode(subs)
+            converted = babelsubs.to(subs, format)
+
+            data['result'] = converted
         else:
             errors = {
                 "errors":{
                     'subtitles': 'You need to send subtitles back',
                     'format': 'You must pass a suitable format',
                 },
-                'result': 'Something is wrong'
+                'result': "Something went wrong, we're terribly sorry."
             }
     else:
         errors = {'result': "Must be a POST request"}
     res = json.dumps(errors or data)
-    if errors:
-        return HttpResponseServerError(res, mimetype='application/javascript')
-    return HttpResponse(json.dumps(data), mimetype='application/javascript')
+    return HttpResponse(res, mimetype='application/javascript')
 
 def widgetizerbootloader(request):
     context = {
@@ -311,8 +296,7 @@ def base_widget_params(request, extra_params={}):
     params.update(extra_params)
     return json.dumps(params)[1:-1]
 
-def download_subtitles(request, handler=SSASubtitles):
-    #FIXME: use GenerateSubtitlesHandler
+def download_subtitles(request, format):
     video_id = request.GET.get('video_id')
     lang_id = request.GET.get('lang_pk')
     revision = request.GET.get('revision', None)
@@ -326,10 +310,10 @@ def download_subtitles(request, handler=SSASubtitles):
 
     if not lang_id:
         # if no language is passed, assume it's the original one
-        language = video.subtitle_language()
+        language = video.newsubtitlelanguage_set(language_code=video.primary_audio_language_code)
     else:
         try:
-            language = video.subtitlelanguage_set.get(pk=lang_id)
+            language = video.newsubtitlelanguage_set.get(pk=lang_id)
         except ObjectDoesNotExist:
             raise Http404
 
@@ -337,24 +321,27 @@ def download_subtitles(request, handler=SSASubtitles):
 
     if not team_video:
         # Non-team videos don't require moderation
-        version = language and language.version(public_only=False, version_no=revision)
+        version = language and language.version(public_only=False,
+                                                version_number=revision)
     else:
         # Members can see all versions
         member = get_member(request.user, team_video.team)
         if member:
-            version = language and language.version(public_only=False, version_no=revision)
+            version = language and language.version(public_only=False,
+                                                    version_number=revision)
         else:
-            version = language and language.version(version_no=revision)
+            version = language and language.version(version_number=revision)
 
     if not version:
         raise Http404
-
-    h = handler.create(version, video, language)
-    subs_text = unicode(h)
+    if not format in babelsubs.get_available_formats():
+        raise HttpResponseServerError("Format not found")
+    
+    subs_text = babelsubs.to(version.get_subtitles(), format, language=version.language_code)
     # since this is a downlaod, we can afford not to escape tags, specially true
     # since speaker change is denoted by '>>' and that would get entirely stripped out
     response = HttpResponse(subs_text, mimetype="text/plain")
-    original_filename = '%s.%s' % (video.lang_filename(language), h.file_type)
+    original_filename = '%s.%s' % (video.lang_filename(language.language_code), format)
 
     if not 'HTTP_USER_AGENT' in request.META or u'WebKit' in request.META['HTTP_USER_AGENT']:
         # Safari 3.0 and Chrome 2.0 accepts UTF-8 encoded string directly.
@@ -363,7 +350,7 @@ def download_subtitles(request, handler=SSASubtitles):
         try:
             original_filename.encode('ascii')
         except UnicodeEncodeError:
-            original_filename = 'subtitles.' + h.file_type
+            original_filename = 'subtitles.' + format
 
         filename_header = 'filename=%s' % original_filename
     else:
@@ -371,21 +358,6 @@ def download_subtitles(request, handler=SSASubtitles):
         filename_header = 'filename*=UTF-8\'\'%s' % iri_to_uri(original_filename.encode('utf-8'))
 
     response['Content-Disposition'] = 'attachment; ' + filename_header
-    return response
-
-def null_srt(request):
-    # FIXME: possibly note duplication with srt, and fix that.
-    video = models.Video.objects.get(video_id=request.GET['video_id'])
-    if 'lang_code' in request.GET:
-        lang_code = request.GET['lang_code']
-        response_text = captions_and_translations_to_srt(
-            video.null_captions_and_translations(request.user, lang_code))
-    else:
-        response_text = captions_to_srt(
-            list(video.null_captions(request.user).videocaption_set.all()))
-    response = HttpResponse(response_text, mimetype="text/plain")
-    response['Content-Disposition'] = \
-        'attachment; filename={0}'.format(video.srt_filename)
     return response
 
 def _is_loggable(method):

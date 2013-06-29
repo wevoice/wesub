@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@ from apps.teams.models import Team, TeamVideo, TeamMember, Workflow, Task
 from auth.models import CustomUser as User
 from contextlib import contextmanager
 from apps.testhelpers import views as helpers
+from utils import test_factories
 from utils.translation import SUPPORTED_LANGUAGE_CODES
 
 from apps.teams.permissions_const import *
@@ -54,36 +55,34 @@ def _set_subtitles(team_video, language, original, complete, translations=[]):
 
 class BaseTestPermission(TestCase):
     def setUp(self):
-        self.auth = dict(username='admin', password='admin')
-        self.team = Team.objects.get(pk=1)
-        self.team.video_policy = Team.VP_MANAGER
-        self.video = self.team.videos.all()[0]
+        self.setup_users()
+        self.setup_team()
+        self.setup_videos()
 
-        # TODO: Remove these magic queryset indexes
+    def setup_users(self):
         self.user = User.objects.all()[0]
+        self.owner_account = test_factories.create_user(username='owner')
+        self.outsider = test_factories.create_user(username='outsider')
 
-        self.owner, _ = TeamMember.objects.get_or_create(
-            user= User.objects.all()[3], role=TeamMember.ROLE_OWNER, team=self.team)
+    def setup_team(self):
+        self.team = test_factories.create_team()
+        self.owner = test_factories.create_team_member(
+            self.team, self.owner_account, role=TeamMember.ROLE_OWNER)
+        self.test_project = test_factories.create_project(self.team)
+        self.default_project = self.team.default_project
 
-        self.outsider = User.objects.get(username='outsider')
+    def setup_videos(self):
+        self.project_video = test_factories.create_team_video(
+            self.team, self.owner_account, project=self.test_project)
+        self.nonproject_video = test_factories.create_team_video(
+            self.team, self.owner_account)
 
-    @property
-    def default_project(self):
-        return self.team.project_set.get(pk=1)
-
-    @property
-    def test_project(self):
-        return self.team.project_set.get(pk=2)
-
-
-    @property
-    def nonproject_video(self):
-        return TeamVideo.objects.filter(project__pk=1)[0]
-
-    @property
-    def project_video(self):
-        return TeamVideo.objects.filter(project__pk=2)[0]
-
+    def clear_cached_workflows(self):
+        # delete the _cached_workflow attributes of our videos.  Their values
+        # may have been changed.
+        for video in (self.nonproject_video, self.project_video):
+            if hasattr(video, '_cached_workflow'):
+                del video._cached_workflow
 
     @contextmanager
     def role(self, r, project=None):
@@ -104,12 +103,6 @@ class BaseTestPermission(TestCase):
 
 
 class TestRules(BaseTestPermission):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
-    def _login(self):
-        self.client.login(**self.auth)
-
-
     # Testing specific permissions
     def test_roles_assignable(self):
         user, team = self.user, self.team
@@ -502,6 +495,7 @@ class TestRules(BaseTestPermission):
         # Review disabled.
         workflow.review_allowed = Workflow.REVIEW_IDS["Don't require review"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -512,6 +506,7 @@ class TestRules(BaseTestPermission):
         # Peer reviewing.
         workflow.review_allowed = Workflow.REVIEW_IDS["Peer must review"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -522,6 +517,7 @@ class TestRules(BaseTestPermission):
         # Manager review.
         workflow.review_allowed = Workflow.REVIEW_IDS["Manager must review"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -541,6 +537,7 @@ class TestRules(BaseTestPermission):
         # Admin review.
         workflow.review_allowed = Workflow.REVIEW_IDS["Admin must review"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -560,6 +557,7 @@ class TestRules(BaseTestPermission):
         # Workflows disabled entirely.
         self.team.workflow_enabled = False
         self.team.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -580,6 +578,7 @@ class TestRules(BaseTestPermission):
         # Approval disabled.
         workflow.approve_allowed = Workflow.APPROVE_IDS["Don't require approval"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -590,6 +589,7 @@ class TestRules(BaseTestPermission):
         # Manager approval.
         workflow.approve_allowed = Workflow.APPROVE_IDS["Manager must approve"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -609,6 +609,7 @@ class TestRules(BaseTestPermission):
         # Admin approval.
         workflow.approve_allowed = Workflow.APPROVE_IDS["Admin must approve"]
         workflow.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -628,6 +629,7 @@ class TestRules(BaseTestPermission):
         # Workflows disabled entirely.
         self.team.workflow_enabled = False
         self.team.save()
+        self.clear_cached_workflows()
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -667,10 +669,6 @@ class TestRules(BaseTestPermission):
         # Projects can only be edited by admins+.
         for r in [ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
-                self.assertTrue(can_edit_project(team, user, test_project))
-
-        for r in [ROLE_ADMIN]:
-            with self.role(r, test_project):
                 self.assertTrue(can_edit_project(team, user, test_project))
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER]:
@@ -825,7 +823,7 @@ class TestRules(BaseTestPermission):
                 self.assertTrue(can_create_task_subtitle(self.nonproject_video, user))
 
         # Once subtitles exist, no one can create a new task.
-        _set_subtitles(self.nonproject_video, 'en', True, True)
+        helpers._add_language_via_pipeline(self.nonproject_video.video, 'en')
 
         self.assertFalse(can_create_task_subtitle(self.nonproject_video))
 
@@ -865,6 +863,7 @@ class TestRules(BaseTestPermission):
         # Any team member.
         team.task_assign_policy = Team.TASK_ASSIGN_IDS['Any team member']
         team.save()
+
 
         for r in [ROLE_CONTRIBUTOR, ROLE_MANAGER, ROLE_ADMIN, ROLE_OWNER]:
             with self.role(r):
@@ -930,16 +929,16 @@ class TestRules(BaseTestPermission):
     # TODO: Review/approve task tests.
 
 class TestViews(BaseTestPermission):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def test_save_role(self):
 
-        owner = self.team.members.filter(role=ROLE_OWNER)[0]
-        member  = self.team.members.filter(role=ROLE_CONTRIBUTOR)[0]
-        member.user.set_password("hey")
-        member.user.save()
+        owner = self.owner
 
-        tv = self.team.teamvideo_set.all()[0]
+        member_account = test_factories.create_user(username='member',
+                                                    password='hey')
+        member = test_factories.create_team_member(
+            self.team, member_account, role=TeamMember.ROLE_CONTRIBUTOR)
+
+        tv = self.project_video
         video_url = reverse("videos:video", args=(tv.video.video_id,))
         owner.user.set_password("hey")
         owner.user.save()

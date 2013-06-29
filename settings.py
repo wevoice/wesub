@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -29,7 +29,7 @@ def rel(*x):
 
 # Rebuild the language dicts to support more languages.
 from django.conf import global_settings
-from libs.unilangs import get_language_code_mapping
+from unilangs import get_language_code_mapping
 
 # We use a custom format for our language labels:
 # Translated Language Name (Native Name)
@@ -86,8 +86,6 @@ EMBED_JS_VERSION = ''
 PREVIOUS_EMBED_JS_VERSIONS = []
 
 CSS_USE_COMPILED = True
-
-USE_BUNDLED_MEDIA = not DEBUG
 
 COMPRESS_YUI_BINARY = "java -jar ./css-compression/yuicompressor-2.4.6.jar"
 COMPRESS_OUTPUT_DIRNAME = "static-cache"
@@ -287,6 +285,38 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-dependencies.js',
     'js/swfobject.js',
     'flowplayer/flowplayer-3.2.6.min.js',
+    'src/js/third-party/amara-jquery.min.js',
+    'src/js/dfxp/dfxp.js',
+]
+
+SUBTITLE_EDITOR_JS = [
+    'src/js/third-party/jquery-1.10.1.js',
+    'src/js/third-party/jquery.autosize.js',
+    'src/js/third-party/angular.1.0.7.js',
+    'src/js/third-party/angular-cookies.js',
+    'src/js/third-party/underscore.min.js',
+    'src/js/third-party/popcorn.js',
+    'src/js/dfxp/dfxp.js',
+    'src/js/uri.js',
+    'src/js/popcorn/popcorn.flash-fallback.js',
+    #'src/js/popcorn/popcorn.netflix.js',
+    'src/js/subtitle-editor/app.js',
+    'src/js/subtitle-editor/collab.js',
+    'src/js/subtitle-editor/dom.js',
+    'src/js/subtitle-editor/help.js',
+    'src/js/subtitle-editor/lock.js',
+    'src/js/subtitle-editor/modal.js',
+    'src/js/subtitle-editor/workflow.js',
+    'src/js/subtitle-editor/subtitles/controllers.js',
+    'src/js/subtitle-editor/subtitles/directives.js',
+    'src/js/subtitle-editor/subtitles/filters.js',
+    'src/js/subtitle-editor/subtitles/models.js',
+    'src/js/subtitle-editor/subtitles/services.js',
+    'src/js/subtitle-editor/timeline/controllers.js',
+    'src/js/subtitle-editor/timeline/directives.js',
+    'src/js/subtitle-editor/video/controllers.js',
+    'src/js/subtitle-editor/video/directives.js',
+    'src/js/subtitle-editor/video/services.js',
 ]
 
 # Local time zone for this installation. Choices can be found here:
@@ -310,11 +340,6 @@ USE_I18N = True
 # Example: "/home/media/media.lawrence.com/"
 STATIC_ROOT = rel('media')+'/'
 MEDIA_ROOT  = rel('user-data')+'/'
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -480,6 +505,7 @@ ACCOUNT_ACTIVATION_DAYS = 9999 # we are using registration only to verify emails
 SESSION_COOKIE_AGE = 2419200 # 4 weeks
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_COOKIE_HTTPONLY = False
 
 RECENT_ACTIVITIES_ONPAGE = 10
 ACTIVITIES_ONPAGE = 20
@@ -630,14 +656,17 @@ MEDIA_BUNDLES = {
     "unisubs-offsite-compiled":{
         "type": "js",
         "files": JS_OFFSITE,
+        "use_closure": True,
         },
 
     "unisubs-onsite-compiled":{
         "type": "js",
         "files": JS_ONSITE,
+        "use_closure": True,
      },
     "unisubs-widgetizer":{
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "files": ["js/config.js"] + JS_WIDGETIZER,
         "bootloader": { 
@@ -648,6 +677,7 @@ MEDIA_BUNDLES = {
     },
     "unisubs-widgetizer-sumo": {
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "files": ["js/config.js"] + JS_WIDGETIZER,
         "extra_defines": {"unisubs.REPORT_ANALYTICS": "false"},
@@ -660,6 +690,7 @@ MEDIA_BUNDLES = {
     "unisubs-widgetizer-debug": {
         "type": "js",
         "files": ["js/config.js" ] + JS_WIDGETIZER  ,
+        "use_closure": True,
         "closure_deps": "js/closure-dependencies.js",
         "debug": True,
         "bootloader": { 
@@ -670,6 +701,7 @@ MEDIA_BUNDLES = {
      },
     "unisubs-statwidget":{
         "type": "js",
+        "use_closure": True,
         "closure_deps": "js/closure-stat-dependencies.js",
         "include_flash_deps": False,
         "files": [
@@ -682,6 +714,7 @@ MEDIA_BUNDLES = {
 
     "unisubs-api":{
         "type": "js",
+        "use_closure": True,
         "files": ["js/config.js"] + JS_API,
         "bootloader": { 
             "gatekeeper": "UnisubsApiLoaded", 
@@ -690,16 +723,17 @@ MEDIA_BUNDLES = {
      },
     "js-base-dependencies":{
         "type":"js",
+        "use_closure": True,
         "optimizations": "WHITESPACE_ONLY",
         "files": JS_BASE_DEPENDENCIES,
      },
     "js-onsite-dialog": {
         "type":"js",
+        "use_closure": True,
         "files": ["js/config.js"]  + JS_DIALOG  ,
     },
     "site_base_js":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
+        "type": "js",
         "files":[
               "js/jquery-1.4.3.js",
               "js/jquery-ui-1.8.16.custom.min.js",
@@ -717,19 +751,15 @@ MEDIA_BUNDLES = {
               "js/libs/jquery.cookie.js",
               "js/unisubs.site.js",
             ],
-        "closure_deps": "",
-        "include_flash_deps": False,
         },
     "js-jqueryui-datepicker":{
         "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
         "files":[
               "js/jquery-ui-1.8.16.custom.datepicker.min.js",
             ],
-        "include_js_base_dependencies": False,
         },
     "js-testing-base":{
-        "type":"js",
+        "type": "js",
         "files": [
                  'js/widget/testing/stubvideoplayer.js',
                  'js/widget/testing/events.js',
@@ -747,9 +777,7 @@ MEDIA_BUNDLES = {
          ),
     },
     "js-teams":{
-        "type":"js",
-        "optimizations": "WHITESPACE_ONLY",
-        "closure_deps": "",
+        "type": "js",
         "files": (
             "js/libs/ICanHaz.js",
             "js/libs/classy.js",
@@ -759,11 +787,10 @@ MEDIA_BUNDLES = {
             "js/jquery.mod.js",
             "js/teams/create-task.js",
          ),
-        "include_js_base_dependencies": False,
-        "include_flash_deps": False,
     },
     "embedder":{
         "type":"js",
+		"use_closure": True,
         "optimizations": "SIMPLE_OPTIMIZATIONS",
         "closure_deps": "",
         "files": (
@@ -772,15 +799,14 @@ MEDIA_BUNDLES = {
             'src/js/third-party/zepto.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
-            'src/js/embedder/popcorn.amaratranscript.js',
-            'src/js/embedder/popcorn.amarasubtitle.js',
+            'src/js/popcorn/popcorn.amaratranscript.js',
+            'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
         "include_js_base_dependencies": False,
         "include_flash_deps": False,
         #"output": 'release/public/embedder.js',
-        "ignore_closure": True,
         "release_url": True,
         "bootloader": { 
             "gatekeeper": "_amaraEmbedderLoaded", 
@@ -799,9 +825,14 @@ MEDIA_BUNDLES = {
     },
     "debug-embed-js": {
         "type": "js",
+        "use_closure": True,
         "optimizations": "WHITESPACE_ONLY",
         "files": JS_BASE_DEPENDENCIES + JS_OFFSITE[:-1]
-    }
+    },
+    'subtitle-editor':  {
+        'type': 'js',
+        'files': SUBTITLE_EDITOR_JS,
+    },
 }
 
 

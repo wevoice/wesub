@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -23,56 +23,47 @@ goog.provide('unisubs.translate.TranslationWidget');
  * @param {Object.<string, *>} subtitle Base language subtitle in json format
  * @param {unisubs.subtitle.EditableCaption} translation
  */
-unisubs.translate.TranslationWidget = function(subtitle, translation, dialog) {
+unisubs.translate.TranslationWidget = function(originalNode, translationCaption, dialog, dfxpWrapper) {
     goog.ui.Component.call(this);
-    this.subtitle_ = subtitle;
+    this.originalNode_ = originalNode;
     this.dialog_ = dialog;
     this.videoURL_ = this.dialog_.getVideoPlayerInternal().videoSource_.videoURL_ || '';
 
     /**
      * @type {unisubs.subtitle.EditableCaption}
      */
-    this.translation_ = translation;
+    this.translationCaption_ = translationCaption;
+    this.dfxpWrapper_ = dfxpWrapper;
 };
 
 goog.inherits(unisubs.translate.TranslationWidget, goog.ui.Component);
 
 unisubs.translate.TranslationWidget.prototype.getSubtitle = function(){
-    return this.subtitle_;
+    return this.originalNode_;
 };
 unisubs.translate.TranslationWidget.prototype.getOriginalValue = function(){
-    return this.subtitle_.text;
+    return this.dfxpWrapper_['content'](this.originalNode_);
 };
-unisubs.translate.TranslationWidget.prototype.getSubJson = function() {
-    return {
-        'subtitle_id': this.getCaptionID(),
-        'text': this.translateInput_.value
-    };
-};
+
 unisubs.translate.TranslationWidget.prototype.createDom = function() {
 
     var $d = goog.bind(this.getDomHelper().createDom, this.getDomHelper());
 
-    // If we're reviewing or approving a translation, we need to display the timing
-    // from the *translation*, not the original.
-    var timingToDisplay;
-    if (this.dialog_.reviewOrApprovalType_) {
-        timingToDisplay = this.translation_.json['start_time'];
-    } else {
-        timingToDisplay = this.subtitle_['start_time'];
-    }
+    var timingToDisplay = this.translationCaption_.getStartTime();
 
     this.setElementInternal(
         $d('li', null,
            $d('div', null,
               $d('span', {'className': 'unisubs-timestamp-time-fixed'}, 
                          unisubs.formatTime(timingToDisplay)),
-              $d('span', 'unisubs-title unisubs-title-notime', this.subtitle_['text']),
+              this.originalTitleWidgetThing_ = $d('span', 'unisubs-title unisubs-title-notime', ''),
               this.loadingIndicator_ = $d('span', 'unisubs-loading-indicator', 'loading...')
            ),
            this.translateInput_ = $d('textarea', 'unisubs-translateField')
         )
     );
+
+    this.originalTitleWidgetThing_.innerHTML = this.dfxpWrapper_['markdownToHTML'](this.getOriginalValue());
     
     this.getHandler()
         .listen(
@@ -84,7 +75,7 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
         .listen(
             this.translateInput_, goog.events.EventType.FOCUS,
             this.inputGainedFocus_);
-    this.translateInput_.value = this.translation_ ? this.translation_.getText() : '';
+    this.translateInput_.value = this.translationCaption_ ? this.translationCaption_.getText() : '';
 };
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
     this.onFocusText_ = this.translateInput_.value;
@@ -99,11 +90,9 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
     var edited = value != this.onFocusText_;
     if (track && edited) {
         if (this.onFocusText_ == "")
-            unisubs.SubTracker.getInstance().trackAdd(this.getCaptionID());
-        else
-            unisubs.SubTracker.getInstance().trackEdit(this.getCaptionID());
+            unisubs.SubTracker.getInstance().trackAdd(this.translationCaption_.getCaptionIndex());
     }
-    this.translation_.setText(value);
+    this.translationCaption_.setText(value);
     this.dialog_.getVideoPlayerInternal().showCaptionText('');
 };
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
@@ -116,7 +105,7 @@ unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
         this.translateInput_.value = '';
 };
 unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
-    return this.subtitle_['subtitle_id'];
+    return this.dfxpWrapper_['getSubtitleIndex'](this.originalNode_);
 };
 
 /**

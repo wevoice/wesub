@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -35,7 +35,7 @@ unisubs.subtitle.SubtitleList = function(videoPlayer, captionSet, displayTimes, 
     /**
      * A map of captionID to unisubs.subtitle.SubtitleWidget
      */
-    this.subtitleMap_ = {};
+    this.subtitleList_ = [];
     this.currentlyEditing_ = false;
     this.showBeginMessage_ = opt_showBeginMessage ? true : false;
     this.showingBeginMessage_ = false;
@@ -71,8 +71,9 @@ unisubs.subtitle.SubtitleList.prototype.createDom = function() {
     } else {
         this.readOnly_ || this.addAddButton_();
         var i;
-        for (i = 0; i < this.captionSet_.count(); i++)
-            this.addSubtitle(this.captionSet_.caption(i), false, true);
+        for (i = 0; i < this.captionSet_.count(); i++) {
+            this.addSubtitle( this.captionSet_.captions_[i],  i, false, true );
+        }
         this.setLastSub_();
     }
 };
@@ -114,25 +115,37 @@ unisubs.subtitle.SubtitleList.prototype.enterDocument = function() {
             this.captionInserted_).
         listen(
             this.captionSet_,
+            et.RESET_SUBS,
+            this.captionsReset_).
+        listen(
+            this.captionSet_,
             et.DELETE,
             this.captionDeleted_);
     if (this.addSubtitleButton_ && !this.readOnly_) {
         this.listenForAdd_();
     }
 };
+unisubs.subtitle.SubtitleList.prototype.captionsReset_ = function(event) {
+    this.captionsCleared_(event);
+    for (var i = 0; i < this.captionSet_.count(); i++) {
+        this.addSubtitle( this.captionSet_.captions_[i],  i, false, true );
+    }
+    this.setLastSub_();
+}
 unisubs.subtitle.SubtitleList.prototype.captionsCleared_ = function(event) {
-    this.subtitleMap_ = {};
+    this.subtitleList_ = [];
     while (this.getChildCount() > 1)
         this.removeChildAt(0, true);
 };
 unisubs.subtitle.SubtitleList.prototype.captionDeleted_ = function(e) {
-    var widget = this.subtitleMap_[e.caption.getCaptionID()];
-    delete this.subtitleMap_[e.caption.getCaptionID()];
+    // use the event index, because at this time, it's no longer
+    // part of the wrapper, so getCaptionIndex will fail
+    var widget = this.subtitleList_[e.index];
     this.removeChild(widget, true);
+    this.subtitleList_.splice( e.index, 1);
 };
 unisubs.subtitle.SubtitleList.prototype.captionTimesCleared_ = function(e) {
-    var subtitleWidgets = goog.object.getValues(this.subtitleMap_);
-    goog.array.forEach(subtitleWidgets, function(w) { w.clearTimes(); });
+    goog.array.forEach(this.subtitleList_, function(w) { w.clearTimes(); });
 };
 unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableCaption) {
     return new unisubs.subtitle.SubtitleWidget(
@@ -150,7 +163,7 @@ unisubs.subtitle.SubtitleList.prototype.createNewSubWidget_ = function(editableC
  * @param {unisubs.subtitle.EditableCaption} subtitle
  *
  */
-unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scrollDown, opt_dontSetLastSub) {
+unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, subtitleIndex, opt_scrollDown, opt_dontSetLastSub) {
     if (this.showingBeginMessage_) {
         goog.dom.removeChildren(this.getElement());
         goog.dom.classes.remove(this.getElement(), 'unisubs-beginTab');
@@ -160,9 +173,9 @@ unisubs.subtitle.SubtitleList.prototype.addSubtitle = function(subtitle, opt_scr
     var dest_offset = this.getChildCount() - (this.readOnly_ ? 0 : 1);
     var subtitleWidget = this.createNewSubWidget_(subtitle);
     this.addChildAt(subtitleWidget, dest_offset, true);
-    this.subtitleMap_[subtitle.getCaptionID()] = subtitleWidget;
+    goog.array.insertAt(this.subtitleList_, subtitleWidget, subtitle.getCaptionIndex());
     if (opt_scrollDown && typeof(opt_scrollDown) == 'boolean')
-        this.scrollToCaption(subtitle.getCaptionID());
+        this.scrollToCaption(subtitleIndex);
     if (!opt_dontSetLastSub)
         this.setLastSub_();
 };
@@ -171,15 +184,16 @@ unisubs.subtitle.SubtitleList.prototype.captionInserted_ = function(e) {
     var subtitleWidget = this.createNewSubWidget_(addedCaption);
     var nextCaption = addedCaption.getNextCaption();
     if (nextCaption != null) {
-        var nextWidget = this.subtitleMap_[nextCaption.getCaptionID()];
-        this.addChildAt(subtitleWidget, this.indexOfChild(nextWidget), true);
+        var nextWidget = this.subtitleList_[nextCaption.getCaptionIndex()];
+        this.addChildAt(subtitleWidget, addedCaption.getCaptionIndex(), true);
     }
     else {
         this.addChildAt(subtitleWidget, this.getChildCount() - 1, true);
         this.setLastSub_();
     }
-    this.subtitleMap_[addedCaption.getCaptionID()] = subtitleWidget;
+    goog.array.insertAt(this.subtitleList_, subtitleWidget, addedCaption.getCaptionIndex());
     subtitleWidget.switchToEditMode();
+    this.updateAllStartTimes();
 };
 unisubs.subtitle.SubtitleList.prototype.setLastSub_ = function() {
     var subWidget = null;
@@ -231,12 +245,12 @@ unisubs.subtitle.SubtitleList.prototype.clearActiveWidget = function() {
 unisubs.subtitle.SubtitleList.prototype.setTaller = function(taller) {
     goog.dom.classes.enable(this.getElement(), 'taller', taller);
 };
-unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(captionID) {
-    if (!this.subtitleMap_[captionID])
-        return;
-    this.scrollToCaption(captionID);
+unisubs.subtitle.SubtitleList.prototype.setActiveWidget = function(node, index) {
+    // TODO: DFXP integration stuff.
+
+    this.scrollToCaption(index);
     this.clearActiveWidget();
-    var subtitleWidget = this.subtitleMap_[captionID];
+    var subtitleWidget = this.subtitleList_[index];
     subtitleWidget.setActive(true);
     this.currentActiveSubtitle_ = subtitleWidget;
 };
@@ -244,21 +258,33 @@ unisubs.subtitle.SubtitleList.prototype.getActiveWidget = function() {
     return this.currentActiveSubtitle_;
 };
 unisubs.subtitle.SubtitleList.prototype.scrollToCaption = function(captionID) {
-    var subtitleWidget = this.subtitleMap_[captionID];
+    var subtitleWidget = this.subtitleList_[captionID];
     if (subtitleWidget)
         goog.style.scrollIntoContainerView(
             subtitleWidget.getElement(),
             this.getElement(), true);
 };
-unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing, timeChanged, subtitleWidget) { this.currentlyEditing_ = editing; if (editing) {
+unisubs.subtitle.SubtitleList.prototype.setCurrentlyEditing_ = function(editing, timeChanged, subtitleWidget) {
+
+    this.currentlyEditing_ = editing;
+
+    if (editing) {
         this.videoPlayer_.pause();
     }
     else {
         var subStartTime = subtitleWidget.getSubtitle().getStartTime();
+
         if (timeChanged) {
             this.videoPlayer_.playWithNoUpdateEvents(subStartTime, 2);
         }
     }
+};
+unisubs.subtitle.SubtitleList.prototype.updateAllStartTimes = function() {
+    goog.array.forEach(this.subtitleList_, function(w) {
+        if (w.timeElement_){
+            goog.dom.setTextContent(w.timeElement_, unisubs.formatTime(w.originalNode_.getStartTime()));
+        }
+    });
 };
 unisubs.subtitle.SubtitleList.prototype.isCurrentlyEditing = function() {
     return this.currentlyEditing_;

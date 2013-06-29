@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -54,7 +54,7 @@ unisubs.widget.DropDown.Selection = {
 };
 
 unisubs.widget.DropDown.prototype.hasSubtitles = function() {
-    return this.videoLanguages_.length > 0;
+    return goog.array.some(this.videoLanguages_, function(el){ return el.IS_PUBLIC });
 };
 unisubs.widget.DropDown.prototype.setStats_ = function(dropDownContents) {
     this.videoLanguages_ = dropDownContents.LANGUAGES;
@@ -138,6 +138,11 @@ unisubs.widget.DropDown.prototype.addVideoLanguagesLinks_ = function($d) {
 
     for (var i = 0; i < this.videoLanguages_.length; i++) {
         var data = this.videoLanguages_[i];
+
+        if(!data.IS_PUBLIC){
+            continue
+        }
+
         var link =
             $d('a', {'href': '#'},
                $d('span', 'unisubs-languageTitle',

@@ -1,15 +1,16 @@
 {{ object }}
-{{ object }}
-{{ object }}
-{{ object }}
 {{ object.description }}
 {% for item in object.videourl_set.all %}
     {{ item.url }}
 {% endfor %}
-{% for lang in object.subtitlelanguage_set.all %}
-    {% if lang.title %}{{ lang.title }}{% endif %}
-    {{ lang.language_display }}
-    {% for item in lang.latest_subtitles %}
-        {{ item.text }}
-    {% endfor %}
+{% for lang in object.newsubtitlelanguage_set.all %}
+    {% if lang.get_title %}{{ lang.get_title }}{% endif %}
+    {{ lang.get_language_code_display }}
+    {% with lang.get_public_tip as tip %}
+        {% if tip %}
+            {% for line in tip.get_subtitles %}
+                {{ line.text }}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 {% endfor %}

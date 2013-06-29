@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 #
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -19,11 +19,15 @@
 from httplib2 import Http
 from urllib import urlencode
 
+from django.conf import settings
+DEFAULT_PROTOCOL = getattr(settings, "DEFAULT_PROTOCOL", 'https')
+
+from django.contrib.sites.models import Site
 from django.utils.translation import ugettext_lazy as _
 
 from utils import send_templated_email
 from utils.metrics import Meter
-from libs.unilangs import LanguageCode
+from unilangs import LanguageCode
 from videos.models import Video
 
 import logging
@@ -94,9 +98,9 @@ class BaseNotification(object):
         self.application_pk = kwargs.pop('application_pk', None)
         self.version_pk = kwargs.pop('version_pk', None)
         if self.language_pk:
-            self.language = self.video.subtitlelanguage_set.get(pk=self.language_pk)
+            self.language = self.video.newsubtitlelanguage_set.get(pk=self.language_pk)
             if self.version_pk:
-                self.version = self.language.subtitleversion_set.get(pk=self.version_pk)
+                self.version = self.language.subtitleversion_set.full().get(pk=self.version_pk)
         else:
             self.language = None
         self.event_name = event_name
@@ -118,7 +122,7 @@ class BaseNotification(object):
                 lang_klass = getattr(self.__class__, "language_resource_class", VideoLanguageResource)
                 url =  lang_klass(self.api_name).get_resource_uri(self.language)
                 if self.version_pk:
-                   url += "subtitles/?version_no=%s"  % self.version.version_no
+                   url += "subtitles/?version_no=%s"  % self.version.version_number
                 return url
             else:
                 return video_klass(self.api_name).get_resource_uri(self.video)
@@ -133,10 +137,10 @@ class BaseNotification(object):
     @property
     def language_code(self):
         if self.language:
-            return  self.from_internal_lang(self.language.language)
+            return  self.from_internal_lang(self.language.language_code)
 
     def send_http_request(self, url, basic_auth_username, basic_auth_password):
-        h = Http()
+        h = Http(disable_ssl_certificate_validation=True)
         if basic_auth_username and basic_auth_password:
             h.add_credentials(basic_auth_username, basic_auth_password)
 
@@ -155,13 +159,18 @@ class BaseNotification(object):
             data['video_id'] = self.video_id
         if self.application_pk:
             data['application_id'] = self.application_pk
-        if self.language_code:
-            data.update({"language_code":self.language_code} )
+        if self.language:
+            data.update({
+                "language_code": self.language_code,
+                "language_id": self.language.pk,
+            })
         data_sent = data
         data = urlencode(data)
         url = "%s?%s" % (url , data)
         try:
-            resp, content = h.request(url, method="POST", body=data)
+            resp, content = h.request(url, method="POST", body=data, headers={
+                'referer': '%s://%s' % (DEFAULT_PROTOCOL, Site.objects.get_current().domain)
+            })
             success = 200 <= resp.status < 400
             if success is False:
                 logger.error("Failed to notify team %s " % (self.team),

@@ -1,6 +1,6 @@
 # Amara, universalsubtitles.org
 # 
-# Copyright (C) 2012 Participatory Culture Foundation
+# Copyright (C) 2013 Participatory Culture Foundation
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -78,7 +78,7 @@ def _execute_language_task(language, event_name):
  
 def _execute_version_task(version, event_name):
     from teams import tasks as team_tasks
-    video = version.language.video
+    video = version.video
     teams = _teams_to_notify(video)
     for team in teams:
         team_tasks.api_notify_on_subtitles_activity.delay(
@@ -136,11 +136,17 @@ def api_on_application_new(sender, **kwargs):
     from teams.models import TeamNotificationSetting
     return _execute_application_task(sender, TeamNotificationSetting.EVENT_APPLICATION_NEW)
 
+def api_on_language_deleted(sender, **kwargs):
+    from teams.models import TeamNotificationSetting
+    return _execute_language_task(
+        sender, TeamNotificationSetting.EVENT_LANGUAGE_DELETED)
+
 #: Actual available signals
 api_subtitles_edited = dispatch.Signal(providing_args=["version"])
 api_subtitles_approved = dispatch.Signal(providing_args=["version"])
 api_subtitles_rejected = dispatch.Signal(providing_args=["version"])
 api_language_edited = dispatch.Signal(providing_args=["language"])
+api_language_deleted = dispatch.Signal()
 api_video_edited = dispatch.Signal(providing_args=["video"])
 api_language_new = dispatch.Signal(providing_args=["language"])
 api_teamvideo_new = dispatch.Signal(providing_args=["video"])
@@ -153,6 +159,7 @@ api_subtitles_approved.connect(api_on_subtitles_approved)
 api_subtitles_rejected.connect(api_on_subtitles_rejected)
 api_language_edited.connect(api_on_language_edited)
 api_language_new.connect(api_on_language_new)
+api_language_deleted.connect(api_on_language_deleted)
 api_video_edited.connect(api_on_video_edited)
 api_teamvideo_new.connect(api_on_teamvideo_new)
 api_application_new.connect(api_on_application_new)

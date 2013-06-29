@@ -56,7 +56,10 @@ a nutshell:
 
 from django.db import transaction
 
-from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
+from apps.subtitles.models import (
+    SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
+    ORIGIN_UPLOAD
+)
 
 
 # Utility Functions -----------------------------------------------------------
@@ -146,6 +149,19 @@ def _user_can_bypass_moderation(team_video, version, committer):
 
     return subtitles_are_complete and is_post_publish_edit and user_can_bypass
 
+def _set_language_for_subtitle_tasks(team_video, saved_version):
+    """Set the language attribute for subtitle tasks.
+
+    When tasks are created, we don't know the primary language, so subtitle
+    tasks might not have their language set.  We should set it when we save
+    the primary audio-language
+    """
+    if saved_version.subtitle_language.is_primary_audio_language():
+        subtitle_tasks = team_video.task_set.incomplete_subtitle()
+        for task in subtitle_tasks.filter(language=''):
+            task.language = saved_version.language_code
+            task.save()
+
 def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
                               complete):
     """Handle any existing tasks for this subtitle addition."""
@@ -181,6 +197,7 @@ def _handle_outstanding_tasks(outstanding_tasks, version, team_video, committer,
             # Also, if the subtitles are complete, we can mark that outstanding
             # subtitle/translate task as complete.
             if complete:
+                task.new_subtitle_version = version
                 task.complete()
 
     # Outstanding review/approve tasks will need to be handled elsewhere.
@@ -270,6 +287,8 @@ def _update_visibility_and_tasks(team_video, version, committer, complete):
             version.visibility = 'private'
             version.save()
 
+    _set_language_for_subtitle_tasks(team_video, version)
+
     # Okay, so now we have an appropriately-visibile version.  Next we see if
     # there are any outstanding tasks for this version/language.
     outstanding_tasks = team_video.task_set.incomplete().filter(
@@ -301,11 +320,8 @@ def _update_video_title(subtitle_language, version):
             version.video.save()
 
 def _fork_dependents(subtitle_language):
-    dependents = [sl.id for sl in
-                  subtitle_language.get_dependent_subtitle_languages()]
-
-    if dependents:
-        SubtitleLanguage.objects.filter(id__in=dependents).update(is_forked=True)
+    for dsl in subtitle_language.get_dependent_subtitle_languages(direct=True):
+        dsl.fork()
 
 def _get_version(video, v):
     """Get the appropriate SV belonging to the given video.
@@ -350,7 +366,8 @@ def _get_language(video, language_code):
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
-                   rollback_of_version_number, committer, complete, created):
+                   rollback_of_version_number, committer, complete, created,
+                   note, origin):
     """Add subtitles in the language to the video.  Really.
 
     This function is the meat of the subtitle pipeline.  The user-facing
@@ -358,11 +375,6 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     """
     sl, language_needs_save = _get_language(video, language_code)
-
-    if complete != None:
-        sl.subtitles_complete = complete
-        language_needs_save = True
-
     if language_needs_save:
         sl.save()
 
@@ -370,22 +382,30 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
             'visibility': visibility, 'visibility_override': visibility_override,
             'parents': [_get_version(video, p) for p in (parents or [])],
             'rollback_of_version_number': rollback_of_version_number,
-            'created': created}
+            'created': created, 'note': note, 'origin': origin}
     _strip_nones(data)
 
     version = sl.add_version(subtitles=subtitles, **data)
-
+    if complete != None:
+        is_complete = complete and version.get_subtitles().fully_synced
+        # only save if the value has changed
+        if is_complete != sl.subtitles_complete:
+            sl.subtitles_complete = is_complete
+            sl.save()
     _update_video_title(sl, version)
     _update_followers(sl, author)
     _perform_team_operations(version, committer, complete)
+
+    if origin in (ORIGIN_UPLOAD, ORIGIN_API):
+        _fork_dependents(sl)
 
     return version
 
 def _rollback_to(video, language_code, version_number, rollback_author):
     sl = SubtitleLanguage.objects.get(video=video, language_code=language_code)
 
-    current = sl.get_tip()
-    target = sl.subtitleversion_set.get(version_number=version_number)
+    current = sl.get_tip(full=True)
+    target = sl.subtitleversion_set.full().get(version_number=version_number)
 
     # The new version is mostly a copy of the target.
     data = {
@@ -398,11 +418,13 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'complete': None,
         'committer': None,
         'created': None,
+        'note': target.note,
+        'origin': ORIGIN_ROLLBACK,
     }
 
     # If any version in the history is public, then rollbacks should also result
     # in public versions.
-    existing_versions = target.sibling_set.all()
+    existing_versions = target.sibling_set.extant()
     data['visibility'] = ('public'
                           if any(v.is_public() for v in existing_versions)
                           else 'private')
@@ -423,6 +445,9 @@ def _rollback_to(video, language_code, version_number, rollback_author):
     # this horrible "forking" crap is going away entirely.
     if current.subtitle_count != target.subtitle_count:
         _fork_dependents(version.subtitle_language)
+
+    from teams.signals import api_subtitles_edited
+    api_subtitles_edited.send(version)
 
     return version
 
@@ -451,7 +476,7 @@ def add_subtitles(video, language_code, subtitles,
                   title=None, description=None, author=None,
                   visibility=None, visibility_override=None,
                   parents=None, committer=None, complete=None,
-                  created=None):
+                  created=None, note=None, origin=None):
     """Add subtitles in the language to the video.  It all starts here.
 
     This function is your main entry point to the subtitle pipeline.
@@ -502,7 +527,7 @@ def add_subtitles(video, language_code, subtitles,
         return _add_subtitles(video, language_code, subtitles, title,
                               description, author, visibility,
                               visibility_override, parents, None, committer,
-                              complete, created)
+                              complete, created, note, origin)
 
 
 def unsafe_rollback_to(video, language_code, version_number,

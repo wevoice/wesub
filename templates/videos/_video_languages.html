@@ -14,11 +14,11 @@
     </div><!-- hd -->
 
     <div class="bd clearfix">
-        {% for lang in languages %}
-            {% with lang.subtitle_count as lines_count %}
+        {% for language in languages %}
+            {% with language.get_subtitle_count as lines_count %}
                 {% if lines_count %}
-                    <a href="{{ lang.get_absolute_url }}" class="{% complete_color lang %}">
-                        <span>{% complete_indicator lang %} {{ lang.language_display }}</span>
+                    <a href="{{ language.get_absolute_url }}" class="{% complete_color language %}">
+                        <span>{{ language.get_language_code_display }}</span>
                     </a>
                 {% endif %}
             {% endwith %}

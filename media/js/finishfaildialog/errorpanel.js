@@ -1,6 +1,6 @@
 // Amara, universalsubtitles.org
 //
-// Copyright (C) 2012 Participatory Culture Foundation
+// Copyright (C) 2013 Participatory Culture Foundation
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -56,5 +56,5 @@ unisubs.finishfaildialog.ErrorPanel.prototype.enterDocument = function() {
 unisubs.finishfaildialog.ErrorPanel.prototype.downloadSubsClicked_ = function(e) {
     e.preventDefault();
     unisubs.finishfaildialog.CopyDialog.showForSubs(
-        this.captionSet_.makeJsonSubs());
+        this.captionSet_.makeDFXPString());
 };
