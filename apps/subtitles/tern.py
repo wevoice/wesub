@@ -345,11 +345,17 @@ def _add_sl(sl):
     return nsl
 
 
+def get_visibility_from_old_version(sv):
+    if sv.moderation_status in ("not__under_moderation", "approved"):
+        return 'public'
+    else:
+        return 'private'
+
 def _stack_version(sv, nsl):
     """Stack the given version onto the given new SL."""
     from apps.subtitles import pipeline
 
-    visibility = 'public' if sv.is_public else 'private'
+    visibility = get_visibility_from_old_version(sv)
 
     subtitles = _get_subtitles(sv)
 
@@ -706,7 +712,7 @@ def _create_subtitle_version(sv, last_version):
     sl = sv.language
     nsl = sl.new_subtitle_language
 
-    visibility = 'public' if sv.is_public else 'private'
+    visibility = get_visibility_from_old_version(sv)
 
     subtitles = _get_subtitles(sv)
 
@@ -754,7 +760,7 @@ def _update_subtitle_version(sv):
     nsv.title = sv.title
     nsv.description = sv.description
     nsv.note = sv.note
-    nsv.visibility = 'public' if sv.is_public else 'private'
+    visibility = get_visibility_from_old_version(sv)
 
     sv.needs_sync = False
 
