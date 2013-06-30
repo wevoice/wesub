@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load media_compressor %}
+{% block title %}
+    DMR Migration Cleanup
+{% endblock %}
+{% block css %}
+{% include_bundle "base" %}
+<style type="text/css">
+    .team-filter {
+        float: right;
+    }
+</style>
+</head>
+{% endblock %}
+
+{% block main_content %}
+<div class="team-filter">
+<form action="">
+    <select name="team">
+        <option value=""{% if not selected_team %} selected{% endif %}>Filter by Team</option>
+        {% for team in teams %}
+        <option value="{{team.slug}}"{% if team == selected_team %} selected{% endif %}>{{ team}}</option>
+        {% endfor %}
+    </select>
+    <input type="submit" value="Filter">
+</form>
+</div>
+<h2>Languages with Versions Missed by Tern</h2>
+<ul>
+<table>
+{% for language in languages %}
+    <tr>
+        <td><a href="{{language.video.get_absolute_url}}">{{language.video}}</a></td>
+        <td>{{language}}</td>
+        <td><a href="/en/subtitles/dmr-cleanup/{{language.video.video_id}}/{{language.language}}/">Fixup</a></td>
+    </tr>
+{% endfor %}
+</table>
+</ul>
+<br><br>
+<h3>{{ extra_count }} more languages not listed</h3>
+
+{% endblock %}

@@ -1,0 +1,11 @@
+{% load subtitles_tags %}
+{% if subtitle.start_time|is_synced_value %}
+{{ subtitle.start_time|format_time_with_ms }}
+{% if subtitle.end_time|is_synced_value %}
+- {{ subtitle.end_time|format_time_with_ms }}
+{% endif %}
+:
+{% else %}
+unsynced: 
+{% endif %}
+{{ subtitle.text }}

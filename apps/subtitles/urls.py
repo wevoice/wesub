@@ -24,3 +24,9 @@ urlpatterns = patterns('subtitles.views',
     url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/regain', 'regain_lock', name='regain_lock'),
     url(r'^editor/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/release', 'release_lock', name='release_lock'),
 )
+
+urlpatterns += patterns('subtitles.dmrcleanup',
+    url(r'^dmr-cleanup/$', 'language_list'),
+    url(r'^dmr-cleanup/(?P<video_id>[\w]+)/(?P<language_code>[\w-]+)/$',
+        'language_fixup'),
+)

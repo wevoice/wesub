@@ -992,6 +992,7 @@ ORIGIN_SCRIPTED = 'scripted'
 ORIGIN_TERN = 'tern'
 ORIGIN_UPLOAD = 'upload'
 ORIGIN_WEB_EDITOR = 'web-editor'
+ORIGIN_DMR_CLEANUP = 'dmr-cleanup'
 
 SUBTITLE_VERSION_ORIGINS = (
     (ORIGIN_API, _("API")),
@@ -1002,6 +1003,7 @@ SUBTITLE_VERSION_ORIGINS = (
     (ORIGIN_TERN, _("Tern")),
     (ORIGIN_UPLOAD, _("Uploaded")),
     (ORIGIN_WEB_EDITOR, _("Through web editor")),
+    (ORIGIN_DMR_CLEANUP, _("Through the DMR cleanup script")),
 )
 
 class SubtitleVersion(models.Model):

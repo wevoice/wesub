@@ -1042,6 +1042,59 @@ class SubtitleVersion(models.Model):
                                                 null=True, blank=True,
                                                 editable=False)
 
+    # Functionality needed for the dmr cleanup
+    # This is definitely dirty, but hopefully it holds up until we've migrated
+    # all the DMR data.
+
+    @property
+    def is_public(self):
+        from teams.moderation_const import APPROVED, UNMODERATED
+        return self.moderation_status in [APPROVED, UNMODERATED]
+
+    def is_dependent(self):
+        return not self.language.is_original and not self.is_forked
+
+    def get_subtitles(self):
+        from subtitles import tern
+        return storage.SubtitleSet.from_list(
+            self.language.language,
+            tern._get_subtitles(self))
+
+    @property
+    def prev_sv(self):
+        if hasattr(self, '_prev_sv'):
+            return self._prev_sv
+
+        try:
+            self._prev_sv = SubtitleVersion.objects.get(
+                language=self.language,
+                version_no=self.version_no-1)
+        except SubtitleVersion.DoesNotExist:
+            self._prev_sv = None
+        return self._prev_sv
+
+    def get_diff(self):
+        from babelsubs.generators.html import HTMLGenerator
+        if self.prev_sv is not None:
+            prev_subtitles = self.prev_sv.get_subtitles()
+        else:
+            prev_subtitles = storage.SubtitleSet.from_list(
+                self.language.language, [])
+        return storage.diff(prev_subtitles, self.get_subtitles(),
+                            HTMLGenerator.MAPPINGS)
+
+    def prev_title(self):
+        if self.prev_sv:
+            return self.prev_sv.title
+        else:
+            return self.video.title
+
+    def prev_description(self):
+        if self.prev_sv:
+            return self.prev_sv.description
+        else:
+            return self.video.description
+
     class Meta:
         ordering = ['-version_no']
         unique_together = (('language', 'version_no'),)
