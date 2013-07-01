@@ -285,19 +285,18 @@ var angular = angular || null;
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
                     $scope.workingSubtitles.description,
+                    $scope.workingSubtitles.metadata,
                     markComplete);
         };
-        $scope.$watch('workingSubtitles.title', function(newValue, oldValue) {
+        function watchSubtitleAttributes(newValue, oldValue) {
             if(newValue != oldValue) {
                 $scope.$root.$emit('work-done');
             }
-        })
-        $scope.$watch('workingSubtitles.description', function(newValue,
-                    oldValue) {
-            if(newValue != oldValue) {
-                $scope.$root.$emit('work-done');
-            }
-        })
+        }
+        $scope.$watch('workingSubtitles.title', watchSubtitleAttributes);
+        $scope.$watch('workingSubtitles.description', watchSubtitleAttributes);
+        $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
+                true);
     });
 
 }).call(this);

@@ -228,6 +228,12 @@
                                 {{ last_version.description|urlize|linebreaks }}
                             </div>
                         </li>
+                        {% for field in metadata %}
+                        <li>
+                            <div class="field">{{field.label }}:</div>
+                            {{ field.content }}
+                        </li>
+                        {% endfor %}
                         {% for item in subtitle_lines %}
                         <li class="subtitle-item {%if item.meta.new_paragraph %} start-of-paragraph{% endif %}">
                             {% if item.0 != None %}

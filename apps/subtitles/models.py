@@ -31,6 +31,7 @@ from apps.subtitles import cache
 from apps.subtitles import shims
 from apps.subtitles import signals
 from apps.auth.models import CustomUser as User
+from apps.videos import metadata
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
 from babelsubs.storage import diff as diff_subtitles
@@ -618,10 +619,15 @@ class SubtitleLanguage(models.Model):
 
         ensure_stringy(kwargs.get('title'))
         ensure_stringy(kwargs.get('description'))
+        metadata = kwargs.pop('metadata', None)
 
         sv = SubtitleVersion(*args, **kwargs)
 
         sv.set_subtitles(kwargs.get('subtitles', None))
+        if metadata is not None:
+            sv.update_metadata(metadata, commit=False)
+            # save the video to commit the changes to it
+            self.video.save()
         self._sanity_check_parents(sv, parents)
 
         sv.full_clean()
@@ -1082,6 +1088,10 @@ class SubtitleVersion(models.Model):
 
     created = models.DateTimeField(editable=False)
 
+    meta_1_content = metadata.MetadataContentField()
+    meta_2_content = metadata.MetadataContentField()
+    meta_3_content = metadata.MetadataContentField()
+
     # Subtitles are stored in a text blob, serialized as base64'ed zipped XML
     # (oh the joys of Django).  Use the subtitles property to get and set them.
     # You shouldn't be touching this field.
@@ -1365,8 +1375,17 @@ class SubtitleVersion(models.Model):
         """
         return self.subtitle_language.subtitleversion_set
 
+    def update_metadata(self, field_data, commit=True):
+        metadata.update_child_and_video(self, self.video, field_data,
+                                           commit)
+
+    def get_metadata(self):
+        return metadata.get_child_metadata(self, self.video)
 
     # Metadata
+    # This is basically a shim for the broken-ass tasks system that should go
+    # away once we tear that out.  See the corresponding model of the same
+    # name in videos.models for more information.
     def _get_metadata(self, key):
         """Return the metadata for this version for the given key, or None."""
         try:

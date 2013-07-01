@@ -22,7 +22,7 @@ files = [
     'src/js/third-party/angular-mocks.js',
     'src/js/third-party/angular-cookies.js',
     'src/js/third-party/jquery.autosize.js',
-    'src/js/third-party/underscore.min.js',
+    'src/js/third-party/underscore.1.4.4.js',
     'src/js/third-party/popcorn.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',

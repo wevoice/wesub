@@ -151,10 +151,14 @@
                         <a class="expander" ng-class="{collapsed: collapsed}" href="#" ng-click="onExpanderClicked($event)"></a>
                         <h2>{% trans "TITLE AND DESCRIPTION" %}</h2>
                         <div class="content" ng-show="!collapsed">
-                            <h3>{% trans "TITLE" %}</h3>
+                            <h3>{% trans "title" %}</h3>
                             <p ng-bind="referenceSubtitles.getTitle()"></p>
-                            <h3>{% trans "DESCRIPTION" %}</h3>
+                            <h3>{% trans "description" %}</h3>
                             <p ng-bind="referenceSubtitles.getDescription()"></p>
+                            <div ng-repeat="field in referenceSubtitles.metadata">
+                                <h3>[[ field[0] | metadataTypeName ]]</h2>
+                                <p>[[ field[1] ]]</p>
+                            </div>
                         </div>
                     </div>
 
@@ -284,6 +288,10 @@ subtitle-repeat directive, see the working subtitles for more info
                             <textarea placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
                             <h3>{% trans "DESCRIPTION" %}</h3>
                             <textarea placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
+                            <div ng-repeat="field in workingSubtitles.metadata">
+                                <h3>[[ field[0] | metadataTypeName ]]</h2>
+                                <textarea autosize-bind="workingSubtitles.metadata[$index][1]"></textarea>
+                            </div>
                         </div>
                     </div>
                     <ul subtitle-list="working-subtitle-set"

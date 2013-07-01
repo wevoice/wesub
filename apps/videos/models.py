@@ -39,6 +39,7 @@ from django.core.urlresolvers import reverse
 
 
 from auth.models import CustomUser as User, Awards
+from videos import metadata
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
 from comments.models import Comment
@@ -155,6 +156,17 @@ class Video(models.Model):
     followers = models.ManyToManyField(User, blank=True, related_name='followed_videos', editable=False)
     complete_date = models.DateTimeField(null=True, blank=True, editable=False)
     featured = models.DateTimeField(null=True, blank=True)
+    # Metadata fields for this video.  These are translatable strings for
+    # metadata on the video.  One example is Speaker name for TED videos.
+    #
+    # This overlaps with VideoMetadata, but we hopefully will be phasing that
+    # out.
+    meta_1_type = metadata.MetadataTypeField()
+    meta_1_content = metadata.MetadataContentField()
+    meta_2_type = metadata.MetadataTypeField()
+    meta_2_content = metadata.MetadataContentField()
+    meta_3_type = metadata.MetadataTypeField()
+    meta_3_content = metadata.MetadataContentField()
 
     subtitles_fetched_count = models.IntegerField(_(u'Sub.fetched'), default=0, db_index=True, editable=False)
     # counter for evertime the widget plays accounted for both on and off site
@@ -787,8 +799,17 @@ class Video(models.Model):
             setattr(self, cached_attr_name,  tv and tv.team.moderates_videos())
         return cached_attr_name
 
+    def get_metadata(self):
+        return metadata.get_fields_for_video(self)
+
+    def update_metadata(self, new_metadata, commit=True):
+        return metadata.update_video(self, new_metadata, commit)
+
     def metadata(self):
         '''Return a dict of metadata for this video.
+
+        Deprecated: don't use this function in new code.  See comments in
+        VideoMetadata for why.
 
         Example:
 
@@ -855,6 +876,17 @@ models.signals.m2m_changed.connect(User.video_followers_change_handler, sender=V
 
 
 # VideoMetadata
+#
+# TODO: remove this this class.  We use this class for a couple things:
+#
+# Author and Creation Date for team videos.  Why do we need these things?
+# Seems like they could easily be attributes on either Video and
+# SubtitleVersion.  This probably can go away when we switch to the new
+# collaboration model.
+#
+# Video IDs for partners like TED so we can translate back and forth between
+# the our IDs and theirs.  However, it would be better/simpler to just use a
+# map table for that.
 class VideoMetadata(models.Model):
     video = models.ForeignKey(Video)
     key = models.PositiveIntegerField(choices=VIDEO_META_CHOICES)

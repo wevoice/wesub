@@ -1,6 +1,7 @@
 import functools
 import os
 import urlparse
+from django.core.cache import cache
 
 import mock
 from nose.plugins import Plugin
@@ -148,6 +149,8 @@ def mock_youtube_get_entry(video_id):
         'tKTZoB2Vjuk': ('Google Python Class Day 1 Part 1',
                         'GoogleDevelopers', '3097'),
         'osexbB_hX4g': ('DO YOU SEE THAT??!!', 'otherijustine', '90'),
+        'hPbYnNRw4UM': ('ONN | Documentary - Beginning',
+                        'OccupyNewsNetworkUK', '1971'),
     }
     try:
         title, author, duration = video_id_map[video_id]
@@ -189,17 +192,10 @@ def mock_youtube_get_entry(video_id):
 youtube_get_entry = mock.Mock(side_effect=mock_youtube_get_entry)
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
 
-class UnisubsTestPlugin(Plugin):
-    name = 'Amara Test Plugin'
-
-    def configure(self, options, conf):
-        super(UnisubsTestPlugin, self).configure(options, conf)
-        # force enabled to always be True.  This only gets loaded because we
-        # manually specify the plugin in the dev_settings_test.py file.  So
-        # it's pretty safe to assume the user wants us enabled.
-        self.enabled = True
-
-    def begin(self):
+class MonkeyPatcher(object):
+    """Replace a functions with mock objects for the tests.
+    """
+    def patch_functions(self):
         # list of (function, mock object tuples)
         patch_info = [
             ('videos.tasks.save_thumbnail_in_s3.delay', save_thumbnail_in_s3),
@@ -230,13 +226,37 @@ class UnisubsTestPlugin(Plugin):
         return [mock_obj.original_func(*args, **kwargs)
                 for args, kwargs in mock_obj.call_args_list]
 
-    def finalize(self, result):
+    def unpatch_functions(self):
         for patch in self.patches:
             patch.stop()
 
-    def afterTest(self, test):
+    def reset_mocks(self):
         for mock_obj, initial_data in self.mock_object_initial_data.items():
             # we used to call reset_mock() here, but this works better.  It
             # also resets the things like return_value and side_effect to
             # their initial value.
             mock_obj.__dict__ = initial_data.copy()
+
+class UnisubsTestPlugin(Plugin):
+    name = 'Amara Test Plugin'
+
+    def __init__(self):
+        Plugin.__init__(self)
+        self.patcher = MonkeyPatcher()
+
+    def configure(self, options, conf):
+        super(UnisubsTestPlugin, self).configure(options, conf)
+        # force enabled to always be True.  This only gets loaded because we
+        # manually specify the plugin in the dev_settings_test.py file.  So
+        # it's pretty safe to assume the user wants us enabled.
+        self.enabled = True
+
+    def begin(self):
+        self.patcher.patch_functions()
+
+    def finalize(self, result):
+        self.patcher.unpatch_functions()
+
+    def afterTest(self, test):
+        self.patcher.reset_mocks()
+        cache.clear()

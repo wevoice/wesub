@@ -22,8 +22,6 @@ var angular = angular || null;
 
     var module = angular.module('amara.SubtitleEditor.subtitles.controllers', []);
 
-    var _ = this._.noConflict();
-
     module.controller('LanguageSelectorController', function($scope) {
         /**
          * This controller is responsible for the language and version selector
@@ -104,7 +102,7 @@ var angular = angular || null;
                 if(newVersion.visibility == 'Public') {
                     $scope.currentVersion = newVersion;
                     $scope.referenceSubtitles.getSubtitles(
-                        $scope.language.language_code, newVersion.version_no);
+                        $scope.language.code, newVersion.version_no);
                 } else {
                     loadEmptySubtitles();
                 }
@@ -114,7 +112,7 @@ var angular = angular || null;
         function loadEmptySubtitles() {
             $scope.currentVersion = null;
             $scope.referenceSubtitles.initEmptySubtitles(
-                    $scope.language.language_code);
+                    $scope.language.code);
         }
 
         function pickInitialLanguage() {
@@ -124,7 +122,7 @@ var angular = angular || null;
             // try to pick the primary audio language
             for(var i = 0; i < $scope.languages.length; i++) {
                 var language = $scope.languages[i];
-                if(language.is_original) {
+                if(language.isPrimaryAudioLanguage) {
                     return language;
                 }
             }

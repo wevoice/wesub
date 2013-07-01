@@ -44,12 +44,9 @@ PASSWORD_HASHERS = (
         'django.contrib.auth.hashers.SHA1PasswordHasher',
 )
 
-import logging
-logging.getLogger('pysolr').setLevel(logging.ERROR)
-logging.getLogger('requests').setLevel(logging.ERROR)
-logging.getLogger('http').setLevel(logging.ERROR)
-logging.disable(logging.INFO)
-logging.disable(logging.DEBUG)
+# Let the nose CaptureLogging plugin handle logging.  It doesn't display
+# logging at all, except if there's a test failure.
+del LOGGING
 
 try:
     from dev_settings_test_local import *

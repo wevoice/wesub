@@ -27,7 +27,8 @@ var angular = angular || null;
 
     var getSubtitleFetchAPIUrl = function(videoId, languageCode, versionNumber) {
         var url = API_BASE_PATH_VIDEOS + videoId +
-            '/languages/' + languageCode + '/subtitles/?format=dfxp';
+            '/languages/' + languageCode + '/subtitles/' +
+            '?format=json&sub_format=dfxp';
 
         if (versionNumber) {
             url = url + '&version=' + versionNumber;
@@ -63,6 +64,7 @@ var angular = angular || null;
         this.responseData = responseData;
         this.name = responseData.name;
         this.code = responseData.language_code;
+        this.versions = responseData.versions;
         if(responseData.is_rtl) {
             this.dir = 'rtl';
         } else {
@@ -71,10 +73,25 @@ var angular = angular || null;
         this.isPrimaryAudioLanguage = responseData.is_original;
     }
 
-    module.factory('SubtitleStorage', function($window, $http) {
+    module.factory('SubtitleStorage', function($http, EditorData) {
 
-        var cachedData = $window.editorData;
+        var cachedData = EditorData;
         var authHeaders = cachedData.authHeaders;
+
+        // Map language_code/version_number to subtitle data
+        var cachedSubtitleData = {};
+        // Populate cachedSubtitleData with versions from editorData that
+        // were pre-filled with the data we need.
+        _.each(cachedData.languages, function(language) {
+            var language_code = language.language_code;
+            cachedSubtitleData[language_code] = {};
+            _.each(language.versions, function(version) {
+                var versionNum = version.version_no;
+                if(version.subtitles) {
+                    cachedSubtitleData[language_code][versionNum] = version;
+                }
+            });
+        });
 
         function ensureLanguageMap() {
             if (cachedData.languageMap) {
@@ -111,6 +128,11 @@ var angular = angular || null;
                 return cachedData;
             },
             getLanguages: function(callback) {
+                function invokeCallback(languagesData) {
+                    callback(_.map(languagesData, function(langData) {
+                        return new Language(langData);
+                    }));
+                }
 
                 // If there are no languages in our cached data, ask the API.
                 if (cachedData.languages && cachedData.languages.length === 0) {
@@ -119,12 +141,12 @@ var angular = angular || null;
 
                     $http.get(url).success(function(response) {
                         cachedData.languages = response.objects;
-                        callback(response.objects);
+                        invokeCallback(response.objects);
                     });
 
                 // If we have cached languages, just call the callback.
                 } else {
-                    callback(cachedData.languages);
+                    invokeCallback(cachedData.languages);
                 }
             },
             getLanguage: function(languageCode) {
@@ -147,47 +169,15 @@ var angular = angular || null;
                 }
 
                 var subtitleData;
-
-                // Loop through all of our cached languages to find the correct subtitle version.
-                for (var i=0; i < cachedData.languages.length; i++){
-
-                    var language = cachedData.languages[i];
-
-                    // Once we find the language we're looking for, find the version.
-                    if (language.language_code === languageCode){
-
-                        for (var j = 0; j < language.versions.length; j++){
-
-                            // We've found the version.
-                            if (language.versions[j].version_no === parseInt(versionNumber, 10)){
-
-                                subtitleData = language.versions[j];
-                                if (subtitleData.subtitlesXML) {
-                                    break;
-                                }
-
-                            }
-                        }
-
-                        break;
-                    }
-                }
-
-                // If we found subtitles, call the callback with them.
-                if (subtitleData.subtitlesXML !== undefined){
-                   callback(subtitleData);
-
-                // Otherwise, ask the API for this version.
+                var versionNum = parseInt(versionNumber, 10);
+                var cacheData = cachedSubtitleData[languageCode][versionNum];
+                if(cacheData) {
+                   callback(cacheData);
                 } else {
-
                     var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode, versionNumber);
-
                     $http.get(url).success(function(response) {
-
-                        // Cache these subtitles on the cached data object.
-                        subtitleData.subtitlesXML = response;
-                        callback(subtitleData);
-
+                        cachedSubtitleData[languageCode][versionNum] = response;
+                        callback(response)
                     });
                 }
             },
@@ -217,7 +207,7 @@ var angular = angular || null;
 
             },
             saveSubtitles: function(videoID, languageCode, dfxpString, title,
-                                   description, isComplete) {
+                                   description, metadata, isComplete) {
                 var url = getSubtitleSaveAPIUrl(videoID, languageCode);
                 // if isComplete is not specified as true or false, we send
                 // null, which means keep the complete flag the same as before
@@ -236,6 +226,7 @@ var angular = angular || null;
                         sub_format: 'dfxp',
                         title: title,
                         description: description,
+                        metadata: metadata,
                         is_complete: isComplete,
                     }
                 });
