@@ -214,6 +214,7 @@ def markup_to_dfxp(text):
     text = ITALIC_RE_OUTER.sub(r'<span fontStyle="italic">\1</span>', text)
     text = UNDER_RE_INNER.sub(r'<span textDecoration="underline">\1</span>', text)
     text = UNDER_RE_OUTER.sub(r'<span textDecoration="underline">\1</span>', text)
+    text = text.replace('\n', '<br />')
 
     return text
 
