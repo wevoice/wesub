@@ -537,13 +537,14 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
                 raise Http404
         else:
             version = versions[0]
+        context['metadata'] = version.get_metadata().convert_for_display()
     else:
         version = None
+        context['metadata'] = video.get_metadata().convert_for_display()
 
     context['rollback_allowed'] = version and version.next_version() is not None
     if team_video and not can_rollback_language(request.user, language):
         context['rollback_allowed'] = False
-    context['metadata'] = version.get_metadata().convert_for_display()
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
