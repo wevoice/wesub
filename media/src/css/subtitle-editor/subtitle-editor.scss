@@ -592,6 +592,19 @@ section.main {
                     border-bottom: 5px solid transparent;
                 }
             }
+
+            &[dir=rtl] {
+                a.expander {
+                    left: auto;
+                    right: 24px;
+
+                    &.collapsed {
+                        border-left: 0;
+                        border-right: 10px solid #fff;
+                    }
+                }
+            }
+
         }
 
         ul {
@@ -745,6 +758,14 @@ section.main {
                     margin-right: 6px;
                 }
             }
+
+            &[dir=rtl] {
+                span.timing {
+                    left: 20px;
+                    right: auto;
+                }
+            }
+
         }
         .end {
             color: #3C3C3D;

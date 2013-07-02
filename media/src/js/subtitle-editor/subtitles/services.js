@@ -70,6 +70,7 @@ var angular = angular || null;
         } else {
             this.dir = 'ltr';
         }
+        this.dir = 'rtl';
         this.isPrimaryAudioLanguage = responseData.is_original;
     }
 
