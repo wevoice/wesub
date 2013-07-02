@@ -138,3 +138,14 @@ class MetadataFieldsTest(TestCase):
                 { 'label': 'Mock Translation', 'content': 'Santa'},
                 { 'label': 'Mock Translation', 'content': 'North Pole'},
             ])
+
+    def test_metadata_searchable(self):
+        version = pipeline.add_subtitles(self.video, 'en', None,
+                                         metadata=[
+                                             ('speaker-name', 'Santa'),
+                                             ('location', 'North Pole'),
+                                         ])
+        self.video.update_search_index()
+        test_utils.update_search_index.run_original()
+        qs = VideoIndex.public().filter(text='santa')
+        self.assertEquals([v.video_id for v in qs], [self.video.video_id])

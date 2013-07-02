@@ -639,6 +639,16 @@ class SubtitleLanguage(models.Model):
         cache.invalidate_language_cache(self)
         return sv
 
+    def get_metadata(self, public=True):
+        tip = self.get_tip(public)
+        if tip:
+            return tip.get_metadata()
+        else:
+            return self.video.get_metadata()
+
+    def get_metadata_for_display(self):
+        return self.get_metadata().convert_for_display()
+
     def is_synced(self, public=True):
         value = cache.get_is_synced(self, public)
         if value is None:
@@ -1379,6 +1389,9 @@ class SubtitleVersion(models.Model):
 
     def get_metadata(self):
         return metadata.get_child_metadata(self, self.video)
+
+    def get_metadata_for_display(self):
+        return self.get_metadata().convert_for_display()
 
     # Metadata
     # This is basically a shim for the broken-ass tasks system that should go
