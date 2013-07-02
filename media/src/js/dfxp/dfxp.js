@@ -656,7 +656,7 @@ var AmaraDFXPParser = function() {
             input = input.replace(MARKUP_REPLACE_SEQ[i][0],
                 MARKUP_REPLACE_SEQ[i][1]);
         }
-        input = input.replace("\n", '<br/>');
+        input = input.replace(RegExp("\n", "g"), '<br/>');
         return input;
     };
     this.needsAnySynced = function() {
