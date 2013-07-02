@@ -204,6 +204,13 @@ var USER_IDLE_MINUTES = 5;
                 for(var i=0; i < updateFuncs.length; i++) {
                     updateFuncs[i](context);
                 }
+                if(attrs.currentSubtitleClass) {
+                    if($scope.timeline.shownSubtitle === subtitle) {
+                        elm.addClass(attrs.currentSubtitleClass);
+                    } else {
+                        elm.removeClass(attrs.currentSubtitleClass);
+                    }
+                }
                 var rv = elm.clone();
                 subtitleMap[subtitle.id] = rv;
                 rv.data('subtitle', subtitle);
@@ -276,6 +283,11 @@ var USER_IDLE_MINUTES = 5;
                 return null;
             }
 
+            function updateSubtitle(subtitle) {
+                var node = subtitleMap[subtitle.id];
+                node.replaceWith(createNodeForSubtitle(subtitle));
+            }
+
             function onChange(change) {
                 var subtitle = change.subtitle;
                 switch(change.type) {
@@ -285,8 +297,7 @@ var USER_IDLE_MINUTES = 5;
                         delete subtitleMap[subtitle.id];
                         break;
                     case 'update':
-                        var node = subtitleMap[subtitle.id];
-                        node.replaceWith(createNodeForSubtitle(subtitle));
+                        updateSubtitle(subtitle);
                         break;
                     case 'insert':
                         if(change.before !== null) {
@@ -397,6 +408,17 @@ var USER_IDLE_MINUTES = 5;
                     });
                 }
             });
+
+            if(attrs.currentSubtitleClass) {
+                $scope.$watch('timeline.shownSubtitle', function(newSub, oldSub) {
+                    if(newSub) {
+                        updateSubtitle(newSub);
+                    }
+                    if(oldSub) {
+                        updateSubtitle(oldSub);
+                    }
+                });
+            }
         }
     });
 

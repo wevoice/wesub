@@ -708,6 +708,9 @@ section.main {
                 &.edit span.subtitle-text {
                     display: none;
                 }
+                &.current-subtitle {
+                    background: #ddeaf7;
+                }
                 span.start-time {
                     color: #CCC;
                     font: normal 10px $OpenSans;

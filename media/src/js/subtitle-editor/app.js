@@ -71,6 +71,12 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
+
+        $scope.timeline = {
+            shownSubtitle: null,
+            currentTime: null,
+            duration: null,
+        };
     });
 
     /* AppController is large, so we split it into several components to
