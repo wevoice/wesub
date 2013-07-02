@@ -165,6 +165,9 @@ var USER_IDLE_MINUTES = 5;
 
             if (isWorkingSet) {
                 scope.$root.$on('scroll-to-subtitle', function(evt, subtitle) {
+                    if(scope.currentEdit.inProgress()) {
+                        return;
+                    }
                     var target = scope.getSubtitleRepeatItem(subtitle);
                     var prev = target.prev();
                     if(prev.length > 0) {
