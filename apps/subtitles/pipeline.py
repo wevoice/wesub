@@ -420,6 +420,7 @@ def _rollback_to(video, language_code, version_number, rollback_author):
         'committer': None,
         'created': None,
         'note': target.note,
+        'metadata': target.get_metadata(),
         'origin': ORIGIN_ROLLBACK,
     }
 
