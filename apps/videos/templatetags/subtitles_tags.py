@@ -19,7 +19,6 @@
 import bleach
 
 from django import template
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import linebreaks
 
@@ -35,14 +34,6 @@ def format_time(milliseconds):
     s = t % 60
     s = s > 9 and s or '0%s' % s
     return '%s:%s' % (t / 60, s)
-
-@register.filter
-def format_time_with_ms(milliseconds):
-    t = int(round(milliseconds / 1000.0))
-    s = t % 60
-    s = s > 9 and s or '0%s' % s
-    decimal = (milliseconds % 1000) // 10
-    return '%s:%s.%02d' % (t / 60, s, decimal)
 
 @register.inclusion_tag('videos/_upload_subtitles.html', takes_context=True)
 def upload_subtitles(context, video):
@@ -79,6 +70,7 @@ def video_url_panel(context):
 @register.simple_tag
 def video_url_count(video):
     return video.videourl_set.count()
+
 
 @register.simple_tag
 def language_url(request, lang):

@@ -385,9 +385,6 @@
             <li>
                 <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit SubtitleLanguage in Django Admin' %}</a>
             </li>
-            <li>
-            <a href="/en/subtitles/dmr-cleanup/{{ video.video_id }}/{{ language.language_code }}/" target="_blank">Fix DMR Issues</a>
-            </li>
         </ul>
     {% endif %}
 {% endblock %}
