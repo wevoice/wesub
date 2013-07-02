@@ -87,6 +87,11 @@ var angular = angular || null;
                 pop.pause();
             },
             seek: function(time) {
+                if(time < 0) {
+                    time = 0;
+                } else if (time > this.duration()) {
+                    time = this.duration();
+                }
                 pop.currentTime(time / 1000);
             },
             togglePlay: function() {
