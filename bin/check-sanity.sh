@@ -17,7 +17,7 @@ fi
 
 # Integration repo version
 if [ -d unisubs-integration ]; then
-    if [ "`cd unisubs-integration; git rev-parse head`" = "`cat optional/unisubs-integration`" ]; then
+    if [ "`cd unisubs-integration; git rev-parse HEAD`" = "`cat optional/unisubs-integration`" ]; then
         tput sgr0
         echo "Integration repo matches (good)..."
     else

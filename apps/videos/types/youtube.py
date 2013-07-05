@@ -20,6 +20,7 @@ import re
 from urlparse import urlparse
 import babelsubs
 import requests
+import time
 
 import gdata.youtube.client
 from gdata.youtube.client import YouTubeError
@@ -383,7 +384,7 @@ class YoutubeVideoType(VideoType):
             video_obj.duration = int(self.entry.media.duration.seconds)
         if self.entry.media.thumbnail:
             # max here will return the thumbnail with the biggest height
-            thumbnail = max([(int(t.height), t) for t in self.entry.media.thumbnail]) 
+            thumbnail = max([(int(t.height), t) for t in self.entry.media.thumbnail])
             video_obj.thumbnail = thumbnail[1].url
         video_obj.small_thumbnail = 'http://i.ytimg.com/vi/%s/default.jpg' % self.video_id
         video_obj.save()
@@ -408,7 +409,7 @@ class YoutubeVideoType(VideoType):
     @classmethod
     def url_from_id(cls, video_id):
         return YoutubeVideoType.URL_TEMPLATE % video_id
-        
+
     @classmethod
     def _get_video_id(cls, video_url):
         for pattern in cls._url_patterns:
@@ -475,7 +476,7 @@ class YoutubeVideoType(VideoType):
 
     def _get_bridge(self, third_party_account):
         # Because somehow Django's ORM is case insensitive on CharFields.
-        is_always = (third_party_account.full_name.lower() == 
+        is_always = (third_party_account.full_name.lower() ==
                         YOUTUBE_ALWAYS_PUSH_USERNAME.lower() or
                      third_party_account.username.lower() ==
                         YOUTUBE_ALWAYS_PUSH_USERNAME.lower())
@@ -727,9 +728,23 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
         }
         r = requests.put(uri, data=entry, headers=headers)
+        request_failed = False
 
         if r.status_code == 403 and 'too_many_recent_calls' in r.content:
-            raise TooManyRecentCallsException(r.headers, r.raw)
+            #raise TooManyRecentCallsException(r.headers, r.raw)
+            extra = r.headers
+            extra['raw'] = r.raw
+            logger.error('Youtube too many recent calls', extra=extra)
+            request_failed = True
+
+        if r.status_code == 400:
+            extra = { 'raw': r.raw }
+            logger.error('Youtube API request failed', extra=extra)
+            request_failed = True
+
+        if request_failed: # retry
+            time.sleep(2)
+            return self._make_update_request(uri, entry)
 
         return r.status_code
 
