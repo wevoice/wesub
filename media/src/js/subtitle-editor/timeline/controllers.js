@@ -96,6 +96,7 @@
                 $scope.currentTime = lastTime;
             }
             lastTime = $scope.currentTime;
+            $scope.timeline.currentTime = $scope.currentTime;
         }
 
         function calcWillSync() {
@@ -172,6 +173,7 @@
 
         $scope.$root.$on('video-update', function() {
             $scope.duration = VideoPlayer.duration();
+            $scope.timeline.duration = $scope.duration;
             updateTimeline();
             if(VideoPlayer.isPlaying()) {
                 startTimer();

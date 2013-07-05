@@ -77,7 +77,7 @@
             $scope.overlayText = scope.subtitle.content();
             $scope.showOverlay = true;
         });
-        $scope.$root.$on('timeline-subtitle-shown', function(evt, subtitle) {
+        $scope.$watch('timeline.shownSubtitle', function(subtitle) {
             if(subtitle !== null) {
                 $scope.overlayText = subtitle.content();
                 $scope.showOverlay = true;

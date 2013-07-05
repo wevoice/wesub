@@ -71,6 +71,12 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
+
+        $scope.timeline = {
+            shownSubtitle: null,
+            currentTime: null,
+            duration: null,
+        };
     });
 
     /* AppController is large, so we split it into several components to
@@ -218,13 +224,19 @@ var angular = angular || null;
             $scope.minutesIdle = 0;
 
             // Shortcuts that should work while editing a subtitle
-            if (evt.keyCode === 32 && evt.shiftKey) {
-                // Space with shift, toggle play / pause.
+            if ((evt.keyCode === 32 && evt.shiftKey) || 
+                evt.keyCode == 9) {
+                // Shift+Space or Tab: toggle play / pause.
                 evt.preventDefault();
                 evt.stopPropagation();
                 VideoPlayer.togglePlay();
-            }
-            else if(evt.target.type == 'textarea') {
+            } else if (evt.keyCode === 188 && evt.shiftKey && evt.ctrlKey) {
+                // Control+Shift+Comma, go back 4 seconds
+                VideoPlayer.seek(VideoPlayer.currentTime() - 4000);
+            } else if (evt.keyCode === 190 && evt.shiftKey && evt.ctrlKey) {
+                // Control+Shift+Period, go forward 4 seconds
+                VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
+            } else if(evt.target.type == 'textarea') {
                 return;
             }
             // Shortcuts that should be disabled while editing a subtitle

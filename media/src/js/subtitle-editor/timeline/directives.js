@@ -433,10 +433,11 @@ var angular = angular || null;
                         unsyncedSubtitle.startTime <= scope.currentTime) {
                     shownSubtitle = unsyncedSubtitle.storedSubtitle;
                 }
-                if(shownSubtitle != scope.subtitle) {
-                    scope.subtitle = shownSubtitle;
-                    scope.$root.$emit('timeline-subtitle-shown',
-                            shownSubtitle);
+                if(shownSubtitle != scope.timeline.shownSubtitle) {
+                    scope.timeline.shownSubtitle = shownSubtitle;
+                    if(shownSubtitle !== null) {
+                        scope.$root.$emit('scroll-to-subtitle', shownSubtitle);
+                    }
                     var phase = scope.$root.$$phase;
                     if(phase != '$apply' && phase != '$digest') {
                         scope.$root.$digest();
