@@ -243,9 +243,9 @@ var AmaraDFXPParser = function() {
             // TODO: Do something that makes more sense.
             //
             // Update: What in the mother is going on here?
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"\"/g, '$1');
 
             // IE special-casing.
             xmlString = xmlString.replace(/xmlns:NS\d+=\"\" /g, '');
