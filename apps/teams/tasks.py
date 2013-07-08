@@ -171,7 +171,7 @@ def api_notify_on_application_activity(team_pk, event_name, application_pk):
         team_pk, event_name, application_pk=application_pk)
 
 
-@periodic_task(run_every=timedelta(seconds=5))
+@periodic_task(run_every=timedelta(seconds=300))
 def gauge_teams():
     from teams.models import Task, Team, TeamMember
     Gauge('teams.Task').report(Task.objects.count())
