@@ -31,7 +31,7 @@ from apps.statistic.models import (
 from utils.metrics import Gauge
 
 
-@periodic_task(run_every=timedelta(seconds=5))
+@periodic_task(run_every=timedelta(seconds=300))
 def gauge_statistic():
     Gauge('statistic.shares.twitter').report(TweeterShareStatistic.objects.count())
     Gauge('statistic.shares.facebook').report(FBShareStatistic.objects.count())

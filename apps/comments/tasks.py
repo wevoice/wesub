@@ -23,7 +23,7 @@ from apps.comments.models import Comment
 from utils.metrics import Gauge
 
 
-@periodic_task(run_every=timedelta(seconds=5))
+@periodic_task(run_every=timedelta(seconds=300))
 def gauge_comments():
     Gauge('comments.Comment').report(Comment.objects.count())
 
