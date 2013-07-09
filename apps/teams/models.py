@@ -2114,9 +2114,6 @@ class Task(models.Model):
 
     def save(self, update_team_video_index=True, *args, **kwargs):
         is_review_or_approve = self.get_type_display() in ('Review', 'Approve')
-        if is_review_or_approve and not self.deleted:
-            assert (self.subtitle_version or self.new_subtitle_version), \
-                   "Review and Approve tasks must have a subtitle_version!"
 
         if self.language:
             assert self.language in VALID_LANGUAGE_CODES, \
