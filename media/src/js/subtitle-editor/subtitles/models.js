@@ -141,7 +141,7 @@ var angular = angular || null;
          * to get a DraftSubtitle.
          * */
         Subtitle.call(this, parser.startTime(node), parser.endTime(node),
-                $(node).text());
+                $(node).text().trim());
         this.node = node;
         this.id = id;
     }
