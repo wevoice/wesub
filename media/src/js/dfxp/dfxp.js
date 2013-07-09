@@ -64,6 +64,101 @@ function markdownToPlaintext(text) {
     return text;
 };
 
+function getDFXPAttr(elt, name) {
+    /**
+     * Get the value of a DFXP attribute
+     *
+     * This function tries the official DFXP attribute name, plus a few others
+     * to handle non-standard markup.
+     *
+     * @param elt -- DOM element
+     * @param name -- attribute name (without the leading "tts:")
+     * @return The node, modified in place
+     */
+    var attrNameList = [
+        // Official DFXP attribute name
+        'tts:' + name,
+        // handle jquery lowercasing attribute names
+        'tts:' + name.toLowerCase(),
+        // handle malformed DFXP XML
+        name
+    ];
+    for(var i=0; i < attrNameList.length; i++) {
+        var attrName = attrNameList[i];
+        if(elt.hasAttribute(attrName)) {
+            return elt.getAttribute(attrName);
+        }
+    }
+    return null;
+}
+
+function dfxpToMarkdown(node) {
+    /**
+     *
+     * Converts a DFXP <p> tag to our markdowny syntax
+     *
+     * This function converts the following tags:
+     *   <span tts:fontWeight=bold>text</span> -> *text*
+     *   <span tts:fontStyle=italic>text</span> -> **text**
+     *   <span tts:textDecoration=underline>text</span> -> _text_
+     *   <br /> -> \n
+     *
+     * @param node DOM Node
+     * @return markdown string
+     */
+
+    if (node === undefined) {
+        return node;
+    }
+
+    // Array of strings that we will join together to build the new content
+    var markdownParts = [];
+
+    // worker function that recursively parses the elements for DFXP tags
+    function traverse(node) {
+        // Text node
+        if(node.nodeType == 3) {
+            if(node.nodeValue.trim() != "") {
+                markdownParts.push(node.nodeValue);
+            }
+            return;
+        }
+
+        var wrapperText = '';
+        if(node.nodeType == 1) {
+            // XML Element
+            var tagName = node.tagName.toLowerCase();
+            if(tagName == 'span') {
+                if(getDFXPAttr(node, 'fontWeight') == 'bold') {
+                    wrapperText += '**';
+                }
+                if(getDFXPAttr(node, 'fontStyle') == 'italic') {
+                    wrapperText += '*';
+                }
+                if(getDFXPAttr(node, 'textDecoration') == 'underline') {
+                    wrapperText += '_';
+                }
+            } else if(tagName == 'br') {
+                markdownParts.push("\n");
+                return;
+            }
+        }
+
+        if(wrapperText) {
+            markdownParts.push(wrapperText);
+        }
+        for(var i=0; i < node.childNodes.length; i++) {
+            traverse(node.childNodes[i]);
+        }
+        if(wrapperText) {
+            markdownParts.push(wrapperText);
+        }
+    }
+
+    traverse(node);
+    return markdownParts.join("");
+};
+
 function leftPad(number, width, character) {
     /*
      * Left Pad a number to the given width, with zeros.
@@ -113,24 +208,6 @@ var AmaraDFXPParser = function() {
         [/(\*)([^\*]+)(\*{1})/g, '<span tts:fontStyle="italic">$2</span>'],
         [/(_)([^_]+)(_{1})/g, '<span tts:textDecoration="underline">$2</span>']
     ];
-    var DFXP_REPLACE_SEQ = [
-
-        // This first set is to handle malformed DFXP XML.
-        ["span[fontWeight='bold']", "**"],
-        ["span[fontStyle='italic']", "*"],
-        ["span[textDecoration='underline']", "_"],
-
-        ["span[tts\\:fontWeight='bold']", "**"],
-        ["span[tts\\:fontStyle='italic']", "*"],
-        ["span[tts\\:textDecoration='underline']", "_"],
-
-        // When jQuery creates elements, it lowercases all attributes. We fix
-        // this when sending back to the server in xmlToString, but for unit
-        // testing we need to match manually created elements, too.
-        ["span[tts\\:fontweight='bold']", "**"],
-        ["span[tts\\:fontstyle='italic']", "*"],
-        ["span[tts\\:textdecoration='underline']", "_"]
-    ];
 
     var that = this;
 
@@ -151,10 +228,10 @@ var AmaraDFXPParser = function() {
         var $preSubtitles = $('p', $preXml);
 
         // Convert subtitles from DFXP to Markdown.
-        for (var i = 0; i < $preSubtitles.length; i++) {
-            var $subtitle = $preSubtitles.eq(i);
-            this.dfxpToMarkdown($subtitle.get(0));
-        }
+        $preSubtitles.each(function() {
+            var markdown = dfxpToMarkdown(this);
+            $(this).text(markdown);
+        });
 
         // Store the original XML for comparison later.
         this.$originalXml = $preXml.clone();
@@ -490,40 +567,6 @@ var AmaraDFXPParser = function() {
                 sub.attr('end', convertFn.call(this, currentEndTime));
             }
         }
-    };
-    this.dfxpToMarkdown = function(node, asText) {
-        /**
-         * Coverts the DFXP spans to our markdowny syntax
-         * in the node's children.
-         * @param node
-         * @return The node, modified in place
-         */
-
-        if (node === undefined){
-            return node;
-        }
-
-        var marker, selector, targets;
-
-        for (var i = 0; i < DFXP_REPLACE_SEQ.length; i++) {
-            selector = DFXP_REPLACE_SEQ[i][0];
-            marker = DFXP_REPLACE_SEQ[i][1];
-            var $targets = $(selector, node);
-
-            for (var t = 0; t < $targets.length; t++) {
-                var $target = $targets.eq(t);
-                $target.replaceWith(marker + $target.text() + marker);
-            }
-        }
-        // Replace BRs with newlines.  We can't handle this with
-        // DFXP_REPLACE_SEQ because that would put newlines on both sides of
-        // the <br> (2573)
-        $('br', node).replaceWith("\n");
-
-        if (asText){
-            return $(node).text();
-        }
-        return node;
     };
     this.endTime = function(node, endTime) {
         /*
@@ -1065,7 +1108,8 @@ var AmaraDFXPParser = function() {
 return {
     AmaraDFXPParser: AmaraDFXPParser,
     markdownToHTML: markdownToHTML,
-    markdownToPlaintext: markdownToPlaintext
+    markdownToPlaintext: markdownToPlaintext,
+    dfxpToMarkdown: dfxpToMarkdown
 }
 
 })(window.AmarajQuery || window.jQuery);
