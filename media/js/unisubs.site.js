@@ -590,18 +590,6 @@ var Site = function(Site) {
             }
 
             that.Utils.truncateTextBlocks($('div.description'), 90);
-
-            // Display rendered subtitles instead of raw Markdown.
-            var dfxpInstance = new window.AmaraDFXPParser();
-            var $subtitles = $('ol.subtitles li.subtitle-item div.translation-text p');
-            for (var i = 0; i < $subtitles.length; i++) {
-
-                var $subtitle = $subtitles.eq(i);
-                dfxpInstance.dfxpToMarkdown($subtitle.get(0));
-                var html = dfxpInstance.markdownToHTML($subtitle.text());
-
-                $subtitle.html(html);
-            }
         },
         video_view: function() {
             $('.add_subtitles').click(function() {
