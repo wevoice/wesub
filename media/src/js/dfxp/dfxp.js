@@ -123,7 +123,6 @@ var AmaraDFXPParser = function() {
         ["span[tts\\:fontWeight='bold']", "**"],
         ["span[tts\\:fontStyle='italic']", "*"],
         ["span[tts\\:textDecoration='underline']", "_"],
-        ["br", "\n"],
 
         // When jQuery creates elements, it lowercases all attributes. We fix
         // this when sending back to the server in xmlToString, but for unit
@@ -244,9 +243,9 @@ var AmaraDFXPParser = function() {
             // TODO: Do something that makes more sense.
             //
             // Update: What in the mother is going on here?
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
-            xmlString = xmlString.replace(/(div|p|span) xmlns=\"\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"http:\/\/www\.w3\.org\/1999\/xhtml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"http:\/\/www\.w3\.org\/ns\/ttml\"/g, '$1');
+            xmlString = xmlString.replace(/(div|p|span|br) xmlns=\"\"/g, '$1');
 
             // IE special-casing.
             xmlString = xmlString.replace(/xmlns:NS\d+=\"\" /g, '');
@@ -516,6 +515,10 @@ var AmaraDFXPParser = function() {
                 $target.replaceWith(marker + $target.text() + marker);
             }
         }
+        // Replace BRs with newlines.  We can't handle this with
+        // DFXP_REPLACE_SEQ because that would put newlines on both sides of
+        // the <br> (2573)
+        $('br', node).replaceWith("\n");
 
         if (asText){
             return $(node).text();

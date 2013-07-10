@@ -20,7 +20,7 @@ var angular = angular || null;
 
 (function() {
     /*
-     * amara.SubtitleList.subtitles.models
+     * amara.subtitles.models
      *
      * Define model classes that we use for subtitles
      */
@@ -141,7 +141,7 @@ var angular = angular || null;
          * to get a DraftSubtitle.
          * */
         Subtitle.call(this, parser.startTime(node), parser.endTime(node),
-                parser.dfxpToMarkdown(node, true));
+                $(node).text().trim());
         this.node = node;
         this.id = id;
     }

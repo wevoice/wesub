@@ -121,7 +121,8 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ('assignee__username', 'team__name', 'assignee__first_name',
                      'assignee__last_name', 'team_video__video__title')
     raw_id_fields = ('team_video', 'team', 'assignee', 'subtitle_version',
-                     'review_base_version')
+                     'review_base_version', 'new_subtitle_version',
+                    'new_review_base_version')
 
     readonly_fields = ('created', 'modified')
     ordering = ('-id',)

@@ -473,7 +473,7 @@ def _save_video_feed(feed_url, last_entry_url, user):
     vf.save()
 
 
-@periodic_task(run_every=timedelta(seconds=60))
+@periodic_task(run_every=timedelta(seconds=300))
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
     Gauge('videos.Video-captioned').report(Video.objects.exclude(newsubtitlelanguage_set=None).count())
