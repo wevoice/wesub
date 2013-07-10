@@ -12,8 +12,8 @@ jQuery(function($) {
          $('#loading').show();
          $.ajax({
                     url: '{% url videos:reset_metadata video.video_id  %}',
-                    success: function() { 
-                        $('#loading').hide(); 
+                    success: function() {
+                        $('#loading').hide();
                         alert("Task queued. It might take about 30 seconds to complete.");
                     }
                 })
@@ -254,7 +254,7 @@ jQuery(function($) {
             {% with l=task.subtitle_version.language %}
                 {% if l %}
                     <td>
-                        {{ l.id }} - 
+                        {{ l.id }} -
                         {{ l.get_language_display }}
                         ({{ l.language }})
                     </td>
@@ -306,8 +306,8 @@ jQuery(function($) {
 <form method="post">
     {% csrf_token %}
     <select name="language">
-        {% for lang in video.subtitlelanguage_set.all %}
-            <option value="{{ lang.pk }}">{{ lang.language }}</option>
+        {% for lang in video.newsubtitlelanguage_set.all %}
+            <option value="{{ lang.pk }}">{{ lang.language_code }}</option>
         {% endfor %}
     </select>
     <input type="hidden" name="action" value="sync" />
