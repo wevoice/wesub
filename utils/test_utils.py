@@ -191,6 +191,7 @@ def mock_youtube_get_entry(video_id):
     return entry
 youtube_get_entry = mock.Mock(side_effect=mock_youtube_get_entry)
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
+_add_amara_description_credit_to_youtube_vurl = mock.Mock()
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -206,6 +207,8 @@ class MonkeyPatcher(object):
              youtube_get_entry),
             ('videos.types.youtube.YoutubeVideoType.get_subtitled_languages',
              youtube_get_subtitled_languages),
+            ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
+             _add_amara_description_credit_to_youtube_vurl),
         ]
         self.patches = []
         for func_name, mock_obj in patch_info:

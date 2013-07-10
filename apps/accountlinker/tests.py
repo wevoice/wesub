@@ -30,6 +30,7 @@ from auth.models import CustomUser as User
 from tasks import get_youtube_data
 from subtitles.pipeline import add_subtitles
 from apps.testhelpers import views as helpers
+from utils import test_factories
 
 from mock import Mock
 
@@ -233,29 +234,53 @@ class AccountTest(TestCase):
         self.assertTrue(is_authorized)
 
     def test_resolve_ownership(self):
-        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
+        tpa = ThirdPartyAccount.objects.create(
+            oauth_access_token='123', oauth_refresh_token='',
+            username='amaratestuser', full_name='Amara Test', type='Y')
 
-        tpa1 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
-                                 username='PCFQA', full_name='PCFQA', type='Y')
-        tpa1.save()
-
-        tpa2 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='',
-                                 username='PCFQA_not_this_one', full_name='PCFQA', type='Y')
-        tpa2.save()
-
+        # test with a video that should be linked to an account
+        video, _ = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=q26umaF242I')
         video_url = video.get_primary_videourl_obj()
         owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
+        self.assertEquals(owner, tpa)
 
-        self.assertEquals(owner.username, 'PCFQA')
-        self.assertEquals(owner.full_name, 'PCFQA')
-        self.assertEquals(owner.type, 'Y')
-
-        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=9bZkp7q19f0')
-
+        # test with a video that shouldn't be linked to an account
+        video, _ = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=pQ9qX8lcaBQ')
         video_url = video.get_primary_videourl_obj()
         owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
-
         self.assertEquals(owner, None)
+
+    def test_resolve_ownership_with_bad_username(self):
+        # for some reason, some of our VideoURL objects have the full name in
+        # onwer_username instead of the username.  In that case, we should
+        # re-fetch the video type, use that username, and update the
+        # owner_username field
+
+        # create 2 accounts with the same full name
+        account = ThirdPartyAccount.objects.create(
+            type='Y', username='amaratestuser', full_name='Amara Test',
+            oauth_access_token='123',
+            oauth_refresh_token='')
+        other_account = ThirdPartyAccount.objects.create(
+            type='Y', username='testing123', full_name='Amara Test',
+            oauth_access_token='123',
+            oauth_refresh_token='')
+        # This url is owned by amaratestuser
+        url = 'http://www.youtube.com/watch?v=q26umaF242I'
+        video, _ = Video.get_or_create_for_url(url)
+        vurl = video.get_primary_videourl_obj()
+        # force the vurl to have the fullname in owner_username
+        vurl.owner_username = 'Amara Test'
+        vurl.save()
+        # try calling resolve_ownership.
+        self.assertEquals(ThirdPartyAccount.objects.resolve_ownership(vurl),
+                          account)
+        # resolve_ownership should also fix the owner_username
+        self.assertEquals(video.get_primary_videourl_obj().owner_username,
+                          'amaratestuser')
+
 
     def test_mirror_on_third_party(self):
         from videos.types import UPDATE_VERSION_ACTION

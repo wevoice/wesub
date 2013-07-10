@@ -291,31 +291,27 @@ class ThirdPartyAccountManager(models.Manager):
     def _resolve_youtube_ownership(self, video_url):
         """ Give a youtube video url, returns a TPA that
         is the owner of the video.
-        We need this because there could be two
+
+        For some reason, some youtube accounts have owner_username set to the
+        full name of the account.  This method works around that and fixes the
+        data in the VideoURL object.
         """
+        if not video_url.owner_username:
+            return None
         try:
             return ThirdPartyAccount.objects.get(type=video_url.type,
                                                  username=video_url.owner_username)
         except ThirdPartyAccount.DoesNotExist:
+            username = YoutubeVideoType(video_url.url).username
             try:
-                return ThirdPartyAccount.objects.get(type=video_url.type,
-                                                 full_name=video_url.owner_username)
+                tpa = ThirdPartyAccount.objects.get(type=video_url.type,
+                                                    username=username)
             except ThirdPartyAccount.DoesNotExist:
-                None
-        except ThirdPartyAccount.MultipleObjectsReturned:
-            type = YoutubeVideoType(video_url.url)
-            uri = type.entry.author[0].uri.text
-            # we can easily extract the username from the uri, since it's the last
-            # part of the path. this is much easier than making yet another api
-            # call to youtube to find out.
-            # i.e. https://gdata.youtube.com/feeds/api/users/gdetrez > gdetrez
-            username = uri.split("/")[-1]
-
-            # we want to avoid exception handling inside exception handling
-            tpa = ThirdPartyAccount.objects.filter(type=video_url.type,
-                                                    username=username)[:1]
-
-            return tpa[0] if tpa else None
+                return None
+            # fix the data in owner_username before returnning
+            video_url.owner_username = username
+            video_url.save()
+            return tpa
 
 class ThirdPartyAccount(models.Model):
     """
