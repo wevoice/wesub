@@ -843,7 +843,7 @@ def video_debug(request, video_id):
 
     if request.method == 'POST' and request.POST.get('action') == 'sync':
         # Sync video to youtube
-        sync_lang = SubtitleLanguage.objects.get(
+        sync_lang = sub_models.SubtitleLanguage.objects.get(
                 pk=request.POST.get('language'))
         youtube_sync(video, sync_lang)
 
