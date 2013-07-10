@@ -29,6 +29,7 @@ from apps.teams.models import (Project, Team, Task, TeamMember, TeamVideo,
 from apps.videos.types import video_type_registrar
 from apps.videos.models import Video, VideoUrl
 from apps.subtitles import pipeline
+from apps.accountlinker.models import ThirdPartyAccount
 
 create_user_counter = itertools.count()
 def create_user(password=None, **kwargs):
@@ -83,9 +84,13 @@ def create_workflow(team, **kwargs):
     defaults.update(kwargs)
     return Workflow.objects.create(team=team, **defaults)
 
-def create_team_video(team, added_by, video=None, **kwargs):
+def create_team_video(team=None, added_by=None, video=None, **kwargs):
+    if team is None:
+        team = create_team()
+    if added_by is None:
+        added_by = create_team_member(team).user
     if video is None:
-        video = create_video()
+        video = create_video(user=added_by)
     return TeamVideo.objects.create(team=team, video=video, added_by=added_by,
                                     **kwargs)
 
@@ -168,3 +173,13 @@ def make_approve_task(team_video, language_code, user):
     else:
         # approve task
         return task
+
+def create_third_party_account(vurl, **kwargs):
+    defaults = {
+        'oauth_access_token': '123', 
+        'oauth_refresh_token': '',
+        'username': vurl.owner_username,
+        'type': vurl.type,
+    }
+    defaults.update(kwargs)
+    return ThirdPartyAccount.objects.create(**defaults)

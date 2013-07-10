@@ -25,259 +25,173 @@ from accountlinker.models import (
     add_amara_description_credit
 )
 from videos.models import Video, VideoUrl, SubtitleLanguage
+from videos.types import UPDATE_VERSION_ACTION
+from videos.types import video_type_registrar
+from videos.types.youtube import YoutubeVideoType
 from teams.models import Team, TeamVideo
 from auth.models import CustomUser as User
 from tasks import get_youtube_data
 from subtitles.pipeline import add_subtitles
 from apps.testhelpers import views as helpers
+from utils import test_factories
 
-from mock import Mock
-
-
-def _set_subtitles(video, language, original, complete, translations=[]):
-    translations = [{'code': lang, 'is_original': False, 'is_complete': True,
-                     'num_subs': 1} for lang in translations]
-
-    data = {'code': language, 'is_original': original, 'is_complete': complete,
-            'num_subs': 1, 'translations': translations}
-
-    helpers._add_lang_to_video(video, data, None)
-
-
-def assert_update_subtitles(version_or_language, account):
-    assert version_or_language != None
-    assert account != None
-
+import mock
 
 class AccountTest(TestCase):
-    fixtures = ["staging_users.json", "staging_videos.json", "staging_teams.json"]
-
     def setUp(self):
-        self.vurl = VideoUrl.objects.filter(type='Y')[1]
-        subs = [
+        self.video, _ = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=q26umaF242I')
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        self.vurl = self.video.get_primary_videourl_obj()
+        add_subtitles(self.video, 'en', [
             (0, 1000, 'Hello', {}),
             (2000, 5000, 'word', {})
-        ]
-        add_subtitles(self.vurl.video, 'en', subs)
+        ])
 
     def test_retrieval(self):
-
-        acc = ThirdPartyAccount.objects.create(type='Y', username='abc',
-                oauth_access_token='a', oauth_refresh_token='b')
+        tpa = test_factories.create_third_party_account(self.vurl)
+        tpa.users.add(test_factories.create_user())
 
         with self.assertRaises(ImproperlyConfigured):
             ThirdPartyAccount.objects.always_push_account()
 
-        setattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME', 'abc')
-        self.assertEquals(ThirdPartyAccount.objects.always_push_account().pk,
-                acc.pk)
+        setattr(settings, 'YOUTUBE_ALWAYS_PUSH_USERNAME', tpa.username)
+        self.assertEquals(ThirdPartyAccount.objects.always_push_account(),
+                          tpa)
 
     def test_rules(self):
-        video = Video.objects.filter(teamvideo__isnull=False)[0]
-        video.user = User.objects.get(username='admin')
-        team = video.get_team_video().team
-        team = team.slug
+        team_video = test_factories.create_team_video()
+        video = team_video.video
+        username = video.user.username
 
-        r = YoutubeSyncRule.objects.create()
-        self.assertFalse(r.should_sync(video))
+        def check_sync_rule(should_sync, **rule_kwargs):
+            YoutubeSyncRule.objects.all().delete()
+            rule = YoutubeSyncRule.objects.create(**rule_kwargs)
+            self.assertEquals(rule.should_sync(video), should_sync)
 
-        YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(team=team)
-        self.assertTrue(r.should_sync(video))
-
-        YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(user='admin')
-        self.assertTrue(r.should_sync(video))
-
-        YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(video=video.video_id)
-        self.assertTrue(r.should_sync(video))
-
-        YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(team='*')
-        self.assertTrue(r.should_sync(video))
-
+        check_sync_rule(False) # blank rule
+        check_sync_rule(True, team=team_video.team.slug)
+        check_sync_rule(True, user=username)
+        check_sync_rule(True, video=video.video_id)
+        check_sync_rule(True, team='*')
         # Videos can have the user field set to None
         video.user = None
         video.save()
+        check_sync_rule(False, user=username)
 
-        YoutubeSyncRule.objects.all().delete()
-        r = YoutubeSyncRule.objects.create(user='admin')
-        self.assertFalse(r.should_sync(video))
+    def test_check_authorization_no_account(self):
+        # test check_authorization with no ThirdPartyAccount set up
+        self.assertEquals(check_authorization(self.video), (False, False))
 
-    def test_not_part_of_team(self):
-        vurl = VideoUrl.objects.filter(type='Y',
-                video__teamvideo__isnull=True)[0]
-        vurl.owner_username = 'test'
-        vurl.save()
-        video = vurl.video
-        third = ThirdPartyAccount.objects.all().exists()
-        self.assertFalse(third)
+    def test_check_authorization_not_linked(self):
+        # test check_authorization when not linked to a user or team
+        test_factories.create_third_party_account(self.vurl)
+        self.assertEquals(check_authorization(self.video), (False, False))
 
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-        self.assertFalse(ignore)
+    def test_check_authorization_individual(self):
+        # test check_authorization when linked to a user
+        tpa = test_factories.create_third_party_account(self.vurl)
+        tpa.users.add(test_factories.create_user())
+        # FIXME: should this return True if the user for the ThirdPartyAccount
+        # doesn't match the user of the video?
+        self.assertEquals(check_authorization(self.video), (True, True))
 
-        ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
+    def test_check_authorization_team(self):
+        # test check_authorization when linked to a team
+        team = test_factories.create_team()
+        tpa = test_factories.create_third_party_account(self.vurl)
+        tpa.teams.add(team)
 
-        is_authorized, ignore = check_authorization(video)
-        self.assertFalse(is_authorized)
-        self.assertEquals(None, ignore)
+        self.assertEquals(check_authorization(self.video), (False, False))
+        test_factories.create_team_video(team, video=self.video)
+        self.assertEquals(check_authorization(self.video), (True, True))
 
-    def test_part_of_team(self):
-        # Prep stuff
-        vurl = VideoUrl.objects.filter(type='Y')[0]
-        vurl.owner_username = 'test'
-        vurl.save()
+    def make_language_complete(self):
+        language = self.video.subtitle_language()
+        language.subtitles_complete = True
+        language.save()
 
-        video = vurl.video
-        user = User.objects.get(username='admin')
-
-        team = Team.objects.all()[0]
-        TeamVideo.objects.create(video=video, team=team, added_by=user)
-
-        third = ThirdPartyAccount.objects.all().exists()
-        self.assertFalse(third)
-
-        # Start testing
-        is_authorized, ignore = check_authorization(video)
-        self.assertFalse(is_authorized)
-        self.assertEquals(None, ignore)
-
-        account = ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
-        team.third_party_accounts.add(account)
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-        self.assertTrue(ignore)
-
-    def test_not_complete(self):
-        version = self.vurl.video.subtitle_language().get_tip()
-        self.assertFalse(version.subtitle_language.subtitles_complete)
-        self.assertFalse(can_be_synced(version))
-
-        version.subtitle_language.subtitles_complete = True
-        version.subtitle_language.save()
-
-        self.assertTrue(version.is_public)
-        self.assertTrue(version.is_synced())
-
-        self.assertTrue(can_be_synced(version))
+    def test_can_be_synced(self):
+        lang = self.video.subtitle_language()
+        self.assertFalse(can_be_synced(lang.get_tip()))
+        self.make_language_complete()
+        self.assertTrue(can_be_synced(lang.get_tip()))
 
     def test_mirror_existing(self):
-        user = User.objects.get(username='admin')
-
+        user = test_factories.create_user()
         tpa1 = ThirdPartyAccount.objects.create(username='a1')
         tpa2 = ThirdPartyAccount.objects.create(username='a2')
-
+        self.vurl.owner_username = 'a1'
+        self.vurl.save()
+        self.make_language_complete()
         user.third_party_accounts.add(tpa1)
         user.third_party_accounts.add(tpa2)
-
-        for url in VideoUrl.objects.all():
-            url.owner_username = 'a1'
-            url.type = 'Y'
-            url.save()
-
-        for sl in SubtitleLanguage.objects.all():
-            sl.is_complete = True
-            sl.save()
 
         data = get_youtube_data(user.pk)
         self.assertEquals(1, len(data))
 
-        synced_sl = filter(lambda x: x.is_complete_and_synced(),
-                SubtitleLanguage.objects.all())
-        self.assertEquals(len(synced_sl), len(data))
-
         video, language, version = data[0]
         self.assertTrue(version.is_public)
         self.assertTrue(version.is_synced())
-        self.assertTrue(language.is_complete)
+        self.assertTrue(language.subtitles_complete)
         self.assertTrue(video.get_team_video() is None)
 
         self.assertTrue(can_be_synced(version))
 
-    def test_individual(self):
-        vurl = VideoUrl.objects.filter(type='Y',
-                video__teamvideo__isnull=True)[0]
-        vurl.owner_username = 'test'
-        vurl.save()
-        video = vurl.video
-        third = ThirdPartyAccount.objects.all().exists()
-        self.assertFalse(third)
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-        self.assertFalse(ignore)
-
-        account = ThirdPartyAccount.objects.create(type='Y',
-                username=vurl.owner_username)
-
-        team = Team.objects.get(slug='volunteer')
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-
-        team.third_party_accounts.add(account)
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertFalse(is_authorized)
-
-        user = User.objects.get(username='admin')
-        team.third_party_accounts.clear()
-        user.third_party_accounts.add(account)
-
-        is_authorized, ignore = check_authorization(video)
-        self.assertTrue(is_authorized)
-
     def test_resolve_ownership(self):
-        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
+        tpa = test_factories.create_third_party_account(self.vurl)
 
-        tpa1 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
-                                 username='PCFQA', full_name='PCFQA', type='Y')
-        tpa1.save()
+        # test with a video that should be linked to an account
+        owner = ThirdPartyAccount.objects.resolve_ownership(self.vurl)
+        self.assertEquals(owner, tpa)
 
-        tpa2 = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='',
-                                 username='PCFQA_not_this_one', full_name='PCFQA', type='Y')
-        tpa2.save()
-
+        # test with a video that shouldn't be linked to an account
+        video, _ = Video.get_or_create_for_url(
+            'http://www.youtube.com/watch?v=pQ9qX8lcaBQ')
         video_url = video.get_primary_videourl_obj()
         owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
-
-        self.assertEquals(owner.username, 'PCFQA')
-        self.assertEquals(owner.full_name, 'PCFQA')
-        self.assertEquals(owner.type, 'Y')
-
-        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=9bZkp7q19f0')
-
-        video_url = video.get_primary_videourl_obj()
-        owner = ThirdPartyAccount.objects.resolve_ownership(video_url)
-
         self.assertEquals(owner, None)
 
+    def test_resolve_ownership_with_bad_username(self):
+        # for some reason, some of our VideoURL objects have the full name in
+        # onwer_username instead of the username.  In that case, we should
+        # re-fetch the video type, use that username, and update the
+        # owner_username field
+
+        # create 2 accounts with the same full name
+        account = test_factories.create_third_party_account(
+            self.vurl, full_name='Amara Test')
+        other_account = ThirdPartyAccount.objects.create(
+            type=self.vurl.type, username='other_user', 
+            full_name='Amara Test', oauth_access_token='123',
+            oauth_refresh_token='')
+        # force the vurl to have the full name in owner_username
+        self.vurl.owner_username = 'Amara Test'
+        self.vurl.save()
+        # try calling resolve_ownership.
+        self.assertEquals(
+            ThirdPartyAccount.objects.resolve_ownership(self.vurl), account)
+        # resolve_ownership should also fix the owner_username
+        self.assertEquals(self.vurl.owner_username, 'amaratestuser')
+
     def test_mirror_on_third_party(self):
-        from videos.types import UPDATE_VERSION_ACTION
-        from videos.types import video_type_registrar
-        from videos.types.youtube import YoutubeVideoType
+        tpa = test_factories.create_third_party_account(self.vurl)
+        tpa.users.add(test_factories.create_user())
+        self.make_language_complete()
+        lang = self.video.subtitle_language()
 
-        video, _ = Video.get_or_create_for_url('http://www.youtube.com/watch?v=tEajVRiaSaQ')
-        tpa = ThirdPartyAccount(oauth_access_token='123', oauth_refresh_token='', 
-                                 username='PCFQA', full_name='PCFQA', type='Y')
-        tpa.save()
+        version = self.video.subtitle_language().get_tip()
 
-        _set_subtitles(video, 'en', True, True, [])
-        language = video.subtitle_language('en')
-        version = language.subtitleversion_set.full()[0]
+        youtube_type_mock = mock.Mock(spec=YoutubeVideoType)
+        spec = 'videos.types.video_type_registrar.video_type_for_url'
+        with mock.patch(spec) as video_type_for_url_mock:
+            video_type_for_url_mock.return_value = youtube_type_mock
+            ThirdPartyAccount.objects.mirror_on_third_party(
+                self.video, 'en', UPDATE_VERSION_ACTION, version)
 
-        youtube_type_mock = Mock(spec=YoutubeVideoType)
-        video_type_registrar.video_type_for_url = Mock()
-        video_type_registrar.video_type_for_url.return_value = youtube_type_mock
-
-        ThirdPartyAccount.objects.mirror_on_third_party(video, 'en', UPDATE_VERSION_ACTION, version)
-
-        youtube_type_mock.update_subtitles.assert_called_once_with(version, tpa)
+        youtube_type_mock.update_subtitles.assert_called_once_with(version,
+                                                                   tpa)
 
     def test_credit(self):
         old = 'abc'
@@ -288,13 +202,13 @@ class AccountTest(TestCase):
         self.assertTrue(new.endswith(url))
 
         new = add_amara_description_credit(old, url, prepend=True)
-        self.assertTrue(new.startswith('Help us caption and translate'))
+        self.assertTrue(new.startswith('Help us caption & translate'))
         self.assertTrue(new.endswith('abc'))
 
         new = add_amara_description_credit(new, url)
-        self.assertTrue(new.startswith('Help us caption and translate'))
-        self.assertFalse(new.endswith('Help us caption and translate'))
-        self.assertEquals(1, new.count('Help us caption and translate'))
+        self.assertTrue(new.startswith('Help us caption & translate'))
+        self.assertFalse(new.endswith('Help us caption & translate'))
+        self.assertEquals(1, new.count('Help us caption & translate'))
 
         # And empty description
         old = ''
