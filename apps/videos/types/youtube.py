@@ -730,8 +730,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             'GData-Version': '2',
             'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
         }
+        status_code = 0
         retry_count = 0
-        r = None
         while True:
             r = self._do_update_request(uri, data=entry, headers=headers)
 
@@ -757,7 +757,8 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
                         'headers': r.headers, 'uri': uri })
                 break
             time.sleep(10)
-        return r.status_code
+            status_code = r.status_code
+        return status_code
 
     def _delete_track(self, track):
         res = self.delete_track(self.youtube_video_id, track,
