@@ -719,7 +719,7 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         return False
 
-    def _make_update_request(self, uri, entry):
+    def _make_update_request(self, uri, entry, retry_delay=2):
         Meter('youtube.api_request').inc()
         headers = {
             'Content-Type': 'application/atom+xml',
@@ -738,13 +738,15 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             request_failed = True
 
         if r.status_code == 400:
-            extra = { 'raw': r.raw }
+            extra = { 'raw': r.raw, 'content': r.content }
             logger.error('Youtube API request failed', extra=extra)
             request_failed = True
 
         if request_failed: # retry
-            time.sleep(2)
-            return self._make_update_request(uri, entry)
+            time.sleep(retry_delay)
+            # hack to increase delay
+            new_delay = retry_delay + 60
+            return self._make_update_request(uri, entry, retry_delay=new_delay)
 
         return r.status_code
 
