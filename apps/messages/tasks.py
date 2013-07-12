@@ -424,7 +424,7 @@ def _reviewed_notification(task_pk, status):
     version = task.get_subtitle_version()
 
     if task.new_review_base_version:
-        user = task.new_review_base_version.user
+        user = task.new_review_base_version.author
     else:
         user = version.author
 
