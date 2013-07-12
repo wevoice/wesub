@@ -1172,12 +1172,14 @@ class Rpc(BaseRpc):
             language_code = language.language_code
             subtitles = SubtitleSet(language_code).to_xml()
             is_latest = True
+            metadata = language.get_metadata()
         else:
             version = version or latest_version
             version_number = version.version_number
             subtitles = version.get_subtitles().to_xml()
             language = version.subtitle_language
             language_code = language.language_code
+            metadata = version.get_metadata()
 
         if latest_version is None or version_number >= latest_version.version_number:
             is_latest = True
@@ -1200,6 +1202,7 @@ class Rpc(BaseRpc):
             language.get_description(public=False),
             language.is_rtl(),
             language.video.is_moderated,
+            metadata,
         )
 
 def language_summary(language, team_video=-1, user=None):

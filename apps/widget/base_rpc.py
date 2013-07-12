@@ -26,7 +26,7 @@ LANGUAGES_MAP = dict(LANGUAGES)
 LANGUAGES_MAP[''] = u'Original'
 
 class BaseRpc:
-    def _make_subtitles_dict(self, subtitles, language, language_pk, is_original, is_complete, version, is_latest,  base_language, title, description, language_is_rtl, is_moderated):
+    def _make_subtitles_dict(self, subtitles, language, language_pk, is_original, is_complete, version, is_latest,  base_language, title, description, language_is_rtl, is_moderated, metadata):
         return {
             'subtitles': subtitles,
             'language_code': language.language_code,
@@ -43,6 +43,7 @@ class BaseRpc:
             'description': description,
             'language_is_rtl': language_is_rtl,
             'is_moderated': is_moderated,
+            'metadata': metadata,
             }
 
     def get_my_user_info(self, request):

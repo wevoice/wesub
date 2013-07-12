@@ -103,4 +103,4 @@ class NullRpc(BaseRpc):
 
     def _subtitles_dict(self, video_id):
         language = subs_models.SubtitleLanguage( language_code='en')
-        return self._make_subtitles_dict([], language, 1, True, False, 1, True, None, "what", "About me", False, False)
+        return self._make_subtitles_dict([], language, 1, True, False, 1, True, None, "what", "About me", False, False, {})
