@@ -421,10 +421,10 @@ def _reviewed_notification(task_pk, status):
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
 
-    if task.review_base_version:
-        user = task.review_base_version.user
+    if task.new_review_base_version:
+        user = task.new_review_base_version.user
     else:
-        user = task.new_subtitle_version.author
+        user = task.get_subtitle_version().author
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
