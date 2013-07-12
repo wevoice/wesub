@@ -4,6 +4,7 @@ from django.test import TestCase
 import mock
 
 from utils import test_factories, test_utils
+from utils.celery_search_index import update_search_index
 from videos.models import Video
 from videos.search_indexes import VideoIndex
 from subtitles import pipeline
@@ -145,7 +146,6 @@ class MetadataFieldsTest(TestCase):
                                              ('speaker-name', 'Santa'),
                                              ('location', 'North Pole'),
                                          ])
-        self.video.update_search_index()
-        test_utils.update_search_index.run_original()
+        update_search_index.apply(args=(Video, self.video.pk))
         qs = VideoIndex.public().filter(text='santa')
         self.assertEquals([v.video_id for v in qs], [self.video.video_id])
