@@ -54,8 +54,6 @@ class UserFactory(factory.Factory):
     FACTORY_FOR = User
     username = factory.Sequence(lambda n: 'TestUser' + n)
     password = 'sha1$pQQnrW0KJTHi$0000b329a889855361001a7e3bd113efbe818f7d'
-    email = 'testuser@example.com'
-
 
 class TeamFactory(factory.Factory):
     FACTORY_FOR = Team
@@ -72,26 +70,30 @@ class TeamContributorMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_CONTRIBUTOR
     user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'ContributorUser' + n))
+        factory.Sequence(lambda n: 'ContributorUser' + n), 
+        email = 'contributor@example.com')
 
 
 class TeamAdminMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_ADMIN
     user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'AdminUser' + n))
+        factory.Sequence(lambda n: 'AdminUser' + n), 
+        email = 'admin@example.com')
 
 class TeamOwnerMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_OWNER
     user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'OwnerUser' + n))
+        factory.Sequence(lambda n: 'OwnerUser' + n),
+        email = 'owner@example.com')
 
 class TeamManagerMemberFactory(factory.Factory):
     FACTORY_FOR = TeamMember
     role = TeamMember.ROLE_MANAGER
     user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'TeamManager' + n))
+        factory.Sequence(lambda n: 'TeamManager' + n), 
+        email = 'manager@example.com')
 
 
 class TeamVideoFactory(factory.Factory):

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
 
+from django.core import mail
+
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
@@ -329,7 +331,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
 
         #Create a partner user to own the team.
-        cls.owner = UserFactory.create(is_partner=True)
+        cls.owner = UserFactory.create(is_partner=True, 
+                                       email='owner@example.com')
 
         #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
         cls.team = TeamMemberFactory.create(
@@ -352,11 +355,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         #Create a member of the team
         cls.contributor = TeamContributorMemberFactory.create(
                 team = cls.team,
-                user = UserFactory.create()
                 ).user
         cls.manager = TeamManagerMemberFactory.create(
                 team = cls.team,
-                user = UserFactory.create()
                 ).user
 
         user_langs = ['en', 'ru', 'de', 'sv', 'pt-br']
@@ -365,6 +366,13 @@ class TestCaseModeratedTasks(WebdriverTestCase):
             UserLangFactory(user=cls.manager, language=lang)
         cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
                                      ), 'oneline.txt')
+
+        cls.rejected_text = ('The subtitles have been returned to you for '
+                             'additional work and/or corrections.')
+        cls.accepted_review = ('The subtitles passed review and have been '
+                               'submitted for approval.')
+        cls.accepted_approve = 'and they are now published!'
+
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
@@ -461,6 +469,36 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Review Original English Subtitles', video.title))
+
+    def test_review_accept__email(self):
+        """Review task removed after reviewer accepts transcription. """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        mail.outbox = []
+        self.complete_review_task(tv, 20)
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+        self.logger.info("MESSAGE: %s" % msg)
+        self.assertIn(self.contributor.email, email_to)
+        self.assertIn(self.accepted_review, msg)
+
+
+
+
 
     def test_review_reject__transcription_reassigned(self):
         """Transcription task is reassigned when rejected by reviewer """
@@ -580,6 +618,34 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
 
+    def test_approve_accept__email(self):
+        """Review task removed after reviewer accepts transcription. """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        mail.outbox = []
+        self.complete_review_task(tv, 20)
+        self.complete_approve_task(tv, 20)
+
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+        self.logger.info("MESSAGE: %s" % msg)
+        self.assertIn(self.manager.email, email_to)
+        self.assertIn(self.accepted_approve, msg)
+
     def test_approve_reject__removes_approve_tasks(self):
         """Approve task removed when transcription is rejected by approver.
 
@@ -643,6 +709,81 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                                         video.title)
         self.assertEqual(t['assignee'], 'Assigned to %s' 
                          % self.manager.username)
+
+    def test_approve_send_back__email(self):
+        """Review task reassigned when, approver rejects transcription.
+
+        """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        self.complete_review_task(tv, 20)
+        
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+                                               'Subtitles', video.title)
+        self.sub_editor.continue_to_next_step() #to subtitle info 
+        mail.outbox = []
+
+        self.sub_editor.complete_approve(result='Send Back')
+        self.sub_editor.click_saved_ok()
+        self.logger.info(mail.outbox)
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+
+        self.assertIn(self.manager.email, email_to)
+        self.assertIn(self.rejected_text, msg)
+
+
+
+
+    def test_review_send_back__email(self):
+        """Translator emailed when review sends-back transcript. """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        mail.outbox = []
+        self.complete_review_task(tv, 20)
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Approve Original English ' 
+                                               'Subtitles', video.title)
+        self.sub_editor.continue_to_next_step() #to subtitle info 
+        self.sub_editor.complete_approve(result='Send Back')
+        self.sub_editor.click_saved_ok()
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+        self.logger.info("MESSAGE: %s" % msg)
+        self.assertIn(self.contributor.email, email_to)
+        self.assertIn(self.rejected_text, msg)
+
 
 
     def make_video_with_approved_transcript(self):
@@ -943,6 +1084,8 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
                                      ), 'oneline.txt')
         cls.tasks_tab.open_team_page(cls.team.slug)
 
+
+
     def tearDown(self):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
@@ -1114,12 +1257,17 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
             UserLangFactory(user=cls.manager, language=lang)
         cls.subs_file = os.path.join(os.path.dirname(os.path.abspath(__file__)
                                      ), 'oneline.txt')
+        cls.rejected_text = ('The subtitles have been returned to you for '
+                             'additional work and/or corrections.')
+        cls.accepted_review = 'The subtitles passed review and have been submitted for approval.'
+        cls.accepted_approve = 'and they are now published!'
 
     def setUp(self):
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert(action='accept')
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
@@ -1162,6 +1310,43 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                         'Approve Original English Subtitles', video.title))
         task = list(tv.task_set.all_approve().all())[0]
 
+    def test_review_accept__email(self):
+        """Beta editor approve task is created when transcription accepted.
+
+        """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'How-to.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        self.tasks_tab.log_in(self.manager, 'password')
+        mail.outbox = []
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+                                               'Subtitles', video.title)
+        self.sub_editor.continue_to_next_step() #to subtitle info 
+        self.sub_editor.open_in_beta_editor()
+        self.editor_pg.close_metadata()
+        self.editor_pg.approve_task()
+        self.logger.info(mail.outbox)
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+
+        self.assertIn(self.contributor.email, email_to)
+        self.assertIn(self.accepted_review, msg)
+
 
 
     def test_review_reject__transcription_reassigned(self):
@@ -1200,6 +1385,44 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.assertEqual(task['assignee'], 
                          'Assigned to %s' %self.contributor.username)
 
+    def test_review_send_back__email(self):
+        """Beta editor transcription task is reassigned when sent back """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        self.tasks_tab.log_in(self.manager, 'password')
+        self.tasks_tab.open_page('teams/%s/tasks/?type=Review'
+                                 % self.team.slug)
+
+        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+                                               'Subtitles', video.title)
+        self.sub_editor.continue_to_next_step() #to subtitle info 
+        self.sub_editor.open_in_beta_editor()
+        self.editor_pg.close_metadata()
+        mail.outbox = []
+        self.editor_pg.send_back_task()
+        self.logger.info(mail.outbox)
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+
+        self.assertIn(self.contributor.email, email_to)
+        self.assertIn(self.rejected_text, msg)
+
+    
 
 
     def test_approve__creates_translate_tasks(self):
