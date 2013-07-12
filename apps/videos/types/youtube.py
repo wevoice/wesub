@@ -719,7 +719,10 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
 
         return False
 
-    def _make_update_request(self, uri, entry, retry_delay=2):
+    def _do_update_request(self, uri, data, headers):
+        return requests.put(uri, data=data, headers=headers)
+
+    def _make_update_request(self, uri, entry):
         Meter('youtube.api_request').inc()
         headers = {
             'Content-Type': 'application/atom+xml',
@@ -727,27 +730,33 @@ class YouTubeApiBridge(gdata.youtube.client.YouTubeClient):
             'GData-Version': '2',
             'X-GData-Key': 'key=%s' % YOUTUBE_API_SECRET
         }
-        r = requests.put(uri, data=entry, headers=headers)
-        request_failed = False
+        retry_count = 0
+        r = None
+        while True:
+            r = self._do_update_request(uri, data=entry, headers=headers)
 
-        if r.status_code == 403 and 'too_many_recent_calls' in r.content:
-            #raise TooManyRecentCallsException(r.headers, r.raw)
-            extra = r.headers
-            extra['raw'] = r.raw
-            logger.error('Youtube too many recent calls', extra=extra)
-            request_failed = True
+            # if not 400 or 403, assume success (i.e. 200, 201, etc.)
+            if r.status_code != 400 and r.status_code != 403:
+                break
 
-        if r.status_code == 400:
-            extra = { 'raw': r.raw, 'content': r.content }
-            logger.error('Youtube API request failed', extra=extra)
-            request_failed = True
+            if r.status_code == 403 and 'too_many_recent_calls' in r.content:
+                #raise TooManyRecentCallsException(r.headers, r.raw)
+                extra = r.headers
+                extra['raw'] = r.raw
+                logger.error('Youtube too many recent calls', extra=extra)
 
-        if request_failed: # retry
-            time.sleep(retry_delay)
-            # hack to increase delay
-            new_delay = retry_delay + 60
-            return self._make_update_request(uri, entry, retry_delay=new_delay)
+            if r.status_code == 400:
+                extra = { 'raw': r.raw, 'content': r.content }
+                logger.error('Youtube API request failed', extra=extra)
 
+            retry_count += 1
+
+            if retry_count > 60: # retry for a max of ~ 10 min
+                logger.error('Retries exhausted for Youtube API request',
+                    extra = { 'content': r.content, 'status': r.status_code,
+                        'headers': r.headers, 'uri': uri })
+                break
+            time.sleep(10)
         return r.status_code
 
     def _delete_track(self, track):
