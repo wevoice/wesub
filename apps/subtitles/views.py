@@ -217,6 +217,7 @@ def subtitle_editor(request, video_id, language_code):
             'description': video.description,
             'primaryVideoURL': video.get_video_url(),
             'videoURLs': video_urls,
+            'metadata': video.get_metadata(),
         },
         'editingVersion': {
             'languageCode': editing_language.language_code,

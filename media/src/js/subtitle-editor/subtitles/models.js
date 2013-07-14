@@ -542,7 +542,7 @@ var angular = angular || null;
         this.title = null;
         this.description = null;
         this.state = 'waiting';
-        this.metadata = [];
+        this.metadata = {};
     }
 
     SubtitleVersionManager.prototype = {
@@ -569,6 +569,7 @@ var angular = angular || null;
             this.description = '';
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
+            this.metadata = this.video.metadata;
         },
         setLanguage: function(code) {
             this.language = this.SubtitleStorage.getLanguage(code);
