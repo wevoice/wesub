@@ -800,7 +800,7 @@ class Video(models.Model):
         return cached_attr_name
 
     def get_metadata(self):
-        return metadata.get_fields_for_video(self)
+        return metadata.get_metadata_for_video(self)
 
     def update_metadata(self, new_metadata, commit=True):
         return metadata.update_video(self, new_metadata, commit)

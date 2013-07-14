@@ -92,7 +92,7 @@ class MetadataContentField(models.CharField):
         })
         models.CharField.__init__(self, **kwargs)
 
-class MetadataFieldList(list):
+class MetadataDict(dict):
     def convert_for_display(self):
         """Convert the types in this list to human-friendly labels.
 
@@ -102,51 +102,53 @@ class MetadataFieldList(list):
         return [{
             'label': _(name_to_label[name]),
             'content': content,
-        } for name, content in self]
+        } for (name, content) in self.items()]
 
-def get_fields_for_video(video):
+def get_metadata_for_video(video):
     """Get a list of metadata for a video
 
-    :returns: list of (name, content) tuples
+    :returns: dict mapping metadata names to their contents
     """
-    rv = MetadataFieldList()
+    rv = MetadataDict()
     for i in xrange(METADATA_FIELD_COUNT):
         type_val = getattr(video, type_field(i))
         if type_val is None:
             break
         else:
-            rv.append((type_value_to_name[type_val],
-                       getattr(video, content_field(i))))
+            name = type_value_to_name[type_val]
+            value = getattr(video, content_field(i))
+            rv[name] = value
     return rv
 
-def update_video(video, field_data, commit=True):
+def update_video(video, new_metadata, commit=True):
     """Update a video object bassed on a list of field data
 
     This method sets the type/content fields on video if needed, then returns
     the content so that it can be set for on the fields of SubtitleVersion.
 
     :param video: Video object to update
-    :param field_data: data for the fields as a list of (name, content) tuples
+    :param new_metadata: data for the fields as a list of (name, content) tuples
     :returns: a list of content values, in the same order as the fields are
     ordered (rv[N] corrsponds for the meta_N_type on video).
     """
+    # make a copy of new_metadata, since we will be removing some of its keys
+    new_metadata = new_metadata.copy()
     rv = []
-    field_data_map = SortedDict(field_data)
     # go through metadata already stored in the video
     for field_index in xrange(METADATA_FIELD_COUNT):
         type_value = getattr(video, type_field(field_index))
         if type_value is None:
             break
         type_name = type_value_to_name[type_value]
-        if type_name in field_data_map:
-            rv.append(field_data_map.pop(type_name))
+        if type_name in new_metadata:
+            rv.append(new_metadata.pop(type_name))
         else:
             rv.append('')
     # go through metadata not yet stored in the video
     # NOTE: after the loop, field_index points to the first metadata that's
     # unused
     changed_video = False
-    for name, content in field_data_map.items():
+    for name, content in new_metadata.items():
         type_value = name_to_type_value[name]
         if field_index >= METADATA_FIELD_COUNT:
             raise ValueError("Can only store %s metadata" %
@@ -160,9 +162,9 @@ def update_video(video, field_data, commit=True):
         video.save()
     return rv
 
-def update_child_and_video(child, video, field_data, commit=True):
+def update_child_and_video(child, video, new_metadata, commit=True):
     """Update metadata for both a video and a child object """
-    content_data = update_video(video, field_data, commit)
+    content_data = update_video(video, new_metadata, commit)
     for i, content in enumerate(content_data):
         setattr(child, content_field(i), content)
     if commit:
@@ -170,12 +172,17 @@ def update_child_and_video(child, video, field_data, commit=True):
 
 def get_child_metadata(child, video):
     """Get the metadata data for a child."""
-    rv = MetadataFieldList()
-    video_metadata = video.get_metadata()
-    for i, (name, video_content) in enumerate(video_metadata):
+    rv = MetadataDict()
+
+    for i in xrange(METADATA_FIELD_COUNT):
+        type_val = getattr(video, type_field(i))
+        if type_val is None:
+            break
+        name = type_value_to_name[type_val]
+        video_content = getattr(video, content_field(i))
         child_content = getattr(child, content_field(i))
         if child_content:
-            rv.append((name, child_content))
+            rv[name] = child_content
         else:
-            rv.append((name, video_content))
+            rv[name] = video_content
     return rv
