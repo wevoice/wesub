@@ -11,6 +11,8 @@ class VideoPage(UnisubsPage):
 
     _URL = "videos/%s"  # %s is the unique onsite video id
     _VIDEO_TITLE = "h2.main-title a"
+    _SPEAKER_NAME = "div.content div div > h4"
+    _LOCATION = "div.content div div h4:nth-child(2)"
     _DESCRIPTION = "div#description"
     _EMBEDDED_VIDEO = "div.unisubs-widget div.unisubs-videoTab-container"
     _SUBTITLE_MENU = "a.unisubs-subtitleMeLink span.unisubs-tabTextchoose"
@@ -115,6 +117,7 @@ class VideoPage(UnisubsPage):
 
 
 
+
     def open_info_page(self):
         self.click_by_css(self._INFO)
 
@@ -130,6 +133,14 @@ class VideoPage(UnisubsPage):
 
     def description_text(self):
         return self.get_text_by_css(self._DESCRIPTION)
+
+    def speaker_name(self):
+        return self.get_text_by_css(self._SPEAKER_NAME)
+
+
+    def location(self):
+        return self.get_text_by_css(self._LOCATION)
+
 
     def video_embed_present(self):
         if self.is_element_present(self._EMBEDDED_VIDEO):

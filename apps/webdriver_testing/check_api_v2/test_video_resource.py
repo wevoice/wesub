@@ -202,8 +202,44 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertEqual(self.video_pg.video_id(), r['id'])
 
 
+    def test_update__speaker_metatdata(self):
+        """Update video metadata, add speaker name field
 
-        
+        PUT /api2/partners/videos/[video-id]/
+        """
+
+        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
+                                   'Birds_short.webmsd.webm'),
+                     'title': 'Test video created via api',
+                     'duration': 37 }
+        url_part = 'videos/'
+        status, response = self.data_utils.post_api_request(self.user,
+                                                   url_part, url_data)
+        vid_id = response['id']
+
+        url_part = 'videos/%s/' % vid_id
+        new_data = {'title': 'MVC webM output sample',
+                    'description': ('This is a sample vid converted to webM '
+                                   '720p using Miro Video Converter'), 
+                    'metadata' : {
+                                             'speaker-name': 'Santa',
+                                             'location': 'North Pole'
+                                         }
+                  }
+        status, response = self.data_utils.put_api_request(self.user, 
+                                                  url_part, new_data)
+        self.video_pg.open_video_page(vid_id)
+
+        #Check response metadata
+        for k, v in new_data.iteritems():
+            self.assertEqual(v, response[k])
+
+        #Check video displays on the site
+        self.assertIn(new_data['metadata']['speaker-name'], 
+            self.video_pg.speaker_name())
+      
+
+ 
     def test_update__metatdata(self):
         """Update video metadata, title, description.
 
@@ -222,8 +258,8 @@ class TestCaseVideoResource(WebdriverTestCase):
         url_part = 'videos/%s/' % vid_id
         new_data = {'title': 'MVC webM output sample',
                     'description': ('This is a sample vid converted to webM '
-                                   '720p using Miro Video Converter')
-                   }
+                                   '720p using Miro Video Converter'), 
+                  }
         status, response = self.data_utils.put_api_request(self.user, 
                                                   url_part, new_data)
         self.video_pg.open_video_page(vid_id)
@@ -264,6 +300,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         for k, v in new_data.iteritems():
             self.assertEqual(v, response[k])
 
+
         #Check the team is listed on the video page 
         self.assertTrue(self.video_pg.team_slug(self.open_team.slug))
 
@@ -303,5 +340,4 @@ class TestCaseVideoResource(WebdriverTestCase):
         team_videos_tab.open_team_project(self.open_team.slug, 
                                           self.project2.slug)
         self.assertTrue(team_videos_tab.video_present(url_data['title']))
-
 
