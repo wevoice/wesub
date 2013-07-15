@@ -35,7 +35,7 @@ goog.provide('unisubs.subtitle.EditableCaptionSet');
  *     when deserializing an EditableCaptionSet from memory after a finish failure. It means that 
  *     during the failed editing session, the EditableCaptionSet got forked.
  */
-unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated, opt_languageWasForked) {
+unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, opt_forkedDuringEdits, opt_description, opt_languageName, opt_languageIsRTL, opt_isModerated, opt_languageWasForked, opt_metadata) {
     goog.events.EventTarget.call(this);
     var that = this;
     var c;
@@ -52,15 +52,21 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
         });
     var i;
 
+    if(opt_metadata === undefined) {
+        opt_metadata = {};
+    }
+
     this.setPreviousAndNextCaptions();
 
     this.completed = opt_completed;
 
     this.title = opt_title;
     this.description = opt_description;
+    this.metadata = opt_metadata;
 
     this.originalTitle = opt_title;
     this.originalDescription = opt_description;
+    this.originalMetadata = goog.array.clone(opt_metadata);
 
     this.forkedDuringEdits_ = !!opt_forkedDuringEdits;
     this.languageName = opt_languageName;
@@ -420,3 +426,8 @@ unisubs.subtitle.EditableCaptionSet.prototype.hasTitleChanged = function() {
 unisubs.subtitle.EditableCaptionSet.prototype.hasDescriptionChanged = function() {
     return this.originalDescription !== this.description;
 };
+
+unisubs.subtitle.EditableCaptionSet.prototype.hasMetadataChanged = function() {
+    return (this.hasTitleChanged || this.hasDescriptionChanged ||
+            !goog.array.equals(this.originalMetadata, this.metadata));
+}

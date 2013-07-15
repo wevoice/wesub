@@ -67,11 +67,13 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     // for original languages we won't have original subtitles
     var source;
     var originalTitle = originalDescription = "";
+    var originalMetadata = {};
     if (!this.inSubtitlingDialog_){
         // we only show the original if this is a translation
         source = this.originalSubtitles_ ? this.originalSubtitles_ : this.subtitles_;
         originalTitle = source.TITLE ? source.TITLE : " no title ";
         originalDescription = source.DESCRIPTION? source.DESCRIPTION : " no description" ;
+        originalMetadata = source.METADATA;
 
     }
     var title = this.subtitles_.title ? this.subtitles_.title : "";
@@ -89,6 +91,17 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
     this.addChild(this.descriptionTranslationWidget_, true);
     this.descriptionTranslationWidget_.setTranslation(description);
     this.titleTranslationWidget_.setTranslation(title);
+
+    for(name in this.subtitles_.metadata) {
+        if(originalMetadata[name]) {
+            var originalValue = originalMetadata[name];
+        } else {
+            var originalValue = this.subtitles_.metadata[name];
+        }
+        var widget  = new unisubs.translate.MetadataTranslationWidget(
+                originalValue, this.subtitles_, name);
+        this.addChild(widget, true);
+    }
 
     if (!this.inSubtitlingDialog_){
         var videoPlayerType = this.dialog_.getVideoPlayerInternal().videoPlayerType_;

@@ -662,7 +662,7 @@ class Rpc(BaseRpc):
             for s in source_version.subtitle_set.all():
                 s.duplicate_for(dest_version).save()
 
-    def _get_new_version_for_save(self, subtitles, language, session, user, new_title, new_description, save_for_later=None):
+    def _get_new_version_for_save(self, subtitles, language, session, user, new_title, new_description, new_metadata, save_for_later=None):
         """Return a new subtitle version for this save, or None if not needed."""
 
         new_version = None
@@ -673,9 +673,12 @@ class Rpc(BaseRpc):
                              and new_title != previous_version.title)
             desc_changed = (new_description is not None
                             and new_description != previous_version.description)
+            metadata_changed = (new_metadata is not None
+                                and new_metadata != previous_version.get_metadata())
         else:
             title_changed = new_title is not None
             desc_changed = new_description is not None
+            metadata_changed = new_metadata is not None
 
         subtitle_set = None
         subs_length = 0
@@ -696,14 +699,17 @@ class Rpc(BaseRpc):
             subtitles_changed = diff(previous_version.get_subtitles(), subtitle_set)['changed']
 
         should_create_new_version = (
-            subtitles_changed or title_changed or desc_changed)
+            subtitles_changed or title_changed or desc_changed or
+            metadata_changed)
 
         if should_create_new_version:
-            new_version, should_create_task = self._create_version(session.language, user,
-                                                                   new_title=new_title,
-                                                                   new_description=new_description,
-                                                                   subtitles=subtitles,
-                                                                   session=session)
+            new_version, should_create_task = self._create_version(
+                session.language, user,
+                new_title=new_title,
+                new_description=new_description,
+                new_metadata=new_metadata,
+                subtitles=subtitles,
+                session=session)
 
             incomplete = not new_version.is_synced() or save_for_later
 
@@ -753,15 +759,16 @@ class Rpc(BaseRpc):
 
     def save_finished(self, request, user, session, subtitles, new_title=None,
                       completed=None, forked=False, new_description=None,
-                      task_id=None, task_notes=None, task_approved=None,
-                      task_type=None, save_for_later=None):
+                      new_metadata=None, task_id=None, task_notes=None,
+                      task_approved=None, task_type=None,
+                      save_for_later=None):
         # TODO: lock all this in a transaction please!
 
         language = session.language
 
         new_version = self._get_new_version_for_save(
             subtitles, language, session, user, new_title,
-            new_description, save_for_later)
+            new_description, new_metadata, save_for_later)
 
         language.release_writelock()
 
@@ -794,6 +801,7 @@ class Rpc(BaseRpc):
     def finished_subtitles(self, request, session_pk, subtitles=None,
                            new_title=None, completed=None, forked=False,
                            throw_exception=False, new_description=None,
+                           new_metadata=None,
                            task_id=None, task_notes=None, task_approved=None,
                            task_type=None, save_for_later=None):
         """Called when a user has finished a set of subtitles and they should be saved.
@@ -815,8 +823,8 @@ class Rpc(BaseRpc):
 
         return self.save_finished(
             request, request.user, session, subtitles, new_title, completed,
-            forked, new_description, task_id, task_notes, task_approved,
-            task_type, save_for_later)
+            forked, new_description, new_metadata, task_id, task_notes,
+            task_approved, task_type, save_for_later)
 
     def _create_review_or_approve_task(self, subtitle_version):
         team_video = subtitle_version.video.get_team_video()
@@ -914,7 +922,7 @@ class Rpc(BaseRpc):
             # language.
             return 'private', True
 
-    def _create_version(self, language, user=None, new_title=None, new_description=None, subtitles=None, session=None):
+    def _create_version(self, language, user=None, new_title=None, new_description=None, new_metadata=None, subtitles=None, session=None):
         latest_version = language.get_tip(public=False)
 
         visibility, should_create_task = self._moderate_language(language, user)
@@ -943,6 +951,7 @@ class Rpc(BaseRpc):
             kwargs['description'] = latest_version.description
         else:
             kwargs['description'] = language.video.description
+        kwargs['metadata'] = new_metadata
 
         if subtitles is None:
             subtitles = []
