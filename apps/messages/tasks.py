@@ -530,7 +530,10 @@ def approved_notification(task_pk, published=False):
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
     version = task.get_subtitle_version()
-    user = version.author
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
+    else:
+        user = version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
@@ -586,7 +589,10 @@ def send_reject_notification(task_pk, sent_back):
 
     version = task.get_subtitle_version()
     subject = ugettext(u"Your subtitles were not accepted")
-    user = version.user
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
+    else:
+        user = version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
