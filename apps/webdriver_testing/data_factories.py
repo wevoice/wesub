@@ -54,6 +54,7 @@ class UserFactory(factory.Factory):
     FACTORY_FOR = User
     username = factory.Sequence(lambda n: 'TestUser' + n)
     password = 'sha1$pQQnrW0KJTHi$0000b329a889855361001a7e3bd113efbe818f7d'
+    email = 'tester@example.com'
 
 class TeamFactory(factory.Factory):
     FACTORY_FOR = Team

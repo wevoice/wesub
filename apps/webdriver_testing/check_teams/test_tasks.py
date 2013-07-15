@@ -137,6 +137,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -618,8 +619,8 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
 
-    def test_approve_accept__email(self):
-        """Review task removed after reviewer accepts transcription. """
+    def test_approve_accept__email_translator(self):
+        """Email sent to reviewer when approver accepts transcription. """
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -636,8 +637,39 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 data=data,
                 user=dict(username=self.contributor.username, 
                           password='password'))
-        mail.outbox = []
         self.complete_review_task(tv, 20)
+        mail.outbox = []
+
+        self.complete_approve_task(tv, 20)
+
+        email_to = mail.outbox[-1].to     
+        msg = str(mail.outbox[-1].message())
+        self.logger.info("MESSAGE: %s" % msg)
+        self.assertIn(self.contributor.email, email_to)
+        self.assertIn(self.accepted_approve, msg)
+
+    def test_approve_accept__email_reviewer(self):
+        """Email sent to reviewer when approver accepts transcription. """
+        #self.skipTest("https://github.com/pculture/unisubs/issues/600")
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+        self.data_utils.upload_subs(
+                video, 
+                data=data,
+                user=dict(username=self.contributor.username, 
+                          password='password'))
+        self.complete_review_task(tv, 20)
+        mail.outbox = []
+
         self.complete_approve_task(tv, 20)
 
         email_to = mail.outbox[-1].to     
@@ -645,6 +677,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.logger.info("MESSAGE: %s" % msg)
         self.assertIn(self.manager.email, email_to)
         self.assertIn(self.accepted_approve, msg)
+
 
     def test_approve_reject__removes_approve_tasks(self):
         """Approve task removed when transcription is rejected by approver.
@@ -711,9 +744,11 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                          % self.manager.username)
 
     def test_approve_send_back__email(self):
-        """Review task reassigned when, approver rejects transcription.
+        """Email sent to reviewer when approver rejects transcription.
 
         """
+        self.skipTest('Needs https://github.com/pculture/unisubs/issues/600 '
+                      ' fixed')
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
@@ -731,9 +766,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                 user=dict(username=self.contributor.username, 
                           password='password'))
         self.complete_review_task(tv, 20)
-        
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
+        
         self.tasks_tab.perform_and_assign_task('Approve Original English ' 
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
