@@ -19,6 +19,7 @@
 
 
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
                                    SubtitleVersion)
 
@@ -104,8 +105,9 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_display = ['video_title', 'id', 'language', 'version_num',
-                    'visibility', 'visibility_override', 'parent_ids',
+                    'visibility', 'visibility_override',
                     'subtitle_count', 'created']
+    list_select_related = True
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
     list_filter = ['created', 'visibility', 'visibility_override',
                    'language_code']
@@ -118,6 +120,7 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     # can't let Django do this.  This means we can't edit parents in the admin,
     # but you should never be doing that anyway.
     exclude = ['parents', 'serialized_subtitles']
+    readonly_fields = ['parent_versions']
 
     # don't allow deletion
     actions = []
@@ -131,15 +134,20 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
     version_num.short_description = 'version #'
 
     def video_title(self, sv):
-        return sv.video.title_display()
+        return sv.video.title
     video_title.short_description = 'video'
 
     def language(self, sv):
         return sv.subtitle_language.get_language_code_display()
 
-    def parent_ids(self, sv):
-        pids = map(str, sv.parents.full().values_list('id', flat=True))
-        return ', '.join(pids) if pids else None
+    def parent_versions(self, sv):
+        links = []
+        for parent in sv.parents.full():
+            href = reverse('admin:subtitles_subtitleversion_change',
+                           args=(parent.pk,))
+            links.append('<a href="%s">%s</a>' % (href, parent))
+        return ', '.join(links)
+    parent_versions.allow_tags = True
 
     # Hack to generate lineages properly when modifying versions in the admin
     # interface.  Maybe we should just disallow this entirely once the version
