@@ -650,7 +650,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
 
     def test_approve_accept__email_reviewer(self):
         """Email sent to reviewer when approver accepts transcription. """
-        #self.skipTest("https://github.com/pculture/unisubs/issues/600")
+        self.skipTest("https://github.com/pculture/unisubs/issues/600")
         video = self.data_utils.create_video()
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=video)
