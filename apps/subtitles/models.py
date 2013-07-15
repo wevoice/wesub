@@ -1383,9 +1383,11 @@ class SubtitleVersion(models.Model):
         """
         return self.subtitle_language.subtitleversion_set
 
-    def update_metadata(self, field_data, commit=True):
-        metadata.update_child_and_video(self, self.video, field_data,
-                                           commit)
+    def update_metadata(self, new_metadata, commit=True):
+        lang = self.subtitle_language
+        metadata.update_child_and_video(self, self.video, new_metadata,
+                                        commit,
+                                        lang.is_primary_audio_language())
 
     def get_metadata(self):
         return metadata.get_child_metadata(self, self.video)

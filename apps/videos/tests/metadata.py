@@ -28,7 +28,43 @@ class MetadataFieldsTest(TestCase):
                                          metadata=metadata)
         self.assertEquals(version.get_metadata(),  metadata)
         # should also add the fields to the video
+        self.video = Video.objects.get(pk=self.video.pk)
         self.assertEquals(self.video.get_metadata(),  metadata)
+
+    def test_update_video(self):
+        # test that when we set metadata for the primary language, it updates
+        # the video's metadata
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker1'})
+        self.video.update_metadata({'speaker-name': 'Speaker2'})
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker2'})
+
+    def test_add_metadata_updates_video(self):
+        # test that when we set metadata for the primary language, it updates
+        # the video's metadata
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        version = pipeline.add_subtitles(
+            self.video, 'en', None,
+            metadata={'speaker-name': 'Speaker2'})
+        self.video = Video.objects.get(pk=self.video.pk)
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker2'})
+
+    def test_add_metadata_doesnt_update_video_for_non_primary(self):
+        # test that when we set metadata for language other than the primary
+        # audio language, it doesn't update the video's metadata
+        self.video.update_metadata({'speaker-name': 'Speaker1'})
+        self.video.primary_audio_language_code = 'en'
+        self.video.save()
+        version = pipeline.add_subtitles(
+            self.video, 'fr', None,
+            metadata={'speaker-name': 'Speaker2'})
+        self.assertEquals(self.video.get_metadata(),
+                          {'speaker-name': 'Speaker1'})
 
     def test_add_metadata_twice(self):
         metadata_1 = {
