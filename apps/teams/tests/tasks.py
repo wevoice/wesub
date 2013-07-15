@@ -573,3 +573,42 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
                      expiration_date)
         self.assert_(approx_expiration + datetime.timedelta(seconds=1) >
                      expiration_date)
+
+class ViewsTest(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team(workflow_enabled=True)
+        w = test_factories.create_workflow(self.team,
+                                           autocreate_subtitle=True)
+        self.admin = test_factories.create_team_member(
+            self.team, role=TeamMember.ROLE_ADMIN)
+        self.client.login(username=self.admin.user.username,
+                          password='password')
+
+    def check_task_list(self, tasks, **query_args):
+        url = reverse("teams:team_tasks", kwargs={'slug': self.team.slug})
+        response = self.client.get(url, query_args)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals([t.id for t in response.context['tasks']],
+                          [t.id for t in tasks])
+
+    def test_search(self):
+        video = test_factories.create_video(primary_audio_language_code='en',
+                                            title='MyTitle')
+        tv = test_factories.create_team_video(self.team, self.admin.user,
+                                              video)
+        self.assertEqual(tv.task_set.count(), 1)
+        self.check_task_list(tv.task_set.all(), q='MyTitle')
+        self.check_task_list(tv.task_set.all(), q='mytitle')
+        self.check_task_list(tv.task_set.all(), q='my')
+        self.check_task_list([], q='OtherTitle')
+
+    def test_search_by_metadata(self):
+        video = test_factories.create_video(primary_audio_language_code='en',
+                                            title='MyTitle')
+        video.update_metadata({'speaker-name': 'Person'})
+        tv = test_factories.create_team_video(self.team, self.admin.user,
+                                              video)
+        self.assertEqual(tv.task_set.count(), 1)
+        self.check_task_list(tv.task_set.all(), q='Person')
+        self.check_task_list(tv.task_set.all(), q='person')
+        self.check_task_list(tv.task_set.all(), q='pers')

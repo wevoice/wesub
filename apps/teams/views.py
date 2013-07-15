@@ -1129,7 +1129,11 @@ def _tasks_list(request, team, project, filters, user):
     if filters.get('q'):
         terms = get_terms(filters['q'])
         for term in terms:
-            tasks = tasks.filter(team_video__video__title__icontains=term)
+            tasks = tasks.filter(
+                Q(team_video__video__title__icontains=term) |
+                Q(team_video__video__meta_1_content__icontains=term) |
+                Q(team_video__video__meta_2_content__icontains=term) |
+                Q(team_video__video__meta_3_content__icontains=term))
 
     if filters.get('type'):
         tasks = tasks.filter(type=Task.TYPE_IDS[filters['type']])
