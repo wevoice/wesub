@@ -120,7 +120,7 @@ def get_metadata_for_video(video):
             rv[name] = value
     return rv
 
-def update_video(video, new_metadata, commit=True):
+def update_video(video, new_metadata, commit=True, update_content=True):
     """Update a video object bassed on a list of field data
 
     This method sets the type/content fields on video if needed, then returns
@@ -128,6 +128,8 @@ def update_video(video, new_metadata, commit=True):
 
     :param video: Video object to update
     :param new_metadata: data for the fields as a list of (name, content) tuples
+    :param commit: Should we save the video after the update?
+    :param update_content: If false, don't overwrite video content columns
     :returns: a list of content values, in the same order as the fields are
     ordered (rv[N] corrsponds for the meta_N_type on video).
     """
@@ -141,7 +143,10 @@ def update_video(video, new_metadata, commit=True):
             break
         type_name = type_value_to_name[type_value]
         if type_name in new_metadata:
-            rv.append(new_metadata.pop(type_name))
+            value = new_metadata.pop(type_name)
+            rv.append(value)
+            if update_content:
+                setattr(video, content_field(field_index), value)
         else:
             rv.append('')
     # go through metadata not yet stored in the video
@@ -162,9 +167,11 @@ def update_video(video, new_metadata, commit=True):
         video.save()
     return rv
 
-def update_child_and_video(child, video, new_metadata, commit=True):
+def update_child_and_video(child, video, new_metadata, commit=True,
+                           update_video_content=True):
     """Update metadata for both a video and a child object """
-    content_data = update_video(video, new_metadata, commit)
+    content_data = update_video(video, new_metadata, commit,
+                                update_video_content)
     for i, content in enumerate(content_data):
         setattr(child, content_field(i), content)
     if commit:

@@ -160,6 +160,18 @@ unisubs.subtitle.MSServerModel.prototype.makeFinishArgs_ = function() {
         atLeastOneThingChanged = true;
     }
 
+    var newMetadata = {}
+    for(key in this.captionSet_.metadata) {
+        var newValue = this.captionSet_.metadata[key];
+        var oldValue = initialCaptionSet.metadata[key];
+        if(goog.isDefAndNotNull(newValue) && newValue != oldValue) {
+            newMetadata[key] = newValue;
+        }
+    }
+    if(newMetadata) {
+        args['new_metadata'] = newMetadata;
+    }
+
     if (goog.isDefAndNotNull(this.captionSet_.completed) &&
         this.captionSet_.completed != initialCaptionSet.completed) {
         args['completed'] = this.captionSet_.completed;

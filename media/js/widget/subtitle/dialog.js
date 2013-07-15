@@ -347,8 +347,7 @@ unisubs.subtitle.Dialog.prototype.handleDoneKeyPress_ = function(event) {
 
         // Make sure this subtitle set has captions.
         if((this.captionSet_.captions_.length === 0) && 
-            !(this.captionSet_.hasTitleChanged() && this.captionSet_.originalTitle == "") &&
-                 !(this.captionSet_.hasDescriptionChanged() && this.captionSet_.originalDescription == "")){
+            !this.captions_.hasMetadataChanged()) {
                 alert('You must create captions in order to submit.');
                 return false;
         } else {
@@ -404,8 +403,7 @@ unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave, sa
 
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) &&
-        !this.captionSet_.hasTitleChanged() &&
-        !this.captionSet_.hasDescriptionChanged() &&
+        !this.captionSet_.hasMetadataChanged() &&
         this.exitURL) {
         // No changes, but we want to go to the new subtitle editor.  Special
         // case this and just to a redirect
@@ -419,8 +417,7 @@ unisubs.subtitle.Dialog.prototype.saveWorkInternal = function(closeAfterSave, sa
     } else if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) && !this.forceSave_){
         this.alreadySaving_ = false;
-        if((this.captionSet_.hasTitleChanged() && this.captionSet_.originalTitle == "") ||
-             (this.captionSet_.hasDescriptionChanged() && this.captionSet_.originalDescription == "")){
+        if(this.captionSet_.hasMetadataChanged()) {
             this.showTitleDescriptionChangedDialog(closeAfterSave, saveForLater);
         } else {
             // there are no subs here, close dialog or back to subtitling

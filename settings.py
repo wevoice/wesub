@@ -232,7 +232,9 @@ JS_DIALOG = \
      'js/widget/translate/descriptiontranslationwidget.js',
      'js/widget/translate/translationrightpanel.js',
      'js/widget/translate/forkdialog.js',
-     'js/widget/translate/titletranslationwidget.js']
+     'js/widget/translate/titletranslationwidget.js',
+     'js/widget/translate/metadatatranslationwidget.js',
+ ]
 
 JS_OFFSITE = list(JS_CORE)
 JS_OFFSITE.append('js/widget/crossdomainembed.js')

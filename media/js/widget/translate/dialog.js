@@ -177,8 +177,7 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, s
 
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) &&
-        !this.serverModel_.captionSet_.hasTitleChanged() &&
-        !this.serverModel_.captionSet_.hasDescriptionChanged() &&
+        !this.serverModel_.captionSet_.hasMetadataChanged() &&
         this.exitURL) {
         // No changes, but we want to go to the new subtitle editor.  Special
         // case this and just to a redirect
@@ -190,8 +189,7 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, s
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) && !this.forceSave_){
         this.alreadySaving_ = false;
-        if((this.captionSet_.hasTitleChanged() && this.captionSet_.originalTitle == "") ||
-             (this.captionSet_.hasDescriptionChanged() && this.captionSet_.originalDescription == "")){
+        if(this.hasMetadataChanged()) {
             this.showTitleDescriptionChangedDialog(closeAfterSave, saveForLater);
         } else {
             // there are no subs here, close dialog or back to subtitling
