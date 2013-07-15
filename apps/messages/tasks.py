@@ -421,10 +421,12 @@ def _reviewed_notification(task_pk, status):
     if status == REVIEWED_AND_PUBLISHED:
         subject += ugettext(" and published")
 
-    if task.review_base_version:
-        user = task.review_base_version.user
+    version = task.get_subtitle_version()
+
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
     else:
-        user = task.new_subtitle_version.author
+        user = version.author
 
     task_language = get_language_label(task.language)
     reviewer = task.assignee
@@ -432,7 +434,7 @@ def _reviewed_notification(task_pk, status):
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.new_subtitle_version.subtitle_language.pk,
+        'lang_id': version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -446,7 +448,7 @@ def _reviewed_notification(task_pk, status):
 
     context = {
         "team":task.team,
-        "title": task.new_subtitle_version.subtitle_language.get_title(),
+        "title": version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -477,13 +479,13 @@ def _reviewed_notification(task_pk, status):
 
     if status == REVIEWED_AND_SENT_BACK:
         if task.type == Task.TYPE_IDS['Review']:
-            Action.create_declined_video_handler(task.new_subtitle_version, reviewer)
+            Action.create_declined_video_handler(version, reviewer)
         else:
-            Action.create_rejected_video_handler(task.new_subtitle_version, reviewer)
+            Action.create_rejected_video_handler(version, reviewer)
     elif status == REVIEWED_AND_PUBLISHED:
-        Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
+        Action.create_approved_video_handler(version, reviewer)
     elif status == REVIEWED_AND_PENDING_APPROVAL:
-        Action.create_accepted_video_handler(task.new_subtitle_version, reviewer)
+        Action.create_accepted_video_handler(version, reviewer)
 
     return msg, email_res
 
@@ -518,8 +520,6 @@ def approved_notification(task_pk, published=False):
         return False
     # some tasks are being created without subtitles version, see
     # https://unisubs.sifterapp.com/projects/12298/issues/552092/comments
-    if not task.new_subtitle_version:
-        return False
 
     if published:
         subject = ugettext(u"Your subtitles have been approved and published!")
@@ -529,14 +529,18 @@ def approved_notification(task_pk, published=False):
         template_txt = "messages/team-task-approved-sentback.txt"
         template_html ="messages/email/team-task-approved-sentback.html"
         subject = ugettext(u"Your subtitles have been returned for further editing")
-    user = task.new_subtitle_version.author
+    version = task.get_subtitle_version()
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
+    else:
+        user = version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.new_subtitle_version.subtitle_language.pk,
+        'lang_id': version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -544,7 +548,7 @@ def approved_notification(task_pk, published=False):
 
     context = {
         "team":task.team,
-        "title": task.new_subtitle_version.subtitle_language.get_title(),
+        "title": version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -567,7 +571,7 @@ def approved_notification(task_pk, published=False):
     template_name = template_html
     Meter('templated-emails-sent-by-type.teams.approval-result').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_approved_video_handler(task.new_subtitle_version, reviewer)
+    Action.create_approved_video_handler(version, reviewer)
     return msg, email_res
 
 @task
@@ -583,15 +587,19 @@ def send_reject_notification(task_pk, sent_back):
     except Task.DoesNotExist:
         return False
 
+    version = task.get_subtitle_version()
     subject = ugettext(u"Your subtitles were not accepted")
-    user = task.new_subtitle_version.user
+    if task.new_review_base_version:
+        user = task.new_review_base_version.author
+    else:
+        user = version.author
     task_language = get_language_label(task.language)
     reviewer = task.assignee
     video = task.team_video.video
     subs_url = "%s%s" % (get_url_base(), reverse("videos:translation_history", kwargs={
         'video_id': video.video_id,
         'lang': task.language,
-        'lang_id': task.new_subtitle_version.subtitle_language.pk,
+        'lang_id': version.subtitle_language.pk,
 
     }))
     reviewer_message_url = "%s%s?user=%s" % (
@@ -599,7 +607,7 @@ def send_reject_notification(task_pk, sent_back):
 
     context = {
         "team":task.team,
-        "title": task.new_subtitle_version.subtitle_language.get_title(),
+        "title": version.subtitle_language.get_title(),
         "user":user,
         "task_language": task_language,
         "url_base":get_url_base(),
@@ -623,7 +631,7 @@ def send_reject_notification(task_pk, sent_back):
     template_name = "messages/email/team-task-rejected.html"
     Meter('templated-emails-sent-by-type.teams.task-rejected').inc()
     email_res =  send_templated_email(user, subject, template_name, context)
-    Action.create_rejected_video_handler(task.new_subtitle_version, reviewer)
+    Action.create_rejected_video_handler(version, reviewer)
     return msg, email_res
 
 COMMENT_MAX_LENGTH = getattr(settings,'COMMENT_MAX_LENGTH', 3000)
