@@ -2,6 +2,7 @@
 import os
 
 from django.core import mail
+from django.core import management
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
@@ -102,6 +103,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
 
         #Create a partner user to own the team.
         cls.owner = UserFactory.create(is_partner=True)
+        cls.data_utils.create_user_api_key(cls.owner)
 
         #CREATE AN OPEN TEAM WITH WORKFLOWS and AUTOTASKS
         cls.team = TeamMemberFactory.create(
@@ -137,7 +139,6 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.team.subtitle_policy > 10:
             self.team.subtitle_policy = 10
             self.team.save() 
@@ -157,6 +158,48 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.perform_and_assign_task('Transcribe Subtitles', tv.title)
         self.create_modal.lang_selection(video_language='English')
         self.assertEqual('Typing', self.sub_editor.dialog_title())
+
+
+
+    def test_task_search__speaker_metadata(self):
+        tv = self.data_utils.create_video()
+        #Update the video title and description (via api)
+        url_part = 'videos/%s/' % tv.video_id
+        new_data = {'metadata': {'speaker-name': 'Ronaldo', 
+                                 'location': 'Portugal'}
+                   }
+        self.data_utils.put_api_request(self.owner, url_part, new_data)
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
+        #Open team tasks page and search for metadata.
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+
+        self.tasks_tab.search('Ronaldo')
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', tv.title))
+
+    def test_task_search__location_metadata(self):
+        tv = self.data_utils.create_video()
+        #Update the video title and description (via api)
+        url_part = 'videos/%s/' % tv.video_id
+        new_data = {'metadata': {'speaker-name': 'Ronaldo', 
+                                 'location': 'Portugal'}
+                   }
+        self.data_utils.put_api_request(self.owner, url_part, new_data)
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
+        #Open team tasks page and search for metadata.
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+
+        self.tasks_tab.search('Portugal')
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles', tv.title))
 
 
     def test_transcription__save(self):

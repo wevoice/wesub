@@ -252,7 +252,6 @@ class TestCaseSearch(WebdriverTestCase):
 
 
 
-
     def test_search__title(self):
         """Team video search for title text.
 
@@ -280,6 +279,30 @@ class TestCaseSearch(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search('mother')
         self.assertTrue(self.videos_tab.video_present(new_data['title']))
+
+
+    def test_search__metadata(self):
+        """Team video search for title text after it has been updated.
+
+        """
+        tv = self.data_utils.create_video()
+
+
+        #Update the video title and description (via api)
+        url_part = 'videos/%s/' % tv.video_id
+        new_data = {'metadata': {'speaker-name': 'Ronaldo', 
+                                 'location': 'Portugal'}
+                   }
+        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
+        TeamVideoFactory(team=self.team, added_by=self.team_owner, video=tv)
+        #Update the solr index
+        management.call_command('update_index', interactive=False)
+
+
+        #Open team videos page and search for updated title text.
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.search('Ronaldo')
+        self.assertTrue(self.videos_tab.video_present(tv.title))
 
 
     def test_search__updated_description(self):
