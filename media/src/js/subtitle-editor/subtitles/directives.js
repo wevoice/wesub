@@ -439,9 +439,7 @@ var USER_IDLE_MINUTES = 5;
                             scope.versionNumber = this.value;
                             scope.$digest();
                         });
-                        SubtitleStorage.getLanguages(function(languages) {
-                            scope.setInitialDisplayLanguage(languages);
-                        });
+                        scope.setInitialDisplayLanguage(SubtitleStorage.getLanguages());
                     }
                 };
             }

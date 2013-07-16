@@ -75,14 +75,19 @@ var angular = angular || null;
 
     module.factory('SubtitleStorage', function($http, EditorData) {
 
-        var cachedData = EditorData;
-        var authHeaders = cachedData.authHeaders;
+        var authHeaders = EditorData.authHeaders;
+        // Map language codes to Language objects
+        var languageMap = {};
+        _.forEach(EditorData.languages, function(languageData) {
+            var language = new Language(languageData);
+            languageMap[language.code] = language;
+        });
 
         // Map language_code/version_number to subtitle data
         var cachedSubtitleData = {};
         // Populate cachedSubtitleData with versions from editorData that
         // were pre-filled with the data we need.
-        _.each(cachedData.languages, function(language) {
+        _.each(EditorData.languages, function(language) {
             var language_code = language.language_code;
             cachedSubtitleData[language_code] = {};
             _.each(language.versions, function(version) {
@@ -93,22 +98,12 @@ var angular = angular || null;
             });
         });
 
-        function ensureLanguageMap() {
-            if (cachedData.languageMap) {
-                return;
-            }
-            var langMap = {};
-            for (var i=0; i < cachedData.languages.length; i++){
-                var language = cachedData.languages[i];
-                langMap[language.language_code] = language;
-            }
-            cachedData.languageMap = langMap;
-        }
 
         return {
             approveTask: function(versionNumber, notes) {
 
-                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+                var url = getTaskSaveAPIUrl(EditorData.team_slug,
+                        EditorData.task_id);
 
                 var promise = $http({
                     method: 'PUT',
@@ -124,42 +119,11 @@ var angular = angular || null;
                 return promise;
 
             },
-            getCachedData: function() {
-                return cachedData;
-            },
             getLanguages: function(callback) {
-                function invokeCallback(languagesData) {
-                    callback(_.map(languagesData, function(langData) {
-                        return new Language(langData);
-                    }));
-                }
-
-                // If there are no languages in our cached data, ask the API.
-                if (cachedData.languages && cachedData.languages.length === 0) {
-
-                    var url = getVideoLangAPIUrl(cachedData.video.id);
-
-                    $http.get(url).success(function(response) {
-                        cachedData.languages = response.objects;
-                        invokeCallback(response.objects);
-                    });
-
-                // If we have cached languages, just call the callback.
-                } else {
-                    invokeCallback(cachedData.languages);
-                }
+                return _.values(languageMap);
             },
             getLanguage: function(languageCode) {
-                ensureLanguageMap();
-                return new Language(cachedData.languageMap[languageCode]);
-            },
-            getLanguageName: function(languageCode) {
-                ensureLanguageMap();
-                return cachedData.languageMap[languageCode].name;
-            },
-            getLanguageIsRTL: function(languageCode) {
-                ensureLanguageMap();
-                return cachedData.languageMap[languageCode].is_rtl;
+                return languageMap[languageCode];
             },
             getSubtitles: function(languageCode, versionNumber, callback){
 
@@ -174,7 +138,7 @@ var angular = angular || null;
                 if(cacheData) {
                    callback(cacheData);
                 } else {
-                    var url = getSubtitleFetchAPIUrl(cachedData.video.id, languageCode, versionNumber);
+                    var url = getSubtitleFetchAPIUrl(EditorData.video.id, languageCode, versionNumber);
                     $http.get(url).success(function(response) {
                         cachedSubtitleData[languageCode][versionNum] = response;
                         callback(response)
@@ -182,14 +146,15 @@ var angular = angular || null;
                 }
             },
             getPrimaryVideoURL: function() {
-                return cachedData.video.primaryVideoURL;
+                return EditorData.video.primaryVideoURL;
             },
             getVideoURLs: function() {
-                return cachedData.video.videoURLs;
+                return EditorData.video.videoURLs;
             },
             sendBackTask: function(versionNumber, notes) {
 
-                var url = getTaskSaveAPIUrl(cachedData.team_slug, cachedData.task_id);
+                var url = getTaskSaveAPIUrl(EditorData.team_slug,
+                        EditorData.task_id);
 
                 var promise = $http({
                     method: 'PUT',
