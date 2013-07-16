@@ -49,7 +49,8 @@ def _version_data(version):
         'description': version.description,
     }
 
-def _language_data(language, editing_version, translated_from_version):
+def _language_data(language, editing_version, translated_from_version,
+                   base_language):
     '''
     Creates a dict with language info, suitable for encoding
     into json and bootstrapping the editor. Includes
@@ -58,17 +59,19 @@ def _language_data(language, editing_version, translated_from_version):
     '''
     versions_data = []
 
-    for version in language.subtitleversion_set.full():
+    versions = list(language.subtitleversion_set.full())
+    for i, version in enumerate(versions):
         version_data = {
             'version_no':version.version_number,
             'visibility': visibility_display(version),
         }
-        if editing_version and editing_version == version and \
-            editing_version.subtitle_language == language:
-            version_data.update(_version_data(editing_version))
-        elif translated_from_version and translated_from_version == version and \
-            translated_from_version.subtitle_language == language:
-            version_data.update(_version_data(translated_from_version))
+        if editing_version == version:
+            version_data.update(_version_data(version))
+        elif translated_from_version == version:
+            version_data.update(_version_data(version))
+        elif (language.language_code == base_language and
+              i == len(versions) - 1):
+            version_data.update(_version_data(version))
 
         versions_data.append(version_data)
 
@@ -166,6 +169,7 @@ def subtitle_editor(request, video_id, language_code):
     '''
     # FIXME: permissions
     video = get_object_or_404(Video, video_id=video_id)
+    base_language = request.GET.get('base-language')
 
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
@@ -224,11 +228,15 @@ def subtitle_editor(request, video_id, language_code):
             'versionNumber': (editing_version.version_number
                               if editing_version else None),
         },
-        'languages': [_language_data(lang, editing_version, translated_from_version) for lang in languages],
+        'baseLanguage': base_language,
+        'languages': [_language_data(lang, editing_version,
+                                     translated_from_version, base_language)
+                      for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
         'oldEditorURL': get_widget_url(editing_language),
         'savedNotes': request.GET.get('saved-notes', '')
     }
+
 
     if task:
         editor_data['task_id'] = task.id

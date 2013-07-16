@@ -71,6 +71,12 @@ var angular = angular || null;
             this.dir = 'ltr';
         }
         this.isPrimaryAudioLanguage = responseData.is_original;
+        var lastVersion = _.last(responseData.versions);
+        if(lastVersion) {
+            this.lastVersionNumber = lastVersion.version_no;
+        } else {
+            this.lastVersionNumber = null;
+        }
     }
 
     module.factory('SubtitleStorage', function($http, EditorData) {
@@ -133,7 +139,15 @@ var angular = angular || null;
                 }
 
                 var subtitleData;
-                var versionNum = parseInt(versionNumber, 10);
+                if(versionNumber === null) {
+                    var language = languageMap[languageCode];
+                    var versionNum = language.lastVersionNumber;
+                    if(versionNum === null) {
+                        throw "no versions for language: " + languageCode;
+                    }
+                } else {
+                    var versionNum = parseInt(versionNumber, 10);
+                }
                 var cacheData = cachedSubtitleData[languageCode][versionNum];
                 if(cacheData) {
                    callback(cacheData);
