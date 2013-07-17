@@ -10,6 +10,8 @@ from auth.models import CustomUser as User
 from apps.teams.forms import TaskCreateForm, TaskAssignForm
 from apps.teams.models import Task, Team, TeamVideo, TeamMember
 from apps.videos.models import Video
+from apps.videos.models import SubtitleVersion as OldSubtitleVersion
+from apps.videos.models import SubtitleLanguage as OldSubtitleLanguage
 from utils.tests import TestEditor
 from utils import test_factories
 
@@ -400,6 +402,51 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
         self.assertEquals(subtitle_language.get_tip().is_public(), True)
+
+    def test_review_and_approve_with_old_version(self):
+        self.change_workflow_settings(ADMIN_MUST_REVIEW,
+                                      ADMIN_MUST_APPROVE)
+        self.workflow.save()
+        member = self.create_member()
+        # make an old SubtitleVersion object.  The fact that most of this data
+        # is bogus is fine, we shouldn't be using the object at all.
+        #
+        # We will move through the task pipeline and set the subtitle_version
+        # attribute on each task.  The point is to simple check that we can
+        # move through without any exceptions.
+        old_language = OldSubtitleLanguage.objects.create(
+            video=self.team_video.video,
+            is_original=True,
+            language='en',
+            created=datetime.datetime.now())
+        old_version = OldSubtitleVersion.objects.create(
+            language=old_language,
+            datetime_started=datetime.datetime.now(),
+            user=member.user,
+            title='Title',
+            description='Description')
+
+        # create the task
+        self.submit_create_task(TYPE_SUBTITLE, member.user.pk)
+        task = self.get_subtitle_task()
+        task.subtitle_version = old_version
+        task.save()
+        self.login(member.user)
+        self.perform_subtitle_task(task)
+        # perform the review
+        review_task = self.get_review_task()
+        review_task.subtitle_version = old_version
+        review_task.save()
+        self.login(self.admin.user)
+        self.submit_assign(self.admin, review_task)
+        self.perform_review_task(review_task, "Test Review Note")
+        # perform the approval
+        approve_task = self.get_approve_task()
+        approve_task.subtitle_version = old_version
+        approve_task.save()
+        self.submit_assign(self.admin, approve_task)
+        self.perform_approve_task(approve_task, "Test Note",
+                                 approval=Task.APPROVED_IDS['Rejected'])
 
     def test_due_date(self):
         self.team.task_expiration = 2
