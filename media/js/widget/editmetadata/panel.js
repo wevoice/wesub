@@ -96,11 +96,14 @@ unisubs.editmetadata.Panel.prototype.createDom = function() {
         if(originalMetadata[name]) {
             var originalValue = originalMetadata[name];
         } else {
-            var originalValue = this.subtitles_.metadata[name];
+            var originalValue = '';
         }
         var widget  = new unisubs.translate.MetadataTranslationWidget(
                 originalValue, this.subtitles_, name);
         this.addChild(widget, true);
+        if(this.subtitles_.metadata && this.subtitles_.metadata[name]) {
+            widget.setTranslation(this.subtitles_.metadata[name]);
+        }
     }
 
     if (!this.inSubtitlingDialog_){
