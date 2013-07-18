@@ -52,6 +52,7 @@ from utils import urlvalidator
 urlpatterns = patterns('',
     url('^500/$', direct_to_template, { 'template': '500.html' }),
     url('^404/$', direct_to_template, { 'template': '404.html' }),
+    url('^robots.txt$', direct_to_template, { 'template': 'robots.txt' }),
     url(r'^crossdomain.xml$',
         'crossdomain_views.root_crossdomain'),
     url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict,
