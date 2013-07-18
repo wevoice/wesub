@@ -1809,11 +1809,10 @@ class Task(models.Model):
         from teams.permissions import can_review, can_approve
 
         if type == 'Approve':
-            # if there's a previous version, it's a post-publish edit.
-            # and according to #1039 we don't wanna auto-assign
-            # the assignee
-            if self.subtitle_version and self.subtitle_version.prev_version() and \
-                    self.subtitle_version.language.is_complete_and_synced():
+            # Check if this is a post-publish edit.
+            # According to #1039 we don't wanna auto-assign the assignee
+            version = self.get_subtitle_version()
+            if version and version.subtitle_language.is_complete_and_synced():
                 return None
 
             type = Task.TYPE_IDS['Approve']

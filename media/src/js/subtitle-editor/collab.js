@@ -20,9 +20,9 @@
 
     var module = angular.module('amara.SubtitleEditor.collab', []);
 
-    module.controller('CollabController', function($scope, $timeout, SubtitleStorage) {
+    module.controller('CollabController', function($scope, $timeout, EditorData) {
 
-        $scope.notes = SubtitleStorage.getCachedData().savedNotes || "";
+        $scope.notes = EditorData.savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
             notes: false,
@@ -37,7 +37,7 @@
         };
 
         // If this is a task, set up the proper panels.
-        if (SubtitleStorage.getCachedData().task_needs_pane) {
+        if (EditorData.task_needs_pane) {
             $scope.modulesOpen = {
                 notes: true,
                 pane: true

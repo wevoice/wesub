@@ -214,6 +214,39 @@ var angular = angular || null;
         this.emitChange('reload', null);
     }
 
+    SubtitleList.prototype.addSubtitlesFromBaseLanguage = function(xml) {
+        /*
+         * Used when we are translating from one language to another.
+         * It loads the latest subtitles for xml and inserts blank subtitles
+         * with the same timings into our subtitle list.
+         */
+        var baseLanguageParser = new AmaraDFXPParser();
+        baseLanguageParser.init(xml);
+        var timings = [];
+        baseLanguageParser.getSubtitles().each(function(index, node) {
+            startTime = baseLanguageParser.startTime(node);
+            endTime = baseLanguageParser.endTime(node);
+            if(startTime >= 0 && endTime >= 0) {
+                timings.push({
+                    'startTime': startTime,
+                    'endTime': endTime,
+                });
+            }
+        });
+        timings.sort(function(s1, s2) {
+            return s1.startTime - s2.startTime;
+        });
+        var that = this;
+        _.forEach(timings, function(timing) {
+            var node = that.parser.addSubtitle(null, {
+                begin: timing.startTime,
+                end: timing.endTime,
+            });
+            that.subtitles.push(that.makeItem(node));
+            that.syncedCount++;
+        });
+    }
+
     SubtitleList.prototype.addChangeCallback = function(callback) {
         this.changeCallbacks.push(callback);
     }
@@ -562,7 +595,7 @@ var angular = angular || null;
                 that.subtitleList.loadXML(subtitleData.subtitles);
             });
         },
-        initEmptySubtitles: function(languageCode) {
+        initEmptySubtitles: function(languageCode, baseLanguage) {
             this.setLanguage(languageCode);
             this.versionNumber = null;
             this.title = '';
@@ -570,6 +603,17 @@ var angular = angular || null;
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
             this.metadata = this.video.metadata;
+            if(baseLanguage) {
+                this.addSubtitlesFromBaseLanguage(baseLanguage);
+            }
+        },
+        addSubtitlesFromBaseLanguage: function(baseLanguage) {
+            var that = this;
+            this.SubtitleStorage.getSubtitles(baseLanguage, null,
+                    function(subtitleData) {
+                that.subtitleList.addSubtitlesFromBaseLanguage(
+                    subtitleData.subtitles);
+            });
         },
         setLanguage: function(code) {
             this.language = this.SubtitleStorage.getLanguage(code);

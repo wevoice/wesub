@@ -287,7 +287,7 @@ var angular = angular || null;
                     editingVersion.versionNumber);
         } else {
             $scope.workingSubtitles.initEmptySubtitles(
-                    editingVersion.languageCode);
+                    editingVersion.languageCode, EditorData.baseLanguage);
         }
 
         $scope.saveSubtitles = function(markComplete) {

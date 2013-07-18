@@ -189,7 +189,7 @@ unisubs.translate.Dialog.prototype.saveWorkInternal = function(closeAfterSave, s
     if (goog.array.isEmpty(
         this.serverModel_.captionSet_.nonblankSubtitles()) && !this.forceSave_){
         this.alreadySaving_ = false;
-        if(this.hasMetadataChanged()) {
+        if(this.serverModel_.captionSet_.hasMetadataChanged()) {
             this.showTitleDescriptionChangedDialog(closeAfterSave, saveForLater);
         } else {
             // there are no subs here, close dialog or back to subtitling

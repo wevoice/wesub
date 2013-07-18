@@ -66,7 +66,7 @@ unisubs.subtitle.EditableCaptionSet = function(dfxp, opt_completed, opt_title, o
 
     this.originalTitle = opt_title;
     this.originalDescription = opt_description;
-    this.originalMetadata = goog.array.clone(opt_metadata);
+    this.originalMetadata = goog.object.clone(opt_metadata);
 
     this.forkedDuringEdits_ = !!opt_forkedDuringEdits;
     this.languageName = opt_languageName;
@@ -428,6 +428,13 @@ unisubs.subtitle.EditableCaptionSet.prototype.hasDescriptionChanged = function()
 };
 
 unisubs.subtitle.EditableCaptionSet.prototype.hasMetadataChanged = function() {
-    return (this.hasTitleChanged || this.hasDescriptionChanged ||
-            !goog.array.equals(this.originalMetadata, this.metadata));
+    if(this.hasTitleChanged() || this.hasDescriptionChanged()) {
+        return true;
+    }
+    for(key in this.originalMetadata) {
+        if(this.metadata[key] != this.originalMetadata[key]) {
+            return true;
+        }
+    }
+    return false;
 }
