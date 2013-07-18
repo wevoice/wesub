@@ -906,7 +906,12 @@ LOGGING = {
             'level': 'INFO',
             'handlers': ['sentry', 'console'],
             'propagate': False
-        }
+        },
+        'timing': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        },
     },
 }
 
