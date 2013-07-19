@@ -167,11 +167,11 @@ class EditorPage(UnisubsPage):
     def close_metadata(self):
         self.logger.info('closing the metadata')
         work_el = self.is_element_present(self._WORKING_METADATA_EXPANDER)
-        if 'collapsed' not in work_el.get_attribute('class'):
+        if work_el and 'collapsed' not in work_el.get_attribute('class'):
             work_el.click()
 
         ref_el = self.is_element_present(self._REF_METADATA_EXPANDER)
-        if 'collapsed' not in ref_el.get_attribute('class'):
+        if ref_el and 'collapsed' not in ref_el.get_attribute('class'):
             ref_el.click()
 
     def working_language(self):

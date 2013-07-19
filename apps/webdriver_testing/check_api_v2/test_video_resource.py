@@ -1,6 +1,9 @@
 import time
 import itertools
 import operator
+
+from django.core import management
+
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
@@ -9,6 +12,7 @@ from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.pages.site_pages import video_page 
 from apps.webdriver_testing.pages.site_pages.teams import videos_tab
+from apps.webdriver_testing.pages.site_pages import watch_page
 
 class TestCaseVideoResource(WebdriverTestCase):
     """TestSuite for videos via the api
@@ -42,6 +46,12 @@ class TestCaseVideoResource(WebdriverTestCase):
             name='team project two',
             workflow_enabled=True)
         cls.video_pg = video_page.VideoPage(cls)
+        cls.watch_pg = watch_page.WatchPage(cls)
+
+
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
+
 
     def test_video__list(self):
         """List the available videos that are in teams.
@@ -208,14 +218,10 @@ class TestCaseVideoResource(WebdriverTestCase):
         PUT /api2/partners/videos/[video-id]/
         """
 
-        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
-                                   'Birds_short.webmsd.webm'),
-                     'title': 'Test video created via api',
-                     'duration': 37 }
-        url_part = 'videos/'
-        status, response = self.data_utils.post_api_request(self.user,
-                                                   url_part, url_data)
-        vid_id = response['id']
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.open_team, added_by=self.user, video=tv)
+
+        vid_id = tv.video_id 
 
         url_part = 'videos/%s/' % vid_id
         new_data = {'title': 'MVC webM output sample',
@@ -228,6 +234,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                   }
         status, response = self.data_utils.put_api_request(self.user, 
                                                   url_part, new_data)
+        self.logger.info(response)
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata
@@ -237,6 +244,13 @@ class TestCaseVideoResource(WebdriverTestCase):
         #Check video displays on the site
         self.assertIn(new_data['metadata']['speaker-name'], 
             self.video_pg.speaker_name())
+
+#        management.call_command('update_index', interactive=False)
+
+#        test_text = new_data['metadata']['speaker-name']
+#        self.watch_pg.open_watch_page()
+#        results_pg = self.watch_pg.basic_search(test_text)
+#        self.assertTrue(results_pg.search_has_results())
       
 
  
