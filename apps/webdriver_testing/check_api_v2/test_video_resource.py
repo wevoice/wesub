@@ -49,9 +49,6 @@ class TestCaseVideoResource(WebdriverTestCase):
         cls.watch_pg = watch_page.WatchPage(cls)
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
-
 
     def test_video__list(self):
         """List the available videos that are in teams.
