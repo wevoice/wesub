@@ -27,6 +27,7 @@ class BillingPage(UnisubsPage):
         self.type_by_css(self._END, end)
         self.select_option_by_text(self._TYPE, bill_type)
         self.submit_by_css(self._SUBMIT)
+        time.sleep(5)
 
     def check_latest_report_url(self):
         self.logger.info(self.get_text_by_css(self._LATEST_REPORT))
