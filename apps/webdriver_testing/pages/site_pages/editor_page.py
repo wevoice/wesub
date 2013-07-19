@@ -228,8 +228,10 @@ class EditorPage(UnisubsPage):
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
-
-        if line !=0:
+        if line == 0:
+            self.click_by_css(self._ADD_SUB_TO_END)
+            position = 0
+        else:
             position = line-1
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
                                                self._SUBTITLE_ITEM]))
