@@ -38,6 +38,7 @@ from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
 from utils.rpc import RpcRouter
+from teams.models import Task
 from subtitles.models import SubtitleLanguage
 from videos.models import (
     Action, VideoUrl, Video, VIDEO_TYPE_YOUTUBE, VideoFeed
@@ -109,8 +110,7 @@ def dashboard(request):
     video_urls = dict([(vu.video_id, vu.effective_url) for vu in
                        VideoUrl.objects.filter(video__in=video_pks, primary=True)])
 
-    for t in tasks:
-        t.cached_video_url = video_urls.get(t.team_video.video_id)
+    Task.add_cached_video_urls(tasks)
 
     context = {
         'user_info': user,

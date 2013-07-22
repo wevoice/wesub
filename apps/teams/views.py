@@ -1179,15 +1179,6 @@ def _get_task_filters(request):
              'assignee': request.GET.get('assignee'),
              'q': request.GET.get('q'), }
 
-def _cache_video_url(tasks):
-    video_pks = [t.team_video.video_id for t in tasks]
-
-    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
-                       VideoUrl.objects.filter(video__in=video_pks, primary=True)])
-
-    for t in tasks:
-        t.cached_video_url = video_urls.get(t.team_video.video_id)
-
 @timefn
 @render_to('teams/dashboard.html')
 def dashboard(request, slug):
@@ -1204,7 +1195,7 @@ def dashboard(request, slug):
         user_filter = {'assignee':str(user.id),'language':'all'}
         user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
         user_tasks = user_tasks.select_related('team_video')
-        _cache_video_url(user_tasks)
+        Task.add_cached_video_urls(user_tasks)
     else:
         user_languages = None
         user_tasks = None
@@ -1255,7 +1246,7 @@ def dashboard(request, slug):
                 break
 
         for video in videos:
-            _cache_video_url(video.tasks)
+            Task.add_cached_video_urls(video.tasks)
     else:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")
         # TED's dashboard should only show TEDTalks videos
@@ -1381,16 +1372,7 @@ def team_tasks(request, slug, project_slug=None):
     from apps.widget.rpc import add_general_settings
     add_general_settings(request, widget_settings)
 
-    team_video_pks = [t.team_video_id for t in tasks]
-    video_pks = (Video.objects.filter(teamvideo__in=team_video_pks)
-                              .values_list('id', flat=True))
-
-    video_urls = dict([(vu.video_id, vu.effective_url) for vu in
-                       VideoUrl.objects.filter(video__in=video_pks,
-                                               primary=True)])
-
-    for t in tasks:
-        t.cached_video_url = video_urls.get(t.team_video.video_id)
+    Task.add_cached_video_urls(tasks)
 
     context = {
         'team': team,
