@@ -55,7 +55,7 @@ from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
-from videos.models import Video, SubtitleVersion, SubtitleLanguage
+from videos.models import Video, VideoUrl, SubtitleVersion, SubtitleLanguage
 from subtitles.models import (
     SubtitleVersion as NewSubtitleVersion,
     SubtitleLanguage as NewSubtitleLanguage,
@@ -1682,6 +1682,21 @@ class Task(models.Model):
     def workflow(self):
         '''Return the most specific workflow for this task's TeamVideo.'''
         return Workflow.get_for_team_video(self.team_video)
+
+    @staticmethod
+    def add_cached_video_urls(tasks):
+        """Add the cached_video_url attribute to a list of atkss
+
+        cached_video_url is the URL as a string for the video.
+        """
+        team_video_pks = [t.team_video_id for t in tasks]
+        video_urls = (VideoUrl.objects
+                      .filter(video__teamvideo__id__in=team_video_pks)
+                      .filter(primary=True))
+        video_url_map = dict((vu.video_id, vu.effective_url)
+                             for vu in video_urls)
+        for t in tasks:
+            t.cached_video_url = video_url_map.get(t.team_video.video_id)
 
 
     def _add_comment(self):

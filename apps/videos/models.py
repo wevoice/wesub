@@ -1526,8 +1526,8 @@ class Action(models.Model):
     objects = ActionManager()
 
     class Meta:
-        ordering = ['-created']
-        get_latest_by = 'created'
+        ordering = ['-id']
+        get_latest_by = 'id'
 
     def __unicode__(self):
         u = self.user and self.user.__unicode__() or 'Anonymous'
