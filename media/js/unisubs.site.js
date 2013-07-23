@@ -164,48 +164,19 @@ var Site = function(Site) {
             $opt.attr('selected', 'selected');
             $select.trigger('liszt:updated');
         },
-        defaultProjFilterOption: function() {
-            /*
-             * Get the project filter option object to use if no project is
-             * specificied in the GET params.
-             */
-            if (window.TEAM_SLUG == 'ted') {
-
-                // If this is a user's task listing, select the 'any project'
-                // option.
-                if (window.ASSIGNEE !== '' && typeof window.ASSIGNEE !== 'undefined') {
-                    return $('option[id="project-opt-any"]');
-                }
-
-                // If this is a video's task listing, select the 'any project'
-                // option.
-                if (window.REQUEST_TEAM_VIDEO && window.REQUEST_TEAM_VIDEO !==  '') {
-                    return $('option[id="project-opt-any"]');
-                
-                // Otherwise, select the TEDTalks project.
-                } else {
-                    $opt = $('option[id="project-opt-tedtalks"]');
-                    if ($opt.length > 0) {
-                        return $opt;
-                    }
-                }
-            }
-            return $('option[id="project-opt-any"]');
-        },
         resetProjFilter: function($select) {
             if (typeof $select == 'undefined') {
-                $select = $('select#project-filter');
+                $select = $('select#id_project');
             }
 
-            if (window.REQUEST_GET_PROJECT) {
-                $opt = $('option[id="project-opt-' + window.REQUEST_GET_PROJECT + '"]');
-            } else {
-                $opt = that.Utils.defaultProjFilterOption();
+            var $defaultOpt = $('option[selected]', $select);
+            // We want to set the selected property, but not change any
+            // attributes.  Newer versions of jquery support this, but for now
+            // we have to use straight javascript to do it.
+            if($defaultOpt.length > 0) {
+                $defaultOpt[0].selected = true;
+                $select.trigger('liszt:updated');
             }
-
-            $select.children().removeAttr('selected');
-            $opt.attr('selected', 'selected');
-            $select.trigger('liszt:updated');
         },
         collapsibleLists: function($lists) {
             $.each($lists, function() {
