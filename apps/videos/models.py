@@ -803,7 +803,7 @@ class Video(models.Model):
         return metadata.get_metadata_for_video(self)
 
     def update_metadata(self, new_metadata, commit=True):
-        return metadata.update_video(self, new_metadata, commit)
+        metadata.update_video(self, new_metadata, commit)
 
     def metadata(self):
         '''Return a dict of metadata for this video.
