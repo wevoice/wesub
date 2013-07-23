@@ -10,8 +10,6 @@ from auth.models import CustomUser as User
 from apps.teams.forms import TaskCreateForm, TaskAssignForm
 from apps.teams.models import Task, Team, TeamVideo, TeamMember
 from apps.videos.models import Video
-from apps.videos.models import SubtitleVersion as OldSubtitleVersion
-from apps.videos.models import SubtitleLanguage as OldSubtitleLanguage
 from utils.tests import TestEditor
 from utils import test_factories
 
@@ -414,17 +412,10 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         # We will move through the task pipeline and set the subtitle_version
         # attribute on each task.  The point is to simple check that we can
         # move through without any exceptions.
-        old_language = OldSubtitleLanguage.objects.create(
-            video=self.team_video.video,
-            is_original=True,
-            language='en',
-            created=datetime.datetime.now())
-        old_version = OldSubtitleVersion.objects.create(
-            language=old_language,
-            datetime_started=datetime.datetime.now(),
-            user=member.user,
-            title='Title',
-            description='Description')
+        old_language = test_factories.create_old_subtitle_language(
+            self.team_video.video, 'en')
+        old_version = test_factories.create_old_subtitle_version(
+            old_language, member.user)
 
         # create the task
         self.submit_create_task(TYPE_SUBTITLE, member.user.pk)

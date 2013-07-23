@@ -159,7 +159,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         """Start Review task, switch to new editor and back to Review.
 
         """
-        self.assertFalse('Needs i2388 fixed')
+        self.skipTest('Needs i2388 fixed')
         self._old_to_new_sv_review()
         self.assertEqual('Swedish subtitles', 
                           self.editor_pg.working_language())

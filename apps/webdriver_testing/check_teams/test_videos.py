@@ -285,6 +285,7 @@ class TestCaseSearch(WebdriverTestCase):
         """Team video search for title text after it has been updated.
 
         """
+        self.skipTest('Needs https://github.com/pculture/unisubs/issues/701')
         tv = self.data_utils.create_video()
 
 

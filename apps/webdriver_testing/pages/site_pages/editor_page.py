@@ -167,11 +167,11 @@ class EditorPage(UnisubsPage):
     def close_metadata(self):
         self.logger.info('closing the metadata')
         work_el = self.is_element_present(self._WORKING_METADATA_EXPANDER)
-        if 'collapsed' not in work_el.get_attribute('class'):
+        if work_el and 'collapsed' not in work_el.get_attribute('class'):
             work_el.click()
 
         ref_el = self.is_element_present(self._REF_METADATA_EXPANDER)
-        if 'collapsed' not in ref_el.get_attribute('class'):
+        if ref_el and 'collapsed' not in ref_el.get_attribute('class'):
             ref_el.click()
 
     def working_language(self):
@@ -228,8 +228,10 @@ class EditorPage(UnisubsPage):
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
-
-        if line !=0:
+        if line == 0:
+            self.click_by_css(self._ADD_SUB_TO_END)
+            position = 0
+        else:
             position = line-1
         els = self.get_elements_list(' '.join([self._WORKING_LIST, 
                                                self._SUBTITLE_ITEM]))

@@ -1165,6 +1165,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
 
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         self.tasks_tab.open_team_page(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
@@ -1183,8 +1184,9 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.open_in_beta_editor(mark_complete=False)
         self.editor_pg.close_metadata()
-        subs = ['third to last', 'pentulitmate subtitle', 'THE END']
-        self.editor_pg.add_subs_to_the_end(subs)
+        subs = ['line 1', 'line 2', 'THE END']
+        self.editor_pg.edit_sub_line(subs, 0)
+
 
         self.editor_pg.save('Exit')
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 

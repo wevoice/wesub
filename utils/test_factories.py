@@ -19,6 +19,7 @@
 """utils.test_factories.py -- Factory methods to create objects for testing
 """
 
+import datetime
 import itertools
 
 from django.contrib.auth.hashers import make_password
@@ -28,6 +29,8 @@ from apps.teams.models import (Project, Team, Task, TeamMember, TeamVideo,
                                Workflow)
 from apps.videos.types import video_type_registrar
 from apps.videos.models import Video, VideoUrl
+from apps.videos.models import SubtitleVersion as OldSubtitleVersion
+from apps.videos.models import SubtitleLanguage as OldSubtitleLanguage
 from apps.subtitles import pipeline
 from apps.accountlinker.models import ThirdPartyAccount
 
@@ -183,3 +186,24 @@ def create_third_party_account(vurl, **kwargs):
     }
     defaults.update(kwargs)
     return ThirdPartyAccount.objects.create(**defaults)
+
+def create_old_subtitle_language(video, language_code='en', **kwargs):
+    defaults = {
+        'video': video,
+        'is_original': True,
+        'language': language_code,
+        'created': datetime.datetime.now(),
+    }
+    defaults.update(kwargs)
+    return OldSubtitleLanguage.objects.create(**defaults)
+
+def create_old_subtitle_version(old_language, user, **kwargs):
+    defaults = {
+        'language': old_language,
+        'datetime_started': datetime.datetime.now(),
+        'user': user,
+        'title': 'Title',
+        'description': 'Description',
+    }
+    defaults.update(kwargs)
+    return OldSubtitleVersion.objects.create(**defaults)
