@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from django.core.urlresolvers import reverse
+from django.utils import translation
 from django.test import TestCase
 import mock
 
@@ -148,3 +150,32 @@ class MetadataFieldsTest(TestCase):
         update_search_index.apply(args=(Video, self.video.pk))
         qs = VideoIndex.public().filter(text='santa')
         self.assertEquals([v.video_id for v in qs], [self.video.video_id])
+
+class MetadataViewsTest(TestCase):
+    def setUp(self):
+        TestCase.setUp(self)
+        self.video = test_factories.create_video()
+        self.video.update_metadata({
+            'location': 'Place',
+        })
+        pipeline.add_subtitles(self.video, 'fr', None, metadata={
+            'location': 'Place-fr',
+        })
+
+    def check_response_location(self, correct_location):
+        url = reverse('videos:video_with_title', kwargs={
+            'video_id': self.video.video_id,
+            'title': self.video.title_for_url(),
+        })
+        response = self.client.get(url)
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.context['metadata'][0]['content'],
+                          correct_location)
+
+    def test_locale_with_metadata(self):
+        translation.activate('fr')
+        self.check_response_location('Place-fr')
+
+    def test_locale_without_metadata(self):
+        translation.activate('de')
+        self.check_response_location('Place')

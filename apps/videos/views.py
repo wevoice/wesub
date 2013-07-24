@@ -299,11 +299,16 @@ def video(request, video, video_url=None, title=None):
         return redirect(video, permanent=True)
 
     video.update_view_counter()
+    language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
+    if language_for_locale:
+        metadata = language_for_locale.get_metadata()
+    else:
+        metadata = video.get_metadata()
 
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
-    context['metadata'] = video.get_metadata().convert_for_display()
+    context['metadata'] = metadata.convert_for_display()
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
     context['language_list'] = LanguageList(video)
     context['shows_widget_sharing'] = video.can_user_see(request.user)
