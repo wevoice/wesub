@@ -117,7 +117,7 @@ class VideosApiClass(object):
             if in_user_language_cmp != 0:
                 return in_user_language_cmp
 
-            if lang1.language in user_langs:
+            if lang1.language_code in user_langs:
                 #both in user's language, sort alphabetically
                 return cmp(lang2.get_language_code_display(), lang1.get_language_code_display())
 
