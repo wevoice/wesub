@@ -1,4 +1,4 @@
-{% load i18n media_compressor %}
+{% load i18n media_compressor metadata_tags %}
 <!DOCTYPE html>
 <html ng-app="amara.SubtitleEditor"
     subtitle-editor
@@ -292,7 +292,7 @@ subtitle-repeat directive, see the working subtitles for more info
                             <textarea placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
                             <div ng-repeat="(key, value) in workingSubtitles.metadata">
                                 <h3>[[ key | metadataTypeName ]]</h2>
-                                <textarea autosize-bind="workingSubtitles.metadata[key]"></textarea>
+                                <textarea placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
                             </div>
                         </div>
                     </div>
