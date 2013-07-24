@@ -400,7 +400,7 @@ class Team(models.Model):
 
         """
         if not hasattr(self, '_videos_count'):
-            setattr(self, '_videos_count', self.videos.count())
+            setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
     @property
