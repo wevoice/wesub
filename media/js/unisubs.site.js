@@ -166,7 +166,7 @@ var Site = function(Site) {
         },
         resetProjFilter: function($select) {
             if (typeof $select == 'undefined') {
-                $select = $('select#id_project');
+                $select = $('select.project-filter');
             }
 
             var $defaultOpt = $('option[selected]', $select);
