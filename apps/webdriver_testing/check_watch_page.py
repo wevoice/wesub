@@ -144,12 +144,9 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         expected_langs = ['English', 'Portuguese']
         if results_pg.search_has_results():
-
             self.assertEqual(expected_langs, results_pg.pulldown_languages(title))
-        
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
-        
+        else: 
+            self.fail('Video search returned no results') 
 
 
 class TestCaseWatchPageListings(WebdriverTestCase):
