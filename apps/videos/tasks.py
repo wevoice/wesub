@@ -476,22 +476,21 @@ def _save_video_feed(feed_url, last_entry_url, user):
 @periodic_task(run_every=timedelta(seconds=300))
 def gauge_videos():
     Gauge('videos.Video').report(Video.objects.count())
-    Gauge('videos.Video-captioned').report(Video.objects.exclude(newsubtitlelanguage_set=None).count())
+    Gauge('videos.Video-captioned').report(
+        SubtitleLanguage.objects.video_count())
     Gauge('videos.SubtitleVersion').report(SubtitleVersion.objects.count())
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
 
 
-# FIXME:
-# @periodic_task(run_every=timedelta(seconds=(60*5)))
-# def gauge_videos_long():
-#     Gauge('videos.Subtitle').report(Subtitle.objects.count())
-
+@periodic_task(run_every=timedelta(seconds=(60*5)))
+def gauge_videos_long():
+    Gauge('videos.Subtitle').report(
+        SubtitleVersion.objects.subtitle_count())
 
 @periodic_task(run_every=timedelta(seconds=60))
 def gague_billing_records():
     from teams.models import BillingRecord
     Gauge('teams.BillingRecord').report(BillingRecord.objects.count())
-
 
 @task
 def sync_latest_versions_for_video(video_pk):

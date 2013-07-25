@@ -602,7 +602,10 @@ var angular = angular || null;
             this.description = '';
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
-            this.metadata = this.video.metadata;
+            this.metadata = {};
+            for(key in this.video.metadata) {
+                this.metadata[key] = '';
+            }
             if(baseLanguage) {
                 this.addSubtitlesFromBaseLanguage(baseLanguage);
             }

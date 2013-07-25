@@ -3,6 +3,7 @@ import os
 import datetime
 import csv
 from collections import defaultdict
+import time
 
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
