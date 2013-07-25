@@ -68,7 +68,7 @@ EOF
             sleep 5
         done
     fi
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/$REV/server_local_settings.py server_local_settings.py
+    s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
 fi
 
 # checkout respective revisions
