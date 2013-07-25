@@ -24,6 +24,7 @@ from datetime import datetime, date, timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import query
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
@@ -227,19 +228,16 @@ class SubtitleLanguageManager(models.Manager):
         return self.get_query_set().extra(where=[
             """
             EXISTS (
-               SELECT 1 FROM subtitles_subtitleversion AS sv
-                INNER JOIN (
-                     SELECT subtitle_language_id,
-                            MAX(version_number) AS tip_version_number
-                       FROM subtitles_subtitleversion AS subver
-                      WHERE NOT subver.visibility_override = 'deleted'
-                      GROUP BY subtitle_language_id
-                ) AS tip_versions ON (
-                    sv.subtitle_language_id = tip_versions.subtitle_language_id
-                    AND sv.version_number = tip_versions.tip_version_number
+                SELECT 1
+                FROM subtitles_subtitleversion AS sv
+                WHERE sv.version_number = (
+                    SELECT MAX(sv2.version_number)
+                    FROM subtitles_subtitleversion sv2
+                    WHERE sv2.subtitle_language_id=subtitles_subtitlelanguage.id
+                    AND sv2.visibility_override != 'deleted'
                 )
-                WHERE sv.subtitle_count > 0
-                  AND sv.subtitle_language_id = subtitles_subtitlelanguage.id
+                AND sv.subtitle_count > 0
+                AND sv.subtitle_language_id=subtitles_subtitlelanguage.id
             )
             """,
         ])
@@ -249,19 +247,16 @@ class SubtitleLanguageManager(models.Manager):
         return self.get_query_set().extra(where=[
             """
             NOT EXISTS (
-               SELECT 1 FROM subtitles_subtitleversion AS sv
-                INNER JOIN (
-                     SELECT subtitle_language_id,
-                            MAX(version_number) AS tip_version_number
-                       FROM subtitles_subtitleversion AS subver
-                      WHERE NOT subver.visibility_override = 'deleted'
-                      GROUP BY subtitle_language_id
-                ) AS tip_versions ON (
-                    sv.subtitle_language_id = tip_versions.subtitle_language_id
-                    AND sv.version_number = tip_versions.tip_version_number
+                SELECT 1
+                FROM subtitles_subtitleversion AS sv
+                WHERE sv.version_number = (
+                    SELECT MAX(sv2.version_number)
+                    FROM subtitles_subtitleversion sv2
+                    WHERE sv2.subtitle_language_id=subtitles_subtitlelanguage.id
+                    AND sv2.visibility_override != 'deleted'
                 )
-                WHERE sv.subtitle_count > 0
-                  AND sv.subtitle_language_id = subtitles_subtitlelanguage.id
+                AND sv.subtitle_count > 0
+                AND sv.subtitle_language_id=subtitles_subtitlelanguage.id
             )
             """,
         ])
@@ -309,6 +304,11 @@ class SubtitleLanguageManager(models.Manager):
             """,
         ])
 
+    def video_count(self):
+        qs = self.get_query_set().extra(select={
+            'video_count': 'count(distinct(video_id))',
+        })
+        return qs.values_list('video_count', flat=True)[0]
 
 class SubtitleLanguage(models.Model):
     """SubtitleLanguages are the equivalent of a 'branch' in a VCS.
@@ -1000,6 +1000,17 @@ class SubtitleVersionManager(models.Manager):
         assert False, ('all() is disabled on SubtitleVersion sets.  '
                        'Use full(), extant(), or public() instead.')
 
+    def subtitle_count(self):
+        qs = self.get_query_set().extra(select={
+            'subs_total': 'SUM(subtitles_subtitleversion.subtitle_count)'
+        }, where=[
+            'subtitles_subtitleversion.version_number = ('
+            'SELECT MAX(version_number) '
+            'FROM subtitles_subtitleversion sv2 '
+            'WHERE sv2.subtitle_language_id = '
+            'subtitles_subtitleversion.subtitle_language_id)'])
+        return qs.values_list('subs_total', flat=True)[0]
+
 ORIGIN_API = 'api'
 ORIGIN_IMPORTED = 'imported'
 ORIGIN_LEGACY_EDITOR = 'web-legacy-editor'
@@ -1386,8 +1397,7 @@ class SubtitleVersion(models.Model):
     def update_metadata(self, new_metadata, commit=True):
         lang = self.subtitle_language
         metadata.update_child_and_video(self, self.video, new_metadata,
-                                        commit,
-                                        lang.is_primary_audio_language())
+                                        commit)
 
     def get_metadata(self):
         return metadata.get_child_metadata(self, self.video)

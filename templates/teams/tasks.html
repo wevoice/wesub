@@ -80,14 +80,9 @@
         <div class="filter-chunk">
             <select id="id_project" name="project"
                     class="project-filter chosen">
-                <option value="
-                        {% url teams:team_tasks team.slug %}{% if team.slug == 'ted' %}{% query_string request.GET project='any' %}{% else %}{% query_string request.GET project='' %}{% endif %}"
-                        id="project-opt-any">{% trans 'any project' %}</option>
+                    <option value=" {% url teams:team_tasks team.slug %}{% if team.slug == 'ted' %}{% query_string request.GET project='any' %}{% else %}{% query_string request.GET project='' %}{% endif %}" id="project-opt-any" {% if not project %}selected="selected"{% endif%}>{% trans 'any project' %}</option>
                 {% for proj in project_choices %}
-                    <option id="project-opt-{{ proj.slug }}"
-                            {% if project == proj %}selected="selected"{% endif %}
-                            value="
-                                    {% url teams:team_tasks team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
+                    <option id="project-opt-{{ proj.slug }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:team_tasks team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
                 {% endfor %}
             </select>
             </select>

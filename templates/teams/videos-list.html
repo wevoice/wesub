@@ -50,7 +50,7 @@
             <p>
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'Videos in' %}</span>
-                    <select name="project-filter" id="project-filter">
+                    <select name="project-filter" id="project-filter" class="project-filter">
                         <option value="{% url teams:detail team.slug %}{% if team.slug == 'ted' %}{% query_string request.GET project='any' %}{% else %}{% query_string request.GET project='' %}{% endif %}" id="project-opt-any">{% trans 'any project' %}</option>
                         {% for proj in project_choices %}
                             <option id="project-opt-{{ proj.slug }}" {% if project == proj %}selected="selected"{% endif %} value="{% url teams:detail team.slug %}{% query_string request.GET project=proj.slug %}">{{ proj.name }}</option>
