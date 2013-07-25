@@ -117,10 +117,11 @@ def get_metadata_for_video(video):
         else:
             name = type_value_to_name[type_val]
             value = getattr(video, content_field(i))
-            rv[name] = value
+            if value:
+                rv[name] = value
     return rv
 
-def update_video(video, new_metadata, commit=True, update_content=True):
+def update_video(video, new_metadata, commit=True):
     """Update a video object bassed on a list of field data
 
     This method sets the type/content fields on video if needed, then returns
@@ -129,12 +130,28 @@ def update_video(video, new_metadata, commit=True, update_content=True):
     :param video: Video object to update
     :param new_metadata: data for the fields as a list of (name, content) tuples
     :param commit: Should we save the video after the update?
-    :param update_content: If false, don't overwrite video content columns
-    :returns: a list of content values, in the same order as the fields are
-    ordered (rv[N] corrsponds for the meta_N_type on video).
     """
-    # make a copy of new_metadata, since we will be removing some of its keys
-    new_metadata = new_metadata.copy()
+    type_names = update_video_types(video, new_metadata.keys(), commit=False)
+    for i, name in enumerate(type_names):
+        if name in new_metadata:
+            setattr(video, content_field(i), new_metadata[name])
+    if commit:
+        video.save()
+
+def update_video_types(video, metadata_types, commit=True):
+    """Update the metadata types for a video.
+
+    This method ensures that a video has a field for all types listed in
+    metadata_types.  If the video doesn't currently have metadata for one of
+    the types, then the content will be set to an empty string.
+
+    :param video: Video object to update
+    :param metadata_types: list of metadata type names
+    :param commit: Should we save the video after the update?
+    :returns: a list of metadata_types for the video, in the order of the
+    fields.  (rv[N] corrsponds for the meta_N_type on video).
+    """
+    current_types = set()
     rv = []
     # go through metadata already stored in the video
     for field_index in xrange(METADATA_FIELD_COUNT):
@@ -142,38 +159,33 @@ def update_video(video, new_metadata, commit=True, update_content=True):
         if type_value is None:
             break
         type_name = type_value_to_name[type_value]
-        if type_name in new_metadata:
-            value = new_metadata.pop(type_name)
-            rv.append(value)
-            if update_content:
-                setattr(video, content_field(field_index), value)
-        else:
-            rv.append('')
+        current_types.add(type_name)
+        rv.append(type_name)
     # go through metadata not yet stored in the video
     # NOTE: after the loop, field_index points to the first metadata that's
     # unused
     changed_video = False
-    for name, content in new_metadata.items():
+    for name in metadata_types:
+        if name in current_types:
+            continue
         type_value = name_to_type_value[name]
         if field_index >= METADATA_FIELD_COUNT:
             raise ValueError("Can only store %s metadata" %
                              METADATA_FIELD_COUNT)
         setattr(video, type_field(field_index), type_value)
-        setattr(video, content_field(field_index), content)
-        rv.append(content)
+        setattr(video, content_field(field_index), '')
+        rv.append(name)
         field_index += 1
         changed_video = True
     if changed_video and commit:
         video.save()
     return rv
 
-def update_child_and_video(child, video, new_metadata, commit=True,
-                           update_video_content=True):
+def update_child_and_video(child, video, new_metadata, commit=True):
     """Update metadata for both a video and a child object """
-    content_data = update_video(video, new_metadata, commit,
-                                update_video_content)
-    for i, content in enumerate(content_data):
-        setattr(child, content_field(i), content)
+    video_types = update_video_types(video, new_metadata.keys(), commit)
+    for i, metadata_type in enumerate(video_types):
+        setattr(child, content_field(i), new_metadata.get(metadata_type, ''))
     if commit:
         child.save()
 
@@ -186,10 +198,7 @@ def get_child_metadata(child, video):
         if type_val is None:
             break
         name = type_value_to_name[type_val]
-        video_content = getattr(video, content_field(i))
         child_content = getattr(child, content_field(i))
         if child_content:
             rv[name] = child_content
-        else:
-            rv[name] = video_content
     return rv

@@ -287,12 +287,12 @@ subtitle-repeat directive, see the working subtitles for more info
                         <h2>{% trans "EDIT TITLE AND DESCRIPTION" %}</h2>
                         <div class="content" ng-show="!collapsed">
                             <h3>{% trans "TITLE" %}</h3>
-                            <textarea placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
+                            <textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
                             <h3>{% trans "DESCRIPTION" %}</h3>
-                            <textarea placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
+                            <textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
                             <div ng-repeat="(key, value) in workingSubtitles.metadata">
                                 <h3>[[ key | metadataTypeName ]]</h2>
-                                <textarea autosize-bind="workingSubtitles.metadata[key]"></textarea>
+                                <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
                             </div>
                         </div>
                     </div>

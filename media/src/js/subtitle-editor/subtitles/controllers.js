@@ -526,8 +526,11 @@ var angular = angular || null;
         var language = $scope.workingSubtitles.language;
         $scope.collapsed = language.isPrimaryAudioLanguage;
         $scope.onExpanderClicked = function($event) {
-            $scope.collapsed = !$scope.collapsed;
+            $scope.$root.$emit('metadata-expander-clicked');
             $event.preventDefault();
         }
+        $scope.$root.$on('metadata-expander-clicked', function() {
+            $scope.collapsed = !$scope.collapsed;
+        });
     });
 }).call(this);
