@@ -52,10 +52,15 @@ EOF
 
     chown root:root /etc/s3cfg
     chmod 600 /etc/s3cfg
-    # get private key from s3 to clone private repo
+
     mkdir -p /root/.ssh
+    # get private key from s3 to clone private repo
     s3cmd -c /etc/s3cfg get --force s3://amara/admin/keys/git-pcf /root/.ssh/git_id_rsa
     chmod 600 /root/.ssh/git_id_rsa
+    cat << EOF > /root/.ssh/config
+Host github.com
+    IdentityFile /root/.ssh/git_id_rsa
+EOF
     cd $APP_DIR
     if [ ! -e "unisubs-integration" ]; then
         until git clone git@github.com:pculture/unisubs-integration.git ; do
