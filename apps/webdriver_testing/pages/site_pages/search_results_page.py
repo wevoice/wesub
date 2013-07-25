@@ -22,6 +22,10 @@ class SearchResultsPage(VideoListings):
     _VIEWS_MONTH_SORT = "div#sidebar ul li a[value=month_views]"
     _VIEWS_TOTAL_SORT = "div#sidebar ul li a[value=total_views]"
     _FIRST_SEARCH_RESULT = "ul.video_list li a"
+    _VIDEO = 'ul.video_list li.Video_list_item'
+    _LANG_PULLDOWN = "ul.details li div.lang_arrow "
+    _MENU_LANGS = 'div.lang_menu div.bd a span'
+
 
     def search_has_no_results(self):
         time.sleep(5)
@@ -59,4 +63,23 @@ class SearchResultsPage(VideoListings):
         if search in self.get_text_by_css(self._PAGE_HEADING):
             return True
 
+    def _video_element(self, title):
+        video_els = self.browser.find_elements_by_css_selector(
+                         self._VIDEO)
+        for el in video_els:
+            if title in el.text:
+                print el.text
+                return el
+
+
+    def pulldown_languages(self, title):
+        el = self._video_element(title)
+        self.logger.info(el.text)
+
+        menu_el = el.find_element_by_css_selector(self._LANG_PULLDOWN)
+        menu_el.click()
+        menu_langs = []
+        lang_els = menu_el.find_elements_by_css_selector(self._MENU_LANGS)
+        menu_langs = [m.text for m in lang_els]
+        return menu_langs
         

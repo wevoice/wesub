@@ -4,7 +4,8 @@ from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import watch_page
 from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.pages.site_pages import search_results_page
-from apps.webdriver_testing.data_factories import UserFactory 
+from apps.webdriver_testing.data_factories import UserFactory
+from apps.webdriver_testing.data_factories import UserLangFactory
 from apps.webdriver_testing.data_factories import VideoFactory 
 from apps.webdriver_testing import data_helpers
 from django.core import management
@@ -130,6 +131,22 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         self.assertTrue(results_pg.page_has_video(
             'original ar with en complete subs'))
         self.assertEqual(1, len(results_pg.page_videos()))
+
+    def test_result__language_menu(self):
+        user = UserFactory()
+        user_speaks = ['en', 'pt', 'ru', 'ar']
+        for lang in user_speaks:
+            UserLangFactory(user = user,
+                            language = lang)
+        self.watch_pg.log_in(user.username, 'password')
+        test_text = 'english'
+        title = 'original english with incomplete'
+        results_pg = self.watch_pg.basic_search(test_text)
+        expected_langs = ['English', 'Portuguese']
+        if results_pg.search_has_results():
+            self.assertEqual(expected_langs, results_pg.pulldown_languages(title))
+        else: 
+            self.fail('Video search returned no results') 
 
 
 class TestCaseWatchPageListings(WebdriverTestCase):
