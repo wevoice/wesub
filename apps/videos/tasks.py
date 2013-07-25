@@ -482,7 +482,7 @@ def gauge_videos():
     Gauge('videos.SubtitleLanguage').report(SubtitleLanguage.objects.count())
 
 
-@periodic_task(run_every=timedelta(seconds=(60*5)))
+@periodic_task(run_every=timedelta(days=1))
 def gauge_videos_long():
     Gauge('videos.Subtitle').report(
         SubtitleVersion.objects.subtitle_count())
