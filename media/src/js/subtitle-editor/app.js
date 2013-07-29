@@ -77,6 +77,11 @@ var angular = angular || null;
             currentTime: null,
             duration: null,
         };
+        // Hide the loading modal after we are done with bootstrapping
+        // everything
+        $scope.$evalAsync(function() {
+            $scope.$root.$emit('hide-modal');
+        });
     });
 
     /* AppController is large, so we split it into several components to

@@ -41,6 +41,7 @@ var USER_IDLE_MINUTES = 5;
             var endHelper = $('div.sync-help.end', elem);
             var infoTray = $('div.info-tray', elem);
             var subtitleList = $('.subtitles ul', elem);
+            var currentArrow = undefined;
             var wrapper = $(elem);
 
             function getSubtitleTop(index) {
@@ -92,6 +93,7 @@ var USER_IDLE_MINUTES = 5;
             }
 
             scope.positionInfoTray = function() {
+                var BUFFER = 22;
                 var subtitle = scope.currentEdit.storedSubtitle();
                 if(subtitle === null) {
                     infoTray.hide();
@@ -99,17 +101,33 @@ var USER_IDLE_MINUTES = 5;
                 }
                 var li = scope.getSubtitleRepeatItem(subtitle);
                 if(li) {
+                    currentArrow = li.find(".arrow");
                     var top = li.offset().top - wrapper.offset().top;
-                    if(top >= 0 && top < wrapper.height()) {
+                    var bottom = top + li.height();
+
+                    var infoTrayBottom = infoTray.height() + top;
+                    var willTrim = wrapper.height() < infoTrayBottom;
+                    if (willTrim) {
+                        var adjustedTop = top - (infoTrayBottom - wrapper.height());
+                        if (adjustedTop + BUFFER < bottom && adjustedTop - BUFFER > top - infoTray.height()) {
+                            top = adjustedTop;
+                        }
+                    }
+                    if(top + BUFFER >= 0 && top + BUFFER < wrapper.height()) {
                         infoTray.css('top', top + 'px');
                         infoTray.show();
+                        currentArrow.show();
                     } else {
                         infoTray.hide();
+                        currentArrow.hide();
                     }
                 }
             }
 
             scope.$watch("currentEdit.draft", function() {
+                if (currentArrow) {
+                    currentArrow.hide(); // Kinda hate this, i think it would be cleaner to give each line its own controller
+                }
                 scope.positionInfoTray();
             });
 

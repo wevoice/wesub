@@ -46,36 +46,31 @@ var angular = angular || null;
         $scope.versionNumber = null;
         $scope.currentVersion = null;
         $scope.versions = [];
-        $scope.languageChanged = function(language, versionNumber) {
-            if (!language) {
+        $scope.languageChanged = function() {
+            if (!$scope.language) {
                 return;
             }
 
-            $scope.versions = _.sortBy(language.versions, function(item) {
+            $scope.versions = _.sortBy($scope.language.versions, function(item) {
                 return item.version_no;
             }).reverse();
 
-            if (isNaN(parseInt(versionNumber))) {
-                // No version number given, select the last version (AKA first
-                // verison in the dropdown)
-                versionNumber = null;
-                for(var i=0; i < $scope.versions.length; i++) {
-                    if($scope.versions[i].visibility == 'Public') {
-                        versionNumber = $scope.versions[i].version_no;
-                        break;
-                    }
-                }
+            $scope.versionNumber = getLastPublicVersion();
+            if($scope.versionNumber !== null) {
+                loadSubtitles();
+            } else {
+                loadEmptySubtitles();
+            }
+        };
 
-                if(versionNumber === null) {
-                    $scope.versionNumber = null;
-                    loadEmptySubtitles();
-                    return;
+        function getLastPublicVersion() {
+            for(var i=0; i < $scope.versions.length; i++) {
+                if($scope.versions[i].visibility == 'Public') {
+                    return $scope.versions[i].version_no.toString();
                 }
             }
-
-            $scope.versionNumber = versionNumber.toString();
-            loadSubtitles();
-        };
+            return null;
+        }
         $scope.findVersion = function(versionNumber) {
             for(var i = 0; i < $scope.versions.length; i++) {
                 if($scope.versions[i].version_no == versionNumber) {
@@ -131,16 +126,13 @@ var angular = angular || null;
         }
 
         $scope.setInitialDisplayLanguage = function(allLanguages) {
-
-            // Hide the loading modal
-            $scope.$root.$emit('hide-modal');
             $scope.languages = allLanguages;
             $scope.language = pickInitialLanguage();
-            $scope.languageChanged($scope.language, "");
+            $scope.languageChanged();
         }
 
         $scope.$watch('language', function(newValue, oldValue) {
-            $scope.languageChanged(newValue, "");
+            $scope.languageChanged();
         });
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     });

@@ -526,20 +526,6 @@ section.main {
                     padding-left: 20px;
                 }
             }
-            &:before {
-                /* Draws a triangle in the middle of the box.
-                 */
-                position: absolute;
-                top: 8px;
-                right: 100%;
-                content: "";
-                display: block;
-                height: 0px;
-                width: 0px;
-                border-top: 15px solid transparent;
-                border-bottom: 15px solid transparent;
-                border-right: 15px solid #e4e5e6;
-            }
         }
     }
     div.subtitles {
@@ -572,7 +558,7 @@ section.main {
                     width: 100%;
                     border: 0;
                     color: #565758;
-                    font-size: 12px;
+                    font: normal 12px $OpenSans;
                     resize: none;
                 }
             }
@@ -615,7 +601,18 @@ section.main {
                 font-size: 12px;
                 line-height: 25px;
                 position: relative;
-
+            span.arrow {
+                position: absolute;
+                top: 8px;
+                right: 0px;
+                content: "";
+                display: none;
+                height: 0px;
+                width: 0px;
+                border-top: 15px solid transparent;
+                border-bottom: 15px solid transparent;
+                border-right: 15px solid #e4e5e6;
+            }
             span.timing {
                 color: #9A9B9C;
                 display: block;
@@ -672,6 +669,7 @@ section.main {
                         }
                     }
                 }
+
                 textarea, span.subtitle-text {
                     border: 0;
                     border-top: 1px solid #EBECED;
