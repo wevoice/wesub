@@ -501,11 +501,9 @@ class Rpc(BaseRpc):
             return { 'response': 'unlockable' }
         else:
             language.writelock(request.user, request.browser_id)
-            language.save()
             video_cache.writelock_add_lang(
                 language.video.video_id, language.language_code)
             return { 'response': 'ok' }
-
 
     # Permissions
     def can_user_edit_video(self, request, video_id):
