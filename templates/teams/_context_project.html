@@ -27,7 +27,7 @@
     </li>
     <li>
         <div>
-            <p>{{ project.tasks_count|simplify_number }}</p>
+            <p>{% if project.tasks_count > 1000 %}{% trans "> 1000" %}{% else %}{{ project.tasks_count }} {% endif %}</p>
             <h4>{% trans "Task" %}{{ project.tasks_count|pluralize }}</h4>
         </div>
     </li>

@@ -60,7 +60,7 @@
     {% if team.workflow_enabled %}
         <li>
             <a href="{% url teams:team_tasks team.slug %}?assignee=none">
-                <p>{{ team.tasks_count|simplify_number }}</p>
+                <p>{% if team.tasks_count > 1000 %}{% trans "> 1000" %}{% else %}{{ team.tasks_count }} {% endif %}</p>
                 <h4>{% trans "Task" %}{{ team.tasks_count|pluralize }}</h4>
             </a>
         </li>
