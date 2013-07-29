@@ -2024,6 +2024,9 @@ class Task(models.Model):
 
     def get_perform_url(self):
         """Return a URL for whatever dialog is used to perform this task."""
+        return reverse('teams:perform_task', args=(self.team.slug, self.id))
+
+    def get_widget_url(self):
 
         mode = Task.TYPE_NAMES[self.type].lower()
 

@@ -1427,11 +1427,12 @@ def perform_task(request, slug=None, task_pk=None):
     if not can_perform_task(request.user, task):
         return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
 
-    task.assignee = request.user
-    task.save()
+    if task.assignee_id != request.user.id:
+        task.assignee = request.user
+        task.save()
 
     # ... perform task ...
-    return HttpResponseRedirect(task.get_perform_url())
+    return HttpResponseRedirect(task.get_widget_url())
 
 def _delete_subtitle_version(version):
     sl = version.subtitle_language
