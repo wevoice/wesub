@@ -590,7 +590,11 @@ var angular = angular || null;
                     function(subtitleData) {
                 that.state = 'loaded';
                 that.title = subtitleData.title;
-                that.metadata = subtitleData.metadata;
+                debugger;
+                that.initMetadataFromVideo()
+                for(key in subtitleData.metadata) {
+                    that.metadata[key] = subtitleData.metadata[key];
+                }
                 that.description = subtitleData.description;
                 that.subtitleList.loadXML(subtitleData.subtitles);
             });
@@ -602,12 +606,15 @@ var angular = angular || null;
             this.description = '';
             this.subtitleList.loadXML(null);
             this.state = 'loaded';
+            this.initMetadataFromVideo()
+            if(baseLanguage) {
+                this.addSubtitlesFromBaseLanguage(baseLanguage);
+            }
+        },
+        initMetadataFromVideo: function() {
             this.metadata = {};
             for(key in this.video.metadata) {
                 this.metadata[key] = '';
-            }
-            if(baseLanguage) {
-                this.addSubtitlesFromBaseLanguage(baseLanguage);
             }
         },
         addSubtitlesFromBaseLanguage: function(baseLanguage) {

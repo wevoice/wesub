@@ -1182,6 +1182,9 @@ class Rpc(BaseRpc):
             subtitles = SubtitleSet(language_code).to_xml()
             is_latest = True
             metadata = language.get_metadata()
+            for key in language.video.get_metadata():
+                if key not in metadata:
+                    metadata[key] = ''
         else:
             version = version or latest_version
             version_number = version.version_number
@@ -1189,6 +1192,9 @@ class Rpc(BaseRpc):
             language = version.subtitle_language
             language_code = language.language_code
             metadata = version.get_metadata()
+            for key in version.video.get_metadata():
+                if key not in metadata:
+                    metadata[key] = ''
 
         if latest_version is None or version_number >= latest_version.version_number:
             is_latest = True
