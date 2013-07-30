@@ -79,6 +79,7 @@ class SearchResultsPage(VideoListings):
         menu_el = el.find_element_by_css_selector(self._LANG_PULLDOWN)
         menu_el.click()
         menu_langs = []
+        self.wait_for_element_visible(self._MENU_LANGS)
         lang_els = menu_el.find_elements_by_css_selector(self._MENU_LANGS)
         menu_langs = [m.text for m in lang_els]
         return menu_langs
