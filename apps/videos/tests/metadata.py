@@ -15,7 +15,7 @@ class MetadataFieldsTest(TestCase):
     def setUp(self):
         TestCase.setUp(self)
         self.video = test_factories.create_video()
-    
+
     def test_metadata_starts_blank(self):
         version = pipeline.add_subtitles(self.video, 'en', None)
         self.assertEquals(self.video.get_metadata(), {})
@@ -31,7 +31,10 @@ class MetadataFieldsTest(TestCase):
         self.assertEquals(version.get_metadata(),  metadata)
         # the video should still have no metadata set
         self.video = Video.objects.get(pk=self.video.pk)
-        self.assertEquals(self.video.get_metadata(), {})
+        self.assertEquals(self.video.get_metadata(), {
+            'speaker-name': '',
+            'location': '',
+        })
 
     def test_update_video(self):
         # test that when we set metadata for the primary language, it updates
@@ -82,7 +85,10 @@ class MetadataFieldsTest(TestCase):
                                          metadata=metadata)
         version2 = pipeline.add_subtitles(self.video, 'fr', None,
                                           metadata=None)
-        self.assertEquals(version2.get_metadata(),  {})
+        self.assertEquals(version2.get_metadata(),  {
+            'speaker-name': '',
+            'location': '',
+        })
 
     def test_additional_field_in_update(self):
         metadata_1 = { 'speaker-name': 'Santa', }
@@ -111,9 +117,10 @@ class MetadataFieldsTest(TestCase):
         # version 2 only has 1 field
         version2 = pipeline.add_subtitles(self.video, 'en', None,
                                           metadata=metadata_2)
-        # version2 should not have data for version
+        # version2 should not have data for location
         self.assertEquals(version2.get_metadata(), {
             'speaker-name': 'Santa',
+            'location': '',
         })
 
     def test_metadata_display(self):
@@ -150,6 +157,13 @@ class MetadataFieldsTest(TestCase):
         update_search_index.apply(args=(Video, self.video.pk))
         qs = VideoIndex.public().filter(text='santa')
         self.assertEquals([v.video_id for v in qs], [self.video.video_id])
+
+    def test_metadata_content_empty(self):
+        self.video.update_metadata({'speaker-name': ''})
+        # get_metadata() should return metadata with the key
+        self.assertEquals(self.video.get_metadata(), {'speaker-name': ''})
+        # but convert_for_display() should eliminate the value
+        self.assertEquals(self.video.get_metadata().convert_for_display(), [])
 
 class MetadataViewsTest(TestCase):
     def setUp(self):
