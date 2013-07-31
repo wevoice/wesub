@@ -8,6 +8,7 @@ from apps.teams.models import (
 )
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.pipeline import add_subtitles
+from apps.teams.models import BillingRecord
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.types.youtube import FROM_YOUTUBE_MARKER
@@ -24,11 +25,11 @@ class BillingTest(TestCase):
     ]
 
     def setUp(self):
-        self.video  = get_video()
-        self.team =Team.objects.all()[0]
+        self.video = get_video()
+        self.team = Team.objects.all()[0]
         TeamVideo.objects.get_or_create(video=self.video, team=self.team,
-                                        added_by = get_user()
-        )
+                                        added_by=get_user())
+
     def test_approved(self):
 
         self.assertEquals(0, Workflow.objects.count())
@@ -125,9 +126,6 @@ class BillingTest(TestCase):
         self.assertTrue(sl_cs.pk in imported_pks)
 
     def test_record_insertion(self):
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -178,8 +176,6 @@ class BillingTest(TestCase):
         Create a version not synced.
         Then later
         """
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -204,8 +200,6 @@ class BillingTest(TestCase):
         Create a translation.
         Then later finish the original one
         """
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -246,11 +240,6 @@ class BillingTest(TestCase):
 
 
     def test_two_languages(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -266,11 +255,6 @@ class BillingTest(TestCase):
         self.assertEquals(2, BillingRecord.objects.all().count())
 
     def test_incomplete_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -284,11 +268,6 @@ class BillingTest(TestCase):
         self.assertEquals(0, BillingRecord.objects.all().count())
 
     def test_original_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
