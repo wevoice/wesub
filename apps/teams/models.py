@@ -2662,8 +2662,8 @@ class BillingReport(models.Model):
                 'Billable minutes', 'Version created', 'Language number',
                 'Team'
         ]
-
         return  self._get_row_data(host, header)
+
     def process(self):
         """
         Generate the correct rows (including headers), saves it to a tempo file,
@@ -2688,6 +2688,7 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
+
     @property
     def start_str(self):
         return self.start_date.strftime("%Y%m%d")
@@ -2733,7 +2734,7 @@ class BillingRecordManager(models.Manager):
                     r.team.slug,
                     r.created.strftime('%Y-%m-%d %H:%M:%S'),
                     r.source,
-                    r.user.username
+                    r.user.username.encode('utf-8'),
                 ])
 
         return rows
