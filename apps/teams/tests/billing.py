@@ -170,7 +170,7 @@ class OldBillingTest(TestCase):
         csv_data = BillingRecord.objects.csv_report_for_team(team, start, end)
 
         self.assertEquals(2, len(csv_data))
-        self.assertEquals(9, len(csv_data[1]))
+        self.assertEquals(10, len(csv_data[1]))
 
         # 2
         sv = add_subtitles(video, 'en', make_subtitle_lines(4), author=user, created=now)
