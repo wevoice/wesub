@@ -20,7 +20,8 @@ from utils import test_factories
 
 import mock
 
-class BillingTest(TestCase):
+class OldBillingTest(TestCase):
+    # FIXME: should move this away from using fixtures
     fixtures = [
         "staging_users.json",
         "staging_teams.json"
@@ -316,3 +317,86 @@ class BillingTest(TestCase):
         )
         report.teams.add(self.team)
         self.process_report(report)
+
+class CreationDateMaker(object):
+    """Get creation dates to use for new subtitle versions."""
+    def __init__(self):
+        self.current_date = self.start_date()
+
+    def next_date(self):
+        self.current_date += timedelta(days=1)
+        return self.current_date
+
+    def date_before_start(self):
+        return self.start_date() - timedelta(days=1)
+
+    def start_date(self):
+        return datetime(2012, 1, 1, 0, 0, 0)
+
+    def end_date(self):
+        return self.current_date + timedelta(days=1)
+
+class BillingTest(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team()
+
+    def add_subtitles(self, video, *args, **kwargs):
+        version = add_subtitles(video, *args, **kwargs)
+        BillingRecord.objects.insert_record(version)
+        return version
+
+    def get_report_data(self, team, start_date, end_date):
+        """Get report data in an easy to test way.
+        """
+        csv_data = BillingRecord.objects.csv_report_for_team(
+            team, start_date, end_date, add_header=True)
+        header_row = csv_data[0]
+        rv = {}
+        rv['record count'] = len(csv_data) - 1
+        for row in csv_data[1:]:
+            row_data = dict((header, value)
+                            for (header, value)
+                            in zip(header_row, row))
+            video_id = row_data['Video ID']
+            language_code = row_data['Language']
+            if video_id not in rv:
+                rv[video_id] = {}
+            self.assert_(language_code not in rv[video_id])
+            rv[video_id][language_code] = row_data
+        return rv
+
+    def test_language_number(self):
+        date_maker = CreationDateMaker()
+        user = test_factories.create_team_member(self.team).user
+
+        video = test_factories.create_video(primary_audio_language_code='en')
+        test_factories.create_team_video(self.team, user, video)
+        self.add_subtitles(video, 'en', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+        self.add_subtitles(video, 'fr', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+        self.add_subtitles(video, 'de', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+
+        video2 = test_factories.create_video(primary_audio_language_code='en')
+        test_factories.create_team_video(self.team, user, video2)
+        # the english version was added before the date range of the report.
+        # It should still bump the language number though.
+        self.add_subtitles(video2, 'en', make_subtitle_lines(4),
+                           created=date_maker.date_before_start(),
+                           complete=True)
+        self.add_subtitles(video2, 'fr', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+
+        data = self.get_report_data(self.team,
+                                           date_maker.start_date(),
+                                           date_maker.end_date())
+        self.assertEquals(data['record count'], 4)
+        self.assertEquals(data[video.video_id]['en']['Language number'], 1)
+        self.assertEquals(data[video.video_id]['fr']['Language number'], 2)
+        self.assertEquals(data[video.video_id]['de']['Language number'], 3)
+        self.assertEquals(data[video2.video_id]['fr']['Language number'], 2)
