@@ -232,7 +232,7 @@ class TestCaseBilling(WebdriverTestCase):
         report.process()
         bill = csv.DictReader(open('user-data/%s' %report.csv_file))
         expected_fields = ['Video Title', 'Video ID', 'Language', 'Minutes', 
-                           'Original', 'Team', 'Created', 'Source', 'User']
+                           'Original', 'Language number', 'Team', 'Created', 'Source', 'User']
         self.assertEqual(expected_fields, bill.fieldnames)
 
 
@@ -273,7 +273,7 @@ class TestCaseBilling(WebdriverTestCase):
                                                   'New model')
         report_dl = self.billing_pg.check_latest_report_url()
         self.logger.info(report_dl)
-        new_headers = 'Video Title,Video ID,Language,Minutes,Original,Team,Created,Source,User' 
+        new_headers = 'Video Title,Video ID,Language,Minutes,Original,Language number,Team,Created,Source,User' 
         self.assertEqual(6, len(report_dl))
         self.assertEqual(new_headers, report_dl[0])
 
@@ -305,7 +305,7 @@ class TestCaseBilling(WebdriverTestCase):
                                                   'New model')
         report_dl = self.billing_pg.check_latest_report_url()
         self.logger.info(report_dl)
-        new_headers = 'Video Title,Video ID,Language,Minutes,Original,Team,Created,Source,User' 
+        new_headers = 'Video Title,Video ID,Language,Minutes,Original,Language number,Team,Created,Source,User' 
         self.assertEqual(8, len(report_dl))
         self.assertEqual(new_headers, report_dl[0])
 
