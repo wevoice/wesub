@@ -16,7 +16,9 @@ from apps.videos.tests.data import (
     make_subtitle_lines, make_subtitle_language, get_video, get_user,
     make_subtitle_version
 )
+from utils import test_factories
 
+import mock
 
 class BillingTest(TestCase):
     fixtures = [
@@ -29,6 +31,14 @@ class BillingTest(TestCase):
         self.team = Team.objects.all()[0]
         TeamVideo.objects.get_or_create(video=self.video, team=self.team,
                                         added_by=get_user())
+
+    def process_report(self, report):
+        # don't really save the report, since that would try to upload the csv
+        # file to S3
+        with mock.patch_object(report, 'save') as mock_save:
+            report.process()
+            self.assertEquals(mock_save.call_count, 1)
+        return report.csv_file.read()
 
     def test_approved(self):
 
@@ -282,3 +292,27 @@ class BillingTest(TestCase):
 
         br = BillingRecord.objects.all()[0]
         self.assertFalse(br.is_original)
+
+    def test_non_ascii_text(self):
+        non_ascii_text = u'abcd\xe9'
+
+        user = test_factories.create_user(username=non_ascii_text)
+        test_factories.create_team_member(self.team, user)
+
+        self.video.title = non_ascii_text
+        self.video.save()
+
+        sv = add_subtitles(self.video, 'en', make_subtitle_lines(4), 
+                           title=non_ascii_text,
+                           author=user,
+                           description=non_ascii_text,
+                           complete=True)
+        video_changed_tasks(self.video.pk, sv.pk)
+
+        report = BillingReport.objects.create(
+            start_date=sv.created - timedelta(days=1),
+            end_date=sv.created + timedelta(days=1),
+            type=BillingReport.TYPE_NEW,
+        )
+        report.teams.add(self.team)
+        self.process_report(report)
