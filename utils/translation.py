@@ -44,6 +44,13 @@ def get_language_choices(with_empty=False):
 
     return languages
 
+def get_language_choices_as_dicts(with_empty=False):
+    """Return a list of language code choices labeled appropriately."""
+    return [
+        {'code': code, 'name': name}
+        for (code, name) in get_language_choices(with_empty)
+    ]
+
 def get_language_label(code):
     """Return the translated, human-readable label for the given language code."""
     lc = LanguageCode(code, 'unisubs')
