@@ -62,6 +62,9 @@ Host github.com
     IdentityFile /root/.ssh/git_id_rsa
 EOF
     cd $APP_DIR
+    git checkout staging
+    git reset --hard
+    git pull --no-ff
     if [ ! -e "unisubs-integration" ]; then
         until git clone git@github.com:pculture/unisubs-integration.git ; do
             echo "Error during clone; trying again in 5 seconds..."
@@ -76,6 +79,7 @@ cd $APP_DIR
 git checkout $REV
 if [ -e $APP_DIR/unisubs-integration ]; then
     cd $APP_DIR/unisubs-integration
+    git checkout master
     git pull --no-ff
     INTEGRATION_REV=`cat ../optional/unisubs-integration`
     git checkout $INTEGRATION_REV

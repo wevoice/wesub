@@ -315,7 +315,7 @@ def team_projects(context, team, varname):
     {% endfor %}
 
     """
-    context[varname] = Project.objects.for_team(team).annotate(Count('teamvideo'))
+    context[varname] = Project.objects.for_team(team)
     return ""
 
 @tag(register, [Variable(), Constant("as"), Name()])

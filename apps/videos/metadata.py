@@ -102,7 +102,10 @@ class MetadataDict(dict):
         return [{
             'label': _(name_to_label[name]),
             'content': content,
-        } for (name, content) in self.items()]
+        }
+            for (name, content) in self.items()
+            if content != ''
+        ]
 
 def get_metadata_for_video(video):
     """Get a list of metadata for a video
@@ -117,8 +120,7 @@ def get_metadata_for_video(video):
         else:
             name = type_value_to_name[type_val]
             value = getattr(video, content_field(i))
-            if value:
-                rv[name] = value
+            rv[name] = value
     return rv
 
 def update_video(video, new_metadata, commit=True):
@@ -199,6 +201,5 @@ def get_child_metadata(child, video):
             break
         name = type_value_to_name[type_val]
         child_content = getattr(child, content_field(i))
-        if child_content:
-            rv[name] = child_content
+        rv[name] = child_content
     return rv

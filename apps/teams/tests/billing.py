@@ -8,6 +8,7 @@ from apps.teams.models import (
 )
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.pipeline import add_subtitles
+from apps.teams.models import BillingRecord
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.types.youtube import FROM_YOUTUBE_MARKER
@@ -15,20 +16,31 @@ from apps.videos.tests.data import (
     make_subtitle_lines, make_subtitle_language, get_video, get_user,
     make_subtitle_version
 )
+from utils import test_factories
 
+import mock
 
-class BillingTest(TestCase):
+class OldBillingTest(TestCase):
+    # FIXME: should move this away from using fixtures
     fixtures = [
         "staging_users.json",
         "staging_teams.json"
     ]
 
     def setUp(self):
-        self.video  = get_video()
-        self.team =Team.objects.all()[0]
+        self.video = get_video()
+        self.team = Team.objects.all()[0]
         TeamVideo.objects.get_or_create(video=self.video, team=self.team,
-                                        added_by = get_user()
-        )
+                                        added_by=get_user())
+
+    def process_report(self, report):
+        # don't really save the report, since that would try to upload the csv
+        # file to S3
+        with mock.patch_object(report, 'save') as mock_save:
+            report.process()
+            self.assertEquals(mock_save.call_count, 1)
+        return report.csv_file.read()
+
     def test_approved(self):
 
         self.assertEquals(0, Workflow.objects.count())
@@ -125,9 +137,6 @@ class BillingTest(TestCase):
         self.assertTrue(sl_cs.pk in imported_pks)
 
     def test_record_insertion(self):
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -178,8 +187,6 @@ class BillingTest(TestCase):
         Create a version not synced.
         Then later
         """
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -204,8 +211,6 @@ class BillingTest(TestCase):
         Create a translation.
         Then later finish the original one
         """
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -246,11 +251,6 @@ class BillingTest(TestCase):
 
 
     def test_two_languages(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -266,11 +266,6 @@ class BillingTest(TestCase):
         self.assertEquals(2, BillingRecord.objects.all().count())
 
     def test_incomplete_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -284,11 +279,6 @@ class BillingTest(TestCase):
         self.assertEquals(0, BillingRecord.objects.all().count())
 
     def test_original_language(self):
-        from apps.teams.models import BillingRecord
-        from apps.videos.tasks import video_changed_tasks
-
-        BillingRecord.objects.all().delete()
-
         user = User.objects.all()[0]
 
         video = Video.objects.filter(teamvideo__isnull=False)[0]
@@ -303,3 +293,110 @@ class BillingTest(TestCase):
 
         br = BillingRecord.objects.all()[0]
         self.assertFalse(br.is_original)
+
+    def test_non_ascii_text(self):
+        non_ascii_text = u'abcd\xe9'
+
+        user = test_factories.create_user(username=non_ascii_text)
+        test_factories.create_team_member(self.team, user)
+
+        self.video.title = non_ascii_text
+        self.video.save()
+
+        sv = add_subtitles(self.video, 'en', make_subtitle_lines(4), 
+                           title=non_ascii_text,
+                           author=user,
+                           description=non_ascii_text,
+                           complete=True)
+        video_changed_tasks(self.video.pk, sv.pk)
+
+        report = BillingReport.objects.create(
+            start_date=sv.created - timedelta(days=1),
+            end_date=sv.created + timedelta(days=1),
+            type=BillingReport.TYPE_NEW,
+        )
+        report.teams.add(self.team)
+        self.process_report(report)
+
+class CreationDateMaker(object):
+    """Get creation dates to use for new subtitle versions."""
+    def __init__(self):
+        self.current_date = self.start_date()
+
+    def next_date(self):
+        self.current_date += timedelta(days=1)
+        return self.current_date
+
+    def date_before_start(self):
+        return self.start_date() - timedelta(days=1)
+
+    def start_date(self):
+        return datetime(2012, 1, 1, 0, 0, 0)
+
+    def end_date(self):
+        return self.current_date + timedelta(days=1)
+
+class BillingTest(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team()
+
+    def add_subtitles(self, video, *args, **kwargs):
+        version = add_subtitles(video, *args, **kwargs)
+        BillingRecord.objects.insert_record(version)
+        return version
+
+    def get_report_data(self, team, start_date, end_date):
+        """Get report data in an easy to test way.
+        """
+        csv_data = BillingRecord.objects.csv_report_for_team(
+            team, start_date, end_date, add_header=True)
+        header_row = csv_data[0]
+        rv = {}
+        rv['record count'] = len(csv_data) - 1
+        for row in csv_data[1:]:
+            row_data = dict((header, value)
+                            for (header, value)
+                            in zip(header_row, row))
+            video_id = row_data['Video ID']
+            language_code = row_data['Language']
+            if video_id not in rv:
+                rv[video_id] = {}
+            self.assert_(language_code not in rv[video_id])
+            rv[video_id][language_code] = row_data
+        return rv
+
+    def test_language_number(self):
+        date_maker = CreationDateMaker()
+        user = test_factories.create_team_member(self.team).user
+
+        video = test_factories.create_video(primary_audio_language_code='en')
+        test_factories.create_team_video(self.team, user, video)
+        self.add_subtitles(video, 'en', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+        self.add_subtitles(video, 'fr', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+        self.add_subtitles(video, 'de', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+
+        video2 = test_factories.create_video(primary_audio_language_code='en')
+        test_factories.create_team_video(self.team, user, video2)
+        # the english version was added before the date range of the report.
+        # It should still bump the language number though.
+        self.add_subtitles(video2, 'en', make_subtitle_lines(4),
+                           created=date_maker.date_before_start(),
+                           complete=True)
+        self.add_subtitles(video2, 'fr', make_subtitle_lines(4),
+                           created=date_maker.next_date(),
+                           complete=True)
+
+        data = self.get_report_data(self.team,
+                                           date_maker.start_date(),
+                                           date_maker.end_date())
+        self.assertEquals(data['record count'], 4)
+        self.assertEquals(data[video.video_id]['en']['Language number'], 1)
+        self.assertEquals(data[video.video_id]['fr']['Language number'], 2)
+        self.assertEquals(data[video.video_id]['de']['Language number'], 3)
+        self.assertEquals(data[video2.video_id]['fr']['Language number'], 2)

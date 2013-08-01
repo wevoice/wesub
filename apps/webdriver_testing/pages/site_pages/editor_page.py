@@ -170,10 +170,6 @@ class EditorPage(UnisubsPage):
         if work_el and 'collapsed' not in work_el.get_attribute('class'):
             work_el.click()
 
-        ref_el = self.is_element_present(self._REF_METADATA_EXPANDER)
-        if ref_el and 'collapsed' not in ref_el.get_attribute('class'):
-            ref_el.click()
-
     def working_language(self):
         """Return the curren working language displayed. """
 
@@ -304,6 +300,7 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._EXIT)
         self.click_by_css(self._EXIT_BUTTON)
         self.handle_js_alert('accept')
+        self.wait_for_element_not_present(self._EXIT)
 
 
     def approve_task(self):

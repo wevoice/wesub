@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
-import datetime
-import logging
+from collections import defaultdict
+from itertools import groupby
 from math import ceil
 import csv
-from itertools import groupby
+import datetime
+import logging
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -400,7 +401,7 @@ class Team(models.Model):
 
         """
         if not hasattr(self, '_videos_count'):
-            setattr(self, '_videos_count', self.videos.count())
+            setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
     def _count_tasks(self):
@@ -2682,8 +2683,8 @@ class BillingReport(models.Model):
                 'Billable minutes', 'Version created', 'Language number',
                 'Team'
         ]
-
         return  self._get_row_data(host, header)
+
     def process(self):
         """
         Generate the correct rows (including headers), saves it to a tempo file,
@@ -2708,6 +2709,7 @@ class BillingReport(models.Model):
         self.csv_file = File(open(fn, 'r'))
         self.processed = datetime.datetime.utcnow()
         self.save()
+
     @property
     def start_str(self):
         return self.start_date.strftime("%Y%m%d")
@@ -2716,6 +2718,60 @@ class BillingReport(models.Model):
     def end_str(self):
         return self.end_date.strftime("%Y%m%d")
 
+class BillingReportGenerator(object):
+    def __init__(self, all_records, add_header=True):
+        if add_header:
+            self.rows = [self.header()]
+        else:
+            self.rows = []
+
+        all_records = list(all_records)
+
+        self.make_language_number_map(all_records)
+
+        for video, records in groupby(all_records, lambda r: r.video):
+            for r in records:
+                self.rows.append(self.make_row(video, r))
+
+    def header(self):
+        return [
+            'Video Title',
+            'Video ID',
+            'Language',
+            'Minutes',
+            'Original',
+            'Language number',
+            'Team',
+            'Created',
+            'Source',
+            'User',
+        ]
+
+    def make_row(self, video, record):
+        return [
+            video.title_display_unabridged().encode('utf-8'),
+            video.video_id,
+            record.new_subtitle_language.language_code,
+            record.minutes,
+            record.is_original,
+            self.language_number_map[record.id],
+            record.team.slug,
+            record.created.strftime('%Y-%m-%d %H:%M:%S'),
+            record.source,
+            record.user.username.encode('utf-8'),
+        ]
+
+    def make_language_number_map(self, records):
+        self.language_number_map = {}
+        videos = set(r.video for r in records)
+        video_counts = dict((v.id, 0) for v in videos)
+        qs = (BillingRecord.objects
+              .filter(video__in=videos)
+              .order_by('created'))
+        for record in qs:
+            vid = record.video.id
+            video_counts[vid] += 1
+            self.language_number_map[record.id] = video_counts[vid]
 
 class BillingRecordManager(models.Manager):
 
@@ -2723,40 +2779,9 @@ class BillingRecordManager(models.Manager):
         return self.filter(team=team, created__gte=start, created__lte=end)
 
     def csv_report_for_team(self, team, start, end, add_header=True):
-
-        header = [
-            'Video Title',
-            'Video ID',
-            'Language',
-            'Minutes',
-            'Original',
-            'Team',
-            'Created',
-            'Source',
-            'User',
-        ]
-
-        if add_header:
-            rows = [header]
-        else:
-            rows = []
-
         all_records = self.data_for_team(team, start, end)
-        for video, records in groupby(all_records, lambda r: r.video):
-            for r in records:
-                rows.append([
-                    video.title_display_unabridged().encode('utf-8'),
-                    video.video_id,
-                    r.new_subtitle_language.language_code,
-                    r.minutes,
-                    r.is_original,
-                    r.team.slug,
-                    r.created.strftime('%Y-%m-%d %H:%M:%S'),
-                    r.source,
-                    r.user.username
-                ])
-
-        return rows
+        generator = BillingReportGenerator(all_records, add_header)
+        return generator.rows
 
     def insert_records_for_translations(self, billing_record):
         """
