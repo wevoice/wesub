@@ -43,6 +43,8 @@ class MetadataFieldsTest(TestCase):
                                                language_code='fr')
         # initially, it should return the keys, but not have any content
         self.assertEquals(lang.get_metadata(), {'speaker-name': ''})
+        # check that convert_for_display doesn't crash (#815)
+        lang.get_metadata().convert_for_display()
         # after versions get created, it stould have the data from the tip
         pipeline.add_subtitles(self.video, 'fr', None,
                                metadata = {'speaker-name': 'French Santa'})

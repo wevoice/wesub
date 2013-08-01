@@ -644,7 +644,12 @@ class SubtitleLanguage(models.Model):
         if tip:
             return tip.get_metadata()
         else:
-            return dict((key, '') for key in self.video.get_metadata())
+            # no versions yet, take the metadata from our video, but use empty
+            # strings for the values
+            video_metadata = self.video.get_metadata()
+            for key in video_metadata:
+                video_metadata[key] = ''
+            return video_metadata
 
     def get_metadata_for_display(self):
         return self.get_metadata().convert_for_display()
