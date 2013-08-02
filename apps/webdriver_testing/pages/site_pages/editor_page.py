@@ -300,8 +300,6 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._EXIT)
         self.click_by_css(self._EXIT_BUTTON)
         self.handle_js_alert('accept')
-        self.wait_for_element_not_present(self._EXIT)
-
 
     def approve_task(self):
         self.click_by_css(self._APPROVE)
