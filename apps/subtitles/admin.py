@@ -43,7 +43,7 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
                     'unexpired_pending_collaborators',
                     'is_forked']
     list_filter = ['created', 'language_code']
-    
+
     inlines = [SubtitleVersionInline]
     search_fields = ['video__title', 'video__video_id', 'language_code']
     raw_id_fields = ['video']
@@ -104,6 +104,7 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
+    list_per_page = 20
     list_display = ['video_title', 'id', 'language', 'version_num',
                     'visibility', 'visibility_override',
                     'subtitle_count', 'created']
