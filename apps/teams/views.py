@@ -1723,8 +1723,8 @@ def sync_third_party_account(request, slug, account_id):
         version = video.latest_version()
         if version is not None:
             ThirdPartyAccount.objects.mirror_on_third_party(
-                    version.video, version.language, UPDATE_VERSION_ACTION,
-                    version)
+                    version.video, version.subtitle_language,
+                    UPDATE_VERSION_ACTION, version)
     messages.success(request, _(u'Successfully synced subtitles.'))
     return HttpResponseRedirect(reverse('teams:third-party-accounts',
         kwargs={'slug': team.slug}))
