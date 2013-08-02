@@ -76,7 +76,7 @@ from utils.metrics import time as timefn
 from utils.panslugify import pan_slugify
 from utils.searching import get_terms
 from utils.translation import (
-    get_language_choices, languages_with_labels, get_user_languages_from_request
+    get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
 from videos.types import UPDATE_VERSION_ACTION
@@ -1072,29 +1072,6 @@ def _get_or_create_workflow(team_slug, project_id, team_video_id):
 
     return workflow
 
-def _task_languages(team, user):
-    languages = filter(None, Task.objects.filter(team=team, deleted=False)
-                                         .values_list('language', flat=True)
-                                         .distinct())
-
-    language_labels = dict(get_language_choices(with_empty=True))
-
-    # TODO: Handle the team language setting here once team settings are
-    # implemented.
-    languages = list(set(languages))
-    lang_data = []
-    for l in languages:
-        if language_labels.get(l):
-            lang_data.append({'code': l, 'name': language_labels[l]} )
-        else:
-            logger.error("Failed to find language code for task", extra={
-                "data": {
-                    "language_code": l,
-                    "supported": language_labels
-                }
-            })
-    return lang_data
-
 def _tasks_list(request, team, project, filters, user):
     '''List tasks for the given team, optionally filtered.
 
@@ -1298,8 +1275,7 @@ def team_tasks(request, slug, project_slug=None):
 
     user = request.user if request.user.is_authenticated() else None
     member = team.members.get(user=user) if user else None
-    languages = _task_languages(team, request.user)
-    languages = sorted(languages, key=lambda l: l['name'])
+    languages = get_language_choices_as_dicts()
     filters = _get_task_filters(request)
     filtered = 0
 
@@ -1451,11 +1427,12 @@ def perform_task(request, slug=None, task_pk=None):
     if not can_perform_task(request.user, task):
         return HttpResponseForbidden(_(u'You are not allowed to perform this task.'))
 
-    task.assignee = request.user
-    task.save()
+    if task.assignee_id != request.user.id:
+        task.assignee = request.user
+        task.save()
 
     # ... perform task ...
-    return HttpResponseRedirect(task.get_perform_url())
+    return HttpResponseRedirect(task.get_widget_url())
 
 def _delete_subtitle_version(version):
     sl = version.subtitle_language
@@ -1746,8 +1723,8 @@ def sync_third_party_account(request, slug, account_id):
         version = video.latest_version()
         if version is not None:
             ThirdPartyAccount.objects.mirror_on_third_party(
-                    version.video, version.language, UPDATE_VERSION_ACTION,
-                    version)
+                    version.video, version.subtitle_language,
+                    UPDATE_VERSION_ACTION, version)
     messages.success(request, _(u'Successfully synced subtitles.'))
     return HttpResponseRedirect(reverse('teams:third-party-accounts',
         kwargs={'slug': team.slug}))

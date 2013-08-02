@@ -404,6 +404,15 @@ class Team(models.Model):
             setattr(self, '_videos_count', self.teamvideo_set.count())
         return self._videos_count
 
+    def _count_tasks(self):
+        qs = Task.objects.filter(team=self, deleted=False, completed=None)
+        # quick, check, are there more than 1000 tasks, if so return 1001, and
+        # let the UI display > 1000
+        if qs[1000:1001].exists():
+            return 1001
+        else:
+            return qs.count()
+
     @property
     def tasks_count(self):
         """Return the number of incomplete, undeleted tasks of this team.
@@ -412,9 +421,8 @@ class Team(models.Model):
 
         """
         if not hasattr(self, '_tasks_count'):
-            setattr(self, '_tasks_count', Task.objects.filter(team=self, deleted=False, completed=None).count())
+            setattr(self, '_tasks_count', self._count_tasks())
         return self._tasks_count
-
 
     # Applications (people applying to join)
     def application_message(self):
@@ -598,6 +606,15 @@ class Project(models.Model):
             setattr(self, '_videos_count', TeamVideo.objects.filter(project=self).count())
         return self._videos_count
 
+    def _count_tasks(self):
+        qs = tasks.filter(team_video__project = self)
+        # quick, check, are there more than 1000 tasks, if so return 1001, and
+        # let the UI display > 1000
+        if qs[1000:1001].exists():
+            return 1001
+        else:
+            return qs.count()
+
     @property
     def tasks_count(self):
         """Return the number of incomplete, undeleted tasks in this project.
@@ -608,7 +625,7 @@ class Project(models.Model):
         tasks = Task.objects.filter(team=self.team, deleted=False, completed=None)
 
         if not hasattr(self, '_tasks_count'):
-            setattr(self, '_tasks_count', tasks.filter(team_video__project = self).count())
+            setattr(self, '_tasks_count', self._count_tasks())
         return self._tasks_count
 
 
@@ -2008,6 +2025,9 @@ class Task(models.Model):
 
     def get_perform_url(self):
         """Return a URL for whatever dialog is used to perform this task."""
+        return reverse('teams:perform_task', args=(self.team.slug, self.id))
+
+    def get_widget_url(self):
 
         mode = Task.TYPE_NAMES[self.type].lower()
 

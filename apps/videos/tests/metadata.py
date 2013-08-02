@@ -10,6 +10,7 @@ from utils.celery_search_index import update_search_index
 from videos.models import Video
 from videos.search_indexes import VideoIndex
 from subtitles import pipeline
+from subtitles.models import SubtitleLanguage
 
 class MetadataFieldsTest(TestCase):
     def setUp(self):
@@ -35,6 +36,28 @@ class MetadataFieldsTest(TestCase):
             'speaker-name': '',
             'location': '',
         })
+
+    def test_language_get_metadata(self):
+        self.video.update_metadata({ 'speaker-name': 'Santa'})
+        lang = SubtitleLanguage.objects.create(video=self.video,
+                                               language_code='fr')
+        # initially, it should return the keys, but not have any content
+        self.assertEquals(lang.get_metadata(), {'speaker-name': ''})
+        # check that convert_for_display doesn't crash (#815)
+        lang.get_metadata().convert_for_display()
+        # after versions get created, it stould have the data from the tip
+        pipeline.add_subtitles(self.video, 'fr', None,
+                               metadata = {'speaker-name': 'French Santa'})
+        lang = SubtitleLanguage.objects.get(id=lang.id)
+        self.assertEquals(lang.get_metadata(),
+                          {'speaker-name': 'French Santa'})
+        # by default, it's the public tip, but that can be changed
+        pipeline.add_subtitles(self.video, 'fr', None, visibility='private',
+                               metadata = {'speaker-name': 'French Santa2'})
+        self.assertEquals(lang.get_metadata(),
+                          {'speaker-name': 'French Santa'})
+        self.assertEquals(lang.get_metadata(public=False),
+                          {'speaker-name': 'French Santa2'})
 
     def test_update_video(self):
         # test that when we set metadata for the primary language, it updates
