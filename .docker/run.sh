@@ -113,6 +113,7 @@ vacuum = true
 pythonpath = $APP_ROOT
 wsgi-file = $APP_DIR/deploy/unisubs.wsgi
 env = DJANGO_SETTINGS_MODULE=unisubs_settings
+static-map = /static=$VE_DIR/lib/python2.7/site-packages/django/contrib/admin/static
 EOF
 
 uwsgi --ini $APP_ROOT/$APP_NAME.ini
