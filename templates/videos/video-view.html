@@ -42,13 +42,11 @@
         </script>
     {% endblock %}
 
-{% block title %}
-    {{ video.title_display }} with subtitles | Amara
-{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block opengraph-head %}
     {{block.super}}
-    <meta property="og:title" content="{% title_for_video video  %}"/>
+    <meta property="og:title" content="{{ page_title }}" />
     <meta property="og:type" content="video"/>
     <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
     {% if video.thumbnail %}
@@ -58,8 +56,7 @@
     {% endif %}
 
     <meta property="og:site_name" content="Amara"/>
-    <meta property="og:description"
-          content="{% title_for_video video %}"/>
+    <meta property="og:description" content="{{ page_title }}" />
 {% endblock  %}
 
 {% block main_content %}
@@ -72,7 +69,7 @@
 
     <div class="grid_4 context alpha">
         <h2 class="main-title">
-            <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display_unabridged }}</a>
+            <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ page_title }}</a>
         </h2>
         <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
             {% for field in metadata %}

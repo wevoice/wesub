@@ -70,16 +70,6 @@ def write_video_type_js(video):
     except VideoTypeError:
         return
 
-@register.simple_tag
-def title_for_video(video, language=None):
-    if not language:
-        return "%s | Amara" % video.title_display()
-    elif video.primary_audio_language_code == language.language_code:
-        return "%s with subtitles | Amara " % video.title
-    else:
-        return "%s with %s subtitles | Amara " % (video.title,
-                language.get_language_code_display())
-
 from django.template.defaulttags import URLNode
 class VideoURLNode(URLNode):
     def render(self, video, request):
