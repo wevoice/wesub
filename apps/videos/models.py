@@ -39,6 +39,7 @@ from django.core.urlresolvers import reverse
 
 
 from auth.models import CustomUser as User, Awards
+from videos import behaviors
 from videos import metadata
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
@@ -238,9 +239,10 @@ class Video(models.Model):
                 return language_title
 
         if self.title and self.title.strip():
-            return self.title
+            title = self.title
         else:
-            return self._title_from_videourl()
+            title = self._title_from_videourl()
+        return behaviors.make_video_title(self, title, self.get_metadata())
 
     def _title_from_latest_version(self):
         latest_version = self.latest_version()

@@ -38,6 +38,7 @@ from babelsubs.storage import SubtitleSet
 from babelsubs.storage import diff as diff_subtitles
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
+from videos.behaviors import make_video_title
 
 from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
@@ -1136,7 +1137,8 @@ class SubtitleVersion(models.Model):
 
     def title_display(self):
         if self.title and self.title.strip():
-            return self.title
+            return make_video_title(self.video, self.title,
+                                    self.get_metadata())
         else:
             # fall back to the video title, but prevent infinite loops if we
             # are the primary audio language
