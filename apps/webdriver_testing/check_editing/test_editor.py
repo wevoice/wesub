@@ -50,7 +50,6 @@ class TestCaseLeftSide(WebdriverTestCase):
     def tearDown(self):
         if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
             self.editor_pg.exit()
-        self.logger.info(self.video_pg.video_title())
         
     def test_reference_lang__forked(self):
         """Default reference lang for forked translation is the same lang. """
@@ -161,8 +160,6 @@ class TestCaseCenter(WebdriverTestCase):
     def tearDown(self):
         if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
             self.editor_pg.exit()
-        self.logger.info(self.video_pg.video_title())
-
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""

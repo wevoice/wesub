@@ -416,6 +416,7 @@ INSTALLED_APPS = (
     'socialauth',
     # our apps
     'accountlinker',
+    'amaracelery',
     'comments',
     'messages',
     'profiles',
