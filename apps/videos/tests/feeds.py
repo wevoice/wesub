@@ -22,6 +22,7 @@ from StringIO import StringIO
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+import mock
 
 from apps.videos.feed_parser import FeedParser
 from apps.videos.models import Video, VideoFeed
@@ -153,3 +154,60 @@ class TestFeedParser(TestCase):
         video, created = Video.get_or_create_for_url(vt=vt)
         self.assertTrue(video)
 
+
+class EntryDataTest(TestCase):
+    def setUp(self):
+        TestCase.setUp(self)
+        self.feed = VideoFeed.objects.create(url="http://example.com/feed")
+
+    def run_feed_update(self, feed_data):
+        with mock.patch('feedparser._open_resource') as open_resource_mock:
+            open_resource_mock.return_value = StringIO(feed_data)
+            self.feed.update()
+
+    def test_rss_attributes(self):
+        feed_data = """\
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rss version="2.0">
+<channel>
+  <title>Test Feed</title>
+  <link>http://example.com/feed</link>
+  <description>Test Feed</description>
+  <item>
+    <title>Feed Title</title>
+    <description>Feed Description</description>
+    <link>http://www.youtube.com/watch?v=e4MSN6IImpI</link>
+  </item>
+</channel>
+</rss>
+"""
+        self.run_feed_update(feed_data)
+        video = Video.objects.get()
+        self.assertEquals(video.title, 'Feed Title')
+        self.assertEquals(video.description, 'Feed Description')
+
+    def test_media_enclosure(self):
+        feed_data = """\
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss">
+<channel>
+  <title>Test Feed</title>
+  <link>http://example.com/feed</link>
+  <description>Test Feed</description>
+  <item>
+    <link>http://www.youtube.com/watch?v=e4MSN6IImpI</link>
+    <media:content url="http://www.youtube.com/watch?v=e4MSN6IImpI">
+        <media:title>Media Enclosure Title</media:title>
+        <media:description>Media Enclosure Description</media:description>
+        <media:thumbnail url="http://example.com/media-enclosure-thumb.jpg" />
+    </media:content>
+  </item>
+</channel>
+</rss>
+"""
+        self.run_feed_update(feed_data)
+        video = Video.objects.get()
+        self.assertEquals(video.title, 'Media Enclosure Title')
+        self.assertEquals(video.description, 'Media Enclosure Description')
+        self.assertEquals(video.thumbnail,
+                          'http://example.com/media-enclosure-thumb.jpg')

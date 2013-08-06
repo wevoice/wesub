@@ -121,7 +121,35 @@ class BaseFeedEntryParser(object):
         raise Exception('Not implemented')
     
     def get_video_info(self, entry):
-        return {}
+        info = {}
+        info_methods = [
+            ('title', self._get_entry_title),
+            ('description', self._get_entry_description),
+            ('thumbnail', self._get_entry_thumbnail),
+        ]
+        for name, method in info_methods:
+            value = method(entry)
+            if value:
+                info[name] = value
+        return info
+
+    def _get_entry_title(self, entry):
+        if entry.get('title'):
+            return entry['title']
+        if entry.get('media_title'):
+            return entry['media_title']
+
+    def _get_entry_description(self, entry):
+        if entry.get('description'):
+            return entry['description']
+        if entry.get('media_description'):
+            return entry['media_description']
+
+    def _get_entry_thumbnail(self, entry):
+        if entry.get('media_thumbnail'):
+            for thumb in entry['media_thumbnail']:
+                if thumb.get('url'):
+                    return thumb['url']
     
     def __call__(self, entry):
         vt = self.get_video_type(entry)

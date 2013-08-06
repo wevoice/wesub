@@ -1870,7 +1870,13 @@ class VideoFeed(models.Model):
         _iter = feed_parser.items(since=last_link, ignore_error=True)
 
         for vt, info, entry in _iter:
-            vt and Video.get_or_create_for_url(vt=vt, user=self.user)
+            if vt:
+                video, created = Video.get_or_create_for_url(
+                    vt=vt, user=self.user)
+                if info:
+                    for name, value in info.items():
+                        setattr(video, name, value)
+                    video.save()
             checked_entries += 1
 
         return checked_entries
