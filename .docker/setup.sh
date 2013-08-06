@@ -8,6 +8,7 @@ VE_ROOT=/opt/ve
 VE_DIR=$VE_ROOT/$APP_NAME
 SETUPTOOLS_URL=https://pypi.python.org/packages/source/s/setuptools/setuptools-0.6c11.tar.gz
 BUILD_DIR=/var/tmp
+CLOSURE_PATH=/opt/google-closure
 
 mkdir -p $APP_ROOT
 mkdir -p $VE_ROOT
@@ -18,7 +19,9 @@ easy_install pip
 pip install uwsgi virtualenv
 
 # install google closure
-svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ /opt/google-closure
+svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ $CLOSURE_PATH
+# symlink for compilation
+ln -sf $CLOSURE_PATH $APP_ROOT/media/js/closure-library
 
 # host key for github
 mkdir -p /root/.ssh
