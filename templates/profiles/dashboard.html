@@ -45,9 +45,9 @@
                 <ul class="listing tasks">
                     {% for task in tasks %}
                         <li>
-                            <a href="{{ task.team_video.video.get_absolute_url }}" title="{{ task.team_video.video.title }}"><img src="{{ task.team_video.video.get_small_thumbnail }}" alt="{{ task.team_video.video.title_display_unabridged }}"></a>
+                            <a href="{{ task.team_video.video.get_absolute_url }}" title="{{ task.team_video.video.title }}"><img src="{{ task.team_video.video.get_small_thumbnail }}" alt="{{ task.team_video.video.title_display }}"></a>
                             <h4>
-                                {{ task.team_video.video.title_display_unabridged }}
+                                {{ task.team_video.video.title_display }}
                             </h4>
                             <p>
                                 <a href="{{ task.team.get_absolute_url }}">{{ task.team }}</a>

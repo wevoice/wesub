@@ -9,7 +9,7 @@
 
 {% block main_content %}
 <h2>{% blocktrans with language.get_language_code_display as language  %}Deleting {{ language }} Language{% endblocktrans %}</h2>
-<h3>{% blocktrans with language.video.get_title_display as video %}Video: {{ video }}{% endblocktrans %}</h3>
+<h3>{% blocktrans with language.video.title_display as video %}Video: {{ video }}{% endblocktrans %}</h3>
 <div class="delete-language-warning">
     <h3>{% trans 'WARNING!' %}</h3>
     <ul>

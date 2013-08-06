@@ -17,6 +17,7 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import datetime
+import string
 import urllib, urllib2
 from collections import namedtuple
 
@@ -286,6 +287,10 @@ def shortlink(request, encoded_pk):
     video = get_object_or_404(Video, pk=pk)
     return redirect(video, video=video, permanent=True)
 
+def video_page_title(video):
+    template = string.Template(ugettext("$title with subtitles | Amara"))
+    return template.substitute(title=video.title_display())
+
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
     """
@@ -308,6 +313,7 @@ def video(request, video, video_url=None, title=None):
     # TODO: make this more pythonic, prob using kwargs
     context = widget.add_onsite_js_files({})
     context['video'] = video
+    context['page_title'] = video_page_title(video)
     context['metadata'] = metadata.convert_for_display()
     context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
     context['language_list'] = LanguageList(video)
@@ -460,6 +466,9 @@ def legacy_history(request, video, lang=None):
             'lang': language.language_code,
             }))
 
+def language_page_title(language):
+    template = string.Template(ugettext("$title with subtitles | Amara"))
+    return template.substitute(title=language.title_display())
 
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None, version_id=None):
@@ -527,6 +536,7 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['widget_params'] = _widget_params(request, video, version_no=None,
                                               language=language, size=(289, 173))
     context['language'] = language
+    context['page_title'] = language_page_title(language)
     context['edit_url'] = language.get_widget_url()
     context['shows_widget_sharing'] = video.can_user_see(request.user)
 

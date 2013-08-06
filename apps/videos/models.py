@@ -39,6 +39,7 @@ from django.core.urlresolvers import reverse
 
 
 from auth.models import CustomUser as User, Awards
+from videos import behaviors
 from videos import metadata
 from videos.types import video_type_registrar
 from videos.feed_parser import FeedParser
@@ -192,8 +193,8 @@ class Video(models.Model):
 
     def __unicode__(self):
         title = self.title_display()
-        if len(title) > 60:
-            title = title[:60]+'...'
+        if len(title) > 35:
+            title = title[:35]+'...'
         return title
 
     def update_search_index(self):
@@ -225,42 +226,50 @@ class Video(models.Model):
 
         return self._video_views_statistic
 
-    def title_display(self, truncate=True):
-        v = self.latest_version()
+    def title_display(self, use_language_title=True):
+        """
+        Get the full title to display for users
 
-        if v and v.title and v.title.strip():
-            title = v.title
-        elif self.title and self.title.strip():
+        :param use_language_title: should we fetch the title from our primary
+        audio language?
+        """
+        if use_language_title:
+            language_title = self._title_from_latest_version()
+            if language_title and language_title.strip():
+                return language_title
+
+        if self.title and self.title.strip():
             title = self.title
         else:
-            try:
-                url = self.videourl_set.all()[:1].get().url
-                if not url:
-                    return 'No title'
-            except models.ObjectDoesNotExist:
+            title = self._title_from_videourl()
+        return behaviors.make_video_title(self, title, self.get_metadata())
+
+    def _title_from_latest_version(self):
+        latest_version = self.latest_version()
+
+        if latest_version:
+            return latest_version.title_display()
+        else:
+            return ''
+
+    def _title_from_videourl(self):
+        try:
+            url = self.videourl_set.all()[:1].get().url
+            if not url:
                 return 'No title'
+        except models.ObjectDoesNotExist:
+            return 'No title'
 
-            url = url.strip('/')
+        url = url.strip('/')
 
-            if url.startswith('http://'):
-                url = url[7:]
+        if url.startswith('http://'):
+            url = url[7:]
 
-            parts = url.split('/')
-            if len(parts) > 1:
-                title = '%s/.../%s' % (parts[0], parts[-1])
-            else:
-                title = url
-
-        if truncate and len(title) > 35:
-            title = title[:35] + '...'
-
-        return title
-
-    def title_display_unabridged(self):
-        """
-        This is just a wrapper around ``title_display`` for use in templates
-        """
-        return self.title_display(False)
+        parts = url.split('/')
+        if len(parts) > 1:
+            return '%s/.../%s' % (parts[0], parts[-1])
+        else:
+            return url
 
     def update_view_counter(self):
         """Queue a Celery task that will increment the number of views for this video."""
@@ -516,7 +525,7 @@ class Video(models.Model):
         """
         from django.utils.text import get_valid_filename
 
-        return get_valid_filename(self.title_display(truncate=False))
+        return get_valid_filename(self.title_display())
 
     def lang_filename(self, language):
         """Return a filename-safe version of this video's string representation with a language code.
@@ -762,17 +771,6 @@ class Video(models.Model):
     def completed_subtitle_languages(self, public_only=True):
         return [sl for sl in self.newsubtitlelanguage_set.all()
                 if sl.is_complete_and_synced(public=public_only)]
-
-    def get_title_display(self):
-        """Return a suitable title to display to a user for this video.
-
-        This will use the most specific title if it's present, but if it's blank
-        it will fall back to the less-specific-but-at-least-it-exists video
-        title instead.
-
-        """
-        l = self.subtitle_language()
-        return l.get_title() if l else self.title
 
     def get_description_display(self):
         """Return a suitable description to display to a user for this video.
@@ -1644,7 +1642,7 @@ class Action(models.Model):
     @classmethod
     def delete_video_handler(cls, video, team, user=None):
         action = cls(team=team)
-        action.new_video_title = video.get_title_display()
+        action.new_video_title = video.title_display()
         action.action_type = cls.DELETE_VIDEO
         action.user = user
         action.created = datetime.now()

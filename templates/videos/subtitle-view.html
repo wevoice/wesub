@@ -46,17 +46,11 @@
     </script>
 {% endblock %}
 
-{% block title %}
-    {% if language.is_primary_audio_language %}
-        "{% firstof last_version.title video.title_display_unabridged %}" {% trans "with" %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
-    {% else %}
-        "{% firstof last_version.title video.title_display_unabridged %}" {% trans "with" %} {% if language.get_translation_source_language_code %}{% trans 'translated' %}{% endif %} {{ language.get_language_code_display }} {% trans "subtitles" %} | Amara
-    {% endif %}
-{% endblock %}
+{% block title %}{{ page_title }}{% endblock %}
 
 {% block opengraph-head %}
     {{block.super}}
-    <meta property="og:title" content="{% title_for_video video language %}"/>
+    <meta property="og:title" content="{{ page_title }}" />
     <meta property="og:type" content="video"/>
     <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
     {% if video.thumbnail %}
@@ -66,7 +60,7 @@
     {% endif %}
 
     <meta property="og:site_name" content="Amara"/>
-    <meta property="og:description" content="{% title_for_video video language %}"/>
+    <meta property="og:description" content="{{ page_title }}" />
 {% endblock  %}
 
 {% block main_content %}
@@ -85,7 +79,7 @@
                 {% if not language.is_rtl %}
                 ←
                 {% endif %}
-                {% firstof last_version.title video.title_display_unabridged %}
+                {{ language.title_display }}
             </a>
         </h2>
         {% widget widget_params %}
