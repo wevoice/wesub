@@ -417,6 +417,7 @@ INSTALLED_APPS = (
     # our apps
     'accountlinker',
     'amaradotorg',
+    'amaracelery',
     'comments',
     'messages',
     'profiles',
