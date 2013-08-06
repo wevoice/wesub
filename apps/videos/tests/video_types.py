@@ -469,4 +469,4 @@ class KalturaVideoTypeTest(TestCase):
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.get()
         self.assertEquals(vu.type, 'K')
-        self.assertEquals(vu.extra_info['kaltura-id'], '1_zr7niumr')
+        self.assertEquals(vu.kaltura_id(), '1_zr7niumr')

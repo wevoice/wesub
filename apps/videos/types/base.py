@@ -34,9 +34,6 @@ class VideoType(object):
     def video_id(self):
         return
 
-    def extra_info(self):
-        return {}
-    
     @classmethod 
     def video_url(cls, obj):
         return obj.url

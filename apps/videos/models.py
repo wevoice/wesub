@@ -1809,9 +1809,11 @@ class VideoUrl(models.Model):
     def effective_url(self):
         self.get_video_type_class().video_url(self)
 
-    @property
-    def extra_info(self):
-        return self.get_video_type().extra_info()
+    def kaltura_id(self):
+        if self.type == 'K':
+            return self.get_video_type().kaltura_id()
+        else:
+            return None
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         assert self.type != '', "Can't set an empty type"
