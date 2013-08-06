@@ -1789,15 +1789,29 @@ class VideoUrl(models.Model):
         self.primary = True
         self.save(updates_timestamp=False)
 
-    @property
-    def effective_url(self):
+    def get_video_type_class(self):
         try:
-            return video_type_registrar[self.type].video_url(self)
+            return video_type_registrar[self.type]
         except KeyError:
             vt = video_type_registrar.video_type_for_url(self.url)
             self.type = vt.abbreviation
             self.save()
-            return video_type_registrar[self.type].video_url(self)
+            return tv
+
+    def get_video_type(self):
+        if hasattr(self, '_video_type'):
+            return self._video_type
+        vt_class = self.get_video_type_class()
+        self._video_type = vt_class(self.url)
+        return self._video_type
+
+    @property
+    def effective_url(self):
+        self.get_video_type_class().video_url(self)
+
+    @property
+    def extra_info(self):
+        return self.get_video_type().extra_info()
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         assert self.type != '', "Can't set an empty type"
