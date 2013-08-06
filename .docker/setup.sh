@@ -17,6 +17,9 @@ easy_install pip
 
 pip install uwsgi virtualenv
 
+# install google closure
+svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ /opt/google-closure
+
 # host key for github
 mkdir -p /root/.ssh
 cat << EOF > /root/.ssh/known_hosts
