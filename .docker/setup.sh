@@ -21,7 +21,7 @@ pip install uwsgi virtualenv
 # install google closure
 svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ $CLOSURE_PATH
 # symlink for compilation
-ln -sf $CLOSURE_PATH $APP_ROOT/media/js/closure-library
+ln -sf $CLOSURE_PATH $APP_DIR/media/js/closure-library
 
 # host key for github
 mkdir -p /root/.ssh
