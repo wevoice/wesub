@@ -99,7 +99,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
                 'lang_url': urlstart + rmlocale(lang.get_absolute_url()),
                 'lang_name': lang.get_language_code_display(),
                 'video_url': urlstart + rmlocale(video.get_absolute_url()),
-                'video_name': video.get_title_display(),
+                'video_name': video.title_display(),
                 'user_url': urlstart + rmlocale(self.user.get_absolute_url()),
                 'user_name': self.user.username,
             })

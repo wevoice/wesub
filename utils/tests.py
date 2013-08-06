@@ -22,6 +22,7 @@ from random import randint, choice
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+import mock
 import simplejson as json
 
 from teams.models import Task
@@ -30,6 +31,7 @@ from utils import test_factories
 from utils.multi_query_set import MultiQuerySet
 from utils.compress import compress, decompress
 from utils.chunkediter import chunkediter
+from utils.behaviors import behavior, DONT_OVERRIDE
 
 class MultiQuerySetTest(TestCase):
     fixtures = ['test.json']
@@ -305,3 +307,53 @@ class TestEditor(object):
                                 task_id=self.task_id,
                                 task_notes=self.task_notes,
                                 task_type=self.task_type)
+
+class BehaviorTest(TestCase):
+    def test_function_override(self):
+        @behavior
+        def func():
+            return 'foo'
+        self.assertEquals(func(), 'foo')
+
+        @func.override
+        def override():
+            return 'bar'
+        self.assertEquals(func(), 'bar')
+
+    def test_dont_override_return(self):
+        @behavior
+        def func():
+            return 'foo'
+        @func.override
+        def override():
+            return DONT_OVERRIDE
+
+    def test_override_the_override(self):
+        # test overriding the override function.  The function that overrides
+        # the override should be called first
+        @behavior
+        def func():
+            return 'foo'
+        @func.override
+        def override1():
+            return 'bar'
+        @override1.override
+        def override2():
+            return 'baz'
+
+        self.assertEquals(func(), 'baz')
+
+    def test_override_twice(self):
+        # test overriding a behavior twice, in this case the 1st override
+        # function should be called first
+        @behavior
+        def func():
+            return 'foo'
+        @func.override
+        def override1():
+            return 'bar'
+        @func.override
+        def override2():
+            return 'baz'
+
+        self.assertEquals(func(), 'bar')

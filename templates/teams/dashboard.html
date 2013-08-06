@@ -57,7 +57,7 @@
                     {% for task in user_tasks %}
                         <li>
                             <h3><a href="{{ task.team_video.video.get_absolute_url }}" title="View video">
-                                {{ task.team_video.video.title_display }}
+                                {{ task.team_video.video.title_display|truncatechars:30 }}
                             </a></h3>
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
@@ -134,11 +134,11 @@
                     {% for team_video in videos %}
                         <li>
                             <div class="thumb">
-                                <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.get_title_display }}">
+                                <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.title_display }}">
                                     <img src="{{ team_video.get_thumbnail }}" alt="{{ video.title }}">
                                 </a>
                                 <h4>
-                                    <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.get_title_display }}">
+                                    <a href="{{ team_video.video.get_absolute_url }}" title="{{ team_video.video.title_display }}">
                                         {{ team_video.video.title_display|truncatewords:15 }}
                                         {% if team_video.video.duration %}
                                             <span class="duration">{{ team_video.video.duration|format_duration }}</span>

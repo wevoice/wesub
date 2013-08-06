@@ -2664,7 +2664,7 @@ class BillingReport(models.Model):
             end = subs[-1].start_time
 
         return [
-            tv.video.title_display_unabridged().encode('utf-8'),
+            tv.video.title_display().encode('utf-8'),
             host + tv.video.get_absolute_url(),
             language.language_code,
             source,
@@ -2749,7 +2749,7 @@ class BillingReportGenerator(object):
 
     def make_row(self, video, record):
         return [
-            video.title_display_unabridged().encode('utf-8'),
+            video.title_display().encode('utf-8'),
             video.video_id,
             record.new_subtitle_language.language_code,
             record.minutes,

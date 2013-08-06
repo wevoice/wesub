@@ -39,7 +39,7 @@ from apps.videos.templatetags.subtitles_tags import format_sub_time
 from apps.videos.tests.videotestutils import (
     WebUseTest, create_langs_and_versions
 )
-from apps.videos.views import LanguageList, LanguageListItem
+from apps.videos import views
 from apps.videos.models import (
     Video, VideoUrl, Action, VIDEO_TYPE_YOUTUBE, SubtitleVersion,
     SubtitleLanguage, Subtitle, UserTestResult
@@ -475,6 +475,50 @@ class TestViews(WebUseTest):
             response = self.client.post(url)
             self.assertEqual(response.status_code, 200)
 
+class VideoTitleTest(TestCase):
+    def test_video_title(self):
+        video = test_factories.create_video(
+            primary_audio_language_code='en', title='foo')
+        self.assertEquals(views.video_page_title(video),
+                          'foo with subtitles | Amara')
+
+    def test_video_language_title(self):
+        video = test_factories.create_video(
+            primary_audio_language_code='en', title='foo')
+        pipeline.add_subtitles(video, 'en', None, title="English Title")
+
+    def test_video_language_title(self):
+        video = test_factories.create_video(
+            primary_audio_language_code='en', title='Video Title')
+        en_version = pipeline.add_subtitles(video, 'en', None,
+                                         title="English Title")
+        en = en_version.subtitle_language
+        self.assertEquals(views.language_page_title(en),
+                          'English Title with subtitles | Amara')
+
+    def test_video_language_title_translation(self):
+        # for translated languages, we display the title in the same way.  In
+        # the past we displayed it differently, this test is still useful
+        video = test_factories.create_video(
+            primary_audio_language_code='en', title='Video Title')
+        en_version = pipeline.add_subtitles(video, 'en', None,
+                                         title="English Title")
+        fr_version = pipeline.add_subtitles(video, 'fr', None,
+                                            title="French Title",
+                                            parents=[en_version])
+        fr = fr_version.subtitle_language
+        self.assertEquals(views.language_page_title(fr),
+                          'French Title with subtitles | Amara')
+
+    def test_video_language_title_fallback(self):
+        # if a language doesn't have a title, then we fall back to the video
+        # title (which is the english title, since that's the primary audoio
+        video = test_factories.create_video(
+            primary_audio_language_code='en', title='Video Title')
+        en_version = pipeline.add_subtitles(video, 'en', None)
+        en = en_version.subtitle_language
+        self.assertEquals(views.language_page_title(en),
+                          'Video Title with subtitles | Amara')
 
 class MakeLanguageListTestCase(TestCase):
     def setUp(self):
@@ -508,7 +552,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'complete', ['original'], lang.get_absolute_url()),
         ])
 
@@ -517,7 +561,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'incomplete', ['original', 'incomplete'],
              lang.get_absolute_url()),
         ])
@@ -527,7 +571,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('Arabic', 'complete', [], lang.get_absolute_url()),
         ])
 
@@ -536,7 +580,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (1500, 2500, "World"),
         ])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('French', 'incomplete', ['incomplete'], lang.get_absolute_url()),
         ])
 
@@ -545,7 +589,7 @@ class MakeLanguageListTestCase(TestCase):
             (0, 1000, "Hello, ", {'new_paragraph':True}),
             (None, None, "World"),
         ])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('Japanese', 'needs-timing', ['incomplete'], lang.get_absolute_url()),
         ])
 
@@ -563,7 +607,7 @@ class MakeLanguageListTestCase(TestCase):
         review_task = task.complete()
         # now in the review phase
         self.assertEquals(review_task.type, Task.TYPE_IDS['Review'])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'needs-review', ['original', 'needs review'],
              lang.get_absolute_url()),
         ])
@@ -587,7 +631,7 @@ class MakeLanguageListTestCase(TestCase):
         approve_task = review_task.complete()
         # now in the approval phase
         self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'needs-review', ['original', 'needs approval'],
              lang.get_absolute_url()),
         ])
@@ -611,14 +655,14 @@ class MakeLanguageListTestCase(TestCase):
         new_subtitle_task = review_task.complete()
         # now in the approval phase
         self.assertEquals(new_subtitle_task.type, Task.TYPE_IDS['Subtitle'])
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'needs-review', ['original', 'needs editing'],
              lang.get_absolute_url()),
         ])
 
     def test_no_lines(self):
         pipeline.add_subtitles(self.video, 'pt', None)
-        self.assertEquals(LanguageList(self.video).items, [ ])
+        self.assertEquals(views.LanguageList(self.video).items, [ ])
 
     def test_multiple_languages(self):
         # english is the original, completed language
@@ -646,7 +690,7 @@ class MakeLanguageListTestCase(TestCase):
 
         # LanguageList should return lines for all the languages, with
         # the original first, then the rest in alphabetical order.
-        self.assertEquals(LanguageList(self.video).items, [
+        self.assertEquals(views.LanguageList(self.video).items, [
             ('English', 'complete', ['original'], en.get_absolute_url()),
             ('Arabic', 'complete', [], ar.get_absolute_url()),
             ('French', 'incomplete', ['incomplete'], fr.get_absolute_url()),

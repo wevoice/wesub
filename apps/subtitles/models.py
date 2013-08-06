@@ -38,6 +38,7 @@ from babelsubs.storage import SubtitleSet
 from babelsubs.storage import diff as diff_subtitles
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
+from videos.behaviors import make_video_title
 
 from utils.compress import compress, decompress
 from utils.redis_utils import RedisSimpleField
@@ -470,6 +471,15 @@ class SubtitleLanguage(models.Model):
 
         return super(SubtitleLanguage, self).save(*args, **kwargs)
 
+    def title_display(self):
+        tip = self.get_tip()
+        if tip is not None:
+            return tip.title_display()
+        else:
+            # fall back to the video title, but prevent infinite loops if we
+            # are the primary audio language
+            return self.video.title_display(
+                use_language_title=not self.is_primary_audio_language())
 
     def get_tip(self, public=False, full=False):
         """Return the tipmost version of this language (if any).
@@ -719,10 +729,8 @@ class SubtitleLanguage(models.Model):
             return tip.get_subtitle_count()
         return 0
 
-
     def is_primary_audio_language(self):
         return self.video.primary_audio_language_code == self.language_code
-
 
     def versions_for_user(self, user):
         from teams.models import TeamVideo
@@ -1126,6 +1134,19 @@ class SubtitleVersion(models.Model):
     serialized_lineage = models.TextField(blank=True)
 
     objects = SubtitleVersionManager()
+
+    def title_display(self):
+        if self.title and self.title.strip():
+            return make_video_title(self.video, self.title,
+                                    self.get_metadata())
+        else:
+            # fall back to the video title, but prevent infinite loops if we
+            # are the primary audio language
+            return self.video.title_display(
+                use_language_title=not self.is_for_primary_audio_language())
+
+    def is_for_primary_audio_language(self):
+        return self.video.primary_audio_language_code == self.language_code
 
     def get_subtitles(self):
         """Return the SubtitleSet for this version.
