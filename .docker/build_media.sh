@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 source /usr/local/bin/config_env.sh
 
 cd $APP_DIR
