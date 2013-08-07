@@ -1807,7 +1807,7 @@ class VideoUrl(models.Model):
 
     @property
     def effective_url(self):
-        self.get_video_type_class().video_url(self)
+        return self.get_video_type_class().video_url(self)
 
     def kaltura_id(self):
         if self.type == 'K':
