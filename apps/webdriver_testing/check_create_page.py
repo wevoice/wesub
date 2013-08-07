@@ -141,7 +141,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         """Add a youtube user feed
 
         """
-        youtube_user = 'croatiadivers'
+        youtube_user = 'janetefinn'
         self.create_pg.submit_youtube_users_videos(youtube_user, save=True)
         self.assertTrue(self.create_pg.multi_submit_successful())
 

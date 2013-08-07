@@ -476,11 +476,13 @@ class Page(object):
         except NoSuchElementException:
             return None
 
-    def open_page(self, url):
+    def open_page(self, url, alert_check=False):
         """Open a page by the full url.
 
         """
         self.browser.get(self.get_absolute_url(url))
+        if alert_check:
+            self.handle_js_alert('accept')
 
     def go_back(self):
         """Go back to previous page.  """

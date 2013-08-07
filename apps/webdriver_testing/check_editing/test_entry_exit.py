@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+from django.test import TestCase
+from django.core import management
 
 from apps.videos.models import Video
 
@@ -23,14 +25,18 @@ from apps.webdriver_testing.data_factories import TeamMemberFactory
 
 class TestCaseEntryExit(WebdriverTestCase):
     """Entry and Exit points to New Editor. """
-    fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
-                'apps/webdriver_testing/fixtures/editor_videos.json',
-                'apps/webdriver_testing/fixtures/editor_subtitles.json']
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
         super(TestCaseEntryExit, cls).setUpClass()
+        fixt_data = [
+                     'apps/webdriver_testing/fixtures/editor_auth.json', 
+                     'apps/webdriver_testing/fixtures/editor_videos.json',
+                     'apps/webdriver_testing/fixtures/editor_subtitles.json'
+        ]
+        for f in fixt_data:
+            management.call_command('loaddata', f, verbosity=0)
         cls.logger.info("""Default Test Data - loaded from fixtures
 
                         English, source primary v2 -> v6
@@ -59,7 +65,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         cls.tasks_tab = TasksTab(cls)
 
         cls.user = UserFactory.create()
-        cls.video_pg.open_page('videos/watch/')
+        cls.video_pg.open_page('auth/login/')
         cls.video_pg.log_in(cls.user, 'password')
 
         #Create a workflow enabled team to check review/approve dialog switching.
@@ -75,11 +81,20 @@ class TestCaseEntryExit(WebdriverTestCase):
                                        approve_allowed = 10, # manager
                                        review_allowed = 10, # peer
                                        )
+        cls.user = UserFactory.create()
+        cls.video_pg.open_page('auth/login/')
+        cls.video_pg.log_in(cls.user.username, 'password')
 
 
 
-    def tearDown(self):
-        self.video_pg.open_page('videos/watch/')
+    @classmethod
+    def tearDownClass(cls):
+        super(TestCaseEntryExit, cls).tearDownClass()
+        management.call_command('flush', verbosity=0, interactive=False)
+
+
+    def setUp(self):
+        self.video_pg.open_page('auth/login', True)
         self.video_pg.handle_js_alert('accept')
 
 
@@ -94,6 +109,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.assertEqual('English', self.editor_pg.selected_ref_language())
         self.assertEqual('English subtitles', 
                           self.editor_pg.working_language())
+        self.editor_pg.exit()
+
 
     def test_timed_to_new_back_to_full(self):
         """From timed editor to beta, reference and working langs are same.
@@ -107,6 +124,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.exit_to_full_editor()
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
+
     def test_forked_to_new(self):
         """Translation editor to beta, reference lang and version is source.
 
@@ -119,6 +137,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
         self.assertEqual('Swedish subtitles', 
                           self.editor_pg.working_language())
+        self.editor_pg.exit()
+
 
 
     def _old_to_new_sv_review(self):
@@ -146,6 +166,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.logger.info('open in new editor')
         self.sub_editor.open_in_beta_editor()
         return video, tv
+        self.editor_pg.exit()
+
 
 
     def test_review_to_new(self):
@@ -154,6 +176,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
         self.assertEqual('Swedish subtitles', 
                           self.editor_pg.working_language())
+        self.editor_pg.exit()
+
 
     def test_review_to_new_back_to_full(self):
         """Start Review task, switch to new editor and back to Review.
@@ -189,6 +213,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.approve_task()
         sv = video.subtitle_language('sv').get_tip(full=True)
         self.assertEqual(5, sv.version_number)
+        self.editor_pg.exit()
+
 
 
 
@@ -212,6 +238,8 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.save('Resume editing')
         self.assertEqual(u"English \u2022 Italo Calvino's Cosmicomics by Sheri Prather",
                          self.editor_pg.video_title())
+        self.editor_pg.exit()
+
 
 
     def test_save_exit(self):
@@ -221,4 +249,3 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.save('Exit')
         self.assertEqual("Italo Calvino's Cosmicomics by Sheri Prather", 
                          self.video_pg.video_title())
-        
