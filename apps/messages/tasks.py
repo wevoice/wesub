@@ -340,7 +340,8 @@ def videos_imported_message(user_pk, imported_videos):
     from messages.models import Message
     user = User.objects.get(pk=user_pk)
     subject = u"Your videos were imported!"
-    url = "%s%s" % (get_url_base(), reverse("profiles:my_videos"))
+    url = "%s%s" % (get_url_base(),
+                    reverse("profiles:videos", kwargs={'user_id': user_pk}))
     context = {"user": user,
                "imported_videos": imported_videos,
                "my_videos_url": url}
