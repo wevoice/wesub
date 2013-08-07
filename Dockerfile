@@ -12,4 +12,4 @@ RUN /bin/bash /tmp/setup.sh
 ADD .docker/run.sh /usr/local/bin/run
 
 EXPOSE 8000
-CMD ["/bin/sh", "-e", "/usr/local/bin/run"]
+CMD ["/bin/bash", "/usr/local/bin/run"]
