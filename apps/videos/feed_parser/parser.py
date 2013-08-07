@@ -147,6 +147,8 @@ class BaseFeedEntryParser(object):
             return entry['media_description']
 
     def _get_entry_thumbnail(self, entry):
+        if entry.get("image") and entry['image'].get('href'):
+            return entry['image']['href']
         if entry.get('media_thumbnail'):
             for thumb in entry['media_thumbnail']:
                 if thumb.get('url'):

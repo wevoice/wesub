@@ -177,6 +177,33 @@ class EntryDataTest(FeedImportTest):
         self.assertEquals(video.thumbnail,
                           'http://example.com/media-enclosure-thumb.jpg')
 
+    def test_itunes_attributes(self):
+        self.set_feed_data("""\
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+     xmlns:itunesu="http://www.itunesu.com/feed" version="2.0" >
+<channel>
+  <title>Test Feed</title>
+  <link>http://example.com/feed</link>
+  <description>Test Feed</description>
+  <item>
+    <title>Entry Title</title>
+    <link>http://qa.pculture.org/amara_tests/1_q5cygpn1</link>
+    <enclosure url="http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/entryId/1_q5cygpn1/flavorId/1_u65nz1sh/name/a.mp4" type="video/mp4"></enclosure>
+    <itunes:author>dean@pculture.org</itunes:author>
+    <itunes:summary>Itunes Description</itunes:summary>
+    <itunes:image href="http://example.com/itunes-thumb.jpg"></itunes:image>
+  </item>
+</channel>
+</rss>""")
+        self.feed.update()
+        video = Video.objects.get()
+        self.assertEquals(video.title, 'Entry Title')
+        self.assertEquals(video.description, 'Itunes Description')
+        self.assertEquals(video.thumbnail,
+                          'http://example.com/itunes-thumb.jpg')
+
+
 # feed data for the tests
 EXAMPLE_FEED_XML = """\
 <?xml version="1.0" encoding="ISO-8859-1" ?>
