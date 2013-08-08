@@ -19,6 +19,7 @@ from base import VideoTypeRegistrar, VideoTypeError
 from youtube import YoutubeVideoType
 from bliptv import BlipTvVideoType
 from htmlfive import HtmlFiveVideoType
+from kaltura import KalturaVideoType
 from dailymotion import DailymotionVideoType
 from vimeo import VimeoVideoType
 from wistia import WistiaVideoType
@@ -29,6 +30,7 @@ from mp3 import Mp3VideoType
 video_type_registrar = VideoTypeRegistrar()
 video_type_registrar.register(YoutubeVideoType)
 video_type_registrar.register(BlipTvVideoType)
+video_type_registrar.register(KalturaVideoType)
 video_type_registrar.register(HtmlFiveVideoType)
 video_type_registrar.register(DailymotionVideoType)
 video_type_registrar.register(VimeoVideoType)

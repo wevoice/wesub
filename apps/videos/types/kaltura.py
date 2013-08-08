@@ -16,5 +16,31 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from .parser import FeedParser
-from .importer import VideoImporter
+from urlparse import urlparse
+
+from videos.types.base import VideoType
+
+def get_kaltura_id(url):
+    path_parts = urlparse(url).path.split("/")
+    try:
+        entry_id_index = path_parts.index('entryId')
+    except ValueError:
+        return None
+    try:
+        return path_parts[entry_id_index+1]
+    except IndexError:
+        return None
+
+class KalturaVideoType(VideoType):
+
+    abbreviation = 'K'
+    name = 'Kaltura'   
+    
+    @classmethod
+    def matches_video_url(cls, url):
+        url = cls.format_url(url)
+        parsed = urlparse(url)
+        return parsed.netloc.endswith("kaltura.com") and get_kaltura_id(url)
+
+    def kaltura_id(self):
+        return get_kaltura_id(self.url)

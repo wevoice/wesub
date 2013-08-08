@@ -1,3 +1,4 @@
+from apps.teams.tests.feeds import *
 from apps.teams.tests.teams import *
 from apps.teams.tests.permissions import *
 from apps.teams.tests.members import *
