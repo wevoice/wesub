@@ -52,13 +52,15 @@ class VideoIndex(CelerySearchIndex):
         return obj.title_display
 
     def prepare(self, obj):
+        obj.prefetch_languages(with_public_tips=True, with_private_tips=True)
         self.prepared_data = super(VideoIndex, self).prepare(obj)
 
-        languages = SubtitleLanguage.objects.having_nonempty_versions().filter(video=obj)
+        languages = [l for l in obj.all_subtitle_languages()
+                     if l.get_tip() is not None]
         collaborators = Collaborator.objects.filter(subtitle_language__video=obj).values("user").distinct().count()
         followers = obj.newsubtitlelanguage_set.all().values("followers").distinct().count()
 
-        self.prepared_data['languages_count'] = languages.count()
+        self.prepared_data['languages_count'] = len(languages)
         self.prepared_data['video_language'] = obj.primary_audio_language_code
         self.prepared_data['languages'] = [language.language_code for language in languages]
         self.prepared_data['contributors_count'] = collaborators + followers

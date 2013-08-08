@@ -340,6 +340,7 @@ class TestViews(WebUseTest):
         self._login()
 
         def _assert_tip_subs(subs):
+            sl_en.clear_tip_cache()
             self.assertEqual([(start, end, txt) for start, end, txt, meta in
                               list(sl_en.get_tip().get_subtitles())],
                              subs)

@@ -18,15 +18,18 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
+import mock
 
-from apps.auth.models import CustomUser as User
-from apps.videos.models import Video
-from apps.videos.tasks import video_changed_tasks
-from apps.videos.tests.data import (
+from auth.models import CustomUser as User
+from subtitles import pipeline
+from subtitles.models import SubtitleLanguage
+from videos.models import Video
+from videos.tasks import video_changed_tasks
+from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
 )
-from apps.widget import video_cache
-
+from widget import video_cache
+from utils import test_factories
 
 def refresh(m):
     return m.__class__._default_manager.get(pk=m.pk)
@@ -205,3 +208,106 @@ class TestModelsSaving(TestCase):
 
         video = _refresh(video)
         self.assertIsNotNone(video.complete_date)
+
+class TestSubtitleLanguageCaching(TestCase):
+    def setUp(self):
+        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+            'video': {
+                'en': [
+                    {},
+                    {},
+                    {}
+                ],
+                'es': [
+                    {},
+                ],
+                'fr': [
+                    {},
+                    {'visibility': 'private'},
+                ],
+            },
+        })
+        self.video = self.videos['video']
+
+    def test_fetch_one_language(self):
+        self.assertEquals(self.video.subtitle_language('en').id,
+                          self.langs['video', 'en'].id)
+
+    def test_fetch_all_languages(self):
+        self.assertEquals(
+            set(l.id for l in self.video.all_subtitle_languages()),
+            set(l.id for l in self.langs.values()))
+
+    def test_cache_one_language(self):
+        # the first call should result in a query
+        with self.assertNumQueries(1):
+            lang = self.video.subtitle_language('en')
+        # subsequent calls shouldn't
+        with self.assertNumQueries(0):
+            self.assertEquals(self.video.subtitle_language('en'), lang)
+            # the language video should be cached as well
+            lang.video
+        # but they should once we clear the cache
+        self.video.clear_language_cache()
+        with self.assertNumQueries(1):
+            self.video.subtitle_language('en')
+
+    def test_cache_all_languages(self):
+        with self.assertNumQueries(1):
+            languages = self.video.all_subtitle_languages()
+
+        lang_map = dict((l.language_code, l) for l in languages)
+        with self.assertNumQueries(0):
+            self.assertEquals(set(languages),
+                              set(self.video.all_subtitle_languages()))
+            # the videos should be cached
+            for lang in languages:
+                lang.video
+            # fetching one video should use the cache as well
+            self.assertEquals(self.video.subtitle_language('en'),
+                              lang_map['en'])
+        self.video.clear_language_cache()
+        with self.assertNumQueries(1):
+            self.video.all_subtitle_languages()
+
+    def test_non_existant_language(self):
+        # subtitle_language() should return None for non-existant languages
+        self.assertEquals(self.video.subtitle_language('pt-br'), None)
+        # we should cache that result
+        with self.assertNumQueries(0):
+            self.assertEquals(self.video.subtitle_language('pt-br'), None)
+        # just because None is in the cache, we shouldn't return it from
+        # all_subtitle_languages()
+        for lang in self.video.all_subtitle_languages():
+            self.assertNotEquals(lang, None)
+        # try that again now that all the languages are cached
+        for lang in self.video.all_subtitle_languages():
+            self.assertNotEquals(lang, None)
+
+    def test_prefetch(self):
+        self.video.prefetch_languages()
+        with self.assertNumQueries(0):
+            self.video.all_subtitle_languages()
+            lang = self.video.subtitle_language('en')
+            # fetching the video should be cached
+            lang.video
+
+    def test_prefetch_some_languages(self):
+        self.video.prefetch_languages(languages=['en', 'es'])
+        with self.assertNumQueries(0):
+            self.video.subtitle_language('en')
+            self.video.subtitle_language('es')
+        with self.assertNumQueries(1):
+            self.video.subtitle_language('fr')
+
+    def test_prefetch_with_tips(self):
+        self.video.prefetch_languages(with_public_tips=True,
+                                      with_private_tips=True)
+        with self.assertNumQueries(0):
+            for lang in self.video.all_subtitle_languages():
+                # fetching the tips should be cached
+                lang.get_tip(public=True)
+                lang.get_tip(public=False)
+                # fetching the version video should be cached
+                lang.get_tip(public=True).video
+                lang.get_tip(public=False).video

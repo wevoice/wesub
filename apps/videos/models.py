@@ -128,6 +128,53 @@ class PublicVideoManager(models.Manager):
     def get_query_set(self):
         return super(PublicVideoManager, self).get_query_set().filter(is_public=True)
 
+class SubtitleLanguageFetcher(object):
+    """Fetches/caches subtitle languages for videos."""
+    def __init__(self):
+        self.cache = {}
+        self.all_languages_fetched = False
+
+    def fetch_one_language(self, video, language_code):
+        if language_code in self.cache:
+            return self.cache[language_code]
+        try:
+            lang = (video.newsubtitlelanguage_set
+                    .get(language_code=language_code))
+            lang.video = video
+        except models.ObjectDoesNotExist:
+            lang = None
+        self.cache[language_code] = lang
+        return lang
+
+    def fetch_all_languages(self, video):
+        if self.all_languages_fetched:
+            return [l for l in self.cache.values() if l is not None]
+
+        languages = list(video.newsubtitlelanguage_set.all())
+        for lang in languages:
+            lang.video = video
+            self.cache[lang.language_code] = lang
+        self.all_languages_fetched = True
+        return languages
+
+    def prefetch_languages(self, video, languages, with_public_tips,
+                           with_private_tips):
+        language_qs = video.newsubtitlelanguage_set.all()
+        if languages is not None:
+            language_qs = language_qs.filter(
+                language_code__in=languages)
+        fetched_languages = language_qs.fetch_and_join(
+            video=video, public_tips=with_public_tips,
+            private_tips=with_private_tips)
+        for lang in fetched_languages:
+            self.cache[lang.language_code] = lang
+        if languages is None:
+            self.all_languages_fetched = True
+
+    def clear_cache(self):
+        self.cache = {}
+        self.all_languages_fetched = False
+
 class Video(models.Model):
     """Central object in the system"""
 
@@ -190,6 +237,10 @@ class Video(models.Model):
 
     objects = models.Manager()
     public  = PublicVideoManager()
+
+    def __init__(self, *args, **kwargs):
+        super(Video, self).__init__(*args, **kwargs)
+        self._language_fetcher = SubtitleLanguageFetcher()
 
     def __unicode__(self):
         title = self.title_display()
@@ -587,26 +638,42 @@ class Video(models.Model):
         return True if self._original_subtitle_language() else False
 
     def subtitle_language(self, language_code=None):
-        """Return the SubtitleLanguage for this video with the given language code, or None.
+        """Get as SubtitleLanguage for this video
 
         If None is passed as a language_code, the original language
         SubtitleLanguage will be returned.  In this case the value will be
         cached in-object.
-
-        This method can produce surprising results if the video has more
-        than one subtitle language with the same code. This is an artifact
-        of when we did not allow this. In this case, we return the
-        language with the most subtitles.
-
         """
-        try:
-            if language_code is None:
-                return self._original_subtitle_language()
-            else:
-                return (self.newsubtitlelanguage_set
-                            .filter(language_code=language_code)[:1].get())
-        except models.ObjectDoesNotExist:
-            return None
+        if language_code is None:
+            language_code = self.primary_audio_language_code
+            if not language_code:
+                return None
+        return self._language_fetcher.fetch_one_language(self, language_code)
+
+    def all_subtitle_languages(self):
+        return self._language_fetcher.fetch_all_languages(self)
+
+    def prefetch_languages(self, languages=None, with_public_tips=False,
+                           with_private_tips=False):
+        """Prefetch and cache languages/versions for this video
+
+        This method fetches subtitle languages and subtitle versions for this
+        video and sets up various caches to reduce future queries.
+
+        :lanuages: list of languages to fetch, or None to fetch all languages.
+        subtitle_language() and all_subtitle_languages() will cache these
+        languages.
+        :with_public_tips: fetch the public tips for all the languages and
+        cache them
+        :with_private_tips: fetch the private tips for all the languages and
+        cache them
+        """
+        self._language_fetcher.prefetch_languages(self, languages,
+                                                  with_public_tips,
+                                                  with_private_tips)
+
+    def clear_language_cache(self):
+        self._language_fetcher.clear_cache()
 
     def subtitle_languages(self, language_code):
         """Return all SubtitleLanguages for this video with the given language code."""
