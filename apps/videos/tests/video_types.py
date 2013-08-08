@@ -35,6 +35,7 @@ from apps.videos.types.brigthcove  import BrightcoveVideoType
 from apps.videos.types.dailymotion import DailymotionVideoType
 from apps.videos.types.flv import FLVVideoType
 from apps.videos.types.htmlfive import HtmlFiveVideoType
+from apps.videos.types.kaltura import KalturaVideoType
 from apps.videos.types.mp3 import Mp3VideoType
 from apps.videos.types.vimeo import VimeoVideoType
 from apps.videos.types.youtube import (
@@ -461,3 +462,11 @@ class CreditTest(TestCase):
         self.assertFalse(should_add_credit(sv))
 
 
+class KalturaVideoTypeTest(TestCase):
+    def test_type(self):
+        url = 'http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/entryId/1_zr7niumr/flavorId/1_djpnqf7y/name/a'
+
+        video, created = Video.get_or_create_for_url(url)
+        vu = video.videourl_set.get()
+        self.assertEquals(vu.type, 'K')
+        self.assertEquals(vu.kaltura_id(), '1_zr7niumr')

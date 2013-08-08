@@ -42,7 +42,7 @@ from auth.models import CustomUser as User, Awards
 from videos import behaviors
 from videos import metadata
 from videos.types import video_type_registrar
-from videos.feed_parser import FeedParser
+from videos.feed_parser import VideoImporter
 from comments.models import Comment
 from statistic import st_widget_view_statistic
 from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
@@ -1789,15 +1789,31 @@ class VideoUrl(models.Model):
         self.primary = True
         self.save(updates_timestamp=False)
 
-    @property
-    def effective_url(self):
+    def get_video_type_class(self):
         try:
-            return video_type_registrar[self.type].video_url(self)
+            return video_type_registrar[self.type]
         except KeyError:
             vt = video_type_registrar.video_type_for_url(self.url)
             self.type = vt.abbreviation
             self.save()
-            return video_type_registrar[self.type].video_url(self)
+            return tv
+
+    def get_video_type(self):
+        if hasattr(self, '_video_type'):
+            return self._video_type
+        vt_class = self.get_video_type_class()
+        self._video_type = vt_class(self.url)
+        return self._video_type
+
+    @property
+    def effective_url(self):
+        return self.get_video_type_class().video_url(self)
+
+    def kaltura_id(self):
+        if self.type == 'K':
+            return self.get_video_type().kaltura_id()
+        else:
+            return None
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         assert self.type != '', "Can't set an empty type"
@@ -1830,47 +1846,11 @@ class VideoFeed(models.Model):
         return self.url
 
     def update(self):
-        feed_parser = FeedParser(self.url)
+        importer = VideoImporter(self.user, self.user, self.last_link)
+        importer.import_videos()
 
-        checked_entries = 0
-        last_link = self.last_link
-
-        try:
-            self.last_link = feed_parser.feed.entries[0]['link']
+        if importer.last_link is not None:
+            self.last_link = importer.last_link
             self.save()
-        except (IndexError, KeyError):
-            pass
 
-        checked_entries += self._create_videos(feed_parser, last_link)
-
-        if not last_link and 'youtube' in self.url:
-            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
-
-            while next_url:
-                url = next_url[0].href
-                feed_parser = FeedParser(url)
-                checked_entries += self._create_videos(feed_parser, last_link)
-                next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
-
-        return checked_entries
-
-    def _get_pages(self, total):
-        pages = float(total) / float(self.YOUTUBE_PAGE_SIZE)
-
-        if pages > int(pages):
-            pages = int(pages) + 1
-        else:
-            pages = int(pages)
-
-        return pages
-
-    def _create_videos(self, feed_parser, last_link):
-        checked_entries = 0
-
-        _iter = feed_parser.items(since=last_link, ignore_error=True)
-
-        for vt, info, entry in _iter:
-            vt and Video.get_or_create_for_url(vt=vt, user=self.user)
-            checked_entries += 1
-
-        return checked_entries
+        return importer.checked_entries

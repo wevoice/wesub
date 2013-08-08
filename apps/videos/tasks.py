@@ -31,15 +31,17 @@ from raven.contrib.django.models import client
 
 from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
+from messages import tasks
 from utils import send_templated_email, DEFAULT_PROTOCOL
 from utils.metrics import Gauge, Meter
 from videos.models import VideoFeed, Video, VIDEO_TYPE_YOUTUBE, VideoUrl
 from subtitles.models import (
     SubtitleLanguage, SubtitleVersion
 )
+from auth.models import CustomUser as User
 from videos.types import video_type_registrar
 from apps.videos.types import VideoTypeError
-from videos.feed_parser import FeedParser
+from videos.feed_parser import VideoImporter
 
 celery_logger = logging.getLogger('celery.task')
 
@@ -186,7 +188,6 @@ def subtitles_complete_changed(language_pk):
 @task()
 def send_change_title_email(video_id, user_id, old_title, new_title):
     from videos.models import Video
-    from auth.models import CustomUser as User
 
     domain = Site.objects.get_current().domain
 
@@ -217,56 +218,29 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
 
 @task()
 def import_videos_from_feeds(urls, user_id=None, team_id=None):
-    from auth.models import CustomUser as User
-    from teams.models import Team, TeamVideo
-    from messages import tasks as notifier
-    from teams.signals import api_teamvideo_new
     from teams.permissions import can_add_video
-
+    from teams.models import Team
     try:
         user = User.objects.get(id=user_id)
     except ObjectDoesNotExist:
         user = None
+    team = None
+    if user is not None:
+        try:
+            team = Team.objects.get(id=team_id)
+            if not can_add_video(team, user):
+                team = None
+        except Team.DoesNotExist:
+            pass
 
-    videos = []
-    last_entry = dict()
-
+    video_count = 0
     for url in urls:
-        feed_parser = FeedParser(url)
-
-        for vt, info, entry in feed_parser.items():
-            if not vt:
-                continue
-
-            videos.append(Video.get_or_create_for_url(vt=vt, user=user))
-            last_entry = entry
-        else:
-            _save_video_feed(url, last_entry.get('link', ''), user)
-
-    try:
-        team = Team.objects.get(id=team_id)
-        project = team.default_project
-
-        if not can_add_video(team, user):
-            team = None
-    except Team.DoesNotExist:
-        team = None
-
-    if team and user:
-        for video, created in videos:
-            try:
-                tv = TeamVideo.objects.get(video=video, team=team)
-            except TeamVideo.DoesNotExist:
-                tv = TeamVideo(video=video, team=team, added_by=user,
-                               project=project)
-                tv.title = video.title
-                tv.description = video.description
-                tv.save()
-
-                api_teamvideo_new.send(tv)
-
-    if user:
-        notifier.videos_imported_message.delay(user_id, len(videos))
+        importer = VideoImporter(url, user, team=team)
+        importer.import_videos()
+        _save_video_feed(url, importer.last_link, user)
+        video_count += importer.video_count
+    if user and video_count > 0:
+        tasks.videos_imported_message.delay(user_id, video_count)
 
 @task()
 def upload_subtitles_to_original_service(version_pk):

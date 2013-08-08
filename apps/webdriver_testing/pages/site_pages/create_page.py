@@ -52,8 +52,7 @@ class CreatePage(UnisubsPage):
         self.logger.info('Submitting youtube users videos: '
                          '%s' %youtube_usernames)
         self._open_multi_submit()
-        for name in youtube_usernames:
-            self.type_by_css(self._YOUTUBE_USER_FIELD, name)
+        self.type_by_css(self._YOUTUBE_USER_FIELD, youtube_usernames)
         if save == True:
             self.click_by_css(self._SAVE_OPTION)
         self.submit_by_css(self._SUBMIT_MULTI)

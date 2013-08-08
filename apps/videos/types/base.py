@@ -33,7 +33,7 @@ class VideoType(object):
     @property
     def video_id(self):
         return
-    
+
     @classmethod 
     def video_url(cls, obj):
         return obj.url

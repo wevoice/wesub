@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import os
+from django.test import TestCase
+from django.core import management
 
 from datetime import datetime as dt
 
@@ -15,14 +17,20 @@ from apps.webdriver_testing.pages.site_pages import editor_page
 from apps.webdriver_testing.data_factories import UserFactory
 
 class TestCaseLeftSide(WebdriverTestCase):
-    fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
-                'apps/webdriver_testing/fixtures/editor_videos.json',
-                'apps/webdriver_testing/fixtures/editor_subtitles.json']
+
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
         super(TestCaseLeftSide, cls).setUpClass()
+        fixt_data = [
+                     'apps/webdriver_testing/fixtures/editor_auth.json', 
+                     'apps/webdriver_testing/fixtures/editor_videos.json',
+                     'apps/webdriver_testing/fixtures/editor_subtitles.json'
+        ]
+        for f in fixt_data:
+            management.call_command('loaddata', f, verbosity=0)
+        
         cls.logger.info("""Default Test Data loaded from fixtures
 
                         English, source primary v2 -> v6
@@ -42,20 +50,26 @@ class TestCaseLeftSide(WebdriverTestCase):
                        """)
         cls.editor_pg = editor_page.EditorPage(cls)
         cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create()
         cls.video_pg = video_page.VideoPage(cls)
-        cls.video_pg.open_page('videos/watch/')
+        cls.user = UserFactory.create()
+        cls.video_pg.open_page('auth/login/', alert_check=True)
         cls.video_pg.log_in(cls.user.username, 'password')
 
-    def tearDown(self):
-        if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
-            self.editor_pg.exit()
+
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestCaseLeftSide, cls).tearDownClass()
+        management.call_command('flush', verbosity=0, interactive=False)
+
         
     def test_reference_lang__forked(self):
         """Default reference lang for forked translation is the same lang. """
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'sv')
         self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.editor_pg.exit()
+
 
 
     def test_reference_lang__primary(self):
@@ -63,12 +77,16 @@ class TestCaseLeftSide(WebdriverTestCase):
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.editor_pg.exit()
+
 
     def test_reference_lang__translation(self):
         """Default reference lang for translation is the parent lang. """
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'da')
         self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.editor_pg.exit()
+
 
     def test_reference_version__translation_latest(self):
         """Default reference version is version translatied from source. """
@@ -77,6 +95,8 @@ class TestCaseLeftSide(WebdriverTestCase):
         self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
         self.editor_pg.open_editor_page(video.video_id, 'da')
         self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
+        self.editor_pg.exit()
+
 
     def test_reference_text_displayed(self):
         """Reference language text updated when language and version changed.
@@ -99,6 +119,8 @@ class TestCaseLeftSide(WebdriverTestCase):
         self.logger.info(self.editor_pg.reference_text(3))
         self.assertEqual(u'可以来解决各种迫切的问题。', 
                          self.editor_pg.reference_text(3))
+        self.editor_pg.exit()
+
 
     def test_reference_private_versions(self):
         """Reference version has no default when all versions are private
@@ -113,17 +135,23 @@ class TestCaseLeftSide(WebdriverTestCase):
         self.assertEqual(None, self.editor_pg.default_ref_version())
         self.assertEqual(None, 
                          self.editor_pg.reference_text(1))
+        self.editor_pg.exit()
 
 
 class TestCaseCenter(WebdriverTestCase):
-    fixtures = ['apps/webdriver_testing/fixtures/editor_auth.json', 
-                'apps/webdriver_testing/fixtures/editor_videos.json',
-                'apps/webdriver_testing/fixtures/editor_subtitles.json']
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
         super(TestCaseCenter, cls).setUpClass()
+        fixt_data = [
+                     'apps/webdriver_testing/fixtures/editor_auth.json', 
+                     'apps/webdriver_testing/fixtures/editor_videos.json',
+                     'apps/webdriver_testing/fixtures/editor_subtitles.json'
+        ]
+        for f in fixt_data:
+            management.call_command('loaddata', f, verbosity=0)
+
         cls.logger.info("""Default Test Data
 
                         video[0]:
@@ -149,17 +177,23 @@ class TestCaseCenter(WebdriverTestCase):
         cls.editor_pg = editor_page.EditorPage(cls)
         cls.data_utils = data_helpers.DataHelpers()
         cls.video_pg = video_page.VideoPage(cls)
+        cls.user = UserFactory.create()
+        cls.video_pg.open_page('auth/login/')
+        cls.video_pg.log_in(cls.user.username, 'password')
+
+
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestCaseCenter, cls).tearDownClass()
+        management.call_command('flush', verbosity=0, interactive=False)
+
 
     def setUp(self):
-        self.user = UserFactory.create()
-        self.video_pg.open_page('videos/watch/')
+        self.video_pg.open_page('auth/login/', True)
         self.video_pg.log_in(self.user.username, 'password')
 
-        
 
-    def tearDown(self):
-        if self.editor_pg.is_element_present(self.editor_pg.EXIT_BUTTON):
-            self.editor_pg.exit()
 
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
@@ -167,6 +201,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.editor_pg.open_editor_page(video.video_id, 'en')
         sub_text, _ = self.editor_pg.click_working_sub_line(3)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
+        self.editor_pg.exit()
+
 
     def test_remove_active_subtitle(self):
         """Remove the selected subtitle line.
@@ -180,6 +216,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.assertEqual(subtext[2], removed_text)
         subtext = self.editor_pg.working_text()
         self.assertNotEqual(subtext[2], removed_text)
+        self.editor_pg.exit()
+
         
 
     def test_working_language(self):
@@ -188,12 +226,16 @@ class TestCaseCenter(WebdriverTestCase):
         self.assertEqual('English subtitles', self.editor_pg.working_language())
         self.editor_pg.open_editor_page(video.video_id, 'tr')
         self.assertEqual('Turkish subtitles', self.editor_pg.working_language())
+        self.editor_pg.exit()
+
 
     def test_page_title(self):
         video = Video.objects.all()[0]
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.assertEqual(u'English \u2022 Open Source Philosophy',
                          self.editor_pg.video_title())
+        self.editor_pg.exit()
+
 
 
     def test_info_tray(self):
@@ -209,6 +251,8 @@ class TestCaseCenter(WebdriverTestCase):
                          'character count is not expected value')
         self.assertEqual('19.5', sub_info['Chars/sec'], 
                          'character rate is not expected value')
+        self.editor_pg.exit()
+
 
     def test_info_tray__multiline(self):
         """Info tray displays start, stop, char count, chars/second."""
@@ -224,6 +268,8 @@ class TestCaseCenter(WebdriverTestCase):
                          'Line 2 is not expected value')
         self.assertEqual('59', sub_info['Characters'], 
                          'character count is not expected value')
+        self.editor_pg.exit()
+
 
     def test_info_tray__char_updates(self):
         """Info tray character counts updates dynamically"""
@@ -233,6 +279,8 @@ class TestCaseCenter(WebdriverTestCase):
         sub_info  = (self.editor_pg.subtitle_info(1, active=True))
         self.assertEqual('11', sub_info['Characters'], 
                          'character count is not expected value')
+        self.editor_pg.exit()
+
 
 
     def test_add_lines_to_end(self):
@@ -245,6 +293,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.editor_pg.add_subs_to_the_end(subs)
         new_subs = self.editor_pg.working_text()[-3:]
         self.assertEqual(subs, new_subs)
+        self.editor_pg.exit()
+
 
     def test_one_version__original(self):
         """Video with only 1 version displays subs in working section.
@@ -255,6 +305,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.editor_pg.open_editor_page(video.video_id, 'en')
         self.assertEqual(5, len(self.editor_pg.working_text()))
         self.assertEqual(5, len(self.editor_pg.reference_text()))
+        self.editor_pg.exit()
+
 
     def test_one_version__forked(self):
         """Video with only 1 version displays subs in working section.
@@ -264,6 +316,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.logger.info('checking subs on single version forked')
         self.editor_pg.open_editor_page(video.video_id, 'nl')
         self.assertEqual(6, len(self.editor_pg.working_text()))
+        self.editor_pg.exit()
+
 
     def test_sync_subs(self):
         """Sync subtitles """
@@ -279,7 +333,9 @@ class TestCaseCenter(WebdriverTestCase):
                   for (x, y) in zip(times[1:], times[:-1])]
         self.logger.info(diffs)
         for x in diffs:
-            self.assertGreater(x.seconds, 4)   
+            self.assertGreater(x.seconds, 4)
+        self.editor_pg.exit()
+
 
     def test_syncing_scroll(self):
         """Scroll sub list while syncing so sub text is always in view.
@@ -295,6 +351,8 @@ class TestCaseCenter(WebdriverTestCase):
             el = self.editor_pg.working_text_elements()[x]
             self.assertTrue(el.is_displayed())
             self.editor_pg.sync(1, sub_length=1, sub_space=.05)
+        self.editor_pg.exit()
+
 
     def test_helper_syncing(self):
         """Sync helper stays in view while syncing subs.
@@ -310,6 +368,8 @@ class TestCaseCenter(WebdriverTestCase):
         for x in range(0, 20):
             self.editor_pg.sync(1, sub_length=1, sub_space=.05)
             self.assertTrue(self.editor_pg.sync_help_displayed())
+        self.editor_pg.exit()
+
 
     def test_helper_scrolling(self):
         """Sync helper not in view after manually scrolling subs.
@@ -327,6 +387,8 @@ class TestCaseCenter(WebdriverTestCase):
         self.editor_pg.toggle_playback()
         self.browser.execute_script("window.location.hash='add-sub-at-end'")
         self.assertFalse(self.editor_pg.sync_help_displayed())
+        self.editor_pg.exit()
+
 
 
     def test_rtl(self):
@@ -346,4 +408,6 @@ class TestCaseCenter(WebdriverTestCase):
         self.assertEqual(expected_text, sub_text)
         self.assertEqual(sub_text, self.editor_pg.sub_overlayed_text())
         self.assertEqual(expected_text, sub_text)
+        self.editor_pg.exit()
+
 

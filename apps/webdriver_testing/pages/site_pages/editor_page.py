@@ -141,6 +141,7 @@ class EditorPage(UnisubsPage):
                 return
         else:
             self.record_error('%s is not a save text option.' % save_option)
+        self.handle_js_alert('accept')
 
 
     def save_disabled(self):
@@ -306,9 +307,11 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_not_present(self._APPROVE)
 
 
+
     def send_back_task(self): 
         self.click_by_css(self._SEND_BACK)
-        self.wait_for_element_not_present(self._SEND_BACK)       
+        self.wait_for_element_not_present(self._SEND_BACK)
+       
 
     def exit_to_full_editor(self):
         """Click exit and return to the full editor. """
@@ -351,6 +354,8 @@ class EditorPage(UnisubsPage):
     def endorse_subs(self):
         self.click_by_css(self._ENDORSE, self._EXIT_BUTTON)
         self.click_by_css(self._EXIT_BUTTON)
+        self.handle_js_alert('accept')
+
 
     def next_step(self):
         els = self.get_elements_list(self._NEXT_STEP)

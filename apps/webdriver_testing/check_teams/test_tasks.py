@@ -1163,12 +1163,8 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         cls.tasks_tab.open_team_page(cls.team.slug)
 
 
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
-        self.tasks_tab.open_team_page(self.team.slug)
-        self.tasks_tab.handle_js_alert('accept')
-
+    def setUp(self):
+        self.tasks_tab.open_page('teams/%s' % self.team.slug, True)
 
 
     def test_transcription__save(self):
@@ -1194,6 +1190,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
                                            tv.title)
         self.assertEqual(task['assignee'], 'Assigned to me')
+
 
 
     def test_transcription__complete(self):
@@ -1347,7 +1344,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.tasks_tab.handle_js_alert(action='accept')
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('MYTMP/%s' % self.id())
         if self.workflow.approve_allowed != 10:
             self.workflow.approve_allowed = 10
             self.workflow.save()
