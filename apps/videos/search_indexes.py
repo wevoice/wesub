@@ -1,18 +1,21 @@
-from haystack.indexes import *
-from haystack.models import SearchResult
-from haystack import site
-from models import Video
-from apps.subtitles.models import SubtitleLanguage, Collaborator
-from utils.celery_search_index import CelerySearchIndex
-from django.conf import settings
-from haystack.query import SearchQuerySet
 import datetime
 
+from django.conf import settings
+from django.template import loader, Context
+from haystack import site
+from haystack.indexes import *
+from haystack.models import SearchResult
+from haystack.query import SearchQuerySet
 from haystack.exceptions import AlreadyRegistered
 
+from apps.subtitles.models import SubtitleLanguage, Collaborator
+from utils.celery_search_index import CelerySearchIndex
+from videos.models import Video
+
+
 class VideoIndex(CelerySearchIndex):
-    text = CharField(document=True, use_template=True)
-    title = CharField(model_attr='title_display', boost=2)
+    text = CharField(document=True)
+    title = CharField(boost=2)
     languages = MultiValueField(faceted=True)
     video_language = CharField(faceted=True)
     languages_count = IntegerField()
@@ -21,8 +24,8 @@ class VideoIndex(CelerySearchIndex):
     small_thumbnail = CharField(model_attr='get_small_thumbnail', indexed=False)
     created = DateTimeField(model_attr='created')
     edited = DateTimeField(model_attr='edited')
-    subtitles_fetched_count = IntegerField(model_attr='subtitles_fetched_count')
-    widget_views_count = IntegerField(model_attr='widget_views_count')
+    subtitles_fetched_count = IntegerField()
+    widget_views_count = IntegerField()
     comments_count = IntegerField()
 
     contributors_count = IntegerField()
@@ -33,13 +36,20 @@ class VideoIndex(CelerySearchIndex):
     week_views = IntegerField()
     month_views = IntegerField()
     year_views = IntegerField()
-    total_views = IntegerField(model_attr='widget_views_count')
+    total_views = IntegerField()
 
     # non public videos won't show up in any of the site's listing
     # not even for the owner
     is_public = BooleanField()
 
     IN_ROW = getattr(settings, 'VIDEO_IN_ROW', 6)
+
+    def prepare_text(self, obj):
+        t = loader.get_template('search/indexes/videos/video_text.txt')
+        return t.render(Context({'object': obj}))
+
+    def prepare_title_display(self, obj):
+        return obj.title_display
 
     def prepare(self, obj):
         self.prepared_data = super(VideoIndex, self).prepare(obj)
@@ -52,15 +62,28 @@ class VideoIndex(CelerySearchIndex):
         self.prepared_data['video_language'] = obj.primary_audio_language_code
         self.prepared_data['languages'] = [language.language_code for language in languages]
         self.prepared_data['contributors_count'] = collaborators + followers
+        self.prepared_data['title'] = obj.title_display().strip()
+        self.prepared_data['is_public'] = obj.is_public
+        self.prepare_action_counts(obj)
+        self.prepare_widget_counts(obj)
+
+        return self.prepared_data
+
+    def prepare_action_counts(self, obj):
         self.prepared_data['activity_count'] = obj.action_set.count()
         self.prepared_data['week_views'] = obj.views['week']
         self.prepared_data['month_views'] = obj.views['month']
         self.prepared_data['year_views'] = obj.views['year']
         self.prepared_data['today_views'] = obj.views['today']
-        self.prepared_data['title'] = obj.title_display().strip()
-        self.prepared_data['is_public'] = obj.is_public
 
-        return self.prepared_data
+    def prepare_subtitles_fetched_count(self, obj):
+        return obj.subtitles_fetched_count
+
+    def prepare_widget_counts(self, obj):
+        # FIXME: we have 2 fields indexing the same data
+        count = obj.widget_views_count
+        self.prepared_data['widget_views_count'] = count
+        self.prepared_data['total_views'] = count
 
     def _setup_save(self, model):
         pass
