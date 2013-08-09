@@ -31,6 +31,7 @@ from apps.videos.types import video_type_registrar
 from apps.videos.models import Video, VideoUrl
 from apps.videos.models import SubtitleVersion as OldSubtitleVersion
 from apps.videos.models import SubtitleLanguage as OldSubtitleLanguage
+from apps.subtitles.models import SubtitleLanguage
 from apps.subtitles import pipeline
 from apps.accountlinker.models import ThirdPartyAccount
 
@@ -207,3 +208,35 @@ def create_old_subtitle_version(old_language, user, **kwargs):
     }
     defaults.update(kwargs)
     return OldSubtitleVersion.objects.create(**defaults)
+
+def bulk_subs(sub_data):
+    """Create a bunch of videos/languages/versions
+
+    sub_data is a dict of dicts containing the data to create the objects
+    with:
+
+    * sub_data maps video titles to language data
+    * language data map language codes to a list of version data
+    * version data is a dict containing kwargs to pass to
+    pipeline.create_subtitles().
+
+    returns a tuple of dicts:
+    * a dict that maps video titles to videos
+    * a dict that maps (title, language_code) to languages
+    * a dict that maps (title, language_code, version_number) to versions
+    """
+    videos = {}
+    langs = {}
+    versions = {}
+    for video_title, language_data in sub_data.items():
+        video = create_video(title=video_title)
+        videos[video_title] = video
+        for language_code, version_data in language_data.items():
+            lang = SubtitleLanguage.objects.create(
+                video=video, language_code=language_code)
+            langs[video_title, language_code] = lang
+            for kwargs in version_data:
+                v = pipeline.add_subtitles(video, language_code, None,
+                                           **kwargs)
+                versions[video_title, language_code, v.version_number] = v
+    return videos, langs, versions

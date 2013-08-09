@@ -164,6 +164,7 @@ class TestBasicAdding(TestCase):
             SubtitleVersion.objects.filter(video=self.video).count(), 2)
 
         # Make sure it looks sane too.
+        sl.clear_tip_cache()
         v = sl.get_tip(full=True)
         self.assertEqual(v.version_number, 2)
         self.assertEqual(v.language_code, 'en')
