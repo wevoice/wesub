@@ -45,7 +45,7 @@ class Command(BaseCommand):
         self.last_fetch_popular_videos_time = 0
         self.all_video_queue = []
         self.popular_video_queue = []
-        time_per_version = 1.0 / options.get('rate', 1)
+        time_per_version = 1.0 / float(options.get('rate', 1))
 
         while True:
             start_time = time.time()
