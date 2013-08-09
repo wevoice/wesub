@@ -19,6 +19,8 @@
 
 """Basic sanity tests to make sure the subtitle models aren't completely broken."""
 
+from __future__ import absolute_import 
+
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
@@ -33,7 +35,7 @@ from apps.subtitles.tests.utils import (
     ancestor_ids
 )
 from apps.teams.models import Team, TeamMember, TeamVideo
-
+from utils import test_factories
 
 class TestSubtitleLanguage(TestCase):
     def setUp(self):
@@ -1698,6 +1700,194 @@ class TestSubtitleLanguageHavingQueries(TestCase):
         self.assertEqual(self._get_not_nonempty_tip_langs(v1), ['en', 'fr'])
         self.assertEqual(self._get_not_nonempty_tip_langs(v2), ['cy', 'en'])
 
+
+class TestSubtitleLanguageTipQueries(TestCase):
+    def setUp(self):
+        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+            'v1': {
+                'en': [
+                    {},
+                    {},
+                    {}
+                ],
+                'fr': [
+                    {},
+                    {'visibility': 'private'},
+                ],
+                'de': [
+                    {'visibility': 'private'},
+                ],
+                'es': [
+                    {'visibility': 'private',
+                     'visibility_override': 'public'},
+                ],
+            },
+            'v2': {
+                'en': [
+                    {},
+                ],
+                'fr': [
+                    {'visibility': 'public',
+                     'visibility_override': 'private'},
+                ],
+            },
+        })
+
+    def test_tip_query(self):
+        self.assertQuerysetEqual(
+            SubtitleVersion.objects.public_tips(), map(repr, [
+                self.versions['v1', 'en', 3],
+                self.versions['v1', 'fr', 1],
+                self.versions['v1', 'es', 1],
+                self.versions['v2', 'en', 1],
+            ]), ordered=False)
+        self.assertQuerysetEqual(
+            SubtitleVersion.objects.private_tips(), map(repr, [
+            self.versions['v1', 'en', 3],
+            self.versions['v1', 'fr', 2],
+            self.versions['v1', 'de', 1],
+            self.versions['v1', 'es', 1],
+            self.versions['v2', 'en', 1],
+            self.versions['v2', 'fr', 1],
+        ]), ordered=False)
+
+class TestSubtitleLanguageCaching(TestCase):
+    def setUp(self):
+        self.video = test_factories.create_video()
+        pipeline.add_subtitles(self.video, 'en', None, visibility='public')
+        self.public_tip = pipeline.add_subtitles(self.video, 'en', None,
+                                            visibility='public')
+        self.private_tip = pipeline.add_subtitles(self.video, 'en', None,
+                                                  visibility='private')
+
+    def get_lang(self):
+        return SubtitleLanguage.objects.get(video=self.video,
+                                            language_code='en')
+
+    def test_get_tip_sets_cache(self):
+        lang = self.get_lang()
+        self.assertEquals(lang._tip_cache, {})
+        public_tip = lang.get_tip(public=True)
+        self.assertEquals(lang._tip_cache, {'public': public_tip})
+        private_tip = lang.get_tip(public=False)
+        self.assertEquals(lang._tip_cache,
+                          {'public': public_tip, 'extant': private_tip})
+
+    def test_cache_tip_sets_cache(self):
+        lang = self.get_lang()
+        lang.set_tip_cache('public', self.public_tip)
+        self.assertEquals(lang._tip_cache, {'public': self.public_tip})
+
+    def test_clear_cache(self):
+        lang = self.get_lang()
+        lang.set_tip_cache('public', self.public_tip)
+        lang.clear_tip_cache()
+        self.assertEquals(lang._tip_cache, {})
+
+    def test_tip_cache_skips_query(self):
+        lang = self.get_lang()
+        def check_get_tip(**kwargs):
+            # the first call should result in a query
+            with self.assertNumQueries(1):
+                lang.get_tip(**kwargs)
+            # the subsequent calls should use the cache
+            with self.assertNumQueries(0):
+                lang.get_tip(**kwargs)
+                lang.get_tip(**kwargs)
+                lang.get_tip(**kwargs)
+        check_get_tip()
+        check_get_tip(public=True)
+        check_get_tip(full=True)
+
+    def test_get_tip_sets_video_and_language(self):
+        lang = self.get_lang()
+        lang.video = self.video
+        # get_tip should set the video for the tip, since we know its the same
+        # as our video
+        tip = lang.get_tip()
+        self.assert_(hasattr(tip, '_video_cache'))
+        self.assert_(hasattr(tip, '_subtitle_language_cache'))
+        self.assertEquals(tip.video.id, self.video.id)
+        # check the cache when we don't have a video
+        lang = self.get_lang()
+        tip = lang.get_tip()
+        self.assert_(not hasattr(tip, '_video_cache'))
+        self.assert_(hasattr(tip, '_subtitle_language_cache'))
+        self.assertEquals(tip.video.id, self.video.id)
+
+class TestFetchAndJoin(TestCase):
+    def setUp(self):
+        self.videos, self.langs, self.versions = test_factories.bulk_subs({
+            'v': {
+                'en': [
+                    {},
+                    {},
+                    {}
+                ],
+                'fr': [
+                    {},
+                    {'visibility': 'private'},
+                ],
+                'de': [
+                    {'visibility': 'private'},
+                ],
+                'es': [
+                    {'visibility': 'private',
+                     'visibility_override': 'public'},
+                ],
+            },
+        })
+        self.public_tips = {
+            'en': self.versions['v', 'en', 3],
+            'fr': self.versions['v', 'fr', 1],
+            'es': self.versions['v', 'es', 1],
+        }
+        self.private_tips = {
+            'en': self.versions['v', 'en', 3],
+            'fr': self.versions['v', 'fr', 2],
+            'de': self.versions['v', 'de', 1],
+            'es': self.versions['v', 'es', 1],
+        }
+
+    def test_fetch_and_join_returns_correct_languages(self):
+        video = self.videos['v']
+        qs = video.newsubtitlelanguage_set.all()
+        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
+                                      video=video)
+        self.assertEquals(set(map(repr, languages)),
+                          set(map(repr, self.langs.values())))
+
+    def test_fetch_and_join_sets_tip_cache(self):
+        video = self.videos['v']
+        qs = video.newsubtitlelanguage_set.all()
+        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
+                                      video=video)
+        for l in languages:
+            self.assertEquals(repr(l._tip_cache['public']),
+                              repr(self.public_tips.get(l.language_code)))
+            self.assertEquals(repr(l._tip_cache['extant']),
+                              repr(self.private_tips.get(l.language_code)))
+
+    def test_fetch_and_join_sets_cached_video(self):
+        video = self.videos['v']
+        qs = video.newsubtitlelanguage_set.all()
+        languages = qs.fetch_and_join(public_tips=True, private_tips=True,
+                                      video=video)
+        for lang in languages:
+            self.assert_(hasattr(lang, '_video_cache'))
+            for version in lang._tip_cache.values():
+                if version is not None:
+                    self.assertEquals(version._video_cache.id, video.id)
+
+    def test_fetch_and_join_sets_cached_language(self):
+        video = self.videos['v']
+        qs = video.newsubtitlelanguage_set.all()
+        languages = qs.fetch_and_join(public_tips=True, private_tips=True)
+        for lang in languages:
+            for version in lang._tip_cache.values():
+                if version is not None:
+                    self.assertEquals(version._subtitle_language_cache.id,
+                                      lang.id)
 
 class TestTeamInteractions(TestCase):
     def setUp(self):
