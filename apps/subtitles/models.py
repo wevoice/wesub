@@ -140,6 +140,45 @@ def get_lineage(parents):
     return lineage
 
 
+class SubtitleLanguagageQuerySet(query.QuerySet):
+    def fetch_and_join(self, public_tips=False, private_tips=False,
+                       video=None):
+        """Fetch languages and join them to related models.
+
+        This method is an efficient way to fetch languages under a couple
+        circumstances:
+            - You know the video for the language
+            - You know that you will fetch the tip versions for the language
+
+        fetch_and_join() fetches all tips using 1 query, where usually you
+        would issue a query per language.
+
+        :param public_tips: set the public tip cache for fetched languages
+        :param private_tips: set the private tip cache for fetched languages
+        :param video: set the cached video for all languages/versions fetched
+        :returns: list of SubtitleLanguage objects
+        """
+        langs = list(self)
+        if video is not None:
+            for lang in langs:
+                lang.video = video
+
+        def join_tips(base_qs, cache_name):
+            qs = base_qs.filter(subtitle_language__in=langs)
+            version_map = dict((v.subtitle_language_id, v) for v in qs)
+            for lang in langs:
+                version = version_map.get(lang.id)
+                lang.set_tip_cache(cache_name, version)
+                if version is not None:
+                    lang.optimize_loaded_version(version)
+
+        if public_tips:
+            join_tips(SubtitleVersion.objects.public_tips(), 'public')
+        if private_tips:
+            join_tips(SubtitleVersion.objects.private_tips(), 'extant')
+
+        return langs
+
 # SubtitleLanguages -----------------------------------------------------------
 class SubtitleLanguageManager(models.Manager):
     #  _   _                ______       ______
@@ -157,6 +196,8 @@ class SubtitleLanguageManager(models.Manager):
     # These methods are not fun, and they are not pretty, but they ARE fast.
     #
     # Prepare yourself.
+    def get_query_set(self):
+        return SubtitleLanguagageQuerySet(self.model)
 
     def having_versions(self):
         """Return a QS of SLs that have at least 1 version.
@@ -376,6 +417,9 @@ class SubtitleLanguage(models.Model):
     class Meta:
         unique_together = [('video', 'language_code')]
 
+    def __init__(self, *args, **kwargs):
+        super(SubtitleLanguage, self).__init__(*args, **kwargs)
+        self._tip_cache = {}
 
     # Writelocking
     @property
@@ -495,20 +539,52 @@ class SubtitleLanguage(models.Model):
             assert False, "Cannot specify public and full in get_tip()!"
 
         if public:
-            versions = SubtitleVersion.objects.public()
+            cache_name = 'public'
         elif full:
-            versions = SubtitleVersion.objects.full()
+            cache_name = 'full'
         else:
-            versions = SubtitleVersion.objects.extant()
+            cache_name = 'extant'
+        if cache_name in self._tip_cache:
+            return self._tip_cache[cache_name]
 
+        # cache name is conveniently the same as the SubtitleVersionManager
+        # attribute name.
+        versions = getattr(SubtitleVersion.objects, cache_name)()
         versions = versions.filter(subtitle_language=self)
         versions = versions.order_by('-version_number')
         versions = versions[:1]
 
         if versions:
-            return versions[0]
+            tip = versions[0]
+            self.optimize_loaded_version(tip)
         else:
-            return None
+            tip = None
+
+        self.set_tip_cache(cache_name, tip)
+        return tip
+
+    def set_tip_cache(self, cache_name, version):
+        """Set the tip cache for this language
+
+        Subsequent calls to get_tip() will used the cached version instead of
+        fetching a new one from the DB.
+
+        :param cache_name: one of ('public', 'extant', or 'full')
+        :param version: SubtitleVersion object
+        """
+        self._tip_cache[cache_name] = version
+
+    def optimize_loaded_version(self, version):
+        """Optimize a verison loaded for this language
+
+        This method caches version.language attribute to be this object.
+        Also, if this object has a cached video, then it sets the version's
+        cached video as well.
+        """
+        video_cache_name = SubtitleLanguage.video.cache_name
+        if hasattr(self, video_cache_name):
+            version.video = getattr(self, video_cache_name)
+        version.subtitle_language = self
 
     def get_public_tip(self):
         """Return the latest public tip for a particular version.
@@ -521,6 +597,9 @@ class SubtitleLanguage(models.Model):
 
         """
         return self.get_tip(public=True)
+
+    def clear_tip_cache(self):
+        self._tip_cache = {}
 
     def first_public_version(self):
         """Returns the very fist version to be made public of none"""
@@ -647,6 +726,7 @@ class SubtitleLanguage(models.Model):
             sv.parents.add(p)
 
         cache.invalidate_language_cache(self)
+        self.clear_tip_cache()
         return sv
 
     def get_metadata(self, public=True):
@@ -1012,6 +1092,26 @@ class SubtitleVersionManager(models.Manager):
     def all(self):
         assert False, ('all() is disabled on SubtitleVersion sets.  '
                        'Use full(), extant(), or public() instead.')
+
+    def private_tips(self):
+        tip_where = """\
+subtitles_subtitleversion.version_number = (
+    SELECT MAX(version_number)
+    FROM subtitles_subtitleversion sv2
+    WHERE sv2.subtitle_language_id =
+           subtitles_subtitleversion.subtitle_language_id)"""
+        return self.get_query_set().extra(where=[tip_where])
+
+    def public_tips(self):
+        public_tip_where = """\
+subtitles_subtitleversion.version_number = (
+    SELECT MAX(version_number)
+    FROM subtitles_subtitleversion sv2 
+    WHERE ((sv2.visibility = 'public' AND sv2.visibility_override = '') OR
+           sv2.visibility_override = 'public') AND
+           sv2.subtitle_language_id =
+           subtitles_subtitleversion.subtitle_language_id)"""
+        return self.get_query_set().extra(where=[public_tip_where])
 
     def subtitle_count(self):
         qs = self.get_query_set().extra(select={

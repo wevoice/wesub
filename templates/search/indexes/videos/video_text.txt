@@ -3,7 +3,7 @@
 {% for item in object.videourl_set.all %}
     {{ item.url }}
 {% endfor %}
-{% for lang in object.newsubtitlelanguage_set.all %}
+{% for lang in object.all_subtitle_languages %}
     {% if lang.get_title %}{{ lang.get_title }}{% endif %}
     {{ lang.get_language_code_display }}
     {% for metadata in lang.get_metadata_for_display %}

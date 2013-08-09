@@ -70,6 +70,7 @@ class TestTranslationShims(TestCase):
         #  1 
         d1 = self.sl_de.add_version()
 
+        self.sl_de.clear_tip_cache()
         self.assertFalse(subtitlelanguage_is_translation(self.sl_de))
 
         # en fr de
@@ -83,6 +84,7 @@ class TestTranslationShims(TestCase):
         #  1 
         d2 = self.sl_de.add_version(parents=[f2])
 
+        self.sl_de.clear_tip_cache()
         self.assertTrue(subtitlelanguage_is_translation(self.sl_de))
 
         # Deleting the *source* of a translation shouldn't change the fact that
@@ -100,6 +102,7 @@ class TestTranslationShims(TestCase):
         f2.visibility_override = 'deleted'
         f2.save()
 
+        self.sl_de.clear_tip_cache()
         self.assertTrue(subtitlelanguage_is_translation(self.sl_de))
 
         # But deleting the version that makes a language a translation should.
@@ -107,6 +110,7 @@ class TestTranslationShims(TestCase):
         d2.visibility_override = 'deleted'
         d2.save()
 
+        self.sl_de.clear_tip_cache()
         self.assertFalse(subtitlelanguage_is_translation(self.sl_de))
 
         # Shut up, Pyflakes.
