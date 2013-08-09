@@ -40,19 +40,18 @@ class TestCaseActivity(WebdriverTestCase):
         GET /api2/partners/activity/[activity-id]/
 
         """
-        self.skipTest('Needs to be updated')
         video = self.data_utils.create_video_with_subs()
         TeamVideoFactory.create(team=self.open_team, 
                                 video=video, 
                                 added_by=self.user)
 
-        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
-                                   'Birds_short.webmsd.webm'),
+        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/fireplace.mp4'),
                      'title': 'Test video created via api',
                      'duration': 37,
                      'team': self.open_team.slug }
         url_part = 'videos/'
         _, response = self.data_utils.post_api_request(self.user, url_part, url_data)
+        self.logger.info(response)
         
         new_data = {'title': 'MVC webM output sample',
                     'description': ('This is a sample vid converted to webM '
@@ -60,11 +59,14 @@ class TestCaseActivity(WebdriverTestCase):
                    }
         status, response = self.data_utils.put_api_request(self.user, response['resource_uri'], 
             new_data)
+        self.logger.info(response)
 
-        activity_query = '?team={0}&type={1}'.format(
-            self.open_team.slug, 2)
+        #activity_query = '?team={0}&type={1}'.format(
+        #    self.open_team.slug, 2)
+        activity_query = '?team=%s&type=4' % self.open_team.slug
         url_part = 'activity/%s' % activity_query
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
+        status, response = self.data_utils.api_get_request(self.user, url_part, output_type='content')
+        self.logger.info(response) 
         self.assertEqual(200, status)
 
 

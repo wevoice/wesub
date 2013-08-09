@@ -267,6 +267,8 @@ class TestCaseDeleteLast(WebdriverTestCase):
         en_v3 = cls.en.get_tip(full=True)
         en_v3.visibility_override = 'deleted'
         en_v3.save() 
+        cls.en.clear_tip_cache() 
+
         cls.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
                                  % cls.team.slug)
  

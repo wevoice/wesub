@@ -812,7 +812,6 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
 
 
     def test_unpublished__member_with_create_tasks(self):
-        self.logger.info(self.en.get_tip(full=True).visibility_override)
         """Unpublished version has Edit Subtitles active for member with permission.
 
         """

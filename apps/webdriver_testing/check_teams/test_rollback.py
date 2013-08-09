@@ -822,8 +822,11 @@ class TestCaseRollbackRevision(WebdriverTestCase):
 
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback())
-        
-        en_v3 = video.subtitle_language('en').get_tip()
+
+        en = video.subtitle_language('en')
+        en.clear_tip_cache() 
+        en_v3 = en.get_tip()
+
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
         self.assertTrue(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
@@ -840,8 +843,10 @@ class TestCaseRollbackRevision(WebdriverTestCase):
 
         self.diffing_pg.open_diffing_page(v1.id, v2.id)
         self.assertTrue(self.diffing_pg.rollback())
+        en = video.subtitle_language('en')
+        en.clear_tip_cache() 
+        en_v3 = en.get_tip()
         
-        en_v3 = video.subtitle_language('en').get_tip()
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
         self.assertTrue(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
@@ -863,8 +868,10 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.video_lang_pg.log_in(reviewer.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback())
+        en = video.subtitle_language('en')
+        en.clear_tip_cache() 
+        en_v3 = en.get_tip()
         
-        en_v3 = video.subtitle_language('en').get_tip()
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
         self.assertTrue(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
@@ -884,8 +891,10 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.video_lang_pg.log_in(self.admin.username, 'password')
         self.video_lang_pg.open_page(v1.get_absolute_url())
         self.assertTrue(self.video_lang_pg.rollback())
+        en = video.subtitle_language('en')
+        en.clear_tip_cache() 
+        en_v3 = en.get_tip()
         
-        en_v3 = video.subtitle_language('en').get_tip()
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
         self.assertFalse(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())
@@ -907,8 +916,10 @@ class TestCaseRollbackRevision(WebdriverTestCase):
 
         self.diffing_pg.open_diffing_page(v1.id, v2.id)
         self.assertTrue(self.diffing_pg.rollback())
+        en = video.subtitle_language('en')
+        en.clear_tip_cache() 
+        en_v3 = en.get_tip()
         
-        en_v3 = video.subtitle_language('en').get_tip()
         self.video_lang_pg.open_page(en_v3.get_absolute_url())
         self.assertFalse(self.video_lang_pg.is_draft())
         self.assertIn('Revision 3', self.video_lang_pg.view_notice())

@@ -106,7 +106,8 @@ class TestCaseUntimedText(WebdriverTestCase):
      
         message = self.video_pg.upload_subtitles('Russian', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
-        subtitle_lang = tv.subtitle_language('ru') 
+        subtitle_lang = tv.subtitle_language('ru')
+        subtitle_lang.clear_tip_cache() 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
 
     def test__version__overwrite_existing(self):
@@ -126,6 +127,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_lang = tv.subtitle_language('ar')
         self.video_pg.page_refresh()
         subtitle_lang = tv.subtitle_language('ar') 
+        subtitle_lang.clear_tip_cache() 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
     
     def test_upload__additional_translation(self):
@@ -142,9 +144,9 @@ class TestCaseUntimedText(WebdriverTestCase):
         message = self.video_pg.upload_subtitles('Swedish', sub_file)
         self.assertEqual(self.video_pg.UPLOAD_SUCCESS_TEXT, message)
         self.video_pg.page_refresh()
-        subtitle_lang = tv.subtitle_language('sv') 
+        subtitle_lang = tv.subtitle_language('sv')
+        subtitle_lang.clear_tip_cache() 
         self.assertEqual(1, subtitle_lang.get_tip().version_number)
-
         self.assertEqual(43, subtitle_lang.get_subtitle_count() )
 
     def test_display__site(self):
@@ -232,6 +234,7 @@ class TestCaseTimedText(WebdriverTestCase):
         """
         self.video_pg.upload_subtitles(lang, sub_file)
         subtitle_lang = self.test_video.subtitle_language(lang_code)
+        subtitle_lang.clear_tip_cache()
         self.assertEqual(expected_count, subtitle_lang.get_subtitle_count())
         self.video_pg.open_page('videos/{0}/{1}/'.format(
             self.test_video.video_id, lang_code))
