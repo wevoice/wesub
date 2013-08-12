@@ -73,125 +73,12 @@ class VideoMetadataAdmin(admin.ModelAdmin):
                      'data']
     raw_id_fields = ['video']
 
-class SubtitleVersionInline(admin.TabularInline):
-    model = SubtitleVersion
-    fields = ['version_no']
-    max_num = 0
-    extra = 0
-
-
-class SubtitleLanguageAdmin(admin.ModelAdmin):
-    # We specifically pull video out into a property to force one query per
-    # row.  This sounds like a bad idea, but:
-    #
-    # 1. MySQL was performing a full table scan when using the select_related()
-    #    for some reason.
-    # 2. It's only 20 extra queries, so it's not the end of the world.
-    list_display = ['video_title', 'is_original', 'language', 'is_complete',
-                    'had_version', 'subtitle_count', 'new_subtitle_language']
-    list_filter = ['is_original', 'is_complete']
-    search_fields = ['video__title', 'video__video_id', 'language']
-    raw_id_fields = ['video']
-    inlines = [SubtitleVersionInline]
-    list_per_page = 20
-    actions = None
-
-    def video_title(self, obj):
-        return unicode(obj.video)
-    video_title.short_description = 'video'
-
-    def delete_model(self, request, obj):
-        video = obj.video
-        super(SubtitleLanguageAdmin, self).delete_model(request, obj)
-        video_changed_tasks.delay(video.pk)
-
-    def versions(self, obj):
-        version_qs = obj.subtitleversion_set.all()
-        link_tpl = '<a href="%s">#%s</a>'
-        links = []
-        for item in version_qs:
-            url = reverse('admin:videos_subtitleversion_change', args=[item.pk])
-            links.append(link_tpl % (url, item.version_no))
-        return ', '.join(links)
-
-    versions.allow_tags = True
-
-    def save_model(self, request, obj, form, change):
-        should_sync_to_youtube = False
-        # cache the old object
-        old_obj = SubtitleLanguage.objects.get(pk=obj.pk)
-        # save it
-        super(SubtitleLanguageAdmin, self).save_model(request, obj, form,
-                                                      change)
-        # refresh new object so that changes are present
-        obj = SubtitleLanguage.objects.get(pk=obj.pk)
-        if change:
-            should_sync_to_youtube = not old_obj.is_complete and obj.is_complete
-
-        if should_sync_to_youtube:
-            latest = obj.latest_version()
-            # don't run on a async:
-            upload_subtitles_to_original_service.run(latest.pk)
-
-
-class SubtitleVersionAdmin(admin.ModelAdmin):
-    # We specifically pull language out into a property to force one query per
-    # row.  This sounds like a bad idea, but:
-    #
-    # 1. MySQL was performing a full table scan when using the select_related()
-    #    for some reason.
-    # 2. It's only 20 extra queries, so it's not the end of the world.
-    list_display = ['video', 'language_title', 'version_no', 'note',
-                    'datetime_started', 'moderation_status', 'origin',
-                    'new_subtitle_version']
-    raw_id_fields = ['language', 'user', 'forked_from']
-    search_fields = ['language__video__title', 'language__video__video_id',
-                     'language__language']
-    list_per_page = 20
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    def language_title(self, obj):
-        return unicode(obj.language)
-    language_title.short_description = 'language'
-    language_title.admin_order_field = 'language__language'
-
-    def video(self, obj):
-        if obj.language.video:
-            return unicode(obj.language.video)
-        else:
-            return None
-
-    def origin(self, obj):
-        return obj.get_workflow_origin()
-
-class SubtitleVersionMetadataAdmin(admin.ModelAdmin):
-    list_display = ['video', 'subtitle_version', 'key']
-    list_filter = ['key', 'created', 'modified']
-    raw_id_fields = ['subtitle_version']
-    search_fields = ['subtitle_version__language__video__video_id',
-                     'subtitle_version__language__video__title']
-
-    def video(self, obj):
-        return obj.subtitle_version.language.video.title
-
-class SubtitleAdmin(admin.ModelAdmin):
-    search_fields = ['version_id']
-    list_display = ['version', 'subtitle_id', 'subtitle_order', 'subtitle_text',
-                    'start_time', 'end_time']
-
 class VideoFeedAdmin(admin.ModelAdmin):
     list_display = ['url', 'last_link', 'created', 'user']
     raw_id_fields = ['user']
 
-#admin.site.register(Subtitle, SubtitleAdmin)
-admin.site.register(SubtitleVersion, SubtitleVersionAdmin)
-admin.site.register(Subtitle)
-admin.site.register(SubtitleVersionMetadata, SubtitleVersionMetadataAdmin)
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)
-admin.site.register(SubtitleLanguage, SubtitleLanguageAdmin)
 admin.site.register(VideoFeed, VideoFeedAdmin)
 
 #Fix Celery tasks display
