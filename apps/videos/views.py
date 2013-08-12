@@ -80,7 +80,6 @@ rpc_router = RpcRouter('videos:rpc_router', {
 })
 
 
-# We don't want to display all formats we understand to the end user
 # .e.g json, nor include aliases
 AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY = [
     'dfxp',  'sbv', 'srt', 'ssa', 'txt', 'vtt',
@@ -94,12 +93,15 @@ class LanguageList(object):
     def __init__(self, video):
         original_languages = []
         other_languages = []
-        for lang in video.newsubtitlelanguage_set.having_nonempty_versions():
-
-            item = LanguageListItem(lang.get_language_code_display(),
-                                    self._calc_status(lang),
-                                    self._calc_tags(lang),
-                                    lang.get_absolute_url())
+        for lang in video.all_subtitle_languages():
+            if lang.get_tip(public=False) is None:
+                # no versions in this language yet
+                continue
+            language_name = lang.get_language_code_display()
+            status = self._calc_status(lang)
+            tags = self._calc_tags(lang)
+            url = lang.get_absolute_url()
+            item = LanguageListItem(language_name, status, tags, url)
             if lang.language_code == video.primary_audio_language_code:
                 original_languages.append(item)
             else:
@@ -480,17 +482,17 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         # This should go away when we stop allowing for blank SubtitleLanguages.
         lang = ''
 
+    video.prefetch_languages(with_public_tips=True, with_private_tips=True)
     video.update_view_counter()
 
     context = widget.add_onsite_js_files({})
 
     if lang_id:
-        try:
-            language = video.newsubtitlelanguage_set.get(pk=lang_id)
-        except sub_models.SubtitleLanguage.DoesNotExist:
-            raise Http404
+        language = video.language_with_pk(lang_id)
     else:
         language = video.subtitle_language(lang)
+    if language is None:
+        raise Http404
 
     if not language:
         if lang in dict(settings.ALL_LANGUAGES):

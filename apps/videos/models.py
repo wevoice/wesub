@@ -653,6 +653,13 @@ class Video(models.Model):
     def all_subtitle_languages(self):
         return self._language_fetcher.fetch_all_languages(self)
 
+    def language_with_pk(self, language_pk):
+        language_pk = int(language_pk)
+        for lang in self.all_subtitle_languages():
+            if lang.pk == language_pk:
+                return lang
+        return None
+
     def prefetch_languages(self, languages=None, with_public_tips=False,
                            with_private_tips=False):
         """Prefetch and cache languages/versions for this video

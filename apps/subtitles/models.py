@@ -610,7 +610,7 @@ class SubtitleLanguage(models.Model):
 
     def has_public_version(self):
         """Check if there are any public versions for this language."""
-        return self.subtitleversion_set.public().exists()
+        return self.get_tip(public=True) is not None
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
