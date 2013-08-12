@@ -106,9 +106,10 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
 class SubtitleVersionChangeList(ChangeList):
     def get_query_set(self, request):
         qs = super(SubtitleVersionChangeList, self).get_query_set(request)
-        # use select_related to optimize the DB access (we don't want to simply
-        # say list_select_related=True because that will join too much)
-        return qs.select_related('video', 'subtitle_language')
+        # for some reason using select_related makes MySQL choose an
+        # absolutely insane way to perform the query.  Use prefetch_related()
+        # instead to work around this.
+        return qs.prefetch_related('video', 'subtitle_language')
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_per_page = 20
