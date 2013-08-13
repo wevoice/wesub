@@ -22,19 +22,19 @@
         window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
         window.TASK = '{% firstof task|default_if_none:""|escapejs '' %}';
         {% if task %}
-            window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
-            window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
+            window.TASK_TEAM_VIDEO_ID = '{{ video_id }}';
+            window.TASK_TEAM_VIDEO_URL = '{{ get_video_url }}';
         {% endif %}
         window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
         window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
-        {% if video.team_set.all.0 %}
-            {% if not video.team_set.all.0.is_visible %}
+        {% if team_video %}
+            {% if not team_video.teams.is_visible %}
                 window.VIDEO_TEAM_NAME = 'Private';
             {% else %}
-                window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
-                window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
+                window.VIDEO_TEAM_NAME = '{{ team_video.team }}';
+                window.VIDEO_TEAM_URL = '{{ team_video.team.get_absolute_url }}';
             {% endif %}
-            {% if video.team_set.all.0.get_workflow.requires_review_or_approval %}
+            {% if team_video.team.get_workflow.requires_review_or_approval %}
                 window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
             {% else %}
                 window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
