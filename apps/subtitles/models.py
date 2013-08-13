@@ -596,7 +596,16 @@ class SubtitleLanguage(models.Model):
             qs = qs.order_by('-version_number')
         else:
             qs = qs.order_by('version_number')
-        return [self.optimize_loaded_version(v) for v in qs]
+        versions = [self.optimize_loaded_version(v) for v in qs]
+        if not public:
+            self._set_previous_version_cache(versions, full)
+        return versions
+
+    def _set_previous_version_cache(self, versions, full):
+        previous_version = None
+        for v in versions:
+            v.cache_previous_version(previous_version, full)
+            previous_version = v
 
     def optimize_loaded_version(self, version):
         """Optimize a verison loaded for this language
@@ -1626,6 +1635,16 @@ class SubtitleVersion(models.Model):
         except IndexError:
             return None
 
+    def _previous_version_cache_name(self, full):
+        if full:
+            return '_previous_version_full'
+        else:
+            return '_previous_version'
+
+    def cache_previous_version(self, version, full=False):
+        """Cache the previous version."""
+        setattr(self, self._previous_version_cache_name(full), version)
+
     def previous_version(self, full=False):
         """Return the previous SubtitleVersion.
 
@@ -1634,12 +1653,18 @@ class SubtitleVersion(models.Model):
         deleted versions will be returned.
 
         """
+        cache_attr_name = self._previous_version_cache_name(full)
+        if hasattr(self, cache_attr_name):
+            return getattr(self, cache_attr_name)
+
         qs = self.sibling_set.full() if full else self.sibling_set.extant()
         try:
-            return (qs.filter(version_number__lt=self.version_number)
-                      .order_by('-version_number')[0])
+            previous_version = (qs.filter(version_number__lt=self.version_number)
+                                .order_by('-version_number')[0])
         except IndexError:
-            return None
+            previous_version = None
+        setattr(self, cache_attr_name, previous_version)
+        return previous_version
 
     def revision_time(self):
         today = date.today()

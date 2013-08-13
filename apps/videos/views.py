@@ -480,10 +480,10 @@ def _versions_for_history_view(language, user, version_id):
     """
     video = language.video
     team_video = video.get_team_video()
-    show_public_versions = (not team_video or
-                            team_video.team.is_member(user))
-    versions = language.get_versions(public=show_public_versions,
+    versions = language.get_versions(public=False,
                                      newest_first=True)
+    if team_video and not team_video.team.is_member(user):
+        versions = [v for v in versions if v.is_public()]
     if version_id:
         for i, version in enumerate(versions):
             if version.id == int(version_id):
