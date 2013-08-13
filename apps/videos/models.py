@@ -393,10 +393,11 @@ class Video(models.Model):
         from teams.models import TeamVideo
 
         try:
-            return self.teamvideo
+            team_video = self.teamvideo
+            team_video.video = self
+            return team_video
         except TeamVideo.DoesNotExist:
             return None
-
 
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
