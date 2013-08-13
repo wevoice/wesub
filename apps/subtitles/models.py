@@ -575,6 +575,29 @@ class SubtitleLanguage(models.Model):
         """
         self._tip_cache[cache_name] = version
 
+    def get_versions(self, public=False, full=False, newest_first=False):
+        """Get a list of versions for this subtitle language
+
+        :param public: if True only return versions visible to the public
+        :param full: if True only return deleted versions
+        :param newest_first: controls ordering of the versions
+        :returns: list of SubtitleVersion objects
+        """
+        if public and full:
+            raise AssertionError("Cannot specify public and full in "
+                                 "get_versions()!")
+        if public:
+            qs = self.subtitleversion_set.public()
+        elif full:
+            qs = self.subtitleversion_set.full()
+        else:
+            qs = self.subtitleversion_set.extant()
+        if newest_first:
+            qs = qs.order_by('-version_number')
+        else:
+            qs = qs.order_by('version_number')
+        return [self.optimize_loaded_version(v) for v in qs]
+
     def optimize_loaded_version(self, version):
         """Optimize a verison loaded for this language
 
@@ -586,6 +609,7 @@ class SubtitleLanguage(models.Model):
         if hasattr(self, video_cache_name):
             version.video = getattr(self, video_cache_name)
         version.subtitle_language = self
+        return version
 
     def get_public_tip(self):
         """Return the latest public tip for a particular version.

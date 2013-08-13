@@ -472,6 +472,39 @@ def language_page_title(language):
     template = string.Template(ugettext("$title with subtitles | Amara"))
     return template.substitute(title=language.title_display())
 
+def _versions_for_history_view(language, user, version_id):
+    """Get SubtitleVersions to use for a view.
+
+    :returns: the tuple (all_versions_list, current_version, next_version).
+    Both current_version and next_version may be None
+    """
+    video = language.video
+    team_video = video.get_team_video()
+    show_public_versions = (not team_video or
+                            team_video.team.is_member(user))
+    versions = language.get_versions(public=show_public_versions,
+                                     newest_first=True)
+    if version_id:
+        for i, version in enumerate(versions):
+            if version.id == int(version_id):
+                current_index = i
+                break
+        else:
+            raise Http404
+    else:
+        current_index = 0
+
+    if current_index < len(versions):
+        current_version = versions[current_index]
+    else:
+        current_version = None
+    if current_index + 1 < len(versions):
+        next_version = versions[current_index + 1]
+    else:
+        next_version = None
+
+    return versions, current_version, next_version
+
 @get_video_from_code
 def history(request, video, lang=None, lang_id=None, version_id=None):
     if not lang:
@@ -508,29 +541,18 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
         else:
             raise Http404
 
-    qs = language.subtitleversion_set
     team_video = video.get_team_video()
-    if team_video and not team_video.team.is_member(request.user):
-        # Non-members can only see public versions.
-        qs = qs.public()
+    versions, version, next_version = _versions_for_history_view(
+        language, request.user, version_id)
+    if version is not None:
+        context['metadata'] = version.get_metadata().convert_for_display()
     else:
-        qs = qs.extant()
-    qs = qs.select_related('user')
-
-    ordering, order_type = request.GET.get('o'), request.GET.get('ot')
-    order_fields = {
-        'date': 'datetime_started',
-        'user': 'user__username',
-        'note': 'note',
-        'time': 'time_change',
-        'text': 'text_change'
-    }
-    if ordering in order_fields and order_type in ['asc', 'desc']:
-        order_prefix = '-' if order_type == 'desc' else ''
-        qs = qs.order_by(order_prefix + order_fields[ordering])
-        context['ordering'], context['order_type'] = ordering, order_type
+        context['metadata'] = video.get_metadata().convert_for_display()
+    if version and next_version:
+        context['rollback_allowed'] = (
+            not team_video or can_rollback_language(request.user, language))
     else:
-        qs = qs.order_by('-version_number')
+        context['rollback_allowed'] = False
 
     context['video'] = video
     context['language_list'] = LanguageList(video)
@@ -545,30 +567,12 @@ def history(request, video, lang=None, lang_id=None, version_id=None):
     context['task'] = _get_related_task(request)
     _add_share_panel_context_for_history(context, video, language)
 
-    versions = list(qs)
     context['revision_list'] = versions
 
-    if versions:
-        if version_id:
-            try:
-                version = [v for v in versions if v.id == int(version_id)][0]
-            except IndexError:
-                raise Http404
-        else:
-            version = versions[0]
-        context['metadata'] = version.get_metadata().convert_for_display()
-    else:
-        version = None
-        context['metadata'] = video.get_metadata().convert_for_display()
-
-    context['rollback_allowed'] = version and version.next_version() is not None
-    if team_video and not can_rollback_language(request.user, language):
-        context['rollback_allowed'] = False
     context['last_version'] = version
     context['subtitle_lines'] = (version.get_subtitles()
                                         .subtitle_items(HTMLGenerator.MAPPINGS)
                                  if version else None)
-    context['next_version'] = version.next_version() if version else None
     context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
 
     user_can_add_version = can_add_version(request.user, video,
