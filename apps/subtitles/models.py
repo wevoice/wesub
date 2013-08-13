@@ -23,6 +23,7 @@ from datetime import datetime, date, timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import query
 from django.utils import simplejson as json
@@ -986,9 +987,12 @@ class SubtitleLanguage(models.Model):
         self.save()
 
 
-    def get_widget_url(self, mode=None, task_id=None):
+    def get_widget_url(self):
         """SHIM for getting the widget URL for this language."""
-        return shims.get_widget_url(self, mode, task_id)
+        return reverse('subtitles:old-editor', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': self.language_code,
+        })
 
     @models.permalink
     def get_absolute_url(self):

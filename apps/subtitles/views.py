@@ -20,8 +20,8 @@ from django.contrib.auth.decorators import login_required
 
 from videos.models import Video
 from teams.models import Task
+from subtitles import shims
 from subtitles.models import SubtitleLanguage, SubtitleVersion
-from subtitles.shims import get_widget_url
 from subtitles.templatetags.new_subtitles_tags import visibility_display
 
 from django.http import HttpResponse
@@ -158,6 +158,14 @@ def get_task_for_editor(video, language_code):
     else:
         return None
 
+def old_editor(request, video_id, language_code):
+    video = get_object_or_404(Video, video_id=video_id)
+    language = get_object_or_404(SubtitleLanguage, video=video,
+                                 language_code=language_code)
+    return redirect(shims.get_widget_url(language,
+                                         request.GET.get('mode'),
+                                         request.GET.get('task_id')))
+
 @login_required
 def subtitle_editor(request, video_id, language_code):
     '''
@@ -233,7 +241,7 @@ def subtitle_editor(request, video_id, language_code):
                                      translated_from_version, base_language)
                       for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
-        'oldEditorURL': get_widget_url(editing_language),
+        'oldEditorURL': editing_language.get_widget_url(),
         'savedNotes': request.GET.get('saved-notes', '')
     }
 
