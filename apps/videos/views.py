@@ -30,10 +30,13 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from apps.videos.templatetags.paginator import paginate
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseForbidden
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.http import (HttpResponse, Http404, HttpResponseRedirect,
+                         HttpResponseForbidden)
+from django.shortcuts import (render, render_to_response, get_object_or_404,
+                              redirect)
 from django.template import RequestContext
 from django.utils.encoding import force_unicode
 from django.utils.http import urlquote_plus
@@ -471,115 +474,142 @@ def language_page_title(language):
     template = string.Template(ugettext("$title with subtitles | Amara"))
     return template.substitute(title=language.title_display())
 
-def _versions_for_history_view(language, user, version_id):
-    """Get SubtitleVersions to use for a view.
+class LanguagePageContext(dict):
+    """Context dict for language pages
 
-    :returns: the tuple (all_versions_list, current_version, next_version).
-    Both current_version and next_version may be None
+    This class defines the base class that sets up the variables we use for
+    all the languages classes.  For the specific language pages (subtitles,
+    comments, revisions), we use a subclass of this.
     """
-    video = language.video
-    team_video = video.get_team_video()
-    versions = language.get_versions(public=False,
-                                     newest_first=True)
-    if team_video and not team_video.team.is_member(user):
-        versions = [v for v in versions if v.is_public()]
-    if version_id:
-        for i, version in enumerate(versions):
-            if version.id == int(version_id):
-                current_index = i
-                break
-        else:
+    def __init__(self, request, video, lang_code, lang_id, version_id):
+        dict.__init__(self)
+        self.public_only = self.calc_public_only(request, video)
+        language = self._get_language(video, lang_code, lang_id)
+        version = self._get_version(request, video, language, version_id)
+        video.prefetch_languages(with_public_tips=True,
+                                 with_private_tips=True)
+        self.setup(request, video, language, version)
+
+    def _get_language(self, video, lang_code, lang_id):
+        """Get a language for the language page views.
+
+        For historical reasons, we normally specify both a language code and a
+        language id.  This method takes both of those and returns a
+        SubtitleLanguage.
+        """
+        try:
+            language = video.language_with_pk(lang_id)
+        except SubtitleLanguage.DoesNotExist:
             raise Http404
-    else:
-        current_index = 0
+        if language.language_code != lang_code:
+            raise Http404
+        return language
 
-    if current_index < len(versions):
-        current_version = versions[current_index]
-    else:
-        current_version = None
-    if current_index + 1 < len(versions):
-        next_version = versions[current_index + 1]
-    else:
-        next_version = None
+    def calc_public_only(self, request, video):
+        team_video = video.get_team_video()
+        return (team_video and not team_video.team.is_member(request.user))
 
-    return versions, current_version, next_version
+    def _get_version(self, request, video, language, version_id):
+        """Get the SubtitleVersion to use for a language page."""
+        team_video = video.get_team_video()
+        if version_id:
+            try:
+                return language.get_version_by_id(version_id,
+                                                  public=self.public_only)
+            except SubtitleVersion.DoesNotExist:
+                raise Http404
+        else:
+            return language.get_tip(public=self.public_only)
+
+    def setup(self, request, video, language, version):
+        """Setup context variables."""
+
+        self.update(widget.add_onsite_js_files({}))
+        team_video = video.get_team_video()
+        next_version = version.next_version()
+
+        self['video'] = video
+        self['language'] = language
+        self['version'] = version
+        self['revision_count'] = language.version_count()
+        self['language_list'] = LanguageList(video)
+        self['page_title'] = language_page_title(language)
+        self['edit_url'] = language.get_widget_url()
+        self['shows_widget_sharing'] = video.can_user_see(request.user)
+        self['widget_params'] = _widget_params(request, video, version_no=None,
+                                                  language=language,
+                                                  size=(289, 173))
+        _add_share_panel_context_for_history(self, video, language)
+        if version is not None:
+            self['metadata'] = version.get_metadata().convert_for_display()
+        else:
+            self['metadata'] = video.get_metadata().convert_for_display()
+
+        if version and next_version:
+            self['rollback_allowed'] = (
+                not team_video or can_rollback_language(request.user, language))
+        else:
+            self['rollback_allowed'] = False
+
+class LanguagePageContextSubtitles(LanguagePageContext):
+    def setup(self, request, video, language, version):
+        LanguagePageContext.setup(self, request, video, language, version)
+
+        team_video = video.get_team_video()
+        user_can_add_version = can_add_version(request.user, video,
+                                               language.language_code)
+
+        self['tab'] = 'subtitles'
+        self['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
+        self['edit_disabled'] = not user_can_add_version
+        # If there are tasks for this language, the user has to go through the
+        # tasks panel to edit things instead of doing it directly from here.
+        if user_can_add_version and video.get_team_video():
+            has_open_task = (Task.objects.incomplete()
+                             .filter(team_video=video.get_team_video(),
+                                     language=language.language_code)
+                             .exists())
+            if has_open_task:
+                self['edit_disabled'] = True
+                self['must_use_tasks'] = True
+
+class LanguagePageContextRevisions(LanguagePageContext):
+    REVISIONS_PER_PAGE = 10
+
+    def setup(self, request, video, language, version):
+        LanguagePageContext.setup(self, request, video, language, version)
+        self['tab'] = 'revisions'
+
+        if self.public_only:
+            revisions_qs = language.subtitleversion_set.public()
+        else:
+            revisions_qs = language.subtitleversion_set.extant()
+        revisions_qs = revisions_qs.order_by('-version_number')
+
+        revisions, pagination_info = paginate(
+            revisions_qs, self.REVISIONS_PER_PAGE, request.GET.get('page'))
+        self.update(pagination_info)
+        self['revisions'] = language.optimize_versions(revisions)
 
 @get_video_from_code
-def history(request, video, lang, lang_id, version_id=None):
-    video.prefetch_languages(with_public_tips=True, with_private_tips=True)
-    video.update_view_counter()
-
-    context = widget.add_onsite_js_files({})
-
-    if lang_id:
-        language = video.language_with_pk(lang_id)
+def language_subtitles(request, video, lang, lang_id, version_id=None):
+    tab = request.GET.get('tab')
+    if tab == 'revisions':
+        ContextClass = LanguagePageContextRevisions
+        template_name = 'videos/language-revisions.html'
+    elif tab == 'comments':
+        ContextClass = LanguagePageContext
+        template_name = 'videos/language-comments.html'
     else:
-        language = video.subtitle_language(lang)
-    if language is None:
-        raise Http404
+        ContextClass = LanguagePageContextSubtitles
+        template_name = 'videos/language-subtitles.html'
 
-    if not language:
-        if lang in dict(settings.ALL_LANGUAGES):
-            config = {}
-            config["videoID"] = video.video_id
-            config["languageCode"] = lang
-            url = (reverse('onsite_widget')
-                   + '?config='
-                   + urlquote_plus(json.dumps(config)))
-            return redirect(url)
-        elif video.newsubtitlelanguage_set.count() > 0:
-            language = video.newsubtitlelanguage_set.all()[0]
-        else:
-            raise Http404
-
-    team_video = video.get_team_video()
-    versions, version, next_version = _versions_for_history_view(
-        language, request.user, version_id)
-    if version is not None:
-        context['metadata'] = version.get_metadata().convert_for_display()
-    else:
-        context['metadata'] = video.get_metadata().convert_for_display()
-    if version and next_version:
-        context['rollback_allowed'] = (
-            not team_video or can_rollback_language(request.user, language))
-    else:
-        context['rollback_allowed'] = False
-
-    context['video'] = video
-    context['language_list'] = LanguageList(video)
-    context['user_can_moderate'] = False
-    context['widget_params'] = _widget_params(request, video, version_no=None,
-                                              language=language, size=(289, 173))
-    context['language'] = language
-    context['page_title'] = language_page_title(language)
-    context['edit_url'] = language.get_widget_url()
-    context['shows_widget_sharing'] = video.can_user_see(request.user)
-
-    context['task'] = _get_related_task(request)
-    _add_share_panel_context_for_history(context, video, language)
-
-    context['revision_list'] = versions
-
-    context['last_version'] = version
-    context['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
-
-    user_can_add_version = can_add_version(request.user, video,
-                                           language.language_code)
-    context['edit_disabled'] = not user_can_add_version
-
-    # If there are tasks for this language, the user has to go through the tasks
-    # panel to edit things instead of doing it directly from here.
-    if user_can_add_version and team_video:
-        has_open_task = (Task.objects.incomplete()
-                                     .filter(team_video=team_video,
-                                             language=language.language_code)
-                                     .exists())
-        if has_open_task:
-            context['edit_disabled'] = True
-            context['must_use_tasks'] = True
-
-    return render_to_response("videos/subtitle-view.html", context,
-                              context_instance=RequestContext(request))
+    # we only want to update the view counter if this request wasn't the
+    # result of a tab click.
+    if 'tab' in request.GET:
+        video.update_view_counter()
+    context = ContextClass(request, video, lang, lang_id, version_id)
+    return render(request, template_name, context)
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
     primary_url = video_url or video.get_video_url()

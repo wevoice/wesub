@@ -514,7 +514,7 @@ var Site = function(Site) {
                     window.location.replace(url);
                 }
             });
-            $('.tabs').tabs();
+            $('.tabs').not('.nojs').tabs();
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -539,14 +539,6 @@ var Site = function(Site) {
                     e.preventDefault();
                 }
             });
-            if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL(window.TASK_TEAM_VIDEO_URL);
-                var opener = new unisubs.widget.SubtitleDialogOpener(
-                    window.TASK_TEAM_VIDEO_ID,
-                    window.TASK_TEAM_VIDEO_URL,
-                    videoSource, null, null);
-                opener.showStartDialog();
-            }
             if (window.IS_AUTHENTICATED && window.ROLLBACK_ALLOWED) {
                 $('#rollback').click(function() {
                     if (!confirm('Subtitles will be rolled back to a previous version')){
@@ -607,7 +599,7 @@ var Site = function(Site) {
                 opener.showStartDialog();
             }
 
-            $('.tabs').tabs();
+            $('.tabs').not('.nojs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {
