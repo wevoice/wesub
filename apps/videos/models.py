@@ -1831,7 +1831,6 @@ class VideoUrl(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-
         return ('videos:video_url', [self.video.video_id, self.pk])
 
     def unique_error_message(self, model_class, unique_check):

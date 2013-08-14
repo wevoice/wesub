@@ -51,7 +51,6 @@ urlpatterns = patterns(
     url(r'^(?P<video_id>(\w|-)+)/debug/$', 'video_debug', name='video_debug'),
     url(r'^(?P<video_id>(\w|-)+)/reset_metadata/$', 'reset_metadata', name='reset_metadata'),
     url(r'^(?P<video_id>(\w|-)+)/set-original-language/$', 'set_original_language', name='set_original_language'),
-    url(r'^(?P<video_id>(\w|-)+)/$', 'history', name='history'),
     url(r'^(?P<video_id>(\w|-)+)/info/$', 'video', name='video'),
     url(r'^(?P<video_id>(\w|-)+)/info/(?P<title>[^/]+)/$', 'video', name='video_with_title'),
     url(r'^(?P<video_id>(\w|-)+)/url/(?P<video_url>\d+)/$', 'video', name='video_url'),

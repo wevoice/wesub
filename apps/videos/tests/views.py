@@ -238,23 +238,6 @@ class TestViews(WebUseTest):
         response = self.client.get(self.video.get_absolute_url(), follow=True)
         self.assertEqual(response.status_code, 200)
 
-    def test_access_video_page_no_original(self):
-        request = RequestMockup(User.objects.all()[0])
-
-        session = create_two_sub_session(request)
-        video_pk = session.language.video.pk
-        video = Video.objects.get(pk=video_pk)
-
-        video.primary_audio_language_code = ''
-        video.save()
-
-        video_changed_tasks.delay(video_pk)
-
-        response = self.client.get(reverse('videos:history', args=[video.video_id]))
-        # Redirect for now, until we remove the concept of SubtitleLanguages
-        # with blank language codes.
-        self.assertEqual(response.status_code, 302)
-
     def test_bliptv_twice(self):
         VIDEO_FILE = 'http://blip.tv/file/get/Kipkay-AirDusterOfficeWeaponry223.m4v'
         old_video_file_url = blip.video_file_url
@@ -304,14 +287,6 @@ class TestViews(WebUseTest):
         self.assertEqual(response.status_code, 200)
 
     def test_history(self):
-        # Redirect for now, until we remove the concept of SubtitleLanguages
-        # with blank language codes.
-        self._simple_test('videos:history',
-            [self.video.video_id], status=302)
-
-        self._simple_test('videos:history',
-            [self.video.video_id], data={'o': 'user', 'ot': 'asc'}, status=302)
-
         sl = self.video.subtitlelanguage_set.all()[:1].get()
         sl.language = 'en'
         sl.save()

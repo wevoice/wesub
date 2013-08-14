@@ -505,15 +505,7 @@ def _versions_for_history_view(language, user, version_id):
     return versions, current_version, next_version
 
 @get_video_from_code
-def history(request, video, lang=None, lang_id=None, version_id=None):
-    if not lang:
-        return HttpResponseRedirect(
-            video.get_absolute_url(video_id=video._video_id_used))
-    elif lang == 'unknown':
-        # A hacky workaround for now.
-        # This should go away when we stop allowing for blank SubtitleLanguages.
-        lang = ''
-
+def history(request, video, lang, lang_id, version_id=None):
     video.prefetch_languages(with_public_tips=True, with_private_tips=True)
     video.update_view_counter()
 
