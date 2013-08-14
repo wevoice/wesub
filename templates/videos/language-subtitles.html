@@ -54,19 +54,9 @@
         {% if version.has_subtitles %}
             <p class="view-notice{% if not version.is_public %} draft{% endif %}">
                 {% if not version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
-                {% if language.get_translation_source_language_code %}
-                    {% blocktrans with language.get_translation_source_language_code|to_localized_display as language %}
-                    Subtitles translated from {{ language }}
-                    {% endblocktrans %}
-                {% endif %}
-                {% trans "Showing" %}
-                <strong>{% trans "Revision" %} {{ version.version_number }}</strong>,
-                {% trans "created" %}
-                <strong>{{ version.revision_time }}</strong>
-                {% trans "by" %}
-                <a href="{{ version.author.profile_url}}" title="View {{ version.author }}'s profile">
-                    <strong>{{ version.author }}</strong>
-                </a>.
+                {% blocktrans with version.version_number as version_number and version.revision_time as revision_time and version.author.profile_url as profile_url and version.author as author %}
+                Showing <strong>Revision {{ version_number }}</strong> created <strong>{{ revision_time }}</strong> by <a href="{{ profile_url}}" title="View {{ author }}'s profile"><strong>{{ author }}</strong></a>.
+                {% endblocktrans %}
                 {% if user.is_staff and perms.videos.edit_video %}
                     <a style="float: right; color: #417690; margin-right: 7px; font-weight: bold; display: inline-block;" href="{% url admin:subtitles_subtitleversion_change version.pk %}">{% trans "Edit in Django Admin" %}</a>
                 {% endif %}
