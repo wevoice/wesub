@@ -121,4 +121,11 @@
 
     {% endif %}
 
+    {% if rollback_allowed %}
+        <div id="rollback-button">
+            <a href="{% url videos:rollback version.pk %}" class="button" id="rollback">
+                {% trans 'Roll back to this version' %}
+            </a>
+        </div>
+    {% endif %}
 </div>

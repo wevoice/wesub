@@ -556,8 +556,6 @@ class LanguagePageContext(dict):
         """Setup context variables."""
 
         self.update(widget.add_onsite_js_files({}))
-        team_video = video.get_team_video()
-        next_version = version.next_version()
 
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
@@ -573,11 +571,15 @@ class LanguagePageContext(dict):
         else:
             self['metadata'] = video.get_metadata().convert_for_display()
 
-        if version and next_version:
-            self['rollback_allowed'] = (
-                not team_video or can_rollback_language(request.user, language))
+        self['rollback_allowed'] = self.calc_rollback_allowed(
+            request, version, language)
+
+    def calc_rollback_allowed(self, request, version, language):
+        team_video = version.video.get_team_video()
+        if version and version.next_version():
+            return not team_video or can_rollback_language(request.user, language)
         else:
-            self['rollback_allowed'] = False
+            return False
 
     def setup_tab(self, request, video, language, video_url):
         """Setup tab-specific variables."""
@@ -605,6 +607,9 @@ class LanguagePageContextSubtitles(LanguagePageContext):
             if has_open_task:
                 self['edit_disabled'] = True
                 self['must_use_tasks'] = True
+        if 'rollback_allowed' not in self:
+            self['rollback_allowed'] = self.calc_rollback_allowed(
+                request, version, language)
 
 class LanguagePageContextComments(LanguagePageContext):
     pass
