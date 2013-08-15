@@ -355,13 +355,6 @@ var Site = function(Site) {
                 } else {
                     var onComplete = null;
                 }
-                var placeholder = $('<img>');
-                placeholder.attr({
-                    class: 'placeholder',
-                    width: '256',
-                    height: '30',
-                    src: STATIC_URL + "images/ajax-loader.gif"
-                });
                 this.each(function(){
                     $('a', this).click(function(evt) {
                         var link = $(this);
@@ -370,7 +363,6 @@ var Site = function(Site) {
                         $('.tabs li').removeClass('current');
                         $('#' + tab + '-tab-header').addClass('current');
                         $('#tab-container').empty();
-                        $('#tab-container').append(placeholder);
                         if(history && history.pushState) {
                             history.pushState(null, null, url);
                         }
