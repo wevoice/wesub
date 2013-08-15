@@ -291,9 +291,42 @@ def shortlink(request, encoded_pk):
     video = get_object_or_404(Video, pk=pk)
     return redirect(video, video=video, permanent=True)
 
-def video_page_title(video):
-    template = string.Template(ugettext("$title with subtitles | Amara"))
-    return template.substitute(title=video.title_display())
+class VideoPageContext(dict):
+    """Context dict for the video page."""
+    def __init__(self, request, video, video_url, tab_only=False):
+        dict.__init__(self)
+        self['video'] = video
+        if not tab_only:
+            self.setup(request, video, video_url)
+
+    def setup(self, request, video, video_url):
+        language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
+        if language_for_locale:
+            metadata = language_for_locale.get_metadata()
+        else:
+            metadata = video.get_metadata()
+
+        self.update(widget.add_onsite_js_files({}))
+        self['page_title'] = self.page_title(video)
+        self['metadata'] = metadata.convert_for_display()
+        self['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
+        self['language_list'] = LanguageList(video)
+        self['shows_widget_sharing'] = video.can_user_see(request.user)
+
+        self['widget_params'] = _widget_params(
+            request, video, language=None,
+            video_url=video_url and video_url.effective_url,
+            size=(620,370)
+        )
+
+        _add_share_panel_context_for_video(self, video)
+        self['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
+        self['original'] = video.subtitle_language()
+        self['task'] =  _get_related_task(request)
+
+    def page_title(self, video):
+        template = string.Template(ugettext("$title with subtitles | Amara"))
+        return template.substitute(title=video.title_display())
 
 @get_video_from_code
 def video(request, video, video_url=None, title=None):
@@ -301,41 +334,35 @@ def video(request, video, video_url=None, title=None):
     If user is about to perform a task on this video, then t=[task.pk]
     will be passed to as a url parameter.
     """
+
     if video_url:
         video_url = get_object_or_404(VideoUrl, pk=video_url)
 
+    # FIXME: what is this crazy mess?
     if not video_url and ((video.title_for_url() and not video.title_for_url() == title) or (not video.title and title)):
         return redirect(video, permanent=True)
 
     video.update_view_counter()
-    language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
-    if language_for_locale:
-        metadata = language_for_locale.get_metadata()
+
+    tab = request.GET.get('tab')
+    if tab not in ('urls', 'comments', 'activity', 'video'):
+        # force tab to be video if it doesn't match either of the other
+        # tabs
+        tab = 'video'
+
+    if request.is_ajax():
+        context = VideoPageContext(request, video, video_url, tab_only=True)
+        template_name = 'videos/video-%s-tab.html' % tab
     else:
-        metadata = video.get_metadata()
+        template_name = 'videos/video-%s.html' % tab
+        context = VideoPageContext(request, video, video_url)
+        if 'tab' in request.GET:
+            # we only want to update the view counter if this request wasn't
+            # the result of a tab click.
+            video.update_view_counter()
+    context['tab'] = tab
 
-    # TODO: make this more pythonic, prob using kwargs
-    context = widget.add_onsite_js_files({})
-    context['video'] = video
-    context['page_title'] = video_page_title(video)
-    context['metadata'] = metadata.convert_for_display()
-    context['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
-    context['language_list'] = LanguageList(video)
-    context['shows_widget_sharing'] = video.can_user_see(request.user)
-
-    context['widget_params'] = _widget_params(
-        request, video, language=None,
-        video_url=video_url and video_url.effective_url,
-        size=(620,370)
-    )
-
-    _add_share_panel_context_for_video(context, video)
-    context['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
-    context['original'] = video.subtitle_language()
-    context['task'] =  _get_related_task(request)
-
-    return render_to_response('videos/video-view.html', context,
-                              context_instance=RequestContext(request))
+    return render(request, template_name, context)
 
 def _get_related_task(request):
     """
@@ -550,12 +577,13 @@ class LanguagePageContext(dict):
         else:
             self['rollback_allowed'] = False
 
+    def setup_tab(self, request, video, video_url):
+        """Setup tab-specific variables."""
+        pass
+
     def page_title(self, language):
         template = string.Template(ugettext("$title with subtitles | Amara"))
         return template.substitute(title=language.title_display())
-
-    def setup_tab(self, request, video, language, version):
-        """Setup context variables to render the tab.  """
 
 class LanguagePageContextSubtitles(LanguagePageContext):
     def setup_tab(self, request, video, language, version):

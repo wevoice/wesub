@@ -662,7 +662,8 @@ var Site = function(Site) {
                 opener.showStartDialog();
             }
 
-            $('.tabs').tabs();
+            var tabLoader = new AHAHTabLoader();
+            tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {
