@@ -543,7 +543,7 @@ class LanguagePageContext(dict):
             try:
                 return language.get_version_by_id(version_id,
                                                   public=self.public_only)
-            except SubtitleVersion.DoesNotExist:
+            except sub_models.SubtitleVersion.DoesNotExist:
                 raise Http404
         else:
             return language.get_tip(public=self.public_only)

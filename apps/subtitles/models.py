@@ -620,7 +620,7 @@ class SubtitleLanguage(models.Model):
         :returns: SubtitleVersion
         """
         qs = self._version_qs(public, full)
-        return optimize_loaded_version(qs.get(pk=version_pk))
+        return self.optimize_loaded_version(qs.get(pk=version_pk))
 
     def _set_previous_version_cache(self, versions, full):
         previous_version = None
