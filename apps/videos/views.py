@@ -615,7 +615,7 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         template_name = 'videos/language-%s.html' % tab
         context = ContextClass(request, video, lang, lang_id, version_id)
         context['tab'] = tab
-        if 'tab' in request.GET:
+        if 'tab' not in request.GET:
             # we only want to update the view counter if this request wasn't
             # the result of a tab click.
             video.update_view_counter()
