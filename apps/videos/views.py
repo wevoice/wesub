@@ -579,7 +579,7 @@ class LanguagePageContext(dict):
         else:
             self['rollback_allowed'] = False
 
-    def setup_tab(self, request, video, video_url):
+    def setup_tab(self, request, video, language, video_url):
         """Setup tab-specific variables."""
         pass
 
