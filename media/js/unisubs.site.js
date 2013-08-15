@@ -618,6 +618,17 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
+            $('.add_subtitles').click( function() {
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
+                return false;
+            });
+            $('.add-translation-behavior').click( function(e) {
+                e.preventDefault();
+                widget_widget_div.selectMenuItem(
+                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
+                return false;
+            });
             var tabLoader = new AHAHTabLoader();
             tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();
