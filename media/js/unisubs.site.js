@@ -24,6 +24,62 @@ var Site = function(Site) {
 
     var that = this;
 
+    /*
+     * use AHAH to load tabs
+     */
+    function AHAHTabLoader(onComplete) {
+        this.tabContainer = $('#tab-container');
+        this.tabCache = {};
+        this.cacheContents(window.location.href);
+        this.onComplete = onComplete;
+    }
+
+    AHAHTabLoader.prototype = {
+        cacheContents: function(url) {
+            this.tabCache[url] = this.tabContainer.contents();
+        },
+        changeCurrentTab: function(url) {
+            var tab = url.match(/tab=([^&]+)/)[1];
+            $('.tabs li').removeClass('current');
+            $('#' + tab + '-tab-header').addClass('current');
+        },
+        updateLocation: function(url) {
+            if(history && history.pushState) {
+                history.pushState(null, null, url);
+            }
+        },
+        addLinks: function(selector) {
+            var self = this;
+            $('a', $(selector)).each(function() {
+                var link = $(this);
+                if(!link.data('AHAHTabLoaderConnected')) {
+                    link.click(function(evt) {
+                        self.handleClick(evt, link);
+                    });
+                    link.data('AHAHTabLoaderConnected', true);
+                }
+            });
+        },
+        handleClick: function(evt, link) {
+            var url = link[0].href;
+            this.changeCurrentTab(url);
+            this.updateLocation(url);
+            this.tabContainer.empty();
+            if(this.tabCache.hasOwnProperty(url)) {
+                this.tabContainer.append(this.tabCache[url]);
+            } else {
+                var self = this;
+                this.tabContainer.load(url, null, function() {
+                    self.cacheContents(url);
+                    if(self.onComplete) {
+                        self.onComplete();
+                    }
+                });
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
+        }
+    };
     this.init = function() {
 
         // Global cached jQuery objects
@@ -346,46 +402,6 @@ var Site = function(Site) {
                 }
                 return this;
             };
-            // caches the contents of the tab for links_load_tab
-            var tabCache = {};
-            tabCache[window.location.href] = $('#tab-container').contents();
-            $.fn.links_load_tab = function(options){
-                /*
-                 * links_load_tab -- make links load #tab-container using AHAH
-                 */
-                if(options === undefined) {
-                    options = {};
-                }
-                function changeCurrentTab(url) {
-                    var tab = url.match(/tab=([^&]+)/)[1];
-                    $('.tabs li').removeClass('current');
-                    $('#' + tab + '-tab-header').addClass('current');
-                }
-                var tabContainer = $('#tab-container');
-                this.each(function(){
-                    $('a', this).click(function(evt) {
-                        var url = this.href;
-                        changeCurrentTab(url);
-                        tabContainer.empty();
-                        if(history && history.pushState) {
-                            history.pushState(null, null, url);
-                        }
-                        if(tabCache.hasOwnProperty(url)) {
-                            tabContainer.append(tabCache[url]);
-                        } else {
-                            tabContainer.load(url, null, function() {
-                                tabCache[url] = tabContainer.contents();
-                                if(options.onComplete) {
-                                    options.onComplete();
-                                }
-                            });
-                        }
-                        evt.stopPropagation();
-                        evt.preventDefault();
-                    });
-                });
-                return this;
-            };
             function addCSRFHeader($){
                 /* Django will guard against csrf even on XHR requests, so we need to read
                    the value from the cookie and add the header for it */
@@ -554,15 +570,14 @@ var Site = function(Site) {
                     window.location.replace(url);
                 }
             });
-            $('.tabs').links_load_tab({
-                onComplete: setupPaginationLinks
+            var tabLoader = new AHAHTabLoader(function() {
+                // We may load new pagination links, in that case make sure
+                // they're loaded.
+                tabLoader.addLinks('.pagination');
             });
-            function setupPaginationLinks() {
-                $('.pagination').links_load_tab({
-                    onComplete: setupPaginationLinks
-                });
-            }
-            setupPaginationLinks();
+            tabLoader.addLinks('.tabs');
+            tabLoader.addLinks('.pagination');
+
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
