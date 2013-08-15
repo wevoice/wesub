@@ -116,12 +116,12 @@
         {% if user.is_authenticated %}
             {% include 'videos/_follow_video_button.html' %}
         {% endif %}
-        <ul class="tabs nojs">
-            <li class="{% if tab == 'subtitles' %}current{% endif %}"><a href="?tab=subtitles">{% trans "Subtitles" %}</a></li>
-            <li class="hascount{% if tab == 'comments' %} current{% endif %}"><a href="?tab=comments">{% trans "Comments" %}<span>{{ language|get_comment_count }}</span></a></li>
-            <li class="hascount{% if tab == 'revisions' %} current{% endif %}"><a href="?tab=revisions">{% trans "Revisions" %}<span>{{ revision_count }}</span></a></li>
+        <ul class="tabs">
+            <li class="{% if tab == 'subtitles' %}current{% endif %}" id="subtitles-tab-header"><a href="?tab=subtitles">{% trans "Subtitles" %}</a></li>
+            <li class="hascount{% if tab == 'comments' %} current{% endif %}" id="comments-tab-header"><a href="?tab=comments">{% trans "Comments" %}<span>{{ language|get_comment_count }}</span></a></li>
+            <li class="hascount{% if tab == 'revisions' %} current{% endif %}" id="revisions-tab-header"><a href="?tab=revisions">{% trans "Revisions" %}<span>{{ revision_count }}</span></a></li>
         </ul>
-        {% block tab %}{% endblock %}
+        <div id="tab-container">{% block tab %}{% endblock %}</div>
     </div>
 
     {% if rollback_allowed %}

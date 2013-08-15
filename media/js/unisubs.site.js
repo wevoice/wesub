@@ -346,6 +346,41 @@ var Site = function(Site) {
                 }
                 return this;
             };
+            $.fn.links_load_tab = function(options){
+                /*
+                 * links_load_tab -- make links load tabs using AHAH
+                 */
+                if(options && options.onComplete) {
+                    var onComplete = options.onComplete;
+                } else {
+                    var onComplete = null;
+                }
+                var placeholder = $('<img>');
+                placeholder.attr({
+                    class: 'placeholder',
+                    width: '256',
+                    height: '30',
+                    src: STATIC_URL + "images/ajax-loader.gif"
+                });
+                this.each(function(){
+                    $('a', this).click(function(evt) {
+                        var link = $(this);
+                        var url = link.attr('href');
+                        var tab = url.match(/tab=([^&]+)/)[1];
+                        $('.tabs li').removeClass('current');
+                        $('#' + tab + '-tab-header').addClass('current');
+                        $('#tab-container').empty();
+                        $('#tab-container').append(placeholder);
+                        if(history && history.pushState) {
+                            history.pushState(null, null, url);
+                        }
+                        $('#tab-container').load(url, null, onComplete);
+                        evt.stopPropagation();
+                        evt.preventDefault();
+                    });
+                });
+                return this;
+            };
             function addCSRFHeader($){
                 /* Django will guard against csrf even on XHR requests, so we need to read
                    the value from the cookie and add the header for it */
@@ -514,7 +549,15 @@ var Site = function(Site) {
                     window.location.replace(url);
                 }
             });
-            $('.tabs').not('.nojs').tabs();
+            $('.tabs').links_load_tab({
+                onComplete: setupPaginationLinks
+            });
+            function setupPaginationLinks() {
+                $('.pagination').links_load_tab({
+                    onComplete: setupPaginationLinks
+                });
+            }
+            setupPaginationLinks();
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -599,7 +642,7 @@ var Site = function(Site) {
                 opener.showStartDialog();
             }
 
-            $('.tabs').not('.nojs').tabs();
+            $('.tabs').tabs();
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {

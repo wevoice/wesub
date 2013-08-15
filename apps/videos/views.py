@@ -481,14 +481,20 @@ class LanguagePageContext(dict):
     all the languages classes.  For the specific language pages (subtitles,
     comments, revisions), we use a subclass of this.
     """
-    def __init__(self, request, video, lang_code, lang_id, version_id):
+    def __init__(self, request, video, lang_code, lang_id, version_id,
+                 tab_only=False):
         dict.__init__(self)
         self.public_only = self.calc_public_only(request, video)
         language = self._get_language(video, lang_code, lang_id)
         version = self._get_version(request, video, language, version_id)
-        video.prefetch_languages(with_public_tips=True,
-                                 with_private_tips=True)
-        self.setup(request, video, language, version)
+        self['video'] = video
+        self['language'] = language
+        self['version'] = version
+        if not tab_only:
+            video.prefetch_languages(with_public_tips=True,
+                                     with_private_tips=True)
+            self.setup(request, video, language, version)
+        self.setup_tab(request, video, language, version)
 
     def _get_language(self, video, lang_code, lang_id):
         """Get a language for the language page views.
@@ -528,9 +534,6 @@ class LanguagePageContext(dict):
         team_video = video.get_team_video()
         next_version = version.next_version()
 
-        self['video'] = video
-        self['language'] = language
-        self['version'] = version
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
         self['page_title'] = language_page_title(language)
@@ -551,15 +554,17 @@ class LanguagePageContext(dict):
         else:
             self['rollback_allowed'] = False
 
+    def setup_tab(self, request, video, language, version):
+        """Setup context variables to render the tab.  """
+
 class LanguagePageContextSubtitles(LanguagePageContext):
-    def setup(self, request, video, language, version):
+    def setup_tab(self, request, video, language, version):
         LanguagePageContext.setup(self, request, video, language, version)
 
         team_video = video.get_team_video()
         user_can_add_version = can_add_version(request.user, video,
                                                language.language_code)
 
-        self['tab'] = 'subtitles'
         self['downloadable_formats'] = AVAILABLE_SUBTITLE_FORMATS_FOR_DISPLAY
         self['edit_disabled'] = not user_can_add_version
         # If there are tasks for this language, the user has to go through the
@@ -573,12 +578,14 @@ class LanguagePageContextSubtitles(LanguagePageContext):
                 self['edit_disabled'] = True
                 self['must_use_tasks'] = True
 
+class LanguagePageContextComments(LanguagePageContext):
+    pass
+
 class LanguagePageContextRevisions(LanguagePageContext):
     REVISIONS_PER_PAGE = 10
 
-    def setup(self, request, video, language, version):
+    def setup_tab(self, request, video, language, version):
         LanguagePageContext.setup(self, request, video, language, version)
-        self['tab'] = 'revisions'
 
         if self.public_only:
             revisions_qs = language.subtitleversion_set.public()
@@ -596,19 +603,26 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
     tab = request.GET.get('tab')
     if tab == 'revisions':
         ContextClass = LanguagePageContextRevisions
-        template_name = 'videos/language-revisions.html'
     elif tab == 'comments':
-        ContextClass = LanguagePageContext
-        template_name = 'videos/language-comments.html'
+        ContextClass = LanguagePageContextComments
     else:
+        # force tab to be subtitles if it doesn't match either of the other
+        # tabs
+        tab = 'subtitles'
         ContextClass = LanguagePageContextSubtitles
-        template_name = 'videos/language-subtitles.html'
 
-    # we only want to update the view counter if this request wasn't the
-    # result of a tab click.
-    if 'tab' in request.GET:
-        video.update_view_counter()
-    context = ContextClass(request, video, lang, lang_id, version_id)
+    if request.is_ajax():
+        context = ContextClass(request, video, lang, lang_id, version_id,
+                               tab_only=True)
+        template_name = 'videos/language-%s-tab.html' % tab
+    else:
+        template_name = 'videos/language-%s.html' % tab
+        context = ContextClass(request, video, lang, lang_id, version_id)
+        context['tab'] = tab
+        if 'tab' in request.GET:
+            # we only want to update the view counter if this request wasn't
+            # the result of a tab click.
+            video.update_view_counter()
     return render(request, template_name, context)
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):
