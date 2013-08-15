@@ -559,8 +559,6 @@ class LanguagePageContext(dict):
 
 class LanguagePageContextSubtitles(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
-        LanguagePageContext.setup(self, request, video, language, version)
-
         team_video = video.get_team_video()
         user_can_add_version = can_add_version(request.user, video,
                                                language.language_code)
@@ -585,8 +583,6 @@ class LanguagePageContextRevisions(LanguagePageContext):
     REVISIONS_PER_PAGE = 10
 
     def setup_tab(self, request, video, language, version):
-        LanguagePageContext.setup(self, request, video, language, version)
-
         if self.public_only:
             revisions_qs = language.subtitleversion_set.public()
         else:

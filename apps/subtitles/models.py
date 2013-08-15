@@ -36,7 +36,7 @@ from apps.auth.models import CustomUser as User
 from apps.videos import metadata
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
-from babelsubs.storage import diff as diff_subtitles
+from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from videos.behaviors import make_video_title
@@ -1499,11 +1499,9 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(),
-                                   HTMLGenerator.MAPPINGS)
-
-        self._text_change = diff_data['text_changed']
-        self._time_change = diff_data['time_changed']
+        self._text_change, self._time_change = calc_changes(
+            parent.get_subtitles(), self.get_subtitles(),
+            HTMLGenerator.MAPPINGS)
 
         return self._time_change, self._text_change
 
@@ -1526,7 +1524,6 @@ class SubtitleVersion(models.Model):
             return '0%'
         else:
             return '%.0f%%' % (self._text_change * 100)
-
 
     def is_private(self):
         if self.visibility_override in ('public', 'deleted'):
@@ -1656,11 +1653,11 @@ class SubtitleVersion(models.Model):
         caches that for the sibling version as well.
         """
         video_cache_name = SubtitleVersion.video.cache_name
-        language_cache_name = SubtitleVersion.language.cache_name
+        language_cache_name = SubtitleVersion.subtitle_language.cache_name
         if hasattr(self, video_cache_name):
             sibling.video = getattr(self, video_cache_name)
         if hasattr(self, language_cache_name):
-            sibling.video = getattr(self, language_cache_name)
+            sibling.language = getattr(self, language_cache_name)
         return sibling
 
     def next_version(self, full=False):
