@@ -327,6 +327,10 @@ class VideoPageContext(dict):
         return template.substitute(title=video.title_display())
 
 @get_video_from_code
+def redirect_to_video(request, video):
+    return redirect(video, permanent=True)
+
+@get_video_from_code
 def video(request, video, video_url=None, title=None):
     """
     If user is about to perform a task on this video, then t=[task.pk]
