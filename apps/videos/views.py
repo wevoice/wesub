@@ -470,10 +470,6 @@ def legacy_history(request, video, lang=None):
             'lang': language.language_code,
             }))
 
-def language_page_title(language):
-    template = string.Template(ugettext("$title with subtitles | Amara"))
-    return template.substitute(title=language.title_display())
-
 class LanguagePageContext(dict):
     """Context dict for language pages
 
@@ -536,7 +532,7 @@ class LanguagePageContext(dict):
 
         self['revision_count'] = language.version_count()
         self['language_list'] = LanguageList(video)
-        self['page_title'] = language_page_title(language)
+        self['page_title'] = self.page_title(language)
         self['edit_url'] = language.get_widget_url()
         self['shows_widget_sharing'] = video.can_user_see(request.user)
         self['widget_params'] = _widget_params(request, video, version_no=None,
@@ -553,6 +549,10 @@ class LanguagePageContext(dict):
                 not team_video or can_rollback_language(request.user, language))
         else:
             self['rollback_allowed'] = False
+
+    def page_title(self, language):
+        template = string.Template(ugettext("$title with subtitles | Amara"))
+        return template.substitute(title=language.title_display())
 
     def setup_tab(self, request, video, language, version):
         """Setup context variables to render the tab.  """
