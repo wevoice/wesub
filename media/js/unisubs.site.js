@@ -552,28 +552,34 @@ var Site = function(Site) {
             function get_compare_link(first_pk, second_pk) {
                 return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
             }
-            $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
-            $('.version_checkbox', '.revisions').change( function() {
-                var $this = $(this);
-                var checked_length = $('.version_checkbox:checked').length;
+            function setupRevisions() {
+                $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
+                $('.version_checkbox', '.revisions').change( function() {
+                    var $this = $(this);
+                    var checked_length = $('.version_checkbox:checked').length;
 
-                if ($this.attr('checked') && (checked_length > 2)) {
-                    $this.attr('checked', '');
-                }
-            });
-            $('.compare_versions_button').click( function() {
-                var $checked = $('.version_checkbox:checked');
-                if ($checked.length !== 2) {
-                    alert(window.SELECT_REVISIONS_TRANS);
-                } else {
-                    var url = get_compare_link($checked[0].value, $checked[1].value);
-                    window.location.replace(url);
-                }
-            });
+                    if ($this.attr('checked') && (checked_length > 2)) {
+                        $this.attr('checked', '');
+                    }
+                });
+                $('.compare_versions_button').click( function() {
+                    var $checked = $('.version_checkbox:checked');
+                    if ($checked.length !== 2) {
+                        alert(window.SELECT_REVISIONS_TRANS);
+                    } else {
+                        var url = get_compare_link($checked[0].value, $checked[1].value);
+                        window.location.replace(url);
+                    }
+                });
+            }
+            setupRevisions();
             var tabLoader = new AHAHTabLoader(function() {
                 // We may load new pagination links, in that case make sure
                 // they're loaded.
                 tabLoader.addLinks('.pagination');
+                // If we loaded the revisions tab, we need to attach our js to
+                // it
+                setupRevisions();
             });
             tabLoader.addLinks('.tabs');
             tabLoader.addLinks('.pagination');
