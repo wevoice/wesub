@@ -618,50 +618,6 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
-            $('.add_subtitles').click(function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
-                return false;
-            });
-            $('.add-translation-behavior').click(function() {
-                widget_widget_div.selectMenuItem(
-                unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
-                return false;
-            });
-            $('.edit-title').click( function() {
-                $('#edit-title-dialog .title-input').val($('.title-container').html());
-            });
-            $('#edit-title-dialog .save-title').click(function() {
-                var title = $('#edit-title-dialog .title-input').val();
-                if (title) {
-                    $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(window.VIDEO_ID, title,
-                        function(response) {
-                            if (response.error) {
-                                $.jGrowl.error(response.error);
-                            } else {
-                                $('.title-container').html(title);
-                                document.title = title + ' | Amara';
-                            }
-                        }
-                    );
-                    $('#edit-title-dialog').modClose();
-                } else {
-                    $.jGrowl.error(window.TITLE_ERROR);
-                }
-            });
-            if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL(
-                        window.TASK_TEAM_VIDEO_URL);
-                var opener = new unisubs.widget.SubtitleDialogOpener(
-                                     window.TASK_TEAM_VIDEO_ID,
-                                     window.TASK_TEAM_VIDEO_URL,
-                                     videoSource,
-                                     null,
-                                     null);
-                opener.showStartDialog();
-            }
-
             var tabLoader = new AHAHTabLoader();
             tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();

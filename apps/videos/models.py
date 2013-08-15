@@ -916,6 +916,12 @@ class Video(models.Model):
         return SL.objects.filter(video=self).exclude(
                 language_code=self.primary_audio_language_code)
 
+    def comment_count(self):
+        if hasattr(self, '_comment_count'):
+            return self._comment_count
+        self._comment_count = Comment.get_for_object(self).count()
+        return self._comment_count
+
     class Meta(object):
         permissions = (
             ("can_moderate_version"   , "Can moderate version" ,),

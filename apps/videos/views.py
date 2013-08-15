@@ -297,6 +297,8 @@ class VideoPageContext(dict):
         dict.__init__(self)
         self['video'] = video
         if not tab_only:
+            video.prefetch_languages(with_public_tips=True,
+                                     with_private_tips=True)
             self.setup(request, video, video_url)
 
     def setup(self, request, video, video_url):
@@ -309,10 +311,8 @@ class VideoPageContext(dict):
         self.update(widget.add_onsite_js_files({}))
         self['page_title'] = self.page_title(video)
         self['metadata'] = metadata.convert_for_display()
-        self['autosub'] = 'true' if request.GET.get('autosub', False) else 'false'
         self['language_list'] = LanguageList(video)
         self['shows_widget_sharing'] = video.can_user_see(request.user)
-
         self['widget_params'] = _widget_params(
             request, video, language=None,
             video_url=video_url and video_url.effective_url,
@@ -320,8 +320,6 @@ class VideoPageContext(dict):
         )
 
         _add_share_panel_context_for_video(self, video)
-        self['lang_count'] = video.subtitlelanguage_set.filter(has_version=True).count()
-        self['original'] = video.subtitle_language()
         self['task'] =  _get_related_task(request)
 
     def page_title(self, video):
