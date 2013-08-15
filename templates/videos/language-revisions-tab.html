@@ -1,6 +1,6 @@
 {% load i18n paginator %}
 <div class="tab" id="revisions-tab">
-    {% if revision_count > 1 %}
+    {% if revisions|length > 1 %}
     <div class="tools">
         <a class="button compare_versions_button">
             {% trans 'Compare Revisions' %}
