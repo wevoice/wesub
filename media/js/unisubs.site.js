@@ -346,27 +346,40 @@ var Site = function(Site) {
                 }
                 return this;
             };
+            // caches the contents of the tab for links_load_tab
+            var tabCache = {};
+            tabCache[window.location.href] = $('#tab-container').contents();
             $.fn.links_load_tab = function(options){
                 /*
-                 * links_load_tab -- make links load tabs using AHAH
+                 * links_load_tab -- make links load #tab-container using AHAH
                  */
-                if(options && options.onComplete) {
-                    var onComplete = options.onComplete;
-                } else {
-                    var onComplete = null;
+                if(options === undefined) {
+                    options = {};
                 }
+                function changeCurrentTab(url) {
+                    var tab = url.match(/tab=([^&]+)/)[1];
+                    $('.tabs li').removeClass('current');
+                    $('#' + tab + '-tab-header').addClass('current');
+                }
+                var tabContainer = $('#tab-container');
                 this.each(function(){
                     $('a', this).click(function(evt) {
-                        var link = $(this);
-                        var url = link.attr('href');
-                        var tab = url.match(/tab=([^&]+)/)[1];
-                        $('.tabs li').removeClass('current');
-                        $('#' + tab + '-tab-header').addClass('current');
-                        $('#tab-container').empty();
+                        var url = this.href;
+                        changeCurrentTab(url);
+                        tabContainer.empty();
                         if(history && history.pushState) {
                             history.pushState(null, null, url);
                         }
-                        $('#tab-container').load(url, null, onComplete);
+                        if(tabCache.hasOwnProperty(url)) {
+                            tabContainer.append(tabCache[url]);
+                        } else {
+                            tabContainer.load(url, null, function() {
+                                tabCache[url] = tabContainer.contents();
+                                if(options.onComplete) {
+                                    options.onComplete();
+                                }
+                            });
+                        }
                         evt.stopPropagation();
                         evt.preventDefault();
                     });
