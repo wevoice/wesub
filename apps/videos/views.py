@@ -575,9 +575,9 @@ class LanguagePageContext(dict):
             request, version, language)
 
     def calc_rollback_allowed(self, request, version, language):
-        team_video = version.video.get_team_video()
         if version and version.next_version():
-            return not team_video or can_rollback_language(request.user, language)
+            return (version.video.get_team_video() is None or
+                    can_rollback_language(request.user, language))
         else:
             return False
 
