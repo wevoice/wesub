@@ -1731,6 +1731,10 @@ class TestSubtitleLanguageTipQueries(TestCase):
                     {'visibility': 'public',
                      'visibility_override': 'private'},
                 ],
+                'de': [
+                    {'visibility': 'public',
+                     'visibility_override': 'deleted'},
+                ],
             },
         })
 

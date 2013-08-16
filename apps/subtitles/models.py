@@ -1168,7 +1168,8 @@ subtitles_subtitleversion.version_number = (
     SELECT MAX(version_number)
     FROM subtitles_subtitleversion sv2
     WHERE sv2.subtitle_language_id =
-           subtitles_subtitleversion.subtitle_language_id)"""
+           subtitles_subtitleversion.subtitle_language_id AND
+           sv2.visibility_override != 'deleted')"""
         return self.get_query_set().extra(where=[tip_where])
 
     def public_tips(self):
