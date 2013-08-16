@@ -1,16 +1,18 @@
 import os
 import time
 import codecs
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import TaskFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
-from apps.webdriver_testing.pages.site_pages.teams import tasks_tab
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import TaskFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages.teams import tasks_tab
+
 class TestCaseSubtitlesUpload(WebdriverTestCase):
     """TestSuite for uploading subtitles via the api.
 
@@ -28,6 +30,8 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         cls.test_video = cls.data_utils.create_video()
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
+
+        cls.video_pg = video_page.VideoPage(cls)
 
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.video_language_pg.set_skiphowto()
@@ -115,19 +119,21 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         sl_sv = video.subtitle_language('sv')
         self.assertFalse(sl_sv.is_forked)
 
+
         #Upload a new set of subs via the api
         upload_url = ( 'videos/%s/languages/en/subtitles/' 
             % video.video_id )
-        upload_data = { 'subtitles': open(en_rev2).read(), 'sub_format': 'srt' } 
+        upload_data = { #'title': 'updated via api',
+                        'subtitles': open(en_rev2).read(), 
+                        'sub_format': 'srt',
+                        'is_complete': True, 
+                        'complete': 1 } 
         status, response = self.data_utils.post_api_request(self.user,
                                                             upload_url, 
                                                             upload_data)
+        video.clear_language_cache()
         sl_sv = video.subtitle_language('sv')
         self.assertTrue(sl_sv.is_forked)
-
-
-
-
 
     def test_upload__display(self):
         """Upload subs via api and check display on language page. """

@@ -213,6 +213,7 @@ class TestCaseTimedText(WebdriverTestCase):
         super(TestCaseTimedText, cls).setUpClass()
         cls.user = UserFactory.create(username = 'user')
         cls.video_pg = video_page.VideoPage(cls)
+        cls.video_lang_pg =  video_language_page.VideoLanguagePage(cls)
         cls.test_video = VideoUrlFactory().video
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
@@ -236,8 +237,8 @@ class TestCaseTimedText(WebdriverTestCase):
         subtitle_lang = self.test_video.subtitle_language(lang_code)
         subtitle_lang.clear_tip_cache()
         self.assertEqual(expected_count, subtitle_lang.get_subtitle_count())
-        self.video_pg.open_page('videos/{0}/{1}/'.format(
-            self.test_video.video_id, lang_code))
+        self.video_lang_pg.open_video_lang_page(self.test_video.video_id, lang_code)
+        self.assertEqual(expected_count, len(self.video_lang_pg.displayed_lines()))
 
     def test_timed__txt(self):
         """Upload timed subs (en) in a txt file.

@@ -83,6 +83,9 @@ class TestCaseWorkflows(WebdriverTestCase):
         #Add ru translation, incomplete.
         cls._upload_translation(cls.video, 'ru', cls.sv, cls.contributor, 
                                 complete=False)
+        cls.video.subtitle_language('en').clear_tip_cache()
+        sl_sv = cls.video.subtitle_language('sv').clear_tip_cache()
+        
 
         cls.video_lang_pg.open_video_lang_page(cls.video.video_id, 'en')
 
@@ -324,11 +327,15 @@ class TestCaseDeletion(WebdriverTestCase):
 
         #Delete English subtitle language + Swedish and German
         cls.video_lang_pg.delete_subtitle_language(['Swedish', 'German'])
+        management.call_command('update_index', interactive=False)
+        management.call_command('update_video_metadata')
+
 
 
     def setUp(self):
         self.video_pg.open_video_page(self.video.video_id)
         self.video_pg.handle_js_alert('accept')
+
 
     @classmethod
     def _upload_subtitles(cls, video, lc, subs, user, complete=True):
@@ -366,6 +373,7 @@ class TestCaseDeletion(WebdriverTestCase):
         """Deleted source language no longer listed in the ui.
 
         """
+        self.video.clear_language_cache()
         self.video_pg.open_video_page(self.video.video_id)
         langs = self.video_pg.subtitle_languages()
         self.assertNotIn('English', langs)
@@ -409,6 +417,7 @@ class TestCaseDeletion(WebdriverTestCase):
         """Deleted translation languages are no longer listed in the ui.
 
         """
+        self.video.clear_language_cache()
         self.video_pg.open_video_page(self.video.video_id)
         langs = self.video_pg.subtitle_languages()
         self.assertNotIn('German', langs)
