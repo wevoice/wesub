@@ -392,12 +392,18 @@ class Video(models.Model):
         """Return the TeamVideo object for this video, or None if there isn't one."""
         from teams.models import TeamVideo
 
+        # django caches the teamvideo attribute, but only if it's not None.
+        # So we do our own caching here as well
+        if hasattr(self, '_cached_teamvideo'):
+            return self._cached_teamvideo
         try:
             team_video = self.teamvideo
             team_video.video = self
-            return team_video
+            rv = team_video
         except TeamVideo.DoesNotExist:
-            return None
+            rv = None
+        self._cached_teamvideo = rv
+        return rv
 
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
