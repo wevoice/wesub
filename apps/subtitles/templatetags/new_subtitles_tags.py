@@ -56,22 +56,22 @@ def render_subtitles(subtitle_version):
     """
     subtitles = subtitle_version.get_subtitles()
     parts = []
-    timing_template = string.Template("""\
+    timing_template = string.Template(u"""\
 <div class="timing">
     <a class="time_link" href="#" title="Play video here">
         <span class="data">$start_time</span>
         $start_time_display - $end_time_display
     </a>
 </div>""")
-    not_synced_timing = """\
+    not_synced_timing = u"""\
 <div class="timing">
     %s
 </div>""" % _('Not Synced')
-    text_template = string.Template("""\
+    text_template = string.Template(u"""\
 <div class="translation-text">
     $text
 </div>""")
-    text_template_new_p = string.Template("""\
+    text_template_new_p = string.Template(u"""\
 <div class="translation-text">
     $text
     <p class='quiet'>¶</p>
@@ -80,9 +80,9 @@ def render_subtitles(subtitle_version):
     for item in subtitles.subtitle_items(HTMLGenerator.MAPPINGS):
         new_paragraph = item.meta.get('new_paragraph', False)
         if new_paragraph:
-            parts.append('<li class="subtitle-item start-of-paragraph">')
+            parts.append(u'<li class="subtitle-item start-of-paragraph">')
         else:
-            parts.append('<li class="subtitle-item">')
+            parts.append(u'<li class="subtitle-item">')
         if item.start_time is not None:
             parts.append(timing_template.substitute(
                 start_time=item.start_time,
@@ -94,4 +94,4 @@ def render_subtitles(subtitle_version):
             parts.append(text_template_new_p.substitute(text=item.text))
         else:
             parts.append(text_template.substitute(text=item.text))
-    return mark_safe("\n".join(parts))
+    return mark_safe(u"\n".join(parts))
