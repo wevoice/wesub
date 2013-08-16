@@ -50,6 +50,11 @@
         {% if version.has_subtitles %}
             <p class="view-notice{% if not version.is_public %} draft{% endif %}">
                 {% if not version.is_public %}<em>{% trans 'Draft only' %}</em>{% endif %}
+                {% if language.get_translation_source_language_code %}
+                    {% blocktrans with language.get_translation_source_language_code|to_localized_display as language %}
+                        Subtitles translated from {{ language }}
+                    {% endblocktrans %}
+                {% endif %}
                 {% blocktrans with version.version_number as version_number and version.revision_time as revision_time and version.author.profile_url as profile_url and version.author as author %}
                 Showing <strong>Revision {{ version_number }}</strong> created <strong>{{ revision_time }}</strong> by <a href="{{ profile_url}}" title="View {{ author }}'s profile"><strong>{{ author }}</strong></a>.
                 {% endblocktrans %}

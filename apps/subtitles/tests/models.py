@@ -137,6 +137,7 @@ class TestSubtitleLanguage(TestCase):
         # now fork the translated one
         translated.is_forked = True
         translated.save()
+        translated = refresh(translated)
         self.assertIsNone(translated.get_translation_source_language())
         self.assertIsNone(translated.get_translation_source_language_code())
         self.assertEqual(

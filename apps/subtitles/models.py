@@ -421,6 +421,7 @@ class SubtitleLanguage(models.Model):
     def __init__(self, *args, **kwargs):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
+        self._translation_source_version_cache = {}
 
     # Writelocking
     @property
@@ -963,31 +964,34 @@ class SubtitleLanguage(models.Model):
         Right now, we're only allowing for 1 version, but that
         could be revisited in the future.
         '''
-        if  not ignore_forking and self.is_forked:
+        cache_key = ignore_forking
+        if cache_key in self._translation_source_version_cache:
+            return self._translation_source_version_cache[cache_key]
+        version = self._get_translation_source_version(ignore_forking)
+        self._translation_source_version_cache[cache_key] = version
+        return version
+
+    def clear_translation_source_cache(self):
+        self._translation_source_version_cache = {}
+
+    def _get_translation_source_version(self, ignore_forking=False):
+        if not ignore_forking and self.is_forked:
             return None
 
-        current_version = self.get_tip()
-        if not current_version:
+        qs = SubtitleVersion.objects.raw("""\
+SELECT parents.*
+FROM subtitles_subtitleversion children
+JOIN subtitles_subtitleversion_parents pmap
+    ON children.id=pmap.from_subtitleversion_id
+JOIN subtitles_subtitleversion parents
+    ON parents.id=pmap.to_subtitleversion_id
+WHERE children.subtitle_language_id=%s AND parents.subtitle_language_id != %s
+ORDER BY children.version_number DESC
+LIMIT 1;""", (self.id, self.id))
+        try:
+            return qs[0]
+        except IndexError:
             return None
-
-        while True:
-            parents = current_version.parents.full().order_by('-pk')
-            # parents can be on the same language, try other languages at first
-            other_languages = parents.exclude(subtitle_language=self)
-            try:
-                return other_languages[0]
-            except IndexError:
-                if current_version.version_number > 1:
-                    try:
-                        # previous versions might have parents in other languages
-                        # so set the current version to the same language, and
-                        # check that out
-                        current_version = parents[0]
-                    except IndexError:
-                        return None
-                else:
-                    return None
-
 
     def get_dependent_subtitle_languages(self, direct=False):
         """Return a list of SLs that are dependents/translations of this.
