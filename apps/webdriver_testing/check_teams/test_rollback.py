@@ -989,6 +989,3 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         self.assertFalse(self.video_lang_pg.is_draft())
         self.assertIn('Revision 5', self.video_lang_pg.view_notice())
 
-
-
-
