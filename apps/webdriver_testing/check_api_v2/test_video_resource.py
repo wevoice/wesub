@@ -305,7 +305,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
 
         #Check the team is listed on the video page 
-        self.video_pg.open_video_page(v.video_id)
+        self.video_pg.open_video_page(vid_id)
         self.assertTrue(self.video_pg.team_slug(self.open_team.slug))
 
     def test_update__project(self):
