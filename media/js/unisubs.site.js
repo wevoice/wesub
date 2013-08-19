@@ -608,19 +608,11 @@ var Site = function(Site) {
                     e.preventDefault();
                 }
             });
-            if (window.IS_AUTHENTICATED && window.ROLLBACK_ALLOWED) {
-                $('#rollback').click(function() {
-                    if (!confirm('Subtitles will be rolled back to a previous version')){
-                        return false;
-                    }
-                });
-            } else {
-                $('#rollback, .new_edit').click(function() {
-                    alert('You need to log in to do that.');
+            $('#rollback').click(function() {
+                if (!confirm('Subtitles will be rolled back to a previous version')){
                     return false;
-                });
-            }
-
+                }
+            });
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
