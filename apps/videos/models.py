@@ -387,7 +387,6 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
         from teams.models import TeamVideo
@@ -404,6 +403,10 @@ class Video(models.Model):
             rv = None
         self._cached_teamvideo = rv
         return rv
+
+    def clear_team_video_cache(self):
+        if hasattr(self, '_cached_teamvideo'):
+            del self._cached_teamvideo
 
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
