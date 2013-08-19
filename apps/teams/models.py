@@ -2730,6 +2730,10 @@ class BillingReportGenerator(object):
         self.make_language_number_map(all_records)
 
         for video, records in groupby(all_records, lambda r: r.video):
+            records = list(records)
+            for lang in self.languages_without_records(video, records):
+                self.rows.append(
+                    self.make_row_for_lang_without_record(video, lang))
             for r in records:
                 self.rows.append(self.make_row(video, r))
 
@@ -2772,6 +2776,28 @@ class BillingReportGenerator(object):
             vid = record.video.id
             video_counts[vid] += 1
             self.language_number_map[record.id] = video_counts[vid]
+
+    def languages_without_records(self, video, records):
+        return (video.newsubtitlelanguage_set
+                .exclude(id__in=[r.new_subtitle_language.id for r in records]))
+
+    def make_row_for_lang_without_record(self, video, language):
+        if language.subtitles_complete:
+            minutes = 0
+        else:
+            minutes = -1
+        return [
+            video.title_display().encode('utf-8'),
+            video.video_id,
+            language.language_code,
+            minutes,
+            language.is_primary_audio_language(),
+            0,
+            'unknown',
+            language.created.strftime('%Y-%m-%d %H:%M:%S'),
+            'unknown',
+            'unknown',
+        ]
 
 class BillingRecordManager(models.Manager):
 
