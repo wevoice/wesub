@@ -115,7 +115,7 @@ unisubs.widget.HangingVideoTab.prototype.showContent = function(
     hasSubtitles, opt_playSubState) 
 {
 
-    if (!hasSubtitles && window['VIDEO_TEAM_NAME'] !== '' && window['VIDEO_TEAM_WORKFLOW_ENABLED'] === true) {
+    if (!hasSubtitles && window['VIDEO_TEAM_WORKFLOW_ENABLED'] === true) {
         this.show(false);
     }
 

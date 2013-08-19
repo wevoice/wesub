@@ -16,6 +16,13 @@
         {% include_bundle "unisubs-onsite-compiled" %}
         <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
         {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+        <script type="text/javascript">
+            {% if team.workflow_enabled %}
+                window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+            {% else %}
+                window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+            {% endif %}
+        </script>
     {% endblock %}
 
 {% block title %}{{ page_title }}{% endblock %}

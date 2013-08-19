@@ -321,6 +321,10 @@ class VideoPageContext(dict):
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
+        if video.get_team_video() is not None:
+            self['team'] = video.get_team_video().team
+        else:
+            self['team'] = None
 
     def page_title(self, video):
         template = string.Template(ugettext("$title with subtitles | Amara"))
