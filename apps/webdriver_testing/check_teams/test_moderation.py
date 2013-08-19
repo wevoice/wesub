@@ -290,7 +290,6 @@ class TestCaseDraftVideos(WebdriverTestCase):
         self.assertFalse(self.video_pg.displays_subtitle_me())
 
 
-
 class TestCaseViewSubtitles(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
 

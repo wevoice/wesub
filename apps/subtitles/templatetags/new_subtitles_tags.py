@@ -16,9 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 
+import string
+
 from django import template
 from django.utils.encoding import force_unicode
-from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext as _
+from babelsubs.generators import HTMLGenerator
 
 register = template.Library()
 
@@ -34,3 +38,60 @@ def visibility_display(subtitle_version):
         'private': _("Private"),
         'deleted': _("Deleted")
     }[visibility])
+
+def format_time(milliseconds):
+    if milliseconds is None:
+        return ''
+    t = int(round(milliseconds / 1000.0))
+    s = t % 60
+    s = s > 9 and s or '0%s' % s
+    return '%s:%s' % (t / 60, s)
+
+@register.filter
+def render_subtitles(subtitle_version):
+    """Render the subtitles for a SubtitleVersion
+
+    This would be much nicer in a django template, but for versions with
+    thousands of subtitles that gets slow
+    """
+    subtitles = subtitle_version.get_subtitles()
+    parts = []
+    timing_template = string.Template(u"""\
+<div class="timing">
+    <a class="time_link" href="#" title="Play video here">
+        <span class="data">$start_time</span>
+        $start_time_display - $end_time_display
+    </a>
+</div>""")
+    not_synced_timing = u"""\
+<div class="timing">
+    %s
+</div>""" % _('Not Synced')
+    text_template = string.Template(u"""\
+<div class="translation-text">
+    $text
+</div>""")
+    text_template_new_p = string.Template(u"""\
+<div class="translation-text">
+    $text
+    <p class='quiet'>¶</p>
+</div>""")
+
+    for item in subtitles.subtitle_items(HTMLGenerator.MAPPINGS):
+        new_paragraph = item.meta.get('new_paragraph', False)
+        if new_paragraph:
+            parts.append(u'<li class="subtitle-item start-of-paragraph">')
+        else:
+            parts.append(u'<li class="subtitle-item">')
+        if item.start_time is not None:
+            parts.append(timing_template.substitute(
+                start_time=item.start_time,
+                start_time_display=format_time(item.start_time),
+                end_time_display=format_time(item.end_time)))
+        else:
+            parts.append(not_synced_timing)
+        if new_paragraph:
+            parts.append(text_template_new_p.substitute(text=item.text))
+        else:
+            parts.append(text_template.substitute(text=item.text))
+    return mark_safe(u"\n".join(parts))

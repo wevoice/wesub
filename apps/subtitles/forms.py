@@ -177,7 +177,7 @@ class SubtitlesUploadForm(forms.Form):
                     u"translate subtitles."))
 
     def _verify_translation_subtitle_counts(self, from_language_code):
-        if from_language_code:
+        if from_language_code and hasattr(self, '_parsed_subtitles'):
             from_count = len(self.from_sv.get_subtitles())
             current_count = len(self._parsed_subtitles.get_subtitles())
 

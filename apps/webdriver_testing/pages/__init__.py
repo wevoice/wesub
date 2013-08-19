@@ -76,6 +76,7 @@ class Page(object):
         time.sleep(2)
         try:
             a = self.browser.switch_to_alert()
+            self.logger.info(a.text)
             if action == "accept":
                 a.accept()
             elif action == "reject":

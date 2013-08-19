@@ -41,6 +41,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         self.video_pg.upload_subtitles('English', rev1)
         sl = video.subtitle_language('en')
         v1 = sl.get_tip().id
+        sl.clear_tip_cache()
 
         user2 = UserFactory.create()
         self.video_pg.log_in(user2.username, 'password')
@@ -208,8 +209,10 @@ class TestCaseRevisionEdits(WebdriverTestCase):
         self._upload_en_draft(video, rev1, user)
         en = video.subtitle_language('en')
         en_v1 = en.get_tip()
+        en.clear_tip_cache() 
         self._upload_en_draft(video, rev2, user, complete=True)
         en_v2 = en.get_tip()
+        en.clear_tip_cache() 
         return en_v1, en_v2
 
     def test_rollback(self):

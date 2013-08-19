@@ -274,7 +274,7 @@ def save_emailed_translations(request):
         user = CustomUser.objects.get(pk=request.POST['user_pk'])
         subs = json.loads(request.POST['sub_text'])
         rpc_views.save_finished(user, session, subs)
-        return redirect(reverse('videos:history', [session.language.video.video_id]))
+        return redirect(session.language.video.get_absolute_url())
 
 def base_widget_params(request, extra_params={}):
     params = {}

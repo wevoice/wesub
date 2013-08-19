@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block body_attrs %}id="video" class="v1 video_view"{% endblock %}
+{% block html_attrs %}id="subtitle_view"{% endblock %}
+
+{% load widget comments i18n media_compressor videos_tags %}
+
+{% block css %}
+    {{ block.super }}
+    {% include_bundle "video_history" %}
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    {% include_bundle "unisubs-onsite-compiled" %}
+
+    <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+    {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+    <script type="text/javascript">
+        window.DIFFING_URL = '{% block diffing_link %}{% url videos:diffing 11111 22222 %}{% endblock %}';
+        window.LANGUAGE_ID = '{{ language.id }}';
+        window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
+        window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
+        window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
+    </script>
+{% endblock %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block opengraph-head %}
+    {{block.super}}
+    <meta property="og:title" content="{{ page_title }}" />
+    <meta property="og:type" content="video"/>
+    <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
+    {% if video.thumbnail %}
+        <meta property="og:image" content="{{ video.get_thumbnail }}" />
+    {% else %}
+        <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
+    {% endif %}
+
+    <meta property="og:site_name" content="Amara"/>
+    <meta property="og:description" content="{{ page_title }}" />
+{% endblock  %}
+
+{% block main_content %}
+    <div class="grid_4 context alpha">
+        <h3 class="sub-title">
+            <a href="{{ language.language_url }}" title="Language permalink">
+                {% if language.is_original %}
+                    {% trans 'Original' %}
+                {% endif %}
+                {{ language.get_language_code_display }}
+                {% trans "subtitles" %}
+            </a>
+        </h3>
+        <h2 class="main-title">
+            <a href="{{ video.get_absolute_url }}" {% if language.is_rtl %}class="is-rtl"{% endif %} title="View video">
+                {% if not language.is_rtl %}
+                ←
+                {% endif %}
+                {{ language.title_display }}
+            </a>
+        </h2>
+        {% widget widget_params %}
+        {% if language.get_description %}
+            <div id="description"{% if language.get_description|length > 300 %} class="abbr collapsed"{% endif %}>
+                <div {% if language.is_rtl %}class="is-rtl"{% endif %}>
+                    {{ language.get_description|urlize|linebreaks }}
+                </div>
+                {% if language.get_description|length > 300 %}
+                    <a class="expand" href="#">Show all ↓</a>
+                {% endif %}
+            </div>
+        {% endif %}
+        <ul class="metrics">
+            <li>
+                <div>
+                    <p>{{ language.followers.count }}</p>
+                    <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <p>{{ language|get_comment_count }}</p>
+                    <h4>{% trans 'Comment' %}{{ language|get_comment_count|pluralize }}</h4>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <p>{{ version.subtitle_count }}</p>
+                    <h4>{% trans "Line" %}{{ version.subtitle_count|pluralize }}</h4>
+                </div>
+            </li>
+        </ul>
+        <div class="sharing-tools">
+            {% if shows_widget_sharing %}
+                {% include '_sharing_widget.html' %}
+            {% endif %}
+        </div>
+        <h3>
+            {% trans "View Subtitles" %}
+            {% if video.languages_count > 0 %}
+                ({{ video.languages_count }})
+            {% endif %}
+        </h3>
+        <ul id="subtitles-menu" {% if video.languages_count > 14 %} class="list-collapsible"{% endif %}>
+            {% include 'videos/_left_navigation.html' %}
+            {% if video.languages_count > 14 %}
+                <li class="expand">
+                    <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="grid_8 view omega">
+        {% if user.is_authenticated %}
+            {% include 'videos/_follow_video_button.html' %}
+        {% endif %}
+        <ul class="tabs">
+            <li class="{% if tab == 'subtitles' %}current{% endif %}" id="subtitles-tab-header"><a href="?tab=subtitles">{% trans "Subtitles" %}</a></li>
+            <li class="hascount{% if tab == 'comments' %} current{% endif %}" id="comments-tab-header"><a href="?tab=comments">{% trans "Comments" %}<span>{{ language|get_comment_count }}</span></a></li>
+            <li class="hascount{% if tab == 'revisions' %} current{% endif %}" id="revisions-tab-header"><a href="?tab=revisions">{% trans "Revisions" %}<span>{{ revision_count }}</span></a></li>
+        </ul>
+        <div id="tab-container">{% block tab %}{% endblock %}</div>
+    </div>
+{% endblock %}
+
+{% block page_controls %}
+    {% if user.is_staff and perms.videos.edit_video %}
+        <ul id="page_controls">
+            <li>
+                <a href="{% url admin:subtitles_subtitlelanguage_change language.pk %}" target="blank">{% trans 'Edit SubtitleLanguage in Django Admin' %}</a>
+            </li>
+            <li>
+                <a href="{% url subtitles:subtitle-editor video.video_id language.language_code %}">New editor</a>
+            </li>
+        </ul>
+    {% endif %}
+{% endblock %}

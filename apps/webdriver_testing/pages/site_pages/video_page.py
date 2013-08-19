@@ -9,7 +9,7 @@ class VideoPage(UnisubsPage):
      Video Page contains the common elements in the video page.
     """
 
-    _URL = "videos/%s"  # %s is the unique onsite video id
+    _URL = "videos/%s/info/"  # %s is the unique onsite video id
     _VIDEO_TITLE = "h2.main-title a"
     _SPEAKER_NAME = "div.content div div > h4"
     _LOCATION = "div.content div div h4:nth-child(2)"
