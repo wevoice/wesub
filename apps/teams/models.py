@@ -89,6 +89,17 @@ class TeamManager(models.Manager):
         else:
             return self.get_query_set().filter(is_visible=True)
 
+    def with_recent_billing_record(self, day_range):
+        """Find teams that have had a new video recently"""
+        start_date = (datetime.datetime.now() -
+                      datetime.timedelta(days=day_range))
+        team_ids = list(BillingRecord.objects
+                        .order_by()
+                        .filter(created__gt=start_date)
+                        .values_list('team_id', flat=True)
+                        .distinct())
+        return Team.objects.filter(id__in=team_ids)
+
 class Team(models.Model):
     APPLICATION = 1
     INVITATION_BY_MANAGER = 2
@@ -2723,10 +2734,11 @@ class BillingReportGenerator(object):
         all_records = list(all_records)
 
         self.make_language_number_map(all_records)
+        self.make_languages_without_records(all_records)
 
         for video, records in groupby(all_records, lambda r: r.video):
             records = list(records)
-            for lang in self.languages_without_records(video, records):
+            for lang in self.languages_without_records.get(video.id, []):
                 self.rows.append(
                     self.make_row_for_lang_without_record(video, lang))
             for r in records:
@@ -2772,20 +2784,33 @@ class BillingReportGenerator(object):
             video_counts[vid] += 1
             self.language_number_map[record.id] = video_counts[vid]
 
-    def languages_without_records(self, video, records):
-        return (video.newsubtitlelanguage_set
-                .exclude(id__in=[r.new_subtitle_language.id for r in records]))
+    def make_languages_without_records(self, records):
+        self.languages_without_records = {}
+        videos = [r.video for r in records]
+        language_ids = [r.new_subtitle_language_id for r in records]
+        no_billing_record_where = """\
+NOT EXISTS (
+    SELECT 1
+    FROM teams_billingrecord br
+    WHERE br.new_subtitle_language_id = subtitles_subtitlelanguage.id
+)"""
+        qs = (NewSubtitleLanguage.objects
+              .filter(video__in=videos, subtitles_complete=True)
+              .exclude(id__in=language_ids).
+              extra(where=[no_billing_record_where]))
+        for lang in qs:
+            vid = lang.video_id
+            if vid not in self.languages_without_records:
+                self.languages_without_records[vid] = [lang]
+            else:
+                self.languages_without_records[vid].append(lang)
 
     def make_row_for_lang_without_record(self, video, language):
-        if language.subtitles_complete:
-            minutes = 0
-        else:
-            minutes = -1
         return [
             video.title_display().encode('utf-8'),
             video.video_id,
             language.language_code,
-            minutes,
+            0,
             language.is_primary_audio_language(),
             0,
             'unknown',

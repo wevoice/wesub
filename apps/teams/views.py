@@ -48,7 +48,8 @@ from teams.forms import (
     AddTeamVideosFromFeedForm, TaskAssignForm, SettingsForm, TaskCreateForm,
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
-    DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm, BillingReportForm
+    DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
+    make_billing_report_form,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -2122,6 +2123,7 @@ def auto_captions_status(request, slug):
 # Billing
 @staff_member_required
 def billing(request):
+    BillingReportForm = make_billing_report_form()
     user = request.user
 
     if not DEV and not (user.is_superuser and user.is_active):
@@ -2136,7 +2138,9 @@ def billing(request):
             report_type = form.cleaned_data.get('type')
 
             report = BillingReport.objects.create( start_date=start_date, end_date=end_date, type=report_type)
+            print 'making report'
             for team in teams:
+                print 'adding team: ', team
                 report.teams.add(team)
 
             process_billing_report.delay(report.pk)

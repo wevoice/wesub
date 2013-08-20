@@ -10,7 +10,7 @@ class BillingPage(UnisubsPage):
     """
 
     _URL = "admin/billing/"
-    _TEAM = "input#id_teams"
+    _TEAM = "ul li label"
     _START = "input#id_start_date"
     _END = "input#id_end_date"
     _TYPE = "select#id_type"
@@ -22,7 +22,13 @@ class BillingPage(UnisubsPage):
 
 
     def submit_billing_parameters(self, team, start, end, bill_type):
-        self.type_by_css(self._TEAM, team)
+        teams = team.split(',')
+        boxes = self.get_elements_list(self._TEAM)
+        self.logger.info(teams)
+        for b in boxes:
+            self.logger.info(b.text)
+            if b.text in teams:
+                b.find_element_by_css_selector('input').click()
         self.type_by_css(self._START, start)
         self.type_by_css(self._END, end)
         self.select_option_by_text(self._TYPE, bill_type)

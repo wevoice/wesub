@@ -416,8 +416,8 @@ class BillingTest(TestCase):
         add_subtitles(video, 'de', make_subtitle_lines(4),
                            created=date_maker.next_date(),
                            complete=True)
-        # pt-br has a uncompleted subtitle language.  We should list -1 minutes
-        # for that language
+        # pt-br has a uncompleted subtitle language.  We should not list that
+        # language in the report
         add_subtitles(video, 'pt-br', make_subtitle_lines(4),
                            created=date_maker.next_date(),
                            complete=False)
@@ -430,12 +430,10 @@ class BillingTest(TestCase):
         data = self.get_report_data(self.team,
                                            date_maker.start_date(),
                                            date_maker.end_date())
-        self.assertEquals(data['record count'], 5)
+        self.assertEquals(data['record count'], 4)
         self.assertEquals(data[video.video_id]['en']['Language number'], 0)
         self.assertEquals(data[video.video_id]['de']['Language number'], 0)
-        self.assertEquals(data[video.video_id]['pt-br']['Language number'], 0)
         self.assertEquals(data[video.video_id]['fr']['Language number'], 1)
         self.assertEquals(data[video.video_id]['es']['Language number'], 2)
         self.assertEquals(data[video.video_id]['en']['Minutes'], 0)
         self.assertEquals(data[video.video_id]['de']['Minutes'], 0)
-        self.assertEquals(data[video.video_id]['pt-br']['Minutes'], -1)
