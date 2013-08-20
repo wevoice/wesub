@@ -265,7 +265,7 @@ var AmaraDFXPParser = function() {
             var seconds = time % 60;
             return leftPad(hours, 2) + ':' +
                 leftPad(minutes, 2) + ':' +
-                leftPad(seconds, 2) +  ',' +
+                leftPad(seconds, 2) +  '.' +
                 leftPad(fraction, 3);
         },
         timeExpressionToMilliseconds: function(timeExpression) {
