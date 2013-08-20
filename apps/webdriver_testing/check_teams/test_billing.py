@@ -107,9 +107,7 @@ class TestCaseBilling(WebdriverTestCase):
 
 
     def test_incomplete(self):
-        """Incomplete videos are not billed.
-
-        """
+        """Incomplete languages have no billing record. """
         video, tv = self._create_tv_with_original_subs(self.user, self.team)
         inc_video, inc_tv = self._create_tv_with_original_subs(self.user, 
                                                                self.team, 
@@ -126,7 +124,6 @@ class TestCaseBilling(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         bill_dict = self._bill_dict(bill)
         self.assertNotIn(inc_video.video_id, bill_dict.keys())
-
 
     def test_primary_audio_language(self):
         """Primary audio lang true / false included in Original field.
@@ -146,7 +143,7 @@ class TestCaseBilling(WebdriverTestCase):
         self.assertIn('sv', self.bill_dict[self.video.video_id].keys())
 
     def test_translation__incomplete(self):
-        """Billing record NOT added for incomplete translations
+        """Incomplete languages have -1 minutes.
 
         """
         video, tv = self._create_tv_with_original_subs(self.user, self.team)
@@ -161,7 +158,10 @@ class TestCaseBilling(WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         bill_dict = self._bill_dict(bill)
-        self.assertNotIn('sv', bill_dict[video.video_id].keys())
+        sv_bill = bill_dict[video.video_id]['sv']
+
+        self.logger.info(sv_bill)
+        self.assertEqual('-1', sv_bill['Minutes'])
 
 
     def test_minutes(self):
