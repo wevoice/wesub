@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import datetime
 import re
 
 from auth.models import CustomUser as User
@@ -681,23 +682,18 @@ class TaskUploadForm(SubtitlesUploadForm):
 
         return version
 
-
-class BillingReportForm(forms.Form):
-    teams = forms.CharField( required=False, help_text="slugs, comma separated")
-    start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
-    end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
-    type = forms.ChoiceField(required=True, choices=BillingReport.TYPE_CHOICES)
-
-
-
-    def clean_teams(self):
-        try:
-            teams = [Team.objects.get(slug=s.strip()) for s in self.cleaned_data.get('teams', '').split(',') if s]
-        except Team.DoesNotExist:
-            raise forms.ValidationError(u"There is no team with slug %s" % s)
-        if not teams:
-            raise forms.ValidationError(u"You need at least one valid team slug")
-        self.cleaned_data['teams'] =  teams
-        return teams
-
+def make_billing_report_form():
+    """Factory function to create a billing report form """
+    class BillingReportForm(forms.Form):
+        teams = forms.ModelMultipleChoiceField(
+            required=True,
+            queryset=Team.objects.with_recent_videos(40).order_by('name'),
+            widget=forms.CheckboxSelectMultiple)
+        start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+        end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
+        type = forms.ChoiceField(required=True,
+                                 choices=BillingReport.TYPE_CHOICES,
+                                 initial=BillingReport.TYPE_NEW,
+                                 widget=forms.RadioSelect)
+    return BillingReportForm
 

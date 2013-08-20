@@ -83,7 +83,11 @@ form ul li label {
     margin: 17px 15px 0 0;
     width: 200px;
 }
-form ul li input {
+form .checkbox-grid ul li label {
+    width: auto;
+}
+
+form ul li input[type!="checkbox"] {
     -moz-border-radius: 5px;
     -moz-box-shadow: 0 1px 0 #FFF, inset 0 2px 0 #DDD;
     -webkit-border-radius: 5px;

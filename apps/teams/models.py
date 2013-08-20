@@ -89,6 +89,17 @@ class TeamManager(models.Manager):
         else:
             return self.get_query_set().filter(is_visible=True)
 
+    def with_recent_videos(self, day_range):
+        """Find teams that have had a new video recently"""
+        start_date = (datetime.datetime.now() -
+                      datetime.timedelta(days=day_range))
+        team_ids = list(TeamVideo.objects
+                        .order_by()
+                        .filter(created__gt=start_date)
+                        .values_list('team_id', flat=True)
+                        .distinct())
+        return Team.objects.filter(id__in=team_ids)
+
 class Team(models.Model):
     APPLICATION = 1
     INVITATION_BY_MANAGER = 2

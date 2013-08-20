@@ -14,7 +14,24 @@
 
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="group">
+            <p>{{ form.teams.label_tag }}</p>
+            <div class="checkbox-grid group">
+                {{ form.teams }}
+            </div>
+            <p>{{ form.start_date.label_tag }}
+                {{ form.start_date }}
+                {{ form.start_date.help_text }}
+            </p>
+            <p>{{ form.end_date.label_tag }}
+                {{ form.end_date }}
+                {{ form.end_date.help_text }}
+            </p>
+            <p>{{ form.type.label_tag }}
+                {{ form.type }}
+                {{ form.type.help_text }}
+            </p>
+        </div>
 
         <button type="submit" class="green_button big" value="login">{% trans 'Submit' %}</button>
     </form>
