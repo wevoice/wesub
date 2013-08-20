@@ -89,11 +89,11 @@ class TeamManager(models.Manager):
         else:
             return self.get_query_set().filter(is_visible=True)
 
-    def with_recent_videos(self, day_range):
+    def with_recent_billing_record(self, day_range):
         """Find teams that have had a new video recently"""
         start_date = (datetime.datetime.now() -
                       datetime.timedelta(days=day_range))
-        team_ids = list(TeamVideo.objects
+        team_ids = list(BillingRecord.objects
                         .order_by()
                         .filter(created__gt=start_date)
                         .values_list('team_id', flat=True)

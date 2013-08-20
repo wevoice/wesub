@@ -687,7 +687,8 @@ def make_billing_report_form():
     class BillingReportForm(forms.Form):
         teams = forms.ModelMultipleChoiceField(
             required=True,
-            queryset=Team.objects.with_recent_videos(40).order_by('name'),
+            queryset=(Team.objects.with_recent_billing_record(40)
+                      .order_by('name')),
             widget=forms.CheckboxSelectMultiple)
         start_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
         end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
