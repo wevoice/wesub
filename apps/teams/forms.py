@@ -693,7 +693,6 @@ def make_billing_report_form():
         end_date = forms.DateField(required=True, help_text='YYYY-MM-DD')
         type = forms.ChoiceField(required=True,
                                  choices=BillingReport.TYPE_CHOICES,
-                                 initial=BillingReport.TYPE_NEW,
-                                 widget=forms.RadioSelect)
+                                 initial=BillingReport.TYPE_NEW)
     return BillingReportForm
 

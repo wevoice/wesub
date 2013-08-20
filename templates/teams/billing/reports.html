@@ -2,15 +2,10 @@
 
 {% load i18n teams_tags %}
 
-{% block html_attrs %}id="login"{% endblock %}
-
 {% block main_content %}
 
 <div class="grid_8 push_2">
-    <div class="sso">
-        <h2>{% trans "Billing" %}</h2>
-        <h2>Billing cut off is {{ cutoff }}</h2>
-    </div>
+    <h2>{% trans "Generate Billing Report" %}</h2>
 
     <form method="post">
         {% csrf_token %}
