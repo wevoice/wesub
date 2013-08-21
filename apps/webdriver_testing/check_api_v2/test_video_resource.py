@@ -4,15 +4,15 @@ import operator
 
 from django.core import management
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamProjectFactory
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.pages.site_pages import video_page 
-from apps.webdriver_testing.pages.site_pages.teams import videos_tab
-from apps.webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamProjectFactory
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.pages.site_pages import video_page 
+from webdriver_testing.pages.site_pages.teams import videos_tab
+from webdriver_testing.pages.site_pages import watch_page
 
 class TestCaseVideoResource(WebdriverTestCase):
     """TestSuite for videos via the api
@@ -242,14 +242,6 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertIn(new_data['metadata']['speaker-name'], 
             self.video_pg.speaker_name())
 
-#        management.call_command('update_index', interactive=False)
-
-#        test_text = new_data['metadata']['speaker-name']
-#        self.watch_pg.open_watch_page()
-#        results_pg = self.watch_pg.basic_search(test_text)
-#        self.assertTrue(results_pg.search_has_results())
-      
-
  
     def test_update__metatdata(self):
         """Update video metadata, title, description.
@@ -258,7 +250,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         """
 
         url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
-                                   'Birds_short.webmsd.webm'),
+                                   'fireplace.mp4'),
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
@@ -299,13 +291,13 @@ class TestCaseVideoResource(WebdriverTestCase):
         vid_id = response['id']
 
         url_part = 'videos/%s/' % vid_id
-        new_data = {'team': self.open_team.slug,
-                    'description': ('This is a sample vid converted to webM '
-                                   '720p using Miro Video Converter')
+        new_data = {'description': ('This is a sample vid converted to webM '
+                                   '720p using Miro Video Converter'),
+                    'team': self.open_team.slug,
                    }
         status, response = self.data_utils.put_api_request(self.user,
                                                   url_part, new_data)
-        self.video_pg.open_video_page(vid_id)
+        self.logger.info(response) 
 
         #Check response metadata
         for k, v in new_data.iteritems():
@@ -313,6 +305,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
 
         #Check the team is listed on the video page 
+        self.video_pg.open_video_page(vid_id)
         self.assertTrue(self.video_pg.team_slug(self.open_team.slug))
 
     def test_update__project(self):
@@ -329,6 +322,8 @@ class TestCaseVideoResource(WebdriverTestCase):
         s, r = self.data_utils.post_api_request(self.user, 
                                        url_part, url_data)
         vid_id = r['id']
+        self.video_pg.open_video_page(vid_id)
+
 
         #Update the video setting the team and project and new description.
         url_part = 'videos/%s/' % vid_id
@@ -339,7 +334,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                    }
         status, response = self.data_utils.put_api_request(self.user, 
                                                   url_part, new_data)
-        self.video_pg.open_video_page(vid_id)
+
+        self.logger.info(response)
 
         #Check response metadata
         for k, v in new_data.iteritems():

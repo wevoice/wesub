@@ -3,7 +3,7 @@
 {% block body_attrs %}id="video_profile" class="v1 video_view"{% endblock %}
 {% block html_attrs %}id="video_view"{% endblock %}
 
-{% load widget comments recent_activity paginator i18n subtitles_tags teams_tags videos_tags media_compressor utils_tags %}
+{% load comments i18n subtitles_tags teams_tags videos_tags media_compressor %}
 
 {% block css %}
     {{ block.super }}
@@ -16,28 +16,11 @@
         {% include_bundle "unisubs-onsite-compiled" %}
         <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
         {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
-
         <script type="text/javascript">
-            window.VIDEO_ID = '{{ video.pk }}';
-            window.TITLE_ERROR = '{% trans "Enter non-empty title" %}';
-            window.TASK = '{% firstof task|default_if_none:""|escapejs '' %}';
-            window.TASK_TEAM_VIDEO_ID = '{{ task.team_video.video.video_id }}';
-            window.TASK_TEAM_VIDEO_URL = '{{ task.team_video.video.get_video_url }}';
-            {% if video.team_set.all.0 %}
-                {% if not video.team_set.all.0.is_visible %}
-                    window.VIDEO_TEAM_NAME = 'Private';
-                {% else %}
-                    window.VIDEO_TEAM_NAME = '{{ video.team_set.all.0 }}';
-                    window.VIDEO_TEAM_URL = '{{ video.team_set.all.0.get_absolute_url }}';
-                {% endif %}
-                {% if video.team_set.all.0.get_workflow.requires_review_or_approval %}
-                    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
-                {% else %}
-                    window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
-                {% endif %}
-            {% endif %}
-            {% if task.get_type_display == 'Translate' %}
-                window.TASK_TRANSLATE_TO_LANGUAGE = '{{ task.language }}';
+            {% if team.workflow_enabled %}
+                window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+            {% else %}
+                window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
             {% endif %}
         </script>
     {% endblock %}
@@ -95,8 +78,8 @@
             </li>
             <li>
                 <div>
-                    <p>{{ video|get_comment_count }}</p>
-                    <h4>{% trans "Comment" %}{{ video|get_comment_count|pluralize }}</h4>
+                    <p>{{ video.comment_count }}</p>
+                    <h4>{% trans "Comment" %}{{ video.comment_count|pluralize }}</h4>
                 </div>
             </li>
             <li>
@@ -155,69 +138,12 @@
             {% include 'videos/_follow_video_button.html' %}
         {% endif %}
         <ul class="tabs">
-            <li class="current"><a href="#video-tab">{% trans "Video" %}</a></li>
-            <li class="hascount"><a href="#comments-tab">{% trans "Comments" %}<span>{{ video|get_comment_count }}</span></a></li>
-            <li><a href="#activity-tab">{% trans "Activity" %}</a></li>
-            <li class="hascount"><a href="#urls-tab">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
+            <li id="video-tab-header" class="{% if tab == 'video' %}current{% endif %}"><a href="?tab=video">{% trans "Video" %}</a></li>
+            <li id="comments-tab-header" class="hascount{% if tab == 'comments' %} current{% endif %}"><a href="?tab=comments">{% trans "Comments" %}<span>{{ video.comment_count }}</span></a></li>
+            <li id="activity-tab-header" class="{% if tab == 'activity' %}current{% endif %}"><a href="?tab=activity">{% trans "Activity" %}</a></li>
+            <li id="urls-tab-header" class="hascount{% if tab == 'urls' %} current{% endif %}"><a href="?tab=urls">{% trans "URLs" %}<span>{% video_url_count video %}</span></a></li>
         </ul>
-        <div class="tab" id="video-tab">
-            {% widget widget_params %}
-            <div class="clearboth">
-                {% with video.get_team_video as team_video %}
-                    {% if team_video and team_video.team.get_workflow.requires_review_or_approval %}
-                        {% render_belongs_to_team_list team_video user %}
-                    {% else %}
-                        <div class="video-tools grid_4 alpha">
-                            <h3>{% trans "Contribute" %}</h3>
-                            <p>
-                                {% with can_create_subs=request.user|can_create_subtitles_for:video can_create_trans=request.user|can_create_translations_for:video %}
-                                    {% if video.languages_count < 1 %}
-                                        {% if can_create_subs %}
-                                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
-                                        {% endif %}
-                                    {% else %}
-                                        {% if can_create_trans %}
-                                            {% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation' %}</a>!
-                                        {% endif %}
-                                    {% endif %}
-                                    {% if can_create_subs or can_create_trans %}
-                                        {% upload_subtitles video %}
-                                    {% else %}
-                                        {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
-                                    {% endif %}
-                                {% endwith %}
-                            </p>
-                        </div>
-                        {% if user.managed_teams and not team_video.team %}
-                            <div class="video-tools grid_4 omega">
-                                <h3>{% trans "Collaborate" %}</h3>
-                                {% team_add_video_select %}
-                            </div>
-                        {% else %}
-                            {% if team_video.team %}
-                                <div class="video-tools grid_4 omega">
-                                    <h3>{% trans "Collaborate" %}</h3>
-                                    {% trans 'This video belongs to the' %} <a href="{% url teams:detail slug=team_video.team.slug %}">{{ team_video.team.name }} {% trans 'Translation Project' %}</a>.
-                                </div>
-                            {% endif %}
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-        </div>
-        <div class="tab" id="comments-tab" style="display:none;">
-            <h3>{% trans "Leave a comment" %}</h3>
-            {% render_comment_form video %}
-            <h3>{{ video|get_comment_count }} {% trans "Comments" %}</h3>
-            {% render_comment_list video %}
-        </div>
-        <div class="tab" id="activity-tab" style="display:none;">
-            {% video_activity video request.user %}
-            <p class="view-more"><a href="{% url videos:actions_list video.video_id %}">{% trans 'View all activity' %}</a></p>
-        </div>
-        <div class="tab" id="urls-tab" style="display:none;">
-            {% video_url_panel %}
-        </div>
+        <div id="tab-container">{% block tab %}{% endblock %}</div>
     </div>
 {% endblock %}
 

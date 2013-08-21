@@ -137,6 +137,7 @@ class TestSubtitleLanguage(TestCase):
         # now fork the translated one
         translated.is_forked = True
         translated.save()
+        translated = refresh(translated)
         self.assertIsNone(translated.get_translation_source_language())
         self.assertIsNone(translated.get_translation_source_language_code())
         self.assertEqual(
@@ -1729,6 +1730,10 @@ class TestSubtitleLanguageTipQueries(TestCase):
                 'fr': [
                     {'visibility': 'public',
                      'visibility_override': 'private'},
+                ],
+                'de': [
+                    {'visibility': 'public',
+                     'visibility_override': 'deleted'},
                 ],
             },
         })

@@ -107,9 +107,7 @@ class TestCaseBilling(WebdriverTestCase):
 
 
     def test_incomplete(self):
-        """Incomplete videos are not billed.
-
-        """
+        """Incomplete languages have no billing record. """
         video, tv = self._create_tv_with_original_subs(self.user, self.team)
         inc_video, inc_tv = self._create_tv_with_original_subs(self.user, 
                                                                self.team, 
@@ -126,7 +124,6 @@ class TestCaseBilling(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         bill_dict = self._bill_dict(bill)
         self.assertNotIn(inc_video.video_id, bill_dict.keys())
-
 
     def test_primary_audio_language(self):
         """Primary audio lang true / false included in Original field.
@@ -146,7 +143,7 @@ class TestCaseBilling(WebdriverTestCase):
         self.assertIn('sv', self.bill_dict[self.video.video_id].keys())
 
     def test_translation__incomplete(self):
-        """Billing record NOT added for incomplete translations
+        """Incomplete languages have -1 minutes.
 
         """
         video, tv = self._create_tv_with_original_subs(self.user, self.team)
@@ -161,7 +158,10 @@ class TestCaseBilling(WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         bill_dict = self._bill_dict(bill)
-        self.assertNotIn('sv', bill_dict[video.video_id].keys())
+        sv_bill = bill_dict[video.video_id]['sv']
+
+        self.logger.info(sv_bill)
+        self.assertEqual('-1', sv_bill['Minutes'])
 
 
     def test_minutes(self):
@@ -267,7 +267,7 @@ class TestCaseBilling(WebdriverTestCase):
         end =  (datetime.date.today() + datetime.timedelta(2))
         self.logger.info(start.strftime("%Y-%m-%d"))
 
-        self.billing_pg.submit_billing_parameters(self.team.slug,
+        self.billing_pg.submit_billing_parameters(self.team.name,
                                                   start.strftime("%Y-%m-%d"),
                                                   end.strftime("%Y-%m-%d"),
                                                   'New model')
@@ -297,9 +297,8 @@ class TestCaseBilling(WebdriverTestCase):
         start = (datetime.date.today() - datetime.timedelta(7))
         end =  (datetime.date.today() + datetime.timedelta(2))
         self.logger.info(start.strftime("%Y-%m-%d"))
-        team_slugs = ','.join([self.team.slug, team2.slug])
-        self.logger.info(team_slugs)
-        self.billing_pg.submit_billing_parameters(team_slugs,
+        team_names = ','.join([self.team.name, team2.name])
+        self.billing_pg.submit_billing_parameters(team_names,
                                                   start.strftime("%Y-%m-%d"),
                                                   end.strftime("%Y-%m-%d"),
                                                   'New model')
@@ -308,30 +307,6 @@ class TestCaseBilling(WebdriverTestCase):
         new_headers = 'Video Title,Video ID,Language,Minutes,Original,Language number,Team,Created,Source,User' 
         self.assertEqual(8, len(report_dl))
         self.assertEqual(new_headers, report_dl[0])
-
-    def test_download__invalid_slugs(self):
-        """Create a report for several teams.
-
-        """
-
-        team2_user = UserFactory.create()
-        team2 = TeamMemberFactory.create(user = team2_user).team
-        video2, tv2 = self._create_tv_with_original_subs(team2_user, team2)
-        self._upload_sv_translation(video2, team2_user, complete=True)
-        self.billing_pg.open_billing_page()
-        self.billing_pg.log_in(self.terri.username, 'password')
-        self.billing_pg.open_billing_page()
-        start = (datetime.date.today() - datetime.timedelta(7))
-        end =  (datetime.date.today() + datetime.timedelta(2))
-        self.logger.info(start.strftime("%Y-%m-%d"))
-        team_slugs = ','.join([self.team.slug, team2.slug, 'fake-team'])
-        self.logger.info(team_slugs)
-        self.billing_pg.submit_billing_parameters(team_slugs,
-                                                  start.strftime("%Y-%m-%d"),
-                                                  end.strftime("%Y-%m-%d"),
-                                                  'New model')
-        self.assertEqual('There is no team with slug fake-team', 
-                         self.billing_pg.form_error_present())
 
     def test_download__old_model(self):
         """Data range of records downloaded to a csv file for a team.
@@ -347,7 +322,7 @@ class TestCaseBilling(WebdriverTestCase):
         end =  (datetime.date.today() + datetime.timedelta(2))
         self.logger.info(start.strftime("%Y-%m-%d"))
 
-        self.billing_pg.submit_billing_parameters(self.team.slug,
+        self.billing_pg.submit_billing_parameters(self.team.name,
                                                   start.strftime("%Y-%m-%d"),
                                                   end.strftime("%Y-%m-%d"),
                                                   'Old model')
@@ -378,13 +353,15 @@ class TestCaseBilling(WebdriverTestCase):
         self.billing_pg.open_billing_page()
         start = (datetime.date.today() - datetime.timedelta(7))
         end =  (datetime.date.today() + datetime.timedelta(2))
-        self.logger.info(start.strftime("%Y-%m-%d"))
-        team_slugs = ','.join([self.team.slug, team2.slug])
-        self.logger.info(team_slugs)
-        self.billing_pg.submit_billing_parameters(team_slugs,
+        team_names = ','.join([self.team.name, team2.name])
+        self.billing_pg.submit_billing_parameters(team_names,
                                                   start.strftime("%Y-%m-%d"),
                                                   end.strftime("%Y-%m-%d"),
                                                   'Old model')
         report_dl = self.billing_pg.check_latest_report_url()
         self.logger.info(report_dl)
         self.assertEqual(8, len(report_dl))
+
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("MYTMP/%s.png" % self.id())
+

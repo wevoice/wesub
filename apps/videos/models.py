@@ -387,16 +387,26 @@ class Video(models.Model):
 
         return "%simages/video-no-thumbnail-medium.png" % settings.STATIC_URL
 
-
     def get_team_video(self):
         """Return the TeamVideo object for this video, or None if there isn't one."""
         from teams.models import TeamVideo
 
+        # django caches the teamvideo attribute, but only if it's not None.
+        # So we do our own caching here as well
+        if hasattr(self, '_cached_teamvideo'):
+            return self._cached_teamvideo
         try:
-            return self.teamvideo
+            team_video = self.teamvideo
+            team_video.video = self
+            rv = team_video
         except TeamVideo.DoesNotExist:
-            return None
+            rv = None
+        self._cached_teamvideo = rv
+        return rv
 
+    def clear_team_video_cache(self):
+        if hasattr(self, '_cached_teamvideo'):
+            del self._cached_teamvideo
 
     def thumbnail_link(self):
         """Return a URL to this video's thumbnail, or '' if there isn't one.
@@ -653,6 +663,13 @@ class Video(models.Model):
     def all_subtitle_languages(self):
         return self._language_fetcher.fetch_all_languages(self)
 
+    def language_with_pk(self, language_pk):
+        language_pk = int(language_pk)
+        for lang in self.all_subtitle_languages():
+            if lang.pk == language_pk:
+                return lang
+        return None
+
     def prefetch_languages(self, languages=None, with_public_tips=False,
                            with_private_tips=False):
         """Prefetch and cache languages/versions for this video
@@ -907,6 +924,12 @@ class Video(models.Model):
         from subtitles.models import SubtitleLanguage as SL
         return SL.objects.filter(video=self).exclude(
                 language_code=self.primary_audio_language_code)
+
+    def comment_count(self):
+        if hasattr(self, '_comment_count'):
+            return self._comment_count
+        self._comment_count = Comment.get_for_object(self).count()
+        return self._comment_count
 
     class Meta(object):
         permissions = (
@@ -1823,7 +1846,6 @@ class VideoUrl(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-
         return ('videos:video_url', [self.video.video_id, self.pk])
 
     def unique_error_message(self, model_class, unique_check):

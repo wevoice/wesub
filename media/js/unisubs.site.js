@@ -24,6 +24,62 @@ var Site = function(Site) {
 
     var that = this;
 
+    /*
+     * use AHAH to load tabs
+     */
+    function AHAHTabLoader(onComplete) {
+        this.tabContainer = $('#tab-container');
+        this.tabCache = {};
+        this.cacheContents(window.location.href);
+        this.onComplete = onComplete;
+    }
+
+    AHAHTabLoader.prototype = {
+        cacheContents: function(url) {
+            this.tabCache[url] = this.tabContainer.contents();
+        },
+        changeCurrentTab: function(url) {
+            var tab = url.match(/tab=([^&]+)/)[1];
+            $('.tabs li').removeClass('current');
+            $('#' + tab + '-tab-header').addClass('current');
+        },
+        updateLocation: function(url) {
+            if(history && history.pushState) {
+                history.pushState(null, null, url);
+            }
+        },
+        addLinks: function(selector) {
+            var self = this;
+            $('a', $(selector)).each(function() {
+                var link = $(this);
+                if(!link.data('AHAHTabLoaderConnected')) {
+                    link.click(function(evt) {
+                        self.handleClick(evt, link);
+                    });
+                    link.data('AHAHTabLoaderConnected', true);
+                }
+            });
+        },
+        handleClick: function(evt, link) {
+            var url = link[0].href;
+            this.changeCurrentTab(url);
+            this.updateLocation(url);
+            this.tabContainer.empty();
+            if(this.tabCache.hasOwnProperty(url)) {
+                this.tabContainer.append(this.tabCache[url]);
+            } else {
+                var self = this;
+                this.tabContainer.load(url, null, function() {
+                    self.cacheContents(url);
+                    if(self.onComplete) {
+                        self.onComplete();
+                    }
+                });
+            }
+            evt.stopPropagation();
+            evt.preventDefault();
+        }
+    };
     this.init = function() {
 
         // Global cached jQuery objects
@@ -496,25 +552,38 @@ var Site = function(Site) {
             function get_compare_link(first_pk, second_pk) {
                 return DIFFING_URL.replace(/<<first_pk>>/, first_pk).replace(/<<second_pk>>/, second_pk);
             }
-            $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
-            $('.version_checkbox', '.revisions').change( function() {
-                var $this = $(this);
-                var checked_length = $('.version_checkbox:checked').length;
+            function setupRevisions() {
+                $('.version_checkbox:first', '.revisions').attr('checked', 'checked');
+                $('.version_checkbox', '.revisions').change( function() {
+                    var $this = $(this);
+                    var checked_length = $('.version_checkbox:checked').length;
 
-                if ($this.attr('checked') && (checked_length > 2)) {
-                    $this.attr('checked', '');
-                }
+                    if ($this.attr('checked') && (checked_length > 2)) {
+                        $this.attr('checked', '');
+                    }
+                });
+                $('.compare_versions_button').click( function() {
+                    var $checked = $('.version_checkbox:checked');
+                    if ($checked.length !== 2) {
+                        alert(window.SELECT_REVISIONS_TRANS);
+                    } else {
+                        var url = get_compare_link($checked[0].value, $checked[1].value);
+                        window.location.replace(url);
+                    }
+                });
+            }
+            setupRevisions();
+            var tabLoader = new AHAHTabLoader(function() {
+                // We may load new pagination links, in that case make sure
+                // they're loaded.
+                tabLoader.addLinks('.pagination');
+                // If we loaded the revisions tab, we need to attach our js to
+                // it
+                setupRevisions();
             });
-            $('.compare_versions_button').click( function() {
-                var $checked = $('.version_checkbox:checked');
-                if ($checked.length !== 2) {
-                    alert(window.SELECT_REVISIONS_TRANS);
-                } else {
-                    var url = get_compare_link($checked[0].value, $checked[1].value);
-                    window.location.replace(url);
-                }
-            });
-            $('.tabs').tabs();
+            tabLoader.addLinks('.tabs');
+            tabLoader.addLinks('.pagination');
+
             $('#add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
@@ -539,75 +608,27 @@ var Site = function(Site) {
                     e.preventDefault();
                 }
             });
-            if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL(window.TASK_TEAM_VIDEO_URL);
-                var opener = new unisubs.widget.SubtitleDialogOpener(
-                    window.TASK_TEAM_VIDEO_ID,
-                    window.TASK_TEAM_VIDEO_URL,
-                    videoSource, null, null);
-                opener.showStartDialog();
-            }
-            if (window.IS_AUTHENTICATED && window.ROLLBACK_ALLOWED) {
-                $('#rollback').click(function() {
-                    if (!confirm('Subtitles will be rolled back to a previous version')){
-                        return false;
-                    }
-                });
-            } else {
-                $('#rollback, .new_edit').click(function() {
-                    alert('You need to log in to do that.');
+            $('#rollback').click(function() {
+                if (!confirm('Subtitles will be rolled back to a previous version')){
                     return false;
-                });
-            }
-
+                }
+            });
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
-            $('.add_subtitles').click(function() {
+            $('.add_subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
                 return false;
             });
-            $('.add-translation-behavior').click(function() {
+            $('.add-translation-behavior').click( function(e) {
+                e.preventDefault();
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.ADD_LANGUAGE);
                 return false;
             });
-            $('.edit-title').click( function() {
-                $('#edit-title-dialog .title-input').val($('.title-container').html());
-            });
-            $('#edit-title-dialog .save-title').click(function() {
-                var title = $('#edit-title-dialog .title-input').val();
-                if (title) {
-                    $('.title-container').html(title).hide().fadeIn();
-                    VideosApi.change_title_video(window.VIDEO_ID, title,
-                        function(response) {
-                            if (response.error) {
-                                $.jGrowl.error(response.error);
-                            } else {
-                                $('.title-container').html(title);
-                                document.title = title + ' | Amara';
-                            }
-                        }
-                    );
-                    $('#edit-title-dialog').modClose();
-                } else {
-                    $.jGrowl.error(window.TITLE_ERROR);
-                }
-            });
-            if (window.TASK) {
-                var videoSource = unisubs.player.MediaSource.videoSourceForURL(
-                        window.TASK_TEAM_VIDEO_URL);
-                var opener = new unisubs.widget.SubtitleDialogOpener(
-                                     window.TASK_TEAM_VIDEO_ID,
-                                     window.TASK_TEAM_VIDEO_URL,
-                                     videoSource,
-                                     null,
-                                     null);
-                opener.showStartDialog();
-            }
-
-            $('.tabs').tabs();
+            var tabLoader = new AHAHTabLoader();
+            tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
         video_set_language: function() {

@@ -19,6 +19,7 @@
 
 
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.core.urlresolvers import reverse
 from apps.subtitles.models import (get_lineage, Collaborator, SubtitleLanguage,
                                    SubtitleVersion)
@@ -102,13 +103,20 @@ class SubtitleLanguageAdmin(admin.ModelAdmin):
             # don't run on a async:
             upload_subtitles_to_original_service.run(tip.pk)
 
+class SubtitleVersionChangeList(ChangeList):
+    def get_query_set(self, request):
+        qs = super(SubtitleVersionChangeList, self).get_query_set(request)
+        # for some reason using select_related makes MySQL choose an
+        # absolutely insane way to perform the query.  Use prefetch_related()
+        # instead to work around this.
+        return qs.prefetch_related('video', 'subtitle_language')
 
 class SubtitleVersionAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ['video_title', 'id', 'language', 'version_num',
                     'visibility', 'visibility_override',
                     'subtitle_count', 'created']
-    list_select_related = True
+    list_select_related = False
     raw_id_fields = ['video', 'subtitle_language', 'parents', 'author']
     list_filter = ['created', 'visibility', 'visibility_override',
                    'language_code']
@@ -125,6 +133,9 @@ class SubtitleVersionAdmin(admin.ModelAdmin):
 
     # don't allow deletion
     actions = []
+
+    def get_changelist(self, request, **kwargs):
+        return SubtitleVersionChangeList
 
     def has_delete_permission(self, request, obj=None):
         # subtitle versions should be immutable, don't allow deletion

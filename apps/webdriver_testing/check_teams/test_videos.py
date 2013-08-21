@@ -1032,7 +1032,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
 
-        self.assertEqual('2 languages needed', 
+        self.assertEqual('3 languages needed', 
             self.videos_tab.displayed_languages(test_title))
 
     def test_pagination__admin(self):

@@ -128,7 +128,12 @@ LOGGING = {
             'level': 'ERROR',
             'handlers': ['null'],
             'propagate': False,
-        }
+        },
+        'timing': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False
+        },
     },
 }
 

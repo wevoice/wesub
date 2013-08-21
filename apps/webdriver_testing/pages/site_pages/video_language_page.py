@@ -54,6 +54,9 @@ class VideoLanguagePage(VideoPage):
         self.logger.info('Getting display lines of sub text')
         displayed_subtitles = []
         line_elements = self.get_elements_list(self._SUB_LINES)
+        if line_elements == None:
+            self.logger.info('No subtitle text found on page')
+            return []
         for el in line_elements:
             l = el.text
             l = l.replace('\n', ' ')

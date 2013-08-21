@@ -89,6 +89,17 @@ class TeamManager(models.Manager):
         else:
             return self.get_query_set().filter(is_visible=True)
 
+    def with_recent_billing_record(self, day_range):
+        """Find teams that have had a new video recently"""
+        start_date = (datetime.datetime.now() -
+                      datetime.timedelta(days=day_range))
+        team_ids = list(BillingRecord.objects
+                        .order_by()
+                        .filter(created__gt=start_date)
+                        .values_list('team_id', flat=True)
+                        .distinct())
+        return Team.objects.filter(id__in=team_ids)
+
 class Team(models.Model):
     APPLICATION = 1
     INVITATION_BY_MANAGER = 2
@@ -663,11 +674,6 @@ class TeamVideo(models.Model):
 
     def __unicode__(self):
         return unicode(self.video)
-
-    def link_to_page(self):
-        if self.all_languages:
-            return self.video.get_absolute_url()
-        return reverse('videos:history', [self.video.video_id])
 
     @models.permalink
     def get_absolute_url(self):
@@ -2493,7 +2499,7 @@ class BillingReport(models.Model):
     type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
 
     def __unicode__(self):
-        return "%s (%s - %s)" % (",".join([x.slug for x in self.teams.all()]),
+        return "%s teams (%s - %s)" % (self.teams.all().count(),
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
 
@@ -2698,7 +2704,7 @@ class BillingReport(models.Model):
             for i,team in enumerate(self.teams.all()):
                 rows = rows + BillingRecord.objects.csv_report_for_team(team,
                     self.start_date, self.end_date, add_header=i == 0)
-        fn = '/tmp/bill-%s-%s-%s-%s-%s.csv' % ("-".join([x.slug for x in self.teams.all()]),
+        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)
 
@@ -2728,8 +2734,13 @@ class BillingReportGenerator(object):
         all_records = list(all_records)
 
         self.make_language_number_map(all_records)
+        self.make_languages_without_records(all_records)
 
         for video, records in groupby(all_records, lambda r: r.video):
+            records = list(records)
+            for lang in self.languages_without_records.get(video.id, []):
+                self.rows.append(
+                    self.make_row_for_lang_without_record(video, lang))
             for r in records:
                 self.rows.append(self.make_row(video, r))
 
@@ -2772,6 +2783,41 @@ class BillingReportGenerator(object):
             vid = record.video.id
             video_counts[vid] += 1
             self.language_number_map[record.id] = video_counts[vid]
+
+    def make_languages_without_records(self, records):
+        self.languages_without_records = {}
+        videos = [r.video for r in records]
+        language_ids = [r.new_subtitle_language_id for r in records]
+        no_billing_record_where = """\
+NOT EXISTS (
+    SELECT 1
+    FROM teams_billingrecord br
+    WHERE br.new_subtitle_language_id = subtitles_subtitlelanguage.id
+)"""
+        qs = (NewSubtitleLanguage.objects
+              .filter(video__in=videos, subtitles_complete=True)
+              .exclude(id__in=language_ids).
+              extra(where=[no_billing_record_where]))
+        for lang in qs:
+            vid = lang.video_id
+            if vid not in self.languages_without_records:
+                self.languages_without_records[vid] = [lang]
+            else:
+                self.languages_without_records[vid].append(lang)
+
+    def make_row_for_lang_without_record(self, video, language):
+        return [
+            video.title_display().encode('utf-8'),
+            video.video_id,
+            language.language_code,
+            0,
+            language.is_primary_audio_language(),
+            0,
+            'unknown',
+            language.created.strftime('%Y-%m-%d %H:%M:%S'),
+            'unknown',
+            'unknown',
+        ]
 
 class BillingRecordManager(models.Manager):
 

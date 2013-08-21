@@ -66,7 +66,7 @@ class TestCaseEntryExit(WebdriverTestCase):
 
         cls.user = UserFactory.create()
         cls.video_pg.open_page('auth/login/')
-        cls.video_pg.log_in(cls.user, 'password')
+        cls.video_pg.log_in(cls.user.username, 'password')
 
         #Create a workflow enabled team to check review/approve dialog switching.
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -82,10 +82,6 @@ class TestCaseEntryExit(WebdriverTestCase):
                                        review_allowed = 10, # peer
                                        )
         cls.user = UserFactory.create()
-        cls.video_pg.open_page('auth/login/')
-        cls.video_pg.log_in(cls.user.username, 'password')
-
-
 
     @classmethod
     def tearDownClass(cls):
@@ -95,7 +91,7 @@ class TestCaseEntryExit(WebdriverTestCase):
 
     def setUp(self):
         self.video_pg.open_page('auth/login', True)
-        self.video_pg.handle_js_alert('accept')
+        self.video_pg.log_in(self.user.username, 'password')
 
 
     def test_timed_to_new(self):
@@ -144,19 +140,26 @@ class TestCaseEntryExit(WebdriverTestCase):
     def _old_to_new_sv_review(self):
         self.logger.info('creating video and adding to team')
         video = Video.objects.all()[0]
+        member = TeamMemberFactory(team=self.team).user
+
         #Add video to team and create a review task
         tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
         translate_task = TaskFactory.build(type = 20, 
                            team = self.team, 
                            team_video = tv, 
                            language = 'sv', 
-                           assignee = self.user)
+                           assignee = member)
 
         self.logger.info('complete the translate task')
         translate_task.new_subtitle_version = translate_task.get_subtitle_version()
         translate_task.save()
         task = translate_task.complete()
         self.logger.info('perform review task to open in old editor')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.log_in(member.username, 'password')
+
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
                                  '&assignee=anyone&lang=sv'.format(
                                  self.team.slug, tv.pk))
@@ -213,9 +216,6 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.approve_task()
         sv = video.subtitle_language('sv').get_tip(full=True)
         self.assertEqual(5, sv.version_number)
-        self.editor_pg.exit()
-
-
 
 
     def test_save_back_to_old(self):

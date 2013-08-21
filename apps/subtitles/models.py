@@ -23,6 +23,7 @@ from datetime import datetime, date, timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import query
 from django.utils import simplejson as json
@@ -35,7 +36,7 @@ from apps.auth.models import CustomUser as User
 from apps.videos import metadata
 from apps.videos.models import Video, Action
 from babelsubs.storage import SubtitleSet
-from babelsubs.storage import diff as diff_subtitles
+from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
 from videos.behaviors import make_video_title
@@ -420,6 +421,7 @@ class SubtitleLanguage(models.Model):
     def __init__(self, *args, **kwargs):
         super(SubtitleLanguage, self).__init__(*args, **kwargs)
         self._tip_cache = {}
+        self._translation_source_version_cache = {}
 
     # Writelocking
     @property
@@ -574,6 +576,59 @@ class SubtitleLanguage(models.Model):
         """
         self._tip_cache[cache_name] = version
 
+    def _version_qs(self, public, full):
+        if public and full:
+            raise AssertionError("Cannot specify public and full in "
+                                 "get_versions()!")
+        if public:
+            return self.subtitleversion_set.public()
+        elif full:
+            return self.subtitleversion_set.full()
+        else:
+            return self.subtitleversion_set.extant()
+
+    def get_versions(self, public=False, full=False, newest_first=False):
+        """Get a list of versions for this subtitle language
+
+        :param public: if True only return versions visible to the public
+        :param full: if True only return deleted versions
+        :param newest_first: controls ordering of the versions
+        :returns: list of SubtitleVersion objects
+        """
+        qs = self._version_qs(public, full)
+        if newest_first:
+            qs = qs.order_by('-version_number')
+        else:
+            qs = qs.order_by('version_number')
+        versions = [self.optimize_loaded_version(v) for v in qs]
+        if not public:
+            self._set_previous_version_cache(versions, full)
+        return versions
+
+    def optimize_versions(self, versions):
+        """Do performance speedups for versions of this language
+
+        This method sets up the cache for various attributes of the versions,
+        like video/language.
+
+        :returns: list of optimized verions
+        """
+        return [self.optimize_loaded_version(v) for v in versions]
+
+    def get_version_by_id(self, version_pk, public=False, full=False):
+        """Get a version for this subtitle_language
+
+        :returns: SubtitleVersion
+        """
+        qs = self._version_qs(public, full)
+        return self.optimize_loaded_version(qs.get(pk=version_pk))
+
+    def _set_previous_version_cache(self, versions, full):
+        previous_version = None
+        for v in versions:
+            v.cache_previous_version(previous_version, full)
+            previous_version = v
+
     def optimize_loaded_version(self, version):
         """Optimize a verison loaded for this language
 
@@ -585,6 +640,7 @@ class SubtitleLanguage(models.Model):
         if hasattr(self, video_cache_name):
             version.video = getattr(self, video_cache_name)
         version.subtitle_language = self
+        return version
 
     def get_public_tip(self):
         """Return the latest public tip for a particular version.
@@ -610,7 +666,7 @@ class SubtitleLanguage(models.Model):
 
     def has_public_version(self):
         """Check if there are any public versions for this language."""
-        return self.subtitleversion_set.public().exists()
+        return self.get_tip(public=True) is not None
 
     def is_complete_and_synced(self, public=False):
         """Return whether this language's subtitles are complete and fully synced."""
@@ -803,6 +859,13 @@ class SubtitleLanguage(models.Model):
         return self.video.title
 
 
+    def version_count(self):
+        if hasattr(self, '_version_count'):
+            return self._version_count
+        else:
+            self._version_count = self.subtitleversion_set.count()
+            return self._version_count
+
     def get_subtitle_count(self):
         tip = self.get_tip()
         if tip:
@@ -901,31 +964,34 @@ class SubtitleLanguage(models.Model):
         Right now, we're only allowing for 1 version, but that
         could be revisited in the future.
         '''
-        if  not ignore_forking and self.is_forked:
+        cache_key = ignore_forking
+        if cache_key in self._translation_source_version_cache:
+            return self._translation_source_version_cache[cache_key]
+        version = self._get_translation_source_version(ignore_forking)
+        self._translation_source_version_cache[cache_key] = version
+        return version
+
+    def clear_translation_source_cache(self):
+        self._translation_source_version_cache = {}
+
+    def _get_translation_source_version(self, ignore_forking=False):
+        if not ignore_forking and self.is_forked:
             return None
 
-        current_version = self.get_tip()
-        if not current_version:
+        qs = SubtitleVersion.objects.raw("""\
+SELECT parents.*
+FROM subtitles_subtitleversion children
+JOIN subtitles_subtitleversion_parents pmap
+    ON children.id=pmap.from_subtitleversion_id
+JOIN subtitles_subtitleversion parents
+    ON parents.id=pmap.to_subtitleversion_id
+WHERE children.subtitle_language_id=%s AND parents.subtitle_language_id != %s
+ORDER BY children.version_number DESC
+LIMIT 1;""", (self.id, self.id))
+        try:
+            return qs[0]
+        except IndexError:
             return None
-
-        while True:
-            parents = current_version.parents.full().order_by('-pk')
-            # parents can be on the same language, try other languages at first
-            other_languages = parents.exclude(subtitle_language=self)
-            try:
-                return other_languages[0]
-            except IndexError:
-                if current_version.version_number > 1:
-                    try:
-                        # previous versions might have parents in other languages
-                        # so set the current version to the same language, and
-                        # check that out
-                        current_version = parents[0]
-                    except IndexError:
-                        return None
-                else:
-                    return None
-
 
     def get_dependent_subtitle_languages(self, direct=False):
         """Return a list of SLs that are dependents/translations of this.
@@ -986,9 +1052,12 @@ class SubtitleLanguage(models.Model):
         self.save()
 
 
-    def get_widget_url(self, mode=None, task_id=None):
+    def get_widget_url(self):
         """SHIM for getting the widget URL for this language."""
-        return shims.get_widget_url(self, mode, task_id)
+        return reverse('subtitles:old-editor', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': self.language_code,
+        })
 
     @models.permalink
     def get_absolute_url(self):
@@ -1099,7 +1168,8 @@ subtitles_subtitleversion.version_number = (
     SELECT MAX(version_number)
     FROM subtitles_subtitleversion sv2
     WHERE sv2.subtitle_language_id =
-           subtitles_subtitleversion.subtitle_language_id)"""
+           subtitles_subtitleversion.subtitle_language_id AND
+           sv2.visibility_override != 'deleted')"""
         return self.get_query_set().extra(where=[tip_where])
 
     def public_tips(self):
@@ -1434,11 +1504,9 @@ class SubtitleVersion(models.Model):
         if not parent:
             return (1.0, 1.0)
 
-        diff_data = diff_subtitles(parent.get_subtitles(), self.get_subtitles(),
-                                   HTMLGenerator.MAPPINGS)
-
-        self._text_change = diff_data['text_changed']
-        self._time_change = diff_data['time_changed']
+        self._text_change, self._time_change = calc_changes(
+            parent.get_subtitles(), self.get_subtitles(),
+            HTMLGenerator.MAPPINGS)
 
         return self._time_change, self._text_change
 
@@ -1461,7 +1529,6 @@ class SubtitleVersion(models.Model):
             return '0%'
         else:
             return '%.0f%%' % (self._text_change * 100)
-
 
     def is_private(self):
         if self.visibility_override in ('public', 'deleted'):
@@ -1584,6 +1651,20 @@ class SubtitleVersion(models.Model):
         """Set the step of the workflow that this version originated in."""
         self._set_metadata('workflow_origin', origin)
 
+    def _optimize_sibling_version(self, sibling):
+        """Optimize siblings return in next_version()/previous_version()
+
+        This method checks if we have a video/language cached and if so,
+        caches that for the sibling version as well.
+        """
+        video_cache_name = SubtitleVersion.video.cache_name
+        language_cache_name = SubtitleVersion.subtitle_language.cache_name
+        if hasattr(self, video_cache_name):
+            sibling.video = getattr(self, video_cache_name)
+        if hasattr(self, language_cache_name):
+            sibling.language = getattr(self, language_cache_name)
+        return sibling
+
     def next_version(self, full=False):
         """Return the next SubtitleVersion.
 
@@ -1592,11 +1673,22 @@ class SubtitleVersion(models.Model):
 
         """
         qs = self.sibling_set.full() if full else self.sibling_set.extant()
+        qs = (qs.filter(version_number__gt=self.version_number)
+              .order_by('version_number'))
         try:
-            return (qs.filter(version_number__gt=self.version_number)
-                      .order_by('version_number')[0])
+            return self._optimize_sibling_version(qs[0])
         except IndexError:
             return None
+
+    def _previous_version_cache_name(self, full):
+        if full:
+            return '_previous_version_full'
+        else:
+            return '_previous_version'
+
+    def cache_previous_version(self, version, full=False):
+        """Cache the previous version."""
+        setattr(self, self._previous_version_cache_name(full), version)
 
     def previous_version(self, full=False):
         """Return the previous SubtitleVersion.
@@ -1606,12 +1698,19 @@ class SubtitleVersion(models.Model):
         deleted versions will be returned.
 
         """
+        cache_attr_name = self._previous_version_cache_name(full)
+        if hasattr(self, cache_attr_name):
+            return getattr(self, cache_attr_name)
+
         qs = self.sibling_set.full() if full else self.sibling_set.extant()
+        qs = (qs.filter(version_number__lt=self.version_number)
+              .order_by('-version_number'))
         try:
-            return (qs.filter(version_number__lt=self.version_number)
-                      .order_by('-version_number')[0])
+            previous_version = self._optimize_sibling_version(qs[0])
         except IndexError:
-            return None
+            previous_version = None
+        setattr(self, cache_attr_name, previous_version)
+        return previous_version
 
     def revision_time(self):
         today = date.today()
