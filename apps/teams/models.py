@@ -2499,7 +2499,7 @@ class BillingReport(models.Model):
     type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
 
     def __unicode__(self):
-        return "%s (%s - %s)" % (",".join([x.slug for x in self.teams.all()]),
+        return "%s teams (%s - %s)" % (self.teams.all().count(),
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
 
@@ -2704,7 +2704,7 @@ class BillingReport(models.Model):
             for i,team in enumerate(self.teams.all()):
                 rows = rows + BillingRecord.objects.csv_report_for_team(team,
                     self.start_date, self.end_date, add_header=i == 0)
-        fn = '/tmp/bill-%s-%s-%s-%s-%s.csv' % ("-".join([x.slug for x in self.teams.all()]),
+        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)
 
