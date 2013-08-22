@@ -330,5 +330,9 @@ class SubtitleViewCountManager(HitCountManager):
     per_month_model = models.SubtitleViewsPerMonth
     last_hit_counter_migration_type = 'S'
 
-video_counts = VideoHitCountManager()
+video_hits = VideoHitCountManager()
 subtitle_views = SubtitleViewCountManager()
+
+def migrate_all():
+    hitcounts.video_counts.migrate()
+    hitcounts.subtitle_views.migrate()

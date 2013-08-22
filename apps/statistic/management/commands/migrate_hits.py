@@ -24,5 +24,4 @@ class Command(BaseCommand):
     help = 'Migrate hit counts to their aggregate tables.'
 
     def handle(self, *args, **kwargs):
-        hitcounts.video_counts.migrate()
-        hitcounts.subtitle_views.migrate()
+        hitcounts.migrate_all()

@@ -204,8 +204,6 @@ def get_subtitles_dict(video_id, language_pk, version_number,
             except SubtitleLanguage.DoesNotExist:
                 language = video.subtitle_language()
 
-        video.update_subtitles_fetched(language)
-
         if language:
             version = language.version(version_number=version_number, public_only=not is_remote)
 
