@@ -117,7 +117,7 @@ unisubs.widget.PlayController.prototype.setUpSubs_ =
                this.finished_).
         listen(this.videoPlayer_,
                unisubs.player.AbstractVideoPlayer.EventType.PLAY_ENDED,
-               this.finished_).
+               this.finished_);
 };
 
 unisubs.widget.PlayController.prototype.getSubtitlesJSON = function() {
