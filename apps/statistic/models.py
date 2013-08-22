@@ -74,3 +74,50 @@ def get_model_statistics(model, today, month_ago, week_ago, day_ago):
     stats['week'] = model.objects.filter(created__range=(week_ago, today)).count()
     stats['day'] = model.objects.filter(created__range=(day_ago, today)).count()
     return stats
+
+class VideoHit(models.Model):
+    video = models.ForeignKey('videos.Video', db_index=True)
+    datetime = models.DateTimeField()
+
+class VideoHitsPerMonth(models.Model):
+    video = models.ForeignKey('videos.Video', db_index=True)
+    date = models.DateField()
+    count = models.PositiveIntegerField()
+    
+    class Meta:
+        unique_together = (('video', 'date'),)
+
+class SubtitleView(models.Model):
+    subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                          db_index=True)
+    datetime = models.DateTimeField()
+
+class SubtitleViewsPerDay(models.Model):
+    subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                          db_index=True)
+    date = models.DateField()
+    count = models.PositiveIntegerField()
+    
+    class Meta:
+        unique_together = (('subtitle_language', 'date'),)
+
+class SubtitleViewsPerMonth(models.Model):
+    subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
+                                          db_index=True)
+    date = models.DateField()
+    count = models.PositiveIntegerField()
+    
+    class Meta:
+        unique_together = (('subtitle_language', 'date'),)
+
+class LastHitCountMigration(models.Model):
+    """Tracks the last time we migrated hit counts to their aggregate
+    tables.
+    """
+    TYPE_CHOICES = [
+        ('V', 'Video Hit'),
+        ('S', 'Subtitle View'),
+    ]
+    type = models.CharField(primary_key=True, max_length=1,
+                            choices=TYPE_CHOICES)
+    date = models.DateField()
