@@ -10,7 +10,7 @@ from auth.models import CustomUser as User
 from apps.teams.forms import TaskCreateForm, TaskAssignForm
 from apps.teams.models import Task, Team, TeamVideo, TeamMember
 from apps.videos.models import Video
-from utils.tests import TestEditor
+from utils.testeditor import TestEditor
 from utils import test_factories
 
 # review setting constants
