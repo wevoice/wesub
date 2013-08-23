@@ -174,8 +174,7 @@ unisubs.widget.DropDown.prototype.createSubtitleHomepageURL_ = function() {
 
 unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function(lang_pk) {
     var uri = new goog.Uri(unisubs.siteURL());
-    uri.setPath("/widget/download_" +
-               (unisubs.IS_NULL ? "null_" : "") + "srt/");
+    uri.setPath("/widget/download-subs/srt");
     uri.setParameterValue("video_id", this.videoID_);
 
     if (this.subtitleState_ && this.subtitleState_.LANGUAGE_PK){
