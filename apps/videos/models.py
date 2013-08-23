@@ -1503,11 +1503,8 @@ class ActionRenderer(object):
         return msg
 
 class ActionManager(models.Manager):
-    def for_team(self, team, public_only=True, ids=False):
+    def for_team(self, team, ids=False):
         '''Return the actions for the given team.
-
-        If public_only is True, only Actions that should be shown to the general
-        public will be returned.
 
         If ids is True, instead of returning Action objects it will return
         a values_list of their IDs.  This can be useful if you need to work
@@ -1518,9 +1515,6 @@ class ActionManager(models.Manager):
             Q(team=team) |
             Q(video__teamvideo__team=team)
         )
-
-        if public_only:
-            result = result.filter(language__has_version=True)
 
         if ids:
             result = result.values_list('id', flat=True)
@@ -1540,23 +1534,10 @@ class ActionManager(models.Manager):
     def for_user_video_activity(self, user):
         return self.filter(video__in=user.videos.all()).exclude(user=user)
 
-    def for_video(self, video, user=None):
-        qs = Action.objects.filter(video=video)
-
-        team_video = video.get_team_video()
-        if team_video:
-            from teams.models import TeamMember
-
-            try:
-                user = user if user.is_authenticated() else None
-                member = team_video.team.members.get(user=user) if user else None
-            except TeamMember.DoesNotExist:
-                member = False
-
-            if not member:
-                qs = qs.filter(language__has_version=True)
-
-        return qs
+    def for_video(self, video):
+        return (Action.objects.filter(video=video)
+                .select_related('user', 'video', 'new_language',
+                                'new_language__video'))
 
 class Action(models.Model):
     ADD_VIDEO = 1
