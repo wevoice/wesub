@@ -226,21 +226,9 @@ class HitCountManager(object):
                                 self.last_hit_counter_migration_type)
 
     def add_hit(self, obj):
-        # Use INSERT DELAYED.  We don't care about the new row at this point,
-        # so there's no reason to wait for the table lock.
-        cursor = db.connection.cursor()
-        if hasattr(db.connection.features, '_mysql_storage_engine'):
-            insert_statement = "INSERT DELAYED"
-        else:
-            insert_statement = "INSERT"
-        sql = string.Template("$insert_statement INTO $table_name"
-                              "(${obj_field}_id, datetime) "
-                              "VALUES (%s, %s)").substitute(
-                                  insert_statement=insert_statement,
-                                  obj_field=self.obj_field_name,
-                                  table_name=self.hit_model._meta.db_table)
-        cursor.execute(sql, (obj.id, now()))
-        cursor.close()
+        self.hit_model.objects.create(**{
+            self.obj_field_name: obj,
+            'datetime': now()})
 
     def migrate(self):
         """Migrate hit counts for an object.
