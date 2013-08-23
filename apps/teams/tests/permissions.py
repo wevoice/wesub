@@ -36,7 +36,7 @@ from apps.teams.permissions import (
     can_create_task_translate, can_join_team, can_edit_video, can_approve,
     roles_user_can_invite, can_add_video_somewhere, can_assign_tasks,
     can_create_and_edit_translations, save_role, can_remove_video,
-    can_delete_team, can_delete_video
+    can_delete_team, can_delete_video, can_post_edit_subtitles
 )
 
 
@@ -63,6 +63,8 @@ class BaseTestPermission(TestCase):
         self.user = User.objects.all()[0]
         self.owner_account = test_factories.create_user(username='owner')
         self.outsider = test_factories.create_user(username='outsider')
+        self.site_admin = test_factories.create_user(username='site_admin',
+                                                     is_staff=True)
 
     def setup_team(self):
         self.team = test_factories.create_team()
@@ -101,6 +103,53 @@ class BaseTestPermission(TestCase):
         if hasattr(self.user, '_cached_teammember'):
             delattr(self.user, '_cached_teammember')
 
+    def update_team(self, **attrs):
+        for name, value in attrs.items():
+            setattr(self.team, name, value)
+        self.team.save()
+
+    def update_workflow(self, **attrs):
+        workflow = self.team.get_workflow()
+        for name, value in attrs.items():
+            setattr(workflow, name, value)
+        workflow.save()
+
+    def check_permission_for_role(self, role, perm_test, has_perm):
+        if role == ROLE_OUTSIDER:
+            if has_perm:
+                self.assertTrue(perm_test(self.outsider))
+            else:
+                self.assertFalse(perm_test(self.outsider))
+        else:
+            with self.role(role):
+                if has_perm:
+                    self.assertTrue(perm_test(self.user))
+                else:
+                    self.assertFalse(perm_test(self.user))
+
+    def check_role_required(self, role, perm_test):
+        self.clear_cached_workflows()
+        self.check_permission_for_role(ROLE_OWNER, perm_test, True)
+        self.check_permission_for_role(ROLE_ADMIN, perm_test,
+                                       role in (ROLE_ADMIN,
+                                                ROLE_MANAGER,
+                                                ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_MANAGER, perm_test,
+                                       role in (ROLE_MANAGER,
+                                                ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_CONTRIBUTOR, perm_test,
+                                       role in (ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_OUTSIDER, perm_test,
+                                       role==ROLE_OUTSIDER)
+
+    def check_staff_permission(self, perm_test, has_perm):
+        if has_perm:
+            self.assertTrue(perm_test(self.site_admin))
+        else:
+            self.assertFalse(perm_test(self.site_admin))
 
 class TestRules(BaseTestPermission):
     # Testing specific permissions
@@ -925,6 +974,63 @@ class TestRules(BaseTestPermission):
 
         langs = can_create_task_translate(self.nonproject_video, outsider)
         self.assertEqual(langs, [])
+
+    def test_can_post_edit_subtitles(self):
+        self.update_team(workflow_enabled=True)
+        def perm_test(user):
+            return can_post_edit_subtitles(self.nonproject_video, user)
+        # If approval is enabled, then users who can approve can post edit
+        self.update_workflow(
+            review_allowed=Workflow.REVIEW_IDS["Manager must review"],
+            approve_allowed=Workflow.APPROVE_IDS["Admin must approve"],
+        )
+        self.check_role_required(ROLE_ADMIN, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_workflow(
+            approve_allowed=Workflow.APPROVE_IDS["Manager must approve"],
+        )
+        self.check_role_required(ROLE_MANAGER, perm_test)
+        self.check_staff_permission(perm_test, True)
+        # If approval is disabled, then users who can review can post edit
+        self.update_workflow(
+            review_allowed=Workflow.REVIEW_IDS["Admin must review"],
+            approve_allowed=Workflow.APPROVE_IDS["Don't require approval"]
+        )
+        self.check_role_required(ROLE_ADMIN, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_workflow(
+            review_allowed=Workflow.REVIEW_IDS["Manager must review"],
+        )
+        self.check_role_required(ROLE_MANAGER, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_workflow(
+            review_allowed=Workflow.REVIEW_IDS["Peer must review"]
+        )
+        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
+        self.check_staff_permission(perm_test, True)
+        # If neither is enabled, then team members can post edit
+        self.update_workflow(
+            review_allowed=Workflow.REVIEW_IDS["Don't require review"]
+        )
+        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
+        self.check_staff_permission(perm_test, True)
+        # if workflows are disabled, but we fall back to the subtitle policy
+        self.update_team(workflow_enabled=False,
+                         subtitle_policy=Team.SUBTITLE_IDS['Only admins'])
+        self.check_role_required(ROLE_ADMIN, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_team(
+            subtitle_policy=Team.SUBTITLE_IDS['Only managers and admins'])
+        self.check_role_required(ROLE_MANAGER, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_team(
+            subtitle_policy=Team.SUBTITLE_IDS['Any team member'])
+        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
+        self.check_staff_permission(perm_test, True)
+        self.update_team(
+            subtitle_policy=Team.SUBTITLE_IDS['Anyone'])
+        self.check_role_required(ROLE_OUTSIDER, perm_test)
+        self.check_staff_permission(perm_test, True)
 
     # TODO: Review/approve task tests.
 

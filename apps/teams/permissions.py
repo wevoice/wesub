@@ -621,16 +621,22 @@ def can_rollback_language(user, language):
     """Can the user rollback a language to a previous version."""
     return can_add_version(user, language.video, language.language_code)
 
-def can_post_edit_subtitles(team, user):
+def can_post_edit_subtitles(team_video, user):
     """ Returns wheter the user has permission to post edit an original language """
-    # check tasks only if workflow is enabled
+    if user.is_staff:
+        return True
+    team = team_video.team
+
     if team.workflow_enabled:
-        return can_create_tasks(team, user)
-    elif team.is_member(user) and not team.moderates_videos():
-        return TeamsPermissionsCheck(True)
+        workflow = Workflow.get_for_team_video(team_video)
+        if workflow.approve_allowed:
+            return can_approve(team_video, user)
+        elif workflow.review_allowed:
+            return can_review(team_video, user)
+        else:
+            return team_video.team.is_member(user)
     else:
-        role = get_role(get_member(user, team))
-        return user.is_staff or role in _perms_equal_or_greater(ROLE_CONTRIBUTOR)
+        return can_create_and_edit_subtitles(user, team_video)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.
@@ -684,7 +690,7 @@ def can_add_version(user, video, language_code):
                                              default_message)
     elif language and language.is_complete_and_synced(True):
         # there are no tasks because the language is complete
-        if not can_post_edit_subtitles(team, user):
+        if not can_post_edit_subtitles(team_video, user):
             # we use a different message here, probably because this code is
             # the most likely to fail, so we add info about contacting the
             # team admin
