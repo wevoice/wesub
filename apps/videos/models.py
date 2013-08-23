@@ -1609,13 +1609,13 @@ class Action(models.Model):
     action_type = models.IntegerField(choices=TYPES)
     # we also store the video's title for deleted videos
     new_video_title = models.CharField(max_length=2048, blank=True)
-    created = models.DateTimeField()
+    created = models.DateTimeField(db_index=True)
 
     objects = ActionManager()
 
     class Meta:
-        ordering = ['-id']
-        get_latest_by = 'id'
+        ordering = ['-created']
+        get_latest_by = 'created'
 
     def __unicode__(self):
         u = self.user and self.user.__unicode__() or 'Anonymous'
