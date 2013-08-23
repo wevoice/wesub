@@ -972,7 +972,6 @@ class Rpc(BaseRpc):
     def get_widget_info(self, request):
         return {
             'all_videos': models.Video.objects.count(),
-            'subtitles_fetched_count': models.Video.objects.aggregate(s=Sum('subtitles_fetched_count'))['s'],
             'videos_with_captions': models.Video.objects.exclude(subtitlelanguage=None).count(),
             'translations_count': models.SubtitleLanguage.objects.filter(is_original=False).count()
         }

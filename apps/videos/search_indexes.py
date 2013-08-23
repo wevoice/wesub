@@ -78,18 +78,8 @@ class VideoIndex(CelerySearchIndex):
         self.prepared_data['year_views'] = obj.views['year']
         self.prepared_data['today_views'] = obj.views['today']
 
-    def prepare_subtitles_fetched_count(self, obj):
-        return obj.subtitles_fetched_count
-
-    def prepare_widget_counts(self, obj):
-        # FIXME: we have 2 fields indexing the same data
-        count = obj.widget_views_count
-        self.prepared_data['widget_views_count'] = count
-        self.prepared_data['total_views'] = count
-
     def _setup_save(self, model):
         pass
-
 
     def _teardown_save(self, model):
         pass

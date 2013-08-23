@@ -215,9 +215,6 @@ class Video(models.Model):
     meta_3_type = metadata.MetadataTypeField()
     meta_3_content = metadata.MetadataContentField()
 
-    subtitles_fetched_count = models.IntegerField(_(u'Sub.fetched'), default=0, db_index=True, editable=False)
-    # counter for evertime the widget plays accounted for both on and off site
-    widget_views_count = models.IntegerField(_(u'Widget views'), default=0, db_index=True, editable=False)
     # counter for the # of times the video page is shown in the unisubs website
     view_count = models.PositiveIntegerField(_(u'Views'), default=0, db_index=True, editable=False)
 
@@ -278,7 +275,7 @@ class Video(models.Model):
     @property
     def views_nocache(self):
         views_st = hitcounts.video_hits.get_counts(self)
-        views_st['total'] = self.widget_views_count
+        views_st['total'] = self.view_count
         return views_st
 
     def title_display(self, use_language_title=True):
@@ -1045,7 +1042,6 @@ class SubtitleLanguage(models.Model):
 
     is_forked = models.BooleanField(default=False, editable=False)
     created = models.DateTimeField()
-    subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_languages', editable=False)
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
@@ -1056,9 +1052,6 @@ class SubtitleLanguage(models.Model):
                                               related_name='old_subtitle_version',
                                               null=True, blank=True,
                                               editable=False)
-
-    subtitles_fetched_counter = RedisSimpleField()
-
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         if 'tern_sync' not in kwargs:
