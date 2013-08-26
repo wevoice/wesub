@@ -15,6 +15,16 @@ SASL_USER=${SASL_USER:-universalsubtitles}
 SASL_PASSWD=${SASL_PASSWORD:-}
 MAILNAME=${MAILNAME:-pculture.org}
 
+# configure /etc/hosts
+cat << EOF > /etc/hosts
+127.0.0.1       localhost $HOSTNAME
+::1             localhost ip6-localhost ip6-loopback
+fe00::0         ip6-localnet
+ff00::0         ip6-mcastprefix
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
+
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
     cat << EOF > /etc/s3cfg
@@ -77,13 +87,6 @@ EOF
         done
     fi
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
-fi
-
-# configure mail
-if [ ! -z "$SASL_USER" ] && [ ! -z "$SASL_PASSWD" ] ; then
-    echo "[$SMTP_HOST]:$SMTP_PORT $SASL_USER:$SASL_PASSWD" > /etc/postfix/sasl_passwd
-    chmod 600 /etc/postfix/sasl_passwd
-    postmap /etc/postfix/sasl_passwd
 fi
 
 # checkout respective revisions
