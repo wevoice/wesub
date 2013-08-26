@@ -1,8 +1,10 @@
 #!/bin/bash
 source /usr/local/bin/config_env.sh
 
+echo "$HOSTNAME" > /etc/mailname
+
 cat << EOF > /etc/postfix/main.cf
-smtpd_banner = $myhostname ESMTP $mail_name (Ubuntu)
+smtpd_banner = $HOSTNAME ESMTP $mail_name (Ubuntu)
 biff = no
 append_dot_mydomain = no
 readme_directory = no
@@ -12,10 +14,10 @@ smtpd_use_tls=yes
 smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
 smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
 myorigin = /etc/mailname
-myhostname = $myhostname
+myhostname = $HOSTNAME
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
-mydestination = $myhostname.ec2.internal, localhost.ec2.internal, , localhost
+mydestination = $HOSTNAME.ec2.internal, localhost.ec2.internal, , localhost
 relayhost = [$SMTP_HOST]:$SMTP_PORT
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 mailbox_size_limit = 0
