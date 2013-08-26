@@ -13,6 +13,7 @@ SMTP_HOST=${SMTP_HOST:-smtp.sendgrid.net}
 SMTP_PORT=${SMTP_PORT:-587}
 SASL_USER=${SASL_USER:-universalsubtitles}
 SASL_PASSWD=${SASL_PASSWORD:-}
+MAILNAME=${MAILNAME:-pculture.org}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg

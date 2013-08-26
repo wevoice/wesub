@@ -1,7 +1,7 @@
 #!/bin/bash
 source /usr/local/bin/config_env.sh
 
-echo "$HOSTNAME" > /etc/mailname
+echo "$MAILNAME" > /etc/mailname
 
 cat << EOF > /etc/postfix/main.cf
 smtpd_banner = $HOSTNAME ESMTP $mail_name (Ubuntu)
