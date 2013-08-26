@@ -621,7 +621,7 @@ def can_rollback_language(user, language):
     """Can the user rollback a language to a previous version."""
     return can_add_version(user, language.video, language.language_code)
 
-def can_post_edit_subtitles(team_video, user):
+def can_post_edit_subtitles(team_video, user, lang=None):
     """ Returns wheter the user has permission to post edit an original language """
     if user.is_staff:
         return True
@@ -630,13 +630,13 @@ def can_post_edit_subtitles(team_video, user):
     if team.workflow_enabled:
         workflow = Workflow.get_for_team_video(team_video)
         if workflow.approve_allowed:
-            return can_approve(team_video, user)
+            return can_approve(team_video, user, lang=lang)
         elif workflow.review_allowed:
-            return can_review(team_video, user)
+            return can_review(team_video, user, lang=lang)
         else:
             return team_video.team.is_member(user)
     else:
-        return can_create_and_edit_subtitles(user, team_video)
+        return can_create_and_edit_subtitles(user, team_video, lang=lang)
 
 def can_delete_language(team, user):
     """Return whether the user has permission to completely delete a language.

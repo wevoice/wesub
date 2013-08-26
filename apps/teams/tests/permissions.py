@@ -87,8 +87,9 @@ class BaseTestPermission(TestCase):
                 del video._cached_workflow
 
     @contextmanager
-    def role(self, r, project=None):
-        add_role(self.team, self.user, self.owner, r, project=project)
+    def role(self, r, project=None, lang=None):
+        add_role(self.team, self.user, self.owner, r, project=project,
+                 lang=lang)
 
         # Handle the caching in permissions.get_role_for_target().
         if hasattr(self.user, '_cached_teammember'):
@@ -97,7 +98,7 @@ class BaseTestPermission(TestCase):
         try:
             yield
         finally:
-            remove_role(self.team, self.user, r, project=project)
+            remove_role(self.team, self.user, r)
 
         # Handle the caching in permissions.get_role_for_target().
         if hasattr(self.user, '_cached_teammember'):
@@ -113,43 +114,6 @@ class BaseTestPermission(TestCase):
         for name, value in attrs.items():
             setattr(workflow, name, value)
         workflow.save()
-
-    def check_permission_for_role(self, role, perm_test, has_perm):
-        if role == ROLE_OUTSIDER:
-            if has_perm:
-                self.assertTrue(perm_test(self.outsider))
-            else:
-                self.assertFalse(perm_test(self.outsider))
-        else:
-            with self.role(role):
-                if has_perm:
-                    self.assertTrue(perm_test(self.user))
-                else:
-                    self.assertFalse(perm_test(self.user))
-
-    def check_role_required(self, role, perm_test):
-        self.clear_cached_workflows()
-        self.check_permission_for_role(ROLE_OWNER, perm_test, True)
-        self.check_permission_for_role(ROLE_ADMIN, perm_test,
-                                       role in (ROLE_ADMIN,
-                                                ROLE_MANAGER,
-                                                ROLE_CONTRIBUTOR,
-                                                ROLE_OUTSIDER))
-        self.check_permission_for_role(ROLE_MANAGER, perm_test,
-                                       role in (ROLE_MANAGER,
-                                                ROLE_CONTRIBUTOR,
-                                                ROLE_OUTSIDER))
-        self.check_permission_for_role(ROLE_CONTRIBUTOR, perm_test,
-                                       role in (ROLE_CONTRIBUTOR,
-                                                ROLE_OUTSIDER))
-        self.check_permission_for_role(ROLE_OUTSIDER, perm_test,
-                                       role==ROLE_OUTSIDER)
-
-    def check_staff_permission(self, perm_test, has_perm):
-        if has_perm:
-            self.assertTrue(perm_test(self.site_admin))
-        else:
-            self.assertFalse(perm_test(self.site_admin))
 
 class TestRules(BaseTestPermission):
     # Testing specific permissions
@@ -975,62 +939,181 @@ class TestRules(BaseTestPermission):
         langs = can_create_task_translate(self.nonproject_video, outsider)
         self.assertEqual(langs, [])
 
+class RolePermissionsTest(BaseTestPermission):
+    """ Test a permission using role-based checking
+
+    Subclasses of RolePermissionsTest should test exactly 1 permission.  They
+    should define check_perm(), which checks if a given user has the permission
+    for a video.  They may optionally define check_perm_for_language, which
+    also includes a language.
+
+    Subclasses can call check_role_required(), which will test that
+    check_perm() and check_perm_for_language() return True for that role and
+    higher.  It will test it the following:
+        - check_perm() using simple roles logic with a non-project video
+        - check_perm() with a project manager with a project video
+        - check_perm_for_language() with a language manager
+    """
+
+    def check_perm(self, user, video):
+        raise NotImplementedError()
+
+    def check_perm_for_language(self, user, video, language):
+        raise NotImplementedError()
+
+    staff_members_always_have_permission = True
+
+    def check_perm_for_language_overrided(self):
+        return (self.check_perm_for_language.im_func !=
+                RolePermissionsTest.check_perm_for_language.im_func)
+
+    def check_permission_for_outsider(self, has_perm):
+        if has_perm:
+            self.assertTrue(self.check_perm(self.outsider,
+                                            self.nonproject_video))
+        else:
+            self.assertFalse(self.check_perm(self.outsider,
+                                             self.nonproject_video))
+
+    def check_permission_without_project_narrowing(self, role, has_perm):
+        with self.role(role):
+            if has_perm:
+                self.assertTrue(self.check_perm(self.user,
+                                                self.nonproject_video))
+            else:
+                self.assertFalse(self.check_perm(self.user,
+                                                 self.nonproject_video))
+
+    def check_permission_with_project_narrowing(self, role, has_perm):
+        with self.role(role, project=self.test_project):
+            if has_perm:
+                self.assertTrue(self.check_perm(self.user,
+                                                self.project_video))
+            else:
+                self.assertFalse(self.check_perm(self.user,
+                                                 self.project_video))
+
+        # for non-project videos, we should treat the user as a contributor,
+        # regardless of their role for the project
+        if role == ROLE_CONTRIBUTOR:
+            with self.role(ROLE_ADMIN, project=self.test_project):
+                if has_perm:
+                    self.assertTrue(self.check_perm(self.user,
+                                                    self.nonproject_video))
+                else:
+                    self.assertFalse(self.check_perm(self.user,
+                                                     self.nonproject_video))
+
+    def check_permission_with_language_narrowing(self, role, has_perm):
+        with self.role(role, lang='en'):
+            if has_perm:
+                self.assertTrue(self.check_perm_for_language(
+                    self.user, self.nonproject_video, 'en'))
+            else:
+                self.assertFalse(self.check_perm_for_language(
+                    self.user, self.nonproject_video, 'en'))
+
+        # for other languages, we should treat the user as a contributor,
+        # regardless of their role for the language
+        if role == ROLE_CONTRIBUTOR:
+            with self.role(ROLE_ADMIN, lang='en'):
+                if has_perm:
+                    self.assertTrue(self.check_perm_for_language(
+                        self.user, self.nonproject_video, 'fr'))
+                else:
+                    self.assertFalse(self.check_perm_for_language(
+                        self.user, self.nonproject_video, 'fr'))
+
+    def check_permission_for_role(self, role, has_perm):
+        if role == ROLE_OUTSIDER:
+            self.check_permission_for_outsider(has_perm)
+            return
+
+        self.check_permission_without_project_narrowing(role, has_perm)
+        self.check_permission_with_project_narrowing(role, has_perm)
+
+        if self.check_perm_for_language_overrided():
+            self.check_permission_with_language_narrowing(role, has_perm)
+
+    def check_role_required(self, role):
+        self.clear_cached_workflows()
+        self.check_permission_for_role(ROLE_OWNER, True)
+        self.check_permission_for_role(ROLE_ADMIN,
+                                       role in (ROLE_ADMIN,
+                                                ROLE_MANAGER,
+                                                ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_MANAGER,
+                                       role in (ROLE_MANAGER,
+                                                ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_CONTRIBUTOR,
+                                       role in (ROLE_CONTRIBUTOR,
+                                                ROLE_OUTSIDER))
+        self.check_permission_for_role(ROLE_OUTSIDER,
+                                       role==ROLE_OUTSIDER)
+        self.check_staff_permission()
+
+    def check_staff_permission(self):
+        if self.staff_members_always_have_permission:
+            self.assertTrue(self.check_perm(self.site_admin,
+                                            self.nonproject_video))
+        else:
+            self.assertFalse(self.check_perm(self.site_admin,
+                                             self.nonproject_video))
+
+
+class CanPostEditSubtitlesTest(RolePermissionsTest):
+    def check_perm(self, user, video):
+        return can_post_edit_subtitles(video, user)
+
+    def check_perm_for_language(self, user, video, language):
+        return can_post_edit_subtitles(video, user, language)
+
     def test_can_post_edit_subtitles(self):
         self.update_team(workflow_enabled=True)
-        def perm_test(user):
-            return can_post_edit_subtitles(self.nonproject_video, user)
         # If approval is enabled, then users who can approve can post edit
         self.update_workflow(
             review_allowed=Workflow.REVIEW_IDS["Manager must review"],
             approve_allowed=Workflow.APPROVE_IDS["Admin must approve"],
         )
-        self.check_role_required(ROLE_ADMIN, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_ADMIN)
         self.update_workflow(
             approve_allowed=Workflow.APPROVE_IDS["Manager must approve"],
         )
-        self.check_role_required(ROLE_MANAGER, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_MANAGER)
         # If approval is disabled, then users who can review can post edit
         self.update_workflow(
             review_allowed=Workflow.REVIEW_IDS["Admin must review"],
             approve_allowed=Workflow.APPROVE_IDS["Don't require approval"]
         )
-        self.check_role_required(ROLE_ADMIN, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_ADMIN)
         self.update_workflow(
             review_allowed=Workflow.REVIEW_IDS["Manager must review"],
         )
-        self.check_role_required(ROLE_MANAGER, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_MANAGER)
         self.update_workflow(
             review_allowed=Workflow.REVIEW_IDS["Peer must review"]
         )
-        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_CONTRIBUTOR)
         # If neither is enabled, then team members can post edit
         self.update_workflow(
             review_allowed=Workflow.REVIEW_IDS["Don't require review"]
         )
-        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_CONTRIBUTOR)
         # if workflows are disabled, but we fall back to the subtitle policy
         self.update_team(workflow_enabled=False,
                          subtitle_policy=Team.SUBTITLE_IDS['Only admins'])
-        self.check_role_required(ROLE_ADMIN, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_ADMIN)
         self.update_team(
             subtitle_policy=Team.SUBTITLE_IDS['Only managers and admins'])
-        self.check_role_required(ROLE_MANAGER, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_MANAGER)
         self.update_team(
             subtitle_policy=Team.SUBTITLE_IDS['Any team member'])
-        self.check_role_required(ROLE_CONTRIBUTOR, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_CONTRIBUTOR)
         self.update_team(
             subtitle_policy=Team.SUBTITLE_IDS['Anyone'])
-        self.check_role_required(ROLE_OUTSIDER, perm_test)
-        self.check_staff_permission(perm_test, True)
+        self.check_role_required(ROLE_OUTSIDER)
 
     # TODO: Review/approve task tests.
 
