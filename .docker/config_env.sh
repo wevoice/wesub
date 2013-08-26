@@ -9,6 +9,10 @@ APP_ROOT=/opt/apps
 APP_DIR=$APP_ROOT/$APP_NAME
 VE_ROOT=/opt/ve
 VE_DIR=$VE_ROOT/$APP_NAME
+SMTP_HOST=${SMTP_HOST:smtp.sendgrid.net}
+SMTP_PORT=${SMTP_PORT:587}
+SASL_USER=${SASL_USER:universalsubtitles}
+SASL_PASSWD=${SASL_PASSWORD:-}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
@@ -72,6 +76,13 @@ EOF
         done
     fi
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
+fi
+
+# configure mail
+if [ ! -z "$SASL_USER" ] && [ ! -z "$SASL_PASSWD" ] ; then
+    echo "[$SMTP_HOST]:$SMTP_PORT $SASL_USER:$SASL_PASSWD" > /etc/postfix/sasl_passwd
+    chmod 600 /etc/postfix/sasl_passwd
+    postmap /etc/postfix/sasl_passwd
 fi
 
 # checkout respective revisions
