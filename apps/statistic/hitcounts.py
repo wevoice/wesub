@@ -268,24 +268,27 @@ class HitCountManager(object):
 
         returns a dict with keys for various counts (today, week, month, year)
         """
+        yesterday = now() - datetime.timedelta(days=1)
+        counts = self._get_aggregate_counts(obj)
+        counts['today'] = self._count_hits(obj, yesterday)
+        return counts
+
+    def _get_aggregate_counts(self, obj):
         try:
             last_migration = models.LastHitCountMigration.objects.get(
                 type=self.last_hit_counter_migration_type)
         except models.LastHitCountMigration.DoesNotExist:
             return {
-                'today': 0,
                 'week': 0,
                 'month': 0,
                 'year': 0,
             }
-        yesterday = now() - datetime.timedelta(days=1)
         last_week = last_migration.date - datetime.timedelta(days=7)
         last_month = last_migration.date - datetime.timedelta(days=30)
         last_year = last_migration.date.replace(
             day=1, year=last_migration.date.year-1)
 
         return {
-            'today': self._count_hits(obj, yesterday),
             'week': self._total_per_day_counts(obj, last_week),
             'month': self._total_per_day_counts(obj, last_month),
             'year': self._total_per_month_counts(obj, last_year),
