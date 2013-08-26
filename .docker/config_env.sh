@@ -9,9 +9,9 @@ APP_ROOT=/opt/apps
 APP_DIR=$APP_ROOT/$APP_NAME
 VE_ROOT=/opt/ve
 VE_DIR=$VE_ROOT/$APP_NAME
-SMTP_HOST=${SMTP_HOST:smtp.sendgrid.net}
-SMTP_PORT=${SMTP_PORT:587}
-SASL_USER=${SASL_USER:universalsubtitles}
+SMTP_HOST=${SMTP_HOST:-smtp.sendgrid.net}
+SMTP_PORT=${SMTP_PORT:-587}
+SASL_USER=${SASL_USER:-universalsubtitles}
 SASL_PASSWD=${SASL_PASSWORD:-}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
