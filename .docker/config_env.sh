@@ -77,9 +77,10 @@ Host github.com
     IdentityFile /root/.ssh/git_id_rsa
 EOF
     cd $APP_DIR
-    git reset --hard
-    git checkout staging
-    git pull --no-ff
+    git fetch
+    git branch --track $REV origin/$REV
+    git checkout --force $REV
+    git pull --ff-only origin $REV
     if [ ! -e "unisubs-integration" ]; then
         until git clone git@github.com:pculture/unisubs-integration.git ; do
             echo "Error during clone; trying again in 5 seconds..."
@@ -91,14 +92,16 @@ fi
 
 # checkout respective revisions
 cd $APP_DIR
-git checkout $REV
+git fetch
+git branch --track $REV origin/$REV
+git checkout --force $REV
+git pull --ff-only origin $REV
 if [ -e $APP_DIR/unisubs-integration ]; then
     cd $APP_DIR/unisubs-integration
-    git reset --hard
+    git fetch
     git checkout master
-    git pull --no-ff
     INTEGRATION_REV=`cat ../optional/unisubs-integration`
-    git checkout $INTEGRATION_REV
+    git reset --hard $INTEGRATION_REV
 fi
 cd $APP_DIR
 python ./deploy/create_commit_file.py

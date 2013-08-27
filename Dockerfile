@@ -7,7 +7,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq -y install wget python-dev python
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y build-dep python-imaging
 ENV REVISION staging
 ADD . /opt/apps/unisubs
-ADD .docker/config_env.sh /usr/local/bin/config_env.sh
+ADD .docker/config_env.sh /usr/local/bin/config_env
 ADD .docker/setup.sh /tmp/setup.sh
 ADD .docker/build_media.sh /usr/local/bin/build_media
 ADD .docker/worker.sh /usr/local/bin/worker

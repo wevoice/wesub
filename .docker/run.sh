@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/local/bin/config_env.sh
+source /usr/local/bin/config_env
 
 cat << EOF > $APP_ROOT/$APP_NAME.ini
 [uwsgi]
