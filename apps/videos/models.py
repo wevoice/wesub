@@ -44,8 +44,7 @@ from videos import metadata
 from videos.types import video_type_registrar
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
-from statistic import st_widget_view_statistic
-from statistic.tasks import st_sub_fetch_handler_update, st_video_view_handler_update
+from statistic import hitcounts
 from widget import video_cache
 from utils.redis_utils import RedisSimpleField
 from utils.amazon import S3EnabledImageField
@@ -216,9 +215,6 @@ class Video(models.Model):
     meta_3_type = metadata.MetadataTypeField()
     meta_3_content = metadata.MetadataContentField()
 
-    subtitles_fetched_count = models.IntegerField(_(u'Sub.fetched'), default=0, db_index=True, editable=False)
-    # counter for evertime the widget plays accounted for both on and off site
-    widget_views_count = models.IntegerField(_(u'Widget views'), default=0, db_index=True, editable=False)
     # counter for the # of times the video page is shown in the unisubs website
     view_count = models.PositiveIntegerField(_(u'Views'), default=0, db_index=True, editable=False)
 
@@ -269,13 +265,18 @@ class Video(models.Model):
             views_st = cache.get(cache_key)
 
             if not views_st:
-                views_st = st_widget_view_statistic.get_views(video=self)
-                views_st['total'] = self.widget_views_count
+                views_st = self.views_nocache
                 cache.set(cache_key, views_st, 60*60*2)
 
             self._video_views_statistic = views_st
 
         return self._video_views_statistic
+
+    @property
+    def views_nocache(self):
+        views_st = hitcounts.video_hits.get_counts(self)
+        views_st['total'] = self.view_count
+        return views_st
 
     def title_display(self, use_language_title=True):
         """
@@ -324,22 +325,7 @@ class Video(models.Model):
 
     def update_view_counter(self):
         """Queue a Celery task that will increment the number of views for this video."""
-        try:
-            st_video_view_handler_update.delay(video_id=self.video_id)
-        except:
-            client.captureException()
-
-    def update_subtitles_fetched(self, lang=None):
-        """Queue a Celery task that will increment the number of times this video's subtitles were fetched."""
-        try:
-            sl_pk = lang.pk if lang else None
-            st_sub_fetch_handler_update.delay(video_id=self.video_id, sl_pk=sl_pk)
-            if lang:
-                from videos.tasks import update_subtitles_fetched_counter_for_sl
-
-                update_subtitles_fetched_counter_for_sl.delay(sl_pk=lang.pk)
-        except:
-            client.captureException()
+        hitcounts.video_hits.add_hit(self)
 
     def get_thumbnail(self, fallback=True):
         """Return a URL to this video's thumbnail.
@@ -1056,7 +1042,6 @@ class SubtitleLanguage(models.Model):
 
     is_forked = models.BooleanField(default=False, editable=False)
     created = models.DateTimeField()
-    subtitles_fetched_count = models.IntegerField(default=0, editable=False)
     followers = models.ManyToManyField(User, blank=True, related_name='followed_languages', editable=False)
     percent_done = models.IntegerField(default=0, editable=False)
     standard_language = models.ForeignKey('self', null=True, blank=True, editable=False)
@@ -1067,9 +1052,6 @@ class SubtitleLanguage(models.Model):
                                               related_name='old_subtitle_version',
                                               null=True, blank=True,
                                               editable=False)
-
-    subtitles_fetched_counter = RedisSimpleField()
-
 
     def save(self, updates_timestamp=True, *args, **kwargs):
         if 'tern_sync' not in kwargs:

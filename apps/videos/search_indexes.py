@@ -51,6 +51,9 @@ class VideoIndex(CelerySearchIndex):
     def prepare_title_display(self, obj):
         return obj.title_display
 
+    def prepare_activity_count(self, obj):
+        return obj.action_set.count()
+
     def prepare(self, obj):
         obj.prefetch_languages(with_public_tips=True, with_private_tips=True)
         self.prepared_data = super(VideoIndex, self).prepare(obj)
@@ -66,30 +69,18 @@ class VideoIndex(CelerySearchIndex):
         self.prepared_data['contributors_count'] = collaborators + followers
         self.prepared_data['title'] = obj.title_display().strip()
         self.prepared_data['is_public'] = obj.is_public
-        self.prepare_action_counts(obj)
-        self.prepare_widget_counts(obj)
+        self.prepare_hitcounts(obj)
 
         return self.prepared_data
 
-    def prepare_action_counts(self, obj):
-        self.prepared_data['activity_count'] = obj.action_set.count()
+    def prepare_hitcounts(self, obj):
         self.prepared_data['week_views'] = obj.views['week']
         self.prepared_data['month_views'] = obj.views['month']
         self.prepared_data['year_views'] = obj.views['year']
         self.prepared_data['today_views'] = obj.views['today']
 
-    def prepare_subtitles_fetched_count(self, obj):
-        return obj.subtitles_fetched_count
-
-    def prepare_widget_counts(self, obj):
-        # FIXME: we have 2 fields indexing the same data
-        count = obj.widget_views_count
-        self.prepared_data['widget_views_count'] = count
-        self.prepared_data['total_views'] = count
-
     def _setup_save(self, model):
         pass
-
 
     def _teardown_save(self, model):
         pass

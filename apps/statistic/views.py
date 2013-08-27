@@ -40,33 +40,40 @@ def update_share_statistic(request, cls):
 
 @cache_page(60 * 60 * 24)
 def videos_statistic(request):
-    today = datetime.today()
-    month_ago = today - timedelta(days=31)
+    now = datetime.now()
+    today = now.date()
+    month_ago = today - timedelta(days=30)
     week_ago = today - timedelta(weeks=1)
-    day_ago = today - timedelta(days=1)
+    day_ago = now - timedelta(days=1)
 
-    tn = 'statistic_subtitlefetchcounters'
+    per_day_activity = """\
+SELECT SUM(count)
+FROM statistic_videoviewcounter AS viewcounter
+WHERE viewcounter.video_id = videos_video.id AND
+      viewcounter.date >= "%s" AND viewcounter.date < "%s" """
+    hit_activity = """\
+SELECT COUNT(1)
+FROM statistic_videohit AS videohit
+WHERE videohit.video_id = videos_video.id AND
+      videohit.datetime >= "%s" AND videohit.datetime < "%s" """
 
     qs = Video.objects.distinct().extra(select={
-        'month_activity': ('SELECT SUM(count) FROM %s WHERE %s.video_id = videos_video.id '+
-        'AND %s.date BETWEEN "%s" and "%s"') % (tn, tn, tn, month_ago, today),
-        'week_activity': ('SELECT SUM(count) FROM %s WHERE %s.video_id = videos_video.id '+
-        'AND %s.date BETWEEN "%s" and "%s"') % (tn, tn, tn, week_ago, today),
-        'day_activity': ('SELECT SUM(count) FROM %s WHERE %s.video_id = videos_video.id '+
-        'AND %s.date BETWEEN "%s" and "%s"') % (tn, tn, tn, day_ago, today)
+        'month_activity': per_day_activity % (month_ago, today),
+        'week_activity': per_day_activity % (week_ago, today),
+        'day_activity': hit_activity % (day_ago, now),
     })
 
     ordering = request.GET.get('o')
     order_type = request.GET.get('ot')
 
     extra_context = {}
-    order_fields = ['title', 'subtitles_fetched_count', 'month_activity', 'week_activity', 'day_activity']
+    order_fields = ['title', 'month_activity', 'week_activity', 'day_activity']
     if ordering in order_fields and order_type in ['asc', 'desc']:
         qs = qs.order_by(('-' if order_type == 'desc' else '')+ordering)
         extra_context['ordering'] = ordering
         extra_context['order_type'] = order_type
     else:
-        qs = qs.order_by('-subtitles_fetched_count')
+        qs = qs.order_by('-view_count')
 
     return object_list(request, queryset=qs,
                        paginate_by=30,

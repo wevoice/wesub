@@ -193,6 +193,12 @@ youtube_get_entry = mock.Mock(side_effect=mock_youtube_get_entry)
 youtube_get_subtitled_languages = mock.Mock(return_value=[])
 _add_amara_description_credit_to_youtube_vurl = mock.Mock()
 
+current_locks = set()
+acquire_lock = mock.Mock(
+    side_effect=lambda c, name: current_locks.add(name))
+release_lock = mock.Mock(
+    side_effect=lambda c, name: current_locks.remove(name))
+
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
     """
@@ -209,13 +215,15 @@ class MonkeyPatcher(object):
              youtube_get_subtitled_languages),
             ('videos.tasks._add_amara_description_credit_to_youtube_vurl',
              _add_amara_description_credit_to_youtube_vurl),
+            ('utils.applock.acquire_lock', acquire_lock),
+            ('utils.applock.release_lock', release_lock),
         ]
         self.patches = []
         for func_name, mock_obj in patch_info:
             self.patches.append(mock.patch(func_name, mock_obj))
             if not func_name.startswith("utils"):
-                # Ugh have to patch the function twice since some modules use app and
-                # some don't
+                # Ugh have to patch the function twice since some modules use
+                # app and some don't
                 self.patches.append(mock.patch('apps.' + func_name, mock_obj))
         self.mock_object_initial_data = {}
         for patch in self.patches:
@@ -263,3 +271,30 @@ class UnisubsTestPlugin(Plugin):
     def afterTest(self, test):
         self.patcher.reset_mocks()
         cache.clear()
+
+def patch_for_test(spec):
+    """Use mock to patch a function for the test case.
+
+    Use this to decorate a TestCase test or setUp method.  It will call
+    TestCase.addCleanup() so that the the patch will stop at the once the test
+    is complete.  It will pass in the mock object used for the patch to the
+    function.
+
+    Example:
+
+    class FooTest(TestCase):
+        @patch_for_test('foo.bar')
+        def setUp(self, mock_foo):
+            ...
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            mock_obj = mock.Mock()
+            patcher = mock.patch(spec, mock_obj)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+            return func(self, mock_obj, *args, **kwargs)
+        return wrapper
+    return decorator
+patch_for_test.__test__ = False

@@ -782,10 +782,6 @@ def stop_notification(request, video_id):
     return render_to_response('videos/stop_notification.html', context,
                               context_instance=RequestContext(request))
 
-def counter(request):
-    count = Video.objects.aggregate(c=Sum('subtitles_fetched_count'))['c']
-    return HttpResponse('draw_unisub_counter({videos_count: %s})' % count)
-
 @login_required
 @require_POST
 def video_url_make_primary(request):

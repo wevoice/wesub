@@ -13,7 +13,6 @@
             <th> {% ordered_column "day_activity" _("Day") %} </th>
             <th> {% ordered_column "week_activity" _("Week") %} </th>
             <th> {% ordered_column "month_activity" _("Month") %} </th>
-            <th> {% ordered_column "subtitles_fetched_count" _("TOTAL") %} </th>
         </tr>
     </thead>
     
@@ -24,7 +23,6 @@
             <td> {{ v.day_activity|default:0 }} </td>
             <td> {{ v.week_activity|default:0 }} </td>
             <td> {{ v.month_activity|default:0 }} </td>
-            <td> {{ v.subtitles_fetched_count }} </td>
         </tr>
         {% endfor %}
     </tbody>
