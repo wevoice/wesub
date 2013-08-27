@@ -389,7 +389,7 @@ def _get_related_task(request):
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.for_video(video, request.user)
+    qs = Action.objects.for_video(video)
 
     extra_context = {
         'video': video
