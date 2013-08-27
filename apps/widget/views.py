@@ -310,7 +310,9 @@ def download_subtitles(request, format):
 
     if not lang_id:
         # if no language is passed, assume it's the original one
-        language = video.newsubtitlelanguage_set(language_code=video.primary_audio_language_code)
+        language = video.subtitle_language()
+        if language is None:
+            raise Http404
     else:
         try:
             language = video.newsubtitlelanguage_set.get(pk=lang_id)
