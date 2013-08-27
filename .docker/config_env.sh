@@ -14,6 +14,8 @@ SMTP_PORT=${SMTP_PORT:-587}
 SASL_USER=${SASL_USER:-universalsubtitles}
 SASL_PASSWD=${SASL_PASSWD:-}
 MAILNAME=${MAILNAME:-pculture.org}
+NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
+NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 
 # configure /etc/hosts
 cat << EOF > /etc/hosts
