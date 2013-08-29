@@ -1,21 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-"""
-Tests for TED speaker-name metadata fields. 
-
-Fields added to the video:
-  1. Via the api
-  2. Via the admin ui for the video
-  3. Via the import of the TED atom feed - set speaker-name for en language
-
-Editor Display:
-  1. Old editor + New editor show blank field, never pre-populated.
-  2. Speaker-name field is present when metadata value on the vidoe is "", 
-     It should appear as a field in both the new and old editors
- 
-"""
-
 import time
 
 from django.core import management
@@ -145,8 +130,6 @@ class TestCaseTranscribe(WebdriverTestCase):
 
         self.assertEquals({u'speaker-name': u'Jerry Garcia'}, v.get_metadata())
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("MYTMP/%s.png" % self.id())
 
 class TestCaseTED(WebdriverTestCase):
     """Test suite for speakername behavior on the TED team."""
