@@ -727,7 +727,7 @@ def send_video_comment_notification(comment_pk_or_instance, version_pk=None):
         obj = language
         object_pk = language.pk
         content_type = ContentType.objects.get_for_model(language)
-        exclude = [c.user for c in language.followers.filter(notify_by_message=False)]
+        exclude = [u for u in language.followers.filter(notify_by_message=False)]
         exclude.append(comment.user)
         message_followers = language.notification_list(exclude)
     else:
