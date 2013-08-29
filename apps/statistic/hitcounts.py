@@ -325,5 +325,5 @@ video_hits = VideoHitCountManager()
 subtitle_views = SubtitleViewCountManager()
 
 def migrate_all():
-    hitcounts.video_counts.migrate()
-    hitcounts.subtitle_views.migrate()
+    video_counts.migrate()
+    subtitle_views.migrate()
