@@ -138,4 +138,13 @@ class DashboardTab(ATeamPage):
             if task_type in task['action'] and title in task['title']:
                 return True
 
+    def video_present(self, video):
+        video_els = self.browser.find_elements_by_css_selector(
+                      " ".join([self._VIDEO, self._VIDEO_TITLE]))
+        self.logger.info(video_els)
+        for el in video_els:
+            self.logger.info(el.text)
+            if video in el.text:
+                return True
+ 
         

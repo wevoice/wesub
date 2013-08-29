@@ -65,6 +65,9 @@ class EditorPage(UnisubsPage):
     _SUB_TIME = 'span.timing'
     _SUB_TEXT = 'span.subtitle-text'
 
+    #METADATA
+    _SPEAKER_FIELD = 'textarea[placeholder="Enter Speaker Name"]' 
+
 
     #RIGHT COLUMN
 
@@ -394,4 +397,3 @@ class EditorPage(UnisubsPage):
 
     def sync_help_displayed(self):
         return self.is_element_visible(self._SYNC_HELP)
-
