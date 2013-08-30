@@ -419,6 +419,7 @@ INSTALLED_APPS = (
     'amaradotorg',
     'amaracelery',
     'comments',
+    'externalsites',
     'messages',
     'profiles',
     'search',
