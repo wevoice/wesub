@@ -40,13 +40,13 @@ class FBShareStatistic(BaseShareStatistic):
 
 class VideoHit(models.Model):
     video = models.ForeignKey('videos.Video', db_index=True)
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(db_index=True)
 
 class VideoViewCounter(models.Model):
     # This should be called VideoHitsPerDay to fit in with the general naming
     # schema, but we VideoViewCounter is the historical name
     video = models.ForeignKey('videos.Video')
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     count = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -56,7 +56,7 @@ class VideoViewCounter(models.Model):
 
 class VideoHitsPerMonth(models.Model):
     video = models.ForeignKey('videos.Video', db_index=True)
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     count = models.PositiveIntegerField()
     
     class Meta:
@@ -65,12 +65,12 @@ class VideoHitsPerMonth(models.Model):
 class SubtitleView(models.Model):
     subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
                                           db_index=True)
-    datetime = models.DateTimeField()
+    datetime = models.DateTimeField(db_index=True)
 
 class SubtitleViewsPerDay(models.Model):
     subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
                                           db_index=True)
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     count = models.PositiveIntegerField()
     
     class Meta:
@@ -79,7 +79,7 @@ class SubtitleViewsPerDay(models.Model):
 class SubtitleViewsPerMonth(models.Model):
     subtitle_language = models.ForeignKey('subtitles.SubtitleLanguage',
                                           db_index=True)
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     count = models.PositiveIntegerField()
     
     class Meta:
@@ -95,4 +95,4 @@ class LastHitCountMigration(models.Model):
     ]
     type = models.CharField(primary_key=True, max_length=1,
                             choices=TYPE_CHOICES)
-    date = models.DateField()
+    date = models.DateField(db_index=True)
