@@ -203,12 +203,12 @@ class VideoHitCountMigrater(HitCountMigrater):
         sql = """\
 UPDATE videos_video
 SET view_count=view_count + (
-    SELECT count FROM statistic_videoviewcounter counter
-    WHERE counter.video_id=videos_video.id
-    AND counter.date=%s)
+    SELECT count FROM statistic_videohitsperday perday
+    WHERE perday.video_id=videos_video.id
+    AND perday.date=%s)
 WHERE videos_video.id IN (
-    SELECT video_id FROM statistic_videoviewcounter counter
-    WHERE counter.date=%s)"""
+    SELECT video_id FROM statistic_videohitsperday perday
+    WHERE perday.date=%s)"""
         cursor.execute(sql, (date, date, ))
 
 class HitCountManager(object):
@@ -316,8 +316,7 @@ class VideoHitCountManager(HitCountManager):
     """Track hits on video pages"""
     obj_field_name = 'video'
     hit_model = models.VideoHit
-    # for historical reasons, the per-day model is called VideoViewCounter
-    per_day_model = models.VideoViewCounter
+    per_day_model = models.VideoHitsPerDay
     per_month_model = models.VideoHitsPerMonth
     last_hit_counter_migration_type = 'V'
 

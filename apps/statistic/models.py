@@ -42,16 +42,12 @@ class VideoHit(models.Model):
     video = models.ForeignKey('videos.Video', db_index=True)
     datetime = models.DateTimeField(db_index=True)
 
-class VideoViewCounter(models.Model):
-    # This should be called VideoHitsPerDay to fit in with the general naming
-    # schema, but we VideoViewCounter is the historical name
+class VideoHitsPerDay(models.Model):
     video = models.ForeignKey('videos.Video')
     date = models.DateField(db_index=True)
     count = models.PositiveIntegerField(default=0)
 
     class Meta:
-        verbose_name = _(u'Video view statistic')
-        verbose_name_plural = _(u'Video view statistic')
         unique_together = (('video', 'date'),)
 
 class VideoHitsPerMonth(models.Model):
