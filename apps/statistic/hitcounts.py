@@ -83,7 +83,7 @@ class HitCountMigrater(object):
         cursor = db.connection.cursor()
         self.migrate_hits(cursor, now_value, last_migration)
         self.migrate_per_day_counts(cursor, now_value, last_migration)
-        self.delete_old_rows(cursor, now_value)
+        self.delete_old_rows(cursor, now_value, last_migration)
         self.update_last_hit_counter_migration(now_value, last_migration)
 
     def get_last_migration(self):
@@ -165,14 +165,32 @@ class HitCountMigrater(object):
     def per_day_removal_date(self, now):
         return now.date() - datetime.timedelta(days=30)
 
-    def delete_old_rows(self, cursor, now):
-        (self.hit_model.objects
-         .filter(datetime__lt=self.hit_removal_date(now))
-         .delete())
+    def delete_old_rows(self, cursor, now, last_migration):
+        self.delete_old_hits(cursor, now, last_migration)
+        self.delete_old_day_counts(cursor, now, last_migration)
 
-        (self.per_day_model.objects
-         .filter(date__lt=self.per_day_removal_date(now))
-         .delete())
+    def delete_old_hits(self, cursor, now, last_migration):
+        delete_before = self.hit_removal_date(now)
+        self.hit_model.objects.filter(datetime__lt=delete_before).delete()
+
+    def delete_old_day_counts(self, cursor, now, last_migration):
+        delete_before = self.per_day_removal_date(now)
+        # deleting the per-day counts is a bit tricky, because the previous
+        # version of this code let this table fill up to like 20 million rows,
+        # so doing a simple delete results in mysql killing the query.
+        # Delete only 1 month of data at a time to work around this.
+        try:
+            first_date = (self.per_day_model.objects
+                          .values_list('date', flat=True)
+                          .order_by('date'))[0]
+        except IndexError:
+            return
+        while delete_before > first_date:
+            month_before = delete_before - datetime.timedelta(days=30)
+            (self.per_day_model.objects
+             .filter(date__lt=delete_before, date__gte=month_before)
+             .delete())
+            delete_before = month_before
 
     def update_last_hit_counter_migration(self, now, last_migration):
         last_migration.date = now.date()
