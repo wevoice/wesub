@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
+import functools
 import logging
 import random
 
@@ -110,6 +111,17 @@ DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
+def settings_page(view_func):
+    """Decorator for the team settings pages."""
+
+    @functools.wraps(view_func)
+    def wrapper(request, slug, *args, **kwargs):
+        team = Team.get(slug, request.user)
+        if not can_change_team_settings(team, request.user):
+            messages.error(request, _(u'You do not have permission to edit this team.'))
+            return HttpResponseRedirect(team.get_absolute_url())
+        return view_func(request, team, *args, **kwargs)
+    return login_required(wrapper)
 
 # Management
 def index(request, my_teams=False):
@@ -211,14 +223,8 @@ def _delete_team(request, team):
     return HttpResponseRedirect(reverse('teams:index'))
 
 @render_to('teams/settings.html')
-@login_required
-def settings_basic(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
-
+@settings_page
+def settings_basic(request, team):
     if request.POST.get('delete'):
         r = _delete_team(request, team)
         if r:
@@ -253,14 +259,8 @@ def settings_basic(request, slug):
     return { 'team': team, 'form': form, }
 
 @render_to('teams/settings-guidelines.html')
-@login_required
-def settings_guidelines(request, slug):
-    team = Team.get(slug, request.user)
-
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
-
+@settings_page
+def settings_guidelines(request, team):
     initial = dict((s.key_name, s.data) for s in team.settings.messages_guidelines())
     if request.POST:
         form = GuidelinesMessagesForm(request.POST, initial=initial)
@@ -279,15 +279,10 @@ def settings_guidelines(request, slug):
     return { 'team': team, 'form': form, }
 
 @render_to('teams/settings-permissions.html')
-@login_required
-def settings_permissions(request, slug):
-    team = Team.get(slug, request.user)
+@settings_page
+def settings_permissions(request, team):
     workflow = Workflow.get_for_target(team.id, 'team')
     moderated = team.moderates_videos()
-
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
 
     if request.POST:
         form = PermissionsForm(request.POST, instance=team)
@@ -314,14 +309,9 @@ def settings_permissions(request, slug):
     return { 'team': team, 'form': form, 'workflow_form': workflow_form, }
 
 @render_to('teams/settings-projects.html')
-@login_required
-def settings_projects(request, slug):
-    team = Team.get(slug, request.user)
+@settings_page
+def settings_projects(request, team):
     projects = team.project_set.exclude(name=Project.DEFAULT_NAME)
-
-    if not can_change_team_settings(team, request.user):
-        messages.error(request, _(u'You do not have permission to edit this team.'))
-        return HttpResponseRedirect(team.get_absolute_url())
 
     return { 'team': team, 'projects': projects, }
 
