@@ -389,7 +389,7 @@ def _get_related_task(request):
 
 def actions_list(request, video_id):
     video = get_object_or_404(Video, video_id=video_id)
-    qs = Action.objects.for_video(video, request.user)
+    qs = Action.objects.for_video(video)
 
     extra_context = {
         'video': video
@@ -781,10 +781,6 @@ def stop_notification(request, video_id):
         context['error'] = u'Incorrect secret hash'
     return render_to_response('videos/stop_notification.html', context,
                               context_instance=RequestContext(request))
-
-def counter(request):
-    count = Video.objects.aggregate(c=Sum('subtitles_fetched_count'))['c']
-    return HttpResponse('draw_unisub_counter({videos_count: %s})' % count)
 
 @login_required
 @require_POST

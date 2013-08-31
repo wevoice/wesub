@@ -30,10 +30,10 @@ class VideoPage(UnisubsPage):
         "textarea")
 
     #TOP TABS
-    _URLS_TAB = 'a[href="#urls-tab"]'
-    _VIDEO_TAB = 'a[href="#video-tab"]'
-    _COMMENTS_TAB = 'a[href="#comments-tab"]'
-    _ACTIVITY_TAB = 'a[href="#activity-tab"]'
+    _URLS_TAB = 'href="?tab=urls"]'
+    _VIDEO_TAB = 'a[href="?tab=video"]'
+    _COMMENTS_TAB = 'a[href="?tab=comments"]'
+    _ACTIVITY_TAB = 'a[href="?tab=activity"]'
 
 
     _ADD_SUBTITLES = "a.add_subtitles"
@@ -70,10 +70,14 @@ class VideoPage(UnisubsPage):
     UPLOAD_SUCCESS_TEXT = ('Thank you for uploading. It may take a minute or '
                            'so for your subtitles to appear.')
 
-    
+    _ACTIVITY_LIST = 'ul.activity li p'    
 
     def open_video_page(self, video_id):
         self.open_page(self._URL % video_id)
+
+    def open_video_activity(self, video_id):
+        self.open_video_page(video_id)
+        self.click_by_css(self._ACTIVITY_TAB)
 
     def video_title(self):
         return self.get_text_by_css(self._VIDEO_TITLE)
@@ -215,3 +219,7 @@ class VideoPage(UnisubsPage):
 
         return status_tag, status_img
 
+    def activity_list(self):
+        activity_els = self.get_elements_list(self._ACTIVITY_LIST)
+        return [el.text for el in activity_els]
+ 

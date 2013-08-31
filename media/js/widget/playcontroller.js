@@ -117,13 +117,7 @@ unisubs.widget.PlayController.prototype.setUpSubs_ =
                this.finished_).
         listen(this.videoPlayer_,
                unisubs.player.AbstractVideoPlayer.EventType.PLAY_ENDED,
-               this.finished_).
-        listen(this.videoPlayer_,
-               unisubs.player.AbstractVideoPlayer.EventType.PLAY,
-               this.trackPlay_);
-    if (this.videoPlayer_.isPlaying()) {
-        this.trackPlay_();
-    }
+               this.finished_);
 };
 
 unisubs.widget.PlayController.prototype.getSubtitlesJSON = function() {
@@ -132,27 +126,6 @@ unisubs.widget.PlayController.prototype.getSubtitlesJSON = function() {
 
 unisubs.widget.PlayController.prototype.getSubMap = function() {
     return this.subMap_;
-};
-
-unisubs.widget.PlayController.prototype.trackPlay_ = function() {
-    var videoURL = this.videoSource_.getVideoURL();
-    try{
-        if (!this.trackedURLs_.contains(videoURL)) {
-            this.trackedURLs_.add(videoURL);
-            unisubs.Tracker.getInstance().trackEvent(
-                "Subs Played",
-                window.location.href,
-                videoURL);
-            unisubs.Rpc.call(
-                'track_subtitle_play',
-                { 'video_id': this.videoID_ });
-        }
-    }catch(e){
-        if (console && console.log){
-            console.error("Could not track video", e.stack);
-        }
-    }
-
 };
 
 unisubs.widget.PlayController.prototype.languageSelected = function(videoLanguage) {

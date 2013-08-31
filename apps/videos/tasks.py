@@ -99,14 +99,6 @@ def update_from_feed(*args, **kwargs):
         update_video_feed.delay(feed.pk)
 
 @task
-def update_subtitles_fetched_counter_for_sl(sl_pk):
-    try:
-        sl = SubtitleLanguage.objects.get(pk=sl_pk)
-        sl.subtitles_fetched_counter.incr()
-    except (SubtitleLanguage.DoesNotExist, ValueError):
-        return
-
-@task
 def update_video_feed(video_feed_id):
     try:
         video_feed = VideoFeed.objects.get(pk=video_feed_id)

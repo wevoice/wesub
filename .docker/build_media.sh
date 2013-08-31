@@ -1,5 +1,5 @@
 #!/bin/bash
-source /usr/local/bin/config_env.sh
+source /usr/local/bin/config_env
 
 cd $APP_DIR
 echo "Compiling Media..."

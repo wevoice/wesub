@@ -23,7 +23,6 @@ from django.db.models import Sum, Q
 from django.utils import translation
 from django.utils.translation import ugettext as _
 
-from statistic.tasks import st_widget_view_statistic_update
 from subtitles import models as new_models
 from teams.models import Task, Workflow, Team, BillingRecord
 from teams.moderation_const import APPROVED, UNMODERATED, WAITING_MODERATION
@@ -200,12 +199,6 @@ class Rpc(BaseRpc):
         resp['subtitles'] = self._get_subtitles_for_widget(request, base_state,
                                                            video_id, is_remote)
         return resp
-
-
-    # Statistics
-    def track_subtitle_play(self, request, video_id):
-        st_widget_view_statistic_update.delay(video_id=video_id)
-        return { 'response': 'ok' }
 
 
     # Start Dialog (aka "Subtitle Into" Dialog)
@@ -979,7 +972,6 @@ class Rpc(BaseRpc):
     def get_widget_info(self, request):
         return {
             'all_videos': models.Video.objects.count(),
-            'subtitles_fetched_count': models.Video.objects.aggregate(s=Sum('subtitles_fetched_count'))['s'],
             'videos_with_captions': models.Video.objects.exclude(subtitlelanguage=None).count(),
             'translations_count': models.SubtitleLanguage.objects.filter(is_original=False).count()
         }

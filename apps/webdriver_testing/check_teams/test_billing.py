@@ -142,27 +142,6 @@ class TestCaseBilling(WebdriverTestCase):
         """
         self.assertIn('sv', self.bill_dict[self.video.video_id].keys())
 
-    def test_translation__incomplete(self):
-        """Incomplete languages have -1 minutes.
-
-        """
-        video, tv = self._create_tv_with_original_subs(self.user, self.team)
-        self._upload_sv_translation(video, self.user, complete=False)
-
-        report = BillingFactory(start_date=(datetime.date.today() - 
-                                            datetime.timedelta(1)),
-                                end_date=datetime.datetime.now(),
-                                )
-        report.teams=[self.team]
-        report.save()
-        report.process()
-        bill = 'user-data/%s' % report.csv_file
-        bill_dict = self._bill_dict(bill)
-        sv_bill = bill_dict[video.video_id]['sv']
-
-        self.logger.info(sv_bill)
-        self.assertEqual('-1', sv_bill['Minutes'])
-
 
     def test_minutes(self):
         """Minutes from last synced sub rounded up to whole minute.
@@ -361,7 +340,3 @@ class TestCaseBilling(WebdriverTestCase):
         report_dl = self.billing_pg.check_latest_report_url()
         self.logger.info(report_dl)
         self.assertEqual(8, len(report_dl))
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("MYTMP/%s.png" % self.id())
-

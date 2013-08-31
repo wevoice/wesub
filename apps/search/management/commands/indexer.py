@@ -25,7 +25,7 @@ from django.db import transaction
 from django.db import reset_queries
 from haystack import site
 
-from statistic.models import VideoViewCounter
+from statistic.models import VideoHitsPerDay
 from videos.models import Video
 
 class Command(BaseCommand):
@@ -90,7 +90,7 @@ class Command(BaseCommand):
     def fetch_popular_video_ids(self):
         week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
 
-        new_popular_video_queue = set(VideoViewCounter.objects
+        new_popular_video_queue = set(VideoHitsPerDay.objects
                                       .filter(date__gt=week_ago)
                                       .order_by()
                                       .distinct()

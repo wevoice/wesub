@@ -700,13 +700,11 @@ def activity(request, slug):
     except TeamMember.DoesNotExist:
         member = None
 
-    public_only = False if member else True
-
     # This section is here to work around MySQL's poor decisions.
     #
     # Much like the Tasks page, this query performs extremely poorly when run
     # normally.  So we split it into two parts here so that each will run fast.
-    action_ids = Action.objects.for_team(team, public_only=public_only, ids=True)
+    action_ids = Action.objects.for_team(team, ids=True)
     action_ids, pagination_info = paginate(action_ids, ACTIONS_ON_PAGE,
                                            request.GET.get('page'))
     action_ids = list(action_ids)

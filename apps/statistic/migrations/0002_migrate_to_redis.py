@@ -5,7 +5,6 @@ from south.v2 import DataMigration
 from django.db import models
 from django.conf import settings
 from redis.exceptions import ConnectionError
-from statistic import st_sub_fetch_handler
 
 class Migration(DataMigration):
     

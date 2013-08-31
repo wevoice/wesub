@@ -36,9 +36,8 @@ def recent_activity(user):
     }
 
 @register.inclusion_tag('videos/_video_activity.html')
-def video_activity(video, user):
-    qs = (Action.objects.for_video(video, user)
-                .select_related('user', 'language__video', 'language', 'video'))
+def video_activity(video):
+    qs = Action.objects.for_video(video)
 
     return {
         'events': qs[:LIMIT],

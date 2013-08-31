@@ -18,18 +18,16 @@
 from datetime import timedelta
 
 from celery.decorators import periodic_task
+from celery.schedules import crontab
 from celery.task import task
-from statistic import (
-    st_sub_fetch_handler, st_video_view_handler, st_widget_view_statistic
-)
 
-from django.db.models import Count, Sum
-from apps.statistic.models import (
+from django.db.models import Count
+
+from statistic import hitcounts
+from statistic.models import (
     EmailShareStatistic, TweeterShareStatistic, FBShareStatistic,
-    SubtitleFetchCounters
 )
 from utils.metrics import Gauge
-
 
 @periodic_task(run_every=timedelta(seconds=300))
 def gauge_statistic():
@@ -66,28 +64,6 @@ def gauge_statistic_languages():
         Gauge('statistic.languages.%s.count' % name).report(count)
 
 
-@periodic_task(run_every=timedelta(hours=6))
-def update_statistic(*args, **kwargs):
-    st_sub_fetch_handler.migrate(verbosity=kwargs.get('verbosity', 1))
-    st_video_view_handler.migrate(verbosity=kwargs.get('verbosity', 1))
-    st_widget_view_statistic.migrate(verbosity=kwargs.get('verbosity', 1))
-
-
-@task
-def st_sub_fetch_handler_update(**kwargs):
-    st_sub_fetch_handler.update(**kwargs)
-
-
-@task
-def st_video_view_handler_update(**kwargs):
-    try:
-        st_video_view_handler.update(**kwargs)
-    except:
-        # Don't worry if we can't reach Redis for this -- it's only a view
-        # counter.
-        pass
-
-
-@task
-def st_widget_view_statistic_update(**kwargs):
-    st_widget_view_statistic.update(**kwargs)
+@periodic_task(run_every=crontab(hour=1, minute=0))
+def migrate_hit_counts():
+    hitcounts.migrate_all()
