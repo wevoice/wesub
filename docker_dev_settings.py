@@ -33,6 +33,15 @@ CACHE_PREFIX = 'unisubsdevsettings'
 CACHE_TIMEOUT = 0
 COMPRESS_MEDIA = False
 
+TWITTER_CONSUMER_KEY = '6lHYqtxzQBD3lQ55Chi6Zg'
+TWITTER_CONSUMER_SECRET = 'ApkJPIIbBKp3Wph0JBoAg2Nsk1Z5EG6PFTevNpd5Y00'
+
+VIMEO_API_KEY = 'e1a46f832f8dfa99652781ee0b39df12'
+VIMEO_API_SECRET = 'bdaeb531298eeee1'
+
+FACEBOOK_APP_KEY = FACEBOOK_APP_ID = '255603057797860'
+FACEBOOK_SECRET_KEY = '2a18604dac1ad7e9817f80f3aa3a69f2'
+
 def get_host_address():
     """Get the address of the host machine."""
     output = subprocess.check_output("ip route list", shell=True)
@@ -54,12 +63,12 @@ DATABASES = {
         }
     }
 
-HAYSTACK_SOLR_URL = 'http://%s/51001/solr/' % HOST_ADDRESS
+HAYSTACK_SOLR_URL = 'http://%s:51001/solr/' % HOST_ADDRESS
 
 BROKER_BACKEND = 'amqplib'
 BROKER_HOST = HOST_ADDRESS
-BROKER_USER = 'usrmquser'
-BROKER_PASSWORD = 'usrmqpassword'
+BROKER_USER = ''
+BROKER_PASSWORD = ''
 BROKER_PORT = 51002
 
 CACHES = {
