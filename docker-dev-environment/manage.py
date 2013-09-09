@@ -13,7 +13,7 @@ def get_cid_path():
 def get_cid(cidpath):
     return open(cidpath).read().strip()
 
-def run_manage(manage_args, docker_args=None):
+def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
     cidpath = get_cid_path()
     unisubs_root = os.path.abspath(os.path.join(
         os.path.dirname(__file__), '..'))
@@ -22,8 +22,9 @@ def run_manage(manage_args, docker_args=None):
         '/usr/bin/docker', 'run',
         '-i', '-t',
         '-cidfile=%s' % cidpath,
-        '-e', 'DJANGO_SETTINGS_MODULE=docker_dev_settings',
+        '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
         '-v', volume_arg,
+        '-w', '/opt/apps/unisubs/',
     ]
     if docker_args:
         run_cmd.extend(docker_args)
