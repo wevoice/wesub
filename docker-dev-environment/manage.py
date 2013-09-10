@@ -19,7 +19,7 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
         os.path.dirname(__file__), '..'))
     volume_arg = '%s:/opt/apps/unisubs' % (unisubs_root,)
     run_cmd = [
-        '/usr/bin/docker', 'run',
+        'docker', 'run',
         '-i', '-t',
         '-cidfile=%s' % cidpath,
         '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
@@ -33,14 +33,14 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
         '/opt/ve/unisubs/bin/python',
         '/opt/apps/unisubs/manage.py',
     ] + manage_args)
-    subprocess.check_call(run_cmd)
+    subprocess.check_call(" ".join(run_cmd), shell=True)
     cid = get_cid(cidpath)
     with open("/dev/null", "w") as dev_null:
-        subprocess.check_call(['/usr/bin/docker', 'stop', cid],
+        subprocess.check_call("docker stop %s" % cid, shell=True,
                               stdout=dev_null)
-        subprocess.check_call(['/usr/bin/docker', 'wait', cid],
+        subprocess.check_call("docker wait %s" % cid, shell=True,
                               stdout=dev_null)
-        subprocess.check_call(['/usr/bin/docker', 'rm', cid],
+        subprocess.check_call("docker rm %s" % cid, shell=True,
                               stdout=dev_null)
     os.unlink(cidpath)
 
