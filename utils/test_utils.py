@@ -198,6 +198,9 @@ acquire_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.add(name))
 release_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.remove(name))
+update_all_subtitles = mock.Mock()
+update_subtitles = mock.Mock()
+delete_subtitles = mock.Mock()
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -217,6 +220,9 @@ class MonkeyPatcher(object):
              _add_amara_description_credit_to_youtube_vurl),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
+            ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
+            ('externalsites.tasks.update_subtitles', update_subtitles),
+            ('externalsites.tasks.delete_subtitles', delete_subtitles),
         ]
         self.patches = []
         for func_name, mock_obj in patch_info:
