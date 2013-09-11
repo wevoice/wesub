@@ -26,10 +26,15 @@ from django.db.models.signals import post_save
 
 import mock
 
-from teams.permissions_const import ROLE_ADMIN
-from externalsites.models import KalturaAccount
+from externalsites import tasks
+from externalsites import urls
+from externalsites.exceptions import SyncingError
+from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
+                                  SyncHistory)
 from subtitles import pipeline
+from teams.permissions_const import ROLE_ADMIN
 from utils import test_factories
+from utils import test_utils
 from utils.test_utils import patch_for_test
 import subtitles.signals
 
@@ -51,6 +56,7 @@ class SignalHandlingTest(TestCase):
         self.mock_update_subtitles = mock_update_subtitles
         self.mock_update_all_subtitles = mock_update_all_subtitles
         self.video = create_kaltura_video('video')
+        self.video_url = self.video.get_primary_videourl_obj()
         team_video = test_factories.create_team_video(video=self.video)
         self.team = team_video.team
         self.account = KalturaAccount.objects.create(
@@ -67,7 +73,8 @@ class SignalHandlingTest(TestCase):
             sender=lang, version=tip)
         self.assertEqual(self.mock_update_subtitles.call_count, 1)
         self.mock_update_subtitles.assert_called_with(
-            KalturaAccount.account_type, self.account.id, lang.id, tip.id)
+            KalturaAccount.account_type, self.account.id, self.video_url.id,
+            lang.id, tip.id)
 
     def test_delete_subititles_on_language_deleted(self):
         lang = self.video.subtitle_language('en')
@@ -75,7 +82,8 @@ class SignalHandlingTest(TestCase):
 
         self.assertEqual(self.mock_delete_subtitles.call_count, 1)
         self.mock_delete_subtitles.assert_called_with(
-            KalturaAccount.account_type, self.account.id, lang.id)
+            KalturaAccount.account_type, self.account.id, self.video_url.id,
+            lang.id)
 
     def test_update_all_subtitles_on_account_save(self):
         post_save.send(KalturaAccount, instance=self.account, created=True)
@@ -115,3 +123,181 @@ class SignalHandlingTest(TestCase):
         video = test_factories.create_video()
         test_factories.create_team_video(team=self.team, video=video)
         self.check_tasks_not_called(video)
+
+class SubtitleTaskTest(TestCase):
+    @patch_for_test('externalsites.models.now')
+    @patch_for_test('externalsites.models.KalturaAccount.update_subtitles')
+    @patch_for_test('externalsites.models.KalturaAccount.delete_subtitles')
+    def setUp(self, mock_delete_subtitles, mock_update_subtitles, mock_now):
+        self.now = datetime.datetime(2013, 1, 1)
+        mock_now.side_effect = self.make_now
+        self.mock_update_subtitles = mock_update_subtitles
+        self.mock_delete_subtitles = mock_delete_subtitles
+        self.video = create_kaltura_video('video')
+        self.video_url = self.video.get_primary_videourl_obj()
+        team_video = test_factories.create_team_video(video=self.video)
+        self.team = team_video.team
+        self.account = KalturaAccount.objects.create(
+            team=self.team, partner_id=1234, secret='abcd')
+        pipeline.add_subtitles(self.video, 'en', None)
+        self.reset_history()
+
+    def reset_history(self):
+        """Reset all mock objects and delete SyncedSubtitleVersion and
+        SyncHistory.
+
+        Call this after making calls that might result in syncing to happen
+        that you don't want to test
+        """
+        self.mock_update_subtitles.reset_mock()
+        self.mock_delete_subtitles.reset_mock()
+        SyncHistory.objects.all().delete()
+        SyncedSubtitleVersion.objects.all().delete()
+
+    def make_now(self):
+        rv = self.now
+        self.now += datetime.timedelta(minutes=1)
+        return rv
+
+    def run_update_subtitles(self, language, version):
+        args = ('K', self.account.id, self.video_url.id, language.id,
+                version.id)
+        test_utils.update_subtitles.original_func.apply(args=args)
+
+    def run_delete_subtitles(self, language):
+        args = ('K', self.account.id, self.video_url.id, language.id)
+        test_utils.delete_subtitles.original_func.apply(args=args)
+
+    def run_update_all_subtitles(self):
+        args = ('K', self.account.id)
+        test_utils.update_all_subtitles.original_func.apply(args=args)
+
+    def check_synced_version(self, language, version):
+        synced_version = SyncedSubtitleVersion.objects.get(
+            account_type=self.account.account_type,
+            account_id=self.account.id, language=language)
+        self.assertEquals(synced_version.version, version)
+
+    def check_no_synced_version(self, language):
+        synced_version_qs = SyncedSubtitleVersion.objects.filter(
+            account_type=self.account.account_type,
+            account_id=self.account.id, language=language)
+        self.assert_(not synced_version_qs.exists())
+
+    def check_sync_history(self, language, correct_history):
+        history_qs = SyncHistory.objects.filter(language=language)
+        self.assertEquals(len(history_qs), len(correct_history))
+        for (history, history_values) in zip(history_qs, correct_history):
+            self.assertEquals(history.account_id, self.account.id)
+            self.assertEquals(history.account_type, self.account.account_type)
+            self.assertEquals(history.action, history_values[0])
+            self.assertEquals(history.status, history_values[1])
+            self.assertEquals(history.datetime, history_values[2])
+            self.assertEquals(history.version, history_values[3])
+            self.assertEquals(history.details, history_values[4])
+
+    def test_upload_subtitles(self):
+        now = self.now
+        language = self.video.subtitle_language('en')
+        version = language.get_tip()
+        self.run_update_subtitles(language, version)
+        self.assertEquals(self.mock_update_subtitles.call_count, 1)
+        self.mock_update_subtitles.assert_called_with(self.video_url,
+                                                      language, version)
+        self.check_sync_history(language, [
+            ('U', 'S', now, version, ''),
+        ])
+        self.check_synced_version(language, version)
+
+    def test_upload_subtitles_error(self):
+        now = self.now
+        exc = SyncingError('Site exploded')
+        self.mock_update_subtitles.side_effect = exc
+        language = self.video.subtitle_language('en')
+        version = language.get_tip()
+        self.run_update_subtitles(language, version)
+        self.assertEquals(self.mock_update_subtitles.call_count, 1)
+        self.mock_update_subtitles.assert_called_with(self.video_url,
+                                                      language, version)
+        self.check_sync_history(language, [
+            ('U', 'E', now, version, exc.msg)
+        ])
+        self.check_no_synced_version(language)
+
+    def test_delete_subtitles(self):
+        now = self.now
+        language = self.video.subtitle_language('en')
+        version = language.get_tip()
+        SyncedSubtitleVersion.objects.set_synced_version(
+            self.account, self.video_url, language, version)
+        self.run_delete_subtitles(language)
+        self.assertEquals(self.mock_delete_subtitles.call_count, 1)
+        self.mock_delete_subtitles.assert_called_with(self.video_url,
+                                                      language)
+        self.check_sync_history(language, [
+            ('D', 'S', now, None, '')
+        ])
+        self.check_no_synced_version(language)
+
+    def test_delete_subtitles_error(self):
+        now = self.now
+        exc = SyncingError('Site exploded')
+        self.mock_delete_subtitles.side_effect = exc
+        language = self.video.subtitle_language('en')
+        version = language.get_tip()
+        SyncedSubtitleVersion.objects.set_synced_version(
+            self.account, self.video_url, language, version)
+        self.run_delete_subtitles(language)
+        self.assertEquals(self.mock_delete_subtitles.call_count, 1)
+        self.mock_delete_subtitles.assert_called_with(self.video_url,
+                                                      language)
+        self.check_sync_history(language, [
+            ('D', 'E', now, None, exc.msg)
+        ])
+        self.check_synced_version(language, version)
+
+    def test_upload_all_subtitles(self):
+        to_sync = [self.video.subtitle_language('en').get_tip()]
+        pipeline.add_subtitles(self.video, 'fr', None)
+        to_sync.append(pipeline.add_subtitles(self.video, 'fr', None))
+        to_sync.append(pipeline.add_subtitles(self.video, 'de', None))
+        to_sync.append(pipeline.add_subtitles(self.video, 'es', None))
+        pipeline.add_subtitles(self.video, 'es', None, visibility='private')
+        pipeline.add_subtitles(self.video, 'pt-br', None, visibility='private')
+        self.reset_history()
+
+        now_values = {}
+
+        def update_subtitles(video_url, language, version):
+            now_values[language.id] = self.now
+            if language.language_code == 'es':
+                raise SyncingError('Error')
+        self.mock_update_subtitles.side_effect = update_subtitles
+
+        self.run_update_all_subtitles()
+        self.assertEquals(self.mock_update_subtitles.call_count,
+                          len(to_sync))
+        for version in to_sync:
+            language = version.subtitle_language
+            self.mock_update_subtitles.assert_any_call(self.video_url,
+                                                       language, version)
+            if language.language_code != 'es':
+                self.check_sync_history(language, [
+                    ('U', 'S', now_values[language.id], version, '')
+                ])
+                self.check_synced_version(language, version)
+            else:
+                self.check_sync_history(language, [
+                    ('U', 'E', now_values[language.id], version, 'Error'),
+                ])
+                self.check_no_synced_version(language)
+
+    def test_history(self):
+        pass
+
+class KalturaSyncingTest(TestCase):
+    def test_upload(self):
+        pass
+
+    def test_reupload(self):
+        pass

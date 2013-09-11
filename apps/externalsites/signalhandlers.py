@@ -22,7 +22,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 
 from externalsites import tasks
-from externalsites.models import KalturaAccount, accounts_for_video
+from externalsites.models import KalturaAccount, lookup_accounts
 from subtitles.models import SubtitleLanguage
 from videos.models import Video
 import subtitles.signals
@@ -30,15 +30,16 @@ import subtitles.signals
 @receiver(subtitles.signals.public_tip_changed)
 def on_public_tip_changed(signal, sender, version, **kwargs):
     language = sender
-    for account in accounts_for_video(language.video):
-        tasks.update_subtitles(account.account_type, account.id, language.id,
-                               version.id)
+    for account, video_url in lookup_accounts(language.video):
+        tasks.update_subtitles(account.account_type, account.id, 
+                               video_url.id, language.id, version.id)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
     language = sender
-    for account in accounts_for_video(language.video):
-        tasks.delete_subtitles(account.account_type, account.id, language.id)
+    for account, video_url in lookup_accounts(language.video):
+        tasks.delete_subtitles(account.account_type, account.id,
+                               video_url.id, language.id)
 
 @receiver(post_save, sender=KalturaAccount)
 def on_account_save(signal, sender, instance, **kwargs):
