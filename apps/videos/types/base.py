@@ -69,15 +69,17 @@ class VideoTypeRegistrar(dict):
     def __init__(self, *args, **kwargs):
         super(VideoTypeRegistrar, self).__init__(*args, **kwargs)
         self.choices = []
+        self.type_list = []
         
     def register(self, video_type):
         self[video_type.abbreviation] = video_type
+        self.type_list.append(video_type)
         self.choices.append((video_type.abbreviation, video_type.name))
         domain = getattr(video_type, 'site', None)
         domain and self.domains.append(domain)
         
     def video_type_for_url(self, url):
-        for video_type in self.itervalues():
+        for video_type in self.type_list:
             if video_type.matches_video_url(url):
                 return video_type(url)
             
