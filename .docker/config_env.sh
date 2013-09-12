@@ -92,7 +92,7 @@ EOF
     fi
     s3cmd -c /etc/s3cfg get --force s3://amara/settings/$SETTINGS_REV/server_local_settings.py server_local_settings.py
     # get transifex config
-    s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /root/.transifexrc
+    s3cmd -c /etc/s3cfg get --force s3://amara/settings/transifexrc /.transifexrc
 fi
 
 # checkout respective revisions
