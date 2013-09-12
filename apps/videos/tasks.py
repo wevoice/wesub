@@ -40,6 +40,7 @@ from subtitles.models import (
 )
 from auth.models import CustomUser as User
 from videos.types import video_type_registrar
+from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from apps.videos.types import VideoTypeError
 from videos.feed_parser import VideoImporter
 
@@ -376,7 +377,6 @@ def _update_captions_in_original_service(version_pk):
     """
     from subtitles.models import SubtitleVersion
     from accountlinker.models import ThirdPartyAccount
-    from .videos.types import UPDATE_VERSION_ACTION
     try:
         version = SubtitleVersion.objects.select_related("language", "language__video").get(pk=version_pk)
     except SubtitleVersion.DoesNotExist:
@@ -396,7 +396,6 @@ def delete_captions_in_original_service(language_pk):
 
     """
     from subtitles.models import SubtitleLanguage
-    from .videos.types import DELETE_LANGUAGE_ACTION
     from accountlinker.models import ThirdPartyAccount
     try:
         language = (SubtitleLanguage.objects.select_related("video")
