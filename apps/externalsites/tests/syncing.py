@@ -20,6 +20,7 @@ from __future__ import absolute_import
 import datetime
 import hashlib
 import itertools
+import string
 
 from django.test import TestCase
 from django.db.models.signals import post_save
@@ -31,6 +32,7 @@ from externalsites import urls
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
                                   SyncHistory)
+from externalsites.syncing import kaltura
 from subtitles import pipeline
 from teams.permissions_const import ROLE_ADMIN
 from utils import test_factories
@@ -295,9 +297,235 @@ class SubtitleTaskTest(TestCase):
     def test_history(self):
         pass
 
+class KalturaApiMocker(test_utils.RequestsMocker):
+    api_url = 'http://www.kaltura.com/api_v3/'
+
+    def __init__(self, partner_id, secret, video_id):
+        test_utils.RequestsMocker.__init__(self)
+        self.partner_id = partner_id
+        self.secret = secret
+        self.video_id = video_id
+        self.session_id = 'SessionString'
+
+    def expect_api_call(self, service, action, data, body):
+        params={'service': service, 'action': action}
+        self.expect_request('post', self.api_url, params=params,
+                            data=data, body=body)
+
+    def expect_session_start(self):
+        self.expect_api_call(
+            'session', 'start', {
+                'secret': self.secret,
+                'partnerId': self.partner_id,
+                'type': 2, # SESSION_TYPE_ADMIN
+            },
+            self.kaltura_result(self.session_id),
+        )
+
+    def expect_session_end(self):
+        self.expect_api_call(
+            'session', 'end', {
+                'ks': self.session_id,
+            },
+            self.kaltura_result('')
+        )
+
+    def expect_captionasset_list(self, return_captions):
+        self.expect_api_call(
+            'caption_captionasset', 'list', {
+                'ks': self.session_id,
+                'filter:entryIdEqual': self.video_id,
+            },
+            self.caption_list_response(return_captions)
+        )
+
+    def expect_captionasset_add(self, caption_id, language):
+        self.expect_api_call(
+            'caption_captionasset', 'add', {
+                'ks': self.session_id,
+                'entryId': self.video_id,
+                'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
+                'captionAsset:language': language,
+                'captionAsset:format': 2, # DFXP
+            },
+            self.caption_response(caption_id, language, 0,
+                                  kaltura.PARTNER_DATA_TAG))
+
+    def expect_captionasset_setcontent(self, caption_id, caption_data,
+                                       language):
+        self.expect_api_call(
+            'caption_captionasset', 'setcontent', {
+                'ks': self.session_id,
+                'id': caption_id,
+                'contentResource:objectType': 'KalturaStringResource',
+                'contentResource:content': caption_data,
+            },
+            self.caption_response(caption_id, language, len(caption_data),
+                                  kaltura.PARTNER_DATA_TAG)
+        )
+
+    def expect_captionasset_delete(self, caption_id):
+        self.expect_api_call(
+            'caption_captionasset', 'delete', {
+                'ks': self.session_id,
+                'captionAssetId': caption_id,
+            },
+            self.kaltura_result(''),
+        )
+
+    def kaltura_result(self, result):
+        return string.Template(
+            '<?xml version="1.0" encoding="utf-8"?><xml>'
+            '<result>$result</result>'
+            '<executionTime>1.0</executionTime></xml>').substitute(
+                result=result)
+
+    def caption_response(self, caption_id, language, size, partner_data):
+        return self.kaltura_result(
+            self.caption_asset_response(caption_id, language, size,
+                                        partner_data))
+
+    def caption_list_response(self, caption_info):
+        object_list = [
+            self.caption_asset_response(cid, language, size, partner_data)
+            for (cid, language, size, partner_data) in caption_info
+        ]
+        return self.kaltura_result(string.Template(
+            '<objectType>KalturaCaptionAssetListResponse</objectType>'
+            '<objects>$objects</objects>'
+            '<totalCount>$count</totalCount>').substitute(
+                count=len(caption_info),
+                objects=''.join('<item>%s</item>' % o for o in object_list)))
+
+    def caption_asset_response(self, caption_id, language, size,
+                               partner_data):
+        if language == 'English':
+            language_code = 'en'
+        elif language == 'French':
+            language_code = 'fr'
+        else:
+            raise ValueError("Unknown language: %s" % language)
+        return string.Template(
+            '<objectType>KalturaCaptionAsset</objectType>'
+            '<captionParamsId></captionParamsId>'
+            '<language>$language</language>'
+            '<languageCode>$language_code</languageCode>'
+            '<isDefault></isDefault>'
+            '<label></label>'
+            '<format>$format_id</format>'
+            '<status>0</status>'
+            '<id>$caption_id</id>'
+            '<entryId>$video_id</entryId>'
+            '<partnerId>$partner_id</partnerId>'
+            '<version></version>'
+            '<size>$size</size>'
+            '<tags></tags><fileExt></fileExt>'
+            '<createdAt>1378994564</createdAt>'
+            '<updatedAt>1378994564</updatedAt>'
+            '<deletedAt></deletedAt>'
+            '<description></description>'
+            '<partnerData>$partner_data</partnerData>'
+            '<partnerDescription></partnerDescription>'
+            '<actualSourceAssetParamsIds></actualSourceAssetParamsIds>'
+        ).substitute(
+            caption_id=caption_id,
+            video_id=self.video_id,
+            partner_id=self.partner_id,
+            partner_data=partner_data,
+            language=language,
+            language_code=language_code,
+            size=size,
+            format_id=2, #DFXP
+        )
+
 class KalturaSyncingTest(TestCase):
-    def test_upload(self):
+    def setUp(self):
+        self.partner_id = 12345
+        self.secret = 'SecretString'
+        self.video_id = 'VideoId'
+
+    def caption_asset_data(self, size=None):
+        if size is None:
+            size = len(self.subtitle_data)
+        return {
+            'format_id': 2, # DFXP
+            'size': size,
+            'entry_id': self.caption_id,
+            'video_id': self.video_id,
+            'partner_id': self.partner_id,
+        }
+
+    def test_upload_first_time(self):
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[])
+        mocker.expect_captionasset_add('captionid', 'English')
+        mocker.expect_captionasset_setcontent('captionid', "CaptionData",
+                                              "English")
+        mocker.expect_session_end()
+        with mocker:
+            kaltura.update_subtitles(self.partner_id, self.secret,
+                                     self.video_id, "en", "CaptionData")
+
+    def test_upload_subsequent_times(self):
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[
+            ('captionid', 'English', 100, kaltura.PARTNER_DATA_TAG),
+        ])
+        mocker.expect_captionasset_setcontent('captionid', "CaptionData",
+                                              "English")
+        mocker.expect_session_end()
+        with mocker:
+            kaltura.update_subtitles(self.partner_id, self.secret,
+                                     self.video_id, 'en', "CaptionData")
+
+    def test_upload_with_other_language(self):
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[
+            ('captionid', 'French', 100, kaltura.PARTNER_DATA_TAG)
+        ])
+        mocker.expect_captionasset_add('captionid', 'English')
+        mocker.expect_captionasset_setcontent('captionid', "CaptionData",
+                                              "English")
+        mocker.expect_session_end()
+        with mocker:
+            kaltura.update_subtitles(self.partner_id, self.secret,
+                                     self.video_id, 'en', "CaptionData")
+
+    def test_upload_with_other_subtitles(self):
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[
+            ('captionid', 'English', 100, 'other-partner-data'),
+        ])
+        mocker.expect_captionasset_add('captionid', 'English')
+        mocker.expect_captionasset_setcontent('captionid', "CaptionData",
+                                              "English")
+        mocker.expect_session_end()
+        with mocker:
+            kaltura.update_subtitles(self.partner_id, self.secret,
+                                     self.video_id, 'en', "CaptionData")
+
+    def test_delete(self):
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[
+            ('captionid', 'English', 100, kaltura.PARTNER_DATA_TAG),
+            ('captionid2', 'French', 100, kaltura.PARTNER_DATA_TAG),
+        ])
+        mocker.expect_captionasset_delete('captionid')
+        mocker.expect_session_end()
+        with mocker:
+            kaltura.delete_subtitles(self.partner_id, self.secret,
+                                     self.video_id, 'en')
+
+    def test_auth_error(self):
         pass
 
-    def test_reupload(self):
+    def test_video_not_found(self):
+        pass
+
+    def test_other_error(self):
         pass

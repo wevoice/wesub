@@ -22,6 +22,7 @@ from django.db import models
 from django.db.models import  query
 from django.utils.translation import ugettext_lazy as _
 
+from externalsites import syncing
 from externalsites.exceptions import SyncingError
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from teams.models import Team
@@ -41,9 +42,18 @@ class ExternalAccount(models.Model):
 
     def update_subtitles(self, video_url, language, version):
         raise NotImplementedError()
+        kaltura_id = video_url.get_video_type().kaltura_id()
+        dfxp_data = language.get_public_tip().get_subtitles().to_xml()
+
+        syncing.kaltura.update_subtitles(self.partner_id, self.secret,
+                                         kaltura_id, language.language_code,
+                                         dfxp_data)
 
     def delete_subtitles(self, video_url, language):
         raise NotImplementedError()
+        kaltura_id = video_url.get_video_type().kaltura_id()
+        syncing.kaltura.delete_subtitles(self.partner_id, self.secret,
+                                         kaltura_id, language.language_code)
 
     class Meta:
         abstract = True
@@ -64,10 +74,17 @@ class KalturaAccount(ExternalAccount):
         verbose_name = _('Kaltura Account')
 
     def update_subtitles(self, video_url, language, version):
-        print 'update kaltura subs: ', video_url, language, version
+        kaltura_id = video_url.get_video_type().kaltura_id()
+        dfxp_data = language.get_public_tip().get_subtitles().to_xml()
+
+        syncing.kaltura.update_subtitles(self.partner_id, self.secret,
+                                         kaltura_id, language.language_code,
+                                         dfxp_data)
 
     def delete_subtitles(self, video_url, language):
-        print 'delete kaltura subs: ', video_url, language
+        kaltura_id = video_url.get_video_type().kaltura_id()
+        syncing.kaltura.delete_subtitles(self.partner_id, self.secret,
+                                         kaltura_id, language.language_code)
 
 account_models = [
     KalturaAccount,
