@@ -21,6 +21,9 @@ import datetime
 from django.db import models
 from django.db.models import  query
 from django.utils.translation import ugettext_lazy as _
+# because of our insane circular imports we need to import haystack right here
+# or else things blow up
+import haystack
 
 from externalsites import syncing
 from externalsites.exceptions import SyncingError

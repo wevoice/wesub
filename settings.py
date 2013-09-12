@@ -423,6 +423,7 @@ INSTALLED_APPS = (
     'messages',
     'profiles',
     'search',
+    'startup',
     'statistic',
     'streamer',
     'teams',
@@ -436,6 +437,10 @@ INSTALLED_APPS = (
     'widget',
     'subtitles',
 )
+
+STARTUP_MODULES = [
+    'externalsites.signalhandlers',
+]
 
 # Celery settings
 

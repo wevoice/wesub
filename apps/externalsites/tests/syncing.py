@@ -28,7 +28,6 @@ from django.db.models.signals import post_save
 import mock
 
 from externalsites import tasks
-from externalsites import urls
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
                                   SyncHistory)

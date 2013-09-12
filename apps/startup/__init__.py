@@ -16,9 +16,9 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+"""startup -- load modules on startup."""
 
-# this is a slightly ugly hack, but we need to make sure the signalhandlers
-# module gets loaded, so we do it hear.  Importing it via models.py won't work
-# because that creates a circular import between models, tasks, and
-# signalhandlers.
-import externalsites.signalhandlers
+from django.conf import settings
+
+for module_name in getattr(settings, 'STARTUP_MODULES', []):
+    __import__(module_name)
