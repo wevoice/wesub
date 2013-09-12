@@ -10,4 +10,4 @@ Host github.com
     IdentityFile /root/.ssh/amara_transifex
 EOF
 
-/bin/bash ./deploy/update_translations.sh
+./deploy/update_translations.sh
