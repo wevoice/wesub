@@ -28,6 +28,7 @@ from django.db.models.signals import post_save
 import mock
 
 from externalsites import tasks
+from externalsites import signalhandlers
 from externalsites.exceptions import SyncingError
 from externalsites.models import (KalturaAccount, SyncedSubtitleVersion,
                                   SyncHistory)
@@ -72,8 +73,8 @@ class SignalHandlingTest(TestCase):
         tip = lang.get_tip()
         subtitles.signals.public_tip_changed.send(
             sender=lang, version=tip)
-        self.assertEqual(self.mock_update_subtitles.call_count, 1)
-        self.mock_update_subtitles.assert_called_with(
+        self.assertEqual(self.mock_update_subtitles.delay.call_count, 1)
+        self.mock_update_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
             lang.id, tip.id)
 
@@ -81,23 +82,23 @@ class SignalHandlingTest(TestCase):
         lang = self.video.subtitle_language('en')
         subtitles.signals.language_deleted.send(lang)
 
-        self.assertEqual(self.mock_delete_subtitles.call_count, 1)
-        self.mock_delete_subtitles.assert_called_with(
+        self.assertEqual(self.mock_delete_subtitles.delay.call_count, 1)
+        self.mock_delete_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id, self.video_url.id,
             lang.id)
 
     def test_update_all_subtitles_on_account_save(self):
         post_save.send(KalturaAccount, instance=self.account, created=True)
-        self.assertEqual(self.mock_update_all_subtitles.call_count, 1)
-        self.mock_update_all_subtitles.assert_called_with(
+        self.assertEqual(self.mock_update_all_subtitles.delay.call_count, 1)
+        self.mock_update_all_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id)
         # we should update all subtitles on a save as well as a create, since
         # the new info may allow us to successfully sync subtitles that we
         # couldn't before.
         self.mock_update_all_subtitles.reset_mock()
         post_save.send(KalturaAccount, instance=self.account, created=False)
-        self.assertEqual(self.mock_update_all_subtitles.call_count, 1)
-        self.mock_update_all_subtitles.assert_called_with(
+        self.assertEqual(self.mock_update_all_subtitles.delay.call_count, 1)
+        self.mock_update_all_subtitles.delay.assert_called_with(
             KalturaAccount.account_type, self.account.id)
 
     def check_tasks_not_called(self, video):

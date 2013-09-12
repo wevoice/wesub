@@ -31,16 +31,16 @@ import subtitles.signals
 def on_public_tip_changed(signal, sender, version, **kwargs):
     language = sender
     for account, video_url in lookup_accounts(language.video):
-        tasks.update_subtitles(account.account_type, account.id, 
-                               video_url.id, language.id, version.id)
+        tasks.update_subtitles.delay(account.account_type, account.id, 
+                                     video_url.id, language.id, version.id)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
     language = sender
     for account, video_url in lookup_accounts(language.video):
-        tasks.delete_subtitles(account.account_type, account.id,
-                               video_url.id, language.id)
+        tasks.delete_subtitles.delay(account.account_type, account.id,
+                                     video_url.id, language.id)
 
 @receiver(post_save, sender=KalturaAccount)
 def on_account_save(signal, sender, instance, **kwargs):
-    tasks.update_all_subtitles(instance.account_type, instance.id)
+    tasks.update_all_subtitles.delay(instance.account_type, instance.id)
