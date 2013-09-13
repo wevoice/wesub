@@ -371,14 +371,18 @@ class KalturaApiMocker(test_utils.RequestsMocker):
         self.expect_request('post', self.api_url, params=params,
                             data=data, body=body)
 
-    def expect_session_start(self):
+    def expect_session_start(self, return_error=False):
+        if return_error:
+            result = self.session_start_error_response()
+        else:
+            result = self.kaltura_result(self.session_id)
         self.expect_api_call(
             'session', 'start', {
                 'secret': self.secret,
                 'partnerId': self.partner_id,
                 'type': 2, # SESSION_TYPE_ADMIN
             },
-            self.kaltura_result(self.session_id),
+            result,
         )
 
     def expect_session_end(self):
@@ -409,6 +413,17 @@ class KalturaApiMocker(test_utils.RequestsMocker):
             },
             self.caption_response(caption_id, language, 0,
                                   kaltura.PARTNER_DATA_TAG))
+
+    def expect_captionasset_add_return_error(self, language):
+        self.expect_api_call(
+            'caption_captionasset', 'add', {
+                'ks': self.session_id,
+                'entryId': self.video_id,
+                'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
+                'captionAsset:language': language,
+                'captionAsset:format': 2, # DFXP
+            },
+            self.entry_not_found_response())
 
     def expect_captionasset_setcontent(self, caption_id, caption_data,
                                        language):
@@ -497,6 +512,22 @@ class KalturaApiMocker(test_utils.RequestsMocker):
             format_id=2, #DFXP
         )
 
+    def error_response(self, code, message):
+        return self.kaltura_result(string.Template(
+            '<error><code>$code</code>'
+            '<message>$message</message></error>').substitute(
+                code=code, message=message))
+
+    def session_start_error_response(self):
+        return self.error_response(
+            'START_SESSION_ERROR',
+            'Error while starting session for partner [%s]' % self.partner_id)
+
+    def entry_not_found_response(self):
+        return self.error_response(
+            'ENTRY_ID_NOT_FOUND',
+            'Entry id not found')
+
 class KalturaSyncingTest(TestCase):
     def setUp(self):
         self.partner_id = 12345
@@ -581,10 +612,20 @@ class KalturaSyncingTest(TestCase):
                                      self.video_id, 'en')
 
     def test_auth_error(self):
-        pass
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start(return_error=True)
+        with mocker:
+            self.assertRaises(SyncingError, kaltura.update_subtitles,
+                              self.partner_id, self.secret, self.video_id,
+                              'en', "CaptionData")
 
     def test_video_not_found(self):
-        pass
-
-    def test_other_error(self):
-        pass
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_captionasset_list(return_captions=[])
+        mocker.expect_captionasset_add_return_error('English')
+        mocker.expect_session_end()
+        with mocker:
+            self.assertRaises(SyncingError, kaltura.update_subtitles,
+                              self.partner_id, self.secret, self.video_id,
+                              'en', "CaptionData")

@@ -375,7 +375,8 @@ class RequestsMocker(object):
             expected = self.expected_requests.pop(0)
         except IndexError:
             raise AssertionError("RequestsMocker: No more calls expected, "
-                                 "but got %s" % (method, url, params, data))
+                                 "but got %s %s %s %s" % 
+                                 (method, url, params, data))
 
         assert_equal(method, expected.method)
         assert_equal(url, expected.url)

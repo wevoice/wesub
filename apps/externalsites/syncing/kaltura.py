@@ -42,14 +42,27 @@ def _node_text(node):
 def _find_child(node, tag_name):
     return node.getElementsByTagName(tag_name)[0]
 
+def _has_child(node, tag_name):
+    return len(node.getElementsByTagName(tag_name)) > 0
+
+def _check_error(result):
+    """Checks if we had an error result."""
+    if _has_child(result, 'error'):
+        error = _find_child(result, 'error')
+        code = _node_text(_find_child(error, 'code'))
+        message = _node_text(_find_child(error, 'message'))
+        raise SyncingError("%s: %s" % (code, message))
+
 def _make_request(service, action, data):
     params = { 'service': service, 'action': action, }
     response = requests.post(KALTURA_API_URL, params=params, data=data)
     dom = minidom.parseString(response.content)
     try:
-        return _find_child(dom, 'result')
+        result = _find_child(dom, 'result')
     except IndexError:
         return None
+    _check_error(result)
+    return result
 
 def _start_session(partner_id, secret):
     result = _make_request('session', 'start', {
@@ -107,15 +120,19 @@ def _delete_captions(ks, caption_id):
 def update_subtitles(partner_id, secret, video_id, language_code,
                      dfxp_data):
     ks = _start_session(partner_id, secret)
-    caption_id = _find_existing_captionset(ks, video_id, language_code)
-    if caption_id is None:
-        caption_id = _add_captions(ks, video_id, language_code)
-    _update_caption_content(ks, caption_id, dfxp_data)
-    _end_session(ks)
+    try:
+        caption_id = _find_existing_captionset(ks, video_id, language_code)
+        if caption_id is None:
+            caption_id = _add_captions(ks, video_id, language_code)
+        _update_caption_content(ks, caption_id, dfxp_data)
+    finally:
+        _end_session(ks)
 
 def delete_subtitles(partner_id, secret, video_id, language_code):
     ks = _start_session(partner_id, secret)
-    caption_id = _find_existing_captionset(ks, video_id, language_code)
-    if caption_id is not None:
-        _delete_captions(ks, caption_id)
-    _end_session(ks)
+    try:
+        caption_id = _find_existing_captionset(ks, video_id, language_code)
+        if caption_id is not None:
+            _delete_captions(ks, caption_id)
+    finally:
+        _end_session(ks)
