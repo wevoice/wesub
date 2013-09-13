@@ -295,7 +295,66 @@ class SubtitleTaskTest(TestCase):
                 self.check_no_synced_version(language)
 
     def test_history(self):
-        pass
+        en_1 = self.video.subtitle_language('en').get_tip()
+        en_2 = pipeline.add_subtitles(self.video, 'en', None)
+        fr_1 = pipeline.add_subtitles(self.video, 'fr', None)
+        en = en_1.subtitle_language
+        fr = fr_1.subtitle_language
+        self.reset_history()
+
+        english_history = []
+        french_history = []
+
+        def create_update_success(version):
+            return SyncHistory.objects.create_for_success(
+                account=self.account,
+                video_url=self.video_url,
+                action=SyncHistory.ACTION_UPDATE_SUBTITLES,
+                language=version.subtitle_language,
+                version=version)
+
+        def create_delete_success(language):
+            return SyncHistory.objects.create_for_success(
+                account=self.account,
+                video_url=self.video_url,
+                action=SyncHistory.ACTION_DELETE_SUBTITLES,
+                language=language)
+
+        def create_update_error(version, message):
+            return SyncHistory.objects.create_for_error(
+                SyncingError(message),
+                account=self.account,
+                video_url=self.video_url,
+                action=SyncHistory.ACTION_UPDATE_SUBTITLES,
+                language=version.subtitle_language,
+                version=version)
+
+        def create_delete_error(language, message):
+            return SyncHistory.objects.create_for_error(
+                SyncingError(message),
+                account=self.account,
+                video_url=self.video_url,
+                action=SyncHistory.ACTION_DELETE_SUBTITLES,
+                language=language)
+
+        # create a bunch of random events and make sure that we store them
+        # correctly
+        english_history.append(create_update_success(en_1))
+        english_history.append(create_update_success(en_2))
+        english_history.append(create_update_error(en_1, 'Bad auth'))
+        english_history.append(create_delete_success(en))
+        english_history.append(create_update_success(en_2))
+
+        french_history.append(create_update_error(fr_1, 'Server down'))
+        french_history.append(create_delete_error(fr, 'Invalid entry id'))
+        french_history.append(create_delete_success(fr))
+
+        self.assertEquals(list(SyncHistory.objects.get_for_language(en)),
+                          list(reversed(english_history)))
+
+        self.assertEquals(list(SyncHistory.objects.get_for_language(fr)),
+                          list(reversed(french_history)))
+
 
 class KalturaApiMocker(test_utils.RequestsMocker):
     api_url = 'http://www.kaltura.com/api_v3/'

@@ -171,6 +171,9 @@ class SyncedSubtitleVersion(models.Model):
     objects = SyncedSubtitleVersionManager()
 
 class SyncHistoryManager(models.Manager):
+    def get_for_language(self, language):
+        return self.filter(language=language).order_by('-id')
+
     def create_for_success(self, **kwargs):
         # for SyncingError, we just use the message directly, since it
         # describes a known failure point, for other errors we convert the
@@ -195,7 +198,7 @@ class SyncHistoryManager(models.Manager):
             account = kwargs.pop('account')
             kwargs['account_id'] = account.id
             kwargs['account_type'] = account.account_type
-        models.Manager.create(self, *args, **kwargs)
+        return models.Manager.create(self, *args, **kwargs)
 
 class SyncHistory(models.Model):
     """History of all subtitle sync attempts."""
