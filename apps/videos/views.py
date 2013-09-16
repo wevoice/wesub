@@ -28,6 +28,7 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from apps.videos.templatetags.paginator import paginate
@@ -645,6 +646,8 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
     elif tab == 'comments':
         ContextClass = LanguagePageContextComments
     elif tab == 'sync-history':
+        if not request.user.is_staff:
+            return redirect_to_login(request.build_absolute_uri())
         ContextClass = LanguagePageContextSyncHistory
     else:
         # force tab to be subtitles if it doesn't match either of the other
