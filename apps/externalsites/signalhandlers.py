@@ -23,7 +23,7 @@ from django.db.models.signals import post_save
 
 from externalsites import tasks
 from externalsites.models import KalturaAccount, lookup_accounts
-from subtitles.models import SubtitleLanguage
+from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import Video
 import subtitles.signals
 
