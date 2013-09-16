@@ -66,7 +66,10 @@ class KalturaAccount(ExternalAccount):
                     'Integration on your Kaltura control panel'))
 
     class Meta:
-        verbose_name = _('Kaltura Account')
+        verbose_name = _('Kaltura account')
+
+    def __unicode__(self):
+        return "KalturaAccount: %s" % (self.partner_id)
 
     def update_subtitles(self, video_url, language, version):
         kaltura_id = video_url.get_video_type().kaltura_id()
@@ -161,7 +164,17 @@ class SyncedSubtitleVersion(models.Model):
             ('account_type', 'account_id', 'video_url', 'language'),
         )
 
+    def __unicode__(self):
+        return "SyncedSubtitleVersion: %s %s -> %s (%s)" % (
+            self.language.video.video_id,
+            self.language.language_code,
+            self.version.version_number,
+            self.get_account())
+
     objects = SyncedSubtitleVersionManager()
+
+    def get_account(self):
+        return get_account(self.account_type, self.account_id)
 
 class SyncHistoryManager(models.Manager):
     def get_for_language(self, language):
@@ -223,3 +236,17 @@ class SyncHistory(models.Model):
     details = models.CharField(max_length=255, blank=True, default='')
 
     objects = SyncHistoryManager()
+
+    class Meta:
+        verbose_name = verbose_name_plural = _('Sync history')
+
+    def __unicode__(self):
+        return "SyncHistory: %s - %s for %s (%s)" % (
+            self.datetime.date(),
+            self.get_action_display(),
+            self.get_account(),
+            self.get_status_display())
+
+    def get_account(self):
+        return get_account(self.account_type, self.account_id)
+

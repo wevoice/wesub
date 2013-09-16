@@ -180,6 +180,14 @@ if settings.USE_INTEGRATION:
         namespace=api2urls.URL_NAMESPACE),),)
 
 if settings.DEBUG:
+    if hasattr(settings, 'EXTRA_STATIC_URLS'):
+        for pattern, directory in settings.EXTRA_STATIC_URLS:
+            urlpatterns += patterns('', (
+                pattern, 'django.views.static.serve', {
+                    'document_root': directory,
+                    'show_indexes': True,
+                }),
+            )
     urlpatterns += patterns('',
         (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
          {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),

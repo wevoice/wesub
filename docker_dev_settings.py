@@ -29,9 +29,15 @@ SITE_NAME = 'unisubs-dev'
 SECRET_KEY = 'a9yr_yzp2vmj-2q1zq)d2+b^w(7fqu2o&jh18u9dozjbd@-$0!'
 STATIC_URL_BASE = STATIC_URL = "http://unisubs.example.com:8000/site_media/"
 MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
+
+SITE_PACKAGES_DIR = '/opt/ve/unisubs/lib/python2.7/site-packages/'
 CACHE_PREFIX = 'unisubsdevsettings'
 CACHE_TIMEOUT = 0
 COMPRESS_MEDIA = False
+EXTRA_STATIC_URLS = [
+    (r'^site_media/admin/(?P<path>.*)$',
+     SITE_PACKAGES_DIR + 'django/contrib/admin/static/admin/'),
+]
 
 TWITTER_CONSUMER_KEY = '6lHYqtxzQBD3lQ55Chi6Zg'
 TWITTER_CONSUMER_SECRET = 'ApkJPIIbBKp3Wph0JBoAg2Nsk1Z5EG6PFTevNpd5Y00'
