@@ -633,6 +633,10 @@ class LanguagePageContextRevisions(LanguagePageContext):
         self.update(pagination_info)
         self['revisions'] = language.optimize_versions(revisions)
 
+class LanguagePageContextSyncHistory(LanguagePageContext):
+    def setup_tab(self, request, video, language, version):
+        self['sync_history'] = language.synchistory_set.order_by('-id').all()
+
 @get_video_from_code
 def language_subtitles(request, video, lang, lang_id, version_id=None):
     tab = request.GET.get('tab')
@@ -640,6 +644,8 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         ContextClass = LanguagePageContextRevisions
     elif tab == 'comments':
         ContextClass = LanguagePageContextComments
+    elif tab == 'sync-history':
+        ContextClass = LanguagePageContextSyncHistory
     else:
         # force tab to be subtitles if it doesn't match either of the other
         # tabs
