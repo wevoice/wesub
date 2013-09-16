@@ -16,21 +16,44 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import logging
+
 from celery.task import task
+from django.core.exceptions import ObjectDoesNotExist
+
 from externalsites.models import (get_account, SyncedSubtitleVersion,
                                   SyncHistory)
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import VideoUrl
 
+celery_logger = logging.getLogger('celery.task')
+
 @task
 def update_subtitles(account_type, account_id, video_url_id, lang_id,
                      version_id):
     """Update a subtitles for a language"""
-    account = get_account(account_type, account_id)
-    language = SubtitleLanguage.objects.get(id=lang_id)
-    video_url = VideoUrl.objects.get(id=video_url_id)
-    version = SubtitleVersion.objects.get(id=version_id)
-    _update_subtitles(account, video_url, language, version)
+    try:
+        account = get_account(account_type, account_id)
+        language = SubtitleLanguage.objects.get(id=lang_id)
+        video_url = VideoUrl.objects.get(id=video_url_id)
+        version = SubtitleVersion.objects.get(id=version_id)
+    except ObjectDoesNotExist, e:
+        celery_logger.error(
+            'Lookup error in update_subtitles(): %s' % e,
+            exc_info=True,
+            extra={
+                'data': {
+                    'account_type': account_type,
+                    'account_id': account_id,
+                    'video_url_id': video_url_id,
+                    'lang_id': lang_id,
+                    'version_id': version_id,
+                }
+            }
+        )
+        return
+    else:
+        _update_subtitles(account, video_url, language, version)
 
 def _update_subtitles(account, video_url, language, version):
     sync_history_values = {
@@ -54,9 +77,25 @@ def _update_subtitles(account, video_url, language, version):
 def delete_subtitles(account_type, account_id, video_url_id, lang_id):
     """Delete a subtitles for a language"""
 
-    account = get_account(account_type, account_id)
-    video_url = VideoUrl.objects.get(id=video_url_id)
-    language = SubtitleLanguage.objects.get(id=lang_id)
+    try:
+        account = get_account(account_type, account_id)
+        video_url = VideoUrl.objects.get(id=video_url_id)
+        language = SubtitleLanguage.objects.get(id=lang_id)
+    except ObjectDoesNotExist, e:
+        celery_logger.error(
+            'Lookup error in delete_subtitles(): %s' % e,
+            exc_info=True,
+            extra={
+                'data': {
+                    'account_type': account_type,
+                    'account_id': account_id,
+                    'video_url_id': video_url_id,
+                    'lang_id': lang_id,
+                    'version_id': version_id,
+                }
+            }
+        )
+        return
 
     sync_history_values = {
         'account': account,
@@ -77,7 +116,23 @@ def delete_subtitles(account_type, account_id, video_url_id, lang_id):
 @task
 def update_all_subtitles(account_type, account_id):
     """Update all subtitles for a given account."""
-    account = get_account(account_type, account_id)
+    try:
+        account = get_account(account_type, account_id)
+    except ObjectDoesNotExist, e:
+        celery_logger.error(
+            'Lookup error in update_all_subtitles(): %s' % e,
+            exc_info=True,
+            extra={
+                'data': {
+                    'account_type': account_type,
+                    'account_id': account_id,
+                    'video_url_id': video_url_id,
+                    'lang_id': lang_id,
+                    'version_id': version_id,
+                }
+            }
+        )
+        return
     team = account.team
     for video in team.videos.all():
         for video_url in video.get_video_urls():
