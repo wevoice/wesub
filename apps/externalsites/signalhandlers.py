@@ -29,13 +29,19 @@ import subtitles.signals
 
 @receiver(subtitles.signals.public_tip_changed)
 def on_public_tip_changed(signal, sender, version, **kwargs):
+    if not isinstance(sender, SubtitleLanguage):
+        raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
+    if not isinstance(version, SubtitleVersion):
+        raise ValueError("version has wrong type: %s" % version)
     language = sender
     for account, video_url in lookup_accounts(language.video):
-        tasks.update_subtitles.delay(account.account_type, account.id, 
+        tasks.update_subtitles.delay(account.account_type, account.id,
                                      video_url.id, language.id, version.id)
 
 @receiver(subtitles.signals.language_deleted)
 def on_language_deleted(signal, sender, **kwargs):
+    if not isinstance(sender, SubtitleLanguage):
+        raise ValueError("sender must be a SubtitleLanguage: %s" % sender)
     language = sender
     for account, video_url in lookup_accounts(language.video):
         tasks.delete_subtitles.delay(account.account_type, account.id,
