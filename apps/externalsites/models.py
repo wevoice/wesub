@@ -184,7 +184,7 @@ class SyncHistoryManager(models.Manager):
         # for SyncingError, we just use the message directly, since it
         # describes a known failure point, for other errors we convert the
         # object to a string
-        return self.create(status=SyncHistory.STATUS_SUCCESS, **kwargs)
+        return self.create(result=SyncHistory.RESULT_SUCCESS, **kwargs)
 
     def create_for_error(self, e, **kwargs):
         # for SyncingError, we just use the message directly, since it
@@ -194,7 +194,7 @@ class SyncHistoryManager(models.Manager):
             details = e.msg
         else:
             details = str(e)
-        return self.create(status=SyncHistory.STATUS_ERROR, details=details,
+        return self.create(result=SyncHistory.RESULT_ERROR, details=details,
                            **kwargs)
 
     def create(self, *args, **kwargs):
@@ -216,12 +216,12 @@ class SyncHistory(models.Model):
         (ACTION_DELETE_SUBTITLES, 'Delete Subtitles'),
     )
 
-    STATUS_SUCCESS = 'S'
-    STATUS_ERROR = 'E'
+    RESULT_SUCCESS = 'S'
+    RESULT_ERROR = 'E'
 
-    STATUS_CHOICES = (
-        (STATUS_SUCCESS, _('Success')),
-        (STATUS_ERROR, _('Error')),
+    RESULT_CHOICES = (
+        (RESULT_SUCCESS, _('Success')),
+        (RESULT_ERROR, _('Error')),
     )
 
     account_type = models.CharField(max_length=1,
@@ -232,7 +232,7 @@ class SyncHistory(models.Model):
     action = models.CharField(max_length=1, choices=ACTION_CHOICES)
     datetime = models.DateTimeField()
     version = models.ForeignKey(SubtitleVersion, null=True, blank=True)
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES)
+    result = models.CharField(max_length=1, choices=RESULT_CHOICES)
     details = models.CharField(max_length=255, blank=True, default='')
 
     objects = SyncHistoryManager()
@@ -245,7 +245,7 @@ class SyncHistory(models.Model):
             self.datetime.date(),
             self.get_action_display(),
             self.get_account(),
-            self.get_status_display())
+            self.get_result_display())
 
     def get_account(self):
         return get_account(self.account_type, self.account_id)

@@ -193,7 +193,7 @@ class SubtitleTaskTest(TestCase):
             self.assertEquals(history.account_id, self.account.id)
             self.assertEquals(history.account_type, self.account.account_type)
             self.assertEquals(history.action, history_values[0])
-            self.assertEquals(history.status, history_values[1])
+            self.assertEquals(history.result, history_values[1])
             self.assertEquals(history.datetime, history_values[2])
             self.assertEquals(history.version, history_values[3])
             self.assertEquals(history.details, history_values[4])
