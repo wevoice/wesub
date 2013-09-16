@@ -32,6 +32,9 @@ celery_logger = logging.getLogger('celery.task')
 def update_subtitles(account_type, account_id, video_url_id, lang_id,
                      version_id):
     """Update a subtitles for a language"""
+    celery_logger.info("externalsites.tasks.update_subtitles"
+                       "(%s, %s, %s, %s, %s)", account_type, account_id,
+                       video_url_id, lang_id, version_id)
     try:
         account = get_account(account_type, account_id)
         language = SubtitleLanguage.objects.get(id=lang_id)
@@ -76,6 +79,9 @@ def _update_subtitles(account, video_url, language, version):
 @task
 def delete_subtitles(account_type, account_id, video_url_id, lang_id):
     """Delete a subtitles for a language"""
+    celery_logger.info("externalsites.tasks.delete_subtitles"
+                       "(%s, %s, %s, %s)", account_type, account_id,
+                       video_url_id, lang_id)
 
     try:
         account = get_account(account_type, account_id)
@@ -116,6 +122,8 @@ def delete_subtitles(account_type, account_id, video_url_id, lang_id):
 @task
 def update_all_subtitles(account_type, account_id):
     """Update all subtitles for a given account."""
+    celery_logger.info("externalsites.tasks.update_all_subtitles(%s, %s)",
+                       account_type, account_id)
     try:
         account = get_account(account_type, account_id)
     except ObjectDoesNotExist, e:
