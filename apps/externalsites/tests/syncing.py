@@ -24,7 +24,7 @@ import string
 
 from django.test import TestCase
 from django.db.models.signals import post_save
-
+import babelsubs
 import mock
 
 from externalsites import tasks
@@ -355,6 +355,39 @@ class SubtitleTaskTest(TestCase):
         self.assertEquals(list(SyncHistory.objects.get_for_language(fr)),
                           list(reversed(french_history)))
 
+class KalturaAccountTest(TestCase):
+    def setUp(self):
+        TestCase.setUp(self)
+        self.partner_id = 1234
+        self.secret = 'Secret'
+        self.account = KalturaAccount.objects.create(
+            team=test_factories.create_team(), partner_id=self.partner_id,
+            secret = self.secret)
+        self.entry_id = 'EntryId'
+        url = ('http://cdnbakmi.kaltura.com'
+                '/p/1492321/sp/149232100/serveFlavor/entryId/'
+                '%s/flavorId/1_dqgopb2z/name/video.mp4') % self.entry_id
+        self.video = test_factories.create_video(url=url, video_type='K')
+        self.video_url = self.video.get_primary_videourl_obj()
+        self.version = pipeline.add_subtitles(self.video, 'en',
+                                              [(100, 200, "sub 1")])
+        self.language = self.version.subtitle_language
+
+    @patch_for_test('externalsites.syncing.kaltura.update_subtitles')
+    def test_kalturaaccount_update_subtitles(self, mock_update_subtitles):
+        srt_data = babelsubs.to(self.version.get_subtitles(), 'srt')
+        self.account.update_subtitles(self.video_url, self.language,
+                                      self.version)
+        mock_update_subtitles.assert_called_with(self.partner_id, self.secret,
+                                                 self.entry_id, 'en',
+                                                 srt_data)
+
+    @patch_for_test('externalsites.syncing.kaltura.delete_subtitles')
+    def test_kalturaaccount_delete_subtitles(self, mock_delete_subtitles):
+        self.account.delete_subtitles(self.video_url, self.language)
+        mock_delete_subtitles.assert_called_with(self.partner_id, self.secret,
+                                                 self.entry_id, 'en')
+
 
 class KalturaApiMocker(test_utils.RequestsMocker):
     api_url = 'http://www.kaltura.com/api_v3/'
@@ -409,7 +442,7 @@ class KalturaApiMocker(test_utils.RequestsMocker):
                 'entryId': self.video_id,
                 'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
                 'captionAsset:language': language,
-                'captionAsset:format': 2, # DFXP
+                'captionAsset:format': 1, # SRT
             },
             self.caption_response(caption_id, language, 0,
                                   kaltura.PARTNER_DATA_TAG))
@@ -421,7 +454,7 @@ class KalturaApiMocker(test_utils.RequestsMocker):
                 'entryId': self.video_id,
                 'captionAsset:partnerData': kaltura.PARTNER_DATA_TAG,
                 'captionAsset:language': language,
-                'captionAsset:format': 2, # DFXP
+                'captionAsset:format': 1, # SRT
             },
             self.entry_not_found_response())
 
@@ -509,7 +542,7 @@ class KalturaApiMocker(test_utils.RequestsMocker):
             language=language,
             language_code=language_code,
             size=size,
-            format_id=2, #DFXP
+            format_id=1, # SRT
         )
 
     def error_response(self, code, message):
@@ -538,7 +571,7 @@ class KalturaSyncingTest(TestCase):
         if size is None:
             size = len(self.subtitle_data)
         return {
-            'format_id': 2, # DFXP
+            'format_id': 1, # SRT
             'size': size,
             'entry_id': self.caption_id,
             'video_id': self.video_id,

@@ -98,16 +98,16 @@ def _add_captions(ks, video_id, language_code):
         'entryId': video_id,
         'captionAsset:language': language,
         'captionAsset:partnerData': PARTNER_DATA_TAG,
-        'captionAsset:format': CAPTION_TYPE_DFXP,
+        'captionAsset:format': CAPTION_TYPE_SRT,
     })
     return _node_text(_find_child(result, 'id'))
 
-def _update_caption_content(ks, caption_id, dfxp_data):
+def _update_caption_content(ks, caption_id, sub_data):
     _make_request('caption_captionasset', 'setcontent', {
         'ks': ks,
         'id': caption_id,
         'contentResource:objectType': 'KalturaStringResource',
-        'contentResource:content': dfxp_data,
+        'contentResource:content': sub_data,
 
     })
 
@@ -118,13 +118,13 @@ def _delete_captions(ks, caption_id):
     })
 
 def update_subtitles(partner_id, secret, video_id, language_code,
-                     dfxp_data):
+                     srt_data):
     ks = _start_session(partner_id, secret)
     try:
         caption_id = _find_existing_captionset(ks, video_id, language_code)
         if caption_id is None:
             caption_id = _add_captions(ks, video_id, language_code)
-        _update_caption_content(ks, caption_id, dfxp_data)
+        _update_caption_content(ks, caption_id, srt_data)
     finally:
         _end_session(ks)
 
