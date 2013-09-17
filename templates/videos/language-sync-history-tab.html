@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="tab" id="comments-tab">
+    {% if sync_history %}
+    <h3>{% trans "Sync History" %}</h3>
+    <table class="sync-history">
+        <tr>
+            <td><h4>{% trans "Date" %}</h4></td>
+            <td><h4>{% trans "Account" %}</h4></td>
+            <td><h4>{% trans "Action" %}</h4></td>
+            <td><h4>{% trans "Version" %}</h4></td>
+            <td><h4>{% trans "Result" %}</h4></td>
+        </tr>
+        {% for item in sync_history %}
+        <tr>
+            <td> {{ item.datetime }}</td>
+            <td> {{ item.get_account_type_display }}</td>
+            <td> {{ item.get_action_display }}</td>
+            <td> <a href="{{ item.version.get_absolute_url }}">{{ item.version.version_number }}</a></td>
+            <td> {{ item.get_result_display }}</td>
+        </tr>
+         {% endfor %}
+    </table>
+    {% else %}
+    <h3>{% trans "No Sync History" %}</h3>
+    {% endif %}
+</div>
+
