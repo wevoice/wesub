@@ -973,6 +973,16 @@ div.fix-chosen div.chzn-container {
         color: $lighter;
     }
 }
+
+.v1 .view #sync-history-tab h2 {
+    padding-top: 1em;
+    text-align: center;
+}
+
+.v1 .view #sync-history-tab table {
+    margin-bottom: 1em;
+}
+
 p.view-more {
     margin-top: 1em;
     text-align: center;

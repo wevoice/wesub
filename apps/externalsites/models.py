@@ -117,12 +117,19 @@ def lookup_accounts(video):
     team = team_video.team
     rv = []
     for video_url in video.get_video_urls():
-        AccountModel = _video_type_to_account_model.get(video_url.type)
-        if AccountModel is None:
-            continue
-        for account in AccountModel.objects.filter(team=team):
+        account = get_account_for_videourl(team, video_url)
+        if account is not None:
             rv.append((account, video_url))
     return rv
+
+def get_account_for_videourl(team, video_url):
+    AccountModel = _video_type_to_account_model.get(video_url.type)
+    if AccountModel is None:
+        return None
+    try:
+        return AccountModel.objects.get(team=team)
+    except AccountModel.DoesNotExist:
+        return None
 
 class SyncedSubtitleVersionManager(models.Manager):
     def set_synced_version(self, account, video_url, language, version):

@@ -31,6 +31,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from apps.videos.templatetags.paginator import paginate
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -637,6 +638,20 @@ class LanguagePageContextRevisions(LanguagePageContext):
 class LanguagePageContextSyncHistory(LanguagePageContext):
     def setup_tab(self, request, video, language, version):
         self['sync_history'] = language.synchistory_set.order_by('-id').all()
+        self['current_version'] = language.get_public_tip()
+        synced_versions = []
+        for video_url in video.get_video_urls():
+            try:
+                version = (language.syncedsubtitleversion_set.
+                           select_related('version').
+                           get(video_url=video_url)).version
+            except ObjectDoesNotExist:
+                version = None
+            synced_versions.append({
+                'video_url': video_url,
+                'version': version,
+            })
+        self['synced_versions'] = synced_versions
 
 @get_video_from_code
 def language_subtitles(request, video, lang, lang_id, version_id=None):

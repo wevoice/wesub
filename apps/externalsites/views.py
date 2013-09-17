@@ -16,10 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.shortcuts import redirect, render
+import logging
 
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render
+
+from externalsites.models import get_account_for_videourl
+from videos.models import VideoUrl
 from teams.views import settings_page
 from externalsites import forms
+
+logger = logging.getLogger('amara.externalsites.views')
 
 class AccountFormHandler(object):
     """Handles a single form for the settings tab
@@ -68,3 +77,37 @@ def team_settings_tab(request, team):
         'team': team,
         'forms': all_forms,
     })
+
+@staff_member_required
+def resync(request, video_url_id, language_code):
+    video_url = get_object_or_404(VideoUrl, id=video_url_id)
+    video = video_url.video
+    language = video.subtitle_language(language_code)
+
+    if request.method == 'POST':
+        logger.info("resyncing subtitles: %s (%s)", video, video_url)
+        team_video = video.get_team_video()
+        if team_video is not None:
+            _resync_video(team_video.team, video_url, language)
+        else:
+            logger.warning("resyncing subtitles: not a team video")
+
+    redirect_url = reverse('videos:translation_history', kwargs={
+        'video_id': video.video_id,
+        'lang': language_code,
+        'lang_id': language.id
+    })
+    return HttpResponseRedirect(redirect_url + '?tab=sync-history')
+
+def _resync_video(team, video_url, language):
+    account = get_account_for_videourl(team, video_url)
+    if account is None:
+        logger.warning("resyncing subtitles: no account")
+        return
+    tip = language.get_public_tip()
+    if tip is not None:
+        logger.info("resyncing subtitle: updating")
+        account.update_subtitles(video_url, language, tip)
+    else:
+        logger.info("resyncing subtitle: deleting")
+        account.delete_subtitles(video_url, language)
