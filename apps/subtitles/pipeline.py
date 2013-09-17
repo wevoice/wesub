@@ -58,7 +58,7 @@ from django.db import transaction
 
 from apps.subtitles.models import (
     SubtitleLanguage, SubtitleVersion, ORIGIN_ROLLBACK, ORIGIN_API,
-    ORIGIN_UPLOAD
+    ORIGIN_UPLOAD, ORIGIN_WEB_EDITOR
 )
 
 
@@ -399,6 +399,12 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
         _fork_dependents(sl)
+    elif origin == ORIGIN_WEB_EDITOR:
+        # fork languages when they are edited in the new editor, since it's
+        # easy to make things out-of-sync from the source language.  Once we
+        # switch over to only using the new editor, we can get rid of the
+        # entire concept of forking.
+        sl.fork()
 
     return version
 
