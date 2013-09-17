@@ -293,13 +293,14 @@ def shortlink(request, encoded_pk):
 
 class VideoPageContext(dict):
     """Context dict for the video page."""
-    def __init__(self, request, video, video_url, tab_only=False):
+    def __init__(self, request, video, video_url, tab, tab_only=False):
         dict.__init__(self)
         self['video'] = video
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
             self.setup(request, video, video_url)
+        self.setup_tab(request, video, video_url, tab)
 
     def setup(self, request, video, video_url):
         language_for_locale = video.subtitle_language(request.LANGUAGE_CODE)
@@ -313,11 +314,6 @@ class VideoPageContext(dict):
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
         self['shows_widget_sharing'] = video.can_user_see(request.user)
-        self['widget_params'] = _widget_params(
-            request, video, language=None,
-            video_url=video_url and video_url.effective_url,
-            size=(620,370)
-        )
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
@@ -329,6 +325,19 @@ class VideoPageContext(dict):
     def page_title(self, video):
         template = string.Template(ugettext("$title with subtitles | Amara"))
         return template.substitute(title=video.title_display())
+
+
+    def setup_tab(self, request, video, video_url, tab):
+        setup_tab_method = getattr(self, 'setup_tab_%s' % tab, None)
+        if setup_tab_method is not None:
+            setup_tab_method(request, video, video_url, tab)
+
+    def setup_tab_video(self, request, video, video_url, tab):
+        self['widget_params'] = _widget_params(
+            request, video, language=None,
+            video_url=video_url and video_url.effective_url,
+            size=(620,370)
+        )
 
 @get_video_from_code
 def redirect_to_video(request, video):
@@ -357,11 +366,12 @@ def video(request, video, video_url=None, title=None):
         tab = 'video'
 
     if request.is_ajax():
-        context = VideoPageContext(request, video, video_url, tab_only=True)
+        context = VideoPageContext(request, video, video_url, tab,
+                                   tab_only=True)
         template_name = 'videos/video-%s-tab.html' % tab
     else:
         template_name = 'videos/video-%s.html' % tab
-        context = VideoPageContext(request, video, video_url)
+        context = VideoPageContext(request, video, video_url, tab)
         if 'tab' in request.GET:
             # we only want to update the view counter if this request wasn't
             # the result of a tab click.
