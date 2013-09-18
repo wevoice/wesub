@@ -2510,9 +2510,11 @@ class TeamNotificationSetting(models.Model):
 class BillingReport(models.Model):
     TYPE_OLD = 1
     TYPE_NEW = 2
+    TYPE_APPROVAL = 3
     TYPE_CHOICES = (
         (TYPE_OLD, 'Old model'),
         (TYPE_NEW, 'New model'),
+        (TYPE_APPROVAL, 'Approval'),
     )
     teams = models.ManyToManyField(Team, related_name='billing_reports')
     start_date = models.DateField()
@@ -2715,12 +2717,7 @@ class BillingReport(models.Model):
         ]
         return  self._get_row_data(host, header)
 
-    def process(self):
-        """
-        Generate the correct rows (including headers), saves it to a tempo file,
-        then set's that file to the csv_file property, which if , using the S3
-        storage will take care of exporting it to s3.
-        """
+    def generate_rows(self):
         if self.type == BillingReport.TYPE_OLD:
             rows = self.generate_rows_type_old()
         elif self.type == BillingReport.TYPE_NEW:
@@ -2728,6 +2725,18 @@ class BillingReport(models.Model):
             for i,team in enumerate(self.teams.all()):
                 rows = rows + BillingRecord.objects.csv_report_for_team(team,
                     self.start_date, self.end_date, add_header=i == 0)
+        else:
+            raise ValueError("Unknown type: %s" % self.type)
+
+        return rows
+
+    def process(self):
+        """
+        Generate the correct rows (including headers), saves it to a tempo file,
+        then set's that file to the csv_file property, which if , using the S3
+        storage will take care of exporting it to s3.
+        """
+        rows = self.generate_rows()
         fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)

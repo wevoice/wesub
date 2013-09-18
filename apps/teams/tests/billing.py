@@ -20,7 +20,7 @@ from utils import test_factories
 
 import mock
 
-class OldBillingTest(TestCase):
+class OldTypeBillingTest(TestCase):
     # FIXME: should move this away from using fixtures
     fixtures = [
         "staging_users.json",
@@ -318,8 +318,8 @@ class OldBillingTest(TestCase):
         report.teams.add(self.team)
         self.process_report(report)
 
-class CreationDateMaker(object):
-    """Get creation dates to use for new subtitle versions."""
+class DateMaker(object):
+    """Get dates to use for billing events."""
     def __init__(self):
         self.current_date = self.start_date()
 
@@ -336,7 +336,29 @@ class CreationDateMaker(object):
     def end_date(self):
         return self.current_date + timedelta(days=1)
 
-class BillingTest(TestCase):
+
+def get_report_data(report_rows):
+    """Get report data in an easy to test way.
+
+    Converts each row into a dict, with the keys being the keys from the
+    header row.
+
+    Converts the list of rows into a dict mapping (video_id, language_code) to
+    a row.
+    """
+    header_row = report_rows[0]
+    rv = {}
+    for row in report_rows[1:]:
+        row_data = dict((header, value)
+                        for (header, value)
+                        in zip(header_row, row))
+        video_id = row_data['Video ID']
+        language_code = row_data['Language']
+        assert (video_id, language_code) not in rv
+        rv[video_id, language_code] = row_data
+    return rv
+
+class NewTypeBillingTest(TestCase):
     def setUp(self):
         self.team = test_factories.create_team()
 
@@ -348,25 +370,14 @@ class BillingTest(TestCase):
     def get_report_data(self, team, start_date, end_date):
         """Get report data in an easy to test way.
         """
-        csv_data = BillingRecord.objects.csv_report_for_team(
-            team, start_date, end_date, add_header=True)
-        header_row = csv_data[0]
-        rv = {}
-        rv['record count'] = len(csv_data) - 1
-        for row in csv_data[1:]:
-            row_data = dict((header, value)
-                            for (header, value)
-                            in zip(header_row, row))
-            video_id = row_data['Video ID']
-            language_code = row_data['Language']
-            if video_id not in rv:
-                rv[video_id] = {}
-            self.assert_(language_code not in rv[video_id])
-            rv[video_id][language_code] = row_data
-        return rv
+        report = BillingReport.objects.create(start_date=start_date,
+                                              end_date=end_date,
+                                              type=BillingReport.TYPE_NEW)
+        report.teams.add(team)
+        return get_report_data(report.generate_rows())
 
     def test_language_number(self):
-        date_maker = CreationDateMaker()
+        date_maker = DateMaker()
         user = test_factories.create_team_member(self.team).user
 
         video = test_factories.create_video(primary_audio_language_code='en')
@@ -393,16 +404,16 @@ class BillingTest(TestCase):
                            complete=True)
 
         data = self.get_report_data(self.team,
-                                           date_maker.start_date(),
-                                           date_maker.end_date())
-        self.assertEquals(data['record count'], 4)
-        self.assertEquals(data[video.video_id]['en']['Language number'], 1)
-        self.assertEquals(data[video.video_id]['fr']['Language number'], 2)
-        self.assertEquals(data[video.video_id]['de']['Language number'], 3)
-        self.assertEquals(data[video2.video_id]['fr']['Language number'], 2)
+                                    date_maker.start_date(),
+                                    date_maker.end_date())
+        self.assertEquals(len(data), 4)
+        self.assertEquals(data[video.video_id, 'en']['Language number'], 1)
+        self.assertEquals(data[video.video_id, 'fr']['Language number'], 2)
+        self.assertEquals(data[video.video_id, 'de']['Language number'], 3)
+        self.assertEquals(data[video2.video_id, 'fr']['Language number'], 2)
 
     def test_missing_records(self):
-        date_maker = CreationDateMaker()
+        date_maker = DateMaker()
         user = test_factories.create_team_member(self.team).user
 
         video = test_factories.create_video(primary_audio_language_code='en')
@@ -428,12 +439,13 @@ class BillingTest(TestCase):
                            created=date_maker.next_date(),
                            complete=True)
         data = self.get_report_data(self.team,
-                                           date_maker.start_date(),
-                                           date_maker.end_date())
-        self.assertEquals(data['record count'], 4)
-        self.assertEquals(data[video.video_id]['en']['Language number'], 0)
-        self.assertEquals(data[video.video_id]['de']['Language number'], 0)
-        self.assertEquals(data[video.video_id]['fr']['Language number'], 1)
-        self.assertEquals(data[video.video_id]['es']['Language number'], 2)
-        self.assertEquals(data[video.video_id]['en']['Minutes'], 0)
-        self.assertEquals(data[video.video_id]['de']['Minutes'], 0)
+                                    date_maker.start_date(),
+                                    date_maker.end_date())
+        self.assertEquals(len(data), 4)
+        self.assertEquals(data[video.video_id, 'en']['Language number'], 0)
+        self.assertEquals(data[video.video_id, 'de']['Language number'], 0)
+        self.assertEquals(data[video.video_id, 'fr']['Language number'], 1)
+        self.assertEquals(data[video.video_id, 'es']['Language number'], 2)
+        self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
+        self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
+
