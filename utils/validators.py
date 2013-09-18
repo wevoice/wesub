@@ -22,13 +22,16 @@ class MaxFileSizeValidator(object):
 
 class UniSubURLValidator(validators.URLValidator):
     def __init__(self, verify_exists=False, validator_user_agent=validators.URL_VALIDATOR_USER_AGENT):
-        self.host = Site.objects.get_current().domain
         self._verify_exists = verify_exists
 
         super(UniSubURLValidator, self).__init__(verify_exists, validator_user_agent)
 
         # Never use Django's built-in verify_exists because it's broken on Python 2.6.
         self.verify_exists = False
+
+    @property
+    def host(self):
+        return Site.objects.get_current().domain
 
     def __call__(self, value):
         super(UniSubURLValidator, self).__call__(value)
