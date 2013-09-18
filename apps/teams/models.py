@@ -757,6 +757,10 @@ class TeamVideo(models.Model):
         Moves this TeamVideo to a new team.
         This method expects you to have run the correct permissions checks.
         """
+        old_team = self.team
+        if old_team == new_team:
+            return
+
         # these imports are here to avoid circular imports, hacky
         from teams.signals import api_teamvideo_new
         from teams.signals import video_moved_from_team_to_team
@@ -785,6 +789,10 @@ class TeamVideo(models.Model):
         video.moderated_by = new_team if new_team.moderates_videos() else None
         video.save()
 
+        TeamVideoMigration.objects.create(from_team=old_team,
+                                          to_team=new_team,
+                                          to_project=self.project)
+
         # Update all Solr data.
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
@@ -797,6 +805,22 @@ class TeamVideo(models.Model):
         api_teamvideo_new.send(self)
         video_moved_from_team_to_team.send(sender=self,
                 destination_team=new_team, video=self.video)
+
+class TeamVideoMigration(models.Model):
+    from_team = models.ForeignKey(Team, related_name='+')
+    to_team = models.ForeignKey(Team, related_name='+')
+    to_project = models.ForeignKey(Project, related_name='+')
+    datetime = models.DateTimeField()
+
+    def __init__(self, *args, **kwargs):
+        if 'datetime' not in kwargs:
+            kwargs['datetime'] = self.now()
+        models.Model.__init__(self, *args, **kwargs)
+
+    @staticmethod
+    def now():
+        # Make now a function so we can patch it in the unittests
+        return datetime.datetime.now()
 
 
 def _create_translation_tasks(team_video, subtitle_version=None):
