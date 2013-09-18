@@ -36,7 +36,7 @@ class OldBillingTest(TestCase):
     def process_report(self, report):
         # don't really save the report, since that would try to upload the csv
         # file to S3
-        with mock.patch_object(report, 'save') as mock_save:
+        with mock.patch.object(report, 'save') as mock_save:
             report.process()
             self.assertEquals(mock_save.call_count, 1)
         return report.csv_file.read()
