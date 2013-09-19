@@ -52,7 +52,7 @@ def create_user(password=None, **kwargs):
     return User.objects.create(**defaults)
 
 create_video_counter = itertools.count()
-def create_video(url=None, **kwargs):
+def create_video(url=None, video_type='H', **kwargs):
     current_count = create_video_counter.next()
     defaults = {
         'title': 'Test Video %s' % current_count,
@@ -65,8 +65,8 @@ def create_video(url=None, **kwargs):
     # make a video url for this video
     if url is None:
         url = 'http://example.com/videos/video-%s' % current_count
-    video_url = VideoUrl.objects.create(url=url, type="H", primary=True,
-                                        video=video)
+    video_url = VideoUrl.objects.create(url=url, type=video_type,
+                                        primary=True, video=video)
     return video
 
 create_team_counter = itertools.count()

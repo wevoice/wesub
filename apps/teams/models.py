@@ -42,7 +42,7 @@ from auth.models import CustomUser as User
 from auth.providers import get_authentication_provider
 from messages import tasks as notifier
 from apps.subtitles import shims
-from apps.subtitles.signals import language_deleted
+from subtitles.signals import language_deleted
 from teams.moderation_const import WAITING_MODERATION, UNMODERATED, APPROVED
 from teams.permissions_const import (
     TEAM_PERMISSIONS, PROJECT_PERMISSIONS, ROLE_OWNER, ROLE_ADMIN, ROLE_MANAGER,

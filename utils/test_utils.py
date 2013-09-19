@@ -1,10 +1,13 @@
+import collections
 import functools
 import os
 import urlparse
-from django.core.cache import cache
 
-import mock
+from django.core.cache import cache
 from nose.plugins import Plugin
+from nose.tools import assert_equal
+import mock
+import requests
 
 
 REQUEST_CALLBACKS = []
@@ -198,6 +201,9 @@ acquire_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.add(name))
 release_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.remove(name))
+update_subtitles = mock.Mock()
+delete_subtitles = mock.Mock()
+update_all_subtitles = mock.Mock()
 
 class MonkeyPatcher(object):
     """Replace a functions with mock objects for the tests.
@@ -217,6 +223,9 @@ class MonkeyPatcher(object):
              _add_amara_description_credit_to_youtube_vurl),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
+            ('externalsites.tasks.update_subtitles', update_subtitles),
+            ('externalsites.tasks.delete_subtitles', delete_subtitles),
+            ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
         ]
         self.patches = []
         for func_name, mock_obj in patch_info:
@@ -298,3 +307,92 @@ def patch_for_test(spec):
         return wrapper
     return decorator
 patch_for_test.__test__ = False
+
+ExpectedRequest = collections.namedtuple(
+    "ExpectedRequest", "method url params data body status_code")
+
+class RequestsMocker(object):
+    """Mock code that uses the requests module
+
+    This object patches the various network functions of the requests module
+    (get, post, put, delete) with mock functions.  You tell it what requests
+    you expect, and what responses to return.
+
+    Example:
+
+    mocker = RequestsMocker()
+    mocker.expect_request('get', 'http://example.com/', body="foo")
+    mocker.expect_request('post', 'http://example.com/form',
+        data={'foo': 'bar'}, body="Form OK")
+    with mocker:
+        function_to_test()
+    """
+
+    def __init__(self):
+        self.expected_requests = []
+
+    def expect_request(self, method, url, params=None, data=None, body='',
+                       status_code=200):
+        self.expected_requests.append(
+            ExpectedRequest(method, url, params, data, body, status_code))
+
+    def __enter__(self):
+        self.setup_patchers()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.unpatch()
+        if exc_type is None:
+            self.check_no_more_expected_calls()
+
+    def setup_patchers(self):
+        self.patchers = []
+        for method in ('get', 'post', 'put', 'delete'):
+            mock_obj = mock.Mock()
+            mock_obj.side_effect = getattr(self, 'mock_%s' % method)
+            patcher = mock.patch('requests.%s' % method, mock_obj)
+            patcher.start()
+            self.patchers.append(patcher)
+
+    def unpatch(self):
+        for patcher in self.patchers:
+            patcher.stop()
+        self.patchers = []
+
+    def mock_get(self, url, params=None, data=None):
+        return self.check_request('get', url, params, data)
+
+    def mock_post(self, url, params=None, data=None):
+        return self.check_request('post', url, params, data)
+
+    def mock_put(self, url, params=None, data=None):
+        return self.check_request('put', url, params, data)
+
+    def mock_delete(self, url, params=None, data=None):
+        return self.check_request('delete', url, params, data)
+
+    def check_request(self, method, url, params, data):
+        try:
+            expected = self.expected_requests.pop(0)
+        except IndexError:
+            raise AssertionError("RequestsMocker: No more calls expected, "
+                                 "but got %s %s %s %s" % 
+                                 (method, url, params, data))
+
+        assert_equal(method, expected.method)
+        assert_equal(url, expected.url)
+        assert_equal(params, expected.params)
+        assert_equal(data, expected.data)
+        return self.make_response(expected.status_code, expected.body)
+
+    def make_response(self, status_code, body):
+        response = requests.Response()
+        response._content = body
+        response.status_code = status_code
+        return response
+
+    def check_no_more_expected_calls(self):
+        if self.expected_requests:
+            raise AssertionError(
+                "leftover expected calls:\n" +
+                "\n".join('%s %s %s' % (er.method, er.url, er.params)
+                          for er in self.expected_requests))

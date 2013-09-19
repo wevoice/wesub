@@ -20,4 +20,8 @@
     <li {% if current_sub == "projects" %}class="current"{% endif %}>
         <a href="{% url teams:settings_projects slug=team.slug %}">{% trans "Projects" %}</a>
     </li>
+
+    <li {% if current_sub == "external-sites" %}class="current"{% endif %}>
+        <a href="{% url teams:settings_externalsites slug=team.slug %}">{% trans "External Sites" %}</a>
+    </li>
 </ul>

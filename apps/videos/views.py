@@ -28,8 +28,10 @@ from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
 from apps.videos.templatetags.paginator import paginate
 from django.core.urlresolvers import reverse
 from django.db.models import Sum
@@ -68,6 +70,7 @@ from apps.videos.search_indexes import VideoIndex
 from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
 from apps.videos.tasks import video_changed_tasks
 from apps.widget.views import base_widget_params
+from externalsites.models import can_sync_videourl
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
@@ -643,6 +646,26 @@ class LanguagePageContextRevisions(LanguagePageContext):
         self.update(pagination_info)
         self['revisions'] = language.optimize_versions(revisions)
 
+class LanguagePageContextSyncHistory(LanguagePageContext):
+    def setup_tab(self, request, video, language, version):
+        self['sync_history'] = language.synchistory_set.order_by('-id').all()
+        self['current_version'] = language.get_public_tip()
+        synced_versions = []
+        for video_url in video.get_video_urls():
+            if not can_sync_videourl(video_url):
+                continue
+            try:
+                version = (language.syncedsubtitleversion_set.
+                           select_related('version').
+                           get(video_url=video_url)).version
+            except ObjectDoesNotExist:
+                version = None
+            synced_versions.append({
+                'video_url': video_url,
+                'version': version,
+            })
+        self['synced_versions'] = synced_versions
+
 @get_video_from_code
 def language_subtitles(request, video, lang, lang_id, version_id=None):
     tab = request.GET.get('tab')
@@ -650,6 +673,10 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         ContextClass = LanguagePageContextRevisions
     elif tab == 'comments':
         ContextClass = LanguagePageContextComments
+    elif tab == 'sync-history':
+        if not request.user.is_staff:
+            return redirect_to_login(request.build_absolute_uri())
+        ContextClass = LanguagePageContextSyncHistory
     else:
         # force tab to be subtitles if it doesn't match either of the other
         # tabs
