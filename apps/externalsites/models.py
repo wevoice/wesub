@@ -45,9 +45,52 @@ class ExternalAccount(models.Model):
         return video_url.type == self.video_url_type
 
     def update_subtitles(self, video_url, language, version):
-        raise NotImplementedError()
+        sync_history_values = {
+            'account': self,
+            'video_url': video_url,
+            'language': language,
+            'action': SyncHistory.ACTION_UPDATE_SUBTITLES,
+            'version': version,
+        }
+
+        try:
+            self.do_update_subtitles(video_url, language, version)
+        except StandardError, e:
+            SyncHistory.objects.create_for_error(e, **sync_history_values)
+        else:
+            SyncHistory.objects.create_for_success(**sync_history_values)
+            SyncedSubtitleVersion.objects.set_synced_version(
+                self, video_url, language, version)
 
     def delete_subtitles(self, video_url, language):
+        sync_history_values = {
+            'account': self,
+            'language': language,
+            'video_url': video_url,
+            'action': SyncHistory.ACTION_DELETE_SUBTITLES,
+        }
+
+        try:
+            self.do_delete_subtitles(video_url, language)
+        except StandardError, e:
+            SyncHistory.objects.create_for_error(e, **sync_history_values)
+        else:
+            SyncHistory.objects.create_for_success(**sync_history_values)
+            SyncedSubtitleVersion.objects.unset_synced_version(
+                self, video_url, language)
+
+    def do_update_subtitles(self, video_url, language, version):
+        """Do the work needed to update subititles.
+
+        Subclasses must implement this method.
+        """
+        raise NotImplementedError()
+
+    def do_delete_subtitles(self, video_url, language):
+        """Do the work needed to delete subtitles
+
+        Subclasses must implement this method.
+        """
         raise NotImplementedError()
 
     class Meta:
@@ -71,7 +114,7 @@ class KalturaAccount(ExternalAccount):
     def __unicode__(self):
         return "KalturaAccount: %s" % (self.partner_id)
 
-    def update_subtitles(self, video_url, language, version):
+    def do_update_subtitles(self, video_url, language, version):
         kaltura_id = video_url.get_video_type().kaltura_id()
         subtitles = language.get_public_tip().get_subtitles()
         sub_data = babelsubs.to(subtitles, 'srt')
@@ -80,7 +123,7 @@ class KalturaAccount(ExternalAccount):
                                          kaltura_id, language.language_code,
                                          sub_data)
 
-    def delete_subtitles(self, video_url, language):
+    def do_delete_subtitles(self, video_url, language):
         kaltura_id = video_url.get_video_type().kaltura_id()
         syncing.kaltura.delete_subtitles(self.partner_id, self.secret,
                                          kaltura_id, language.language_code)

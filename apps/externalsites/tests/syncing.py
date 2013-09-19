@@ -128,8 +128,8 @@ class SignalHandlingTest(TestCase):
 
 class SubtitleTaskTest(TestCase):
     @patch_for_test('externalsites.models.now')
-    @patch_for_test('externalsites.models.KalturaAccount.update_subtitles')
-    @patch_for_test('externalsites.models.KalturaAccount.delete_subtitles')
+    @patch_for_test('externalsites.models.KalturaAccount.do_update_subtitles')
+    @patch_for_test('externalsites.models.KalturaAccount.do_delete_subtitles')
     def setUp(self, mock_delete_subtitles, mock_update_subtitles, mock_now):
         self.now = datetime.datetime(2013, 1, 1)
         mock_now.side_effect = self.make_now

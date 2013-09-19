@@ -21,8 +21,7 @@ import logging
 from celery.task import task
 from django.core.exceptions import ObjectDoesNotExist
 
-from externalsites.models import (get_account, SyncedSubtitleVersion,
-                                  SyncHistory)
+from externalsites.models import get_account
 from subtitles.models import SubtitleLanguage, SubtitleVersion
 from videos.models import VideoUrl
 
@@ -56,25 +55,7 @@ def update_subtitles(account_type, account_id, video_url_id, lang_id,
         )
         return
     else:
-        _update_subtitles(account, video_url, language, version)
-
-def _update_subtitles(account, video_url, language, version):
-    sync_history_values = {
-        'account': account,
-        'video_url': video_url,
-        'language': language,
-        'action': SyncHistory.ACTION_UPDATE_SUBTITLES,
-        'version': version,
-    }
-
-    try:
         account.update_subtitles(video_url, language, version)
-    except StandardError, e:
-        SyncHistory.objects.create_for_error(e, **sync_history_values)
-    else:
-        SyncHistory.objects.create_for_success(**sync_history_values)
-        SyncedSubtitleVersion.objects.set_synced_version(
-            account, video_url, language, version)
 
 @task
 def delete_subtitles(account_type, account_id, video_url_id, lang_id):
@@ -103,21 +84,7 @@ def delete_subtitles(account_type, account_id, video_url_id, lang_id):
         )
         return
 
-    sync_history_values = {
-        'account': account,
-        'language': language,
-        'video_url': video_url,
-        'action': SyncHistory.ACTION_DELETE_SUBTITLES,
-    }
-
-    try:
-        account.delete_subtitles(video_url, language)
-    except StandardError, e:
-        SyncHistory.objects.create_for_error(e, **sync_history_values)
-    else:
-        SyncHistory.objects.create_for_success(**sync_history_values)
-        SyncedSubtitleVersion.objects.unset_synced_version(
-            account, video_url, language)
+    account.delete_subtitles(video_url, language)
 
 @task
 def update_all_subtitles(account_type, account_id):
@@ -149,5 +116,5 @@ def update_all_subtitles(account_type, account_id):
 
 def _sync_all_languages(account, video_url, video):
     for language in video.newsubtitlelanguage_set.having_public_versions():
-        _update_subtitles(account, video_url, language,
-                          language.get_public_tip())
+        account.update_subtitles(video_url, language,
+                                 language.get_public_tip())
