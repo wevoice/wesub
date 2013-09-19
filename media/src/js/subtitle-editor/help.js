@@ -29,10 +29,10 @@
          */
 
         $scope.commands = [
-            { key: 'shift + space', description: 'play / pause the video' },
-            { key: 'shift + tab', description: 'move to the previous subtitle' },
-            { key: 'tab', description: 'move to the next subtitle' }
-        ];
+            { key: 'tab', description: 'starts and stops video playback' },
+            { key: 'enter', description: 'moves to the next line and <br /> adds a new line (when the timeline is closed)' },
+            { key: 'shift + ctrl + . or ,', description: 'skips playback forward or back 4 seconds' }
+                   ];
 
         $scope.showAdvancedModal = function() {
 

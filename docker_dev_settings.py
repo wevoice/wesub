@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 # Amara, universalsubtitles.org
-# 
+#
 # Copyright (C) 2013 Participatory Culture Foundation
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
 # published by the Free Software Foundation, either version 3 of the
 # License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see 
+# along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 # Settings file for docker development.  This file works with the setup built
@@ -29,7 +29,6 @@ SITE_NAME = 'unisubs-dev'
 SECRET_KEY = 'a9yr_yzp2vmj-2q1zq)d2+b^w(7fqu2o&jh18u9dozjbd@-$0!'
 STATIC_URL_BASE = STATIC_URL = "http://unisubs.example.com:8000/site_media/"
 MEDIA_URL = "http://unisubs.example.com:8000/user-data/"
-
 SITE_PACKAGES_DIR = '/opt/ve/unisubs/lib/python2.7/site-packages/'
 CACHE_PREFIX = 'unisubsdevsettings'
 CACHE_TIMEOUT = 0
@@ -38,7 +37,6 @@ EXTRA_STATIC_URLS = [
     (r'^site_media/admin/(?P<path>.*)$',
      SITE_PACKAGES_DIR + 'django/contrib/admin/static/admin/'),
 ]
-
 TWITTER_CONSUMER_KEY = '6lHYqtxzQBD3lQ55Chi6Zg'
 TWITTER_CONSUMER_SECRET = 'ApkJPIIbBKp3Wph0JBoAg2Nsk1Z5EG6PFTevNpd5Y00'
 
@@ -88,12 +86,20 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
+<<<<<<< HEAD
         'level': 'INFO',
+=======
+        'level': 'WARNING',
+>>>>>>> staging
         'handlers': ['console'],
     },
     'formatters': {
         'verbose': {
+<<<<<<< HEAD
             'format': '%(levelname)s %(asctime)s %(name)s %(message)s'
+=======
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+>>>>>>> staging
         },
     },
     'handlers': {
