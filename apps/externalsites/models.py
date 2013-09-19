@@ -165,6 +165,9 @@ def lookup_accounts(video):
             rv.append((account, video_url))
     return rv
 
+def can_sync_videourl(video_url):
+    return video_url.type in _video_type_to_account_model
+
 def get_account_for_videourl(team, video_url):
     AccountModel = _video_type_to_account_model.get(video_url.type)
     if AccountModel is None:

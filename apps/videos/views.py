@@ -70,6 +70,7 @@ from apps.videos.search_indexes import VideoIndex
 from apps.videos.share_utils import _add_share_panel_context_for_video, _add_share_panel_context_for_history
 from apps.videos.tasks import video_changed_tasks
 from apps.widget.views import base_widget_params
+from externalsites.models import can_sync_videourl
 from utils import send_templated_email
 from utils.basexconverter import base62
 from utils.decorators import never_in_prod
@@ -641,6 +642,8 @@ class LanguagePageContextSyncHistory(LanguagePageContext):
         self['current_version'] = language.get_public_tip()
         synced_versions = []
         for video_url in video.get_video_urls():
+            if not can_sync_videourl(video_url):
+                continue
             try:
                 version = (language.syncedsubtitleversion_set.
                            select_related('version').
