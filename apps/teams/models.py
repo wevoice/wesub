@@ -51,7 +51,7 @@ from teams.permissions_const import (
 from videos.tasks import (
     upload_subtitles_to_original_service, sync_latest_versions_for_video
 )
-from teams.tasks import update_one_team_video
+from teams import tasks
 from utils import DEFAULT_PROTOCOL
 from utils.amazon import S3EnabledImageField, S3EnabledFileField
 from utils.panslugify import pan_slugify
@@ -796,7 +796,7 @@ class TeamVideo(models.Model):
         # Update all Solr data.
         metadata_manager.update_metadata(video.pk)
         video.update_search_index()
-        update_one_team_video(self.pk)
+        tasks.update_one_team_video(self.pk)
 
         # Create any necessary tasks.
         autocreate_tasks(self)
@@ -856,7 +856,7 @@ def _create_translation_tasks(team_video, subtitle_version=None):
         # wasted tasks
         task.save(update_team_video_index=False)
 
-    update_one_team_video.delay(team_video.pk)
+    tasks.update_one_team_video.delay(team_video.pk)
 
 def autocreate_tasks(team_video):
     workflow = Workflow.get_for_team_video(team_video)
@@ -890,7 +890,7 @@ def team_video_save(sender, instance, created, **kwargs):
     TODO: Rename this to something more specific.
 
     """
-    update_one_team_video.delay(instance.id)
+    tasks.update_one_team_video.delay(instance.id)
 
 def team_video_delete(sender, instance, **kwargs):
     """Perform necessary actions for when a TeamVideo is deleted.
@@ -1513,7 +1513,6 @@ class TaskManager(models.Manager):
     def complete(self):
         """Return a QS of tasks that are not deleted, but are completed."""
         return self.not_deleted().filter(completed__isnull=False)
-
 
     def _type(self, types, completed=None, approved=None):
         """Return a QS of tasks that are not deleted and are one of the given types.
@@ -2186,7 +2185,7 @@ class Task(models.Model):
         result = super(Task, self).save(*args, **kwargs)
 
         if update_team_video_index:
-            update_one_team_video.delay(self.team_video.pk)
+            tasks.update_one_team_video.delay(self.team_video.pk)
 
         return result
 
@@ -2717,6 +2716,22 @@ class BillingReport(models.Model):
         ]
         return  self._get_row_data(host, header)
 
+    def generate_rows_type_delivery(self):
+        header = [
+            'Team',
+            'Video Title',
+            'Video ID',
+            'Language',
+            'Minutes',
+            'Original',
+            'Migrated',
+            'Subtitler',
+            'Subtitler Email',
+            'Reviewer',
+            'Reviewer Email',
+        ]
+        return self._get_row_data(host, header)
+
     def generate_rows(self):
         if self.type == BillingReport.TYPE_OLD:
             rows = self.generate_rows_type_old()
@@ -2725,6 +2740,8 @@ class BillingReport(models.Model):
             for i,team in enumerate(self.teams.all()):
                 rows = rows + BillingRecord.objects.csv_report_for_team(team,
                     self.start_date, self.end_date, add_header=i == 0)
+        elif self.type == BillingRecord.TYPE_DELIVERY:
+            rows = self.generate_rows_type_delivery()
         else:
             raise ValueError("Unknown type: %s" % self.type)
 
