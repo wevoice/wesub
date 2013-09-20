@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, date
+import itertools
 
 from django.test import TestCase
 
@@ -8,7 +9,9 @@ from apps.teams.models import (
 )
 from apps.subtitles.models import SubtitleLanguage, SubtitleVersion
 from apps.subtitles.pipeline import add_subtitles
-from apps.teams.models import BillingRecord
+from apps.teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
+                                          ROLE_ADMIN)
+from apps.teams.models import BillingRecord, Task
 from apps.videos.models import Video
 from apps.videos.tasks import video_changed_tasks
 from apps.videos.types.youtube import FROM_YOUTUBE_MARKER
@@ -17,6 +20,7 @@ from apps.videos.tests.data import (
     make_subtitle_version
 )
 from utils import test_factories
+from utils import test_utils
 
 import mock
 
@@ -336,7 +340,6 @@ class DateMaker(object):
     def end_date(self):
         return self.current_date + timedelta(days=1)
 
-
 def get_report_data(report_rows):
     """Get report data in an easy to test way.
 
@@ -449,3 +452,107 @@ class NewTypeBillingTest(TestCase):
         self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
         self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
 
+class ApprovalTypeBillingTest(TestCase):
+    @test_utils.patch_for_test('teams.models.Task.now')
+    def setUp(self, mock_now):
+        self.date_maker = DateMaker()
+        mock_now.side_effect = self.date_maker.next_date
+        self.setup_team()
+        self.setup_users()
+        self.setup_videos()
+
+    def setup_team(self):
+        self.team = test_factories.create_team(workflow_enabled=True)
+        test_factories.create_workflow(
+            self.team,
+            review_allowed=20, # manager must review
+            approve_allowed=20, # admin must approve
+        )
+
+    def setup_users(self):
+        # make a bunch of users to subtitle/review the work
+        subtitlers = [test_factories.create_user() for i in xrange(3)]
+        reviewers = [test_factories.create_user() for i in xrange(2)]
+        for u in subtitlers:
+            test_factories.create_team_member(user=u, team=self.team,
+                                              role=ROLE_CONTRIBUTOR)
+        for u in reviewers:
+            test_factories.create_team_member(user=u, team=self.team,
+                                              role=ROLE_MANAGER)
+        self.subtitler_iter = itertools.cycle(subtitlers)
+        self.reviewer_iter = itertools.cycle(reviewers)
+
+        self.admin = test_factories.create_team_member(team=self.team,
+                                                       role=ROLE_ADMIN).user
+
+    def setup_videos(self):
+        # make a bunch of languages that have moved through the review process
+        self.subtitlers = {}
+        self.reviewers = {}
+        self.approved_languages = []
+        self.approval_dates = {}
+
+        v1 = test_factories.create_team_video(self.team).video
+        v2 = test_factories.create_team_video(self.team).video
+        v3 = test_factories.create_team_video(self.team).video
+        languages = [
+            (v1, 'en'),
+            (v1, 'fr'),
+            (v1, 'de'),
+            (v1, 'pt-br'),
+            (v2, 'en'),
+            (v2, 'es'),
+            (v2, 'fr'),
+            (v2, 'de'),
+            (v2, 'pt-br'),
+            (v3, 'en'),
+            (v3, 'de'),
+        ]
+
+        for i, (video, language_code) in enumerate(languages):
+            subtitler = self.subtitler_iter.next()
+            reviewer = self.reviewer_iter.next()
+            review_task = test_factories.make_review_task(
+                video.get_team_video(), language_code, subtitler)
+            review_task.assignee = reviewer
+            review_task.approved = Task.APPROVED_IDS['Approved']
+            approve_task = review_task.complete()
+            self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
+            self.subtitlers[video.video_id, language_code] = subtitler
+            self.reviewers[video.video_id, language_code] = reviewer
+            # for some of those videos, approve them
+            if i < 8:
+                approve_task.assignee = self.admin
+                approve_task.approved = Task.APPROVED_IDS['Approved']
+                rv = approve_task.complete()
+                self.approved_languages.append(
+                    video.subtitle_language(language_code))
+                self.approval_dates[video.video_id, language_code] = \
+                        self.date_maker.current_date
+
+    def get_report_data(self, start_date, end_date):
+        """Get report data in an easy to test way.
+        """
+        report = BillingReport.objects.create(
+            start_date=start_date, end_date=end_date,
+            type=BillingReport.TYPE_APPROVAL)
+        report.teams.add(self.team)
+        return get_report_data(report.generate_rows())
+
+    def test_report(self):
+        data = self.get_report_data(self.date_maker.start_date(),
+                                    self.date_maker.end_date())
+        # check that we got the right number of rows
+        self.assertEquals(len(data), len(self.approved_languages))
+        # check video ids and language codes
+        self.assertEquals(set(data.keys()),
+                          set((lang.video.video_id, lang.language_code)
+                              for lang in self.approved_languages))
+        # test subtitler/reviewer
+        for (video_id, language_code), row in data.items():
+            subtitler = self.subtitlers[video_id, language_code]
+            reviewer = self.reviewers[video_id, language_code]
+            self.assertEquals(row['Subtitler'], subtitler.full_name)
+            self.assertEquals(row['Subtitler Email'], subtitler.email)
+            self.assertEquals(row['Reviewer'], reviewer.full_name)
+            self.assertEquals(row['Reviewer Email'], reviewer.email)

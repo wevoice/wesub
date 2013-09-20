@@ -40,6 +40,7 @@ def create_user(password=None, **kwargs):
     current_count = create_user_counter.next()
     defaults = {
         'username': 'test_user_%s' % current_count,
+        'full_name': 'User Number %s' % current_count,
         'email': 'test_user_%s@example.com' % current_count,
         'notify_by_email': True,
         'valid_email': True,
@@ -144,7 +145,7 @@ def make_review_task(team_video, language_code, user):
     """
     team = team_video.team
     task = Task(team=team, team_video=team_video, assignee=None,
-         language=language_code, type=Task.TYPE_IDS['Translate'])
+                language=language_code, type=Task.TYPE_IDS['Translate'])
     task.save()
     v = pipeline.add_subtitles(team_video.video, language_code, None,
                                complete=False, visibility='private')

@@ -822,7 +822,6 @@ class TeamVideoMigration(models.Model):
         # Make now a function so we can patch it in the unittests
         return datetime.datetime.now()
 
-
 def _create_translation_tasks(team_video, subtitle_version=None):
     """Create any translation tasks that should be autocreated for this video.
 
@@ -1724,6 +1723,13 @@ class Task(models.Model):
                                          self.get_type_display(),
                                          self.team_video)
 
+    @staticmethod
+    def now():
+        """datetime.datetime.now as a method
+
+        This lets us patch it in the unittests.
+        """
+        return datetime.datetime.now()
 
     @property
     def workflow(self):
@@ -1763,8 +1769,7 @@ class Task(models.Model):
 
     def future(self):
         """Return whether this task expires in the future."""
-        return self.expiration_date > datetime.datetime.now()
-
+        return self.expiration_date > self.now()
 
     # Functions related to task completion.
     def _send_back(self, sends_notification=True):
@@ -1829,7 +1834,7 @@ class Task(models.Model):
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
 
-        self.completed = datetime.datetime.now()
+        self.completed = self.now()
         self.save()
 
         return { 'Subtitle': self._complete_subtitle,
@@ -2127,7 +2132,7 @@ class Task(models.Model):
             self.expiration_date = None
         else:
             limit = datetime.timedelta(days=self.team.task_expiration)
-            self.expiration_date = datetime.datetime.now() + limit
+            self.expiration_date = self.now() + limit
 
     def get_subtitle_version(self):
         """ Gets the subtitle version related to this task.
@@ -2524,7 +2529,11 @@ class BillingReport(models.Model):
     type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
 
     def __unicode__(self):
-        return "%s teams (%s - %s)" % (self.teams.all().count(),
+        if hasattr(self, 'id') and self.id is not None:
+            team_count = self.teams.all().count()
+        else:
+            team_count = 0
+        return "%s teams (%s - %s)" % (team_count,
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
 
@@ -2716,21 +2725,50 @@ class BillingReport(models.Model):
         ]
         return  self._get_row_data(host, header)
 
-    def generate_rows_type_delivery(self):
-        header = [
+    def generate_rows_type_approval(self):
+        header = (
             'Team',
             'Video Title',
             'Video ID',
             'Language',
             'Minutes',
             'Original',
-            'Migrated',
             'Subtitler',
             'Subtitler Email',
             'Reviewer',
             'Reviewer Email',
-        ]
-        return self._get_row_data(host, header)
+        )
+        rows = [header]
+        tasks = Task.objects.complete_approve().filter(
+            team__in=self.teams.all(),
+            completed__range=(self.start_date, self.end_date))
+        for task in tasks:
+            video = task.team_video.video
+            version = task.new_subtitle_version
+            language = version.subtitle_language
+            review_task = (Task.objects.complete_review()
+                           .filter(team_video=task.team_video,
+                                   language=task.language)
+                           .order_by('-completed'))[0]
+            subtitle_task = (Task.objects.complete_subtitle_or_translate()
+                             .filter(team_video=task.team_video,
+                                     language=task.language)
+                             .order_by('-completed'))[0]
+
+            rows.append((
+                task.team.name,
+                video.title_display(),
+                video.video_id,
+                task.language,
+                get_minutes_for_version(version, True),
+                int(language.is_primary_audio_language()),
+                subtitle_task.assignee.full_name,
+                subtitle_task.assignee.email,
+                review_task.assignee.full_name,
+                review_task.assignee.email,
+            ))
+
+        return rows
 
     def generate_rows(self):
         if self.type == BillingReport.TYPE_OLD:
@@ -2740,8 +2778,8 @@ class BillingReport(models.Model):
             for i,team in enumerate(self.teams.all()):
                 rows = rows + BillingRecord.objects.csv_report_for_team(team,
                     self.start_date, self.end_date, add_header=i == 0)
-        elif self.type == BillingRecord.TYPE_DELIVERY:
-            rows = self.generate_rows_type_delivery()
+        elif self.type == BillingReport.TYPE_APPROVAL:
+            rows = self.generate_rows_type_approval()
         else:
             raise ValueError("Unknown type: %s" % self.type)
 
@@ -2957,6 +2995,31 @@ class BillingRecordManager(models.Manager):
         return new_record, from_translations
 
 
+def get_minutes_for_version(version, round_up_to_integer):
+    """
+    Return the number of minutes the subtitles specified in version
+    """
+    subs = version.get_subtitles()
+
+    if len(subs) == 0:
+        return 0
+
+    start = subs[0].start_time
+    end = subs[-1].end_time
+
+    # The -1 value for the end_time isn't allowed anymore but some
+    # legacy data will still have it.
+    if end == -1:
+        end = subs[-1].star_time
+
+    if not end:
+        end = subs[-1].start_time
+    duration_seconds =  (end - start) / 1000.0
+    minutes = duration_seconds/60.0
+    if round_up_to_integer:
+        minutes = int(ceil(minutes))
+    return minutes
+
 class BillingRecord(models.Model):
     video = models.ForeignKey(Video)
 
@@ -2996,28 +3059,7 @@ class BillingRecord(models.Model):
         return super(BillingRecord, self).save(*args, **kwargs)
 
     def get_minutes(self):
-        """
-        Return the number of minutes the subtitles specified in `version`
-        cover as an int.
-        """
-        subs = self.new_subtitle_version.get_subtitles()
-
-        if len(subs) == 0:
-            return 0
-
-        start = subs[0].start_time
-        end = subs[-1].end_time
-
-        # The -1 value for the end_time isn't allowed anymore but some
-        # legacy data will still have it.
-        if end == -1:
-            end = subs[-1].star_time
-
-        if not end:
-            end = subs[-1].start_time
-        duration_seconds =  (end - start) / 1000.0
-        minutes = duration_seconds/60.0
-        return  int(ceil(minutes))
+        get_minutes_for_version(self.new_subtitle_version, True)
 
 class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
