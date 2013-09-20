@@ -1831,6 +1831,26 @@ class Task(models.Model):
             notifier.reviewed_and_sent_back.delay(self.pk)
         return task
 
+    def complete_approved(self, user):
+        """Mark a review/approve task as Approved and complete it.
+
+        :param user: user who is approving he task
+        :returns: next task in the workflow.
+        """
+        self.assignee = user
+        self.approved = Task.APPROVED_IDS['Approved']
+        return self.complete()
+
+    def complete_rejected(self, user):
+        """Mark a review/approve task as Rejected and complete it.
+
+        :param user: user who is approving he task
+        :returns: next task in the workflow.
+        """
+        self.assignee = user
+        self.approved = Task.APPROVED_IDS['Rejected']
+        return self.complete()
+
     def complete(self):
         '''Mark as complete and return the next task in the process if applicable.'''
 
@@ -2044,6 +2064,7 @@ class Task(models.Model):
 
             # And send them back to the original service.
             upload_subtitles_to_original_service.delay(sv.pk)
+            task = None
         else:
             # Send the subtitles back for improvement.
             task = self._send_back()
@@ -2055,7 +2076,7 @@ class Task(models.Model):
 
         # Notify the appropriate users.
         notifier.approved_notification.delay(self.pk, approval)
-
+        return task
 
     def get_perform_url(self):
         """Return a URL for whatever dialog is used to perform this task."""
@@ -2740,6 +2761,7 @@ class BillingReport(models.Model):
         )
         rows = [header]
         tasks = Task.objects.complete_approve().filter(
+            approved=Task.APPROVED_IDS['Approved'],
             team__in=self.teams.all(),
             completed__range=(self.start_date, self.end_date))
         for task in tasks:

@@ -357,7 +357,9 @@ def get_report_data(report_rows):
                         in zip(header_row, row))
         video_id = row_data['Video ID']
         language_code = row_data['Language']
-        assert (video_id, language_code) not in rv
+        assert (video_id, language_code) not in rv, \
+                "Duplicate video_id/language in row: (%s, %s)" % (
+                    video_id, language_code)
         rv[video_id, language_code] = row_data
     return rv
 
@@ -514,17 +516,24 @@ class ApprovalTypeBillingTest(TestCase):
             reviewer = self.reviewer_iter.next()
             review_task = test_factories.make_review_task(
                 video.get_team_video(), language_code, subtitler)
-            review_task.assignee = reviewer
-            review_task.approved = Task.APPROVED_IDS['Approved']
-            approve_task = review_task.complete()
+            approve_task = review_task.complete_approved(reviewer)
             self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
             self.subtitlers[video.video_id, language_code] = subtitler
             self.reviewers[video.video_id, language_code] = reviewer
-            # for some of those videos, approve them
-            if i < 8:
-                approve_task.assignee = self.admin
-                approve_task.approved = Task.APPROVED_IDS['Approved']
-                rv = approve_task.complete()
+            if i < 6:
+                # for some of those videos, approve them
+                approve_task.complete_approved(self.admin)
+                self.approved_languages.append(
+                    video.subtitle_language(language_code))
+                self.approval_dates[video.video_id, language_code] = \
+                        self.date_maker.current_date
+            if 6 <= i < 8:
+                # for some of those videos, send them back to review, then
+                # review again and approve the final result
+                # for some of those videos, approve them
+                review_task2 = approve_task.complete_rejected(self.admin)
+                approve_task2 = review_task2.complete_approved(reviewer)
+                approve_task2.complete_approved(self.admin)
                 self.approved_languages.append(
                     video.subtitle_language(language_code))
                 self.approval_dates[video.video_id, language_code] = \
