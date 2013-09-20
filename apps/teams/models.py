@@ -2533,13 +2533,11 @@ class TeamNotificationSetting(models.Model):
 
 
 class BillingReport(models.Model):
-    TYPE_OLD = 1
-    TYPE_NEW = 2
+    TYPE_BILLING_RECORD = 2
     TYPE_APPROVAL = 3
     TYPE_CHOICES = (
-        (TYPE_OLD, 'Old model'),
-        (TYPE_NEW, 'New model'),
-        (TYPE_APPROVAL, 'Approval'),
+        (TYPE_BILLING_RECORD, 'Crowd sourced'),
+        (TYPE_APPROVAL, 'Professional services'),
     )
     teams = models.ManyToManyField(Team, related_name='billing_reports')
     start_date = models.DateField()
@@ -2547,7 +2545,8 @@ class BillingReport(models.Model):
     csv_file = S3EnabledFileField(blank=True, null=True,
             upload_to='teams/billing/')
     processed = models.DateTimeField(blank=True, null=True)
-    type = models.IntegerField(choices=TYPE_CHOICES, default=TYPE_OLD)
+    type = models.IntegerField(choices=TYPE_CHOICES,
+                               default=TYPE_BILLING_RECORD)
 
     def __unicode__(self):
         if hasattr(self, 'id') and self.id is not None:
@@ -2557,194 +2556,6 @@ class BillingReport(models.Model):
         return "%s teams (%s - %s)" % (team_count,
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
-
-    def start_datetime(self):
-        midnight = datetime.time(0, 0, 0)
-        return datetime.datetime.combine(self.start_date, midnight)
-
-    def end_datetime(self):
-        almost_midnight = datetime.time(23, 59, 59)
-        return datetime.datetime.combine(self.end_date, almost_midnight)
-
-    def _should_bill(self, language, version, start, end):
-        if not version:
-            return False
-
-        # for moderated team videos we want to be sure that they're published
-        if not version.is_public():
-            return False
-
-        # teams that require no moderation we bill if the user says they're
-        # complete
-        tv = version.video.get_team_video()
-        if not tv or tv.team.is_moderated:
-            if language.in_progress():
-                return False
-
-        if (version.created <= start or
-                version.created >= end):
-            return False
-
-        return True
-
-    def _get_lang_data(self, languages, from_date, team):
-        workflow = team.get_workflow()
-
-        # TODO:
-        # These do the same for now.  If a workflow is enabled, we should get
-        # the first approved version.  Not sure how to do that yet.
-        imported, crowd_created = self._separate_languages(languages)
-
-        # TODO: Are we going to count deleted versions here?  If so, the
-        # get_tip() calls here may need full=True to get deleted tips...
-        if workflow.approve_enabled:
-            imported_data = [(language, language.first_public_version())
-                             for language in imported]
-            crowd_created_data = [(language, language.first_public_version())
-                                  for language in crowd_created]
-        else:
-            imported_data = [(language, language.get_tip()) for
-                             language in imported]
-            crowd_created_data = [(language, language.get_tip()) for
-                                  language in crowd_created]
-
-        old_version_counter = 1
-
-        created_result = []
-
-        # now make sure we don't have any versions from before the
-        # from_date
-        for lang, ver in crowd_created_data:
-            if ver and ver.created < from_date:
-                old_version_counter += 1
-                continue
-
-            created_result.append((lang, ver))
-
-        return created_result, imported_data, old_version_counter
-
-    def _separate_languages(self, languages):
-        """
-        Return two lists;  a list of imported languages and a list of crowd
-        created languages.
-
-        Imported language is a language either
-        * Whose version 0 contains a note of "From youtube"
-        * that was completed before team.created
-        * that is not English
-
-        Crowd created language is a language
-        * that is not imported
-        """
-        from videos.types.youtube import FROM_YOUTUBE_MARKER
-        imported = set()
-        crowd_created = set()
-
-        for lang in languages:
-            try:
-                v = lang.subtitleversion_set.order_by('version_number')[0]
-            except IndexError:
-                # Throw away languages that don't have a zero version.
-                continue
-
-            tv = lang.video.get_team_video()
-            team = tv and tv.team
-            if lang.language_code == 'en':
-                crowd_created.add(lang)
-            elif v.note == FROM_YOUTUBE_MARKER or v.origin == ORIGIN_IMPORTED or \
-                    (not tv or v.created < team.created):
-                imported.add(lang)
-            else:
-                crowd_created.add(lang)
-
-        return imported, crowd_created
-
-    def _get_row_data(self, host, header=None):
-        if not header:
-            header = []
-
-        rows = [header]
-
-        start_date = self.start_datetime()
-        end_date = self.end_datetime()
-
-        for team in self.teams.all():
-            tvs = TeamVideo.objects.filter(team=team).order_by('video__title')
-
-            for tv in tvs:
-                languages = tv.video.newsubtitlelanguage_set.all()
-
-                created_data, imported_data, old_version_counter = \
-                        self._get_lang_data(languages, start_date, team)
-
-                created_rows = self._loop(created_data, 'created', start_date,
-                        end_date, tv, host, old_version_counter)
-
-                imported_rows = self._loop(imported_data, 'imported', start_date,
-                        end_date, tv, host)
-
-                rows = rows + created_rows + imported_rows
-
-        return rows
-
-    def _loop(self, iterable, source, start, end, tv, host, counter=None):
-        rows = []
-
-        for language, v in iterable:
-
-            if not self._should_bill(language, v, start, end):
-                continue
-
-            row = self._prepare_row(tv, language, v, source, counter, host)
-
-            if not row:
-                continue
-
-            rows.append(row)
-
-            if counter is not None:
-                counter += 1
-
-        return rows
-
-    def _prepare_row(self, tv, language, version, source, counter, host):
-        subs = version.get_subtitles()
-
-        if len(subs) == 0:
-            return None
-
-        start = subs[0].start_time
-        end = subs[-1].end_time
-
-        # The -1 value for the end_time isn't allowed anymore but some
-        # legacy data will still have it.
-        if end == -1:
-            end = subs[-1].start_time
-
-        if not end:
-            end = subs[-1].start_time
-
-        return [
-            tv.video.title_display().encode('utf-8'),
-            host + tv.video.get_absolute_url(),
-            language.language_code,
-            source,
-            round((float(end) - float(start)) / (60 * 1000), 2),
-            version.created.strftime("%Y-%m-%d %H:%M:%S"),
-            counter or '',
-            tv.team.slug
-        ]
-
-    def generate_rows_type_old(self):
-        domain = Site.objects.get_current().domain
-        protocol = getattr(settings, 'DEFAULT_PROTOCOL')
-        host = '%s://%s' % (protocol, domain)
-
-        header = ['Video title', 'Video URL', 'Video language', 'Source',
-                'Billable minutes', 'Version created', 'Language number',
-                'Team'
-        ]
-        return  self._get_row_data(host, header)
 
     def generate_rows_type_approval(self):
         header = (
@@ -2783,14 +2594,16 @@ class BillingReport(models.Model):
 
         return rows
 
+    def generate_rows_type_billing_record(self):
+        rows = []
+        for i,team in enumerate(self.teams.all()):
+            rows = rows + BillingRecord.objects.csv_report_for_team(team,
+                self.start_date, self.end_date, add_header=i == 0)
+        return rows
+
     def generate_rows(self):
-        if self.type == BillingReport.TYPE_OLD:
-            rows = self.generate_rows_type_old()
-        elif self.type == BillingReport.TYPE_NEW:
-            rows = []
-            for i,team in enumerate(self.teams.all()):
-                rows = rows + BillingRecord.objects.csv_report_for_team(team,
-                    self.start_date, self.end_date, add_header=i == 0)
+        if self.type == BillingReport.TYPE_BILLING_RECORD:
+            rows = self.generate_rows_type_billing_record()
         elif self.type == BillingReport.TYPE_APPROVAL:
             rows = self.generate_rows_type_approval()
         else:
@@ -3072,7 +2885,7 @@ class BillingRecord(models.Model):
         return super(BillingRecord, self).save(*args, **kwargs)
 
     def get_minutes(self):
-        get_minutes_for_version(self.new_subtitle_version, True)
+        return get_minutes_for_version(self.new_subtitle_version, True)
 
 class Partner(models.Model):
     name = models.CharField(_(u'name'), max_length=250, unique=True)
