@@ -86,20 +86,12 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'root': {
-<<<<<<< HEAD
         'level': 'INFO',
-=======
-        'level': 'WARNING',
->>>>>>> staging
         'handlers': ['console'],
     },
     'formatters': {
         'verbose': {
-<<<<<<< HEAD
             'format': '%(levelname)s %(asctime)s %(name)s %(message)s'
-=======
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
->>>>>>> staging
         },
     },
     'handlers': {
