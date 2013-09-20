@@ -561,7 +561,4 @@ class ApprovalTypeBillingTest(TestCase):
         for (video_id, language_code), row in data.items():
             subtitler = self.subtitlers[video_id, language_code]
             reviewer = self.reviewers[video_id, language_code]
-            self.assertEquals(row['Subtitler'], subtitler.full_name)
-            self.assertEquals(row['Subtitler Email'], subtitler.email)
-            self.assertEquals(row['Reviewer'], reviewer.full_name)
-            self.assertEquals(row['Reviewer Email'], reviewer.email)
+            self.assertEquals(row['Approver'], unicode(self.admin))

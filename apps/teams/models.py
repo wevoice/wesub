@@ -2754,40 +2754,25 @@ class BillingReport(models.Model):
             'Language',
             'Minutes',
             'Original',
-            'Subtitler',
-            'Subtitler Email',
-            'Reviewer',
-            'Reviewer Email',
+            'Approver',
         )
         rows = [header]
         tasks = Task.objects.complete_approve().filter(
             approved=Task.APPROVED_IDS['Approved'],
             team__in=self.teams.all(),
             completed__range=(self.start_date, self.end_date))
-        for task in tasks:
-            video = task.team_video.video
-            version = task.new_subtitle_version
+        for approve_task in tasks:
+            video = approve_task.team_video.video
+            version = approve_task.new_subtitle_version
             language = version.subtitle_language
-            review_task = (Task.objects.complete_review()
-                           .filter(team_video=task.team_video,
-                                   language=task.language)
-                           .order_by('-completed'))[0]
-            subtitle_task = (Task.objects.complete_subtitle_or_translate()
-                             .filter(team_video=task.team_video,
-                                     language=task.language)
-                             .order_by('-completed'))[0]
-
             rows.append((
-                task.team.name,
+                approve_task.team.name,
                 video.title_display(),
                 video.video_id,
-                task.language,
+                approve_task.language,
                 get_minutes_for_version(version, True),
                 int(language.is_primary_audio_language()),
-                subtitle_task.assignee.full_name,
-                subtitle_task.assignee.email,
-                review_task.assignee.full_name,
-                review_task.assignee.email,
+                unicode(approve_task.assignee),
             ))
 
         return rows

@@ -40,7 +40,8 @@ def create_user(password=None, **kwargs):
     current_count = create_user_counter.next()
     defaults = {
         'username': 'test_user_%s' % current_count,
-        'full_name': 'User Number %s' % current_count,
+        'first_name': 'TestUser',
+        'last_name': 'Number %s' % current_count,
         'email': 'test_user_%s@example.com' % current_count,
         'notify_by_email': True,
         'valid_email': True,
