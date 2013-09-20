@@ -493,6 +493,7 @@ class ApprovalTypeBillingTest(TestCase):
         self.reviewers = {}
         self.approved_languages = []
         self.approval_dates = {}
+        self.translations = set()
 
         v1 = test_factories.create_team_video(self.team).video
         v2 = test_factories.create_team_video(self.team).video
@@ -510,22 +511,33 @@ class ApprovalTypeBillingTest(TestCase):
             (v3, 'en'),
             (v3, 'de'),
         ]
+        self.videos = {
+            v1.video_id: v1,
+            v2.video_id: v2,
+            v3.video_id: v3,
+        }
 
         for i, (video, language_code) in enumerate(languages):
+            video_id = video.video_id
             subtitler = self.subtitler_iter.next()
             reviewer = self.reviewer_iter.next()
+            if i % 3 == 0:
+                task_type = 'Translate'
+                self.translations.add((video_id, language_code))
+            else:
+                task_type = 'Subtitle'
             review_task = test_factories.make_review_task(
-                video.get_team_video(), language_code, subtitler)
+                video.get_team_video(), language_code, subtitler, task_type)
             approve_task = review_task.complete_approved(reviewer)
             self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
-            self.subtitlers[video.video_id, language_code] = subtitler
-            self.reviewers[video.video_id, language_code] = reviewer
+            self.subtitlers[video_id, language_code] = subtitler
+            self.reviewers[video_id, language_code] = reviewer
             if i < 6:
                 # for some of those videos, approve them
                 approve_task.complete_approved(self.admin)
                 self.approved_languages.append(
                     video.subtitle_language(language_code))
-                self.approval_dates[video.video_id, language_code] = \
+                self.approval_dates[video_id, language_code] = \
                         self.date_maker.current_date
             if 6 <= i < 8:
                 # for some of those videos, send them back to review, then
@@ -536,7 +548,7 @@ class ApprovalTypeBillingTest(TestCase):
                 approve_task2.complete_approved(self.admin)
                 self.approved_languages.append(
                     video.subtitle_language(language_code))
-                self.approval_dates[video.video_id, language_code] = \
+                self.approval_dates[video_id, language_code] = \
                         self.date_maker.current_date
 
     def get_report_data(self, start_date, end_date):
@@ -548,17 +560,33 @@ class ApprovalTypeBillingTest(TestCase):
         report.teams.add(self.team)
         return get_report_data(report.generate_rows())
 
-    def test_report(self):
-        data = self.get_report_data(self.date_maker.start_date(),
-                                    self.date_maker.end_date())
+    def check_report_rows(self, report_data):
         # check that we got the right number of rows
-        self.assertEquals(len(data), len(self.approved_languages))
+        self.assertEquals(len(report_data), len(self.approved_languages))
         # check video ids and language codes
-        self.assertEquals(set(data.keys()),
+        self.assertEquals(set(report_data.keys()),
                           set((lang.video.video_id, lang.language_code)
                               for lang in self.approved_languages))
-        # test subtitler/reviewer
-        for (video_id, language_code), row in data.items():
+
+    def check_approver(self, report_data):
+        for (video_id, language_code), row in report_data.items():
             subtitler = self.subtitlers[video_id, language_code]
             reviewer = self.reviewers[video_id, language_code]
             self.assertEquals(row['Approver'], unicode(self.admin))
+
+    def check_language_columns(self, report_data):
+        for (video_id, language_code), row in report_data.items():
+            lang = self.videos[video_id].subtitle_language(language_code)
+            self.assertEquals(row['Original'],
+                              lang.is_primary_audio_language())
+            if (video_id, language_code) in self.translations:
+                self.assertEquals(row['Translation?'], True)
+            else:
+                self.assertEquals(row['Translation?'], False)
+
+    def test_report(self):
+        report_data = self.get_report_data(self.date_maker.start_date(),
+                                    self.date_maker.end_date())
+        self.check_report_rows(report_data)
+        self.check_approver(report_data)
+        self.check_language_columns(report_data)

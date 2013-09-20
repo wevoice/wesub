@@ -2754,6 +2754,7 @@ class BillingReport(models.Model):
             'Language',
             'Minutes',
             'Original',
+            'Translation?',
             'Approver',
         )
         rows = [header]
@@ -2765,13 +2766,18 @@ class BillingReport(models.Model):
             video = approve_task.team_video.video
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
+            subtitle_task = (Task.objects.complete_subtitle_or_translate()
+                             .filter(team_video=approve_task.team_video,
+                                     language=approve_task.language)
+                             .order_by('-completed'))[0]
             rows.append((
                 approve_task.team.name,
                 video.title_display(),
                 video.video_id,
                 approve_task.language,
                 get_minutes_for_version(version, True),
-                int(language.is_primary_audio_language()),
+                language.is_primary_audio_language(),
+                subtitle_task.type==Task.TYPE_IDS['Translate'],
                 unicode(approve_task.assignee),
             ))
 
