@@ -2533,11 +2533,17 @@ class TeamNotificationSetting(models.Model):
 
 
 class BillingReport(models.Model):
+    # use BillingRecords to signify completed work
     TYPE_BILLING_RECORD = 2
+    # use approval tasks to signify completed work
     TYPE_APPROVAL = 3
+    # Like TYPE_APPROVAL, but centered on the users who subtitle/review the
+    # work
+    TYPE_APPROVAL_FOR_USERS = 4
     TYPE_CHOICES = (
         (TYPE_BILLING_RECORD, 'Crowd sourced'),
         (TYPE_APPROVAL, 'Professional services'),
+        (TYPE_APPROVAL_FOR_USERS, 'On-demand translators'),
     )
     teams = models.ManyToManyField(Team, related_name='billing_reports')
     start_date = models.DateField()
@@ -2557,6 +2563,12 @@ class BillingReport(models.Model):
                 self.start_date.strftime('%Y-%m-%d'),
                 self.end_date.strftime('%Y-%m-%d'))
 
+    def _get_approved_tasks(self):
+        return Task.objects.complete_approve().filter(
+            approved=Task.APPROVED_IDS['Approved'],
+            team__in=self.teams.all(),
+            completed__range=(self.start_date, self.end_date))
+
     def generate_rows_type_approval(self):
         header = (
             'Team',
@@ -2569,11 +2581,7 @@ class BillingReport(models.Model):
             'Approver',
         )
         rows = [header]
-        tasks = Task.objects.complete_approve().filter(
-            approved=Task.APPROVED_IDS['Approved'],
-            team__in=self.teams.all(),
-            completed__range=(self.start_date, self.end_date))
-        for approve_task in tasks:
+        for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
@@ -2594,6 +2602,50 @@ class BillingReport(models.Model):
 
         return rows
 
+    def generate_rows_type_approval_for_users(self):
+        header = (
+            'User',
+            'Task Type',
+            'Team',
+            'Video Title',
+            'Video ID',
+            'Language',
+            'Minutes',
+            'Original',
+            'Approver',
+            'Note',
+        )
+        data_rows = []
+        for approve_task in self._get_approved_tasks():
+            video = approve_task.team_video.video
+            version = approve_task.new_subtitle_version
+            language = version.subtitle_language
+
+            subtitle_task = (Task.objects.complete_subtitle_or_translate()
+                             .filter(team_video=approve_task.team_video,
+                                     language=approve_task.language)
+                             .order_by('-completed'))[0]
+            review_task = (Task.objects.complete_review()
+                             .filter(team_video=approve_task.team_video,
+                                     language=approve_task.language)
+                             .order_by('-completed'))[0]
+
+            for task in (subtitle_task, review_task):
+                data_rows.append((
+                    unicode(task.assignee),
+                    task.get_type_display(),
+                    approve_task.team.name,
+                    video.title_display(),
+                    video.video_id,
+                    language.language_code,
+                    get_minutes_for_version(version, False),
+                    language.is_primary_audio_language(),
+                    unicode(approve_task.assignee),
+                    task.body))
+
+        data_rows.sort(key=lambda row: row[0])
+        return [header] + data_rows
+
     def generate_rows_type_billing_record(self):
         rows = []
         for i,team in enumerate(self.teams.all()):
@@ -2606,6 +2658,8 @@ class BillingReport(models.Model):
             rows = self.generate_rows_type_billing_record()
         elif self.type == BillingReport.TYPE_APPROVAL:
             rows = self.generate_rows_type_approval()
+        elif self.type == BillingReport.TYPE_APPROVAL_FOR_USERS:
+            rows = self.generate_rows_type_approval_for_users()
         else:
             raise ValueError("Unknown type: %s" % self.type)
 

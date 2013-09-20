@@ -1,3 +1,4 @@
+import collections
 from datetime import datetime, timedelta
 import itertools
 
@@ -29,27 +30,32 @@ class DateMaker(object):
     def end_date(self):
         return self.current_date + timedelta(days=1)
 
-def get_report_data(report_rows):
-    """Get report data in an easy to test way.
-
+def convert_rows_to_dicts(report_rows):
+    """
     Converts each row into a dict, with the keys being the keys from the
     header row.
-
-    Converts the list of rows into a dict mapping (video_id, language_code) to
-    a row.
     """
     header_row = report_rows[0]
-    rv = {}
+    rv = []
     for row in report_rows[1:]:
-        row_data = dict((header, value)
-                        for (header, value)
-                        in zip(header_row, row))
-        video_id = row_data['Video ID']
-        language_code = row_data['Language']
-        assert (video_id, language_code) not in rv, \
-                "Duplicate video_id/language in row: (%s, %s)" % (
-                    video_id, language_code)
-        rv[video_id, language_code] = row_data
+        rv.append(dict((header, value)
+                       for (header, value) in zip(header_row, row)))
+    return rv
+
+def group_report_rows(report_rows, key_columns):
+    """Group report data in an easy to test way.
+
+    Calls convert_rows_to_dicts() on each row, then converts the list of rows
+    into a dict mapping the values from key_columns to rows.
+    """
+    rv = {}
+    for row_data in convert_rows_to_dicts(report_rows):
+        if len(key_columns) > 1:
+            key = tuple(row_data[c] for c in key_columns)
+        else:
+            key = row_data[key_columns[0]]
+        assert key not in rv, "Duplicate key: %s" % key
+        rv[key] = row_data
     return rv
 
 class BillingRecordTest(TestCase):
@@ -69,7 +75,8 @@ class BillingRecordTest(TestCase):
             end_date=end_date,
             type=BillingReport.TYPE_BILLING_RECORD)
         report.teams.add(team)
-        return get_report_data(report.generate_rows())
+        return group_report_rows(report.generate_rows(),
+                                 ('Video ID', 'Language'))
 
     def test_language_number(self):
         date_maker = DateMaker()
@@ -144,7 +151,7 @@ class BillingRecordTest(TestCase):
         self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
         self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
 
-class ApprovalTest(TestCase):
+class ApprovalTestBase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
     def setUp(self, mock_now):
         self.date_maker = DateMaker()
@@ -179,8 +186,9 @@ class ApprovalTest(TestCase):
 
     def setup_videos(self):
         # make a bunch of languages that have moved through the review process
-        self.subtitlers = {}
-        self.reviewers = {}
+        self.subtitled_languages = collections.defaultdict(list)
+        self.reviewed_languages = collections.defaultdict(list)
+        self.notes = {}
         self.approved_languages = []
         self.approval_dates = {}
         self.translations = set()
@@ -206,11 +214,13 @@ class ApprovalTest(TestCase):
             v2.video_id: v2,
             v3.video_id: v3,
         }
+        notes_iter = itertools.cycle(['Great', 'Bad', 'Okay', ''])
 
         for i, (video, language_code) in enumerate(languages):
             video_id = video.video_id
             subtitler = self.subtitler_iter.next()
             reviewer = self.reviewer_iter.next()
+            note = notes_iter.next()
             if i % 3 == 0:
                 task_type = 'Translate'
                 self.translations.add((video_id, language_code))
@@ -218,29 +228,41 @@ class ApprovalTest(TestCase):
                 task_type = 'Subtitle'
             review_task = test_factories.make_review_task(
                 video.get_team_video(), language_code, subtitler, task_type)
+            review_task.body = note
             approve_task = review_task.complete_approved(reviewer)
             self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
-            self.subtitlers[video_id, language_code] = subtitler
-            self.reviewers[video_id, language_code] = reviewer
+            self.notes[video_id, language_code, 'Review'] = note
             if i < 6:
                 # for some of those videos, approve them
                 approve_task.complete_approved(self.admin)
-                self.approved_languages.append(
-                    video.subtitle_language(language_code))
-                self.approval_dates[video_id, language_code] = \
-                        self.date_maker.current_date
+                self.add_approved_language(video, language_code, subtitler,
+                                           reviewer)
             if 6 <= i < 8:
                 # for some of those videos, send them back to review, then
                 # review again and approve the final result
                 # for some of those videos, approve them
                 review_task2 = approve_task.complete_rejected(self.admin)
+                note = notes_iter.next()
+                review_task2.body = note
+                self.notes[video_id, language_code, 'Review'] = note
                 approve_task2 = review_task2.complete_approved(reviewer)
                 approve_task2.complete_approved(self.admin)
-                self.approved_languages.append(
-                    video.subtitle_language(language_code))
-                self.approval_dates[video_id, language_code] = \
-                        self.date_maker.current_date
+                self.add_approved_language(video, language_code, subtitler,
+                                           reviewer)
 
+    def add_approved_language(self, video, language_code, subtitler, reviewer):
+        video_id = video.video_id
+        self.approved_languages.append(
+            video.subtitle_language(language_code))
+        self.approval_dates[video_id, language_code] = \
+                self.date_maker.current_date
+        self.subtitled_languages[unicode(subtitler)].append((video_id,
+                                                             language_code))
+        self.reviewed_languages[unicode(reviewer)].append((video_id,
+                                                           language_code))
+
+
+class ApprovalTest(ApprovalTestBase):
     def get_report_data(self, start_date, end_date):
         """Get report data in an easy to test way.
         """
@@ -248,7 +270,8 @@ class ApprovalTest(TestCase):
             start_date=start_date, end_date=end_date,
             type=BillingReport.TYPE_APPROVAL)
         report.teams.add(self.team)
-        return get_report_data(report.generate_rows())
+        return group_report_rows(report.generate_rows(),
+                                 ('Video ID', 'Language'))
 
     def check_report_rows(self, report_data):
         # check that we got the right number of rows
@@ -260,8 +283,6 @@ class ApprovalTest(TestCase):
 
     def check_approver(self, report_data):
         for (video_id, language_code), row in report_data.items():
-            subtitler = self.subtitlers[video_id, language_code]
-            reviewer = self.reviewers[video_id, language_code]
             self.assertEquals(row['Approver'], unicode(self.admin))
 
     def check_language_columns(self, report_data):
@@ -280,3 +301,58 @@ class ApprovalTest(TestCase):
         self.check_report_rows(report_data)
         self.check_approver(report_data)
         self.check_language_columns(report_data)
+
+class ApprovalForUsersTest(ApprovalTestBase):
+    def get_report_data(self, start_date, end_date):
+        """Get report data in an easy to test way.
+        """
+        report = BillingReport.objects.create(
+            start_date=start_date, end_date=end_date,
+            type=BillingReport.TYPE_APPROVAL_FOR_USERS)
+        report.teams.add(self.team)
+        return convert_rows_to_dicts(report.generate_rows())
+
+    def check_report_rows(self, report_data):
+        # we should have 2 rows per approved language, since each language has
+        # a reviewer and subtitler
+        self.assertEquals(len(report_data), len(self.approved_languages) * 2)
+        report_users = [r['User'] for r in report_data]
+        for u, langs in self.reviewed_languages.items():
+            self.assertEquals(report_users.count(u), len(langs))
+        self.assertEquals(report_users, list(sorted(report_users)))
+
+    def check_videos_and_languages(self, report_data):
+        for row in report_data:
+            video_id = row['Video ID']
+            language = row['Language']
+            if (video_id, language) in self.subtitled_languages[row['User']]:
+                if (video_id, language) in self.translations:
+                    self.assertEquals(row['Task Type'], 'Translate')
+                else:
+                    self.assertEquals(row['Task Type'], 'Subtitle')
+            elif (video_id, language) in self.reviewed_languages[row['User']]:
+                self.assertEquals(row['Task Type'], 'Review')
+            else:
+                raise AssertionError("%s - %s was not subtitled or reviewed" %
+                                     (video_id, language))
+
+    def check_notes(self, report_data):
+        for row in report_data:
+            print (row['Video ID'], row['Language'], row['Task Type'],
+                   row['Note'])
+        for row in report_data:
+            key = (row['Video ID'], row['Language'], row['Task Type'])
+            correct_note = self.notes.get(key, '')
+            if row['Note'] != correct_note:
+                raise AssertionError("Wrong notes for %s, %s, %s.  "
+                                     "note: %r should be %r" % (
+                                         row['Video ID'], row['Language'],
+                                         row['Task Type'], row['Note'],
+                                         correct_note))
+
+    def test_report(self):
+        report_data = self.get_report_data(self.date_maker.start_date(),
+                                    self.date_maker.end_date())
+        self.check_report_rows(report_data)
+        self.check_videos_and_languages(report_data)
+        self.check_notes(report_data)
