@@ -12,18 +12,31 @@ def imagedir(dirname):
                         'dockerfiles',
                         dirname)
 
+def get_image_id(tag):
+    id_path = os.path.join(unisubs_root(), 'docker-dev-environment',
+                           'imageids', tag)
+    return open(id_path).read().strip()
+
+def get_current_image_id(tag):
+    output = subprocess.check_output("docker images -q %s" % tag, shell=True)
+    return output.strip()
+
 def build_image(tag, docker_dir):
     cmdline = 'docker build -t=%s %s' % (tag, docker_dir)
     subprocess.check_call(cmdline, shell=True)
 
+def build_image_if_needed(tag, docker_dir):
+    if get_image_id(tag) != get_current_image_id(tag):
+        build_image(tag, docker_dir)
+
 def main():
     root = unisubs_root()
-    build_image('amara', unisubs_root())
-    build_image('amara-dev', imagedir('amara-dev'))
-    build_image('amara-dev-mysql', imagedir('mysql'))
-    build_image('amara-dev-rabbitmq', imagedir('rabbitmq'))
-    build_image('amara-dev-solr', imagedir('solr'))
-    build_image('amara-dev-memcache', imagedir('memcache'))
+    build_image_if_needed('amara', unisubs_root())
+    build_image_if_needed('amara-dev', imagedir('amara-dev'))
+    build_image_if_needed('amara-dev-mysql', imagedir('mysql'))
+    build_image_if_needed('amara-dev-rabbitmq', imagedir('rabbitmq'))
+    build_image_if_needed('amara-dev-solr', imagedir('solr'))
+    build_image_if_needed('amara-dev-memcache', imagedir('memcache'))
 
 if __name__ == '__main__':
     main()
