@@ -19,5 +19,5 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('externalsites.views',
-    url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>\w+)/$', 'resync', name='resync'),
+    url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
 )
