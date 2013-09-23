@@ -89,3 +89,4 @@ node_modules/
 /buildout
 /src
 frontend-unit-tests-results.xml
+/docker-dev-environment/cidfiles

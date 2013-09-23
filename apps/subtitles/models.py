@@ -25,13 +25,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.db.models import query
+from django.db.models import query, Q
 from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
 
 from apps.subtitles import cache
 from apps.subtitles import shims
-from apps.subtitles import signals
 from apps.auth.models import CustomUser as User
 from apps.videos import metadata
 from apps.videos.models import Video, Action
@@ -39,6 +38,7 @@ from babelsubs.storage import SubtitleSet
 from babelsubs.storage import calc_changes
 from babelsubs.generators.html import HTMLGenerator
 from babelsubs import load_from
+from subtitles import signals
 from videos.behaviors import make_video_title
 
 from utils.compress import compress, decompress
@@ -779,6 +779,8 @@ class SubtitleLanguage(models.Model):
 
         cache.invalidate_language_cache(self)
         self.clear_tip_cache()
+        if sv.is_public():
+            signals.public_tip_changed.send(self, version=sv)
         return sv
 
     def get_metadata(self, public=True):
@@ -811,7 +813,7 @@ class SubtitleLanguage(models.Model):
         languages = [self] + self.get_dependent_subtitle_languages()
         for lang in languages:
             for sv in lang.subtitleversion_set.extant().all():
-                sv.unpublish(delete=True)
+                sv.unpublish(delete=True, signal=False)
             signals.language_deleted.send(lang)
             from teams.signals import api_language_deleted
             api_language_deleted.send(lang)
@@ -1526,6 +1528,21 @@ class SubtitleVersion(models.Model):
         else:
             return '%.0f%%' % (self._text_change * 100)
 
+    def is_tip(self, public=True):
+        qs = SubtitleVersion.objects.filter(
+            subtitle_language_id=self.subtitle_language_id,
+            version_number__gt=self.version_number)
+        if public:
+            visibility_is_public = (Q(visibility=public) &
+                                    Q(visibility_override__isnull=True))
+            override_is_public = Q(visibility_override='public')
+
+            qs = qs.filter(visibility_is_public | override_is_public)
+        else:
+            qs = qs.exclude(Q(visibility='deleted') |
+                           Q(visibility_override='deleted'))
+        return not qs.exists()
+
     def is_private(self):
         if self.visibility_override in ('public', 'deleted'):
             return False
@@ -1733,20 +1750,39 @@ class SubtitleVersion(models.Model):
         team_video = self.video.get_team_video()
 
         assert team_video, \
-               "Cannot unpublish for a video not moderated by a team."
+               "Cannot publish for a video not moderated by a team."
+        was_public = self.is_public()
         self.visibility = 'public'
         self.save()
+        if not was_public and self.is_tip():
+            self.subtitle_language.set_tip_cache('public', self)
+            signals.public_tip_changed.send(self.subtitle_language,
+                                            version=self)
 
-    def unpublish(self, delete=False):
+    def unpublish(self, delete=False, signal=True):
         """Unpublish this version.
 
-        If delete is given, "delete" it entirely (not *really*, of course).
-
+        :param delete: when set, flag the languages as deleted rather than
+        private
+        :param signal: when set we will emit the public_tip_changed() or
+        language_deleted signal
         """
         team_video = self.video.get_team_video()
+        assert team_video, \
+               "Cannot unpublish for a video not moderated by a team."
+        if signal:
+            was_tip = self.is_tip()
 
         self.visibility_override = 'deleted' if delete else 'private'
         self.save()
+        if signal and was_tip:
+            self.subtitle_language.clear_tip_cache()
+            new_tip = version=self.subtitle_language.get_tip(public=True)
+            if new_tip is not None:
+                signals.public_tip_changed.send(self.subtitle_language,
+                                                version=new_tip)
+            else:
+                signals.language_deleted.send(self.subtitle_language)
 
     @models.permalink
     def get_absolute_url(self):

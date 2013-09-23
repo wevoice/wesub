@@ -1,0 +1,14 @@
+Details about services:
+  * MySQL
+    - port: 51000
+    - user: "root"
+    - password: ""
+
+  * Solr:
+    - port: 51001
+
+  * rabbitmq:
+    - port: 51002
+
+  * memcached:
+    - port: 51003

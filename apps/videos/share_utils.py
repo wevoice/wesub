@@ -7,7 +7,8 @@ import widget
 from django.utils.simplejson import dumps as json
 from django.utils.translation import ugettext_lazy as _
 
-domain = Site.objects.get_current().domain
+def domain():
+    return Site.objects.get_current().domain
     
 def _make_facebook_url(page_url, msg):
     title = u'%s: %s' % (msg, page_url)
@@ -46,7 +47,7 @@ def _share_video_title(video):
 
 def _add_share_panel_context_for_video(context, video):
     page_url = reverse('videos:video', kwargs={'video_id':video.video_id})
-    abs_page_url = "http://{0}{1}".format(domain, page_url)
+    abs_page_url = "http://{0}{1}".format(domain(), page_url)
     
     if video.latest_version() is not None:
         msg = _(u"Just found a version of this video with subtitles")
@@ -70,7 +71,7 @@ def _add_share_panel_context_for_video(context, video):
 
 def _add_share_panel_context_for_history(context, video, language=None):
     page_url = language.get_absolute_url() if language else video.get_absolute_url()
-    abs_page_url = "http://{0}{1}".format(domain, page_url)
+    abs_page_url = "http://{0}{1}".format(domain(), page_url)
     
     msg = _(u"%(language)s subtitles for %(video)s:") % {
         'language': language,
@@ -99,7 +100,7 @@ def _add_share_panel_context_for_history(context, video, language=None):
 
 def _add_share_panel_context_for_translation_history(context, video, language_code):
     page_url = reverse('videos:translation_history', args=[video.video_id, language_code])
-    abs_page_url = "http://{0}{1}".format(domain, page_url)
+    abs_page_url = "http://{0}{1}".format(domain(), page_url)
 
     language_name = widget.LANGUAGES_MAP[language_code]
     
