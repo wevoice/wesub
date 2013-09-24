@@ -405,6 +405,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
         # switch over to only using the new editor, we can get rid of the
         # entire concept of forking.
         sl.fork()
+        _fork_dependents(sl)
 
     return version
 
