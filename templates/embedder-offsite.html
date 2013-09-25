@@ -5,6 +5,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css" />
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+        {% block script-include %}
         <script type="text/javascript">
             (function (window, document) {
                 var loader = function () {
@@ -15,6 +16,7 @@
                 window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
             })(window, document);
         </script>
+        {% endblock %}
         <style type="text/css" media="screen">
             body {
                 margin: 20px 0 500px 0;
@@ -49,5 +51,6 @@
                 <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"></div>
             </section>
         </div>
+    {% block body-bottom %}{% endblock %}
     </body>
 </html>
