@@ -31,6 +31,16 @@ def should_include_js_base_dependencies(bundle_type, bundle):
             bundle.get('use_closure') and
             bundle.get('include_js_base_dependencies', True))
 
+def _bundle_output(bundle_name, bundle):
+    if 'output' in bundle:
+        return bundle['output']
+    elif bundle_name == 'embedder':
+        # have to special case this for some reason
+        return "release/public/embedder.js"
+    else:
+        raise ValueError("Don't know how to get bundle output for %s" %
+                         bundle_name)
+
 def _urls_for(bundle_name, should_compress):
     # if we want to turn off compilation at runtime (eg/ on javascript unit tests)
     # then we need to know the media url prior the the unique mungling
@@ -49,7 +59,7 @@ def _urls_for(bundle_name, should_compress):
     
     if should_compress == True and bundle.get('release_url', False):
         media_url = settings.STATIC_URL_BASE
-        urls += [bundle['output']]
+        urls += [_bundle_output(bundle_name, bundle)]
     elif  should_compress == True:
         base = ""
         suffix = ""

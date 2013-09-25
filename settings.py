@@ -800,9 +800,6 @@ MEDIA_BUNDLES = {
     },
     "embedder":{
         "type":"js",
-		"use_closure": True,
-        "optimizations": "SIMPLE_OPTIMIZATIONS",
-        "closure_deps": "",
         "files": (
             "src/js/third-party/json2.min.js",
             'src/js/third-party/underscore.min.js',
@@ -814,8 +811,6 @@ MEDIA_BUNDLES = {
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
-        "include_js_base_dependencies": False,
-        "include_flash_deps": False,
         #"output": 'release/public/embedder.js',
         "release_url": True,
         "bootloader": { 
