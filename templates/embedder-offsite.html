@@ -1,3 +1,4 @@
+{% load media_compressor %}
 <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -5,18 +6,16 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css" />
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-        {% block script-include %}
         <script type="text/javascript">
             (function (window, document) {
                 var loader = function () {
                     var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
-                    script.src = 'http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js';
+                    script.src = "{% full_url_for 'embedder' %}";
                     tag.parentNode.insertBefore(script, tag);
                 };
                 window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
             })(window, document);
         </script>
-        {% endblock %}
         <style type="text/css" media="screen">
             body {
                 margin: 20px 0 500px 0;
@@ -51,6 +50,5 @@
                 <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"></div>
             </section>
         </div>
-    {% block body-bottom %}{% endblock %}
     </body>
 </html>

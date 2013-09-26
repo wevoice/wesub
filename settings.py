@@ -811,11 +811,11 @@ MEDIA_BUNDLES = {
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
-        #"output": 'release/public/embedder.js',
         "release_url": True,
         "bootloader": { 
             "gatekeeper": "_amaraEmbedderLoaded", 
-        }
+        },
+        "output": 'release/public/embedder.js',
 
     },
     "embedder-css":{

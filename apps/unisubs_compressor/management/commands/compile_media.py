@@ -205,7 +205,10 @@ class Command(BaseCommand):
         if bundle_settings.get('use_closure'):
             return self.compile_js_closure_bundle(bundle_name, files)
 
-        output_file_name = bundle_name + '.js'
+        if 'bootloader' in bundle_settings:
+            output_file_name = "{0}-inner.js".format(bundle_name)
+        else:
+            output_file_name = "{0}.js".format(bundle_name)
         output_path = os.path.join(self.temp_dir, "js" , output_file_name)
         with open(output_path, 'w') as output:
             for input_filename in files:
@@ -213,6 +216,10 @@ class Command(BaseCommand):
                 minified = jsmin(open(input_path).read());
                 output.write('/* %s */\n' % input_filename);
                 output.write("%s;\n" % (minified,))
+
+        if 'bootloader' in bundle_settings:
+            self._compile_js_bootloader(
+                bundle_name, bundle_settings['bootloader'])
 
     def ensure_js_dir_exists(self):
         temp_js_dir = os.path.join(self.temp_dir, 'js')

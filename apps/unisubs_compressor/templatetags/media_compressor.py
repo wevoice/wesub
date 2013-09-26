@@ -77,7 +77,7 @@ def _urls_for(bundle_name, should_compress):
         
         if should_compress:
             logger.warning("could not find final url for %s" % bundle_name)
-    return urls  , media_url, bundle_type
+    return urls, media_url, bundle_type
     
 @register.simple_tag
 def include_bundle(bundle_name, should_compress=None):
@@ -91,3 +91,8 @@ def include_bundle(bundle_name, should_compress=None):
 @register.simple_tag
 def url_for(bundle_name, should_compress=True):
     return _urls_for(bundle_name, should_compress)[0][0]
+
+@register.simple_tag
+def full_url_for(bundle_name, should_compress=True):
+    urls, media_url, bundle_type = _urls_for(bundle_name, should_compress)
+    return media_url + urls[0]
