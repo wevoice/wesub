@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from dockerdev import services
+from dockerdev import containers
 
-services.stop_services()
+containers.stop_services()
 

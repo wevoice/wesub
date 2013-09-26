@@ -33,8 +33,12 @@ def get_cid(image_name):
         return None
     return open(cid_path(image_name)).read().strip()
 
-def running_images():
+def get_running_images():
     output = get_docker_output("ps -q")
+    return [line.strip() for line in output.split("\n")]
+
+def get_all_images():
+    output = get_docker_output("ps -a -q")
     return [line.strip() for line in output.split("\n")]
 
 def run_image(image_name):
@@ -52,15 +56,21 @@ def remove_image(image_name):
     os.remove(cid_path(image_name))
 
 def start_services():
-    currently_running = running_images()
+    currently_running = get_running_images()
+    all_images = get_all_images()
     for image_name in SERVICE_IMAGES:
         if not os.path.exists(cid_path(image_name)):
             run_image(image_name)
-        elif get_cid(image_name) not in currently_running:
-            start_image(image_name)
+        else:
+            cid = get_cid(image_name)
+            if cid not in all_images:
+                os.remove(cid_path(image_name))
+                run_image(image_name)
+            elif cid not in currently_running:
+                start_image(image_name)
 
 def stop_services():
-    currently_running = running_images()
+    currently_running = get_running_images()
     for image_name in SERVICE_IMAGES:
         if get_cid(image_name) in currently_running:
             stop_image(image_name)

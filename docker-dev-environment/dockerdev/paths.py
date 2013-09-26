@@ -30,8 +30,5 @@ def image_dir(image_name):
     else:
         return os.path.join(env_root(), 'dockerfiles', image_name)
 
-def imageid_path(image_name):
-    return os.path.join(env_root(), 'imageids', image_name)
-
 def cid_path(image_name):
     return os.path.join(env_root(), 'cidfiles', image_name)

@@ -36,6 +36,7 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
     image_name = 'amara-dev-manage-%s' % (uuid.uuid1().hex[:10],)
     volume_arg = '%s:/opt/apps/unisubs' % (unisubs_root(),)
     run_cmd = [
+        'docker',
         'run',
         '-i', '-t',
         '-cidfile=%s' % cid_path(image_name),

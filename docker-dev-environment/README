@@ -15,7 +15,6 @@ which will take a while:
 
 ./startup.py
 
-
 Notes:
   - You will either need to run these scripts as root, or add your user to the
     docker group.  (Read the Why Sudo? section in
@@ -25,6 +24,9 @@ Notes:
     network with:
 
     sudo sh reset-docker-network.sh
+
+  - If you or someone else changes a Dockerfile, use ./startup --rebuild to
+    rebuild all images.
 
 RUNNING A TEST SERVER:
 
@@ -48,7 +50,7 @@ STOPPING SERVICES:
 
 ./shutdown.py
 
-SERVICES:
+NOTES ON SERVICES:
 
 We set up several docker images/containers to provide services for the dev
 envonment.  Here's some details about them:
