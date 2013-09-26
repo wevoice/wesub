@@ -17,9 +17,10 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 import os
+import time
 
 from dockerdev.paths import cid_path
-from dockerdev.rundocker import run_docker, get_docker_output
+from dockerdev.rundocker import run_docker, get_docker_output, run_manage
 
 SERVICE_IMAGES = [
     'amara-dev-mysql',
@@ -41,9 +42,18 @@ def get_all_images():
     output = get_docker_output("ps -a -q")
     return [line.strip() for line in output.split("\n")]
 
+def initailize_mysql_container():
+    print '* initializing your database'
+    run_manage(['syncdb', '--all', '--noinput'])
+    run_manage(['migrate', '--fake'])
+
 def run_image(image_name):
     run_docker("run -d -cidfile=%s -h=%s %s", cid_path(image_name),
                image_name, image_name)
+    if image_name == 'amara-dev-mysql':
+        # give mysql a bit of time to startup
+        time.sleep(1)
+        initailize_mysql_container()
 
 def start_image(image_name):
     run_docker("start %s" % (get_cid(image_name)))
