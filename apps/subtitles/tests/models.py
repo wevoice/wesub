@@ -151,37 +151,43 @@ class TestSubtitleLanguage(TestCase):
 
     def test_get_tip(self):
         sl = make_sl(self.video, 'en')
+        versions = []
 
         def _assert_tip(public, version_number):
             tip = sl.get_tip(public=public)
             if tip:
-                tip = tip.version_number
-            self.assertEqual(tip, version_number)
+                self.assertEqual(tip.version_number, version_number)
+                self.assertEqual(tip.is_tip(public), True)
+            else:
+                self.assertEqual(tip, None)
+
+        def add_version(**kwargs):
+            versions.append(sl.add_version(**kwargs))
 
         _assert_tip(False, None)
         _assert_tip(True, None)
 
-        sl.add_version(visibility='private')
+        add_version(visibility='private')
         _assert_tip(False, 1)
         _assert_tip(True, None)
 
-        sl.add_version()
+        add_version()
         _assert_tip(False, 2)
         _assert_tip(True, 2)
 
-        sl.add_version(visibility='public', visibility_override='private')
+        add_version(visibility='public', visibility_override='private')
         _assert_tip(False, 3)
         _assert_tip(True, 2)
 
-        sl.add_version(visibility='private', visibility_override='private')
+        add_version(visibility='private', visibility_override='private')
         _assert_tip(False, 4)
         _assert_tip(True, 2)
 
-        sl.add_version(visibility='private', visibility_override='public')
+        add_version(visibility='private', visibility_override='public')
         _assert_tip(False, 5)
         _assert_tip(True, 5)
 
-        sl.add_version(visibility='public', visibility_override='public')
+        add_version(visibility='public', visibility_override='public')
         _assert_tip(False, 6)
         _assert_tip(True, 6)
 

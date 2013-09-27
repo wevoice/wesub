@@ -464,7 +464,7 @@ class CreditTest(TestCase):
 
 class KalturaVideoTypeTest(TestCase):
     def test_type(self):
-        url = 'http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/entryId/1_zr7niumr/flavorId/1_djpnqf7y/name/a'
+        url = 'http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/serveFlavor/entryId/1_zr7niumr/flavorId/1_djpnqf7y/name/a.mp4'
 
         video, created = Video.get_or_create_for_url(url)
         vu = video.videourl_set.get()

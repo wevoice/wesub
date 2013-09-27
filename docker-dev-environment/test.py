@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
-import manage
 import sys
 
-def runserver(args):
-    manage.run_manage(["test"] + args, settings='docker_dev_settings_test')
+from dockerdev.rundocker import run_manage
 
-if __name__ == '__main__':
-    runserver(sys.argv[1:])
+run_manage(["test"] + sys.argv[1:], settings='docker_dev_settings_test')
