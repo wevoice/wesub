@@ -71,6 +71,7 @@ var angular = angular || null;
             this.dir = 'ltr';
         }
         this.isPrimaryAudioLanguage = responseData.is_original;
+        this.subtitlesComplete = responseData.subtitles_complete;
         var lastVersion = _.last(responseData.versions);
         if(lastVersion) {
             this.lastVersionNumber = lastVersion.version_no;
