@@ -232,10 +232,12 @@ var angular = angular || null;
             // of the new version when the save is complete.  If nothing has
             // changed, then we don't save anything and return the current
             // version number.
+            var language = $scope.workingSubtitles.language;
             if ($scope.status !== 'saving') {
                 var deferred = $q.defer();
 
-                if($scope.changesMade || markComplete !== undefined) {
+                if($scope.changesMade ||
+                        markComplete !== language.subtitlesComplete) {
                     // changes have been made, we need to save the subtitles
                     $scope.status = 'saving';
                     var promise = $scope.saveSubtitles(markComplete);
