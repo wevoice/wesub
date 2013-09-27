@@ -285,7 +285,7 @@ span.unisubs-widget {
     width: 440px !important;
 }
 .unisubs-modal-widget-sync .unisubs-right, .unisubs-modal-widget-review .unisubs-right {
-    height: 751px !important
+    height: 771px !important
 }
 .unisubs-modal-widget-translate .unisubs-right {
     background: url("../images/widget_right_bg.gif") 0 0 repeat-y !important;
@@ -964,7 +964,7 @@ span.unisubs-videoplayer object, span.unisubs-videoplayer embed {
     display: block !important
 }
 ul.unisubs-titlesList {
-    height: 336px !important;
+    height: 352px !important;
     margin: 0 !important;
     overflow: auto !important;
     padding: 0 !important;
