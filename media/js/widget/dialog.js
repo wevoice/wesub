@@ -53,7 +53,7 @@ goog.inherits(unisubs.Dialog, goog.ui.Dialog);
 /* @const {int}
  * Number of minutes until the idle dialog is show
  */
-unisubs.Dialog.MINUTES_TILL_WARNING = 5;
+unisubs.Dialog.MINUTES_TILL_WARNING = 15;
 
 /* @const {int}
  * Number of seconds after the idle dialog is show that
