@@ -2621,16 +2621,21 @@ class BillingReport(models.Model):
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
 
-            subtitle_task = (Task.objects.complete_subtitle_or_translate()
-                             .filter(team_video=approve_task.team_video,
-                                     language=approve_task.language)
-                             .order_by('-completed'))[0]
-            review_task = (Task.objects.complete_review()
-                             .filter(team_video=approve_task.team_video,
-                                     language=approve_task.language)
-                             .order_by('-completed'))[0]
+            all_tasks = []
+            all_tasks.append((Task.objects.complete_subtitle_or_translate()
+                              .filter(team_video=approve_task.team_video,
+                                      language=approve_task.language)
+                              .order_by('-completed'))[0])
+            try:
+                all_tasks.append((Task.objects.complete_review()
+                                  .filter(team_video=approve_task.team_video,
+                                          language=approve_task.language)
+                                  .order_by('-completed'))[0])
+            except IndexError:
+                # review not enabled
+                pass
 
-            for task in (subtitle_task, review_task):
+            for task in all_tasks:
                 data_rows.append((
                     unicode(task.assignee),
                     task.get_type_display(),

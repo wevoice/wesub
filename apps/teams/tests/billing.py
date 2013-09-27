@@ -356,3 +356,36 @@ class ApprovalForUsersTest(ApprovalTestBase):
         self.check_report_rows(report_data)
         self.check_videos_and_languages(report_data)
         self.check_notes(report_data)
+
+class ApprovalForUsersNoReviewTest(TestCase):
+    # Test the approval for users type when review is disabled
+    #
+    @test_utils.patch_for_test('teams.models.Task.now')
+    def setUp(self, mock_now):
+        self.date_maker = DateMaker()
+        mock_now.side_effect = self.date_maker.next_date
+        self.team = test_factories.create_team(workflow_enabled=True)
+        test_factories.create_workflow(
+            self.team,
+            review_allowed=0, # no review
+            approve_allowed=20, # admin must approve
+        )
+        self.admin = test_factories.create_team_member(team=self.team,
+                                                       role=ROLE_ADMIN).user
+        self.video = test_factories.create_team_video(self.team).video
+
+        approve_task = test_factories.make_approve_task(
+            self.video.get_team_video(), 'en', self.admin, 'Subtitle')
+        approve_task.complete_approved(self.admin)
+
+    def test_report(self):
+        report = BillingReport.objects.create(
+            start_date=self.date_maker.start_date(),
+            end_date=self.date_maker.end_date(),
+            type=BillingReport.TYPE_APPROVAL_FOR_USERS)
+        report.teams.add(self.team)
+        report_data = group_report_rows(report.generate_rows(),
+                                        ('User',))
+        self.assertEquals(len(report_data), 1)
+        self.assertEquals(report_data[unicode(self.admin)]['Video ID'],
+                          self.video.video_id)
