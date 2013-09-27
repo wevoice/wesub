@@ -363,6 +363,19 @@ def _get_language(video, language_code):
 
     return sl, language_needs_save
 
+def _timings_changed(subtitle_language, new_version):
+    """Calculate if the number of subtitles or the timings the subtitles have
+    changed between the tip version and the previous version.
+    """
+    previous_version = new_version.previous_version()
+    if previous_version is None:
+        return False
+    new_timings = [(s.start_time, s.end_time)
+                   for s in new_version.get_subtitles()]
+    old_timings = [(s.start_time, s.end_time)
+                   for s in previous_version.get_subtitles()]
+    return new_timings != old_timings
+
 
 def _add_subtitles(video, language_code, subtitles, title, description, author,
                    visibility, visibility_override, parents,
@@ -399,7 +412,7 @@ def _add_subtitles(video, language_code, subtitles, title, description, author,
 
     if origin in (ORIGIN_UPLOAD, ORIGIN_API):
         _fork_dependents(sl)
-    elif origin == ORIGIN_WEB_EDITOR:
+    elif origin == ORIGIN_WEB_EDITOR and _timings_changed(sl, version):
         # fork languages when they are edited in the new editor, since it's
         # easy to make things out-of-sync from the source language.  Once we
         # switch over to only using the new editor, we can get rid of the
