@@ -2597,7 +2597,7 @@ class BillingReport(models.Model):
                 get_minutes_for_version(version, True),
                 language.is_primary_audio_language(),
                 subtitle_task.type==Task.TYPE_IDS['Translate'],
-                unicode(approve_task.assignee).encode('utf-8'),
+                unicode(approve_task.assignee),
             ))
 
         return rows
@@ -2637,7 +2637,7 @@ class BillingReport(models.Model):
 
             for task in all_tasks:
                 data_rows.append((
-                    unicode(task.assignee).encode("utf-8"),
+                    unicode(task.assignee),
                     task.get_type_display(),
                     approve_task.team.name,
                     video.title_display(),
@@ -2645,8 +2645,8 @@ class BillingReport(models.Model):
                     language.language_code,
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
-                    unicode(approve_task.assignee).encode("utf-8"),
-                    unicode(task.body).encode("utf-8")))
+                    unicode(approve_task.assignee),
+                    unicode(task.body)))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows
@@ -2667,8 +2667,13 @@ class BillingReport(models.Model):
             rows = self.generate_rows_type_approval_for_users()
         else:
             raise ValueError("Unknown type: %s" % self.type)
-
         return rows
+
+    def convert_unicode_to_utf8(self, rows):
+        for row in rows:
+            for i, value in enumerate(row):
+                if isinstance(value, unicode):
+                    row[i] = value.encode("utf-8")
 
     def process(self):
         """
@@ -2677,6 +2682,7 @@ class BillingReport(models.Model):
         storage will take care of exporting it to s3.
         """
         rows = self.generate_rows()
+        self.convert_unicode_to_utf8(rows)
         fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)
@@ -2733,7 +2739,7 @@ class BillingReportGenerator(object):
 
     def make_row(self, video, record):
         return [
-            video.title_display().encode('utf-8'),
+            video.title_display(),
             video.video_id,
             record.new_subtitle_language.language_code,
             record.minutes,
@@ -2742,7 +2748,7 @@ class BillingReportGenerator(object):
             record.team.slug,
             record.created.strftime('%Y-%m-%d %H:%M:%S'),
             record.source,
-            record.user.username.encode('utf-8'),
+            record.user.username,
         ]
 
     def make_language_number_map(self, records):
@@ -2780,7 +2786,7 @@ NOT EXISTS (
 
     def make_row_for_lang_without_record(self, video, language):
         return [
-            video.title_display().encode('utf-8'),
+            video.title_display(),
             video.video_id,
             language.language_code,
             0,
