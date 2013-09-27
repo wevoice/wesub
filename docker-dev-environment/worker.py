@@ -1,14 +1,10 @@
 #!/usr/bin/python
 
-import manage
+from dockerdev.rundocker import run_manage
 
-def runworker():
-    manage.run_manage([
-        "celery", "worker",
-        "--scheduler=djcelery.schedulers.DatabaseScheduler",
-        "--loglevel=DEBUG",
-        "--autoreload",
-    ])
-
-if __name__ == '__main__':
-    runworker()
+run_manage([
+    "celery", "worker",
+    "--scheduler=djcelery.schedulers.DatabaseScheduler",
+    "--loglevel=DEBUG",
+    "--autoreload",
+])

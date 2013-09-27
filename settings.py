@@ -419,9 +419,11 @@ INSTALLED_APPS = (
     'amaradotorg',
     'amaracelery',
     'comments',
+    'externalsites',
     'messages',
     'profiles',
     'search',
+    'startup',
     'statistic',
     'streamer',
     'teams',
@@ -435,6 +437,10 @@ INSTALLED_APPS = (
     'widget',
     'subtitles',
 )
+
+STARTUP_MODULES = [
+    'externalsites.signalhandlers',
+]
 
 # Celery settings
 
@@ -794,9 +800,6 @@ MEDIA_BUNDLES = {
     },
     "embedder":{
         "type":"js",
-		"use_closure": True,
-        "optimizations": "SIMPLE_OPTIMIZATIONS",
-        "closure_deps": "",
         "files": (
             "src/js/third-party/json2.min.js",
             'src/js/third-party/underscore.min.js',
@@ -808,13 +811,11 @@ MEDIA_BUNDLES = {
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
-        "include_js_base_dependencies": False,
-        "include_flash_deps": False,
-        #"output": 'release/public/embedder.js',
         "release_url": True,
         "bootloader": { 
             "gatekeeper": "_amaraEmbedderLoaded", 
-        }
+        },
+        "output": 'release/public/embedder.js',
 
     },
     "embedder-css":{

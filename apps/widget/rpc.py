@@ -200,6 +200,17 @@ class Rpc(BaseRpc):
                                                            video_id, is_remote)
         return resp
 
+    def track_subtitle_play(self, request, video_id):
+        # NOTE: we used to use this method to track when subtitles were
+        # played from amara or other sites, however it wasn't very useful
+        # since most other sites din't use it.  So when we switched to the new
+        # statistics system we just removed the functionality.
+        #
+        # It would be great to re-implement this, and connect it to
+        # statistics.hitcounts.subtitle_views.  However, we need to figure how
+        # to deal the external sites.
+
+        return { 'response': 'ok' }
 
     # Start Dialog (aka "Subtitle Into" Dialog)
     def _get_blocked_languages(self, team_video, user):

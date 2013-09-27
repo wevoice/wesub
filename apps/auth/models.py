@@ -309,7 +309,10 @@ class CustomUser(BaseUser):
 
     @classmethod
     def get_anonymous(cls):
-        return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)
+        try:
+            return cls.objects.get(pk=settings.ANONYMOUS_USER_ID)
+        except cls.DoesNotExist:
+            return None
 
     @property
     def is_anonymous(self):
