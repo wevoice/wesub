@@ -2597,7 +2597,7 @@ class BillingReport(models.Model):
                 get_minutes_for_version(version, True),
                 language.is_primary_audio_language(),
                 subtitle_task.type==Task.TYPE_IDS['Translate'],
-                unicode(approve_task.assignee),
+                unicode(approve_task.assignee).encode('utf-8'),
             ))
 
         return rows
@@ -2637,7 +2637,7 @@ class BillingReport(models.Model):
 
             for task in all_tasks:
                 data_rows.append((
-                    unicode(task.assignee),
+                    unicode(task.assignee).encode("utf-8"),
                     task.get_type_display(),
                     approve_task.team.name,
                     video.title_display(),
@@ -2645,7 +2645,7 @@ class BillingReport(models.Model):
                     language.language_code,
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
-                    unicode(approve_task.assignee),
+                    unicode(approve_task.assignee).encode("utf-8"),
                     task.body))
 
         data_rows.sort(key=lambda row: row[0])
