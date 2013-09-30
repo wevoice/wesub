@@ -3,6 +3,8 @@ import functools
 import os
 import urlparse
 
+import mock
+from celery.task import Task
 from django.core.cache import cache
 from nose.plugins import Plugin
 from nose.tools import assert_equal
@@ -201,6 +203,7 @@ acquire_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.add(name))
 release_lock = mock.Mock(
     side_effect=lambda c, name: current_locks.remove(name))
+invalidate_widget_video_cache = mock.Mock()
 update_subtitles = mock.Mock()
 delete_subtitles = mock.Mock()
 update_all_subtitles = mock.Mock()
@@ -211,9 +214,9 @@ class MonkeyPatcher(object):
     def patch_functions(self):
         # list of (function, mock object tuples)
         patch_info = [
-            ('videos.tasks.save_thumbnail_in_s3.delay', save_thumbnail_in_s3),
-            ('teams.tasks.update_one_team_video.delay', update_team_video),
-            ('utils.celery_search_index.update_search_index.delay',
+            ('videos.tasks.save_thumbnail_in_s3', save_thumbnail_in_s3),
+            ('teams.tasks.update_one_team_video', update_team_video),
+            ('utils.celery_search_index.update_search_index',
              update_search_index),
             ('videos.types.youtube.YoutubeVideoType._get_entry',
              youtube_get_entry),
@@ -223,24 +226,34 @@ class MonkeyPatcher(object):
              _add_amara_description_credit_to_youtube_vurl),
             ('utils.applock.acquire_lock', acquire_lock),
             ('utils.applock.release_lock', release_lock),
+            ('widget.video_cache.invalidate_cache',
+             invalidate_widget_video_cache),
             ('externalsites.tasks.update_subtitles', update_subtitles),
             ('externalsites.tasks.delete_subtitles', delete_subtitles),
             ('externalsites.tasks.update_all_subtitles', update_all_subtitles),
         ]
         self.patches = []
-        for func_name, mock_obj in patch_info:
-            self.patches.append(mock.patch(func_name, mock_obj))
-            if not func_name.startswith("utils"):
-                # Ugh have to patch the function twice since some modules use
-                # app and some don't
-                self.patches.append(mock.patch('apps.' + func_name, mock_obj))
         self.mock_object_initial_data = {}
-        for patch in self.patches:
-            mock_obj = patch.start()
-            self.mock_object_initial_data[mock_obj] = mock_obj.__dict__.copy()
-            mock_obj.original_func = patch.temp_original
-            mock_obj.run_original = functools.partial(self.run_original_func,
-                                                      mock_obj)
+        for func_name, mock_obj in patch_info:
+            self.start_patch(func_name, mock_obj)
+
+    def start_patch(self, func_name, mock_obj):
+        patch = mock.patch(func_name, mock_obj)
+        mock_obj = patch.start()
+        self.mock_object_initial_data[mock_obj] = mock_obj.__dict__.copy()
+        mock_obj.original_func = patch.temp_original
+        mock_obj.run_original = functools.partial(self.run_original_func,
+                                                  mock_obj)
+        self.patches.append(patch)
+
+        if isinstance(patch.temp_original, Task):
+            # for celery tasks, also patch the .delay() method
+            self.start_patch(func_name + '.delay', mock_obj)
+        if (not func_name.startswith("apps.") and
+            not func_name.startswith("utils")):
+            # Ugh have to patch the function twice since some modules use
+            # app and some don't
+            self.start_patch('apps.' + func_name, mock_obj)
 
     def run_original_func(self, mock_obj):
         return [mock_obj.original_func(*args, **kwargs)
