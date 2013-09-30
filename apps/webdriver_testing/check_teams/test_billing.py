@@ -421,8 +421,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         self.logger.info('Adding translation for next video')
         self.add_translation('de', vid, self.contributor2, complete=True)
         self.data_utils.complete_review_task(tv, 20, self.contributor, 
-                                             note = 'Task shared with Gabriel')
-        #José') add back when non-ascii chars in notes fixed.
+                                             note = 'Task shared with GabrielJosé') 
 
         self.data_utils.complete_approve_task(tv, 20, self.admin)
         report = BillingFactory(type=4, 
@@ -457,7 +456,8 @@ class TestCaseDemandReports(WebdriverTestCase):
                                    'Note': 'Task shared with Gabriel', 
                                    'User': " ".join([self.contributor.first_name, 
                                                      self.contributor.last_name]),
-                                   'Original': 'False' 
+                                   'Original': 'False',
+                                   'Note': 'Task shared with GabrielJos\xc3\xa9'
                                  }
         self.assertIn(expected_translate_data, user_tasks)
         self.assertIn(expected_reviewer_data, user_tasks)
