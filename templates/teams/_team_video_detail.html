@@ -32,7 +32,7 @@
     <ul class="admin-controls">
         {% with search_record|can_edit_video:request.user as can_edit_this_video %}
             {% if can_edit_this_video %}
-                {% if team.slug|lower == 'tedx-import' or team.slug|lower == 'tedxtalks-prep' %}
+                {% if team.slug|lower == 'tedx-import' or team.slug|lower == 'tedxtalks-prep' or team.slug|lower == 'tedxtalks-import' %}
                     <li>
                         <a href="{% url videos:set_original_language search_record.video_id %}" title="Set language">Set language</a>
                     </li>

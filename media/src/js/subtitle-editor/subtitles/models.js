@@ -590,7 +590,6 @@ var angular = angular || null;
                     function(subtitleData) {
                 that.state = 'loaded';
                 that.title = subtitleData.title;
-                debugger;
                 that.initMetadataFromVideo()
                 for(key in subtitleData.metadata) {
                     that.metadata[key] = subtitleData.metadata[key];

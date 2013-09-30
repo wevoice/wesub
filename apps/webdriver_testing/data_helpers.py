@@ -176,7 +176,7 @@ class DataHelpers(object):
         videos = _create_videos(testdata, [])
         return videos
 
-    def complete_review_task(self, tv, status_code, assignee):
+    def complete_review_task(self, tv, status_code, assignee, note=None):
         """Complete the review task, 20 for approve, 30 for reject.
  
         Making the assumtion that I have only 1 at a time.
@@ -185,10 +185,12 @@ class DataHelpers(object):
         task = list(tv.task_set.incomplete_review().all())[0]
         task.assignee = assignee
         task.approved = status_code
+        if note:
+            task.body = note
         task.save()
         task.complete()
 
-    def complete_approve_task(self, tv, status_code, assignee):
+    def complete_approve_task(self, tv, status_code, assignee, note=None):
         """Complete the approve task, 20 for approve, 30 for reject.
  
         Making the assumtion that I have only 1 at a time.
@@ -197,5 +199,7 @@ class DataHelpers(object):
         task = list(tv.task_set.incomplete_approve().all())[0]
         task.assignee = assignee 
         task.approved = status_code
+        if note:
+            task.body = note
         task.save()
         task.complete()

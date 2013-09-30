@@ -89,6 +89,7 @@ def _language_data(language, editing_version, translated_from_version,
         'pk': language.pk,
         'numVersions': language.num_versions,
         'versions': versions_data,
+        'subtitles_complete': language.subtitles_complete,
         'is_rtl': language.is_rtl(),
         'is_original': language.is_primary_audio_language()
     }

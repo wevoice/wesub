@@ -16,8 +16,19 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls import patterns, url
+import os
 
-urlpatterns = patterns('externalsites.views',
-    url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
-)
+def unisubs_root():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+def env_root():
+    return os.path.join(unisubs_root(), 'docker-dev-environment')
+
+def image_dir(image_name):
+    if image_name == 'amara':
+        return unisubs_root()
+    else:
+        return os.path.join(env_root(), 'dockerfiles', image_name)
+
+def cid_path(image_name):
+    return os.path.join(env_root(), 'cidfiles', image_name)

@@ -40,6 +40,8 @@ def create_user(password=None, **kwargs):
     current_count = create_user_counter.next()
     defaults = {
         'username': 'test_user_%s' % current_count,
+        'first_name': 'TestUser',
+        'last_name': 'Number %s' % current_count,
         'email': 'test_user_%s@example.com' % current_count,
         'notify_by_email': True,
         'valid_email': True,
@@ -134,7 +136,7 @@ def dxfp_sample(language_code):
  </body>
 </tt>""" % language_code)
 
-def make_review_task(team_video, language_code, user):
+def make_review_task(team_video, language_code, user, task_type='Translate'):
     """Move a video through the tasks process to the review stage, then return
     that task.
 
@@ -144,7 +146,7 @@ def make_review_task(team_video, language_code, user):
     """
     team = team_video.team
     task = Task(team=team, team_video=team_video, assignee=None,
-         language=language_code, type=Task.TYPE_IDS['Translate'])
+                language=language_code, type=Task.TYPE_IDS[task_type])
     task.save()
     v = pipeline.add_subtitles(team_video.video, language_code, None,
                                complete=False, visibility='private')
@@ -152,7 +154,7 @@ def make_review_task(team_video, language_code, user):
     task.new_subtitle_version = v
     return task.complete()
 
-def make_approve_task(team_video, language_code, user):
+def make_approve_task(team_video, language_code, user, task_type='Translate'):
     """Move a video through the tasks process to the approve stage, then return
     that task.
 
@@ -163,7 +165,7 @@ def make_approve_task(team_video, language_code, user):
     team = team_video.team
     assert team.get_workflow().approve_allowed != 0
     task = Task(team=team, team_video=team_video, assignee=None,
-         language=language_code, type=Task.TYPE_IDS['Translate'])
+         language=language_code, type=Task.TYPE_IDS[task_type])
     task.save()
     v = pipeline.add_subtitles(team_video.video, language_code, None,
                                complete=False, visibility='private')

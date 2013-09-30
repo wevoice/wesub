@@ -18,7 +18,7 @@
 
 var angular = angular || null;
 var LOCK_EXPIRATION = 25;
-var USER_IDLE_MINUTES = 5;
+var USER_IDLE_MINUTES = 15;
 
 (function() {
 

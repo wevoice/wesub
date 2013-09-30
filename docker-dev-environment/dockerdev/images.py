@@ -16,8 +16,21 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django.conf.urls import patterns, url
+from dockerdev.paths import unisubs_root, image_dir
+from dockerdev.rundocker import get_docker_output, run_docker
 
-urlpatterns = patterns('externalsites.views',
-    url(r'^resync/(?P<video_url_id>\d+)/(?P<language_code>[\w-]+)/$', 'resync', name='resync'),
-)
+ALL_IMAGES = [
+    'amara',
+    'amara-dev',
+    'amara-dev-mysql',
+    'amara-dev-rabbitmq',
+    'amara-dev-solr',
+    'amara-dev-memcache',
+]
+
+def build_image(image_name):
+    run_docker('build -t=%s %s', image_name, image_dir(image_name))
+
+def rebuild_images():
+    for image_name in ALL_IMAGES:
+        build_image(image_name)
