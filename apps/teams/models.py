@@ -2646,7 +2646,7 @@ class BillingReport(models.Model):
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
                     unicode(approve_task.assignee).encode("utf-8"),
-                    task.body))
+                    unicode(task.body).encode("utf-8")))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows
