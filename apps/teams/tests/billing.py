@@ -384,9 +384,7 @@ class ApprovalForUsersTest(ApprovalTestBase):
         self.check_videos_and_languages(report_data)
         self.check_notes(report_data)
 
-class ApprovalForUsersNoReviewTest(TestCase):
-    # Test the approval for users type when review is disabled
-    #
+class SimpleApprovalTestCase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
     def setUp(self, mock_now):
         self.date_maker = DateMaker()
@@ -401,11 +399,12 @@ class ApprovalForUsersNoReviewTest(TestCase):
                                                        role=ROLE_ADMIN).user
         self.video = test_factories.create_team_video(self.team).video
 
+class ApprovalForUsersNoReviewTest(SimpleApprovalTestCase):
+    # Test the approval for users type when review is disabled
+    def test_report(self):
         approve_task = test_factories.make_approve_task(
             self.video.get_team_video(), 'en', self.admin, 'Subtitle')
         approve_task.complete_approved(self.admin)
-
-    def test_report(self):
         report = BillingReport.objects.create(
             start_date=self.date_maker.start_date(),
             end_date=self.date_maker.end_date(),
@@ -416,3 +415,42 @@ class ApprovalForUsersNoReviewTest(TestCase):
         self.assertEquals(len(report_data), 1)
         self.assertEquals(report_data[unicode(self.admin)]['Video ID'],
                           self.video.video_id)
+
+class ApprovalReportSubtitleWithNoTimingTest(SimpleApprovalTestCase):
+    # Test the approval for users type when review is disabled
+    def check_report(self, subtitle_data):
+        approve_task = test_factories.make_approve_task(
+            self.video.get_team_video(), 'en', self.admin, 'Subtitle',
+            subtitle_data)
+        approve_task.complete_approved(self.admin)
+        report = BillingReport.objects.create(
+            start_date=self.date_maker.start_date(),
+            end_date=self.date_maker.end_date(),
+            type=BillingReport.TYPE_APPROVAL)
+        report.teams.add(self.team)
+        report_data = group_report_rows(report.generate_rows(),
+                                        ('Video ID', 'Language'))
+        self.assertEquals(len(report_data), 1)
+
+    def test_no_timings_at_all(self):
+        self.check_report([
+            (None, None, 'subtitle without timing'),
+        ])
+
+    def test_extra_sub_without_timing_at_end(self):
+        self.check_report([
+            (100, 200, 'subtitle with timing'),
+            (None, None, 'subtitle without timing'),
+        ])
+
+    def test_no_end_time(self):
+        self.check_report([
+            (100, 200, 'subtitle with timing'),
+            (300, None, 'subtitle with no end time'),
+        ])
+
+    def test_no_start_time(self):
+        self.check_report([
+            (None, 200, 'subtitle with no start time'),
+            (300, 400, 'subtitle with timing'),
+        ])

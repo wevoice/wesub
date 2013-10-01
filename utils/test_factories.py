@@ -154,7 +154,8 @@ def make_review_task(team_video, language_code, user, task_type='Translate'):
     task.new_subtitle_version = v
     return task.complete()
 
-def make_approve_task(team_video, language_code, user, task_type='Translate'):
+def make_approve_task(team_video, language_code, user, task_type='Translate',
+                      subtitle_data=None):
     """Move a video through the tasks process to the approve stage, then return
     that task.
 
@@ -167,7 +168,7 @@ def make_approve_task(team_video, language_code, user, task_type='Translate'):
     task = Task(team=team, team_video=team_video, assignee=None,
          language=language_code, type=Task.TYPE_IDS[task_type])
     task.save()
-    v = pipeline.add_subtitles(team_video.video, language_code, None,
+    v = pipeline.add_subtitles(team_video.video, language_code, subtitle_data,
                                complete=False, visibility='private')
     task.assignee = user
     task.new_subtitle_version = v
