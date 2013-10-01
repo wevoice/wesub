@@ -2675,10 +2675,12 @@ class BillingReport(models.Model):
         return rows
 
     def convert_unicode_to_utf8(self, rows):
-        for row in rows:
-            for i, value in enumerate(row):
-                if isinstance(value, unicode):
-                    row[i] = value.encode("utf-8")
+        def _convert(value):
+            if isinstance(value, unicode):
+                return value.encode("utf-8")
+            else:
+                return value
+        return [tuple(_convert(v) for v in row) for row in rows]
 
     def process(self):
         """
@@ -2687,7 +2689,7 @@ class BillingReport(models.Model):
         storage will take care of exporting it to s3.
         """
         rows = self.generate_rows()
-        self.convert_unicode_to_utf8(rows)
+        rows = self.convert_unicode_to_utf8(rows)
         fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
                                                self.start_str, self.end_str,
                                                self.get_type_display(), self.pk)
