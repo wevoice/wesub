@@ -2630,6 +2630,7 @@ class BillingReport(models.Model):
             except IndexError:
                 # no subtitling task, probably the review task was manually
                 # created.
+                pass
             try:
                 all_tasks.append((Task.objects.complete_review()
                                   .filter(team_video=approve_task.team_video,
