@@ -2622,10 +2622,14 @@ class BillingReport(models.Model):
             language = version.subtitle_language
 
             all_tasks = []
-            all_tasks.append((Task.objects.complete_subtitle_or_translate()
-                              .filter(team_video=approve_task.team_video,
-                                      language=approve_task.language)
-                              .order_by('-completed'))[0])
+            try:
+                all_tasks.append((Task.objects.complete_subtitle_or_translate()
+                                  .filter(team_video=approve_task.team_video,
+                                          language=approve_task.language)
+                                  .order_by('-completed'))[0])
+            except IndexError:
+                # no subtitling task, probably the review task was manually
+                # created.
             try:
                 all_tasks.append((Task.objects.complete_review()
                                   .filter(team_video=approve_task.team_video,
