@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 import collections
 from datetime import datetime, timedelta
 import itertools
 
 from django.test import TestCase
 
-from apps.teams.models import BillingRecord, BillingReport, Task
-from apps.subtitles.pipeline import add_subtitles
-from apps.teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
-                                          ROLE_ADMIN)
-from apps.videos.tests.data import make_subtitle_lines
+from teams.models import BillingRecord, BillingReport, Task
+from subtitles.pipeline import add_subtitles
+from teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
+                                     ROLE_ADMIN)
+from videos.tests.data import make_subtitle_lines
 from utils import test_factories
 from utils import test_utils
 
@@ -150,6 +151,32 @@ class BillingRecordTest(TestCase):
         self.assertEquals(data[video.video_id, 'es']['Language number'], 2)
         self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
         self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
+
+class ProcessReportTest(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team()
+        self.report = BillingReport.objects.create(
+            start_date=datetime(2013, 1, 1),
+            end_date=datetime(2013, 2, 1),
+            type=BillingReport.TYPE_APPROVAL)
+        self.report.teams.add(self.team)
+
+    @test_utils.patch_for_test("teams.models.BillingReport.generate_rows")
+    def test_success(self, mock_generate_rows):
+        mock_generate_rows.return_value = [
+            ('Foo', 'Bar'),
+            ('foo value', 'bar value'),
+        ]
+        self.report.process()
+        self.assertNotEquals(self.report.processed, None)
+        self.assertNotEquals(self.report.csv_file, None)
+
+    @test_utils.patch_for_test("teams.models.BillingReport.generate_rows")
+    def test_error(self, mock_generate_rows):
+        mock_generate_rows.side_effect = ValueError()
+        self.report.process()
+        self.assertNotEquals(self.report.processed, None)
+        self.assertEquals(self.report.csv_file, None)
 
 class ApprovalTestBase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')

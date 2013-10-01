@@ -58,11 +58,17 @@
             <td>{{ report.end_date }}</td>
             <td>{{ report.get_type_display }}</td>
             <td>{{ report.processed|date:"Y-m-d" }}</td>
+            <td>
             {% if report.processed %}
-                <td><a href="{{ report.csv_file.url }}">Download csv</a></td>
+                {% if report.csv_file %}
+                    <a href="{{ report.csv_file.url }}">Download csv</a>
+                {% else %}
+                    Failed
+                {% endif %}
             {% else %}
-                <td>Processing</td>
+                Processing
             {% endif %}
+            </td>
         </tr>
         {% endfor %}
 
