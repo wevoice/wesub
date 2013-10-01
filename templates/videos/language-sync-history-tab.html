@@ -42,7 +42,8 @@
             <td><h4>{% trans "Account" %}</h4></td>
             <td><h4>{% trans "Action" %}</h4></td>
             <td><h4>{% trans "Version" %}</h4></td>
-            <td class="last"><h4>{% trans "Result" %}</h4></td>
+            <td><h4>{% trans "Result" %}</h4></td>
+            <td class="last"><h4>{% trans "Details" %}</h4></td>
         </tr>
         {% for item in sync_history %}
         <tr>
@@ -51,6 +52,7 @@
             <td> {{ item.get_action_display }}</td>
             <td> <a href="{{ item.version.get_absolute_url }}">{{ item.version.version_number }}</a></td>
             <td class="last"> {{ item.get_result_display }}</td>
+            <td class="last"> {{ item.details }}</td>
         </tr>
          {% endfor %}
     </table>
