@@ -2441,7 +2441,7 @@ class TeamNotificationSettingManager(models.Manager):
             team = Team.objects.get(pk=team_pk)
         except Team.DoesNotExist:
             logger.error("A pk for a non-existent team was passed in.",
-                    extra={"team_pk": team_pk, "event_name": event_name})
+                         extra={"team_pk": team_pk, "event_name": event_name})
             return
 
         try:
@@ -2688,19 +2688,27 @@ class BillingReport(models.Model):
         then set's that file to the csv_file property, which if , using the S3
         storage will take care of exporting it to s3.
         """
-        rows = self.generate_rows()
-        rows = self.convert_unicode_to_utf8(rows)
-        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
-                                               self.start_str, self.end_str,
-                                               self.get_type_display(), self.pk)
+        try:
+            rows = self.generate_rows()
+        except StandardError:
+            logger.error("Error generating billing report: (id: %s)", self.id)
+            self.csv_file = None
+        else:
+            self.csv_file = self.make_csv_file(rows)
+        self.processed = datetime.datetime.utcnow()
+        self.save()
 
+    def make_csv_file(self, rows):
+        rows = self.convert_unicode_to_utf8(rows)
+        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (
+            self.teams.all().count(),
+            self.start_str, self.end_str,
+            self.get_type_display(), self.pk)
         with open(fn, 'w') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
 
-        self.csv_file = File(open(fn, 'r'))
-        self.processed = datetime.datetime.utcnow()
-        self.save()
+        return File(open(fn, 'r'))
 
     @property
     def start_str(self):
