@@ -2126,9 +2126,7 @@ def billing(request):
             report_type = form.cleaned_data.get('type')
 
             report = BillingReport.objects.create( start_date=start_date, end_date=end_date, type=report_type)
-            print 'making report'
             for team in teams:
-                print 'adding team: ', team
                 report.teams.add(team)
 
             process_billing_report.delay(report.pk)
