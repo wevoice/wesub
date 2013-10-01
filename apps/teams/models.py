@@ -2895,17 +2895,31 @@ def get_minutes_for_version(version, round_up_to_integer):
     if len(subs) == 0:
         return 0
 
-    start = subs[0].start_time
-    end = subs[-1].end_time
+    for sub in subs:
+        if sub.start_time is not None:
+            start_time = sub.start_time
+            break
+        # we shouldn't have an end time set without a start time, but handle
+        # it just in case
+        if sub.end_time is not None:
+            start_time = sub.end_time
+            break
+    else:
+        return 0
 
-    # The -1 value for the end_time isn't allowed anymore but some
-    # legacy data will still have it.
-    if end == -1:
-        end = subs[-1].star_time
+    for sub in reversed(subs):
+        if sub.end_time is not None:
+            end_time = sub.end_time
+            break
+        # we shouldn't have an end time not set, but check for that just in
+        # case
+        if sub.start_time is not None:
+            end_time = sub.start_time
+            break
+    else:
+        return 0
 
-    if not end:
-        end = subs[-1].start_time
-    duration_seconds =  (end - start) / 1000.0
+    duration_seconds =  (end_time - start_time) / 1000.0
     minutes = duration_seconds/60.0
     if round_up_to_integer:
         minutes = int(ceil(minutes))
