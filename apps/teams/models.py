@@ -2441,7 +2441,7 @@ class TeamNotificationSettingManager(models.Manager):
             team = Team.objects.get(pk=team_pk)
         except Team.DoesNotExist:
             logger.error("A pk for a non-existent team was passed in.",
-                    extra={"team_pk": team_pk, "event_name": event_name})
+                         extra={"team_pk": team_pk, "event_name": event_name})
             return
 
         try:
@@ -2597,7 +2597,7 @@ class BillingReport(models.Model):
                 get_minutes_for_version(version, True),
                 language.is_primary_audio_language(),
                 subtitle_task.type==Task.TYPE_IDS['Translate'],
-                unicode(approve_task.assignee).encode('utf-8'),
+                unicode(approve_task.assignee),
             ))
 
         return rows
@@ -2622,10 +2622,15 @@ class BillingReport(models.Model):
             language = version.subtitle_language
 
             all_tasks = []
-            all_tasks.append((Task.objects.complete_subtitle_or_translate()
-                              .filter(team_video=approve_task.team_video,
-                                      language=approve_task.language)
-                              .order_by('-completed'))[0])
+            try:
+                all_tasks.append((Task.objects.complete_subtitle_or_translate()
+                                  .filter(team_video=approve_task.team_video,
+                                          language=approve_task.language)
+                                  .order_by('-completed'))[0])
+            except IndexError:
+                # no subtitling task, probably the review task was manually
+                # created.
+                pass
             try:
                 all_tasks.append((Task.objects.complete_review()
                                   .filter(team_video=approve_task.team_video,
@@ -2637,7 +2642,7 @@ class BillingReport(models.Model):
 
             for task in all_tasks:
                 data_rows.append((
-                    unicode(task.assignee).encode("utf-8"),
+                    unicode(task.assignee),
                     task.get_type_display(),
                     approve_task.team.name,
                     video.title_display(),
@@ -2645,8 +2650,8 @@ class BillingReport(models.Model):
                     language.language_code,
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
-                    unicode(approve_task.assignee).encode("utf-8"),
-                    unicode(task.body).encode("utf-8")))
+                    unicode(approve_task.assignee),
+                    unicode(task.body)))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows
@@ -2667,8 +2672,15 @@ class BillingReport(models.Model):
             rows = self.generate_rows_type_approval_for_users()
         else:
             raise ValueError("Unknown type: %s" % self.type)
-
         return rows
+
+    def convert_unicode_to_utf8(self, rows):
+        def _convert(value):
+            if isinstance(value, unicode):
+                return value.encode("utf-8")
+            else:
+                return value
+        return [tuple(_convert(v) for v in row) for row in rows]
 
     def process(self):
         """
@@ -2676,18 +2688,27 @@ class BillingReport(models.Model):
         then set's that file to the csv_file property, which if , using the S3
         storage will take care of exporting it to s3.
         """
-        rows = self.generate_rows()
-        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (self.teams.all().count(),
-                                               self.start_str, self.end_str,
-                                               self.get_type_display(), self.pk)
+        try:
+            rows = self.generate_rows()
+        except StandardError:
+            logger.error("Error generating billing report: (id: %s)", self.id)
+            self.csv_file = None
+        else:
+            self.csv_file = self.make_csv_file(rows)
+        self.processed = datetime.datetime.utcnow()
+        self.save()
 
+    def make_csv_file(self, rows):
+        rows = self.convert_unicode_to_utf8(rows)
+        fn = '/tmp/bill-%s-teams-%s-%s-%s-%s.csv' % (
+            self.teams.all().count(),
+            self.start_str, self.end_str,
+            self.get_type_display(), self.pk)
         with open(fn, 'w') as f:
             writer = csv.writer(f)
             writer.writerows(rows)
 
-        self.csv_file = File(open(fn, 'r'))
-        self.processed = datetime.datetime.utcnow()
-        self.save()
+        return File(open(fn, 'r'))
 
     @property
     def start_str(self):
@@ -2733,7 +2754,7 @@ class BillingReportGenerator(object):
 
     def make_row(self, video, record):
         return [
-            video.title_display().encode('utf-8'),
+            video.title_display(),
             video.video_id,
             record.new_subtitle_language.language_code,
             record.minutes,
@@ -2742,7 +2763,7 @@ class BillingReportGenerator(object):
             record.team.slug,
             record.created.strftime('%Y-%m-%d %H:%M:%S'),
             record.source,
-            record.user.username.encode('utf-8'),
+            record.user.username,
         ]
 
     def make_language_number_map(self, records):
@@ -2780,7 +2801,7 @@ NOT EXISTS (
 
     def make_row_for_lang_without_record(self, video, language):
         return [
-            video.title_display().encode('utf-8'),
+            video.title_display(),
             video.video_id,
             language.language_code,
             0,
@@ -2889,17 +2910,31 @@ def get_minutes_for_version(version, round_up_to_integer):
     if len(subs) == 0:
         return 0
 
-    start = subs[0].start_time
-    end = subs[-1].end_time
+    for sub in subs:
+        if sub.start_time is not None:
+            start_time = sub.start_time
+            break
+        # we shouldn't have an end time set without a start time, but handle
+        # it just in case
+        if sub.end_time is not None:
+            start_time = sub.end_time
+            break
+    else:
+        return 0
 
-    # The -1 value for the end_time isn't allowed anymore but some
-    # legacy data will still have it.
-    if end == -1:
-        end = subs[-1].star_time
+    for sub in reversed(subs):
+        if sub.end_time is not None:
+            end_time = sub.end_time
+            break
+        # we shouldn't have an end time not set, but check for that just in
+        # case
+        if sub.start_time is not None:
+            end_time = sub.start_time
+            break
+    else:
+        return 0
 
-    if not end:
-        end = subs[-1].start_time
-    duration_seconds =  (end - start) / 1000.0
+    duration_seconds =  (end_time - start_time) / 1000.0
     minutes = duration_seconds/60.0
     if round_up_to_integer:
         minutes = int(ceil(minutes))

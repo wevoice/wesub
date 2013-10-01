@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 import collections
 from datetime import datetime, timedelta
 import itertools
 
 from django.test import TestCase
 
-from apps.teams.models import BillingRecord, BillingReport, Task
-from apps.subtitles.pipeline import add_subtitles
-from apps.teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
-                                          ROLE_ADMIN)
-from apps.videos.tests.data import make_subtitle_lines
+from teams.models import BillingRecord, BillingReport, Task
+from subtitles.pipeline import add_subtitles
+from teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
+                                     ROLE_ADMIN)
+from videos.tests.data import make_subtitle_lines
 from utils import test_factories
 from utils import test_utils
 
@@ -150,6 +151,32 @@ class BillingRecordTest(TestCase):
         self.assertEquals(data[video.video_id, 'es']['Language number'], 2)
         self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
         self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
+
+class ProcessReportTest(TestCase):
+    def setUp(self):
+        self.team = test_factories.create_team()
+        self.report = BillingReport.objects.create(
+            start_date=datetime(2013, 1, 1),
+            end_date=datetime(2013, 2, 1),
+            type=BillingReport.TYPE_APPROVAL)
+        self.report.teams.add(self.team)
+
+    @test_utils.patch_for_test("teams.models.BillingReport.generate_rows")
+    def test_success(self, mock_generate_rows):
+        mock_generate_rows.return_value = [
+            ('Foo', 'Bar'),
+            ('foo value', 'bar value'),
+        ]
+        self.report.process()
+        self.assertNotEquals(self.report.processed, None)
+        self.assertNotEquals(self.report.csv_file, None)
+
+    @test_utils.patch_for_test("teams.models.BillingReport.generate_rows")
+    def test_error(self, mock_generate_rows):
+        mock_generate_rows.side_effect = ValueError()
+        self.report.process()
+        self.assertNotEquals(self.report.processed, None)
+        self.assertEquals(self.report.csv_file, None)
 
 class ApprovalTestBase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
@@ -357,9 +384,7 @@ class ApprovalForUsersTest(ApprovalTestBase):
         self.check_videos_and_languages(report_data)
         self.check_notes(report_data)
 
-class ApprovalForUsersNoReviewTest(TestCase):
-    # Test the approval for users type when review is disabled
-    #
+class SimpleApprovalTestCase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
     def setUp(self, mock_now):
         self.date_maker = DateMaker()
@@ -374,11 +399,12 @@ class ApprovalForUsersNoReviewTest(TestCase):
                                                        role=ROLE_ADMIN).user
         self.video = test_factories.create_team_video(self.team).video
 
+class ApprovalForUsersNoReviewTest(SimpleApprovalTestCase):
+    # Test the approval for users type when review is disabled
+    def test_report(self):
         approve_task = test_factories.make_approve_task(
             self.video.get_team_video(), 'en', self.admin, 'Subtitle')
         approve_task.complete_approved(self.admin)
-
-    def test_report(self):
         report = BillingReport.objects.create(
             start_date=self.date_maker.start_date(),
             end_date=self.date_maker.end_date(),
@@ -389,3 +415,42 @@ class ApprovalForUsersNoReviewTest(TestCase):
         self.assertEquals(len(report_data), 1)
         self.assertEquals(report_data[unicode(self.admin)]['Video ID'],
                           self.video.video_id)
+
+class ApprovalReportSubtitleWithNoTimingTest(SimpleApprovalTestCase):
+    # Test the approval for users type when review is disabled
+    def check_report(self, subtitle_data):
+        approve_task = test_factories.make_approve_task(
+            self.video.get_team_video(), 'en', self.admin, 'Subtitle',
+            subtitle_data)
+        approve_task.complete_approved(self.admin)
+        report = BillingReport.objects.create(
+            start_date=self.date_maker.start_date(),
+            end_date=self.date_maker.end_date(),
+            type=BillingReport.TYPE_APPROVAL)
+        report.teams.add(self.team)
+        report_data = group_report_rows(report.generate_rows(),
+                                        ('Video ID', 'Language'))
+        self.assertEquals(len(report_data), 1)
+
+    def test_no_timings_at_all(self):
+        self.check_report([
+            (None, None, 'subtitle without timing'),
+        ])
+
+    def test_extra_sub_without_timing_at_end(self):
+        self.check_report([
+            (100, 200, 'subtitle with timing'),
+            (None, None, 'subtitle without timing'),
+        ])
+
+    def test_no_end_time(self):
+        self.check_report([
+            (100, 200, 'subtitle with timing'),
+            (300, None, 'subtitle with no end time'),
+        ])
+
+    def test_no_start_time(self):
+        self.check_report([
+            (None, 200, 'subtitle with no start time'),
+            (300, 400, 'subtitle with timing'),
+        ])
