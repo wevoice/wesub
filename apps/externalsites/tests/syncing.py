@@ -662,3 +662,14 @@ class KalturaSyncingTest(TestCase):
             self.assertRaises(SyncingError, kaltura.update_subtitles,
                               self.partner_id, self.secret, self.video_id,
                               'en', "CaptionData")
+
+    def test_invalid_kaltura_language(self):
+        # test what happens when we try to sync a language that doesn't map to
+        # a kaltura language, like pt-br
+        mocker = KalturaApiMocker(self.partner_id, self.secret, self.video_id)
+        mocker.expect_session_start()
+        mocker.expect_session_end()
+        with mocker:
+            self.assertRaises(SyncingError, kaltura.update_subtitles,
+                              self.partner_id, self.secret, self.video_id,
+                              'pt-br', "CaptionData")
