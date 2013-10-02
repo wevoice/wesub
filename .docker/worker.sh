@@ -2,7 +2,7 @@
 source /usr/local/bin/config_env
 
 PRE=""
-CMD="$VE_DIR/bin/python manage.py celeryd -E $CELERY_OPTS --scheduler=djcelery.schedulers.DatabaseScheduler --settings=unisubs_settings"
+CMD="$VE_DIR/bin/python manage.py celery worker --scheduler=djcelery.schedulers.DatabaseScheduler --loglevel=DEBUG -B -E $CELERY_OPTS"
 
 cd $APP_DIR
 if [ ! -z "$NEW_RELIC_LICENSE_KEY" ] ; then
