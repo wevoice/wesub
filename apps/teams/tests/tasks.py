@@ -113,6 +113,11 @@ class TranslateTranscribeTestBase(TestCase):
             self.team_video.task_set.incomplete_approve().count(),
             approve_count)
 
+    def check_tip_is_public(self, should_be_public, language_code=None):
+        self.team_video.video.clear_language_cache()
+        lang = self.team_video.video.subtitle_language(language_code)
+        self.assertEquals(lang.get_tip().is_public(), should_be_public)
+
     def delete_tasks(self):
         self.team_video.task_set.all().delete()
 
@@ -250,8 +255,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the review is ready to go
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -260,7 +264,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         # The review is now complete, check aftermath
         self.assertEquals(self.get_review_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True)
 
     def test_review_send_back(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
@@ -272,8 +276,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the review is ready to go
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -285,7 +288,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.check_incomplete_counts(1, 0, 0)
         task = self.get_incomplete_task()
         self.assertEquals(task.assignee, member.user)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
 
     def test_approve(self):
         self.change_workflow_settings(DONT_REQUIRE_REVIEW,
@@ -298,8 +301,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the approval task is ready to go
         self.check_incomplete_counts(0, 0, 1)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the approval
         approve_task = self.get_approve_task()
         self.login(self.admin.user)
@@ -308,7 +310,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         # The approve is now complete, check aftermath
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True)
 
     def test_approve_send_back(self):
         self.change_workflow_settings(DONT_REQUIRE_REVIEW,
@@ -321,8 +323,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the approval task is ready to go
         self.check_incomplete_counts(0, 0, 1)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the approval
         approve_task = self.get_approve_task()
         self.login(self.admin.user)
@@ -334,7 +335,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.check_incomplete_counts(1, 0, 0)
         task = self.get_incomplete_task()
         self.assertEquals(task.assignee, member.user)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
 
     def test_review_and_approve(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
@@ -347,8 +348,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the review task is next
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -356,7 +356,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_review_task(review_task, "Test Review Note")
         # check that that worked
         self.check_incomplete_counts(0, 0, 1)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         self.assertEquals(self.get_review_task().body, "Test Review Note")
         # perform the approval
         approve_task = self.get_approve_task()
@@ -368,7 +368,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.check_incomplete_counts(0, 1, 0)
         task = self.get_incomplete_task()
         self.assertEquals(task.assignee, self.admin.user)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
 
     def test_review_and_approve_send_back(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
@@ -381,8 +381,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task)
         # test test that the review task is next
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language()
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -390,7 +389,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         self.perform_review_task(review_task, "Test Review Note")
         # check that that worked
         self.check_incomplete_counts(0, 0, 1)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False)
         self.assertEquals(self.get_review_task().body, "Test Review Note")
         # perform the approval
         approve_task = self.get_approve_task()
@@ -399,7 +398,7 @@ class TranscriptionTaskTest(TranslateTranscribeTestBase):
         # The approve is now complete, check aftermath
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True)
 
     def test_review_and_approve_with_old_version(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
@@ -523,8 +522,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task, 'en', 'ru')
         # test test that the review is ready to go
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language('ru')
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False, 'ru')
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -533,7 +531,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         # The review is now complete, check aftermath
         self.assertEquals(self.get_review_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True, 'ru')
 
     def test_approve(self):
         self.change_workflow_settings(DONT_REQUIRE_REVIEW,
@@ -546,8 +544,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task, 'en', 'ru')
         # test test that the review is ready to go
         self.check_incomplete_counts(0, 0, 1)
-        subtitle_language = self.team_video.video.subtitle_language('ru')
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False, 'ru')
         # perform the approve
         approve_task = self.get_approve_task()
         self.login(self.admin.user)
@@ -556,7 +553,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         # The approve is now complete, check aftermath
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True, 'ru')
 
     def test_review_and_approve(self):
         self.change_workflow_settings(ADMIN_MUST_REVIEW,
@@ -570,8 +567,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         self.perform_subtitle_task(task, 'en', 'ru')
         # test test that the review is ready to go
         self.check_incomplete_counts(0, 1, 0)
-        subtitle_language = self.team_video.video.subtitle_language('ru')
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False, 'ru')
         # perform the review
         review_task = self.get_review_task()
         self.login(self.admin.user)
@@ -580,7 +576,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         # The review is now complete, next step is approval
         self.assertEquals(self.get_review_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 1)
-        self.assertEquals(subtitle_language.get_tip().is_public(), False)
+        self.check_tip_is_public(False, 'ru')
         # perform the approve
         approve_task = self.get_approve_task()
         self.login(self.admin.user)
@@ -589,7 +585,7 @@ class TranslationTaskTest(TranslateTranscribeTestBase):
         # The approve is now complete, check aftermath
         self.assertEquals(self.get_approve_task().body, "Test Note")
         self.check_incomplete_counts(0, 0, 0)
-        self.assertEquals(subtitle_language.get_tip().is_public(), True)
+        self.check_tip_is_public(True)
 
     def test_due_date(self):
         self.team.task_expiration = 2

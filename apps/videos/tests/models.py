@@ -29,7 +29,7 @@ from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version, make_rollback_to
 )
 from widget import video_cache
-from utils import test_factories
+from utils import test_factories, test_utils
 
 def refresh(m):
     return m.__class__._default_manager.get(pk=m.pk)
@@ -54,6 +54,7 @@ class TestVideo(TestCase):
         _assert_create_and_get(self.html5_video)
 
     def test_url_cache(self):
+        test_utils.invalidate_widget_video_cache.run_original_for_test()
         video = get_video(1)
         video_url = video.get_video_url()
 

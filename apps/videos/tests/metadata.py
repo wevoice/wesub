@@ -178,6 +178,7 @@ class MetadataFieldsTest(TestCase):
                                              'location': 'North Pole',
                                          })
         update_search_index.apply(args=(Video, self.video.pk))
+        test_utils.update_search_index.run_original()
         qs = VideoIndex.public().filter(text='santa')
         self.assertEquals([v.video_id for v in qs], [self.video.video_id])
 

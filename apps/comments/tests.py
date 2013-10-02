@@ -28,7 +28,8 @@ from videos.models import Video
 from apps.auth.models import CustomUser as User
 
 from django.core import mail
-from apps.comments.models import Comment
+from comments.models import Comment
+from localeurl.utils import universal_url, DEFAULT_PROTOCOL
 from messages.tasks import  send_video_comment_notification, SUBJECT_EMAIL_VIDEO_COMMENTED
 
 
@@ -72,12 +73,16 @@ class CommentEmailTests(TestCase):
 
 
     def test_universal_urls(self):
-        from localeurl.utils import universal_url
         domain= Site.objects.get_current().domain
         vid = self.video.video_id
-        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid), universal_url("videos:video", kwargs={"video_id":vid}))
-        self.assertEqual("http://%s/videos/%s/info/" % (domain, vid), universal_url("videos:video", args=(vid,)))
-                    
+        correct_url = "%s://%s/videos/%s/info/" % (
+            DEFAULT_PROTOCOL, domain, vid)
+        self.assertEqual(correct_url,
+                         universal_url("videos:video",
+                                       kwargs={"video_id":vid}))
+        self.assertEqual(correct_url,
+                         universal_url("videos:video", args=(vid,)))
+
     def test_simple_email(self):
         num_followers = 5
         self._create_followers(self.video, num_followers)

@@ -37,4 +37,4 @@ class SimpleTest(TestCase):
         v = models.Video.objects.get(title='c')
         en = v.subtitle_language('en')
         self.assertTrue(en.is_forked)
-        self.assertEquals('ar', v.subtitle_language().language)
+        self.assertEquals('ar', v.subtitle_language().language_code)

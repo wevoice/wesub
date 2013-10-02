@@ -39,7 +39,7 @@ from apps.videos.types.kaltura import KalturaVideoType
 from apps.videos.types.mp3 import Mp3VideoType
 from apps.videos.types.vimeo import VimeoVideoType
 from apps.videos.types.youtube import (
-    YoutubeVideoType, save_subtitles_for_lang,
+    YoutubeVideoType,
     _prepare_subtitle_data_for_version, add_credit, should_add_credit
 )
 from utils import test_utils
@@ -97,31 +97,6 @@ class YoutubeVideoTypeTest(TestCase):
         vt = self.vt(self.shorter_url)
         self.assertTrue(vt)
         self.assertEqual(vt.video_id , self.shorter_url.split("/")[-1])
-
-    def test_subtitles_saving(self):
-        youtube_url = 'http://www.youtube.com/watch?v=L4XpSM87VUk'
-
-        test_utils.youtube_get_subtitled_languages.return_value = [
-            {'lang_code': 'en', 'name': 'My Subtitles'}
-        ]
-        vt = self.vt(youtube_url)
-        video, created = Video.get_or_create_for_url(youtube_url)
-
-        langs = vt.get_subtitled_languages()
-        lang = None
-        for candidate in langs:
-            if candidate['lang_code'] == 'en':
-                lang = candidate
-                break
-        self.assertTrue(lang, "This video must have an 'en' language whose last sub is 'Thanks'")
-
-        save_subtitles_for_lang(lang, video.pk, video.videourl_set.all()[0].videoid)
-
-        sl = video.subtitle_language(lang['lang_code'])
-
-        subtitles = sl.get_tip().get_subtitles()
-        self.assertTrue(len(subtitles))
-        self.assertEqual(list(subtitles)[-1][2], u'English subtitles.')
 
     def test_data_prep(self):
         video = Video.objects.all()[0]

@@ -19,6 +19,7 @@
 
 from datetime import datetime
 import json
+
 from BeautifulSoup import BeautifulSoup
 
 from babelsubs.storage import SubtitleSet, diff
@@ -49,7 +50,7 @@ from apps.videos.tests.data import (
 )
 from apps.widget import video_cache
 from apps.widget.tests import create_two_sub_session, RequestMockup
-from utils import test_factories
+from utils import test_factories, test_utils
 
 class TestViews(WebUseTest):
     fixtures = ['test.json', 'subtitle_fixtures.json']
@@ -189,6 +190,7 @@ class TestViews(WebUseTest):
         self.assertEqual(len(mail.outbox), initial_count + len(v.notification_list()))
 
     def test_video_url_remove(self):
+        test_utils.invalidate_widget_video_cache.run_original_for_test()
         self._login()
         v = Video.objects.get(video_id='iGzkk7nwWX8F')
         # add another url since primary can't be removed
@@ -420,9 +422,6 @@ class TestViews(WebUseTest):
     def test_search(self):
         self._simple_test('search:index')
 
-    def test_counter(self):
-        self._simple_test('counter')
-
     def test_test_mp4_page(self):
         self._simple_test('test-mp4-page')
 
@@ -452,16 +451,26 @@ class TestViews(WebUseTest):
             self.assertEqual(response.status_code, 200)
 
 class VideoTitleTest(TestCase):
+    def check_video_page_title(self, video, correct_title):
+        self.assertEquals(views.VideoPageContext.page_title(video),
+                          correct_title)
+
+    def check_language_page_title(self, language, correct_title):
+        self.assertEquals(views.LanguagePageContext.page_title(language),
+                          correct_title)
+
     def test_video_title(self):
         video = test_factories.create_video(
             primary_audio_language_code='en', title='foo')
-        self.assertEquals(views.video_page_title(video),
-                          'foo with subtitles | Amara')
+        self.check_video_page_title(video,
+                                    'foo with subtitles | Amara')
 
     def test_video_language_title(self):
         video = test_factories.create_video(
             primary_audio_language_code='en', title='foo')
         pipeline.add_subtitles(video, 'en', None, title="English Title")
+        self.check_video_page_title(video,
+                                    'English Title with subtitles | Amara')
 
     def test_video_language_title(self):
         video = test_factories.create_video(
@@ -469,8 +478,8 @@ class VideoTitleTest(TestCase):
         en_version = pipeline.add_subtitles(video, 'en', None,
                                          title="English Title")
         en = en_version.subtitle_language
-        self.assertEquals(views.language_page_title(en),
-                          'English Title with subtitles | Amara')
+        self.check_language_page_title(en,
+                                       'English Title with subtitles | Amara')
 
     def test_video_language_title_translation(self):
         # for translated languages, we display the title in the same way.  In
@@ -483,7 +492,7 @@ class VideoTitleTest(TestCase):
                                             title="French Title",
                                             parents=[en_version])
         fr = fr_version.subtitle_language
-        self.assertEquals(views.language_page_title(fr),
+        self.check_language_page_title(fr,
                           'French Title with subtitles | Amara')
 
     def test_video_language_title_fallback(self):
@@ -493,7 +502,7 @@ class VideoTitleTest(TestCase):
             primary_audio_language_code='en', title='Video Title')
         en_version = pipeline.add_subtitles(video, 'en', None)
         en = en_version.subtitle_language
-        self.assertEquals(views.language_page_title(en),
+        self.check_language_page_title(en,
                           'Video Title with subtitles | Amara')
 
 class MakeLanguageListTestCase(TestCase):
