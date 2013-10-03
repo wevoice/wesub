@@ -18,6 +18,11 @@
 
 from docker_dev_settings import *
 
+INSTALLED_APPS += (
+    'django_nose',
+    'webdriver_testing',
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

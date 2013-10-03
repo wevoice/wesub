@@ -32,13 +32,15 @@ def get_docker_output(arguments, *params, **kwargs):
     print '* %s' % cmdline
     return subprocess.check_output(cmdline, shell=True, **kwargs)
 
-def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
+def run_manage(manage_args, docker_args=None, settings='docker_dev_settings',
+               wrapper_script=None):
     image_name = 'amara-dev-manage-%s' % (uuid.uuid1().hex[:10],)
     volume_arg = '%s:/opt/apps/unisubs' % (unisubs_root(),)
     run_cmd = [
         'docker',
         'run',
         '-i', '-t',
+        '-h=unisubs.example.com',
         '-cidfile=%s' % cid_path(image_name),
         '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
         '-v', volume_arg,
@@ -46,14 +48,18 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings'):
     ]
     if docker_args:
         run_cmd.extend(docker_args)
+    run_cmd.append('amara-dev')
+    if wrapper_script is not None:
+        run_cmd.append(wrapper_script)
     run_cmd.extend([
-        'amara-dev',
         '/opt/ve/unisubs/bin/python',
         '/opt/apps/unisubs/manage.py',
     ] + manage_args)
     # can't use run_docker here because it will not work with the interactive
     # terminal
-    subprocess.check_call(" ".join(run_cmd), shell=True)
+    cmdline = " ".join(run_cmd)
+    print '* %s' % cmdline
+    subprocess.check_call(cmdline, shell=True)
     cid = open(cid_path(image_name)).read().strip()
     with open("/dev/null", "w") as dev_null:
         run_docker("stop %s" % cid, stdout=dev_null)
