@@ -41,6 +41,9 @@ TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
 
+STATIC_URL_BASE = STATIC_URL = "http://unisubs.example.com:8081/site_media/"
+MEDIA_URL = "http://unisubs.example.com:8081/user-data/"
+
 # Use MD5 password hashing, other algorithms are purposefully slow to increase
 # security.  Also include the SHA1 hasher since some of the tests use it.
 PASSWORD_HASHERS = (
