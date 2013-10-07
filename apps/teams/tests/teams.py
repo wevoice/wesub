@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 import os, re, json
 from datetime import datetime, timedelta, date
 
@@ -12,28 +14,27 @@ from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 
 from auth.models import CustomUser as User
-from apps.teams import tasks
-from apps.teams import moderation_const as MODERATION
-from apps.teams.forms import InviteForm
-from apps.teams.permissions import add_role
-from apps.teams.tests.teamstestsutils import refresh_obj, reset_solr
-from apps.teams.models import (
-    Team, Invite, TeamVideo, Application, TeamMember,
-    TeamLanguagePreference, Partner, TeamNotificationSetting
-)
-from apps.teams.templatetags import teams_tags
-from apps.videos.search_indexes import VideoIndex
-from apps.videos import metadata_manager
-from apps.videos.models import Video, SubtitleVersion
-from apps.subtitles.models import SubtitleLanguage
-from messages.models import Message
-from widget.tests import create_two_sub_session, RequestMockup
-
-from subtitles.pipeline import add_subtitles
-from subtitles import models as sub_models
-
-from utils import test_utils, test_factories
 from haystack.query import SearchQuerySet
+from messages.models import Message
+from subtitles import models as sub_models
+from subtitles.models import SubtitleLanguage
+from subtitles.pipeline import add_subtitles
+from teams.forms import InviteForm
+from teams import moderation_const as MODERATION
+from teams import tasks
+from teams.models import (
+    Team, Invite, TeamVideo, Application, TeamMember,
+    TeamLanguagePreference, Partner, TeamNotificationSetting,
+    InviteExpiredException
+)
+from teams.permissions import add_role
+from teams.templatetags import teams_tags
+from teams.tests.teamstestsutils import refresh_obj, reset_solr
+from utils import test_utils, test_factories
+from videos import metadata_manager
+from videos.models import Video, SubtitleVersion
+from videos.search_indexes import VideoIndex
+from widget.tests import create_two_sub_session, RequestMockup
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
@@ -1155,9 +1156,6 @@ class TestInvites(TestCase):
             password=self.user.username
         )
         # acn't accept twice:
-        # must import as team.models, not app.teams.models
-        # else the module signature won't match
-        from ..teams.models import InviteExpiredException
         self.assertRaises(InviteExpiredException, invite.accept)
         self.assertFalse(self.team.members.filter(user=self.user, team=self.team).exists())
         # re-invite

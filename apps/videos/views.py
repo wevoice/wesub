@@ -99,7 +99,8 @@ class LanguageList(object):
         original_languages = []
         other_languages = []
         for lang in video.all_subtitle_languages():
-            if lang.get_tip(public=False) is None:
+            public_tip = lang.get_tip(public=False)
+            if public_tip is None or public_tip.subtitle_count == 0:
                 # no versions in this language yet
                 continue
             language_name = lang.get_language_code_display()
@@ -160,7 +161,6 @@ class LanguageList(object):
 
     def __len__(self):
         return len(self.items)
-
 
 def index(request):
     context = widget.add_onsite_js_files({})
@@ -325,7 +325,8 @@ class VideoPageContext(dict):
         else:
             self['team'] = None
 
-    def page_title(self, video):
+    @staticmethod
+    def page_title(video):
         template = string.Template(ugettext("$title with subtitles | Amara"))
         return template.substitute(title=video.title_display())
 
@@ -602,7 +603,8 @@ class LanguagePageContext(dict):
         """Setup tab-specific variables."""
         pass
 
-    def page_title(self, language):
+    @staticmethod
+    def page_title(language):
         template = string.Template(ugettext("$title with subtitles | Amara"))
         return template.substitute(title=language.title_display())
 

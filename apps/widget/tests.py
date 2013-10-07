@@ -149,6 +149,8 @@ class TestRpc(TestCase):
         self.assertEqual(1, len(sset))
 
     def test_add_alternate_urls(self):
+        test_utils.invalidate_widget_video_cache.run_original_for_test()
+
         url_0 = VIDEO_URL
         url_1 = 'http://ia700406.us.archive.org/16/items/PeopleOfHtml5-BruceLawsonmp4Version/PeopleOfHtml5-BruceLawson.mp4'
 
@@ -451,6 +453,7 @@ class TestRpc(TestCase):
         self.assertFalse(sub_models.SubtitleLanguage.objects.having_nonempty_versions().filter(pk=language.pk).exists())
 
     def test_start_translating(self):
+        test_utils.invalidate_widget_video_cache.run_original_for_test()
         request = RequestMockup(self.user_0)
         session = self._create_basic_version(request)
         sl_en = session.language
@@ -726,6 +729,7 @@ class TestRpc(TestCase):
         self.assertEquals(response['subtitles']['description'], description)
 
     def test_create_translation_dependent_on_dependent(self):
+        test_utils.invalidate_widget_video_cache.run_original_for_test()
         request = RequestMockup(self.user_0)
         session = create_two_sub_dependent_session(request)
         response = rpc.start_editing(
@@ -986,15 +990,6 @@ class TestCache(TestCase):
 
     def setUp(self):
         self.user_0 = CustomUser.objects.get(pk=3)
-
-    def test_get_cache_url_no_exceptions(self):
-        e = None
-        try:
-            video_cache.get_video_urls("bad key")
-        except models.Video.DoesNotExist,e:
-            pass
-        if e is None:
-            self.fail("Bad cache key should fail")
 
     def test_video_id_not_empty_string(self):
         url = "http://videos-cdn.mozilla.net/serv/mozhacks/demos/screencasts/londonproject/screencast.ogv"

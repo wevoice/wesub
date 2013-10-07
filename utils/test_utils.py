@@ -6,6 +6,7 @@ import urlparse
 import mock
 from celery.task import Task
 from django.core.cache import cache
+from django.conf import settings
 from nose.plugins import Plugin
 from nose.tools import assert_equal
 import mock
@@ -240,24 +241,39 @@ class MonkeyPatcher(object):
     def start_patch(self, func_name, mock_obj):
         patch = mock.patch(func_name, mock_obj)
         mock_obj = patch.start()
+        self.setup_run_original(mock_obj, patch)
         self.mock_object_initial_data[mock_obj] = mock_obj.__dict__.copy()
-        mock_obj.original_func = patch.temp_original
-        mock_obj.run_original = functools.partial(self.run_original_func,
-                                                  mock_obj)
         self.patches.append(patch)
 
-        if isinstance(patch.temp_original, Task):
-            # for celery tasks, also patch the .delay() method
-            self.start_patch(func_name + '.delay', mock_obj)
         if (not func_name.startswith("apps.") and
             not func_name.startswith("utils")):
             # Ugh have to patch the function twice since some modules use
             # app and some don't
             self.start_patch('apps.' + func_name, mock_obj)
 
-    def run_original_func(self, mock_obj):
-        return [mock_obj.original_func(*args, **kwargs)
+    def setup_run_original(self, mock_obj, patch):
+        mock_obj.original_func = patch.temp_original
+        mock_obj.run_original = functools.partial(self.run_original,
+                                                  mock_obj)
+        mock_obj.run_original_for_test = functools.partial(
+            self.run_original_for_test, mock_obj)
+
+    def run_original(self, mock_obj):
+        rv = [mock_obj.original_func(*args, **kwargs)
                 for args, kwargs in mock_obj.call_args_list]
+        if isinstance(mock_obj.original_func, Task):
+            # for celery tasks, also run the delay() and apply() methods
+            rv.extend(mock_obj.original_func.delay(*args, **kwargs)
+                      for args, kwargs in mock_obj.delay.call_args_list)
+            rv.extend(mock_obj.original_func.apply(*args, **kwargs)
+                      for args, kwargs in mock_obj.apply.call_args_list)
+
+        return rv
+
+    def run_original_for_test(self, mock_obj):
+        # set side_effect to be the original function.  We will undo this when
+        # reset_mocks() is called at the end of the test
+        mock_obj.side_effect = mock_obj.original_func
 
     def unpatch_functions(self):
         for patch in self.patches:
@@ -276,6 +292,9 @@ class UnisubsTestPlugin(Plugin):
     def __init__(self):
         Plugin.__init__(self)
         self.patcher = MonkeyPatcher()
+        self.directories_to_skip = set([
+            os.path.join(settings.PROJECT_ROOT, 'libs'),
+        ])
 
     def configure(self, options, conf):
         super(UnisubsTestPlugin, self).configure(options, conf)
@@ -293,6 +312,11 @@ class UnisubsTestPlugin(Plugin):
     def afterTest(self, test):
         self.patcher.reset_mocks()
         cache.clear()
+
+    def wantDirectory(self, dirname):
+        if dirname in self.directories_to_skip:
+            return False
+        return None
 
 def patch_for_test(spec):
     """Use mock to patch a function for the test case.

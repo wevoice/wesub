@@ -105,6 +105,7 @@ class AccountTest(TestCase):
 
         self.assertEquals(check_authorization(self.video), (False, False))
         test_factories.create_team_video(team, video=self.video)
+        self.video.clear_team_video_cache()
         self.assertEquals(check_authorization(self.video), (True, True))
 
     def make_language_complete(self):
