@@ -19,6 +19,8 @@
 """externalsites.syncing.kaltura_languages -- Map language code kaltura language names.
 """
 
+from externalsites.exceptions import SyncingError
+
 class KalturaLanguageMap:
     # Taken from the official kaltura client
     AB = "Abkhazian"
@@ -167,4 +169,7 @@ class KalturaLanguageMap:
 
     @classmethod
     def get_name(cls, language_code):
-        return getattr(cls, language_code.upper())
+        try:
+            return getattr(cls, language_code.upper())
+        except AttributeError:
+            raise SyncingError("No kaltura language for %s" % language_code)
