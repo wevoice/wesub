@@ -2569,6 +2569,9 @@ class BillingReport(models.Model):
             team__in=self.teams.all(),
             completed__range=(self.start_date, self.end_date))
 
+    def _report_date(self, datetime):
+        return datetime.strftime('%Y-%m-%d %H:%M:%S')
+
     def generate_rows_type_approval(self):
         header = (
             'Team',
@@ -2579,6 +2582,7 @@ class BillingReport(models.Model):
             'Original',
             'Translation?',
             'Approver',
+            'Date',
         )
         rows = [header]
         for approve_task in self._get_approved_tasks():
@@ -2598,6 +2602,7 @@ class BillingReport(models.Model):
                 language.is_primary_audio_language(),
                 subtitle_task.type==Task.TYPE_IDS['Translate'],
                 unicode(approve_task.assignee),
+                self._report_date(approve_task.completed),
             ))
 
         return rows
@@ -2614,6 +2619,7 @@ class BillingReport(models.Model):
             'Original',
             'Approver',
             'Note',
+            'Date',
         )
         data_rows = []
         for approve_task in self._get_approved_tasks():
@@ -2651,7 +2657,8 @@ class BillingReport(models.Model):
                     get_minutes_for_version(version, False),
                     language.is_primary_audio_language(),
                     unicode(approve_task.assignee),
-                    unicode(task.body)))
+                    unicode(task.body),
+                    self._report_date(task.completed)))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows

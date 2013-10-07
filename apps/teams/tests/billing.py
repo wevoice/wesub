@@ -43,6 +43,9 @@ def convert_rows_to_dicts(report_rows):
                        for (header, value) in zip(header_row, row)))
     return rv
 
+def report_date(datetime):
+    return datetime.strftime('%Y-%m-%d %H:%M:%S')
+
 def group_report_rows(report_rows, key_columns):
     """Group report data in an easy to test way.
 
@@ -218,6 +221,8 @@ class ApprovalTestBase(TestCase):
         self.notes = {}
         self.approved_languages = []
         self.approval_dates = {}
+        self.review_dates = {}
+        self.subtitle_dates = {}
         self.translations = set()
 
         v1 = test_factories.create_team_video(self.team).video
@@ -255,8 +260,12 @@ class ApprovalTestBase(TestCase):
                 task_type = 'Subtitle'
             review_task = test_factories.make_review_task(
                 video.get_team_video(), language_code, subtitler, task_type)
+            self.subtitle_dates[video_id, language_code] = \
+                    self.date_maker.current_date
             review_task.body = note
             approve_task = review_task.complete_approved(reviewer)
+            self.review_dates[video_id, language_code] = \
+                    self.date_maker.current_date
             self.assertEquals(approve_task.type, Task.TYPE_IDS['Approve'])
             self.notes[video_id, language_code, 'Review'] = note
             if i < 6:
@@ -273,6 +282,8 @@ class ApprovalTestBase(TestCase):
                 review_task2.body = note
                 self.notes[video_id, language_code, 'Review'] = note
                 approve_task2 = review_task2.complete_approved(reviewer)
+                self.review_dates[video_id, language_code] = \
+                        self.date_maker.current_date
                 approve_task2.complete_approved(self.admin)
                 self.add_approved_language(video, language_code, subtitler,
                                            reviewer)
@@ -310,7 +321,9 @@ class ApprovalTest(ApprovalTestBase):
 
     def check_approver(self, report_data):
         for (video_id, language_code), row in report_data.items():
+            approval_date = self.approval_dates[video_id, language_code]
             self.assertEquals(row['Approver'], unicode(self.admin))
+            self.assertEquals(row['Date'], report_date(approval_date))
 
     def check_language_columns(self, report_data):
         for (video_id, language_code), row in report_data.items():
@@ -365,9 +378,6 @@ class ApprovalForUsersTest(ApprovalTestBase):
 
     def check_notes(self, report_data):
         for row in report_data:
-            print (row['Video ID'], row['Language'], row['Task Type'],
-                   row['Note'])
-        for row in report_data:
             key = (row['Video ID'], row['Language'], row['Task Type'])
             correct_note = self.notes.get(key, '')
             if row['Note'] != correct_note:
@@ -377,12 +387,24 @@ class ApprovalForUsersTest(ApprovalTestBase):
                                          row['Task Type'], row['Note'],
                                          correct_note))
 
+    def check_dates(self, report_data):
+        for row in report_data:
+            video_id = row['Video ID']
+            language = row['Language']
+            if row['Task Type'] in ('Subtitle', 'Translate'):
+                subtitle_date = self.subtitle_dates[video_id, language]
+                self.assertEquals(row['Date'], report_date(subtitle_date))
+            elif row['Task Type'] == 'Review':
+                review_date = self.review_dates[video_id, language]
+                self.assertEquals(row['Date'], report_date(review_date))
+
     def test_report(self):
         report_data = self.get_report_data(self.date_maker.start_date(),
                                     self.date_maker.end_date())
         self.check_report_rows(report_data)
         self.check_videos_and_languages(report_data)
         self.check_notes(report_data)
+        self.check_dates(report_data)
 
 class SimpleApprovalTestCase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
