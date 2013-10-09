@@ -18,6 +18,11 @@
 
 from docker_dev_settings import *
 
+INSTALLED_APPS += (
+    'django_nose',
+    'webdriver_testing',
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -31,10 +36,30 @@ DATABASES = {
 
 CACHE_PREFIX = "testcache"
 CACHE_TIMEOUT = 60
-DEFAULT_PROTOCOL = 'https'
+DEFAULT_PROTOCOL = 'http'
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_PLUGINS = ['utils.test_utils.UnisubsTestPlugin']
 CELERY_ALWAYS_EAGER = True
+
+STATIC_URL_BASE = STATIC_URL = "/site_media/"
+MEDIA_URL = "/user-data/"
+INSTALLED_APPS  + ('django.contrib.staticfiles',
+
+                   )
+TEMPLATE_CONTEXT_PROCESSORS + ('django.core.context_processors.static',)
+
+
+STATICFILES_FINDERS = (
+   'django.contrib.staticfiles.finders.FileSystemFinder',
+
+   'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+   )
+
+
+MEDIA_ROOT = rel('user-data/')
+STATIC_ROOT = rel('static/')
+STATICFILES_DIRS = (rel('media/'), rel('user-data/'))
+
 
 # Use MD5 password hashing, other algorithms are purposefully slow to increase
 # security.  Also include the SHA1 hasher since some of the tests use it.
