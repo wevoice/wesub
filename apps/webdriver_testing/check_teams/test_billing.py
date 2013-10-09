@@ -435,7 +435,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
         user_tasks = []
-        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver']
+        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver', 'Date']
         for e in entries:
             [e.pop(x) for x in unwanted_fields]
             user_tasks.append(e)
@@ -492,7 +492,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
         team_data = []
-        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver']
+        unwanted_fields = ['Video ID', 'Team', 'Video Title', 'Approver', 'Date']
         for e in entries:
             [e.pop(x) for x in unwanted_fields]
             team_data.append(e)
