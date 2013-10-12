@@ -118,7 +118,7 @@ class TestCaseSubmittable(WebdriverTestCase):
         self.assertTrue(True, sub_lang.subtitles_complete)
         video_language_pg = video_language_page.VideoLanguagePage(self)
         video_language_pg.open_video_lang_page(self.test_video.video_id, 'en')
-        self.assertEqual(6, sub_lang.get_subtitle_count())
+        self.assertEqual(4, sub_lang.get_subtitle_count())
 
 
 
@@ -167,5 +167,5 @@ class TestCaseIncomplete(WebdriverTestCase):
         self.sub_editor.submit(complete=False)
         sub_lang = self.test_video.subtitle_language('en')
         self.assertEqual(False, sub_lang.subtitles_complete)
-        self.assertEqual(6, sub_lang.get_subtitle_count())
+        self.assertEqual(4, sub_lang.get_subtitle_count())
 

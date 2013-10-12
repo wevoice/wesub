@@ -2,10 +2,6 @@
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
-from apps.webdriver_testing.data_factories import TeamOwnerMemberFactory
-
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.teams.models import TeamMember
 
@@ -29,7 +25,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
         """A contributor can leave a team.
 
         """
-        contributor = TeamContributorMemberFactory(team = self.team).user
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team = self.team).user
 
         self.team_dir_pg.log_in(contributor.username, 'password')
         self.team_dir_pg.leave_team(self.team.slug)
@@ -39,7 +35,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
         """Second to last owner can leave the team.
 
         """
-        owner2 = TeamOwnerMemberFactory(team = self.team).user
+        owner2 = TeamMemberFactory(team = self.team).user
 
         self.team_dir_pg.log_in(owner2.username, 'password')
         self.team_dir_pg.leave_team(self.team.slug)
@@ -49,7 +45,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
         """An admin can leave the team.
 
         """
-        admin = TeamAdminMemberFactory(team = self.team).user
+        admin = TeamMemberFactory(role="ROLE_ADMIN",team = self.team).user
 
         self.team_dir_pg.log_in(admin.username, 'password')
         self.team_dir_pg.leave_team(self.team.slug)
@@ -74,7 +70,7 @@ class TestCaseLeaveTeam(WebdriverTestCase):
         """A contributor leaves team by clicking leave link.
 
         """
-        contributor = TeamContributorMemberFactory(team = self.team).user
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team = self.team).user
 
         self.team_dir_pg.log_in(contributor.username, 'password')
         self.team_dir_pg.open_my_teams_page()

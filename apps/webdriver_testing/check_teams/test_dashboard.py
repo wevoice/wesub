@@ -8,8 +8,6 @@ from apps.webdriver_testing.pages.site_pages.teams import dashboard_tab
 from apps.webdriver_testing.data_factories import TeamMemberFactory
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TaskFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import UserFactory
@@ -39,7 +37,10 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         for vid in test_videos:
             vidurl_data = {'url': ('http://qa.pculture.org/amara_tests/%s' 
                                    % vid[0]),
-                           'video__title': vid[0]}
+                           'video__title': vid[0],
+                          }
+            if vid[2] is not None:
+                vidurl_data['video__primary_audio_language_code'] = vid[2]
             video = cls.data_utils.create_video(**vidurl_data)
             if vid[1] is not None:
                 video_data = {'language_code': vid[1],
@@ -49,25 +50,26 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                                             'Timed_text.sv.dfxp'),
                               'is_complete': True
                               }
-                cls.data_utils.upload_subs(video, video_data)
+                cls.data_utils.upload_subs(cls.team_owner, **video_data)
 
             TeamVideoFactory(video = video,
                              team = cls.team,
                              added_by = cls.team_owner)
 
         cls.logger.info('setup: Create team members Polly Glott and Mono Glot.')
-        cls.polly_glott = TeamContributorMemberFactory.create(
+        cls.polly_glott = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = cls.team,
                 user = UserFactory(username =  'PollyGlott')
                 ).user
-        cls.mono_glot = TeamContributorMemberFactory.create(
+        cls.mono_glot = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = cls.team,
                 user = UserFactory(username =  'MonoGlot')
                 ).user
 
     def setUp(self):
         self.dashboard_tab.open_team_page(self.team.slug)
-
 
     def test_members__generic_create_subs(self):
         """Dashboard displays generic create subs message when no orig lang specified.
@@ -102,7 +104,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
 
 
 
-    def test_members__specific_langs_needed(self):
+    def test_members_specific_langs_needed(self):
         """Dashboard displays videos matching members language preferences.     
 
         """
@@ -115,8 +117,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 
         #Verify expected videos are displayed.
-        expected_lang_list = ['Create English Subtitles', 
-                              'Create Czech Subtitles',
+        expected_lang_list = ['Create Czech Subtitles',
                               'Create Russian Subtitles',
                               'Create Arabic Subtitles']
         self.dashboard_tab.open_team_page(self.team.slug)
@@ -128,7 +129,6 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
 
         """
         test_team = TeamMemberFactory.create(team__name='Admin Manager Video Policy',
-                                             team__slug='video-policy-2',
                                              user = self.team_owner,
                                              team__video_policy=2, 
                                              ).team
@@ -146,7 +146,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                                              team__video_policy=2,
                                              user=self.team_owner,
                                              ).team
-        team_member = TeamContributorMemberFactory.create(
+        team_member = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = test_team,
                 user = UserFactory(username='NoAddEd')
                 ).user
@@ -163,7 +164,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                                              team__slug='no-videos',
                                              user=self.team_owner,
                                              ).team
-        TeamContributorMemberFactory.create(
+        TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = test_team,
                 user = self.mono_glot)
         self.dashboard_tab.log_in(self.mono_glot.username, 'password')
@@ -179,7 +181,8 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
                                              team__slug='no-videos',
                                              user=self.team_owner,
                                              ).team
-        TeamContributorMemberFactory.create(
+        TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = test_team,
                 user = self.mono_glot)
 
@@ -222,7 +225,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
         cls.user = UserFactory(username = 'user', is_partner=True)
-        cls.data_utils.create_user_api_key(cls.user)
+        
         cls.subs_file = os.path.join(os.path.dirname
                 (os.path.abspath(__file__)), 'oneline.txt')
 
@@ -251,13 +254,15 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         polly_speaks = ['en', 'fr', 'ru', 'ar']
         cls.logger.info("setup: Create user Polly who speaks: %s" 
                         % polly_speaks)
-        cls.polly_glott = TeamContributorMemberFactory.create(
+        cls.polly_glott = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = cls.team,
                 user = UserFactory(username =  'PollyGlott')
                 ).user
         cls.logger.info("setup: Create manager reviewer who speaks: %s" 
                         % polly_speaks)
-        cls.reviewer = TeamManagerMemberFactory.create(
+        cls.reviewer = TeamMemberFactory.create(
+                role = 'ROLE_MANAGER',
                 team = cls.team,
                 user = UserFactory(username =  'reviewer')
                 ).user
@@ -339,7 +344,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         """Members with no lang prefs the list of available tasks in English.
 
         """
-        mono_glot = TeamContributorMemberFactory.create(
+        mono_glot = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = self.team,
                 user = UserFactory()
                 ).user
@@ -390,7 +396,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.team.video_policy=1
         self.team.save()
         video = self.non_team_video
-        self.data_utils.upload_subs(video)     
+        self.data_utils.upload_subs(self.user, video=video.pk)     
         tv = TeamVideoFactory(video = video,
                               team = self.team,
                               added_by = self.polly_glott)
@@ -398,8 +404,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         #Login user and go to team dashboard page
         self.logger.info('Polly Glott logs in and goes to team dashboard page.')
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
-        self.dashboard_tab.set_skiphowto()
-
         self.dashboard_tab.open_team_page(self.team.slug)
         self.dashboard_tab.click_lang_task('Short Birds MP4', 
                                            'Translate Russian')
@@ -431,13 +435,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                       'is_complete': True, 
                       'complete': 1
                      }
-        self.data_utils.upload_subs(
-                video,
-                data=video_data, 
-                user=dict(username=self.user.username, 
-                password='password'))
-
-
+        self.data_utils.upload_subs(self.user, **video_data)
         #Login as reviewer and start the review task.
         self.logger.info('Log in as user review to perform the review task.')
         self.dashboard_tab.log_in(self.reviewer.username, 'password')
@@ -461,7 +459,7 @@ class TestCaseLangSuggestion(WebdriverTestCase):
         self.create_modal = dialogs.CreateLanguageSelection(self)
         self.dashboard_tab = dashboard_tab.DashboardTab(self)
         self.user = UserFactory(username = 'user', is_partner=True)
-        self.data_utils.create_user_api_key(self.user)
+        
 
         #Add a team with workflows, tasks and preferred languages
         self.logger.info('setup: Create a team with tasks enabled')
@@ -514,7 +512,8 @@ class TestCaseLangSuggestion(WebdriverTestCase):
         """
         url_part = 'teams/{0}/tasks?video_id={1}'.format(
             team.slug, video_id)
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
         task_objects =  response['objects']
         for task in task_objects:
             if task['type'] == task_type and task['language'] == lang:
@@ -524,7 +523,8 @@ class TestCaseLangSuggestion(WebdriverTestCase):
         """Members with no lang pref see the prompt to set language preference.
 
         """
-        mono_glot = TeamContributorMemberFactory.create(
+        mono_glot = TeamMemberFactory.create(
+                role = 'ROLE_CONTRIBUTOR',
                 team = self.team,
                 user = UserFactory()
                 ).user
@@ -538,8 +538,8 @@ class TestCaseLangSuggestion(WebdriverTestCase):
         task_resp = self.get_task(jaws_vid.video_id, self.team, 'Subtitle', 'fr')
         url_part = task_resp['resource_uri'] 
         updated_info = {'assignee': mono_glot.username} 
-        status, response = self.data_utils.put_api_request(self.user, url_part, 
-            updated_info)
+        self.data_utils.make_request(self.user, 'put', 
+                                     url_part, **updated_info)
 
         self.dashboard_tab.open_team_page(self.team.slug)
         self.assertTrue(self.dashboard_tab.suggestion_present(

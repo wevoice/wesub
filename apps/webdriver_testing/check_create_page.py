@@ -17,8 +17,9 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from apps.webdriver_testing.pages.site_pages import create_page
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import create_page
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from videos.models import VideoUrl
 
 class TestCaseCreateVideos(WebdriverTestCase):
     """ TestSuite for video submission tests. """
@@ -194,10 +195,40 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
-    def test_feed__youtube_feed(self):
+    def test_youtube_feed(self):
         """Add a youtube feed
 
         """
         url = "http://gdata.youtube.com/feeds/api/users/janetefinn/uploads"
+        video_url = ("http://www.youtube.com/watch?"
+                     "v=BXMPp0TLSEo")
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
+        vurl = VideoUrl.objects.get(url=video_url)
+        self.assertTrue('Y', vurl.type)
+
+    def test_kaltura_yahoo_feed(self):
+        """Add a kaltura yahoo feed
+
+        """
+        url = "http://qa.pculture.org/feeds_test/kaltura_yahoo_feed.rss"
+        video_url = ("http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/"
+                     "serveFlavor/entryId/1_ydvz9mq1/flavorId/1_i3dcmygl/"
+                     "name/a.mp4")
+        self.create_pg.submit_feed_url(url)
+        self.assertTrue(self.create_pg.multi_submit_successful())
+        vurl = VideoUrl.objects.get(url=video_url)
+        self.assertTrue('K', vurl.type)
+
+    def test_kaltura_itunes_feed(self):
+        """Add a kaltura itunes feed
+
+        """
+        url = "http://qa.pculture.org/feeds_test/kaltura_itunes_feed.rss"
+        video_url = ("http://cdnbakmi.kaltura.com/p/1492321/sp/149232100/"
+                     "serveFlavor/entryId/1_zlgl6ut8/flavorId/1_dqgopb2z/"
+                     "name/a.mp4")
+        self.create_pg.submit_feed_url(url)
+        self.assertTrue(self.create_pg.multi_submit_successful())
+        vurl = VideoUrl.objects.get(url=video_url)
+        self.assertTrue('K', vurl.type)

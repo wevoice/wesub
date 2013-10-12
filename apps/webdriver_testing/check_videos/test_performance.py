@@ -25,7 +25,6 @@ class TestCaseEditUploaded(WebdriverTestCase):
 
     def test_edit__large(self):
         """Upload a large set of subtitles then open for editing. """
-        self.skipTest('skipping for now need to see why fails on jenkins')
         video =  self.data_utils.create_video()
         data = {'language_code': 'en',
                 'video': video.pk,
@@ -35,11 +34,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
                 'is_complete': True,
                 'complete': 1
            }
-        r = self.data_utils.upload_subs(
-                video, 
-                data=data,
-                user=dict(username=self.user.username, 
-                          password='password'))
+        r = self.data_utils.upload_subs(self.user, **data)
         sub_file = os.path.join(self.subs_data_dir, 'srt-full.srt')
 
         fr_data = {'language_code': 'fr',
@@ -47,11 +42,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
                      'from_language_code': 'en',
                      'draft': open(sub_file),
                     }
-        r = self.data_utils.upload_subs(video, 
-                                        data=fr_data,
-                                        user=dict(username=self.user.username,
-                                                  password='password'))
-        
+        r = self.data_utils.upload_subs(self.user, **data)
         self.video_language_pg.open_video_lang_page(video.video_id, 'fr')
         self.video_language_pg.log_in(self.user.username, 'password')
         self.video_language_pg.page_refresh()
