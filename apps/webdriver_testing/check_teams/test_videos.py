@@ -4,24 +4,21 @@ import json
 import time
 import os
 import filecmp
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams import videos_tab
-from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
-from apps.webdriver_testing.data_factories import TeamProjectFactory
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import VideoFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing import data_helpers
-from apps.testhelpers.views import _create_videos
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams import videos_tab
+from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
+from webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamManagerLanguageFactory
+from webdriver_testing.data_factories import TeamProjectFactory
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import VideoFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing import data_helpers
+from testhelpers.views import _create_videos
 from django.core import management
 
 
@@ -41,7 +38,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.team = TeamMemberFactory.create(
             user = self.team_owner).team
         
-        self.manager_user = TeamAdminMemberFactory(
+        self.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
             team = self.team,
             user = UserFactory(username = 'TeamAdmin')).user
         self.videos_tab = videos_tab.VideosTab(self)
@@ -51,7 +48,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
                 'type': 'Y'
                }
         self.test_video = self.data_utils.create_video(**data)
-        self.data_utils.upload_subs(self.test_video)
+        self.data_utils.add_subs(video=self.test_video)
         TeamVideoFactory.create(
             team=self.team, 
             video=self.test_video, 
@@ -230,7 +227,7 @@ class TestCaseSearch(WebdriverTestCase):
         cls.team_owner = UserFactory.create(is_partner=True)
         cls.team = TeamMemberFactory.create(
             user = cls.team_owner).team
-        cls.manager_user = TeamAdminMemberFactory(
+        cls.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
             team = cls.team,
             user = UserFactory()).user
         cls.videos_tab = videos_tab.VideosTab(cls)
@@ -241,13 +238,20 @@ class TestCaseSearch(WebdriverTestCase):
                 'type': 'Y'
                }
         cls.test_video = cls.data_utils.create_video(**data)
-        cls.data_utils.upload_subs(cls.test_video) 
+        subs_data = {
+                'language_code': 'en',
+                'subtitles': ('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'complete': True,
+                'video': cls.test_video
+               }
+        cls.data_utils.add_subs(**subs_data) 
         TeamVideoFactory.create(
             team=cls.team, 
             video=cls.test_video, 
             added_by=cls.manager_user)
 
-        cls.data_utils.create_user_api_key(cls.team_owner) 
+         
         management.call_command('update_index', interactive=False)
 
 
@@ -270,8 +274,10 @@ class TestCaseSearch(WebdriverTestCase):
         new_data = {'title': 'Please do not glance at my mother.',
                     'description': 'Title update for grammar and politeness.'
                    }
-        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
-        time.sleep(2)
+
+        
+        self.data_utils.make_request(self.team_owner, 'put', 
+                                     url_part, **new_data)
         #Update the solr index
         management.call_command('update_index', interactive=False)
 
@@ -294,7 +300,8 @@ class TestCaseSearch(WebdriverTestCase):
         new_data = {'metadata': {'speaker-name': 'Ronaldo', 
                                  'location': 'Portugal'}
                    }
-        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
+        self.data_utils.make_request(self.team_owner, 'put', 
+                                     url_part, **new_data)
         TeamVideoFactory(team=self.team, added_by=self.team_owner, video=tv)
         #Update the solr index
         management.call_command('update_index', interactive=False)
@@ -314,8 +321,9 @@ class TestCaseSearch(WebdriverTestCase):
         url_part = 'videos/%s/' % self.test_video.video_id
         new_data = { 'description': 'description update for grammar and politeness.'
                    }
-        self.data_utils.put_api_request(self.team_owner, url_part, new_data)
-        time.sleep(2)
+        self.data_utils.make_request(self.team_owner, 'put', 
+                                     url_part, **new_data)
+
         #Update the solr index
         management.call_command('update_index', interactive=False)
 
@@ -370,7 +378,7 @@ class TestCaseFilterSort(WebdriverTestCase):
         cls.team_owner = UserFactory.create(is_partner=True)
         cls.team = TeamMemberFactory.create(
             user = cls.team_owner).team
-        cls.manager_user = TeamAdminMemberFactory(
+        cls.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
             team = cls.team,
             user = UserFactory()).user
         cls.videos_tab = videos_tab.VideosTab(cls)
@@ -379,13 +387,13 @@ class TestCaseFilterSort(WebdriverTestCase):
                        'type': 'Y'
                       }
         cls.test_video = cls.data_utils.create_video(**vidurl_data)
-        cls.data_utils.upload_subs(cls.test_video)
+        cls.data_utils.add_subs(video=cls.test_video)
         TeamVideoFactory.create(
             team=cls.team, 
             video=cls.test_video, 
             added_by=cls.manager_user)
 
-        cls.data_utils.create_user_api_key(cls.team_owner) 
+         
         videos = cls.data_utils.create_several_team_videos_with_subs(
             cls.team, 
             cls.manager_user)
@@ -550,7 +558,7 @@ class TestCaseProjectsFilterSort(WebdriverTestCase):
         cls.logger.info('setup: Creating team Video Test')
         cls.team = TeamMemberFactory.create(user = cls.team_owner).team
  
-        cls.manager_user = TeamAdminMemberFactory(
+        cls.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
             team=cls.team,
             user = UserFactory()).user
 
@@ -683,7 +691,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         self.logger.info('Adding user contributor to the team and logging in')
         #Create a user who is a contributor to the team.
-        contributor = TeamContributorMemberFactory(
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
             team = self.limited_access_team,
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
@@ -703,7 +711,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         #Create a user who is a contributor to the team.
         self.logger.info('Adding user contributor to the team and logging in')
-        contributor = TeamContributorMemberFactory(
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
             team = self.limited_access_team,
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
@@ -721,7 +729,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         self.logger.info('Adding user contributor to the team and logging in')
         #Create a user who is a contributor to the team.
-        contributor = TeamContributorMemberFactory(
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
             team = self.limited_access_team,
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
@@ -742,7 +750,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         #Create a user who is a contributor to the team.
         self.logger.info('Adding user contributor to the team and logging in')
-        contributor = TeamContributorMemberFactory(
+        contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
             team = self.limited_access_team,
             user = UserFactory(username = 'contributor')).user
         self.videos_tab.log_in(contributor.username, 'password')
@@ -762,7 +770,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
         #Create a user who is a manager to the team.
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'manager')).user
         self.videos_tab.log_in(manager.username, 'password')
@@ -776,7 +784,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'manager')).user
         self.videos_tab.log_in(manager.username, 'password')
@@ -795,7 +803,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
         #Create a user who is a manager to the team.
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'manager')).user
         self.videos_tab.log_in(manager.username, 'password')
@@ -809,7 +817,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         vids = self.add_some_team_videos()
         self.logger.info('Adding manager user to the team and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'manager')).user
         self.videos_tab.log_in(manager.username, 'password')
@@ -823,7 +831,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'EnglishManager'))
         TeamManagerLanguageFactory(member = manager,
@@ -843,7 +851,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'EnglishManager'))
         TeamManagerLanguageFactory(member = manager,
@@ -859,7 +867,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         """
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'EnglishManager'))
         TeamManagerLanguageFactory(member = manager,
@@ -880,7 +888,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         vids = self.add_some_team_videos()
         self.logger.info('Adding English language manager and logging in')
-        manager = TeamManagerMemberFactory(
+        manager = TeamMemberFactory(role="ROLE_MANAGER",
             team = self.limited_access_team,
             user = UserFactory(username = 'EnglishManager'))
         TeamManagerLanguageFactory(member = manager,
@@ -965,7 +973,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         #Create a user who is a team admin.
         self.logger.info('Create a team admin and log in as that user')
-        admin_member = TeamAdminMemberFactory(
+        admin_member = TeamMemberFactory(role="ROLE_ADMIN",
             team = self.limited_access_team,
             user = UserFactory(username = 'admin_member')).user
         self.videos_tab.log_in(admin_member.username, 'password')
@@ -984,7 +992,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         #Create a user who is a team admin.
         self.logger.info('Create a team admin and log in as that user')
-        admin_member = TeamAdminMemberFactory(
+        admin_member = TeamMemberFactory(role="ROLE_ADMIN",
             team = self.limited_access_team,
             user = UserFactory(username = 'admin_member')).user
         self.videos_tab.log_in(admin_member.username, 'password')

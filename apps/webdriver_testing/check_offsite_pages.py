@@ -1,31 +1,39 @@
 import time
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import offsite_page
-from apps.webdriver_testing.data_factories import UserFactory 
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
-from apps.webdriver_testing.data_helpers import create_video_with_subs
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import offsite_page
+from webdriver_testing.data_factories import UserFactory 
+from webdriver_testing.pages.site_pages import UnisubsPage
+from webdriver_testing import data_helpers 
 
 
 class TestCaseOffsiteWidget(WebdriverTestCase):
     """Test suite for the widget demo pages.
 
     """
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    def setUp(self):
-        WebdriverTestCase.setUp(self)
-        self.offsite_pg = offsite_page.OffsitePage(self)
-        self.user = UserFactory.create()
-        self.unisubs_pg = UnisubsPage(self)
-        self.unisubs_pg.log_in(username=self.user.username, passw='password')
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseOffsiteWidget, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.offsite_pg = offsite_page.OffsitePage(cls)
+        cls.user = UserFactory.create()
+        cls.unisubs_pg = UnisubsPage(cls)
+#        cls.unisubs_pg.log_in(username=cls.user.username, password='password')
 
-    def test_widget__nytimes(self):
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('MYTMP/%s.png' % self.id())
+
+
+    def test_nytimes(self):
         """Verify subs display on ny times demo page.
 
         """
         url = "pagedemo/nytimes_youtube_embed"
         self.offsite_pg.open_page(url)
-        time.sleep(5)
-        self.offsite_pg.start_playback(0)
+        time.sleep(15)
+        s = self.offsite_pg.start_playback(0)
+        self.logger.info(s)
         self.offsite_pg.pause_playback_when_subs_appear(0)
         self.offsite_pg.displays_subs_in_correct_position()
 

@@ -3,26 +3,26 @@ import time
 
 from django.core import management
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu 
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import UserLangFactory
-from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
-from apps.webdriver_testing.pages.site_pages.teams.videos_tab import VideosTab
-from apps.webdriver_testing.pages.editor_pages import dialogs
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor
+from webdriver_testing.pages.editor_pages import unisubs_menu 
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+
+
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import UserLangFactory
+from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
+from webdriver_testing.pages.site_pages.teams.videos_tab import VideosTab
+from webdriver_testing.pages.editor_pages import dialogs
+from webdriver_testing.pages.editor_pages import subtitle_editor
 
 class TestCaseUnpublishLast(WebdriverTestCase):
     """TestSuite for Unapprove / Delete last version of language.  """
@@ -56,7 +56,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
         cls.contributor = TeamMemberFactory(team=cls.team).user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
@@ -96,8 +96,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
 
     @classmethod
     def _upload_lang(cls, video, subs, lc, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': video.pk,
                      'draft': open(subs),
                      'complete': int(complete),
@@ -105,7 +104,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                     }
         if lc == 'en':
             draft_data['primary_audio_language_code'] = 'en'
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -239,7 +238,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
         cls.contributor = TeamMemberFactory(team=cls.team).user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
@@ -281,8 +280,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
     @classmethod
     def _upload_lang(cls, video, subs, lc, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': video.pk,
                      'draft': open(subs),
                      'complete': int(complete),
@@ -290,7 +288,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
                     }
         if lc == 'en':
             draft_data['primary_audio_language_code'] = 'en'
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):

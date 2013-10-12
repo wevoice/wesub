@@ -6,4 +6,4 @@ pylint
 mock==0.7.2
 # selenium test suite
 selenium==2.33
-factory_boy==1.2.0
+factory_boy

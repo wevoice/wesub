@@ -20,7 +20,7 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         super(TestCaseVideoLangResource, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create()
-        cls.data_utils.create_user_api_key(cls.user)
+        
       
         #Create some test data and set subtitle data dir
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
@@ -34,15 +34,12 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         #Create the language for the test video
         test_video = self.data_utils.create_video()
 
-        create_url = ('videos/%s/languages/'  % test_video.video_id)
-        create_data = {'language_code': 'en',
+        url_part = ('videos/%s/languages/'  % test_video.video_id)
+        data = {'language_code': 'en',
                        'is_complete': True 
                       }
-        status, response = self.data_utils.post_api_request(self.user,  
-            create_url, 
-            create_data)
-        self.assertEqual(201, status)
-        self.logger.info(response)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        self.assertEqual(201, r.status_code)
 
     def test_original(self):
         """Set a language as original via the api
@@ -50,25 +47,22 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         test_video = self.data_utils.create_video()
         
         #Create the language for the test video
-        create_url = ('videos/%s/languages/'  % test_video.video_id)
-        create_data = {'language_code': 'fr',
+        url_part = ('videos/%s/languages/'  % test_video.video_id)
+        data = {'language_code': 'fr',
                        'is_original': True 
                       }
-        status, response = self.data_utils.post_api_request(self.user,  
-            create_url, 
-            create_data)
-        self.assertEqual(201, status)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json
+
+        self.assertEqual(201, r.status_code)
         url_part = 'videos/%s/' % test_video.video_id
-        s, r = self.data_utils.api_get_request(self.user, url_part)
-        self.assertEqual('fr', r['original_language'])
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+        self.assertEqual('fr', response['original_language'])
 
 
     def _create_team_owner(self):
         return UserFactory.create()
-
-    def _create_team_member(self, team):
-        member = TeamMemberFactory(team=team).user
-        return dict(username=member.username, password='password')
 
     def _create_team(self):
         owner = UserFactory.create()
@@ -89,20 +83,21 @@ class TestCaseVideoLangResource(WebdriverTestCase):
     def _create_video_with_complete_transcript(self, team, owner):
         sub_file = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                  'subtitle_data', 'Timed_text.en.srt')
-        member_creds = self._create_team_member(team)
+        member = TeamMemberFactory(team=team, role='ROLE_CONTRIBUTOR').user
+
         video = VideoUrlFactory().video
         tv = TeamVideoFactory.create(
             team=team, 
             video=video, 
             added_by=owner)
-        orig_data = {'language_code': 'en',
-                     'video': video.pk,
-                     'primary_audio_language_code': 'en',
-                     'draft': open(sub_file),
-                     'is_complete': True,
-                     'complete': 1,
+        data = {
+                     'language_code': 'en',
+                     'video': video,
+                     'visibility': 'private',
+                     'complete': True,
+                     'committer': member
                     }
-        self.data_utils.upload_subs(video, orig_data, member_creds)
+        self.data_utils.add_subs(**data)
         return video, tv
 
     def test_response__reviewer(self):
@@ -114,7 +109,8 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         self.data_utils.complete_approve_task(tv, 20, owner)
 
         url_part = ('videos/%s/languages/' % video.video_id)
-        _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
         self.assertIn(member.username, response['objects'][0]['reviewer'])
 
     def test_response__approver(self):
@@ -123,7 +119,9 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         self.data_utils.complete_review_task(tv, 20, owner)
         self.data_utils.complete_approve_task(tv, 20, owner)
         url_part = ('videos/%s/languages/' % video.video_id)
-        _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+
         self.assertIn(owner.username, response['objects'][0]['approver'])
 
     def test_response__published(self):
@@ -132,7 +130,9 @@ class TestCaseVideoLangResource(WebdriverTestCase):
         self.data_utils.complete_review_task(tv, 20, owner)
         self.data_utils.complete_approve_task(tv, 20, owner)
         url_part = ('videos/%s/languages/' % video.video_id)
-        _, response = self.data_utils.api_get_request(self.user, url_part, output_type='json')
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+
         self.assertTrue(response['objects'][0]['versions'][0]['published'])
 
  

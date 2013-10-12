@@ -6,7 +6,7 @@ import operator
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import TeamMemberFactory
-from webdriver_testing.data_factories import TeamContributorMemberFactory
+
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
 from webdriver_testing.data_factories import WorkflowFactory
@@ -29,7 +29,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         cls.user = UserFactory.create(
             username='TestUser',
             is_partner = True)
-        cls.data_utils.create_user_api_key(cls.user)
+        
         cls.team = cls.create_workflow_team()
         cls.team2 = cls.create_workflow_team()
 
@@ -76,34 +76,34 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
 
     @classmethod
     def create_tv_with_original_subs(cls, lc, user, team, complete=True):
-        member_creds = dict(username=user.username, password='password')
         sub_file = 'apps/webdriver_testing/subtitle_data/Timed_text.en.srt'
-        video = VideoUrlFactory().video
+        video = cls.data_utils.create_video()
         tv = TeamVideoFactory.create(
             team=team, 
             video=video, 
             added_by=user)
-        data = {'language_code': lc,
-                'video': video.pk,
-                'primary_audio_language_code': lc,
-                'draft': open(sub_file),
-                'is_complete': complete,
-                'complete': int(complete),
+
+        data = {
+                    'language_code': lc,
+                    'complete': complete, 
+                    'visibility': 'private',
+                    'committer': user,
+                    'video': video
                 }
-        cls.data_utils.upload_subs(video, data, member_creds)
+        cls.data_utils.add_subs(**data)
+
         return video, tv
 
     @classmethod
     def add_translation(cls, lc, video, user, complete=False):
-        member_creds = dict(username=user.username, password='password')
-
-        data = {'language_code': lc,
-                'video': video.pk,
-                'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'Timed_text.sv.dfxp'),
-                'is_complete': complete,
-                'complete': int(complete),}
-        cls.data_utils.upload_subs(video, data=data, user=member_creds)
+        data = {
+                    'language_code': lc,
+                    'complete': complete, 
+                    'visibility': 'private',
+                    'committer': user,
+                    'video': video
+                }
+        cls.data_utils.add_subs(**data)
 
 
 
@@ -113,7 +113,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         GET /api2/partners/teams/[team-slug]/tasks/
         """
         url_part = 'teams/%s/tasks/?type=Translate' % self.team.slug
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         task_objects =  response['objects']
         self.assertEqual(17, len(task_objects))
 
@@ -123,7 +124,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         GET /api2/partners/teams/[team-slug]/tasks/
         """
         url_part = 'teams/%s/tasks/?completed&type=Translate' % self.team.slug
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         task_objects =  response['objects']
         self.assertEqual(3, len(task_objects))
 
@@ -133,7 +135,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         GET /api2/partners/teams/[team-slug]/tasks/
         """
         url_part = 'teams/%s/tasks/?open&type=Translate' % self.team.slug
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         task_objects =  response['objects']
         self.assertEqual(14, len(task_objects))
 
@@ -145,7 +148,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         """
         url_part = 'teams/{0}/tasks/?video_id={1}'.format(
             self.team.slug, self.test_video.video_id)
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         task_objects =  response['objects']
         self.assertEqual(9, len(task_objects)) 
@@ -157,7 +161,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         """
         url_part = 'teams/{0}/tasks/?video_id={1}&type=Approve'.format(
             self.team.slug, self.test_video.video_id)
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         task_objects =  response['objects']
         self.assertEqual(2, len(task_objects)) 
@@ -170,7 +175,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         """
         url_part = 'teams/{0}/tasks/?video_id={1}&language=de'.format(
             self.team.slug, self.test_video.video_id)
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         task_objects =  response['objects']
         self.assertEqual(3, len(task_objects)) 
@@ -183,7 +189,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         """
         url_part = 'teams/{0}/tasks/?video_id={1}&language=en&completed'.format(
             self.team.slug, self.test_video.video_id)
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         task_objects =  response['objects']
         self.assertEqual(3, len(task_objects)) 
@@ -197,7 +204,8 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
 
         url_part = 'teams/%s/tasks/?assignee=%s' % (
                 self.team2.slug, self.user.username)
-        status, response = self.data_utils.api_get_request(self.user,url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         task_objects =  response['objects']
         self.assertEqual(3, len(task_objects))
@@ -213,13 +221,14 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
                         "video_id": self.test_video2.video_id,
                         "language": "bo"
                     }
-        status, response = self.data_utils.post_api_request(self.user, url_part,
-            task_data)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **task_data)
+        response = r.json
         url_part = 'teams/{0}/tasks/{1}/'.format(self.team2.slug, 
             response['id'])
 
         del task_data['language']
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
         
         for k, v in task_data.iteritems():
             self.assertEqual(v, response[k])
@@ -237,11 +246,10 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
                         "video_id": self.test_video2.video_id,
                         "language": "es-mx"
                     }
-        status, response = self.data_utils.post_api_request(self.user, url_part,
-            task_data)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **task_data)
+        response = r.json 
 
         del task_data['language']
-        self.logger.info(response)
         for k, v in task_data.iteritems():
             self.assertEqual(v, response[k])
 
@@ -256,16 +264,15 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
                         "video_id": self.test_video2.video_id,
                         "language": "cs"
                     }
-        status, response = self.data_utils.post_api_request(self.user, url_part,
-            task_data)
 
-
+        r = self.data_utils.make_request(self.user, 'post', url_part, **task_data)
+        response = r.json
         url_part = 'teams/{0}/tasks/{1}/'.format(self.team2.slug, 
             response['id'])
  
         updated_info = {'priority': 3} 
-        status, response = self.data_utils.put_api_request(self.user, url_part, 
-            updated_info) 
+        r = self.data_utils.make_request(self.user, 'put', url_part, **updated_info)
+        response = r.json 
         self.assertEqual(updated_info['priority'], response['priority'])
 
     def test_tasks_delete(self):
@@ -279,19 +286,50 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
                         "video_id": self.test_video2.video_id,
                         "language": "hr"
                     }
-        status, response = self.data_utils.post_api_request(self.user, url_part,
-            task_data)
+
+        r = self.data_utils.make_request(self.user, 'post', url_part, **task_data)
+        response = r.json 
         task_id = response['id']
         #Make the DELETE request
         url_part = 'teams/{0}/tasks/{1}/'.format(self.team2.slug, task_id)
 
-        status, response = self.data_utils.delete_api_request(self.user, url_part) 
+        r = self.data_utils.make_request(self.user, 'delete', url_part)
+
         url_part = 'teams/%s/tasks/' % self.team2.slug
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json 
+
         task_objects =  response['objects']
         task_ids = []
         for k, v in itertools.groupby(task_ids, 
             operator.itemgetter('id')):
                 tasks_list.append(k)
         self.assertNotIn(task_id, task_ids)
+
+
+    def test_fetch_public_subtitles(self):
+        """Return public subtitles of a moderated video.
+
+        For videos under moderation only the latest published version is returned. 
+        """
+        url_part = 'videos/{0}/languages/en/?format=json'.format(
+                    self.test_video.video_id)
+
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+        self.logger.info(response)
+        self.assertNotEqual(404, r.status_code)
+        self.assertIs(3, response['subtitle_count'])
+
+    def test_fetch_draft_subtitles(self):
+        """Fetch nothing if moderated and no version has been accepted in review.
+        """
+        draft_video, tv = self.create_tv_with_original_subs(
+                    'en', self.user, self.team2)
+
+        url_part = 'videos/{0}/languages/en/?format=srt'.format(draft_video.video_id)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.content
+        self.logger.info(r.content)
+        self.assertNotEqual(404, r.status_code)
 

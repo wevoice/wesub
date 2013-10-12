@@ -7,10 +7,10 @@ from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing.pages.site_pages import video_page
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
+
+
 from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
+
 from apps.webdriver_testing.data_factories import WorkflowFactory
 from apps.webdriver_testing.data_factories import TeamLangPrefFactory
 from apps.webdriver_testing.data_factories import UserFactory
@@ -47,22 +47,21 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
         cls.contributor = TeamMemberFactory(team=cls.team).user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
 
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        self.data_utils.upload_subs(user, **data)
 
     def _add_team_video(self):
         video = self.data_utils.create_video()
@@ -146,7 +145,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Reviewer must Edit Subtitles via task after fails approve.
 
         """
-        reviewer = TeamContributorMemberFactory(team=self.team).user
+        reviewer = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
 
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -167,7 +166,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Edit Subtitles not active for member not assigned with task.
 
         """
-        member2 = TeamContributorMemberFactory(team=self.team).user
+        member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
 
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -247,18 +246,18 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.en_lc = TeamManagerMemberFactory(team=cls.team)
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.en_lc = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team)
         TeamManagerLanguageFactory(member = cls.en_lc,
                                    language = 'en')
-        cls.de_lc = TeamManagerMemberFactory(user__username='de_manager',
+        cls.de_lc = TeamMemberFactory(role="ROLE_MANAGER",user__username='de_manager',
                                              team=cls.team)
         TeamManagerLanguageFactory(member = cls.de_lc,
                                    language = 'de')
 
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
 
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.site_user = UserFactory.create()
 
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
@@ -275,8 +274,7 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open('apps/webdriver_testing/subtitle_data/Timed_text.en.srt'),
@@ -284,8 +282,8 @@ class TestCaseApprovalWorkflowPostEdit(WebdriverTestCase):
                      'is_complete': True,
                     }
         if lc != 'en':
-            draft_data['from_language_code'] = 'en'
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+            data['from_language_code'] = 'en'
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -448,22 +446,21 @@ class TestCaseNoReviews(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
         cls.contributor = TeamMemberFactory(team=cls.team).user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
 
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        self.data_utils.upload_subs(user, **data)
 
     def _add_team_video(self):
         video = self.data_utils.create_video()
@@ -497,7 +494,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         """Edit Subtitles inactive for unassigned task, edit via tasks panel.
 
         """
-        member2 = TeamContributorMemberFactory(team=self.team).user
+        member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
 
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -516,7 +513,7 @@ class TestCaseNoReviews(WebdriverTestCase):
         """Edit Subtitles inactive for member not assigned task, no permission.
 
         """
-        member2 = TeamContributorMemberFactory(team=self.team).user
+        member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
 
         video, tv = self._add_team_video()
         subs = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -573,11 +570,11 @@ class TestCaseNoReviewsPostEdit(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
 
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
-        cls.contributor2 = TeamContributorMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
+        cls.contributor2 = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
 
         cls.video = cls.data_utils.create_video()
         cls.tv = TeamVideoFactory(team=cls.team, 
@@ -590,8 +587,7 @@ class TestCaseNoReviewsPostEdit(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': cls.video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open('apps/webdriver_testing/subtitle_data'
@@ -599,7 +595,7 @@ class TestCaseNoReviewsPostEdit(WebdriverTestCase):
                      'complete': 1,
                      'is_complete': True
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
 
 
@@ -890,10 +886,10 @@ class TestCaseNoWorkflow(WebdriverTestCase):
                                             team__subtitle_policy=20, #any team
                                             user = cls.owner,
                                             ).team
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
 
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.video = cls.data_utils.create_video()
         cls.tv = TeamVideoFactory(team=cls.team, 
                                   added_by=cls.owner, 
@@ -906,8 +902,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
 
     @classmethod
     def _upload_subs(cls, video, lc, user):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': cls.video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open('apps/webdriver_testing/subtitle_data'
@@ -915,7 +910,7 @@ class TestCaseNoWorkflow(WebdriverTestCase):
                      'complete': 1,
                      'is_complete': True
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
 
     def test_admin_edit_permissions(self):
@@ -1225,7 +1220,7 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
         cls.contributor = TeamMemberFactory(team=cls.team).user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
@@ -1239,15 +1234,14 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -1325,7 +1319,7 @@ class TestCaseAdminUnpublish(WebdriverTestCase):
         """
         self.team.task_assign_policy = 30
         self.team.save()
-        team_member = TeamContributorMemberFactory(team=self.team).user
+        team_member = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
         self.video_lang_pg.log_in(team_member.username, 'password')
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'en')
         

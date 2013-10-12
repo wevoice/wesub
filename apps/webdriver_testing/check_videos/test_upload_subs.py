@@ -198,7 +198,7 @@ class TestCaseUntimedText(WebdriverTestCase):
             self.test_video.video_id, 'en')
         displayed_list = video_language_pg.displayed_lines()
         #Verify the edited text is in the sub list
-        self.assertIn("Under the sea", displayed_list)
+        self.assertIn("I'd like to be Under the sea", displayed_list[0])
 
         #Verify the origal unedited text is still present in the sub list.
         self.assertIn(expected_list[-1], displayed_list)

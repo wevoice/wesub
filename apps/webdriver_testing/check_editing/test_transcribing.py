@@ -85,25 +85,17 @@ class TestCaseTranscribing(WebdriverTestCase):
         """
         EXPECTED_UNSYNCED_TEXT = u"""1
 99:59:59,999 --> 99:59:59,999
-I'd like to be
+I'd like to be Under the sea
 
 2
 99:59:59,999 --> 99:59:59,999
-Under the sea
+In an octopus' garden in the shade.
 
 3
 99:59:59,999 --> 99:59:59,999
-In an octopus' garden in the shade.
+He'd let me in Knows where we've been
 
 4
-99:59:59,999 --> 99:59:59,999
-He'd let me in
-
-5
-99:59:59,999 --> 99:59:59,999
-Knows where we've been
-
-6
 99:59:59,999 --> 99:59:59,999
 In his octopus' garden in the shade.
 """

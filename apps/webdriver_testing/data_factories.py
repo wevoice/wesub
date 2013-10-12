@@ -2,8 +2,6 @@ import datetime
 import factory
 from apps.videos.models import Video 
 from apps.videos.models import VideoUrl
-from apps.videos.models import SubtitleLanguage
-from apps.videos.types import video_type_registrar
 from apps.teams.models import Team
 from apps.teams.models import TeamMember
 from apps.teams.models import MembershipNarrowing
@@ -18,120 +16,100 @@ from apps.teams.models import BillingReport
 from apps.auth.models import CustomUser as User
 from apps.auth.models import UserLanguage
 from apps.messages.models import Message
-from apps.subtitles.models import SubtitleLanguage
 
-class TeamManagerLanguageFactory(factory.Factory):
+class TeamManagerLanguageFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = MembershipNarrowing
 
 
-class VideoFactory(factory.Factory):
+class VideoFactory(factory.django.DjangoModelFactory):
     """Creates a video using a sequence.
 
     """
     FACTORY_FOR = Video
-    title = factory.Sequence(lambda n: 'Test video number' + n)
-    description = "Greatest Video ever made"
+    title = factory.Sequence(lambda n: 'Test Video %d'  %n)
     created = datetime.datetime.now()
+    factory.PostGeneration(lambda obj, create, extracted, **kwargs: VideoUrlFactory.create(video=obj))
 
-class VideoUrlFactory(factory.Factory):
+class VideoUrlFactory(factory.django.DjangoModelFactory):
     """Create a video url to use in creating a video.
 
     """
     FACTORY_FOR = VideoUrl
-    url = factory.Sequence(lambda n: 'http://unisubs.example.com/'+ n +'.mp4')
-    type = 'H'
+    url = factory.Sequence(lambda n: 'http://unisubs.example.com/%d.mp4' % n)
     primary=True
     original=True
+    type = 'H'
     video = factory.SubFactory(VideoFactory)
-    video__title = factory.Sequence(lambda n: ('Test Video %s' % n))
 
-
-
-class UserLangFactory(factory.Factory):
+class UserLangFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = UserLanguage
 
-class UserFactory(factory.Factory):
+
+class UserFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = User
-    username = factory.Sequence(lambda n: 'TestUser' + n)
-    password = 'sha1$pQQnrW0KJTHi$0000b329a889855361001a7e3bd113efbe818f7d'
-    email = 'tester@example.com'
+    username = factory.Sequence(lambda n: 'TestUser_%d' % n)
+    email = factory.LazyAttribute(lambda a: '{0}@example.com'.format(a.username).lower())
+    notify_by_email = True
+    valid_email = True 
+    password = factory.PostGenerationMethodCall('set_password',
+                                                'password')
+    
 
-class TeamFactory(factory.Factory):
+class TeamFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Team
-    name = factory.Sequence(lambda n: 'Test Team' + n)
-    slug = factory.Sequence(lambda n: 'test-team-' + n)
+    name = factory.Sequence(lambda n: 'Test Team%d' % n)
+    slug = factory.Sequence(lambda n: 'test-team-%d' % n)
 
-class TeamMemberFactory(factory.Factory):
+class TeamMemberFactory(factory.django.DjangoModelFactory):
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Set the user's role for the team, default is owner.
+        try:
+            kwargs['role'] = getattr(TeamMember, kwargs['role'])
+        except:
+            kwargs['role'] = TeamMember.ROLE_OWNER
+        return kwargs
+
     FACTORY_FOR = TeamMember
     team = factory.SubFactory(TeamFactory)
-    role = TeamMember.ROLE_OWNER
     user = factory.SubFactory(UserFactory)
 
-class TeamContributorMemberFactory(factory.Factory):
-    FACTORY_FOR = TeamMember
-    role = TeamMember.ROLE_CONTRIBUTOR
-    user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'ContributorUser' + n), 
-        email = 'contributor@example.com')
 
-
-class TeamAdminMemberFactory(factory.Factory):
-    FACTORY_FOR = TeamMember
-    role = TeamMember.ROLE_ADMIN
-    user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'AdminUser' + n), 
-        email = 'admin@example.com')
-
-class TeamOwnerMemberFactory(factory.Factory):
-    FACTORY_FOR = TeamMember
-    role = TeamMember.ROLE_OWNER
-    user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'OwnerUser' + n),
-        email = 'owner@example.com')
-
-class TeamManagerMemberFactory(factory.Factory):
-    FACTORY_FOR = TeamMember
-    role = TeamMember.ROLE_MANAGER
-    user = factory.SubFactory(UserFactory, username=
-        factory.Sequence(lambda n: 'TeamManager' + n), 
-        email = 'manager@example.com')
-
-
-class TeamVideoFactory(factory.Factory):
+class TeamVideoFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = TeamVideo
     team = factory.SubFactory(TeamFactory)
     video = factory.SubFactory(VideoFactory)
     added_by = factory.SubFactory(UserFactory)
     created = datetime.datetime.now()
 
-class TeamProjectFactory(factory.Factory):
+class TeamProjectFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Project
     team = factory.SubFactory(TeamFactory)
     created = datetime.datetime.now()
-    name = factory.Sequence(lambda n: 'TestProject' + n)
+    name = factory.Sequence(lambda n: 'TestProject%d' % n)
 
 
-class TeamInviteFactory(factory.Factory):
+class TeamInviteFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Invite
 
 
-class ApplicationFactory(factory.Factory):
+class ApplicationFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Application
     created = datetime.datetime.now()
 
 
-class TeamLangPrefFactory(factory.Factory):
+class TeamLangPrefFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = TeamLanguagePreference
     team = factory.SubFactory(TeamFactory)
 
-class WorkflowFactory(factory.Factory):
+class WorkflowFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Workflow
     
-class TaskFactory(factory.Factory):
+class TaskFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Task 
     team_video = factory.SubFactory(TeamVideoFactory)
 
-class BillingFactory(factory.Factory):
+class BillingFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = BillingReport 
     type = 2
 

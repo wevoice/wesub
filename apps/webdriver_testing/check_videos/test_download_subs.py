@@ -1,10 +1,9 @@
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor 
 import codecs
 import os
 
@@ -26,10 +25,9 @@ class TestCaseDownloadSubs(WebdriverTestCase):
         """Create the test videos and add subtitles to it.
   
         """
-        video = VideoUrlFactory(
-            url = 'http://example.unisubs.com/download-test.mp4',
-            video__title = title
-            ).video
+        video = self.data_utils.create_video()
+        video.title = title
+        video.save() 
         data = {'language_code': lang_code,
                 'video': video.pk,
                 'primary_audio_language_code': lang_code,
@@ -38,7 +36,7 @@ class TestCaseDownloadSubs(WebdriverTestCase):
                 'complete': 1
                 }
 
-        self.data_utils.upload_subs(video, data)
+        self.data_utils.upload_subs(self.user, **data)
         return video
 
     def _download_filename(self, title, lang_code, output):
