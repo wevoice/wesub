@@ -2598,7 +2598,7 @@ class BillingReport(models.Model):
                 video.title_display(),
                 video.video_id,
                 approve_task.language,
-                get_minutes_for_version(version, True),
+                get_minutes_for_version(version, False),
                 language.is_primary_audio_language(),
                 subtitle_task.type==Task.TYPE_IDS['Translate'],
                 unicode(approve_task.assignee),
