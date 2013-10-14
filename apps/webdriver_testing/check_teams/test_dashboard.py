@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
+
 import datetime
 import os
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
-from apps.webdriver_testing.pages.site_pages.teams import dashboard_tab
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TaskFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import UserLangFactory
-from apps.webdriver_testing.pages.editor_pages import dialogs
-from subtitles.models import SubtitleVersion
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages.teams import dashboard_tab
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TaskFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import UserLangFactory
+from webdriver_testing.pages.editor_pages import dialogs
 
 class TestCaseTaskFreeDashboard(WebdriverTestCase):
     """Test suite for display of Team dashboard when there are no tasks.  """
@@ -71,7 +71,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
     def setUp(self):
         self.dashboard_tab.open_team_page(self.team.slug)
 
-    def test_members__generic_create_subs(self):
+    def test_members_generic_create_subs(self):
         """Dashboard displays generic create subs message when no orig lang specified.
 
         """
@@ -89,7 +89,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         langs = self.dashboard_tab.languages_needed('Birds_short')
         self.assertEqual(['Create Subtitles'], langs)
 
-    def test_members__no_languages(self):
+    def test_members_no_languages(self):
         """Dashboard displays Create Subtitles when member has no langs specified.
 
         """
@@ -124,7 +124,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
 
-    def test_add_suggestion__displayed(self):
+    def test_add_suggestion_displayed(self):
         """Add videos link displays for user with permissions, when no videos found.
 
         """
@@ -136,7 +136,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.dashboard_tab.open_team_page(test_team.slug)
         self.assertTrue(self.dashboard_tab.suggestion_present(suggestion_type='add'))
 
-    def test_add_suggestion__not_displayed(self):
+    def test_add_suggestion_not_displayed(self):
         """Add videos link not displayed for user with no permissions, when no videos
           found.
 
@@ -155,7 +155,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.dashboard_tab.open_team_page(test_team.slug)
         self.assertFalse(self.dashboard_tab.suggestion_present(suggestion_type='add'))
 
-    def test_lang_suggestion__displayed(self):
+    def test_lang_suggestion_displayed(self):
         """Update preferred languages displayed, when no videos found.
 
         """
@@ -173,7 +173,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.assertTrue(self.dashboard_tab.suggestion_present(
                              suggestion_type='language'))
 
-    def test_browse_suggestion__displayed(self):
+    def test_browse_suggestion_displayed(self):
         """Browse videos link displayed, when no videos found.
 
         """
@@ -191,7 +191,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         self.assertTrue(self.dashboard_tab.suggestion_present(
                              suggestion_type='browse'))
 
-    def test_no_create__nonmember(self):
+    def test_no_create_nonmember(self):
         """Non-members see dashboard videos without the option to create subtitles.
 
         """
@@ -201,7 +201,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
         self.assertEqual(langs, None)
 
-    def test_no_create__guest(self):
+    def test_no_create_guest(self):
         """Guests see dashboard videos without the option to create subtitles.
 
         """
@@ -305,7 +305,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.handle_js_alert(action='accept')
 
 
-    def test_members__assigned_tasks(self):
+    def test_members_assigned_tasks(self):
         """Members see “Videos you're working on” with  assigned languages.
  
         """
@@ -326,7 +326,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                             task_type='Create French subtitles',
                             title=video.title))
 
-    def test_members__available_tasks(self):
+    def test_members_available_tasks(self):
         """Members see “Videos that need your help” with the relevant tasks.
  
         """
@@ -340,7 +340,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
 
 
-    def test_no_langs__available_tasks(self):
+    def test_no_langs_available_tasks(self):
         """Members with no lang prefs the list of available tasks in English.
 
         """
@@ -365,7 +365,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
 
 
-    def test_start__subtitles(self):
+    def test_start_subtitles(self):
         """Member starts subtitling from dash, “Videos that need your help”.
 
         """
@@ -386,7 +386,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
 
-    def test_start__translation(self):
+    def test_start_translation(self):
         """Member starts translation from any task in “Videos that need your
            help”.
 
@@ -412,7 +412,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
                          self.sub_editor.dialog_title())
 
 
-    def test_start__review(self):
+    def test_start_review(self):
         """Member starts review from any task in “Videos that need your help”.
 
         """
@@ -506,20 +506,7 @@ class TestCaseLangSuggestion(WebdriverTestCase):
                              team = self.team,
                              added_by = self.user)
 
-    def get_task(self, video_id, team, task_type, lang):
-        """Return the tasks give a video id, and language via the api.
- 
-        """
-        url_part = 'teams/{0}/tasks?video_id={1}'.format(
-            team.slug, video_id)
-        r = self.data_utils.make_request(self.user, 'get', url_part)
-        response = r.json
-        task_objects =  response['objects']
-        for task in task_objects:
-            if task['type'] == task_type and task['language'] == lang:
-                return task
-
-    def test_member__language_suggestion(self):
+    def test_member_language_suggestion(self):
         """Members with no lang pref see the prompt to set language preference.
 
         """
@@ -528,18 +515,16 @@ class TestCaseLangSuggestion(WebdriverTestCase):
                 team = self.team,
                 user = UserFactory()
                 ).user
+
         self.dashboard_tab.open_team_page(self.team.slug)
         self.browser.delete_all_cookies()
         self.dashboard_tab.log_in(mono_glot.username, 'password')
 
-        self.logger.info('Subtitle task for jaws video is assigned to Mono '
-                         'Glot via api.')
         jaws_vid = self.vid_obj_list[0]  #see setUp for data details.
-        task_resp = self.get_task(jaws_vid.video_id, self.team, 'Subtitle', 'fr')
-        url_part = task_resp['resource_uri'] 
-        updated_info = {'assignee': mono_glot.username} 
-        self.data_utils.make_request(self.user, 'put', 
-                                     url_part, **updated_info)
+
+        task = list(jaws_vid.teamvideo.task_set.filter(language='fr'))[0]
+        task.assignee = mono_glot
+        task.save()
 
         self.dashboard_tab.open_team_page(self.team.slug)
         self.assertTrue(self.dashboard_tab.suggestion_present(

@@ -103,7 +103,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                      'is_complete': complete,
                     }
         if lc == 'en':
-            draft_data['primary_audio_language_code'] = 'en'
+            data['primary_audio_language_code'] = 'en'
         cls.data_utils.upload_subs(user, **data)
 
     @classmethod
@@ -287,7 +287,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
                      'is_complete': complete,
                     }
         if lc == 'en':
-            draft_data['primary_audio_language_code'] = 'en'
+            data['primary_audio_language_code'] = 'en'
         cls.data_utils.upload_subs(user, **data)
 
     @classmethod

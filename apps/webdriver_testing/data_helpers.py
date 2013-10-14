@@ -91,8 +91,10 @@ class DataHelpers(object):
         default_subs = ('apps/webdriver_testing/subtitle_data'
                        '/basic_subs.dfxp')
         s = defaults.get('subtitles', default_subs)
-        subs = load_from_file(s).to_internal().subtitle_items()
-        defaults['subtitles'] = subs
+        
+        subs = load_from_file(s, language=defaults['language_code'])
+        sub_items = subs.to_internal()
+        defaults['subtitles'] = sub_items
         v = pipeline.add_subtitles(**defaults)
         return v
 

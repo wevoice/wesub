@@ -99,23 +99,23 @@ class TestCaseSubtitlesUpload(WebdriverTestCase):
         en_rev2 = os.path.join(subs_dir, 'Timed_text.rev2.en.srt')
         sv = os.path.join(subs_dir, 'Timed_text.sv.dfxp')
         complete = True
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(en_rev1),
                      'complete': int(complete),
                      'is_complete': complete
                     }
-        self.data_utils.upload_subs(video, self.user, draft_data)
+        self.data_utils.upload_subs(self.user, **data)
 
-        draft_data = {'language_code': 'sv',
+        data = {'language_code': 'sv',
                      'video': video.pk,
                      'from_language_code': 'en',
                      'draft': open(sv),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        self.data_utils.upload_subs(video, self.user, draft_data)
+        self.data_utils.upload_subs(self.user, **data)
         sl_sv = video.subtitle_language('sv')
         self.assertFalse(sl_sv.is_forked)
 

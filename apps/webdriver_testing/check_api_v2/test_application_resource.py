@@ -75,23 +75,22 @@ class TestCaseApplications(WebdriverTestCase):
 
            GET /api2/partners/teams/[team-slug]/application/[application-id]/
         """
-        url_part = 'teams/%s/applications/' % self.team.slug
-        r = self.data_utils.make_request(self.user, 'get', url_part) 
-        response = r.json
-        self.logger.info(response)
+        user = UserFactory.create()
+        application = ApplicationFactory.create(
+                team = self.team,
+                user = user,
+                status = 0, 
+                note = 'I want to join too.')
 
-        expected_details = {'user': response['objects'][0]['user'], 
-                            'status': response['objects'][0]['status']}
- 
-        url_part = response['objects'][0]['resource_uri']
-
+        url_part = url_part = 'teams/%s/applications/%s/' % (self.team.slug, 
+                                                            application.pk)
         r = self.data_utils.make_request(self.user, 'get', url_part) 
         response = r.json
         self.logger.info(response)
         self.a_team_pg.open_page('teams/%s/applications/' % self.team.slug)
+        self.assertEqual(response['status'], 'Pending')
+        self.assertEqual(response['user'], user.username)
 
-        for k, v in expected_details.iteritems():
-            self.assertEqual(v, response[k])
 
 
 

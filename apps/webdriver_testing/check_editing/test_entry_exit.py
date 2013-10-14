@@ -215,7 +215,7 @@ class TestCaseEntryExit(WebdriverTestCase):
         self.editor_pg.save('Resume editing')
         self.editor_pg.approve_task()
         sv = video.subtitle_language('sv').get_tip(full=True)
-        self.assertEqual(5, sv.version_number)
+        self.assertEqual(4, sv.version_number)
 
 
     def test_save_back_to_old(self):

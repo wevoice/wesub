@@ -40,6 +40,6 @@ class TestCaseSubtitles(WebdriverTestCase):
                 'is_complete': True,
                 'complete': 1
                 }
-        self.data_utils.upload_subs(self.user, **dadta)
+        self.data_utils.upload_subs(self.user, **data)
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual('English', self.menu.visible_menu_text())

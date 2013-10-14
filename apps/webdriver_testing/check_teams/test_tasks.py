@@ -314,7 +314,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         """Incomplete translation task exists, is assigned to the same user.
 
         """
-        data = { 'video_primary_audio_language_code': 'en' }
+        data = { 'video__primary_audio_language_code': 'en' }
         tv = self.data_utils.create_video(**data)
         self.data_utils.add_subs(video=tv)
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)

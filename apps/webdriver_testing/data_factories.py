@@ -3,6 +3,7 @@ import factory
 from apps.videos.models import Video 
 from apps.videos.models import VideoUrl
 from apps.teams.models import Team
+from apps.teams.models import Partner
 from apps.teams.models import TeamMember
 from apps.teams.models import MembershipNarrowing
 from apps.teams.models import Task
@@ -54,6 +55,11 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.PostGenerationMethodCall('set_password',
                                                 'password')
     
+
+
+class PartnerFactory(factory.django.DjangoModelFactory):
+    FACTORY_FOR = Partner
+
 
 class TeamFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Team

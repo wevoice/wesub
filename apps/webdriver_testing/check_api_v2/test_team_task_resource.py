@@ -319,7 +319,7 @@ class TestCaseTeamTaskResource(WebdriverTestCase):
         response = r.json
         self.logger.info(response)
         self.assertNotEqual(404, r.status_code)
-        self.assertIs(3, response['subtitle_count'])
+        self.assertIs(6, response['subtitle_count'])
 
     def test_fetch_draft_subtitles(self):
         """Fetch nothing if moderated and no version has been accepted in review.

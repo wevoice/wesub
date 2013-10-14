@@ -5,6 +5,7 @@ import operator
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import PartnerFactory
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
@@ -22,20 +23,21 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseTeamMemberResource, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.user = UserFactory.create(username = 'TestUser', is_partner=True)
-        cls.team_member = UserFactory.create(username = 'team_member')
-        
-
+        cls.user = UserFactory.create(is_partner=True)
+ 
+        cls.partner = PartnerFactory()
         #create an open team with description text and 2 members
         cls.open_team = TeamMemberFactory.create(
             team__name="A1 Waay Cool team",
             team__slug='a1-waay-cool-team',
             team__description='this is the coolest, most creative team ever',
+            team__partner = cls.partner,
             user = cls.user,
             ).team
 
-        TeamMemberFactory.create(role="ROLE_CONTRIBUTOR", team=cls.open_team, 
-                user = UserFactory.create(username = 'member'))
+        cls.member = TeamMemberFactory(role="ROLE_CONTRIBUTOR", team=cls.open_team).user
+        cls.member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR", team=cls.open_team).user
+
 
         #Open to the teams page so you can see what's there.
         cls.teams_dir_pg = TeamsDirPage(cls)
@@ -46,16 +48,14 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
 
         GET /api2/partners/teams/[team-slug]/members/
         """
-        expected_members = ['TestUser', 'member'] 
         url_part = 'teams/%s/members/' % self.open_team.slug
         r = self.data_utils.make_request(self.user, 'get', url_part)
-        self.logger.info(r.json)
         response = r.json
         member_objects =  response['objects']
         members_list = []
         for k, v in itertools.groupby(member_objects, operator.itemgetter('username')):
             members_list.append(k)
-        self.assertEqual(sorted(expected_members), sorted(members_list))
+        self.assertGreaterEqual(len(members_list), 2)
 
 
     def test_members_update(self):
@@ -63,51 +63,43 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
 
         PUT /api2/partners/teams/[team-slug]/members/[username]/
         """
+        new_member = TeamMemberFactory(role="ROLE_CONTRIBUTOR", team=self.open_team).user
 
         updated_info = {
             'role': 'admin' 
             } 
 
-        url_part = 'teams/%s/members/member/' % self.open_team.slug
+        url_part = 'teams/%s/members/%s/' % (self.open_team.slug, 
+                                             new_member.username)
         self.data_utils.make_request(self.user, 'put', url_part, **updated_info)
         
         self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
         members_tb = members_tab.MembersTab(self)
-        members_tb.member_search(self.open_team.slug, 'member')
+        members_tb.member_search(self.open_team.slug, new_member.username)
         self.assertEqual(members_tb.user_role(), 'Admin')
 
-    def test_member_create_contributor(self):
-        """Verify video urls for a particular video are listed.
+    def test_create_contributor(self):
+        """Add a team member via the api.
           
           POST /api2/partners/teams/[team-slug]/members/
         """
-        
+        team = TeamMemberFactory.create(user = self.user).team
+        team.partner = self.partner
+        team.save()
         #create a second team with 'second_member' as a member.
-        second_user = UserFactory.create(username = 'second_member')
-        second_team = TeamMemberFactory.create(
-            team__name="normal team",
-            team__slug='normal-team',
-            team__description='this is the junior team',
-            user = self.user,
-            ).team
-        TeamMemberFactory.create(role="ROLE_CONTRIBUTOR", 
-                                 team=second_team, 
-                                 user = second_user)
-        
-        user_details = {"username": second_user.username,
-                        "role": "admin"
+        user_details = {"username": self.member.username,
+                        "role": "contributor"
                        } 
-        url_part = 'teams/%s/members/' % self.open_team.slug
+        url_part = 'teams/%s/members/' % team.slug
         self.data_utils.make_request(self.user, 'post', url_part, **user_details)
-        self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
+        self.teams_dir_pg.open_page('teams/%s/members/' % team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
+        members_tb = members_tab.MembersTab(self)
+        members_tb.member_search(team.slug, self.member.username)
+        self.assertEqual(members_tb.user_role(), 'Contributor')
+
        
-        url_part = 'teams/%s/members/' % self.open_team.slug
-        r = self.data_utils.make_request(self.user, 'get', url_part)
-        self.logger.info(r.status_code)
-        response = r.content
-        self.assertNotEqual(None, response, "Got a None response")
 
     def test_member_safe_invite(self):
         """Use safe-members api to invite user from 1 team to anther.
@@ -165,22 +157,21 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
        
 
     def test_members_delete(self):
-        """Team is deleted by the owner.
+        """Team member is deleted by the owner.
 
            DELETE /api2/partners/teams/[team-slug]/members/[username]/
         """
-        url_part = 'teams/%s/members/member' % self.open_team.slug
+        url_part = 'teams/%s/members/%s/' % (self.open_team.slug, 
+                                            self.member2.username)
         r = self.data_utils.make_request(self.user, 'delete', url_part)
         
         url_part = 'teams/%s/members/' % self.open_team.slug
         r = self.data_utils.make_request(self.user, 'get', url_part)
         response = r.json
+        member_list = []
         member_objects =  response['objects']
 
-        self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
-        self.teams_dir_pg.log_in(self.user.username, 'password')
-        members_list = []
         for k, v in itertools.groupby(member_objects, operator.itemgetter('username')):
-            members_list.append(k)
-        self.assertNotIn('member', members_list)
+            member_list.append(k)
+        self.assertNotIn('member', member_list)
  

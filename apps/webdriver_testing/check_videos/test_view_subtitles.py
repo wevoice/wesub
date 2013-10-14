@@ -46,7 +46,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(self.user, **data))
+        cls.data_utils.upload_subs(self.user, **data)
         complete = False
         #Upload ar, translated from de, incomplete
         data = {'language_code': 'ar',
