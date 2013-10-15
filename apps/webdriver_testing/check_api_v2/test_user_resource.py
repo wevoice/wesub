@@ -14,7 +14,7 @@ class TestCaseUserResource(WebdriverTestCase):
         super(TestCaseUserResource, cls).setUpClass()
         cls.user = UserFactory.create(username = 'user')
         cls.data_utils = data_helpers.DataHelpers()
-        cls.data_utils.create_user_api_key(cls.user)
+        
 
     def api_create_user(self, **kwargs):
         """Create a user via the api.
@@ -22,18 +22,17 @@ class TestCaseUserResource(WebdriverTestCase):
            POST /api2/partners/users/
         """
 
-        create_url = 'users/'
-        create_data = {'username': None,
+        url_part = 'users/'
+        data = {'username': None,
                        'email': None, 
                        'password': 'password',
                        'first_name': None, 
                        'last_name': None, 
                        'create_login_token': None
                        }
-        create_data.update(kwargs)
-        status, response = self.data_utils.post_api_request(self.user, 
-                                                            create_url, 
-                                                            create_data)
+        data.update(kwargs)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json 
         return response 
 
 

@@ -1,19 +1,19 @@
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import diffing_page
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import UserFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import diffing_page
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+
+from webdriver_testing.data_factories import TeamManagerLanguageFactory
+
+
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import UserFactory
 
 
 class TestCaseApprovalWorkflow(WebdriverTestCase):
@@ -45,24 +45,23 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         for language in lang_list:
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
-        cls.contributor2 = TeamContributorMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
+        cls.contributor2 = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -191,7 +190,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Rollback active for reviewer after transcript fails approve.
 
         """
-        reviewer = TeamContributorMemberFactory(team=self.team).user
+        reviewer = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
         video, tv = self._add_team_video()
         v1, _ = self._create_complete_rev(video, self.contributor)
 
@@ -210,7 +209,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Rollback not active for member not assigned with task.
 
         """
-        member2 = TeamContributorMemberFactory(team=self.team).user
+        member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
         video, tv = self._add_team_video()
         v1, _ = self._create_two_drafts(video, self.contributor)
 
@@ -223,7 +222,7 @@ class TestCaseApprovalWorkflow(WebdriverTestCase):
         """Rollback not active for member not assigned with task.
 
         """
-        member2 = TeamContributorMemberFactory(team=self.team).user
+        member2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
         video, tv = self._add_team_video()
         v1, v2 = self._create_two_drafts(video, self.contributor)
 
@@ -279,20 +278,20 @@ class TestCaseWorkflowPermissions(WebdriverTestCase):
         for language in lang_list:
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
-        cls.contributor2 = TeamContributorMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
+        cls.contributor2 = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
 
 
         cls.site_user = UserFactory.create()
-        cls.en_lc = TeamManagerMemberFactory(team=cls.team)
+        cls.en_lc = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team)
         TeamManagerLanguageFactory(member = cls.en_lc,
                                    language = 'en')
-        cls.de_lc = TeamManagerMemberFactory(team=cls.team)
+        cls.de_lc = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team)
         TeamManagerLanguageFactory(member = cls.de_lc,
                                    language = 'de')
-        cls.site_staff = TeamContributorMemberFactory(team=cls.team).user
+        cls.site_staff = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.site_staff.is_staff = True
         cls.site_staff.save()
 
@@ -308,15 +307,14 @@ class TestCaseWorkflowPermissions(WebdriverTestCase):
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -661,10 +659,10 @@ class TestCaseNoReviews(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
         
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
-        cls.contributor2 = TeamContributorMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
+        cls.contributor2 = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
 
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')
@@ -678,15 +676,14 @@ class TestCaseNoReviews(WebdriverTestCase):
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
 
     @classmethod
@@ -828,10 +825,10 @@ class TestCaseNoWorkflow(WebdriverTestCase):
                                             team__subtitle_policy=20, #any team
                                             user = cls.owner,
                                             ).team
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.manager = TeamManagerMemberFactory(team=cls.team).user
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
-        cls.contributor2 = TeamContributorMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
+        cls.contributor2 = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.site_user = UserFactory.create()
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')
@@ -843,16 +840,14 @@ class TestCaseNoWorkflow(WebdriverTestCase):
 
     @classmethod
     def _upload_en_draft(cls, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
-
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):
@@ -1195,8 +1190,8 @@ class TestCaseRollbackRevision(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.team).user
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data')  
 
@@ -1206,15 +1201,14 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         return video, tv
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        self.data_utils.upload_subs(user, **data)
 
     def _create_two_drafts(self, video, user):
         rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')
@@ -1272,7 +1266,7 @@ class TestCaseRollbackRevision(WebdriverTestCase):
         """Reviewer can rollback after transcript fails approve.
 
         """
-        reviewer = TeamContributorMemberFactory(team=self.team).user
+        reviewer = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=self.team).user
         video, tv = self._add_team_video()
         v1, _ = self._create_complete_rev(video, self.contributor)
 

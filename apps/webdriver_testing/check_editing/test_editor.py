@@ -7,14 +7,14 @@ from django.core import management
 
 from datetime import datetime as dt
 
-from apps.videos.models import Video
+from videos.models import Video
 
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import editor_page
-from apps.webdriver_testing.data_factories import UserFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.data_factories import UserFactory
 
 class TestCaseLeftSide(WebdriverTestCase):
 
@@ -62,7 +62,7 @@ class TestCaseLeftSide(WebdriverTestCase):
         super(TestCaseLeftSide, cls).tearDownClass()
         management.call_command('flush', verbosity=0, interactive=False)
 
-        
+
     def test_reference_lang__forked(self):
         """Default reference lang for forked translation is the same lang. """
         video = Video.objects.all()[0]
@@ -258,11 +258,11 @@ class TestCaseCenter(WebdriverTestCase):
         """Info tray displays start, stop, char count, chars/second."""
         video = Video.objects.all()[3]
         self.editor_pg.open_editor_page(video.video_id, 'en')
-        line1 = 'This is the first line '
+        line1 = 'This is the first line'
         line2 = 'This is the much longer second line'
         self.editor_pg.edit_sub_line([line1, 'br', line2], 1)
-        sub_info  = (self.editor_pg.subtitle_info(1))
-        self.assertEqual('23', sub_info['Line 1'], 
+        sub_info  = self.editor_pg.subtitle_info(1, True)
+        self.assertEqual('22', sub_info['Line 1'], 
                          'Line 1 is not expected value')
         self.assertEqual('35', sub_info['Line 2'], 
                          'Line 2 is not expected value')
@@ -285,7 +285,7 @@ class TestCaseCenter(WebdriverTestCase):
 
     def test_add_lines_to_end(self):
         """Add sub to the end of the subtitle list, enter adds new active sub."""
-
+        self.logger.info(Video.objects.all())
         video = Video.objects.all()[4]
         self.editor_pg.open_editor_page(video.video_id, 'nl')
 

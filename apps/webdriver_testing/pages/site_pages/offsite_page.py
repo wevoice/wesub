@@ -10,7 +10,7 @@ class OffsitePage(UnisubsPage):
     _WIDGET_MENU = "span.unisubs-tabTextchoose"
 
     def start_playback(self, video_position):
-        self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].play()" % video_position)
+        self.browser.execute_script("return unisubs.widget.Widget.getAllWidgets()[%d].play();" % video_position)
 
     def pause_playback(self, video_position):
         self.browser.execute_script("unisubs.widget.Widget.getAllWidgets()[%d].pause()" % video_position)

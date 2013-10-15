@@ -5,7 +5,7 @@ from apps.webdriver_testing.pages.site_pages.teams import messages_tab
 from apps.webdriver_testing.pages.site_pages.teams import members_tab
 from apps.webdriver_testing.pages.site_pages import user_messages_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
+
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
 import time
@@ -38,7 +38,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
             user = cls.team_owner,
             ).team
 
-        cls.team_member = TeamContributorMemberFactory.create(
+        cls.team_member = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                                            user=UserFactory(),
                                            team=cls.team).user
 

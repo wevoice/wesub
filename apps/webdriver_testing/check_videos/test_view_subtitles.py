@@ -1,14 +1,14 @@
 import codecs
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor
+from webdriver_testing.pages.editor_pages import unisubs_menu 
 
 
 class TestCaseViewSubtitles(WebdriverTestCase):
@@ -37,8 +37,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        user_auth = dict(username=cls.user.username, password='password')
-        cls.data_utils.upload_subs(cls.video, data, user_auth)
+        cls.data_utils.upload_subs(self.user, **data)
         #Upload sv, translated from de, complete
         data = {'language_code': 'sv',
                 'video': cls.video.pk,
@@ -47,7 +46,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(cls.video, data, user_auth)
+        cls.data_utils.upload_subs(self.user, **data)
         complete = False
         #Upload ar, translated from de, incomplete
         data = {'language_code': 'ar',
@@ -56,7 +55,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(cls.video, data, user_auth)
+        cls.data_utils.upload_subs(self.user, **data)
         #Upload hu, translated from sv, incomplete
         data = {'language_code': 'hu',
                 'video': cls.video.pk,
@@ -65,7 +64,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(cls.video, data, user_auth)
+        cls.data_utils.upload_subs(self.user, **data)
         cls.video_pg.open_video_page(cls.video.video_id)
 
 
@@ -132,8 +131,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        user_auth = dict(username=self.user.username, password='password')
-        self.data_utils.upload_subs(vid, data, user_auth)
+        self.data_utils.upload_subs(self.user, **data)
         #Upload sv, forked
         data = {'language_code': 'sv',
                 'video': vid.pk,
@@ -141,7 +139,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        self.data_utils.upload_subs(vid, data, user_auth)
+        self.data_utils.upload_subs(self.user, **data)
         self.video_pg.open_video_page(vid.video_id)
         _, en_status = self.video_pg.language_status('English')
         self.assertIn('status-complete', en_status, 

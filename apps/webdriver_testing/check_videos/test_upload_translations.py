@@ -2,13 +2,13 @@ import os
 import codecs
 import time
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor 
 
 class TestCaseUploadTranslation(WebdriverTestCase):
     """TestSuite for uploading subtitles with untimed text.  """
@@ -31,7 +31,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         self.video_pg.open_page('videos/create/')
         self.video_pg.handle_js_alert('accept')
         self.tv = self.data_utils.create_video()
-        self.data_utils.upload_subs(self.tv)
+        self.data_utils.upload_subs(self.user, video=self.tv.pk)
         self.video_pg.open_video_page(self.tv.video_id)
 
     def _upload_and_verify(self, tv, sub_file, language, lang_code):

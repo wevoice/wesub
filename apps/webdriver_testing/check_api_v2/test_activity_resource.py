@@ -4,7 +4,7 @@ import time
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
+
 from apps.webdriver_testing.data_factories import TeamVideoFactory
 
 from apps.webdriver_testing import data_helpers
@@ -21,7 +21,7 @@ class TestCaseActivity(WebdriverTestCase):
         super(TestCaseActivity, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(is_partner = True)
-        cls.data_utils.create_user_api_key(cls.user)
+        
         
         #create an open team with description text and 2 members
         cls.open_team = TeamMemberFactory.create(
@@ -40,7 +40,7 @@ class TestCaseActivity(WebdriverTestCase):
         GET /api2/partners/activity/[activity-id]/
 
         """
-        video = self.data_utils.create_video_with_subs()
+        video = self.data_utils.create_video_with_subs(self.user)
         TeamVideoFactory.create(team=self.open_team, 
                                 video=video, 
                                 added_by=self.user)
@@ -50,24 +50,23 @@ class TestCaseActivity(WebdriverTestCase):
                      'duration': 37,
                      'team': self.open_team.slug }
         url_part = 'videos/'
-        _, response = self.data_utils.post_api_request(self.user, url_part, url_data)
-        self.logger.info(response)
+        r = self.data_utils.make_request(self.user, 'post', 
+                                         url_part, **url_data)
+        response = r.json
         
         new_data = {'title': 'MVC webM output sample',
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
                    }
-        status, response = self.data_utils.put_api_request(self.user, response['resource_uri'], 
-            new_data)
-        self.logger.info(response)
-
+        r = self.data_utils.make_request(self.user, 'put', 
+                                         response['resource_uri'], **new_data)
+        response = r.json
         #activity_query = '?team={0}&type={1}'.format(
         #    self.open_team.slug, 2)
         activity_query = '?team=%s&type=4' % self.open_team.slug
         url_part = 'activity/%s' % activity_query
-        status, response = self.data_utils.api_get_request(self.user, url_part, output_type='content')
-        self.logger.info(response) 
-        self.assertEqual(200, status)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        self.assertEqual(200, r.status_code)
 
 
 
@@ -84,13 +83,15 @@ class TestCaseActivity(WebdriverTestCase):
                      'duration': 37,
                      'team': self.open_team.slug }
         url_part = 'videos/'
-        status, response = self.data_utils.post_api_request(self.user, 
-            url_part, url_data)
-        new_vid_id = response['id']
+        r = self.data_utils.make_request(self.user, 'post',
+            url_part, **url_data)
+        resp = r.json
+        new_vid_id = resp['id']
 
         activity_query = '?team={0}&type={1}'.format(
             self.open_team.slug, 1)
         url_part = 'activity/%s' %activity_query
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
-        self.assertEqual(new_vid_id, response['objects'][0]['video'])
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        resp = r.json
+        self.assertEqual(new_vid_id, resp['objects'][0]['video'])
     

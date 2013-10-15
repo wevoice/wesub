@@ -5,9 +5,9 @@ from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
 from apps.webdriver_testing.pages.site_pages.teams import members_tab
 from apps.webdriver_testing.pages.site_pages import user_messages_page
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
-from apps.webdriver_testing.data_factories import TeamAdminMemberFactory
+
+
+
 from apps.webdriver_testing.data_factories import TeamProjectFactory
 from apps.webdriver_testing.data_factories import UserFactory
 
@@ -25,10 +25,10 @@ class TestCaseMembersTab(WebdriverTestCase):
         cls.team_owner =  UserFactory.create()
         cls.team = TeamMemberFactory.create(team__name='Members tab roles Test',
                                             user = cls.team_owner).team
-        cls.promoted_manager = TeamContributorMemberFactory.create(
+        cls.promoted_manager = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                                team=cls.team,
                                user = UserFactory()).user
-        cls.promoted_admin = TeamContributorMemberFactory.create(
+        cls.promoted_admin = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                              team=cls.team,
                              user = UserFactory()).user
         cls.project = TeamProjectFactory.create(team=cls.team, 
@@ -155,11 +155,11 @@ class TestCaseManageMembers(WebdriverTestCase):
         cls.team_owner =  UserFactory.create()
         cls.team = TeamMemberFactory.create(team__membership_policy=1,
                                             user = cls.team_owner).team
-        cls.manager = TeamManagerMemberFactory.create(
+        cls.manager = TeamMemberFactory(role="ROLE_MANAGER",
                                team=cls.team).user
-        cls.admin = TeamAdminMemberFactory.create(
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",
                              team=cls.team).user
-        cls.member = TeamContributorMemberFactory.create(
+        cls.member = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                              team=cls.team).user
         cls.members_tab.open_members_page(cls.team.slug)
 

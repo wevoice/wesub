@@ -16,8 +16,8 @@ from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamProjectFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
-from webdriver_testing.data_factories import TeamContributorMemberFactory
-from webdriver_testing.data_factories import TeamAdminMemberFactory
+
+
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.pages.site_pages import watch_page
@@ -62,7 +62,7 @@ class TestCaseTranscribe(WebdriverTestCase):
                                             review_allowed = 10,
                                            )
 
-        cls.member = TeamAdminMemberFactory.create(
+        cls.member = TeamMemberFactory(role="ROLE_ADMIN",
                 team = cls.transcribe_team,
                 )
         entries = [ { 
@@ -169,7 +169,7 @@ class TestCaseTED(WebdriverTestCase):
                                             review_allowed = 10,
                                            )
 
-        cls.member = TeamAdminMemberFactory.create(
+        cls.member = TeamMemberFactory(role="ROLE_ADMIN",
                 team = cls.ted_team,
                 )
 
@@ -178,8 +178,8 @@ class TestCaseTED(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.ted_team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamAdminMemberFactory(team=cls.ted_team).user
-        cls.data_utils.create_user_api_key(cls.admin)
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.ted_team).user
+        
         cls.contributor = TeamMemberFactory(team=cls.ted_team).user
 
         entries = [ { 
@@ -247,7 +247,6 @@ class TestCaseTED(WebdriverTestCase):
         #Add ru draft, no speaker name
         cls._create_subs(cls.speaker_video, 'ru')
         management.call_command('update_index', interactive=False)
-        cls.dashboard_tab.open_team_page(cls.ted_team.slug)
 
 
     @classmethod
@@ -256,9 +255,8 @@ class TestCaseTED(WebdriverTestCase):
         new_data = {
                     'metadata' : { 'speaker-name': speaker }
                   }
-        status, response = self.data_utils.put_api_request(self.user, 
-                                                  url_part, new_data)
-
+        self.data_utils.make_request(self.user, 'put', 
+                                     url_part, **new_data)
         
     @classmethod
     def _create_subs(cls, video, lc, complete=False, metadata=None, title=None):
@@ -283,54 +281,62 @@ class TestCaseTED(WebdriverTestCase):
         """TED api returns translated speaker name from published version."""
 
         url_part = '%sapi2/ted/videos/1806/languages/sv' % self.base_url
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
+        resp = self.data_utils.make_request(self.admin, 'get', url_part)
+        r = resp.json
         self.assertEqual(r['metadata']['speaker-name'], 'Jultomten')
 
     def test_ted_api_title_published(self):
         """TED api returns translated title from published version."""
         url_part = '%sapi2/ted/videos/1806/languages/sv' % self.base_url
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['title'], 'sv subs title')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
+        self.assertEqual(response['title'], 'sv subs title')
 
     def test_ted_api_speaker_draft(self):
         """TED api returns translated speaker name from draft version."""
         url_part = '%sapi2/ted/videos/1806/languages/de' % self.base_url
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['metadata']['speaker-name'], 'Klaus')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
+        self.assertEqual(response['metadata']['speaker-name'], 'Klaus')
 
     def test_ted_api_title_draft(self):
         """TED api returns translated speaker name from draft version."""
         url_part = '%sapi2/ted/videos/1806/languages/de' % self.base_url
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['title'], 'de subs title')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
+        self.assertEqual(response['title'], 'de subs title')
 
 
     def test_ted_api_nospeaker(self):
         """TED api returns '' when no translated speaker name. """
         url_part = '%sapi2/ted/videos/1806/languages/ru' % self.base_url
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['metadata']['speaker-name'], '')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
+        self.assertEqual(response['metadata']['speaker-name'], '')
 
 
     def test_amara_api_published(self):
         """Amara api returns translated speaker name for published version. """
         url_part = 'videos/%s/languages/sv' % self.speaker_video.video_id
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
+        resp = self.data_utils.make_request(self.admin, 'get', url_part)
+        r = resp.json
         self.assertEqual(r['metadata']['speaker-name'], 'Jultomten')
 
 
     def test_amara_api_draft(self):
         """Amara api returns '' when only draft version. """
-        self.video_pg.open_page('videos/%s/%s/' % (self.speaker_video.video_id, 'de')) 
         url_part = 'videos/%s/languages/de' % self.speaker_video.video_id
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['metadata']['speaker-name'], '')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
 
-    def test_amara_api__nospeaker(self):
+        self.assertEqual(response['metadata']['speaker-name'], '')
+
+    def test_amara_api_nospeaker(self):
         """Amara api returns '' when no speaker name translated. """
         url_part = 'videos/%s/languages/ru' % self.speaker_video.video_id
-        s, r = self.data_utils.api_get_request(self.admin, url_part)
-        self.assertEqual(r['metadata']['speaker-name'], '')
+        r = self.data_utils.make_request(self.admin, 'get', url_part)
+        response = r.json
+        self.assertEqual(response['metadata']['speaker-name'], '')
 
     def test_site_search_video_speakername(self):
         """Site search for video speaker name has results. """
@@ -362,6 +368,7 @@ class TestCaseTED(WebdriverTestCase):
 
     def test_dashboard_display_speaker(self):
         """Speaker name displays with title on dashboard. """
+        self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.dashboard_tab.log_in(self.admin.username, 'password')
         self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.assertTrue(self.dashboard_tab.dash_task_present(
@@ -370,6 +377,7 @@ class TestCaseTED(WebdriverTestCase):
 
     def test_dashboard_display_nospeaker(self):
         """Title only when no speaker name for video on dashboard. """
+        self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.dashboard_tab.log_in(self.admin.username, 'password')
         self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.assertTrue(self.dashboard_tab.video_present('NoSpeakerVideo'))
