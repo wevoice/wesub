@@ -268,15 +268,11 @@ class EditorPage(UnisubsPage):
 
     def add_subs_to_the_end(self, subs):
         """Click Add subtitles at the end and add new lines"""
-        self.toggle_timeline('Hide')
-        self.browser.execute_script("window.location.hash='add-sub-at-end'")
-        self.click_by_css(self._ADD_SUB_TO_END)
+        self.toggle_timeline('Show')
         for line in subs:
-            el = self._last_working_list_element()
-            el.send_keys(line + Keys.ENTER)
-        #get rid of extra blank line at the end
-        el = self._last_working_list_element()
-        el.send_keys(Keys.ESCAPE)
+            self.browser.execute_script("window.location.hash='add-sub-at-end'")
+            self.click_by_css(self._ADD_SUB_TO_END)
+            self.type_by_css('textarea.subtitle-edit', '%s\n' % line)
 
         
 

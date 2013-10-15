@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
-from apps.webdriver_testing.data_factories import TeamManagerMemberFactory
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu
-from apps.webdriver_testing.pages.editor_pages import dialogs
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.data_factories import TeamMemberFactory
+
+
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.editor_pages import unisubs_menu
+from webdriver_testing.pages.editor_pages import dialogs
 
 
 class TestCasePublishedVideos(WebdriverTestCase):    
@@ -29,7 +29,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
 
 
         cls.user = UserFactory(username = 'user', is_partner=True)
-        cls.data_utils.create_user_api_key(cls.user)
+        
         #Add a team with workflows, tasks and preferred languages
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -43,7 +43,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
                                             approve_allowed = 10,
                                             review_allowed = 10,
                                            )
-        cls.member = TeamContributorMemberFactory.create(
+        cls.member = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                 team = cls.team,
                 user = UserFactory(username='member')
                 ).user
@@ -52,7 +52,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
         #Add video to team with published subtitles
         cls.logger.info('Setup: Add video to team with published subs.')
         vid = cls.data_utils.create_video()
-        cls.data_utils.upload_subs(vid)
+        cls.data_utils.add_subs(video=vid)
         cls.published = TeamVideoFactory.create(
                 team=cls.team, 
                 video=vid,
@@ -192,7 +192,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
 
 
         cls.user = UserFactory(username = 'user', is_partner=True)
-        cls.data_utils.create_user_api_key(cls.user)
+        
         #Add a team with workflows, tasks and preferred languages
         cls.logger.info('setup: Create a team with tasks enabled')
         cls.team = TeamMemberFactory.create(team__workflow_enabled=True,
@@ -206,7 +206,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
                                             approve_allowed = 10,
                                             review_allowed = 10,
                                            )
-        cls.member = TeamContributorMemberFactory.create(
+        cls.member = TeamMemberFactory.create(role="ROLE_CONTRIBUTOR",
                 team = cls.team,
                 user = UserFactory(username='member')
                 ).user
@@ -218,12 +218,11 @@ class TestCaseDraftVideos(WebdriverTestCase):
                 team=cls.team, 
                 video=cls.data_utils.create_video(),
                 added_by=cls.user).video
-        cls.data_utils.upload_subs(
-                cls.draft, data=None, 
-                user=dict(username=cls.user.username, password='password'))
-
+        data = { 'visibility': 'private', 
+                 'video': cls.draft,
+                 'committer': cls.user }
+        cls.data_utils.add_subs(**data)
         cls.video_pg.open_video_page(cls.draft.video_id)
-        cls.video_pg.set_skiphowto()
 
     def setUp(self):
         self.team.translate_policy=20
@@ -318,7 +317,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                                        approve_allowed = 10, # manager
                                        review_allowed = 10, # peer
                                        )
-        cls.contributor = TeamContributorMemberFactory(team=cls.team).user
+        cls.contributor = TeamMemberFactory(team=cls.team, role="ROLE_CONTRIBUTOR").user
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
                                     'subtitle_data') 
         cls.rev1 = os.path.join(cls.subs_dir, 'Timed_text.en.srt')
@@ -348,27 +347,25 @@ class TestCaseViewSubtitles(WebdriverTestCase):
 
     @classmethod
     def _upload_subtitles(cls, video, lc, subs, user, complete=True):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _upload_translation(cls, video, lc, subs, user, complete=True):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': lc,
+        data = {'language_code': lc,
                      'video': video.pk,
                      'from_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        cls.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        cls.data_utils.upload_subs(user, **data)
 
     @classmethod
     def _add_team_video(cls):

@@ -3,7 +3,6 @@ from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import TeamMemberFactory
-from apps.webdriver_testing.data_factories import TeamContributorMemberFactory
 from apps.webdriver_testing.pages.site_pages import user_messages_page
 
 
@@ -24,7 +23,7 @@ class TestCaseMessages(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
     
         cls.user = UserFactory.create()
-        cls.data_utils.create_user_api_key(cls.user)
+        
 
         cls.open_team = TeamMemberFactory.create(
             team__name="A1 Waay Cool team",
@@ -33,11 +32,13 @@ class TestCaseMessages(WebdriverTestCase):
             user = cls.user,
             ).team
         cls.team_member = UserFactory.create(username = 'team_member')
-        TeamContributorMemberFactory.create(
+        TeamMemberFactory.create(
+            role = "ROLE_CONTRIBUTOR",
             team=cls.open_team, 
             user = cls.team_member) 
         for x in range(3):
-            TeamContributorMemberFactory.create(
+            TeamMemberFactory.create(
+            role = "ROLE_CONTRIBUTOR",
             team = cls.open_team,
             user = UserFactory.create())
 
@@ -59,7 +60,7 @@ class TestCaseMessages(WebdriverTestCase):
                             "subject": "Subject of the message",
                             "content": "The message content" } 
         url_part = 'message/' 
-        self.data_utils.post_api_request(self.user, url_part, message_details)
+        self.data_utils.make_request(self.user, 'post', url_part, **message_details)
         self.messages_pg.log_in(self.second_user.username, 'password')
         self.messages_pg.open_messages() 
         self.assertEqual(message_details['content'], 
@@ -78,7 +79,7 @@ class TestCaseMessages(WebdriverTestCase):
                             "subject": "Subject of the team message",
                             "content": "The team message content" } 
         url_part = 'message/' 
-        self.data_utils.post_api_request(self.user, url_part, message_details)
+        self.data_utils.make_request(self.user, 'post', url_part, **message_details)
         self.messages_pg.log_in(self.team_member.username, 'password')
         self.messages_pg.open_messages() 
 
@@ -98,7 +99,7 @@ class TestCaseMessages(WebdriverTestCase):
                             "subject": "Subject of the team message",
                             "content": "The team message content" } 
         url_part = 'message/' 
-        self.data_utils.post_api_request(self.user, url_part, message_details)
+        self.data_utils.make_request(self.user, 'post', url_part, **message_details)
         self.messages_pg.log_in(self.second_user.username, 'password')
         self.messages_pg.open_messages() 
         self.assertEqual('You have no messages.', 
@@ -114,7 +115,7 @@ class TestCaseMessages(WebdriverTestCase):
                             "subject": "Subject of the team message",
                             "content": "The team message content" } 
         url_part = 'message/' 
-        self.data_utils.post_api_request(self.user, url_part, message_details)
+        self.data_utils.make_request(self.user, 'post', url_part, **message_details)
         self.messages_pg.log_in(self.user.username, 'password')
         self.messages_pg.open_sent_messages() 
 

@@ -1,14 +1,14 @@
 import codecs
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor
+from webdriver_testing.pages.editor_pages import unisubs_menu 
 
 
 class TestCaseSubtitles(WebdriverTestCase):
@@ -40,6 +40,6 @@ class TestCaseSubtitles(WebdriverTestCase):
                 'is_complete': True,
                 'complete': 1
                 }
-        self.data_utils.upload_subs(video, data)
+        self.data_utils.upload_subs(self.user, **data)
         self.video_pg.open_video_page(video.video_id)
         self.assertEqual('English', self.menu.visible_menu_text())
