@@ -1,5 +1,5 @@
 FROM ubuntu:12.04
-MAINTAINER Evan Hazlett "ejhazlett@gmail.com"
+MAINTAINER Amara "http://amara.org"
 RUN (echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse" > /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get -qq update
