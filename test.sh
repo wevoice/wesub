@@ -1,14 +1,19 @@
 #!/bin/bash
 
 ROOT=`pwd`
-AMARA=`docker images | grep amara`
-if [ -z "$AMARA" ] ; then
-    cd $ROOT && docker build -t amara .
-    cd $ROOT/.docker/mysql && docker build -t amara-mysql .
-    cd $ROOT/.docker/solr && docker build -t amara-solr .
-    cd $ROOT/.docker/memcached && docker build -t amara-memcached .
-    cd $ROOT/.docker/rabbitmq && docker build -t amara-rabbitmq .
-fi
+for IMG in amara-app amara-mysql amara-solr amara-memcached amara-rabbitmq
+do
+    echo "Checking image $IMG..."
+    if [ "`docker images | awk '{ print $1; }' | grep $IMG`" = "" ] ; then
+        echo "Building $IMG image..."
+        # check for top level image
+        if [ "$IMG" = "amara-app" ] ; then
+            cd $ROOT && docker build -t $IMG .
+        else
+            cd $ROOT/.docker/$IMG && docker build -t $IMG .
+        fi
+    fi
+done
 
 #MYSQL=$(docker run -i -t -d amara-mysql)
 #MYSQL_PORT=$(docker port $MYSQL 3306)
@@ -19,25 +24,14 @@ SOLR_PORT=$(docker port $SOLR 8983)
 RABBITMQ=$(docker run -i -t -d amara-rabbitmq)
 RABBITMQ_PORT=$(docker port $RABBITMQ 5672)
 
-echo "Containers: $MYSQL:$MYSQL_PORT $SOLR:$SOLR_PORT $MEMCACHED:$MEMCACHED_PORT $RABBITMQ:$RABBITMQ_PORT"
-
-# TODO: config settings
-cd $ROOT
-cp dev_settings_test.py test_settings.py
-cat << EOF >> test_settings.py
-BROKER_PORT = $BROKER_PORT
-BROKER_USER = 'guest'
-BROKER_PASSWORD = 'guest'
-
-HAYSTACK_SOLR_URL = 'http://127.0.0.1:$SOLR_PORT/'
-EOF
+echo "Containers: Solr:$SOLR:$SOLR_PORT RabbitMQ:$RABBITMQ:$RABBITMQ_PORT"
 
 # run tests
-docker run -i -t amara test_app
+docker run -i -t -e TEST_BROKER_PORT=$RABBITMQ_PORT -e TEST_SOLR_PORT=$SOLR_PORT amara-app /usr/local/bin/test_app
 
 sleep 5
 
-for CNT in "$MYSQL $SOLR $MEMCACHED $RABBITMQ"
+for CNT in $MYSQL $SOLR $MEMCACHED $RABBITMQ
 do
     docker kill $CNT
     docker rm $CNT
