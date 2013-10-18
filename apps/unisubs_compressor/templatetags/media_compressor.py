@@ -168,9 +168,7 @@ def handle_special_file(filename):
 @handle_special_file('src/js/embedder/conf.js')
 def render_embedder_conf():
     script_src = render_to_string('embedder/conf.js', {
-        # HACK: use amara.org as the current site, this lets us get the
-        # subtitles from there to make the demo work.
-        'current_site': 'amara.org',
+        'current_site': Site.objects.get_current(),
         'STATIC_URL': calc_static_url(),
     })
     return '<script type="text/javascript">%s</script>' % script_src
