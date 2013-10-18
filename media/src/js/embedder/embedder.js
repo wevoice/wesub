@@ -252,6 +252,7 @@
                     // We could just make this a callback on the model's initialize() for
                     // after we get a response, but there may be cases where we want to init
                     // a VideoModel separately from an AmaraView.
+                    that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
 
@@ -273,6 +274,7 @@
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
+                                that.setCurrentLanguageMessage('No subtitles available');
                             }
                         }
                     );
@@ -305,9 +307,21 @@
                     // We have no languages.
                 }
             },
+            setCurrentLanguageMessage: function(text) {
+                this.$amaraCurrentLang.text(text);
+                // Hide the expander triangle
+                this.$amaraCurrentLang.css('background-image', 'none');
+            },
+            setCurrentLanguage: function(subtitleSet) {
+                var languageCode = subtitleSet.get('language');
+                var langaugeName = this.getLanguageNameForCode(languageCode);
+                this.$amaraCurrentLang.text(langaugeName);
+                // Show the expander triangle
+                this.$amaraCurrentLang.css('background-image', '');
+            },
             buildSubtitles: function(language) {
 
-                this.$amaraCurrentLang.text('Loading…');
+                this.setCurrentLanguageMessage('Loading…');
 
                 // Remove any existing subtitle events.
                 this.pop.removePlugin('amarasubtitle');
@@ -338,14 +352,14 @@
 
                     this.$popSubtitlesContainer = _$('div.amara-popcorn-subtitles', this.$el);
 
-                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
+                    this.setCurrentLanguage(subtitleSet);
                 }
             },
             buildTranscript: function(language) {
 
                 var that = this;
 
-                this.$amaraCurrentLang.text('Loading…');
+                this.setCurrentLanguageMessage('Loading…');
 
                 // Remove any existing transcript events.
                 this.pop.removePlugin('amaratranscript');
@@ -383,7 +397,7 @@
 
                     }
 
-                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
+                    this.setCurrentLanguage(subtitleSet);
 
                     // If we're in the middle of the video, we'll have an active transcript plugin
                     // ready to scroll to.
