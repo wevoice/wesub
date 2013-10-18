@@ -330,8 +330,8 @@
                     // For each subtitle, init the Popcorn subtitle plugin.
                     for (var i = 0; i < subtitles.length; i++) {
                         this.pop.amarasubtitle({
-                            start: subtitles[i].start,
-                            end: subtitles[i].end,
+                            start: subtitles[i].start / 1000.0,
+                            end: subtitles[i].end / 1000.0,
                             text: subtitles[i].text
                         });
                     }
@@ -372,10 +372,9 @@
                     for (var i = 0; i < subtitles.length; i++) {
 
                         this.pop.amaratranscript({
-                            start: subtitles[i].start,
-                            startClean: utils.parseFloatAndRound(subtitles[i].start),
+                            start: subtitles[i].start / 1000.0,
+                            end: subtitles[i].end / 1000.0,
                             startOfParagraph: subtitles[i].start_of_paragraph,
-                            end: subtitles[i].end,
                             text: subtitles[i].text,
                             container: this.$transcriptBody.get(0),
                             view: this,
