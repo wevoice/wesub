@@ -244,7 +244,8 @@ def create(request):
     video_form = VideoForm(request.user, request.POST or None)
     context = {
         'video_form': video_form,
-        'youtube_form': AddFromFeedForm(request.user)
+        'youtube_form': AddFromFeedForm(request.user),
+        'initial_url': request.GET.get('initial_url'),
     }
     if video_form.is_valid():
         try:

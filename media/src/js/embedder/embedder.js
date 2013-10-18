@@ -230,7 +230,7 @@
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
-                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'),
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
                         width: that.model.get('width')
                     }));
 
@@ -262,6 +262,9 @@
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
 
+                                // update the view on amara button
+                                that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+
                                 // Make the request to fetch the initial subtitles.
                                 //
                                 // TODO: This needs to be an option.
@@ -274,7 +277,7 @@
                                 });
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
-                                that.setCurrentLanguageMessage('No subtitles available');
+                                that.setCurrentLanguageMessage('Video not on Amara');
                             }
                         }
                     );
@@ -423,6 +426,7 @@
                 this.$amaraBar           = _$('div.amara-bar',        this.$amaraTools);
                 this.$amaraTranscript    = _$('div.amara-transcript', this.$amaraTools);
 
+                this.$viewOnAmaraButton   = _$('a.amara-logo', this.$amaraBar);
                 this.$amaraDisplays      = _$('ul.amara-displays',         this.$amaraTools);
                 this.$transcriptButton   = _$('a.amara-transcript-button', this.$amaraDisplays);
                 this.$subtitlesButton    = _$('a.amara-subtitles-button',  this.$amaraDisplays);
