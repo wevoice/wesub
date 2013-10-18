@@ -812,8 +812,9 @@ MEDIA_BUNDLES = {
             'src/js/embedder/embedder.js'
         ),
         "release_url": True,
-        "bootloader": { 
-            "gatekeeper": "_amaraEmbedderLoaded", 
+        "bootloader": {
+            "gatekeeper": "_amaraEmbedderLoaded",
+            "file": 'src/js/embedder/embedder.js',
         },
         "output": 'release/public/embedder.js',
 
