@@ -17,16 +17,7 @@ CELERY_OPTS=${CELERY_OPTS:-}
 MAILNAME=${MAILNAME:-pculture.org}
 NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
-
-# configure /etc/hosts
-cat << EOF > /etc/hosts
-127.0.0.1       localhost $HOSTNAME
-::1             localhost ip6-localhost ip6-loopback
-fe00::0         ip6-localnet
-ff00::0         ip6-mcastprefix
-ff02::1         ip6-allnodes
-ff02::2         ip6-allrouters
-EOF
+SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
@@ -96,17 +87,19 @@ EOF
 fi
 
 # checkout respective revisions
-cd $APP_DIR
-git fetch
-git branch --track $REV origin/$REV
-git checkout --force $REV
-git pull --ff-only origin $REV
-if [ -e $APP_DIR/unisubs-integration ]; then
-    cd $APP_DIR/unisubs-integration
+if [ -z "$SKIP_CODE_PULL" ] ; then
+    cd $APP_DIR
     git fetch
-    git checkout master
-    INTEGRATION_REV=`cat ../optional/unisubs-integration`
-    git reset --hard $INTEGRATION_REV
+    git branch --track $REV origin/$REV
+    git checkout --force $REV
+    git pull --ff-only origin $REV
+    if [ -e $APP_DIR/unisubs-integration ]; then
+        cd $APP_DIR/unisubs-integration
+        git fetch
+        git checkout master
+        INTEGRATION_REV=`cat ../optional/unisubs-integration`
+        git reset --hard $INTEGRATION_REV
+    fi
 fi
 cd $APP_DIR
 python ./deploy/create_commit_file.py
