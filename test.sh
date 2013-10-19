@@ -17,6 +17,9 @@ do
         if [ "$IMG" = "amara-app" ] ; then
             cd $ROOT && docker build -t $IMG .
         else
+            if [ ! -e "$ROOT/.docker/$IMG" ] ; then
+                git clone https://github.com/pculture/docker-$IMG $IMG
+            fi
             cd $ROOT/.docker/$IMG && docker build -t $IMG .
         fi
     fi
