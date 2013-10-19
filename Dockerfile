@@ -1,5 +1,5 @@
 FROM ubuntu:12.04
-MAINTAINER Evan Hazlett "ejhazlett@gmail.com"
+MAINTAINER Amara "http://amara.org"
 RUN (echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse" > /etc/apt/sources.list)
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get -qq update
@@ -15,6 +15,7 @@ ADD .docker/config_env.sh /usr/local/bin/config_env
 ADD .docker/setup.sh /tmp/setup.sh
 ADD .docker/build_media.sh /usr/local/bin/build_media
 ADD .docker/worker.sh /usr/local/bin/worker
+ADD .docker/test_app.sh /usr/local/bin/test_app
 ADD .docker/update_translations.sh /usr/local/bin/update_translations
 RUN /bin/bash /tmp/setup.sh
 ADD .docker/run.sh /usr/local/bin/run
