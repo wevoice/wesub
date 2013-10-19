@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_HOST=${DOCKER_HOST:-}
+DOCKER_HOST="$1"
 if [ ! -z "$DOCKER_HOST" ] ; then
     DOCKER="docker -H $DOCKER_HOST"
     IPADDR="$DOCKER_HOST"
@@ -8,10 +8,10 @@ else
     IPADDR=`ifconfig docker0 | awk '/inet addr/ {split ($2,A,":"); print A[2]}'`
 fi
 ROOT=`pwd`
-for IMG in amara-app amara-mysql amara-solr amara-memcached amara-rabbitmq
+for IMG in amara-app amara-solr amara-rabbitmq
 do
     echo "Checking image $IMG..."
-    if [ "`docker images | awk '{ print $1; }' | grep $IMG`" = "" ] ; then
+    if [ "`$DOCKER images | awk '{ print $1; }' | grep $IMG`" = "" ] ; then
         echo "Building $IMG image..."
         # check for top level image
         if [ "$IMG" = "amara-app" ] ; then
