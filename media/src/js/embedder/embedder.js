@@ -338,8 +338,6 @@
             },
             buildSubtitles: function(language) {
 
-                this.setCurrentLanguageMessage('Loading…');
-
                 // Remove any existing subtitle events.
                 this.pop.removePlugin('amarasubtitle');
                 
@@ -370,6 +368,8 @@
                     this.$popSubtitlesContainer = _$('div.amara-popcorn-subtitles', this.$el);
 
                     this.setCurrentLanguage(subtitleSet);
+                } else {
+                    this.setCurrentLanguageMessage('');
                 }
             },
             buildTranscript: function(language) {
@@ -389,7 +389,6 @@
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
-
                 if (subtitleSets.length) {
                     var subtitleSet = subtitleSets[0];
 
@@ -432,7 +431,7 @@
                     this.$amaraTranscriptLines = $('a.amara-transcript-line', this.$transcriptBody);
 
                 } else {
-                    _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
+                    _$('.amara-transcript-line', this.$transcriptBody).text('No subtitles available.');
                 }
             },
             cacheNodes: function() {
@@ -510,7 +509,12 @@
                         );
 
                         // Call the callback.
-                        callback(resp);
+                        callback();
+                    },
+                    error: function() {
+                        // We should handle errors better here, but simply
+                        // invoking the callback works okay for now.
+                        callback();
                     }
                 });
             },
