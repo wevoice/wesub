@@ -220,7 +220,7 @@
                 this.$el.height('auto');
 
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart(this.$popContainer.attr('id'), this.model.get('url'));
+                this.pop = this.loadPopcorn();
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -285,6 +285,20 @@
 
                 return this;
 
+            },
+            loadPopcorn: function() {
+                var url = this.model.get('url');
+                // For youtube, we need to alter the URL to enable controls.
+                if(url.indexOf('youtube.com') != -1) {
+                    if(url.indexOf('?') == -1) {
+                        url += '?controls=1';
+                    } else {
+                        url += '&controls=1';
+                    }
+                }
+                pop = _Popcorn.smart(this.$popContainer.attr('id'), url);
+                pop.controls(true);
+                return pop;
             },
 
             // View methods.
