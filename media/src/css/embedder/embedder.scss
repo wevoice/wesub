@@ -333,6 +333,14 @@ div.amara-embed {
                         color: #FFF;
                         @include box-shadow(-4px, 0px, 0, #313233);
                     }
+                    .highlight {
+                        background: yellow;
+                        color: #212223;
+                    }
+                    .current-highlight {
+                        background: yellow;
+                        color: #000;
+                    }
                 }
             }
         }

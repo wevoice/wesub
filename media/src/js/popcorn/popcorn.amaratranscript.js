@@ -31,7 +31,7 @@
 
             // When we reach this subtitle, add this class.
             options.line.classList.add('current-subtitle');
-            options.view.scrollToLine(options);
+            options.view.autoScrollToLine(options.line);
         },
         end: function(event, options){
 
