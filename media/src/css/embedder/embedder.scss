@@ -276,16 +276,39 @@ div.amara-embed {
                 }
                 div.amara-transcript-header-right {
                     float: right;
+                    position: relative;
 
-                    form {
-                        margin: 0;
+                    input {
+                        background: transparent;
+                        border: 0;
+                        border-left: 1px solid #DADBDC;
+                        font: normal 12px Tahoma;
+                        padding: 12px;
+                    }
 
-                        input {
-                            background: transparent;
-                            border: 0;
-                            border-left: 1px solid #DADBDC;
-                            font: normal 12px Tahoma;
-                            padding: 12px;
+                    a {
+                        display: block;
+                        position: absolute;
+                        border-right: 6px solid transparent;
+                        border-left: 6px solid transparent;
+                        top: 50%;
+                        margin-top: -3px;
+                        display: none;
+
+                        &.amara-transcript-search-next {
+                            right: 11px;
+                            border-top: 6px solid #949596;
+                            &.disabled {
+                                border-top-color: #ced0d1;
+                            }
+                        }
+
+                        &.amara-transcript-search-prev {
+                            right: 30px;
+                            border-bottom: 6px solid #949596;
+                            &.disabled {
+                                border-bottom-color: #ced0d1;
+                            }
                         }
                     }
                 }
@@ -335,11 +358,10 @@ div.amara-embed {
                     }
                     .highlight {
                         background: yellow;
-                        color: #212223;
                     }
                     .current-highlight {
                         background: yellow;
-                        color: #000;
+                        border: 1px solid #333;
                     }
                 }
             }

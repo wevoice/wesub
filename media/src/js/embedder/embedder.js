@@ -192,6 +192,9 @@
                 'keyup input.amara-transcript-search':   'updateSearch',
                 'change input.amara-transcript-search':  'updateSearch',
 
+                'click a.amara-transcript-search-next':  'moveSearchNext',
+                'click a.amara-transcript-search-prev':  'moveSearchPrev',
+
                 // Transcript
                 'click a.amara-transcript-autoscroll':   'pauseAutoScroll',
                 'click a.amara-transcript-line':         'transcriptLineClicked'
@@ -204,6 +207,8 @@
                 var that = this;
                 this.subtitleLines = [];
                 this.currentSearch = '';
+                this.currentSearchIndex = 0;
+                this.currentSearchMatches = 0;
 
                 // If jQuery exists on the page, Backbone tries to use it and there's an odd
                 // bug if we don't convert it to a local Zepto object.
@@ -451,7 +456,10 @@
                 this.$amaraDisplays      = _$('ul.amara-displays',         this.$amaraTools);
                 this.$transcriptButton   = _$('a.amara-transcript-button', this.$amaraDisplays);
                 this.$subtitlesButton    = _$('a.amara-subtitles-button',  this.$amaraDisplays);
-                this.$search   = _$('input.amara-transcript-search', this.$amaraTranscript);
+                this.$transcriptHeaderRight = _$('div.amara-transcript-header-right', this.$amaraTranscript);
+                this.$search              = _$('input.amara-transcript-search', this.$transcriptHeaderRight);
+                this.$searchNext          = _$('a.amara-transcript-search-next', this.$transcriptHeaderRight);
+                this.$searchPrev          = _$('a.amara-transcript-search-prev', this.$transcriptHeaderRight);
 
                 this.$amaraLanguages     = _$('div.amara-languages',       this.$amaraTools);
                 this.$amaraCurrentLang   = _$('a.amara-current-language',  this.$amaraLanguages);
@@ -748,6 +756,9 @@
                         this.addSearchSpans(text);
                     }
                     this.currentSearch = text;
+                    this.currentSearchIndex = 0;
+                    this.currentSearchMatches = _$('span.highlight', this.$transcriptBody).length;
+                    this.updateSearchCurrentMatch();
                 }
                 return false;
             },
@@ -766,6 +777,52 @@
                     var subtitle = this.subtitleLines[i].subtitle;
                     line.innerHTML = subtitle.text;
                 }
+            },
+            moveSearchNext: function(evt) {
+                this.currentSearchIndex = Math.min(this.currentSearchIndex + 1, this.currentSearchMatches - 1);
+                this.updateSearchCurrentMatch();
+                evt.preventDefault();
+                return false;
+            },
+            moveSearchPrev: function(evt) {
+                this.currentSearchIndex = Math.max(this.currentSearchIndex - 1, 0);
+                this.updateSearchCurrentMatch();
+                evt.preventDefault();
+                return false;
+            },
+            updateSearchCurrentMatch: function() {
+                if(this.currentSearchMatches > 0) {
+                    this.showSearchArrows();
+                } else {
+                    this.hideSearchArrows();
+                }
+                if(this.currentSearchIndex == 0) {
+                    this.$searchPrev.addClass('disabled');
+                } else {
+                    this.$searchPrev.removeClass('disabled');
+                }
+                if(this.currentSearchIndex == this.currentSearchMatches - 1) {
+                    this.$searchNext.addClass('disabled');
+                } else {
+                    this.$searchNext.removeClass('disabled');
+                }
+                _$('span.current-highlight', this.$transcriptBody).removeClass('current-highlight');
+                var that = this;
+                _$('span.highlight', this.$transcriptBody)
+                    .eq(this.currentSearchIndex)
+                    .addClass('current-highlight')
+                    .each(function(index, span) {
+                        that.scrollToLine(span.parentElement);
+
+                    });
+            },
+            showSearchArrows: function() {
+                this.$searchNext.show();
+                this.$searchPrev.show();
+            },
+            hideSearchArrows: function() {
+                this.$searchNext.hide();
+                this.$searchPrev.hide();
             },
             waitUntilVideoIsComplete: function(callback) {
 
@@ -800,9 +857,9 @@
                 '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
                 '            </div>' +
                 '            <div class="amara-transcript-header-right">' +
-                '                <form action="" class="amara-transcript-search">' +
-                '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
-                '                </form>' +
+            '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
+            '                    <a href="#" class="amara-transcript-search-next"></a>' +
+            '                    <a href="#" class="amara-transcript-search-prev"></a>' +
                 '            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
