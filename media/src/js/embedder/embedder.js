@@ -17,6 +17,37 @@
         return str.replace(specials, "\\$&");
     }
 
+    function padWithZeros(number, width) {
+        var numString = number.toString();
+        var characters = [];
+
+        for(var i=numString.length; i < width; i++) {
+            characters.push("0");
+        }
+        characters.push(numString);
+        return characters.join('');
+    }
+
+    function formatTime(milliseconds) {
+        if(milliseconds === undefined || milliseconds === null || milliseconds < 0) {
+            return '';
+        }
+        var seconds = Math.floor(milliseconds / 1000);
+        var milliseconds = milliseconds % 1000;
+        var hours = Math.floor(seconds / 3600);
+        var minutes = Math.floor((seconds % 3600) / 60);
+
+        var timeParts = [];
+        if(hours > 0) {
+            timeParts.push(hours);
+            timeParts.push(padWithZeros(minutes, 2));
+        } else {
+            timeParts.push(minutes);
+        }
+        timeParts.push(padWithZeros(seconds, 2));
+        return timeParts.join(":") + '.' + milliseconds;
+    }
+
     var Amara = function(Amara) {
 
         // For reference in inner functions.
@@ -424,6 +455,7 @@
                 line.href = '#';
                 line.classList.add('amara-transcript-line');
                 line.innerHTML = subtitle.text;
+                line.title = formatTime(subtitle.start);
 
                 var container = this.$transcriptBody.get(0);
                 // If this subtitle has indicated that it's the beginning of a
