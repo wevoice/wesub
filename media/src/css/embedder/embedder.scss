@@ -338,13 +338,12 @@ div.amara-embed {
                     @include border-radius();
 
                     &:hover {
-                        background: #D1D2D3;
+                        background: #CACBCC;
                         @include box-shadow(-4px, 0px, 0, #D1D2D3);
                     }
                     &.current-subtitle {
-                        background: #313233;
-                        color: #FFF;
-                        @include box-shadow(-4px, 0px, 0, #313233);
+                        background: #DADADA;
+                        @include box-shadow(-4px, 0px, 0, #D1D2D3);
                     }
                     &:after {
                         content: " ";
@@ -357,12 +356,15 @@ div.amara-embed {
                         color: #FFF;
                         @include box-shadow(-4px, 0px, 0, #313233);
                     }
-                    .highlight {
-                        background: yellow;
+                    .search-match {
+                        background: #fdffc3;
+                        padding: 5px 0;
+                        margin: -5px 0;
+                        @include border-radius();
                     }
-                    .current-highlight {
-                        background: yellow;
-                        border: 1px solid #333;
+                    .current-search-match {
+                        background: #f9fe7e;
+                        @include border-radius();
                     }
                 }
             }

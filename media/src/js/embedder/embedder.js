@@ -757,13 +757,13 @@
                     }
                     this.currentSearch = text;
                     this.currentSearchIndex = 0;
-                    this.currentSearchMatches = _$('span.highlight', this.$transcriptBody).length;
+                    this.currentSearchMatches = _$('span.search-match', this.$transcriptBody).length;
                     this.updateSearchCurrentMatch();
                 }
                 return false;
             },
             addSearchSpans: function(text) {
-                var replacementText = '<span class="highlight">$1</span>';
+                var replacementText = '<span class="search-match">$1</span>';
                 for(var i = 0; i < this.subtitleLines.length; i++) {
                     var line = this.subtitleLines[i].line;
                     var regex = new RegExp('(' + regexEscape(text) + ')', 'gi');
@@ -806,11 +806,11 @@
                 } else {
                     this.$searchNext.removeClass('disabled');
                 }
-                _$('span.current-highlight', this.$transcriptBody).removeClass('current-highlight');
+                _$('span.current-search-match', this.$transcriptBody).removeClass('current-search-match');
                 var that = this;
-                _$('span.highlight', this.$transcriptBody)
+                _$('span.search-match', this.$transcriptBody)
                     .eq(this.currentSearchIndex)
-                    .addClass('current-highlight')
+                    .addClass('current-search-match')
                     .each(function(index, span) {
                         that.scrollToLine(span.parentElement);
 
