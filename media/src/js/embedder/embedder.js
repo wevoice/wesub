@@ -33,7 +33,6 @@
             return '';
         }
         var seconds = Math.floor(milliseconds / 1000);
-        var milliseconds = milliseconds % 1000;
         var hours = Math.floor(seconds / 3600);
         var minutes = Math.floor((seconds % 3600) / 60);
 
@@ -44,8 +43,8 @@
         } else {
             timeParts.push(minutes);
         }
-        timeParts.push(padWithZeros(seconds, 2));
-        return timeParts.join(":") + '.' + milliseconds;
+        timeParts.push(padWithZeros(seconds % 60, 2));
+        return timeParts.join(":");
     }
 
     var Amara = function(Amara) {
