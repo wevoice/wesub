@@ -343,7 +343,7 @@ div.amara-embed {
                     }
                     &.current-subtitle {
                         background: #DADADA;
-                        @include box-shadow(-4px, 0px, 0, #D1D2D3);
+                        @include box-shadow(-4px, 0px, 0, #DADADA);
                     }
                     &:after {
                         content: " ";
