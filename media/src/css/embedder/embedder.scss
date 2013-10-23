@@ -358,14 +358,14 @@ div.amara-embed {
                         @include box-shadow(-4px, 0px, 0, #313233);
                     }
                     .search-match {
-                        background: #fdffc3;
+                        background: #fcff9e;
                         padding: 5px 0;
                         margin: -5px 0;
                         @include border-radius();
                     }
                     .current-search-match {
-                        background: #f9fe7e;
-                        @include border-radius();
+                        border: 1px solid #bbbe68;
+                        margin: -5px -1px;
                     }
                 }
             }
