@@ -34,18 +34,8 @@ def get_docker_output(arguments, *params, **kwargs):
 
 def run_manage(manage_args, docker_args=None, settings='docker_dev_settings',
                wrapper_script=None):
-    image_name = 'amara-dev-manage-%s' % (uuid.uuid1().hex[:10],)
-    volume_arg = '%s:/opt/apps/unisubs' % (unisubs_root(),)
-    run_cmd = [
-        'docker',
-        'run',
-        '-i', '-t',
-        '-h=unisubs.example.com',
-        '-cidfile=%s' % cid_path(image_name),
-        '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
-        '-v', volume_arg,
-        '-w', '/opt/apps/unisubs/',
-    ]
+    image_name = unique_image_name('amara-dev-manage')
+    run_cmd = _docker_manage_args(image_name, settings)
     if docker_args:
         run_cmd.extend(docker_args)
     run_cmd.append('amara-dev')
@@ -55,14 +45,38 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings',
         '/opt/ve/unisubs/bin/python',
         '/opt/apps/unisubs/manage.py',
     ] + manage_args)
-    # can't use run_docker here because it will not work with the interactive
-    # terminal
-    cmdline = " ".join(run_cmd)
-    print '* %s' % cmdline
-    subprocess.check_call(cmdline, shell=True)
+    run_docker(" ".join(run_cmd))
     cid = open(cid_path(image_name)).read().strip()
     with open("/dev/null", "w") as dev_null:
         run_docker("stop %s" % cid, stdout=dev_null)
         run_docker("wait %s" % cid, stdout=dev_null)
         run_docker("rm %s" % cid, stdout=dev_null)
     os.remove(cid_path(image_name))
+
+def run_shell():
+    image_name = unique_image_name('amara-dev-shell')
+    run_cmd = _docker_manage_args(image_name)
+    run_cmd.extend(['amara-dev', '/bin/bash', '--init-file',
+                    '/opt/ve/unisubs/bin/activate'])
+    run_docker(" ".join(run_cmd))
+    cid = open(cid_path(image_name)).read().strip()
+    with open("/dev/null", "w") as dev_null:
+        run_docker("stop %s" % cid, stdout=dev_null)
+        run_docker("wait %s" % cid, stdout=dev_null)
+        run_docker("rm %s" % cid, stdout=dev_null)
+    os.remove(cid_path(image_name))
+
+def unique_image_name(prefix):
+    return '%s-%s' % (prefix, uuid.uuid1().hex[:10])
+
+def _docker_manage_args(image_name, settings='docker_dev_settings'):
+    volume_arg = '%s:/opt/apps/unisubs' % (unisubs_root(),)
+    return [
+        'run',
+        '-i', '-t',
+        '-h=unisubs.example.com',
+        '-cidfile=%s' % cid_path(image_name),
+        '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
+        '-v', volume_arg,
+        '-w', '/opt/apps/unisubs/',
+    ]
