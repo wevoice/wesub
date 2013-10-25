@@ -54,20 +54,26 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
 
     def test_videos_added_hourly(self):
+        """check emails sent with hourly setting for videos added"""
+        TeamMemberFactory(role="ROLE_CONTRIBUTOR",
+                                           user=UserFactory(),
+                                           team=self.team)
 
+        for x in range(0,5):
+            video = TeamVideoFactory.create(
+                    team=self.team, 
+                    video=self.data_utils.create_video())
         mail.outbox = []
-        video = TeamVideoFactory.create(
-                team=self.team, 
-                video=self.data_utils.create_video())
-        
         tasks.add_videos_notification_hourly.apply()
         msg = str(mail.outbox[-1].message())
         self.assertIn('team has added new videos, and they need your help:', 
                       msg)
-        self.logger.info(msg)
+        for x in mail.outbox:
+            self.logger.info(x.message())
         self.assertEqual(3,len(mail.outbox))
 
     def test_videos_added_daily(self):
+        """check email sent with daily setting for videos added"""
         team2 = TeamMemberFactory(team__notify_interval='NOTIFY_DAILY').team
         mail.outbox = []
         video = TeamVideoFactory.create(
