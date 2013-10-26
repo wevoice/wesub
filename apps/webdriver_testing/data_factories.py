@@ -62,6 +62,16 @@ class PartnerFactory(factory.django.DjangoModelFactory):
 
 
 class TeamFactory(factory.django.DjangoModelFactory):
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Set the interval notification.
+        try:
+            kwargs['notify_interval'] = getattr(Team, kwargs['notify_interval'])
+        except:
+            kwargs['notify_interval'] = Team.NOTIFY_HOURLY
+        return kwargs
+
+
     FACTORY_FOR = Team
     name = factory.Sequence(lambda n: 'Test Team%d' % n)
     slug = factory.Sequence(lambda n: 'test-team-%d' % n)
