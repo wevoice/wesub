@@ -21,10 +21,11 @@ class S3ImageFieldFile(FieldFile):
             return ''
 
         size = (width, height)
+        name = self._get_thumbnail_name(size)
 
-        if not settings.USE_AMAZON_S3 and not self.storage.exists(self.name):
+        if not settings.USE_AMAZON_S3 and not self.storage.exists(name):
             self._create_thumbnail(self._open_image(), size)
-        return self.storage.url(self._get_thumbnail_name(size))
+        return self.storage.url(name)
 
     def _open_image(self):
         return Image.open(self.storage.open(self.name))
@@ -117,10 +118,9 @@ class S3EnabledImageField(models.ImageField):
     attr_class = S3ImageFieldFile
 
     def __init__(self, bucket=settings.AWS_USER_DATA_BUCKET_NAME,
-                       thumb_sizes=THUMB_SIZES, thumb_options=dict(crop='smart', upscale=True),
-                       verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
+                 thumb_sizes=THUMB_SIZES, verbose_name=None, name=None,
+                 width_field=None, height_field=None, **kwargs):
         self.thumb_sizes = thumb_sizes
-        self.thumb_options = thumb_options
         self.bucket_name = bucket
 
         if settings.USE_AMAZON_S3:
@@ -177,7 +177,6 @@ add_introspection_rules([
         [],
         {
             "thumb_sizes": ["thumb_sizes", {"default": THUMB_SIZES}],
-            "thumb_options": ["thumb_options", {"default": dict(crop='smart')}]
         },
     ),
 ], ["^utils\.amazon\.fields"])
