@@ -100,6 +100,13 @@ class TeamManager(models.Manager):
                         .distinct())
         return Team.objects.filter(id__in=team_ids)
 
+    def needs_new_video_notification(self, notify_interval):
+        return (self.filter(
+            notify_interval=notify_interval,
+            teamvideo__created__gt=models.F('last_notification_time'))
+            .distinct())
+
+
 class Team(models.Model):
     APPLICATION = 1
     INVITATION_BY_MANAGER = 2
@@ -140,6 +147,13 @@ class Team(models.Model):
     SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
     SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])
 
+    NOTIFY_DAILY = 'D'
+    NOTIFY_HOURLY = 'H'
+    NOTIFY_INTERVAL_CHOICES = (
+        (NOTIFY_DAILY, _('Daily')),
+        (NOTIFY_HOURLY, _('Hourly')),
+    )
+
     name = models.CharField(_(u'name'), max_length=250, unique=True)
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links. Line breaks and HTML not supported.'))
@@ -162,6 +176,9 @@ class Team(models.Model):
     is_moderated = models.BooleanField(default=False)
     header_html_text = models.TextField(blank=True, default='', help_text=_(u"HTML that appears at the top of the teams page."))
     last_notification_time = models.DateTimeField(editable=False, default=datetime.datetime.now)
+    notify_interval = models.CharField(max_length=1,
+                                       choices=NOTIFY_INTERVAL_CHOICES,
+                                       default=NOTIFY_DAILY)
 
     auth_provider_code = models.CharField(_(u'authentication provider code'),
             max_length=24, blank=True, default="")
