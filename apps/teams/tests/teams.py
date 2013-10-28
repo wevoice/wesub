@@ -146,6 +146,31 @@ class TestNotification(TestCase):
         TeamNotificationSetting.objects.notify_team(t2.pk, 'x')
         TeamNotificationSetting.objects.notify_team(t3.pk, 'x')
 
+class NeedsNewVideoNotificationTest(TestCase):
+    def make_team(self, notify_interval, add_video=True):
+        team = test_factories.create_team(notify_interval=notify_interval)
+        member = test_factories.create_team_member(team)
+        if add_video:
+            test_factories.create_team_video(team, member.user)
+        return team
+
+    def setUp(self):
+        self.t1 = self.make_team(Team.NOTIFY_HOURLY)
+        self.t2 = self.make_team(Team.NOTIFY_HOURLY, add_video=False)
+        self.t3 = self.make_team(Team.NOTIFY_DAILY)
+        self.t4 = self.make_team(Team.NOTIFY_DAILY, add_video=False)
+
+    def check_needs_new_video_notification(self, notify_interval,
+                                           *correct_teams):
+        qs = Team.objects.needs_new_video_notification(notify_interval)
+        self.assertEquals(set(t.slug for t in qs),
+                          set(t.slug for t in correct_teams))
+
+    def test_hourly(self):
+        self.check_needs_new_video_notification(Team.NOTIFY_HOURLY, self.t1)
+
+    def test_daily(self):
+        self.check_needs_new_video_notification(Team.NOTIFY_DAILY, self.t3)
 
 class TeamVideoTest(TestCase):
 

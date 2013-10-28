@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
-from apps.webdriver_testing.pages.site_pages.teams import messages_tab
-from apps.webdriver_testing.pages.site_pages.teams import members_tab
-from apps.webdriver_testing.pages.site_pages import user_messages_page
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from django.core import mail
 
-from apps.webdriver_testing.data_factories import TeamProjectFactory
-from apps.webdriver_testing.data_factories import UserFactory
-import time
+from teams import tasks
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams import ATeamPage
+from webdriver_testing.pages.site_pages.teams import messages_tab
+from webdriver_testing.pages.site_pages.teams import members_tab
+from webdriver_testing.pages.site_pages import user_messages_page
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import TeamProjectFactory
+from webdriver_testing.data_factories import UserFactory
 
 class TestCaseTeamMessages(WebdriverTestCase):
     """TestSuite for searching team videos """
@@ -25,6 +28,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTeamMessages, cls).setUpClass()
+        cls.data_utils = data_helpers.DataHelpers()
         cls.a_team_pg = ATeamPage(cls)
         cls.members_tab = members_tab.MembersTab(cls)
         cls.messages_tab = messages_tab.MessagesTab(cls)
@@ -48,6 +52,41 @@ class TestCaseTeamMessages(WebdriverTestCase):
         cls.messages_tab.open_messages_tab(cls.team.slug)
         cls.messages_tab.edit_messages(cls._TEST_MESSAGES)
 
+
+    def test_videos_added_hourly(self):
+        """check emails sent with hourly setting for videos added"""
+        TeamMemberFactory(role="ROLE_CONTRIBUTOR",
+                                           user=UserFactory(),
+                                           team=self.team)
+
+        for x in range(0,5):
+            video = TeamVideoFactory.create(
+                    team=self.team, 
+                    video=self.data_utils.create_video())
+        mail.outbox = []
+        tasks.add_videos_notification_hourly.apply()
+        msg = str(mail.outbox[-1].message())
+        self.assertIn('team has added new videos, and they need your help:', 
+                      msg)
+        for x in mail.outbox:
+            self.logger.info(x.message())
+        self.assertEqual(3,len(mail.outbox))
+
+    def test_videos_added_daily(self):
+        """check email sent with daily setting for videos added"""
+        team2 = TeamMemberFactory(team__notify_interval='NOTIFY_DAILY').team
+        mail.outbox = []
+        video = TeamVideoFactory.create(
+                team=team2, 
+                video=self.data_utils.create_video())
+        
+        tasks.add_videos_notification_daily.apply()
+        msg = str(mail.outbox[-1].message())
+        self.logger.info(msg)
+        self.assertIn('team has added new videos, and they need your help:', 
+                      msg)
+
+ 
         
     def test_messages__edit(self):
         """Change the default messages via the UI and verify they are stored.
@@ -69,7 +108,6 @@ class TestCaseTeamMessages(WebdriverTestCase):
             username = self.non_member.username,
             message = 'Join my team',
             role = 'Contributor')
-        time.sleep(2)
 
         #Verify the user gets the message displayed.
         self.user_message_pg.log_in(self.non_member.username, 'password')

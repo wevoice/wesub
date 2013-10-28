@@ -407,7 +407,6 @@ INSTALLED_APPS = (
     'haystack',
     'rosetta',
     'raven.contrib.django',
-    'sorl.thumbnail',
     'south',
     'tastypie',
     # third party apps forked on our repo
