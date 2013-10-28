@@ -136,7 +136,8 @@ def dxfp_sample(language_code):
  </body>
 </tt>""" % language_code)
 
-def make_review_task(team_video, language_code, user, task_type='Translate'):
+def make_review_task(team_video, language_code, user, task_type='Translate',
+                     sub_data=None):
     """Move a video through the tasks process to the review stage, then return
     that task.
 
@@ -148,7 +149,7 @@ def make_review_task(team_video, language_code, user, task_type='Translate'):
     task = Task(team=team, team_video=team_video, assignee=None,
                 language=language_code, type=Task.TYPE_IDS[task_type])
     task.save()
-    v = pipeline.add_subtitles(team_video.video, language_code, None,
+    v = pipeline.add_subtitles(team_video.video, language_code, sub_data,
                                complete=False, visibility='private')
     task.assignee = user
     task.new_subtitle_version = v

@@ -5,13 +5,12 @@ from django.core import mail
 from django.contrib.sites.models import Site
 
 from localeurl.templatetags.localeurl_tags import rmlocale
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import diffing_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import diffing_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
 
 
 class TestCaseRevisionNotifications(WebdriverTestCase):
@@ -32,7 +31,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Subtitle contributor gets an email when new revision added.
 
         """
-        video = VideoUrlFactory().video
+        video = self.data_utils.create_video()
         self.video_pg.open_video_page(video.video_id)
 
         self.video_pg.log_in(self.user.username, 'password')
@@ -62,7 +61,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Language follower gets an email when new revision added.
 
         """
-        video = VideoUrlFactory().video
+        video = self.data_utils.create_video()
 
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
@@ -110,7 +109,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
         """Video follower gets an email when new revision added.
 
         """
-        video = VideoUrlFactory().video
+        video = self.data_utils.create_video()
         follower = UserFactory.create(email='follower@example.com')
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -140,7 +139,7 @@ class TestCaseRevisionNotifications(WebdriverTestCase):
 
         """
         self.skipTest('needs https://unisubs.sifterapp.com/issues/2220 fixed')
-        video = VideoUrlFactory().video
+        video = self.data_utils.create_video()
         follower = UserFactory.create(email='follower@example.com')
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.log_in(follower.username, 'password')
@@ -181,15 +180,14 @@ class TestCaseRevisionEdits(WebdriverTestCase):
         return video
 
     def _upload_en_draft(self, video, subs, user, complete=False):
-        auth_creds = dict(username=user.username, password='password')
-        draft_data = {'language_code': 'en',
+        data = {'language_code': 'en',
                      'video': video.pk,
                      'primary_audio_language_code': 'en',
                      'draft': open(subs),
                      'complete': int(complete),
                      'is_complete': complete,
                     }
-        self.data_utils.upload_subs(video, draft_data, user=auth_creds)
+        self.data_utils.upload_subs(user, **data)
 
     def _create_two_incomplete(self, video, user):
         rev1 = os.path.join(self.subs_dir, 'Timed_text.en.srt')

@@ -25,7 +25,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         super(TestCaseVideoResource, cls).setUpClass()
         cls.user = UserFactory.create(username = 'user')
         cls.data_utils = data_helpers.DataHelpers()
-        cls.data_utils.create_user_api_key(cls.user)
+        
         cls.test_video = cls.data_utils.create_video()
         cls.open_team = TeamMemberFactory.create(
             team__name="Cool team",
@@ -50,7 +50,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
 
 
-    def test_video__list(self):
+    def test_video_list(self):
         """List the available videos that are in teams.
 
         GET /api2/partners/videos/
@@ -71,7 +71,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/'
-        status, response = self.data_utils.api_get_request(self.user, url_part)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -80,7 +81,7 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertIn(tv.video_id, videos_list)
 
 
-    def test_query__project(self):
+    def test_query_project(self):
         """List the available videos.
 
         GET /api2/partners/videos/
@@ -98,7 +99,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/?project=%s' %self.project1.slug
-        status, response = self.data_utils.api_get_request(self.user, url_part)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -106,7 +108,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 videos_list.append(k)
         self.assertEqual(5, len(videos_list))
 
-    def test_query__team(self):
+    def test_query_team(self):
         """List the available videos.
 
         GET /api2/partners/videos/team=<team slug>
@@ -116,7 +118,9 @@ class TestCaseVideoResource(WebdriverTestCase):
                 added_by=self.user,
                 project = self.project1)
         url_part = 'videos/?team=%s' %self.open_team.slug
-        status, response = self.data_utils.api_get_request(self.user, url_part)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -124,7 +128,7 @@ class TestCaseVideoResource(WebdriverTestCase):
                 videos_list.append(k)
         self.assertEqual(5, len(videos_list))
 
-    def test_sort__newest(self):
+    def test_sort_newest(self):
         """List the available videos.
 
         GET /api2/partners/videos/
@@ -138,7 +142,9 @@ class TestCaseVideoResource(WebdriverTestCase):
             
             time.sleep(1)
         url_part = 'videos/?order_by=-created' 
-        status, response = self.data_utils.api_get_request(self.user, url_part)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+
         video_objects =  response['objects']
         videos_list = []
         for k, v in itertools.groupby(video_objects, 
@@ -147,7 +153,7 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         self.assertEqual(team_vid_list[-1], videos_list[0])
 
-    def test_sort__title(self):
+    def test_sort_title(self):
         """List the available videos sorted by title (desc)
 
         GET /api2/partners/videos/
@@ -163,7 +169,8 @@ class TestCaseVideoResource(WebdriverTestCase):
 
 
         url_part = 'videos/?order_by=-title' 
-        status, response = self.data_utils.api_get_request(self.user, url_part)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
         
         video_objects =  response['objects']
         videos_list = []
@@ -172,28 +179,30 @@ class TestCaseVideoResource(WebdriverTestCase):
                 videos_list.append(k)
         self.assertEqual('Zzz-test-video', videos_list[0])
 
-    def test_video__create(self):
+    def test_video_create(self):
         """Add a new video.
 
         POST /api2/partners/videos/
         """
 
-        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
+        data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
                                    'Birds_short.webmsd.webm'),
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = self.data_utils.post_api_request(self.user, url_part, url_data)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json
+
         self.video_pg.open_video_page(response['id'])
         #Check response metadata
-        for k, v in url_data.iteritems():
+        for k, v in data.iteritems():
             self.assertEqual(v, response[k])
 
         #Check video displays on the site
         self.assertTrue(self.video_pg.video_embed_present())
 
 
-    def test_video__details(self):
+    def test_video_details(self):
         """Get video details.
 
         GET /api2/partners/videos/[video-id]/
@@ -201,15 +210,17 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         test_video = self.data_utils.create_video()
         url_part = 'videos/%s/' % test_video.video_id
-        s, r = self.data_utils.api_get_request(self.user, url_part)
-        self.assertEqual(r['title'], test_video.title)
+        r = self.data_utils.make_request(self.user, 'get', url_part)
+        response = r.json
+
+        self.assertEqual(response['title'], test_video.title)
         self.assertIn(test_video.get_primary_videourl_obj().url, 
-                      r['all_urls'])
-        self.video_pg.open_page(r['site_url'])
-        self.assertEqual(self.video_pg.video_id(), r['id'])
+                      response['all_urls'])
+        self.video_pg.open_page(response['site_url'])
+        self.assertEqual(self.video_pg.video_id(), response['id'])
 
 
-    def test_update__speaker_metatdata(self):
+    def test_update_speaker_metatdata(self):
         """Update video metadata, add speaker name field
 
         PUT /api2/partners/videos/[video-id]/
@@ -229,9 +240,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                                              'location': 'North Pole'
                                          }
                   }
-        status, response = self.data_utils.put_api_request(self.user, 
-                                                  url_part, new_data)
-        self.logger.info(response)
+        r = self.data_utils.make_request(self.user, 'put', url_part, **new_data)
+        response = r.json
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata
@@ -243,7 +253,7 @@ class TestCaseVideoResource(WebdriverTestCase):
             self.video_pg.speaker_name())
 
  
-    def test_update__metatdata(self):
+    def test_update_metatdata(self):
         """Update video metadata, title, description.
 
         PUT /api2/partners/videos/[video-id]/
@@ -254,8 +264,9 @@ class TestCaseVideoResource(WebdriverTestCase):
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = self.data_utils.post_api_request(self.user,
-                                                   url_part, url_data)
+        r = self.data_utils.make_request(self.user, 'post', 
+                                         url_part, **url_data)
+        response = r.json
         vid_id = response['id']
 
         url_part = 'videos/%s/' % vid_id
@@ -263,8 +274,8 @@ class TestCaseVideoResource(WebdriverTestCase):
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter'), 
                   }
-        status, response = self.data_utils.put_api_request(self.user, 
-                                                  url_part, new_data)
+        r = self.data_utils.make_request(self.user, 'put', url_part, **new_data)
+        response = r.json
         self.video_pg.open_video_page(vid_id)
 
         #Check response metadata
@@ -275,19 +286,20 @@ class TestCaseVideoResource(WebdriverTestCase):
         self.assertEqual(new_data['description'], 
             self.video_pg.description_text())
 
-    def test_update__team(self):
+    def test_update_team(self):
         """Update the video metadata, add to team and edit video description.
 
         PUT /api2/partners/videos/[video-id]/
         """
 
-        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
+        data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
                                    'Birds_short.webmsd.webm'),
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        status, response = self.data_utils.post_api_request(self.user, 
-                                                   url_part, url_data)
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json
+
         vid_id = response['id']
 
         url_part = 'videos/%s/' % vid_id
@@ -295,33 +307,31 @@ class TestCaseVideoResource(WebdriverTestCase):
                                    '720p using Miro Video Converter'),
                     'team': self.open_team.slug,
                    }
-        status, response = self.data_utils.put_api_request(self.user,
-                                                  url_part, new_data)
-        self.logger.info(response) 
+        r = self.data_utils.make_request(self.user, 'put', url_part, **new_data)
+        response = r.json
 
         #Check response metadata
         for k, v in new_data.iteritems():
             self.assertEqual(v, response[k])
-
-
         #Check the team is listed on the video page 
         self.video_pg.open_video_page(vid_id)
         self.assertTrue(self.video_pg.team_slug(self.open_team.slug))
 
-    def test_update__project(self):
+    def test_update_project(self):
         """Edit video, add it to a team and project.
 
         PUT /api2/partners/videos/[video-id]/
         """
         #Create the initial video via api and get the id
-        url_data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
+        data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
                                    'Birds_short.webmsd.webm'),
                      'title': 'Test video created via api',
                      'duration': 37 }
         url_part = 'videos/'
-        s, r = self.data_utils.post_api_request(self.user, 
-                                       url_part, url_data)
-        vid_id = r['id']
+        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        response = r.json
+
+        vid_id = response['id']
         self.video_pg.open_video_page(vid_id)
 
 
@@ -332,10 +342,9 @@ class TestCaseVideoResource(WebdriverTestCase):
                     'description': ('This is a sample vid converted to webM '
                                    '720p using Miro Video Converter')
                    }
-        status, response = self.data_utils.put_api_request(self.user, 
-                                                  url_part, new_data)
+        r = self.data_utils.make_request(self.user, 'put', url_part, **new_data)
+        response = r.json
 
-        self.logger.info(response)
 
         #Check response metadata
         for k, v in new_data.iteritems():
@@ -346,5 +355,5 @@ class TestCaseVideoResource(WebdriverTestCase):
         team_videos_tab.log_in(self.user.username, 'password')
         team_videos_tab.open_team_project(self.open_team.slug, 
                                           self.project2.slug)
-        self.assertTrue(team_videos_tab.video_present(url_data['title']))
+        self.assertTrue(team_videos_tab.video_present(data['title']))
 

@@ -1,50 +1,74 @@
 from StringIO import StringIO
 from hashlib import sha1
-from thread import start_new_thread
 from time import time
 from uuid import uuid4
+import os
 
 from boto.s3.connection import S3Connection
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models.fields.files import FieldFile
-from sorl.thumbnail.base import Thumbnail
-from sorl.thumbnail.main import build_thumbnail_name
+from easy_thumbnails.processors import scale_and_crop
 from south.modelsinspector import add_introspection_rules
-
+from PIL import Image
 
 THUMB_SIZES = getattr(settings, 'THUMBNAILS_SIZE', ())
-USE_THREADED_THUMBNAIL_CREATING = getattr(settings, 'USE_THREADED_THUMBNAIL_CREATING', False)
-
-def create_thumbnails(obj, content, size=None, thumb_name=None):
-    sizes = size and [size] or obj.field.thumb_sizes
-
-    for size in sizes:
-        img = StringIO()
-        content.seek(0)
-        if not isinstance(content, StringIO):
-            content = StringIO(content.read(content.size))
-        Thumbnail(content, size, dest=img, opts=obj.field.thumb_options)
-        th_name = thumb_name or obj.build_thumbnail_name(obj.name, size)
-        obj.storage.save(th_name, ContentFile(img.read()))
 
 class S3ImageFieldFile(FieldFile):
-    def thumb_url(self, w, h):
+    def thumb_url(self, width, height):
         if not self.name:
             return ''
 
-        name = self.build_thumbnail_name(self.name, (w, h))
-        if not settings.USE_AMAZON_S3 and not self.storage.exists(name) and self.storage.exists(self.name):
-            create_thumbnails(self, self.storage.open(self.name), (w, h), name)
+        size = (width, height)
+        name = self._get_thumbnail_name(size)
+
+        if not settings.USE_AMAZON_S3 and not self.storage.exists(name):
+            self._create_thumbnail(self._open_image(), size)
         return self.storage.url(name)
+
+    def _open_image(self):
+        return Image.open(self.storage.open(self.name))
 
     def generate_file_name(self):
         return sha1(settings.SECRET_KEY+str(time())+str(uuid4())).hexdigest()
 
-    def build_thumbnail_name(self, name, size, options=None):
-        options = options or self.field.thumb_options
-        return build_thumbnail_name(name, size, options)
+    def _get_thumbnail_name(self, size):
+        """"Get the name for a thumbnail.
+
+        This method employs some extremely wonkey logic to duplicate the thumbnail
+        names that solr-thumbnail created for us
+
+        :param name: name of the original file
+        :param size: width/height of the thumbnail as a tuple
+        :returns: filename string
+        """
+        return "%s_%sx%s_crop-smart_upscale-True_q85.jpg" % (
+            self.name.replace('.', '_'), size[0], size[1])
+
+    def _create_all_thumbnails(self, image):
+        """Create thumbnails for each size for our field's thumb_sizes """
+
+        for size in self.field.thumb_sizes:
+            self._create_thumbnail(image, size)
+
+    def _create_thumbnail(self, image, size):
+        """Create a thumbnail for a given size
+
+        This method creates thumbnail for the given width/height then saves them
+        using field's storage.
+
+        :param image: PIL source image
+        :param size: width/height as a tuple
+        """
+
+        dest_image = scale_and_crop(image, size, crop='smart', upscale=True)
+        dest_bytes = StringIO()
+        dest_image.save(dest_bytes, format="JPEG")
+
+        self.storage.save(self._get_thumbnail_name(size),
+                          ContentFile(dest_bytes.getvalue()))
+
 
     def save(self, name, content, save=True):
         ext = name.split('.')[-1]
@@ -57,10 +81,8 @@ class S3ImageFieldFile(FieldFile):
         self._size = len(content)
         self._committed = True
 
-        if USE_THREADED_THUMBNAIL_CREATING:
-            start_new_thread(create_thumbnails, (self, content))
-        else:
-            create_thumbnails(self, content)
+        content.seek(0)
+        self._create_all_thumbnails(Image.open(content))
 
         # Save the object because it has changed, unless save is False
         if save:
@@ -77,7 +99,7 @@ class S3ImageFieldFile(FieldFile):
         self.storage.delete(self.name)
 
         for size in self.field.thumb_sizes:
-            name = self.build_thumbnail_name(self.name, size)
+            name = self._get_thumbnail_name(size)
             self.storage.delete(name)
 
         self.name = None
@@ -96,10 +118,9 @@ class S3EnabledImageField(models.ImageField):
     attr_class = S3ImageFieldFile
 
     def __init__(self, bucket=settings.AWS_USER_DATA_BUCKET_NAME,
-                       thumb_sizes=THUMB_SIZES, thumb_options=dict(crop='smart', upscale=True),
-                       verbose_name=None, name=None, width_field=None, height_field=None, **kwargs):
+                 thumb_sizes=THUMB_SIZES, verbose_name=None, name=None,
+                 width_field=None, height_field=None, **kwargs):
         self.thumb_sizes = thumb_sizes
-        self.thumb_options = thumb_options
         self.bucket_name = bucket
 
         if settings.USE_AMAZON_S3:
@@ -156,7 +177,6 @@ add_introspection_rules([
         [],
         {
             "thumb_sizes": ["thumb_sizes", {"default": THUMB_SIZES}],
-            "thumb_options": ["thumb_options", {"default": dict(crop='smart')}]
         },
     ),
 ], ["^utils\.amazon\.fields"])

@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import search_results_page
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import UserLangFactory
-from apps.webdriver_testing.data_factories import VideoFactory 
-from apps.webdriver_testing import data_helpers
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import search_results_page
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import UserLangFactory
+from webdriver_testing.data_factories import VideoFactory 
+from webdriver_testing import data_helpers
 from django.core import management
 import datetime
 import time
@@ -26,27 +26,31 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         testdata = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
                     'video__title': ('X Factor Audition - Stop Looking At My '
                                     'Mom Rap - Brian Bradley'),
-                    'type': 'Y'
+                    'type': 'Y',
+                    'video__primary_audio_language_code': 'en'
                    }
 
         video = cls.data.create_video(**testdata)
-        cls.data.upload_subs(video)
-        
+        data = {
+                'language_code': 'en',
+                'subtitles': ('apps/webdriver_testing/subtitle_data/'
+                              'Timed_text.en.srt'),
+                'complete': True,
+                'video': video
+               }
+        cls.data.add_subs(**data)
+        cls.user = UserFactory()        
         cls.data.create_videos_with_fake_subs('apps/webdriver_testing/'
                                          'subtitle_data/fake_subs.json')
         VideoFactory.create(title = u'不过这四个问题')
         video = VideoFactory.create(title = "my test vid")
         data = {
                 'language_code': 'zh-cn',
-                'video_language': 'zh-cn',
-                'video': video.pk,
-                'draft': open('apps/webdriver_testing/subtitle_data/'
+                'subtitles': ('apps/webdriver_testing/subtitle_data/'
                               'Timed_text.zh-cn.sbv'),
-                'is_complete': True
+                'complete': True
                }
-        test_video = cls.data.create_video_with_subs(video_url = 
-                       "http://unisubs.example.com/test_nonascii.mp4",
-                       data = data)
+        test_video = cls.data.create_video_with_subs(cls.user, **data)
         management.call_command('update_index', interactive=False)
 
 
@@ -55,6 +59,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         super(TestCaseWatchPageSearch, self).setUp()
         self.watch_pg.open_watch_page()
         
+
     def test_search__simple(self):
         """Search for text contained in video title.
 
@@ -63,7 +68,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_results())
 
-    def test_search__subs_nonascii(self):
+    def test_search_subs_nonascii(self):
         """Search for sub content with non-ascii char strings.
  
         """
@@ -84,7 +89,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         self.assertTrue(results_pg.search_has_results())
        
 
-    def test_search__sub_content(self):
+    def test_search_sub_content(self):
         """Search contents in subtitle text.
 
         """
@@ -92,7 +97,7 @@ class TestCaseWatchPageSearch(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_results())
 
-    def test_search__video_lang(self):
+    def test_search_video_lang(self):
         """Search for videos by video language.
  
         """
@@ -160,11 +165,11 @@ class TestCaseWatchPageListings(WebdriverTestCase):
 
         cls.watch_pg = watch_page.WatchPage(cls)
         cls.data = data_helpers.DataHelpers()
+        cls.user = UserFactory()
         cls.data.create_videos_with_fake_subs('apps/webdriver_testing/subtitle_data/fake_subs.json')
 
         #create a video and mark as featured.
-        cls.feature_vid = cls.data.create_video_with_subs(video_url = 
-                                        "http://vimeo.com/903633")
+        cls.feature_vid = cls.data.create_video_with_subs(cls.user)
         cls.feature_vid.featured=datetime.datetime.now()
         cls.feature_vid.save()
        

@@ -9,9 +9,19 @@ from teams.models import BillingRecord, BillingReport, Task
 from subtitles.pipeline import add_subtitles
 from teams.permissions_const import (ROLE_CONTRIBUTOR, ROLE_MANAGER,
                                      ROLE_ADMIN)
-from videos.tests.data import make_subtitle_lines
 from utils import test_factories
 from utils import test_utils
+
+def make_subtitle_lines(count, seconds=60):
+    lines = []
+    ms_per_line = seconds * 1000 // count
+    for line_num in xrange(0, count):
+        start_time = ms_per_line * line_num
+        lines.append((start_time,
+                      start_time + ms_per_line,
+                      "subtitle %s" % line_num,
+                     ))
+    return lines
 
 class DateMaker(object):
     """Get dates to use for billing events."""
@@ -155,6 +165,26 @@ class BillingRecordTest(TestCase):
         self.assertEquals(data[video.video_id, 'en']['Minutes'], 0)
         self.assertEquals(data[video.video_id, 'de']['Minutes'], 0)
 
+    def test_minutes(self):
+        date_maker = DateMaker()
+        user = test_factories.create_team_member(self.team).user
+
+        video = test_factories.create_video(primary_audio_language_code='en')
+        test_factories.create_team_video(self.team, user, video)
+        self.add_subtitles(video, 'en', make_subtitle_lines(100, 100),
+                           created=date_maker.next_date(), complete=True)
+        self.add_subtitles(video, 'fr', make_subtitle_lines(100, 80),
+                           created=date_maker.next_date(), complete=True)
+
+        data = self.get_report_data(self.team,
+                                    date_maker.start_date(),
+                                    date_maker.end_date())
+        self.assertEquals(len(data), 2)
+        # For english the duration is 1:40, for french it's 1:20.  We should
+        # always round up, so both should count as 2 minutes
+        self.assertEquals(data[video.video_id, 'en']['Minutes'], 2)
+        self.assertEquals(data[video.video_id, 'fr']['Minutes'], 2)
+
 class ProcessReportTest(TestCase):
     def setUp(self):
         self.team = test_factories.create_team()
@@ -259,7 +289,8 @@ class ApprovalTestBase(TestCase):
             else:
                 task_type = 'Subtitle'
             review_task = test_factories.make_review_task(
-                video.get_team_video(), language_code, subtitler, task_type)
+                video.get_team_video(), language_code, subtitler, task_type,
+                sub_data=make_subtitle_lines(10, 90))
             self.subtitle_dates[video_id, language_code] = \
                     self.date_maker.current_date
             review_task.body = note
@@ -299,7 +330,6 @@ class ApprovalTestBase(TestCase):
         self.reviewed_languages[unicode(reviewer)].append((video_id,
                                                            language_code))
 
-
 class ApprovalTest(ApprovalTestBase):
     def get_report_data(self, start_date, end_date):
         """Get report data in an easy to test way.
@@ -335,12 +365,19 @@ class ApprovalTest(ApprovalTestBase):
             else:
                 self.assertEquals(row['Translation?'], False)
 
+    def check_minutes(self, report_data):
+        # all subtitles are 90 seconds long, we should report this as 1.5
+        # minutes.
+        for (video_id, language_code), row in report_data.items():
+            self.assertEquals(row['Minutes'], 1.5)
+
     def test_report(self):
         report_data = self.get_report_data(self.date_maker.start_date(),
                                     self.date_maker.end_date())
         self.check_report_rows(report_data)
         self.check_approver(report_data)
         self.check_language_columns(report_data)
+        self.check_minutes(report_data)
 
 class ApprovalForUsersTest(ApprovalTestBase):
     def get_report_data(self, start_date, end_date):
@@ -398,6 +435,12 @@ class ApprovalForUsersTest(ApprovalTestBase):
                 review_date = self.review_dates[video_id, language]
                 self.assertEquals(row['Date'], report_date(review_date))
 
+    def check_minutes(self, report_data):
+        # all subtitles are 90 seconds long, we should report this as 1.5
+        # minutes.
+        for row in report_data:
+            self.assertEquals(row['Minutes'], 1.5)
+
     def test_report(self):
         report_data = self.get_report_data(self.date_maker.start_date(),
                                     self.date_maker.end_date())
@@ -405,6 +448,7 @@ class ApprovalForUsersTest(ApprovalTestBase):
         self.check_videos_and_languages(report_data)
         self.check_notes(report_data)
         self.check_dates(report_data)
+        self.check_minutes(report_data)
 
 class SimpleApprovalTestCase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')

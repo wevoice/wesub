@@ -228,27 +228,27 @@ unisubs.player.VimeoVideoPlayer.prototype.onVimeoPlayerReady_ = function(swf_id)
         that.loadedFraction_ = data;
         that.dispatchEvent(unisubs.player.AbstractVideoPlayer.EventType.PROGRESS);
     };
-    this.player_['api_addEventListener']('onLoading', onLoadingFn);
+    this.player_['api_addEventListener']('loadProgress', onLoadingFn);
 
     var onFinishFn = "onVimeoFin" + randomString;
     window[onFinishFn] = function(data, swf_id) {
         that.dispatchEndedEvent();
     };
-    this.player_['api_addEventListener']('onFinish', onFinishFn);
+    this.player_['api_addEventListener']('finish', onFinishFn);
 
     var onPlayFn = "onVimeoPla" + randomString;
     window[onPlayFn] = function(swfID) {
         that.isPlaying_ = true;
         that.timeUpdateTimer_.start();
     };
-    this.player_['api_addEventListener']('onPlay', onPlayFn);
+    this.player_['api_addEventListener']('play', onPlayFn);
 
     var onPauseFn = "onVimeoPau" + randomString;
     window[onPauseFn] = function(swfID) {
         that.isPlaying_ = false;
         that.timeUpdateTimer_.stop();
     };
-    this.player_['api_addEventListener']('onPause', onPauseFn);
+    this.player_['api_addEventListener']('pause', onPauseFn);
 
     var onSeekFn = "onVimeoSeek" + randomString;
     window[onSeekFn] = function(data) {

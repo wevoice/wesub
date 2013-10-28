@@ -12,15 +12,16 @@ class TestCaseLanguagesFetch(WebdriverTestCase):
         WebdriverTestCase.setUp(self)
         self.user = UserFactory.create(username = 'TestUser', is_partner=True)
         self.data_utils = data_helpers.DataHelpers()
-        self.data_utils.create_user_api_key(self.user)
+        
 
 
     def test_fetch__languages(self):
         """Fetch the list of available languages.
         """
         url_part = 'languages/'
-        status, response = self.data_utils.api_get_request(self.user, url_part) 
-        self.assertEqual(200, status)
+        r = self.data_utils.make_request(self.user, 'get', url_part) 
+        self.assertEqual(200, r.status_code)
+        response = r.json
         langs = response['languages']
         lang_checks = {"hr": "Croatian", 
                       "zh-cn": "Chinese, Simplified",

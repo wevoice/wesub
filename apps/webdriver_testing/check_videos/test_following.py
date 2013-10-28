@@ -6,7 +6,6 @@ from apps.webdriver_testing.pages.site_pages import create_page
 from apps.webdriver_testing.pages.site_pages import video_language_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
 
 
 class TestCaseFollowing(WebdriverTestCase):
@@ -25,7 +24,7 @@ class TestCaseFollowing(WebdriverTestCase):
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
         cls.create_pg = create_page.CreatePage(cls)
         cls.create_pg.open_create_page()
-        cls.video = cls.data_utils.create_video_with_subs()
+        cls.video = cls.data_utils.create_video_with_subs(cls.user)
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
         cls.create_pg.open_create_page()
@@ -37,7 +36,7 @@ class TestCaseFollowing(WebdriverTestCase):
         """
         self.create_pg.open_create_page()
         self.create_pg.log_in(self.user, 'password')
-        url = 'http://www.youtube.com/watch?v=5EVhiBGvVFc'
+        url = 'http://qa.pculture.org/amara_tests/Birds_short.webmsd.webm'
         self.create_pg.submit_video(url)
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
 
@@ -47,7 +46,7 @@ class TestCaseFollowing(WebdriverTestCase):
 
         """
         self.video_pg.log_in(self.user, 'password')
-        tv = VideoUrlFactory().video
+        tv = self.data_utils.create_video()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
         self.video_pg.upload_subtitles('English', sub_file)
@@ -60,7 +59,7 @@ class TestCaseFollowing(WebdriverTestCase):
 
         """
         self.video_pg.log_in(self.user, 'password')
-        tv = VideoUrlFactory().video
+        tv = self.data_utils.create_video()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
         self.video_pg.upload_subtitles('English', sub_file)
