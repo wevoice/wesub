@@ -16,7 +16,7 @@ mkdir -p $VE_ROOT
 # install pip
 easy_install pip
 
-pip install uwsgi virtualenv
+pip install uwsgi virtualenv eventlet
 
 # install google closure
 svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ $CLOSURE_PATH
