@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-from urllib import urlopen
 
 from celery.decorators import periodic_task
 from celery.schedules import crontab, timedelta
@@ -28,6 +27,7 @@ from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
 from haystack import site
 from raven.contrib.django.models import client
+import requests
 
 from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
@@ -91,7 +91,8 @@ def save_thumbnail_in_s3(video_id):
         return
 
     if video.thumbnail and not video.s3_thumbnail:
-        content = ContentFile(urlopen(video.thumbnail).read())
+        response = request.get(video.thumbnail, timeout=15)
+        content = ContentFile(response.content)
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
 
 @periodic_task(run_every=crontab(minute=0, hour=1))
