@@ -83,7 +83,7 @@ def cleanup():
     TaskState.objects.filter(tstamp__lt=d).delete()
     transaction.commit_unless_managed()
 
-@task(time_limit=10)
+@task(time_limit=20)
 def save_thumbnail_in_s3(video_id):
     try:
         video = Video.objects.get(pk=video_id)
