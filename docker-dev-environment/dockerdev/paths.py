@@ -31,4 +31,7 @@ def image_dir(image_name):
         return os.path.join(env_root(), 'dockerfiles', image_name)
 
 def cid_path(image_name):
-    return os.path.join(env_root(), 'cidfiles', image_name)
+    root_path = os.path.join(env_root(), 'cidfiles')
+    if not os.path.exists(root_path):
+        os.makedirs(root_path)
+    return os.path.join(root_path, image_name)
