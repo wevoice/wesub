@@ -4,7 +4,7 @@ RUN (echo "deb http://archive.ubuntu.com/ubuntu precise main universe multiverse
 RUN (echo "deb-src http://archive.ubuntu.com/ubuntu precise main universe multiverse" >> /etc/apt/sources.list)
 RUN apt-get -qq update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y upgrade
-RUN DEBIAN_FRONTEND=noninteractive apt-get -qq -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext
+RUN DEBIAN_FRONTEND=noninteractive apt-get -qq -y install wget python-dev python-setuptools make gcc s3cmd libmysqlclient-dev libmemcached-dev supervisor libxml2-dev libxslt-dev zlib1g-dev swig libssl-dev libyaml-dev git-core python-m2crypto subversion openjdk-6-jre libjpeg-dev libfreetype6-dev gettext build-essential gcc
 # fix PIL
 RUN ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
 RUN ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
