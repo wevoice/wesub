@@ -31,6 +31,15 @@ ALL_IMAGES = [
 def build_image(image_name):
     run_docker('build -t=%s %s', image_name, image_dir(image_name))
 
+def image_exists(image_name):
+    output = get_docker_output('images -q %s', image_name)
+    return output.strip() != ''
+
 def rebuild_images():
     for image_name in ALL_IMAGES:
         build_image(image_name)
+
+def build_images():
+    for image_name in ALL_IMAGES:
+        if not image_exists(image_name):
+            build_image(image_name)
