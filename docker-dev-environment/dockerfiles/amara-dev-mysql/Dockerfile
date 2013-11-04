@@ -13,7 +13,4 @@ ADD setup-mysql.sh /tmp/setup-mysql.sh
 RUN bash /tmp/setup-mysql.sh
 RUN rm /tmp/setup-mysql.sh
 
-
-EXPOSE 51000:3306
-
 CMD ["/usr/sbin/mysqld"]

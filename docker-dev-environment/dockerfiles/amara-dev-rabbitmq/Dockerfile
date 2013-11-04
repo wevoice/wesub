@@ -12,6 +12,4 @@ RUN echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.l
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rabbitmq-server
 
-EXPOSE 51002:5672
-
 CMD ["/usr/sbin/rabbitmq-server"]
