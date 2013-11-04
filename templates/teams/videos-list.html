@@ -96,7 +96,7 @@
         </div>
 
         {% if team_video_md_list %}
-            <ul class="videos listing">
+            <ul class="videos listing group">
                 {% with team|is_team_member:request.user as user_is_team_member %}
                     {% for md_obj in team_video_md_list %}
                         {% team_video_detail md_obj %}

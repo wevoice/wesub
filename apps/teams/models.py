@@ -667,6 +667,8 @@ class Project(models.Model):
 
 # TeamVideo
 class TeamVideo(models.Model):
+    THUMBNAIL_SIZE = (288, 162)
+
     team = models.ForeignKey(Team)
     video = models.OneToOneField(Video)
     description = models.TextField(blank=True,
@@ -675,7 +677,7 @@ class TeamVideo(models.Model):
                     u'volunteers more likely to help out!'))
     thumbnail = S3EnabledImageField(upload_to='teams/video_thumbnails/', null=True, blank=True,
         help_text=_(u'We automatically grab thumbnails for certain sites, e.g. Youtube'),
-                                    thumb_sizes=((290,165), (120,90),))
+                                    thumb_sizes=(THUMBNAIL_SIZE, (120,90),))
     all_languages = models.BooleanField(_('Need help with all languages'), default=False,
         help_text=_(u'If you check this, other languages will not be displayed.'))
     added_by = models.ForeignKey(User)
@@ -698,7 +700,7 @@ class TeamVideo(models.Model):
 
     def get_thumbnail(self):
         if self.thumbnail:
-            return self.thumbnail.thumb_url(290, 165)
+            return self.thumbnail.thumb_url(*TeamVideo.THUMBNAIL_SIZE)
 
         video_thumb = self.video.get_thumbnail(fallback=False)
         if video_thumb:

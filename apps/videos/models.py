@@ -197,7 +197,7 @@ class Video(models.Model):
         blank=True,
         upload_to='video/thumbnail/',
         thumb_sizes=(
-            (290,165),
+            (288,162),
             (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -368,7 +368,7 @@ class Video(models.Model):
 
         """
         if self.s3_thumbnail:
-            return self.s3_thumbnail.thumb_url(290, 165)
+            return self.s3_thumbnail.thumb_url(288, 162)
 
         if self.thumbnail:
             return self.thumbnail

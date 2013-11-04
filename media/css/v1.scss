@@ -707,6 +707,11 @@ div.fix-chosen div.chzn-container {
         }
     }
 }
+
+.v1 .listing.videos {
+        padding: 0 1px;
+}
+
 .v1 .listing.videos > li {
     border: none;
     float: left;
@@ -720,7 +725,7 @@ div.fix-chosen div.chzn-container {
         @include border-box();
         bottom: 0; left: 1em;
         padding: 1em;
-        width: 290px;
+        width: 288px;
         background: rgba(0,0,0,.65);
         color: #fff;
 
@@ -738,15 +743,15 @@ div.fix-chosen div.chzn-container {
     }
 
     .thumb {
-        height: 180px;
+        height: 162px;
         overflow: hidden;
         position: relative;
         top: 0;
 
         a img {
             margin: 1em;
-            width: 290px;
-            height: 180px;
+            width: 288px;
+            height: 162px;
             border: none;
         }
     }
