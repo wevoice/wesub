@@ -480,6 +480,7 @@ var angular = angular || null;
                     $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
+                evt.stopPropagation();
             } else if (evt.keyCode === 27) {
                 // Escape cancels editing
                 finishEdit(false);
@@ -487,19 +488,7 @@ var angular = angular || null;
                     subtitleList.removeSubtitle(subtitle);
                 }
                 evt.preventDefault();
-            } else if (evt.keyCode == 9) {
-                // Tab navigates to other subs
-                finishEdit(true);
-                if(!evt.shiftKey) {
-                    var targetSub = subtitleList.nextSubtitle(subtitle);
-                } else {
-                    var targetSub = subtitleList.prevSubtitle(subtitle);
-                }
-                if(targetSub !== null) {
-                    $scope.currentEdit.start(targetSub);
-                    $scope.$root.$emit('scroll-to-subtitle', targetSub);
-                }
-                evt.preventDefault();
+                evt.stopPropagation();
             }
         }
         
