@@ -291,6 +291,27 @@ var angular = angular || null;
             $scope.workingSubtitles.versionNumber = $scope.nextVersionNumber;
             $scope.nextVersionNumber = null;
         }
+        function savedNewRevision() {
+            return ($scope.workingSubtitles.versionNumber !==
+                    $scope.nextVersionNumber);
+        }
+        function closeDialogTitle(allowResume) {
+            if($scope.status === 'saved') {
+                if(allowResume) {
+                    if (savedNewRevision()) {
+                        return "You've saved a new revision!";
+                    } else {
+                        return "You've saved task notes";
+                    }
+                } else {
+                    return "Subtitles saved";
+                }
+            } else if($scope.changesMade) {
+                return 'Your changes will be discarded.';
+            } else {
+                return 'You are leaving the editor';
+            }
+        }
         $scope.showCloseModal = function(allowResume) {
             var buttons = [];
 
@@ -329,20 +350,8 @@ var angular = angular || null;
 
             }
 
-            if($scope.status === 'saved') {
-                if(allowResume) {
-                    var heading = "You've saved a new revision!";
-                } else {
-                    var heading = "Subtitles saved";
-                }
-            } else if($scope.changesMade) {
-                var heading = 'Your changes will be discarded.';
-            } else {
-                var heading = 'You are leaving the editor';
-            }
-
             $scope.$root.$emit('show-modal', {
-                heading: heading,
+                heading: closeDialogTitle(allowResume),
                 buttons: buttons
             });
         };
