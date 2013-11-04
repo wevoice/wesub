@@ -11,7 +11,6 @@ RUN curl http://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add -
 RUN echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install rabbitmq-server
-RUN echo "127.0.0.1 amara-dev-rabbitmq" >> /etc/hosts
 
 EXPOSE 51002:5672
 
