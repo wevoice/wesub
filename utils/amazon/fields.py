@@ -28,7 +28,8 @@ class S3ImageFieldFile(FieldFile):
         return self.storage.url(name)
 
     def _open_image(self):
-        return Image.open(self.storage.open(self.name))
+        content = self.storage.open(self.name).read()
+        return Image.open(StringIO(content))
 
     def generate_file_name(self):
         return sha1(settings.SECRET_KEY+str(time())+str(uuid4())).hexdigest()
