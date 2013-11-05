@@ -82,7 +82,6 @@ var angular = angular || null;
 
     module.factory('SubtitleStorage', function($http, EditorData) {
 
-        var authHeaders = EditorData.authHeaders;
         // Map language codes to Language objects
         var languageMap = {};
         _.forEach(EditorData.languages, function(languageData) {
@@ -105,6 +104,17 @@ var angular = angular || null;
             });
         });
 
+        function authHeaders() {
+            var rv = {};
+            debugger;
+            for (var key in EditorData.authHeaders) {
+                var val = EditorData.authHeaders[key];
+                var utfVal = unescape(encodeURIComponent(val));
+                rv[key] = utfVal;
+            }
+            return rv;
+        }
+
 
         return {
             approveTask: function(versionNumber, notes) {
@@ -115,7 +125,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'PUT',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         complete: true,
                         body: notes,
@@ -174,7 +184,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'PUT',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         complete: true,
                         body: notes,
@@ -198,7 +208,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'POST',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         video: videoID,
                         language: languageCode,
