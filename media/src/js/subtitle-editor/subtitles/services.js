@@ -106,7 +106,11 @@ var angular = angular || null;
 
         function authHeaders() {
             var rv = {};
-            debugger;
+            // The following code converts the values of
+            // EditorData.authHeaders into utf-8 encoded bytestrings to send
+            // back to the server.  The unescape/encodeURIComponent part seems
+            // pretty hacky, but it should work for all browsers
+            // (http://monsur.hossa.in/2012/07/20/utf-8-in-javascript.html)
             for (var key in EditorData.authHeaders) {
                 var val = EditorData.authHeaders[key];
                 var utfVal = unescape(encodeURIComponent(val));
