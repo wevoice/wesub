@@ -2785,6 +2785,18 @@ a.truncated-expand {
         line-height: 175%;
     }
 }
+
+#error-page {
+    h1 {
+        font-size: 2em;
+        padding: 0.75em 0 1em;
+        font-weight: bold;
+    }
+
+    p {
+        font-size: 1.4em;
+    }
+}
 .messages.v1 .view {
     border-top: 1px solid $fainter;
     margin-left: 0;
