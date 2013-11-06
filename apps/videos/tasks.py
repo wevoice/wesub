@@ -230,9 +230,9 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
     video_count = 0
     for url in urls:
         importer = VideoImporter(url, user, team=team)
-        importer.import_videos()
+        new_videos = importer.import_videos()
         _save_video_feed(url, importer.last_link, user)
-        video_count += importer.video_count
+        video_count += len(new_videos)
     if user and video_count > 0:
         tasks.videos_imported_message.delay(user_id, video_count)
 
