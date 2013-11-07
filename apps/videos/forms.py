@@ -30,9 +30,9 @@ from django.utils.translation import ugettext_lazy as _
 from math_captcha.forms import MathCaptchaForm
 
 from apps.videos.feed_parser import FeedParser
-from apps.videos.models import Video, UserTestResult, VideoUrl
+from apps.videos.models import Video, VideoFeed, UserTestResult, VideoUrl
 from apps.videos.permissions import can_user_edit_video_urls
-from apps.videos.tasks import import_videos_from_feeds
+from apps.videos.tasks import import_videos_from_feed
 from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
@@ -224,13 +224,16 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
 
         self.yt_service = yt_service
-        self.urls = []
         self.video_limit_routreach = False
 
     def clean_feed_url(self):
         url = self.cleaned_data.get('feed_url', '')
 
         if url:
+            if VideoFeed.objects.filter(url=url).exists():
+                raise forms.ValidationError(
+                    _(u'Feed for {url} already exists').format(url=url))
+
             self.parse_feed_url(url)
 
         return url
@@ -260,16 +263,15 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
             raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
 
-        self.urls.append(url)
 
     def success_message(self):
         return _(u"The videos are being added in the background. "
                  u"If you are logged in, you will receive a message when it's done")
 
     def save(self, team=None):
-        user_id = self.user.id if self.user else None
-        team_id = team.id if team else None
-        import_videos_from_feeds.delay(self.urls, user_id, team_id)
+        feed = VideoFeed.objects.create(user=self.user,
+                                        url=self.cleaned_data['feed_url'])
+        import_videos_from_feed.delay(feed.id)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)

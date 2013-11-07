@@ -41,6 +41,7 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User, Awards
 from videos import behaviors
 from videos import metadata
+from videos import signals
 from videos.types import video_type_registrar
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
@@ -1893,6 +1894,7 @@ class VideoFeed(models.Model):
     last_link = models.URLField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
+    team = models.ForeignKey("teams.Team", blank=True, null=True)
 
     YOUTUBE_PAGE_SIZE = 25
 
@@ -1906,4 +1908,5 @@ class VideoFeed(models.Model):
         if importer.last_link is not None:
             self.last_link = importer.last_link
             self.save()
+        signals.feed_imported.send(sender=self, new_videos=new_videos)
         return new_videos

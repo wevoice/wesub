@@ -23,6 +23,7 @@ from django.test import TestCase
 import mock
 
 from utils import test_utils, test_factories
+from videos import signals
 from videos.models import Video, VideoUrl, VideoFeed
 from videos.feed_parser import importer
 from videos.types import HtmlFiveVideoType
@@ -161,7 +162,12 @@ class VideoImporterTestCase(TestCase):
 class VideoFeedTest(TestCase):
     @test_utils.patch_for_test('videos.models.VideoImporter')
     def test_video_feed(self, mock_video_importer_class):
+        mock_feed_imported_handler = mock.Mock()
+        signals.feed_imported.connect(mock_feed_imported_handler, weak=False)
+        self.addCleanup(signals.feed_imported.disconnect,
+                        mock_feed_imported_handler)
         user = test_factories.create_user()
+
         url = 'http://example.com/feed.rss'
         last_link = 'http://example.com/video3'
         feed = VideoFeed.objects.create(url=url, user=user)
@@ -177,6 +183,8 @@ class VideoFeedTest(TestCase):
         mock_video_importer.import_videos.assert_called()
         self.assertEquals(rv, feed_videos)
         self.assertEquals(feed.last_link, last_link)
+        mock_feed_imported_handler.assert_called_with(
+            signal=signals.feed_imported, sender=feed, new_videos=feed_videos)
         # check doing another update, we should pass the last link in to
         # VideoImporter
         mock_video_importer.import_videos.return_value = []
@@ -184,4 +192,6 @@ class VideoFeedTest(TestCase):
         mock_video_importer_class.assert_called_with(url, user, last_link)
         mock_video_importer.import_videos.assert_called()
         self.assertEquals(rv, [])
+        mock_feed_imported_handler.assert_called_with(
+            signal=signals.feed_imported, sender=feed, new_videos=[])
         self.assertEquals(feed.last_link, mock_video_importer.last_link)

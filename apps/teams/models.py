@@ -3023,3 +3023,6 @@ class Partner(models.Model):
     def is_admin(self, user):
         return user in self.admins.all()
 
+# we know that models.py is always loaded, import signalhandlers to ensure it
+# gets loaded as well
+import teams.signalhandlers

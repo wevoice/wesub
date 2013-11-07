@@ -22,21 +22,19 @@ from .parser import FeedParser
 
 class VideoImporter(object):
     """Import videos from a feed URL."""
-    def __init__(self, url, user, import_since=None, team=None):
+    def __init__(self, url, user, import_since=None):
         """Create a VideoImporter
 
         :param url: feed url
         :param user: User that creates videos for
         :param import_since: URL of the last imported link.  If set, we will
         only import videos after this link
-        :param team: Team to create videos for
         """
         self.url = url
         self.user = user
         self.import_since = import_since
         self.checked_entries = 0
         self.last_link = ''
-        self.team = team
 
     def import_videos(self):
         self._created_videos = []
@@ -79,8 +77,6 @@ class VideoImporter(object):
 
     def _create_video(self, video_type, info, entry):
         from videos.models import Video
-        from teams.models import TeamVideo
-        from teams.signals import api_teamvideo_new
         video, created = Video.get_or_create_for_url(
             vt=video_type, user=self.user)
         if info:
@@ -89,8 +85,3 @@ class VideoImporter(object):
             video.save()
         if created:
             self._created_videos.append(video)
-        if created and self.team is not None:
-            tv = TeamVideo.objects.create(
-                video=video, team=self.team, added_by=self.user,
-                description=video.description)
-            api_teamvideo_new.send(tv)

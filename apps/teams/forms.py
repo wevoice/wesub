@@ -36,9 +36,10 @@ from apps.teams.permissions import (
 from apps.teams.permissions_const import ROLE_NAMES
 from apps.videos.forms import AddFromFeedForm
 from apps.videos.models import (
-        VideoMetadata, VIDEO_META_TYPE_IDS, Video
+        VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
 from apps.videos.search_indexes import VideoIndex
+from apps.videos.tasks import import_videos_from_feed
 from utils.forms import ErrorableModelForm
 from utils.forms.unisub_video_form import UniSubBoundVideoField
 from utils.translation import get_language_choices
@@ -238,11 +239,16 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
     VIDEOS_LIMIT = None
 
     def __init__(self, team, user, *args, **kwargs):
+        if not can_add_video(team, user):
+            raise ValueError("%s can't add videos to %s" % (user, team))
         self.team = team
         super(AddTeamVideosFromFeedForm, self).__init__(user, *args, **kwargs)
 
     def save(self, *args, **kwargs):
-        super(AddTeamVideosFromFeedForm, self).save(team=self.team)
+        feed = VideoFeed.objects.create(team=self.team,
+                                        user=self.user,
+                                        url=self.cleaned_data['feed_url'])
+        import_videos_from_feed.delay(feed.id)
 
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)
