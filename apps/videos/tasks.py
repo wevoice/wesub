@@ -229,9 +229,8 @@ def import_videos_from_feeds(urls, user_id=None, team_id=None):
 
     video_count = 0
     for url in urls:
-        importer = VideoImporter(url, user, team=team)
-        new_videos = importer.import_videos()
-        _save_video_feed(url, importer.last_link, user)
+        feed = _save_video_feed(url, user)
+        new_videos = feed.update()
         video_count += len(new_videos)
     if user and video_count > 0:
         tasks.videos_imported_message.delay(user_id, video_count)
@@ -427,17 +426,12 @@ def delete_captions_in_original_service_by_code(language_code, video_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         video, language_code, DELETE_LANGUAGE_ACTION)
 
-def _save_video_feed(feed_url, last_entry_url, user):
+def _save_video_feed(feed_url, user):
     """ Creates or updates a videofeed given some url """
     try:
-        vf = VideoFeed.objects.get(url=feed_url)
+        return VideoFeed.objects.get(url=feed_url, user=user)
     except VideoFeed.DoesNotExist:
-        vf = VideoFeed(url=feed_url)
-
-    vf.user = user
-    vf.last_link = last_entry_url
-    vf.save()
-
+        return VideoFeed.objects.create(url=feed_url, user=user)
 
 @periodic_task(run_every=timedelta(seconds=300))
 def gauge_videos():

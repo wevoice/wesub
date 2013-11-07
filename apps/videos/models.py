@@ -1900,11 +1900,10 @@ class VideoFeed(models.Model):
         return self.url
 
     def update(self):
-        importer = VideoImporter(self.user, self.user, self.last_link)
-        importer.import_videos()
+        importer = VideoImporter(self.url, self.user, self.last_link)
+        new_videos = importer.import_videos()
 
         if importer.last_link is not None:
             self.last_link = importer.last_link
             self.save()
-
-        return importer.checked_entries
+        return new_videos
