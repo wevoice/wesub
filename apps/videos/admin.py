@@ -22,7 +22,8 @@ from videos.models import (
     VideoUrl, SubtitleVersionMetadata, Action, Subtitle
 )
 from videos.tasks import (
-    video_changed_tasks, upload_subtitles_to_original_service
+    video_changed_tasks, upload_subtitles_to_original_service,
+    import_videos_from_feed
 )
 
 from django.core.urlresolvers import reverse
@@ -73,8 +74,14 @@ class VideoMetadataAdmin(admin.ModelAdmin):
     raw_id_fields = ['video']
 
 class VideoFeedAdmin(admin.ModelAdmin):
+    def update(modeladmin, request, queryset):
+        for feed in queryset:
+            import_videos_from_feed.delay(feed.id)
+    update.short_description = "Update feeds"
+
     list_display = ['url', 'last_link', 'created', 'user']
     raw_id_fields = ['user']
+    actions = [update]
 
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoMetadata, VideoMetadataAdmin)
