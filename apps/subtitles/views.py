@@ -249,6 +249,8 @@ def subtitle_editor(request, video_id, language_code):
 
     if task:
         editor_data['task_id'] = task.id
+        if not editor_data['savedNotes']:
+            editor_data['savedNotes'] = task.body
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
         editor_data['team_slug'] = task.team.slug
 

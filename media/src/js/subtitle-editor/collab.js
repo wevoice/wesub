@@ -59,6 +59,9 @@
         $scope.sendBack = function() {
             $scope.$root.$emit('send-back-task');
         };
+        $scope.notesChanged = function() {
+            $scope.$root.$emit('notes-changed');
+        };
 
         $scope.$root.$on('editing-done', function($event, $editScope) {
             if ($editScope.subtitleList.needsAnyTranscribed()) {
