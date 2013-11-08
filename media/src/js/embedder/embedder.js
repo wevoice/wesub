@@ -103,6 +103,7 @@
             is_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
+            show_logo: true,
             width: '',
 
             // Set from the Amara API
@@ -197,7 +198,7 @@
         this.AmaraView = _Backbone.View.extend({
             initialize: function() {
                 this.model.view = this;
-                this.template = __.template(this.templateHTML);
+                this.template = __.template(this.templateHTML());
                 this.render();
 
                 // Default states.
@@ -869,12 +870,12 @@
                     callback();
                 }
             },
-
-            templateHTML: '' +
+	    templateHTML: function() {
+		return '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar amara-group">' +
                 //'        <a href="#" class="amara-share-button amara-button"></a>' +
-                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' +
+                (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
                 '            <li><a href="#" class="amara-transcript-button amara-button" title="Toggle transcript viewer"></a></li>' +
                 '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
@@ -904,6 +905,7 @@
                 '        </div>' +
                 '    </div>' +
                 '</div>'
+	    }
         });
 
         // push() handles all action calls before and after the embedder is loaded.
@@ -971,7 +973,8 @@
                     that.push(['embedVideo', {
                         'div': this,
                         'initial_language': $div.data('initial-language'),
-                        'url': $div.data('url')
+                        'url': $div.data('url'),
+                        'show_logo': $div.data('hidelogo') ? false : true,
                     }]);
                 });
             }
