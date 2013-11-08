@@ -126,6 +126,22 @@ var angular = angular || null;
                 return promise;
 
             },
+            updateTaskNotes: function(notes) {
+
+                var url = getTaskSaveAPIUrl(EditorData.team_slug,
+                        EditorData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        body: notes,
+                    }
+                });
+
+                return promise;
+            },
             getLanguages: function(callback) {
                 return _.values(languageMap);
             },

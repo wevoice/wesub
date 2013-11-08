@@ -75,6 +75,7 @@ class EditorPage(UnisubsPage):
     _ENDORSE = 'div.substeps button.endorse'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
+    _NOTES = 'textarea[ng-model="notes"]'
 
     def open_editor_page(self, video_id, lang, close_metadata=True):
         self.open_page(self._URL.format(video_id, lang))
@@ -311,6 +312,12 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._SEND_BACK)
         self.wait_for_element_not_present(self._SEND_BACK)
        
+    def add_note(self, note_text):
+        self.type_by_css(self._NOTES, note_text)
+
+    def current_notes(self):
+        return self.get_text_by_css(self._NOTES)
+
 
     def exit_to_full_editor(self):
         """Click exit and return to the full editor. """

@@ -1288,8 +1288,39 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                         'Approve Original English Subtitles', video.title))
         task = list(tv.task_set.all_approve().all())[0]
 
+    def test_review_notes_are_saved(self):
+        """Notes added and saved in review task are displayed when editor opened.
+
+        """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
+                         video=video)
+        data = {'language_code': 'en',
+                'video': video.pk,
+                'primary_audio_language_code': 'en',
+                'draft': open('apps/webdriver_testing/subtitle_data/'
+                              'How-to.en.srt'),
+                'is_complete': True,
+                'complete': 1
+               }
+
+        self.data_utils.upload_subs(self.contributor, **data)
+        self.tasks_tab.log_in(self.manager, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.perform_and_assign_task('Review Original English ' 
+                                               'Subtitles', video.title)
+        self.sub_editor.continue_to_next_step() #to subtitle info 
+        self.sub_editor.open_in_beta_editor()
+        note_text = 'This is a note'
+        self.editor_pg.add_note(note_text)
+        self.editor_pg.save('Exit')
+        task = list(tv.task_set.all_review().all())[0]
+        self.logger.info(dir(task))
+        self.assertEqual(note_text, task.body)
+
+
     def test_review_accept_email(self):
-        """Beta editor approve task is created when transcription accepted.
+        """Email sent when task accepted, contains notes.
 
         """
         video = self.data_utils.create_video()
@@ -1313,6 +1344,8 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
         self.editor_pg.close_metadata()
+        note_text = 'This is a note'
+        self.editor_pg.add_note(note_text)
         self.editor_pg.approve_task()
         self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
@@ -1320,6 +1353,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
 
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.accepted_review, msg)
+        self.assertIn(note_text, msg)
 
 
 
