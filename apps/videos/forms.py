@@ -214,7 +214,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
     usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
     youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'),
                                        help_text=_(u'For example: http://www.youtube.com/user/username'))
-    feed_url = FeedURLField(required=False, help_text=_(u'Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added.'))
+    feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Youtube, Vimeo, Dailymotion, and more.'))
 
     def __init__(self, user, *args, **kwargs):
         if not user.is_authenticated():
