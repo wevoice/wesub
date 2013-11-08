@@ -199,6 +199,7 @@
             initialize: function() {
                 this.model.view = this;
                 this.template = __.template(this.templateHTML());
+                this.templateVideo = __.template(this.templateVideoHTML());
                 this.render();
 
                 // Default states.
@@ -218,7 +219,7 @@
                 'click a.amara-current-language':        'languageButtonClicked',
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
-                'click ul.amara-languages-list a':       'changeLanguage',
+                'click ul.amara-languages-list a.language-item':       'changeLanguage',
                 'click a.amara-transcript-button':       'toggleTranscriptDisplay',
                 'keyup input.amara-transcript-search':   'updateSearch',
                 'change input.amara-transcript-search':  'updateSearch',
@@ -308,6 +309,7 @@
 
                                 // update the view on amara button
                                 that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
 
                                 // Make the request to fetch the initial subtitles.
                                 //
@@ -349,11 +351,19 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
+		var video_url = this.model.get('url')
+                this.$amaraLanguagesList.append(this.templateVideo({
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
+		}));
+                this.$amaraLanguagesList.append('' +
+						'<li>' +
+						'<hr/>' +
+						'</li>');
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
                         this.$amaraLanguagesList.append('' +
                             '<li>' +
-                                '<a href="#" data-language="' + langs[i].code + '">' +
+                                '<a href="#" class="language-item" data-language="' + langs[i].code + '">' +
                                     langs[i].name +
                                 '</a>' +
                             '</li>');
@@ -870,6 +880,9 @@
                     callback();
                 }
             },
+	    templateVideoHTML: function() {
+		return '<li><a id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on Amara.org in a new window">View on Amara.org</a></li>'
+	    },
 	    templateHTML: function() {
 		return '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
