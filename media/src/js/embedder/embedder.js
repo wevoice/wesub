@@ -529,8 +529,10 @@
                 var subtitleSets = this.model.subtitles.where({'language': language});
                 if (subtitleSets.length) {
                     var languageCode = subtitleSets[0].get('language');
-                    var langaugeName = this.getLanguageNameForCode(languageCode);
-                    this.$amaraCurrentLang.text(langaugeName);
+                    var languageName = this.getLanguageNameForCode(languageCode);
+		    _$('ul.amara-languages-list a').removeClass('currently-selected');
+		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
+                    this.$amaraCurrentLang.text(languageName);
                     // Show the expander triangle
                     this.$amaraCurrentLang.css('background-image', '');
                 } else {

@@ -243,12 +243,16 @@ div.amara-embed {
                         a {
                             color: #DEDEDE;
                             display: block;
-
+			    padding-bottom: 5px;
+			    text-decoration: none;
                             &:hover {
                                 color: #FFF;
                             }
                         }
-                    }
+			a.currently-selected {
+			    font-weight: bold;
+			}
+                     }
                 }
             }
         }
