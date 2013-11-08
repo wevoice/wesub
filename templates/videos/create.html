@@ -43,7 +43,7 @@
           
           <h3>{% trans "Automatically submit videos" %}</h3>
           <ul>
-          {{ feed_form.as_ul }}
+              {{ feed_form.as_ul }}
           </ul>
           <button class="green_button big">{% trans "Let's Go!" %}</button>
       </form>
@@ -51,7 +51,7 @@
 
 </div><!-- // submit_video_form -->
 <div id="submit_multiple_toggle">
-  <a id="btn_submit_multiple_toggle" class="toogle-create-form" href="#">{% trans "Or Submit Multiple Videos" %}</a>
+  <a id="btn_submit_multiple_toggle" class="toggle-create-form" href="#">{% trans "Or Submit Multiple Videos" %}</a>
 </div><!-- // submit_multiple_toggle -->
 
 <p class="prompt">
@@ -63,7 +63,7 @@
 </p>
 
 <script type="text/javascript">
-    jQuery('.toogle-create-form').click(function(){
+    jQuery('.toggle-create-form').click(function(){
         var $link = $(this);
         $('#submit_multiple_videos').toggle(0, function(){
             if ($(this).is(':visible')){
