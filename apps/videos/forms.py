@@ -224,6 +224,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
         self.yt_service = yt_service
         self.video_limit_routreach = False
+        self.urls = []
 
     def clean_feed_url(self):
         url = self.cleaned_data.get('feed_url', '')
@@ -261,16 +262,17 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
         if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
             raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
+        self.urls.append(url)
 
 
     def success_message(self):
         return _(u"The videos are being added in the background. "
                  u"If you are logged in, you will receive a message when it's done")
 
-    def save(self, team=None):
-        feed = VideoFeed.objects.create(user=self.user,
-                                        url=self.cleaned_data['feed_url'])
-        import_videos_from_feed.delay(feed.id)
+    def save(self):
+        for url in self.urls:
+            feed = VideoFeed.objects.create(user=self.user, url=url)
+            import_videos_from_feed.delay(feed.id)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)
