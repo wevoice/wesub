@@ -23,6 +23,7 @@ from django import template
 from django.template.loader import render_to_string
 from django.conf import settings
 from django.contrib.sites.models import Site
+from urlparse import urlparse
 
 logger = logging.getLogger(__name__)
 register = template.Library()
@@ -168,7 +169,7 @@ def handle_special_file(filename):
 @handle_special_file('src/js/embedder/conf.js')
 def render_embedder_conf():
     script_src = render_to_string('embedder/conf.js', {
-        'current_site': Site.objects.get_current(),
+        'current_site': urlparse(calc_static_url()).netloc,
         'STATIC_URL': calc_static_url(),
     })
     return '<script type="text/javascript">%s</script>' % script_src
