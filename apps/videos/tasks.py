@@ -213,7 +213,8 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
 def import_videos_from_feed(feed_id):
     feed = VideoFeed.objects.get(id=feed_id)
     new_videos = feed.update()
-    tasks.videos_imported_message.delay(feed.user.id, len(new_videos))
+    if feed.user is not None:
+        tasks.videos_imported_message.delay(feed.user.id, len(new_videos))
 
 @task()
 def upload_subtitles_to_original_service(version_pk):
