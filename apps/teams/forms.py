@@ -244,11 +244,9 @@ class AddTeamVideosFromFeedForm(AddFromFeedForm):
         self.team = team
         super(AddTeamVideosFromFeedForm, self).__init__(user, *args, **kwargs)
 
-    def save(self, *args, **kwargs):
-        feed = VideoFeed.objects.create(team=self.team,
-                                        user=self.user,
-                                        url=self.cleaned_data['feed_url'])
-        import_videos_from_feed.delay(feed.id)
+    def make_feed(self, url):
+        return VideoFeed.objects.create(team=self.team, user=self.user,
+                                        url=url)
 
 class CreateTeamForm(BaseVideoBoundForm):
     logo = forms.ImageField(validators=[MaxFileSizeValidator(settings.AVATAR_MAX_SIZE)], required=False)

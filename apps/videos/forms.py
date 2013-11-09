@@ -271,8 +271,11 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
     def save(self):
         for url in self.urls:
-            feed = VideoFeed.objects.create(user=self.user, url=url)
+            feed = self.make_feed(url)
             import_videos_from_feed.delay(feed.id)
+
+    def make_feed(self, url):
+        return VideoFeed.objects.create(user=self.user, url=url)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)
