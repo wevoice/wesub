@@ -351,7 +351,8 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
-		var video_url = this.model.get('url')
+                langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
+                var video_url = this.model.get('url')
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
