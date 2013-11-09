@@ -81,7 +81,7 @@
                     <a class="discard" href="#" ng-click="discard()">
                         Exit
                     </a>
-                    <a class="save" href="#" ng-class="{ disabled: !changesMade }" ng-click="save()">
+                    <a class="save" href="#" ng-class="{ disabled: saveDisabled() }" ng-click="save()">
                         Save
                     </a>
                 </div>
@@ -374,7 +374,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                      ng-class="{open: modulesOpen.notes}">
                     <a class="title" ng-click="toggleDocking('notes')">Notes</a>
                     <div class="content" ng-show="modulesOpen.notes">
-                        <textarea ng-model="notes"></textarea>
+                        <textarea ng-model="notes" ng-change="notesChanged()"></textarea>
                     </div>
                 </div>
                 <div class="approval module" ng-show="modulesEnabled.approval">

@@ -101,6 +101,32 @@ class StaticSitemap(Sitemap):
     def lastmod(self, obj):
         return obj.lastmod
 
+class VideoSitemapValuesQuery(object):
+    """Wraps the queryset for VideoSitemap to make it more efficient.
+
+    To efficently retrieve items from the queryset, we want to use a values
+    query, (Video.objects.values('video_id', 'edited')).  However, if we
+    simply use that, then when django calls count() on that query, it creates
+    the following terribly query:
+
+    SELECT COUNT(*) FROM (SELECT `videos_video`.`video_id` AS `video_id`,
+    `videos_video`.`edited` AS `edited` FROM `videos_video`)
+
+    This query moves columns from the entire videos table into a tmp table,
+    and has brought down our site.
+    """
+    def __init__(self, *values):
+        self._qs = Video.objects.values(*values)
+
+    def count(self):
+        return Video.objects.count()
+
+    def __getitem__(self, index_or_slice):
+        return self._qs.__getitem__(index_or_slice)
+
+    def __len__(self):
+        return len(self._qs)
+
 class VideoSitemap(Sitemap):
     '''
     Definition of video pages, based on the videos available on site.
@@ -111,7 +137,7 @@ class VideoSitemap(Sitemap):
     priority = 0.8
 
     def items(self):
-        return Video.objects.values('video_id', 'edited')
+        return VideoSitemapValuesQuery('video_id', 'edited')
 
     @permalink
     def location(self, obj):

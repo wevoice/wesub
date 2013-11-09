@@ -29,6 +29,14 @@ SERVICE_IMAGES = [
     'amara-dev-memcache',
 ]
 
+# map image names to port redirections for them
+PORT_MAPPINGS = {
+    'amara-dev-mysql': ['51000:3306'],
+    'amara-dev-rabbitmq': ['51002:5672'],
+    'amara-dev-solr': ['51001:8983'],
+    'amara-dev-memcache': ['51003:11211'],
+}
+
 def get_cid(image_name):
     if not os.path.exists(cid_path(image_name)):
         return None
@@ -48,21 +56,29 @@ def initailize_mysql_container():
     run_manage(['migrate', '--fake'])
 
 def run_image(image_name):
-    run_docker("run -d -cidfile=%s -h=%s %s", cid_path(image_name),
-               image_name, image_name)
+    cmd_line = [
+        'run',
+        '-d',
+        '-cidfile=%s' % cid_path(image_name),
+        '-h=%s' % image_name,
+    ]
+    for port_map in PORT_MAPPINGS.get(image_name, []):
+        cmd_line.append("-p=%s" % port_map)
+    cmd_line.append(image_name)
+    run_docker(' '.join(cmd_line))
     if image_name == 'amara-dev-mysql':
         # give mysql a bit of time to startup
         time.sleep(1)
         initailize_mysql_container()
 
-def start_image(image_name):
+def start_container(image_name):
     run_docker("start %s" % (get_cid(image_name)))
 
-def stop_image(image_name):
+def stop_container(image_name):
     run_docker("stop %s" % (get_cid(image_name)))
 
-def remove_image(image_name):
-    run_docker("rmi %s" % (get_cid(image_name)))
+def remove_container(image_name):
+    run_docker("rm %s" % (get_cid(image_name)))
     os.remove(cid_path(image_name))
 
 def start_services():
@@ -77,16 +93,16 @@ def start_services():
                 os.remove(cid_path(image_name))
                 run_image(image_name)
             elif cid not in currently_running:
-                start_image(image_name)
+                start_container(image_name)
 
 def stop_services():
     currently_running = get_running_images()
     for image_name in SERVICE_IMAGES:
         if get_cid(image_name) in currently_running:
-            stop_image(image_name)
+            stop_container(image_name)
 
 def remove_services():
     stop_services()
     for image_name in SERVICE_IMAGES:
         if get_cid(image_name) is not None:
-            remove_image(image_name)
+            remove_container(image_name)

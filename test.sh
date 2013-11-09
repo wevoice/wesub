@@ -1,4 +1,8 @@
 #!/bin/bash
+AWS_ID=${AWS_ACCESS_ID:-}
+AWS_KEY=${AWS_SECRET_KEY:-}
+REV=${REVISION:-staging}
+SETTINGS_REV=${SETTINGS_REVISION:-$REV}
 DOCKER_HOST="$1"
 if [ ! -z "$DOCKER_HOST" ] ; then
     DOCKER="docker -H $DOCKER_HOST"
@@ -27,15 +31,15 @@ do
     fi
 done
 
-SOLR=$($DOCKER run -i -t -d amara-solr)
-SOLR_PORT=$($DOCKER port $SOLR 8983)
-RABBITMQ=$($DOCKER run -i -t -d amara-rabbitmq)
-RABBITMQ_PORT=$($DOCKER port $RABBITMQ 5672)
+SOLR=$($DOCKER run -i -t -d -p 8983 amara-solr)
+SOLR_PORT=$($DOCKER port $SOLR 8983 | awk -F: '{ print $2; }')
+RABBITMQ=$($DOCKER run -i -t -d -p 5672 amara-rabbitmq)
+RABBITMQ_PORT=$($DOCKER port $RABBITMQ 5672 | awk -F: '{ print $2; }')
 
 echo "Containers: Solr:$SOLR:$SOLR_PORT RabbitMQ:$RABBITMQ:$RABBITMQ_PORT"
 
 # run tests
-$DOCKER run -i -h unisubs.example.com -e SKIP_CODE_PULL=true -e TEST_IPADDR=$IPADDR -e TEST_BROKER_PORT=$RABBITMQ_PORT -e TEST_SOLR_PORT=$SOLR_PORT amara-app /usr/local/bin/test_app
+$DOCKER run -i -h unisubs.example.com -e AWS_ACCESS_ID=$AWS_ID -e AWS_SECRET_KEY=$AWS_KEY -e REVISION=$REV -e TEST_IPADDR=$IPADDR -e TEST_BROKER_PORT=$RABBITMQ_PORT -e TEST_SOLR_PORT=$SOLR_PORT amara-app /usr/local/bin/test_app
 
 RETVAL=$?
 
