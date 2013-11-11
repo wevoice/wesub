@@ -349,7 +349,7 @@ var Site = function(Site) {
                     $('.filters').toggle();
                     $(this).children('span').toggleClass('open');
                 });
-                $('select', '.filters').change(function(e) {
+                $('select', '.filters:not(.no-ajax)').change(function(e) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
@@ -806,12 +806,10 @@ var Site = function(Site) {
                     }
                 }
             });
+            $('form.filters.videos-list select').chosen({
+                disable_search_threshold: 6
+            });
 
-            that.Utils.resetLangFilter();
-            that.Utils.resetProjFilter();
-            that.callOnPageShow(that.Utils.resetLangFilter);
-            that.callOnPageShow(that.Utils.resetProjFilter);
-            that.Utils.chosenify();
         },
         team_settings_permissions: function() {
             $workflow = $('#id_workflow_enabled');
