@@ -4,8 +4,9 @@
     <head>
         <title>Embedder test for external sites.</title>
         <meta charset="utf-8" />
-        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.1/css/bootstrap.css" type="text/css" />
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
         {% include_bootstrapped_bundle 'embedder' %}
         <style type="text/css" media="screen">
             body {
@@ -17,22 +18,20 @@
         </style>
     </head>
     <body>
-        <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=5CKwCfLUwj4"></div>
+      <div class="container">
+        <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=5CKwCfLUwj4" ></div>
         <hr>
-        <div class="container main">
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <a class="brand" href="/embedder/">
-                            Amara Embedder
-                        </a>
-                        <ul class="nav pull-right">
-                            <li><a href="http://universalsubtitles.org">Amara (Universal Subtitles)</a></li>
-                            <li><a href="http://popcornjs.org">Popcorn.js</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+        <div class="navbar navbar-default">
+          <div class="navbar-header"><a class="navbar-brand" href="/embedder/">Amara Embedder</a>
+	  </div>
+	  <div>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://universalsubtitles.org">Amara (Universal Subtitles)</a></li>
+              <li><a href="http://popcornjs.org">Popcorn.js</a></li>
+            </ul>
+	  </div>
+        </div>
+
             <section class="main">
                 <h4>Note: this new Embedder is a work in progress.<br />It currently only supports YouTube, Vimeo, and HTML5 videos.</h4>
                 <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>

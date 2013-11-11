@@ -216,7 +216,7 @@
                 'mousemove':                             'mouseMoved',
 
                 // Toolbar
-                'click a.amara-current-language':        'languageButtonClicked',
+//                'click a.amara-current-language':        'languageButtonClicked',
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
                 'click ul.amara-languages-list a.language-item':       'changeLanguage',
@@ -276,6 +276,7 @@
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
+			download_subtitle_url: '',
                         width: that.model.get('width')
                     }));
 
@@ -352,19 +353,18 @@
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
                 langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
-                var video_url = this.model.get('url')
+                var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
-                this.$amaraLanguagesList.append('' +
-						'<li>' +
-						'<hr/>' +
-						'</li>');
+                this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
+                
+
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
                         this.$amaraLanguagesList.append('' +
-                            '<li>' +
-                                '<a href="#" class="language-item" data-language="' + langs[i].code + '">' +
+                            '<li role="presentation">' +
+                                '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
                                     langs[i].name +
                                 '</a>' +
                             '</li>');
@@ -518,8 +518,6 @@
                 var language = _$(e.target).data('language');
 
                 this.loadSubtitles(language);
-                this.$amaraLanguagesList.hide();
-                return false;
             },
             loadSubtitles: function(language) {
                 // If we've already fetched subtitles for this language, don't
@@ -545,6 +543,7 @@
 		    _$('ul.amara-languages-list a').removeClass('currently-selected');
 		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
                     this.$amaraCurrentLang.text(languageName);
+                    _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
                     // Show the expander triangle
                     this.$amaraCurrentLang.css('background-image', '');
                 } else {
@@ -882,32 +881,68 @@
                 }
             },
 	    templateVideoHTML: function() {
-		return '<li><a id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on Amara.org in a new window">View on Amara.org</a></li>'
+                return '' +
+                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
+                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embeded code">Get Embeded Code</a></li>' +
+                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>';
 	    },
 	    templateHTML: function() {
 		return '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar amara-group">' +
-                //'        <a href="#" class="amara-share-button amara-button"></a>' +
                 (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
                 '            <li><a href="#" class="amara-transcript-button amara-button" title="Toggle transcript viewer"></a></li>' +
                 '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
                 '        </ul>' +
-                '        <div class="amara-languages">' +
-                '            <a href="#" class="amara-current-language">Loading&hellip;</a>' +
-                '            <ul class="amara-languages-list"></ul>' +
+		'        <div class="dropdown amara-languages">' +
+                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;<span class="caret"></span>' +
+                '            </a>'+
+                '            <ul class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
                 '    </div>' +
+                '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
+		'        <div class="modal-dialog">' +
+		'            <div class="modal-content">' +
+		'                <div class="modal-header">' +
+		'                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+		'                    <h4 class="modal-title" id="myModalLabel">Embed Video</h4>' +
+		'                </div>' +
+		'                <div class="modal-body">' +    
+		'                    <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>' +
+                '                        <pre class="pre-scrollable">' +
+                '&lt;script type="text/javascript"&gt;' +
+                '(function (window, document) {' +
+                '    var loader = function () {' +
+                '        var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];' +
+                '        script.src = "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";' +
+                '        tag.parentNode.insertBefore(script, tag);' +
+                '    };' +
+                '    window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);' +
+                '})(window, document);' +
+                '&lt;/script&gt;' +
+                '                        </pre>' +
+                '                        <p>Step 2: paste this somewhere inside your HTML body, with the video URL, height, and width of your choosing:</p>' +
+                '                        <pre class="pre-scrollable">' +
+                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"&gt;&lt;/div&gt;' +
+                '                        </pre>' +
+		'                        <p>If you do not want the amara logo to appear, you can add <code>data-hidelogo="true"</code> in the previous tag.</p>' +
+		'                    </div>' +
+		'                <div class="modal-footer">' +
+		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+		'            </div>' +
+		'        </div>' +
+		'    </div>' +
+		'</div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
                 '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
                 '            </div>' +
                 '            <div class="amara-transcript-header-right">' +
-            '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
-            '                    <a href="#" class="amara-transcript-search-next"></a>' +
-            '                    <a href="#" class="amara-transcript-search-prev"></a>' +
+                '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
+                '                    <a href="#" class="amara-transcript-search-next"></a>' +
+                '                    <a href="#" class="amara-transcript-search-prev"></a>' +
                 '            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
