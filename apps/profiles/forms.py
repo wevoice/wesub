@@ -147,7 +147,8 @@ class EditUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'homepage', 'biography')
+        fields = ('first_name', 'last_name', 'homepage', 'biography',
+                  'pay_rate_code')
 
 
 class EditAccountForm(forms.ModelForm):

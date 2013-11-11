@@ -2639,6 +2639,7 @@ class BillingReport(models.Model):
             'Approver',
             'Note',
             'Date',
+            'Pay Rate',
         )
         data_rows = []
         for approve_task in self._get_approved_tasks():
@@ -2677,7 +2678,9 @@ class BillingReport(models.Model):
                     language.is_primary_audio_language(),
                     unicode(approve_task.assignee),
                     unicode(task.body),
-                    self._report_date(task.completed)))
+                    self._report_date(task.completed),
+                    task.assignee.pay_rate_code,
+                ))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows
