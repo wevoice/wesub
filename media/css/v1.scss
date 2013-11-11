@@ -2126,7 +2126,6 @@ ol.subtitles-diff li{
         height: 16px;
         line-height: 18px;
         vertical-align: middle;
-        margin: 0;
     }
     .chzn-container {
         height: 100%;
@@ -2199,16 +2198,6 @@ ol.subtitles-diff li{
                 width: 100%;
             }
         }
-    }
-
-    a.button.cancel, button.reduced {
-        float: right;
-        padding: 3px 1em;
-        font-size: 1em;
-        margin: -4px 0 0 0;
-    }
-    a.button.cancel {
-        margin-right: 0.5em;
     }
 }
 .v1 .bootstrap .modal {
@@ -2537,10 +2526,6 @@ a.truncated-expand {
     padding: 10px 40px 5px 10px;
     position: relative;
     text-align: left;
-
-    &.videos-list {
-        padding-right: 10px;
-    }
 
     .chzn-container {
         width: auto !important;

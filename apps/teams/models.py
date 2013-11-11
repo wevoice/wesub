@@ -336,11 +336,6 @@ class Team(models.Model):
 
 
     # Membership and roles
-    def get_member(self, user):
-        if not user.is_authenticated():
-            raise TeamMember.DoesNotExist()
-        return self.members.get(user=user)
-
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.
 
@@ -481,11 +476,17 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None,
-                                          num_completed_langs=None,
-                                          project=None, user=None, query=None,
-                                          sort=None, exclude_language=None):
-        qs = self.get_videos_for_user(user)
+    def get_videos_for_languages_haystack(self, language=None, num_completed_langs=None,
+                                          project=None, user=None, query=None, sort=None):
+        from teams.search_indexes import TeamVideoLanguagesIndex
+
+        is_member = (user and user.is_authenticated()
+                     and self.members.filter(user=user).exists())
+
+        if is_member:
+            qs =  TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
+        else:
+            qs =  TeamVideoLanguagesIndex.results().filter(team_id=self.id)
 
         if project:
             qs = qs.filter(project_pk=project.pk)
@@ -497,10 +498,7 @@ class Team(models.Model):
         if language:
             qs = qs.filter(video_completed_langs=language)
 
-        if exclude_language:
-            qs = qs.exclude(video_completed_langs=language)
-
-        if num_completed_langs is not None:
+        if num_completed_langs != None:
             qs = qs.filter(num_completed_langs=num_completed_langs)
 
         qs = qs.order_by({
@@ -514,16 +512,6 @@ class Team(models.Model):
 
         return qs
 
-    def get_videos_for_user(self, user):
-        from teams.search_indexes import TeamVideoLanguagesIndex
-
-        is_member = (user and user.is_authenticated()
-                     and self.members.filter(user=user).exists())
-
-        if is_member:
-            return TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
-        else:
-            return TeamVideoLanguagesIndex.results().filter(team_id=self.id)
 
     # Projects
     @property
