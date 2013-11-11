@@ -882,9 +882,9 @@
             },
 	    templateVideoHTML: function() {
                 return '' +
-                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
+                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
                 '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embeded code">Get Embeded Code</a></li>' +
-                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>';
+                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>';
 	    },
 	    templateHTML: function() {
 		return '' +
@@ -898,7 +898,7 @@
 		'        <div class="dropdown amara-languages">' +
                 '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;<span class="caret"></span>' +
                 '            </a>'+
-                '            <ul class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
+                '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
                 '    </div>' +
                 '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +

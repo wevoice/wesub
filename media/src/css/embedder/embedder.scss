@@ -229,10 +229,8 @@ div.amara-embed {
                 }
                 ul.amara-languages-list {
                     background: #1D1E1F;
- //                   display: none;
                     left: 0;
                     margin: 0;
-//                    padding: 20px;
                     position: absolute;
                     top: 36px;
                     width: 100%;
@@ -243,10 +241,10 @@ div.amara-embed {
                         a {
                             color: #DEDEDE;
                             display: block;
-			    padding-bottom: 5px;
+			    padding-left: 35px;
 			    text-decoration: none;
                             &:hover {
-                                color: #FFF;
+                                color: #222;
                             }
                         }
 			a.currently-selected {
@@ -399,4 +397,14 @@ div.amara-context-menu {
             }
         }
     }
+}
+
+.dropdown-menu .unisubs-subtitle-homepage {
+		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -64px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-download-subtitles {
+		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -100px rgba(0, 0, 0, 0) !important;
+}
+#languages-dropdown {
+	       min-width: 250px;
 }
