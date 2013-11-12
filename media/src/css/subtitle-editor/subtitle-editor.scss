@@ -158,27 +158,22 @@ div.modal {
             text-align: right;
         }
         div.download {
-            textarea {
-                background: #E3E6E9;
-                font: normal 12px monospace;
-                height: 100px;
-                margin-bottom: 5px;
-                margin-top: 0;
-                padding: 10px;
-                width: 100%;
-                @include border-radius(3px);
+            .button {
+                padding: 1em 3em;
             }
             p {
+                margin-top: 20px;
                 color: #CCC;
             }
         }
     }
 }
-button {
+button, a.button {
     border: 0;
     color: #DEDFDF;
     cursor: pointer;
     display: inline-block;
+    text-decoration: none;
     font: normal 12px $OpenSans;
     margin: 0 10px;
     padding: 5px 20px;

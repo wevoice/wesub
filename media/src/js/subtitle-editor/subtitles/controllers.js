@@ -249,7 +249,12 @@ var angular = angular || null;
             // Start by either saving the subtitles, or simply returning the
             // current version number.
             $scope.status = 'saving';
-            if($scope.changesMade || markCompleteChanged) {
+
+            if($scope.overrides.forceSaveError) {
+                var deferred = $q.defer();
+                deferred.reject('Simulated Error');
+                var promise = deferred.promise;
+            } else if($scope.changesMade || markCompleteChanged) {
                 var promise = $scope.saveSubtitles(markComplete);
                 promise = promise.then(function onSuccess(response) {
                     $scope.changesMade = false;
@@ -364,7 +369,7 @@ var angular = angular || null;
             }
 
             $scope.$root.$emit("show-modal", {
-                heading: message || "There was an error saving your subtitles. You'll need to copy and save your subtitles below, and upload them to the system later.",
+                heading: message || "There was an error saving your subtitles. You'll need to save your subtitles with the link below, and upload them to the system later.",
                 buttons: [
                     {'text': 'Close editor', 'class': 'no', 'fn': onClose}
                 ]

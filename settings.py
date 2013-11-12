@@ -308,6 +308,7 @@ SUBTITLE_EDITOR_JS = [
     'src/js/subtitle-editor/help.js',
     'src/js/subtitle-editor/lock.js',
     'src/js/subtitle-editor/modal.js',
+    'src/js/subtitle-editor/objecturl.js',
     'src/js/subtitle-editor/workflow.js',
     'src/js/subtitle-editor/subtitles/controllers.js',
     'src/js/subtitle-editor/subtitles/directives.js',

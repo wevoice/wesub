@@ -17,9 +17,12 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
-    var module = angular.module('amara.SubtitleEditor.modal', []);
+    var module = angular.module('amara.SubtitleEditor.modal', [
+        'amara.SubtitleEditor.objecturl',
+        'amara.SubtitleEditor.subtitles.services',
+        ]);
 
-    module.controller('ModalController', function($scope, SubtitleStorage) {
+    module.controller('ModalController', function($scope, ObjectUrl, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -29,6 +32,8 @@
 
         $scope.isVisible = true;
         $scope.content = null;
+        $scope.showDownloadLink = false;
+        $scope.downloadLink = "#";
 
         $scope.hide = function() {
 
@@ -53,7 +58,10 @@
         });
         $scope.$root.$on('show-modal-download', function($event) {
 
-            $scope.content.dfxpString = $scope.workingSubtitles.subtitleList.toXMLString();
+            var data = $scope.workingSubtitles.subtitleList.toXMLString();
+            $scope.showDownloadLink = true;
+            $scope.downloadLink = ObjectUrl.create(data,
+                'application/ttaf+xml');
         });
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
@@ -62,4 +70,17 @@
             }
         });
     });
+    module.controller('DebugModalController', function($scope) {
+        $scope.isVisible = false;
+
+        $scope.close = function($event) {
+            $scope.isVisible = false;
+            $event.stopPropagation();
+            $event.preventDefault();
+        }
+
+        $scope.$root.$on('show-debug-modal', function($event, heading) {
+            $scope.isVisible = true;
+        });
+    })
 }).call(this);

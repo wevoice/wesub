@@ -17,6 +17,7 @@
 # with this program.  If not, see http://www.gnu.org/licenses/agpl-3.0.html.
 import simplejson as json
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from videos.models import Video
 from teams.models import Task
@@ -256,6 +257,7 @@ def subtitle_editor(request, video_id, language_code):
 
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
+        'DEBUG': settings.DEBUG,
         'language': editing_language,
         'other_languages': languages,
         'version': editing_version,

@@ -40,7 +40,22 @@
 
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown }">
-
+    {% if DEBUG %}
+    <div class="modal"
+        ng-controller="DebugModalController"
+        ng-show="isVisible">
+        <div class="content inner">
+            <p>
+            <label>
+                <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
+            </label>
+            </p>
+            <div class=".buttons">
+                <button class="no" ng-click="close($event)">Close</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="modal"
         ng-controller="ModalController"
         ng-show="isVisible">
@@ -52,9 +67,11 @@
             ng-cloak>
             <h1 ng-show="content.heading">[[ content.heading ]]</h1>
             <p ng-show="content.text">[[ content.text ]]</p>
-            <div ng-show="content.dfxpString" class="download">
-                <textarea class="download" ng-show="content.dfxpString">[[ content.dfxpString ]]</textarea>
-                <p>Copy the subtitles above and save them to your computer. You can upload them later.</p>
+            <div ng-show="showDownloadLink" class="download">
+                <a class="button yes" ng-href="[[ downloadLink ]]" href="#" download="SubtitleBackup.dfxp">Download Subtitles</a>
+                <p>
+                To avoid data corruption, please do not open or edit the subtitles in any text editor.
+                </p>
             </div>
             <div class="content.buttons"
                 ng-show="content.buttons.length">
@@ -78,6 +95,11 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
                 <div class="exit dropdown">
+                    {% if DEBUG %}
+                        <a href="#" ng-click="showDebugModal($event)">
+                            Debug
+                        </a>
+                    {% endif %}
                     <a class="discard" href="#" ng-click="discard()">
                         Exit
                     </a>
