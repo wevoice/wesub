@@ -241,7 +241,7 @@ div.amara-embed {
                         a {
                             color: #DEDEDE;
                             display: block;
-			    padding-left: 35px;
+			    padding-left: 40px;
 			    text-decoration: none;
                             &:hover {
                                 color: #222;
@@ -404,6 +404,9 @@ div.amara-context-menu {
 }
 .dropdown-menu .unisubs-download-subtitles {
 		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -100px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .currently-selected-item {
+		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -240px rgba(0, 0, 0, 0) !important;
 }
 #languages-dropdown {
 	       min-width: 250px;

@@ -544,6 +544,8 @@
 		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
                     this.$amaraCurrentLang.text(languageName);
                     _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+		    _$('ul.amara-languages-list li').removeClass('currently-selected-item');
+		    $('.currently-selected').parent().addClass('currently-selected-item');
                     // Show the expander triangle
                     this.$amaraCurrentLang.css('background-image', '');
                 } else {
@@ -880,6 +882,7 @@
                     callback();
                 }
             },
+	    templateVideoURL: '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ video_url }}"&gt;&lt;/div&gt;',
 	    templateVideoHTML: function() {
                 return '' +
                 '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
