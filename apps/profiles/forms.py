@@ -141,10 +141,6 @@ class EditUserEmailForm(forms.ModelForm):
         fields = ('email',)
 
 class EditUserForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(EditUserForm, self).__init__(*args, **kwargs)
-
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'homepage', 'biography',
@@ -185,3 +181,12 @@ class EditAccountForm(forms.ModelForm):
             self.instance.email = email
             self.instance.save()
         return super(EditAccountForm, self).save(commit)
+
+class AdminProfileForm(forms.ModelForm):
+    """Form for site admins to see on the user's profile page (aka the
+    activity page).
+    """
+
+    class Meta:
+        model = User
+        fields = ('pay_rate_code',)

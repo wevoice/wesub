@@ -1528,6 +1528,24 @@ div#language_picker {
 .profile.v1 form {
     padding-top: 3em;
 
+    &.admin-edit-user {
+        padding-top: 0;
+
+        label {
+            padding: 0;
+        }
+
+        fieldset {
+            padding: 0;
+        }
+
+        div.submit {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+    }
+
     .alpha {
         margin-left: 0;
     }
