@@ -276,6 +276,7 @@
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
+			original_video_url:  that.model.get('url'),
 			download_subtitle_url: '',
                         width: that.model.get('width')
                     }));
@@ -882,11 +883,10 @@
                     callback();
                 }
             },
-	    templateVideoURL: '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ video_url }}"&gt;&lt;/div&gt;',
 	    templateVideoHTML: function() {
                 return '' +
                 '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
-                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embeded code">Get Embeded Code</a></li>' +
+                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
                 '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>';
 	    },
 	    templateHTML: function() {
@@ -913,21 +913,25 @@
 		'                </div>' +
 		'                <div class="modal-body">' +    
 		'                    <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>' +
-                '                        <pre class="pre-scrollable">' +
-                '&lt;script type="text/javascript"&gt;' +
-                '(function (window, document) {' +
-                '    var loader = function () {' +
-                '        var script = document.createElement("script"), tag = document.getElementsByTagName("script")[0];' +
-                '        script.src = "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";' +
-                '        tag.parentNode.insertBefore(script, tag);' +
-                '    };' +
-                '    window.addEventListener ? window.addEventListener("load", loader, false) : window.attachEvent("onload", loader);' +
-                '})(window, document);' +
+                '                        <pre class="pre-small">' +
+                '&lt;script type="text/javascript"&gt;\n' +
+                '(function (window, document) {\n' +
+                '  var loader = function () {\n' +
+                '    var script = document.createElement("script"),\n' +
+                '                 tag = document.getElementsByTagName("script")[0];\n' +
+                '    script.src =\n' +
+                '      "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";\n' +
+                '    tag.parentNode.insertBefore(script, tag);\n' +
+                '  };\n' +
+                '  window.addEventListener ?\n' +
+                '    window.addEventListener("load", loader, false) :\n' +
+                '    window.attachEvent("onload", loader);\n' +
+                '})(window, document);\n' +
                 '&lt;/script&gt;' +
                 '                        </pre>' +
-                '                        <p>Step 2: paste this somewhere inside your HTML body, with the video URL, height, and width of your choosing:</p>' +
-                '                        <pre class="pre-scrollable">' +
-                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"&gt;&lt;/div&gt;' +
+                '                        <p>Step 2: paste this somewhere inside your HTML body, with the height and width of your choosing:</p>' +
+                '                        <pre class="pre-small">' +
+                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
 		'                        <p>If you do not want the amara logo to appear, you can add <code>data-hidelogo="true"</code> in the previous tag.</p>' +
 		'                    </div>' +

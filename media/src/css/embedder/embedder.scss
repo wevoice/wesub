@@ -206,7 +206,6 @@ div.amara-embed {
                 padding: 0 10px;
                 position: relative;
                 width: 21%;
-
                 .amara-current-language {
                     background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
                     color: #DEDEDE;
@@ -239,7 +238,7 @@ div.amara-embed {
                         list-style-type: none;
 
                         a {
-                            color: #DEDEDE;
+                            color: #666666;
                             display: block;
 			    padding-left: 40px;
 			    text-decoration: none;
@@ -400,14 +399,22 @@ div.amara-context-menu {
 }
 
 .dropdown-menu .unisubs-subtitle-homepage {
-		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -64px rgba(0, 0, 0, 0) !important;
+    background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -64px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .unisubs-download-subtitles {
-		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -100px rgba(0, 0, 0, 0) !important;
+    background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -100px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .currently-selected-item {
-		  background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -240px rgba(0, 0, 0, 0) !important;
+     background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -240px rgba(0, 0, 0, 0) !important;
 }
-#languages-dropdown {
-	       min-width: 250px;
+.pre-small {
+    font-size: 0.75em;
+}
+ul.dropdown-menu.amara-languages-list {
+    min-width: 250px;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+}
+ul.amara-languages-list > li {
+    margin-top: 5px;
 }
