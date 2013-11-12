@@ -318,7 +318,8 @@ class TestCaseDemandReports(WebdriverTestCase):
                                        preferred=True)
         cls.contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=team,
                                      user__first_name='Jerry', 
-                                     user__last_name='Garcia').user
+                                     user__last_name='Garcia',
+                                     user__pay_rate_code='L2').user
 
         cls.contributor2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
                 team=team,
@@ -408,6 +409,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         Report should: 
         - display the video time as a decimal
         - contain separate entries for translator and reviewer
+        - show the pay rate for translator and reviewer
         - contain True / False for original language
         - contain any reviewers notes.
         - list the approver, team, title and id.
@@ -442,10 +444,11 @@ class TestCaseDemandReports(WebdriverTestCase):
                             'Task Type': 'Translate', 
                             'Language': 'de', 
                             'Minutes': '2.45015', 
+                            'Pay Rate': '',
                             'Note': '', 
                             'User': ("Gabriel Jos\xc3\xa9 de la Concordia "
                                      "Garc\xc3\xada M\xc3\xa1rquez"),
-                            'Original': 'False' 
+                            'Original': 'False'
                           }
 
         expected_reviewer_data = {
@@ -455,6 +458,7 @@ class TestCaseDemandReports(WebdriverTestCase):
                                    'Note': 'Task shared with Gabriel', 
                                    'User': " ".join([self.contributor.first_name, 
                                                      self.contributor.last_name]),
+                                   'Pay Rate': 'L2',
                                    'Original': 'False',
                                    'Note': 'Task shared with GabrielJos\xc3\xa9'
                                  }
@@ -498,14 +502,14 @@ class TestCaseDemandReports(WebdriverTestCase):
         expected_translation_data = {  
                                        'Translation?': 'True', 
                                        'Language': 'de', 
-                                       'Minutes': '3', 
+                                       'Minutes': '2.45015', 
                                        'Original': 'False'
                                     }
 
         expected_orig_lang_data = {
                                      'Translation?': 'False', 
                                      'Language': 'en', 
-                                     'Minutes': '3', 
+                                     'Minutes': '2.45015', 
                                      'Original': 'True'
                                   } 
 
