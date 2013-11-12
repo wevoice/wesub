@@ -230,10 +230,6 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         url = self.cleaned_data.get('feed_url', '')
 
         if url:
-            if VideoFeed.objects.filter(url=url).exists():
-                raise forms.ValidationError(
-                    _(u'Feed for {url} already exists').format(url=url))
-
             self.parse_feed_url(url)
 
         return url
@@ -262,8 +258,14 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
         if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
             raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
-        self.urls.append(url)
+        if url in self.urls:
+            raise forms.ValidationError(
+                _(u"Duplicate feed URL in form: {url}").format(url=url))
+        if VideoFeed.objects.filter(url=url).exists():
+            raise forms.ValidationError(
+                _(u'Feed for {url} already exists').format(url=url))
 
+        self.urls.append(url)
 
     def success_message(self):
         return _(u"The videos are being added in the background. "
