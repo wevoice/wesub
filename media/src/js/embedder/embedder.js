@@ -201,7 +201,6 @@
                 this.template = __.template(this.templateHTML());
                 this.templateVideo = __.template(this.templateVideoHTML());
                 this.render();
-
                 // Default states.
                 this.states = {
                     autoScrolling: true,
@@ -359,17 +358,32 @@
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
 		}));
                 this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
+		// TODO: This wont work if we have several widgets in one page
+                this.$amaraLanguagesList.append('            <li role="presentation"><div><ul id="language-list-inside"></ul></div></li>');
                 
 
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
-                        this.$amaraLanguagesList.append('' +
+                        _$('#language-list-inside').append('' +
                             '<li role="presentation">' +
                                 '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
                                     langs[i].name +
                                 '</a>' +
                             '</li>');
                     }
+		    // Scrollbar for languages only
+		    $('#language-list-inside').mCustomScrollbar({
+			theme:"light-thick"
+		    });
+		    // When the user clicks on the scrollbar, don't close the dropdown
+		    $(".mCSB_scrollTools").click(function( event ) {
+			event.stopPropagation();
+		    });
+		    // When the menu opens, we scroll to the selected language
+		    $('.dropdown').on('shown.bs.dropdown', function () {
+			$("#language-list-inside").mCustomScrollbar("update");
+			$("#language-list-inside").mCustomScrollbar("scrollTo",".currently-selected");
+		    });
                 } else {
                     // We have no languages.
                 }

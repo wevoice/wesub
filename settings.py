@@ -805,6 +805,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/zepto.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
+            'src/js/third-party/jquery.mCustomScrollbar.concat.min.js',
             'src/js/popcorn/popcorn.amaratranscript.js',
             'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/conf.js',
@@ -821,6 +822,7 @@ MEDIA_BUNDLES = {
     "embedder-css":{
         "type":"css",
         "files": (
+            "src/css/embedder/jquery.mCustomScrollbar.css",
             "src/css/embedder/embedder-dev.css",
         ),
         "include_js_base_dependencies": False,

@@ -418,3 +418,16 @@ ul.dropdown-menu.amara-languages-list {
 ul.amara-languages-list > li {
     margin-top: 5px;
 }
+#language-list-inside li a {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#language-list-inside {
+    max-height: 130px;
+    padding-left: 0px;
+    overflow: auto;
+}
+#language-list-inside li a:hover, 
+#language-list-inside li a:focus {
+    background-color: #F5F5F5;
+}
