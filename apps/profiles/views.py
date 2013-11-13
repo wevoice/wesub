@@ -33,7 +33,7 @@ from tastypie.models import ApiKey
 
 from auth.models import CustomUser as User
 from profiles.forms import (EditUserForm, EditAccountForm, SendMessageForm,
-                            EditAvatarForm)
+                            EditAvatarForm, AdminProfileForm)
 from profiles.rpc import ProfileApiClass
 from apps.messages.models import Message
 from utils.orm import LoadRelatedQuerySet
@@ -81,11 +81,22 @@ def activity(request, user_id=None):
             except (User.DoesNotExist, ValueError):
                 raise Http404
 
+    if request.user.is_staff:
+        if request.method == 'POST':
+            form = AdminProfileForm(instance=user, data=request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, _('Your profile has been updated.'))
+                return redirect('profiles:profile', user_id=user.username)
+        else:
+            form = AdminProfileForm(instance=user)
+    else:
+        form = None
     qs = Action.objects.filter(user=user)
 
     extra_context = {
         'user_info': user,
-        'can_edit': user == request.user
+        'form': form,
     }
 
     return object_list(request, queryset=qs, allow_empty=True,

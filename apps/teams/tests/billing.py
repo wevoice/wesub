@@ -230,8 +230,10 @@ class ApprovalTestBase(TestCase):
 
     def setup_users(self):
         # make a bunch of users to subtitle/review the work
-        subtitlers = [test_factories.create_user() for i in xrange(3)]
-        reviewers = [test_factories.create_user() for i in xrange(2)]
+        subtitlers = [test_factories.create_user(pay_rate_code='S%s' % i)
+                      for i in xrange(3)]
+        reviewers = [test_factories.create_user(pay_rate_code='R%s' % i)
+                     for i in xrange(2)]
         for u in subtitlers:
             test_factories.create_team_member(user=u, team=self.team,
                                               role=ROLE_CONTRIBUTOR)
@@ -243,6 +245,7 @@ class ApprovalTestBase(TestCase):
 
         self.admin = test_factories.create_team_member(team=self.team,
                                                        role=ROLE_ADMIN).user
+        self.users = dict((unicode(u), u) for u in subtitlers + reviewers)
 
     def setup_videos(self):
         # make a bunch of languages that have moved through the review process
@@ -441,6 +444,13 @@ class ApprovalForUsersTest(ApprovalTestBase):
         for row in report_data:
             self.assertEquals(row['Minutes'], 1.5)
 
+    def check_pay_rates(self, report_data):
+        # all subtitles are 90 seconds long, we should report this as 1.5
+        # minutes.
+        for row in report_data:
+            user = self.users[row['User']]
+            self.assertEquals(row['Pay Rate'], user.pay_rate_code)
+
     def test_report(self):
         report_data = self.get_report_data(self.date_maker.start_date(),
                                     self.date_maker.end_date())
@@ -449,6 +459,7 @@ class ApprovalForUsersTest(ApprovalTestBase):
         self.check_notes(report_data)
         self.check_dates(report_data)
         self.check_minutes(report_data)
+        self.check_pay_rates(report_data)
 
 class SimpleApprovalTestCase(TestCase):
     @test_utils.patch_for_test('teams.models.Task.now')
