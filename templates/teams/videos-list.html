@@ -57,11 +57,11 @@
                         {% endfor %}
                     </select>
                     {% trans 'Language:' %}
-                    <select name="lang-mode">
+                    <select name="lang-mode" id="lang_mode">
                         <option value="+"{% if language_mode == '+' %} selected="selected"{% endif %}>{% trans "has" %}</option>
                         <option value="-"{% if language_mode == '-' %} selected="selected"{% endif %}>{% trans "doesn't have" %}</option>
                     </select>
-                    <select name="lang">
+                    <select name="lang" id="lang">
                         <option value="any"{% if language_code == None %}selected="selected"{% endif %}>{% trans 'any' %}</option>
                         {% for code, name in language_choices %}
                             <option {% if language_code == code %}selected="selected"{% endif %} value="{{ code }}">{{ name }}</option>
@@ -91,7 +91,7 @@
                         </option>
                     </select>
                 </div>
-                <button class="reduced">update</button>
+                <button class="reduced" id="update">update</button>
                 {% if filtered %}
                     <a href="{% url teams:detail team.slug %}" class="button cancel">Clear</a>
                 {% endif %}
