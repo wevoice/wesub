@@ -177,9 +177,10 @@ var angular = angular || null;
                         $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
 
-                    }, function onError() {
+                    }, function onError(e) {
                         $scope.status = 'error';
                         $scope.showErrorModal();
+                        throw e;
                     });
                 }
             });
@@ -222,9 +223,10 @@ var angular = angular || null;
                         $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
                         
-                    }, function onError() {
+                    }, function onError(e) {
                         $scope.status = 'error';
                         $scope.showErrorModal();
+                        throw e;
                     });
 
                 }
@@ -282,7 +284,7 @@ var angular = angular || null;
             }, function onError(e) {
                 $scope.status = 'error';
                 $scope.showErrorModal();
-                return e;
+                throw e;
             });
         }
 
