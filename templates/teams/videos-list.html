@@ -50,7 +50,7 @@
             <p>
                 <div class="filter-chunk">
                     <span class="inner">{% trans 'Project:' %}</span>
-                    <select name="project-filter">
+                    <select name="project-filter" id="project">
                         <option value="any"{% if project == None %} selected="selected"{% endif %}>{% trans 'any' %}</option>
                         {% for project_choice in project_choices %}
                         <option {% if project == project_choice %}selected="selected"{% endif %} value="{{ project_choice.slug }}">{{ project_choice.name }}</option>
