@@ -46,7 +46,7 @@
                     <input type="hidden" name="lang-mode" value="{{ language_mode }}" />
                     <input type="hidden" name="sort" value="{{ sort }}" />
                     {% endif %}
-                    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search&hellip;" />
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search&hellip;" />
                 </fieldset>
             </form>
             {% if can_add_video %}
@@ -58,9 +58,10 @@
             </a>
         </div>
         <form class="filters videos-list group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
+            <input type="hidden" name="q" value="{{ query }}" />
             <button class="reduced" id="update">update</button>
             {% if filtered %}
-                <a href="{% url teams:detail team.slug %}" class="button cancel">Clear</a>
+            <a href="{% url teams:detail team.slug %}{% if query %}?q={{ query }}{% endif %}" class="button cancel">Clear</a>
             {% endif %}
             <div class="filter-chunk">
                 <span class="inner">{% trans 'Project:' %}</span>

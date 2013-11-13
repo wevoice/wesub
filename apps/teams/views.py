@@ -453,7 +453,7 @@ def detail(request, slug, project_slug=None, languages=None):
     else:
         project = _default_project_for_team(team)
 
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     language_filter = request.GET.get('lang')
     language_code = language_filter if language_filter != 'any' else None
