@@ -440,15 +440,14 @@ def detail(request, slug, project_slug=None, languages=None):
     except TeamMember.DoesNotExist:
         member = None
 
-    if project_slug is None or project_slug == '':
-        project_slug = request.GET.get('project')
-
-    if project_slug:
-        if project_slug == 'any':
+    project_filter = (project_slug if project_slug is not None
+                      else request.GET.get('project'))
+    if project_filter:
+        if project_filter == 'any':
             project = None
         else:
             try:
-                project = Project.objects.get(team=team, slug=project_slug)
+                project = Project.objects.get(team=team, slug=project_filter)
             except Project.DoesNotExist:
                 project = None
     else:
@@ -456,9 +455,8 @@ def detail(request, slug, project_slug=None, languages=None):
 
     query = request.GET.get('q')
     sort = request.GET.get('sort')
-    language_code = request.GET.get('lang')
-    if language_code == 'any':
-        language_code = None
+    language_filter = request.GET.get('lang')
+    language_code = language_filter if language_filter != 'any' else None
     language_mode = request.GET.get('lang-mode', '+')
     filtered = bool(set(request.GET.keys()).intersection([
         'project', 'lang', 'sort']))
@@ -471,6 +469,8 @@ def detail(request, slug, project_slug=None, languages=None):
         'team': team,
         'member': member,
         'project':project,
+        'project_filter': project_filter,
+        'language_filter': language_filter,
         'language_code': language_code,
         'language_mode': language_mode,
         'sort': sort,

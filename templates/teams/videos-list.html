@@ -23,6 +23,7 @@
         window.REQUEST_GET_PROJECT = '{{ request.GET.project }}';
         window.TEAM_SLUG = '{{ team.slug }}';
     </script>
+    {% include "teams/_search_js.html" %}
 {% endblock %}
 
 {% block select_language_dialog %}
@@ -37,7 +38,17 @@
         {% endwith %}
 
         <div class="tools group">
-            {% include "teams/_search.html" %}
+            <form action="" method="get" class="search">
+                <fieldset>
+                    {% if filtered %}
+                    <input type="hidden" name="project" value="{{ project_filter }}" />
+                    <input type="hidden" name="lang" value="{{ language_filter }}" />
+                    <input type="hidden" name="lang-mode" value="{{ language_mode }}" />
+                    <input type="hidden" name="sort" value="{{ sort }}" />
+                    {% endif %}
+                    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search&hellip;" />
+                </fieldset>
+            </form>
             {% if can_add_video %}
                 <a href="{% url teams:add_video team.slug %}{% if project %}?project={{ project.pk }}{% endif %}" class="button">{% trans "Add Video" %}</a>
             {% endif %}  
@@ -53,7 +64,7 @@
             {% endif %}
             <div class="filter-chunk">
                 <span class="inner">{% trans 'Project:' %}</span>
-                <select name="project-filter" id="project">
+                <select name="project" id="project">
                     <option value="any"{% if project == None %} selected="selected"{% endif %}>{% trans 'any' %}</option>
                     {% for project_choice in project_choices %}
                     <option {% if project == project_choice %}selected="selected"{% endif %} value="{{ project_choice.slug }}">{{ project_choice.name }}</option>
