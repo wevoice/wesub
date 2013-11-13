@@ -67,6 +67,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.assertTrue(self.feed_pg.submit_successful())
         vurl = VideoUrl.objects.get(url=video_url)
         self.assertTrue('Y', vurl.type)
+        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
 
     def test_kaltura_yahoo_feed(self):
         """Add a kaltura yahoo feed
@@ -80,6 +81,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.assertTrue(self.feed_pg.submit_successful())
         vurl = VideoUrl.objects.get(url=video_url)
         self.assertTrue('K', vurl.type)
+        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
 
     def test_kaltura_itunes_feed(self):
         """Add a kaltura itunes feed
@@ -93,3 +95,4 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.assertTrue(self.feed_pg.submit_successful())
         vurl = VideoUrl.objects.get(url=video_url)
         self.assertTrue('K', vurl.type)
+        self.assertEqual(self.team.name, vurl.video.teamvideo.team.name)
