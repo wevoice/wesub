@@ -22,24 +22,22 @@ from .parser import FeedParser
 
 class VideoImporter(object):
     """Import videos from a feed URL."""
-    def __init__(self, url, user, import_since=None, team=None):
+    def __init__(self, url, user, import_since=None):
         """Create a VideoImporter
 
         :param url: feed url
         :param user: User that creates videos for
         :param import_since: URL of the last imported link.  If set, we will
         only import videos after this link
-        :param team: Team to create videos for
         """
         self.url = url
         self.user = user
         self.import_since = import_since
         self.checked_entries = 0
-        self.video_count = 0
         self.last_link = ''
-        self.team = team
 
     def import_videos(self):
+        self._created_videos = []
         feed_parser = FeedParser(self.url)
         # the link at the top of the feed should be the latest link
         try:
@@ -49,16 +47,24 @@ class VideoImporter(object):
         self._create_videos(feed_parser)
         if self.import_since is None and 'youtube' in self.url:
             self._import_extra_links_from_youtube(feed_parser)
+        rv = self._created_videos
+        del self._created_videos
+        return rv
+
+    def _next_urls(self, feed_parser):
+        return [
+            link for link in feed_parser.feed.feed.get('links', [])
+            if link.get('rel') == 'next'
+        ]
 
     def _import_extra_links_from_youtube(self, main_feed_parser):
-        next_url = [ x for x in main_feed_parser.feed.feed.get('links', [])
-                    if x['rel'] == 'next' ]
+        next_urls = self._next_urls(main_feed_parser)
 
-        while next_url:
-            url = next_url[0].href
+        while next_urls:
+            url = next_urls[0]['href']
             feed_parser = FeedParser(url)
             self._create_videos(feed_parser)
-            next_url = [x for x in feed_parser.feed.feed.get('links', []) if x['rel'] == 'next']
+            next_urls = self._next_urls(feed_parser)
 
     def _create_videos(self, feed_parser):
         _iter = feed_parser.items(since=self.import_since,
@@ -67,21 +73,15 @@ class VideoImporter(object):
         for vt, info, entry in _iter:
             if vt:
                 self._create_video(vt, info, entry)
-                self.video_count += 1
             self.checked_entries += 1
 
     def _create_video(self, video_type, info, entry):
         from videos.models import Video
-        from teams.models import TeamVideo
-        from teams.signals import api_teamvideo_new
         video, created = Video.get_or_create_for_url(
             vt=video_type, user=self.user)
         if info:
             for name, value in info.items():
                 setattr(video, name, value)
             video.save()
-        if created and self.team is not None:
-            tv = TeamVideo.objects.create(
-                video=video, team=self.team, added_by=self.user,
-                description=video.description)
-            api_teamvideo_new.send(tv)
+        if created:
+            self._created_videos.append(video)

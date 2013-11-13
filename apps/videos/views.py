@@ -244,7 +244,7 @@ def create(request):
     video_form = VideoForm(request.user, request.POST or None)
     context = {
         'video_form': video_form,
-        'youtube_form': AddFromFeedForm(request.user)
+        'feed_form': AddFromFeedForm(request.user)
     }
     if video_form.is_valid():
         try:
@@ -281,7 +281,7 @@ def create_from_feed(request):
         return redirect('videos:create')
     context = {
         'video_form': VideoForm(),
-        'youtube_form': form,
+        'feed_form': form,
         'from_feed': True
     }
     return render_to_response('videos/create.html', context,

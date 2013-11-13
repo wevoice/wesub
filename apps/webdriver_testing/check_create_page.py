@@ -94,7 +94,7 @@ class TestCaseCreateVideos(WebdriverTestCase):
         """Add a blip video.
 
         """
-
+        self.skipTest('the test link no longer works, seems like blip support is broken for now')
         url = "http://blip.tv/file/get/Linuxconfau-LightningTalks606.flv"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
@@ -143,7 +143,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
 
         """
         youtube_user = 'janetefinn'
-        self.create_pg.submit_youtube_users_videos(youtube_user, save=True)
+        self.create_pg.submit_youtube_users_videos(youtube_user)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__youtube_user_url(self):
@@ -151,7 +151,7 @@ class TestCaseAddFeeds(WebdriverTestCase):
 
         """
         url = "http://www.youtube.com/user/jdragojevic"
-        self.create_pg.submit_youtube_user_page(url, save=True)
+        self.create_pg.submit_youtube_user_page(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
     def test_feed__vimeo(self):
@@ -195,13 +195,15 @@ class TestCaseAddFeeds(WebdriverTestCase):
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
 
+
+
+
     def test_youtube_feed(self):
         """Add a youtube feed
 
         """
-        url = "http://gdata.youtube.com/feeds/api/users/janetefinn/uploads"
-        video_url = ("http://www.youtube.com/watch?"
-                     "v=BXMPp0TLSEo")
+        url = "http://gdata.youtube.com/feeds/api/users/amaratestuser/uploads"
+        video_url = ("http://www.youtube.com/watch?v=q26umaF242I")
         self.create_pg.submit_feed_url(url)
         self.assertTrue(self.create_pg.multi_submit_successful())
         vurl = VideoUrl.objects.get(url=video_url)
