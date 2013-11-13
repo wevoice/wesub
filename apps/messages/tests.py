@@ -531,6 +531,6 @@ class TeamBlockSettingsTest(TestCase):
         # add videos notification is a bit different
         setting_name = "block_new_video_message"
         Setting.objects.create(team=team, key=Setting.KEY_IDS[setting_name])
-        team_tasks.add_videos_notification()
+        team_tasks.add_videos_notification_daily()
         self.assertEquals(Message.objects.all().count(), 0,
             "%s is on, so this message should *not * be sent" % setting_name)
