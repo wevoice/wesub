@@ -47,6 +47,10 @@
             </a>
         </div>
         <form class="filters videos-list group no-ajax{% if filtered %} active{% endif %}" action="" method="GET">
+            <button class="reduced" id="update">update</button>
+            {% if filtered %}
+                <a href="{% url teams:detail team.slug %}" class="button cancel">Clear</a>
+            {% endif %}
             <div class="filter-chunk">
                 <span class="inner">{% trans 'Project:' %}</span>
                 <select name="project-filter" id="project">
@@ -55,6 +59,8 @@
                     <option {% if project == project_choice %}selected="selected"{% endif %} value="{{ project_choice.slug }}">{{ project_choice.name }}</option>
                     {% endfor %}
                 </select>
+            </div>
+            <div class="filter-chunk">
                 {% trans 'Language:' %}
                 <select name="lang-mode" id="lang_mode">
                     <option value="+"{% if language_mode == '+' %} selected="selected"{% endif %}>{% trans "has" %}</option>
@@ -68,7 +74,7 @@
                 </select>
             </div>
             <div class="filter-chunk">
-                <span class="inner">{% trans 'sorted by' %}</span>
+                <span class="inner">{% trans 'Sort:' %}</span>
                 <select name="sort">
                     <option {% if sort == 'name' %}selected="selected"{% endif %} value="name">
                         {% trans 'name, a-z' %}
@@ -90,10 +96,6 @@
                     </option>
                 </select>
             </div>
-            <button class="reduced" id="update">update</button>
-            {% if filtered %}
-                <a href="{% url teams:detail team.slug %}" class="button cancel">Clear</a>
-            {% endif %}
         </form>
 
         {% if team_video_md_list %}
