@@ -130,8 +130,16 @@ div.amara-embed {
             @include multi-border-radius(0, 0, 3px, 3px);
             @include vertical-gradient(#1B1C1D, #212223);
 
-            a.amara-button {
+            a.amara-logo {
                 background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
+            }
+            a.amara-transcript-button {
+                background: transparent url('../../images/glyphicons_029_notes_2.png') 0 2px no-repeat;
+            }
+            a.amara-subtitles-button {
+                background: transparent url('../../images/glyphicons_392_subtitles.png') 0 7px no-repeat;
+            }
+            a.amara-button {
                 display: inline-block;
                 height: 36px;
                 @include opacity(.5);
@@ -181,19 +189,23 @@ div.amara-embed {
                         width: 28px;
 
                         &.amara-transcript-button {
+/*
                             background-position: 7px -37px;
                             margin-right: 3px;
 
                             &:active {
                                 background-position: 7px -36px;
                             }
+*/
                         }
                         &.amara-subtitles-button {
+/*
                             background-position: 6px -86px;
 
                             &:active {
                                 background-position: 6px -85px;
                             }
+*/
                         }
                     }
                 }
