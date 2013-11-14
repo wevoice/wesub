@@ -87,7 +87,7 @@
     }
 }
 div.amara-embed {
-    font: normal 14px Helvetica;
+    font: normal 14px;
 
     a {
         &:hover {
@@ -109,7 +109,7 @@ div.amara-embed {
             div {
                 background: rgba(0, 0, 0, .8);
                 color: #FFF;
-                font: bold 16px/22px Helvetica;
+                font: bold 16px/22px;
                 margin: 0;
                 padding: 12px 20px;
                 text-align: center;
@@ -210,7 +210,7 @@ div.amara-embed {
                     background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
                     color: #DEDEDE;
                     display: block;
-                    font: normal 12px Tahoma;
+                    font: normal 12px;
                     height: 36px;
                     padding: 10px 20px 10px 5px;
                     overflow: hidden;
@@ -273,7 +273,7 @@ div.amara-embed {
                     }
                     a.amara-transcript-autoscroll {
                         color: #9A9B9C;
-                        font: normal 12px Tahoma;
+                        font: normal 12px;
                         text-decoration: none;
                     }
                 }
@@ -285,7 +285,7 @@ div.amara-embed {
                         background: transparent;
                         border: 0;
                         border-left: 1px solid #DADBDC;
-                        font: normal 12px Tahoma;
+                        font: normal 12px;
                         padding: 12px;
                     }
 
@@ -390,7 +390,7 @@ div.amara-context-menu {
                 background: #FFF;
                 display: block;
                 color: #000;
-                font: normal 12px Tahoma;
+                font: normal 12px;
                 padding: 5px;
                 @include border-radius(2px);
             }
