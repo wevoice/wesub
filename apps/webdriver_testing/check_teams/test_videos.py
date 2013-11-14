@@ -464,7 +464,7 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseProjectsAddEdit, cls).setUpClass()
-        #management.call_command('flush', interactive=False)
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -507,6 +507,8 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
         self.videos_tab.add_video(
             url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0',
             project = self.project2.name)
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.open_page(project_page)
         self.assertTrue(self.videos_tab.video_present(
             'What is up with Noises? (The Science and Mathematics'
@@ -518,8 +520,10 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
 
         """
         tv = self.videos_list[0]
-        self.videos_tab.open_page(self.project2_page)
+        self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(tv.title)
+        self.videos_tab.project_filter(project=self.project2.name)
+        self.videos_tab.update_filters()
         self.assertTrue(self.videos_tab.video_present(tv.title))
 
 
@@ -557,7 +561,7 @@ class TestCaseProjectsFilter(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseProjectsFilter, cls).setUpClass()
-        #management.call_command('flush', interactive=False)
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -597,7 +601,7 @@ class TestCaseProjectsFilter(WebdriverTestCase):
         
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.project_filter(project=self.project1.name)
-#        self.videos_tab.update_filters()
+        self.videos_tab.update_filters()
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
@@ -606,9 +610,10 @@ class TestCaseProjectsFilter(WebdriverTestCase):
         """Filter on the project page by language.
 
         """
-        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project2.slug)
-        self.videos_tab.open_page(project_page)
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.project_filter(project=self.project2.name)
+        self.videos_tab.update_filters()
+
         self.videos_tab.sub_lang_filter(language = 'English')
         self.videos_tab.update_filters()
         self.assertTrue(self.videos_tab.video_present('c'))
