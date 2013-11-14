@@ -397,15 +397,20 @@ div.amara-context-menu {
         }
     }
 }
-
 .dropdown-menu .unisubs-subtitle-homepage {
-    background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -64px rgba(0, 0, 0, 0) !important;
+     background: url("../../images/glyphicons_318_more_items.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .unisubs-download-subtitles {
-    background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -100px rgba(0, 0, 0, 0) !important;
+     background: url("../../images/glyphicons_212_down_arrow.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .dropdown-menu .currently-selected-item {
-     background: url("../../images/dropdown_icons.png") no-repeat scroll 19px -240px rgba(0, 0, 0, 0) !important;
+     background: url("../../images/glyphicons_206_ok_2.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-embed-link {
+     background: url("../../images/glyphicons_117_embed.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-order-subtitles {
+     background: url("../../images/glyphicons_065_tag.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
 }
 .pre-small {
     font-size: 0.75em;

@@ -899,9 +899,10 @@
             },
 	    templateVideoHTML: function() {
                 return '' +
-                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="View this video on amara.org in a new window">Subtitle Homepage</a></li>' +
-                '<li role="presentation"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
-                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>';
+                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
+                '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
+                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
+                '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>';
 	    },
 	    templateHTML: function() {
 		return '' +
