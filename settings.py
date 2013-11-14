@@ -802,7 +802,7 @@ MEDIA_BUNDLES = {
         "files": (
             "src/js/third-party/json2.min.js",
             'src/js/third-party/underscore.min.js',
-            'src/js/third-party/zepto.min.js',
+            'src/js/third-party/jquery-1.8.3.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
             'src/js/third-party/jquery.mCustomScrollbar.concat.min.js',
