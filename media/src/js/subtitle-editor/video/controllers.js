@@ -23,7 +23,6 @@
     module.controller('VideoController', function($scope, VideoPlayer) {
         $scope.overlayText = null;
         $scope.showOverlay = false;
-        $scope.timelineOverlayText = null;
 
         $scope.videoState = {
             loaded: false,
@@ -62,8 +61,8 @@
             if(newValue !== null && newValue !== undefined) {
                 $scope.overlayText = newValue;
                 $scope.showOverlay = true;
-            } else if($scope.timelineOverlayText !== null) {
-                $scope.overlayText = $scope.timelineOverlayText;
+            } else if($scope.timeline.shownSubtitle !== null) {
+                $scope.overlayText = $scope.timeline.shownSubtitle.content();
                 $scope.showOverlay = true;
             } else {
                 $scope.showOverlay = false;
@@ -81,10 +80,8 @@
             if(subtitle !== null) {
                 $scope.overlayText = subtitle.content();
                 $scope.showOverlay = true;
-                $scope.timelineOverlayText = $scope.overlayText;
             } else {
                 $scope.showOverlay = false;
-                $scope.timelineOverlayText = null;
             }
         });
 
