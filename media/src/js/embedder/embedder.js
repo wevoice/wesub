@@ -4,7 +4,7 @@
     // function. Set dependencies to use no-conflict mode to avoid destroying any
     // original objects.
     var __ = _.noConflict();
-    var _$ = jQuery;
+    var _$ = jQuery.noConflict();
     var _Backbone = Backbone.noConflict();
     var _Popcorn = Popcorn.noConflict();
 
@@ -372,17 +372,17 @@
                             '</li>');
                     }
 		    // Scrollbar for languages only
-		    jQuery('#language-list-inside').mCustomScrollbar({
+		    _$('#language-list-inside').mCustomScrollbar({
 			theme:"light-thick"
 		    });
 		    // When the user clicks on the scrollbar, don't close the dropdown
-		    jQuery(".mCSB_scrollTools").click(function( event ) {
+		    _$(".mCSB_scrollTools").click(function( event ) {
 			event.stopPropagation();
 		    });
 		    // When the menu opens, we scroll to the selected language
-		    jQuery('.dropdown').on('shown.bs.dropdown', function () {
-			jQuery("#language-list-inside").mCustomScrollbar("update");
-			jQuery("#language-list-inside").mCustomScrollbar("scrollTo",".currently-selected");
+		    _$('.dropdown').on('shown.bs.dropdown', function () {
+			_$("#language-list-inside").mCustomScrollbar("update");
+			_$("#language-list-inside").mCustomScrollbar("scrollTo",".currently-selected");
 		    });
                 } else {
                     // We have no languages.
@@ -469,7 +469,7 @@
                         });
                     }
 
-                    this.$amaraTranscriptLines = jQuery('a.amara-transcript-line', this.$transcriptBody);
+                    this.$amaraTranscriptLines = _$('a.amara-transcript-line', this.$transcriptBody);
 
                 } else {
                     _$('.amara-transcript-line', this.$transcriptBody).text('No subtitles available.');
@@ -560,7 +560,7 @@
                     this.$amaraCurrentLang.text(languageName);
                     _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
 		    _$('ul.amara-languages-list li').removeClass('currently-selected-item');
-		    jQuery('.currently-selected').parent().addClass('currently-selected-item');
+		    _$('.currently-selected').parent().addClass('currently-selected-item');
                     // Show the expander triangle
                     this.$amaraCurrentLang.css('background-image', '');
                 } else {
@@ -1038,9 +1038,9 @@
             var amaraEmbeds = _$('div.amara-embed');
 
             if (amaraEmbeds.length) {
-                jQuery.each(amaraEmbeds, function() {
+                _$.each(amaraEmbeds, function() {
 
-                    var $div = jQuery(this);
+                    var $div = _$(this);
 
                     // Call embedVideo with this div and URL.
                     that.push(['embedVideo', {
