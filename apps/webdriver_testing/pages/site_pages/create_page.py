@@ -14,12 +14,10 @@ class CreatePage(UnisubsPage):
     _URL = "videos/create/"
     _SUBMIT_BUTTON = "form.main_video_form button.green_button"
     _MULTI_SUBMIT_LINK = (" div#submit_multiple_toggle "
-                         "a#btn_submit_multiple_toggle.toogle-create-form")
+                         "a#btn_submit_multiple_toggle.toggle-create-form")
     _YOUTUBE_USER_FIELD = "li input#id_usernames"
     _YOUTUBE_PAGE_FIELD = "li input#id_youtube_user_url"
     _FEED_URL = "li input#id_feed_url"
-    _SAVE_OPTION = ("div#submit_multiple_videos form#bulk_create ul li "
-                    "input#id_save_feed")
     _SUBMIT_MULTI = ("div#submit_multiple_videos "
                     "form#bulk_create button.green_button")
     _HIDE_MULTI = "div#submit_multiple_toggle"
@@ -44,7 +42,7 @@ class CreatePage(UnisubsPage):
         self.page_down(self._HIDE_MULTI)
         self.wait_for_element_present(self._YOUTUBE_USER_FIELD)
 
-    def submit_youtube_users_videos(self, youtube_usernames, save=False):
+    def submit_youtube_users_videos(self, youtube_usernames):
         """Submit 1 or several youtube user names.
         Type 1 or several youtube user names in hte Youtube usernames field.
 
@@ -53,31 +51,24 @@ class CreatePage(UnisubsPage):
                          '%s' %youtube_usernames)
         self._open_multi_submit()
         self.type_by_css(self._YOUTUBE_USER_FIELD, youtube_usernames)
-        if save == True:
-            self.click_by_css(self._SAVE_OPTION)
         self.submit_by_css(self._SUBMIT_MULTI)
 
-    def submit_youtube_user_page(self, youtube_user_url, save=False):
+    def submit_youtube_user_page(self, youtube_user_url):
         """Submit videos from youtube user page url.
 
         """
         self._open_multi_submit()
         self.logger.info('Submitting youtube user page %s' %youtube_user_url)
         self.type_by_css(self._YOUTUBE_PAGE_FIELD, youtube_user_url)
-        if save == True:
-            self.logger.info('Choosing the save option')
-            self.click_by_css(self._SAVE_OPTION)
         self.submit_by_css(self._SUBMIT_MULTI)
 
-    def submit_feed_url(self, feed_url, save=False):
+    def submit_feed_url(self, feed_url):
         """Submit videos from a supported feed type.
 
         """
         self._open_multi_submit()
         self.logger.info('Submitting the feed %s' % feed_url)
         self.type_by_css(self._FEED_URL, feed_url)
-        if save == True:
-            self.click_by_css(self._SAVE_OPTION)
         self.submit_by_css(self._SUBMIT_MULTI)
 
     def multi_submit_successful(self):

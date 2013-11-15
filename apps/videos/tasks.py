@@ -42,7 +42,6 @@ from auth.models import CustomUser as User
 from videos.types import video_type_registrar
 from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from apps.videos.types import VideoTypeError
-from videos.feed_parser import VideoImporter
 
 celery_logger = logging.getLogger('celery.task')
 
@@ -211,30 +210,11 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
                              context, fail_silently=not settings.DEBUG)
 
 @task()
-def import_videos_from_feeds(urls, user_id=None, team_id=None):
-    from teams.permissions import can_add_video
-    from teams.models import Team
-    try:
-        user = User.objects.get(id=user_id)
-    except ObjectDoesNotExist:
-        user = None
-    team = None
-    if user is not None:
-        try:
-            team = Team.objects.get(id=team_id)
-            if not can_add_video(team, user):
-                team = None
-        except Team.DoesNotExist:
-            pass
-
-    video_count = 0
-    for url in urls:
-        importer = VideoImporter(url, user, team=team)
-        importer.import_videos()
-        _save_video_feed(url, importer.last_link, user)
-        video_count += importer.video_count
-    if user and video_count > 0:
-        tasks.videos_imported_message.delay(user_id, video_count)
+def import_videos_from_feed(feed_id):
+    feed = VideoFeed.objects.get(id=feed_id)
+    new_videos = feed.update()
+    if feed.user is not None:
+        tasks.videos_imported_message.delay(feed.user.id, len(new_videos))
 
 @task()
 def upload_subtitles_to_original_service(version_pk):
@@ -427,17 +407,12 @@ def delete_captions_in_original_service_by_code(language_code, video_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         video, language_code, DELETE_LANGUAGE_ACTION)
 
-def _save_video_feed(feed_url, last_entry_url, user):
+def _save_video_feed(feed_url, user):
     """ Creates or updates a videofeed given some url """
     try:
-        vf = VideoFeed.objects.get(url=feed_url)
+        return VideoFeed.objects.get(url=feed_url, user=user)
     except VideoFeed.DoesNotExist:
-        vf = VideoFeed(url=feed_url)
-
-    vf.user = user
-    vf.last_link = last_entry_url
-    vf.save()
-
+        return VideoFeed.objects.create(url=feed_url, user=user)
 
 @periodic_task(run_every=timedelta(seconds=300))
 def gauge_videos():
