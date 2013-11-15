@@ -105,6 +105,8 @@
             url: '',
             show_logo: true,
             show_order_subtitles: true,
+            show_subtitles_default: false,
+            show_transcript_default: false,
             width: '',
 
             // Set from the Amara API
@@ -308,11 +310,9 @@
 
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
-
                                 // update the view on amara button
                                 that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
                                 _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
-
                                 // Make the request to fetch the initial subtitles.
                                 //
                                 // TODO: This needs to be an option.
@@ -551,6 +551,8 @@
             setCurrentLanguage: function(language) {
                 this.buildTranscript(language);
                 this.buildSubtitles(language);
+		this.setSubtitlesDisplay(this.model.get('show_subtitles_default'));
+		this.setTranscriptDisplay(this.model.get('show_transcript_default'));
                 this.scrollTranscriptToCurrentTime();
                 var subtitleSets = this.model.subtitles.where({'language': language});
                 if (subtitleSets.length) {
@@ -802,6 +804,26 @@
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
+            setSubtitlesDisplay: function(show) {
+		if (show) {
+                    this.$popSubtitlesContainer.show();
+                    this.$subtitlesButton.addClass('amara-button-enabled');
+		} else {
+                    this.$popSubtitlesContainer.hide();
+                    this.$subtitlesButton.removeClass('amara-button-enabled');
+		}
+                return false;
+            },
+            setTranscriptDisplay: function(show) {
+		if (show) {
+                this.$amaraTranscript.show();
+                this.$transcriptButton.addClass('amara-button-enabled');
+		} else {
+                this.$amaraTranscript.hide();
+                this.$transcriptButton.removeClass('amara-button-enabled');
+		}
+                return false;
+            },
             transcriptLineClicked: function(e) {
                 this.hideTranscriptContextMenu();
                 return false;
@@ -949,10 +971,13 @@
                 '                        <pre class="pre-small">' +
                 '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
-                '                        <p>You can disable parts of the controls and logos:</p>' +
+                '                        <p>You can set the following options:</p>' +
                 '                        <ul>' +
-                '                            <li>Hide the Amara logo by adding <code>data-hidelogo="true"</code> in the previous tag.</li>' +
-                '                            <li>Hide the menu item to order subtitles by adding <code>data-hideorder="true"</code> in the previous tag.</li>' +
+                '                            <li>Hide the Amara logo by adding <code>data-hide-logo="true"</code> in the previous tag.</li>' +
+                '                            <li>Hide the menu item to order subtitles by adding <code>data-hide-order="true"</code> in the previous tag.</li>' +
+                '                            <li>Set the initial active subtitle language by adding <code>data-initial-language="language"</code> in the previous tag, where language is the language code, such as "en" for English.</li>' +
+                '                            <li>Display the subtitles by default by adding <code>data-show-subtitles-default="true"</code> in the previous tag.</li>' +
+                '                            <li>Display the transcript by default by adding <code>data-show-transcript-default="true"</code> in the previous tag.</li>' +
                 '                        </ul>' +
 		'                    </div>' +
 		'                <div class="modal-footer">' +
@@ -1052,8 +1077,10 @@
                         'div': this,
                         'initial_language': $div.data('initial-language'),
                         'url': $div.data('url'),
-                        'show_logo': $div.data('hidelogo') ? false : true,
-                        'show_order_subtitles': $div.data('hideorder') ? false : true,
+                        'show_logo': $div.data('hide-logo') ? false : true,
+                        'show_order_subtitles': $div.data('hide-order') ? false : true,
+			'show_subtitles_default': $div.data('show-subtitles-default'),
+			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);
                 });
             }
