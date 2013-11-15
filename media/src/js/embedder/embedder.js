@@ -104,6 +104,7 @@
             subtitles: [], // Backbone collection
             url: '',
             show_logo: true,
+            show_order_subtitles: true,
             width: '',
 
             // Set from the Amara API
@@ -902,7 +903,7 @@
                 '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
                 '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
                 '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
-                '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://about.amara.org/order-subtitles/" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>';
+		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://about.amara.org/order-subtitles/" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
 	    },
 	    templateHTML: function() {
 		return '' +
@@ -948,7 +949,11 @@
                 '                        <pre class="pre-small">' +
                 '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
-		'                        <p>If you do not want the amara logo to appear, you can add <code>data-hidelogo="true"</code> in the previous tag.</p>' +
+                '                        <p>You can disable parts of the controls and logos:</p>' +
+                '                        <ul>' +
+                '                            <li>Hide the Amara logo by adding <code>data-hidelogo="true"</code> in the previous tag.</li>' +
+                '                            <li>Hide the menu item to order subtitles by adding <code>data-hideorder="true"</code> in the previous tag.</li>' +
+                '                        </ul>' +
 		'                    </div>' +
 		'                <div class="modal-footer">' +
 		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
@@ -1048,6 +1053,7 @@
                         'initial_language': $div.data('initial-language'),
                         'url': $div.data('url'),
                         'show_logo': $div.data('hidelogo') ? false : true,
+                        'show_order_subtitles': $div.data('hideorder') ? false : true,
                     }]);
                 });
             }
