@@ -975,7 +975,9 @@
                 '            </a>' +
                 '        </div>' +
                 '    </div>' +
-                '</div>'
+                '</div>' +
+		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
+	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>'
 	    }
         });
 
