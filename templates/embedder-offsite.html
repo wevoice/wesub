@@ -4,18 +4,7 @@
     <head>
         <title>Embedder test for external sites.</title>
         <meta charset="utf-8" />
-        <link rel="stylesheet" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" type="text/css" />
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-        <script type="text/javascript">
-            (function (window, document) {
-                var loader = function () {
-                    var script = document.createElement('script'), tag = document.getElementsByTagName('script')[0];
-                    script.src = "{% full_url_for 'embedder' %}";
-                    tag.parentNode.insertBefore(script, tag);
-                };
-                window.addEventListener ? window.addEventListener('load', loader, false) : window.attachEvent('onload', loader);
-            })(window, document);
-        </script>
+        {% include_bootstrapped_bundle 'embedder' %}
         <style type="text/css" media="screen">
             body {
                 margin: 20px 0 500px 0;
@@ -26,29 +15,38 @@
         </style>
     </head>
     <body>
-        <div class="container main">
-            <div class="navbar">
-                <div class="navbar-inner">
-                    <div class="container">
-                        <a class="brand" href="/embedder/">
-                            Amara Embedder
-                        </a>
-                        <ul class="nav pull-right">
-                            <li><a href="http://universalsubtitles.org">Amara (Universal Subtitles)</a></li>
-                            <li><a href="http://popcornjs.org">Popcorn.js</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+      <div class="container">
+        <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=5CKwCfLUwj4" ></div>
+        <hr>
+        <div class="navbar navbar-default">
+          <div class="navbar-header"><a class="navbar-brand" href="/embedder/">Amara Embedder</a>
+	  </div>
+	  <div>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="http://universalsubtitles.org">Amara (Universal Subtitles)</a></li>
+              <li><a href="http://popcornjs.org">Popcorn.js</a></li>
+            </ul>
+	  </div>
+        </div>
+
             <section class="main">
                 <h4>Note: this new Embedder is a work in progress.<br />It currently only supports YouTube, Vimeo, and HTML5 videos.</h4>
                 <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>
                 <script type="text/javascript" src="https://snipt.net/embed/b40956e6b61188ed54e001dc6382bf04/"></script>
                 <p>Step 2: paste this somewhere inside your HTML body, with the video URL, height, and width of your choosing:</p>
                 <script type="text/javascript" src="https://snipt.net/embed/0f2bd07c64809fab54ec2b2a7a9ea34d/"></script>
-                <p>Demo:</p>
-                <div class="amara-embed" style="height: 480px; width: 854px" data-url="http://www.youtube.com/watch?v=bNySL-ihAvo"></div>
+		<p>You can set the following options:</p>
+		<ul>
+		  <li>Hide the Amara logo by adding <code>data-hide-logo="true"</code> in the previous tag.</li>
+		  <li>Hide the menu item to order subtitles by adding <code>data-hide-order="true"</code> in the previous tag.</li>
+		  <li>Set the initial active subtitle language by adding <code>data-initial-language="language"</code> in the previous tag, where language is the language code, such as "en" for English.</li>
+		  <li>Display the subtitles by default by adding <code>data-show-subtitles-default="true"</code> in the previous tag.</li>
+		  <li>Display the transcript by default by adding <code>data-show-transcript-default="true"</code> in the previous tag.</li>
+		</ul>
             </section>
         </div>
+      <br />
+      <br />
+      <br />
     </body>
 </html>

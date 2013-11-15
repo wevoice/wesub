@@ -12,6 +12,7 @@ South==0.7
 easy-thumbnails==1.4
 Pillow==2.2.1
 six==1.4.1
+eventlet
 vendor/django-registration.tar.gz
 vendor/django-piston-0.2.3.tar.gz
 vendor/django-keyedcache.tar.gz
@@ -22,6 +23,7 @@ vendor/gdata-2.0.16.tar.gz
 vendor/django-math-captcha-0.1.tar.gz
 vendor/BeautifulSoup-3.2.0.tar.gz
 celery==3.0.11
+billiard==2.7.3.30
 django-celery==3.0.10
 vendor/pycrypto-2.1.0.tar.gz
 oauth==1.0.1

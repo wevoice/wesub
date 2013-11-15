@@ -10,6 +10,4 @@ RUN tar zxf apache-solr-3.5.0.tgz
 RUN rm apache-solr-3.5.0.tgz
 ADD schema.xml /opt/apache-solr-3.5.0/example/solr/conf/schema.xml
 
-EXPOSE 51001:8983
-
 CMD cd /opt/apache-solr-3.5.0/example && java -Dsolr.solr.home=solr -jar start.jar

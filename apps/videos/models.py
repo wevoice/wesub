@@ -41,6 +41,7 @@ from django.core.urlresolvers import reverse
 from auth.models import CustomUser as User, Awards
 from videos import behaviors
 from videos import metadata
+from videos import signals
 from videos.types import video_type_registrar
 from videos.feed_parser import VideoImporter
 from comments.models import Comment
@@ -197,7 +198,7 @@ class Video(models.Model):
         blank=True,
         upload_to='video/thumbnail/',
         thumb_sizes=(
-            (290,165),
+            (288,162),
             (120,90),))
     edited = models.DateTimeField(null=True, editable=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -368,7 +369,7 @@ class Video(models.Model):
 
         """
         if self.s3_thumbnail:
-            return self.s3_thumbnail.thumb_url(290, 165)
+            return self.s3_thumbnail.thumb_url(288, 162)
 
         if self.thumbnail:
             return self.thumbnail
@@ -1893,6 +1894,7 @@ class VideoFeed(models.Model):
     last_link = models.URLField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, blank=True, null=True)
+    team = models.ForeignKey("teams.Team", blank=True, null=True)
 
     YOUTUBE_PAGE_SIZE = 25
 
@@ -1900,11 +1902,11 @@ class VideoFeed(models.Model):
         return self.url
 
     def update(self):
-        importer = VideoImporter(self.user, self.user, self.last_link)
-        importer.import_videos()
+        importer = VideoImporter(self.url, self.user, self.last_link)
+        new_videos = importer.import_videos()
 
         if importer.last_link is not None:
             self.last_link = importer.last_link
             self.save()
-
-        return importer.checked_entries
+        signals.feed_imported.send(sender=self, new_videos=new_videos)
+        return new_videos

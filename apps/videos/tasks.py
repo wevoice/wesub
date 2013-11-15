@@ -16,7 +16,6 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 import logging
-from urllib import urlopen
 
 from celery.decorators import periodic_task
 from celery.schedules import crontab, timedelta
@@ -28,6 +27,7 @@ from django.core.files.base import ContentFile
 from django.db.models import ObjectDoesNotExist
 from haystack import site
 from raven.contrib.django.models import client
+import requests
 
 from babelsubs.storage import diff as diff_subtitles
 from messages.models import Message
@@ -42,7 +42,6 @@ from auth.models import CustomUser as User
 from videos.types import video_type_registrar
 from videos.types import UPDATE_VERSION_ACTION, DELETE_LANGUAGE_ACTION
 from apps.videos.types import VideoTypeError
-from videos.feed_parser import VideoImporter
 
 celery_logger = logging.getLogger('celery.task')
 
@@ -83,7 +82,7 @@ def cleanup():
     TaskState.objects.filter(tstamp__lt=d).delete()
     transaction.commit_unless_managed()
 
-@task(time_limit=2)
+@task(time_limit=20)
 def save_thumbnail_in_s3(video_id):
     try:
         video = Video.objects.get(pk=video_id)
@@ -91,7 +90,8 @@ def save_thumbnail_in_s3(video_id):
         return
 
     if video.thumbnail and not video.s3_thumbnail:
-        content = ContentFile(urlopen(video.thumbnail).read())
+        response = requests.get(video.thumbnail, timeout=15)
+        content = ContentFile(response.content)
         video.s3_thumbnail.save(video.thumbnail.split('/')[-1], content)
 
 @periodic_task(run_every=crontab(minute=0, hour=1))
@@ -210,30 +210,11 @@ def send_change_title_email(video_id, user_id, old_title, new_title):
                              context, fail_silently=not settings.DEBUG)
 
 @task()
-def import_videos_from_feeds(urls, user_id=None, team_id=None):
-    from teams.permissions import can_add_video
-    from teams.models import Team
-    try:
-        user = User.objects.get(id=user_id)
-    except ObjectDoesNotExist:
-        user = None
-    team = None
-    if user is not None:
-        try:
-            team = Team.objects.get(id=team_id)
-            if not can_add_video(team, user):
-                team = None
-        except Team.DoesNotExist:
-            pass
-
-    video_count = 0
-    for url in urls:
-        importer = VideoImporter(url, user, team=team)
-        importer.import_videos()
-        _save_video_feed(url, importer.last_link, user)
-        video_count += importer.video_count
-    if user and video_count > 0:
-        tasks.videos_imported_message.delay(user_id, video_count)
+def import_videos_from_feed(feed_id):
+    feed = VideoFeed.objects.get(id=feed_id)
+    new_videos = feed.update()
+    if feed.user is not None:
+        tasks.videos_imported_message.delay(feed.user.id, len(new_videos))
 
 @task()
 def upload_subtitles_to_original_service(version_pk):
@@ -426,17 +407,12 @@ def delete_captions_in_original_service_by_code(language_code, video_pk):
     ThirdPartyAccount.objects.mirror_on_third_party(
         video, language_code, DELETE_LANGUAGE_ACTION)
 
-def _save_video_feed(feed_url, last_entry_url, user):
+def _save_video_feed(feed_url, user):
     """ Creates or updates a videofeed given some url """
     try:
-        vf = VideoFeed.objects.get(url=feed_url)
+        return VideoFeed.objects.get(url=feed_url, user=user)
     except VideoFeed.DoesNotExist:
-        vf = VideoFeed(url=feed_url)
-
-    vf.user = user
-    vf.last_link = last_entry_url
-    vf.save()
-
+        return VideoFeed.objects.create(url=feed_url, user=user)
 
 @periodic_task(run_every=timedelta(seconds=300))
 def gauge_videos():

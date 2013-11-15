@@ -13,7 +13,7 @@
 
 {% block view_content %}
 
-    <div class="view grid_8 alpha">
+    <div class="view grid_8 omega">
         {% with 'videos' as current %}
             {% include 'teams/_tabs.html' %}
         {% endwith %}
@@ -25,7 +25,6 @@
                 {% include "_form_field.html" with field=form.youtube_user_url %}
 
                 {% smart_field_render form.feed_url %}
-                {% smart_field_render form.save_feed%}
             </fieldset>
             <div class="submit">
                 <button><span>{% trans 'Save' %}</span></button>

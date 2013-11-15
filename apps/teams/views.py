@@ -404,65 +404,86 @@ def _default_project_for_team(team):
         return None
 
 
+def _get_videos_for_detail_page(team, user, query, project, language_code,
+                                language_mode, sort):
+
+    kwargs = {
+        'language': None,
+        'exclude_language': None,
+        'num_completed_langs': None,
+        'user': user,
+        'project': project,
+        'query': query,
+        'sort': sort,
+    }
+    num_completed_langs = language = exclude_language = None
+    if language_mode == '+':
+        kwargs['language'] = language_code
+    elif language_mode == '-':
+        if language_code is not None:
+            kwargs['exclude_language'] = language_code
+        else:
+            kwargs['num_completed_langs'] = 0
+    else:
+        raise ValueError("invalid language_mode: %r" % (language_mode,))
+
+    return team.get_videos_for_languages_haystack(**kwargs)
+
 # Videos
 @timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
     team = Team.get(slug, request.user)
 
-    user = request.user if request.user.is_authenticated() else None
     try:
-        member = team.members.get(user=user)
+        member = team.get_member(request.user)
     except TeamMember.DoesNotExist:
         member = None
 
-    filtered = 0
-
-    if project_slug is None or project_slug == '':
-        project_slug = request.GET.get('project')
-
-    if project_slug:
-        if project_slug == 'any':
+    project_filter = (project_slug if project_slug is not None
+                      else request.GET.get('project'))
+    if project_filter:
+        if project_filter == 'any':
             project = None
         else:
             try:
-                project = Project.objects.get(team=team, slug=project_slug)
+                project = Project.objects.get(team=team, slug=project_filter)
             except Project.DoesNotExist:
                 project = None
     else:
         project = _default_project_for_team(team)
 
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     sort = request.GET.get('sort')
-    language = request.GET.get('lang'
-)
-    if language or project_slug:
-        filtered = filtered + 1
+    language_filter = request.GET.get('lang')
+    language_code = language_filter if language_filter != 'any' else None
+    language_mode = request.GET.get('lang-mode', '+')
+    filtered = bool(set(request.GET.keys()).intersection([
+        'project', 'lang', 'sort']))
 
-    if language != 'none':
-        qs = team.get_videos_for_languages_haystack(
-             language, user=request.user, project=project, query=query, sort=sort)
-    else:
-        qs = team.get_videos_for_languages_haystack(
-             num_completed_langs=0, user=request.user, project=project, query=query, sort=sort)
+    qs = _get_videos_for_detail_page(team, request.user, query, project,
+                                     language_code, language_mode, sort)
 
     extra_context = widget.add_onsite_js_files({})
-
-    extra_context['all_videos_count'] = team.get_videos_for_languages_haystack(
-        None, user=request.user, project=None, query=None, sort=sort).count()
-
     extra_context.update({
         'team': team,
         'member': member,
         'project':project,
+        'project_filter': project_filter,
+        'language_filter': language_filter,
+        'language_code': language_code,
+        'language_mode': language_mode,
+        'sort': sort,
         'can_add_video': can_add_video(team, request.user, project),
         'can_edit_videos': can_add_video(team, request.user, project),
-        'filtered': filtered
+        'filtered': filtered,
+        'all_videos_count': team.get_videos_for_user(request.user).count(),
     })
 
     if extra_context['can_add_video'] or extra_context['can_edit_videos']:
-        # Cheat and reduce the number of videos on the page if we're dealing with
-        # someone who can edit videos in the team, for performance reasons.
+        # Cheat and reduce the number of videos on the page if we're dealing
+        # with someone who can edit videos in the team, for performance
+        # reasons.
         is_editor = True
         per_page = 8
     else:
@@ -502,7 +523,6 @@ def detail(request, slug, project_slug=None, languages=None):
         extra_context['order_name'] = sort_names['-time']
 
     extra_context['current_videos_count'] = qs.count()
-    extra_context['filtered'] = filtered
 
     team_video_md_list, pagination_info = paginate(qs, per_page, request.GET.get('page'))
     extra_context.update(pagination_info)

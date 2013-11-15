@@ -140,6 +140,7 @@ var angular = angular || null;
     module.controller('SaveSessionController', function($scope, $q, SubtitleStorage, EditorData) {
 
         $scope.changesMade = false;
+        $scope.notesChanged = false;
         $scope.nextVersionNumber = null;
         $scope.fromOldEditor = Boolean(EditorData.oldEditorURL);
         $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
@@ -147,6 +148,10 @@ var angular = angular || null;
         if ($scope.fromOldEditor) {
             $scope.dialogURL = EditorData.oldEditorURL;
         }
+
+        $scope.saveDisabled = function() {
+            return !($scope.changesMade || $scope.notesChanged);
+        };
 
         $scope.discard = function() {
             $scope.showCloseModal(false);
@@ -172,9 +177,10 @@ var angular = angular || null;
                         $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
 
-                    }, function onError() {
+                    }, function onError(e) {
                         $scope.status = 'error';
                         $scope.showErrorModal();
+                        throw e;
                     });
                 }
             });
@@ -183,7 +189,7 @@ var angular = angular || null;
         $scope.save = function(options) {
             var defaults = {
                 force: false,
-                markComplete: null,
+                markComplete: undefined,
                 allowResume: true,
             }
             if(options !== undefined) {
@@ -191,7 +197,7 @@ var angular = angular || null;
             }
             options = defaults;
 
-            if(!$scope.changesMade && !options.markComplete &&!options.force) {
+            if(!$scope.changesMade && !$scope.notesChanged && !options.markComplete && !options.force) {
                 return;
             }
 
@@ -217,9 +223,10 @@ var angular = angular || null;
                         $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
                         
-                    }, function onError() {
+                    }, function onError(e) {
                         $scope.status = 'error';
                         $scope.showErrorModal();
+                        throw e;
                     });
 
                 }
@@ -233,37 +240,79 @@ var angular = angular || null;
             // changed, then we don't save anything and return the current
             // version number.
             var language = $scope.workingSubtitles.language;
-            if ($scope.status !== 'saving') {
+            var curentVersionNumber = $scope.workingSubtitles.versionNumber;
+            var markCompleteChanged = (markComplete !== undefined &&
+                    markComplete !== language.subtitlesComplete);
+
+            // saveSession may save the subtitles and/or save the task notes,
+            // but we don't know which up front, or none of those.  We handle
+            // that by chaining together promises.
+
+            // Start by either saving the subtitles, or simply returning the
+            // current version number.
+            $scope.status = 'saving';
+            if($scope.changesMade || markCompleteChanged) {
+                var promise = $scope.saveSubtitles(markComplete);
+                promise = promise.then(function onSuccess(response) {
+                    $scope.changesMade = false;
+                    // extract the version number from the JSON data
+                    return response.data.version_number;
+                });
+            } else {
                 var deferred = $q.defer();
-
-                if($scope.changesMade ||
-                        (markComplete !== undefined &&
-                         markComplete !== language.subtitlesComplete)) {
-                    // changes have been made, we need to save the subtitles
-                    $scope.status = 'saving';
-                    var promise = $scope.saveSubtitles(markComplete);
-                    promise.then(function onSuccess(response) {
-                        $scope.status = 'saved';
-                        $scope.changesMade = false;
-                        deferred.resolve(response.data.version_number);
-                    }, function onError(e) {
-                        $scope.status = 'error';
-                        $scope.showErrorModal();
-                        deferred.reject(e);
-                    });
-                } else {
-                    // no changes made, just return the current version
-                    $scope.status = 'saved';
-                    deferred.resolve($scope.workingSubtitles.versionNumber);
-                }
-
-                return deferred.promise;
+                deferred.resolve(curentVersionNumber);
+                var promise = deferred.promise;
             }
-        };
+            // chain on saving the notes on if needed
+            if($scope.notesChanged) {
+                promise = promise.then(function onSuccess(versionNumber) {
+                    var notes = $scope.getNotes();
+                    var promise2 = SubtitleStorage.updateTaskNotes(notes);
+                    return promise2.then(function onSuccess(result) {
+                        // ignore the result of updateTaskNotes() and just
+                        // return the version number.
+                        $scope.notesChanged = false;
+                        return versionNumber;
+                    });
+                });
+            }
+
+            // Finally update the scope status
+            return promise.then(function onSuccess(versionNumber) {
+                $scope.status = 'saved';
+                return versionNumber;
+            }, function onError(e) {
+                $scope.status = 'error';
+                $scope.showErrorModal();
+                throw e;
+            });
+        }
+
         function resumeEditing() {
             $scope.status = '';
             $scope.workingSubtitles.versionNumber = $scope.nextVersionNumber;
             $scope.nextVersionNumber = null;
+        }
+        function savedNewRevision() {
+            return ($scope.workingSubtitles.versionNumber !==
+                    $scope.nextVersionNumber);
+        }
+        function closeDialogTitle(allowResume) {
+            if($scope.status === 'saved') {
+                if(allowResume) {
+                    if (savedNewRevision()) {
+                        return "You've saved a new revision!";
+                    } else {
+                        return "You've saved task notes";
+                    }
+                } else {
+                    return "Subtitles saved";
+                }
+            } else if($scope.changesMade) {
+                return 'Your changes will be discarded.';
+            } else {
+                return 'You are leaving the editor';
+            }
         }
         $scope.showCloseModal = function(allowResume) {
             var buttons = [];
@@ -303,20 +352,8 @@ var angular = angular || null;
 
             }
 
-            if($scope.status === 'saved') {
-                if(allowResume) {
-                    var heading = "You've saved a new revision!";
-                } else {
-                    var heading = "Subtitles saved";
-                }
-            } else if($scope.changesMade) {
-                var heading = 'Your changes will be discarded.';
-            } else {
-                var heading = 'You are leaving the editor';
-            }
-
             $scope.$root.$emit('show-modal', {
-                heading: heading,
+                heading: closeDialogTitle(allowResume),
                 buttons: buttons
             });
         };
@@ -348,6 +385,9 @@ var angular = angular || null;
         });
         $scope.$root.$on('work-done', function() {
             $scope.changesMade = true;
+        });
+        $scope.$root.$on('notes-changed', function() {
+            $scope.notesChanged = true;
         });
 
         window.onbeforeunload = function() {
@@ -480,6 +520,7 @@ var angular = angular || null;
                     $scope.$root.$emit('scroll-to-subtitle', nextSubtitle);
                 }
                 evt.preventDefault();
+                evt.stopPropagation();
             } else if (evt.keyCode === 27) {
                 // Escape cancels editing
                 finishEdit(false);
@@ -487,19 +528,7 @@ var angular = angular || null;
                     subtitleList.removeSubtitle(subtitle);
                 }
                 evt.preventDefault();
-            } else if (evt.keyCode == 9) {
-                // Tab navigates to other subs
-                finishEdit(true);
-                if(!evt.shiftKey) {
-                    var targetSub = subtitleList.nextSubtitle(subtitle);
-                } else {
-                    var targetSub = subtitleList.prevSubtitle(subtitle);
-                }
-                if(targetSub !== null) {
-                    $scope.currentEdit.start(targetSub);
-                    $scope.$root.$emit('scroll-to-subtitle', targetSub);
-                }
-                evt.preventDefault();
+                evt.stopPropagation();
             }
         }
         

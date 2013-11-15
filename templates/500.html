@@ -3,9 +3,14 @@
 {% load feedback %}
 
 {% block main_content %}
-    {% error_feedback_form 500 %}
+
+<div id="error-page" class="grid_10 push_1">
+    <h1>We're sorry - you've encountered an error.</h1>
+
+    <p>Please help us fix it by filing a ticket at <a href="http://support.amara.org/support/home">our support center</a>.</p>
+    <br>
+
+    <p>Get back to <a href="/">amara.org</a></p>
+</div>
+
 {% endblock %}
-
-{% block feedback_form %}{% endblock %}
-
-{% block feedback-button %}{% endblock %}

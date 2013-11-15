@@ -82,7 +82,6 @@ var angular = angular || null;
 
     module.factory('SubtitleStorage', function($http, EditorData) {
 
-        var authHeaders = EditorData.authHeaders;
         // Map language codes to Language objects
         var languageMap = {};
         _.forEach(EditorData.languages, function(languageData) {
@@ -105,6 +104,21 @@ var angular = angular || null;
             });
         });
 
+        function authHeaders() {
+            var rv = {};
+            // The following code converts the values of
+            // EditorData.authHeaders into utf-8 encoded bytestrings to send
+            // back to the server.  The unescape/encodeURIComponent part seems
+            // pretty hacky, but it should work for all browsers
+            // (http://monsur.hossa.in/2012/07/20/utf-8-in-javascript.html)
+            for (var key in EditorData.authHeaders) {
+                var val = EditorData.authHeaders[key];
+                var utfVal = unescape(encodeURIComponent(val));
+                rv[key] = utfVal;
+            }
+            return rv;
+        }
+
 
         return {
             approveTask: function(versionNumber, notes) {
@@ -115,7 +129,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'PUT',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         complete: true,
                         body: notes,
@@ -125,6 +139,22 @@ var angular = angular || null;
 
                 return promise;
 
+            },
+            updateTaskNotes: function(notes) {
+
+                var url = getTaskSaveAPIUrl(EditorData.team_slug,
+                        EditorData.task_id);
+
+                var promise = $http({
+                    method: 'PUT',
+                    url: url,
+                    headers: authHeaders,
+                    data:  {
+                        body: notes,
+                    }
+                });
+
+                return promise;
             },
             getLanguages: function(callback) {
                 return _.values(languageMap);
@@ -174,7 +204,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'PUT',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         complete: true,
                         body: notes,
@@ -198,7 +228,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'POST',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         video: videoID,
                         language: languageCode,

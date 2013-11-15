@@ -22,55 +22,58 @@ from testhelpers.views import _create_videos
 from django.core import management
 
 
-class TestCaseAddRemoveEdit(WebdriverTestCase):
-    """
-    Main videos tab tests and Projects tab. 
-    """
+class TestCaseAddRemoveEdit(WebdriverTestCase):    
+    NEW_BROWSER_PER_TEST_CASE = False
 
-    def setUp(self):
-        super(TestCaseAddRemoveEdit, self).setUp()
-        #management.call_command('flush', interactive=False)
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseAddRemoveEdit, cls).setUpClass()
 
-        self.data_utils = data_helpers.DataHelpers()
-        self.logger.info("Create team and add 1 video")
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.logger.info("Create team and add 1 video")
 
-        self.team_owner = UserFactory.create()
-        self.team = TeamMemberFactory.create(
-            user = self.team_owner).team
+        cls.team_owner = UserFactory.create()
+        cls.team = TeamMemberFactory.create(
+            user = cls.team_owner).team
         
-        self.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
-            team = self.team,
+        cls.manager_user = TeamMemberFactory(role="ROLE_ADMIN",
+            team = cls.team,
             user = UserFactory(username = 'TeamAdmin')).user
-        self.videos_tab = videos_tab.VideosTab(self)
+        cls.videos_tab = videos_tab.VideosTab(cls)
         data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
                 'video__title': ('X Factor Audition - Stop Looking At My '
                                 'Mom Rap - Brian Bradley'),
                 'type': 'Y'
                }
-        self.test_video = self.data_utils.create_video(**data)
-        self.data_utils.add_subs(video=self.test_video)
+        cls.test_video = cls.data_utils.create_video(**data)
+        cls.data_utils.add_subs(video=cls.test_video)
         TeamVideoFactory.create(
-            team=self.team, 
-            video=self.test_video, 
-            added_by=self.manager_user)
+            team=cls.team, 
+            video=cls.test_video, 
+            added_by=cls.manager_user)
+        management.call_command('update_index', interactive=False)
+        cls.videos_tab.open_videos_tab(cls.team.slug)
 
-        self.videos_tab.open_videos_tab(self.team.slug)
 
-    def test_add__new(self):
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())
+
+    def test_add_new(self):
         """Submit a new video for the team.
 
         """
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY')
+            url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0')
         self.videos_tab.open_videos_tab(self.team.slug)
 
         self.assertTrue(self.videos_tab.video_present(
-            'Video Ranger Message (1950s) - Classic TV PSA'))
+            'What is up with Noises? (The Science and Mathematics'
+                        ' of Sound, Frequency, and Pitch)'))
 
 
-    def test_add__duplicate(self):
+    def test_add_duplicate(self):
         """Submit a video that is already in amara.
 
         """
@@ -82,7 +85,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
             'This video already belongs to a team.')
 
 
-    def test_add__team_duplicate(self):
+    def test_add_team_duplicate(self):
         """Duplicate videos are not added again.
 
         """
@@ -98,7 +101,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.assertEqual(self.videos_tab.error_message(), 
                          'This video already belongs to a team.')
 
-    def test_remove__site(self):
+    def test_remove_site(self):
         """Remove video from team and site, total destruction!
 
         Must be the team owner to get the team vs. site dialog.
@@ -110,6 +113,8 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
             team=self.team, 
             video = tv,
             added_by=self.manager_user)
+        management.call_command('update_index', interactive=False)
+
         #Search for the video in team videos and remove it.
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(tv.title)
@@ -131,7 +136,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.assertTrue(results_pg.search_has_no_results())
 
 
-    def test_remove__team_only(self):
+    def test_remove_team_only(self):
         """Remove video from team but NOT site.
 
         Must be the team owner to get the team vs. site dialog.
@@ -144,6 +149,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
             team=self.team, 
             video = tv,
             added_by=self.manager_user)
+        management.call_command('update_index', interactive=False)
 
         #Search for the video in team videos and remove it.
         self.videos_tab.open_videos_tab(self.team.slug)
@@ -168,7 +174,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.assertTrue(results_pg.search_has_results())
 
 
-    def test_edit__thumbnail(self):
+    def test_edit_thumbnail(self):
         """Upload a new thumbnail.
 
         """
@@ -176,6 +182,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         videos = self.data_utils.create_several_team_videos_with_subs(
             self.team, 
             self.manager_user)
+        management.call_command('update_index', interactive=False)
 
 
         self.videos_tab.log_in(self.team_owner.username, 'password')
@@ -189,7 +196,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.assertTrue(filecmp.cmp(new_thumb, site_thumb))
   
  
-    def test_edit__change_team(self):
+    def test_edit_change_team(self):
         """Edit a video, changing it from 1 team to another.
 
         """
@@ -199,6 +206,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         videos = self.data_utils.create_several_team_videos_with_subs(
             self.team, 
             self.manager_user)
+        management.call_command('update_index', interactive=False)
 
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.team.slug)
@@ -207,6 +215,8 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
             video=video_title,
             team = team2.name, 
             )
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.open_videos_tab(team2.slug)
         self.assertTrue(self.videos_tab.video_present(video_title))
 
@@ -250,13 +260,12 @@ class TestCaseSearch(WebdriverTestCase):
             team=cls.team, 
             video=cls.test_video, 
             added_by=cls.manager_user)
-
          
         management.call_command('update_index', interactive=False)
 
 
 
-    def test_search__title(self):
+    def test_search_title(self):
         """Team video search for title text.
 
         """
@@ -264,7 +273,7 @@ class TestCaseSearch(WebdriverTestCase):
         self.videos_tab.search('X Factor')
         self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
-    def test_search__updated_title(self):
+    def test_search_updated_title(self):
         """Team video search for title text after it has been updated.
 
         """
@@ -287,33 +296,7 @@ class TestCaseSearch(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_present(new_data['title']))
 
 
-    def test_search__metadata(self):
-        """Team video search for title text after it has been updated.
-
-        """
-        self.skipTest('Needs https://github.com/pculture/unisubs/issues/701')
-        tv = self.data_utils.create_video()
-
-
-        #Update the video title and description (via api)
-        url_part = 'videos/%s/' % tv.video_id
-        new_data = {'metadata': {'speaker-name': 'Ronaldo', 
-                                 'location': 'Portugal'}
-                   }
-        self.data_utils.make_request(self.team_owner, 'put', 
-                                     url_part, **new_data)
-        TeamVideoFactory(team=self.team, added_by=self.team_owner, video=tv)
-        #Update the solr index
-        management.call_command('update_index', interactive=False)
-
-
-        #Open team videos page and search for updated title text.
-        self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.search('Ronaldo')
-        self.assertTrue(self.videos_tab.video_present(tv.title))
-
-
-    def test_search__updated_description(self):
+    def test_search_updated_description(self):
         """Team video search for description text after it has been updated.
 
         """
@@ -333,7 +316,7 @@ class TestCaseSearch(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
 
-    def test_search__subs(self):
+    def test_search_subs(self):
         """Team video search for subtitle text.
 
         """
@@ -353,7 +336,7 @@ class TestCaseSearch(WebdriverTestCase):
                                     "('q')[1].value='日本語'")
         self.assertTrue(self.videos_tab.video_present(self.test_video.title))
 
-    def test_search__no_results(self):
+    def test_search_no_results(self):
         """Team video search returns no results.
 
         """
@@ -399,7 +382,9 @@ class TestCaseFilterSort(WebdriverTestCase):
             cls.manager_user)
         management.call_command('update_index', interactive=False)
 
-    def test_filter__clear(self):
+
+
+    def test_filter_clear(self):
         """Clear filters.
 
         """
@@ -407,6 +392,7 @@ class TestCaseFilterSort(WebdriverTestCase):
 
         #Filter so that no videos are present
         self.videos_tab.sub_lang_filter(language = 'French')
+        self.videos_tab.update_filters()
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
@@ -415,40 +401,58 @@ class TestCaseFilterSort(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
 
 
-    def test_filter__languages(self):
+    def test_filter_languages(self):
         """Filter team videos by language.
 
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.sub_lang_filter(language = 'Russian')
+        self.videos_tab.update_filters()
+
         self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
 
-    def test_filter__no_incomplete(self):
+    def test_filter_missing_languages(self):
+        """Filter team videos by language with no subtitles.
+
+        """
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.sub_lang_filter(language = 'Portuguese', has=False)
+        self.videos_tab.update_filters()
+
+        self.assertTrue(self.videos_tab.video_present('qs1-not-transback'))
+
+    def test_filter_no_incomplete(self):
         """Filter by language, incomplete subs are not in results. 
 
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.sub_lang_filter(language = ['Portuguese'])
+        self.videos_tab.update_filters()
+
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
 
-    def test_sort__name_ztoa(self):
+    def test_sort_name_ztoa(self):
         """Sort videos on team page reverse alphabet.
 
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.video_sort(sort_option = 'name, z-a')
+        self.videos_tab.update_filters()
+
         self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'qs1-not-transback')
 
-    def test_sort__time_oldest(self):
+    def test_sort_time_oldest(self):
         """Sort videos on team page by oldest.
 
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.video_sort(sort_option = 'time, oldest')
+        self.videos_tab.update_filters()
+
         self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
                          self.test_video.title)
@@ -460,7 +464,7 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseProjectsAddEdit, cls).setUpClass()
-        #management.call_command('flush', interactive=False)
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -493,7 +497,7 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
                         .format(cls.team.slug, cls.project2.slug))
 
 
-    def test_add__new(self):
+    def test_add_new(self):
         """Submit a new video for the team and assign to a project.
 
         """
@@ -501,21 +505,25 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
             self.project2.slug)
         self.videos_tab.open_page(project_page)
         self.videos_tab.add_video(
-            url = 'http://www.youtube.com/watch?v=MBfgEnIKQOY',
+            url = 'http://www.youtube.com/watch?v=i_0DXxNeaQ0',
             project = self.project2.name)
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.open_page(project_page)
-
-        #Verify the video is present on the videos tab for that project.
         self.assertTrue(self.videos_tab.video_present(
-            'Video Ranger Message (1950s) - Classic TV PSA'))    
+            'What is up with Noises? (The Science and Mathematics'
+                        ' of Sound, Frequency, and Pitch)'))
 
-    def test_search__simple(self):
+
+    def test_search_simple(self):
         """Peform a basic search on the project page for videos.
 
         """
         tv = self.videos_list[0]
-        self.videos_tab.open_page(self.project2_page)
+        self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.search(tv.title)
+        self.videos_tab.project_filter(project=self.project2.name)
+        self.videos_tab.update_filters()
         self.assertTrue(self.videos_tab.video_present(tv.title))
 
 
@@ -532,7 +540,7 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
             self.videos_tab.search_no_result())
 
 
-    def test_edit__change_project(self):
+    def test_edit_change_project(self):
         """Move a video from project2 to project 1.
 
         """
@@ -541,17 +549,19 @@ class TestCaseProjectsAddEdit(WebdriverTestCase):
         self.videos_tab.open_page(self.project2_page)
         self.videos_tab.edit_video(video=tv.title,
                                    project = self.project1.name)
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.open_page(self.project1_page)
         self.assertTrue(self.videos_tab.video_present(tv.title))
 
 
-class TestCaseProjectsFilterSort(WebdriverTestCase):
+class TestCaseProjectsFilter(WebdriverTestCase):
     NEW_BROWSER_PER_TEST_CASE = False
 
     @classmethod
     def setUpClass(cls):
-        super(TestCaseProjectsFilterSort, cls).setUpClass()
-        #management.call_command('flush', interactive=False)
+        super(TestCaseProjectsFilter, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.data_utils = data_helpers.DataHelpers()
         cls.videos_tab = videos_tab.VideosTab(cls)
         cls.team_owner = UserFactory.create()
@@ -584,30 +594,31 @@ class TestCaseProjectsFilterSort(WebdriverTestCase):
         cls.videos_tab.open_videos_tab(cls.team.slug)
         cls.videos_tab.log_in(cls.manager_user.username, 'password')
 
-
-
-    def test_filter__projects(self):
+    def test_filter_projects(self):
         """Filter video view by project.
 
         """
         
         self.videos_tab.open_videos_tab(self.team.slug)
-        self.videos_tab.project_filter(project = self.project1.name)
+        self.videos_tab.project_filter(project=self.project1.name)
+        self.videos_tab.update_filters()
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
 
-    def test_filter__languages(self):
+    def test_filter_languages(self):
         """Filter on the project page by language.
 
         """
-        project_page = 'teams/{0}/videos/?project={1}'.format(self.team.slug, 
-            self.project2.slug)
-        self.videos_tab.open_page(project_page)
+        self.videos_tab.open_videos_tab(self.team.slug)
+        self.videos_tab.project_filter(project=self.project2.name)
+        self.videos_tab.update_filters()
+
         self.videos_tab.sub_lang_filter(language = 'English')
+        self.videos_tab.update_filters()
         self.assertTrue(self.videos_tab.video_present('c'))
 
-    def test_sort__most_subtitles(self):
+    def test_sort_most_subtitles(self):
         """Sort on the project page by most subtitles.
 
         """
@@ -622,9 +633,10 @@ class TestCaseProjectsFilterSort(WebdriverTestCase):
                 video=video, 
                 added_by=self.manager_user,
                 project = self.project2)
-
+        management.call_command('update_index', interactive=False)
         self.videos_tab.open_page(project_page)
         self.videos_tab.video_sort(sort_option = 'most subtitles')
+        self.videos_tab.update_filters()
         self.videos_tab.videos_displayed()
         self.assertEqual(self.videos_tab.first_video_listed(), 
             'lots of translations')
@@ -660,6 +672,9 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         cls.videos_tab.open_page(cls.limited_access_team.slug)
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())
+
     def turn_on_automatic_tasks(self):
         self.logger.info('Turning on automatic task creation')
         #Turn on task autocreation for the team.
@@ -682,9 +697,11 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         vids = self.data_utils.create_several_team_videos_with_subs(
             team = self.limited_access_team,
             teamowner = self.team_owner)
+        management.call_command('update_index', interactive=False)
+
         return vids
 
-    def test_contributor__no_edit(self):
+    def test_contributor_no_edit(self):
         """Video policy: manager and admin; contributor sees no edit link.
 
         """
@@ -699,7 +716,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_contributor__edit_permission(self):
+    def test_contributor_edit_permission(self):
         """Video policy: all team members; contributor sees the edit link.
 
         """
@@ -721,7 +738,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_contributor__no_tasks(self):
+    def test_contributor_no_tasks(self):
         """Task policy: manager and admin; contributor sees no task link.
 
         """
@@ -738,7 +755,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 
                          'Tasks'))
 
-    def test_contributor__tasks_permission(self):
+    def test_contributor_tasks_permission(self):
         """Task policy: all team members; contributor sees the task link.
 
         """
@@ -759,7 +776,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
 
-    def test_manager__no_edit(self):
+    def test_manager_no_edit(self):
         """Video policy: admin only; manager sees no edit link.
 
         """
@@ -778,7 +795,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_manager__edit_permission(self):
+    def test_manager_edit_permission(self):
         """Video policy: manager and admin; manager sees the edit link.
 
         """
@@ -792,7 +809,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_manager__no_tasks(self):
+    def test_manager_no_tasks(self):
         """Task policy: admin only; manager sees no task link.
 
         """
@@ -810,7 +827,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_manager__tasks_permission(self):
+    def test_manager_tasks_permission(self):
         """Task policy: manager and admin; manager sees the task link.
 
         """
@@ -825,7 +842,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_restricted_manager__no_tasks(self):
+    def test_restricted_manager_no_tasks(self):
         """Task policy: manager and admin; language manager sees no task link.
 
         """
@@ -841,7 +858,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_restricted_manager__tasks(self):
+    def test_restricted_manager_tasks(self):
         """Task policy: all team members; language manager sees task link.
 
         """
@@ -861,7 +878,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_restricted_manager__no_edit(self):
+    def test_restricted_manager_no_edit(self):
         """Video policy: manager and admin; language manager sees no edit link.
 
         """
@@ -878,7 +895,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
 
-    def test_restricted_manager__edit(self):
+    def test_restricted_manager_edit(self):
         """Video policy: all team members; language manager sees edit link.
 
         """
@@ -900,7 +917,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
 
 
-    def test_nonmember__no_tasks(self):
+    def test_nonmember_no_tasks(self):
         """Task policy: all team members; non-member sees no tasks. 
 
         """
@@ -916,7 +933,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_nonmember__no_edit(self):
+    def test_nonmember_no_edit(self):
         """Video policy: all team members; non-memeber sees no edit.
 
         """
@@ -934,7 +951,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
 
-    def test_guest__no_tasks(self):
+    def test_guest_no_tasks(self):
         """Task policy: all team members; guest sees no tasks. 
 
         """
@@ -948,7 +965,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Tasks'))
 
-    def test_guest__no_edit(self):
+    def test_guest_no_edit(self):
         """Video policy: all team members; guest sees no edit.
 
         """
@@ -962,7 +979,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertFalse(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
 
-    def test_admin__edit_link(self):
+    def test_admin_edit_link(self):
         """Video policy: admin only; admin sees edit link.
 
         """
@@ -980,7 +997,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertTrue(self.videos_tab.video_has_link(vids[0].title, 'Edit'))
 
-    def test_admin__task_link(self):
+    def test_admin_task_link(self):
         """Task policy: admin only; admin sees task link.
 
         """
@@ -1008,6 +1025,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         #Add some test videos to the team.
         vids = self.add_some_team_videos()
+
         test_title = vids[0].title
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
@@ -1015,12 +1033,13 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         self.assertEqual(test_title, self.tasks_tab.filtered_video())
 
-    def test_languages__no_tasks(self):
+    def test_languages_no_tasks(self):
         """Without tasks, display number of completed languages for video.
 
         """
         #Add some test videos to the team.
         vids = self.add_some_team_videos()
+
         test_title = 'c'
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
@@ -1028,7 +1047,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertEqual('1 language', 
             self.videos_tab.displayed_languages(test_title))
 
-    def test_languages__automatic_tasks(self):
+    def test_languages_automatic_tasks(self):
         """With automatic tasks, display number of needed languages for video.
 
         """
@@ -1036,6 +1055,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         #Add some test videos to the team.
         vids = self.add_some_team_videos()
+
         test_title = 'c'
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
@@ -1043,7 +1063,7 @@ class TestCaseVideosDisplay(WebdriverTestCase):
         self.assertEqual('3 languages needed', 
             self.videos_tab.displayed_languages(test_title))
 
-    def test_pagination__admin(self):
+    def test_pagination_admin(self):
         """Check number of videos displayed per page for team admin.
 
         """
@@ -1052,11 +1072,13 @@ class TestCaseVideosDisplay(WebdriverTestCase):
                 team=self.limited_access_team, 
                 video=VideoFactory.create(), 
                 added_by=self.team_owner)
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.log_in(self.team_owner.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
         self.assertEqual(8, self.videos_tab.num_videos())
 
-    def test_pagination__user(self):
+    def test_pagination_user(self):
         """Check number of videos displayed per page for team contributor.
 
         """
@@ -1066,7 +1088,10 @@ class TestCaseVideosDisplay(WebdriverTestCase):
                 team=self.limited_access_team, 
                 video=VideoFactory.create(), 
                 added_by=self.team_owner)
+        management.call_command('update_index', interactive=False)
+
         self.videos_tab.log_in(contributor.username, 'password')
         self.videos_tab.open_videos_tab(self.limited_access_team.slug)
+        self.videos_tab._open_filters()
         self.assertEqual(16, self.videos_tab.num_videos())
 

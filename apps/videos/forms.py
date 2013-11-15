@@ -30,9 +30,9 @@ from django.utils.translation import ugettext_lazy as _
 from math_captcha.forms import MathCaptchaForm
 
 from apps.videos.feed_parser import FeedParser
-from apps.videos.models import Video, UserTestResult, VideoUrl
+from apps.videos.models import Video, VideoFeed, UserTestResult, VideoUrl
 from apps.videos.permissions import can_user_edit_video_urls
-from apps.videos.tasks import import_videos_from_feeds
+from apps.videos.tasks import import_videos_from_feed
 from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
@@ -214,8 +214,7 @@ class AddFromFeedForm(forms.Form, AjaxForm):
     usernames = UsernameListField(required=False, label=_(u'Youtube usernames'), help_text=_(u'Enter usernames separated by comma.'))
     youtube_user_url = StripRegexField(youtube_user_url_re, required=False, label=_(u'Youtube page link.'),
                                        help_text=_(u'For example: http://www.youtube.com/user/username'))
-    feed_url = FeedURLField(required=False, help_text=_(u'Supported: Youtube, Vimeo, or Dailymotion. Only supported sites added.'))
-    save_feed = forms.BooleanField(required=False, label=_(u'Save feed'), help_text=_(u'Choose this if you wish to add videos from this feed in the future. Only valid RSS feeds will be saved.'))
+    feed_url = FeedURLField(required=False, help_text=_(u'We support: rss 2.0 media feeds including Youtube, Vimeo, Dailymotion, and more.'))
 
     def __init__(self, user, *args, **kwargs):
         if not user.is_authenticated():
@@ -224,8 +223,8 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         super(AddFromFeedForm, self).__init__(*args, **kwargs)
 
         self.yt_service = yt_service
-        self.urls = []
         self.video_limit_routreach = False
+        self.urls = []
 
     def clean_feed_url(self):
         url = self.cleaned_data.get('feed_url', '')
@@ -259,6 +258,12 @@ class AddFromFeedForm(forms.Form, AjaxForm):
 
         if not hasattr(feed_parser.feed, 'version') or not feed_parser.feed.version:
             raise forms.ValidationError(_(u'Sorry, we could not find a valid feed at the URL you provided. Please check the URL and try again.'))
+        if url in self.urls:
+            raise forms.ValidationError(
+                _(u"Duplicate feed URL in form: {url}").format(url=url))
+        if VideoFeed.objects.filter(url=url).exists():
+            raise forms.ValidationError(
+                _(u'Feed for {url} already exists').format(url=url))
 
         self.urls.append(url)
 
@@ -266,10 +271,13 @@ class AddFromFeedForm(forms.Form, AjaxForm):
         return _(u"The videos are being added in the background. "
                  u"If you are logged in, you will receive a message when it's done")
 
-    def save(self, team=None):
-        user_id = self.user.id if self.user else None
-        team_id = team.id if team else None
-        import_videos_from_feeds.delay(self.urls, user_id, team_id)
+    def save(self):
+        for url in self.urls:
+            feed = self.make_feed(url)
+            import_videos_from_feed.delay(feed.id)
+
+    def make_feed(self, url):
+        return VideoFeed.objects.create(user=self.user, url=url)
 
 class FeedbackForm(forms.Form):
     email = forms.EmailField(required=False)

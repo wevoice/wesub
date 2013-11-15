@@ -3,9 +3,14 @@
 {% load feedback %}
 
 {% block main_content %}
-    {% error_feedback_form 404 %}
+
+<div id="error-page" class="grid_10 push_1">
+    <h1>We're sorry - the page you are trying to access does not exist.</h1>
+
+    <p>If you need help please see <a href="http://support.amara.org/support/home">our support center</a>.</p>
+        <br>
+
+    <p>Otherwise, get back to <a href="/">amara.org</a></p>
+</div>
+
 {% endblock %}
-
-{% block feedback_form %}{% endblock %}
-
-{% block feedback-button %}{% endblock %}
