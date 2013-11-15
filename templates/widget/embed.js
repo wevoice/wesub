@@ -55,7 +55,7 @@
     var scriptsToLoad = ["{{js_file}}"];
 
     var siteConfig = {
-        siteURL: 'http://{{current_site}}',
+        siteURL: 'http://{{current_site.domain}}',
         staticURL: '{{STATIC_URL}}'
     };
 
