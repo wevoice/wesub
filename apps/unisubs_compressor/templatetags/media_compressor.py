@@ -16,14 +16,17 @@
 # along with this program.  If not, see 
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
-from django import template
-
-register = template.Library()
-from django.conf import settings
-
 import logging
-logger = logging.getLogger(__name__)
+import string
 
+from django import template
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.contrib.sites.models import Site
+from urlparse import urlparse
+
+logger = logging.getLogger(__name__)
+register = template.Library()
 should_compress = None
 
 def should_include_js_base_dependencies(bundle_type, bundle):
@@ -41,13 +44,22 @@ def _bundle_output(bundle_name, bundle):
         raise ValueError("Don't know how to get bundle output for %s" %
                          bundle_name)
 
+def calc_should_compress_from_settings():
+    default = not getattr(settings, "DEBUG", False)
+    return getattr(settings, "COMPRESS_MEDIA", default)
+
+def calc_static_url():
+    if calc_should_compress_from_settings():
+        return settings.STATIC_URL
+    else:
+        return settings.STATIC_URL_BASE
+
 def _urls_for(bundle_name, should_compress):
     # if we want to turn off compilation at runtime (eg/ on javascript unit tests)
     # then we need to know the media url prior the the unique mungling
     media_url = settings.STATIC_URL
     if should_compress is None :
-        should_compress = getattr(settings, "COMPRESS_MEDIA",
-                                  not getattr(settings, "DEBUG", False))
+        should_compress = calc_should_compress_from_settings()
     else:
         should_compress = bool(should_compress)
         if bool(should_compress) is False:
@@ -78,14 +90,59 @@ def _urls_for(bundle_name, should_compress):
         if should_compress:
             logger.warning("could not find final url for %s" % bundle_name)
     return urls, media_url, bundle_type
+
+def render_links(files, media_url, bundle_type):
+    if bundle_type == 'css':
+        link_template = string.Template('<link rel="stylesheet" '
+                                        'type="text/css" '
+                                        'href="${media_url}${file}">')
+    elif bundle_type == 'js':
+        link_template = string.Template('<script type="text/javascript" '
+                                        'src="${media_url}${file}"></script>')
+    else:
+        raise ValueError("Unknown bundle type: %s" % bundle_type)
+
+    output = []
+    for file in files:
+        special_handler = _special_files_handlers.get(file)
+        if special_handler is None:
+            output.append(link_template.substitute(media_url=media_url,
+                                                   file=file))
+        else:
+            output.append(special_handler())
+    return "\n".join(output)
     
 @register.simple_tag
 def include_bundle(bundle_name, should_compress=None):
-    urls, media_url, bundle_type = _urls_for(bundle_name, should_compress)
-    return template.loader.render_to_string("uni_compressor/%s_links.html" % bundle_type,{
-        "urls": urls,
-        "adapted_media_url": media_url,
-        "bundle_type": bundle_type,
+    return render_links(*_urls_for(bundle_name, should_compress))
+
+@register.simple_tag
+def include_bootstrapped_bundle(bundle_name):
+    should_compress = calc_should_compress_from_settings()
+    if should_compress:
+        return include_bootstrapped_bundle_compressed(bundle_name)
+    else:
+        return include_bootstrapped_bundle_uncompressed(bundle_name)
+
+def include_bootstrapped_bundle_uncompressed(bundle_name):
+    media_url = settings.STATIC_URL
+    bundle_settings = settings.MEDIA_BUNDLES[bundle_name]
+    bootloader_settings = bundle_settings['bootloader']
+    files = list(bundle_settings['files'])
+    bootstrapped_file = bootloader_settings['file']
+    files.remove(bootstrapped_file)
+
+    bootloader = render_to_string("uni_compressor/bootloader.html", {
+        'url': media_url + bootstrapped_file,
+    })
+
+    links = render_links(files, media_url, 'js')
+
+    return "\n".join([links, bootloader])
+
+def include_bootstrapped_bundle_compressed(bundle_name):
+    return render_to_string("uni_compressor/bootloader.html", {
+        'url': full_url_for(bundle_name),
     })
 
 @register.simple_tag
@@ -96,3 +153,23 @@ def url_for(bundle_name, should_compress=True):
 def full_url_for(bundle_name, should_compress=True):
     urls, media_url, bundle_type = _urls_for(bundle_name, should_compress)
     return media_url + urls[0]
+
+
+# some of the files in our media settings bundle need to be handled specially
+# when we serve them uncompressed.  Instead of simply linking to them, we
+# should render the output of the special handler function.
+_special_files_handlers = {}
+
+def handle_special_file(filename):
+    def wrapper(func):
+        _special_files_handlers[filename] = func
+        return func
+    return wrapper
+
+@handle_special_file('src/js/embedder/conf.js')
+def render_embedder_conf():
+    script_src = render_to_string('embedder/conf.js', {
+        'current_site': urlparse(calc_static_url()).netloc,
+        'STATIC_URL': calc_static_url(),
+    })
+    return '<script type="text/javascript">%s</script>' % script_src

@@ -87,7 +87,7 @@
     }
 }
 div.amara-embed {
-    font: normal 14px Helvetica;
+    font: normal 14px;
 
     a {
         &:hover {
@@ -104,12 +104,13 @@ div.amara-embed {
             display: none;
             left: 0;
             position: absolute;
+            text-align: center;
 
             div {
                 background: rgba(0, 0, 0, .8);
                 color: #FFF;
-                font: bold 16px/22px Helvetica;
-                margin: 0 20px;
+                font: bold 16px/22px;
+                margin: 0;
                 padding: 12px 20px;
                 text-align: center;
                 @include border-radius(5px);
@@ -129,8 +130,16 @@ div.amara-embed {
             @include multi-border-radius(0, 0, 3px, 3px);
             @include vertical-gradient(#1B1C1D, #212223);
 
-            a.amara-button {
+            a.amara-logo {
                 background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
+            }
+            a.amara-transcript-button {
+                background: transparent url('../../images/glyphicons_029_notes_2.png') 0 7px no-repeat;
+            }
+            a.amara-subtitles-button {
+                background: transparent url('../../images/cc-icon-amara-18px.png') 10px 11px no-repeat;
+            }
+            a.amara-button {
                 display: inline-block;
                 height: 36px;
                 @include opacity(.5);
@@ -180,18 +189,23 @@ div.amara-embed {
                         width: 28px;
 
                         &.amara-transcript-button {
+/*
                             background-position: 7px -37px;
+                            margin-right: 3px;
 
                             &:active {
                                 background-position: 7px -36px;
                             }
+*/
                         }
                         &.amara-subtitles-button {
+/*
                             background-position: 6px -86px;
 
                             &:active {
                                 background-position: 6px -85px;
                             }
+*/
                         }
                     }
                 }
@@ -204,12 +218,11 @@ div.amara-embed {
                 padding: 0 10px;
                 position: relative;
                 width: 21%;
-
                 .amara-current-language {
                     background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
                     color: #DEDEDE;
                     display: block;
-                    font: normal 12px Tahoma;
+                    font: normal 12px;
                     height: 36px;
                     padding: 10px 20px 10px 5px;
                     overflow: hidden;
@@ -227,10 +240,8 @@ div.amara-embed {
                 }
                 ul.amara-languages-list {
                     background: #1D1E1F;
-                    display: none;
                     left: 0;
                     margin: 0;
-                    padding: 20px;
                     position: absolute;
                     top: 36px;
                     width: 100%;
@@ -239,14 +250,18 @@ div.amara-embed {
                         list-style-type: none;
 
                         a {
-                            color: #DEDEDE;
+                            color: #DFDFDF;
                             display: block;
-
+			    padding-left: 40px;
+			    text-decoration: none;
                             &:hover {
-                                color: #FFF;
+                                color: #222;
                             }
                         }
-                    }
+			a.currently-selected {
+			    font-weight: bold;
+			}
+                     }
                 }
             }
         }
@@ -270,22 +285,45 @@ div.amara-embed {
                     }
                     a.amara-transcript-autoscroll {
                         color: #9A9B9C;
-                        font: normal 12px Tahoma;
+                        font: normal 12px;
                         text-decoration: none;
                     }
                 }
                 div.amara-transcript-header-right {
                     float: right;
+                    position: relative;
 
-                    form {
-                        margin: 0;
+                    input {
+                        background: transparent;
+                        border: 0;
+                        border-left: 1px solid #DADBDC;
+                        font: normal 12px;
+                        padding: 12px;
+                    }
 
-                        input {
-                            background: transparent;
-                            border: 0;
-                            border-left: 1px solid #DADBDC;
-                            font: normal 12px Tahoma;
-                            padding: 12px;
+                    a {
+                        display: block;
+                        position: absolute;
+                        border-right: 6px solid transparent;
+                        border-left: 6px solid transparent;
+                        top: 50%;
+                        margin-top: -3px;
+                        display: none;
+
+                        &.amara-transcript-search-next {
+                            right: 11px;
+                            border-top: 6px solid #949596;
+                            &.disabled {
+                                border-top-color: #ced0d1;
+                            }
+                        }
+
+                        &.amara-transcript-search-prev {
+                            right: 30px;
+                            border-bottom: 6px solid #949596;
+                            &.disabled {
+                                border-bottom-color: #ced0d1;
+                            }
                         }
                     }
                 }
@@ -314,13 +352,12 @@ div.amara-embed {
                     @include border-radius();
 
                     &:hover {
-                        background: #D1D2D3;
+                        background: #CACBCC;
                         @include box-shadow(-4px, 0px, 0, #D1D2D3);
                     }
                     &.current-subtitle {
-                        background: #313233;
-                        color: #FFF;
-                        @include box-shadow(-4px, 0px, 0, #313233);
+                        background: #DADADA;
+                        @include box-shadow(-4px, 0px, 0, #DADADA);
                     }
                     &:after {
                         content: " ";
@@ -332,6 +369,16 @@ div.amara-embed {
                         background: #313233;
                         color: #FFF;
                         @include box-shadow(-4px, 0px, 0, #313233);
+                    }
+                    .search-match {
+                        background: #fcff9e;
+                        padding: 5px 0;
+                        margin: -5px 0;
+                        @include border-radius();
+                    }
+                    .current-search-match {
+                        border: 1px solid #bbbe68;
+                        margin: -5px -1px;
                     }
                 }
             }
@@ -355,10 +402,49 @@ div.amara-context-menu {
                 background: #FFF;
                 display: block;
                 color: #000;
-                font: normal 12px Tahoma;
+                font: normal 12px;
                 padding: 5px;
                 @include border-radius(2px);
             }
         }
     }
+}
+.dropdown-menu .unisubs-subtitle-homepage {
+     background: url("../../images/glyphicons_318_more_items.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-download-subtitles {
+     background: url("../../images/glyphicons_212_down_arrow.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .currently-selected-item {
+     background: url("../../images/glyphicons_206_ok_2.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-embed-link {
+     background: url("../../images/glyphicons_117_embed.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.dropdown-menu .unisubs-order-subtitles {
+     background: url("../../images/glyphicons_065_tag.png") no-repeat scroll 16px 7px rgba(0, 0, 0, 0) !important;
+}
+.pre-small {
+    font-size: 0.75em;
+}
+ul.dropdown-menu.amara-languages-list {
+    min-width: 250px;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+}
+ul.amara-languages-list > li {
+    margin-top: 5px;
+}
+#language-list-inside li a {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#language-list-inside {
+    max-height: 130px;
+    padding-left: 0px;
+    overflow: auto;
+}
+#language-list-inside li a:hover, 
+#language-list-inside li a:focus {
+    background-color: #F5F5F5;
 }

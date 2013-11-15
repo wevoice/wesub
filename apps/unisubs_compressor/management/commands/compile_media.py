@@ -24,6 +24,7 @@ from django.core.management.base import BaseCommand
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
+from urlparse import urlparse
 
 import optparse
 
@@ -425,7 +426,7 @@ class Command(BaseCommand):
     def _output_embed_to_dir(self, output_dir, version=''):
         file_name = 'embed{0}.js'.format(version)
         context = widget.add_offsite_js_files(
-            {'current_site': Site.objects.get_current(),
+            {'current_site': urlparse(settings.STATIC_URL).netloc,
              'STATIC_URL': get_cache_base_url() +"/",
              'COMPRESS_MEDIA': settings.COMPRESS_MEDIA,
              "js_file": get_cache_base_url() +"/js/unisubs-offsite-compiled.js" })
@@ -445,7 +446,7 @@ class Command(BaseCommand):
 
         file_name = os.path.join(JS_LIB, 'js/config.js')
 
-        context = {'current_site': Site.objects.get_current(),
+        context = {'current_site': urlparse(settings.STATIC_URL).netloc,
                    'STATIC_URL': get_cache_base_url()+ "/",
                    'COMPRESS_MEDIA': settings.COMPRESS_MEDIA }
         rendered = render_to_string(

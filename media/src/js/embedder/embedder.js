@@ -4,13 +4,48 @@
     // function. Set dependencies to use no-conflict mode to avoid destroying any
     // original objects.
     var __ = _.noConflict();
-    var _$ = Zepto;
+    var _$ = jQuery.noConflict();
     var _Backbone = Backbone.noConflict();
     var _Popcorn = Popcorn.noConflict();
 
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
+
+    function regexEscape(str) {
+        var specials = /[.*+?|()\[\]{}\\$^]/g; // .*+?|()[]{}\$^
+        return str.replace(specials, "\\$&");
+    }
+
+    function padWithZeros(number, width) {
+        var numString = number.toString();
+        var characters = [];
+
+        for(var i=numString.length; i < width; i++) {
+            characters.push("0");
+        }
+        characters.push(numString);
+        return characters.join('');
+    }
+
+    function formatTime(milliseconds) {
+        if(milliseconds === undefined || milliseconds === null || milliseconds < 0) {
+            return '';
+        }
+        var seconds = Math.floor(milliseconds / 1000);
+        var hours = Math.floor(seconds / 3600);
+        var minutes = Math.floor((seconds % 3600) / 60);
+
+        var timeParts = [];
+        if(hours > 0) {
+            timeParts.push(hours);
+            timeParts.push(padWithZeros(minutes, 2));
+        } else {
+            timeParts.push(minutes);
+        }
+        timeParts.push(padWithZeros(seconds % 60, 2));
+        return timeParts.join(":");
+    }
 
     var Amara = function(Amara) {
 
@@ -68,6 +103,10 @@
             is_on_amara: null,
             subtitles: [], // Backbone collection
             url: '',
+            show_logo: true,
+            show_order_subtitles: true,
+            show_subtitles_default: false,
+            show_transcript_default: false,
             width: '',
 
             // Set from the Amara API
@@ -160,12 +199,11 @@
         // Amara view. This contains all of the events and logic for a single instance of
         // an Amara-powered video.
         this.AmaraView = _Backbone.View.extend({
-
             initialize: function() {
                 this.model.view = this;
-                this.template = __.template(this.templateHTML);
+                this.template = __.template(this.templateHTML());
+                this.templateVideo = __.template(this.templateVideoHTML());
                 this.render();
-
                 // Default states.
                 this.states = {
                     autoScrolling: true,
@@ -180,11 +218,16 @@
                 'mousemove':                             'mouseMoved',
 
                 // Toolbar
-                'click a.amara-current-language':        'languageButtonClicked',
+//                'click a.amara-current-language':        'languageButtonClicked',
                 'click a.amara-share-button':            'shareButtonClicked',
                 'click a.amara-subtitles-button':        'toggleSubtitlesDisplay',
-                'click ul.amara-languages-list a':       'changeLanguage',
+                'click ul.amara-languages-list a.language-item':       'changeLanguage',
                 'click a.amara-transcript-button':       'toggleTranscriptDisplay',
+                'keyup input.amara-transcript-search':   'updateSearch',
+                'change input.amara-transcript-search':  'updateSearch',
+
+                'click a.amara-transcript-search-next':  'moveSearchNext',
+                'click a.amara-transcript-search-prev':  'moveSearchPrev',
 
                 // Transcript
                 'click a.amara-transcript-autoscroll':   'pauseAutoScroll',
@@ -196,6 +239,10 @@
                 // TODO: Split this monster of a render() into several render()s.
                 
                 var that = this;
+                this.subtitleLines = [];
+                this.currentSearch = '';
+                this.currentSearchIndex = 0;
+                this.currentSearchMatches = 0;
 
                 // If jQuery exists on the page, Backbone tries to use it and there's an odd
                 // bug if we don't convert it to a local Zepto object.
@@ -220,7 +267,7 @@
                 this.$el.height('auto');
 
                 // Init the Popcorn video.
-                this.pop = _Popcorn.smart(this.$popContainer.attr('id'), this.model.get('url'));
+                this.pop = this.loadPopcorn();
 
                 this.pop.on('loadedmetadata', function() {
 
@@ -230,7 +277,9 @@
 
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
-                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'),
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
+			original_video_url:  that.model.get('url'),
+			download_subtitle_url: '',
                         width: that.model.get('width')
                     }));
 
@@ -252,6 +301,7 @@
                     // We could just make this a callback on the model's initialize() for
                     // after we get a response, but there may be cases where we want to init
                     // a VideoModel separately from an AmaraView.
+                    that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
 
@@ -260,19 +310,16 @@
 
                                 // Build the language selection dropdown menu.
                                 that.buildLanguageSelector();
-
+                                // update the view on amara button
+                                that.$viewOnAmaraButton.attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
+                                _$('#amara-video-link').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + that.model.get('id'));
                                 // Make the request to fetch the initial subtitles.
                                 //
                                 // TODO: This needs to be an option.
-                                that.fetchSubtitles(that.model.get('initial_language'), function() {
-
-                                    // When we've got a response with the subtitles, start building
-                                    // out the transcript viewer and subtitles.
-                                    that.buildTranscript(that.model.get('initial_language'));
-                                    that.buildSubtitles(that.model.get('initial_language'));
-                                });
+                                that.loadSubtitles(that.model.get('initial_language'));
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
+                                that.setCurrentLanguageMessage('Video not on Amara');
                             }
                         }
                     );
@@ -280,6 +327,20 @@
 
                 return this;
 
+            },
+            loadPopcorn: function() {
+                var url = this.model.get('url');
+                // For youtube, we need to alter the URL to enable controls.
+                if(url.indexOf('youtube.com') != -1) {
+                    if(url.indexOf('?') == -1) {
+                        url += '?controls=1';
+                    } else {
+                        url += '&controls=1';
+                    }
+                }
+                pop = _Popcorn.smart(this.$popContainer.attr('id'), url);
+                pop.controls(true);
+                return pop;
             },
 
             // View methods.
@@ -292,22 +353,48 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
+                langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
+                var video_url = this.model.get('url');
+                this.$amaraLanguagesList.append(this.templateVideo({
+                        video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
+		}));
+                this.$amaraLanguagesList.append('            <li role="presentation" class="divider"></li>');
+		// TODO: This wont work if we have several widgets in one page
+                this.$amaraLanguagesList.append('            <li role="presentation"><div><ul id="language-list-inside"></ul></div></li>');
+                
+
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
-                        this.$amaraLanguagesList.append('' +
-                            '<li>' +
-                                '<a href="#" data-language="' + langs[i].code + '">' +
+                        _$('#language-list-inside').append('' +
+                            '<li role="presentation">' +
+                                '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
                                     langs[i].name +
                                 '</a>' +
                             '</li>');
                     }
+		    // Scrollbar for languages only
+		    _$('#language-list-inside').mCustomScrollbar({
+			theme:"light-thick"
+		    });
+		    // When the user clicks on the scrollbar, don't close the dropdown
+		    _$(".mCSB_scrollTools").click(function( event ) {
+			event.stopPropagation();
+		    });
+		    // When the menu opens, we scroll to the selected language
+		    _$('.dropdown').on('shown.bs.dropdown', function () {
+			_$("#language-list-inside").mCustomScrollbar("update");
+			_$("#language-list-inside").mCustomScrollbar("scrollTo",".currently-selected");
+		    });
                 } else {
                     // We have no languages.
                 }
             },
+            setCurrentLanguageMessage: function(text) {
+                this.$amaraCurrentLang.text(text);
+                // Hide the expander triangle
+                this.$amaraCurrentLang.css('background-image', 'none');
+            },
             buildSubtitles: function(language) {
-
-                this.$amaraCurrentLang.text('Loading…');
 
                 // Remove any existing subtitle events.
                 this.pop.removePlugin('amarasubtitle');
@@ -330,26 +417,25 @@
                     // For each subtitle, init the Popcorn subtitle plugin.
                     for (var i = 0; i < subtitles.length; i++) {
                         this.pop.amarasubtitle({
-                            start: subtitles[i].start,
-                            end: subtitles[i].end,
+                            start: subtitles[i].start / 1000.0,
+                            end: subtitles[i].end / 1000.0,
                             text: subtitles[i].text
                         });
                     }
 
                     this.$popSubtitlesContainer = _$('div.amara-popcorn-subtitles', this.$el);
 
-                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
                 }
             },
             buildTranscript: function(language) {
 
                 var that = this;
 
-                this.$amaraCurrentLang.text('Loading…');
+                this.setCurrentLanguageMessage('Loading…');
 
-                // Remove any existing transcript events.
-                this.pop.removePlugin('amaratranscript');
-                
+                // remove plugins added for previous languages
+                this.pop.removePlugin('code');
+
                 // TODO: This is a temporary patch for Popcorn bug http://bit.ly/NShGdX
                 //
                 // (we think)
@@ -358,7 +444,6 @@
 
                 // Get the subtitle sets for this language.
                 var subtitleSets = this.model.subtitles.where({'language': language});
-
                 if (subtitleSets.length) {
                     var subtitleSet = subtitleSets[0];
 
@@ -368,51 +453,72 @@
                     // Remove the loading indicator.
                     this.$transcriptBody.html('');
 
-                    // For each subtitle, init the Popcorn transcript plugin.
                     for (var i = 0; i < subtitles.length; i++) {
-
-                        this.pop.amaratranscript({
-                            start: subtitles[i].start,
-                            startClean: utils.parseFloatAndRound(subtitles[i].start),
-                            startOfParagraph: subtitles[i].start_of_paragraph,
-                            end: subtitles[i].end,
-                            text: subtitles[i].text,
-                            container: this.$transcriptBody.get(0),
+                        var line = this.addSubtitleLine(subtitles[i]);
+                        this.pop.code({
+                            start: subtitles[i].start / 1000.0,
+                            end: subtitles[i].end / 1000.0,
+                            line: line,
                             view: this,
-                            _$: _$
+                            onStart: function(options) {
+                                options.line.classList.add('current-subtitle');
+                                options.view.autoScrollToLine(options.line);
+                            },
+                            onEnd: function(options) {
+                                options.line.classList.remove('current-subtitle');
+                            }
                         });
-
                     }
 
-                    this.$amaraCurrentLang.text(this.getLanguageNameForCode(subtitleSet.get('language')));
-
-                    // If we're in the middle of the video, we'll have an active transcript plugin
-                    // ready to scroll to.
-
-                    // Get the currently running amaratranscript plugin instances.
-                    var currentPluginInstances = this.pop.data.running.amaratranscript;
-
-                    if (currentPluginInstances.length) {
-
-                        // Scroll to the current subtitle.
-                        this.scrollToLine(currentPluginInstances[0]);
-
-                    }
-
-                    this.$amaraTranscriptLines = $('a.amara-transcript-line', this.$transcriptBody);
+                    this.$amaraTranscriptLines = _$('a.amara-transcript-line', this.$transcriptBody);
 
                 } else {
-                    _$('.amara-transcript-line-right', this.$transcriptBody).text('No subtitles available.');
+                    _$('.amara-transcript-line', this.$transcriptBody).text('No subtitles available.');
                 }
+            },
+            addSubtitleLine: function(subtitle) {
+                // Construct the transcript line.
+                var line = document.createElement('a');
+                line.href = '#';
+                line.classList.add('amara-transcript-line');
+                line.innerHTML = subtitle.text;
+                line.title = formatTime(subtitle.start);
+
+                var container = this.$transcriptBody.get(0);
+                // If this subtitle has indicated that it's the beginning of a
+                // paragraph, prepend two line breaks before the subtitle.
+                if (subtitle.start_of_paragraph) {
+                    container.appendChild(document.createElement('br'));
+                    container.appendChild(document.createElement('br'));
+                }
+                // Clicking the link should seek to its time.
+                var pop = this.pop;
+                line.addEventListener('click', function(e) {
+                    pop.currentTime(subtitle.start / 1000.0);
+                    e.preventDefault();
+                    return false;
+                }, false);
+                // Add the subtitle to the transcript container.
+                container.appendChild(line);
+                this.subtitleLines.push({
+                    line: line,
+                    subtitle: subtitle,
+                });
+                return line;
             },
             cacheNodes: function() {
                 this.$amaraTools         = _$('div.amara-tools',      this.$el);
                 this.$amaraBar           = _$('div.amara-bar',        this.$amaraTools);
                 this.$amaraTranscript    = _$('div.amara-transcript', this.$amaraTools);
 
+                this.$viewOnAmaraButton   = _$('a.amara-logo', this.$amaraBar);
                 this.$amaraDisplays      = _$('ul.amara-displays',         this.$amaraTools);
                 this.$transcriptButton   = _$('a.amara-transcript-button', this.$amaraDisplays);
                 this.$subtitlesButton    = _$('a.amara-subtitles-button',  this.$amaraDisplays);
+                this.$transcriptHeaderRight = _$('div.amara-transcript-header-right', this.$amaraTranscript);
+                this.$search              = _$('input.amara-transcript-search', this.$transcriptHeaderRight);
+                this.$searchNext          = _$('a.amara-transcript-search-next', this.$transcriptHeaderRight);
+                this.$searchPrev          = _$('a.amara-transcript-search-prev', this.$transcriptHeaderRight);
 
                 this.$amaraLanguages     = _$('div.amara-languages',       this.$amaraTools);
                 this.$amaraCurrentLang   = _$('a.amara-current-language',  this.$amaraLanguages);
@@ -427,21 +533,42 @@
                 var that = this;
                 var language = _$(e.target).data('language');
 
+                this.loadSubtitles(language);
+            },
+            loadSubtitles: function(language) {
+                // If we've already fetched subtitles for this language, don't
+                // fetch them again.
                 var subtitleSets = this.model.subtitles.where({'language': language});
-
-                // If we've already fetched subtitles for this language, don't fetch them again.
+                var that = this;
                 if (subtitleSets.length) {
-                    this.buildTranscript(language);
-                    this.buildSubtitles(language);
+                    this.setCurrentLanguage(language);
                 } else {
                     this.fetchSubtitles(language, function() {
-                        that.buildTranscript(language);
-                        that.buildSubtitles(language);
+                        that.setCurrentLanguage(language);
                     });
                 }
-
-                this.$amaraLanguagesList.hide();
-                return false;
+            },
+            setCurrentLanguage: function(language) {
+                this.buildTranscript(language);
+                this.buildSubtitles(language);
+		this.setSubtitlesDisplay(this.model.get('show_subtitles_default'));
+		this.setTranscriptDisplay(this.model.get('show_transcript_default'));
+                this.scrollTranscriptToCurrentTime();
+                var subtitleSets = this.model.subtitles.where({'language': language});
+                if (subtitleSets.length) {
+                    var languageCode = subtitleSets[0].get('language');
+                    var languageName = this.getLanguageNameForCode(languageCode);
+		    _$('ul.amara-languages-list a').removeClass('currently-selected');
+		    this.$amaraLanguagesList.find("[data-language='" + language + "']").addClass('currently-selected');
+                    this.$amaraCurrentLang.text(languageName);
+                    _$('#amara-download-subtitles').attr('href', 'http://' + _amaraConf.baseURL + '/en/videos/' + this.model.get('id') + '/' + languageCode);
+		    _$('ul.amara-languages-list li').removeClass('currently-selected-item');
+		    _$('.currently-selected').parent().addClass('currently-selected-item');
+                    // Show the expander triangle
+                    this.$amaraCurrentLang.css('background-image', '');
+                } else {
+                    this.setCurrentLanguageMessage('');
+                }
             },
             fetchSubtitles: function(language, callback) {
                 // Make a call to the Amara API and retrieve a set of subtitles for a specific
@@ -479,7 +606,12 @@
                         );
 
                         // Call the callback.
-                        callback(resp);
+                        callback();
+                    },
+                    error: function() {
+                        // We should handle errors better here, but simply
+                        // invoking the callback works okay for now.
+                        callback();
                     }
                 });
             },
@@ -539,16 +671,7 @@
 
                 // If we're no longer paused, scroll to the currently active subtitle.
                 if (!isNowPaused) {
-                    
-                    // Get the currently running amaratranscript plugin instances.
-                    var currentPluginInstances = this.pop.data.running.amaratranscript;
-
-                    if (currentPluginInstances.length) {
-
-                        // Scroll to the current subtitle.
-                        this.scrollToLine(currentPluginInstances[0]);
-                    }
-
+                    this.scrollTranscriptToCurrentTime();
                 } else {
 
                     // If we're moving from a scrolling state to a paused state,
@@ -571,36 +694,39 @@
                 
                 return false;
             },
-            scrollToLine: function(pluginInstance) {
-                // Scroll the transcript container to the line, and bring the line to the center
-                // of the vertical height of the container.
-                //
-                //     * pluginInstance (amaratranscript plugin instance)
-
-                // Only scroll to line if the auto-scroll is not paused.
+            autoScrollToLine: function(transcriptLine) {
                 if (!this.states.autoScrollPaused) {
-
-                    // Retrieve the absolute positions of the line and the container.
-                    var linePos = _$(pluginInstance.line).offset();
-                    var containerPos = _$(pluginInstance.container).offset();
-
-                    // The difference in top-positions between the line and the container.
-                    var diffY = linePos.top - containerPos.top;
-
-                    // The available vertical space within the container.
-                    var spaceY = pluginInstance.container.clientHeight - pluginInstance.line.offsetHeight;
-
-                    // Set the scrollTop of the container to the difference in top-positions,
-                    // plus the existing scrollTop, minus 50% of the available vertical space.
-                    var oldScrollTop = pluginInstance.container.scrollTop;
-                    var newScrollTop = oldScrollTop + (diffY - (spaceY / 2));
-
-                    // We need to tell our transcript tracking to ignore this scroll change,
-                    // otherwise our scrolling detector would trigger the auto-scroll to stop.
-                    this.states.autoScrolling = true;
-                    pluginInstance.container.scrollTop = newScrollTop;
+                    this.scrollToLine(transcriptLine);
                 }
+            },
+            scrollToLine: function(transcriptLine) {
+                // Scroll the transcript container to the line, and bring the
+                // line to the center of the vertical height of the container.
 
+                var $line = _$(transcriptLine);
+                var $container = this.$transcriptBody;
+
+                var lineTop = $line.offset().top - $container.offset().top;
+                var lineHeight = $line.height();
+                var containerHeight = $container.height();
+                var oldScrollTop = $container.prop('scrollTop');
+                // We need to tell our transcript tracking to ignore this
+                // scroll change, otherwise our scrolling detector would
+                // trigger the auto-scroll to stop.
+                this.states.autoScrolling = true;
+                $container.prop('scrollTop', oldScrollTop + lineTop -
+                        (containerHeight / 2) + (lineHeight / 2));
+            },
+            scrollTranscriptToCurrentTime: function() {
+                var currentTime = this.pop.currentTime() * 1000;
+                // For each subtitle, init the Popcorn transcript plugin.
+                for (var i = 0; i < this.subtitleLines.length; i++) {
+                    var subtitleLine = this.subtitleLines[i];
+                    if(subtitleLine.subtitle.start >= currentTime) {
+                        this.scrollToLine(subtitleLine.line);
+                        break;
+                    }
+                }
             },
             setCursorPosition: function(e) {
                 this.cursorX = e.pageX;
@@ -678,6 +804,26 @@
                 this.$transcriptButton.toggleClass('amara-button-enabled');
                 return false;
             },
+            setSubtitlesDisplay: function(show) {
+		if (show) {
+                    this.$popSubtitlesContainer.show();
+                    this.$subtitlesButton.addClass('amara-button-enabled');
+		} else {
+                    this.$popSubtitlesContainer.hide();
+                    this.$subtitlesButton.removeClass('amara-button-enabled');
+		}
+                return false;
+            },
+            setTranscriptDisplay: function(show) {
+		if (show) {
+                this.$amaraTranscript.show();
+                this.$transcriptButton.addClass('amara-button-enabled');
+		} else {
+                this.$amaraTranscript.hide();
+                this.$transcriptButton.removeClass('amara-button-enabled');
+		}
+                return false;
+            },
             transcriptLineClicked: function(e) {
                 this.hideTranscriptContextMenu();
                 return false;
@@ -685,6 +831,82 @@
             transcriptScrolled: function() {
                 this.hideTranscriptContextMenu();
                 this.pauseAutoScroll(true);
+            },
+            updateSearch: function() {
+                var text = this.$search.val().trim();
+                if(text != this.currentSearch) {
+                    this.removeSearchSpans();
+                    if(text) {
+                        this.addSearchSpans(text);
+                    }
+                    this.currentSearch = text;
+                    this.currentSearchIndex = 0;
+                    this.currentSearchMatches = _$('span.search-match', this.$transcriptBody).length;
+                    this.updateSearchCurrentMatch();
+                }
+                return false;
+            },
+            addSearchSpans: function(text) {
+                var replacementText = '<span class="search-match">$1</span>';
+                for(var i = 0; i < this.subtitleLines.length; i++) {
+                    var line = this.subtitleLines[i].line;
+                    var regex = new RegExp('(' + regexEscape(text) + ')', 'gi');
+                    line.innerHTML = line.innerHTML.replace(regex,
+                            replacementText);
+                }
+            },
+            removeSearchSpans: function() {
+                for(var i = 0; i < this.subtitleLines.length; i++) {
+                    var line = this.subtitleLines[i].line;
+                    var subtitle = this.subtitleLines[i].subtitle;
+                    line.innerHTML = subtitle.text;
+                }
+            },
+            moveSearchNext: function(evt) {
+                this.currentSearchIndex = Math.min(this.currentSearchIndex + 1, this.currentSearchMatches - 1);
+                this.updateSearchCurrentMatch();
+                evt.preventDefault();
+                return false;
+            },
+            moveSearchPrev: function(evt) {
+                this.currentSearchIndex = Math.max(this.currentSearchIndex - 1, 0);
+                this.updateSearchCurrentMatch();
+                evt.preventDefault();
+                return false;
+            },
+            updateSearchCurrentMatch: function() {
+                if(this.currentSearchMatches > 0) {
+                    this.showSearchArrows();
+                } else {
+                    this.hideSearchArrows();
+                }
+                if(this.currentSearchIndex == 0) {
+                    this.$searchPrev.addClass('disabled');
+                } else {
+                    this.$searchPrev.removeClass('disabled');
+                }
+                if(this.currentSearchIndex == this.currentSearchMatches - 1) {
+                    this.$searchNext.addClass('disabled');
+                } else {
+                    this.$searchNext.removeClass('disabled');
+                }
+                _$('span.current-search-match', this.$transcriptBody).removeClass('current-search-match');
+                var that = this;
+                _$('span.search-match', this.$transcriptBody)
+                    .eq(this.currentSearchIndex)
+                    .addClass('current-search-match')
+                    .each(function(index, span) {
+                        that.scrollToLine(span.parentElement);
+
+                    });
+            },
+            showSearchArrows: function() {
+                this.$searchNext.show();
+                this.$searchPrev.show();
+            },
+            hideSearchArrows: function() {
+                this.$searchNext.hide();
+                this.$searchPrev.hide();
             },
             waitUntilVideoIsComplete: function(callback) {
 
@@ -698,31 +920,82 @@
                     callback();
                 }
             },
-
-            templateHTML: '' +
+	    templateVideoHTML: function() {
+                return '' +
+                '<li role="presentation" class="unisubs-subtitle-homepage"><a role="menuitem" tabindex="-1" id="amara-video-link" href="{{ video_url }}" target="blank" title="Improve these subtitles on amara.org">Improve these Subtitles</a></li>' +
+                '<li role="presentation" class="unisubs-embed-link"><a role="menuitem" tabindex="-1" id="amara-embed-link" href="" data-toggle="modal" data-target="#embed-code-modal" title="Get the embed code">Get Embed Code</a></li>' +
+                '<li role="presentation" class="unisubs-download-subtitles"><a role="menuitem" tabindex="-1" id="amara-download-subtitles" href="{{ video_url }}" target="blank" title="Download subtitles from amara.org">Download Subtitles</a></li>' +
+		(this.model.get('show_order_subtitles') ? '<li role="presentation" class="unisubs-order-subtitles"><a role="menuitem" tabindex="-1" href="http://about.amara.org/order-subtitles/" target="blank" title="Order Captions or Subtitles">Order Captions or Subtitles</a></li>' : '');
+	    },
+	    templateHTML: function() {
+		return '' +
                 '<div class="amara-tools" style="width: {{ width }}px;">' +
                 '    <div class="amara-bar amara-group">' +
-                //'        <a href="#" class="amara-share-button amara-button"></a>' +
-                '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' +
+                (this.model.get('show_logo') ? '        <a href="{{ video_url }}" target="blank" class="amara-logo amara-button" title="View this video on Amara.org in a new window">Amara</a>' : '') +
                 '        <ul class="amara-displays amara-group">' +
                 '            <li><a href="#" class="amara-transcript-button amara-button" title="Toggle transcript viewer"></a></li>' +
                 '            <li><a href="#" class="amara-subtitles-button amara-button" title="Toggle subtitles"></a></li>' +
                 '        </ul>' +
-                '        <div class="amara-languages">' +
-                '            <a href="#" class="amara-current-language">Loading&hellip;</a>' +
-                '            <ul class="amara-languages-list"></ul>' +
+		'        <div class="dropdown amara-languages">' +
+                '            <a class="amara-current-language" id="dropdownMenu1" role="button" data-toggle="dropdown" data-target="#" href="">Loading&hellip;<span class="caret"></span>' +
+                '            </a>'+
+                '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
                 '    </div>' +
+                '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
+		'        <div class="modal-dialog">' +
+		'            <div class="modal-content">' +
+		'                <div class="modal-header">' +
+		'                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
+		'                    <h4 class="modal-title" id="myModalLabel">Embed Video</h4>' +
+		'                </div>' +
+		'                <div class="modal-body">' +    
+		'                    <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>' +
+                '                        <pre class="pre-small">' +
+                '&lt;script type="text/javascript"&gt;\n' +
+                '(function (window, document) {\n' +
+                '  var loader = function () {\n' +
+                '    var script = document.createElement("script"),\n' +
+                '                 tag = document.getElementsByTagName("script")[0];\n' +
+                '    script.src =\n' +
+                '      "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";\n' +
+                '    tag.parentNode.insertBefore(script, tag);\n' +
+                '  };\n' +
+                '  window.addEventListener ?\n' +
+                '    window.addEventListener("load", loader, false) :\n' +
+                '    window.attachEvent("onload", loader);\n' +
+                '})(window, document);\n' +
+                '&lt;/script&gt;' +
+                '                        </pre>' +
+                '                        <p>Step 2: paste this somewhere inside your HTML body, with the height and width of your choosing:</p>' +
+                '                        <pre class="pre-small">' +
+                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
+                '                        </pre>' +
+                '                        <p>You can set the following options:</p>' +
+                '                        <ul>' +
+                '                            <li>Hide the Amara logo by adding <code>data-hide-logo="true"</code> in the previous tag.</li>' +
+                '                            <li>Hide the menu item to order subtitles by adding <code>data-hide-order="true"</code> in the previous tag.</li>' +
+                '                            <li>Set the initial active subtitle language by adding <code>data-initial-language="language"</code> in the previous tag, where language is the language code, such as "en" for English.</li>' +
+                '                            <li>Display the subtitles by default by adding <code>data-show-subtitles-default="true"</code> in the previous tag.</li>' +
+                '                            <li>Display the transcript by default by adding <code>data-show-transcript-default="true"</code> in the previous tag.</li>' +
+                '                        </ul>' +
+		'                    </div>' +
+		'                <div class="modal-footer">' +
+		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+		'            </div>' +
+		'        </div>' +
+		'    </div>' +
+		'</div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
                 '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
                 '            </div>' +
-                //'            <div class="amara-transcript-header-right">' +
-                //'                <form action="" class="amara-transcript-search">' +
-                //'                    <input class="amara-transcript-search-input" placeholder="Search transcript" />' +
-                //'                </form>' +
-                //'            </div>' +
+                '            <div class="amara-transcript-header-right">' +
+                '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
+                '                    <a href="#" class="amara-transcript-search-next"></a>' +
+                '                    <a href="#" class="amara-transcript-search-prev"></a>' +
+                '            </div>' +
                 '        </div>' +
                 '        <div class="amara-transcript-body">' +
                 '            <a href="#" class="amara-transcript-line">' +
@@ -732,7 +1005,10 @@
                 '            </a>' +
                 '        </div>' +
                 '    </div>' +
-                '</div>'
+                '</div>' +
+		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
+	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>'
+	    }
         });
 
         // push() handles all action calls before and after the embedder is loaded.
@@ -792,7 +1068,7 @@
             var amaraEmbeds = _$('div.amara-embed');
 
             if (amaraEmbeds.length) {
-                amaraEmbeds.each(function() {
+                _$.each(amaraEmbeds, function() {
 
                     var $div = _$(this);
 
@@ -800,7 +1076,11 @@
                     that.push(['embedVideo', {
                         'div': this,
                         'initial_language': $div.data('initial-language'),
-                        'url': $div.data('url')
+                        'url': $div.data('url'),
+                        'show_logo': $div.data('hide-logo') ? false : true,
+                        'show_order_subtitles': $div.data('hide-order') ? false : true,
+			'show_subtitles_default': $div.data('show-subtitles-default'),
+			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);
                 });
             }
