@@ -134,10 +134,10 @@ div.amara-embed {
                 background: transparent url('../../images/embedder/amara-sprites.png') 0 0 no-repeat;
             }
             a.amara-transcript-button {
-                background: transparent url('../../images/glyphicons_029_notes_2.png') 0 2px no-repeat;
+                background: transparent url('../../images/glyphicons_029_notes_2.png') 0 7px no-repeat;
             }
             a.amara-subtitles-button {
-                background: transparent url('../../images/glyphicons_392_subtitles.png') 0 7px no-repeat;
+                background: transparent url('../../images/cc-icon-amara-18px.png') 10px 11px no-repeat;
             }
             a.amara-button {
                 display: inline-block;
@@ -440,7 +440,7 @@ ul.amara-languages-list > li {
     padding-bottom: 3px;
 }
 #language-list-inside {
-    max-height: 200px;
+    max-height: 130px;
     padding-left: 0px;
     overflow: auto;
 }
