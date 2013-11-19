@@ -77,6 +77,7 @@ def _docker_manage_args(image_name, settings='docker_dev_settings'):
         '-h=unisubs.example.com',
         '-cidfile=%s' % cid_path(image_name),
         '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
+        '-e', 'DJANGO_LIVE_TEST_SERVER_ADDRESS=localhost:8090-8100,9000-9200', 
         '-v', volume_arg,
         '-w', '/opt/apps/unisubs/',
     ]
