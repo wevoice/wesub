@@ -22,7 +22,7 @@ class MembersTab(ATeamPage):
     _CANCEL_EDITS = ".modal-footer .action-close"
 
     #INVITATION FORM 
-    _INVITEE_USERNAME_PULLDOWN = "div.ajaxChosen"
+    _INVITEE_USERNAME_PULLDOWN = "div#uid_chzn a"
     _INVITEE_USERNAME = 'select[name="user_id"]'
     _INVITEE_MESSAGE = "textarea#id_message"
     _INVITEE_ROLE = "select#id_role"
