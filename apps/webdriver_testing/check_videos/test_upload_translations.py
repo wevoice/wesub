@@ -31,7 +31,9 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         self.video_pg.open_page('videos/create/')
         self.video_pg.handle_js_alert('accept')
         self.tv = self.data_utils.create_video()
-        self.data_utils.upload_subs(self.user, video=self.tv.pk)
+        self.data_utils.upload_subs(self.user, 
+                                    video=self.tv.pk,
+                                    primary_audio_language_code='en')
         self.video_pg.open_video_page(self.tv.video_id)
 
     def _upload_and_verify(self, tv, sub_file, language, lang_code):
@@ -76,6 +78,7 @@ class TestCaseUploadTranslation(WebdriverTestCase):
         sub_editor = subtitle_editor.SubtitleEditor(self)
         self.assertEqual('Adding a New Translation', 
                          sub_editor.dialog_title())
+        sub_editor.save_translation()
 
     def test_txt(self):
         """Upload translation (de) in a txt file.

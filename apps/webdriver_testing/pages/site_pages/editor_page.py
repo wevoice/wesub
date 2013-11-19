@@ -314,7 +314,7 @@ class EditorPage(UnisubsPage):
        
     def add_note(self, note_text):
         self.type_by_css(self._NOTES, note_text)
-
+    
     def current_notes(self):
         return self.get_text_by_css(self._NOTES)
 

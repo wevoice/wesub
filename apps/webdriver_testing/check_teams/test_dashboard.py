@@ -71,6 +71,7 @@ class TestCaseTaskFreeDashboard(WebdriverTestCase):
     def setUp(self):
         self.dashboard_tab.open_team_page(self.team.slug)
 
+
     def test_members_generic_create_subs(self):
         """Dashboard displays generic create subs message when no orig lang specified.
 

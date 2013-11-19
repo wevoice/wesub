@@ -88,7 +88,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
 
  
         
-    def test_messages__edit(self):
+    def test_messages_edit(self):
         """Change the default messages via the UI and verify they are stored.
 
         """
@@ -98,7 +98,7 @@ class TestCaseTeamMessages(WebdriverTestCase):
         self.assertEqual(self._TEST_MESSAGES, 
             self.messages_tab.stored_messages())
 
-    def test_messages__invitation(self):
+    def test_messages_invitation(self):
         """Invited user see the custom message.  """
         self.members_tab.log_in(self.team_owner.username, 'password')
         self.messages_tab.open_messages_tab(self.team.slug)

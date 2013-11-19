@@ -55,9 +55,6 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         cls.videos_tab.open_videos_tab(cls.team.slug)
 
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-
     def test_add_new(self):
         """Submit a new video for the team.
 
@@ -156,7 +153,7 @@ class TestCaseAddRemoveEdit(WebdriverTestCase):
         self.videos_tab.search(tv.title)
         self.videos_tab.remove_video(video = tv.title, 
             removal_action='team-removal')
-
+        time.sleep(2)
         #Update the solr index
         management.call_command('update_index', interactive=False)
 
@@ -590,9 +587,14 @@ class TestCaseProjectsFilter(WebdriverTestCase):
                 video=video, 
                 added_by=cls.manager_user,
                 project = cls.project2)
-
+        management.call_command('update_index', interactive=False)
         cls.videos_tab.open_videos_tab(cls.team.slug)
         cls.videos_tab.log_in(cls.manager_user.username, 'password')
+
+
+    def setUp(self):
+        self.videos_tab.open_videos_tab(self.team.slug)
+
 
     def test_filter_projects(self):
         """Filter video view by project.
@@ -602,6 +604,7 @@ class TestCaseProjectsFilter(WebdriverTestCase):
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.project_filter(project=self.project1.name)
         self.videos_tab.update_filters()
+        time.sleep(3)
         self.assertEqual(self.videos_tab.NO_VIDEOS_TEXT, 
             self.videos_tab.search_no_result())
 
@@ -612,8 +615,6 @@ class TestCaseProjectsFilter(WebdriverTestCase):
         """
         self.videos_tab.open_videos_tab(self.team.slug)
         self.videos_tab.project_filter(project=self.project2.name)
-        self.videos_tab.update_filters()
-
         self.videos_tab.sub_lang_filter(language = 'English')
         self.videos_tab.update_filters()
         self.assertTrue(self.videos_tab.video_present('c'))
@@ -672,8 +673,6 @@ class TestCaseVideosDisplay(WebdriverTestCase):
 
         cls.videos_tab.open_page(cls.limited_access_team.slug)
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
 
     def turn_on_automatic_tasks(self):
         self.logger.info('Turning on automatic task creation')
