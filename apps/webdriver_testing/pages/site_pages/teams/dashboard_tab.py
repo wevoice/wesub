@@ -91,7 +91,7 @@ class DashboardTab(ATeamPage):
 
         if 'languages need your help' in lang_el.text:
             show_el = video_el.find_element_by_css_selector(self._SHOW_LANGS)
-            show_el.click()
+            self.hover_by_el(show_el)
             lang_list = video_el.find_elements_by_css_selector(
                 self._LANG_LIST)
             for el in lang_list:
@@ -107,7 +107,8 @@ class DashboardTab(ATeamPage):
         video_el = self._video_element(video)
         langs = video_el.find_elements_by_css_selector(self._VIDEO_LANGS)
         if 'languages need your help' in langs[0].text:
-            video_el.find_element_by_css_selector(self._SHOW_LANGS).click()
+            show_el = video_el.find_element_by_css_selector(self._SHOW_LANGS)
+            self.hover_by_el(show_el)            
             els = self.get_elements_list(self._LANG_LIST)
             for el in els:
                 if language in el.text:
