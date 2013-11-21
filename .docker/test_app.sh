@@ -68,23 +68,18 @@ NOSE_ARGS = ['--logging-filter=test_steps, -remote_connection, '
 
 EOF
 
-PRE_CMD=""
 CMD="$VE_DIR/bin/python manage.py test search subtitles auth comments messages profiles statistic teams videos widget ted cogi apiv2 --settings=test_settings --with-xunit"
 
 if [ ! -z "$RUN_SELENIUM" ] ; then
     echo "Running Selenium tests..."
     # install xvfb
-    DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb python-software-properties
-    add-apt-repository -y ppa:mozillateam/firefox-next
-    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get install -y xvfb python-software-properties dbus-x11 x11-xserver-utils flashplugin-installer
     apt-get install -y firefox
-    Xvfb :99 -screen 0 2048x1600x24 > /dev/null 2>&1 &
-    export DISPLAY=:99
-    CMD="$VE_DIR/bin/python manage.py test webdriver_testing --settings=test_settings --with-xunit"
+    sleep 5
+    CMD='xvfb-run --auto-servernum --server-args="-screen 0 2048x1600x24" $VE_DIR/bin/python manage.py test webdriver_testing --settings=test_settings --with-xunit'
 fi
 
 echo "Running Tests..."
 cd $APP_DIR
-echo $APP_DIR
-echo $PRE_CMD $CMD
-$PRE_CMD $CMD
+echo $CMD
+/bin/bash -c "$CMD"
