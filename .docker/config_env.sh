@@ -2,13 +2,7 @@
 AWS_ID=${AWS_ACCESS_ID:-}
 AWS_KEY=${AWS_SECRET_KEY:-}
 S3_PASSPHRASE=${S3_PASSPHRASE:-}
-REV=${REVISION:-staging}
 SETTINGS_REV=${SETTINGS_REVISION:-$REV}
-APP_NAME=unisubs
-APP_ROOT=/opt/apps
-APP_DIR=$APP_ROOT/$APP_NAME
-VE_ROOT=/opt/ve
-VE_DIR=$VE_ROOT/$APP_NAME
 SMTP_HOST=${SMTP_HOST:-smtp.sendgrid.net}
 SMTP_PORT=${SMTP_PORT:-587}
 SASL_USER=${SASL_USER:-universalsubtitles}
@@ -18,6 +12,12 @@ MAILNAME=${MAILNAME:-pculture.org}
 NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME:-}
 NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY:-}
 SKIP_CODE_PULL=${SKIP_CODE_PULL:-}
+export APP_NAME=unisubs
+export APP_ROOT=/opt/apps
+export APP_DIR=$APP_ROOT/$APP_NAME
+export VE_ROOT=/opt/ve
+export VE_DIR=$VE_ROOT/$APP_NAME
+export REV=${REVISION:-staging}
 
 if [ ! -z "$AWS_ID" ] && [ ! -z "$AWS_SECRET_KEY" ] ; then
     # create s3cfg
