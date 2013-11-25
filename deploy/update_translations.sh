@@ -2,9 +2,6 @@
 # in order for this to work, you must have a ~/.transifexrc file (kept out of source control since it requires a passwords)
 source /usr/local/bin/config_env
 
-# Abort if any error
-set -e
-
 cd $APP_DIR
 echo "Running makemessages"
 $VE_DIR/bin/python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
@@ -25,3 +22,4 @@ git add locale/*/LC_MESSAGES/django.*o
 git commit -m "Updated transifex translations -- through update_translations.sh"
 date
 git push
+echo "Translations updated..."
