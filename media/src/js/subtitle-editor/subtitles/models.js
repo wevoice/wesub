@@ -332,6 +332,10 @@ var angular = angular || null;
         if(subtitle.isSynced() && !wasSynced) {
             this.syncedCount++;
         }
+        if(!subtitle.isSynced() && wasSynced) {
+            this.syncedCount--;
+        }
+	
     }
 
     SubtitleList.prototype.updateSubtitleTime = function(subtitle, startTime, endTime) {

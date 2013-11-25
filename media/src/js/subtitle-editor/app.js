@@ -86,6 +86,10 @@ var angular = angular || null;
 		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
 		nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
 	    }
+	    while (nextWorkingSubtitle) {
+		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, 0, 0);
+		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+	    }
 	}
 
         $scope.timeline = {
