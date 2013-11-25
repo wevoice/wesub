@@ -1,7 +1,9 @@
 #!/bin/bash
+# in order for this to work, you must have a ~/.transifexrc file (kept out of source control since it requires a passwords)
+source /usr/local/bin/config_env
+
 # Abort if any error
 set -e
-source /usr/local/bin/config_env
 
 cd $APP_DIR
 echo "Running makemessages"
@@ -23,4 +25,3 @@ git add locale/*/LC_MESSAGES/django.*o
 git commit -m "Updated transifex translations -- through update_translations.sh"
 date
 git push
-# in order for this to work, you must have a ~/.transifexrc file (kept out of source control since it requires a passwords)
