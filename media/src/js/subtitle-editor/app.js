@@ -71,6 +71,22 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
+	/*
+	 * Might not be the right location
+	 * TODO: move this to the proper place (probably the SubtitleList
+	 * model.
+	 */
+	$scope.copyTimingOver = function() {
+	    var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.subtitles[$scope.workingSubtitles.subtitleList.indexOfFirstSubtitleAfter(-1)];
+	    var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.subtitles[$scope.referenceSubtitles.subtitleList.indexOfFirstSubtitleAfter(-1)];
+	    while (nextWorkingSubtitle && nextReferenceSubtitle) {
+		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
+									nextReferenceSubtitle.startTime,
+									nextReferenceSubtitle.endTime);
+		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+		nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
+	    }
+	}
 
         $scope.timeline = {
             shownSubtitle: null,
