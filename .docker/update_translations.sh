@@ -1,6 +1,8 @@
 #!/bin/bash
 source /usr/local/bin/config_env
-
+# install client
+pip install transifex-client
+# update
 cd $APP_DIR
 # get private key from s3 to clone private repo
 s3cmd -c /etc/s3cfg get --force s3://amara/admin/keys/amara-transifex /root/.ssh/amara_transifex
