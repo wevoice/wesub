@@ -1,4 +1,5 @@
 #!/bin/bash
+source /usr/local/bin/config_env
 
 # Abort if any error
 set -e
