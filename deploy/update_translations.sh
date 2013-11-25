@@ -1,11 +1,10 @@
 #!/bin/bash
-source /usr/local/bin/config_env
-
 # Abort if any error
 set -e
+source /usr/local/bin/config_env
 
+cd $APP_DIR
 echo "Running makemessages"
-cd ..
 $VE_DIR/bin/python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 $VE_DIR/bin/python manage.py makemessages -d djangojs -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
 
