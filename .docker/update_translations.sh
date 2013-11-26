@@ -1,7 +1,5 @@
 #!/bin/bash
 source /usr/local/bin/config_env
-# install client
-pip install transifex-client
 # update
 cd $APP_DIR
 # get private key from s3 to clone private repo

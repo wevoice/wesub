@@ -2,6 +2,9 @@
 # in order for this to work, you must have a ~/.transifexrc file (kept out of source control since it requires a passwords)
 source /usr/local/bin/config_env
 
+echo "Installing latest Transifex client..."
+# install client
+pip install transifex-client
 cd $APP_DIR
 echo "Running makemessages"
 $VE_DIR/bin/python manage.py makemessages -i deploy\* -i media\js\closure-library\* -i media/js/unisubs-calcdeps.js.py -a
