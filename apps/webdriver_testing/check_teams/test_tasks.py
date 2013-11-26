@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-
+import time
 from django.core import mail
 from django.core import management
 
@@ -420,7 +420,9 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         """Review task is created on transcription submission. """
         tv = TeamVideoFactory(team=self.team, added_by=self.owner, 
                          video=self.data_utils.create_video()).video
-        self.data_utils.upload_subs(self.contributor, video=tv.pk)
+        self.data_utils.upload_subs(self.contributor, 
+                                    video=tv.pk, 
+                                    primary_audio_language_code='en')
         self.tasks_tab.log_in(self.manager, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
 
@@ -1289,7 +1291,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         task = list(tv.task_set.all_approve().all())[0]
 
     def test_review_notes_are_saved(self):
-        """Notes added and saved in review task are displayed when editor opened.
+        """Notes added are saved. 
 
         """
         video = self.data_utils.create_video()
@@ -1299,19 +1301,17 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                 'video': video.pk,
                 'primary_audio_language_code': 'en',
                 'draft': open('apps/webdriver_testing/subtitle_data/'
-                              'How-to.en.srt'),
+                              'Timed_text.en.srt'),
                 'is_complete': True,
                 'complete': 1
                }
 
-        self.data_utils.upload_subs(self.contributor, **data)
-        self.tasks_tab.log_in(self.manager, 'password')
+        self.data_utils.upload_subs(self.manager, **data)
+        self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.perform_and_assign_task('Review Original English ' 
-                                               'Subtitles', video.title)
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.open_in_beta_editor()
-        note_text = 'This is a note'
+        self.tasks_tab.open_page('/subtitles/editor/%s/en/' % video.video_id)
+        note_text = 'This is a note \n'
+        self.editor_pg.close_metadata()
         self.editor_pg.add_note(note_text)
         self.editor_pg.save('Exit')
         task = list(tv.task_set.all_review().all())[0]
@@ -1344,8 +1344,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
         self.editor_pg.close_metadata()
-        note_text = 'This is a note'
-        self.editor_pg.add_note(note_text)
         self.editor_pg.approve_task()
         self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
@@ -1353,7 +1351,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
 
         self.assertIn(self.contributor.email, email_to)
         self.assertIn(self.accepted_review, msg)
-        self.assertIn(note_text, msg)
 
 
 

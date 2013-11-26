@@ -40,10 +40,16 @@
         <div class="tools group">
             <form action="" method="get" class="search">
                 <fieldset>
-                    {% if filtered %}
+                    {% if project_filter %}
                     <input type="hidden" name="project" value="{{ project_filter }}" />
+                    {% endif %}
+                    {% if language_filter %}
                     <input type="hidden" name="lang" value="{{ language_filter }}" />
+                    {% endif %}
+                    {% if language_mode %}
                     <input type="hidden" name="lang-mode" value="{{ language_mode }}" />
+                    {% endif %}
+                    {% if sort %}
                     <input type="hidden" name="sort" value="{{ sort }}" />
                     {% endif %}
                     <input type="text" name="q" value="{{ query }}" placeholder="Search&hellip;" />
