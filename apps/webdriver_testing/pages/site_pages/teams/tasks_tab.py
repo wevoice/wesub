@@ -25,7 +25,7 @@ class TasksTab(ATeamPage):
     #CREATE TASK FORM
     _TASK_TYPE = 'select#id_type'
     _TASK_ASSIGNEE = 'div#id_assignee_chzn'
-    _TASK_LANGUAGE = 'div.language-selector div#id_language_chzn'
+    _TASK_LANGUAGE = 'div#id_language_chzn'
     
     _TASK_SAVE = "div.submit button"
 
@@ -102,7 +102,7 @@ class TasksTab(ATeamPage):
         if task_type:
             self.select_option_by_text(self._TASK_TYPE, task_type)
         if task_language:
-            self.click_by_css(self._TASK_LANGUAGE)
+            self.click_by_css(self._TASK_LANGUAGE + ' a span')
             el = self._TASK_LANGUAGE + ' div.chzn-search input' 
             self.type_by_css(el, task_language + '\n')
         if task_assignee:
@@ -118,10 +118,3 @@ class TasksTab(ATeamPage):
         except:
             return None
 
-
- 
-
- 
-
-        
-    
