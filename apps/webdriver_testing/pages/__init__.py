@@ -558,6 +558,7 @@ class Page(object):
                     found_el = chosen.find_element_by_css_selector("input").click()
                     result.click()
 
+
     def record_error(self, e=None):
         """
             Records an error.

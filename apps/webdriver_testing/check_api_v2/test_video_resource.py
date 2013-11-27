@@ -322,21 +322,23 @@ class TestCaseVideoResource(WebdriverTestCase):
 
         PUT /api2/partners/videos/[video-id]/
         """
-        #Create the initial video via api and get the id
-        data = { 'video_url': ('http://qa.pculture.org/amara_tests/'
-                                   'Birds_short.webmsd.webm'),
-                     'title': 'Test video created via api',
-                     'duration': 37 }
-        url_part = 'videos/'
-        r = self.data_utils.make_request(self.user, 'post', url_part, **data)
-        response = r.json
 
-        vid_id = response['id']
-        self.video_pg.open_video_page(vid_id)
+        tv = self.data_utils.create_video()
+        #Create the initial video via api and get the id
+       # data = { 'video_url': 'http://unisubs.example.com/newurl3.mp4',
+#'http://youtube.com/watch?v=e4MSN6IImpI',
+        #             'title': 'Test video created via api',
+        #             'duration': 182 }
+        #url_part = 'videos/'
+        #r = self.data_utils.make_request(self.user, 'post', url_part, **data)
+        #response = r.json
+
+       # vid_id = response['id']
+        self.video_pg.open_video_page(tv.video_id)
 
 
         #Update the video setting the team and project and new description.
-        url_part = 'videos/%s/' % vid_id
+        url_part = 'videos/%s/' % tv.video_id
         new_data = {'team': self.open_team.slug,
                     'project': self.project2.slug,
                     'description': ('This is a sample vid converted to webM '
@@ -350,10 +352,14 @@ class TestCaseVideoResource(WebdriverTestCase):
         for k, v in new_data.iteritems():
             self.assertEqual(v, response[k])
 
+        management.call_command('update_index', interactive=False)
         #Open the projects page on the site and verify video in project.
         team_videos_tab = videos_tab.VideosTab(self)
         team_videos_tab.log_in(self.user.username, 'password')
-        team_videos_tab.open_team_project(self.open_team.slug, 
-                                          self.project2.slug)
-        self.assertTrue(team_videos_tab.video_present(data['title']))
+        team_videos_tab.open_videos_tab(self.open_team.slug)
+        team_videos_tab.sub_lang_filter(language = 'All', has=False)
+        team_videos_tab.project_filter(project=self.project2.name)
+        team_videos_tab.update_filters()
+
+        self.assertTrue(team_videos_tab.video_present(tv.title))
 
