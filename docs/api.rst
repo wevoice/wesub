@@ -5,16 +5,16 @@ This is the documentation of v2 of Amara's API. Please contact us
 if you’d like to use the Amara API for commercial purposes.
 
 .. note:: The v1 of the API is deprecated, but can still be accessed through
-    http://www.universalsubtitles.org/api/1.0/documentation/ . Users should migrate
+    http://www.amara.org/api/1.0/documentation/ . Users should migrate
     to the v2 of the API. If you're missing a feature on the API, please `let us
-    know <https://universalsubtitles.tenderapp.com/>`_ .
+    know <https://support.amara.org/>`_ .
 
 Authentication
 --------------
 
 Before interacting with the API, you must have an API key. In order to get one,
 create a user on the Amara website, then go to the `edit profile
-<http://www.universalsubtitles.org/en/profiles/edit/>`_ page. At the bottom of
+<http://www.amara.org/en/profiles/edit/>`_ page. At the bottom of
 the page you will find a "Generate new key" button . Clicking on it will fetch
 your user the needed API key.
 
@@ -26,7 +26,7 @@ Every request must have the username and the API keys as headers. For example::
 So a sample request would look like this::
 
     $ curl -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
-        https://staging.universalsubtitles.org/api2/partners/videos/
+        https://staging.amara.org/api2/partners/videos/
 
 Data Formats
 ------------
@@ -49,11 +49,11 @@ The endpoint for the API is the environment base URL +  ``/api2/partners/``.
 
 Possible environments:
 
-* Staging: ``https://staging.universalsubtitles.org/``
-* Production: ``https://www.universalsubtitles.org/``
+* Staging: ``https://staging.amara.org/``
+* Production: ``https://www.amara.org/``
 
 Therefore, most clients should be making requests against:
-``https://www.universalsubtitles.org/api2/partners/``
+``https://www.amara.org/api2/partners/``
 
 All API requests should go through https. The staging environment might need
 HTTP basic auth, please contact us to request credentials.  When basic auth is
@@ -61,7 +61,7 @@ needed on staging, you end up with a request like this::
 
     $ curl -H 'X-api-username: my_username_here' -H 'X-apikey: my_api_key_here' \
         --user basic_auth_username:basic_auth_password \
-        https://staging.universalsubtitles.org/api2/partners/videos/
+        https://staging.amara.org/api2/partners/videos/
 
 If you're under a partnership, you might have a different base URL. Please
 contact us if you're not sure.
@@ -317,7 +317,6 @@ Creating Video Languages:
     :form title: The title for the video localized to this language - optional
     :form description: Localized description for this language - optional.
     :form is_original: Boolean indicating if this is the original language for the video. - optional - defaults to false.
-    :form is_complete: Boolean indicating if the complete subtitling set is available for this language - optional, defaults to false.
     :form is_original: If set to true, will mark this language as the primary audio language for the video ( see VideoResource) - optional, defaults to false.
 
 .. seealso::  To list available languages, see ``Language Resource``.
@@ -390,6 +389,8 @@ Creating new subtitles for a language:
         for fetching subtitles are accepted. Optional - defaults to ``srt``.
     :query title: Give a title to the new revision
     :query description: Give a description to the new revision
+
+    :form is_complete: Boolean indicating if the complete subtitling set is available for this language - optional, defaults to false.
 
 This will create a new subtitle version with the new subtitles.
 
