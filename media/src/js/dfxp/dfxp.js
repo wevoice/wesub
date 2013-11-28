@@ -218,6 +218,7 @@ var AmaraDFXPParser = function() {
             return;
         }
 
+//	console.log('XML: ' + xml);
         if (typeof xml === 'string') {
             xml = $.parseXML(xml);
         }
@@ -226,13 +227,24 @@ var AmaraDFXPParser = function() {
         // formatting for bold, italic, etc. Convert them back to Markdown.
         var $preXml = $(xml.documentElement);
         var $preSubtitles = $('p', $preXml);
-
-        // Convert subtitles from DFXP to Markdown.
+	
+	var $preDivs = $('div', $preXml);
+	
+	$.each($preDivs, function(index, element) {
+	    $.each($(element).find('p'), function(i, x) {
+		console.log('' + i + $(x).text());
+		var markdown = dfxpToMarkdown(x);
+		$(x).text(((i==0) ? 'First ' : '') + markdown);
+	    });
+	});
+	
+        // Convert subtitles from DFXP to Markdown
+/*.
         $preSubtitles.each(function() {
             var markdown = dfxpToMarkdown(this);
             $(this).text(markdown);
         });
-
+*/
         // Store the original XML for comparison later.
         this.$originalXml = $preXml.clone();
 
