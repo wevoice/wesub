@@ -133,6 +133,8 @@ _RTL_OVERRIDE_MAP = {
     'az': False,
     # Force Urdu to be RTL (see gh-722)
     'ur': True,
+    # Force Aramaic to be RTL (gh-1073)
+    'arc': True,
 }
 
 def is_rtl(language_code):
