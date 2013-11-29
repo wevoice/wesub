@@ -119,6 +119,13 @@ class Page(object):
         mouseAction = webdriver.ActionChains(self.browser)
         mouseAction.move_to_element(element).perform()
 
+    def hover_by_el(self, element):
+        """Hover over element of provided css selector.
+
+        """
+        mouseAction = webdriver.ActionChains(self.browser)
+        mouseAction.move_to_element(element).perform()
+
     def click_item_from_pulldown(self, menu_el, menu_item_el):
         """Open a hover pulldown and choose a displayed item.
 
@@ -550,6 +557,7 @@ class Page(object):
                 except:
                     found_el = chosen.find_element_by_css_selector("input").click()
                     result.click()
+
 
     def record_error(self, e=None):
         """

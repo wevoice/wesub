@@ -498,7 +498,7 @@ class Team(models.Model):
             qs = qs.filter(video_completed_langs=language)
 
         if exclude_language:
-            qs = qs.exclude(video_completed_langs=language)
+            qs = qs.exclude(video_completed_langs=exclude_language)
 
         if num_completed_langs is not None:
             qs = qs.filter(num_completed_langs=num_completed_langs)

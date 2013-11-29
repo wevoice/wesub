@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage 
-from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
-from apps.webdriver_testing.pages.site_pages.teams import members_tab
-from apps.webdriver_testing.data_factories import *
-from apps.teams.models import TeamMember
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams import ATeamPage 
+from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from webdriver_testing.pages.site_pages.teams import members_tab
+from webdriver_testing.data_factories import *
+from teams.models import TeamMember
 
 
 class TestCaseOpenTeamPage(WebdriverTestCase):
@@ -24,7 +24,7 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
         cls.a_team_pg.open_team_page(cls.team.slug)
 
 
-    def test_join__guest(self):
+    def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.
 
         """
@@ -32,7 +32,7 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
         self.assertIn("We've got lots of great content that we'd love your ", 
                       self.a_team_pg.dashboard_welcome_message())
 
-    def test_join__authenticated(self):
+    def test_join_authenticated(self):
         """Logged in user can join an open team.
 
         """
@@ -70,14 +70,14 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         cls.a_team_pg.open_team_page(cls.team.slug)
 
 
-    def test_join__guest(self):
+    def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.
 
         """
         self.a_team_pg.open_team_page(self.team.slug)
         self.assertTrue(self.a_team_pg.join_exists())
 
-    def test_join__apply(self):
+    def test_join_apply(self):
         """User can apply to join team and is a member after approval.
 
         """
@@ -93,10 +93,11 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         user_app.approve(
             author = self.team_owner.username, 
             interface = "web UI")
-        self.members_tab.member_search(self.team.slug, test_joiner.username)
+        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.member_search(test_joiner.username)
         self.assertEqual(self.members_tab.user_role(), 'Contributor')
 
-    def test_removed_user__no_reapply(self):
+    def test_removed_user_no_reapply(self):
         """User removed from a team can not re-apply.
 
         """
@@ -113,14 +114,16 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
             author = self.team_owner.username, 
             interface = "web UI")
         self.members_tab.log_in(self.team_owner.username, 'password')
-        self.members_tab.member_search(self.team.slug, test_joiner.username)
+
+        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.member_search(test_joiner.username)
         self.members_tab.delete_user()
         self.a_team_pg.log_in(test_joiner.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.assertEqual('Your application is pending', 
                          self.a_team_pg.replacement_text())
 
-    def test_user_leaves__rejoin(self):
+    def test_user_leaves_rejoin(self):
         """User leaves team can rejoin without application
 
         """
@@ -147,7 +150,7 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         self.assertIn(self.team.name, self.team_dir_pg.teams_on_page())
 
 
-    def test_rejected__no_reapply(self):
+    def test_rejected_no_reapply(self):
         """User removed from a team can not re-apply.
 
         """
@@ -156,10 +159,10 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
         self.a_team_pg.submit_application()
-        user_app = ApplicationFactory.build(
+        user_app = ApplicationFactory(
             team=self.team,
             user=test_joiner,
-            pk=1)
+            pk=135)
         user_app.deny(
             author = self.team_owner.username, 
             interface = "web UI")
@@ -186,7 +189,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
         cls.a_team_pg.open_team_page(cls.team.slug)
 
 
-    def test_join__guest(self):
+    def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.
 
         """
@@ -194,7 +197,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
         self.assertIn('This team is invitation only.', 
                       self.a_team_pg.dashboard_welcome_message())
 
-    def test_join__authenticated(self):
+    def test_join_authenticated(self):
         """Authenticated user can't join application-only team.
 
         """
@@ -204,7 +207,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
         self.assertFalse(self.a_team_pg.join_exists(), 
             'Invite-only team should not display join button')
 
-    def test_join__contributer_invitation(self):
+    def test_join_contributer_invitation(self):
         """User is added to team as contributor after accepting invitation.
 
         """
@@ -301,7 +304,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
 
 
 
-    def test_join__admin_invitation(self):
+    def test_join_admin_invitation(self):
         """User is added to team as admin after accepting invitation.
 
         """
@@ -315,12 +318,13 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
             )
         invitation.accept()
         self.members_tab.log_in(user.username, 'password')
-        self.members_tab.member_search(self.team.slug, user.username)
+        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.member_search(user.username)
         self.assertEqual(self.members_tab.user_role(), 'Admin')
         self.assertTrue(self.members_tab.settings_tab_visible(), 
             "Did not find the settings tab on the page")
  
-    def test_join__manager_invitation(self):
+    def test_join_manager_invitation(self):
         """User is added to team as manager after accepting invitation.
 
         """
@@ -335,7 +339,8 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
             )
         invitation.accept()
         self.members_tab.log_in(user.username, 'password')
-        self.members_tab.member_search(self.team.slug, user.username)
+        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.member_search(user.username)
         self.assertEqual(self.members_tab.user_role(), 'Manager')
         self.assertFalse(self.members_tab.settings_tab_visible(), 
             "Settings tab present for manager role")

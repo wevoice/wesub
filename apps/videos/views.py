@@ -377,10 +377,6 @@ def video(request, video, video_url=None, title=None):
     else:
         template_name = 'videos/video-%s.html' % tab
         context = VideoPageContext(request, video, video_url, tab)
-        if 'tab' in request.GET:
-            # we only want to update the view counter if this request wasn't
-            # the result of a tab click.
-            video.update_view_counter()
     context['tab'] = tab
 
     return render(request, template_name, context)

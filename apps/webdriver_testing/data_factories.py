@@ -112,6 +112,7 @@ class TeamInviteFactory(factory.django.DjangoModelFactory):
 class ApplicationFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = Application
     created = datetime.datetime.now()
+    pk = factory.Sequence(lambda n: 100+n)
 
 
 class TeamLangPrefFactory(factory.django.DjangoModelFactory):

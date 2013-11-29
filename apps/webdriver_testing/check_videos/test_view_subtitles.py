@@ -27,17 +27,16 @@ class TestCaseViewSubtitles(WebdriverTestCase):
         cls.subs_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
         cls.video = VideoUrlFactory().video
-
         #Upload original language de
         complete = True
         data = {'language_code': 'de',
                 'video': cls.video.pk,
                 'primary_audio_language_code': 'de',
                 'draft': open(os.path.join(cls.subs_dir, 'Timed_text.en.srt')), 
-                'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(self.user, **data)
+        cls.data_utils.upload_subs(cls.user, **data)
+       
         #Upload sv, translated from de, complete
         data = {'language_code': 'sv',
                 'video': cls.video.pk,
@@ -46,7 +45,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(self.user, **data)
+        cls.data_utils.upload_subs(cls.user, **data)
         complete = False
         #Upload ar, translated from de, incomplete
         data = {'language_code': 'ar',
@@ -55,7 +54,7 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(self.user, **data)
+        cls.data_utils.upload_subs(cls.user, **data)
         #Upload hu, translated from sv, incomplete
         data = {'language_code': 'hu',
                 'video': cls.video.pk,
@@ -64,9 +63,9 @@ class TestCaseViewSubtitles(WebdriverTestCase):
                 'is_complete': complete,
                 'complete': int(complete)
                 }
-        cls.data_utils.upload_subs(self.user, **data)
+        cls.data_utils.upload_subs(cls.user, **data)
         cls.video_pg.open_video_page(cls.video.video_id)
-
+        
 
     def setUp(self):
         self.video_pg.open_video_page(self.video.video_id)
