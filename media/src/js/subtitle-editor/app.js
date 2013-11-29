@@ -63,7 +63,7 @@ var angular = angular || null;
         $scope.scrollingSynced = true;
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
-
+        $scope.copyOverShown = true;
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
@@ -83,11 +83,14 @@ var angular = angular || null;
 		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
 									nextReferenceSubtitle.startTime,
 									nextReferenceSubtitle.endTime);
+		$scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle,
+									     $scope.referenceSubtitles.subtitleList.getSubtitleParagraph(nextReferenceSubtitle)
+									    );
 		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
 		nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
 	    }
 	    while (nextWorkingSubtitle) {
-		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, 0, 0);
+		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, '', '');
 		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
 	    }
 	}
@@ -304,7 +307,8 @@ var angular = angular || null;
             video, SubtitleStorage);
         $scope.referenceSubtitles = new SubtitleVersionManager(
             video, SubtitleStorage);
-
+	//$scope.copyOverShown = ($scope.referenceSubtitles.versionNumber != null);
+	//console.log("$scope.copyOverShown " + $scope.copyOverShown + " $scope.referenceSubtitles.versionNumber " + $scope.referenceSubtitles.versionNumber);
         var editingVersion = EditorData.editingVersion;
 
         if(editingVersion.versionNumber) {

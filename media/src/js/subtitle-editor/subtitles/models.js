@@ -218,30 +218,33 @@ var angular = angular || null;
         /*
          * Used when we are translating from one language to another.
          * It loads the latest subtitles for xml and inserts blank subtitles
-         * with the same timings into our subtitle list.
+         * with the same timings and paragraphs into our subtitle list.
          */
         var baseLanguageParser = new AmaraDFXPParser();
         baseLanguageParser.init(xml);
-        var timings = [];
+        var baseAttributes = [];
         baseLanguageParser.getSubtitles().each(function(index, node) {
             startTime = baseLanguageParser.startTime(node);
             endTime = baseLanguageParser.endTime(node);
+            startOfParagraph = baseLanguageParser.startOfParagraph(node);
             if(startTime >= 0 && endTime >= 0) {
-                timings.push({
+                baseAttributes.push({
                     'startTime': startTime,
                     'endTime': endTime,
+                    'startOfParagraph': startOfParagraph
                 });
             }
         });
-        timings.sort(function(s1, s2) {
+        baseAttributes.sort(function(s1, s2) {
             return s1.startTime - s2.startTime;
         });
         var that = this;
-        _.forEach(timings, function(timing) {
+        _.forEach(baseAttributes, function(baseAttribute) {
             var node = that.parser.addSubtitle(null, {
-                begin: timing.startTime,
-                end: timing.endTime,
+                begin: baseAttribute.startTime,
+                end: baseAttribute.endTime,
             });
+            that.parser.startOfParagraph(node, baseAttribute.startOfParagraph);
             that.subtitles.push(that.makeItem(node));
             that.syncedCount++;
         });
@@ -355,6 +358,19 @@ var angular = angular || null;
     SubtitleList.prototype.updateSubtitleContent = function(subtitle, content) {
         this._updateSubtitleContent(subtitle, content);
         this.emitChange('update', subtitle);
+    }
+
+    SubtitleList.prototype._updateSubtitleParagraph = function(subtitle, startOfParagraph) {
+        this.parser.startOfParagraph(subtitle.node, startOfParagraph);
+    }
+
+    SubtitleList.prototype.updateSubtitleParagraph = function(subtitle, startOfParagraph) {
+        this._updateSubtitleParagraph(subtitle, startOfParagraph);
+        this.emitChange('update', subtitle);
+    }
+
+    SubtitleList.prototype.getSubtitleParagraph = function(subtitle) {
+	return this.parser.startOfParagraph(subtitle.node);
     }
 
     SubtitleList.prototype.insertSubtitleBefore = function(otherSubtitle) {
