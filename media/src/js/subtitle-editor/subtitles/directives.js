@@ -243,7 +243,6 @@ var USER_IDLE_MINUTES = 15;
 
             function conditionalClassFunc(expr, className) {
                 var condition = $parse(expr);
-
                 return function(context) {
                     if(condition(context)) {
                         elm.addClass(className);
@@ -392,6 +391,13 @@ var USER_IDLE_MINUTES = 15;
             // Map subtitle ID to node for that subtitle
             var subtitleMap = {};
 
+            if(attrs.conditionalClass) {
+		attrs.conditionalClass.split(',').forEach(function(pattern) {
+		    var split = pattern.split(":", 2);
+                    updateFuncs.push(conditionalClassFunc(split[0], split[1]));
+		});
+            }
+
             elm.remove();
             reloadSubtitles();
 
@@ -406,10 +412,6 @@ var USER_IDLE_MINUTES = 15;
                         startEditOn(newValue);
                     }
                 });
-            }
-            if(attrs.conditionalClass) {
-                var split = attrs.conditionalClass.split(":", 2);
-                updateFuncs.push(conditionalClassFunc(split[0], split[1]));
             }
             // We connect to the click event of the parent element.  If we
             // have many subtitles, creating a handler for each <li> isn't
