@@ -170,10 +170,13 @@
 subtitle-repeat directive, see the working subtitles for more info
 -->
                         <li subtitle-repeat="referenceSubtitles.subtitleList"
-                            conditional-class="subtitle.isEmpty():empty"
+                            conditional-class="subtitle.isEmpty():empty,subtitle.startOfParagraph:paragraph-start"
                             class="subtitle-list-item">
                             <span class="timing">
                                 [[ subtitle.startTime | displayTime ]]
+                            </span>
+                            <span class="new-paragraph">
+                              ¶
                             </span>
                             <span class="subtitle-text">[[ subtitle.content() ]]</span>
                         </li>
@@ -310,7 +313,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 -->
                         <li subtitle-repeat="workingSubtitles.subtitleList"
                             class="subtitle-list-item"
-                            conditional-class="subtitle.isEmpty():empty"
+                            conditional-class="subtitle.startOfParagraph:paragraph-start,subtitle.isEmpty():empty"
                             current-subtitle-class="current-subtitle"
                             bind-to-edit="currentEdit.draft"
                             edit-keydown="onEditKeydown"
@@ -329,6 +332,10 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                                     subtitle-click="insert"></a>
                             </div>
                             <span class="arrow"></span>
+                            <a href="#" class="new-paragraph"
+                               subtitle-click="changeParagraph">
+                              ¶
+                            </a>
                             <span class="subtitle-text">[[ subtitle.content() ]]</span>
                         </li>
 

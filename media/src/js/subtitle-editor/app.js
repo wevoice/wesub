@@ -67,7 +67,6 @@ var angular = angular || null;
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
-
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
@@ -91,8 +90,12 @@ var angular = angular || null;
 	    }
 	    while (nextWorkingSubtitle) {
 		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, '', '');
+		$scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle, false);
 		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
 	    }
+	    // Sent no matter anything has changed or not, ideally we'd only emit
+	    // that if anything changed
+	    $scope.$root.$emit('work-done');
 	}
 
         $scope.timeline = {

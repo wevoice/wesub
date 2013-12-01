@@ -596,6 +596,11 @@ section.main {
         ul {
             overflow: hidden;
 
+
+            li.paragraph-start .new-paragraph {
+                       font-weight: bold;
+		       color: #000;
+            }
             li {
                 color: #3C3C3D;
                 font-size: 12px;
@@ -669,7 +674,15 @@ section.main {
                         }
                     }
                 }
-
+		.new-paragraph {
+		        color: #B0B0B0;
+                        font: normal 18px $OpenSans;
+                        text-decoration: none;
+                        top: 12px;
+                        display: block;
+                        position: absolute;
+                        left: 15px;
+                }
                 textarea, span.subtitle-text {
                     border: 0;
                     border-top: 1px solid #EBECED;

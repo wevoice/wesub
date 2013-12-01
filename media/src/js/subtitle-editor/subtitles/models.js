@@ -49,7 +49,7 @@ var angular = angular || null;
     </tt>';
     };
 
-    function Subtitle(startTime, endTime, markdown) {
+    function Subtitle(startTime, endTime, markdown, startOfParagraph) {
         /* Represents a subtitle in our system
          *
          * Subtitle has the following properties:
@@ -60,6 +60,7 @@ var angular = angular || null;
         this.startTime = startTime;
         this.endTime = endTime;
         this.markdown = markdown;
+        this.startOfParagraph = startOfParagraph;
     }
 
     Subtitle.prototype.duration = function() {
@@ -141,7 +142,7 @@ var angular = angular || null;
          * to get a DraftSubtitle.
          * */
         Subtitle.call(this, parser.startTime(node), parser.endTime(node),
-                $(node).text().trim());
+                $(node).text().trim(), parser.startOfParagraph(node));
         this.node = node;
         this.id = id;
     }
@@ -365,7 +366,10 @@ var angular = angular || null;
     }
 
     SubtitleList.prototype.updateSubtitleParagraph = function(subtitle, startOfParagraph) {
-        this._updateSubtitleParagraph(subtitle, startOfParagraph);
+        // If startOfParagraph is not given, it is toggled
+        var newStartOfParagraph = (startOfParagraph == undefined) ? !(this.parser.startOfParagraph(subtitle.node)) : startOfParagraph;
+        this._updateSubtitleParagraph(subtitle, newStartOfParagraph);
+        subtitle.startOfParagraph = newStartOfParagraph;
         this.emitChange('update', subtitle);
     }
 
