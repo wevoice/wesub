@@ -600,6 +600,8 @@ var angular = angular || null;
         this.description = null;
         this.state = 'waiting';
         this.metadata = {};
+        this.empty = true;
+
     }
 
     SubtitleVersionManager.prototype = {
@@ -620,6 +622,7 @@ var angular = angular || null;
                 }
                 that.description = subtitleData.description;
                 that.subtitleList.loadXML(subtitleData.subtitles);
+                that.empty = that.subtitleList.length() == 0;
             });
         },
         initEmptySubtitles: function(languageCode, baseLanguage) {
@@ -633,6 +636,7 @@ var angular = angular || null;
             if(baseLanguage) {
                 this.addSubtitlesFromBaseLanguage(baseLanguage);
             }
+            this.empty = this.subtitleList.length() == 0;
         },
         initMetadataFromVideo: function() {
             this.metadata = {};
@@ -646,6 +650,7 @@ var angular = angular || null;
                     function(subtitleData) {
                 that.subtitleList.addSubtitlesFromBaseLanguage(
                     subtitleData.subtitles);
+                that.empty = that.subtitleList.length() == 0;
             });
         },
         setLanguage: function(code) {
