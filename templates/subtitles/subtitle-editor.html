@@ -227,15 +227,19 @@ subtitle-repeat directive, see the working subtitles for more info
                     {{ language }} subtitles
                     {% endblocktrans %}
                 </div>
-                <div class="switches">
-                    <a class="copyover-display" href="#" ng-click="copyTimingOver()" ng-class="{ 'copyOverDisabled': referenceSubtitles.empty }">Copy timing</a>
-                    <a class="timeline-display" href="#" ng-click="toggleTimelineShown()">
-                        <span ng-show="timelineShown">Hide</span>
-                        <span ng-show="!timelineShown">Show</span>
-                        timeline
-                    </a>
-                    <a ng-show="false" href="#" class="video-display">Hide video</a>
-                </div>
+		<div class="toolbox">
+		  <div class="toolbox-inside">
+		    <a href="#">Tools</a>
+		    <ul class="toolbox-menu">
+		      <li ng-show="!referenceSubtitles.empty"><a href="#" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
+                      <li><a href="#" ng-click="toggleTimelineShown()">
+			  <span ng-show="timelineShown">Hide</span>
+			  <span ng-show="!timelineShown">Show</span>
+			  Timeline
+                      </a></li>
+		    </ul>
+		  </div>
+		</div>
             </div>
             <div class="subtitles-wrapper"
                 ng-controller="WorkingSubtitlesController"

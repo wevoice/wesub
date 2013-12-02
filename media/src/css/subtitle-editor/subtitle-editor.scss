@@ -1079,6 +1079,54 @@ section.main {
                 font-size: 12px;
                 line-height: 1.34em;
             }
+	    div.toolbox {
+                padding: 10px;
+                float: right;
+                div.toolbox-inside:hover ul.toolbox-menu {
+                  display:block;
+                }
+                div.toolbox-inside {              
+                   width: 150px;
+		   position: relative;
+                }
+                div.toolbox-inside > a {
+                width: 100%;
+		color: black;
+                font-weight: bold;
+                font-size: 12px;
+                line-height: 1.34em;
+                text-decoration: none;
+                text-align: right;
+                   position: absolute;
+                   right: 0;
+                }
+
+
+                ul.toolbox-menu {
+                   background: #E7E8E9;
+                   display:none;
+                   position: absolute;
+                   text-align: right;
+                   top: 16px;
+                   right: 0;
+		   li { 
+		       list-style-type: none;
+    		       display: inline-block;
+                       width:100%;
+                       a {
+                           width:100%;
+                           color: #7A7B7C;
+                           display: inline-block;
+                           padding: 10px;
+                           padding-left: 22px;
+                           text-decoration: none;
+                           &:hover {
+                              background: #C5C5C5;
+                           }
+                          }
+		      }
+                }
+	    }
             div.switches {
                 float: right;
 
