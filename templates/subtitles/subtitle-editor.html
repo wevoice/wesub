@@ -231,7 +231,7 @@ subtitle-repeat directive, see the working subtitles for more info
 		  <div class="toolbox-inside">
 		    <a href="#">Tools</a>
 		    <ul class="toolbox-menu">
-		      <li ng-show="!referenceSubtitles.empty"><a href="#" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
+		      <li ng-show="!(workingSubtitles.subtitleList.length() == 0 || referenceSubtitles.subtitleList.length() == 0)"><a href="#" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
                       <li><a href="#" ng-click="toggleTimelineShown()">
 			  <span ng-show="timelineShown">Hide</span>
 			  <span ng-show="!timelineShown">Show</span>
