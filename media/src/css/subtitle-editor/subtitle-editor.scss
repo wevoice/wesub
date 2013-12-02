@@ -598,8 +598,8 @@ section.main {
 
 
             li.paragraph-start .new-paragraph {
-                       font-weight: bold;
-		       color: #000;
+                       font-style: normal;
+		       color: #666;
             }
             li {
                 color: #3C3C3D;
@@ -676,9 +676,9 @@ section.main {
                 }
 		.new-paragraph {
 		        color: #B0B0B0;
-                        font: normal 18px $OpenSans;
+                        font: normal 13px $OpenSans;
                         text-decoration: none;
-                        top: 12px;
+                        top: 13px;
                         display: block;
                         position: absolute;
                         left: 15px;
