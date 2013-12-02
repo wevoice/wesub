@@ -88,7 +88,7 @@ var angular = angular || null;
 		nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
 	    }
 	    while (nextWorkingSubtitle) {
-		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, '', '');
+		$scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
 		$scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle, false);
 		nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
 	    }
