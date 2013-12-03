@@ -16,4 +16,6 @@ cat << EOF > /root/.gitconfig
     email = admin@amara.org
 EOF
 
+sed -i 's/.*url.*/url = git@github.com:pculture\/unisubs/g' $APP_DIR/.git/config
+
 ./deploy/update_translations.sh
