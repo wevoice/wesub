@@ -75,28 +75,26 @@ var angular = angular || null;
 	 * model.
 	 */
 	$scope.copyTimingOver = function() {
-            // If there is no synced working subtitle, we don't do anything
-	    if($scope.workingSubtitles.subtitleList.syncedCount > 0) {
-                var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.subtitles[$scope.workingSubtitles.subtitleList.indexOfFirstSubtitleAfter(-1)];
-                var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.subtitles[$scope.referenceSubtitles.subtitleList.indexOfFirstSubtitleAfter(-1)];
-                while (nextWorkingSubtitle && nextReferenceSubtitle) {
-                    $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
-                                                                            nextReferenceSubtitle.startTime,
-                                                                            nextReferenceSubtitle.endTime);
-                    $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle,
-                                                                                 $scope.referenceSubtitles.subtitleList.getSubtitleParagraph(nextReferenceSubtitle));
-                    nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
-                    nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
-                }
-            	while (nextWorkingSubtitle) {
-                    $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
-                    $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle, false);
-                    nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
-                }
-                // Sent no matter anything has changed or not, ideally we'd only emit
-                // that if anything changed
-                $scope.$root.$emit('work-done');
+            // Todo : a better way to retrieve the first subtitles
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.subtitles[$scope.workingSubtitles.subtitleList.indexOfFirstSubtitleAfter(-2)];
+            var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.subtitles[$scope.referenceSubtitles.subtitleList.indexOfFirstSubtitleAfter(-2)];
+            while (nextWorkingSubtitle && nextReferenceSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
+                                                                        nextReferenceSubtitle.startTime,
+                                                                        nextReferenceSubtitle.endTime);
+                $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle,
+                                                                             $scope.referenceSubtitles.subtitleList.getSubtitleParagraph(nextReferenceSubtitle));
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+                nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
             }
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
+                $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle, false);
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+            }
+            // Sent no matter anything has changed or not, ideally we'd only emit
+            // that if anything changed
+            $scope.$root.$emit('work-done');
 	}
 
         $scope.timeline = {
