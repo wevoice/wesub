@@ -75,9 +75,8 @@ var angular = angular || null;
 	 * model.
 	 */
 	$scope.copyTimingOver = function() {
-            // Todo : a better way to retrieve the first subtitles
-            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.subtitles[$scope.workingSubtitles.subtitleList.indexOfFirstSubtitleAfter(-2)];
-            var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.subtitles[$scope.referenceSubtitles.subtitleList.indexOfFirstSubtitleAfter(-2)];
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.firstSubtitle();
             while (nextWorkingSubtitle && nextReferenceSubtitle) {
                 $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
                                                                         nextReferenceSubtitle.startTime,
