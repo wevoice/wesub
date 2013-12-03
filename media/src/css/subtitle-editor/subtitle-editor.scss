@@ -596,10 +596,16 @@ section.main {
         ul {
             overflow: hidden;
 
-
+            .subtitle-list-item {
+                .new-paragraph {display: none;}
+                &:hover {
+                    a.new-paragraph {display: block;}
+                }
+            }
             li.paragraph-start .new-paragraph {
                        font-style: normal;
 		       color: #666;
+                       display: block;
             }
             li {
                 color: #3C3C3D;
@@ -679,7 +685,6 @@ section.main {
                         font: normal 13px $OpenSans;
                         text-decoration: none;
                         top: 13px;
-                        display: block;
                         position: absolute;
                         left: 15px;
                 }
