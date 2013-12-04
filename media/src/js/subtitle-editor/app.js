@@ -69,19 +69,19 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
-	$scope.adjustRefsSize = function() {
-	    var newHeaderSize = Math.max($('div.subtitles.reference .content').height(),
-					 $('div.subtitles.working .content').height());
-	    $('div.subtitles.reference .content').height(newHeaderSize);
-	    $('div.subtitles.working .content').height(newHeaderSize);
-	    if($scope.referenceSubtitles.subtitleList.length() > 0 && ($scope.referenceSubtitles.subtitleList.length() == $scope.workingSubtitles.subtitleList.length())) {
-		var $reference = $('div.subtitles.reference').first();
-		var $working = $('div.subtitles.working').first();
-		if($reference.height() < $working.height()) {
-		    $reference.last().height($reference.last().height() + $working.height() - $reference.height() );
-		}
-	    }
-	}
+	$scope.adjustReferenceSize = function() {
+            // Adjusts header size and then ref size so that refs and working look well in parallell
+            var newHeaderSize = Math.max($('div.subtitles.reference .content').height(),
+                                         $('div.subtitles.working .content').height());
+            $('div.subtitles.reference .content').height(newHeaderSize);
+            $('div.subtitles.working .content').height(newHeaderSize);
+            if($scope.referenceSubtitles.subtitleList.length() > 0 && ($scope.referenceSubtitles.subtitleList.length() == $scope.workingSubtitles.subtitleList.length())) {
+                var $reference = $('div.subtitles.reference').first();
+                var $working = $('div.subtitles.working').first();
+                if($reference.height() < $working.height())
+                    $reference.last().height($reference.last().height() + $working.height() - $reference.height() );
+            }
+        }
 	/*
 	 * Might not be the right location
 	 * TODO: move this to the proper place (probably the SubtitleList

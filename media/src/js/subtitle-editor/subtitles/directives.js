@@ -155,38 +155,28 @@ var USER_IDLE_MINUTES = 15;
             scroller.scroll(function() {
                 // If scroll sync is locked.
                 if (scope.scrollingSynced) {
-		    var delta = 0;
-		    var index_scrolled = -1;
-		    $('div.subtitles').each(function(index) {
-			if ($(this).scrollTop() != scrollingPrevious[index]) {
-			    delta = $(this).scrollTop() - scrollingPrevious[index];
-			    index_scrolled = index;
-			}
-		    });
-		    $('div.subtitles').each(function(index) {
-			if (index != index_scrolled) {
-			    var newScrollTop = $(this).scrollTop() + delta;
-			    $(this).scrollTop(newScrollTop);
-			    if ($(this).scrollTop() != newScrollTop) {
-				if ($(this).scrollTop() != 0) {
-				    $(this).children().last().height($(this).children().last().height() + 20);
-				}
-			    }
-			}
-		    });
-/*
-                    var newScrollTop = $(elem).parent().scrollTop();
-
-                    $('div.subtitles').each(function() {
-			console.log("Scrolling index " + index);
-                        var $set = $(this);
-
-                        if ($set.scrollTop() !== newScrollTop) {
-                            $set.scrollTop(newScrollTop);
+                    var delta = 0;
+                    var index_scrolled = -1;
+                    $('div.subtitles').each(function(index) {
+                        var newScrollTop = $(this).scrollTop();
+                        if (newScrollTop != scrollingPrevious[index]) {
+                            delta = newScrollTop - scrollingPrevious[index];
+                            index_scrolled = index;
                         }
-
                     });
-*/
+                    if (index_scrolled != -1) {
+                        $('div.subtitles').each(function(index) {
+                            if (index != index_scrolled) {
+                                var newScrollTop = $(this).scrollTop() + delta;
+                                $(this).scrollTop(newScrollTop);
+                                var updatedScrollTop = $(this).scrollTop();
+                                if ((updatedScrollTop != newScrollTop) && (updatedScrollTop != 0)) {
+                                    $(this).children().last().height($(this).children().last().height() + newScrollTop - updatedScrollTop);
+                                    $(this).scrollTop(newScrollTop);
+                                }
+                            }
+                        });
+                    }
                 }
 		$('div.subtitles').each(function(index) {
 		    scrollingPrevious[index] = $(this).scrollTop();
@@ -401,7 +391,9 @@ var USER_IDLE_MINUTES = 15;
                     var subtitle = subtitleList.subtitles[i];
                     parent.append(createNodeForSubtitle(subtitle));
                 }
-		$scope.adjustRefsSize();
+                // Probably not great to have it here
+                // We need to adjust the sizes to look nicer while scrolling
+                $scope.adjustReferenceSize();
             }
             $scope.getSubtitleRepeatItem = function(subtitle) {
                 var rv = subtitleMap[subtitle.id];
