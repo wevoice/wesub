@@ -2659,7 +2659,7 @@ class BillingReport(models.Model):
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
 
-            all_tasks = []
+            all_tasks = [approve_task]
             try:
                 all_tasks.append((Task.objects.complete_subtitle_or_translate()
                                   .filter(team_video=approve_task.team_video,
