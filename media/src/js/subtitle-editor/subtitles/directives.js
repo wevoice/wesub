@@ -144,6 +144,10 @@ var USER_IDLE_MINUTES = 15;
 
     module.directive('subtitleList', function($window) {
         var window = $($window);
+	var scrollingPrevious = [];
+	$('div.subtitles').each(function(index) {
+	    scrollingPrevious[index] = $(this).scrollTop();
+	});
         return function link(scope, elem, attrs) {
             var scroller = $(elem).parent();
             var isWorkingSet = (attrs.subtitleList == "working-subtitle-set");
@@ -151,10 +155,24 @@ var USER_IDLE_MINUTES = 15;
             scroller.scroll(function() {
                 // If scroll sync is locked.
                 if (scope.scrollingSynced) {
+		    var delta = 0;
+		    var index_scrolled = -1;
+		    $('div.subtitles').each(function(index) {
+			if ($(this).scrollTop() != scrollingPrevious[index]) {
+			    delta = $(this).scrollTop() - scrollingPrevious[index];
+			    index_scrolled = index;
+			}
+		    });
+		    $('div.subtitles').each(function(index) {
+			if (index != index_scrolled) {
+			    $(this).scrollTop($(this).scrollTop() + delta);
+			}
+		    });
+/*
                     var newScrollTop = $(elem).parent().scrollTop();
 
                     $('div.subtitles').each(function() {
-
+			console.log("Scrolling index " + index);
                         var $set = $(this);
 
                         if ($set.scrollTop() !== newScrollTop) {
@@ -162,7 +180,12 @@ var USER_IDLE_MINUTES = 15;
                         }
 
                     });
+*/
                 }
+		$('div.subtitles').each(function(index) {
+		    scrollingPrevious[index] = $(this).scrollTop();
+		});
+
                 if(isWorkingSet) {
                     scope.$root.$emit("working-subtitles-scrolled");
                 }
