@@ -70,8 +70,11 @@ var angular = angular || null;
             $scope.timelineShown = !$scope.timelineShown
         }
 	$scope.adjustRefsSize = function() {
+	    var newHeaderSize = Math.max($('div.subtitles.reference .content').height(),
+					 $('div.subtitles.working .content').height());
+	    $('div.subtitles.reference .content').height(newHeaderSize);
+	    $('div.subtitles.working .content').height(newHeaderSize);
 	    if($scope.referenceSubtitles.subtitleList.length() > 0 && ($scope.referenceSubtitles.subtitleList.length() == $scope.workingSubtitles.subtitleList.length())) {
-
 		var $reference = $('div.subtitles.reference').first();
 		var $working = $('div.subtitles.working').first();
 		if($reference.height() < $working.height()) {
