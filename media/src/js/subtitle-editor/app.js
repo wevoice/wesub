@@ -69,6 +69,16 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
+	$scope.adjustRefsSize = function() {
+	    if($scope.referenceSubtitles.subtitleList.length() > 0 && ($scope.referenceSubtitles.subtitleList.length() == $scope.workingSubtitles.subtitleList.length())) {
+
+		var $reference = $('div.subtitles.reference').first();
+		var $working = $('div.subtitles.working').first();
+		if($reference.height() < $working.height()) {
+		    $reference.last().height($reference.last().height() + $working.height() - $reference.height() );
+		}
+	    }
+	}
 	/*
 	 * Might not be the right location
 	 * TODO: move this to the proper place (probably the SubtitleList
