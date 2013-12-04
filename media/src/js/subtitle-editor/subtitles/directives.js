@@ -165,7 +165,13 @@ var USER_IDLE_MINUTES = 15;
 		    });
 		    $('div.subtitles').each(function(index) {
 			if (index != index_scrolled) {
-			    $(this).scrollTop($(this).scrollTop() + delta);
+			    var newScrollTop = $(this).scrollTop() + delta;
+			    $(this).scrollTop(newScrollTop);
+			    if ($(this).scrollTop() != newScrollTop) {
+				if ($(this).scrollTop() != 0) {
+				    $(this).children().last().height($(this).children().last().height() + 20);
+				}
+			    }
 			}
 		    });
 /*
