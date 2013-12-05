@@ -229,7 +229,7 @@ subtitle-repeat directive, see the working subtitles for more info
                 </div>
 		<div class="toolbox">
 		  <div class="toolbox-inside">
-		    <a href="#">+</a>
+		    <a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
 		    <ul class="toolbox-menu">
 		      <li ng-show="!(workingSubtitles.subtitleList.length() == 0 || referenceSubtitles.subtitleList.length() == 0)"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
                       <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
