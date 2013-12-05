@@ -13,11 +13,12 @@ class MembersTab(ATeamPage):
     _EDIT_USER = "a.edit-role"
     _DELETE_USER = 'ul.admin-controls li a.delete'
     _SORT_FILTER = "a#sort-filter"
+    _SEARCH = 'form.search input[name="q"]'
 
     #EDIT USER MODAL
     _ROLE_PULLDOWN = "select#roles"
-    _ROLE_LANG_PULLDOWN = "div#language-restriction select.chzn-select"
-    _ROLE_PROJ_PULLDOWN = "div#project-restriction select.chzn-select"
+    _ROLE_LANG_PULLDOWN = "div#language-restriction select#lang"
+    _ROLE_PROJ_PULLDOWN = "div#project-restriction select#proj"
     _SAVE_EDITS = "a.action-save"
     _CANCEL_EDITS = ".modal-footer .action-close"
 
@@ -56,6 +57,7 @@ class MembersTab(ATeamPage):
         """Return the of the user role of teh first user on the page.
 
         """
+        
         return self.get_text_by_css(self._ROLE)
 
     def displays_invite(self):
@@ -80,10 +82,9 @@ class MembersTab(ATeamPage):
         self.submit_by_css(self._INVITATION_SEND)
 
 
-    def member_search(self, team_slug, query):
-        team_url = self._URL % team_slug
-        search_url = "%s?q=%s" % (team_url, query)
-        self.open_page(search_url)
+    def member_search(self, search):
+        self.clear_text(self._SEARCH)
+        self.submit_form_text_by_css(self._SEARCH, search)
 
     def lang_search(self, team_slug, lang):
         """Open the url of language search term.
@@ -121,12 +122,14 @@ class MembersTab(ATeamPage):
         """Restrict languages via the edit user form.
 
         """
+        self.click_by_css("div#lang_chzn")
         self.select_from_chosen(self._ROLE_LANG_PULLDOWN, languages)
 
     def _project_restrictions(self, projects):
         """Restrict projects via the edit user form.
 
         """
+        self.click_by_css("div#proj_chzn")
         self.select_from_chosen(self._ROLE_PROJ_PULLDOWN, projects)
 
     def delete_user_link(self):

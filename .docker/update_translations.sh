@@ -10,4 +10,12 @@ Host github.com
     IdentityFile /root/.ssh/amara_transifex
 EOF
 
+cat << EOF > /root/.gitconfig
+[user]
+    name = transifex
+    email = admin@amara.org
+EOF
+
+sed -i 's/.*url.*/url = git@github.com:pculture\/unisubs/g' $APP_DIR/.git/config
+
 ./deploy/update_translations.sh
