@@ -109,8 +109,8 @@ var angular = angular || null;
             $scope.$root.$emit('work-done');
 	}
         $scope.copyTimingEnabled = function() {
-            return (workingSubtitles.subtitleList.length() > 0 &&
-                     referenceSubtitles.subtitleList.syncedCount > 0)
+            return ($scope.workingSubtitles.subtitleList.length() > 0 &&
+                     $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
         $scope.timeline = {
             shownSubtitle: null,
