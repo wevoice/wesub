@@ -69,7 +69,7 @@ var angular = angular || null;
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
-	$scope.adjustReferenceSize = function() {
+        $scope.adjustReferenceSize = function() {
             // Adjusts header size and then ref size so that refs and working look well in parallell
             var newHeaderSize = Math.max($('div.subtitles.reference .content').height(),
                                          $('div.subtitles.working .content').height());
@@ -87,7 +87,7 @@ var angular = angular || null;
 	 * TODO: move this to the proper place (probably the SubtitleList
 	 * model.
 	 */
-	$scope.copyTimingOver = function() {
+        $scope.copyTimingOver = function() {
             var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
             var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.firstSubtitle();
             while (nextWorkingSubtitle && nextReferenceSubtitle) {
@@ -108,7 +108,10 @@ var angular = angular || null;
             // that if anything changed
             $scope.$root.$emit('work-done');
 	}
-
+        $scope.copyTimingEnabled = function() {
+            return !(workingSubtitles.subtitleList.length() == 0 ||
+                     referenceSubtitles.subtitleList.length() == 0)
+        }
         $scope.timeline = {
             shownSubtitle: null,
             currentTime: null,
