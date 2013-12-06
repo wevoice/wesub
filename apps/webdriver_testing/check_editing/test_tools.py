@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time 
 from django.test import TestCase
 from django.core import management
 
@@ -116,7 +117,7 @@ class TestCaseTools(WebdriverTestCase):
         ref_times = self.editor_pg.reference_times()
         self.assertEqual(ref_times[:5], working_times[:5]) 
 
-    def test_copy_timings_no_reference(self):
+    def test_copy_timings_reference_unsynced(self):
         """No copy in menu if reference subs are draft. """
         video = Video.objects.all()[0]
         test_user = UserFactory.create()
@@ -125,6 +126,19 @@ class TestCaseTools(WebdriverTestCase):
         self.video_pg.log_in(test_user.username, 'password')
         self.video_pg.open_video_page(video.video_id)
         self.video_pg.upload_subtitles('Dutch', sub_file)
+        self.editor_pg.open_ed_with_base(video.video_id, 'sv', 'nl')
+        self.editor_pg.select_ref_language('Dutch')
+        time.sleep(3)
+        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
+
+    def test_copy_timings_reference_draft(self):
+        """No copy in menu if reference subs are draft. """
+        video = Video.objects.all()[0]
+        test_user = UserFactory.create()
+        self.video_pg.log_in(test_user.username, 'password')
         self.editor_pg.open_editor_page(video.video_id, 'hr')
         self.editor_pg.select_ref_language('Turkish')
-        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
+        self.editor_pg.copy_timings()
+        working_times = self.editor_pg.start_times()
+        ref_times = self.editor_pg.reference_times()
+        self.assertEqual(ref_times[:5], working_times[:5]) 

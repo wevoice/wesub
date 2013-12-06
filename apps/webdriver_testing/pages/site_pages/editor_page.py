@@ -84,6 +84,12 @@ class EditorPage(UnisubsPage):
         if close_metadata:
             self.close_metadata()
 
+
+    def open_ed_with_base(self, video_id, lang, base_lang='en'):
+        url = self._URL + '?base-language={2}'
+        self.open_page(url.format(video_id, lang, base_lang))
+        self.close_metadata()
+
     def keyboard_controls_help(self):
         pass
 
