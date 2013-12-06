@@ -100,7 +100,9 @@ body {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
 }
-
+div.toolbar {
+    height: 40px;
+}
 // Utils
 .group:after {
     content: ".";
@@ -596,6 +598,17 @@ section.main {
         ul {
             overflow: hidden;
 
+            .subtitle-list-item {
+                .new-paragraph {display: none;}
+                &:hover {
+                    a.new-paragraph {display: block;}
+                }
+            }
+            li.paragraph-start .new-paragraph {
+                       font-style: normal;
+		       color: #666;
+                       display: block;
+            }
             li {
                 color: #3C3C3D;
                 font-size: 12px;
@@ -669,7 +682,14 @@ section.main {
                         }
                     }
                 }
-
+		.new-paragraph {
+		        color: #B0B0B0;
+                        font: normal 13px $OpenSans;
+                        text-decoration: none;
+                        top: 13px;
+                        position: absolute;
+                        left: 15px;
+                }
                 textarea, span.subtitle-text {
                     border: 0;
                     border-top: 1px solid #EBECED;
@@ -1066,6 +1086,75 @@ section.main {
                 font-size: 12px;
                 line-height: 1.34em;
             }
+	    div.toolbox {
+                padding-top: 5px;
+                padding-right: 10px;
+                float: right;
+                div.toolbox-inside:hover ul.toolbox-menu {
+                  display:block;
+                }
+                div.toolbox-inside {              
+                   width: 150px;
+		   position: relative;
+                }
+                div.toolbox-inside > a {
+		color: black;
+                font-weight: 900;
+                font-size: 18px;
+                line-height: 1.34em;
+                text-decoration: none;
+                text-align: right;
+                position: absolute;
+                right: 0;
+                padding: 3px 0px 20px 20px;
+                }
+
+
+                ul.toolbox-menu {
+                   &:before {
+                       position: absolute;
+                       display: block;
+                       content: "";
+                       border-color: transparent transparent #212223 transparent;
+                       border-style: solid;
+                       border-width: 10px;
+                       height:0;
+                       width:0;
+                       position:absolute;
+                       top:-20px;
+                       right: 1em;
+                   }
+                   background: #212223;
+                   display:none;
+                   position: absolute;
+                   text-align: left;
+                   top: 35px;
+                   right: -16px;
+		   li { 
+		       list-style-type: none;
+    		       display: inline-block;
+                       width:100%;
+                       a {
+                           width:100%;
+                           color: #DDDDDD;
+                           display: inline-block;
+                           padding: 10px;
+                           padding-left: 28px;
+                           text-decoration: none;
+                           &.copyover {
+                             background: url('../../../images/subtitle-editor/glyphicons_358_file_import.png') 10px no-repeat;
+                           }
+                           &.show-timeline {
+                             background: url('../../../images/subtitle-editor/glyphicons_054_clock.png') 10px no-repeat;
+                           }
+                           &:hover {
+                              background: #C5C5C5;
+                              color: #212223;
+                           }
+                          }
+		      }
+                }
+	    }
             div.switches {
                 float: right;
 
@@ -1081,6 +1170,9 @@ section.main {
                         text-decoration: underline;
                     }
                     &.timeline-display {
+                        background-position: left -88px;
+                    }
+                    &.copyover-display {
                         background-position: left -88px;
                     }
                     &.video-display {

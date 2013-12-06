@@ -63,15 +63,55 @@ var angular = angular || null;
         $scope.scrollingSynced = true;
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
-
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
-
         $scope.toggleTimelineShown = function() {
             $scope.timelineShown = !$scope.timelineShown
         }
-
+        $scope.adjustReferenceSize = function() {
+            // Adjusts header size and then ref size so that refs and working look well in parallell
+            var newHeaderSize = Math.max($('div.subtitles.reference .content').height(),
+                                         $('div.subtitles.working .content').height());
+            $('div.subtitles.reference .content').height(newHeaderSize);
+            $('div.subtitles.working .content').height(newHeaderSize);
+            if($scope.referenceSubtitles.subtitleList.length() > 0 && ($scope.referenceSubtitles.subtitleList.length() == $scope.workingSubtitles.subtitleList.length())) {
+                var $reference = $('div.subtitles.reference').first();
+                var $working = $('div.subtitles.working').first();
+                if($reference.height() < $working.height())
+                    $reference.last().height($reference.last().height() + $working.height() - $reference.height() );
+            }
+        }
+	/*
+	 * Might not be the right location
+	 * TODO: move this to the proper place (probably the SubtitleList
+	 * model.
+	 */
+        $scope.copyTimingOver = function() {
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.firstSubtitle();
+            while (nextWorkingSubtitle && nextReferenceSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle,
+                                                                        nextReferenceSubtitle.startTime,
+                                                                        nextReferenceSubtitle.endTime);
+                $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle,
+                                                                             $scope.referenceSubtitles.subtitleList.getSubtitleParagraph(nextReferenceSubtitle));
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+                nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.nextSubtitle(nextReferenceSubtitle);
+            }
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
+                $scope.workingSubtitles.subtitleList.updateSubtitleParagraph(nextWorkingSubtitle, false);
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+            }
+            // Sent no matter anything has changed or not, ideally we'd only emit
+            // that if anything changed
+            $scope.$root.$emit('work-done');
+	}
+        $scope.copyTimingEnabled = function() {
+            return ($scope.workingSubtitles.subtitleList.length() > 0 &&
+                     $scope.referenceSubtitles.subtitleList.syncedCount > 0)
+        }
         $scope.timeline = {
             shownSubtitle: null,
             currentTime: null,
@@ -284,7 +324,6 @@ var angular = angular || null;
             video, SubtitleStorage);
         $scope.referenceSubtitles = new SubtitleVersionManager(
             video, SubtitleStorage);
-
         var editingVersion = EditorData.editingVersion;
 
         if(editingVersion.versionNumber) {

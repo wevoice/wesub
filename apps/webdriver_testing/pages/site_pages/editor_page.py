@@ -3,7 +3,7 @@
 import time
 
 from selenium.webdriver.common.keys import Keys
-
+from selenium.common.exceptions import ElementNotVisibleException
 from apps.webdriver_testing.pages.site_pages import UnisubsPage
 
 class EditorPage(UnisubsPage):
@@ -48,14 +48,16 @@ class EditorPage(UnisubsPage):
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
     _WORKING_LANGUAGE = 'section.center div.subtitles-language'
-    _REMOVE_SUBTITLE = 'a.remove-subtitle'
     _ADD_SUBTITLE = 'a.add-subtitle'
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
     _INFO_DETAILS = 'div.info-tray tr'
     _ADD_SUB_TO_END = 'a.end'
-    _TIMELINE_DISPLAY = 'a.timeline-display span'
+    _TIMELINE_DISPLAY = 'a.show-timeline span'
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
+    _COPY_TIMING = 'a.copyover'
+    _TOOLS_MENU = 'div.toolbox-inside a'
+    _PARAGRAPH_MARKER = '.paragraph-start'
 
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
@@ -81,6 +83,12 @@ class EditorPage(UnisubsPage):
         self.open_page(self._URL.format(video_id, lang))
         if close_metadata:
             self.close_metadata()
+
+
+    def open_ed_with_base(self, video_id, lang, base_lang='en'):
+        url = self._URL + '?base-language={2}'
+        self.open_page(url.format(video_id, lang, base_lang))
+        self.close_metadata()
 
     def keyboard_controls_help(self):
         pass
@@ -212,14 +220,11 @@ class EditorPage(UnisubsPage):
         """Toggle the timeline display.  Action should be Show or Hide.
 
         """
+        self.hover_tools_menu()
         els = self.get_elements_list(self._TIMELINE_DISPLAY)
         for el in els: 
-            if el.is_displayed:
-                current = el.text
-                break
-               
-        if current == action:
-            el.click()
+            if action in el.text:
+                el.click()
 
 
     def video_title(self):
@@ -257,6 +262,28 @@ class EditorPage(UnisubsPage):
         rem.click()
         return removed_text
 
+    def hover_tools_menu(self):
+        self.hover_by_css(self._TOOLS_MENU)
+
+    def copy_timings(self):
+        self.hover_tools_menu()
+        try:
+            self.click_by_css(self._COPY_TIMING)
+            time.sleep(1)
+        except ElementNotVisibleException:
+            return "Element not displayed"
+ 
+    def toggle_paragraph(self, position):
+        """Toggles the paragraph marker on or off. """
+
+        _, el = self.click_working_sub_line(position)
+        try:
+            para = el.find_element_by_css_selector(self._PARAGRAPH_MARKERS)
+        except:
+            self.record_error('paragraph button not found')
+        para.click() 
+
+
     def _last_working_list_element(self):
         """return the last active element in the working list."""
 
@@ -275,7 +302,13 @@ class EditorPage(UnisubsPage):
             self.click_by_css(self._ADD_SUB_TO_END)
             self.type_by_css('textarea.subtitle-edit', '%s\n' % line)
 
-        
+    def add_new_lines(self, lines):
+        self.browser.execute_script("window.location.hash='add-sub-at-end'")
+        self.click_by_css(self._ADD_SUB_TO_END)
+        for x in range(lines-1):
+            self.type_by_css('span.subtitle-text', "\n")
+            time.sleep(.5)
+
 
     def edit_sub_line(self, newtext, line, enter=True):
         old_text, el = self.click_working_sub_line(line)
@@ -397,6 +430,24 @@ class EditorPage(UnisubsPage):
             for el in els:
                 times.append(el.text)
             return times
+
+    def reference_times(self, position=None):
+        """Return a list of the start times of the reference subs. 
+
+        If position is supplied, just return that sub time.
+        """
+
+        els = self.get_elements_list(' '.join([self._REFERENCE_LIST,
+                                               self._SUBTITLE_ITEM,
+                                               self._SUB_TIME]))
+        if position:
+            return els[position].text
+        else:
+            times = []
+            for el in els:
+                times.append(el.text)
+            return times
+
 
     def sync_help_displayed(self):
         return self.is_element_visible(self._SYNC_HELP)
