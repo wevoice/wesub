@@ -62,7 +62,6 @@ class TestCaseTools(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
 
     def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
         try:
             self.editor_pg.exit()
         except:
@@ -118,7 +117,7 @@ class TestCaseTools(WebdriverTestCase):
         self.assertEqual(ref_times[:5], working_times[:5]) 
 
     def test_copy_timings_reference_unsynced(self):
-        """No copy in menu if reference subs are draft. """
+        """No copy in menu if reference subs are unsynced. """
         video = Video.objects.all()[0]
         test_user = UserFactory.create()
         sub_file = os.path.join(os.getcwd(), 'apps', 'webdriver_testing', 
@@ -132,13 +131,18 @@ class TestCaseTools(WebdriverTestCase):
         self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
 
     def test_copy_timings_reference_draft(self):
-        """No copy in menu if reference subs are draft. """
+        """No copy in menu if reference subs are draft (incomplete). """
+        video = Video.objects.all()[0]
+        test_user = UserFactory.create()
+        self.video_pg.log_in(test_user.username, 'password')
+        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.select_ref_language('Turkish')
+        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
+
+    def test_copy_timings_working_blank(self):
+        """No copy in menu if there are no working subs. """
         video = Video.objects.all()[0]
         test_user = UserFactory.create()
         self.video_pg.log_in(test_user.username, 'password')
         self.editor_pg.open_editor_page(video.video_id, 'hr')
-        self.editor_pg.select_ref_language('Turkish')
-        self.editor_pg.copy_timings()
-        working_times = self.editor_pg.start_times()
-        ref_times = self.editor_pg.reference_times()
-        self.assertEqual(ref_times[:5], working_times[:5]) 
+        self.assertEqual("Element not displayed", self.editor_pg.copy_timings())
