@@ -54,6 +54,26 @@
         <h1 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display }}</a>
         </h1>
+        <ul class="metrics">
+            <li>
+                <div>
+                    <p>{{ video.followers.count }}</p>
+                    <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                </div>
+            </li>
+            <li>
+                <div>
+                    <p>{{ video.comment_count }}</p>
+                    <h4>{% trans "Comment" %}{{ video.comment_count|pluralize }}</h4>
+                </div>
+            </li>
+            <li class="last">
+                <div>
+                    <p>{{ video.languages_count }}</p>
+                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                </div>
+            </li>
+        </ul>
         <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
             {% for field in metadata %}
                 <h4>{{ field.label}}: {{ field.content}} </h4>
@@ -69,32 +89,6 @@
                 {% endif %}
             </div>
         {% endwith %}
-        <ul class="metrics">
-            <li>
-                <div>
-                    <p>{{ video.followers.count }}</p>
-                    <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
-                </div>
-            </li>
-            <li>
-                <div>
-                    <p>{{ video.comment_count }}</p>
-                    <h4>{% trans "Comment" %}{{ video.comment_count|pluralize }}</h4>
-                </div>
-            </li>
-            <li>
-                <div>
-                    <p>{{ video.languages_count }}</p>
-                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
-                </div>
-            </li>
-            <li class="last">
-                <div>
-                    <p>{{ video.view_count }}</p>
-                    <h4>{% trans "View" %}{{ video.view_count|pluralize }}</h4>
-                </div>
-            </li>
-        </ul>
         <div class="sharing-tools">
             {% if shows_widget_sharing %}
                 {% include '_sharing_widget.html' %}
