@@ -74,6 +74,22 @@
                 </div>
             </li>
         </ul>
+        {% if user.managed_teams and not team %}
+        <div class="section">
+            {% team_add_video_select %}
+        </div>
+        {% else %}
+            {% if team %}
+                <div class="section group">
+                    {% if team.logo %}
+                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
+                    {% endif %}
+                    {% blocktrans with team.get_absolute_url as url %}
+                    This video belongs to the <a href="{{ url }}">{{ team }}</a> translation project.
+                    {% endblocktrans %}
+                </div>
+            {% endif %}
+        {% endif %}
         <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
             {% for field in metadata %}
                 <h4>{{ field.label}}: {{ field.content}} </h4>
@@ -111,21 +127,19 @@
             </ul>
         {% else %}
             {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
-                {% with video.get_team_video as team_video %}
-                    {% if team_video %}
-                        {% if team_video.team.workflow_enabled %}
-                            {% if team_video.task_set.incomplete.exists %}
-                                <p>{% trans "No subtitles yet." %} <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">{% trans "View tasks for this video." %}</a></p>
-                            {% else %}
-                                {% trans "This video doesn't have any subtitles or tasks yet." %}
-                            {% endif %}
+                {% if team_video %}
+                    {% if team_video.team.workflow_enabled %}
+                        {% if team_video.task_set.incomplete.exists %}
+                            <p>{% trans "No subtitles yet." %} <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">{% trans "View tasks for this video." %}</a></p>
                         {% else %}
-                            <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+                            {% trans "This video doesn't have any subtitles or tasks yet." %}
                         {% endif %}
                     {% else %}
                         <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
                     {% endif %}
-                {% endwith %}
+                {% else %}
+                    <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
+                {% endif %}
             {% else %}
                 <p>
                     {% trans "This video doesn't have any subtitles yet." %}

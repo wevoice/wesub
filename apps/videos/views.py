@@ -321,10 +321,12 @@ class VideoPageContext(dict):
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
-        if video.get_team_video() is not None:
-            self['team'] = video.get_team_video().team
+        team_video = video.get_team_video()
+        if team_video is not None:
+            self['team'] = team_video.team
+            self['team_video'] = team_video
         else:
-            self['team'] = None
+            self['team'] = self['team_video'] = None
 
     @staticmethod
     def page_title(video):

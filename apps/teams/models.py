@@ -158,7 +158,9 @@ class Team(models.Model):
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links. Line breaks and HTML not supported.'))
 
-    logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
+    logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True,
+                               upload_to='teams/logo/',
+                               thumb_sizes=[(280, 100), (100, 100), (48, 48)])
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
@@ -320,8 +322,7 @@ class Team(models.Model):
     def small_logo_thumbnail(self):
         """Return the URL for a really small version of this team's logo, or None."""
         if self.logo:
-            return self.logo.thumb_url(50, 50)
-
+            return self.logo.thumb_url(48, 48)
 
     # URLs
     @models.permalink
