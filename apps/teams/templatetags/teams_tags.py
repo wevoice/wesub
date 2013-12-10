@@ -216,20 +216,6 @@ def team_move_video_select(context):
                                 and team.pk != team_video.team.pk]
     return context
 
-@register.inclusion_tag('videos/_team_list.html', takes_context=True)
-def render_belongs_to_team_list(context, team_video, user):
-    teams =  []
-    video = team_video.video
-    for t in list(video.team_set.filter()):
-        if t.is_visible or user in t.users.all():
-            if video.moderated_by == t:
-                t.moderates =True
-                teams.insert(0, t)
-            else:
-                teams.append(t)
-    return {"teams": teams, "team_video": team_video, "user": context["request"].user}
-
-
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
 def team_video_detail(context, team_video_search_record):
     context['search_record'] = team_video_search_record

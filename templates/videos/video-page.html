@@ -90,27 +90,29 @@
                 </div>
             {% endif %}
         {% endif %}
-        <div class="section">
-            <h4>{% trans "Contribute" %}</h4>
-            <p>
-                {% with can_create_subs=request.user|can_create_subtitles_for:video can_create_trans=request.user|can_create_translations_for:video %}
+        {% if can_create_subs or can_create_trans %}
+            <div class="section">
+                <h4>{% trans "Contribute" %}</h4>
+                {% if team.workflow_enabled %}
+                    {% blocktrans with team_video.get_tasks_page_url as url %}
+                    Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.
+                    {% endblocktrans %}
+                {% else %}
+                <p>
                     {% if video.languages_count < 1 %}
                         {% if can_create_subs %}
-                            {% trans "This video doesn't have any subtitles yet" %} :( <a href="#" class="add_subtitles">{% trans 'Create subtitles now' %}</a>!
+                        {% trans "This video doesn't have any subtitles yet" %} :(<br /><a href="#" class="add_subtitles">{% trans 'Create subtitles now!' %}</a>
                         {% endif %}
                     {% else %}
                         {% if can_create_trans %}
-                            {% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation' %}</a>!
+                            {% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a>
                         {% endif %}
                     {% endif %}
-                    {% if can_create_subs or can_create_trans %}
-                        {% upload_subtitles video %}
-                    {% else %}
-                        {% trans 'Subtitles for this video are moderated. If it belongs to a team, try joining the team to contribute.' %}
-                    {% endif %}
-                {% endwith %}
-            </p>
-        </div>
+                    {% upload_subtitles video %}
+                </p>
+                {% endif %}
+            </div>
+        {% endif %}
         <div {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %}>
             {% for field in metadata %}
                 <h4>{{ field.label}}: {{ field.content}} </h4>

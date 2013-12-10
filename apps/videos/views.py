@@ -55,6 +55,8 @@ from apps.subtitles import models as sub_models
 from apps.subtitles.forms import SubtitlesUploadForm
 from apps.subtitles.pipeline import rollback_to
 from apps.teams.models import Task
+from apps.teams.permissions import (can_create_and_edit_subtitles,
+                                    can_create_and_edit_translations)
 from apps.videos import permissions
 from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
@@ -325,8 +327,13 @@ class VideoPageContext(dict):
         if team_video is not None:
             self['team'] = team_video.team
             self['team_video'] = team_video
+            self['can_create_subs'] = can_create_and_edit_subtitles(
+                request.user, team_video)
+            self['can_create_trans'] = can_create_and_edit_translations(
+                request.user, team_video)
         else:
             self['team'] = self['team_video'] = None
+            self['can_create_trans'] = self['can_create_subs'] = True
 
     @staticmethod
     def page_title(video):

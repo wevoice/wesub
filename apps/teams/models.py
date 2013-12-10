@@ -233,6 +233,11 @@ class Team(models.Model):
     def __unicode__(self):
         return self.name or self.slug
 
+    def get_tasks_page_url(self):
+        return reverse('teams:team_tasks', kwargs={
+            'slug': self.slug,
+        })
+
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
 
@@ -710,6 +715,9 @@ class TeamVideo(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('teams:team_video', [self.pk])
+
+    def get_tasks_page_url(self):
+        return "%s?team_video=%s" % (self.team.get_tasks_page_url(), self.pk)
 
     def get_thumbnail(self):
         if self.thumbnail:
