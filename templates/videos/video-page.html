@@ -91,27 +91,25 @@
             {% endif %}
         {% endif %}
         {% if can_create_subs or can_create_trans %}
-            <div class="section">
-                <h4>{% trans "Contribute" %}</h4>
-                {% if team.workflow_enabled %}
-                    {% blocktrans with team_video.get_tasks_page_url as url %}
-                    Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.
-                    {% endblocktrans %}
-                {% else %}
-                <p>
-                    {% if video.languages_count < 1 %}
-                        {% if can_create_subs %}
-                        {% trans "This video doesn't have any subtitles yet" %} :(<br /><a href="#" class="add_subtitles">{% trans 'Create subtitles now!' %}</a>
-                        {% endif %}
-                    {% else %}
-                        {% if can_create_trans %}
-                            {% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a>
-                        {% endif %}
+            <h3>{% trans "Contribute" %}</h3>
+            {% if team.workflow_enabled %}
+                {% blocktrans with team_video.get_tasks_page_url as url %}
+                Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.
+                {% endblocktrans %}
+            {% else %}
+            <p>
+                {% if video.languages_count < 1 %}
+                    {% if can_create_subs %}
+                    {% trans "This video doesn't have any subtitles yet" %} :(<br /><a href="#" class="add_subtitles">{% trans 'Create subtitles now!' %}</a>
                     {% endif %}
-                    {% upload_subtitles video %}
-                </p>
+                {% else %}
+                    {% if can_create_trans %}
+                        {% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a>
+                    {% endif %}
                 {% endif %}
-            </div>
+                {% upload_subtitles video %}
+            </p>
+            {% endif %}
         {% endif %}
         <div class="sharing-tools">
             {% if shows_widget_sharing %}
