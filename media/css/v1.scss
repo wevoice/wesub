@@ -1844,7 +1844,7 @@ body.account {
     }
 
     .section {
-        margin: 0 0 1em 0;
+        margin: 2em 0 0 0;
         padding: 0;
     }
 
@@ -2307,8 +2307,7 @@ ol.subtitles-diff li{
 .v1 .context .metrics {
     border: 1px solid #eaeaea;
     color: #999;
-    float: left;
-    margin: 0 0 1em 0;
+    margin: 0;
     width: 100%;
     @include border-radius(3px);
     @include linear-gradient(top, hsla(0, 0%, 96%, 1), hsla(0, 0%, 98%, 1) 5%, hsla(0, 0%, 97%, 1));
