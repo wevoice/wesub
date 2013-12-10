@@ -54,49 +54,43 @@
         <h1 class="main-title">
             <a href="{{share_panel_permalink}}" {% if video.latest_version.language.is_rtl %}class="is-rtl"{% endif %} title="Video permalink">{{ video.title_display }}</a>
         </h1>
-        <ul class="metrics group">
+        <ul class="metrics">
+            <li>
+                <div>
+                    <p>{{ video.languages_count }}</p>
+                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                </div>
+            </li>
             <li>
                 <div>
                     <p>{{ video.followers.count }}</p>
                     <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
                 </div>
             </li>
-            <li>
-                <div>
-                    <p>{{ video.comment_count }}</p>
-                    <h4>{% trans "Comment" %}{{ video.comment_count|pluralize }}</h4>
-                </div>
-            </li>
-            <li class="last">
-                <div>
-                    <p>{{ video.languages_count }}</p>
-                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
-                </div>
-            </li>
         </ul>
-        {% if user.managed_teams and not team %}
-        <div class="section">
-            {% team_add_video_select %}
-        </div>
-        {% else %}
-            {% if team %}
-                <div class="section group">
-                    {% if team.logo %}
-                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
-                    {% endif %}
-                    {% blocktrans with team.get_absolute_url as url %}
-                    This video belongs to the <a href="{{ url }}">{{ team }}</a> translation project.
-                    {% endblocktrans %}
-                </div>
-            {% endif %}
-        {% endif %}
-        {% if can_create_subs or can_create_trans %}
+        <div class="contribute">
             <h3>{% trans "Contribute" %}</h3>
+            {% if user.managed_teams and not team %}
+                {% team_add_video_select %}
+            {% else %}
+                {% if team %}
+                    <p>
+                        {% if team.logo %}
+                        <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
+                        {% endif %}
+                        {% blocktrans with team.get_absolute_url as url %}
+                        This video is part of the <a href="{{ url }}">{{ team }}</a> team.
+                        {% endblocktrans %}
+                    </p>
+                {% endif %}
+            {% endif %}
             {% if team.workflow_enabled %}
+            <p>
                 {% blocktrans with team_video.get_tasks_page_url as url %}
                 Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.
                 {% endblocktrans %}
-            {% else %}
+            </p>
+            {% elif can_create_subs or can_create_trans %}
             <p>
                 {% if video.languages_count < 1 %}
                     {% if can_create_subs %}
@@ -110,7 +104,7 @@
                 {% upload_subtitles video %}
             </p>
             {% endif %}
-        {% endif %}
+        </div>
         <div class="sharing-tools">
             {% if shows_widget_sharing %}
                 {% include '_sharing_widget.html' %}
