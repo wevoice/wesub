@@ -105,11 +105,6 @@
             </p>
             {% endif %}
         </div>
-        <div class="sharing-tools">
-            {% if shows_widget_sharing %}
-                {% include '_sharing_widget.html' %}
-            {% endif %}
-        </div>
         <h3>
             {% trans "View Subtitles" %}
             {% if video.languages_count > 0 %}
@@ -126,26 +121,15 @@
                 {% endif %}
             </ul>
         {% else %}
-            {% if request.user|can_create_subtitles_for:video or request.user|can_create_translations_for:video %}
-                {% if team_video %}
-                    {% if team_video.team.workflow_enabled %}
-                        {% if team_video.task_set.incomplete.exists %}
-                            <p>{% trans "No subtitles yet." %} <a href="{% url teams:team_tasks slug=team_video.team.slug %}?team_video={{ team_video.pk }}">{% trans "View tasks for this video." %}</a></p>
-                        {% else %}
-                            {% trans "This video doesn't have any subtitles or tasks yet." %}
-                        {% endif %}
-                    {% else %}
-                        <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
-                    {% endif %}
-                {% else %}
-                    <p>{% trans "Be the first to " %}<a href="#" class="add_subtitles">{% trans 'create subtitles' %}</a>!</p>
-                {% endif %}
-            {% else %}
-                <p>
-                    {% trans "This video doesn't have any subtitles yet." %}
-                </p>
-            {% endif %}
+            <p>
+                {% trans "This video doesn't have any subtitles yet." %}
+            </p>
         {% endif %}
+        <div class="sharing-tools">
+            {% if shows_widget_sharing %}
+                {% include '_sharing_widget.html' %}
+            {% endif %}
+        </div>
     </div>
     <div class="grid_8 view omega">
         {% if user.is_authenticated %}
