@@ -74,7 +74,7 @@
                 {% team_add_video_select %}
             {% else %}
                 {% if team %}
-                    <p>
+                    <p class="group">
                         {% if team.logo %}
                         <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
                         {% endif %}
@@ -100,26 +100,7 @@
             </p>
             {% endif %}
         </div>
-        <h3>
-            {% trans "View Subtitles" %}
-            {% if video.languages_count > 0 %}
-                ({{ video.languages_count }})
-            {% endif %}
-        </h3>
-        {% if language_list %}
-            <ul id="subtitles-menu" {% if language_list|length > 14 %} class="list-collapsible collapsed"{% endif %}>
-                {% include 'videos/_left_navigation.html' %}
-                {% if language_list|length > 14 %}
-                    <li class="expand">
-                        <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
-                    </li>
-                {% endif %}
-            </ul>
-        {% else %}
-            <p>
-                {% trans "This video doesn't have any subtitles yet." %}
-            </p>
-        {% endif %}
+        {% include 'videos/_language-list.html' %}
         <div class="sharing-tools">
             {% if shows_widget_sharing %}
                 {% include '_sharing_widget.html' %}

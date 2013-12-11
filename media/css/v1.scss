@@ -1824,11 +1824,18 @@ body.account {
 
     #description {
         line-height: 150%;
-        margin-top: 1em;
 
         p {
             margin-bottom: .5em;
         }
+    }
+
+    .view #description {
+        margin-top: 1em;
+    }
+
+    .context #widget_div {
+        margin-top: 1em;
     }
 
     ul#subtitles-menu {
@@ -1922,6 +1929,11 @@ body.account {
                 color: $dark;
             }
         }
+
+        a#embed-link {
+            float: right;
+            font-size: 12px;
+        }
     }
 
     h4 {
@@ -1968,6 +1980,7 @@ body.account {
     .notation {
         color: inherit;
     }
+
 }
 ol.subtitles {
     clear: both;
