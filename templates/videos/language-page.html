@@ -72,17 +72,17 @@
                 {% endif %}
             </div>
         {% endif %}
-        <ul class="metrics group">
+        <ul class="metrics">
             <li>
                 <div>
-                    <p>{{ language.followers.count }}</p>
-                    <h4>{% trans "Follower" %}{{ language.followers.count|pluralize }}</h4>
+                    <span class="count">{{ language.followers.count }}</span>
+                    {% trans "Follower" %}{{ language.followers.count|pluralize }}
                 </div>
             </li>
-            <li class="last">
+            <li>
                 <div>
-                    <p>{{ version.subtitle_count }}</p>
-                    <h4>{% trans "Line" %}{{ version.subtitle_count|pluralize }}</h4>
+                    <span class="count">{{ version.subtitle_count }}</span>
+                    {% trans "Line" %}{{ version.subtitle_count|pluralize }}
                 </div>
             </li>
         </ul>

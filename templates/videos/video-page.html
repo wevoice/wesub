@@ -57,14 +57,14 @@
         <ul class="metrics">
             <li>
                 <div>
-                    <p>{{ video.languages_count }}</p>
-                    <h4>{% trans "Language" %}{{ video.languages_count|pluralize }}</h4>
+                    <span class="count">{{ video.languages_count }}</span>
+                    {% trans "Language" %}{{ video.languages_count|pluralize }}
                 </div>
             </li>
             <li>
                 <div>
-                    <p>{{ video.followers.count }}</p>
-                    <h4>{% trans "Follower" %}{{ video.followers.count|pluralize }}</h4>
+                    <span class="count">{{ video.followers.count }}</span>
+                    {% trans "Follower" %}{{ video.followers.count|pluralize }}
                 </div>
             </li>
         </ul>
