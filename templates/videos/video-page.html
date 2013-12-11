@@ -84,7 +84,7 @@
                     </p>
                 {% endif %}
             {% endif %}
-            {% if team.workflow_enabled %}
+            {% if team.workflow_enabled and user_is_team_member %}
             <p>
                 {% blocktrans with team_video.get_tasks_page_url as url %}
                 Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.

@@ -331,9 +331,12 @@ class VideoPageContext(dict):
                 request.user, team_video)
             self['can_create_trans'] = can_create_and_edit_translations(
                 request.user, team_video)
+            self['user_is_team_member'] = team_video.team.user_is_member(
+                request.user)
         else:
             self['team'] = self['team_video'] = None
             self['can_create_trans'] = self['can_create_subs'] = True
+            self['user_is_team_member'] = False
 
     @staticmethod
     def page_title(video):
