@@ -80,7 +80,7 @@ class TestNotification(TestCase):
         mail.outbox = []
         self.user.notify_by_email = True
         self.user.save()
-        tasks.add_videos_notification.delay()
+        tasks.add_videos_notification_daily.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -93,7 +93,7 @@ class TestNotification(TestCase):
         self.user.is_active = False
         self.user.save()
         mail.outbox = []
-        tasks.add_videos_notification.delay()
+        tasks.add_videos_notification_daily.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
@@ -101,7 +101,7 @@ class TestNotification(TestCase):
         self.user.notify_by_email = False
         self.user.save()
         mail.outbox = []
-        tasks.add_videos_notification.delay()
+        tasks.add_videos_notification_daily.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 
@@ -116,7 +116,7 @@ class TestNotification(TestCase):
 
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 1)
         mail.outbox = []
-        tasks.add_videos_notification.delay()
+        tasks.add_videos_notification_daily.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(len(send_templated_email_mockup.context['team_videos']), 1)
@@ -127,7 +127,7 @@ class TestNotification(TestCase):
         TeamVideo.objects.filter(team=self.team).update(created=created_date)
         self.assertEqual(TeamVideo.objects.filter(created__gt=self.team.last_notification_time).count(), 0)
         mail.outbox = []
-        tasks.add_videos_notification.delay()
+        tasks.add_videos_notification_daily.delay()
         self.team = Team.objects.get(pk=self.team.pk)
         self.assertEqual(len(mail.outbox), 0)
 

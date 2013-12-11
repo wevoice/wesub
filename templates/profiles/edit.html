@@ -33,6 +33,10 @@
                 {% include "_form_field.html" with field=form.biography %}
                
                 {% include "_form_field.html" with field=form.homepage %}
+
+                {% if user.is_staff %}
+                    {% include "_form_field.html" with field=form.pay_rate_code %}
+                {% endif %}
             </fieldset>
         </div>
         <div class="grid_4 omega">

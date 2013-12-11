@@ -2,21 +2,21 @@ import os
 
 from django.core import management
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import watch_page
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamMemberFactory
 
 
 
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.pages.editor_pages import subtitle_editor
 
 
 class TestCaseWorkflows(WebdriverTestCase):
@@ -119,7 +119,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         tv = TeamVideoFactory(team=cls.team, added_by=cls.owner, video=video)
         return video, tv
 
-    def test_delete_button__team_admins(self):
+    def test_delete_button_team_admins(self):
         """Team Admins can Delete Subtitle Language.
 
         """
@@ -130,7 +130,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.assertTrue(self.video_lang_pg.delete_subtitles_language_exists())
 
 
-    def test_delete_button__team_owners(self):
+    def test_delete_button_team_owners(self):
         """Team Owners can Delete Subtitle Language.
 
         """
@@ -141,7 +141,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.assertTrue(self.video_lang_pg.delete_subtitles_language_exists())
 
 
-    def test_delete_button__is_staff(self):
+    def test_delete_button_is_staff(self):
         """Site admin (staff) can Delete Subtitle Language.
 
         """
@@ -152,7 +152,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(self.video.video_id, 'sv')
         self.assertTrue(self.video_lang_pg.delete_subtitles_language_exists())
 
-    def test_delete_button__non_team(self):
+    def test_delete_button_non_team(self):
         """Non-team videos have no Delete Subtitle Language button.
 
         """
@@ -163,7 +163,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.assertFalse(self.video_lang_pg.delete_subtitles_language_exists())
 
-    def test_delete_button__non_workflow_team(self):
+    def test_delete_button_non_workflow_team(self):
         """Non workflow team videos have Delete Subtitle Language button.
 
         """
@@ -182,7 +182,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self._upload_subtitles(self.video, 'en', self.rev1, self.contributor)
 
 
-    def test_delete_button__members(self):
+    def test_delete_button_members(self):
         """Members do not see the Delete Subtitle Language button.
 
         """
@@ -193,7 +193,7 @@ class TestCaseWorkflows(WebdriverTestCase):
         self.assertFalse(self.video_lang_pg.delete_subtitles_language_exists())
 
 
-    def test_delete_button__non_members(self):
+    def test_delete_button_non_members(self):
         """Non-members do not see the Delete Subtitle Language button.
 
         """
@@ -366,7 +366,7 @@ class TestCaseDeletion(WebdriverTestCase):
 
 
 
-    def test_deleted_source__language__ui(self):
+    def test_deleted_source_language_ui(self):
         """Deleted source language no longer listed in the ui.
 
         """
@@ -377,7 +377,7 @@ class TestCaseDeletion(WebdriverTestCase):
 
 
 
-    def test_deleted_source__searching(self):
+    def test_deleted_source_searching(self):
         """Search results don't match deleted transcript text.
 
         """
@@ -388,7 +388,7 @@ class TestCaseDeletion(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_no_results())
 
-    def test_deleted_source__tasks(self):
+    def test_deleted_source_tasks(self):
         """Tasks related to deleted language are deleted.
 
         """
@@ -397,7 +397,7 @@ class TestCaseDeletion(WebdriverTestCase):
         task = list(self.tv.task_set.filter(language='en'))
         self.assertEqual(0, len(task))
 
-    def test_deleted_translations__tasks(self):
+    def test_deleted_translations_tasks(self):
         """Tasks for deleted translations are deleted.
 
         """
@@ -410,7 +410,7 @@ class TestCaseDeletion(WebdriverTestCase):
         self.assertEqual(0, len(task))
 
 
-    def test_deleted_translations__language__ui(self):
+    def test_deleted_translations_language_ui(self):
         """Deleted translation languages are no longer listed in the ui.
 
         """
@@ -421,7 +421,7 @@ class TestCaseDeletion(WebdriverTestCase):
         self.assertNotIn('Swedish', langs)
 
 
-    def test_delete_translations__searching(self):
+    def test_delete_translations_searching(self):
         """Search results don't match deleted transcript text.
 
         """
@@ -432,7 +432,7 @@ class TestCaseDeletion(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(test_text)
         self.assertTrue(results_pg.search_has_no_results())
 
-    def test_recreate__source_language(self):
+    def test_recreate_source_language(self):
         """Create a new task for the language after deletion.
 
         """ 
@@ -446,7 +446,7 @@ class TestCaseDeletion(WebdriverTestCase):
                         'Transcribe Subtitles', self.video.title))
 
 
-    def test_recreate__translation_language(self):
+    def test_recreate_translation_language(self):
         """Create a new task for translated langauge after deletion.
 
         """
@@ -527,7 +527,7 @@ class TestCaseDeletion(WebdriverTestCase):
         self.assertTrue(ru.is_forked)
 
     
-    def test_forked_translations__tasks(self):
+    def test_forked_translations_tasks(self):
         """Tasks for forked translations are not deleted.
 
         """
@@ -535,7 +535,7 @@ class TestCaseDeletion(WebdriverTestCase):
         self.assertEqual(1, len(task), 
                          're: https://unisubs.sifterapp.com/issues/2328')
 
-    def test_forked_review__tasks(self):
+    def test_forked_review_tasks(self):
         """Review tasks for forked translations are not deleted.
 
         """
@@ -550,7 +550,7 @@ class TestCaseDeletion(WebdriverTestCase):
                         'Review Croatian Subtitles', self.video.title))
 
 
-    def test_forked_approve__tasks(self):
+    def test_forked_approve_tasks(self):
         """Approve tasks for forked translations are not deleted.
 
         """
@@ -564,11 +564,11 @@ class TestCaseDeletion(WebdriverTestCase):
         self.assertTrue(self.tasks_tab.task_present(
                         'Approve Italian Subtitles', self.video.title))
 
-
     def test_perform_forked_approve_task(self):
         """Approve tasks for forked translations open in timed dialog.
 
         """
+        self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
                                  '&assignee=anyone&lang=it'.format(
                                  self.team.slug, self.tv.pk))
@@ -581,6 +581,7 @@ class TestCaseDeletion(WebdriverTestCase):
         """Review tasks for forked translations open in timed dialog.
 
         """
+        self.tasks_tab.log_in(self.admin.username, 'password')
         self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
                                  '&assignee=anyone&lang=hr'.format(
                                  self.team.slug, self.tv.pk))

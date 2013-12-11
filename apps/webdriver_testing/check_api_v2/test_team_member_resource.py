@@ -76,7 +76,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         self.teams_dir_pg.open_page('teams/%s/members/' % self.open_team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
         members_tb = members_tab.MembersTab(self)
-        members_tb.member_search(self.open_team.slug, new_member.username)
+        members_tb.member_search(new_member.username)
         self.assertEqual(members_tb.user_role(), 'Admin')
 
     def test_create_contributor(self):
@@ -96,7 +96,7 @@ class TestCaseTeamMemberResource(WebdriverTestCase):
         self.teams_dir_pg.open_page('teams/%s/members/' % team.slug)
         self.teams_dir_pg.log_in(self.user.username, 'password')
         members_tb = members_tab.MembersTab(self)
-        members_tb.member_search(team.slug, self.member.username)
+        members_tb.member_search(self.member.username)
         self.assertEqual(members_tb.user_role(), 'Contributor')
 
        

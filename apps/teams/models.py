@@ -336,6 +336,11 @@ class Team(models.Model):
 
 
     # Membership and roles
+    def get_member(self, user):
+        if not user.is_authenticated():
+            raise TeamMember.DoesNotExist()
+        return self.members.get(user=user)
+
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.
 
@@ -476,17 +481,11 @@ class Team(models.Model):
     def _lang_pair(self, lp, suffix):
         return SQ(content="{0}_{1}_{2}".format(lp[0], lp[1], suffix))
 
-    def get_videos_for_languages_haystack(self, language=None, num_completed_langs=None,
-                                          project=None, user=None, query=None, sort=None):
-        from teams.search_indexes import TeamVideoLanguagesIndex
-
-        is_member = (user and user.is_authenticated()
-                     and self.members.filter(user=user).exists())
-
-        if is_member:
-            qs =  TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
-        else:
-            qs =  TeamVideoLanguagesIndex.results().filter(team_id=self.id)
+    def get_videos_for_languages_haystack(self, language=None,
+                                          num_completed_langs=None,
+                                          project=None, user=None, query=None,
+                                          sort=None, exclude_language=None):
+        qs = self.get_videos_for_user(user)
 
         if project:
             qs = qs.filter(project_pk=project.pk)
@@ -498,7 +497,10 @@ class Team(models.Model):
         if language:
             qs = qs.filter(video_completed_langs=language)
 
-        if num_completed_langs != None:
+        if exclude_language:
+            qs = qs.exclude(video_completed_langs=exclude_language)
+
+        if num_completed_langs is not None:
             qs = qs.filter(num_completed_langs=num_completed_langs)
 
         qs = qs.order_by({
@@ -512,6 +514,16 @@ class Team(models.Model):
 
         return qs
 
+    def get_videos_for_user(self, user):
+        from teams.search_indexes import TeamVideoLanguagesIndex
+
+        is_member = (user and user.is_authenticated()
+                     and self.members.filter(user=user).exists())
+
+        if is_member:
+            return TeamVideoLanguagesIndex.results_for_members(self).filter(team_id=self.id)
+        else:
+            return TeamVideoLanguagesIndex.results().filter(team_id=self.id)
 
     # Projects
     @property
@@ -2639,6 +2651,7 @@ class BillingReport(models.Model):
             'Approver',
             'Note',
             'Date',
+            'Pay Rate',
         )
         data_rows = []
         for approve_task in self._get_approved_tasks():
@@ -2646,7 +2659,7 @@ class BillingReport(models.Model):
             version = approve_task.new_subtitle_version
             language = version.subtitle_language
 
-            all_tasks = []
+            all_tasks = [approve_task]
             try:
                 all_tasks.append((Task.objects.complete_subtitle_or_translate()
                                   .filter(team_video=approve_task.team_video,
@@ -2677,7 +2690,9 @@ class BillingReport(models.Model):
                     language.is_primary_audio_language(),
                     unicode(approve_task.assignee),
                     unicode(task.body),
-                    self._report_date(task.completed)))
+                    self._report_date(task.completed),
+                    task.assignee.pay_rate_code,
+                ))
 
         data_rows.sort(key=lambda row: row[0])
         return [header] + data_rows
@@ -3023,3 +3038,6 @@ class Partner(models.Model):
     def is_admin(self, user):
         return user in self.admins.all()
 
+# we know that models.py is always loaded, import signalhandlers to ensure it
+# gets loaded as well
+import teams.signalhandlers

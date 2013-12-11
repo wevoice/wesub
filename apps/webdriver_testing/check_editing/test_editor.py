@@ -194,7 +194,6 @@ class TestCaseCenter(WebdriverTestCase):
         self.video_pg.log_in(self.user.username, 'password')
 
 
-
     def test_selected_subs_on_video(self):
         """Clicking a working subs displays it on the video."""
         video = Video.objects.all()[0]

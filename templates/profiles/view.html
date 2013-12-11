@@ -29,6 +29,26 @@
     {% endif %}
 {% endblock %}
 
+{% block left_column_extra %}
+{% if form %}
+    <h3>{% trans "Edit" %}</h3>
+
+    <form class="admin-edit-user" action="" method="post" >
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <fieldset>
+            {% include "_form_field.html" with field=form.pay_rate_code %}
+        </fieldset>
+
+        <div class="submit">
+            <button class="button save" type="submit" value="Save">
+                {% trans 'Save Changes' %}
+            </button>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}
+
 {% block page_controls %}
     {% if user.is_staff and perms.videos.edit_video %}
         <ul id="page_controls">

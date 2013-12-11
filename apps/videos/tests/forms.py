@@ -18,11 +18,12 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
+import mock
 
-from apps.videos.forms import VideoForm
-from apps.videos.models import Video
-from apps.videos.types import video_type_registrar
-
+from videos.forms import AddFromFeedForm, VideoForm
+from videos.models import Video, VideoFeed
+from videos.types import video_type_registrar
+from utils import test_factories, test_utils
 
 class TestVideoForm(TestCase):
     def setUp(self):
@@ -62,3 +63,82 @@ class TestVideoForm(TestCase):
         self._test_urls(self.daily_motion_urls)
 
 
+class AddFromFeedFormTestCase(TestCase):
+    @test_utils.patch_for_test('videos.forms.FeedParser')
+    def setUp(self, MockFeedParserClass):
+        TestCase.setUp(self)
+        self.user = test_factories.create_user()
+        mock_feed_parser = mock.Mock()
+        mock_feed_parser.version = 1.0
+        MockFeedParserClass.return_value = mock_feed_parser
+
+    def make_form(self, **data):
+        return AddFromFeedForm(self.user, data=data)
+
+    def make_feed(self, url):
+        return VideoFeed.objects.create(user=self.user, url=url)
+
+    def youtube_url(self, username):
+        return 'https://gdata.youtube.com/feeds/api/users/%s/uploads' % (
+            username,)
+
+    def youtube_user_url(self, username):
+        return 'http://www.youtube.com/user/%s' % (username,)
+
+    def check_feed_urls(self, *feed_urls):
+        self.assertEquals(set(f.url for f in VideoFeed.objects.all()),
+                          set(feed_urls))
+
+    def test_success(self):
+        form = self.make_form(
+            feed_url='http://example.com/feed.rss',
+            usernames='testuser, testuser2',
+            youtube_user_url=self.youtube_user_url('testuser3'))
+        self.assertEquals(form.errors, {})
+        form.save()
+        self.check_feed_urls(
+            'http://example.com/feed.rss',
+            self.youtube_url('testuser'),
+            self.youtube_url('testuser2'),
+            self.youtube_url('testuser3'),
+        )
+
+    def test_duplicate_feeds(self):
+        # test trying to add feed that already exists
+        url = 'http://example.com/feed.rss'
+        self.make_feed(url)
+        form = self.make_form(feed_url=url)
+        self.assertNotEquals(form.errors, {})
+
+    def test_duplicate_feeds_with_youtube_users(self):
+        # test trying to add a youtube user when the feed for that user
+        # already exists
+        self.make_feed(self.youtube_url('testuser'))
+        form = self.make_form(usernames='testuser')
+        self.assertNotEquals(form.errors, {})
+
+    def test_duplicate_feeds_with_youtube_urls(self):
+        # test trying to add a youtube url when the feed for that user already
+        # exists
+        self.make_feed(self.youtube_url('testuser'))
+        form = self.make_form(
+            youtube_user_url=self.youtube_user_url('testuser'))
+        self.assertNotEquals(form.errors, {})
+
+    def test_duplicate_feeds_in_form(self):
+        # test having duplicate feeds in 1 form, for example when the feed url
+        # is the same as the URL for a youtube user.
+        form = self.make_form(
+            feed_url=self.youtube_url('testuser'),
+            youtube_user_url=self.youtube_user_url('testuser'))
+        self.assertNotEquals(form.errors, {})
+
+        form = self.make_form(
+            usernames='testuser',
+            youtube_user_url=self.youtube_user_url('testuser'))
+        self.assertNotEquals(form.errors, {})
+
+        form = self.make_form(
+            feed_url=self.youtube_url('testuser'),
+            usernames='testuser')
+        self.assertNotEquals(form.errors, {})

@@ -318,7 +318,8 @@ class TestCaseDemandReports(WebdriverTestCase):
                                        preferred=True)
         cls.contributor = TeamMemberFactory(role="ROLE_CONTRIBUTOR",team=team,
                                      user__first_name='Jerry', 
-                                     user__last_name='Garcia').user
+                                     user__last_name='Garcia',
+                                     user__pay_rate_code='L2').user
 
         cls.contributor2 = TeamMemberFactory(role="ROLE_CONTRIBUTOR",
                 team=team,
@@ -384,7 +385,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
         self.logger.info(entries)
-        self.assertEqual(12, len(entries))
+        self.assertEqual(18, len(entries))
 
     def test_professional_svcs_report(self):
         """Professional svcs report only contains approved videos."""
@@ -408,6 +409,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         Report should: 
         - display the video time as a decimal
         - contain separate entries for translator and reviewer
+        - show the pay rate for translator and reviewer
         - contain True / False for original language
         - contain any reviewers notes.
         - list the approver, team, title and id.
@@ -442,10 +444,11 @@ class TestCaseDemandReports(WebdriverTestCase):
                             'Task Type': 'Translate', 
                             'Language': 'de', 
                             'Minutes': '2.45015', 
+                            'Pay Rate': '',
                             'Note': '', 
                             'User': ("Gabriel Jos\xc3\xa9 de la Concordia "
                                      "Garc\xc3\xada M\xc3\xa1rquez"),
-                            'Original': 'False' 
+                            'Original': 'False'
                           }
 
         expected_reviewer_data = {
@@ -455,6 +458,7 @@ class TestCaseDemandReports(WebdriverTestCase):
                                    'Note': 'Task shared with Gabriel', 
                                    'User': " ".join([self.contributor.first_name, 
                                                      self.contributor.last_name]),
+                                   'Pay Rate': 'L2',
                                    'Original': 'False',
                                    'Note': 'Task shared with GabrielJos\xc3\xa9'
                                  }
@@ -498,14 +502,14 @@ class TestCaseDemandReports(WebdriverTestCase):
         expected_translation_data = {  
                                        'Translation?': 'True', 
                                        'Language': 'de', 
-                                       'Minutes': '3', 
+                                       'Minutes': '2.45015', 
                                        'Original': 'False'
                                     }
 
         expected_orig_lang_data = {
                                      'Translation?': 'False', 
                                      'Language': 'en', 
-                                     'Minutes': '3', 
+                                     'Minutes': '2.45015', 
                                      'Original': 'True'
                                   } 
 
@@ -540,7 +544,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         self.assertEqual(8, len(entries))
 
     def test_translators_no_review(self):
-        """Profession services report generates when no review tasks.
+        """Translators report generates when no review tasks.
         
         """
         team = self.create_workflow_team()
@@ -563,8 +567,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         report.process()
         bill = 'user-data/%s' % report.csv_file
         entries = self._bill_dict(bill)
-        # expect 13 entries from the main team + 1 from the no review team
-        self.assertEqual(2, len(entries))
+        self.assertEqual(4, len(entries))
 
     def test_download_professional(self):
         """Check generation and download of professional services report.
@@ -602,7 +605,7 @@ class TestCaseDemandReports(WebdriverTestCase):
         report_dl = self.billing_pg.check_latest_report_url()
         self.logger.info(report_dl)
         # 1 header + 12 entries
-        self.assertEqual(13, len(report_dl))
+        self.assertEqual(19, len(report_dl))
 
 
 

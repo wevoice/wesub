@@ -18,10 +18,9 @@ class VideosTab(ATeamPage):
     _VIDEO_LANGS = '.languages'
     _VIDEO_TASK_LINK = '.callout' # href has the url
     _ADD_VIDEO = 'a[href*="add/video"]'
-    _CLEAR_FILTERS = 'a.clear-filters'
+    _CLEAR_FILTERS = 'a.cancel'
     _FILTERS = 'a#sort-filter span'
     _FILTER_OPEN = 'a#sort-filter span.open'
-
     _ADMIN_LINKS = 'ul.admin-controls li a'
 
     #ADD VIDEO FORM
@@ -46,9 +45,11 @@ class VideosTab(ATeamPage):
 
     #FILTER and SORT
     #_LANG_FILTER = 'div.filters div.filter-chunk div'
-    _LANG_FILTER = 'select#lang-filter'
+    _LANG_FILTER = 'select#lang'
+    _LANG_MODE_FILTER = 'select#lang_mode'
     _SORT_FILTER = 'select[name="sort"]'
-    _PROJECT_FILTER = 'select#project-filter'
+    _PROJECT_FILTER = 'select#project'
+    _UPDATE_FILTER = 'button#update'
 
     def open_videos_tab(self, team):
         """Open the team with the provided team slug.
@@ -94,6 +95,9 @@ class VideosTab(ATeamPage):
         self.click_by_css(self._CLEAR_FILTERS)
 
 
+    def update_filters(self):
+        self.click_by_css(self._UPDATE_FILTER) 
+ 
     def project_filter(self, project):
         """Filter the displayed videos by project
 
@@ -101,11 +105,11 @@ class VideosTab(ATeamPage):
         """
         self.logger.info('Filtering videos by project %s ' % project)
         self._open_filters()
-        self.click_by_css('div#project-filter_chzn a.chzn-single')
+        self.click_by_css('div#project_chzn a.chzn-single')
         self.select_from_chosen(self._PROJECT_FILTER, project)
 
 
-    def sub_lang_filter(self, language):
+    def sub_lang_filter(self, language, has=True):
         """Filter the displayed videos by subtitle language'
 
         Valid choices are the full language name spelled out.
@@ -113,8 +117,14 @@ class VideosTab(ATeamPage):
         """
         self.logger.info('Filtering videos by language %s ' % language)
         self._open_filters()
-        self.click_by_css('div#lang-filter_chzn a.chzn-single')
+        self.click_by_css('div#lang_chzn a.chzn-single')
         self.select_from_chosen(self._LANG_FILTER, language)
+        if not has:
+            self.click_by_css('div#lang_mode_chzn a.chzn-single')
+            self.select_from_chosen(self._LANG_MODE_FILTER, "doesn't have")
+
+            
+
 
     def video_sort(self, sort_option):
         """Sort videos via the pulldown.
@@ -133,6 +143,7 @@ class VideosTab(ATeamPage):
         span_chunk = filter_chunks[-1].find_element_by_css_selector('div a.chzn-single span')
         span_chunk.click()
         self.select_from_chosen(self._SORT_FILTER, sort_option)
+        
 
     def _video_element(self, video):
         """Return the webdriver object for a video based on the title.

@@ -67,12 +67,12 @@ class DataHelpers(object):
 
     def upload_subs(self, user, **kwargs):
         defaults = {'language_code': 'en',
-                    'primary_audio_language_code': 'en',
                     'draft': open('apps/webdriver_testing/subtitle_data/'
                             'Timed_text.en.srt'),
                     'complete': 1
                     }
         defaults.update(kwargs)
+        self.logger.info(defaults)
         c = Client()
         try:
             c.login(username=user.username, password='password')

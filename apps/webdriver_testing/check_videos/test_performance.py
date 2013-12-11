@@ -2,10 +2,10 @@ import os
 
 from apps.webdriver_testing.webdriver_base import WebdriverTestCase
 from apps.webdriver_testing.pages.site_pages import video_language_page
+from apps.webdriver_testing.pages.site_pages import editor_page
 from apps.webdriver_testing import data_helpers
 from apps.webdriver_testing.data_factories import UserFactory
 from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
 
 
 class TestCaseEditUploaded(WebdriverTestCase):
@@ -18,7 +18,7 @@ class TestCaseEditUploaded(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(username = 'user')
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
 
@@ -43,7 +43,6 @@ class TestCaseEditUploaded(WebdriverTestCase):
         r = self.data_utils.add_subs(**fr_data)
         self.video_language_pg.open_video_lang_page(video.video_id, 'fr')
         self.video_language_pg.log_in(self.user.username, 'password')
-        self.video_language_pg.page_refresh()
-        self.video_language_pg.edit_subtitles()
-        self.assertEqual('Adding a New Translation', 
-                         self.sub_editor.dialog_title())
+        self.editor_pg.open_editor_page(video.video_id, 'fr')
+        self.assertEqual(10, len(self.editor_pg.working_text()))
+        self.assertEqual(1194, len(self.editor_pg.reference_text()))

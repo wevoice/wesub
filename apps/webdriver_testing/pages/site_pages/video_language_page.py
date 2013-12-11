@@ -69,7 +69,7 @@ class VideoLanguagePage(VideoPage):
 
         """
         self.logger.info('Locating the download link element for the format')
-        self.click_by_css(self._DOWNLOAD_SUBS)
+        self.hover_by_css(self._DOWNLOAD_SUBS)
         self.wait_for_element_present(self._DOWNLOAD_OPTION)
         format_els = self.get_elements_list(self._DOWNLOAD_OPTION)
         for el in format_els:

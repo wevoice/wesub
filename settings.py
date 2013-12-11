@@ -803,17 +803,19 @@ MEDIA_BUNDLES = {
         "files": (
             "src/js/third-party/json2.min.js",
             'src/js/third-party/underscore.min.js',
-            'src/js/third-party/zepto.min.js',
+            'src/js/third-party/jquery-1.8.3.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
+            'src/js/third-party/jquery.mCustomScrollbar.concat.min.js',
             'src/js/popcorn/popcorn.amaratranscript.js',
             'src/js/popcorn/popcorn.amarasubtitle.js',
             'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
         "release_url": True,
-        "bootloader": { 
-            "gatekeeper": "_amaraEmbedderLoaded", 
+        "bootloader": {
+            "gatekeeper": "_amaraEmbedderLoaded",
+            "file": 'src/js/embedder/embedder.js',
         },
         "output": 'release/public/embedder.js',
 
@@ -821,6 +823,7 @@ MEDIA_BUNDLES = {
     "embedder-css":{
         "type":"css",
         "files": (
+            "src/css/embedder/jquery.mCustomScrollbar.css",
             "src/css/embedder/embedder-dev.css",
         ),
         "include_js_base_dependencies": False,

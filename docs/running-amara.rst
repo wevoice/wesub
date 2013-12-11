@@ -44,8 +44,7 @@ To run the development version:
 
 
 6. Check out google closure into directory of your choice: ::
-
-    $ svn checkout http://closure-library.googlecode.com/svn/trunk/ <directory>.
+    $ svn checkout -r 1196 http://closure-library.googlecode.com/svn/trunk/ <directory>
 
    Then symlink ``media/js/closure-library`` to the checkout location. From the
    unisubs directory in step 1::

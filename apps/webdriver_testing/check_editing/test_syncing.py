@@ -1,16 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.editor_pages import dialogs
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
-from apps.webdriver_testing.data_factories import UserFactory
+
+import unittest
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.editor_pages import dialogs
+from webdriver_testing.pages.editor_pages import unisubs_menu
+from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.data_factories import UserFactory
 import os
 import time
 
+@unittest.skip('slow')
 class TestCasePartialSync(WebdriverTestCase):
     """Tests for the Subtitle Syncing editor page.
         
@@ -20,6 +23,7 @@ class TestCasePartialSync(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCasePartialSync, cls).setUpClass()
+        cls.skipTest('slow')
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(username = 'user')
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
