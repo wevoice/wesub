@@ -3,7 +3,9 @@
 {% if language_list %}
     <h3>
         {% include '_embed_link.html' %}
-        {% blocktrans with count=language_list|length %}
+        {% blocktrans count count=language_list|length %}
+            {{ count }} Language
+        {% plural %}
             {{ count }} Languages
         {% endblocktrans %}
     </h3>

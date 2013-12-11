@@ -70,24 +70,20 @@
         </ul>
         <div class="contribute">
             <h3>{% trans "Contribute" %}</h3>
-            {% if user.managed_teams and not team %}
-                {% team_add_video_select %}
-            {% else %}
-                {% if team %}
-                    <p class="group">
-                        {% if team.logo %}
-                        <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
-                        {% endif %}
-                        {% blocktrans with team.get_absolute_url as url %}
-                        This video is part of the <a href="{{ url }}">{{ team }}</a> team.
-                        {% endblocktrans %}
-                    </p>
-                {% endif %}
+            {% if team %}
+                <p class="group">
+                    {% if team.logo %}
+                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
+                    {% endif %}
+                    {% blocktrans with team.get_absolute_url as url %}
+                    <span class="team-link">This video is part of the <a href="{{ url }}">{{ team }}</a> team.</span>
+                    {% endblocktrans %}
+                </p>
             {% endif %}
             {% if team.workflow_enabled and user_is_team_member %}
             <p>
                 {% blocktrans with team_video.get_tasks_page_url as url %}
-                Contribute subtitles: View <a href="{{ url }}">tasks for this video</a>.
+                View <a href="{{ url }}">tasks for this video</a>.
                 {% endblocktrans %}
             </p>
             {% elif can_create_subs or can_create_trans %}
@@ -101,11 +97,15 @@
             {% endif %}
         </div>
         {% include 'videos/_language-list.html' %}
-        <div class="sharing-tools">
-            {% if shows_widget_sharing %}
-                {% include '_sharing_widget.html' %}
-            {% endif %}
+        {% if shows_widget_sharing %}
+        <div class="sharing-tools group">
+            {% include '_sharing_widget.html' %}
         </div>
+        {% endif %}
+        <h3>{% trans 'Your Teams' %}</h3>
+        {% if user.managed_teams and not team %}
+            {% team_add_video_select %}
+        {% endif %}
     </div>
     <div class="grid_8 view omega">
         {% if user.is_authenticated %}

@@ -1853,8 +1853,15 @@ body.account {
     word-wrap: break-word;
     @include linear-gradient(right, hsla(0, 0%, 97%, 1), hsla(0, 0%, 100%, 1) 2%, hsla(0, 0%, 100%, 1));
 
-    .contribute p {
-        margin-bottom: 1em;
+    .contribute {
+        p {
+            margin-bottom: 1em;
+        }
+
+        span.team-link {
+            padding-top: 0.25em;
+            display: block;
+        }
     }
 
     .logo {
