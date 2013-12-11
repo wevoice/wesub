@@ -102,7 +102,6 @@
             {% include '_sharing_widget.html' %}
         </div>
         {% endif %}
-        <h3>{% trans 'Your Teams' %}</h3>
         {% if user.managed_teams and not team %}
             {% team_add_video_select %}
         {% endif %}
