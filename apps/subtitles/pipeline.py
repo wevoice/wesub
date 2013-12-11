@@ -314,7 +314,7 @@ def _update_followers(subtitle_language, author):
         subtitle_language.followers.add(author)
 
 def _update_video_data(subtitle_language, version):
-    if subtitle_language.is_primary_audio_language():
+    if version.is_public() and subtitle_language.is_primary_audio_language():
         video = version.video
         video_changed = False
         if version.title and video.title != version.title:
