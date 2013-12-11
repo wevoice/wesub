@@ -166,21 +166,25 @@ var angular = angular || null;
                     EditorData.editingVersion.languageCode);
         }
 
+        function userIdleTimeout() {
+            $scope.minutesIdle++;
+
+            if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
+                showIdleModal();
+                $timeout.cancel(regainLockTimer);
+            } else {
+                startUserIdleTimer();
+            }
+        }
+
         function startUserIdleTimer() {
-            var userIdleTimeout = function() {
-
-                $scope.minutesIdle++;
-
-                if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
-                    showIdleModal();
-                    $timeout.cancel(regainLockTimer);
-                } else {
-                    $timeout(userIdleTimeout, 60 * 1000);
-                }
-            };
-
             $timeout(userIdleTimeout, 60 * 1000);
         }
+
+        $scope.cancelUserIdleTimeout = function() {
+            $timeout.cancel(userIdleTimeout);
+        }
+
         function startRegainLockTimer() {
             var regainLockTimeout = function() {
                 regainLock();

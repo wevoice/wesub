@@ -370,6 +370,8 @@ var angular = angular || null;
                 window.location = '/videos/' + $scope.videoId + "/";
             }
 
+            $scope.cancelUserIdleTimeout();
+
             $scope.$root.$emit("show-modal", {
                 heading: message || "There was an error saving your subtitles. You'll need to save your subtitles with the link below, and upload them to the system later.",
                 buttons: [
