@@ -88,9 +88,11 @@
             </p>
             {% elif can_create_subs or can_create_trans %}
                 {% if video.languages_count = 0 and can_create_subs %}
-                    <p class="edit-subtitles">{% trans "This video doesn't have any subtitles yet" %} :(<br /><a href="#" class="add_subtitles">{% trans 'Create subtitles now!' %}</a></p>
+                    <a href="#" class="add-subtitles icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
+                    <p>{% trans "This video doesn't have any subtitles yet." %} <a href="#" class="add-subtitles">{% trans 'Create subtitles now!' %}</a></p>
                 {% elif video.languages_count > 0 and can_create_trans %}
-                    <p class="edit-subtitles">{% trans "Don't see one of your languages?" %}<br /><a class="add-translation-behavior" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a><p/>
+                    <a href="#" class="add-translation icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
+                    <p>{% trans "Don't see one of your languages?" %}<br /><a class="add-translation" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a><p/>
                 {% endif %}
                 {% upload_subtitles video %}
             </p>

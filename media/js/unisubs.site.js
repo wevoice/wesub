@@ -616,12 +616,12 @@ var Site = function(Site) {
             that.Utils.truncateTextBlocks($('div.description'), 90);
         },
         video_view: function() {
-            $('.add_subtitles').click( function() {
+            $('.add-subtitles').click( function() {
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.IMPROVE_SUBTITLES);
                 return false;
             });
-            $('.add-translation-behavior').click( function(e) {
+            $('.add-translation').click( function(e) {
                 e.preventDefault();
                 widget_widget_div.selectMenuItem(
                 unisubs.widget.DropDown.Selection.ADD_LANGUAGE);

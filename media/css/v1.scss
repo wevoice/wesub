@@ -1862,11 +1862,12 @@ body.account {
             padding-top: 0.25em;
             display: block;
         }
-    }
 
-    .logo {
-        float: left;
-        margin-right: 10px;
+        img.logo, a.icon {
+            display: inline-block;
+            float: left;
+            margin-right: 10px;
+        }
     }
 
     .abbr {
@@ -1892,16 +1893,6 @@ body.account {
             height: auto;
         }
 
-    }
-
-    .edit-subtitles {
-        padding-left: 35px;
-        background: url('../images/edit-subtitles.png') no-repeat 2px 2px;
-    }
-
-    .upload-subtitles {
-        padding-left: 35px;
-        background: url('../images/upload-subtitles.png') no-repeat 0 0;
     }
 
     #widget_div {
