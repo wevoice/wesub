@@ -256,7 +256,23 @@ header.main {
             margin: 0;
             padding: 8px 12px;
             text-transform: lowercase;
+            float: left;
         }
+        div.video-title {
+
+            margin: 0;
+            padding: 8px 12px;
+            float: right;
+            width: 500px;
+            text-align: right;
+            color: #D0D1D2;
+            font: normal 13px $OpenSans;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+
+	}
     }
     section.video {
         border-left: 1px solid #2B2C2D;
