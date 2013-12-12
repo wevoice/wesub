@@ -5,6 +5,9 @@ $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, san
 $OpenSans: 'Open Sans', $Helvetica;
 $CodePro: 'CodeProLC', $OpenSans;
 
+$sync-help-height: 54px;
+$span-key-height: 32px;
+
 // Custom fonts
 @font-face {
     font-family: 'CodeProLC';
@@ -416,7 +419,7 @@ section.main {
     span.key {
         background: white;
         display: block;
-        height: 32px;
+        height: $span-key-height;
         float: left;
         margin-right: 10px;
         position: relative;
@@ -457,19 +460,19 @@ section.main {
             position: absolute;
             display: none;
             width: 120px;
-            height: 65px;
+            height: $sync-help-height;
             color: #ffffff;
             z-index: 80;
 
             div.text {
-                line-height: 65px;
+                line-height: $sync-help-height;
                 vertical-align: middle;
             }
 
             span.key {
                 margin-left: 14px;
-                margin-top: 16px;
-                width: 32px;
+                margin-top: ($sync-help-height - $span-key-height) / 2 ;
+                width: $span-key-height;
                 span {
                     color: #000;
                     font-size: 12px;
