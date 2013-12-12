@@ -897,10 +897,12 @@ section.main {
                 width: 42%;
 
                 select {
+                    // No idea why it is not inherited from body
+                    color: $text-color;
+                    font: normal 12px $OpenSans;
                     background: transparent;
                     font-size: 12px;
                     line-height: 134%;
-                    height: 1.33em;
                     border: 0;
                     cursor: pointer;
                     margin: 0;
