@@ -7,7 +7,7 @@ $CodePro: 'CodeProLC', $OpenSans;
 
 $sync-help-height: 54px;
 $span-key-height: 32px;
-
+$text-color: #565758;
 // Custom fonts
 @font-face {
     font-family: 'CodeProLC';
@@ -91,7 +91,7 @@ html, body {
     overflow: hidden;
 }
 body {
-    color: #565758;
+    color: $text-color;
     font: normal 11px/14px $OpenSans;
     margin: 0;
     text-rendering: optimizeLegibility;
@@ -574,7 +574,7 @@ section.main {
                     line-height: 140%;
                     width: 100%;
                     border: 0;
-                    color: #565758;
+                    color: $text-color;
                     font: normal 12px $OpenSans;
                     resize: none;
                 }
