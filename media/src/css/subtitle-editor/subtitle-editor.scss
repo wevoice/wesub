@@ -822,9 +822,9 @@ section.main {
             background: #0C3F70;
             color: white;
             font-size: 12px;
-            height: 216px;
-            margin: 20px;
-            padding: 20px;
+            height: 200px;
+            margin: 10px;
+            padding: 10px;
             @include border-radius(3px);
 
             span.key {
@@ -870,7 +870,7 @@ section.main {
         }
         div.preview {
             color: #949596;
-            height: 34px;
+            height: 32px;
             text-align: center;
             text-shadow: 0 1px 0 white;
 
@@ -927,7 +927,9 @@ section.main {
         div.video {
             height: 290px;
             position: relative;
-
+            // We move it upwards, covering the header
+            margin-top: -38px;
+            background: none repeat scroll 0 0 #F3F4F5;
             div.subtitle-overlay {
                 position: absolute;
                 bottom: 63px;
@@ -1200,7 +1202,7 @@ section.main {
     }
     section.right {
         div.steps-container {
-            height: 290px;
+            height: 250px;
             position: relative;
 
             ul.steps {
@@ -1373,7 +1375,7 @@ section.timeline {
     height: 65px;
     overflow: hidden;
     position: absolute;
-    top: 329px;
+    top: 290px;
     width: 100%;
     z-index: 51;
 
