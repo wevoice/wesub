@@ -287,10 +287,6 @@ header.main {
             text-overflow: ellipsis;
             white-space: nowrap;
             width: 100%;
-
-            span.subtitles-language {
-                font-weight: bold;
-            }
             span.sep {
                 display: inline-block;
                 margin: 0 5px;
@@ -1097,9 +1093,7 @@ section.main {
             );
 
             div.subtitles-language {
-                color: black;
                 float: left;
-                font-weight: bold;
                 padding: 10px;
                 font-size: 12px;
                 line-height: 1.34em;
