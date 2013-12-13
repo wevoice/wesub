@@ -8,6 +8,8 @@ $CodePro: 'CodeProLC', $OpenSans;
 $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
+$dark-grey: #212223;
+
 // Custom fonts
 @font-face {
     font-family: 'CodeProLC';
@@ -135,7 +137,7 @@ div.modal {
     z-index: 99;
 
     div.inner {
-        background: #212223;
+        background: $dark-grey;
         color: #F1F1F1;
         margin: 230px auto 0 auto;
         padding: 40px;
@@ -244,7 +246,7 @@ button {
     }
 }
 header.main {
-    background: #212223;
+    background: $dark-grey;
     border-bottom: 1px solid #474849;
     @include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
@@ -342,7 +344,7 @@ header.main {
                 }
             }
             ul {
-                background: #212223;
+                background: $dark-grey;
                 right: 0;
                 padding: 7px 15px;
                 position: absolute;
@@ -351,7 +353,7 @@ header.main {
                 @include border-radius(3px);
 
                 &:before {
-                    border-bottom: 12px solid #212223;
+                    border-bottom: 12px solid $dark-grey;
                     border-left: 12px solid transparent;
                     border-right: 12px solid transparent;
                     content: "";
@@ -930,7 +932,8 @@ section.main {
             position: relative;
             // We move it upwards, covering the header
             margin-top: -38px;
-            background: none repeat scroll 0 0 #F3F4F5;
+            //background: none repeat scroll 0 0 #F3F4F5;
+            background: none repeat scroll 0 0 $dark-grey;
             div.subtitle-overlay {
                 position: absolute;
                 bottom: 63px;
@@ -973,7 +976,7 @@ section.main {
 
             ul.video-controls {
                 height: 32px;
-                background: #212223;
+                background: $dark-grey;
                 border-bottom: 1px solid #19191a;
                 color: #fff;
 
@@ -1132,7 +1135,7 @@ section.main {
                        position: absolute;
                        display: block;
                        content: "";
-                       border-color: transparent transparent #212223 transparent;
+                       border-color: transparent transparent $dark-grey transparent;
                        border-style: solid;
                        border-width: 10px;
                        height:0;
@@ -1141,7 +1144,7 @@ section.main {
                        top:-20px;
                        right: 1em;
                    }
-                   background: #212223;
+                   background: $dark-grey;
                    display:none;
                    position: absolute;
                    text-align: left;
@@ -1166,7 +1169,7 @@ section.main {
                            }
                            &:hover {
                               background: #C5C5C5;
-                              color: #212223;
+                              color: $dark-grey;
                            }
                           }
 		      }
@@ -1370,7 +1373,7 @@ section.collab {
 
 // Timeline mode
 section.timeline {
-    background: #212223;
+    background: $dark-grey;
     height: 65px;
     overflow: hidden;
     position: absolute;
