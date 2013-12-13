@@ -195,7 +195,6 @@ def team_add_video_select(context):
     #fix problem with encoding "?" in build_absolute_uri. It is not encoded,
     #so we get not same URL that page has
     location = request.get_full_path()
-    context['video_absolute_url'] = request.build_absolute_uri(urlquote(location))
 
     user = context['user']
     if user.is_authenticated():
