@@ -1402,6 +1402,8 @@ section.timeline {
             @include border-radius(3px);
 
             span {
+                // This is to avoid seeing the second line
+                height: 15px;
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
