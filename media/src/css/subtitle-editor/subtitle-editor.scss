@@ -264,19 +264,14 @@ header.main {
             float: left;
         }
         div.video-title {
-
             margin: 0;
-            padding: 8px 12px;
-            float: right;
-            width: 500px;
+            padding: 10px 12px;
             text-align: right;
             color: #D0D1D2;
             font: normal 13px $OpenSans;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-
-
 	}
     }
     section.video {
@@ -932,7 +927,6 @@ section.main {
             position: relative;
             // We move it upwards, covering the header
             margin-top: -38px;
-            //background: none repeat scroll 0 0 #F3F4F5;
             background: none repeat scroll 0 0 $dark-grey;
             div.subtitle-overlay {
                 position: absolute;

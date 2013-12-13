@@ -116,6 +116,10 @@ var angular = angular || null;
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+        $scope.displayedTitle = function() {
+            return ($scope.workingSubtitles.title || 
+                     $scope.referenceSubtitles.title)
+        }
         $scope.timeline = {
             shownSubtitle: null,
             currentTime: null,
