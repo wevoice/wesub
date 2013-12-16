@@ -272,6 +272,10 @@ header.main {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            a {
+              padding: 0 10px;
+              vertical-align: middle;
+            }
 	}
     }
     section.video {
