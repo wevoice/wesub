@@ -75,6 +75,8 @@
                 <p class="group">
                     {% if team.logo %}
                     <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
+                    {% else %}
+                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ STATIC_URL }}images/team.png"></a>
                     {% endif %}
                     {% blocktrans with team.get_absolute_url as url %}
                     <span class="team-link">This video is part of the <a href="{{ url }}">{{ team }}</a> team.</span>
@@ -82,6 +84,7 @@
                 </p>
             {% endif %}
             {% if team.workflow_enabled and user_is_team_member %}
+            <a class="icon" href="{{ team_video.get_tasks_page_url }}"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
             <p>
                 {% blocktrans with team_video.get_tasks_page_url as url %}
                 View <a href="{{ url }}">tasks for this video</a>.
