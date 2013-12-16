@@ -17,32 +17,29 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import urllib
 import urlparse
 
 from babelsubs.parsers.dfxp import DFXPParser
 from django.core.urlresolvers import reverse
-from django.utils.text import get_valid_filename
 from django.test import TestCase
 
-from apps.videos.tests.data import (
+from subtitles.templatetags import new_subtitles_tags
+from videos.tests.data import (
     get_video, make_subtitle_language, make_subtitle_version
 )
 
 
 class DFXPTest(TestCase):
     def _download_subs(self, subtitle_language, format):
-        url = reverse("subtitles:download", kwargs={
-            'video_id': subtitle_language.video.video_id,
-            'language_code': subtitle_language.language_code,
-            'filename': subtitle_language.version().title,
-            'format': format,
-        })
-        filename = urlparse.urlparse(url).path.split('/')[-1]
-        expected_filename = get_valid_filename(("%s.%s.%s" % (
-            subtitle_language.version().title,
+        url = new_subtitles_tags.subtitle_download_url(
+            subtitle_language.get_tip(), format)
+        url_filename = urlparse.urlparse(url).path.split('/')[-1]
+        expected_filename = ("%s.%s.%s" % (
+            subtitle_language.version().title.replace('.', '_'),
             subtitle_language.language_code,
-            format)))
-        self.assertEquals(filename, expected_filename)
+            format))
+        self.assertEquals(urllib.unquote(url_filename), expected_filename)
 
         res = self.client.get(url)
         self.assertEqual(res.status_code, 200)
