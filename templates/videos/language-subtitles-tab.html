@@ -39,7 +39,7 @@
                 <ul>
                   {% for format_name in downloadable_formats %}
                      <li>
-                       <a href="{% url widget:download format_name %}?video_id={{ video.video_id }}&lang_pk={{ language.pk }}&revision={{ version.version_number }}">{{format_name|upper}}</a>
+                     <a href="{% subtitle_download_url version format_name %}">{{format_name|upper}}</a>
                     </li>
                   {% endfor %}
                 </ul>

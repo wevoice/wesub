@@ -220,6 +220,9 @@ class Team(models.Model):
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
+    def __init__(self, *args, **kwargs):
+        models.Model.__init__(self, *args, **kwargs)
+        self._member_cache = {}
 
     def save(self, *args, **kwargs):
         creating = self.pk is None
@@ -337,9 +340,22 @@ class Team(models.Model):
 
     # Membership and roles
     def get_member(self, user):
+        """Get a TeamMember object for a user or None."""
         if not user.is_authenticated():
-            raise TeamMember.DoesNotExist()
-        return self.members.get(user=user)
+            return None
+
+        if user.id in self._member_cache:
+            return self._member_cache[user.id]
+        try:
+            member = self.members.get(user=user)
+        except TeamMember.DoesNotExist:
+            member = None
+        self._member_cache[user.id] = member
+        return member
+
+    def user_is_member(self, user):
+        return self.get_member(user) is not None
+
 
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.

@@ -17,6 +17,8 @@
 # along with this program. If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+import urlparse
+
 from babelsubs.parsers.dfxp import DFXPParser
 from django.core.urlresolvers import reverse
 from django.utils.text import get_valid_filename
@@ -29,19 +31,21 @@ from apps.videos.tests.data import (
 
 class DFXPTest(TestCase):
     def _download_subs(self, subtitle_language, format):
-        url = reverse("widget:download", args=[format])
-        res = self.client.get(url, {
+        url = reverse("subtitles:download", kwargs={
             'video_id': subtitle_language.video.video_id,
-            'lang_pk': subtitle_language.pk
+            'language_code': subtitle_language.language_code,
+            'filename': subtitle_language.version().title,
+            'format': format,
         })
-        self.assertEqual(res.status_code, 200)
+        filename = urlparse.urlparse(url).path.split('/')[-1]
         expected_filename = get_valid_filename(("%s.%s.%s" % (
             subtitle_language.version().title,
             subtitle_language.language_code,
             format)))
-        expected_header = 'attachment; filename=%s' % expected_filename
-        self.assertEqual(res['Content-Disposition'] , expected_header)
+        self.assertEquals(filename, expected_filename)
 
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, 200)
         return res.content
 
     def test_dfxp_serializer(self):
