@@ -57,6 +57,7 @@ class EditorPage(UnisubsPage):
     _COPY_TIMING = 'a.copyover'
     _TOOLS_MENU = 'div.toolbox-inside a'
     _PARAGRAPH_MARKER = '.paragraph-start'
+    _REMOVE_SUBTITLE = '.remove-subtitle'
 
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
