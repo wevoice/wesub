@@ -42,8 +42,7 @@ class EditorPage(UnisubsPage):
     _REF_METADATA_EXPANDER = 'div.reference div.metadata a'
 
     #CENTER COLUMN
-    _VIDEO_TITLE = "section.video span.video-title"
-    _VIDEO_LANG = "section.video span.subtitles-language"
+    _VIDEO_TITLE = "div.video-title a"
     _PLAYER = "div#player"
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
@@ -230,7 +229,7 @@ class EditorPage(UnisubsPage):
     def video_title(self):
         """Return the text displayed for the video title. """
 
-        return self.get_text_by_css(self._VIDEO_TITLE)
+        return self.get_element_attribute(self._VIDEO_TITLE, "title")
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """
