@@ -49,6 +49,7 @@ from gdata.service import RequestError
 from vidscraper.errors import Error as VidscraperError
 
 import widget
+from widget import rpc as widget_rpc
 from apps.auth.models import CustomUser as User
 from apps.statistic.models import EmailShareStatistic
 from apps.subtitles import models as sub_models
@@ -320,6 +321,8 @@ class VideoPageContext(dict):
         self['metadata'] = metadata.convert_for_display()
         self['language_list'] = LanguageList(video)
         self['shows_widget_sharing'] = video.can_user_see(request.user)
+        self['widget_settings'] = json.dumps(
+            widget_rpc.get_general_settings(request))
 
         _add_share_panel_context_for_video(self, video)
         self['task'] =  _get_related_task(request)
