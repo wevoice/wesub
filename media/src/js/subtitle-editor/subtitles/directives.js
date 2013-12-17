@@ -189,9 +189,9 @@ var USER_IDLE_MINUTES = 15;
 
             function resizeScroller() {
                 if (scope.timelineShown) {
-                    var scrollerTop = 431;
+                    var scrollerTop = 398;
                 } else {
-                    var scrollerTop = 366;
+                    var scrollerTop = 327;
                 }
                 scroller.height(window.height() - scrollerTop);
             }
