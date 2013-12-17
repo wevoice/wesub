@@ -2456,6 +2456,11 @@ a.truncated-expand {
 #teams .view form.settings {
     margin-left: 1.5em;
     margin-right: 2.5em;
+
+    .logo-field {
+        float: left;
+        width: 50%;
+    }
 }
 #teams div.join div#apply-modal {
     div.modal-body {

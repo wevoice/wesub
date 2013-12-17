@@ -6,37 +6,37 @@
 {% load comments i18n subtitles_tags teams_tags videos_tags media_compressor %}
 
 {% block css %}
-    {{ block.super }}
-    {% include_bundle "video_history" %}
-    {% include_bundle "widget-css"%}
+{{ block.super }}
+{% include_bundle "video_history" %}
+{% include_bundle "widget-css"%}
 {% endblock %}
 
-    {% block scripts %}
-        {{ block.super }}
-        {% include_bundle "unisubs-onsite-compiled" %}
-        <script src="{% url videos:rpc_api %}" type="text/javascript"></script>
-        {% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
-        <script type="text/javascript">
-            {% if team.workflow_enabled %}
-                window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
-            {% else %}
-                window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
-            {% endif %}
-            window.WIDGET_SETTINGS = {{ widget_settings|safe }};
-        </script>
-    {% endblock %}
+{% block scripts %}
+{{ block.super }}
+{% include_bundle "unisubs-onsite-compiled" %}
+<script src="{% url videos:rpc_api %}" type="text/javascript"></script>
+{% with write_video_type_js as jsinclude %}{% if jsinclude %}{% write_video_type_js video %}{% endif %}{% endwith %}
+<script type="text/javascript">
+    {% if team.workflow_enabled %}
+    window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+{% else %}
+window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+{% endif %}
+window.WIDGET_SETTINGS = {{ widget_settings|safe }};
+</script>
+{% endblock %}
 
 {% block title %}{{ page_title }}{% endblock %}
 
 {% block opengraph-head %}
-    {{block.super}}
-    <meta property="og:title" content="{{ page_title }}" />
-    <meta property="og:type" content="video"/>
-    <meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
-    {% if video.thumbnail %}
-    <meta property="og:image" content="{{ video.get_thumbnail }}" />
-    {% else %}
-    <meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
+{{block.super}}
+<meta property="og:title" content="{{ page_title }}" />
+<meta property="og:type" content="video"/>
+<meta property="og:url" content="http://{{ current_site.domain }}{{ video.get_absolute_url }}"/>
+{% if video.thumbnail %}
+<meta property="og:image" content="{{ video.get_thumbnail }}" />
+{% else %}
+<meta property="og:image" content="{{ STATIC_URL }}images/small_logo.png" />
     {% endif %}
 
     <meta property="og:site_name" content="Amara"/>
@@ -73,8 +73,8 @@
             <h3>{% trans "Contribute" %}</h3>
             {% if team %}
                 <p class="group">
-                    {% if team.logo %}
-                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.small_logo_thumbnail }}"></a>
+                    {% if team.square_logo %}
+                    <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ team.square_logo_thumbnail_small }}"></a>
                     {% else %}
                     <a href="{{ team.get_absolute_url }}"><img class="logo" src="{{ STATIC_URL }}images/team.png"></a>
                     {% endif %}

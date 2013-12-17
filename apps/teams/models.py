@@ -160,7 +160,13 @@ class Team(models.Model):
 
     logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True,
                                upload_to='teams/logo/',
-                               thumb_sizes=[(280, 100), (100, 100), (48, 48)])
+                               default='',
+                               thumb_sizes=[(280, 100), (100, 100)])
+    square_logo = S3EnabledImageField(verbose_name=_(u'square logo'),
+                                      blank=True,
+                                      default='',
+                                      upload_to='teams/square-logo/',
+                                      thumb_sizes=[(100, 100), (48, 48)])
     is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
@@ -318,19 +324,24 @@ class Team(models.Model):
 
     # Thumbnails
     def logo_thumbnail(self):
-        """Return the URL for a kind-of small version of this team's logo, or None."""
+        """URL for a kind-of small version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(100, 100)
 
-    def medium_logo_thumbnail(self):
-        """Return the URL for a medium version of this team's logo, or None."""
+    def logo_thumbnail_medium(self):
+        """URL for a medium version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(280, 100)
 
-    def small_logo_thumbnail(self):
-        """Return the URL for a really small version of this team's logo, or None."""
-        if self.logo:
-            return self.logo.thumb_url(48, 48)
+    def square_logo_thumbnail(self):
+        """URL for this team's square logo, or None."""
+        if self.square_logo:
+            return self.square_logo.thumb_url(100, 100)
+
+    def square_logo_thumbnail_small(self):
+        """URL for a small version of this team's square logo, or None."""
+        if self.square_logo:
+            return self.square_logo.thumb_url(48, 48)
 
     # URLs
     @models.permalink
