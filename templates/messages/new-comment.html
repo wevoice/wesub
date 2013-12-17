@@ -1,3 +1,7 @@
 {{ commenter }} commented on "{{ video.title_display }}".
 
-{{ protocol }}://{{ domain }}{{ video.get_absolute_url }}
+{% if language %}
+{{ protocol }}://{{ domain }}{{ language.get_absolute_url }}?tab=comments
+{% else %}
+{{ protocol }}://{{ domain }}{{ video.get_absolute_url }}?tab=comments
+{% endif %}
