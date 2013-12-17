@@ -173,6 +173,9 @@ unisubs.widget.DropDown.prototype.createSubtitleHomepageURL_ = function() {
 };
 
 unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function() {
+    if(this.subtitleState_ === null) {
+        return '#';
+    }
     var filename = (this.subtitleState_.TITLE.replace('.', '_') + '.' +
             this.subtitleState_.LANGUAGE);
     var path = ("/subtitles/" + this.videoID_ + "/" +
