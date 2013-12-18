@@ -545,6 +545,7 @@ class LanguagePageContext(dict):
         self['video'] = video
         self['language'] = language
         self['version'] = version
+        self['user'] = request.user
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
