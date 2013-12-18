@@ -68,7 +68,7 @@
             <h1 ng-show="content.heading">[[ content.heading ]]</h1>
             <p ng-show="content.text">[[ content.text ]]</p>
             <div ng-show="showDownloadLink" class="download">
-                <a class="button yes" ng-href="[[ downloadLink ]]" href="#" download="SubtitleBackup.dfxp">Download Subtitles</a>
+                <a class="button yes" href="#" ng-click="onDownloadClick($event)">Download Subtitles</a>
                 <p>
                 To avoid data corruption, please do not open or edit the subtitles in any text editor.
                 </p>

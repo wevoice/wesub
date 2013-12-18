@@ -19,29 +19,25 @@
 var angular = angular || null;
 
 (function() {
-    var module = angular.module('amara.SubtitleEditor.objecturl', []);
+    var module = angular.module('amara.SubtitleEditor.blob', []);
 
-    module.factory('ObjectUrl', function($window) {
+    module.factory('Blob', function($window) {
         var BlobBuilder = $window.BlobBuilder || $window.MozBlobBuilder || $window.WebKitBlobBuilder || $window.MSBlobBuilder;
         var Blob = $window.Blob;
         var URL = $window.URL || $window.webkitURL;
 
-        function makeBlob(data, type) {
-            if(Blob) {
-                return new Blob([data], {type: type});
-            }
-            else if(BlobBuilder) {
-                var blobBuilder = new BlobBuilder();
-                blobBuilder.append(value);
-                return blobBuilder.getBlob(type);
-            } else {
-                throw "Blob not supported";
-            }
-        }
-
         return {
             create: function(data, type) {
-                return URL.createObjectURL(makeBlob(data, type));
+                if(Blob) {
+                    return new Blob([data], {type: type});
+                }
+                else if(BlobBuilder) {
+                    var blobBuilder = new BlobBuilder();
+                    blobBuilder.append(value);
+                    return blobBuilder.getBlob(type);
+                } else {
+                    throw "Blob not supported";
+                }
             }
         }
     });

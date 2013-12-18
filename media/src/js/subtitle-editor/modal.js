@@ -18,11 +18,11 @@
 
 (function() {
     var module = angular.module('amara.SubtitleEditor.modal', [
-        'amara.SubtitleEditor.objecturl',
+        'amara.SubtitleEditor.blob',
         'amara.SubtitleEditor.subtitles.services',
         ]);
 
-    module.controller('ModalController', function($scope, ObjectUrl, SubtitleStorage) {
+    module.controller('ModalController', function($scope, Blob, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -33,7 +33,6 @@
         $scope.isVisible = true;
         $scope.content = null;
         $scope.showDownloadLink = false;
-        $scope.downloadLink = "#";
 
         $scope.hide = function() {
 
@@ -60,9 +59,12 @@
 
             var data = $scope.workingSubtitles.subtitleList.toXMLString();
             $scope.showDownloadLink = true;
-            $scope.downloadLink = ObjectUrl.create(data,
-                'application/ttaf+xml');
+            $scope.downloadBlob = Blob.create(data, 'application/ttaf+xml');
         });
+        $scope.onDownloadClick = function($event) {
+            $event.preventDefault();
+            window.saveAs($scope.downloadBlob, 'SubtitleBackup.dfxp');
+        }
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
                 $scope.content.heading = heading;

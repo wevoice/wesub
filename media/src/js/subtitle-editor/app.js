@@ -20,12 +20,12 @@ var angular = angular || null;
 (function() {
 
     var module = angular.module('amara.SubtitleEditor', [
+        'amara.SubtitleEditor.blob',
         'amara.SubtitleEditor.collab',
         'amara.SubtitleEditor.help',
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
-        'amara.SubtitleEditor.objecturl',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
         'amara.SubtitleEditor.subtitles.directives',
