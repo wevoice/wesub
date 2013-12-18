@@ -1476,3 +1476,36 @@ body.timeline-shown {
         margin-top: 65px;
     }
 }
+
+// Styling of the new modals
+.modal-style {
+    @extend %modal;    
+    background: rgba(black, .6);
+    color: #F1F1F1;
+    div.modal-inner {
+      padding: 40px;
+      background: $dark-grey;
+      .modal-content {max-height: 200vh;}
+      div,
+      footer,
+      header {
+        border: none;
+        background: $dark-grey;
+      }
+      h1 {
+        font: normal 17px $Helvetica;
+      }
+      h2 {
+        font: normal 15px $Helvetica;
+      }
+      textarea {
+        background: #E3E6E9;
+        font: normal 12px monospace;
+        height: 100px;
+        margin-bottom: 5px;
+        margin-top: 0;
+        padding: 10px;
+        width: 100%;
+      }
+   }
+}

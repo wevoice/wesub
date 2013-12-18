@@ -421,18 +421,18 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
         <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
         </div>
     </section>
-    <section id="set-title-modal" class="semantic-content" id="modal-text" tabindex="-1"
+    <section id="set-title-modal" class="modal-style semantic-content" id="modal-text" tabindex="-1"
 	     role="dialog" aria-labelledby="modal-label" aria-hidden="true">
       <div class="modal-inner"
            ng-controller="SubtitleMetadataController"
            dir="[[ workingSubtitles.language.dir ]]">
-	<header id="modal-label">{% trans "EDIT TITLE AND DESCRIPTION" %}</header>
+	<header id="modal-label"><h1>{% trans "EDIT TITLE AND DESCRIPTION" %}</h1></header>
 	<div class="modal-content">
           <div class="metadata">
             <div class="content">
-              <h3>{% trans "TITLE" %}</h3>
+              <h2>{% trans "TITLE" %}</h2>
               <textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
-              <h3>{% trans "DESCRIPTION" %}</h3>
+              <h2>{% trans "DESCRIPTION" %}</h2>
               <textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
               <div ng-repeat="(key, value) in workingSubtitles.metadata">
                 <h3>[[ key | metadataTypeName ]]</h3>
@@ -442,13 +442,10 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
           </div>
 	</div>
 	<footer>
-	  <a class="open-modal" role="button" title="Done" href="#modal-embed">Done</a>
-	  <a class="close-action" data-dismiss="modal" title="Cancel" href="#!">Cancel</a>
+	  <button class="open-modal yes" role="button" title="Done" href="#modal-embed">Done</button>
+	  <button class="close-action no" data-dismiss="modal" title="Cancel" href="#!">Cancel</button>
 	</footer>
       </div>
-      
-      <a href="#!" class="modal-close" title="Close this modal" data-close="Close"
-	 data-dismiss="modal">×</a>
     </section>
 
     {% include_bundle "subtitle-editor" %}
