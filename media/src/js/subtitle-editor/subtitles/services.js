@@ -148,7 +148,7 @@ var angular = angular || null;
                 var promise = $http({
                     method: 'PUT',
                     url: url,
-                    headers: authHeaders,
+                    headers: authHeaders(),
                     data:  {
                         body: notes,
                     }
