@@ -1,5 +1,5 @@
 #!/bin/bash
-DOCKER_HOST="$1"
+DOCKER_HOST=${1:-}
 AWS_ID=${2:-}
 AWS_KEY=${3:-}
 REV=${REVISION:-staging}
