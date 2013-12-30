@@ -430,14 +430,16 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 	<div class="modal-content">
           <div class="metadata">
             <div class="content">
-              <h2>{% trans "TITLE" %}</h2>
-              <textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
-              <h2>{% trans "DESCRIPTION" %}</h2>
-              <textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
-              <div ng-repeat="(key, value) in workingSubtitles.metadata">
-                <h3>[[ key | metadataTypeName ]]</h3>
-		<textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
-	      </div>
+	      <form>
+		<h2>{% trans "TITLE" %}</h2>
+		<textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
+		<h2>{% trans "DESCRIPTION" %}</h2>
+		<textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
+		<div ng-repeat="(key, value) in workingSubtitles.metadata">
+                  <h3>[[ key | metadataTypeName ]]</h3>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
+		</div>
+	      </form>
             </div>
           </div>
 	</div>
