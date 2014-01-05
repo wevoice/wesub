@@ -432,20 +432,22 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
             <div class="content">
 	      <form>
 		<h2>{% trans "TITLE" %}</h2>
-		<textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
+		<textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="currentSubtitles.title"></textarea>
 		<h2>{% trans "DESCRIPTION" %}</h2>
-		<textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
-		<div ng-repeat="(key, value) in workingSubtitles.metadata">
+		<textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="currentSubtitles.description"></textarea>
+		<div ng-repeat="(key, value) in currentSubtitles.metadata">
                   <h3>[[ key | metadataTypeName ]]</h3>
-		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
 	      </form>
             </div>
           </div>
 	</div>
 	<footer>
-	  <button class="open-modal yes" role="button" title="Done" href="#modal-embed">Done</button>
-	  <button class="close-action no" data-dismiss="modal" title="Cancel" href="#!">Cancel</button>
+	  <a role="button" title="Done" href="#!" class="open-modal yes" ng-click="update(currentSubtitles)">Done</a>
+	  <a href="#!" class="close-action no" data-close="Close" data-dismiss="modal" title="Cancel" ng-click="reset()">
+	    Cancel
+	  </a>
 	</footer>
       </div>
     </section>
