@@ -2,14 +2,12 @@
     var AmaraIframeController = function() {
 	var iframes = [];
 	this.initIframes = function() {
-	    console.log("Entering initIframes");
 	    var elements = document.getElementsByClassName("amara-embed");
-	    console.log("In initIframes: " + elements);
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
-		var url = currentDiv.getAttribute('data-url');
 		var iframe = document.createElement("IFRAME");
-		iframe.src = "http://" + window.location.host + "/embedder-widget/" + url;
+		iframe.src = "http://" + window.location.host + "/embedder-widget-iframe/?data=" +
+		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		currentDiv.appendChild(iframe);
 		iframes.push(iframe);
 	    }
