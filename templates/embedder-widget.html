@@ -7,8 +7,9 @@
     {% include_bootstrapped_bundle 'embedder' %}
   </head>
   <body>
-    <div class="container">
-      <div id="widget-div" class="amara-embed" style="height: 480px; width: 854px"></div>
+<!--    <div class="container"> -->
+<div>
+      <div id="widget-div" class="amara-embed"></div>
     </div>
 <script  type="text/javascript">
 var qs = (function(a) {
@@ -23,8 +24,14 @@ var qs = (function(a) {
   return b;
 })(window.location.search.substr(1).split('&'));
 var parsedAttributes = JSON.parse(qs['data'])
-for (var attribute in parsedAttributes)
-    document.getElementById("widget-div").dataset[attribute] = parsedAttributes[attribute];
-</script>
+for (var attribute in parsedAttributes) {
+    if (attribute == 'height')
+        document.getElementById("widget-div").style.height = parsedAttributes[attribute];
+    else if (attribute == 'width')
+        document.getElementById("widget-div").style.width = parsedAttributes[attribute];
+    else
+        document.getElementById("widget-div").dataset[attribute] = parsedAttributes[attribute];
+}
+		      </script>
   </body>
 </html>
