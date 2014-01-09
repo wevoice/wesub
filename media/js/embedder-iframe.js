@@ -7,7 +7,10 @@
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
 		var iframe = document.createElement("IFRAME");
-		iframe.src = "http://" + window.location.host + "/embedder-widget-iframe/?data=" +
+		var parser = document.createElement('a');
+		var scripts = document.getElementsByTagName("script");
+		parser.href = scripts[scripts.length-1].src;
+		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		iframe.style.border = "none";
 		iframe.style.overflow = "hidden";
