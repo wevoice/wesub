@@ -553,7 +553,7 @@ var angular = angular || null;
         // the original language.  That way translators will know that they
         // should fill something out there.
         $scope.currentSubtitles = {
-            title: $scope.workingSubtitles.title,
+            title: $scope.workingSubtitles.getTitle(),
             description: $scope.workingSubtitles.description,
             metadata: $scope.workingSubtitles.metadata
         };
