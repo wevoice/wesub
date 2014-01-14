@@ -435,9 +435,13 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 	      <form>
 		<h2>{% trans "TITLE" %}</h2>
 		<textarea rows="3" placeholder="{% trans 'Enter title' %}"></textarea>
+		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key == 'speaker-name'">
+                  <h3>[[ key | metadataTypeName ]]</h3>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]"></textarea>
+		</div>
 		<h2>{% trans "DESCRIPTION" %}</h2>
 		<textarea rows="8" placeholder="{% trans 'Enter description' %}"></textarea>
-		<div ng-repeat="(key, value) in currentSubtitles.metadata">
+		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key != 'speaker-name'">
                   <h3>[[ key | metadataTypeName ]]</h3>
 		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
