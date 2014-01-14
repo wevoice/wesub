@@ -263,16 +263,21 @@ header.main {
             text-transform: lowercase;
             float: left;
         }
+        div.video-title-icon {
+            float: right;
+            padding: 12px 5px;
+        }
         div.video-title {
             margin: 0;
-            padding: 10px 12px;
+            padding: 10px 5px;
             text-align: right;
-            color: #D0D1D2;
             font: normal 13px $OpenSans;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             a {
+              color: #D0D1D2;
+              text-decoration: none;
               padding: 0 10px;
               vertical-align: middle;
             }
