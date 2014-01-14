@@ -391,18 +391,33 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                         2. Sync timing
                         <div class="substeps"
                             ng-show="workflow.stage == 'sync'">
-                            <p ng-show="!workflow.canMoveToReview()">
+                            <p ng-show="!workflow.canMoveToTitle()">
                                 {% trans "Not all lines are synced yet." %}
                             </p>
-                            <div ng-show="workflow.canMoveToReview()">
+                            <div ng-show="workflow.canMoveToTitle()">
                                 <p>{% trans "All lines are synced." %}</p>
+                                <button class="next-step"
+                                    ng-click="onNextClicked($event)">
+                                    {% trans "Edit title and description" %}
+                                </button>
+                        </div>
+                    </li>
+                    <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
+                        3. Edit title and description
+                        <div class="substeps"
+                            ng-show="workflow.stage == 'title'">
+                            <p ng-show="!workflow.canMoveToReview()">
+                                {% trans "Title and description were not edited yet." %}
+                            </p>
+                            <div ng-show="workflow.canMoveToReview()">
+                                <p>{% trans "Title and description have been edited edited." %}</p>
                                 <button class="next-step"
                                     ng-click="onNextClicked($event)">
                                     {% trans "Start reviewing" %}
                                 </button>
                         </div>
                     </li>
-                    <li>3. Review and complete
+                    <li>[[ 3 + translating() ]]. Review and complete
                     <div class="substeps"
                         ng-show="workflow.stage == 'review'">
                         <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>

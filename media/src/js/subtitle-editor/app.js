@@ -61,7 +61,15 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+	$scope.currentTitle = {};
+	$scope.currentTitle.Edited = false;
+	$scope.titleEdited = function() {
+	    return $scope.currentTitle.Edited;
+	}
+        $scope.translating = function() {
+            return ($scope.referenceSubtitles.subtitleList.length() > 0);
+        }
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
