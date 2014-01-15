@@ -67,7 +67,7 @@ var angular = angular || null;
 	    return $scope.currentTitle.Edited;
 	}
         $scope.translating = function() {
-            return ($scope.referenceSubtitles.subtitleList.length() > 0);
+            return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
