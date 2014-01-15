@@ -278,32 +278,6 @@ class Team(models.Model):
         """Return whether this team's membership is by application only."""
         return self.membership_policy == self.APPLICATION
 
-    @classmethod
-    def get(cls, slug, user=None, raise404=True):
-        """Return the Team with the given slug.
-
-        If a user is given the Team must be visible to that user.  Otherwise the
-        Team must be visible to the public.
-
-        If raise404 is given an Http404 exception will be raised if a suitable
-        team is not found.  Otherwise None will be returned.
-
-        """
-        if user:
-            qs = cls.objects.for_user(user)
-        else:
-            qs = cls.objects.filter(is_visible=True)
-        try:
-            return qs.get(slug=slug)
-        except cls.DoesNotExist:
-            try:
-                return qs.get(pk=int(slug))
-            except (cls.DoesNotExist, ValueError):
-                pass
-
-        if raise404:
-            raise Http404
-
     def get_workflow(self):
         """Return the workflow for the given team.
 
