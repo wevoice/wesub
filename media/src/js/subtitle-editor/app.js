@@ -63,7 +63,8 @@ var angular = angular || null;
         $scope.scrollingSynced = true;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
-	$scope.titleEdited = function() {
+	$scope.titleEdited = function(newValue) {
+	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
 	    return $scope.currentTitle.Edited;
 	}
         $scope.translating = function() {

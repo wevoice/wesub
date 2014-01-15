@@ -559,14 +559,12 @@ var angular = angular || null;
         };
 
         $scope.update = function(subtitles) {
-            $scope.currentTitle.Edited = true;
             $scope.workingSubtitles.title = subtitles.title;
             $scope.workingSubtitles.description = subtitles.description;
             $scope.workingSubtitles.metadata = subtitles.metadata;
         };
  
         $scope.reset = function() {
-            $scope.currentTitle.Edited = true;
             $scope.currentSubtitles.title = $scope.workingSubtitles.title;
             $scope.currentSubtitles.description = $scope.workingSubtitles.description;
             $scope.currentSubtitles.metadata = $scope.workingSubtitles.metadata;

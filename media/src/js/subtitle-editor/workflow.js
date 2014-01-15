@@ -47,8 +47,10 @@ var angular = angular || null;
             if(newStage == 'review' && !this.canMoveToReview()) {
                 return;
             }
-	    if (newStage == 'title')
+	    if (newStage == 'title') {
 		window.location.hash = 'set-title-modal';
+		this.titleEdited(true);
+	    }
             this.stage = newStage;
         },
         canMoveToTitle: function() {
