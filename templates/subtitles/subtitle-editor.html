@@ -396,21 +396,25 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                             </p>
                             <div ng-show="workflow.canMoveToTitle()">
                                 <p>{% trans "All lines are synced." %}</p>
-                                <button class="next-step"
+                                <button ng-show="translating()" class="next-step"
                                     ng-click="onNextClicked($event)">
                                     {% trans "Edit title and description" %}
+                                </button>
+                                <button ng-show="!translating()" class="next-step"
+                                    ng-click="onNextClicked($event)">
+                                    {% trans "Start reviewing" %}
                                 </button>
                         </div>
                     </li>
                     <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-                        3. Edit title and description
+                        3. Translate title
                         <div class="substeps"
                             ng-show="workflow.stage == 'title'">
                             <p ng-show="!workflow.canMoveToReview()">
                                 {% trans "Title and description were not edited yet." %}
                             </p>
                             <div ng-show="workflow.canMoveToReview()">
-                                <p>{% trans "Title and description have been edited edited." %}</p>
+                                <p>{% trans "Title and description have been edited." %}</p>
                                 <button class="next-step"
                                     ng-click="onNextClicked($event)">
                                     {% trans "Start reviewing" %}
@@ -450,17 +454,17 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 	      <form>
 		<h2>{% trans "TITLE" %}</h2>
 		<p ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</p>
-		<textarea rows="3" placeholder="{% trans 'Enter title' %}" autosize-bind="currentSubtitles.title"></textarea>
+		<textarea rows="3" placeholder="{% trans 'Enter title' %}" fixsize-bind="currentSubtitles.title"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key == 'speaker-name'">
                   <h3>[[ key | metadataTypeName ]]</h3>
-		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="currentSubtitles.metadata[key]"></textarea>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
 		<h2>{% trans "DESCRIPTION" %}</h2>
 		<p ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</p>
-		<textarea rows="8" placeholder="{% trans 'Enter description' %}" autosize-bind="currentSubtitles.description"></textarea>
+		<textarea rows="8" placeholder="{% trans 'Enter description' %}" fixsize-bind="currentSubtitles.description"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key != 'speaker-name'">
                   <h3>[[ key | metadataTypeName ]]</h3>
-		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="currentSubtitles.metadata[key]"></textarea>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
 	      </form>
             </div>

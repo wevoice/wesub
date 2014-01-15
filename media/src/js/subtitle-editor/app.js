@@ -126,7 +126,7 @@ var angular = angular || null;
         }
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
-                     $scope.referenceSubtitles.getTitle())
+                     $scope.referenceSubtitles.getTitle());
         }
         $scope.timeline = {
             shownSubtitle: null,
