@@ -236,6 +236,7 @@ var angular = angular || null;
                         sub_format: 'dfxp',
                         title: title,
                         description: description,
+                        origin: 'web-editor',
                         metadata: metadata,
                         is_complete: isComplete,
                     }
