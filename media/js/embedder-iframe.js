@@ -28,13 +28,17 @@
 	    });
 	};
 	this.resizeIframe = function(iframe) {
-	    if (iframe.contentWindow && iframe.contentWindow.document && iframe.contentWindow.document.documentElement && (
-		iframe.width != iframe.contentWindow.document.documentElement.scrollWidth ||
-		    iframe.height != iframe.contentWindow.document.documentElement.scrollHeight)) {
-		iframe.width = 0;
-		iframe.width = iframe.contentWindow.document.documentElement.scrollWidth;
-		iframe.contentWindow.document.documentElement.childNodes[iframe.contentWindow.document.documentElement.childNodes.length - 1].height = 1;
-		iframe.height = iframe.contentWindow.document.documentElement.scrollHeight;
+	    if (iframe.contentDocument && iframe.contentDocument.body && 
+		iframe.contentWindow && iframe.contentWindow.document.documentElement) {
+		var sh = Math.min(iframe.contentWindow.document.documentElement.scrollHeight,
+				  iframe.contentDocument.body.scrollHeight);
+		var sw = Math.min(iframe.contentWindow.document.documentElement.scrollWidth,
+				  iframe.contentDocument.body.scrollWidth);
+		if( (iframe.width != sw) || (iframe.height != sh)) {
+		    iframe.width = 0;
+		    iframe.width = sw;
+		    iframe.height = sh;
+		}
 	    }
 	};
     };
