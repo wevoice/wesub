@@ -456,7 +456,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 		<textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
 		<textarea rows="1" placeholder="{% trans 'Enter Title' %}" fixsize-bind="currentSubtitles.title"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key == 'speaker-name'">
-                  <h3>[[ key | metadataTypeName ]]</h3>
+                  <h2>[[ key | metadataTypeName ]]</h2>
 		  <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.metadata[key] ]]</textarea>
 		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
@@ -464,7 +464,7 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
 		<textarea rows="4" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</textarea>
 		<textarea rows="8" placeholder="{% trans 'Enter Description' %}" fixsize-bind="currentSubtitles.description"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key != 'speaker-name'">
-                  <h3>[[ key | metadataTypeName ]]</h3>
+                  <h2>[[ key | metadataTypeName ]]</h2>
 		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
 	      </form>
