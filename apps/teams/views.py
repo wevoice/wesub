@@ -883,7 +883,7 @@ def approve_application(request, slug, application_pk):
     else:
         messages.error(request, _(u'You can\'t approve applications.'))
 
-    return redirect('teams:applications', team.pk)
+    return redirect('teams:applications', team.slug)
 
 @login_required
 def deny_application(request, slug, application_pk):
