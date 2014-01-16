@@ -45,37 +45,8 @@
         </div>
     {% endif %}
 {% endif %}
-<ul class="metrics">
-    <li>
-        <a href="{% url teams:detail team.slug %}">
-            <span class="count">{{ team.videos_count|simplify_number }}</span>
-            {% trans "Video" %}{{ team.videos_count|pluralize }}
-        </a>
-    </li>
-    <li>
-        <a href="{% url teams:detail_members team.slug %}">
-            <span class="count">{{team.member_count|simplify_number}}</span>
-            {% trans "Member" %}{{ team.member_count|pluralize }}
-        </a>
-    </li>
-    {% if team.workflow_enabled %}
-        <li>
-            <a href="{% url teams:team_tasks team.slug %}?assignee=none">
-                <span class="count">{% if team.tasks_count > 1000 %}{% trans "> 1000" %}{% else %}{{ team.tasks_count }} {% endif %}</span>
-                {% trans "Task" %}{{ team.tasks_count|pluralize }}
-            </a>
-        </li>
-    {% endif %}
-    {% if projects|length > 0 %}
-        <li>
-            <a href="{% url teams:detail team.slug %}">
-                <span class="count">{{ projects|length|simplify_number }}</span>
-                {% trans "Project" %}{{ projects|length|pluralize }}
-            </a>
-        </li>
-    {% endif %}
-</ul>
-{% if team|is_team_member:user %}
+{% team_metrics team member projects %}
+{% if member %}
     <h3>Member Tools</h3>
     {% if team.workflow_enabled %}
         {% if team.max_tasks_per_member or team.task_expiration %}
