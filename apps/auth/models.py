@@ -30,7 +30,7 @@ except ImportError:
     import sha
     sha1 = sha.sha
 from django.utils.translation import ugettext_lazy as _, ugettext
-from django.utils.http import urlquote_plus
+from django.utils.http import urlquote
 from django.core.exceptions import MultipleObjectsReturned
 from utils.amazon import S3EnabledImageField
 from datetime import datetime, timedelta
@@ -273,7 +273,7 @@ class CustomUser(BaseUser):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('profiles:profile', [urlquote_plus(self.username)])
+        return ('profiles:profile', [urlquote(self.username)])
 
     @property
     def language(self):
