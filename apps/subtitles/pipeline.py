@@ -140,14 +140,13 @@ def _user_can_bypass_moderation(team_video, version, committer):
     from apps.teams.permissions import can_publish_edits_immediately
     subtitle_language = version.subtitle_language
 
-    subtitles_are_complete = subtitle_language.subtitles_complete
     is_post_publish_edit = (version.sibling_set.public()
                                                .exclude(id=version.id)
                                                .exists())
     user_can_bypass = can_publish_edits_immediately(team_video, committer,
                                                     subtitle_language.language_code)
 
-    return subtitles_are_complete and is_post_publish_edit and user_can_bypass
+    return is_post_publish_edit and user_can_bypass
 
 def _set_language_for_subtitle_tasks(team_video, saved_version):
     """Set the language attribute for subtitle tasks.
