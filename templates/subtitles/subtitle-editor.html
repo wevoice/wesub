@@ -447,21 +447,22 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
       <div class="modal-inner"
            ng-controller="SubtitleMetadataController"
            dir="[[ workingSubtitles.language.dir ]]">
-	<header id="modal-label"><h1>{% trans "EDIT TITLE AND DESCRIPTION" %}</h1></header>
+	<header id="modal-label"><h1>{% trans "Edit title and description" %}</h1></header>
 	<div class="modal-content">
           <div class="metadata">
             <div class="content">
 	      <form>
-		<h2>{% trans "TITLE" %}</h2>
-		<textarea rows="2" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
-		<textarea rows="3" placeholder="{% trans 'Enter title' %}" fixsize-bind="currentSubtitles.title"></textarea>
+		<h2>{% trans "Title" %}</h2>
+		<textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
+		<textarea rows="1" placeholder="{% trans 'Enter Title' %}" fixsize-bind="currentSubtitles.title"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key == 'speaker-name'">
                   <h3>[[ key | metadataTypeName ]]</h3>
+		  <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.metadata[key] ]]</textarea>
 		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
 		</div>
-		<h2>{% trans "DESCRIPTION" %}</h2>
+		<h2>{% trans "Description" %}</h2>
 		<textarea rows="4" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</textarea>
-		<textarea rows="8" placeholder="{% trans 'Enter description' %}" fixsize-bind="currentSubtitles.description"></textarea>
+		<textarea rows="8" placeholder="{% trans 'Enter Description' %}" fixsize-bind="currentSubtitles.description"></textarea>
 		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key != 'speaker-name'">
                   <h3>[[ key | metadataTypeName ]]</h3>
 		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
