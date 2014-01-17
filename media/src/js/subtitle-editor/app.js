@@ -61,7 +61,16 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
-        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList);
+	$scope.currentTitle = {};
+	$scope.currentTitle.Edited = false;
+	$scope.titleEdited = function(newValue) {
+	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
+	    return $scope.currentTitle.Edited;
+	}
+        $scope.translating = function() {
+            return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
+        }
+        $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
@@ -117,8 +126,8 @@ var angular = angular || null;
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
         $scope.displayedTitle = function() {
-            return ($scope.workingSubtitles.title || 
-                     $scope.referenceSubtitles.title)
+            return ($scope.workingSubtitles.getTitle() || 
+                     $scope.referenceSubtitles.getTitle());
         }
         $scope.timeline = {
             shownSubtitle: null,

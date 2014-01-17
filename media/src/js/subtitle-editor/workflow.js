@@ -25,7 +25,9 @@ var angular = angular || null;
      * App-level Workflow object
      */
 
-    Workflow = function(subtitleList) {
+    Workflow = function(subtitleList, translating, titleEdited) {
+	this.translating = translating;
+	this.titleEdited = titleEdited;
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.length() == 0) {
@@ -45,17 +47,33 @@ var angular = angular || null;
             if(newStage == 'review' && !this.canMoveToReview()) {
                 return;
             }
+	    if (newStage == 'title') {
+		window.location.hash = 'set-title-modal';
+		this.titleEdited(true);
+	    }
             this.stage = newStage;
         },
+        canMoveToTitle: function() {
+	    if (this.translating())
+		return (this.subtitleList.length() > 0 &&
+			!this.subtitleList.needsAnyTranscribed() &&
+			!this.subtitleList.needsAnySynced());
+	    else return true;
+        },
         canMoveToReview: function() {
-            return (this.subtitleList.length() > 0 &&
-                    !this.subtitleList.needsAnyTranscribed() &&
-                    !this.subtitleList.needsAnySynced());
+	    if (this.translating())
+		return (this.titleEdited());
+	    else
+		return (this.subtitleList.length() > 0 &&
+			!this.subtitleList.needsAnyTranscribed() &&
+			!this.subtitleList.needsAnySynced());
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {
-                return (this.stage == 'review' || this.stage == 'sync');
+                return (this.stage == 'review' || this.stage == 'sync' || this.stage == 'title');
             } else if(stageName == 'sync') {
+                return (this.stage == 'review' || this.stage == 'title');
+            } else if(stageName == 'title') {
                 return this.stage == 'review'
             } else {
                 return false;
@@ -90,8 +108,15 @@ var angular = angular || null;
                     $scope.toggleTimelineShown();
                 }
                 rewindPlayback();
-            } else if ($scope.workflow.stage == 'sync') {
+            } else if ($scope.workflow.stage == 'title') {
                 $scope.workflow.switchStage('review');
+                rewindPlayback();
+	    }
+	    else if ($scope.workflow.stage == 'sync') {
+		if ($scope.translating())
+                    $scope.workflow.switchStage('title');
+		else
+                    $scope.workflow.switchStage('review');
                 rewindPlayback();
             }
             evt.preventDefault();
