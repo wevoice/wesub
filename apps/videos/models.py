@@ -23,6 +23,7 @@ import string
 import random
 from datetime import datetime, date
 import time
+import re
 
 from django.utils.safestring import mark_safe
 from django.core.cache import cache
@@ -331,7 +332,11 @@ class Video(models.Model):
 
         This is basically the video title, with some chars replaced.
         """
-        return self.title_display().replace('.', '_').replace('\n', ' ')
+        title = self.title_display()
+        # replace newlines with ' '
+        title = title.replace("\n", ' ')
+        # remove any questionable characters
+        return re.sub(r'(?u)[^-\w ]', '', title)
 
     def update_view_counter(self):
         """Queue a Celery task that will increment the number of views for this video."""

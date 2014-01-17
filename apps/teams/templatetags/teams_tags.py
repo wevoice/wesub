@@ -16,13 +16,15 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import namedtuple
+
 from django import template
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from videos.models import Video
 from apps.widget import video_cache
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ngettext
 from django.core.urlresolvers import reverse
 from django.utils.http import urlencode, urlquote
 from widget.views import base_widget_params
@@ -160,6 +162,34 @@ def team_select(context, team):
         'team': team,
         'objects': qs,
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
+    }
+
+TeamMetric = namedtuple('TeamMetric', 'url label count')
+
+@register.inclusion_tag('teams/_metrics.html')
+def team_metrics(team, member, projects):
+    metrics = [
+        TeamMetric(reverse('teams:detail', args=(team.slug,)),
+                   ngettext('Video', 'Videos', team.videos_count),
+                   team.videos_count),
+        TeamMetric(reverse('teams:detail_members', args=(team.slug,)),
+                   ngettext('Member', 'Members', team.member_count),
+                   team.member_count),
+    ]
+    if team.workflow_enabled:
+        metrics.append(TeamMetric(
+            reverse('teams:team_tasks', args=(team.slug,)),
+            ngettext('Task', 'Tasks', team.tasks_count),
+            team.tasks_count))
+    if projects:
+        metrics.append(TeamMetric(
+            reverse('teams:detail', args=(team.slug,)),
+            ngettext('Project', 'Projects', len(projects)),
+            len(projects)))
+
+    return {
+        'with_links': (team.is_visible or member),
+        'metrics': metrics,
     }
 
 @register.filter
