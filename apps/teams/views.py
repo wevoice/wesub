@@ -1112,11 +1112,15 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters['language'] != 'all':
+        if filters['language'] == 'my-languages':
+            if (request.user.is_authenticated() and
+                request.user.get_languages()):
+                languages = [
+                    ul.language for ul in request.user.get_languages()
+                ] + ['']
+                tasks = tasks.filter(language__in=languages)
+        else:
             tasks = tasks.filter(language=filters['language'])
-    elif request.user.is_authenticated() and request.user.get_languages():
-        languages = [ul.language for ul in request.user.get_languages()] + ['']
-        tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
         terms = get_terms(filters['q'])

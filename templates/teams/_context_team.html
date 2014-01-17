@@ -71,7 +71,7 @@
         </li>
         {% if team.workflow_enabled %}
             <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">{% trans 'Your tasks' %}</a>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=me">{% trans 'Your tasks' %}</a>
                 ({{ team|user_tasks_count:user }})
             </li>
             <li>

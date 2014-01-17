@@ -213,7 +213,7 @@ var Site = function(Site) {
             if (window.REQUEST_GET_LANG) {
                 $opt = $('option[id="lang-opt-' + window.REQUEST_GET_LANG + '"]');
             } else {
-                $opt = $('option[id="lang-opt-mine"]');
+                $opt = $('option[id="lang-opt-all"]');
             }
 
             $select.children().removeAttr('selected');
