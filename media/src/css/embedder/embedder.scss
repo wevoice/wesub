@@ -219,7 +219,7 @@ div.amara-embed {
                 position: relative;
                 width: 21%;
                 .amara-current-language {
-                    background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
+                    background: transparent url('../../images/embedder/amara-sprites.png') right -187px no-repeat;
                     color: #DEDEDE;
                     display: block;
                     font: normal 12px;
@@ -243,7 +243,8 @@ div.amara-embed {
                     left: 0;
                     margin: 0;
                     position: absolute;
-                    top: 36px;
+                    top: auto;
+                    bottom: 100%;
                     width: 100%;
 
                     li {
