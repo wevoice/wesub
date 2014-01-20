@@ -1,15 +1,16 @@
+// This must be done when the js file is first loaded
+var scriptFiles = document.getElementsByTagName("script");
+var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 (function(window) {
     var AmaraIframeController = function() {
 	var iframes = [];
-	var toto = 0;
 	this.initIframes = function() {
 	    var elements = document.getElementsByClassName("amara-embed");
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
 		var iframe = document.createElement("IFRAME");
 		var parser = document.createElement('a');
-		var scripts = document.getElementsByTagName("script");
-		parser.href = scripts[scripts.length-1].src;
+		parser.href = THIS_JS_FILE;
 		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		iframe.style.border = "none";
