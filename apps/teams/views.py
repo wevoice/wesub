@@ -111,12 +111,18 @@ DEV_OR_STAGING = DEV or getattr(settings, 'STAGING', False)
 
 BILLING_CUTOFF = getattr(settings, 'BILLING_CUTOFF', None)
 
+def get_team_for_view(slug, user, exclude_private=True):
+    try:
+        return Team.objects.for_user(user, exclude_private).get(slug=slug)
+    except Team.DoesNotExist:
+        raise Http404
+
 def settings_page(view_func):
     """Decorator for the team settings pages."""
 
     @functools.wraps(view_func)
     def wrapper(request, slug, *args, **kwargs):
-        team = Team.get(slug, request.user)
+        team = get_team_for_view(slug, request.user)
         if not can_change_team_settings(team, request.user):
             messages.error(request, _(u'You do not have permission to edit this team.'))
             return HttpResponseRedirect(team.get_absolute_url())
@@ -362,7 +368,7 @@ def _set_languages(team, codes_preferred, codes_blacklisted):
 @render_to('teams/settings-languages.html')
 @login_required
 def settings_languages(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not can_change_team_settings(team, request.user):
         messages.error(request, _(u'You do not have permission to edit this team.'))
@@ -433,7 +439,7 @@ def _get_videos_for_detail_page(team, user, query, project, language_code,
 @timefn
 @render_to('teams/videos-list.html')
 def detail(request, slug, project_slug=None, languages=None):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     try:
         member = team.get_member(request.user)
@@ -553,7 +559,7 @@ def detail(request, slug, project_slug=None, languages=None):
 @render_to('teams/add_video.html')
 @login_required
 def add_video(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     project_id = request.GET.get('project') or request.POST.get('project') or None
     project = Project.objects.get(team=team, pk=project_id) if project_id else team.default_project
@@ -606,7 +612,7 @@ def move_video(request):
 @render_to('teams/add_videos.html')
 @login_required
 def add_videos(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not can_add_video(team, request.user):
         messages.error(request, _(u"You can't add videos to this team/project."))
@@ -702,7 +708,7 @@ def remove_video(request, team_video_pk):
 @timefn
 @render_to('teams/activity.html')
 def activity(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     user = request.user if request.user.is_authenticated() else None
     try:
@@ -743,7 +749,7 @@ def detail_members(request, slug, role=None):
     sort = request.GET.get('sort', 'joined')
     filtered = False
 
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     user = request.user if request.user.is_authenticated() else None
     try:
@@ -817,7 +823,7 @@ def detail_members(request, slug, role=None):
 
 @login_required
 def remove_member(request, slug, user_pk):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     member = get_object_or_404(TeamMember, team=team, user__pk=user_pk)
 
@@ -840,7 +846,7 @@ def remove_member(request, slug, user_pk):
 
 @login_required
 def applications(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not team.is_member(request.user):
         return  HttpResponseForbidden("Not allowed")
@@ -860,7 +866,7 @@ def applications(request, slug):
 
 @login_required
 def approve_application(request, slug, application_pk):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not team.is_member(request.user):
         raise Http404
@@ -877,11 +883,11 @@ def approve_application(request, slug, application_pk):
     else:
         messages.error(request, _(u'You can\'t approve applications.'))
 
-    return redirect('teams:applications', team.pk)
+    return redirect('teams:applications', team.slug)
 
 @login_required
 def deny_application(request, slug, application_pk):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not team.is_member(request.user):
         raise Http404
@@ -903,7 +909,7 @@ def deny_application(request, slug, application_pk):
 @render_to('teams/invite_members.html')
 @login_required
 def invite_members(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not can_invite(team, request.user):
         return HttpResponseForbidden(_(u'You cannot invite people to this team.'))
@@ -1032,7 +1038,7 @@ def _member_search_result(member, team, task_id, team_video_id, task_type, task_
 
 @render_to_json
 def search_members(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
     q = request.GET.get('term', '').replace('(', '').replace(')', '')
     terms = get_terms(q)
 
@@ -1106,11 +1112,15 @@ def _tasks_list(request, team, project, filters, user):
         tasks = tasks.filter(completed=None)
 
     if filters.get('language'):
-        if filters['language'] != 'all':
+        if filters['language'] == 'my-languages':
+            if (request.user.is_authenticated() and
+                request.user.get_languages()):
+                languages = [
+                    ul.language for ul in request.user.get_languages()
+                ] + ['']
+                tasks = tasks.filter(language__in=languages)
+        else:
             tasks = tasks.filter(language=filters['language'])
-    elif request.user.is_authenticated() and request.user.get_languages():
-        languages = [ul.language for ul in request.user.get_languages()] + ['']
-        tasks = tasks.filter(language__in=languages)
 
     if filters.get('q'):
         terms = get_terms(filters['q'])
@@ -1169,7 +1179,7 @@ def _get_task_filters(request):
 @render_to('teams/dashboard.html')
 def dashboard(request, slug):
 
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user, exclude_private=False)
     user = request.user if request.user.is_authenticated() else None
     try:
         member = team.members.get(user=user)
@@ -1233,7 +1243,7 @@ def dashboard(request, slug):
 
         for video in videos:
             Task.add_cached_video_urls(video.tasks)
-    else:
+    elif team.is_visible:
         team_videos = team.videos.select_related("teamvideo").order_by("-teamvideo__created")
         # TED's dashboard should only show TEDTalks videos
         # http://i.imgur.com/fjjqx.gif
@@ -1258,6 +1268,8 @@ def dashboard(request, slug):
                     tv = video.teamvideo
                     tv.languages = [l for l in user_languages if l.language not in subtitled_languages]
                     videos.append(tv)
+    else:
+        videos = []
 
     context = {
         'team': team,
@@ -1273,7 +1285,7 @@ def dashboard(request, slug):
 @timefn
 @render_to('teams/tasks.html')
 def team_tasks(request, slug, project_slug=None):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if not can_view_tasks_tab(team, request.user):
         messages.error(request, _("You cannot view this team's tasks."))
@@ -1626,7 +1638,7 @@ def project_list(request, slug):
 @render_to('teams/settings-projects-add.html')
 @login_required
 def add_project(request, slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
 
     if request.POST:
         form = ProjectForm(request.POST)
@@ -1659,7 +1671,7 @@ def add_project(request, slug):
 @render_to('teams/settings-projects-edit.html')
 @login_required
 def edit_project(request, slug, project_slug):
-    team = Team.get(slug, request.user)
+    team = get_team_for_view(slug, request.user)
     project = Project.objects.get(slug=project_slug, team=team)
     project_list_url = reverse('teams:settings_projects', args=[], kwargs={'slug': slug})
 

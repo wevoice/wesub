@@ -2,14 +2,14 @@
 
 from __future__ import absolute_import
 
-import os, re, json
 from datetime import datetime, timedelta, date
+import os, re, json
 
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-
 from django.db.models import ObjectDoesNotExist
 from django.test import TestCase
 
@@ -28,9 +28,11 @@ from teams.models import (
     InviteExpiredException
 )
 from teams.permissions import add_role
+from teams.rpc import TeamsApiClass
 from teams.templatetags import teams_tags
 from teams.tests.teamstestsutils import refresh_obj, reset_solr
 from utils import test_utils, test_factories
+from utils.rpc import Error, Msg
 from videos import metadata_manager
 from videos.models import Video, SubtitleVersion
 from videos.search_indexes import VideoIndex
@@ -38,15 +40,12 @@ from widget.tests import create_two_sub_session, RequestMockup
 
 LANGUAGE_RE = re.compile(r"S_([a-zA-Z\-]+)")
 
-
 def fix_teams_roles(teams=None):
     for t in teams or Team.objects.all():
        for member in t.members.all():
            add_role(t, member.user,  t.members.all()[0], member.role)
 
-
 class TestNotification(TestCase):
-
     def setUp(self):
         fix_teams_roles()
         self.team = test_factories.create_team()
@@ -874,10 +873,71 @@ class TeamsTest(TestCase):
 
         self.assertEquals(video.title, title)
 
-from apps.teams.rpc import TeamsApiClass
-from utils.rpc import Error, Msg
-from django.contrib.auth.models import AnonymousUser
+class TeamListingTest(TestCase):
+    def setUp(self):
+        self.random_user = test_factories.create_user()
+        self.public_teams = {}
+        self.private_teams = {}
+        for is_visible in True, False:
+            for membership_policy, label in Team.MEMBERSHIP_POLICY_CHOICES:
+                self.setup_team(is_visible, membership_policy)
 
+    def setup_team(self, is_visible, membership_policy):
+        team = test_factories.create_team(is_visible=is_visible,
+                                          membership_policy=membership_policy)
+        if is_visible:
+            self.public_teams[membership_policy] = team
+        else:
+            self.private_teams[membership_policy] = team
+
+    def publicly_listed_teams(self):
+        """Get the teams that should be listed for anyone.
+
+        We should list teams that are either visible, or their membership is
+        not invitation-only
+        """
+        private_teams_to_list = [
+            self.private_teams[Team.OPEN],
+            self.private_teams[Team.APPLICATION]
+        ]
+        return self.public_teams.values() + private_teams_to_list
+
+    def check_listing(self, user, correct_teams, exclude_private=False):
+        def sort_func(team):
+            return team.slug
+        for_user = Team.objects.for_user(user, exclude_private)
+        self.assertEquals(sorted(for_user, key=sort_func),
+                          sorted(correct_teams, key=sort_func))
+
+    def test_listing_for_non_member(self):
+        self.check_listing(self.random_user, self.publicly_listed_teams())
+
+    def test_members_see_private_teams(self):
+        private_team = self.private_teams[Team.INVITATION_BY_ADMIN]
+        user = test_factories.create_team_member(private_team).user
+        self.check_listing(user,
+                           self.publicly_listed_teams() + [private_team])
+
+    def test_members_dont_see_duplicates(self):
+        # if a user is a member of a public team, make sure we don't list it
+        # twice
+        public_team = self.public_teams[Team.INVITATION_BY_ADMIN]
+        user = test_factories.create_team_member(public_team).user
+        # make a second team member, which is one way this error happens
+        test_factories.create_team_member(public_team)
+        self.check_listing(user, self.publicly_listed_teams())
+
+    def test_deleted_teams_not_listed(self):
+        deleted_team = self.public_teams[Team.INVITATION_BY_ADMIN]
+        deleted_team.deleted = True
+        deleted_team.save()
+        self.check_listing(self.random_user,
+                           [t for t in self.publicly_listed_teams()
+                            if t != deleted_team])
+
+    def test_exclude_private(self):
+        self.check_listing(self.random_user, self.public_teams.values(),
+                           exclude_private=True)
 
 class TestJqueryRpc(TestCase):
 

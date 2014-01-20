@@ -1,5 +1,5 @@
 @charset "UTF-8";
-
+@import "modal";
 // Fonts
 $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
 $OpenSans: 'Open Sans', $Helvetica;
@@ -181,7 +181,7 @@ div.modal {
         }
     }
 }
-button {
+button, .modal-inner a {
     border: 0;
     color: #DEDFDF;
     cursor: pointer;
@@ -189,7 +189,7 @@ button {
     font: normal 12px $OpenSans;
     margin: 0 10px;
     padding: 5px 20px;
-
+    text-decoration: none;
     @include border-radius(2px);
 
     &.approve {
@@ -263,15 +263,24 @@ header.main {
             text-transform: lowercase;
             float: left;
         }
+        div.video-title-icon {
+            float: right;
+            padding: 12px 5px;
+        }
         div.video-title {
             margin: 0;
-            padding: 10px 12px;
+            padding: 10px 5px;
             text-align: right;
-            color: #D0D1D2;
             font: normal 13px $OpenSans;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            a {
+              color: #D0D1D2;
+              text-decoration: none;
+              padding: 0 10px;
+              vertical-align: middle;
+            }
 	}
     }
     section.video {
@@ -1119,8 +1128,8 @@ section.main {
                 text-decoration: none;
                 text-align: right;
                 position: absolute;
-                right: 0;
-                padding: 3px 0px 20px 20px;
+                right: 15px;
+                padding: 3px 0px 10px 20px;
                 }
 
 
@@ -1471,4 +1480,42 @@ body.timeline-shown {
     div.workspace-tools, div.language-selections {
         margin-top: 65px;
     }
+}
+
+// Styling of the new modals
+.modal-style {
+    @extend %modal;    
+    background: rgba(black, .6);
+    color: #F1F1F1;
+    div.modal-inner {
+      padding: 40px;
+      background: $dark-grey;
+      .modal-content {max-height: 200vh;}
+      div,
+      footer,
+      header {
+        border: none;
+        background: $dark-grey;
+      }
+      h1 {
+        font: normal 17px $Helvetica;
+      }
+      h2 {
+        font: normal 15px $Helvetica;
+        margin-bottom: 6px;
+      }
+      textarea {
+        background: #E3E6E9;
+        font: normal 12px monospace;
+        margin-bottom: 5px;
+        margin-top: 0;
+        padding: 10px;
+        width: 100%;
+        &.refarea {  
+          background: #555;
+          color: #F1F1F1;
+          border: none;
+        }
+      }
+   }
 }

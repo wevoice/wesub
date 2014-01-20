@@ -552,6 +552,24 @@ var angular = angular || null;
         // We should expand the section by default if we are not working with
         // the original language.  That way translators will know that they
         // should fill something out there.
+        $scope.currentSubtitles = {
+            title: $scope.workingSubtitles.getTitle(),
+            description: $scope.workingSubtitles.description,
+            metadata: $scope.workingSubtitles.metadata
+        };
+
+        $scope.update = function(subtitles) {
+            $scope.workingSubtitles.title = subtitles.title;
+            $scope.workingSubtitles.description = subtitles.description;
+            $scope.workingSubtitles.metadata = subtitles.metadata;
+        };
+ 
+        $scope.reset = function() {
+            $scope.currentSubtitles.title = $scope.workingSubtitles.title;
+            $scope.currentSubtitles.description = $scope.workingSubtitles.description;
+            $scope.currentSubtitles.metadata = $scope.workingSubtitles.metadata;
+        };
+
         var language = $scope.workingSubtitles.language;
         $scope.collapsed = language.isPrimaryAudioLanguage;
         $scope.onExpanderClicked = function($event) {
