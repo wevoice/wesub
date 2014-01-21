@@ -807,6 +807,7 @@ MEDIA_BUNDLES = {
             'src/js/third-party/jquery-1.8.3.min.js',
             'src/js/third-party/backbone.min.js',
             'src/js/third-party/popcorn.js',
+            'src/js/third-party/popcorn.brightcove.js',
             'src/js/third-party/jquery.mCustomScrollbar.concat.min.js',
             'src/js/popcorn/popcorn.amaratranscript.js',
             'src/js/popcorn/popcorn.amarasubtitle.js',

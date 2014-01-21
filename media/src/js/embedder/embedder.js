@@ -134,12 +134,11 @@
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
                 _$.ajax({
-                    url: apiURL + this.get('url'),
+                    url: apiURL + encodeURIComponent(this.get('url')),
                     dataType: 'jsonp',
                     success: function(resp) {
 
                         if (resp.objects.length) {
-
                             // The video exists on Amara.
                             video.set('is_on_amara', true);
 
@@ -159,7 +158,6 @@
                             }
 
                         } else {
-
                             // The video does not exist on Amara.
                             video.set('is_on_amara', false);
 
@@ -638,7 +636,6 @@
                 return false;
             },
             linkToTranscriptLine: function(line) {
-                console.log(line.get(0));
                 this.hideTranscriptContextMenu();
                 return false;
             },
