@@ -1119,7 +1119,7 @@ def _tasks_list(request, team, project, filters, user):
                     ul.language for ul in request.user.get_languages()
                 ] + ['']
                 tasks = tasks.filter(language__in=languages)
-        else:
+        elif filters['language'] != 'all':
             tasks = tasks.filter(language=filters['language'])
 
     if filters.get('q'):
