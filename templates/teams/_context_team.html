@@ -1,7 +1,5 @@
 {% load i18n teams_tags utils_tags query_string %}
 
-{% team_projects team as projects %}
-
 <h2 class="main-title">
     <a href="" title="permalink">{{ team }}</a>
 </h2>
@@ -15,66 +13,40 @@
         {% endif %}
     </div>
 {% endif %}
-{% if projects|length > 0 %}
-    <div id="projects-list">
-        <div>
-            <h4>{% trans 'Projects' %} ({{ projects|length }})</h4>
-            <ul {% if projects|length > 6 %} class="list-collapsible"{% endif %}>
-                {% for project in projects %}
-                    <li {% if forloop.counter > 6 %} class="hidden"{% endif %}>
-                        {% if '/tasks/' in request.path %}
-                            <a href="{% url teams:team_tasks team.slug %}{% query_string request.GET project=project.slug %}">
-                        {% else %}
-                            <a href="{% url teams:detail team.slug %}{% query_string request.GET project=project.slug %}">
-                        {% endif %}
-                            {{ project }}
-                            <span class="count">
-                                {{ project.videos_count }}
-                                {% trans 'video' %}{{ project.videos_count|pluralize }}
-                            </span>
-                        </a>
-                    </li>
-                {% endfor %}
-                {% if projects|length > 6 %}
-                    <li class="expand">
-                        <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-{% endif %}
-<ul class="metrics">
-    <li>
-        <a href="{% url teams:detail team.slug %}">
-            <span class="count">{{ team.videos_count|simplify_number }}</span>
-            {% trans "Video" %}{{ team.videos_count|pluralize }}
-        </a>
-    </li>
-    <li>
-        <a href="{% url teams:detail_members team.slug %}">
-            <span class="count">{{team.member_count|simplify_number}}</span>
-            {% trans "Member" %}{{ team.member_count|pluralize }}
-        </a>
-    </li>
-    {% if team.workflow_enabled %}
-        <li>
-            <a href="{% url teams:team_tasks team.slug %}?assignee=none">
-                <span class="count">{% if team.tasks_count > 1000 %}{% trans "> 1000" %}{% else %}{{ team.tasks_count }} {% endif %}</span>
-                {% trans "Task" %}{{ team.tasks_count|pluralize }}
-            </a>
-        </li>
-    {% endif %}
+{% if team.is_visible or member %}
+    {% team_projects team as projects %}
     {% if projects|length > 0 %}
-        <li>
-            <a href="{% url teams:detail team.slug %}">
-                <span class="count">{{ projects|length|simplify_number }}</span>
-                {% trans "Project" %}{{ projects|length|pluralize }}
-            </a>
-        </li>
+        <div id="projects-list">
+            <div>
+                <h4>{% trans 'Projects' %} ({{ projects|length }})</h4>
+                <ul {% if projects|length > 6 %} class="list-collapsible"{% endif %}>
+                    {% for project in projects %}
+                        <li {% if forloop.counter > 6 %} class="hidden"{% endif %}>
+                            {% if '/tasks/' in request.path %}
+                                <a href="{% url teams:team_tasks team.slug %}{% query_string request.GET project=project.slug %}">
+                            {% else %}
+                                <a href="{% url teams:detail team.slug %}{% query_string request.GET project=project.slug %}">
+                            {% endif %}
+                                {{ project }}
+                                <span class="count">
+                                    {{ project.videos_count }}
+                                    {% trans 'video' %}{{ project.videos_count|pluralize }}
+                                </span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                    {% if projects|length > 6 %}
+                        <li class="expand">
+                            <a href="#"><span class="all">{% trans 'Show all' %} ↓</span><span class="less">{% trans 'Show less' %} ↑</span></a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     {% endif %}
-</ul>
-{% if team|is_team_member:user %}
+{% endif %}
+{% team_metrics team member projects %}
+{% if member %}
     <h3>Member Tools</h3>
     {% if team.workflow_enabled %}
         {% if team.max_tasks_per_member or team.task_expiration %}
@@ -99,7 +71,7 @@
         </li>
         {% if team.workflow_enabled %}
             <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">{% trans 'Your tasks' %}</a>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=me">{% trans 'Your tasks' %}</a>
                 ({{ team|user_tasks_count:user }})
             </li>
             <li>

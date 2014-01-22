@@ -40,7 +40,17 @@ class DownloadFilenameTest(TestCase):
         self.check_get_download_filename(u"my\ntitle", u'my title')
 
     def test_period(self):
-        self.check_get_download_filename(u"my.title", u'my_title')
+        self.check_get_download_filename(u"my.title", u'mytitle')
+
+    def test_hash(self):
+        self.check_get_download_filename(u"my#title", u'mytitle')
+
+    def test_question_mark(self):
+        self.check_get_download_filename(u"my?title", u'mytitle')
+
+    def test_space(self):
+        # spaces should be left alone
+        self.check_get_download_filename(u"my title", u'my title')
 
     def test_long_title(self):
         title = (u"This is a really long title used to "

@@ -298,6 +298,7 @@ SUBTITLE_EDITOR_JS = [
     'src/js/third-party/angular-cookies.js',
     'src/js/third-party/underscore.1.4.4.js',
     'src/js/third-party/popcorn.js',
+    'src/js/third-party/modal-helper.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',
     'src/js/popcorn/popcorn.flash-fallback.js',

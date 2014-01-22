@@ -1312,7 +1312,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('/subtitles/editor/%s/en/' % video.video_id)
-        note_text = 'This is a note \n'
+        note_text = 'This is a note'
         self.editor_pg.close_metadata()
         self.editor_pg.add_note(note_text)
         self.editor_pg.save('Exit')
