@@ -29,7 +29,7 @@ class TestCaseOpenTeamPage(WebdriverTestCase):
 
         """
         self.a_team_pg.open_team_page(self.team.slug)
-        self.assertIn("We've got lots of great content that we'd love your ", 
+        self.assertIn("We need your help subtitling our videos!", 
                       self.a_team_pg.dashboard_welcome_message())
 
     def test_join_authenticated(self):
@@ -69,6 +69,9 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         cls.members_tab = members_tab.MembersTab(cls)
         cls.a_team_pg.open_team_page(cls.team.slug)
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
 
     def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.
@@ -89,11 +92,11 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         user_app = ApplicationFactory.build(
             team=self.team,
             user=test_joiner,
-            pk=1)
+            )
         user_app.approve(
             author = self.team_owner.username, 
             interface = "web UI")
-        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.open_members_page(self.team.slug)
         self.members_tab.member_search(test_joiner.username)
         self.assertEqual(self.members_tab.user_role(), 'Contributor')
 
@@ -109,13 +112,13 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         user_app = ApplicationFactory.build(
             team=self.team,
             user=test_joiner,
-            pk=1)
+            )
         user_app.approve(
             author = self.team_owner.username, 
             interface = "web UI")
         self.members_tab.log_in(self.team_owner.username, 'password')
 
-        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.open_members_page(self.team.slug)
         self.members_tab.member_search(test_joiner.username)
         self.members_tab.delete_user()
         self.a_team_pg.log_in(test_joiner.username, 'password')
@@ -127,7 +130,8 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         """User leaves team can rejoin without application
 
         """
-        test_joiner = UserFactory.create()
+        self.a_team_pg.log_out()
+        test_joiner = UserFactory()
         self.a_team_pg.log_in(test_joiner.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
@@ -135,14 +139,13 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         user_app = ApplicationFactory.build(
             team=self.team,
             user=test_joiner,
-            pk=1)
+            )
         user_app.approve(
             author = self.team_owner.username, 
             interface = "web UI")
-
+        user_app.save()
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.leave_team(self.team.slug)
-
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
         self.a_team_pg.submit_application()
@@ -154,18 +157,20 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         """User removed from a team can not re-apply.
 
         """
+        self.a_team_pg.log_out()
         test_joiner = UserFactory.create()
         self.a_team_pg.log_in(test_joiner.username, 'password')
         self.a_team_pg.open_team_page(self.team.slug)
         self.a_team_pg.apply()
         self.a_team_pg.submit_application()
-        user_app = ApplicationFactory(
+        user_app = ApplicationFactory.build(
             team=self.team,
             user=test_joiner,
-            pk=135)
+            )
         user_app.deny(
             author = self.team_owner.username, 
             interface = "web UI")
+        user_app.save()
         self.a_team_pg.open_team_page(self.team.slug)
         self.assertEqual('Your application is pending', 
                          self.a_team_pg.replacement_text())
@@ -318,7 +323,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
             )
         invitation.accept()
         self.members_tab.log_in(user.username, 'password')
-        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.open_members_page(self.team.slug)
         self.members_tab.member_search(user.username)
         self.assertEqual(self.members_tab.user_role(), 'Admin')
         self.assertTrue(self.members_tab.settings_tab_visible(), 
@@ -339,7 +344,7 @@ class TestCaseInvitationTeamPage(WebdriverTestCase):
             )
         invitation.accept()
         self.members_tab.log_in(user.username, 'password')
-        self.members_tab.open_members_tab(self.team.slug)
+        self.members_tab.open_members_page(self.team.slug)
         self.members_tab.member_search(user.username)
         self.assertEqual(self.members_tab.user_role(), 'Manager')
         self.assertFalse(self.members_tab.settings_tab_visible(), 

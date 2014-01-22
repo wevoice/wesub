@@ -10,7 +10,7 @@ class VideoPage(UnisubsPage):
     """
 
     _URL = "videos/%s/info/"  # %s is the unique onsite video id
-    _VIDEO_TITLE = "h2.main-title a"
+    _VIDEO_TITLE = ".main-title a"
     _SPEAKER_NAME = "div.content div div > h4"
     _LOCATION = "div.content div div h4:nth-child(2)"
     _DESCRIPTION = "div#description"

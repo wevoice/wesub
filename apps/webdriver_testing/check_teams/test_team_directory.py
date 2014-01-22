@@ -53,10 +53,20 @@ class TestCaseTeamsPage(WebdriverTestCase):
         for x in range(5):
             TeamVideoFactory.create(team=cls.app_team, added_by=cls.cool_user)
 
-        #create 1 private team
+        #create 1 private invitation team
         cls.priv_team = TeamMemberFactory.create(
             team__name='my own private idaho ',
             team__slug='private-idaho',
+            team__membership_policy=2,
+            team__is_visible=False,
+            user__username='Id A Read',
+            user__password='password').team
+
+
+        #create 1 private application team
+        cls.priv_team = TeamMemberFactory.create(
+            team__name='private application',
+            team__slug='private-application',
             team__membership_policy=1,
             team__is_visible=False,
             user__username='Id A Read',
@@ -97,12 +107,19 @@ class TestCaseTeamsPage(WebdriverTestCase):
         self.teams_dir_pg.team_search('creative')
         self.assertTrue(self.COOL_TEAM_NAME in self.teams_dir_pg.teams_on_page())
 
-    def test_directory__search_private_non_member(self):
-        """Non-member search for a private team, get's no results.
+    def test_search_private_invitation_non_member(self):
+        """Non-member search for a private invitation only team, get's no results.
 
         """
         self.teams_dir_pg.team_search('private idaho')
         self.assertTrue(self.teams_dir_pg.search_has_no_matches())
+
+    def test_search_private_application_non_member(self):
+        """Non-member search for a private application team, has results.
+
+        """
+        self.teams_dir_pg.team_search('private application')
+        self.assertTrue('private application' in self.teams_dir_pg.teams_on_page())
 
     def test_directory__open_team_page(self):
         """open a team page from the directory.
