@@ -1119,7 +1119,7 @@ def _tasks_list(request, team, project, filters, user):
                     ul.language for ul in request.user.get_languages()
                 ] + ['']
                 tasks = tasks.filter(language__in=languages)
-        elif filters['language'] != 'all':
+        else:
             tasks = tasks.filter(language=filters['language'])
 
     if filters.get('q'):
@@ -1188,7 +1188,7 @@ def dashboard(request, slug):
 
     if user:
         user_languages = set([ul for ul in user.get_languages()])
-        user_filter = {'assignee':str(user.id),'language':'all'}
+        user_filter = {'assignee':str(user.id)}
         user_tasks = _tasks_list(request, team, None, user_filter, user).order_by('expiration_date')[0:14]
         user_tasks = user_tasks.select_related('team_video')
         Task.add_cached_video_urls(user_tasks)
