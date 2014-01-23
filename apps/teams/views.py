@@ -1213,7 +1213,9 @@ def dashboard(request, slug):
         else:
             project = None
 
-        if not user_languages:
+        if user_languages:
+            filters['language'] = 'my-languages'
+        else:
             user_languages = get_user_languages_from_request(request)
             filters['language'] = user_languages[0]
 

@@ -279,10 +279,6 @@ class TestCaseTED(WebdriverTestCase):
                       title=title, 
                       visibility='private')
 
-
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
     def test_ted_api_speakername_published(self):
         """TED api returns translated speaker name from published version."""
 
