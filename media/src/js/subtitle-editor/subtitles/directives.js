@@ -352,7 +352,7 @@ var USER_IDLE_MINUTES = 15;
                 var li = subtitleMap[draft.storedSubtitle.id];
                 li.addClass('edit');
                 var textarea = $('<textarea class="subtitle-edit" />');
-                textarea.val(draft.markdown);
+                textarea.val(_.unescape(draft.markdown));
                 li.append(textarea);
                 textarea.autosize();
                 textarea.focus();
@@ -364,7 +364,7 @@ var USER_IDLE_MINUTES = 15;
                 DomUtil.setSelectionRange(textarea[0], caretPos, caretPos);
                 textarea.on('keyup', function(evt) {
                     $scope.$apply(function() {
-                        draft.markdown = textarea.val();
+                        draft.markdown = _.escape(textarea.val());
                     });
                 });
                 if(attrs.editKeydown) {
