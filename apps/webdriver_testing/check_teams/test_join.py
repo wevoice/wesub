@@ -69,9 +69,6 @@ class TestCaseApplicationTeamPage(WebdriverTestCase):
         cls.members_tab = members_tab.MembersTab(cls)
         cls.a_team_pg.open_team_page(cls.team.slug)
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
-
 
     def test_join_guest(self):
         """Guest user sees Sign in message when visiting a team page.

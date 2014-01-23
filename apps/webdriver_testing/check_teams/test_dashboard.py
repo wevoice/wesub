@@ -2,6 +2,9 @@
 
 import datetime
 import os
+
+from django.core import management
+
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.editor_pages import subtitle_editor 
@@ -317,7 +320,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         task = list(tv.task_set.incomplete_subtitle().filter(language='fr'))[0]
         task.assignee = self.polly_glott
         task.save()
-
+        management.call_command('index_team_videos', self.team.slug)
         #Login user and go to team dashboard page
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 

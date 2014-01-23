@@ -220,7 +220,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.type_subs(self.subs_file)
         self.sub_editor.save_and_exit()
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&/' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
                                            tv.title)
@@ -237,7 +237,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.type_subs(self.subs_file)
         self.sub_editor.save_and_exit()
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
                                  % self.team.slug)
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
                                              tv.title)
@@ -278,7 +278,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
 
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
 
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', tv.title)
@@ -290,7 +290,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.sub_editor.continue_to_next_step() #to review
         self.sub_editor.submit(complete=True)
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
 
         self.assertTrue(self.tasks_tab.task_present(
@@ -329,7 +329,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.sub_editor.save_translation()
         self.tasks_tab.open_tasks_tab(self.team.slug)
 
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
                                            'Russian', tv.title)
@@ -439,7 +439,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
                          video=self.data_utils.create_video()).video
         self.data_utils.upload_subs(self.contributor, video=tv.pk)
         self.tasks_tab.log_in(self.manager, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Transcribe Subtitles', tv.title))
@@ -539,7 +539,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.complete_review(result='Send Back')
         self.sub_editor.click_saved_ok()
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
                                            video.title)
@@ -563,7 +563,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.data_utils.upload_subs(self.contributor, **data)
         self.complete_review_task(tv, 30)
         self.tasks_tab.log_in(self.manager, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Review Original English Subtitles', video.title))
@@ -691,7 +691,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_approve_task(tv, 30)
 
         self.tasks_tab.log_in(self.manager, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve Original English Subtitles', video.title))
@@ -720,7 +720,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.complete_approve(result='Send Back')
         self.sub_editor.click_saved_ok()
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         t = self.tasks_tab.task_present('Review Original English Subtitles',
                                         video.title)
@@ -911,7 +911,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.upload_translation(video)
         self.complete_review_task(tv, 30)
         self.tasks_tab.log_in(self.owner, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         t = self.tasks_tab.task_present('Translate Subtitles into Swedish',
                                         video.title)
@@ -966,7 +966,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.complete_review_task(tv, 20)
         self.complete_approve_task(tv, 30)
         self.tasks_tab.log_in(self.owner, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         t = self.tasks_tab.task_present('Review Swedish Subtitles',
                                         video.title)
@@ -1017,7 +1017,7 @@ class TestCaseModeratedTasks(WebdriverTestCase):
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.type_subs(self.subs_file)
         self.sub_editor.save_and_exit()
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
                                  % self.team.slug)
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles', 
                                              tv.title)
@@ -1106,7 +1106,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
 
 
         self.editor_pg.save('Exit')
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
                                            tv.title)
@@ -1128,7 +1128,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
 
         self.data_utils.upload_subs(self.contributor, **data)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
 
         self.tasks_tab.perform_assigned_task('Transcribe English Subtitles',
@@ -1143,7 +1143,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.editor_pg.start_next_step()
         self.editor_pg.start_next_step()
         self.editor_pg.endorse_subs()
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
                         'Translate Subtitles into Russian', tv.title))
@@ -1169,7 +1169,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.editor_pg.edit_sub_line('TEST EDITED TEXT', 1, enter=False)
         self.editor_pg.save('Exit')
 
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=all' 
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
                                            'Russian', tv.title)
@@ -1381,7 +1381,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.editor_pg.send_back_task()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs editing', en_tag) 
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Transcribe English Subtitles',
                                            video.title)
@@ -1482,7 +1482,7 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.editor_pg.send_back_task()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs review', en_tag) 
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         t = self.tasks_tab.task_present('Review Original English Subtitles',
                                         video.title)
