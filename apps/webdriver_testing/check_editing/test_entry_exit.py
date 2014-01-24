@@ -5,22 +5,22 @@ import os
 from django.test import TestCase
 from django.core import management
 
-from apps.videos.models import Video
+from videos.models import Video
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.site_pages import editor_page
-from apps.webdriver_testing.pages.editor_pages import dialogs
-from apps.webdriver_testing.pages.editor_pages import unisubs_menu
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import TaskFactory
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.pages.editor_pages import dialogs
+from webdriver_testing.pages.editor_pages import unisubs_menu
+from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import TaskFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamMemberFactory
 
 
 class TestCaseEntryExit(WebdriverTestCase):
@@ -30,32 +30,6 @@ class TestCaseEntryExit(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseEntryExit, cls).setUpClass()
-        fixt_data = [
-                     'apps/webdriver_testing/fixtures/editor_auth.json', 
-                     'apps/webdriver_testing/fixtures/editor_videos.json',
-                     'apps/webdriver_testing/fixtures/editor_subtitles.json'
-        ]
-        for f in fixt_data:
-            management.call_command('loaddata', f, verbosity=0)
-        cls.logger.info("""Default Test Data - loaded from fixtures
-
-                        English, source primary v2 -> v6
-                                 v1 -> deleted
-
-                        Chinese v1 -> v3
-                                v3 {"zh-cn": 2, "en": 6}
-
-                        Danish v1 --> v4
-                               v4 {"en": 5, "da": 3}
-                               
-                        Swedish v1 --> v3 FORKED
-                                v3 {"sv": 2}
-                                v1 --> private
-
-                        Turkish (tr) v1 incomplete {"en": 5}
-                       """)
-
-        
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
@@ -63,7 +37,56 @@ class TestCaseEntryExit(WebdriverTestCase):
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
         cls.tasks_tab = TasksTab(cls)
+        cls.data_utils = data_helpers.DataHelpers()
+        cls.user = UserFactory.create()
+        cls.video_pg.open_page('auth/login/')
+        cls.video_pg.log_in(cls.user.username, 'password')
+        cls.user = UserFactory.create()
 
+    @classmethod
+    def tearDownClass(cls):
+        super(TestCaseEntryExit, cls).tearDownClass()
+
+    def test_timed_to_new_and_back(self):
+        """From timed editor to beta, reference and working langs are same.
+
+        """
+        data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                 'video__title': ('X Factor Audition - Stop Looking At My '
+                                  'Mom Rap - Brian Bradley'),
+                                  'type': 'Y'
+               }
+        video = self.data_utils.create_video(**data)
+        self.data_utils.add_subs(video=video)
+
+        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
+        self.video_lang_pg.edit_subtitles()
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
+        self.assertEqual(u'Editing English\u2026', 
+                          self.editor_pg.working_language())
+        self.editor_pg.exit_to_full_editor()
+        self.assertEqual('Typing', self.sub_editor.dialog_title())
+
+
+
+
+class TestCaseTaskEntry(WebdriverTestCase):
+
+    """Entry and Exit points to New Editor. """
+    NEW_BROWSER_PER_TEST_CASE = False
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestCaseTaskEntry, cls).setUpClass()
+        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
+        cls.video_lang_pg = video_language_page.VideoLanguagePage(cls)
+        cls.tasks_tab = TasksTab(cls)
+        cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create()
         cls.video_pg.open_page('auth/login/')
         cls.video_pg.log_in(cls.user.username, 'password')
@@ -83,169 +106,117 @@ class TestCaseEntryExit(WebdriverTestCase):
                                        )
         cls.user = UserFactory.create()
 
-    @classmethod
-    def tearDownClass(cls):
-        super(TestCaseEntryExit, cls).tearDownClass()
-        management.call_command('flush', verbosity=0, interactive=False)
 
+
+        cls.logger.info('creating video and adding to team')
+        data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
+                'video__primary_audio_language_code': 'en',
+                'video__title': ('X Factor Audition'),
+                'type': 'Y'
+               }
+        cls.video = cls.data_utils.create_video(**data)
+        for x in range(3):
+            cls.data_utils.add_subs(video=cls.video)
+        cls.member = TeamMemberFactory(team=cls.team).user
+
+        #Add video to team and create some review / approve tasks
+        
+        tv = TeamVideoFactory(team=cls.team, added_by=cls.user, video=cls.video)
+        langs = ('sv', 'de', 'fr', 'es', 'pt')
+        for lang in langs:
+            translate_task = TaskFactory.create(type = 20, 
+                                               team = cls.team, 
+                                               team_video = tv, 
+                                               language = lang, 
+                                               assignee = cls.member)
+
+            translate_task.save()
+            data = {
+                    'language_code': lang,
+                    'complete': False, 
+                    'visibility': 'private'
+                   }
+  
+            cls.data_utils.add_subs(video=cls.video, **data)
+            task = translate_task.complete()
+            cls.tasks_tab.open_tasks_tab(cls.team.slug)
+            cls.tasks_tab.log_in(cls.member.username, 'password')
 
     def setUp(self):
-        self.video_pg.open_page('auth/login', True)
-        self.video_pg.log_in(self.user.username, 'password')
-
-
-    def test_timed_to_new(self):
-        """From timed editor to beta, reference and working langs are same.
-
-        """
-        video = Video.objects.all()[0]
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_lang_pg.edit_subtitles()
-        self.sub_editor.open_in_beta_editor()
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.assertEqual('Editing English\u2026', 
-                          self.editor_pg.working_language())
-        self.editor_pg.exit()
-
-
-    def test_timed_to_new_back_to_full(self):
-        """From timed editor to beta, reference and working langs are same.
-
-        """
-        video = Video.objects.all()[0]
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
-        self.video_lang_pg.edit_subtitles()
-        self.sub_editor.open_in_beta_editor()
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.editor_pg.exit_to_full_editor()
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
-
-
-    def test_forked_to_new(self):
-        """Translation editor to beta, reference lang and version is source.
-
-        """
-        video = Video.objects.all()[0]
-        self.video_lang_pg.open_video_lang_page(video.video_id, 'sv')
-        self.video_lang_pg.edit_subtitles()
-        self.sub_editor.open_in_beta_editor()
-        self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
-        self.assertEqual('Editing Swedish\u2026', 
-                          self.editor_pg.working_language())
-        self.editor_pg.exit()
-
-
-
-    def _old_to_new_sv_review(self):
-        self.logger.info('creating video and adding to team')
-        video = Video.objects.all()[0]
-        member = TeamMemberFactory(team=self.team).user
-
-        #Add video to team and create a review task
-        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
-        translate_task = TaskFactory.build(type = 20, 
-                           team = self.team, 
-                           team_video = tv, 
-                           language = 'sv', 
-                           assignee = member)
-
-        self.logger.info('complete the translate task')
-        translate_task.new_subtitle_version = translate_task.get_subtitle_version()
-        translate_task.save()
-        task = translate_task.complete()
-        self.logger.info('perform review task to open in old editor')
         self.tasks_tab.open_tasks_tab(self.team.slug)
-        self.tasks_tab.log_in(member.username, 'password')
-
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-
-        self.tasks_tab.open_page('teams/{0}/tasks/?team_video={1}'
-                                 '&assignee=anyone&lang=sv'.format(
-                                 self.team.slug, tv.pk))
-        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles', 
-                                               video.title)
-        self.sub_editor.continue_to_next_step()
-        self.logger.info('open in new editor')
-        self.sub_editor.open_in_beta_editor()
-        return video, tv
-        self.editor_pg.exit()
-
-
+        self.tasks_tab.handle_js_alert('accept')
 
     def test_review_to_new(self):
-        self._old_to_new_sv_review()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=sv' % self.team.slug) 
+        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles',
+                                                self.video.title)
+        self.sub_editor.open_in_beta_editor()
         self.assertEqual('English', self.editor_pg.selected_ref_language())
-        self.assertEqual('Version 6', self.editor_pg.selected_ref_version())
-        self.assertEqual('Editing Swedish\u2026', 
+        self.assertEqual('Version 3', self.editor_pg.selected_ref_version())
+        self.assertEqual(u'Editing Swedish\u2026', 
                           self.editor_pg.working_language())
         self.editor_pg.exit()
 
-
-    def test_review_to_new_back_to_full(self):
-        """Start Review task, switch to new editor and back to Review.
-
-        """
-        self.skipTest('Needs i2388 fixed')
-        self._old_to_new_sv_review()
-        self.assertEqual('Editing Swedish\u2026', 
-                          self.editor_pg.working_language())
-        self.editor_pg.exit_to_full_editor()
-        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
 
     def test_review_to_new_approve(self):
         """Start Review task, switch to new editor and endorse 
 
         """
-        video, tv = self._old_to_new_sv_review()
-        self.assertEqual('Editing Swedish\u2026', 
+
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=es' % self.team.slug) 
+        self.tasks_tab.perform_and_assign_task('Review Spanish Subtitles',
+                                                self.video.title)
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual(u'Editing Spanish\u2026', 
                           self.editor_pg.working_language())
         self.editor_pg.approve_task()
-        self.assertEqual(video.title, 
+        self.assertEqual(self.video.title, 
                          self.video_pg.video_title())
-        self.assertEqual(1, len(list(tv.task_set.all_approve().all())))
+        self.assertEqual(1, len(list(self.video.teamvideo.task_set.all_approve().filter(language='es'))))
 
 
     def test_edit_approve_version(self):
         """Edit then and approve review task save new version.
 
         """
-        video, tv = self._old_to_new_sv_review()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=de' % self.team.slug) 
+        self.tasks_tab.perform_and_assign_task('Review German Subtitles',
+                                                self.video.title)
+        self.sub_editor.open_in_beta_editor()
+        self.assertEqual(u'Editing German\u2026', 
+                          self.editor_pg.working_language())
         self.editor_pg.edit_sub_line('12345 chars', 1)
         self.editor_pg.save('Resume editing')
         self.editor_pg.approve_task()
-        sv = video.subtitle_language('sv').get_tip(full=True)
-        self.assertEqual(4, sv.version_number)
-
+        de_tag, _ = self.video_pg.language_status('German')
+        self.assertEqual('needs approval', de_tag) 
+        de = self.video.subtitle_language('de').get_tip(full=True)
+        self.assertEqual(3, de.version_number)
+        
 
     def test_save_back_to_old(self):
         """Open in new editor, then save and go back to old editor.
 
         """
-        video = Video.objects.all()[3]
-        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.open_editor_page(self.video.video_id, 'fr')
         self.editor_pg.edit_sub_line('12345 chars', 1)
         self.editor_pg.save('Back to full editor')
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
     def test_save_resume(self):
-        """Open in new editor, then save and go back to old editor.
+        """Open in new editor, then save and resume editing.
 
         """
-        video = Video.objects.all()[3]
-        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.open_editor_page(self.video.video_id, 'fr')
         self.editor_pg.edit_sub_line('12345 chars', 1)
         self.editor_pg.save('Resume editing')
-        self.assertEqual(u"English \u2022 Italo Calvino's Cosmicomics by Sheri Prather",
+        self.assertEqual(self.video.title,
                          self.editor_pg.video_title())
         self.editor_pg.exit()
 
-
-
     def test_save_exit(self):
-        video = Video.objects.all()[3]
-        self.editor_pg.open_editor_page(video.video_id, 'en')
+        self.editor_pg.open_editor_page(self.video.video_id, 'pt')
         self.editor_pg.edit_sub_line('12345 chars', 1)
         self.editor_pg.save('Exit')
-        self.assertEqual("Italo Calvino's Cosmicomics by Sheri Prather", 
+        self.assertEqual(self.video.title, 
                          self.video_pg.video_title())
