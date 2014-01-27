@@ -79,16 +79,13 @@ class EditorPage(UnisubsPage):
     _APPROVE = 'button.approve'
     _NOTES = 'textarea[ng-model="notes"]'
 
-    def open_editor_page(self, video_id, lang, close_metadata=True):
+    def open_editor_page(self, video_id, lang):
         self.open_page(self._URL.format(video_id, lang))
-        if close_metadata:
-            self.close_metadata()
 
 
     def open_ed_with_base(self, video_id, lang, base_lang='en'):
         url = self._URL + '?base-language={2}'
         self.open_page(url.format(video_id, lang, base_lang))
-        self.close_metadata()
 
     def keyboard_controls_help(self):
         pass
@@ -176,12 +173,6 @@ class EditorPage(UnisubsPage):
             for el in els:
                 subs.append(el.text)
         return subs
-
-    def close_metadata(self):
-        self.logger.info('closing the metadata')
-        work_el = self.is_element_present(self._WORKING_METADATA_EXPANDER)
-        if work_el and 'collapsed' not in work_el.get_attribute('class'):
-            work_el.click()
 
     def working_language(self):
         """Return the curren working language displayed. """

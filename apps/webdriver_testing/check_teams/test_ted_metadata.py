@@ -368,6 +368,7 @@ class TestCaseTED(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(speaker)
         self.assertTrue(results_pg.search_has_no_results())
 
+
     def test_dashboard_display_speaker(self):
         """Speaker name displays with title on dashboard. """
         self.dashboard_tab.log_out()
@@ -377,7 +378,9 @@ class TestCaseTED(WebdriverTestCase):
 
         self.dashboard_tab.log_in(self.admin.username, 'password')
         self.dashboard_tab.open_team_page(self.ted_team.slug)
-        self.assertTrue(self.dashboard_tab.video_present('Jinsop Lee: TestVideo1'))
+        self.assertTrue(self.dashboard_tab.dash_task_present(
+                            task_type='Create Russian subtitles',
+                            title='Jinsop Lee: TestVideo1'))
 
     def test_dashboard_display_nospeaker(self):
         """Title only when no speaker name for video on dashboard. """

@@ -304,7 +304,9 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.data_utils.add_subs(video=tv)
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=ru'
+                                 % self.team.slug)
+        #self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
         self.create_modal.lang_selection()
@@ -316,20 +318,20 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         """Incomplete translation task exists, is assigned to the same user.
 
         """
+        self.tasks_tab.log_out()
         data = { 'video__primary_audio_language_code': 'en' }
         tv = self.data_utils.create_video(**data)
         self.data_utils.add_subs(video=tv)
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=ru' 
+                                 % self.team.slug)
         self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
         self.create_modal.lang_selection()
         self.sub_editor.type_translation()
         self.sub_editor.save_translation()
-        self.tasks_tab.open_tasks_tab(self.team.slug)
-
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me' 
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru' 
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
                                            'Russian', tv.title)
@@ -1100,7 +1102,6 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
                                                tv.title)
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.open_in_beta_editor(mark_complete=False)
-        self.editor_pg.close_metadata()
         subs = ['line 1', 'line 2', 'THE END']
         self.editor_pg.edit_sub_line(subs, 0)
 
@@ -1137,7 +1138,6 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
                                 'oneline.txt')
         self.sub_editor.edit_subs(sub_file)
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.edit_sub_line('TEST EDITED TEXT', 1)
         self.assertEqual('Start reviewing', self.editor_pg.next_step())
         self.editor_pg.start_next_step()
@@ -1159,17 +1159,17 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.data_utils.add_subs(video=tv)
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=ru'
+                                 % self.team.slug)
         self.tasks_tab.perform_and_assign_task('Translate Subtitles into ' 
                                                'Russian', tv.title)
         self.create_modal.lang_selection(video_language='English')
         self.sub_editor.type_translation()
         self.sub_editor.open_in_beta_editor(mark_complete=False)
-        self.editor_pg.close_metadata()
         self.editor_pg.edit_sub_line('TEST EDITED TEXT', 1, enter=False)
         self.editor_pg.save('Exit')
 
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=me&lang=ru'
                                  % self.team.slug)
         task = self.tasks_tab.task_present('Translate Subtitles into '
                                            'Russian', tv.title)
@@ -1185,7 +1185,7 @@ class TestCaseAutomaticTasksBetaEditor(WebdriverTestCase):
         self.data_utils.add_subs(video=tv)
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.log_in(self.contributor, 'password')
-        self.editor_pg.open_editor_page(tv.video_id, 'ru', close_metadata=False)
+        self.editor_pg.open_editor_page(tv.video_id, 'ru')
         self.assertIn('Another user is currently performing', 
                       self.video_pg.get_message())
 
@@ -1282,7 +1282,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.approve_task()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs approval', en_tag) 
@@ -1313,7 +1312,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.open_page('/subtitles/editor/%s/en/' % video.video_id)
         note_text = 'This is a note'
-        self.editor_pg.close_metadata()
         self.editor_pg.add_note(note_text)
         self.editor_pg.save('Exit')
         task = list(tv.task_set.all_review().all())[0]
@@ -1345,7 +1343,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.approve_task()
         self.logger.info(mail.outbox)
         email_to = mail.outbox[-1].to     
@@ -1377,7 +1374,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.send_back_task()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs editing', en_tag) 
@@ -1411,7 +1407,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         mail.outbox = []
         self.editor_pg.send_back_task()
         self.logger.info(mail.outbox)
@@ -1447,7 +1442,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.approve_task()
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.assertTrue(self.tasks_tab.task_present(
@@ -1478,7 +1472,6 @@ class TestCaseModeratedTasksBetaEditor(WebdriverTestCase):
                                                'Subtitles', video.title)
         self.sub_editor.continue_to_next_step() #to subtitle info 
         self.sub_editor.open_in_beta_editor()
-        self.editor_pg.close_metadata()
         self.editor_pg.send_back_task()
         en_tag, _ = self.video_pg.language_status('English')
         self.assertEqual('original | needs review', en_tag) 

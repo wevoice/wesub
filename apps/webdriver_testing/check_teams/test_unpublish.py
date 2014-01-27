@@ -84,7 +84,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         en_v3 = cls.en.get_tip(full=True)
         en_v3.visibility_override = 'private'
         en_v3.save() 
-        cls.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        cls.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % cls.team.slug)
  
 
@@ -172,7 +172,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         self.sub_editor.mark_subs_complete()
         self.sub_editor.click_saved_ok()
         self.assertTrue(self.video.subtitle_language('de').get_tip(public=True))
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve German Subtitles', self.video.title))
@@ -268,7 +268,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         en_v3.save() 
         cls.en.clear_tip_cache() 
 
-        cls.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        cls.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % cls.team.slug)
  
 
@@ -356,7 +356,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         self.sub_editor.mark_subs_complete()
         self.sub_editor.click_saved_ok()
         self.assertTrue(self.video.subtitle_language('de').get_tip(public=True))
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
         self.assertFalse(self.tasks_tab.task_present(
                         'Approve German Subtitles', self.video.title))

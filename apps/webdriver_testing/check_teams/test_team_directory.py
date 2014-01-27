@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from django.core import management
 
-from apps.webdriver_testing.data_factories import TeamMemberFactory, TeamVideoFactory, UserFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages.teams_dir_page import TeamsDirPage
+from webdriver_testing.pages.site_pages.teams import ATeamPage
+
+from webdriver_testing.data_factories import TeamMemberFactory, TeamVideoFactory, UserFactory
 
 class TestCaseTeamsPage(WebdriverTestCase):
     """Test suite for the teams directory page. """
@@ -13,6 +15,7 @@ class TestCaseTeamsPage(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTeamsPage, cls).setUpClass()
+        management.call_command('flush', interactive=False)
         cls.COOL_TEAM_NAME = "A1 Waay Cool team"
 
         #CREATE A USER

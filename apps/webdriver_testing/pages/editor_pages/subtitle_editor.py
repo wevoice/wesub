@@ -60,6 +60,7 @@ class SubtitleEditor(EditorDialogs):
 
     def type_translation(self, subs_file=None):
         self.logger.info('typing in translation')
+        self.wait_for_element_present(self._TRANSLATE_INPUT)
         if not subs_file:
             subs_file = os.path.join(os.path.dirname
                 (os.path.abspath(__file__)), 'default_sub_text.txt')
