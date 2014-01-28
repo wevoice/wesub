@@ -71,11 +71,11 @@
         </li>
         {% if team.workflow_enabled %}
             <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=me">{% trans 'Your tasks' %}</a>
+                <a href="{% url teams:team_tasks team.slug %}?assignee=me&proj=any&lang=all">{% trans 'Your tasks' %}</a>
                 ({{ team|user_tasks_count:user }})
             </li>
             <li>
-                <a href="{% url teams:team_tasks team.slug %}?assignee=none">{% trans 'All available tasks' %}</a>
+                <a href="{% url teams:team_tasks team.slug %}?proj=any">{% trans 'All available tasks' %}</a>
             </li>
         {% endif %}
         {% if team|can_leave_team:user %}
