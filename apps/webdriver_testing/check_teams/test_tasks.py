@@ -351,6 +351,81 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
                          'into Russian', tv.title), 
                          "You don't have permission to perform this task.")
 
+    def test_available_tasks_filter(self):
+        """Available tasks are for any project"""
+        self.tasks_tab.log_in(self.contributor, 'password')
+        tv = self.data_utils.create_video()
+        TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.available_tasks()
+        self.assertIn("?proj=any", self.tasks_tab.current_url())
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles',
+                                                     tv.title))
+
+    def test_your_tasks_filter(self):
+        """Your tasks shows all assigned to you. """
+        video = self.data_utils.create_video()
+        video.primary_audio_language_code = 'pt-br'
+        video.save()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        task = list(tv.task_set.incomplete_subtitle().filter(language='pt-br'))[0]
+        task.assignee = self.contributor
+        task.save()
+        management.call_command('index_team_videos', self.team.slug)
+        self.tasks_tab.log_in(self.contributor, 'password')
+        self.tasks_tab.open_tasks_tab(self.team.slug)
+        self.tasks_tab.your_tasks()
+        self.assertIn("assignee=me&proj=any&lang=all", 
+                      self.tasks_tab.current_url())
+        self.assertTrue(self.tasks_tab.task_present(
+                'Transcribe Portuguese, Brazilian Subtitles', video.title))
+
+    def test_members_assignment_filter(self):
+        """Assignment filters by user, lang all and any project. """
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_page('teams/%s/members' % self.team.slug)
+        self.tasks_tab.click_link_partial_text('Assignments')
+        self.assertIn("?assignee=", self.tasks_tab.current_url())
+        self.assertIn("&project=any&lang=all", self.tasks_tab.current_url())
+
+ 
+    def test_video_langs_needed_filter(self):
+        """Video XX langs needed filters by lang all and any assignee and tv. """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        management.call_command('index_team_videos', self.team.slug)
+        management.call_command('update_index', interactive=False)
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_page('teams/%s/videos' % self.team.slug)
+        self.tasks_tab.click_link_partial_text('language needed')
+        self.assertIn("?team_video=", self.tasks_tab.current_url())
+        self.assertIn("&lang=all&assignee=anyone", self.tasks_tab.current_url())
+
+
+
+    def test_video_tasks_filter(self):
+        """Video task link filters by lang all and any assignee and tv. """
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        management.call_command('index_team_videos', self.team.slug)
+        management.call_command('update_index', interactive=False)
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_page('teams/%s/videos' % self.team.slug)
+        self.tasks_tab.click_by_css('a[title="Manage tasks"]')
+        self.assertIn("?team_video=", self.tasks_tab.current_url())
+
+
+    def test_video_page_tasks_link(self):
+        """Tasks link on video page filters to that video."""
+        video = self.data_utils.create_video()
+        tv = TeamVideoFactory(team=self.team, added_by=self.owner, video=video)
+        management.call_command('index_team_videos', self.team.slug)
+        management.call_command('update_index', interactive=False)
+        self.tasks_tab.log_in(self.owner, 'password')
+        self.tasks_tab.open_page('videos/%s' % video.video_id)
+        self.tasks_tab.click_link_text('tasks for this video')
+        self.assertIn("?team_video=", self.tasks_tab.current_url())
+
 class TestCaseModeratedTasks(WebdriverTestCase):    
     NEW_BROWSER_PER_TEST_CASE = False
 

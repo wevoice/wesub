@@ -20,7 +20,6 @@ class DashboardTab(ATeamPage):
     _TASK_VIDEO_ACTION = 'ul.actions li a'
 
 
-
     _NO_VIDEOS_TEXT = "Sorry, we couldn't find any videos for you." 
     _LANGUAGE_SUGGESTION = 'ul.suggestions li a[data-modal="language_modal"]'
     #User is authenticated and has no languages specified.
@@ -148,4 +147,5 @@ class DashboardTab(ATeamPage):
             if video in el.text:
                 return True
  
-        
+    def manage_tasks(self):
+        self.click_link_text('Manage your tasks')
