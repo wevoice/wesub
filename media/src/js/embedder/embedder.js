@@ -996,44 +996,26 @@
                 '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
 		'        <div class="modal-dialog">' +
 		'            <div class="modal-content">' +
-		'                <div class="modal-header">' +
-		'                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-		'                    <h4 class="modal-title" id="myModalLabel">Embed Video</h4>' +
-		'                </div>' +
 		'                <div class="modal-body">' +    
-		'                    <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>' +
+		'                    <p>Step 1: paste this anywhere in your document:</p>' +
                 '                        <pre class="pre-small">' +
-                '&lt;script type="text/javascript"&gt;\n' +
-                '(function (window, document) {\n' +
-                '  var loader = function () {\n' +
-                '    var script = document.createElement("script"),\n' +
-                '                 tag = document.getElementsByTagName("script")[0];\n' +
-                '    script.src =\n' +
-                '      "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";\n' +
-                '    tag.parentNode.insertBefore(script, tag);\n' +
-                '  };\n' +
-                '  window.addEventListener ?\n' +
-                '    window.addEventListener("load", loader, false) :\n' +
-                '    window.attachEvent("onload", loader);\n' +
-                '})(window, document);\n' +
+                '&lt;script type="text/javascript" src="http://amara.org/embedder-iframe"&gt;\n' +
                 '&lt;/script&gt;' +
                 '                        </pre>' +
-                '                        <p>Step 2: paste this somewhere inside your HTML body, with the height and width of your choosing:</p>' +
+                '                        <p>Step 2: paste this somewhere inside your HTML body, wherever you would like your widgets to appear, with the height, width and options of your choosing:</p>' +
                 '                        <pre class="pre-small">' +
-                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
+                '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
                 '                        </pre>' +
-                '                        <p>You can set the following options:</p>' +
                 '                        <ul>' +
-                '                            <li>Hide the Amara logo by adding <code>data-hide-logo="true"</code> in the previous tag.</li>' +
-                '                            <li>Hide the menu item to order subtitles by adding <code>data-hide-order="true"</code> in the previous tag.</li>' +
-                '                            <li>Set the initial active subtitle language by adding <code>data-initial-language="language"</code> in the previous tag, where language is the language code, such as "en" for English.</li>' +
-                '                            <li>Display the subtitles by default by adding <code>data-show-subtitles-default="true"</code> in the previous tag.</li>' +
-                '                            <li>Display the transcript by default by adding <code>data-show-transcript-default="true"</code> in the previous tag.</li>' +
+                '                            <li>Hide Amara logo: <code>data-hide-logo="true"</code>.</li>' +
+                '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
+                '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
+                '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
+                '                            <li>Display transcript by default: <code>data-show-transcript-default="true"</code>.</li>' +
                 '                        </ul>' +
-		'                    </div>' +
-		'                <div class="modal-footer">' +
 		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-		'            </div>' +
+
+		'                    </div>' +
 		'        </div>' +
 		'    </div>' +
 		'</div>'
