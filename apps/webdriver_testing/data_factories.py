@@ -48,7 +48,7 @@ class UserLangFactory(factory.django.DjangoModelFactory):
 
 class UserFactory(factory.django.DjangoModelFactory):
     FACTORY_FOR = User
-    username = factory.Sequence(lambda n: 'TestUser_%d' % n)
+    username = factory.Sequence(lambda d: 'TestUser_%d' % d)
     email = factory.LazyAttribute(lambda a: '{0}@example.com'.format(a.username).lower())
     notify_by_email = True
     valid_email = True 

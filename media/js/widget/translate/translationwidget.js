@@ -75,18 +75,18 @@ unisubs.translate.TranslationWidget.prototype.createDom = function() {
         .listen(
             this.translateInput_, goog.events.EventType.FOCUS,
             this.inputGainedFocus_);
-    this.translateInput_.value = this.translationCaption_ ? this.translationCaption_.getText() : '';
+    this.setTranslateinputValue(this.translationCaption_ ? this.translationCaption_.getText() : '');
 };
 unisubs.translate.TranslationWidget.prototype.inputGainedFocus_ = function(event) {
-    this.onFocusText_ = this.translateInput_.value;
+    this.onFocusText_ = this.getTranslateinputValue();
     this.dialog_.getVideoPlayerInternal().showCaptionText(this.onFocusText_ || this.getOriginalValue());
 };
 unisubs.translate.TranslationWidget.prototype.inputKeyUp_ = function(track) {
-    this.onKeyUpText_ = this.translateInput_.value;
+    this.onKeyUpText_ = this.getTranslateinputValue();
     this.dialog_.getVideoPlayerInternal().showCaptionText(this.onKeyUpText_ || this.getOriginalValue());
 };
 unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) {
-    var value = goog.string.trim(this.translateInput_.value);
+    var value = goog.string.trim(this.getTranslateinputValue());
     var edited = value != this.onFocusText_;
     if (track && edited) {
         if (this.onFocusText_ == "")
@@ -96,13 +96,20 @@ unisubs.translate.TranslationWidget.prototype.inputLostFocus_ = function(track) 
     this.dialog_.getVideoPlayerInternal().showCaptionText('');
 };
 unisubs.translate.TranslationWidget.prototype.setTranslationContent = function(value){
-    this.translateInput_.value = value;
+    this.setTranslateinputValue(value);
     this.inputLostFocus_(false);
 };
 unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     this.translateInput_.disabled = !enabled;
-    if (!enabled)
-        this.translateInput_.value = '';
+    if (!enabled) {
+        this.setTranslateinputValue('');
+    }
+};
+unisubs.translate.TranslationWidget.prototype.getTranslateinputValue = function() {
+    return goog.string.htmlEscape(this.translateInput_.value);
+};
+unisubs.translate.TranslationWidget.prototype.setTranslateinputValue = function(text) {
+    this.translateInput_.value = goog.string.unescapeEntities(text);
 };
 unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
     return this.dfxpWrapper_['getSubtitleIndex'](this.originalNode_);
@@ -113,7 +120,7 @@ unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
  * @return {boolean}
  */
 unisubs.translate.TranslationWidget.prototype.isEmpty = function(){
-    return ! goog.string.trim(this.translateInput_.value);
+    return !goog.string.trim(this.getTranslateinputValue());
 };
 
 unisubs.translate.TranslationWidget.prototype.showLoadingIndicator = function(){

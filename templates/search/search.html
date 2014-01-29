@@ -27,21 +27,7 @@
                 }
             });
             
-            //Add active class for sidebar filtering links
-            var parameterNames = $.address.parameterNames();
-            for (var i = 0, l = parameterNames.length; i < l; i++) {
-                var name = parameterNames[i];
-                if (name === 'q'){
-                    continue
-                }
-                var value = $.address.parameter(name);
-                
-                var $link = $('#sidebar a[name='+name+'][value='+value+']');
-                $link.parents('ul').find('li').removeClass('active');
-                $link.parents('li').addClass('active');
-            };           
-            
-            //Add hadnler for search form submit
+            //Add handler for search form submit
             var $form = $('form.search-form');
             var $q_input = $form.find('input[name=q]');
             

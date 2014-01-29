@@ -241,7 +241,7 @@ unisubs.subtitle.SubtitleWidget.prototype.switchToEditMode = function() {
     this.textareaElem_ = this.getDomHelper().createDom(
         'textarea', 'unisubs-subedit');
     goog.dom.append(this.titleElem_, this.textareaElem_);
-    this.textareaElem_.value = this.originalNode_.getText();
+    this.textareaElem_.value = goog.string.unescapeEntities(this.originalNode_.getText());
     this.textareaElem_.focus();
     this.keyHandler_ = new goog.events.KeyHandler(this.textareaElem_);
     this.getHandler().listen(this.keyHandler_,
@@ -259,10 +259,11 @@ unisubs.subtitle.SubtitleWidget.prototype.handleKey_ = function(event) {
 unisubs.subtitle.SubtitleWidget.prototype.switchToView_ = function() {
     if (!this.showingTextarea_)
         return;
+
     unisubs.subtitle.SubtitleWidget.editing_ = null;
     this.getHandler().unlisten(this.keyHandler_);
     this.disposeEventHandlers_();
-    this.originalNode_.setText(this.textareaElem_.value);
+    this.originalNode_.setText(goog.string.htmlEscape(this.textareaElem_.value));
     goog.dom.removeNode(this.textareaElem_);
     this.titleElem_.appendChild(this.titleElemInner_);
     this.showingTextarea_ = false;

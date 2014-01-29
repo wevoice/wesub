@@ -57,7 +57,7 @@ class TestCaseTeamsResource(WebdriverTestCase):
         cls.priv_team = TeamMemberFactory.create(
             team__name='my own private idaho',
             team__slug='private-idaho',
-            team__membership_policy=1,
+            team__membership_policy=2,
             team__is_visible=False,
             user = cls.private_user).team
 

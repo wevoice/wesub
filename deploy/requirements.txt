@@ -4,7 +4,7 @@
 html5lib==0.95
 vendor/amqplib-1.0.2-patched.tar.gz
 amqp==1.0.8
-Django==1.4.3
+Django==1.4.10
 Fabric==1.4.0
 PyRSS2Gen==1.0.0
 PyYAML==3.10
