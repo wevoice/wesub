@@ -12,6 +12,7 @@
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
     
+    //////////////////////////////////////////////////////////////////
     //The following section is to communicate with the host page
     var hostPage = {};
     window.addEventListener('message', initReceiver, false);
@@ -25,7 +26,7 @@
 	    }
 	}
     }
-    // Should be triggered whenever the content of the widget changes size
+    // Should be triggered whenever the size of the content of the widget changes
     function sizeUpdated() {
 	if(hostPage.source)
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
@@ -33,15 +34,6 @@
 							 document.body.scrollWidth),
 					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
 					}, hostPage.origin);
-	    
-	/*
-	  hostPage.source.postMessage({resize: true, index: hostPage.index,
-	  width: Math.min(document.documentElement.scrollWidth,
-	  document.body.scrollWidth),
-	  height: Math.min(document.documentElement.scrollHeight,
-	  document.body.scrollHeight),
-	  }, hostPage.origin);
-	*/
     }
     ////////////////////////////////////////////
 

@@ -9,8 +9,8 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	var iframeDomain = '';
 	var resize = function(index, width, height) {
 	    iframes[index].width = 0;
-	    iframes[index].width = width;
-	    iframes[index].height = height;
+	    iframes[index].width = width + 10;
+	    iframes[index].height = height + 10;
 	};
 	this.resizeReceiver = function(e) {
 	    if (e.data.initDone)
