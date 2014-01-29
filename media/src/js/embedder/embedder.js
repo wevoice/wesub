@@ -11,6 +11,39 @@
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
+    
+    //The following section is to communicate with the host page
+    var hostPage = {};
+    window.addEventListener('message', initReceiver, false);
+    function initReceiver(e) {
+	if (e.data) {
+	    if (e.data.fromIframeController) {
+		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
+		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
+		sizeUpdated();
+		window.removeEventListener('message', initReceiver, false);
+	    }
+	}
+    }
+    // Should be triggered whenever the content of the widget changes size
+    function sizeUpdated() {
+	if(hostPage.source)
+	    hostPage.source.postMessage({resize: true, index: hostPage.index,
+					 width: Math.min(document.documentElement.scrollWidth,
+							 document.body.scrollWidth),
+					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
+					}, hostPage.origin);
+	    
+	/*
+	  hostPage.source.postMessage({resize: true, index: hostPage.index,
+	  width: Math.min(document.documentElement.scrollWidth,
+	  document.body.scrollWidth),
+	  height: Math.min(document.documentElement.scrollHeight,
+	  document.body.scrollHeight),
+	  }, hostPage.origin);
+	*/
+    }
+    ////////////////////////////////////////////
 
     function regexEscape(str) {
         var specials = /[.*+?|()\[\]{}\\$^]/g; // .*+?|()[]{}\$^
@@ -320,11 +353,13 @@
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
                                 that.setCurrentLanguageMessage('Video not on Amara');
+				that.setTranscriptDisplay(false);
                             }
+                            sizeUpdated();
                         }
                     );
                 });
-
+                sizeUpdated();
                 return this;
 
             },
@@ -638,7 +673,6 @@
                 return false;
             },
             linkToTranscriptLine: function(line) {
-                console.log(line.get(0));
                 this.hideTranscriptContextMenu();
                 return false;
             },
@@ -802,6 +836,7 @@
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
+                sizeUpdated();
                 return false;
             },
             setSubtitlesDisplay: function(show) {
@@ -819,9 +854,11 @@
                 this.$amaraTranscript.show();
                 this.$transcriptButton.addClass('amara-button-enabled');
 		} else {
-                this.$amaraTranscript.hide();
+                    this.$amaraTranscript.hide();
+		    
                 this.$transcriptButton.removeClass('amara-button-enabled');
 		}
+		sizeUpdated();
                 return false;
             },
             transcriptLineClicked: function(e) {
@@ -942,6 +979,28 @@
                 '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
                 '    </div>' +
+                '    <div class="amara-transcript">' +
+                '        <div class="amara-transcript-header amara-group">' +
+                '            <div class="amara-transcript-header-left">' +
+                '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
+                '            </div>' +
+                '            <div class="amara-transcript-header-right">' +
+                '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
+                '                    <a href="#" class="amara-transcript-search-next"></a>' +
+                '                    <a href="#" class="amara-transcript-search-prev"></a>' +
+                '            </div>' +
+                '        </div>' +
+                '        <div class="amara-transcript-body">' +
+                '            <a href="#" class="amara-transcript-line">' +
+                '                <span class="amara-transcript-line">' +
+                '                    Loading transcript&hellip;' +
+                '                </span>' +
+                '            </a>' +
+                '        </div>' +
+                '    </div>' +
+                '</div>' +
+		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
+	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>' +
                 '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
 		'        <div class="modal-dialog">' +
 		'            <div class="modal-content">' +
@@ -985,29 +1044,8 @@
 		'            </div>' +
 		'        </div>' +
 		'    </div>' +
-		'</div>' +
-                '    <div class="amara-transcript">' +
-                '        <div class="amara-transcript-header amara-group">' +
-                '            <div class="amara-transcript-header-left">' +
-                '                <a class="amara-transcript-autoscroll" href="#">Auto-scroll <span>ON</span></a>' +
-                '            </div>' +
-                '            <div class="amara-transcript-header-right">' +
-                '                    <input class="amara-transcript-search" placeholder="Search transcript" />' +
-                '                    <a href="#" class="amara-transcript-search-next"></a>' +
-                '                    <a href="#" class="amara-transcript-search-prev"></a>' +
-                '            </div>' +
-                '        </div>' +
-                '        <div class="amara-transcript-body">' +
-                '            <a href="#" class="amara-transcript-line">' +
-                '                <span class="amara-transcript-line">' +
-                '                    Loading transcript&hellip;' +
-                '                </span>' +
-                '            </a>' +
-                '        </div>' +
-                '    </div>' +
-                '</div>' +
-		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
-	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>'
+		'</div>'
+
 	    }
         });
 
@@ -1043,7 +1081,6 @@
         // init() gets called as soon as the embedder has finished loading.
         // Simply processes the existing _amara queue if we have one.
         this.init = function() {
-
             // Load the Amara CSS.
             var tag = document.getElementsByTagName('script')[0];
             var style = document.createElement('link');
@@ -1083,8 +1120,7 @@
 			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);
                 });
-            }
-
+            }	    
         };
 
     };

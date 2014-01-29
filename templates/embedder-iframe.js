@@ -1,16 +1,32 @@
 // This must be done when the js file is first loaded
 var scriptFiles = document.getElementsByTagName("script");
 var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
+
 (function(window) {
     var AmaraIframeController = function() {
 	var iframes = [];
+	var timers = [];
+	var iframeDomain = '';
+	var resize = function(index, width, height) {
+	    iframes[index].width = 0;
+	    iframes[index].width = width;
+	    iframes[index].height = height;
+	};
+	this.resizeReceiver = function(e) {
+	    if (e.data.initDone)
+		window.clearInterval(timers[e.data.index]);
+	    if (e.data.resize)
+		resize(e.data.index, e.data.width, e.data.height);
+	};
 	this.initIframes = function() {
 	    var elements = document.getElementsByClassName("amara-embed");
+	    var parser = document.createElement('a');
+	    window.addEventListener('message', this.resizeReceiver, false);
+	    parser.href = THIS_JS_FILE;
+	    iframeDomain = "http://" + parser.host;
 	    for (var i = 0 ; i < elements.length ; i++) {
 		var currentDiv = elements[i];
 		var iframe = document.createElement("IFRAME");
-		var parser = document.createElement('a');
-		parser.href = THIS_JS_FILE;
 		iframe.src = "http://" + parser.host + "/embedder-widget-iframe/?data=" +
 		    encodeURIComponent(JSON.stringify(currentDiv.dataset));
 		iframe.style.border = "none";
@@ -21,25 +37,18 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
 	};
 	this.initResize = function() {
 	    var controller = this;
-	    iframes.forEach(function(iframe) {
-		window.setInterval(function() {
-		    controller.resizeIframe(iframe);
+	    var newIndex = 0;
+	    iframes.forEach(function(iframe, index) {
+		timers.push(window.setInterval(function() {
+		    controller.postToIframe(iframe, index);
 		}
-				   ,100);
+					       ,100));
 	    });
 	};
-	this.resizeIframe = function(iframe) {
-	    if (iframe.contentDocument && iframe.contentDocument.body && 
-		iframe.contentWindow && iframe.contentWindow.document.documentElement) {
-		var sh = Math.min(iframe.contentWindow.document.documentElement.scrollHeight,
-				  iframe.contentDocument.body.scrollHeight);
-		var sw = Math.min(iframe.contentWindow.document.documentElement.scrollWidth,
-				  iframe.contentDocument.body.scrollWidth);
-		if( (iframe.width != sw) || (iframe.height != sh)) {
-		    iframe.width = 0;
-		    iframe.width = sw;
-		    iframe.height = sh;
-		}
+
+	this.postToIframe = function(iframe, index) {
+	    if (iframe.contentWindow) {
+		iframe.contentWindow.postMessage({fromIframeController: true, index: index}, iframeDomain);
 	    }
 	};
     };
@@ -53,7 +62,6 @@ var THIS_JS_FILE = scriptFiles[scriptFiles.length-1].src;
     window.initIframeController = initIframeController;
 
 })(window);
-
 
 if(window.attachEvent) {
     window.attachEvent('onload', window.initIframeController);
