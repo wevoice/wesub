@@ -358,7 +358,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         TeamVideoFactory(team=self.team, added_by=self.owner, video=tv)
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.available_tasks()
-        self.assertIn("?proj=any", self.tasks_tab.current_url())
+        self.assertIn("?project=any", self.tasks_tab.current_url())
         self.assertTrue(self.tasks_tab.task_present('Transcribe Subtitles',
                                                      tv.title))
 
@@ -375,7 +375,7 @@ class TestCaseAutomaticTasks(WebdriverTestCase):
         self.tasks_tab.log_in(self.contributor, 'password')
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.your_tasks()
-        self.assertIn("assignee=me&proj=any&lang=all", 
+        self.assertIn("assignee=me&project=any&lang=all", 
                       self.tasks_tab.current_url())
         self.assertTrue(self.tasks_tab.task_present(
                 'Transcribe Portuguese, Brazilian Subtitles', video.title))
