@@ -89,10 +89,10 @@
             <span class="inner">{% trans 'for' %}</span>
         </div>
         <div class="filter-chunk">
-            <select id="id_task_language" name="language" class="lang-filter chosen">
-                <option id="lang-opt-all" value="{{ request.path }}{% query_string request.GET lang='' page='' %}">{% trans 'all languages' %}</option>
+            <select id="id_task_language" name="lang" class="lang-filter chosen">
+                <option id="lang-opt-all" value="{{ request.path }}{% query_string request.GET lang='all' page='' %}">{% trans 'all languages' %}</option>
                 {% if request.user.is_authenticated %}
-                <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang='my-languages' page='' %}">{% trans 'my languages' %}</option>
+                <option id="lang-opt-mine" value="{{ request.path }}{% query_string request.GET lang='' page='' %}">{% trans 'my languages' %}</option>
                 {% endif %}
                 {% for language in languages %}
                     <option id="lang-opt-{{ language.code }}" value="{% query_string request.GET lang=language.code page='' %}">{{ language.name }}</option>
@@ -179,7 +179,7 @@
         {% if not filtered %}
             <p class="view-notice">
                 <strong>
-                    {% trans 'Showing unassigned tasks. ' %}
+                    {% trans 'Showing unassigned tasks in languages you speak. ' %}
                     {% if team|user_tasks_count:user > 0 %}
                         {% trans "Want to view " %}
                         <a href="{% url teams:team_tasks team.slug %}?assignee=me&lang=all">{% trans "your tasks" %}</a>
