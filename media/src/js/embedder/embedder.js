@@ -30,8 +30,7 @@
     function sizeUpdated() {
 	if(hostPage.source)
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
-					 width: Math.min(document.documentElement.scrollWidth,
-							 document.body.scrollWidth),
+					 width: _$(".amara-tools").width(),
 					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
 					}, hostPage.origin);
     }
