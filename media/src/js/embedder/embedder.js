@@ -162,7 +162,6 @@
                     url: apiURL + this.get('url'),
                     dataType: 'jsonp',
                     success: function(resp) {
-
                         if (resp.objects.length) {
 
                             // The video exists on Amara.
@@ -173,13 +172,15 @@
 
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
-
+				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
+							  function(language) {return language.code;});
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
                                 video.set('initial_language',
-                                    video.get('initial_language') ||
-                                    video.get('original_language') ||
-                                    'en'
+					  (video.get('initial_language') && (visibleLanguages.indexOf(video.get('initial_language')) > -1) && video.get('initial_language')) ||
+					  (video.get('original_language') && (visibleLanguages.indexOf(video.get('original_language')) > -1) && video.get('original_language')) ||
+					  ((visibleLanguages.indexOf('en') > -1) && 'en') ||
+					  ((visibleLanguages.length > 0) && visibleLanguages[0])
                                 );
                             }
 
@@ -393,11 +394,13 @@
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
                         _$('#language-list-inside').append('' +
-                            '<li role="presentation">' +
-                                '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
-                                    langs[i].name +
-                                '</a>' +
-                            '</li>');
+							   '<li role="presentation">' +
+							   '<a role="menuitem" tabindex="-1" ' +
+							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : '') +
+							   '>' +
+							   langs[i].name +
+							   '</a>' +
+							   '</li>');
                     }
 		    // Scrollbar for languages only
 		    _$('#language-list-inside').mCustomScrollbar({
