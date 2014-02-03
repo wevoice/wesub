@@ -2,15 +2,21 @@ describe('Test the subtitle-repeat directive', function() {
     var subtitleList = null;
     var scope = null;
     var elm = null;
+    var readOnlyScope = null;
+    var readOnlyElm = null;
     var subtitles = null;
+    var displayTime = null;
 
     beforeEach(function() {
         module('amara.SubtitleEditor.subtitles.directives');
+        module('amara.SubtitleEditor.subtitles.filters');
         module('amara.SubtitleEditor.subtitles.models');
         module('amara.SubtitleEditor.dom');
+        module('amara.SubtitleEditor.mocks');
     });
 
-    beforeEach(inject(function(SubtitleList) {
+    beforeEach(inject(function($compile, $filter, $rootScope, SubtitleList) {
+        displayTime = $filter('displayTime');
         subtitles = [];
         subtitleList = new SubtitleList();
         subtitleList.loadXML(null);
@@ -18,37 +24,32 @@ describe('Test the subtitle-repeat directive', function() {
             var sub = subtitleList.insertSubtitleBefore(null);
             subtitleList.updateSubtitleContent(sub, 'subtitle ' + i);
             subtitleList.updateSubtitleTime(sub, i * 1000, i * 1000 + 500);
+            subtitleList.updateSubtitleParagraph(sub, false);
             subtitles.push(sub);
         }
-        inject(function($rootScope, $compile) {
-                elm = angular.element(
-                '<div>' +
-                '<ul>' +
-                '<li subtitle-repeat="subtitleList" ' +
-                'bind-to-edit="editingSub" ' +
-             'conditional-class="subtitle.isEmpty():empty" ' +
-             'edit-keydown="onEditKeyDown">' +
-          '<span class="timing">{{ subtitle.startTime }}</span>' +
-          '<span class="text">{{ subtitle.content() }}</span>' +
-          '<a href="#" class="add" subtitle-click="add">add</a>' +
-          '<a href="#" class="remove" subtitle-click="remove">remove</a>' +
-          '<a href="#" class="no-subtitle-click">other</a>' +
-        '</li>' +
-      '</ul>' +
-    '</div>');
-            scope = $rootScope;
-            scope.subtitleList = subtitleList;
-            $compile(elm)(scope);
-            scope.$digest();
-        })
+        $rootScope.timeline = { shownSubtitle: null };
+        $rootScope.currentEdit = { draft: null };
+
+        scope = $rootScope.$new();
+        scope.subtitleList = subtitleList;
+        elm = angular.element(
+            '<ul subtitle-repeat="subtitleList" />');
+        $compile(elm)(scope);
+        scope.$digest();
+
+        readOnlyScope = $rootScope.$new();
+        readOnlyScope.subtitleList = subtitleList;
+        readOnlyElm = angular.element(
+            '<ul subtitle-repeat="subtitleList" read-only="1" />');
+        $compile(readOnlyElm)(readOnlyScope);
 
         this.addMatchers({
-            'toMatchSubtitle': function(subtitle) {
+            'toHaveSubtitleContent': function(subtitle) {
                 var li = this.actual;
-                if($('.text', li).html() != subtitle.content()) {
+                if($('.subtitle-text', li).html() != subtitle.content()) {
                     return false;
                 }
-                if($('.timing', li).html() != subtitle.startTime) {
+                if($('.timing', li).html() != displayTime(subtitle.startTime)) {
                     return false;
                 }
                 return true;
@@ -57,47 +58,70 @@ describe('Test the subtitle-repeat directive', function() {
     }));
 
     function childLIs() {
-        return $('ul', elm).children();
+        return $('li', elm);
     }
 
-    it('creates an li for each subtitle', function() {
+    function readOnlyChildLIs() {
+        return $('li', readOnlyElm)
+    }
+
+    it('creates an LI for each subtitle', function() {
         expect(childLIs().length).toEqual(5);
     });
 
-    it('interpolates strings', function() {
+    it('populates the LIs with content', function() {
         lis = childLIs();
         for(var i=0; i < subtitles.length; i++) {
-            expect(lis[i]).toMatchSubtitle(subtitles[i]);
+            expect(lis[i]).toHaveSubtitleContent(subtitles[i]);
         }
     });
 
     it('adds conditional classes', function() {
         for(var i=0; i < subtitles.length; i++) {
             expect(childLIs().eq(i).hasClass('empty')).toBeFalsy();
+            expect(childLIs().eq(0).hasClass('paragraph-start')).toBeFalsy();
+            expect(childLIs().eq(0).hasClass('current-subtitle')).toBeFalsy();
         }
         subtitleList.updateSubtitleContent(subtitles[0], '');
+        subtitleList.updateSubtitleParagraph(subtitles[1], true);
+        scope.timeline.shownSubtitle = subtitles[2];
+        scope.$digest();
         expect(childLIs().eq(0).hasClass('empty')).toBeTruthy();
+        expect(childLIs().eq(1).hasClass('paragraph-start')).toBeTruthy();
+        expect(childLIs().eq(2).hasClass('current-subtitle')).toBeTruthy();
     });
 
     it('updates the DOM on changes', function() {
         // test remove
         subtitleList.removeSubtitle(subtitles[0]);
         expect(childLIs().length).toEqual(4);
-        expect(childLIs()[0]).toMatchSubtitle(subtitles[1]);
+        expect(childLIs()[0]).toHaveSubtitleContent(subtitles[1]);
         // test update
         subtitleList.updateSubtitleContent(subtitles[1], 'new content');
         expect(childLIs().length).toEqual(4);
-        expect(childLIs()[0]).toMatchSubtitle(subtitles[1]);
+        expect(childLIs()[0]).toHaveSubtitleContent(subtitles[1]);
         expect(childLIs().length).toEqual(4);
         subtitleList.updateSubtitleTime(subtitles[1], 500, 1500);
-        expect(childLIs()[0]).toMatchSubtitle(subtitles[1]);
+        expect(childLIs()[0]).toHaveSubtitleContent(subtitles[1]);
         // test insert
         var newSub = subtitleList.insertSubtitleBefore(subtitles[1]);
         expect(childLIs().length).toEqual(5);
-        expect(childLIs()[0]).toMatchSubtitle(newSub);
+        expect(childLIs()[0]).toHaveSubtitleContent(newSub);
         var newSubAtBack = subtitleList.insertSubtitleBefore(null);
         expect(childLIs().length).toEqual(6);
-        expect(childLIs()[5]).toMatchSubtitle(newSubAtBack);
+        expect(childLIs()[5]).toHaveSubtitleContent(newSubAtBack);
+    });
+
+    it('creates buttons except when in read-only mode', function() {
+        var li = childLIs()[0];
+        expect($('button.remove-subtitle', li).length).toBeTruthy();
+        expect($('button.insert-subtitle', li).length).toBeTruthy();
+        expect($('button.new-paragraph', li).length).toBeTruthy();
+
+        li = readOnlyChildLIs()[0];
+        expect($('button.remove-subtitle', li).length).toBeFalsy();
+        expect($('button.insert-subtitle', li).length).toBeFalsy();
+        expect($('button.new-paragraph', li).length).toBeFalsy();
     });
 
     it('handles clicks', function() {
@@ -105,7 +129,7 @@ describe('Test the subtitle-repeat directive', function() {
         var sub = subtitles[0];
         // If there is no click handler, the click event shouldn't cause an
         // exception.
-        $('a.add', li).click();
+        $('button.insert-subtitle', li).click();
         // Test click handlers
         var clickActions = [];
         scope.onSubtitleClick = function(evt, subtitle, action) {
@@ -113,28 +137,33 @@ describe('Test the subtitle-repeat directive', function() {
             clickActions.push(action);
         }
         // Test clicks
-        $('a.add', li).click();
-        expect(clickActions).toEqual(['add']);
-        $('a.remove', li).click();
-        expect(clickActions).toEqual(['add', 'remove']);
-        // Test clicking something without a handler
-        $('a.no-subtitle-click', li).click();
-        expect(clickActions).toEqual(['add', 'remove']);
+        $('button.insert-subtitle', li).click();
+        expect(clickActions).toEqual(['insert']);
+        $('button.remove-subtitle', li).click();
+        expect(clickActions).toEqual(['insert', 'remove']);
+        $('button.new-paragraph', li).click();
+        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph']);
+        // Clicking outside a button should result in the edit action
+        $('.timing', li).click();
+        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph', 'edit']);
+        // Clicking on a read-only list shouldn't result in any action
+        $('.timing', readOnlyChildLIs()[0]).click();
+        expect(clickActions).toEqual(['insert', 'remove', 'changeParagraph', 'edit']);
     });
 
     it('adds/removes a textarea based on bind-to-edit', function() {
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         expect($('textarea', childLIs()[0]).length).toEqual(1);
         expect($('textarea', childLIs()[0]).val())
             .toEqual(subtitles[0].markdown);
-        scope.editingSub = subtitles[1].draftSubtitle();
+        scope.currentEdit.draft = subtitles[1].draftSubtitle();
         scope.$digest();
         expect($('textarea', childLIs()[0]).length).toEqual(0);
         expect($('textarea', childLIs()[1]).length).toEqual(1);
         expect($('textarea', childLIs()[1]).val())
             .toEqual(subtitles[1].markdown);
-        scope.editingSub = null;
+        scope.currentEdit.draft = null;
         scope.$digest();
         expect($('textarea', childLIs()[1]).length).toEqual(0);
     });
@@ -142,7 +171,7 @@ describe('Test the subtitle-repeat directive', function() {
     it('sets the caret position to the end of the text',
             inject(function(DomUtil) {
         spyOn(DomUtil, 'setSelectionRange');
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         var textarea = $('textarea', elm)[0];
         expect(DomUtil.setSelectionRange).toHaveBeenCalledWith(textarea,
@@ -153,8 +182,8 @@ describe('Test the subtitle-repeat directive', function() {
     it('sets the caret position to initialCaretPos if set',
             inject(function(DomUtil) {
         spyOn(DomUtil, 'setSelectionRange');
-        scope.editingSub = subtitles[0].draftSubtitle();
-        scope.editingSub.initialCaretPos = 2;
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft.initialCaretPos = 2;
         scope.$digest();
         var textarea = $('textarea', elm)[0];
         expect(DomUtil.setSelectionRange).
@@ -166,7 +195,7 @@ describe('Test the subtitle-repeat directive', function() {
             expect(this.length).toEqual(1);
             expect(this[0]).toEqual($('textarea', elm)[0]);
         });
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         expect($.fn.focus.callCount).toEqual(1);
     });
@@ -176,40 +205,40 @@ describe('Test the subtitle-repeat directive', function() {
             expect(this.length).toEqual(1);
             expect(this[0]).toEqual($('textarea', elm)[0]);
         });
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         expect($.fn.autosize.callCount).toEqual(1);
     });
 
     it('adds the edit class based on bind-to-edit', function() {
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         expect(childLIs().eq(0).hasClass('edit')).toBeTruthy();
-        scope.editingSub = subtitles[1].draftSubtitle();
+        scope.currentEdit.draft = subtitles[1].draftSubtitle();
         scope.$digest();
         expect(childLIs().eq(0).hasClass('edit')).toBeFalsy();
         expect(childLIs().eq(1).hasClass('edit')).toBeTruthy();
-        scope.editingSub = null;
+        scope.currentEdit.draft = null;
         scope.$digest();
         expect(childLIs().eq(1).hasClass('edit')).toBeFalsy();
     });
 
     it('updates the bind-to-edit var on keyup', function() {
-        scope.editingSub = subtitles[0].draftSubtitle();
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         var textarea = $('textarea', childLIs()[0]);
         textarea.val('new content');
         textarea.keyup();
-        expect(scope.editingSub.markdown).toEqual('new content');
+        expect(scope.currentEdit.draft.markdown).toEqual('new content');
     });
 
     it('emits edit-keydown in edit-mode', function() {
-        scope.editingSub = subtitles[0].draftSubtitle();
-        scope.$digest();
-        var textarea = $('textarea', childLIs()[0]);
         scope.onEditKeyDown = function(evt) {
             expect(evt.type).toEqual('keydown');
         };
+        scope.currentEdit.draft = subtitles[0].draftSubtitle();
+        scope.$digest();
+        var textarea = $('textarea', childLIs()[0]);
         var spy = spyOn(scope, 'onEditKeyDown');
         textarea.keydown();
         expect(spy.callCount).toEqual(1);
@@ -219,6 +248,5 @@ describe('Test the subtitle-repeat directive', function() {
         expect(scope.getSubtitleRepeatItem(subtitles[0]).get(0)).
             toEqual(childLIs().get(0));
     });
-
 
 });

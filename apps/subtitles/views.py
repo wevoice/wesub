@@ -29,6 +29,7 @@ from subtitles.templatetags.new_subtitles_tags import visibility_display
 
 from django.http import HttpResponse
 from django.db.models import Count
+from django.conf import settings
 from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -246,6 +247,7 @@ def subtitle_editor(request, video_id, language_code):
                       for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
         'oldEditorURL': editing_language.get_widget_url(),
+        'staticURL': settings.STATIC_URL,
     }
 
 
