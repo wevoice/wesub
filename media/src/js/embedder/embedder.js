@@ -396,7 +396,7 @@
                         _$('#language-list-inside').append('' +
 							   '<li role="presentation">' +
 							   '<a role="menuitem" tabindex="-1" ' +
-							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : '') +
+							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
 							   '>' +
 							   langs[i].name +
 							   '</a>' +
