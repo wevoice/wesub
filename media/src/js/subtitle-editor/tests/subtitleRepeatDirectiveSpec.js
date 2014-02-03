@@ -37,8 +37,6 @@ describe('Test the subtitle-repeat directive', function() {
       '</ul>' +
     '</div>');
             scope = $rootScope;
-            // Temporary fix until me make it right
-            scope.adjustReferenceSize = function() {};
             scope.subtitleList = subtitleList;
             $compile(elm)(scope);
             scope.$digest();

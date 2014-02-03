@@ -391,9 +391,6 @@ var USER_IDLE_MINUTES = 15;
                     var subtitle = subtitleList.subtitles[i];
                     parent.append(createNodeForSubtitle(subtitle));
                 }
-                // Probably not great to have it here
-                // We need to adjust the sizes to look nicer while scrolling
-                $scope.adjustReferenceSize();
             }
             $scope.getSubtitleRepeatItem = function(subtitle) {
                 var rv = subtitleMap[subtitle.id];
