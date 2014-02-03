@@ -162,7 +162,6 @@
                     url: apiURL + this.get('url'),
                     dataType: 'jsonp',
                     success: function(resp) {
-console.log("Here");
                         if (resp.objects.length) {
 
                             // The video exists on Amara.
