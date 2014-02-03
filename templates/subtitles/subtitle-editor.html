@@ -148,9 +148,8 @@
                 </div>
             </div>
             <div class="subtitles-wrapper">
-                <div class="reference subtitles">
-                    <ul subtitle-list="reference-subtitle-set"
-                        dir="[[ referenceSubtitles.language.dir ]]">
+                <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
+                    <ul dir="[[ referenceSubtitles.language.dir ]]">
 
 <!-- 
 subtitle-repeat directive, see the working subtitles for more info
@@ -273,9 +272,8 @@ subtitle-repeat directive, see the working subtitles for more info
                     </table>
                 </div>
 
-                <div class="working subtitles">
-                    <ul subtitle-list="working-subtitle-set"
-                        dir="[[ workingSubtitles.language.dir ]]"
+                <div class="working subtitles" subtitle-scroller="working-subtitle-set" />
+                    <ul dir="[[ workingSubtitles.language.dir ]]"
                         id="working-subtitle-set">
 <!--
 subtitle-repeat directive:

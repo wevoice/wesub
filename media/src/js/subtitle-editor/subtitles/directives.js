@@ -142,14 +142,14 @@ var USER_IDLE_MINUTES = 15;
         };
     });
 
-    module.directive('subtitleList', function($window) {
+    module.directive('subtitleScroller', function($window) {
         var window = $($window);
 	var scrollingPrevious = [];
 	$('div.subtitles').each(function(index) {
 	    scrollingPrevious[index] = $(this).scrollTop();
 	});
         return function link(scope, elem, attrs) {
-            var scroller = $(elem).parent();
+            var scroller = $(elem);
             var isWorkingSet = (attrs.subtitleList == "working-subtitle-set");
             // Handle scroll.
             scroller.scroll(function() {
