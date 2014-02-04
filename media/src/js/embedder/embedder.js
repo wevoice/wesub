@@ -161,7 +161,6 @@
                     url: apiURL + this.get('url'),
                     dataType: 'jsonp',
                     success: function(resp) {
-
                         if (resp.objects.length) {
 
                             // The video exists on Amara.
@@ -379,7 +378,11 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
-                langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
+                langs.sort(function(l1, l2) {
+		    if (l1.name > l2.name) return 1;
+		    if (l1.name < l2.name) return -1;
+		    return 0;
+		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
