@@ -331,7 +331,7 @@ var USER_IDLE_MINUTES = 15;
                     classes.push('paragraph-start');
                 }
                 elt.prop('className', classes.join(' '));
-                $('span.subtitle-text', elt).text(content);
+                $('span.subtitle-text', elt).html(content);
                 $('span.timing', elt).text(displayTime(subtitle.startTime));
             }
 
