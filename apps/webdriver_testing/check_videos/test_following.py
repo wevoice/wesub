@@ -9,7 +9,7 @@ from webdriver_testing.data_factories import UserFactory
 
 
 class TestCaseFollowing(WebdriverTestCase):
-    """TestSuite for download subtitles from the video's lanugage page   """
+    """TestSuite for video following settings.  """
     NEW_BROWSER_PER_TEST_CASE = False
     FOLLOWING = u'\u2713 Following'
     NOT_FOLLOWING = 'Not Following'

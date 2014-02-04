@@ -4,6 +4,7 @@ from apps.webdriver_testing.pages.site_pages import UnisubsPage
 from urlparse import urlsplit
 
 
+
 class VideoPage(UnisubsPage):
     """
      Video Page contains the common elements in the video page.
@@ -70,6 +71,10 @@ class VideoPage(UnisubsPage):
     UPLOAD_SUCCESS_TEXT = ('Thank you for uploading. It may take a minute or '
                            'so for your subtitles to appear.')
 
+
+    #TAB FIELDS
+
+    _COMMENTS_BOX = 'textarea#id_comment_form_content'
     _ACTIVITY_LIST = 'ul.activity li p'    
 
     def open_video_page(self, video_id):
@@ -222,4 +227,13 @@ class VideoPage(UnisubsPage):
     def activity_list(self):
         activity_els = self.get_elements_list(self._ACTIVITY_LIST)
         return [el.text for el in activity_els]
+
+
+    def open_comments(self):
+        self.click_by_css(self._COMMENTS_TAB)
+
+    def add_comment(self, comment_text):
+        self.submit_form_text_by_css(self._COMMENTS_BOX, comment_text)
+        self.is_text_present("a", '0 minutes ago') 
+
  

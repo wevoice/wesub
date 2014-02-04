@@ -30,8 +30,7 @@
     function sizeUpdated() {
 	if(hostPage.source)
 	    hostPage.source.postMessage({resize: true, index: hostPage.index,
-					 width: Math.min(document.documentElement.scrollWidth,
-							 document.body.scrollWidth),
+					 width: _$(".amara-tools").width(),
 					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
 					}, hostPage.origin);
     }
@@ -159,12 +158,10 @@
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
                 _$.ajax({
-                    url: apiURL + this.get('url'),
+                    url: apiURL + encodeURIComponent(this.get('url')),
                     dataType: 'jsonp',
                     success: function(resp) {
-
                         if (resp.objects.length) {
-
                             // The video exists on Amara.
                             video.set('is_on_amara', true);
 
@@ -173,18 +170,19 @@
 
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
-
+				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
+							  function(language) {return language.code;});
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
                                 video.set('initial_language',
-                                    video.get('initial_language') ||
-                                    video.get('original_language') ||
-                                    'en'
+					  (video.get('initial_language') && (visibleLanguages.indexOf(video.get('initial_language')) > -1) && video.get('initial_language')) ||
+					  (video.get('original_language') && (visibleLanguages.indexOf(video.get('original_language')) > -1) && video.get('original_language')) ||
+					  ((visibleLanguages.indexOf('en') > -1) && 'en') ||
+					  ((visibleLanguages.length > 0) && visibleLanguages[0])
                                 );
                             }
 
                         } else {
-
                             // The video does not exist on Amara.
                             video.set('is_on_amara', false);
 
@@ -380,7 +378,11 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
-                langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
+                langs.sort(function(l1, l2) {
+		    if (l1.name > l2.name) return 1;
+		    if (l1.name < l2.name) return -1;
+		    return 0;
+		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
@@ -393,11 +395,13 @@
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
                         _$('#language-list-inside').append('' +
-                            '<li role="presentation">' +
-                                '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
-                                    langs[i].name +
-                                '</a>' +
-                            '</li>');
+							   '<li role="presentation">' +
+							   '<a role="menuitem" tabindex="-1" ' +
+							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
+							   '>' +
+							   langs[i].name +
+							   '</a>' +
+							   '</li>');
                     }
 		    // Scrollbar for languages only
 		    _$('#language-list-inside').mCustomScrollbar({
