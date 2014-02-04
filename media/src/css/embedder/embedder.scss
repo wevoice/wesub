@@ -259,6 +259,9 @@ div.amara-embed {
                                 color: #222;
                             }
                         }
+                        a.language-item-inactive {
+                            color: #555;
+                        }
 			a.currently-selected {
 			    font-weight: bold;
 			}
@@ -445,7 +448,7 @@ ul.amara-languages-list > li {
     padding-left: 0px;
     overflow: auto;
 }
-#language-list-inside li a:hover, 
-#language-list-inside li a:focus {
+#language-list-inside li a.language-item:hover, 
+#language-list-inside li a.language-item:focus {
     background-color: #F5F5F5;
 }
