@@ -81,7 +81,7 @@ var angular = angular || null;
     }
 
     Subtitle.prototype.characterCount = function() {
-        return dfxp.markdownToPlaintext(this.markdown).length;
+        return _.unescape(dfxp.markdownToPlaintext(this.markdown)).length;
     }
 
     Subtitle.prototype.characterRate = function() {

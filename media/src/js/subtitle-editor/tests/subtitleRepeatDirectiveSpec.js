@@ -233,13 +233,13 @@ describe('Test the subtitle-repeat directive', function() {
     });
 
     it('emits edit-keydown in edit-mode', function() {
-        scope.onEditKeyDown = function(evt) {
+        scope.onEditKeydown = function(evt) {
             expect(evt.type).toEqual('keydown');
         };
         scope.currentEdit.draft = subtitles[0].draftSubtitle();
         scope.$digest();
         var textarea = $('textarea', childLIs()[0]);
-        var spy = spyOn(scope, 'onEditKeyDown');
+        var spy = spyOn(scope, 'onEditKeydown');
         textarea.keydown();
         expect(spy.callCount).toEqual(1);
     });

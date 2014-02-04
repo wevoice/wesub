@@ -415,10 +415,10 @@ var USER_IDLE_MINUTES = 15;
                         draft.markdown = _.escape(textarea.val());
                     });
                 });
-                if($scope.onEditKeyDown) {
+                if($scope.onEditKeydown) {
                     textarea.on('keydown', function(evt) {
                         $scope.$apply(function() {
-                            $scope.onEditKeyDown(evt);
+                            $scope.onEditKeydown(evt);
                         });
                     });
                 }
