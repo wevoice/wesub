@@ -39,6 +39,23 @@ var angular = angular || null;
         }
     });
 
+    module.directive('fixsizeBind', function($parse) {
+        return function link(scope, elm, attrs) {
+            var getter = $parse(attrs.fixsizeBind);
+            // set the value before calling autosize, otherwise we don't size
+            // correctly on the first pass
+            elm.val(getter(scope));
+            scope.$watch(attrs.fixsizeBind, function(newVal) {
+                elm.val(newVal).trigger('autosize');
+            });
+            elm.on('change', function() {
+                scope.$apply(function() {
+                    getter.assign(scope, elm.val());
+                });
+            });
+        }
+    });
+
     module.factory('DomUtil', function() {
         return {
             setSelectionRange: function(elem, selectionStart, selectionEnd) {

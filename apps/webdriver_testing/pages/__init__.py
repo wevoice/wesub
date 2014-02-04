@@ -146,6 +146,7 @@ class Page(object):
         mouseAction = (webdriver.ActionChains(self.browser)
                        .move_to_element(menu_element)
                        .perform())
+        
         el = self.is_element_visible(menu_item_el)
         el.click()
 

@@ -16,13 +16,15 @@
 # along with this program.  If not, see
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
+from collections import namedtuple
+
 from django import template
 from teams.models import Team, TeamVideo, Project, TeamMember, Workflow, Task
 from django.db.models import Count
 from videos.models import Video
 from apps.widget import video_cache
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ngettext
 from django.core.urlresolvers import reverse
 from django.utils.http import urlencode, urlquote
 from widget.views import base_widget_params
@@ -162,6 +164,34 @@ def team_select(context, team):
         'can_create_team': DEV_OR_STAGING or (user.is_superuser and user.is_active)
     }
 
+TeamMetric = namedtuple('TeamMetric', 'url label count')
+
+@register.inclusion_tag('teams/_metrics.html')
+def team_metrics(team, member, projects):
+    metrics = [
+        TeamMetric(reverse('teams:detail', args=(team.slug,)),
+                   ngettext('Video', 'Videos', team.videos_count),
+                   team.videos_count),
+        TeamMetric(reverse('teams:detail_members', args=(team.slug,)),
+                   ngettext('Member', 'Members', team.member_count),
+                   team.member_count),
+    ]
+    if team.workflow_enabled:
+        metrics.append(TeamMetric(
+            reverse('teams:team_tasks', args=(team.slug,)),
+            ngettext('Task', 'Tasks', team.tasks_count),
+            team.tasks_count))
+    if projects:
+        metrics.append(TeamMetric(
+            reverse('teams:detail', args=(team.slug,)),
+            ngettext('Project', 'Projects', len(projects)),
+            len(projects)))
+
+    return {
+        'with_links': (team.is_visible or member),
+        'metrics': metrics,
+    }
+
 @register.filter
 def team_is_visible(team_slug):
     try:
@@ -195,7 +225,6 @@ def team_add_video_select(context):
     #fix problem with encoding "?" in build_absolute_uri. It is not encoded,
     #so we get not same URL that page has
     location = request.get_full_path()
-    context['video_absolute_url'] = request.build_absolute_uri(urlquote(location))
 
     user = context['user']
     if user.is_authenticated():
@@ -215,20 +244,6 @@ def team_move_video_select(context):
                                 and can_remove_video(team_video, user)
                                 and team.pk != team_video.team.pk]
     return context
-
-@register.inclusion_tag('videos/_team_list.html', takes_context=True)
-def render_belongs_to_team_list(context, team_video, user):
-    teams =  []
-    video = team_video.video
-    for t in list(video.team_set.filter()):
-        if t.is_visible or user in t.users.all():
-            if video.moderated_by == t:
-                t.moderates =True
-                teams.insert(0, t)
-            else:
-                teams.append(t)
-    return {"teams": teams, "team_video": team_video, "user": context["request"].user}
-
 
 @register.inclusion_tag('teams/_team_video_detail.html', takes_context=True)
 def team_video_detail(context, team_video_search_record):

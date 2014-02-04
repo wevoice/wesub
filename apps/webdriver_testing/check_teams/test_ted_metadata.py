@@ -13,6 +13,7 @@ from subtitles.pipeline import add_subtitles
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import UserLangFactory
 from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamProjectFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
@@ -21,8 +22,8 @@ from webdriver_testing.data_factories import TeamLangPrefFactory
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
 from webdriver_testing.pages.site_pages import edit_video_page
 from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
 from webdriver_testing.pages.site_pages.teams.videos_tab import VideosTab
@@ -178,7 +179,8 @@ class TestCaseTED(WebdriverTestCase):
             TeamLangPrefFactory.create(team=cls.ted_team, language_code=language,
                                        preferred=True)
 
-        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",team=cls.ted_team).user
+        cls.admin = TeamMemberFactory(role="ROLE_ADMIN",
+                                      team=cls.ted_team).user
         
         cls.contributor = TeamMemberFactory(team=cls.ted_team).user
 
@@ -247,6 +249,7 @@ class TestCaseTED(WebdriverTestCase):
         #Add ru draft, no speaker name
         cls._create_subs(cls.speaker_video, 'ru')
         management.call_command('update_index', interactive=False)
+        cls.video_pg.open_video_page(cls.speaker_video.video_id)
 
 
     @classmethod
@@ -275,7 +278,6 @@ class TestCaseTED(WebdriverTestCase):
                       metadata=metadata,
                       title=title, 
                       visibility='private')
-
 
     def test_ted_api_speakername_published(self):
         """TED api returns translated speaker name from published version."""
@@ -366,9 +368,14 @@ class TestCaseTED(WebdriverTestCase):
         results_pg = self.watch_pg.basic_search(speaker)
         self.assertTrue(results_pg.search_has_no_results())
 
+
     def test_dashboard_display_speaker(self):
         """Speaker name displays with title on dashboard. """
-        self.dashboard_tab.open_team_page(self.ted_team.slug)
+        self.dashboard_tab.log_out()
+        for lang in ['en', 'ru', 'sv']:
+            UserLangFactory(user = self.admin,
+                            language = lang)
+
         self.dashboard_tab.log_in(self.admin.username, 'password')
         self.dashboard_tab.open_team_page(self.ted_team.slug)
         self.assertTrue(self.dashboard_tab.dash_task_present(
@@ -385,7 +392,7 @@ class TestCaseTED(WebdriverTestCase):
     def test_tasks_tab_display_speaker(self):
         """Speaker name displays with title on tasks tab. """
         self.tasks_tab.log_in(self.admin.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.ted_team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
                         'Jinsop Lee: TestVideo1'))
@@ -393,7 +400,7 @@ class TestCaseTED(WebdriverTestCase):
     def test_tasks_tab_search_speaker(self):
         """Tasks tab search on speaker name returns search results . """
         self.tasks_tab.log_in(self.admin.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone&q=Jinsop'
+        self.tasks_tab.open_page('teams/%s/tasks/?project=any&assignee=anyone&q=Jinsop'
                                  % self.ted_team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve German Subtitles',
                         'Jinsop Lee: TestVideo1'))
@@ -402,7 +409,7 @@ class TestCaseTED(WebdriverTestCase):
     def test_tasks_tab_display_nospeaker(self):
         """Title only when no speaker name for video on tasks tab. """
         self.tasks_tab.log_in(self.admin.username, 'password')
-        self.tasks_tab.open_page('teams/%s/tasks/?lang=all&assignee=anyone'
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.ted_team.slug)
         self.assertTrue(self.tasks_tab.task_present('Transcribe English Subtitles',
                         'NoSpeakerVideo'))

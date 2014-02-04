@@ -79,15 +79,21 @@ class TeamManager(models.Manager):
         """Return a QS of all non-deleted teams."""
         return super(TeamManager, self).get_query_set().filter(deleted=False)
 
-    def for_user(self, user):
-        """Return a QS of all the (non-deleted) teams visible for the given user."""
+    def for_user(self, user, exclude_private=False):
+        """Return the teams visible for the given user.
+
+        If exclude_private is True, then we will exclude private teams, even
+        if the user can apply to them.
+        """
+        # policies where we should show the team, even if they're not visible
+        visible_policies = [Team.OPEN, Team.APPLICATION]
+        q = models.Q(is_visible=True)
+        if not exclude_private:
+            q |= models.Q(membership_policy__in=visible_policies)
         if user.is_authenticated():
-            return self.get_query_set().filter(
-                    models.Q(is_visible=True) |
-                    models.Q(members__user=user)
-            ).distinct()
-        else:
-            return self.get_query_set().filter(is_visible=True)
+            user_teams = TeamMember.objects.filter(user=user)
+            q |= models.Q(id__in=user_teams.values('team_id'))
+        return self.get_query_set().filter(q)
 
     def with_recent_billing_record(self, day_range):
         """Find teams that have had a new video recently"""
@@ -114,12 +120,12 @@ class Team(models.Model):
     OPEN = 4
     INVITATION_BY_ADMIN = 5
     MEMBERSHIP_POLICY_CHOICES = (
-            (OPEN, _(u'Open')),
-            (APPLICATION, _(u'Application')),
-            (INVITATION_BY_ALL, _(u'Invitation by any team member')),
-            (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
-            (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
-            )
+        (OPEN, _(u'Open')),
+        (APPLICATION, _(u'Application')),
+        (INVITATION_BY_ALL, _(u'Invitation by any team member')),
+        (INVITATION_BY_MANAGER, _(u'Invitation by manager')),
+        (INVITATION_BY_ADMIN, _(u'Invitation by admin')),
+    )
 
     VP_MEMBER = 1
     VP_MANAGER = 2
@@ -131,19 +137,19 @@ class Team(models.Model):
     )
 
     TASK_ASSIGN_CHOICES = (
-            (10, 'Any team member'),
-            (20, 'Managers and admins'),
-            (30, 'Admins only'),
-            )
+        (10, 'Any team member'),
+        (20, 'Managers and admins'),
+        (30, 'Admins only'),
+    )
     TASK_ASSIGN_NAMES = dict(TASK_ASSIGN_CHOICES)
     TASK_ASSIGN_IDS = dict([choice[::-1] for choice in TASK_ASSIGN_CHOICES])
 
     SUBTITLE_CHOICES = (
-            (10, 'Anyone'),
-            (20, 'Any team member'),
-            (30, 'Only managers and admins'),
-            (40, 'Only admins'),
-            )
+        (10, 'Anyone'),
+        (20, 'Any team member'),
+        (30, 'Only managers and admins'),
+        (40, 'Only admins'),
+    )
     SUBTITLE_NAMES = dict(SUBTITLE_CHOICES)
     SUBTITLE_IDS = dict([choice[::-1] for choice in SUBTITLE_CHOICES])
 
@@ -158,8 +164,16 @@ class Team(models.Model):
     slug = models.SlugField(_(u'slug'), unique=True)
     description = models.TextField(_(u'description'), blank=True, help_text=_('All urls will be converted to links. Line breaks and HTML not supported.'))
 
-    logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True, upload_to='teams/logo/')
-    is_visible = models.BooleanField(_(u'publicly Visible?'), default=True)
+    logo = S3EnabledImageField(verbose_name=_(u'logo'), blank=True,
+                               upload_to='teams/logo/',
+                               default='',
+                               thumb_sizes=[(280, 100), (100, 100)])
+    square_logo = S3EnabledImageField(verbose_name=_(u'square logo'),
+                                      blank=True,
+                                      default='',
+                                      upload_to='teams/square-logo/',
+                                      thumb_sizes=[(100, 100), (48, 48)])
+    is_visible = models.BooleanField(_(u'videos public?'), default=True)
     videos = models.ManyToManyField(Video, through='TeamVideo',  verbose_name=_('videos'))
     users = models.ManyToManyField(User, through='TeamMember', related_name='teams', verbose_name=_('users'))
 
@@ -181,7 +195,7 @@ class Team(models.Model):
                                        default=NOTIFY_DAILY)
 
     auth_provider_code = models.CharField(_(u'authentication provider code'),
-            max_length=24, blank=True, default="")
+                                          max_length=24, blank=True, default="")
 
     # Enabling Features
     projects_enabled = models.BooleanField(default=False)
@@ -189,28 +203,28 @@ class Team(models.Model):
 
     # Policies and Permissions
     membership_policy = models.IntegerField(_(u'membership policy'),
-            choices=MEMBERSHIP_POLICY_CHOICES,
-            default=OPEN)
+                                            choices=MEMBERSHIP_POLICY_CHOICES,
+                                            default=OPEN)
     video_policy = models.IntegerField(_(u'video policy'),
-            choices=VIDEO_POLICY_CHOICES,
-            default=VP_MEMBER)
+                                       choices=VIDEO_POLICY_CHOICES,
+                                       default=VP_MEMBER)
     task_assign_policy = models.IntegerField(_(u'task assignment policy'),
-            choices=TASK_ASSIGN_CHOICES,
-            default=TASK_ASSIGN_IDS['Any team member'])
+                                             choices=TASK_ASSIGN_CHOICES,
+                                             default=TASK_ASSIGN_IDS['Any team member'])
     subtitle_policy = models.IntegerField(_(u'subtitling policy'),
-            choices=SUBTITLE_CHOICES,
-            default=SUBTITLE_IDS['Anyone'])
+                                          choices=SUBTITLE_CHOICES,
+                                          default=SUBTITLE_IDS['Anyone'])
     translate_policy = models.IntegerField(_(u'translation policy'),
-            choices=SUBTITLE_CHOICES,
-            default=SUBTITLE_IDS['Anyone'])
+                                           choices=SUBTITLE_CHOICES,
+                                           default=SUBTITLE_IDS['Anyone'])
     max_tasks_per_member = models.PositiveIntegerField(_(u'maximum tasks per member'),
-            default=None, null=True, blank=True)
+                                                       default=None, null=True, blank=True)
     task_expiration = models.PositiveIntegerField(_(u'task expiration (days)'),
-            default=None, null=True, blank=True)
+                                                  default=None, null=True, blank=True)
 
     deleted = models.BooleanField(default=False)
     partner = models.ForeignKey('Partner', null=True, blank=True,
-            related_name='teams')
+                                related_name='teams')
 
     objects = TeamManager()
     all_objects = models.Manager() # For accessing deleted teams, if necessary.
@@ -220,6 +234,9 @@ class Team(models.Model):
         verbose_name = _(u'Team')
         verbose_name_plural = _(u'Teams')
 
+    def __init__(self, *args, **kwargs):
+        models.Model.__init__(self, *args, **kwargs)
+        self._member_cache = {}
 
     def save(self, *args, **kwargs):
         creating = self.pk is None
@@ -230,6 +247,11 @@ class Team(models.Model):
 
     def __unicode__(self):
         return self.name or self.slug
+
+    def get_tasks_page_url(self):
+        return reverse('teams:team_tasks', kwargs={
+            'slug': self.slug,
+        })
 
     def render_message(self, msg):
         """Return a string of HTML represention a team header for a notification.
@@ -255,32 +277,6 @@ class Team(models.Model):
     def is_by_application(self):
         """Return whether this team's membership is by application only."""
         return self.membership_policy == self.APPLICATION
-
-    @classmethod
-    def get(cls, slug, user=None, raise404=True):
-        """Return the Team with the given slug.
-
-        If a user is given the Team must be visible to that user.  Otherwise the
-        Team must be visible to the public.
-
-        If raise404 is given an Http404 exception will be raised if a suitable
-        team is not found.  Otherwise None will be returned.
-
-        """
-        if user:
-            qs = cls.objects.for_user(user)
-        else:
-            qs = cls.objects.filter(is_visible=True)
-        try:
-            return qs.get(slug=slug)
-        except cls.DoesNotExist:
-            try:
-                return qs.get(pk=int(slug))
-            except (cls.DoesNotExist, ValueError):
-                pass
-
-        if raise404:
-            raise Http404
 
     def get_workflow(self):
         """Return the workflow for the given team.
@@ -308,20 +304,24 @@ class Team(models.Model):
 
     # Thumbnails
     def logo_thumbnail(self):
-        """Return the URL for a kind-of small version of this team's logo, or None."""
+        """URL for a kind-of small version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(100, 100)
 
-    def medium_logo_thumbnail(self):
-        """Return the URL for a medium version of this team's logo, or None."""
+    def logo_thumbnail_medium(self):
+        """URL for a medium version of this team's logo, or None."""
         if self.logo:
             return self.logo.thumb_url(280, 100)
 
-    def small_logo_thumbnail(self):
-        """Return the URL for a really small version of this team's logo, or None."""
-        if self.logo:
-            return self.logo.thumb_url(50, 50)
+    def square_logo_thumbnail(self):
+        """URL for this team's square logo, or None."""
+        if self.square_logo:
+            return self.square_logo.thumb_url(100, 100)
 
+    def square_logo_thumbnail_small(self):
+        """URL for a small version of this team's square logo, or None."""
+        if self.square_logo:
+            return self.square_logo.thumb_url(48, 48)
 
     # URLs
     @models.permalink
@@ -337,9 +337,22 @@ class Team(models.Model):
 
     # Membership and roles
     def get_member(self, user):
+        """Get a TeamMember object for a user or None."""
         if not user.is_authenticated():
-            raise TeamMember.DoesNotExist()
-        return self.members.get(user=user)
+            return None
+
+        if user.id in self._member_cache:
+            return self._member_cache[user.id]
+        try:
+            member = self.members.get(user=user)
+        except TeamMember.DoesNotExist:
+            member = None
+        self._member_cache[user.id] = member
+        return member
+
+    def user_is_member(self, user):
+        return self.get_member(user) is not None
+
 
     def _is_role(self, user, role=None):
         """Return whether the given user has the given role in this team.
@@ -709,6 +722,9 @@ class TeamVideo(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('teams:team_video', [self.pk])
+
+    def get_tasks_page_url(self):
+        return "%s?team_video=%s" % (self.team.get_tasks_page_url(), self.pk)
 
     def get_thumbnail(self):
         if self.thumbnail:
@@ -2656,7 +2672,7 @@ class BillingReport(models.Model):
         data_rows = []
         for approve_task in self._get_approved_tasks():
             video = approve_task.team_video.video
-            version = approve_task.new_subtitle_version
+            version = approve_task.get_subtitle_version()
             language = version.subtitle_language
 
             all_tasks = [approve_task]

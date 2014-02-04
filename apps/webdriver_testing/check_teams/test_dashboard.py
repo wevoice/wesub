@@ -2,10 +2,14 @@
 
 import datetime
 import os
+
+from django.core import management
+
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.editor_pages import subtitle_editor 
 from webdriver_testing.pages.site_pages.teams import dashboard_tab
+from webdriver_testing.pages.site_pages.teams import tasks_tab 
 from webdriver_testing.data_factories import TeamMemberFactory
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import TaskFactory
@@ -225,8 +229,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.dashboard_tab = dashboard_tab.DashboardTab(cls)
+        cls.tasks_tab = tasks_tab.TasksTab(cls)
         cls.user = UserFactory(username = 'user', is_partner=True)
-        
         cls.subs_file = os.path.join(os.path.dirname
                 (os.path.abspath(__file__)), 'oneline.txt')
 
@@ -317,7 +321,7 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         task = list(tv.task_set.incomplete_subtitle().filter(language='fr'))[0]
         task.assignee = self.polly_glott
         task.save()
-
+        management.call_command('index_team_videos', self.team.slug)
         #Login user and go to team dashboard page
         self.dashboard_tab.log_in(self.polly_glott.username, 'password')
 
@@ -326,6 +330,26 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.assertTrue(self.dashboard_tab.dash_task_present(
                             task_type='Create French subtitles',
                             title=video.title))
+
+    def test_manage_your_tasks_link(self):
+        """manage your tasks link opens with correct filter defaults. """ 
+        #Login user and go to team dashboard page
+        video = self.data_utils.create_video()
+        video.primary_audio_language_code = 'ar'
+        video.save()
+        tv = TeamVideoFactory(team=self.team, added_by=self.user, video=video)
+        task = list(tv.task_set.incomplete_subtitle().filter(language='ar'))[0]
+        task.assignee = self.polly_glott
+        task.save()
+        management.call_command('index_team_videos', self.team.slug)
+
+        self.dashboard_tab.log_in(self.polly_glott.username, 'password')
+        #Verify expected videos are displayed.
+        self.dashboard_tab.open_team_page(self.team.slug)
+        self.dashboard_tab.manage_tasks()
+        self.assertIn("?assignee=me&lang=all", self.tasks_tab.current_url())
+        self.assertTrue(self.tasks_tab.task_present('Transcribe Arabic Subtitles',
+                                                     video.title))
 
     def test_members_available_tasks(self):
         """Members see “Videos that need your help” with the relevant tasks.
@@ -339,7 +363,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         expected_lang_list = ['Create English subtitles'] 
         langs = self.dashboard_tab.languages_needed('fireplace.mp4')
         self.assertEqual(sorted(langs), sorted(expected_lang_list))
-
 
     def test_no_langs_available_tasks(self):
         """Members with no lang prefs the list of available tasks in English.
@@ -444,8 +467,8 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.logger.info("Clicking the Review English subtitles task")
         self.dashboard_tab.click_lang_task(video.title, 'Review English subtitles')
         self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
-
-
+        self.dashboard_tab.open_team_page(self.team.slug)
+        self.dashboard_tab.handle_js_alert("accept")
 
 
 class TestCaseLangSuggestion(WebdriverTestCase):

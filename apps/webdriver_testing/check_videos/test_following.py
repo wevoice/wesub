@@ -1,15 +1,15 @@
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import create_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import create_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
 
 
 class TestCaseFollowing(WebdriverTestCase):
-    """TestSuite for download subtitles from the video's lanugage page   """
+    """TestSuite for video following settings.  """
     NEW_BROWSER_PER_TEST_CASE = False
     FOLLOWING = u'\u2713 Following'
     NOT_FOLLOWING = 'Not Following'
@@ -30,7 +30,7 @@ class TestCaseFollowing(WebdriverTestCase):
         cls.create_pg.open_create_page()
 
 
-    def test_default__submitter_following_video(self):
+    def test_default_submitter_following_video(self):
         """Video submitter is following video by default.
 
         """
@@ -41,7 +41,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
 
 
-    def test_default__subtitler_following_language(self):
+    def test_default_subtitler_following_language(self):
         """Subtitler is set to following for language contributed.
 
         """
@@ -54,7 +54,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.assertEqual(self.FOLLOWING, self.video_language_pg.follow_text())
 
 
-    def test_default__subtitler_not_following_video(self):
+    def test_default_subtitler_not_following_video(self):
         """Not following is setting for Video after contribution subtitles.
 
         """
@@ -68,7 +68,7 @@ class TestCaseFollowing(WebdriverTestCase):
 
 
 
-    def test_default__not_following_video(self):
+    def test_default_not_following_video(self):
         """Non-contributor is not following video by default.
 
         """
@@ -76,7 +76,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.open_video_page(self.video.video_id)
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
-    def test_default__not_following_language(self):
+    def test_default_not_following_language(self):
         """Non-contributor is not following language by default.
 
         """
@@ -84,7 +84,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_language_pg.open_video_lang_page(self.video.video_id, 'en')
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
-    def test_toggle__following_video(self):
+    def test_toggle_following_video(self):
         """Turn on and off following for a video
         """
         follower = UserFactory.create()
@@ -95,7 +95,7 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.toggle_follow()
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
-    def test_toggle__following_language(self):
+    def test_toggle_following_language(self):
         """Turn on / off following for a language.
 
         """
@@ -107,8 +107,8 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.toggle_follow(lang=True)
         self.assertEqual(self.NOT_FOLLOWING, self.video_language_pg.follow_text())
 
-    def test_toggle_video__lang_unchanged(self):
-        """Turn on following for a video, does not change languages.
+    def test_follow_video_follows_language(self):
+        """Turn on following for a video, follows the languages.
 
         """
         follower = UserFactory.create()
@@ -117,9 +117,9 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.toggle_follow()
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
         self.video_language_pg.open_video_lang_page(self.video.video_id, 'en')
-        self.assertEqual(self.NOT_FOLLOWING, self.video_language_pg.follow_text())
+        self.assertEqual(self.FOLLOWING, self.video_language_pg.follow_text())
 
-    def test_toggle_lang__video_unchanged(self):
+    def test_toggle_lang_video_unchanged(self):
         """Turn on / off following for a language does not change video setting.
 
         """

@@ -12,8 +12,13 @@ var Popcorn = Popcorn || null;
         ctxContainer.className = 'amara-popcorn-subtitles';
 
         style.width = '100%';
-
-        context.media.parentNode.appendChild(ctxContainer);
+        
+        // I do not know why the media node and its parents get the same id but
+        // seem to be different with Youtube media, so checking this for now
+        if(context.media.id == context.media.parentNode.id)
+            context.media.parentNode.appendChild(ctxContainer);
+        else
+            context.media.appendChild(ctxContainer);
 
         newdiv = document.createElement('div');
         newdiv.id = Popcorn.guid('subtitle-');

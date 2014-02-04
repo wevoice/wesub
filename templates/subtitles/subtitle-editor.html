@@ -83,14 +83,17 @@
     </div>
     <header class="main group">
         <section class="site left column">
+	    <div class="video-title-icon">
+	      <a class="call-modal" title="Clicking this link shows the modal" href="#set-title-modal">
+		<img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_030_pencil.png"></img>
+	      </a>
+	    </div>
             <h1>Amara</h1>
+	    <div class="video-title">
+	      <a title="[[ displayedTitle() ]]" href="#set-title-modal">[[ displayedTitle() ]]</a>
+	    </div>
         </section>
         <section class="video center column ng-cloak">
-            <span class="video-title">
-                <span class="subtitles-language">{{ language.get_language_code_display }}</span>
-                <span class="sep">•</span>
-                [[ workingSubtitles.title ]]
-            </span>
         </section>
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
@@ -168,23 +171,6 @@
             </div>
             <div class="subtitles-wrapper">
                 <div class="reference subtitles">
-                    <div class="metadata"
-                        ng-controller="SubtitleMetadataController"
-                        dir="[[ referenceSubtitles.language.dir ]]">
-                        <a class="expander" ng-class="{collapsed: collapsed}" href="#" ng-click="onExpanderClicked($event)"></a>
-                        <h2>{% trans "TITLE AND DESCRIPTION" %}</h2>
-                        <div class="content" ng-show="!collapsed">
-                            <h3>{% trans "title" %}</h3>
-                            <p ng-bind="referenceSubtitles.getTitle()"></p>
-                            <h3>{% trans "description" %}</h3>
-                            <p ng-bind="referenceSubtitles.getDescription()"></p>
-                            <div ng-repeat="(key, value) in referenceSubtitles.metadata">
-                                <h3>[[ key | metadataTypeName ]]</h2>
-                                <p>[[ value ]]</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <ul subtitle-list="reference-subtitle-set"
                         dir="[[ referenceSubtitles.language.dir ]]">
 
@@ -246,7 +232,7 @@ subtitle-repeat directive, see the working subtitles for more info
             <div class="workspace-tools group toolbar">
                 <div class="subtitles-language">
                     {% blocktrans with language.get_language_code_display as language %}
-                    {{ language }} subtitles
+                    Editing {{ language }}&hellip;
                     {% endblocktrans %}
                 </div>
 		<div class="toolbox">
@@ -310,22 +296,6 @@ subtitle-repeat directive, see the working subtitles for more info
                 </div>
 
                 <div class="working subtitles">
-                    <div class="metadata"
-                        ng-controller="SubtitleMetadataController"
-                        dir="[[ workingSubtitles.language.dir ]]">
-                        <a class="expander" ng-class="{collapsed: collapsed}" href="#" ng-click="onExpanderClicked($event)"></a>
-                        <h2>{% trans "EDIT TITLE AND DESCRIPTION" %}</h2>
-                        <div class="content" ng-show="!collapsed">
-                            <h3>{% trans "TITLE" %}</h3>
-                            <textarea rows="1" placeholder="{% trans 'Enter title' %}" class="title" autosize-bind="workingSubtitles.title"></textarea>
-                            <h3>{% trans "DESCRIPTION" %}</h3>
-                            <textarea rows="1" placeholder="{% trans 'Enter description' %}" class="description" autosize-bind="workingSubtitles.description"></textarea>
-                            <div ng-repeat="(key, value) in workingSubtitles.metadata">
-                                <h3>[[ key | metadataTypeName ]]</h2>
-                                <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" autosize-bind="workingSubtitles.metadata[key]"></textarea>
-                            </div>
-                        </div>
-                    </div>
                     <ul subtitle-list="working-subtitle-set"
                         dir="[[ workingSubtitles.language.dir ]]"
                         id="working-subtitle-set">
@@ -443,18 +413,37 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
                         2. Sync timing
                         <div class="substeps"
                             ng-show="workflow.stage == 'sync'">
-                            <p ng-show="!workflow.canMoveToReview()">
+                            <p ng-show="!workflow.canMoveToTitle()">
                                 {% trans "Not all lines are synced yet." %}
                             </p>
-                            <div ng-show="workflow.canMoveToReview()">
+                            <div ng-show="workflow.canMoveToTitle()">
                                 <p>{% trans "All lines are synced." %}</p>
+                                <button ng-show="translating()" class="next-step"
+                                    ng-click="onNextClicked($event)">
+                                    {% trans "Edit title and description" %}
+                                </button>
+                                <button ng-show="!translating()" class="next-step"
+                                    ng-click="onNextClicked($event)">
+                                    {% trans "Start reviewing" %}
+                                </button>
+                        </div>
+                    </li>
+                    <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
+                        3. Translate title
+                        <div class="substeps"
+                            ng-show="workflow.stage == 'title'">
+                            <p ng-show="!workflow.canMoveToReview()">
+                                {% trans "Title and description were not edited yet." %}
+                            </p>
+                            <div ng-show="workflow.canMoveToReview()">
+                                <p>{% trans "Title and description have been edited." %}</p>
                                 <button class="next-step"
                                     ng-click="onNextClicked($event)">
                                     {% trans "Start reviewing" %}
                                 </button>
                         </div>
                     </li>
-                    <li>3. Review and complete
+                    <li>[[ 3 + translating() ]]. Review and complete
                     <div class="substeps"
                         ng-show="workflow.stage == 'review'">
                         <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
@@ -475,7 +464,43 @@ what is supported, check out tests/subtitleRepeatDirective.spec.
         <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
         </div>
     </section>
-
+    <section id="set-title-modal" class="modal-style semantic-content" id="modal-text" tabindex="-1"
+	     role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+      <div class="modal-inner"
+           ng-controller="SubtitleMetadataController"
+           dir="[[ workingSubtitles.language.dir ]]">
+	<header id="modal-label"><h1>{% trans "Edit title and description" %}</h1></header>
+	<div class="modal-content">
+          <div class="metadata">
+            <div class="content">
+	      <form>
+		<h2>{% trans "Title" %}</h2>
+		<textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getTitle() ]]</textarea>
+		<textarea rows="1" placeholder="{% trans 'Enter Title' %}" fixsize-bind="currentSubtitles.title"></textarea>
+		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key == 'speaker-name'">
+                  <h2>[[ key | metadataTypeName ]]</h2>
+		  <textarea rows="1" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.metadata[key] ]]</textarea>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
+		</div>
+		<h2>{% trans "Description" %}</h2>
+		<textarea rows="4" class="refarea" readonly ng-show="translating()">[[ referenceSubtitles.getDescription() ]]</textarea>
+		<textarea rows="8" placeholder="{% trans 'Enter Description' %}" fixsize-bind="currentSubtitles.description"></textarea>
+		<div ng-repeat="(key, value) in currentSubtitles.metadata" ng-show="key != 'speaker-name'">
+                  <h2>[[ key | metadataTypeName ]]</h2>
+		  <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
+		</div>
+	      </form>
+            </div>
+          </div>
+	</div>
+	<footer>
+	  <a role="button" title="Done" href="#!" class="open-modal yes" ng-click="update(currentSubtitles)">Done</a>
+	  <a href="#!" class="close-action no" data-close="Close" data-dismiss="modal" title="Cancel" ng-click="reset()">
+	    Cancel
+	  </a>
+	</footer>
+      </div>
+    </section>
 
     {% include_bundle "subtitle-editor" %}
     {# include bold style too #}

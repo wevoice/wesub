@@ -219,7 +219,7 @@ div.amara-embed {
                 position: relative;
                 width: 21%;
                 .amara-current-language {
-                    background: transparent url('../../images/embedder/amara-sprites.png') right -139px no-repeat;
+                    background: transparent url('../../images/embedder/amara-sprites.png') right -187px no-repeat;
                     color: #DEDEDE;
                     display: block;
                     font: normal 12px;
@@ -243,7 +243,8 @@ div.amara-embed {
                     left: 0;
                     margin: 0;
                     position: absolute;
-                    top: 36px;
+                    top: auto;
+                    bottom: 100%;
                     width: 100%;
 
                     li {
@@ -257,6 +258,9 @@ div.amara-embed {
                             &:hover {
                                 color: #222;
                             }
+                        }
+                        a.language-item-inactive {
+                            color: #555;
                         }
 			a.currently-selected {
 			    font-weight: bold;
@@ -429,8 +433,8 @@ div.amara-context-menu {
 }
 ul.dropdown-menu.amara-languages-list {
     min-width: 250px;
-    border-top-right-radius: 0px;
-    border-top-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
 }
 ul.amara-languages-list > li {
     margin-top: 5px;
@@ -444,7 +448,7 @@ ul.amara-languages-list > li {
     padding-left: 0px;
     overflow: auto;
 }
-#language-list-inside li a:hover, 
-#language-list-inside li a:focus {
+#language-list-inside li a.language-item:hover, 
+#language-list-inside li a.language-item:focus {
     background-color: #F5F5F5;
 }

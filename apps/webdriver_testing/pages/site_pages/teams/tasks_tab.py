@@ -84,8 +84,12 @@ class TasksTab(ATeamPage):
     def perform_and_assign_task(self, task_type, title):
         task = self.task_present(task_type, title)
         perform_el = task['perform']
-        self.click_item_after_hover(perform_el, 
-                                    self._ASSIGN_AND_PERFORM)
+        action_el = perform_el.parent
+        self.hover_by_el(perform_el)
+         
+        start_el = action_el.find_element_by_css_selector(self._ASSIGN_AND_PERFORM)
+ 
+        self.click_item_from_pulldown(perform_el, start_el) 
 
     def perform_assigned_task(self, task_type, title):
         task = self.task_present(task_type, title)
@@ -95,7 +99,6 @@ class TasksTab(ATeamPage):
 
     def filtered_video(self):
         return self.get_text_by_css(self._FILTERED_VIDEO)
-
 
     def add_task(self, task_type=None, task_assignee=None, task_language=None):
         self.click_by_css(self._ADD_TASK)
@@ -118,3 +121,8 @@ class TasksTab(ATeamPage):
         except:
             return None
 
+    def available_tasks(self):
+        self.click_link_text('All available tasks')
+
+    def your_tasks(self):
+        self.click_link_partial_text('Your tasks')

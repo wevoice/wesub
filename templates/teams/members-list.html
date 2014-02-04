@@ -121,7 +121,7 @@
                                 </li>
                             {% endif %}
                             <li>
-                                <a href="{% url teams:team_tasks team.slug %}?assignee={{ member.user.username|urlencode }}">{% trans 'Assignments' %}</a>
+                                <a href="{% url teams:team_tasks team.slug %}?assignee={{ member.user.username|urlencode }}&project=any&lang=all">{% trans 'Assignments' %}</a>
                             </li>
                         </ul>
                         {% if member in assignable_roles %}

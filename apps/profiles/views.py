@@ -71,15 +71,14 @@ class OptimizedQuerySet(LoadRelatedQuerySet):
                 videos[l.video_id].langs_cache.append(l)
 
 
-def activity(request, user_id=None):
-    if user_id:
+def profile(request, user_id):
+    try:
+        user = User.objects.get(username=user_id)
+    except User.DoesNotExist:
         try:
-            user = User.objects.get(username=user_id)
-        except User.DoesNotExist:
-            try:
-                user = User.objects.get(id=user_id)
-            except (User.DoesNotExist, ValueError):
-                raise Http404
+            user = User.objects.get(id=user_id)
+        except (User.DoesNotExist, ValueError):
+            raise Http404
 
     if request.user.is_staff:
         if request.method == 'POST':

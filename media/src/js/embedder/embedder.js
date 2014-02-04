@@ -11,6 +11,30 @@
     // _amara may exist with a queue of actions that need to be processed after the
     // embedder has finally loaded. Store the queue in toPush for processing in init().
     var toPush = window._amara || [];
+    
+    //////////////////////////////////////////////////////////////////
+    //The following section is to communicate with the host page
+    var hostPage = {};
+    window.addEventListener('message', initReceiver, false);
+    function initReceiver(e) {
+	if (e.data) {
+	    if (e.data.fromIframeController) {
+		hostPage = {origin: e.origin, source: e.source, index: e.data.index};
+		hostPage.source.postMessage({initDone: true, index: hostPage.index}, hostPage.origin);
+		sizeUpdated();
+		window.removeEventListener('message', initReceiver, false);
+	    }
+	}
+    }
+    // Should be triggered whenever the size of the content of the widget changes
+    function sizeUpdated() {
+	if(hostPage.source)
+	    hostPage.source.postMessage({resize: true, index: hostPage.index,
+					 width: _$(".amara-tools").width(),
+					 height: _$(".amara-popcorn").height() + _$(".amara-tools").height(),
+					}, hostPage.origin);
+    }
+    ////////////////////////////////////////////
 
     function regexEscape(str) {
         var specials = /[.*+?|()\[\]{}\\$^]/g; // .*+?|()[]{}\$^
@@ -134,12 +158,10 @@
                 // Make a call to the Amara API to get attributes like available languages,
                 // internal ID, description, etc.
                 _$.ajax({
-                    url: apiURL + this.get('url'),
+                    url: apiURL + encodeURIComponent(this.get('url')),
                     dataType: 'jsonp',
                     success: function(resp) {
-
                         if (resp.objects.length) {
-
                             // The video exists on Amara.
                             video.set('is_on_amara', true);
 
@@ -148,18 +170,19 @@
 
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
-
+				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
+							  function(language) {return language.code;});
                                 // Set the initial language to either the one provided by the initial
                                 // options, or the original language from the API.
                                 video.set('initial_language',
-                                    video.get('initial_language') ||
-                                    video.get('original_language') ||
-                                    'en'
+					  (video.get('initial_language') && (visibleLanguages.indexOf(video.get('initial_language')) > -1) && video.get('initial_language')) ||
+					  (video.get('original_language') && (visibleLanguages.indexOf(video.get('original_language')) > -1) && video.get('original_language')) ||
+					  ((visibleLanguages.indexOf('en') > -1) && 'en') ||
+					  ((visibleLanguages.length > 0) && visibleLanguages[0])
                                 );
                             }
 
                         } else {
-
                             // The video does not exist on Amara.
                             video.set('is_on_amara', false);
 
@@ -320,11 +343,13 @@
                             } else {
                                 // Do some other stuff for videos that aren't yet on Amara.
                                 that.setCurrentLanguageMessage('Video not on Amara');
+				that.setTranscriptDisplay(false);
                             }
+                            sizeUpdated();
                         }
                     );
                 });
-
+                sizeUpdated();
                 return this;
 
             },
@@ -353,7 +378,11 @@
             
             buildLanguageSelector: function() {
                 var langs = this.model.get('languages');
-                langs.sort(function(l1, l2) {return (l1.name > l2.name);});		
+                langs.sort(function(l1, l2) {
+		    if (l1.name > l2.name) return 1;
+		    if (l1.name < l2.name) return -1;
+		    return 0;
+		});
                 var video_url = this.model.get('url');
                 this.$amaraLanguagesList.append(this.templateVideo({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + video_url,
@@ -366,11 +395,13 @@
                 if (langs.length) {
                     for (var i = 0; i < langs.length; i++) {
                         _$('#language-list-inside').append('' +
-                            '<li role="presentation">' +
-                                '<a  role="menuitem" tabindex="-1" href="#" class="language-item" data-language="' + langs[i].code + '">' +
-                                    langs[i].name +
-                                '</a>' +
-                            '</li>');
+							   '<li role="presentation">' +
+							   '<a role="menuitem" tabindex="-1" ' +
+							   (langs[i].visible  ? ('href="#" class="language-item" data-language="' + langs[i].code + '"') : 'class="language-item-inactive"') +
+							   '>' +
+							   langs[i].name +
+							   '</a>' +
+							   '</li>');
                     }
 		    // Scrollbar for languages only
 		    _$('#language-list-inside').mCustomScrollbar({
@@ -638,7 +669,6 @@
                 return false;
             },
             linkToTranscriptLine: function(line) {
-                console.log(line.get(0));
                 this.hideTranscriptContextMenu();
                 return false;
             },
@@ -802,6 +832,7 @@
                 // TODO: This button needs to be disabled unless we have a transcript to toggle.
                 this.$amaraTranscript.toggle();
                 this.$transcriptButton.toggleClass('amara-button-enabled');
+                sizeUpdated();
                 return false;
             },
             setSubtitlesDisplay: function(show) {
@@ -819,9 +850,11 @@
                 this.$amaraTranscript.show();
                 this.$transcriptButton.addClass('amara-button-enabled');
 		} else {
-                this.$amaraTranscript.hide();
+                    this.$amaraTranscript.hide();
+		    
                 this.$transcriptButton.removeClass('amara-button-enabled');
 		}
+		sizeUpdated();
                 return false;
             },
             transcriptLineClicked: function(e) {
@@ -942,50 +975,6 @@
                 '            <ul id="languages-dropdown" class="dropdown-menu amara-languages-list" role="menu" aria-labelledby="dropdownMenu1"></ul>' +
                 '        </div>' +
                 '    </div>' +
-                '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
-		'        <div class="modal-dialog">' +
-		'            <div class="modal-content">' +
-		'                <div class="modal-header">' +
-		'                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-		'                    <h4 class="modal-title" id="myModalLabel">Embed Video</h4>' +
-		'                </div>' +
-		'                <div class="modal-body">' +    
-		'                    <p>Step 1: paste this in your document somewhere (closest to the closing body tag is preferable):</p>' +
-                '                        <pre class="pre-small">' +
-                '&lt;script type="text/javascript"&gt;\n' +
-                '(function (window, document) {\n' +
-                '  var loader = function () {\n' +
-                '    var script = document.createElement("script"),\n' +
-                '                 tag = document.getElementsByTagName("script")[0];\n' +
-                '    script.src =\n' +
-                '      "http://s3.amazonaws.com/s3.www.universalsubtitles.org/release/public/embedder.js";\n' +
-                '    tag.parentNode.insertBefore(script, tag);\n' +
-                '  };\n' +
-                '  window.addEventListener ?\n' +
-                '    window.addEventListener("load", loader, false) :\n' +
-                '    window.attachEvent("onload", loader);\n' +
-                '})(window, document);\n' +
-                '&lt;/script&gt;' +
-                '                        </pre>' +
-                '                        <p>Step 2: paste this somewhere inside your HTML body, with the height and width of your choosing:</p>' +
-                '                        <pre class="pre-small">' +
-                '&lt;div class="amara-embed" style="height: 480px; width: 854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
-                '                        </pre>' +
-                '                        <p>You can set the following options:</p>' +
-                '                        <ul>' +
-                '                            <li>Hide the Amara logo by adding <code>data-hide-logo="true"</code> in the previous tag.</li>' +
-                '                            <li>Hide the menu item to order subtitles by adding <code>data-hide-order="true"</code> in the previous tag.</li>' +
-                '                            <li>Set the initial active subtitle language by adding <code>data-initial-language="language"</code> in the previous tag, where language is the language code, such as "en" for English.</li>' +
-                '                            <li>Display the subtitles by default by adding <code>data-show-subtitles-default="true"</code> in the previous tag.</li>' +
-                '                            <li>Display the transcript by default by adding <code>data-show-transcript-default="true"</code> in the previous tag.</li>' +
-                '                        </ul>' +
-		'                    </div>' +
-		'                <div class="modal-footer">' +
-		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
-		'            </div>' +
-		'        </div>' +
-		'    </div>' +
-		'</div>' +
                 '    <div class="amara-transcript">' +
                 '        <div class="amara-transcript-header amara-group">' +
                 '            <div class="amara-transcript-header-left">' +
@@ -1007,7 +996,34 @@
                 '    </div>' +
                 '</div>' +
 		'<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">' +
-	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>'
+	        '<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>' +
+                '    <div class="modal fade" id="embed-code-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">' +
+		'        <div class="modal-dialog">' +
+		'            <div class="modal-content">' +
+		'                <div class="modal-body">' +    
+		'                    <p>Step 1: paste this anywhere in your document:</p>' +
+                '                        <pre class="pre-small">' +
+                '&lt;script type="text/javascript" src="http://amara.org/embedder-iframe"&gt;\n' +
+                '&lt;/script&gt;' +
+                '                        </pre>' +
+                '                        <p>Step 2: paste this somewhere inside your HTML body, wherever you would like your widgets to appear, with the height, width and options of your choosing:</p>' +
+                '                        <pre class="pre-small">' +
+                '&lt;div class="amara-embed" data-height="480px" data-width="854px" data-url="{{ original_video_url }}"&gt;&lt;/div&gt;' +
+                '                        </pre>' +
+                '                        <ul>' +
+                '                            <li>Hide Amara logo: <code>data-hide-logo="true"</code>.</li>' +
+                '                            <li>Hide order subtitles menu item: <code>data-hide-order="true"</code>.</li>' +
+                '                            <li>Set initial active subtitle language: <code>data-initial-language="en"</code>.</li>' +
+                '                            <li>Display subtitles by default: <code>data-show-subtitles-default="true"</code>.</li>' +
+                '                            <li>Display transcript by default: <code>data-show-transcript-default="true"</code>.</li>' +
+                '                        </ul>' +
+		'                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>' +
+
+		'                    </div>' +
+		'        </div>' +
+		'    </div>' +
+		'</div>'
+
 	    }
         });
 
@@ -1043,7 +1059,6 @@
         // init() gets called as soon as the embedder has finished loading.
         // Simply processes the existing _amara queue if we have one.
         this.init = function() {
-
             // Load the Amara CSS.
             var tag = document.getElementsByTagName('script')[0];
             var style = document.createElement('link');
@@ -1083,8 +1098,7 @@
 			'show_transcript_default': $div.data('show-transcript-default'),
                     }]);
                 });
-            }
-
+            }	    
         };
 
     };

@@ -42,8 +42,7 @@ class EditorPage(UnisubsPage):
     _REF_METADATA_EXPANDER = 'div.reference div.metadata a'
 
     #CENTER COLUMN
-    _VIDEO_TITLE = "section.video span.video-title"
-    _VIDEO_LANG = "section.video span.subtitles-language"
+    _VIDEO_TITLE = "div.video-title a"
     _PLAYER = "div#player"
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
@@ -58,6 +57,7 @@ class EditorPage(UnisubsPage):
     _COPY_TIMING = 'a.copyover'
     _TOOLS_MENU = 'div.toolbox-inside a'
     _PARAGRAPH_MARKER = '.paragraph-start'
+    _REMOVE_SUBTITLE = '.remove-subtitle'
 
     #SUBTITLES
     _REFERENCE_LIST = ('div.reference ul[subtitle-list='
@@ -79,16 +79,13 @@ class EditorPage(UnisubsPage):
     _APPROVE = 'button.approve'
     _NOTES = 'textarea[ng-model="notes"]'
 
-    def open_editor_page(self, video_id, lang, close_metadata=True):
+    def open_editor_page(self, video_id, lang):
         self.open_page(self._URL.format(video_id, lang))
-        if close_metadata:
-            self.close_metadata()
 
 
     def open_ed_with_base(self, video_id, lang, base_lang='en'):
         url = self._URL + '?base-language={2}'
         self.open_page(url.format(video_id, lang, base_lang))
-        self.close_metadata()
 
     def keyboard_controls_help(self):
         pass
@@ -177,12 +174,6 @@ class EditorPage(UnisubsPage):
                 subs.append(el.text)
         return subs
 
-    def close_metadata(self):
-        self.logger.info('closing the metadata')
-        work_el = self.is_element_present(self._WORKING_METADATA_EXPANDER)
-        if work_el and 'collapsed' not in work_el.get_attribute('class'):
-            work_el.click()
-
     def working_language(self):
         """Return the curren working language displayed. """
 
@@ -230,7 +221,7 @@ class EditorPage(UnisubsPage):
     def video_title(self):
         """Return the text displayed for the video title. """
 
-        return self.get_text_by_css(self._VIDEO_TITLE)
+        return self.get_element_attribute(self._VIDEO_TITLE, "title")
 
     def click_working_sub_line(self, line):
         """Click in a subline of the working text. """

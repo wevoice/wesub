@@ -22,10 +22,11 @@ goog.provide('unisubs.widget.DropDown');
  * @constructor
  * @param {unisubs.widget.DropDownContents} dropDownContents
  */
-unisubs.widget.DropDown = function(videoID, dropDownContents, videoTab) {
+unisubs.widget.DropDown = function(videoID, videoFilename, dropDownContents, videoTab) {
     goog.ui.Component.call(this);
 
     this.videoID_ = videoID;
+    this.videoFilename_ = videoFilename;
     this.setStats_(dropDownContents);
     this.videoTab_ = videoTab;
     /**
@@ -172,15 +173,16 @@ unisubs.widget.DropDown.prototype.createSubtitleHomepageURL_ = function() {
     return unisubs.getSubtitleHomepageURL(this.videoID_);
 };
 
-unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function(lang_pk) {
-    var uri = new goog.Uri(unisubs.siteURL());
-    uri.setPath("/widget/download-subs/srt");
-    uri.setParameterValue("video_id", this.videoID_);
-
-    if (this.subtitleState_ && this.subtitleState_.LANGUAGE_PK){
-       uri.setParameterValue('lang_pk', this.subtitleState_.LANGUAGE_PK);
+unisubs.widget.DropDown.prototype.createDownloadSRTURL_ = function() {
+    if(this.subtitleState_ === null) {
+        return '#';
     }
-
+    var filename = this.videoFilename_ + '.' + this.subtitleState_.LANGUAGE;
+    var path = ("/subtitles/" + this.videoID_ + "/" +
+            this.subtitleState_.LANGUAGE + "/download/" +
+            encodeURIComponent(filename) + '.srt');
+    var uri = new goog.Uri(unisubs.siteURL());
+    uri.setPath(path);
     return uri.toString();
 };
 
@@ -203,8 +205,7 @@ unisubs.widget.DropDown.prototype.createActionLinks_ = function($d) {
               'Subtitle Homepage'));
     this.downloadSubtitlesLink_ =
         $d('li', 'unisubs-downloadSubtitles',
-           $d('a', {'href': this.createDownloadSRTURL_()},
-              'Download Subtitles'));
+           $d('a', {'href': '#'}, 'Download Subtitles'));
 
     this.moderatedNotice_ =
         $d('li', 'unisubs-moderated',

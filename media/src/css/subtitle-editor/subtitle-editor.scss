@@ -1,9 +1,14 @@
 @charset "UTF-8";
-
+@import "modal";
 // Fonts
 $Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
 $OpenSans: 'Open Sans', $Helvetica;
 $CodePro: 'CodeProLC', $OpenSans;
+
+$sync-help-height: 54px;
+$span-key-height: 32px;
+$text-color: #565758;
+$dark-grey: #212223;
 
 // Custom fonts
 @font-face {
@@ -88,7 +93,7 @@ html, body {
     overflow: hidden;
 }
 body {
-    color: #565758;
+    color: $text-color;
     font: normal 11px/14px $OpenSans;
     margin: 0;
     text-rendering: optimizeLegibility;
@@ -132,7 +137,7 @@ div.modal {
     z-index: 99;
 
     div.inner {
-        background: #212223;
+        background: $dark-grey;
         color: #F1F1F1;
         margin: 230px auto 0 auto;
         padding: 40px;
@@ -170,7 +175,7 @@ div.modal {
         }
     }
 }
-button, a.button {
+button, .modal-inner a {
     border: 0;
     color: #DEDFDF;
     cursor: pointer;
@@ -179,7 +184,7 @@ button, a.button {
     font: normal 12px $OpenSans;
     margin: 0 10px;
     padding: 5px 20px;
-
+    text-decoration: none;
     @include border-radius(2px);
 
     &.approve {
@@ -236,7 +241,7 @@ button, a.button {
     }
 }
 header.main {
-    background: #212223;
+    background: $dark-grey;
     border-bottom: 1px solid #474849;
     @include multi-box-shadow(0, -1px, 0, #151617, 0, 5px, 8px, #D7D8D9);
 
@@ -251,7 +256,27 @@ header.main {
             margin: 0;
             padding: 8px 12px;
             text-transform: lowercase;
+            float: left;
         }
+        div.video-title-icon {
+            float: right;
+            padding: 12px 5px;
+        }
+        div.video-title {
+            margin: 0;
+            padding: 10px 5px;
+            text-align: right;
+            font: normal 13px $OpenSans;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            a {
+              color: #D0D1D2;
+              text-decoration: none;
+              padding: 0 10px;
+              vertical-align: middle;
+            }
+	}
     }
     section.video {
         border-left: 1px solid #2B2C2D;
@@ -266,10 +291,6 @@ header.main {
             text-overflow: ellipsis;
             white-space: nowrap;
             width: 100%;
-
-            span.subtitles-language {
-                font-weight: bold;
-            }
             span.sep {
                 display: inline-block;
                 margin: 0 5px;
@@ -322,7 +343,7 @@ header.main {
                 }
             }
             ul {
-                background: #212223;
+                background: $dark-grey;
                 right: 0;
                 padding: 7px 15px;
                 position: absolute;
@@ -331,7 +352,7 @@ header.main {
                 @include border-radius(3px);
 
                 &:before {
-                    border-bottom: 12px solid #212223;
+                    border-bottom: 12px solid $dark-grey;
                     border-left: 12px solid transparent;
                     border-right: 12px solid transparent;
                     content: "";
@@ -399,7 +420,7 @@ section.main {
     span.key {
         background: white;
         display: block;
-        height: 32px;
+        height: $span-key-height;
         float: left;
         margin-right: 10px;
         position: relative;
@@ -440,19 +461,19 @@ section.main {
             position: absolute;
             display: none;
             width: 120px;
-            height: 65px;
+            height: $sync-help-height;
             color: #ffffff;
             z-index: 80;
 
             div.text {
-                line-height: 65px;
+                line-height: $sync-help-height;
                 vertical-align: middle;
             }
 
             span.key {
                 margin-left: 14px;
-                margin-top: 16px;
-                width: 32px;
+                margin-top: ($sync-help-height - $span-key-height) / 2 ;
+                width: $span-key-height;
                 span {
                     color: #000;
                     font-size: 12px;
@@ -463,7 +484,7 @@ section.main {
                 /* Draws a triangle in the middle of the box.
                  */
                 position: absolute;
-                top: 17px;
+                top: 12px;
                 content: "";
                 display: block;
                 height: 0px;
@@ -554,7 +575,7 @@ section.main {
                     line-height: 140%;
                     width: 100%;
                     border: 0;
-                    color: #565758;
+                    color: $text-color;
                     font: normal 12px $OpenSans;
                     resize: none;
                 }
@@ -801,9 +822,9 @@ section.main {
             background: #0C3F70;
             color: white;
             font-size: 12px;
-            height: 216px;
-            margin: 20px;
-            padding: 20px;
+            height: 200px;
+            margin: 10px;
+            padding: 10px;
             @include border-radius(3px);
 
             span.key {
@@ -849,7 +870,7 @@ section.main {
         }
         div.preview {
             color: #949596;
-            height: 34px;
+            height: 32px;
             text-align: center;
             text-shadow: 0 1px 0 white;
 
@@ -872,15 +893,17 @@ section.main {
                 border-right: 1px solid #DADBDC;
                 float: left;
                 overflow: hidden;
-                padding: 10px 10px;
+                padding-top: 10px;
                 position: relative;
                 width: 42%;
 
                 select {
+                    // No idea why it is not inherited from body
+                    color: $text-color;
+                    font: normal 12px $OpenSans;
                     background: transparent;
                     font-size: 12px;
                     line-height: 134%;
-                    height: 1.33em;
                     border: 0;
                     cursor: pointer;
                     margin: 0;
@@ -906,7 +929,9 @@ section.main {
         div.video {
             height: 290px;
             position: relative;
-
+            // We move it upwards, covering the header
+            margin-top: -38px;
+            background: none repeat scroll 0 0 $dark-grey;
             div.subtitle-overlay {
                 position: absolute;
                 bottom: 63px;
@@ -949,7 +974,7 @@ section.main {
 
             ul.video-controls {
                 height: 32px;
-                background: #212223;
+                background: $dark-grey;
                 border-bottom: 1px solid #19191a;
                 color: #fff;
 
@@ -997,7 +1022,7 @@ section.main {
                     float: none;
                     margin-left: 48px;
                     margin-right: 135px;
-                    padding-top: 2px;
+                    padding-top: 4px;
 
                     div {
                         height: 28px;
@@ -1074,9 +1099,7 @@ section.main {
             );
 
             div.subtitles-language {
-                color: black;
                 float: left;
-                font-weight: bold;
                 padding: 10px;
                 font-size: 12px;
                 line-height: 1.34em;
@@ -1100,8 +1123,8 @@ section.main {
                 text-decoration: none;
                 text-align: right;
                 position: absolute;
-                right: 0;
-                padding: 3px 0px 20px 20px;
+                right: 15px;
+                padding: 3px 0px 10px 20px;
                 }
 
 
@@ -1110,7 +1133,7 @@ section.main {
                        position: absolute;
                        display: block;
                        content: "";
-                       border-color: transparent transparent #212223 transparent;
+                       border-color: transparent transparent $dark-grey transparent;
                        border-style: solid;
                        border-width: 10px;
                        height:0;
@@ -1119,7 +1142,7 @@ section.main {
                        top:-20px;
                        right: 1em;
                    }
-                   background: #212223;
+                   background: $dark-grey;
                    display:none;
                    position: absolute;
                    text-align: left;
@@ -1144,7 +1167,7 @@ section.main {
                            }
                            &:hover {
                               background: #C5C5C5;
-                              color: #212223;
+                              color: $dark-grey;
                            }
                           }
 		      }
@@ -1179,7 +1202,7 @@ section.main {
     }
     section.right {
         div.steps-container {
-            height: 290px;
+            height: 250px;
             position: relative;
 
             ul.steps {
@@ -1348,11 +1371,11 @@ section.collab {
 
 // Timeline mode
 section.timeline {
-    background: #212223;
+    background: $dark-grey;
     height: 65px;
     overflow: hidden;
     position: absolute;
-    top: 329px;
+    top: 290px;
     width: 100%;
     z-index: 51;
 
@@ -1383,6 +1406,8 @@ section.timeline {
             @include border-radius(3px);
 
             span {
+                // This is to avoid seeing the second line
+                height: 15px;
                 display: block;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -1450,4 +1475,42 @@ body.timeline-shown {
     div.workspace-tools, div.language-selections {
         margin-top: 65px;
     }
+}
+
+// Styling of the new modals
+.modal-style {
+    @extend %modal;    
+    background: rgba(black, .6);
+    color: #F1F1F1;
+    div.modal-inner {
+      padding: 40px;
+      background: $dark-grey;
+      .modal-content {max-height: 200vh;}
+      div,
+      footer,
+      header {
+        border: none;
+        background: $dark-grey;
+      }
+      h1 {
+        font: normal 17px $Helvetica;
+      }
+      h2 {
+        font: normal 15px $Helvetica;
+        margin-bottom: 6px;
+      }
+      textarea {
+        background: #E3E6E9;
+        font: normal 12px monospace;
+        margin-bottom: 5px;
+        margin-top: 0;
+        padding: 10px;
+        width: 100%;
+        &.refarea {  
+          background: #555;
+          color: #F1F1F1;
+          border: none;
+        }
+      }
+   }
 }
