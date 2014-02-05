@@ -106,10 +106,10 @@ unisubs.translate.TranslationWidget.prototype.setEnabled = function(enabled) {
     }
 };
 unisubs.translate.TranslationWidget.prototype.getTranslateinputValue = function() {
-    return goog.string.htmlEscape(this.translateInput_.value);
+    return this.translateInput_.value;
 };
 unisubs.translate.TranslationWidget.prototype.setTranslateinputValue = function(text) {
-    this.translateInput_.value = goog.string.unescapeEntities(text);
+    this.translateInput_.value = text;
 };
 unisubs.translate.TranslationWidget.prototype.getCaptionID = function() {
     return this.dfxpWrapper_['getSubtitleIndex'](this.originalNode_);
