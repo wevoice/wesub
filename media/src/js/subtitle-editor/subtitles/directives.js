@@ -150,7 +150,7 @@ var USER_IDLE_MINUTES = 15;
 	});
         return function link(scope, elem, attrs) {
             var scroller = $(elem);
-            var isWorkingSet = (attrs.subtitleList == "working-subtitle-set");
+            var isWorkingSet = (attrs.subtitleScroller == "working-subtitle-set");
             // Handle scroll.
             scroller.scroll(function() {
                 // If scroll sync is locked.
