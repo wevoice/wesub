@@ -21,7 +21,7 @@ var jQuery = window.jQuery || null;
 
 (function (Popcorn, window, document) {
 
-    var STATIC_ROOT_URL = window.Amara.conf.STATIC_ROOT_URL;
+    var STATIC_ROOT_URL = window._amaraConf ? window._amaraConf.staticURL : window.Amara.conf.STATIC_ROOT_URL;
     var CURRENT_TIME_MONITOR_MS = 16;
     var EMPTY_STRING = "";
 
