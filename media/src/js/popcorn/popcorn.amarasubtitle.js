@@ -15,7 +15,8 @@ var Popcorn = Popcorn || null;
         
         // I do not know why the media node and its parents get the same id but
         // seem to be different with Youtube media, so checking this for now
-        if(context.media.id == context.media.parentNode.id)
+        if ((context.media.nodeName == 'VIDEO') ||
+           (context.media.id == context.media.parentNode.id))
             context.media.parentNode.appendChild(ctxContainer);
         else
             context.media.appendChild(ctxContainer);
