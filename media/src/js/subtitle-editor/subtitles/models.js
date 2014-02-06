@@ -141,8 +141,9 @@ var angular = angular || null;
          * without saving them to the DFXP store, use the draftSubtitle() method
          * to get a DraftSubtitle.
          * */
+        var text = $(node).text().trim();
         Subtitle.call(this, parser.startTime(node), parser.endTime(node),
-                $(node).text().trim(), parser.startOfParagraph(node));
+                text, parser.startOfParagraph(node));
         this.node = node;
         this.id = id;
     }

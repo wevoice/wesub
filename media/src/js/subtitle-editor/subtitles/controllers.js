@@ -98,6 +98,7 @@ var angular = angular || null;
                     $scope.currentVersion = newVersion;
                     $scope.referenceSubtitles.getSubtitles(
                         $scope.language.code, newVersion.version_no);
+                    $scope.adjustReferenceSize();
                 } else {
                     loadEmptySubtitles();
                 }
@@ -108,6 +109,7 @@ var angular = angular || null;
             $scope.currentVersion = null;
             $scope.referenceSubtitles.initEmptySubtitles(
                     $scope.language.code);
+            $scope.adjustReferenceSize();
         }
 
         function pickInitialLanguage() {
