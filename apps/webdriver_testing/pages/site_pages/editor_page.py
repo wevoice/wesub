@@ -47,7 +47,7 @@ class EditorPage(UnisubsPage):
     _EMBEDDED_VIDEO = "div#video"
     _VIDEO_SUBTITLE = 'div.subtitle-overlay div'
     _WORKING_LANGUAGE = 'section.center div.subtitles-language'
-    _ADD_SUBTITLE = 'a.add-subtitle'
+    _ADD_SUBTITLE = 'button.insert-subtitle'
     _SYNC_HELP = 'div.sync-help'
     _INFO_TRAY = 'div.info-tray'
     _INFO_DETAILS = 'div.info-tray tr'
@@ -56,14 +56,13 @@ class EditorPage(UnisubsPage):
     _WORKING_METADATA_EXPANDER = 'div.working div.metadata a'
     _COPY_TIMING = 'a.copyover'
     _TOOLS_MENU = 'div.toolbox-inside a'
-    _PARAGRAPH_MARKER = '.paragraph-start'
+    _PARAGRAPH_MARKER = '.new-paragraph'
     _REMOVE_SUBTITLE = '.remove-subtitle'
 
     #SUBTITLES
-    _REFERENCE_LIST = ('div.reference ul[subtitle-list='
-                       '"reference-subtitle-set"]')
+    _REFERENCE_LIST = 'div.reference ul.subtitle-list'
     _WORKING_LIST = 'ul#working-subtitle-set'
-    _SUBTITLE_ITEM = 'li.subtitle-list-item'
+    _SUBTITLE_ITEM = 'li'
     _SUB_TIME = 'span.timing'
     _SUB_TEXT = 'span.subtitle-text'
 
@@ -269,7 +268,7 @@ class EditorPage(UnisubsPage):
 
         _, el = self.click_working_sub_line(position)
         try:
-            para = el.find_element_by_css_selector(self._PARAGRAPH_MARKERS)
+            para = el.find_element_by_css_selector(self._PARAGRAPH_MARKER)
         except:
             self.record_error('paragraph button not found')
         para.click() 
