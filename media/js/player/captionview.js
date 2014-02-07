@@ -101,17 +101,16 @@ unisubs.player.CaptionView.prototype.setUpPositioning =
  * @param text The text to split in 32x4
  * @param opt_charsPerLine The max number of characters to allow per line
  * @param opt_maxLines The max number of lines to allow
- * @param opt_linebreakStr Which string to use when joining lines, i.e. \n or <bt/>
  * @return An array with lines of a maximum 42 chars
 **/
-unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_maxLines, opt_linebreakStr){
+unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_maxLines){
 
     var charsPerLine = opt_charsPerLine || 42;
     var maxLines = opt_maxLines || 4;
     var linebreakStr = opt_linebreakStr || "<br/>";
     // short circuit most common case
     if (!text){
-        return "";
+        return [];
     }
 
     // If we get text with newlines, sometimes those newlines get cut off
@@ -156,11 +155,11 @@ unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_ma
     if (currentLine.length){
         lines.push(currentLine);
     }
-    // now join each line with a space, then all lines with a line break char
+    // join each line with a space, then return the array.
     var lines = goog.array.map(lines, function(line){
         return line.join(" ");
     }).slice(0, maxLines);
-    return lines.join(linebreakStr);
+    return lines;
 }
 
 /*
@@ -174,14 +173,13 @@ unisubs.player.CaptionView.prototype.setCaptionText = function(text) {
         // displaying subtitles.  We should remove this once we have pluginable
         // popcorn set up.
         if (unisubs.caption_display_mode == 'n') {
-            text = unisubs.player.CaptionView.breakLines(text, 42);
+            var lines = unisubs.player.CaptionView.breakLines(text, 42);
         } else {
-            text = goog.string.newLineToBr(text);
+            var lines = text.split('\n');
         }
-        // convert to markdown after text layout has been done
-        // as to not inflate char count:
+        lines = goog.array.map(lines, unisubs.html.markdownToHtml);
+        text = lines.join("<br />");
 
-        text = unisubs.html.markdownToHtml(text);
         this.getElement().innerHTML = text;
 
         goog.i18n.bidi.setElementDirAndAlign(this.getElement(),
