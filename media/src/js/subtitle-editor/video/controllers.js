@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.video.controllers', []);
 
-    module.controller('VideoController', function($scope, VideoPlayer) {
+    module.controller('VideoController', ['$scope', '$sce', 'VideoPlayer', function($scope, $sce, VideoPlayer) {
         $scope.overlayText = null;
         $scope.showOverlay = false;
 
@@ -59,26 +59,25 @@
 
         $scope.$watch('currentEdit.draft.content()', function(newValue) {
             if(newValue !== null && newValue !== undefined) {
-                $scope.overlayText = newValue;
+                $scope.overlayText = $sce.trustAsHtml(newValue);
                 $scope.showOverlay = true;
             } else if($scope.timeline.shownSubtitle !== null) {
-                $scope.overlayText = $scope.timeline.shownSubtitle.content();
+                $scope.overlayText = $sce.trustAsHtml($scope.timeline.shownSubtitle.content());
                 $scope.showOverlay = true;
             } else {
                 $scope.showOverlay = false;
             }
         });
         $scope.$root.$on('subtitle-selected', function($event, scope) {
-
             if(scope.subtitle.isSynced()) {
                 VideoPlayer.playChunk(scope.startTime, scope.duration());
             }
-            $scope.overlayText = scope.subtitle.content();
+            $scope.overlayText = $sce.trustAsHtml(scope.subtitle.content());
             $scope.showOverlay = true;
         });
         $scope.$watch('timeline.shownSubtitle', function(subtitle) {
             if(subtitle !== null) {
-                $scope.overlayText = subtitle.content();
+                $scope.overlayText = $sce.trustAsHtml(subtitle.content());
                 $scope.showOverlay = true;
             } else {
                 $scope.showOverlay = false;
@@ -91,5 +90,5 @@
               VideoPlayer.init();
         });
 
-    });
+    }]);
 }).call(this);

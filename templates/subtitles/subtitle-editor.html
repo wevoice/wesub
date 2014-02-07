@@ -190,7 +190,7 @@
         <section class="center column">
         <div class="video" ng-controller="VideoController">
             <div class="video-container" id="video"></div>
-            <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html-unsafe="overlayText"></div></div>
+            <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
             <ul class="video-controls group">
                 <li class="play-pause" ng-class="{'playing': videoState.playing}">
                     <a href="#" ng-click="playPauseClicked($event)"></a>
