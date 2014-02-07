@@ -289,16 +289,6 @@ class Rpc(BaseRpc):
         }
 
 
-    # Ugly hack for N caption display.
-    def get_caption_display_mode(self, language):
-        team_video = language.video.get_team_video()
-        _NETFLIX_TEAMS = ['netflix', 'netflix-private', 'netflix-applicant', 'netflix-n']
-        if team_video and team_video.team.slug.lower() in _NETFLIX_TEAMS:
-            return 'n'
-        else:
-            return 'normal'
-
-
     def get_timing_mode(self, language, user):
         """
         Decides if allows forking. Criteria:
@@ -422,7 +412,6 @@ class Rpc(BaseRpc):
 
         return_dict = { "can_edit": True,
                         "session_pk": session.pk,
-                        "caption_display_mode": self.get_caption_display_mode(language),
                         "timing_mode": self.get_timing_mode(language, request.user),
                         "subtitles": subtitles }
 
@@ -482,7 +471,6 @@ class Rpc(BaseRpc):
             return_dict = { "response": "ok",
                             "can_edit" : True,
                             "session_pk" : session.pk,
-                            "caption_display_mode": self.get_caption_display_mode(session.language),
                             "timing_mode": self.get_timing_mode(session.language, request.user),
                             "subtitles" : subtitles }
 
