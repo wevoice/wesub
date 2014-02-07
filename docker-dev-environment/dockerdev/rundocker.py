@@ -74,6 +74,7 @@ def _docker_manage_args(image_name, settings='docker_dev_settings'):
     return [
         'run',
         '-i', '-t',
+        '-p 8000',
         '-h=unisubs.example.com',
         '-cidfile=%s' % cid_path(image_name),
         '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,

@@ -17,9 +17,12 @@
 // http://www.gnu.org/licenses/agpl-3.0.html.
 
 (function() {
-    var module = angular.module('amara.SubtitleEditor.modal', []);
+    var module = angular.module('amara.SubtitleEditor.modal', [
+        'amara.SubtitleEditor.blob',
+        'amara.SubtitleEditor.subtitles.services',
+        ]);
 
-    module.controller('ModalController', function($scope, SubtitleStorage) {
+    module.controller('ModalController', function($scope, Blob, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the modal.
          * @param $scope
@@ -29,6 +32,15 @@
 
         $scope.isVisible = true;
         $scope.content = null;
+        $scope.showDownloadLink = false;
+
+        function canUseBlobURL() {
+            // FileSaver doesn't work correctly with Safari, so we disable
+            // using blobs to create a direct download link.  See #751 for
+            // more info.
+            return (navigator.userAgent.indexOf('Safari') == -1 ||
+                navigator.userAgent.indexOf('Chrome') > -1);
+        }
 
         $scope.hide = function() {
 
@@ -53,8 +65,18 @@
         });
         $scope.$root.$on('show-modal-download', function($event) {
 
-            $scope.content.dfxpString = $scope.workingSubtitles.subtitleList.toXMLString();
+            var data = $scope.workingSubtitles.subtitleList.toXMLString();
+            if(canUseBlobURL()) {
+                $scope.showDownloadLink = true;
+                $scope.downloadBlob = Blob.create(data, 'application/ttaf+xml');
+            } else {
+                $scope.content.dfxpString = data;
+            }
         });
+        $scope.onDownloadClick = function($event) {
+            $event.preventDefault();
+            window.saveAs($scope.downloadBlob, 'SubtitleBackup.dfxp');
+        }
         $scope.$root.$on('change-modal-heading', function($event, heading) {
             if ($scope.content) {
                 $scope.content.heading = heading;
@@ -62,4 +84,17 @@
             }
         });
     });
+    module.controller('DebugModalController', function($scope) {
+        $scope.isVisible = false;
+
+        $scope.close = function($event) {
+            $scope.isVisible = false;
+            $event.stopPropagation();
+            $event.preventDefault();
+        }
+
+        $scope.$root.$on('show-debug-modal', function($event, heading) {
+            $scope.isVisible = true;
+        });
+    })
 }).call(this);

@@ -87,5 +87,6 @@
                 "name": "English"
             },
         ],
+        'staticURL': 'http://example.com/'
     });
 }).call(this);

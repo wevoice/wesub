@@ -40,7 +40,22 @@
 
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown }">
-
+    {% if DEBUG %}
+    <div class="modal"
+        ng-controller="DebugModalController"
+        ng-show="isVisible">
+        <div class="content inner">
+            <p>
+            <label>
+                <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
+            </label>
+            </p>
+            <div class=".buttons">
+                <button class="no" ng-click="close($event)">Close</button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="modal"
         ng-controller="ModalController"
         ng-show="isVisible">
@@ -54,7 +69,13 @@
             <p ng-show="content.text">[[ content.text ]]</p>
             <div ng-show="content.dfxpString" class="download">
                 <textarea class="download" ng-show="content.dfxpString">[[ content.dfxpString ]]</textarea>
-                <p>Copy the subtitles above and save them to your computer. You can upload them later.</p>
+                <p>Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later.</p>
+            </div>
+            <div ng-show="showDownloadLink" class="download">
+                <a class="button yes" href="#" ng-click="onDownloadClick($event)">Download Subtitles</a>
+                <p>
+                To avoid data corruption, please do not open or edit the subtitles in any text editor.
+                </p>
             </div>
             <div class="content.buttons"
                 ng-show="content.buttons.length">
@@ -81,6 +102,11 @@
         <section class="status right column group">
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
                 <div class="exit dropdown">
+                    {% if DEBUG %}
+                        <a href="#" ng-click="showDebugModal($event)">
+                            Debug
+                        </a>
+                    {% endif %}
                     <a class="discard" href="#" ng-click="discard()">
                         Exit
                     </a>
@@ -148,26 +174,11 @@
                 </div>
             </div>
             <div class="subtitles-wrapper">
-                <div class="reference subtitles">
-                    <ul subtitle-list="reference-subtitle-set"
-                        dir="[[ referenceSubtitles.language.dir ]]">
-
-<!-- 
-subtitle-repeat directive, see the working subtitles for more info
--->
-                        <li subtitle-repeat="referenceSubtitles.subtitleList"
-                            conditional-class="subtitle.isEmpty():empty,subtitle.startOfParagraph:paragraph-start"
-                            class="subtitle-list-item">
-                            <span class="timing">
-                                [[ subtitle.startTime | displayTime ]]
-                            </span>
-                            <span class="new-paragraph">
-                              ¶
-                            </span>
-                            <span class="subtitle-text">[[ subtitle.content() ]]</span>
-                        </li>
-
-                    </ul>
+                <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
+                    <ul class="subtitle-list"
+                        subtitle-repeat="referenceSubtitles.subtitleList"
+                        dir="[[ referenceSubtitles.language.dir ]]"
+                        read-only="yes"></ul>
 
                 </div>
                 <a ng-click="toggleScrollingSynced()"
@@ -273,47 +284,11 @@ subtitle-repeat directive, see the working subtitles for more info
                     </table>
                 </div>
 
-                <div class="working subtitles">
-                    <ul subtitle-list="working-subtitle-set"
+                <div class="working subtitles" subtitle-scroller="working-subtitle-set" />
+                    <ul class="subtitle-list"
+                        subtitle-repeat="workingSubtitles.subtitleList"
                         dir="[[ workingSubtitles.language.dir ]]"
-                        id="working-subtitle-set">
-<!--
-subtitle-repeat directive:
-
-We use this instead of ng-repeat because it's performs much better with large
-subtitle sets.  However, that performance comes at the cost of flexibility.
-We don't support arbitrary angular directives inside the element.  To see
-what is supported, check out tests/subtitleRepeatDirective.spec.
--->
-                        <li subtitle-repeat="workingSubtitles.subtitleList"
-                            class="subtitle-list-item"
-                            conditional-class="subtitle.startOfParagraph:paragraph-start,subtitle.isEmpty():empty"
-                            current-subtitle-class="current-subtitle"
-                            bind-to-edit="currentEdit.draft"
-                            edit-keydown="onEditKeydown"
-                            subtitle-click="edit">
-
-                            <span class="timing">
-                                [[ subtitle.startTime | displayTime ]]
-                            </span>
-
-                            <div class="hover">
-                                <a href="#" class="remove-subtitle"
-                                    subtitle-click="remove">
-                                    Remove
-                                </a>
-                                <a href="#" class="add-subtitle"
-                                    subtitle-click="insert"></a>
-                            </div>
-                            <span class="arrow"></span>
-                            <a href="#" class="new-paragraph"
-                               subtitle-click="changeParagraph">
-                              ¶
-                            </a>
-                            <span class="subtitle-text">[[ subtitle.content() ]]</span>
-                        </li>
-
-                    </ul>
+                        id="working-subtitle-set"></ul>
 
                     <div ng-switch="bottomState()">
                         <a class="end"
