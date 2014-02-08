@@ -189,6 +189,9 @@ class TestCaseCenter(WebdriverTestCase):
         management.call_command('flush', verbosity=0, interactive=False)
 
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())
+
     def setUp(self):
         self.video_pg.open_page('auth/login/', True)
         self.video_pg.log_in(self.user.username, 'password')
@@ -364,7 +367,7 @@ class TestCaseCenter(WebdriverTestCase):
         self.editor_pg.toggle_playback()
         self.editor_pg.sync(1, sub_length=2, sub_space=2)
 
-        for x in range(0, 20):
+        for x in range(0, 17):
             self.editor_pg.sync(1, sub_length=1, sub_space=.05)
             self.assertTrue(self.editor_pg.sync_help_displayed())
         self.editor_pg.exit()
