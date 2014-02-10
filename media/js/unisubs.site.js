@@ -368,6 +368,7 @@ var Site = function(Site) {
                     });
                     e.preventDefault();
                 });
+                $('a.open-modal.start-open').click();
                 $('.action-close, .close', '.bootstrap').click(function(){
                     closeModal($(this).parents('.modal'));
                     return false;

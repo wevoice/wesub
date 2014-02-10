@@ -63,7 +63,7 @@ from apps.videos.decorators import get_video_revision, get_video_from_code
 from apps.videos.forms import (
     VideoForm, FeedbackForm, EmailFriendForm, UserTestResultForm,
     CreateVideoUrlForm, TranscriptionFileForm, AddFromFeedForm,
-    ChangeVideoOriginalLanguageForm
+    ChangeVideoOriginalLanguageForm, CreateSubtitlesForm,
 )
 from apps.videos.models import (
     Video, Action, SubtitleLanguage, VideoUrl, AlreadyEditingException
@@ -303,6 +303,8 @@ class VideoPageContext(dict):
     def __init__(self, request, video, video_url, tab, tab_only=False):
         dict.__init__(self)
         self['video'] = video
+        self['create_subtitles_form'] = CreateSubtitlesForm(
+            video, request.POST or None)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -393,6 +395,11 @@ def video(request, video, video_url=None, title=None):
         template_name = 'videos/video-%s.html' % tab
         context = VideoPageContext(request, video, video_url, tab)
     context['tab'] = tab
+
+    create_subtitles_form = context['create_subtitles_form']
+    if create_subtitles_form.is_valid():
+        create_subtitles_form.set_primary_audio_language()
+        return redirect(create_subtitles_form.editor_url())
 
     return render(request, template_name, context)
 

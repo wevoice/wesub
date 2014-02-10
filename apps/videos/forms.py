@@ -23,6 +23,7 @@ from datetime import datetime
 from django import forms
 from django.conf import settings
 from django.core.mail import EmailMessage, send_mail
+from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
 from django.utils.safestring import mark_safe
@@ -39,11 +40,17 @@ from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexF
 from utils.http import url_exists
 from utils.translation import get_language_choices
 
-ALL_LANGUAGES = [(val, _(name)) for val, name in settings.ALL_LANGUAGES]
 KB_SIZELIMIT = 512
 
 import logging
 logger = logging.getLogger("videos-forms")
+
+def language_choices():
+    choices = [
+        ('', _('--Select language--'))
+    ]
+    choices.extend(get_language_choices())
+    return choices
 
 class TranscriptionFileForm(forms.Form, AjaxForm):
     txtfile = forms.FileField()
@@ -345,9 +352,34 @@ class EmailFriendForm(MathCaptchaForm):
         send_mail(subject, message, from_email, to_emails)
 
 class ChangeVideoOriginalLanguageForm(forms.Form):
-    language_code = forms.ChoiceField(choices=ALL_LANGUAGES)
+    language_code = forms.ChoiceField(choices=language_choices())
 
-    def __init__(self, *args, **kwargs):
-        super(ChangeVideoOriginalLanguageForm, self).__init__(*args, **kwargs)
+class CreateSubtitlesForm(forms.Form):
+    subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'),
+                                               choices=language_choices())
 
-        self.fields['language_code'].choices = [('', '--Select language--')] + get_language_choices()
+    def __init__(self, video, *args, **kwargs):
+        super(CreateSubtitlesForm, self).__init__(*args, **kwargs)
+        self.video = video
+        if self.needs_primary_audio_language:
+            self.fields['primary_audio_language_code'] = forms.ChoiceField(
+                label=_('This video is in:'),
+                help_text=_('Please double check the primary spoken '
+                            'language. This step cannot be undone.'),
+                choices=language_choices())
+
+    @property
+    def needs_primary_audio_language(self):
+        return not bool(self.video.primary_audio_language_code)
+
+    def set_primary_audio_language(self):
+        if self.needs_primary_audio_language:
+            self.video.primary_audio_language_code = \
+                    self.cleaned_data['primary_audio_language_code']
+            self.video.save()
+
+    def editor_url(self):
+        return reverse('subtitles:subtitle-editor', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': self.cleaned_data['subtitle_language_code'],
+        })

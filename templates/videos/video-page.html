@@ -46,7 +46,7 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
 {% block main_content %}
     {% if saved %}
         <div id="messages">
-            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add atranslation, click the button below.{% endblocktrans %}</p>
+            <p>{% blocktrans %}Subtitles saved! You can share the video with friends, or get an embed code for your site. To add a translation, click the button below.{% endblocktrans %}</p>
             <a href="#" id="closeBut">{% trans "Close" %}</a>
         </div>
     {% endif %}
@@ -91,12 +91,9 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
                 {% endblocktrans %}
             </p>
             {% elif can_create_subs or can_create_trans %}
-                {% if video.languages_count = 0 and can_create_subs %}
-                    <a href="#" class="add-subtitles icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-                    <p>{% trans "This video doesn't have any subtitles yet." %} <a href="#" class="add-subtitles">{% trans 'Create subtitles now!' %}</a></p>
-                {% elif video.languages_count > 0 and can_create_trans %}
-                    <a href="#" class="add-translation icon"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-                    <p>{% trans "Don't see one of your languages?" %}<br /><a class="add-translation" id="add_translation " href="#">{% trans 'Create a new translation!' %}</a><p/>
+                {% if can_create_subs %}
+                <a href="#create-subtitles-modal" class="icon open-modal{% if create_subtitles_form.is_bound %} start-open{% endif %}"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
+                    <p>{% trans "This video doesn't have any subtitles yet." %} <a href="#create-subtitles-modal" class="open-modal">{% trans 'Create subtitles now!' %}</a></p>
                 {% endif %}
                 {% upload_subtitles video %}
             </p>
@@ -124,6 +121,36 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
         </ul>
         <div id="tab-container">{% block tab %}{% endblock %}</div>
     </div>
+    <div class="bootstrap">
+        <div id="create-subtitles-modal" class="modal">
+            <div class="modal-header">
+                <a href="#" class="close action-close">x</a>
+                <h3>{% trans 'Create Subtitles' %}</h3>
+            </div>
+            
+            <form method="post" action="">
+                <div class="modal-body">
+                    <div class="global-errors"></div>
+                    {% if create_subtitles_form.needs_primary_audio_language %}
+                        <p>
+                            {% include "_form_field.html" with field=create_subtitles_form.primary_audio_language_code %}
+                        </p>
+                    {% else %}
+                        <p>{% blocktrans with language=video.get_primary_audio_language_code_display %}This video is in {{ language }}{% endblocktrans %}</p>
+                    {% endif %}
+                    <p>
+                        {% include "_form_field.html" with field=create_subtitles_form.subtitle_language_code %}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <p class="button-container">
+                        <button>{% trans 'Continue' %}</button>
+                    </p>
+                </div>
+                {% csrf_token %}
+            </form>
+        </div>
+    </div>
 {% endblock %}
 
 {% block page_controls %}
@@ -145,5 +172,3 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
         </ul>
     {% endif %}
 {% endblock %}
-  
-trans
