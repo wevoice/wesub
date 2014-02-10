@@ -304,7 +304,7 @@ class VideoPageContext(dict):
         dict.__init__(self)
         self['video'] = video
         self['create_subtitles_form'] = CreateSubtitlesForm(
-            video, request.POST or None)
+            video, request.user, request.POST or None)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)

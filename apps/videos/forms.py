@@ -38,14 +38,14 @@ from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
 from utils.forms import AjaxForm, EmailListField, UsernameListField, StripRegexField, FeedURLField, ReCaptchaField
 from utils.http import url_exists
-from utils.translation import get_language_choices
+from utils.translation import get_language_choices, get_user_languages_from_request
 
 KB_SIZELIMIT = 512
 
 import logging
 logger = logging.getLogger("videos-forms")
 
-def language_choices():
+def language_choices_with_empty():
     choices = [
         ('', _('--Select language--'))
     ]
@@ -352,21 +352,43 @@ class EmailFriendForm(MathCaptchaForm):
         send_mail(subject, message, from_email, to_emails)
 
 class ChangeVideoOriginalLanguageForm(forms.Form):
-    language_code = forms.ChoiceField(choices=language_choices())
+    language_code = forms.ChoiceField(choices=language_choices_with_empty())
 
 class CreateSubtitlesForm(forms.Form):
-    subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'),
-                                               choices=language_choices())
+    subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'))
 
-    def __init__(self, video, *args, **kwargs):
+    def __init__(self, video, user, *args, **kwargs):
         super(CreateSubtitlesForm, self).__init__(*args, **kwargs)
         self.video = video
+        self.user = user
+        self.setup_subtitle_language_code()
         if self.needs_primary_audio_language:
             self.fields['primary_audio_language_code'] = forms.ChoiceField(
                 label=_('This video is in:'),
                 help_text=_('Please double check the primary spoken '
                             'language. This step cannot be undone.'),
-                choices=language_choices())
+                choices=language_choices_with_empty())
+
+
+    def setup_subtitle_language_code(self):
+        field = self.fields['subtitle_language_code']
+        if self.user.is_authenticated():
+            user_langs = [l.language for l in self.user.get_languages()]
+        else:
+            user_langs = get_user_languages_from_request()
+            if not user_langs:
+                user_langs = ['en']
+        current_langs = set(l.language_code for l in
+                            self.video.newsubtitlelanguage_set.having_versions())
+        field.choices = [choice for choice in get_language_choices()
+                         if choice[0] not in current_langs]
+        def sort_key(choice):
+            code, label = choice
+            if code in user_langs:
+                return user_langs.index(code)
+            else:
+                return len(user_langs)
+        field.choices.sort(key=sort_key)
 
     @property
     def needs_primary_audio_language(self):
