@@ -1,5 +1,8 @@
 @charset "UTF-8";
 
+// Fonts
+$Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
+
 @mixin border-radius($radius: 5px) {
     -moz-background-clip: padding-box;
     -moz-border-radius: $radius;
@@ -122,6 +125,99 @@ body {
                 padding-top: 0;
             }
         }
+    }
+    .editor-style-modal {
+            @include border-radius(3px);
+            @include box-shadow(0, 0, 30px, rgba(black, .4));
+            background: #212223;
+            color: #F1F1F1;
+            padding: 40px;
+            font: normal 1.1em $Helvetica;
+
+            h3 {
+                font: normal 17px $Helvetica;
+                margin-bottom: 20px;
+                color: inherit;
+                border-bottom: 1px solid #777;
+            }
+
+            table {
+                background: transparent;
+                width: auto;
+                font-size: inherit;
+
+                td, th {
+                    padding: 0 0 10px 0;
+                    margin: 0;
+                    border: none;
+                    font-weight: normal;
+                    line-height: 20px;
+                }
+
+                tr.with-help td, tr.with-help th {
+                    padding-bottom: 0;
+                }
+
+                td {
+
+                    &.errors {
+                        padding-bottom: 0;
+                    }
+
+                    &.notation {
+                        margin-top: -18px;
+                    }
+                }
+
+                th {
+                    padding-right: 9px;
+                }
+
+                tr {
+                    border: none;
+                }
+            }
+
+            ul.errorlist {
+                margin: 0;
+
+                li {
+                    color: inherit;
+                }
+            }
+
+
+            label {
+                color: inherit;
+                margin-right: 0.5em;
+            }
+
+            select {
+                color: #333;
+                line-height: 20px;
+                height: 20px;
+            }
+
+            button {
+                background: solid #29B0BF;
+                background-image: none;
+                padding: 5px 20px;
+                border: 0;
+
+                &:hover {
+                    background: solid #29B0BF;
+                    background-image: none;
+                }
+
+                &.close {
+                    @include opacity(1.0);
+                    background: #4A4B4C;
+
+                    &:hover {
+                        color: inherit;
+                    }
+                }
+            }
     }
     .upload-draft-modal {
 
