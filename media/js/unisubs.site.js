@@ -299,6 +299,24 @@ var Site = function(Site) {
             });
         }
     };
+    this.openModalDialog = function(modal_id) {
+        var $target = $(modal_id);
+        $target.show();
+        $('body').append('<div class="well"></div>');
+
+        $target.click(function(event){
+            event.stopPropagation();
+        });
+
+        $('html').bind('click.modal', function() {
+            that.closeModal($target);
+        });
+    };
+    this.closeModal = function(elt) {
+        elt.hide();
+        $('body div.well').remove();
+        $('html').unbind('click.modal');
+    }
     this.Views = {
         /*
          * Each of these views runs on a specific
@@ -355,29 +373,14 @@ var Site = function(Site) {
             }
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
-                    $target = $($(this).attr('href'));
-                    $target.show();
-
-                    $('body').append('<div class="well"></div>');
-
-                    $target.click(function(event){
-                        event.stopPropagation();
-                    });
-                    $('html').bind('click.modal', function() {
-                        closeModal($target);
-                    });
+                    that.openModalDialog($(this).attr('href'));
                     e.preventDefault();
                 });
                 $('a.open-modal.start-open').click();
                 $('.action-close, .close', '.bootstrap').click(function(){
-                    closeModal($(this).parents('.modal'));
+                    that.closeModal($(this).parents('.modal'));
                     return false;
                 });
-                function closeModal(e) {
-                    e.hide();
-                    $('body div.well').remove();
-                    $('html').unbind('click.modal');
-                }
             }
             $.fn.tabs = function(options){
                 this.each(function(){

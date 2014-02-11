@@ -65,6 +65,7 @@ unisubs.widget.SubtitleController.prototype.videoAnchorClicked_ =
     function(e) 
 {
     e.preventDefault();
+    e.stopPropagation();
     unisubs.Tracker.getInstance().trackPageview('videoTabClicked');
     var resumeEditingRecord = null;
     if (!unisubs.IS_NULL && unisubs.supportsLocalStorage()) {
@@ -114,14 +115,11 @@ unisubs.widget.SubtitleController.prototype.videoAnchorClickedImpl_ = function()
 };
 
 unisubs.widget.SubtitleController.prototype.improveSubtitles = function() {
-    var state  = this.playController_.getSubtitleState();
-    this.dialogOpener_.openDialogOrRedirect(
-        new unisubs.widget.OpenDialogArgs(
-            state.LANGUAGE,
-            null,
-            state.LANGUAGE_PK,
-            state.BASE_LANGUAGE_CODE),
-        this.playController_.getVideoSource().getVideoURL());
+    var language  = this.playController_.getSubtitleState().LANGUAGE
+
+    var uri = unisubs.siteURL() + '/subtitles/editor/' + this.videoID_ + "/" + language + "/";
+
+    window.location.assign(uri);
 };
 
 /**
@@ -137,8 +135,7 @@ unisubs.widget.SubtitleController.prototype.openSubtitleDialog =
 unisubs.widget.SubtitleController.prototype.openNewLanguageDialog = 
     function(opt_langState) 
 {
-    this.dialogOpener_.showStartDialog(
-        this.playController_.getVideoSource().getVideoURL(), opt_langState);
+    site.openModalDialog('#create-subtitles-modal');
 };
 
 unisubs.widget.SubtitleController.prototype.subtitleDialogClosed_ = function(e) {
