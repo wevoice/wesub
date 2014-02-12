@@ -377,7 +377,8 @@ def video(request, video, video_url=None, title=None):
     if not video_url and ((video.title_for_url() and not video.title_for_url() == title) or (not video.title and title)):
         return redirect(video, permanent=True)
 
-    video.update_view_counter()
+    if request.method != 'POST':
+        video.update_view_counter()
 
     tab = request.GET.get('tab')
     if tab not in ('urls', 'comments', 'activity', 'video'):
@@ -394,10 +395,8 @@ def video(request, video, video_url=None, title=None):
         context = VideoPageContext(request, video, video_url, tab)
     context['tab'] = tab
 
-    create_subtitles_form = context['create_subtitles_form']
-    if create_subtitles_form.is_valid():
-        create_subtitles_form.set_primary_audio_language()
-        return redirect(create_subtitles_form.editor_url())
+    if context['create_subtitles_form'].is_valid():
+        return context['create_subtitles_form'].handle_post()
 
     return render(request, template_name, context)
 
@@ -551,6 +550,8 @@ class LanguagePageContext(dict):
         self['language'] = language
         self['version'] = version
         self['user'] = request.user
+        self['create_subtitles_form'] = CreateSubtitlesForm(
+            video, request.user, request.POST or None)
         if not tab_only:
             video.prefetch_languages(with_public_tips=True,
                                      with_private_tips=True)
@@ -711,10 +712,12 @@ def language_subtitles(request, video, lang, lang_id, version_id=None):
         template_name = 'videos/language-%s.html' % tab
         context = ContextClass(request, video, lang, lang_id, version_id)
         context['tab'] = tab
-        if 'tab' not in request.GET:
+        if 'tab' not in request.GET and request.method != 'POST':
             # we only want to update the view counter if this request wasn't
             # the result of a tab click.
             video.update_view_counter()
+    if context['create_subtitles_form'].is_valid():
+        return context['create_subtitles_form'].handle_post()
     return render(request, template_name, context)
 
 def _widget_params(request, video, version_no=None, language=None, video_url=None, size=None):

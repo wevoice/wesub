@@ -24,6 +24,7 @@ from django import forms
 from django.conf import settings
 from django.core.mail import EmailMessage, send_mail
 from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.utils.encoding import force_unicode, DjangoUnicodeDecodeError
 from django.utils.safestring import mark_safe
@@ -405,3 +406,7 @@ class CreateSubtitlesForm(forms.Form):
             'video_id': self.video.video_id,
             'language_code': self.cleaned_data['subtitle_language_code'],
         })
+
+    def handle_post(self):
+        self.set_primary_audio_language()
+        return redirect(self.editor_url())
