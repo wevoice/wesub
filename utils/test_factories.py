@@ -24,7 +24,7 @@ import itertools
 
 from django.contrib.auth.hashers import make_password
 
-from apps.auth.models import CustomUser as User
+from apps.auth.models import CustomUser as User, UserLanguage
 from apps.teams.models import (Project, Team, Task, TeamMember, TeamVideo,
                                Workflow)
 from apps.videos.types import video_type_registrar
@@ -46,12 +46,16 @@ def create_user(password=None, **kwargs):
         'notify_by_email': True,
         'valid_email': True,
     }
+    languages = kwargs.pop('languages', [])
     defaults.update(kwargs)
     if password is not None:
         defaults['password'] = make_password(password)
     else:
         defaults['password'] = make_password('password')
-    return User.objects.create(**defaults)
+    user = User.objects.create(**defaults)
+    for language in languages:
+        UserLanguage.objects.create(user=user, language=language)
+    return user
 
 create_video_counter = itertools.count()
 def create_video(url=None, video_type='H', **kwargs):

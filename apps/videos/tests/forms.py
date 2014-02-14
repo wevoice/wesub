@@ -18,12 +18,17 @@
 # http://www.gnu.org/licenses/agpl-3.0.html.
 
 from django.test import TestCase
+from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 import mock
 
-from videos.forms import AddFromFeedForm, VideoForm
+from subtitles import pipeline
+from videos.forms import AddFromFeedForm, VideoForm, CreateSubtitlesForm
 from videos.models import Video, VideoFeed
 from videos.types import video_type_registrar
 from utils import test_factories, test_utils
+from utils.translation import get_language_choices
 
 class TestVideoForm(TestCase):
     def setUp(self):
@@ -142,3 +147,118 @@ class AddFromFeedFormTestCase(TestCase):
             feed_url=self.youtube_url('testuser'),
             usernames='testuser')
         self.assertNotEquals(form.errors, {})
+
+class CreateSubtitlesFormTest(TestCase):
+    @test_utils.patch_for_test('videos.forms.get_user_languages_from_request')
+    def setUp(self, mock_get_user_languages_from_request):
+        self.video = test_factories.create_video()
+        self.user = test_factories.create_user()
+        self.mock_get_user_languages_from_request = \
+                mock_get_user_languages_from_request
+
+    def make_mock_request(self):
+        mock_request = mock.Mock()
+        mock_request.user = self.user
+        return mock_request
+
+    def make_form(self, data=None):
+        return CreateSubtitlesForm(self.make_mock_request(), self.video,
+                                   data=data)
+
+    def test_needs_primary_audio_language(self):
+        self.video.primary_audio_language_code = ''
+        self.assertEquals(self.make_form().needs_primary_audio_language, True)
+
+        self.video.primary_audio_language_code = 'en'
+        self.assertEquals(self.make_form().needs_primary_audio_language, False)
+
+    def test_subtitle_language_order(self):
+        # We should display a user's preferred languages first in our language
+        # list.  After that we should list all languages sorted by their label
+        def language_choices_ordered(*langs_on_top):
+            choice_map = dict((code, label)
+                              for (code, label) in get_language_choices())
+            rv = []
+            for code in langs_on_top:
+                rv.append((code, choice_map.pop(code)))
+            rv.extend(sorted(choice_map.items(),
+                             key=lambda choice: choice[1]))
+            return rv
+
+        self.user = test_factories.create_user(languages=['fr', 'es'])
+        self.assertEquals(
+            self.make_form()['subtitle_language_code'].field.choices,
+            language_choices_ordered('fr', 'es'))
+        # for anonymous users, we should call
+        # get_user_languages_from_request().  If that fails to return a
+        # usable result, then we default to english.
+        self.user = AnonymousUser()
+        self.mock_get_user_languages_from_request.return_value = ['pt-br']
+        self.assertEquals(
+            self.make_form()['subtitle_language_code'].field.choices,
+            language_choices_ordered('pt-br'))
+
+        self.mock_get_user_languages_from_request.return_value = []
+        self.assertEquals(
+            self.make_form()['subtitle_language_code'].field.choices,
+            language_choices_ordered('en'))
+
+    def test_subtitle_language_filter(self):
+        # test that we allow languages that already have subtitles
+        pipeline.add_subtitles(self.video, 'en', None)
+        pipeline.add_subtitles(self.video, 'fr', None)
+        self.assertEquals(
+            set(self.make_form()['subtitle_language_code'].field.choices),
+            set((code, label) for (code, label) in get_language_choices()
+                if code not in ('en', 'fr')))
+
+    def check_redirect(self, response, language_code):
+        self.assertEquals(response.__class__, HttpResponseRedirect)
+        correct_url = reverse('subtitles:subtitle-editor', kwargs={
+            'video_id': self.video.video_id,
+            'language_code': language_code,
+        })
+        self.assertEquals(response['Location'], correct_url)
+
+    def test_submit_video_has_no_primary_audio_language(self):
+        # test submitting when the primary audio language code is needed
+        self.video.primary_audio_language_code = ''
+        form = self.make_form({
+            'video_id': self.video.video_id,
+            'primary_audio_language_code': 'en',
+            'subtitle_language_code': 'fr',
+        })
+        self.assertEquals(form.is_valid(), True)
+        # handle_post should set the primary_audio_language_code, then
+        # redirect to the editor
+        response = form.handle_post()
+        self.assertEquals(self.video.primary_audio_language_code, 'en')
+        self.check_redirect(response, 'fr')
+
+        # try the same thing without primary_audio_language_code being
+        # present.
+        self.video.primary_audio_language_code = ''
+        form = self.make_form({
+            'video_id': self.video.video_id,
+            'subtitle_language_code': 'fr',
+        })
+        self.assertEquals(form.is_valid(), False)
+
+    def test_submit_video_has_primary_audio_language_set(self):
+        self.video.primary_audio_language_code = 'en'
+        form = self.make_form({
+            'video_id': self.video.video_id,
+            'subtitle_language_code': 'fr',
+        })
+        self.assertEquals(form.is_valid(), True)
+        # handle_post should set the primary_audio_language_code, then
+        # redirect to the editor
+        response = form.handle_post()
+        self.assertEquals(self.video.primary_audio_language_code, 'en')
+        self.check_redirect(response, 'fr')
+
+        # try the same thing without subtitle_language_code being present.
+        form = self.make_form({
+            'video_id': self.video.video_id,
+        })
+        self.assertEquals(form.is_valid(), False)

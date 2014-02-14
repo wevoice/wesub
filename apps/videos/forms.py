@@ -358,10 +358,11 @@ class ChangeVideoOriginalLanguageForm(forms.Form):
 class CreateSubtitlesForm(forms.Form):
     subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'))
 
-    def __init__(self, video, user, *args, **kwargs):
-        super(CreateSubtitlesForm, self).__init__(*args, **kwargs)
+    def __init__(self, request, video, data=None):
+        super(CreateSubtitlesForm, self).__init__(data=data)
         self.video = video
-        self.user = user
+        self.request = request
+        self.user = request.user
         self.setup_subtitle_language_code()
         if self.needs_primary_audio_language:
             self.fields['primary_audio_language_code'] = forms.ChoiceField(
@@ -370,13 +371,12 @@ class CreateSubtitlesForm(forms.Form):
                             'language. This step cannot be undone.'),
                 choices=language_choices_with_empty())
 
-
     def setup_subtitle_language_code(self):
         field = self.fields['subtitle_language_code']
         if self.user.is_authenticated():
             user_langs = [l.language for l in self.user.get_languages()]
         else:
-            user_langs = get_user_languages_from_request()
+            user_langs = get_user_languages_from_request(self.request)
             if not user_langs:
                 user_langs = ['en']
         current_langs = set(l.language_code for l in
