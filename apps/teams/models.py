@@ -2130,32 +2130,11 @@ class Task(models.Model):
         return reverse('teams:perform_task', args=(self.team.slug, self.id))
 
     def get_widget_url(self):
-
-        mode = Task.TYPE_NAMES[self.type].lower()
-
-        if self.get_subtitle_version():
-            sl = self.get_subtitle_version().subtitle_language
-            base_url = shims.get_widget_url(sl, mode=mode, task_id=self.pk)
-        else:
-            video = self.team_video.video
-
-            if self.language:
-                sl = video.subtitle_language(language_code=self.language)
-
-                if sl:
-                    base_url = reverse("videos:translation_history", kwargs={
-                        "video_id": video.video_id,
-                        "lang": sl.language_code,
-                        "lang_id": sl.pk,
+        """Get the URL to edit the video for this task.  """
+        return reverse("subtitles:subtitle-editor", kwargs={
+                        "video_id": self.team_video.video.video_id,
+                        "language_code": self.language
                     })
-                else:
-                    # The subtitleLanguage may not exist (yet).
-                    base_url = video.get_absolute_url()
-            else:
-                # Subtitle tasks might not have a language.
-                base_url = video.get_absolute_url()
-
-        return base_url + "?t=%s" % self.pk
 
     def needs_start_dialog(self):
         """Check if this task needs the start dialog.

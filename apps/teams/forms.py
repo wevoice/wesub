@@ -22,6 +22,8 @@ from auth.models import CustomUser as User
 from django import forms
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -34,7 +36,7 @@ from apps.teams.permissions import (
     can_assign_task, can_delete_language, can_remove_video
 )
 from apps.teams.permissions_const import ROLE_NAMES
-from apps.videos.forms import AddFromFeedForm
+from apps.videos.forms import AddFromFeedForm, language_choices_with_empty
 from apps.videos.models import (
         VideoMetadata, VIDEO_META_TYPE_IDS, Video, VideoFeed,
 )
@@ -711,3 +713,55 @@ def make_billing_report_form():
                                  initial=BillingReport.TYPE_BILLING_RECORD)
     return BillingReportForm
 
+class DashboardCreateSubtitlesForm(forms.Form):
+    #video = forms.ModelChoiceField(queryset=Video.objects.none(),
+    # widget=forms.HiddenInput)
+    video = forms.ModelChoiceField(queryset=Video.objects.none(),
+                                   widget=forms.HiddenInput)
+    primary_audio_language_code = forms.ChoiceField(
+                label=_('This video is in:'),
+                help_text=_('Please double check the primary spoken '
+                            'language. This step cannot be undone.'),
+                choices=language_choices_with_empty())
+    subtitle_language_code = forms.ChoiceField(
+        label=_('Subtitle into:'), choices=language_choices_with_empty())
+
+    def __init__(self, request, team, data=None):
+        super(DashboardCreateSubtitlesForm, self).__init__(data=data)
+        self.request = request
+        self.user = request.user
+        self.fields['video'].queryset = team.videos
+        self.setup_subtitle_language_code()
+
+    def setup_subtitle_language_code(self):
+        if self.user.is_authenticated():
+            user_langs = [l.language for l in self.user.get_languages()]
+        else:
+            user_langs = get_user_languages_from_request(self.request)
+            if not user_langs:
+                user_langs = ['en']
+        def sort_key(choice):
+            code, label = choice
+            if code in user_langs:
+                return user_langs.index(code)
+            else:
+                return len(user_langs)
+        field = self.fields['subtitle_language_code']
+        field.choices = sorted(get_language_choices(), key=sort_key)
+
+    def set_primary_audio_language(self):
+        lang = self.cleaned_data['primary_audio_language_code']
+        video = self.cleaned_data['video']
+        if lang != video.primary_audio_language_code:
+            video.primary_audio_language_code = lang
+            video.save()
+
+    def editor_url(self):
+        return reverse('subtitles:subtitle-editor', kwargs={
+            'video_id': self.cleaned_data['video'].video_id,
+            'language_code': self.cleaned_data['subtitle_language_code'],
+        })
+
+    def handle_post(self):
+        self.set_primary_audio_language()
+        return redirect(self.editor_url())

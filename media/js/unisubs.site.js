@@ -786,6 +786,17 @@ var Site = function(Site) {
             $('.dropdown').click(function(){
                 return false;
             });
+            $('a.open-create-subtitles').click(function(evt) {
+                var $this = $(this);
+                evt.preventDefault();
+                evt.stopPropagation();
+                $('#create-subtitles-modal input[name=video]').val($this.data('video-id'));
+                that.openModalDialog('#create-subtitles-modal');
+            });
+            $('#create-subtitles-modal button.close').click(function(evt) {
+                evt.preventDefault();
+                that.closeModal($('#create-subtitles-modal'));
+            });
         },
         team_videos_list: function() {
             $form = $('form', 'div#remove-modal');

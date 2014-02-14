@@ -50,7 +50,7 @@ from teams.forms import (
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
-    make_billing_report_form,
+    make_billing_report_form, DashboardCreateSubtitlesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -1182,6 +1182,14 @@ def dashboard(request, slug):
     except TeamMember.DoesNotExist:
         member = None
 
+    if member:
+        create_subtitles_form = DashboardCreateSubtitlesForm(
+            request, team, data=request.POST or None)
+        if create_subtitles_form.is_valid():
+            return create_subtitles_form.handle_post()
+    else:
+        create_subtitles_form = None
+
     if user:
         user_languages = set([ul for ul in user.get_languages()])
         user_filter = {'assignee':str(user.id), 'language': 'all'}
@@ -1193,10 +1201,6 @@ def dashboard(request, slug):
         user_tasks = None
 
     filters = {'assignee': 'none'}
-
-    widget_settings = {}
-    from apps.widget.rpc import add_general_settings
-    add_general_settings(request, widget_settings)
 
     videos = []
 
@@ -1273,7 +1277,7 @@ def dashboard(request, slug):
         'user_tasks': user_tasks,
         'videos': videos,
         'can_add_video': can_add_video(team, request.user),
-        'widget_settings': widget_settings
+        'create_subtitles_form': create_subtitles_form,
     }
 
     return context
