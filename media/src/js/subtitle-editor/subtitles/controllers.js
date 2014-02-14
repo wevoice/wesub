@@ -144,12 +144,7 @@ var angular = angular || null;
         $scope.changesMade = false;
         $scope.notesChanged = false;
         $scope.nextVersionNumber = null;
-        $scope.fromOldEditor = Boolean(EditorData.oldEditorURL);
         $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
-
-        if ($scope.fromOldEditor) {
-            $scope.dialogURL = EditorData.oldEditorURL;
-        }
 
         $scope.saveDisabled = function() {
             return !($scope.changesMade || $scope.notesChanged);
@@ -335,14 +330,6 @@ var angular = angular || null;
                 });
             }
 
-            if ($scope.fromOldEditor) {
-                buttons.push({
-                    'text': 'Back to full editor', 'class': 'yes', 'fn': function() {
-                        window.location = $scope.dialogURL;
-                    }
-                });
-            }
-
             buttons.push({
                 'text': 'Exit', 'class': 'no', 'fn': function() {
                     window.location = $scope.primaryVideoURL;
@@ -361,6 +348,37 @@ var angular = angular || null;
 
             $scope.$root.$emit('show-modal', {
                 heading: closeDialogTitle(allowResume),
+                buttons: buttons
+            });
+        };
+        $scope.switchToLegacyEditor = function($event) {
+            $event.preventDefault();
+            if(!$scope.changesMade) {
+                window.location = EditorData.oldEditorURL;
+                return;
+            }
+
+            var heading = "You have unsaved changes.  If you switch now you will lose you're work";
+
+            buttons = [
+                {
+                    text: 'Continue editing',
+                    class: 'no',
+                    fn: function() {
+                        $scope.$root.$emit('hide-modal');
+                    },
+                },
+                {
+                    text: 'Discard chnges',
+                    class: 'yes',
+                    fn: function() {
+                        window.location = EditorData.oldEditorURL;
+                    },
+                },
+            ];
+
+            $scope.$root.$emit('show-modal', {
+                heading: heading,
                 buttons: buttons
             });
         };
