@@ -714,8 +714,6 @@ def make_billing_report_form():
     return BillingReportForm
 
 class DashboardCreateSubtitlesForm(forms.Form):
-    #video = forms.ModelChoiceField(queryset=Video.objects.none(),
-    # widget=forms.HiddenInput)
     video = forms.ModelChoiceField(queryset=Video.objects.none(),
                                    widget=forms.HiddenInput)
     primary_audio_language_code = forms.ChoiceField(

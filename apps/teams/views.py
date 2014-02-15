@@ -81,6 +81,7 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
+from videos.forms import CreateSubtitlesForm
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.tasks import (
@@ -1452,8 +1453,25 @@ def perform_task(request, slug=None, task_pk=None):
         task.assignee = request.user
         task.save()
 
-    # ... perform task ...
-    return HttpResponseRedirect(task.get_widget_url())
+    if not task.needs_start_dialog():
+        # ... perform task ...
+        return HttpResponseRedirect(task.get_widget_url())
+    else:
+        # need to set the language first
+        return start_subtitle_task(request, team, task)
+
+@render_to('teams/start-subtitle-task.html')
+def start_subtitle_task(request, team, task):
+    video = task.team_video.video
+    form = CreateSubtitlesForm(request, video, request.POST or None)
+    if form.is_valid():
+        task.language = form.cleaned_data['subtitle_language_code']
+        task.save()
+        return form.handle_post()
+    return {
+        'team': team,
+        'form': form,
+    }
 
 def _delete_subtitle_version(version):
     sl = version.subtitle_language
