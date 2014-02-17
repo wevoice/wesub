@@ -50,7 +50,7 @@ from teams.forms import (
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
-    make_billing_report_form, DashboardCreateSubtitlesForm,
+    make_billing_report_form
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -81,7 +81,7 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
-from videos.forms import CreateSubtitlesForm
+from videos.forms import CreateSubtitlesForm, MultiVideoCreateSubtitlesForm
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.tasks import (
@@ -1184,8 +1184,8 @@ def dashboard(request, slug):
         member = None
 
     if member:
-        create_subtitles_form = DashboardCreateSubtitlesForm(
-            request, team, data=request.POST or None)
+        create_subtitles_form = MultiVideoCreateSubtitlesForm(
+            request, team.videos, data=request.POST or None)
         if create_subtitles_form.is_valid():
             return create_subtitles_form.handle_post()
     else:

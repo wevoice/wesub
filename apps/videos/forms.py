@@ -34,6 +34,7 @@ from math_captcha.forms import MathCaptchaForm
 from apps.videos.feed_parser import FeedParser
 from apps.videos.models import Video, VideoFeed, UserTestResult, VideoUrl
 from apps.videos.permissions import can_user_edit_video_urls
+from teams.permissions import can_create_and_edit_subtitles
 from apps.videos.tasks import import_videos_from_feed
 from apps.videos.types import video_type_registrar, VideoTypeError
 from apps.videos.types.youtube import yt_service
@@ -355,58 +356,142 @@ class EmailFriendForm(MathCaptchaForm):
 class ChangeVideoOriginalLanguageForm(forms.Form):
     language_code = forms.ChoiceField(choices=language_choices_with_empty())
 
-class CreateSubtitlesForm(forms.Form):
+class CreateSubtitlesFormBase(forms.Form):
+    """Base class for forms to create new subtitle languages."""
     subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'))
-
-    def __init__(self, request, video, data=None):
-        super(CreateSubtitlesForm, self).__init__(data=data)
-        self.video = video
-        self.request = request
-        self.user = request.user
-        self.setup_subtitle_language_code()
-        if self.needs_primary_audio_language:
-            self.fields['primary_audio_language_code'] = forms.ChoiceField(
+    primary_audio_language_code = forms.ChoiceField(
                 label=_('This video is in:'),
                 help_text=_('Please double check the primary spoken '
                             'language. This step cannot be undone.'),
                 choices=language_choices_with_empty())
 
+    def __init__(self, request, data=None):
+        super(CreateSubtitlesFormBase, self).__init__(data=data)
+        self.request = request
+        self.user = request.user
+        self.setup_subtitle_language_code()
+
     def setup_subtitle_language_code(self):
-        field = self.fields['subtitle_language_code']
         if self.user.is_authenticated():
             user_langs = [l.language for l in self.user.get_languages()]
         else:
             user_langs = get_user_languages_from_request(self.request)
             if not user_langs:
                 user_langs = ['en']
-        current_langs = set(l.language_code for l in
-                            self.video.newsubtitlelanguage_set.having_versions())
-        field.choices = [choice for choice in get_language_choices()
-                         if choice[0] not in current_langs]
         def sort_key(choice):
             code, label = choice
             if code in user_langs:
                 return user_langs.index(code)
             else:
                 return len(user_langs)
-        field.choices.sort(key=sort_key)
-
-    @property
-    def needs_primary_audio_language(self):
-        return not bool(self.video.primary_audio_language_code)
+        field = self.fields['subtitle_language_code']
+        field.choices = sorted(get_language_choices(), key=sort_key)
 
     def set_primary_audio_language(self):
-        if self.needs_primary_audio_language:
-            self.video.primary_audio_language_code = \
-                    self.cleaned_data['primary_audio_language_code']
-            self.video.save()
+        video = self.get_video()
+        lang = self.cleaned_data['primary_audio_language_code']
+        video.primary_audio_language_code = lang
+        video.save()
 
     def editor_url(self):
         return reverse('subtitles:subtitle-editor', kwargs={
-            'video_id': self.video.video_id,
+            'video_id': self.get_video().video_id,
             'language_code': self.cleaned_data['subtitle_language_code'],
         })
 
     def handle_post(self):
         self.set_primary_audio_language()
         return redirect(self.editor_url())
+
+    def get_video(self):
+        """Get the video that the user wants to create subtiltes for."""
+        raise NotImplementedError()
+
+    def clean(self):
+        cleaned_data = super(CreateSubtitlesFormBase, self).clean()
+        team_video = self.get_video().get_team_video()
+        language_code = cleaned_data.get('subtitle_language_code')
+        if (team_video is not None and
+            not can_create_and_edit_subtitles(self.user, team_video,
+                                              language_code)):
+            raise forms.ValidationError("You don't have permissions to "
+                                        "edit that video")
+        return cleaned_data
+
+class CreateSubtitlesForm(CreateSubtitlesFormBase):
+    """Form to create subtitles for pages that display a single video.
+
+    This form is generally put in a modal dialog.  See
+    the video page for an example.
+    """
+
+    subtitle_language_code = forms.ChoiceField(label=_('Subtitle into:'))
+
+    def __init__(self, request, video, data=None):
+        self.video = video
+        super(CreateSubtitlesForm, self).__init__(request, data=data)
+        if not self.needs_primary_audio_language:
+            del self.fields['primary_audio_language_code']
+
+    def setup_subtitle_language_code(self):
+        super(CreateSubtitlesForm, self).setup_subtitle_language_code()
+        # remove languages that already have subtitles
+        current_langs = set(
+            l.language_code for l in
+            self.video.newsubtitlelanguage_set.having_versions())
+        field = self.fields['subtitle_language_code']
+        field.choices = [choice for choice in field.choices
+                         if choice[0] not in current_langs]
+
+    def set_primary_audio_language(self):
+        if self.needs_primary_audio_language:
+            super(CreateSubtitlesForm, self).set_primary_audio_language()
+
+    @property
+    def needs_primary_audio_language(self):
+        return not bool(self.video.primary_audio_language_code)
+
+    def get_video(self):
+        return self.video
+
+class MultiVideoCreateSubtitlesForm(CreateSubtitlesFormBase):
+    """Form to create subtitles for pages that display multiple videos.
+
+    This form is normally used with some javascript that alters the form
+    for a specific video.  This is done with a couple special things on the
+    <A> tag:
+        * Adding both the open-modal and multi-video-create-subtitles classes
+        * The multi_video_create_subtitles_data_attrs template filter, which
+          fills in a bunch of data attributes
+
+    See the team dashboard page for an example.
+    """
+    video = forms.ModelChoiceField(queryset=Video.objects.none(),
+                                   widget=forms.HiddenInput)
+    primary_audio_language_code = forms.ChoiceField(
+                label=_('This video is in:'),
+                help_text=_('Please double check the primary spoken '
+                            'language. This step cannot be undone.'),
+                choices=language_choices_with_empty())
+    subtitle_language_code = forms.ChoiceField(
+        label=_('Subtitle into:'), choices=language_choices_with_empty())
+
+    def __init__(self, request, video_queryset, data=None):
+        super(MultiVideoCreateSubtitlesForm, self).__init__(request, data=data)
+        self.fields['video'].queryset = video_queryset
+
+    def get_video(self):
+        return self.cleaned_data['video']
+
+    def clean(self):
+        cleaned_data = super(MultiVideoCreateSubtitlesForm, self).clean()
+        video = cleaned_data['video']
+        lang_code = cleaned_data['subtitle_language_code']
+        if video.subtitle_language(lang_code) is not None:
+            lang = video.subtitle_language(lang_code)
+            self._errors['subtitle_language_code'] = [
+                forms.ValidationError('%s subtitles already created',
+                                      params=lang.get_language_code_display())
+            ]
+            del cleaned_data['subtitle_language_code']
+        return cleaned_data

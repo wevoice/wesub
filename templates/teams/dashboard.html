@@ -185,7 +185,7 @@
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
                                         {% if not team_video.video.primary_audio_language_code or not team_video.languages %}
-                                        <a href="#" class="open-create-subtitles" data-video-id="{{team_video.video.id }}" title="Get started now">{% trans 'Create Subtitles' %}</a>
+                                        <a href="#" class="open-modal multi-video-create-subtitles" {{ team_video.video|multi_video_create_subtitles_data_attrs }} title="Get started now">{% trans 'Create Subtitles' %}</a>
                                         {% elif team_video.languages|length > 1 %}
                                             <a href="#" class="dropdown">
                                                 {{ team_video.languages|length }}
@@ -244,23 +244,6 @@
     </div>
 
     {% if create_subtitles_form %}
-    <div class="bootstrap">
-        <div id="create-subtitles-modal" class="modal editor-style-modal">
-            <form method="post" action="">
-                {% csrf_token %}
-                {{ create_subtitles_form.video }}
-                <h3>{% trans 'Create Subtitles' %}</h3>
-                <div class="global-errors"></div>
-                <table>
-                    {% include "_form_field_table.html" with field=create_subtitles_form.primary_audio_language_code %}
-                    {% include "_form_field_table.html" with field=create_subtitles_form.subtitle_language_code %}
-                </table>
-                <div class="buttons">
-                    <button>{% trans 'Continue' %}</button>
-                    <button class="close">{% trans 'Close' %}</button>
-                </div>
-            </form>
-        </div>
-    </div>
+        {% include 'videos/_multi-video-create-subtitles-form.html' %}
     {% endif %}
 {% endblock %}

@@ -317,6 +317,35 @@ var Site = function(Site) {
         $('body div.well').remove();
         $('html').unbind('click.modal');
     }
+    this.openMultiVideoCreateSubtitlesModal = function(link) {
+        var form = ('#multi-video-create-subtitles-modal');
+        var video_id = link.data('video-id');
+        var primary_audio_lang_code = link.data('video-primary-audio-lang-code');
+        var langs = link.data('video-langs').split(':');
+        var video_input = $('input[name=video]', form);
+        var primary_audio_lang_select = $('select[name=primary_audio_lang_code]', form);
+        var language_select = $('select[name=subtitle_language_code]', form);
+
+        video_input.val(video_id);
+        if(primary_audio_lang_code) {
+            primary_audio_lang_select.val(primary_audio_lang_code);
+            primary_audio_lang_select.attr('disabled', true);
+        } else {
+            primary_audio_lang_select.val('');
+            primary_audio_lang_select.attr('disabled', false);
+
+        }
+        $('option', language_select).attr('disabled', false);
+        _.each(langs, function(lang) {
+            $('option[value=' + lang + ']', language_select).attr('disabled',
+                true);
+
+        });
+        $("option:not([disabled]):first", language_select).attr('selected',
+                true);
+        that.openModalDialog('#multi-video-create-subtitles-modal');
+    }
+
     this.Views = {
         /*
          * Each of these views runs on a specific
@@ -373,8 +402,13 @@ var Site = function(Site) {
             }
             if ($('a.open-modal').length) {
                 $('a.open-modal').live('click',function(e){
-                    that.openModalDialog($(this).attr('href'));
                     e.preventDefault();
+                    e.stopPropagation();
+                    if($(this).hasClass('multi-video-create-subtitles')) {
+                        that.openMultiVideoCreateSubtitlesModal($(this));
+                    } else {
+                        that.openModalDialog($(this).attr('href'));
+                    }
                 });
                 $('a.open-modal.start-open').click();
                 $('.action-close, .close', '.bootstrap').click(function(){
@@ -785,17 +819,6 @@ var Site = function(Site) {
         team_dashboard: function() {
             $('.dropdown').click(function(){
                 return false;
-            });
-            $('a.open-create-subtitles').click(function(evt) {
-                var $this = $(this);
-                evt.preventDefault();
-                evt.stopPropagation();
-                $('#create-subtitles-modal input[name=video]').val($this.data('video-id'));
-                that.openModalDialog('#create-subtitles-modal');
-            });
-            $('#create-subtitles-modal button.close').click(function(evt) {
-                evt.preventDefault();
-                that.closeModal($('#create-subtitles-modal'));
             });
         },
         team_videos_list: function() {

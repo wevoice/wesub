@@ -24,7 +24,8 @@ from django.http import HttpResponseRedirect
 import mock
 
 from subtitles import pipeline
-from videos.forms import AddFromFeedForm, VideoForm, CreateSubtitlesForm
+from videos.forms import (AddFromFeedForm, VideoForm, CreateSubtitlesForm,
+                          MultiVideoCreateSubtitlesForm,)
 from videos.models import Video, VideoFeed
 from videos.types import video_type_registrar
 from utils import test_factories, test_utils
@@ -148,7 +149,7 @@ class AddFromFeedFormTestCase(TestCase):
             usernames='testuser')
         self.assertNotEquals(form.errors, {})
 
-class CreateSubtitlesFormTest(TestCase):
+class CreateSubtitlesFormTestBase(TestCase):
     @test_utils.patch_for_test('videos.forms.get_user_languages_from_request')
     def setUp(self, mock_get_user_languages_from_request):
         self.video = test_factories.create_video()
@@ -161,6 +162,7 @@ class CreateSubtitlesFormTest(TestCase):
         mock_request.user = self.user
         return mock_request
 
+class CreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
     def make_form(self, data=None):
         return CreateSubtitlesForm(self.make_mock_request(), self.video,
                                    data=data)
@@ -204,7 +206,7 @@ class CreateSubtitlesFormTest(TestCase):
             language_choices_ordered('en'))
 
     def test_subtitle_language_filter(self):
-        # test that we allow languages that already have subtitles
+        # test that we don't allow languages that already have subtitles
         pipeline.add_subtitles(self.video, 'en', None)
         pipeline.add_subtitles(self.video, 'fr', None)
         self.assertEquals(
@@ -224,7 +226,6 @@ class CreateSubtitlesFormTest(TestCase):
         # test submitting when the primary audio language code is needed
         self.video.primary_audio_language_code = ''
         form = self.make_form({
-            'video_id': self.video.video_id,
             'primary_audio_language_code': 'en',
             'subtitle_language_code': 'fr',
         })
@@ -239,7 +240,6 @@ class CreateSubtitlesFormTest(TestCase):
         # present.
         self.video.primary_audio_language_code = ''
         form = self.make_form({
-            'video_id': self.video.video_id,
             'subtitle_language_code': 'fr',
         })
         self.assertEquals(form.is_valid(), False)
@@ -247,7 +247,6 @@ class CreateSubtitlesFormTest(TestCase):
     def test_submit_video_has_primary_audio_language_set(self):
         self.video.primary_audio_language_code = 'en'
         form = self.make_form({
-            'video_id': self.video.video_id,
             'subtitle_language_code': 'fr',
         })
         self.assertEquals(form.is_valid(), True)
@@ -258,7 +257,33 @@ class CreateSubtitlesFormTest(TestCase):
         self.check_redirect(response, 'fr')
 
         # try the same thing without subtitle_language_code being present.
+        form = self.make_form({})
+        self.assertEquals(form.is_valid(), False)
+
+    def test_user_permissions_check(self):
+        team = test_factories.create_team(subtitle_policy=40)
+        test_factories.create_team_video(team=team, video=self.video)
         form = self.make_form({
-            'video_id': self.video.video_id,
+            'primary_audio_language_code': 'en',
+            'subtitle_language_code': 'fr',
+        })
+        # The form should be invalid, because our user doesn't have
+        # permissions to subtitle the video.
+        self.assertEquals(form.is_valid(), False)
+
+class MultiVideoCreateSubtitlesFormTest(CreateSubtitlesFormTestBase):
+    def make_form(self, data=None):
+        return MultiVideoCreateSubtitlesForm(self.make_mock_request(),
+                                             Video.objects.all(), data=data)
+
+    def test_submit_with_existing_language(self):
+        # test that submiting a subtitle language that's already created for
+        # our video fails
+        pipeline.add_subtitles(self.video, 'fr', None)
+        form = self.make_form({
+            'video': self.video.id,
+            'primary_audio_language_code': 'en',
+            'subtitle_language_code': 'fr',
         })
         self.assertEquals(form.is_valid(), False)
+        self.assertEquals(form.errors.keys(), ['subtitle_language_code'])
