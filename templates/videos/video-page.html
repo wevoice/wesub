@@ -92,7 +92,7 @@ window.WIDGET_SETTINGS = {{ widget_settings|safe }};
             </p>
             {% elif can_create_subs %}
                 <a href="#create-subtitles-modal" class="icon open-modal{% if create_subtitles_form.is_bound %} start-open{% endif %}"><img src="{{ STATIC_URL}}images/edit-subtitles.png"></a>
-                    <p>{% trans "This video doesn't have any subtitles yet." %} <a href="#create-subtitles-modal" class="open-modal">{% trans 'Create subtitles now!' %}</a></p>
+                    <p><a href="#create-subtitles-modal" class="open-modal">{% trans 'Add a new language!' %}</a></p>
                 {% upload_subtitles video %}
             </p>
             {% endif %}
