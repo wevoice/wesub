@@ -2129,6 +2129,13 @@ class Task(models.Model):
         """Return a URL for whatever dialog is used to perform this task."""
         return reverse('teams:perform_task', args=(self.team.slug, self.id))
 
+    def tasks_page_perform_link_text(self):
+        """Get the link text for perform link on the tasks page."""
+        if self.get_subtitle_version():
+            return _('Resume')
+        else:
+            return _('Start now')
+
     def get_widget_url(self):
         """Get the URL to edit the video for this task.  """
         return reverse("subtitles:subtitle-editor", kwargs={
@@ -2143,14 +2150,11 @@ class Task(models.Model):
         transcribe/translate task.  We don't need it for review/approval, or
         if the task is being resumed.
         """
-        # We use the start dialog for select several things:
+        # We use the start dialog for select two things:
         #   - primary audio language
         #   - language of the subtitles
-        #   - language to translate from
-        # If we have a SubtitleVersion to use, then we have all the info we
-        # need and can skip the dialog.
-        return (self.new_review_base_version is None and
-                self.get_subtitle_version() is None)
+        return (self.language == '' or
+                self.team_video.video.primary_audio_language_code == '')
 
     def get_reviewer(self):
         """For Approve tasks, return the last user to Review these subtitles.

@@ -58,16 +58,7 @@
                             <a href="{{ task.team_video.video.get_absolute_url }}" class="thumb"><img src="{{ task.team_video.get_thumbnail }}" alt="{{ task.team_video.title }}"></a>
                             <ul class="actions">
                                 <li>
-                                        {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                            <a href="{{ task.get_perform_url}}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
-                                            {% trans "Create" %} {{ task.get_language_display }} {% trans "subtitles" %}
-                                        {% else %}
-                                            <a href="{{ task.get_perform_url }}" class="perform-task perform-task-{{ task.pk }} button reduced" id="task-{{ task.id }}">
-                                            {{ task.get_type_display }}
-                                            {{ task.get_language_display }} {% trans "subtitles" %}
-                                        {% endif %}
-                                    </a>
-                                    {% include "teams/_perform_task_js.html" %}
+                                    {% include "teams/_perform_task_link.html" %}
                                 </li>
                                 {% if task.expiration_date != None %}
                                     <li>
@@ -155,32 +146,14 @@
                                                 <ul>
                                                     {% for task in team_video.tasks %}
                                                         <li>
-                                                            <a class="perform-task-{{ task.pk }}" href="{{ task.get_perform_url }}" title="Get started now">
-                                                                {% if task.get_type_display == 'Subtitle' %}
-                                                                    {% trans "Create Subtitles" %}
-                                                                {% else %}
-                                                                    {{ task.get_type_display }}
-                                                                    {% if task.get_language_display %}
-                                                                        {{ task.get_language_display }}
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                            </a>
+                                                            {% include "teams/_perform_task_link.html" %}
                                                         </li>
-                                                        {% include "teams/_perform_task_js.html" %}
                                                     {% endfor %}
                                                 </ul>
                                             </div>
                                         {% else %} {# there is only one task for this video #}
                                             {% with task=team_video.tasks|first %}
-                                            <a href="{{ task.get_perform_url }}" class="perform-task-{{ task.pk }}" title="Get started now">
-                                                    {% if task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
-                                                        Create {{ task.get_language_display }} subtitles
-                                                    {% else %}
-                                                        {{ task.get_type_display }}
-                                                        {{ task.get_language_display }} subtitles
-                                                    {% endif %}
-                                                </a>
-                                                {% include "teams/_perform_task_js.html" %}
+                                                {% include "teams/_perform_task_link.html" %}
                                             {% endwith %}
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}

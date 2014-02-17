@@ -50,7 +50,8 @@ from teams.forms import (
     PermissionsForm, WorkflowForm, InviteForm, TaskDeleteForm,
     GuidelinesMessagesForm, RenameableSettingsForm, ProjectForm, LanguagesForm,
     DeleteLanguageForm, MoveTeamVideoForm, TaskUploadForm,
-    make_billing_report_form
+    make_billing_report_form, TaskCreateSubtitlesForm,
+    TeamMultiVideoCreateSubtitlesForm,
 )
 from teams.models import (
     Team, TeamMember, Invite, Application, TeamVideo, Task, Project, Workflow,
@@ -81,7 +82,6 @@ from utils.translation import (
     get_language_choices, get_language_choices_as_dicts, languages_with_labels, get_user_languages_from_request
 )
 from utils.chunkediter import chunkediter
-from videos.forms import CreateSubtitlesForm, MultiVideoCreateSubtitlesForm
 from videos.types import UPDATE_VERSION_ACTION
 from videos import metadata_manager
 from videos.tasks import (
@@ -1184,8 +1184,8 @@ def dashboard(request, slug):
         member = None
 
     if member:
-        create_subtitles_form = MultiVideoCreateSubtitlesForm(
-            request, team.videos, data=request.POST or None)
+        create_subtitles_form = TeamMultiVideoCreateSubtitlesForm(
+            request, team, data=request.POST or None)
         if create_subtitles_form.is_valid():
             return create_subtitles_form.handle_post()
     else:
@@ -1301,6 +1301,14 @@ def team_tasks(request, slug, project_slug=None):
     filters = _get_task_filters(request)
     filtered = 0
 
+    if member:
+        create_subtitles_form = TeamMultiVideoCreateSubtitlesForm(
+            request, team, data=request.POST or None)
+        if create_subtitles_form.is_valid():
+            return create_subtitles_form.handle_post()
+    else:
+        create_subtitles_form = None
+
     if project_slug != '' and project_slug != None:
         if project_slug == 'any':
             project = None
@@ -1385,6 +1393,7 @@ def team_tasks(request, slug, project_slug=None):
         'filtered': filtered,
         'member': member,
         'project_choices': team.project_set.exclude(name='_root'),
+        'create_subtitles_form': create_subtitles_form,
     }
 
     context.update(pagination_info)
@@ -1462,11 +1471,8 @@ def perform_task(request, slug=None, task_pk=None):
 
 @render_to('teams/start-subtitle-task.html')
 def start_subtitle_task(request, team, task):
-    video = task.team_video.video
-    form = CreateSubtitlesForm(request, video, request.POST or None)
+    form = TaskCreateSubtitlesForm(request, task, request.POST or None)
     if form.is_valid():
-        task.language = form.cleaned_data['subtitle_language_code']
-        task.save()
         return form.handle_post()
     return {
         'team': team,

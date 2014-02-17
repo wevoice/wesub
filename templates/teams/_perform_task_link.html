@@ -1,30 +1,11 @@
-{% load i18n %}
+{% load i18n videos_tags %}
 
-{% if task.get_subtitle_version %}
-    {% trans "Resume" as link_text%}
-{% else %}
-    {% trans "Start now" as link_text%}
-{% endif %} 
-
-{% if task.needs_start_dialog %}
-    <a class="perform perform-task-{{ task.pk }}" href="">{{ link_text }}</a>
-    <script type="text/javascript">
-        $('.perform-task-{{ task.pk }}').click(function() {
-            var videoSource = unisubs.player.MediaSource.videoSourceForURL('{{ task.cached_video_url }}');
-            var opener = new unisubs.widget.SubtitleDialogOpener(
-                '{{ task.team_video.video.video_id }}',
-                '{{ task.cached_video_url|safe }}',
-                videoSource, null, null, 'fr'
-            );
-            {% if task.language %}
-                opener.showStartDialog(null, {'LANGUAGE': '{{ task.language }}', 'FORCE': true});
-            {% else %}
-                opener.showStartDialog();
-            {% endif %}
-
-            return false;
-        });
-    </script>
-{% else %}
-    <a class="perform" href="{{ task.get_perform_url }}">{{ link_text }}</a>
-{% endif %}
+<a href="{{ task.get_perform_url}}" class="perform-task button reduced{% if task.needs_start_dialog %} open-modal multi-video-create-subtitles{% endif %}" {{ task.team_video.video|multi_video_create_subtitles_data_attrs }}>
+    {% if link_text %}
+        {{ link_text }}
+    {% elif task.get_type_display == 'Subtitle' or task.get_type_display == 'Translate' %}
+        {% blocktrans with language=task.get_language_display %}Create {{ language }} subtitles{% endblocktrans %}
+    {% else %}
+        {% blocktrans with language=task.get_language_display task_action=task.get_type_display %}{{ task_action }} {{ language }} subtitles{% endblocktrans %}
+    {% endif %}
+</a>

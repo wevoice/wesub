@@ -133,6 +133,7 @@ var Site = function(Site) {
          */
 
         chosenify: function() {
+            debugger;
             $('select', '.v1 .content').filter(function() {
                 if ($(this).parents('div').hasClass('ajaxChosen')) {
                     return false;
@@ -724,27 +725,6 @@ var Site = function(Site) {
             });
             $('a.action-assign-submit').click(function(e) {
                 $(e.target).closest('form').submit();
-                return false;
-            });
-            $('a.assign-and-perform').click(function(e) {
-                var $target = $(e.target);
-                $target.text('Loading...');
-
-                that.Utils.assignTask($target.attr('data-id'), function(){
-                    $target.hide();
-
-                    $li = $target.parent().siblings('li.hidden-perform-link');
-                    $li.show();
-
-                    $link = $li.children('a.perform');
-                    $link.text('Loading...');
-                    if ($link.attr('href') !== '') {
-                        window.location = $link.attr('href');
-                    } else {
-                        $link.click();
-                    }
-                });
-
                 return false;
             });
             $('div.member-ajax-chosen select', '.v1 .content').ajaxChosen({
