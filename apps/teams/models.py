@@ -2131,7 +2131,7 @@ class Task(models.Model):
 
     def tasks_page_perform_link_text(self):
         """Get the link text for perform link on the tasks page."""
-        if self.get_subtitle_version():
+        if self.assignee:
             return _('Resume')
         else:
             return _('Start now')
