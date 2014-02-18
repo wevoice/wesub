@@ -220,6 +220,7 @@ def subtitle_editor(request, video_id, language_code):
     for v in video.get_video_urls():
         video_urls.append(v.url)
 
+
     editor_data = {
         'canSync': bool(request.GET.get('canSync', True)),
         'canAddAndRemove': bool(request.GET.get('canAddAndRemove', True)),
@@ -247,7 +248,10 @@ def subtitle_editor(request, video_id, language_code):
                                      translated_from_version, base_language)
                       for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
-        'oldEditorURL': editing_language.get_widget_url(),
+        'oldEditorURL': reverse('subtitles:old-editor', kwargs={
+            'video_id': video.video_id,
+            'language_code': editing_language.language_code,
+        }),
         'staticURL': settings.STATIC_URL,
     }
 
