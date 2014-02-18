@@ -74,12 +74,20 @@ class EditorPage(UnisubsPage):
 
     _NEXT_STEP = 'div.substeps div button.next-step'
     _ENDORSE = 'div.substeps button.endorse'
+
+    # COLLAB PANEL
+    _COLLAB_PANEL = 'section.collab'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
     _NOTES = 'textarea[ng-model="notes"]'
 
     def open_editor_page(self, video_id, lang):
         self.open_page(self._URL.format(video_id, lang))
+
+
+    def open_ed_with_base(self, video_id, lang, base_lang='en'):
+        url = self._URL + '?base-language={2}'
+        self.open_page(url.format(video_id, lang, base_lang))
 
     def keyboard_controls_help(self):
         pass
@@ -128,10 +136,14 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_present(self._VIDEO_SUBTITLE, wait_time=20)
         return self.get_text_by_css(self._VIDEO_SUBTITLE)
 
+
+    def legacy_editor(self):
+        self.click_link_text("Legacy Editor")
+
     def save(self, save_option):
         """Click the save button and the choose one of the save options.
 
-        Options are: Resume editing, Back to full editor, Exit
+        Options are: Resume editing, Exit
 
         """
         self.click_by_css(self._SAVE)
@@ -319,6 +331,9 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._EXIT)
         self.click_by_css(self._EXIT_BUTTON)
         self.handle_js_alert('accept')
+
+    def collab_panel_displayed(self):
+        return self.is_element_visible(self._COLLAB_PANEL)
 
     def approve_task(self):
         self.click_by_css(self._APPROVE)
