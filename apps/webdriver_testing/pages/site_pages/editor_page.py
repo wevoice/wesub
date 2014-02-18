@@ -81,11 +81,6 @@ class EditorPage(UnisubsPage):
     def open_editor_page(self, video_id, lang):
         self.open_page(self._URL.format(video_id, lang))
 
-
-    def open_ed_with_base(self, video_id, lang, base_lang='en'):
-        url = self._URL + '?base-language={2}'
-        self.open_page(url.format(video_id, lang, base_lang))
-
     def keyboard_controls_help(self):
         pass
 

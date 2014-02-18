@@ -325,15 +325,8 @@ unisubs.subtitle.Dialog.prototype.handleSaveAndOpenInNewEditor_ = function(event
         return;
     }
 
-    // if this is related to a task, send the new editor the right task id
-    if(this.subtitles_.BASE_LANGUAGE) {
-        var baseLanguageURLPart = '&base-language=' + this.subtitles_.BASE_LANGUAGE;
-    } else {
-        var baseLanguageURLPart = '';
-    }
     this.exitURL = '/subtitles/editor/' + this.serverModel_.videoID_ + '/' +
-        this.subtitles_.LANGUAGE + '/?from-old-editor=true' +
-        baseLanguageURLPart;
+        this.subtitles_.LANGUAGE + '/?from-old-editor=true';
     this.saveWork(false, true);
 };
 unisubs.subtitle.Dialog.prototype.handleSaveAndExitKeyPress_ = function(event) {
