@@ -34,6 +34,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
@@ -261,6 +262,10 @@ def subtitle_editor(request, video_id, language_code):
         editor_data['savedNotes'] = task.body
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
         editor_data['team_slug'] = task.team.slug
+        editor_data['oldEditorURL'] += '?' + urlencode({
+            'mode': Task.TYPE_NAMES[task.type].lower(),
+            'task_id': task.id,
+        })
 
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
