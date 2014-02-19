@@ -184,7 +184,14 @@ def subtitle_editor(request, video_id, language_code):
     '''
     # FIXME: permissions
     video = get_object_or_404(Video, video_id=video_id)
-    base_language = video.primary_audio_language_code
+
+    if (video.primary_audio_language_code and 
+        SubtitleVersion.objects.extant().filter(
+            video=video, language_code=video.primary_audio_language_code)
+        .exists()):
+        base_language = video.primary_audio_language_code
+    else:
+        base_language = None
 
     try:
         editing_language = video.newsubtitlelanguage_set.get(language_code=language_code)
