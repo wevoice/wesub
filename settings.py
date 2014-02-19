@@ -302,6 +302,7 @@ SUBTITLE_EDITOR_JS = [
     'src/js/third-party/FileSaver.js',
     'src/js/third-party/popcorn.brightcove.js',
     'src/js/third-party/modal-helper.js',
+    'src/js/third-party/json2.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',
     'src/js/popcorn/popcorn.flash-fallback.js',
