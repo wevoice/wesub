@@ -147,7 +147,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?lang=ru&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Review Russian Subtitles', 
+        self.tasks_tab.perform_task('Review Russian Subtitles', 
                                                self.video.title)
         self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
         self.sub_editor.continue_to_next_step() #to subtitle info 
@@ -164,7 +164,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?lang=de&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Approve German Subtitles', 
+        self.tasks_tab.perform_task('Approve German Subtitles', 
                                                self.video.title)
         self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
         self.sub_editor.continue_to_next_step() #to subtitle info 
@@ -331,7 +331,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?lang=ru&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Review Russian Subtitles', 
+        self.tasks_tab.perform_task('Review Russian Subtitles', 
                                                self.video.title)
         self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
         self.sub_editor.continue_to_next_step() #to subtitle info 
@@ -348,7 +348,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?lang=de&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Approve German Subtitles', 
+        self.tasks_tab.perform_task('Approve German Subtitles', 
                                                self.video.title)
         self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
         self.sub_editor.continue_to_next_step() #to subtitle info 

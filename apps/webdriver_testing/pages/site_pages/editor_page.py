@@ -291,8 +291,10 @@ class EditorPage(UnisubsPage):
 
         
 
-    def add_subs_to_the_end(self, subs):
+    def add_subs_to_the_end(self, subs=None):
         """Click Add subtitles at the end and add new lines"""
+        if not subs:
+            subs = ["line 1", "line 2", "line 3", "line 4", "line 5"]
         self.toggle_timeline('Show')
         for line in subs:
             self.browser.execute_script("window.location.hash='add-sub-at-end'")

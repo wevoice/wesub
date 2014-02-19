@@ -14,8 +14,10 @@ class TasksTab(ATeamPage):
     _TASK = 'ul.tasks > li'
     _TASK_KIND = 'h3' # title is an attribute of a
     _TASK_VIDEO = 'p a'
+
+    _TASK_PERFORM = 'ul.actions div.action-group ul li a.perform-task'
     _ASSIGNEE = 'ul.actions li h4'
-    _TASK_TRIGGER = 'h5.trigger'
+    _TASK_TRIGGER = 'ul.actions div.action-group h5.trigger'
     _TASK_THUMB = 'a.thumb'
 
     _FILTERED_VIDEO = 'p.view-notice strong'
@@ -34,9 +36,8 @@ class TasksTab(ATeamPage):
  
 
     #TASK OPTIONS
-    _PERFORM = 'div.action-group h5' #Opens on hover
-    _PERFORM_ASSIGNED = '.perform'
-    _ASSIGN_AND_PERFORM = '.assign-and-perform'
+    _PERFORM_ASSIGNED = 'a.perform-task'
+    _ASSIGN_AND_PERFORM = 'a.perform-task'
     _DISABLED_TASK = '.cannot-perform'
 
     def open_tasks_tab(self, team):
@@ -60,9 +61,14 @@ class TasksTab(ATeamPage):
                 video =  el.find_element_by_css_selector(self._TASK_VIDEO).text,
                 assignee = el.find_element_by_css_selector(self._ASSIGNEE).text)
             try:
-                task['perform'] = el.find_element_by_css_selector(self._TASK_TRIGGER)
+                task['trigger'] = el.find_element_by_css_selector(self._TASK_TRIGGER)
+            except:
+                task['trigger'] =  None
+            try:
+                task['perform'] = el.find_element_by_css_selector(self._TASK_PERFORM)
             except:
                 task['perform'] =  None
+            self.logger.info(task)
             task_list.append(task)
         return task_list
 
@@ -81,15 +87,12 @@ class TasksTab(ATeamPage):
         self.click_by_css(self._PERFORM)
  
  
-    def perform_and_assign_task(self, task_type, title):
+    def perform_task(self, task_type, title):
         task = self.task_present(task_type, title)
-        perform_el = task['perform']
-        action_el = perform_el.parent
-        self.hover_by_el(perform_el)
-         
-        start_el = action_el.find_element_by_css_selector(self._ASSIGN_AND_PERFORM)
- 
-        self.click_item_from_pulldown(perform_el, start_el) 
+        perform_link = task['perform']
+        trigger = task['trigger']
+        trigger.click()
+        perform_link.click()
 
     def perform_assigned_task(self, task_type, title):
         task = self.task_present(task_type, title)

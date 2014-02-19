@@ -30,7 +30,6 @@ class TestCaseEntryExit(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseEntryExit, cls).setUpClass()
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
         cls.editor_pg = editor_page.EditorPage(cls)
@@ -47,10 +46,11 @@ class TestCaseEntryExit(WebdriverTestCase):
     def tearDownClass(cls):
         super(TestCaseEntryExit, cls).tearDownClass()
 
-    def test_timed_to_new_and_back(self):
-        """From timed editor to beta, reference and working langs are same.
+    def test_exit_to_legacy(self):
+        """Open legacy editor from new.
 
         """
+
         data = {'url': 'http://www.youtube.com/watch?v=WqJineyEszo',
                  'video__title': ('X Factor Audition - Stop Looking At My '
                                   'Mom Rap - Brian Bradley'),
@@ -61,11 +61,10 @@ class TestCaseEntryExit(WebdriverTestCase):
 
         self.video_lang_pg.open_video_lang_page(video.video_id, 'en')
         self.video_lang_pg.edit_subtitles()
-        self.sub_editor.open_in_beta_editor()
         self.assertEqual('English', self.editor_pg.selected_ref_language())
         self.assertEqual(u'Editing English\u2026', 
                           self.editor_pg.working_language())
-        self.editor_pg.exit_to_full_editor()
+        self.editor_pg.legacy_editor()
         self.assertEqual('Typing', self.sub_editor.dialog_title())
 
 
@@ -79,7 +78,6 @@ class TestCaseTaskEntry(WebdriverTestCase):
     @classmethod
     def setUpClass(cls):
         super(TestCaseTaskEntry, cls).setUpClass()
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
         cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
         cls.editor_pg = editor_page.EditorPage(cls)
@@ -146,16 +144,22 @@ class TestCaseTaskEntry(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
-    def test_review_to_new(self):
+    def tearDown(self):
+        self.browser.get_screenshot_as_file('%s.png' % self.id())
+
+
+    def test_review_to_legacy(self):
+        """Perform task (review) opens in new editor"""
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=sv' % self.team.slug) 
-        self.tasks_tab.perform_and_assign_task('Review Swedish Subtitles',
-                                                self.video.title)
-        self.sub_editor.open_in_beta_editor()
+        self.tasks_tab.perform_task('Review Swedish Subtitles',
+                                     self.video.title)
         self.assertEqual('English', self.editor_pg.selected_ref_language())
         self.assertEqual('Version 3', self.editor_pg.selected_ref_version())
         self.assertEqual(u'Editing Swedish\u2026', 
                           self.editor_pg.working_language())
-        self.editor_pg.exit()
+        self.assertTrue(self.editor_pg.collab_panel_displayed())
+        self.editor_pg.legacy_editor()
+        self.assertEqual('Review', self.sub_editor.dialog_title())
 
 
     def test_review_to_new_approve(self):
@@ -164,7 +168,7 @@ class TestCaseTaskEntry(WebdriverTestCase):
         """
 
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=es' % self.team.slug) 
-        self.tasks_tab.perform_and_assign_task('Review Spanish Subtitles',
+        self.tasks_tab.perform_task('Review Spanish Subtitles',
                                                 self.video.title)
         self.sub_editor.open_in_beta_editor()
         self.assertEqual(u'Editing Spanish\u2026', 
@@ -180,7 +184,7 @@ class TestCaseTaskEntry(WebdriverTestCase):
 
         """
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=de' % self.team.slug) 
-        self.tasks_tab.perform_and_assign_task('Review German Subtitles',
+        self.tasks_tab.perform_task('Review German Subtitles',
                                                 self.video.title)
         self.sub_editor.open_in_beta_editor()
         self.assertEqual(u'Editing German\u2026', 

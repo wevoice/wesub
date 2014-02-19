@@ -573,7 +573,7 @@ class TestCaseDeletion(WebdriverTestCase):
                                  '&assignee=anyone&lang=it'.format(
                                  self.team.slug, self.tv.pk))
 
-        self.tasks_tab.perform_and_assign_task('Approve Italian Subtitles', 
+        self.tasks_tab.perform_task('Approve Italian Subtitles', 
                                                self.video.title)
         self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
 
@@ -586,7 +586,7 @@ class TestCaseDeletion(WebdriverTestCase):
                                  '&assignee=anyone&lang=hr'.format(
                                  self.team.slug, self.tv.pk))
 
-        self.tasks_tab.perform_and_assign_task('Review Croatian Subtitles', 
+        self.tasks_tab.perform_task('Review Croatian Subtitles', 
                                                self.video.title)
         self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
 
