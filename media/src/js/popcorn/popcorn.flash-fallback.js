@@ -141,7 +141,10 @@ var jQuery = window.jQuery || null;
                     onPlayerReady();
                 },
                 plugins:{
-                    controls: null,
+                    // controls are ideally disabled in editor and enabled
+                    // in embedder, which is not obvious to make it optional
+                    // with popcorn API, so putting it always on for now
+                    // controls: null,
                 }
             };
             player = player = window.$f(elem, flashEmbedParams, config);
