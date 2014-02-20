@@ -1,21 +1,15 @@
 import os
 
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.pages.site_pages import watch_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.data_factories import TeamVideoFactory
-from apps.webdriver_testing.data_factories import TeamMemberFactory
-
-
-from apps.webdriver_testing.data_factories import TeamManagerLanguageFactory
-
-from apps.webdriver_testing.data_factories import WorkflowFactory
-from apps.webdriver_testing.data_factories import TeamLangPrefFactory
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor
-
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing import data_helpers
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.data_factories import TeamVideoFactory
+from webdriver_testing.data_factories import TeamMemberFactory
+from webdriver_testing.data_factories import TeamManagerLanguageFactory
+from webdriver_testing.data_factories import WorkflowFactory
+from webdriver_testing.data_factories import TeamLangPrefFactory
+from webdriver_testing.data_factories import UserFactory
 
 class TestCaseApprovalWorkflow(WebdriverTestCase):
     """TestSuite for display of Edit Subtitles button on a revision. """
