@@ -166,16 +166,8 @@ unisubs.subtitle.TranscribeEntry.prototype.issueLengthWarning_ =
     var max_chars;
     var start_warning;
 
-    // TODO: This ugly hack is for N, who require a different standard of
-    // displaying subtitles.  We should remove this once we have pluginable
-    // popcorn set up.
-    if (unisubs.caption_display_mode == 'n') {
-        max = 128;
-        start_warning = 90;
-    } else {
-        max = unisubs.subtitle.TranscribeEntry.CHAR_LIMIT;
-        start_warning = 50;
-    }
+    max = unisubs.subtitle.TranscribeEntry.CHAR_LIMIT;
+    start_warning = 50;
 
     var length = this.labelInput_.getValue().length;
     if (breakable && length > max_chars)

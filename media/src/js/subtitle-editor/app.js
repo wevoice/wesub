@@ -1,4 +1,3 @@
-// Amara, universalsubtitles.org
 //
 // Copyright (C) 2013 Participatory Culture Foundation
 //
@@ -21,6 +20,7 @@ var angular = angular || null;
 (function() {
 
     var module = angular.module('amara.SubtitleEditor', [
+        'amara.SubtitleEditor.blob',
         'amara.SubtitleEditor.collab',
         'amara.SubtitleEditor.help',
         'amara.SubtitleEditor.modal',
@@ -40,11 +40,13 @@ var angular = angular || null;
         'ngCookies'
     ]);
 
-    // instead of using {{ }} for variables, use [[ ]]
-    // so as to avoid conflict with django templating
-    module.config(function($interpolateProvider) {
+    module.config(function($compileProvider, $interpolateProvider) {
+        // instead of using {{ }} for variables, use [[ ]]
+        // so as to avoid conflict with django templating
         $interpolateProvider.startSymbol('[[');
         $interpolateProvider.endSymbol(']]');
+        // Allow blob: urls
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|blob):/);
     });
 
     module.constant('MIN_DURATION', 250); // 0.25 seconds
@@ -134,11 +136,21 @@ var angular = angular || null;
             currentTime: null,
             duration: null,
         };
+        $scope.showDebugModal = function(evt) {
+            $scope.$root.$emit('show-debug-modal');
+            evt.preventDefault();
+            evt.stopPropagation();
+            return false;
+        };
         // Hide the loading modal after we are done with bootstrapping
         // everything
         $scope.$evalAsync(function() {
             $scope.$root.$emit('hide-modal');
         });
+        // Overrides for debugging
+        $scope.overrides = {
+            forceSaveError: false
+        };
     });
 
     /* AppController is large, so we split it into several components to
@@ -167,21 +179,25 @@ var angular = angular || null;
                     EditorData.editingVersion.languageCode);
         }
 
+        function userIdleTimeout() {
+            $scope.minutesIdle++;
+
+            if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
+                showIdleModal();
+                $timeout.cancel(regainLockTimer);
+            } else {
+                startUserIdleTimer();
+            }
+        }
+
         function startUserIdleTimer() {
-            var userIdleTimeout = function() {
-
-                $scope.minutesIdle++;
-
-                if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
-                    showIdleModal();
-                    $timeout.cancel(regainLockTimer);
-                } else {
-                    $timeout(userIdleTimeout, 60 * 1000);
-                }
-            };
-
             $timeout(userIdleTimeout, 60 * 1000);
         }
+
+        $scope.cancelUserIdleTimeout = function() {
+            $timeout.cancel(userIdleTimeout);
+        }
+
         function startRegainLockTimer() {
             var regainLockTimeout = function() {
                 regainLock();

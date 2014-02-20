@@ -19,6 +19,7 @@
 
 from webdriver_testing.pages.site_pages import create_page
 from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
 from videos.models import VideoUrl
 
 class TestCaseCreateVideos(WebdriverTestCase):
@@ -29,6 +30,7 @@ class TestCaseCreateVideos(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseCreateVideos, cls).setUpClass()
         cls.create_pg = create_page.CreatePage(cls)
+        cls.video_pg = video_page.VideoPage(cls)
         cls.create_pg.open_create_page()
     
 
@@ -36,24 +38,37 @@ class TestCaseCreateVideos(WebdriverTestCase):
         super(TestCaseCreateVideos, self).setUp()
         self.create_pg.open_create_page()
 
-    def test_create__youtube(self):
+    def test_create_youtube(self):
         """Add a youtube video.
 
         """
         url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-
-    def test_create__brightcove(self):
-        """Add a brightcove video.
+    def test_create_link_brightcove(self):
+        """Add a brightcove video that resolves to link.bright...
 
         """
         url = 'http://bcove.me/8yxc6sxy'
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__dailymotion(self):
+
+    def test_create_bcove_me(self):
+        """Add a brightcove that resolves to bcove.me/...
+
+        """
+        url = 'http://bcove.me/1ub2ar8x'
+        self.create_pg.submit_video(url)
+        self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
+
+
+
+    def test_create_dailymotion(self):
         """Add a dailymotion video.
 
         """
@@ -62,8 +77,9 @@ class TestCaseCreateVideos(WebdriverTestCase):
                'xlh9h1_fim-syndicat-des-apiculteurs-de-metz-environs_news')
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__vimeo(self):
+    def test_create_vimeo(self):
         """Add a vimeo video.
 
         """
@@ -71,8 +87,9 @@ class TestCaseCreateVideos(WebdriverTestCase):
         url = "http://vimeo.com/26487510"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__ogg(self):
+    def test_create_ogg(self):
         """Add an ogg video video.
 
         """
@@ -80,8 +97,9 @@ class TestCaseCreateVideos(WebdriverTestCase):
         url = "http://qa.pculture.org/amara_tests/Birds_short.oggtheora.ogg"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__mp4(self):
+    def test_create_mp4(self):
         """Add a an mp4 video.
 
         """
@@ -89,8 +107,9 @@ class TestCaseCreateVideos(WebdriverTestCase):
         url = "http://qa.pculture.org/amara_tests/Birds_short.mp4"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__blip_flv(self):
+    def test_create_blip_flv(self):
         """Add a blip video.
 
         """
@@ -99,7 +118,7 @@ class TestCaseCreateVideos(WebdriverTestCase):
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
 
-    def test_create__webm(self):
+    def test_create_webm(self):
         """Add a webM video.
 
         """
@@ -107,15 +126,17 @@ class TestCaseCreateVideos(WebdriverTestCase):
         url = "http://qa.pculture.org/amara_tests/Birds_short.webmsd.webm"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
-    def test_create__youtu_be_url(self):
+    def test_create_youtu_be_url(self):
         """Add a youtube video with youtu.be url.
 
         """
 
-        url = "http://youtu.be/BXMPp0TLSEo"
+        url = "http://youtu.be/q26umaF242I"
         self.create_pg.submit_video(url)
         self.assertTrue(self.create_pg.submit_success())
+        self.assertTrue(self.video_pg.video_embed_present())
 
 
 

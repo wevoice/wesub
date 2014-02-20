@@ -20,6 +20,7 @@ import simplejson as json
 
 import babelsubs
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from videos.models import Video
 from teams.models import Task
@@ -29,6 +30,7 @@ from subtitles.templatetags.new_subtitles_tags import visibility_display
 
 from django.http import HttpResponse
 from django.db.models import Count
+from django.conf import settings
 from django.contrib import messages
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -246,6 +248,7 @@ def subtitle_editor(request, video_id, language_code):
                       for lang in languages],
         'languageCode': request.LANGUAGE_CODE,
         'oldEditorURL': editing_language.get_widget_url(),
+        'staticURL': settings.STATIC_URL,
     }
 
 
@@ -257,6 +260,7 @@ def subtitle_editor(request, video_id, language_code):
 
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
+        'DEBUG': settings.DEBUG,
         'language': editing_language,
         'other_languages': languages,
         'version': editing_version,

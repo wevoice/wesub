@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.help', []);
 
-    module.controller('HelpController', function($scope, SubtitleStorage) {
+    module.controller('HelpController', ['$scope', '$sce', function($scope, $sce, SubtitleStorage) {
         /**
          * Responsible for handling the various states of the help panel.
          * @param $scope
@@ -29,9 +29,9 @@
          */
 
         $scope.commands = [
-            { key: 'tab', description: 'starts and stops video playback' },
-            { key: 'enter', description: 'moves to the next line and <br /> adds a new line (when the timeline is closed)' },
-            { key: 'shift + ctrl + . or ,', description: 'skips playback forward or back 4 seconds' }
+            { key: 'tab', description: $sce.trustAsHtml('starts and stops video playback') },
+            { key: 'enter', description: $sce.trustAsHtml('moves to the next line and <br /> adds a new line (when the timeline is closed)') },
+            { key: 'shift + enter', description: $sce.trustAsHtml('adds a line break in the subtitle line') }
                    ];
 
         $scope.showAdvancedModal = function() {
@@ -48,5 +48,5 @@
 
         };
 
-    });
+    }]);
 }).call(this);

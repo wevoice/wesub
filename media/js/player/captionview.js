@@ -95,74 +95,6 @@ unisubs.player.CaptionView.prototype.setUpPositioning =
 };
 
 
-/**
- * Split the given text into the given characters per line and maximumlines.
- *
- * @param text The text to split in 32x4
- * @param opt_charsPerLine The max number of characters to allow per line
- * @param opt_maxLines The max number of lines to allow
- * @param opt_linebreakStr Which string to use when joining lines, i.e. \n or <bt/>
- * @return An array with lines of a maximum 42 chars
-**/
-unisubs.player.CaptionView.breakLines = function (text, opt_charsPerLine, opt_maxLines, opt_linebreakStr){
-
-    var charsPerLine = opt_charsPerLine || 42;
-    var maxLines = opt_maxLines || 4;
-    var linebreakStr = opt_linebreakStr || "<br/>";
-    // short circuit most common case
-    if (!text){
-        return "";
-    }
-
-    // If we get text with newlines, sometimes those newlines get cut off
-    // when we're splitting words. This makes sure we always retain the original
-    // newlines.
-    text = text.replace('\n', ' \n');
-
-    var lines = [];
-    var currentLine  = [];
-        charsOnCurrentLine = 0,
-        words = text.split(" "),
-        word = null;
-    while(words.length){
-        word = words.shift();
-        // if there is a line break, push to a new line and put
-        // the remaining substring back on the words stack
-        var newLineIndex = word.indexOf('\n');
-        if (newLineIndex > -1){
-            var leftOver = word.substring(newLineIndex + 1, word.length);
-            if (leftOver){
-                words.unshift(leftOver);
-            }
-            word = word.substring(0, newLineIndex);
-        }
-
-        charsOnCurrentLine =  currentLine.join(" ").length + word.length + 1;
-        if (  charsOnCurrentLine <= charsPerLine  ){
-            // next word will fit within a line
-            currentLine.push(word);
-            if (newLineIndex > -1){
-                // terminate this line early
-                lines.push(currentLine);
-                currentLine = [];
-            }
-            continue;
-        }else{
-            // overflow, add to the final lines
-            lines.push(currentLine);
-            currentLine = [word];
-        }
-    }
-    if (currentLine.length){
-        lines.push(currentLine);
-    }
-    // now join each line with a space, then all lines with a line break char
-    var lines = goog.array.map(lines, function(line){
-        return line.join(" ");
-    }).slice(0, maxLines);
-    return lines.join(linebreakStr);
-}
-
 /*
  * @param The html text to show, or null for blank caption
  */
@@ -170,18 +102,10 @@ unisubs.player.CaptionView.prototype.setCaptionText = function(text) {
     if (text == null || text == "") {
         this.setVisibility(false);
     } else {
-        // TODO: This ugly hack is for N, who require a different standard of
-        // displaying subtitles.  We should remove this once we have pluginable
-        // popcorn set up.
-        if (unisubs.caption_display_mode == 'n') {
-            text = unisubs.player.CaptionView.breakLines(text, 42);
-        } else {
-            text = goog.string.newLineToBr(text);
-        }
-        // convert to markdown after text layout has been done
-        // as to not inflate char count:
+        var lines = text.split('\n');
+        lines = goog.array.map(lines, unisubs.html.markdownToHtml);
+        text = lines.join("<br />");
 
-        text = unisubs.html.markdownToHtml(text);
         this.getElement().innerHTML = text;
 
         goog.i18n.bidi.setElementDirAndAlign(this.getElement(),

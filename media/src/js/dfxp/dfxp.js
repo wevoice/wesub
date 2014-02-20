@@ -19,6 +19,11 @@
 
 var dfxp = (function($) {
 
+function escapeMarkdown(text) {
+    /* Escape HTML entities in markdown */
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function markdownToHTML(text) {
     /*
      * Convert text to Markdown-style rendered HTML with bold, italic,
@@ -32,6 +37,7 @@ function markdownToHTML(text) {
         { match: /(\r\n|\n|\r)/gm, replaceWith: "<br />" },
         { match: / {2}/g, replaceWith: "&nbsp;&nbsp;" }
     ];
+    text = escapeMarkdown(text);
 
     for (var i = 0; i < replacements.length; i++) {
         var match = replacements[i].match;
@@ -697,6 +703,7 @@ var AmaraDFXPParser = function() {
         if (input === undefined){
             return input;
         }
+        input = escapeMarkdown(input);
         for (var i = 0; i < MARKUP_REPLACE_SEQ.length; i ++){
             input = input.replace(MARKUP_REPLACE_SEQ[i][0],
                 MARKUP_REPLACE_SEQ[i][1]);
@@ -1067,28 +1074,21 @@ var AmaraDFXPParser = function() {
 
             for (var i = 0; i < $subtitles.length; i++) {
                 var $subtitle = $subtitles.eq(i);
-                var convertedText = this.markdownToDFXP($subtitle.text());
+                var markdown = $subtitle.text();
+                var convertedText = this.markdownToDFXP(markdown);
 
                 // If the converted text is different from the subtitle text, it
                 // means we were able to convert some Markdown to DFXP.
-                if (convertedText !== $subtitle.text()) {
+                if (convertedText !== escapeMarkdown(markdown)) {
 
-                    // Create a new object with this new converted DOM structure.
+                    // Create a new object with this new converted DOM
+                    // structure.
                     //
-                    // We have to use a placeholder div otherwise if you try and just append
-                    // the convertedText to the subtitle node, it'll disregard text that is not
-                    // within a child element.
-                    var $newObj = $('<div class="removeme">').append(convertedText);
-
-                    // Clear out the subtitle's existing content.
-                    $subtitle.text('');
-
-                    // Append the new object to this subtitle.
-                    $subtitle.append($newObj);
-
-                    // Kill the placeholder div.
-                    $('div.removeme', $subtitle).children().unwrap();
-
+                    // It's a bit tricky to add convertedText to our subtitle
+                    // <p> element, since it can contain text and/or HTML
+                    // elements.  parseHTML seems to be the best way to do it.
+                    $subtitle.empty();
+                    $subtitle.append($.parseHTML(convertedText));
                 }
             }
         }
