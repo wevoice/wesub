@@ -286,7 +286,7 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-library/closure/goog/base.js',
     'js/closure-dependencies.js',
     'js/swfobject.js',
-    'flowplayer/flowplayer-3.2.6.min.js',
+    'flowplayer/flowplayer-3.2.13.min.js',
     'src/js/third-party/amara-jquery.min.js',
     'src/js/dfxp/dfxp.js',
 ]
