@@ -144,9 +144,6 @@ def onsite_widget(request):
             return HttpResponseRedirect(reverse('teams:team_tasks',
                                                 kwargs={'slug': task.team.slug}))
 
-    if 'HTTP_REFERER' in request.META:
-        config['returnURL'] = request.META['HTTP_REFERER']
-
     if not config.get('nullWidget'):
         video_id = config.get('videoID')
 
@@ -154,9 +151,8 @@ def onsite_widget(request):
             raise Http404
 
         video = get_object_or_404(models.Video, video_id=video_id)
+        config['returnURL'] = video.get_absolute_url()
 
-        if not 'returnURL' in config:
-            config['returnURL'] = video.get_absolute_url()
 
         if not 'effectiveVideoURL' in config:
             config['effectiveVideoURL'] = video.get_video_url()
