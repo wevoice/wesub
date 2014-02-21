@@ -378,7 +378,7 @@
                                     ng-click="onNextClicked($event)">
                                     {% trans "Edit title and description" %}
                                 </button>
-                                <button ng-show="!translating()" class="next-step"
+                                <button ng-show="!translating() && workflow.canMoveToReview()" class="next-step"
                                     ng-click="onNextClicked($event)">
                                     {% trans "Start reviewing" %}
                                 </button>
