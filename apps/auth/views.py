@@ -180,6 +180,11 @@ def render_login(request, user_creation_form, login_form, redirect_to):
             }, context_instance=RequestContext(request))
 
 def make_redirect_to(request, default=''):
+    """Get the URL to redirect to after logging a user in.
+
+    This method has a simply check against open redirects to prevent attackers
+    from putting their sites into the next GET param (see 1253)
+    """
     redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, default)
     if not redirect_to or '//' in redirect_to:
         return '/'
