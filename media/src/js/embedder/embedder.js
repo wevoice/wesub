@@ -355,6 +355,13 @@
             },
             loadPopcorn: function() {
                 var url = this.model.get('url');
+                // Hack for apparent Chrome issue with HTML5 videos
+                // if same video is open twice in the same browser instance 
+                if(url.indexOf('?') == -1) {
+                    url += '?noise=' + Date.now();
+                } else {
+                    url += '&noise=' + Date.now();
+                }
                 // For youtube, we need to alter the URL to enable controls.
                 if(url.indexOf('youtube.com') != -1) {
                     if(url.indexOf('?') == -1) {
