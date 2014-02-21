@@ -38,7 +38,7 @@ unisubs.player.BrightcoveVideoSource = function(playerID, playerKey, videoID, op
 /* @const
  * @type {string} 
  */
-unisubs.player.BrightcoveVideoSource.BASE_DOMAIN = "brightcove.com";
+unisubs.player.BrightcoveVideoSource.BASE_DOMAINS = ["brightcove.com", "bcove.me"];
 
 unisubs.player.BrightcoveVideoSource.forURL = 
     function(videoURL, opt_videoConfig) 
@@ -69,9 +69,10 @@ unisubs.player.BrightcoveVideoSource.forURL =
 
 unisubs.player.BrightcoveVideoSource.isBrightcove = function(videoURL) {
     var uri = new goog.Uri(videoURL);
-    return   goog.string.caseInsensitiveEndsWith(
-        uri.getDomain(),
-        unisubs.player.BrightcoveVideoSource.BASE_DOMAIN);
+    return unisubs.player.BrightcoveVideoSource.BASE_DOMAINS.reduce(function(previous, current) {
+        return (previous || goog.string.caseInsensitiveEndsWith(
+            uri.getDomain(),
+            current));})
 };
 
 unisubs.player.BrightcoveVideoSource.prototype.createPlayer = function() {

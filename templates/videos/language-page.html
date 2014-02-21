@@ -22,6 +22,11 @@
         window.SELECT_REVISIONS_TRANS = '{% trans "Select two revisions to compare, please" %}';
         window.IS_AUTHENTICATED = '{{ user.is_authenticated }}' == 'True';
         window.ROLLBACK_ALLOWED = '{{ rollback_allowed }}' == 'True';
+        {% if team.workflow_enabled %}
+        window.VIDEO_TEAM_WORKFLOW_ENABLED = true;
+        {% else %}
+        window.VIDEO_TEAM_WORKFLOW_ENABLED = false;
+        {% endif %}
     </script>
 {% endblock %}
 
