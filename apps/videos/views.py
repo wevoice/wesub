@@ -603,6 +603,10 @@ class LanguagePageContext(dict):
                                                   language=language,
                                                   size=(289, 173))
         _add_share_panel_context_for_history(self, video, language)
+        if video.get_team_video() is not None:
+            self['team'] = video.get_team_video().team
+        else:
+            self['team'] = None
         if version is not None:
             self['metadata'] = version.get_metadata().convert_for_display()
         else:
