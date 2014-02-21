@@ -167,7 +167,6 @@
 
                             // There should only be one object.
                             if (resp.objects.length === 1) {
-
                                 // Set all of the API attrs as attrs on the video model.
                                 video.set(resp.objects[0]);
 				var visibleLanguages = _$.map(_$.grep(video.get('languages'), function(language) {return language.visible;}),
@@ -280,6 +279,9 @@
                 this.$popContainer.width(this.$el.width());
                 this.$popContainer.height(this.$el.height());
 
+                this.model.set('height', this.$popContainer.height());
+                this.model.set('width', this.$popContainer.width());
+
                 // This is a hack until Popcorn.js supports passing a DOM elem to
                 // its smart() method. See: http://bit.ly/L0Lb7t
                 var id = 'amara-popcorn-' + Math.floor(Math.random() * 100000000);
@@ -288,16 +290,16 @@
                 // Reset the height on the parent amara-embed div. If we don't do this,
                 // our amara-tools div won't be visible.
                 this.$el.height('auto');
-
                 // Init the Popcorn video.
                 this.pop = this.loadPopcorn();
 
                 this.pop.on('loadedmetadata', function() {
-
+                    // This does not work for html5 videos. The size must be the one set as parameter
                     // Set the video model's height and width, now that we know it.
+                    /*
                     that.model.set('height', that.pop.position().height);
                     that.model.set('width', that.pop.position().width);
-
+                    */
                     // Create the actual core DOM for the Amara container.
                     that.$el.append(that.template({
                         video_url: 'http://' + _amaraConf.baseURL + '/en/videos/create/?initial_url=' + that.model.get('url'),
@@ -305,6 +307,9 @@
 			download_subtitle_url: '',
                         width: that.model.get('width')
                     }));
+
+                    // In case of HTML5 videos, we need to set their dimension directly to the video element
+                    _$('video', that.$popContainer).width(that.$popContainer.width()).height(that.$popContainer.height());
 
                     // Just set some cached Zepto selections for later use.
                     that.cacheNodes();
@@ -327,7 +332,6 @@
                     that.setCurrentLanguageMessage('Loading…');
                     that.waitUntilVideoIsComplete(
                         function() {
-
                             // Grab the subtitles for the initial language and do yo' thang.
                             if (that.model.get('is_on_amara')) {
 
@@ -620,7 +624,6 @@
                     url: apiURL,
                     dataType: 'jsonp',
                     success: function(resp) {
-
                         // Save these subtitles to the video's 'subtitles' collection.
 
                         // TODO: Placeholder until we have the API return the language code.
