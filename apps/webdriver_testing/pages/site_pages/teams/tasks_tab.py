@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from apps.webdriver_testing.pages.site_pages.teams import ATeamPage
+from webdriver_testing.pages.site_pages.teams import ATeamPage
+import time
 
 class TasksTab(ATeamPage):
     """Actions for the Videos tab of a Team Page.
@@ -88,17 +89,12 @@ class TasksTab(ATeamPage):
  
  
     def perform_task(self, task_type, title):
+        time.sleep(2)
         task = self.task_present(task_type, title)
         perform_link = task['perform']
         trigger = task['trigger']
         trigger.click()
         perform_link.click()
-
-    def perform_assigned_task(self, task_type, title):
-        task = self.task_present(task_type, title)
-        perform_el = task['perform']
-        self.click_item_after_hover(perform_el, self._PERFORM_ASSIGNED)
-
 
     def filtered_video(self):
         return self.get_text_by_css(self._FILTERED_VIDEO)

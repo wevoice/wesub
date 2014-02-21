@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import time
-from apps.webdriver_testing.pages.site_pages import UnisubsPage
+
+from webdriver_testing.pages.site_pages import UnisubsPage
 
 class SiteModals(UnisubsPage):
     """Modal dialogs on site.
@@ -29,6 +29,4 @@ class SiteModals(UnisubsPage):
         if audio:
             self.click_by_css(self._PRIMARY_AUDIO)
             self.select_option_by_text(self._PRIMARY_AUDIO, audio)
-
         self.click_continue() 
-        

@@ -309,8 +309,6 @@ class TestCaseTasksEnabledDashboard(WebdriverTestCase):
         self.dashboard_tab.open_team_page(self.team.slug)
         self.dashboard_tab.handle_js_alert(action='accept')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_members_assigned_tasks(self):
         """Members see “Videos you're working on” with  assigned languages.

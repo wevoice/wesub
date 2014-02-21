@@ -73,7 +73,7 @@ class EditorPage(UnisubsPage):
     #RIGHT COLUMN
 
     _NEXT_STEP = 'div.substeps div button.next-step'
-    _ENDORSE = 'div.substeps button.endorse'
+    _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
 
     # COLLAB PANEL
     _COLLAB_PANEL = 'section.collab'
@@ -139,6 +139,7 @@ class EditorPage(UnisubsPage):
 
     def legacy_editor(self):
         self.click_link_text("Legacy Editor")
+        time.sleep(2)
 
     def save(self, save_option):
         """Click the save button and the choose one of the save options.
@@ -182,7 +183,7 @@ class EditorPage(UnisubsPage):
 
     def working_language(self):
         """Return the curren working language displayed. """
-
+        self.wait_for_element_present(self._WORKING_LANGUAGE)
         return self.get_text_by_css(self._WORKING_LANGUAGE)
 
     def working_text(self, position=None):
@@ -263,12 +264,15 @@ class EditorPage(UnisubsPage):
         self.hover_by_css(self._TOOLS_MENU)
 
     def copy_timings(self):
+        copy_el = self.browser.find_element_by_css_selector(self._COPY_TIMING)
+        li = copy_el.parent
+        self.logger.info(dir(li))
+        hidden = li.get_attribute("class")
+        self.logger.info(hidden)
+        if hidden == 'ng-hide':
+           return "Element not displayed"
         self.hover_tools_menu()
-        try:
-            self.click_by_css(self._COPY_TIMING)
-            time.sleep(1)
-        except ElementNotVisibleException:
-            return "Element not displayed"
+        copy_el.click()
  
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
@@ -340,8 +344,6 @@ class EditorPage(UnisubsPage):
     def approve_task(self):
         self.click_by_css(self._APPROVE)
         self.wait_for_element_not_present(self._APPROVE)
-
-
 
     def send_back_task(self): 
         self.click_by_css(self._SEND_BACK)

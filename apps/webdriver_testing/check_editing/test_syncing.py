@@ -6,16 +6,16 @@ from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
 from webdriver_testing.pages.site_pages import video_language_page
-from webdriver_testing.pages.editor_pages import dialogs
-from webdriver_testing.pages.editor_pages import unisubs_menu
 from webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.data_factories import UserFactory
 import os
 import time
 
 @unittest.skip('slow')
 class TestCasePartialSync(WebdriverTestCase):
-    """Tests for the Subtitle Syncing editor page.
+    """Tests for the Legacy Editor Subtitle Syncing editor page.
         
     """
     NEW_BROWSER_PER_TEST_CASE = False
@@ -25,14 +25,13 @@ class TestCasePartialSync(WebdriverTestCase):
         super(TestCasePartialSync, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(username = 'user')
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
+        cls.modal = site_modals.SiteModals(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
-        cls.unisubs_menu = unisubs_menu.UnisubsMenu(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.video_language_pg = video_language_page.VideoLanguagePage(cls)
 
-        td = {'url': ('http://qa.pculture.org/amara_tests/'
-                   'Birds_short.mp4')
+        td = {'url': ('http://www.youtube.com/watch?v=WqJineyEszo')
              }
         cls.test_video = cls.data_utils.create_video(**td)
         cls.video_pg.open_video_page(cls.test_video.video_id)
@@ -40,16 +39,18 @@ class TestCasePartialSync(WebdriverTestCase):
         cls.video_pg.set_skiphowto()
         #Open the video page and sync the first 3 subs
         cls.video_pg.add_subtitles()
-        cls.create_modal.create_original_subs('English', 'English')
+        cls.modal.add_language('English', 'English')
+        cls.editor_pg.legacy_editor()
         cls.typed_subs = cls.sub_editor.type_subs()
         cls.sub_editor.save_and_exit()
 
                         
     def setUp(self):
         super(TestCasePartialSync, self).setUp()
-        self.video_language_pg.open_video_lang_page(self.test_video.video_id,
-                                                    'en')  
+        self.video_language_pg.open_video_lang_page(
+                self.test_video.video_id, 'en')
         self.video_language_pg.edit_subtitles()
+        self.editor_pg.legacy_editor()
         self.sub_editor.continue_to_next_step()
         num_synced_subs = 3
         self.sub_editor.sync_subs(num_synced_subs)
@@ -109,62 +110,3 @@ class TestCasePartialSync(WebdriverTestCase):
         self.logger.info( time_check)
         self.assertIn(time_check, saved_subs)
             
-
-        
-class TestCaseSyncBrowserError(WebdriverTestCase):
-    """Tests for the Subtitle Syncing editor page.
-        
-    """
-    NEW_BROWSER_PER_TEST_CASE = True
-
-    def setUp(self):
-        super(TestCaseSyncBrowserError, self).setUp()
-        self.data_utils = data_helpers.DataHelpers()
-        self.user = UserFactory.create(username = 'user')
-        self.create_modal = dialogs.CreateLanguageSelection(self)
-        self.sub_editor = subtitle_editor.SubtitleEditor(self)
-        self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
-        self.video_pg = video_page.VideoPage(self)
-        self.video_language_pg = video_language_page.VideoLanguagePage(self)
-
-        td = {'url': ('http://qa.pculture.org/amara_tests/'
-                   'Birds_short.mp4')
-             }
-        self.test_video = self.data_utils.create_video(**td)
-        self.video_pg.open_video_page(self.test_video.video_id)
-        self.video_pg.log_in(self.user.username, 'password')
-        self.video_pg.set_skiphowto()
-        #Open the video page and sync the first 3 subs
-        self.video_pg.add_subtitles()
-        self.create_modal.create_original_subs('English', 'English')
-        self.typed_subs = self.sub_editor.type_subs()
-        self.sub_editor.continue_to_next_step()
-        num_synced_subs = 3
-        self.sub_editor.sync_subs(num_synced_subs)
-
-    def test_close__abruptly(self):
-        """Partially synced subs are saved when browser closes abruptly.
-      
-        Note: the browser needs to be open for about 80 seconds for saving.
-        """
-        timing_list = self.sub_editor.sub_timings()
-        self.logger.info( 'sleeping for 90 seconds to initiate automatic save')
-        time.sleep(90)
-        self.sub_editor.open_page("")
-        self.sub_editor.handle_js_alert('accept')
-        time.sleep(5)
-        self.video_pg.open_video_page(self.test_video.video_id)
-        self.unisubs_menu.open_menu()
-
-        self.assertEqual(self.create_modal.warning_dialog_title(), 
-            'Resume editing?')
-
-        # Resume dialog - click OK
-        self.create_modal.resume_dialog_ok()
- 
-        #Move to the syncing screen
-        self.sub_editor.continue_to_next_step()
-
-        #Verify sub timings are same as pre-save timings 
-        self.assertEqual(timing_list, self.sub_editor.sub_timings())
-

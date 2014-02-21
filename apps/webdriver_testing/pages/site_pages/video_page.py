@@ -37,7 +37,7 @@ class VideoPage(UnisubsPage):
     _ACTIVITY_TAB = 'a[href="?tab=activity"]'
 
 
-    _ADD_SUBTITLES = "a.add_subtitles"
+    _ADD_SUBTITLES = "a.open-modal"
 
     #VIDEO SIDE SECTION
     _INFO = "ul#video-menu.left_nav li:nth-child(1) > a"

@@ -144,9 +144,6 @@ class TestCaseTaskEntry(WebdriverTestCase):
         self.tasks_tab.open_tasks_tab(self.team.slug)
         self.tasks_tab.handle_js_alert('accept')
 
-    def tearDown(self):
-        self.browser.get_screenshot_as_file('%s.png' % self.id())
-
 
     def test_review_to_legacy(self):
         """Perform task (review) opens in new editor"""
@@ -159,7 +156,7 @@ class TestCaseTaskEntry(WebdriverTestCase):
                           self.editor_pg.working_language())
         self.assertTrue(self.editor_pg.collab_panel_displayed())
         self.editor_pg.legacy_editor()
-        self.assertEqual('Review', self.sub_editor.dialog_title())
+        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
 
 
     def test_review_to_new_approve(self):
@@ -170,7 +167,6 @@ class TestCaseTaskEntry(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=es' % self.team.slug) 
         self.tasks_tab.perform_task('Review Spanish Subtitles',
                                                 self.video.title)
-        self.sub_editor.open_in_beta_editor()
         self.assertEqual(u'Editing Spanish\u2026', 
                           self.editor_pg.working_language())
         self.editor_pg.approve_task()
@@ -178,34 +174,6 @@ class TestCaseTaskEntry(WebdriverTestCase):
                          self.video_pg.video_title())
         self.assertEqual(1, len(list(self.video.teamvideo.task_set.all_approve().filter(language='es'))))
 
-
-    def test_edit_approve_version(self):
-        """Edit then and approve review task save new version.
-
-        """
-        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone&lang=de' % self.team.slug) 
-        self.tasks_tab.perform_task('Review German Subtitles',
-                                                self.video.title)
-        self.sub_editor.open_in_beta_editor()
-        self.assertEqual(u'Editing German\u2026', 
-                          self.editor_pg.working_language())
-        self.editor_pg.edit_sub_line('12345 chars', 1)
-        self.editor_pg.save('Resume editing')
-        self.editor_pg.approve_task()
-        de_tag, _ = self.video_pg.language_status('German')
-        self.assertEqual('needs approval', de_tag) 
-        de = self.video.subtitle_language('de').get_tip(full=True)
-        self.assertEqual(3, de.version_number)
-        
-
-    def test_save_back_to_old(self):
-        """Open in new editor, then save and go back to old editor.
-
-        """
-        self.editor_pg.open_editor_page(self.video.video_id, 'fr')
-        self.editor_pg.edit_sub_line('12345 chars', 1)
-        self.editor_pg.save('Back to full editor')
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
 
     def test_save_resume(self):
         """Open in new editor, then save and resume editing.
