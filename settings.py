@@ -369,6 +369,7 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'middleware.SaveUserIp',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'unisubs.urls'

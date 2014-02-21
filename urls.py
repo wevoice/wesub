@@ -24,6 +24,7 @@ from django.template import RequestContext, loader
 from django.views.generic.simple import direct_to_template, redirect_to
 from sitemaps import sitemaps, sitemap_view, sitemap_index
 from socialauth.models import AuthMeta, OpenidProfile
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 admin.autodiscover()
 
@@ -121,7 +122,7 @@ urlpatterns = patterns('',
         {'template': 'embedder-iframe.js'}, 'embedder_iframe'),
     url(r'^embedder-offsite/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'embedder-offsite.html'}, 'embedder_page_offsite'),
-    url(r'^embedder-widget', 'django.views.generic.simple.direct_to_template',
+    url(r'^embedder-widget-iframe', xframe_options_exempt(direct_to_template),
         {'template': 'embedder-widget.html'}, 'embedder_page_offsite'),
     url(r'^embedder-offsite-iframe/$', 'django.views.generic.simple.direct_to_template',
         {'template': 'embedder-offsite-iframe.html'}, 'embedder_page_offsite_iframe'),
