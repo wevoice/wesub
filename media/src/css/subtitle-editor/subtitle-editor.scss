@@ -891,6 +891,16 @@ section.main {
             // We move it upwards, covering the header
             margin-top: -38px;
             background: none repeat scroll 0 0 $dark-grey;
+            div.instructions-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: none repeat scroll 0 0 $dark-grey;
+                opacity: 0.6;
+                width: 100%;
+                height: 100%;
+                display: none;
+            }
             div.subtitle-overlay {
                 position: absolute;
                 bottom: 63px;
