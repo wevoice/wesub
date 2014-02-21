@@ -140,7 +140,7 @@ def token_login(request, token):
             backend = get_backends()[0]
             user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
             stock_login(request, user)
-            next_url = request.GET.get("next", reverse("profiles:edit"))
+            next_url = make_redirect_to(request, reverse("profiles:edit"))
             return HttpResponseRedirect(next_url)
 
     except LoginToken.DoesNotExist:
@@ -179,10 +179,9 @@ def render_login(request, user_creation_form, login_form, redirect_to):
             REDIRECT_FIELD_NAME: redirect_to,
             }, context_instance=RequestContext(request))
 
-def make_redirect_to(request):
-    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, '')
+def make_redirect_to(request, default=''):
+    redirect_to = request.REQUEST.get(REDIRECT_FIELD_NAME, default)
     if not redirect_to or '//' in redirect_to:
         return '/'
     else:
         return redirect_to
-
