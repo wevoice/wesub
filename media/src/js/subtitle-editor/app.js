@@ -349,8 +349,9 @@ var angular = angular || null;
         };
     });
 
-    module.controller("AppControllerSubtitles", function($scope, EditorData,
-                SubtitleStorage, CurrentEditManager, SubtitleVersionManager) {
+    module.controller("AppControllerSubtitles", function($scope, $timeout,
+                EditorData, SubtitleStorage, CurrentEditManager,
+                SubtitleBackupStorage, SubtitleVersionManager) {
         var video = EditorData.video;
         $scope.currentEdit = new CurrentEditManager();
         $scope.workingSubtitles = new SubtitleVersionManager(
@@ -367,9 +368,53 @@ var angular = angular || null;
                     editingVersion.languageCode, EditorData.baseLanguage);
         }
 
+        $scope.saveAutoBackup = function() {
+            SubtitleBackupStorage.saveBackup(video.id,
+                    $scope.workingSubtitles.language.code,
+                    $scope.workingSubtitles.versionNumber,
+                    $scope.workingSubtitles.subtitleList.toXMLString());
+        }
+        $scope.restoreAutoBackup = function() {
+            var savedData = SubtitleBackupStorage.getBackup(video.id,
+                    $scope.workingSubtitles.language.code,
+                    editingVersion.versionNumber);
+            $scope.workingSubtitles.subtitleList.loadXML(savedData);
+        }
+
+        $scope.promptToRestoreAutoBackup = function() {
+            var dialog = {}
+            dialog.heading = 'You have an unsaved backup of your subtitling work, do you want to restore it?';
+            dialog.buttons = [
+                    {
+                        'text': 'Restore',
+                        'class': 'yes',
+                        'fn': function() {
+                            $scope.restoreAutoBackup();
+                            $scope.$emit('hide-modal');
+                        }
+                    },
+                    {
+                        'text': 'Discard',
+                        'class': 'no',
+                        'fn': function() {
+                            SubtitleBackupStorage.clearBackup();
+                            $scope.$emit('hide-modal');
+                        }
+                    },
+            ];
+            $scope.$root.$emit("show-modal", dialog);
+        }
+
+        if(SubtitleBackupStorage.hasBackup(video.id,
+                $scope.workingSubtitles.language.code,
+                editingVersion.versionNumber)) {
+            $timeout($scope.promptToRestoreAutoBackup);
+        }
+
+
         $scope.saveSubtitles = function(markComplete) {
             return SubtitleStorage.saveSubtitles(
-                    $scope.videoId,
+                    video.id,
                     $scope.workingSubtitles.language.code,
                     $scope.workingSubtitles.subtitleList.toXMLString(),
                     $scope.workingSubtitles.title,
