@@ -28,6 +28,7 @@ var angular = angular || null;
     Workflow = function(subtitleList, translating, titleEdited) {
 	this.translating = translating;
 	this.titleEdited = titleEdited;
+	this.showOverlay = false;
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.length() == 0) {
