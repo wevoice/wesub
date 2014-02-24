@@ -18,7 +18,7 @@ files = [
     //ANGULAR_SCENARIO,
     //ANGULAR_SCENARIO_ADAPTER,
     'src/js/third-party/jquery-1.10.1.js',
-    'src/js/third-party/angular.1.0.7.js',
+    'src/js/third-party/angular.*.js',
     'src/js/third-party/angular-mocks.js',
     'src/js/third-party/angular-cookies.js',
     'src/js/third-party/jquery.autosize.js',

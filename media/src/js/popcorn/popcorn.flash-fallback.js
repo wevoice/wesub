@@ -21,7 +21,7 @@ var jQuery = window.jQuery || null;
 
 (function (Popcorn, window, document) {
 
-    var STATIC_ROOT_URL = window.Amara.conf.STATIC_ROOT_URL;
+    var STATIC_ROOT_URL = window._amaraConf ? window._amaraConf.staticURL : window.Amara.conf.STATIC_ROOT_URL;
     var CURRENT_TIME_MONITOR_MS = 16;
     var EMPTY_STRING = "";
 
@@ -467,13 +467,13 @@ var jQuery = window.jQuery || null;
     // Helper for identifying URLs we know how to play.
     HTMLFlashFallbackVideoElement.prototype._canPlaySrc = function (url) {
         var isH264 = (/\.mp4$/i.test(url) || /\.m4v$/i.test(url));
+        var isFlv = (/\.flv$/i.test(url));
         var supportsVideo = !!document.createElement('video').canPlayType;
 
         // does this browser supports the native h264?
         var v = document.createElement("video");
         var canPlayH264 = v.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
-
-        if (isH264 && (!supportsVideo || !canPlayH264)){
+        if ((isFlv) || (isH264 && (!supportsVideo || !canPlayH264))) {
             return "probably";
         }
     };
