@@ -36,7 +36,7 @@ var angular = angular || null;
             this.stage = 'sync';
         }
         this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.allLinesCompleted()) {
+            if(self.stage == 'review' && !self.subtitleList.isComplete()) {
                 self.stage = 'sync';
             }
         });
@@ -50,18 +50,13 @@ var angular = angular || null;
 	    }
             this.stage = newStage;
         },
-        allLinesCompleted: function() {
-            return (this.subtitleList.length() > 0 &&
-                    !this.subtitleList.needsAnyTranscribed() &&
-                    !this.subtitleList.needsAnySynced());
-        },
         canMoveToNext: function() {
             switch(this.stage) {
                 case 'type':
                     return true;
                     
                 case 'sync':
-                    return this.allLinesCompleted();
+                    return this.subtitleList.isComplete();
 
                 case 'title':
                     return this.titleEdited();
