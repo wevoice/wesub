@@ -82,7 +82,7 @@ describe('The Workflow class', function() {
         expect(workflow.stage).toBe('sync');
     });
 
-    it('knows whichs stage are done', function() {
+    it('knows which stages are done', function() {
         expect(workflow.stageDone('type')).toBeFalsy();
         expect(workflow.stageDone('sync')).toBeFalsy();
         workflow.switchStage('sync');
