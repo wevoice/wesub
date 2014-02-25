@@ -340,13 +340,11 @@
                 <div class="approval module" ng-show="modulesEnabled.approval">
                     <div class="content">
                         <button class="send-back" ng-click="sendBack()">Send Back</button>
-                        <button class="approve" ng-click="approve()">Accept</button>
+                        <button ng-disabled="!canApprove()" class="approve" ng-click="approve()">Accept</button>
                     </div>
                 </div>
+                <p ng-show="errorMessage()" class="error">[[ errorMessage() ]]</p>
             </aside>
-            <div class="errors">
-                <div ng-show="error" class="error">[[ error ]]</div>
-            </div>
         </section>
         <section class="right column">
             <div class="steps-container"

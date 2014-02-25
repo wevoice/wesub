@@ -1291,6 +1291,11 @@ section.collab {
                     padding: 10px 0 10px 30px;
                     text-align: left;
                     width: 48%;
+
+                    &[disabled] {
+                        background: #888;
+                        cursor: default;
+                    }
                 }
             }
             &.open {
@@ -1312,19 +1317,10 @@ section.collab {
             }
         }
     }
-    div.errors {
-        .error {
-            background: #F2DEDE url('../../../images/warning.png') 10px center no-repeat;
-            border: 1px solid #EED3D7;
-            border-left: 0;
-            bottom: 30%;
-            color: #B94A48;
-            display: block;
-            padding: 10px 20px 10px 36px;
-            position: fixed;
-            z-index: 49;
-            @include multi-border-radius(0, 2px, 2px, 0);
-        }
+    .error {
+        margin-left: 20px;
+        font: normal 13px $OpenSans;
+        color: #ddd;
     }
 }
 
