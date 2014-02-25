@@ -69,8 +69,17 @@ unisubs.player.Html5VideoSource.prototype.createPlayer_ = function(forSubDialog)
         !unisubs.player.supportsH264())
         return new unisubs.player.FlvVideoPlayer(this, forSubDialog);
     else {
+        // This is a workaround for Chrome issue with
+        // same video open in multiple tabs or windows
+        // not great, because prevents caching
+        var randomizedURL = this.videoURL_;
+        if(randomizedURL.indexOf('?') == -1) {
+                randomizedURL += '?noise=' + Date.now();
+            } else {
+                randomizedURL += '&noise=' + Date.now();
+            }
         var newSource = new unisubs.player.Html5VideoSource(
-            this.videoURL_, this.videoType_, this.videoConfig_);
+            randomizedURL, this.videoType_, this.videoConfig_);
         newSource.setAlternateSources(this.alternateSources_);
         return new unisubs.player.Html5VideoPlayer(
             newSource, forSubDialog);
