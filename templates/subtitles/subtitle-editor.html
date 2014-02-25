@@ -353,12 +353,9 @@
                 ng-controller="WorkflowProgressionController">
                 <ul class="steps">
                     <li ng-class="{done: workflow.stageDone('type')}">
-                    1. Type what you hear
-                        <div class="substeps"
-                            ng-show="workflow.stage == 'type'">
-                            <p ng-show="!workflow.canMoveToReview()">
-                                {% trans "Is all the content subtitled?" %}
-                            </p>
+                    {% trans "1. Type what you hear" %}
+                        <div class="substeps" ng-show="workflow.stage == 'type'">
+                            <p>{% trans "Is all the content subtitled?" %}</p>
                             <button class="next-step"
                                 ng-click="onNextClicked($event)">
                                 {% trans "Yes, start syncing" %}
@@ -366,46 +363,53 @@
                     </div>
                     </li>
                     <li ng-class="{done: workflow.stageDone('sync')}">
-                        2. Sync timing
-                        <div class="substeps"
-                            ng-show="workflow.stage == 'sync'">
-                            <p ng-show="!workflow.canMoveToTitle()">
-                                {% trans "Not all lines are synced yet." %}
-                            </p>
-                            <div ng-show="workflow.canMoveToTitle()">
-                                <p>{% trans "All lines are synced." %}</p>
-                                <button ng-show="translating()" class="next-step"
-                                    ng-click="onNextClicked($event)">
-                                    {% trans "Edit title and description" %}
-                                </button>
-                                <button ng-show="!translating() && workflow.canMoveToReview()" class="next-step"
-                                    ng-click="onNextClicked($event)">
-                                    {% trans "Start reviewing" %}
-                                </button>
+                        {% trans "2. Sync timing" %}
+                        <div class="substeps" ng-show="workflow.stage == 'sync'">
+                            <ng-switch on="workflow.canMoveToNext()">
+                                <p ng-switch-when="false">
+                                    {% trans "Not all lines are completed." %}
+                                </p>
+                                <div ng-switch-when="true">
+                                    <p>{% trans "All lines are completed." %}</p>
+                                    <button class="next-step" ng-click="onNextClicked($event)">
+                                        <ng-switch on="translating()">
+                                            <div ng-switch-when="true">{% trans "Edit title and description" %}</div>
+                                            <div ng-switch-when="false">{% trans "Start reviewing" %}</div>
+                                        </ng-switch>
+                                    </button>
+                                </div>
+                            </ng-switch>
                         </div>
                     </li>
                     <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-                        3. Translate title
+                        {% trans "3. Translate title" %}
                         <div class="substeps"
                             ng-show="workflow.stage == 'title'">
-                            <p ng-show="!workflow.canMoveToReview()">
-                                {% trans "Title and description were not edited yet." %}
-                            </p>
-                            <div ng-show="workflow.canMoveToReview()">
-                                <p>{% trans "Title and description have been edited." %}</p>
-                                <button class="next-step"
-                                    ng-click="onNextClicked($event)">
-                                    {% trans "Start reviewing" %}
-                                </button>
+                            <ng-switch on="workflow.canMoveToNext()">
+                                <p ng-switch-when="false">
+                                    {% trans "Title and description were not edited yet." %}
+                                </p>
+                                <div ng-switch-when="true">
+                                    <p>{% trans "Title and description have been edited." %}</p>
+                                    <button class="next-step" ng-click="onNextClicked($event)">
+                                        {% trans "Start reviewing" %}
+                                    </button>
+                                </div>
+                            </ng-switch>
                         </div>
                     </li>
-                    <li>[[ 3 + translating() ]]. Review and complete
-                    <div class="substeps"
-                        ng-show="workflow.stage == 'review'">
-                        <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
-                        <button class="endorse" ng-click="endorse()">
-                            {% trans "Complete" %}
-                        </button>
+                    <li>
+                        <ng-switch on="translating()">
+                            <div ng-switch-when="false">{% trans "3. Review and complete" %}</div>
+                            <div ng-switch-when="true">{% trans "4. Review and complete" %}</div>
+                        </ng-switch>
+                        <div class="substeps"
+                            ng-show="workflow.stage == 'review'">
+                            <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
+                            <button class="endorse" ng-click="endorse()">
+                                {% trans "Complete" %}
+                            </button>
+                        </div>
                     </li>
                 </ul>
             </div>

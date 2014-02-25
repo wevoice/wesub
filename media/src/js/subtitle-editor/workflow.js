@@ -36,7 +36,7 @@ var angular = angular || null;
             this.stage = 'sync';
         }
         this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.canMoveToReview()) {
+            if(self.stage == 'review' && !self.allLinesCompleted()) {
                 self.stage = 'sync';
             }
         });
@@ -44,29 +44,34 @@ var angular = angular || null;
 
     Workflow.prototype = {
         switchStage: function(newStage) {
-            if(newStage == 'review' && !this.canMoveToReview()) {
-                return;
-            }
 	    if (newStage == 'title') {
 		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
             this.stage = newStage;
         },
-        canMoveToTitle: function() {
-	    if (this.translating())
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
-	    else return true;
+        allLinesCompleted: function() {
+            return (this.subtitleList.length() > 0 &&
+                    !this.subtitleList.needsAnyTranscribed() &&
+                    !this.subtitleList.needsAnySynced());
         },
-        canMoveToReview: function() {
-	    if (this.translating())
-		return (this.titleEdited());
-	    else
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
+        canMoveToNext: function() {
+            switch(this.stage) {
+                case 'type':
+                    return true;
+                    
+                case 'sync':
+                    return this.allLinesCompleted();
+
+                case 'title':
+                    return this.titleEdited();
+
+                case 'review':
+                    return false;
+
+                default:
+                    throw "invalid value for Workflow.stage: " + this.stage;
+            }
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {
