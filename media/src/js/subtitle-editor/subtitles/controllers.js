@@ -139,9 +139,10 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     });
 
-    module.controller('SaveSessionController', function($scope, $q, SubtitleStorage, EditorData) {
+    module.controller('SaveSessionController', function($scope, $q, $timeout, SubtitleBackupStorage, SubtitleStorage, EditorData) {
 
         $scope.changesMade = false;
+        $scope.autoBackupNeeded = false;
         $scope.notesChanged = false;
         $scope.nextVersionNumber = null;
         $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
@@ -256,6 +257,7 @@ var angular = angular || null;
             } else if($scope.changesMade || markCompleteChanged) {
                 var promise = $scope.saveSubtitles(markComplete);
                 promise = promise.then(function onSuccess(response) {
+                    SubtitleBackupStorage.clearBackup();
                     $scope.changesMade = false;
                     // extract the version number from the JSON data
                     return response.data.version_number;
@@ -412,10 +414,19 @@ var angular = angular || null;
         });
         $scope.$root.$on('work-done', function() {
             $scope.changesMade = true;
+            $scope.autoBackupNeeded = true;
         });
         $scope.$root.$on('notes-changed', function() {
             $scope.notesChanged = true;
         });
+
+        function handleAutoBackup() {
+            if($scope.autoBackupNeeded) {
+                $scope.saveAutoBackup();
+                $scope.autoBackupNeeded = false;
+            }
+        }
+        $timeout(handleAutoBackup, 60 * 1000);
 
         window.onbeforeunload = function() {
             if($scope.changesMade) {

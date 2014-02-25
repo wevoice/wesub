@@ -302,6 +302,7 @@ SUBTITLE_EDITOR_JS = [
     'src/js/third-party/FileSaver.js',
     'src/js/third-party/popcorn.brightcove.js',
     'src/js/third-party/modal-helper.js',
+    'src/js/third-party/json2.min.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',
     'src/js/popcorn/popcorn.flash-fallback.js',
@@ -369,6 +370,7 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'middleware.SaveUserIp',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'unisubs.urls'
