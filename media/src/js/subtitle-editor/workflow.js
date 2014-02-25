@@ -28,7 +28,7 @@ var angular = angular || null;
     Workflow = function(subtitleList, translating, titleEdited) {
 	this.translating = translating;
 	this.titleEdited = titleEdited;
-	this.showOverlay = false;
+	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.length() == 0) {
@@ -44,14 +44,19 @@ var angular = angular || null;
     }
 
     Workflow.prototype = {
+	tabPressed: function(){
+           if (this.showOverlay) this.showOverlay = false;
+	},
         switchStage: function(newStage) {
             if(newStage == 'review' && !this.canMoveToReview()) {
                 return;
             }
 	    if (newStage == 'title') {
+                this.showOverlay = false; 
 		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
+            this.showOverlay = true;
             this.stage = newStage;
         },
         canMoveToTitle: function() {
