@@ -73,11 +73,13 @@ unisubs.player.Html5VideoSource.prototype.createPlayer_ = function(forSubDialog)
         // same video open in multiple tabs or windows
         // not great, because prevents caching
         var randomizedURL = this.videoURL_;
-        if(randomizedURL.indexOf('?') == -1) {
-                randomizedURL += '?noise=' + Date.now();
-            } else {
-                randomizedURL += '&noise=' + Date.now();
-            }
+        if (window.chrome) {
+            if (randomizedURL.indexOf('?') == -1) {
+                    randomizedURL += '?amaranoise=' + Date.now();
+                } else {
+                    randomizedURL += '&amaranoise=' + Date.now();
+                }
+        }
         var newSource = new unisubs.player.Html5VideoSource(
             randomizedURL, this.videoType_, this.videoConfig_);
         newSource.setAlternateSources(this.alternateSources_);
