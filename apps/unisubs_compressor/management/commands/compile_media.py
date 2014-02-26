@@ -54,7 +54,7 @@ def to_static_root(*path_components):
 JS_LIB = os.path.join(settings.PROJECT_ROOT, "media")
 CLOSURE_LIB = os.path.join(JS_LIB, "js", "closure-library")
 FLOWPLAYER_JS = os.path.join(
-    settings.PROJECT_ROOT, "media/flowplayer/flowplayer-3.2.6.min.js")
+    settings.PROJECT_ROOT, "media/flowplayer/flowplayer-3.2.13.min.js")
 COMPILER_PATH = os.path.join(settings.PROJECT_ROOT,  "closure", "compiler.jar")
 
 
