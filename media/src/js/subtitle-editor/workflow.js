@@ -96,6 +96,12 @@ var angular = angular || null;
             $scope.currentEdit.start(newSub);
         }
 
+        var notATask = !EditorData.task_needs_pane;
+
+        $scope.showOverlay = function() {
+            return (notATask && $scope.workflow.showOverlay);
+        }
+
         function rewindPlayback() {
             VideoPlayer.pause();
             VideoPlayer.seek(0);
