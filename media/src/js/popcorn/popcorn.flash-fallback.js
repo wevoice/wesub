@@ -125,7 +125,7 @@ var jQuery = window.jQuery || null;
         function onPlayerJSReady(event) {
             parent.appendChild(elem);
             var flashEmbedParams = {
-                'src': STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.7.swf",
+                'src': STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.18.swf",
                 'wmode': 'opaque',
                 'width': '100%',
                 'height': '100%'
@@ -278,7 +278,7 @@ var jQuery = window.jQuery || null;
 
         function loadFlowPlayerJs() {
             var el = document.createElement("script");
-            el.src = STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.6.min.js";
+            el.src = STATIC_ROOT_URL + "flowplayer/flowplayer-3.2.13.min.js";
             var firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(el, firstScriptTag);
             var intervalId = setInterval(function () {
