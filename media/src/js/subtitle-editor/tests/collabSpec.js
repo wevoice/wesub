@@ -39,7 +39,7 @@ describe('The Collab Controller', function() {
                     var correctError = null;
                 } else {
                     var correctCanApprove = false;
-                    var correctError = 'Not all lines are completed';
+                    var correctError = 'Not all lines are completed.';
                 }
                 if(canApprove !== correctCanApprove) {
                     this.message = function() {

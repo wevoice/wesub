@@ -69,7 +69,7 @@
 
         $scope.errorMessage = function() {
             if(!$scope.canApprove()) {
-                return 'Not all lines are completed';
+                return 'Not all lines are completed.';
             }
             return null;
         }
