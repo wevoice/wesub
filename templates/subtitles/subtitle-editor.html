@@ -223,29 +223,31 @@
 	    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="workflow.showOverlay">
 	      <div ng-show="workflow.stage == 'type'">
 		<h1>Thanks for making Subtitles!</h1>
-		<p>Just watch the video and type everything you hear in the space below.</p>
-		<p>Some helpful keyboard shortcuts are displayed on the left.</p>
-		<p>The guide on the right tells you what to do next.</p>
-		<p>Press the Tab key to start playing the video and begin subtitling.</p>
+		<ul>
+		  <li>Watch the video and type everything you hear.</li>
+		  <li>Keyboard shortcuts are displayed on the left.</li>
+		  <li>The guide on the right tells you what's next.</li>
+		  <li>Press the TAB key to start subtitling!</li>
+		</ul>
 	      </div>
 	      <div ng-show="workflow.stage == 'sync'">
-		<h1>Now you need to align your subtitles with the video.</h1>
-		<p>Taps the Down arrow key each time you want to start a subtitle.</p>
-		<p>The UP arrow key will set the end time, but that's optional.</p>
-		<p>Press the Tab key to start playing the video and the Down arrow to start syncing.</p>
+		<h1>Subtitle Syncing</h1>
+		<ul>
+		  <li>Tap the DOWN arrow to start a subtitle.</li>
+		  <li>Tap the UP arrow to set the end time (optional).</li>
+		  <li>Press the TAB key to start syncing!</li>
+		</ul>
 	      </div>
 	      <div ng-show="workflow.stage == 'title'"></div>
 	      <div ng-show="workflow.stage == 'review'">
-		<h1>Watch the video one more time and make any corrections</h1>
-		<p>Here are some tips for making high quality subtitles:</p>
+		<h1>Review your work</h1>
 		<ul>
-		  <li>Include text that appears in the video (signs, etc.)</li>
-		  <li>Include important sounds in [brackets]</li>
-		  <li>It's best to split a long phase using Shift + Enter to insert a line break.</li>
-		  <li>When you are done, press complete to sign off on your work, or you can use the Save button to save a revision and finish later.</li>
+		  <li>Watch the video and make corrections.</li>
+		  <li>Follow the style guide to make quality subtitles.</li>
+		  <li>Press complete to sign off on your work.</li>
+		  <li>Use the Save button to save and finish later</li>
+		  <li>Press the TAB key to continue!</li>
 		</ul>
-		<p>Press the Tab key to start playback.</p>
-		
 	      </div>
 	    </div>
           </div>
