@@ -71,7 +71,7 @@ unisubs.player.FlvVideoPlayer.prototype.enterDocument = function() {
         this.getElement().appendChild(videoDiv);
         this.setDimensionsKnownInternal();
         var flashEmbedParams = {
-            'src': unisubs.staticURL() + 'flowplayer/flowplayer-3.2.7.swf',
+            'src': unisubs.staticURL() + 'flowplayer/flowplayer-3.2.18.swf',
             'width': this.playerSize_.width + '',
             'height': this.playerSize_.height + '',
             'wmode': 'opaque'
