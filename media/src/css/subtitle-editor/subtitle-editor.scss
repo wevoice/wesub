@@ -896,11 +896,14 @@ section.main {
                 top: 0;
                 left: 0;
                 background: none repeat scroll 0 0 $dark-grey;
-                opacity: 0.8;
+                opacity: 0.95;
                 width: 100%;
                 height: 100%;
                 display: block;
                 div {
+                ul {
+                    list-style-image: url('../../../images/subtitle-editor/glyphicons_halflings_006_star.png');
+                }
                 margin: 25px;
                 color: white;
                 font-size: 12px;
