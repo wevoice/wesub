@@ -286,7 +286,7 @@ JS_BASE_DEPENDENCIES = [
     'js/closure-library/closure/goog/base.js',
     'js/closure-dependencies.js',
     'js/swfobject.js',
-    'flowplayer/flowplayer-3.2.6.min.js',
+    'flowplayer/flowplayer-3.2.13.min.js',
     'src/js/third-party/amara-jquery.min.js',
     'src/js/dfxp/dfxp.js',
 ]
@@ -302,6 +302,7 @@ SUBTITLE_EDITOR_JS = [
     'src/js/third-party/FileSaver.js',
     'src/js/third-party/popcorn.brightcove.js',
     'src/js/third-party/modal-helper.js',
+    'src/js/third-party/json2.min.js',
     'src/js/dfxp/dfxp.js',
     'src/js/uri.js',
     'src/js/popcorn/popcorn.flash-fallback.js',
@@ -369,6 +370,7 @@ MIDDLEWARE_CLASSES = (
     'middleware.P3PHeaderMiddleware',
     'middleware.UserUUIDMiddleware',
     'middleware.SaveUserIp',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'unisubs.urls'
@@ -809,12 +811,13 @@ MEDIA_BUNDLES = {
             'src/js/third-party/underscore.min.js',
             'src/js/third-party/jquery-1.8.3.min.js',
             'src/js/third-party/backbone.min.js',
+            'src/js/embedder/conf.js',
             'src/js/third-party/popcorn.js',
             'src/js/third-party/popcorn.brightcove.js',
+            'src/js/popcorn/popcorn.flash-fallback.js',
             'src/js/third-party/jquery.mCustomScrollbar.concat.min.js',
             'src/js/popcorn/popcorn.amaratranscript.js',
             'src/js/popcorn/popcorn.amarasubtitle.js',
-            'src/js/embedder/conf.js',
             'src/js/embedder/embedder.js'
         ),
         "release_url": True,

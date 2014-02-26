@@ -246,6 +246,68 @@ var angular = angular || null;
             }
         };
     });
+    module.factory('SubtitleBackupStorage', function($window) {
+        /**
+         * Get the editor data that was passed to us from python
+         *
+         */
+        var storage = $window.localStorage;
+        var storageKey = 'amara-subtitle-backup';
+
+        function getSavedData() {
+            var data = $window.localStorage.getItem(storageKey);
+            if(data === null) {
+                return null;
+            } else {
+                try {
+                    return JSON.parse(data);
+                } catch (e) {
+                    return null;
+                }
+
+            }
+        }
+
+        function savedDataIsValid(savedData, videoId, languageCode, versionNumber) {
+                return (savedData !== null &&
+                        savedData.videoId == videoId &&
+                        savedData.languageCode == languageCode &&
+                        savedData.versionNumber == versionNumber);
+        }
+
+        return {
+            saveBackup: function(videoId, languageCode, versionNumber, dfxpString) {
+                var data = {
+                    videoId: videoId,
+                    languageCode: languageCode,
+                    versionNumber: versionNumber,
+                    dfxpString: dfxpString
+                }
+                $window.localStorage.setItem(storageKey,
+                        JSON.stringify(data));
+            },
+            hasBackup: function(videoId, languageCode, versionNumber) {
+                return savedDataIsValid(getSavedData(), videoId,
+                        languageCode, versionNumber);
+            },
+            hasAnyBackup: function() {
+                return getSavedData() !== null;
+            },
+            getBackup: function(videoId, languageCode, versionNumber) {
+                var savedData = getSavedData();
+                if(savedDataIsValid(savedData, videoId, languageCode,
+                            versionNumber)) {
+                    this.clearBackup();
+                    return savedData.dfxpString;
+                } else {
+                    return null;
+                }
+            },
+            clearBackup: function() {
+                $window.localStorage.removeItem(storageKey);
+            },
+        };
+    });
     module.factory('EditorData', function($window) {
         /**
          * Get the editor data that was passed to us from python
