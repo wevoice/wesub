@@ -410,10 +410,13 @@ var USER_IDLE_MINUTES = 15;
                     var caretPos = draft.initialCaretPos;
                 }
                 DomUtil.setSelectionRange(textarea[0], caretPos, caretPos);
-                textarea.on('keyup', function(evt) {
-                    $scope.$apply(function() {
-                        draft.markdown = textarea.val();
-                    });
+                textarea.on('keyup input propertychange', function(evt) {
+                    var val = textarea.val();
+                    if(val != draft.markdown) {
+                        $scope.$apply(function() {
+                            draft.markdown = val;
+                        });
+                    }
                 });
                 if($scope.onEditKeydown) {
                     textarea.on('keydown', function(evt) {
