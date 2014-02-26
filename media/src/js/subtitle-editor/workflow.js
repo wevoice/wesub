@@ -90,6 +90,12 @@ var angular = angular || null;
 
     module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
 
+        // If a blank list of subs start, we autimatically start edition
+        if ($scope.workflow.subtitleList.length() == 0) {
+            var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
+            $scope.currentEdit.start(newSub);
+        }
+
         function rewindPlayback() {
             VideoPlayer.pause();
             VideoPlayer.seek(0);
