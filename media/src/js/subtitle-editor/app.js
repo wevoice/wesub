@@ -297,6 +297,27 @@ var angular = angular || null;
             $scope.currentEdit.start(sub);
         }
 
+        // This function is to have the keyboard shortcut help
+        // panel trigger same actions as keystrokes
+        $scope.handleMouseKeyDown = function(keyString) {
+            var evt = {
+                ctrlKey: false,
+                shiftKey: false,
+                preventDefault: function() {},
+                stopPropagation: function() {},
+                target: {}
+            }
+            var keys = keyString.split('-');
+            evt.keyCode = parseInt(keys[0]);
+            for (var i = 1 ; i < keys.length ; i++) {
+                if (keys[i] == "ctrl")
+                    evt.ctrlKey = true;
+                else if (keys[i] == "shift")
+                    evt.shiftKey = true;
+            }
+            $scope.handleAppKeyDown(evt);
+        }
+
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;

@@ -143,52 +143,52 @@
 	  
           <h1>{% trans "Keyboard controls" %}</h1>
 	  <div ng-show="workflow.stage == 'type'">
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
 	    </div>
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('13-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern">Enter</div>
 	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
 	    </div>
 	  </div>
 	  <div ng-show="workflow.stage == 'sync'">
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
 	    </div>
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('40')">
 	      <div class="key-pattern">Down Arrow</div>
 	      <div class="shortcut-desc">{% trans "Set the Start time" %}</div>
 	    </div>
-	    <div class="instruction-item">
+	    <div class="instruction-item" ng-click="handleMouseKeyDown('38')">
 	      <div class="key-pattern">Up Arrow</div>
 	      <div class="shortcut-desc">{% trans "Set the End Time (optional)" %}</div>
 	    </div>
 	  </div>
 	      <div ng-show="workflow.stage == 'title'"></div>
 	      <div ng-show="workflow.stage == 'review'">
-		<div class="instruction-item">
+		<div class="instruction-item" ng-click="handleMouseKeyDown('9')">
 		  <div class="key-pattern">Tab</div>
 		  <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 		</div>
-		<div class="instruction-item">
+		<div class="instruction-item" ng-click="handleMouseKeyDown('9-shift')">
 		  <div class="key-pattern">Shift</div>
 		  <div class="key-pattern">Tab</div>
 		  <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
 		</div>
-		<div class="instruction-item">
+		<div class="instruction-item" ng-click="handleMouseKeyDown('13-shift')">
 		  <div class="key-pattern">Shift</div>
 		  <div class="key-pattern">Enter</div>
 		  <div class="shortcut-desc">{% trans "Insert a line break" %}</div>

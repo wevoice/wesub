@@ -793,6 +793,9 @@ section.main {
                 display: table;
                 width: 100%;
                 @include border-radius(3px);
+                &:hover {
+                    cursor: pointer;
+                }
                 div.key-pattern {
                     float: left;
                     border-bottom: 1px solid #474849;
