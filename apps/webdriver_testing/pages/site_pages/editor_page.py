@@ -26,11 +26,13 @@ class EditorPage(UnisubsPage):
     #SAVE ERROR MODAL
     
     _SAVE_ERROR = 'div.modal div h1'
+    _EDITOR_MODAL = 'div.modal div h1'
+    _MODAL_NO = 'button.no'
+    _MODAL_YES = 'button.yes'
     _SAVE_ERROR_TEXT = ("There was an error saving your subtitles. You'll "
                         "need to copy and save your subtitles below, and "
                         "upload them to the system later.")
     _SAVE_SUBS = 'div.download textarea'
-    _CLOSE = 'button.no'
     _MAIN = 'section.main'
 
     #LEFT COLUMN
@@ -81,8 +83,19 @@ class EditorPage(UnisubsPage):
     _APPROVE = 'button.approve'
     _NOTES = 'textarea[ng-model="notes"]'
 
-    def open_editor_page(self, video_id, lang):
+    def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
+        self.restore_autobackup(restore)
+        
+    def restore_autobackup(self, restore=False):
+        if self.is_element_visible(self._EDITOR_MODAL):
+            modal = self.get_text_by_css(self._EDITOR_MODAL)
+            self.logger.info(modal)
+            if restore:
+                self.click_by_css(self._MODAL_YES)
+            else:
+                self.click_by_css(self._MODAL_NO)
+ 
 
 
     def open_ed_with_base(self, video_id, lang, base_lang='en'):
