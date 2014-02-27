@@ -14,7 +14,7 @@
             <div class="message">
                 {% with team.application_message as application_message %}
                     {% if application_message %}
-                        {{ team.application_message|linebreaksbr|urlize }}
+                        {{ team.application_message|urlize|linebreaksbr }}
                     {% else %}
                         <h4>{% trans "Language skill" %}</h4>
                         <p>
