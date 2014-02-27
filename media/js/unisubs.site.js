@@ -133,7 +133,6 @@ var Site = function(Site) {
          */
 
         chosenify: function() {
-            debugger;
             $('select', '.v1 .content').filter(function() {
                 if ($(this).parents('div').hasClass('ajaxChosen')) {
                     return false;
@@ -318,13 +317,20 @@ var Site = function(Site) {
         $('body div.well').remove();
         $('html').unbind('click.modal');
     }
-    this.openMultiVideoCreateSubtitlesModal = function(link) {
+    this.openModalForLink = function(link) {
+        var modalId = link.attr('href');
+        if(modalId == '#multi-video-create-subtitles-modal') {
+            that.setupMultiVideoCreateSubtitlesModal(link);
+        }
+        that.openModalDialog(modalId);
+    }
+    this.setupMultiVideoCreateSubtitlesModal = function(link) {
         var form = ('#multi-video-create-subtitles-modal');
         var video_id = link.data('video-id');
         var primary_audio_lang_code = link.data('video-primary-audio-lang-code');
         var langs = link.data('video-langs').split(':');
         var video_input = $('input[name=video]', form);
-        var primary_audio_lang_select = $('select[name=primary_audio_lang_code]', form);
+        var primary_audio_lang_select = $('select[name=primary_audio_language_code]', form);
         var language_select = $('select[name=subtitle_language_code]', form);
 
         video_input.val(video_id);
@@ -344,7 +350,6 @@ var Site = function(Site) {
         });
         $("option:not([disabled]):first", language_select).attr('selected',
                 true);
-        that.openModalDialog('#multi-video-create-subtitles-modal');
     }
 
     this.Views = {
@@ -402,19 +407,23 @@ var Site = function(Site) {
                 });
             }
             if ($('a.open-modal').length) {
-                $('a.open-modal').live('click',function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if($(this).hasClass('multi-video-create-subtitles')) {
-                        that.openMultiVideoCreateSubtitlesModal($(this));
-                    } else {
-                        that.openModalDialog($(this).attr('href'));
+                $('a.open-modal').each(function() {
+                    var $link = $(this);
+                    var modalId = $link.attr('href');
+                    var $modal = $(modalId);
+                    $link.bind('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        that.openModalForLink($link);
+                    });
+                    $('.action-close, .close', $modal).click(function(e){
+                        e.preventDefault();
+                        e.stopPropagation();
+                        that.closeModal($modal);
+                    });
+                    if($modal.hasClass('start-open')) {
+                        that.openModalForLink($link);
                     }
-                });
-                $('a.open-modal.start-open').click();
-                $('.action-close, .close', '.bootstrap').click(function(){
-                    that.closeModal($(this).parents('.modal'));
-                    return false;
                 });
             }
             $.fn.tabs = function(options){

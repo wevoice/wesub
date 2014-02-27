@@ -158,7 +158,7 @@
                                         {% endif %}
                                     {% else %} {# this is a non-task team #}
                                         {% if not team_video.video.primary_audio_language_code or not team_video.languages %}
-                                        <a href="#" class="open-modal multi-video-create-subtitles" {{ team_video.video|multi_video_create_subtitles_data_attrs }} title="Get started now">{% trans 'Create Subtitles' %}</a>
+                                        <a href="#multi-video-create-subtitles-modal" class="open-modal" {{ team_video.video|multi_video_create_subtitles_data_attrs }} title="Get started now">{% trans 'Create Subtitles' %}</a>
                                         {% elif team_video.languages|length > 1 %}
                                             <a href="#" class="dropdown">
                                                 {{ team_video.languages|length }}
