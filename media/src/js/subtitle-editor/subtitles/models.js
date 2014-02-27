@@ -298,6 +298,12 @@ var angular = angular || null;
         return this.syncedCount < this.length();
     }
 
+    SubtitleList.prototype.isComplete = function() {
+        return (this.length() > 0 &&
+                !this.needsAnyTranscribed() &&
+                !this.needsAnySynced());
+    }
+
     SubtitleList.prototype.toXMLString = function() {
         return this.parser.xmlToString(true, true);
     }
