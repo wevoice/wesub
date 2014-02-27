@@ -98,7 +98,7 @@ class TestCasePublishedVideos(WebdriverTestCase):
     def test_playback(self):
         """Published version can be played on the video page."""
         self.video_pg.open_video_page(self.published.video_id)
-        self.video_pg.log_in(self.member, 'password')
+        self.video_pg.log_in(self.member.username, 'password')
         self.menu.open_menu()
         self.menu.select_language('English')
         self.assertEqual('English', self.menu.visible_menu_text())
@@ -270,7 +270,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
 
     def test_draft__playback(self):
         """Draft can not be played on the video page."""
-        self.video_pg.log_in(self.member, 'password')
+        self.video_pg.log_in(self.member.username, 'password')
         self.assertFalse(self.video_pg.displays_add_subtitles())
 
     def test_draft__guest_improve(self):
@@ -284,7 +284,7 @@ class TestCaseDraftVideos(WebdriverTestCase):
         #Opening up translation permissions, otherwise the menu is hidden
         self.team.translate_policy=10
         self.team.save()
-        self.video_pg.log_in(self.member, 'password')
+        self.video_pg.log_in(self.member.username, 'password')
         self.video_pg.open_video_page(self.draft.video_id)
         self.assertFalse(self.video_pg.displays_subtitle_me())
 
