@@ -28,6 +28,7 @@ var angular = angular || null;
     Workflow = function(subtitleList, translating, titleEdited) {
 	this.translating = translating;
 	this.titleEdited = titleEdited;
+	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.length() == 0) {
@@ -43,11 +44,16 @@ var angular = angular || null;
     }
 
     Workflow.prototype = {
+	tabPressed: function(){
+           if (this.showOverlay) this.showOverlay = false;
+	},
         switchStage: function(newStage) {
 	    if (newStage == 'title') {
+                this.showOverlay = false; 
 		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
+            this.showOverlay = true;
             this.stage = newStage;
         },
         canMoveToNext: function() {
@@ -83,6 +89,18 @@ var angular = angular || null;
     module.value('Workflow', Workflow);
 
     module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
+
+        // If a blank list of subs start, we autimatically start edition
+        if ($scope.workflow.subtitleList.length() == 0) {
+            var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
+            $scope.currentEdit.start(newSub);
+        }
+
+        var notATask = !EditorData.task_needs_pane;
+
+        $scope.showOverlay = function() {
+            return (notATask && $scope.workflow.showOverlay);
+        }
 
         function rewindPlayback() {
             VideoPlayer.pause();

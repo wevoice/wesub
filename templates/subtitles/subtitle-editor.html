@@ -191,101 +191,131 @@
             </div>
         </section>
         <section class="center column">
-        <div class="video" ng-controller="VideoController">
+          <div class="video" ng-controller="VideoController">
             <div class="video-container" id="video"></div>
             <div class="subtitle-overlay" dir="{{ language.dir }}" ng-show="showOverlay"><div ng-bind-html="overlayText"></div></div>
             <ul class="video-controls group">
-                <li class="play-pause" ng-class="{'playing': videoState.playing}">
-                    <a href="#" ng-click="playPauseClicked($event)"></a>
-                </li>
-                <li class="time">
-                    <span ng-show="videoState.loaded">
-                        [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
-                    </span>
-                </li>
-                <li class="volume" ng-show="videoState.loaded">
-                    <a href="#" ng-click="volumeToggleClicked($event)"></a>
-                </li>
-                <li class="progress" progress-bar
-                    ng-mousedown="onProgressMouseDown($event)">
-                    <div class="slice-left"><div></div></div>
-                    <div class="slice-right"><div></div></div>
-                    <div class="slice-mid"><div></div></div>
-                </li>
+              <li class="play-pause" ng-class="{'playing': videoState.playing}">
+                <a href="#" ng-click="playPauseClicked($event)"></a>
+              </li>
+              <li class="time">
+                <span ng-show="videoState.loaded">
+                  [[ videoState.currentTime|displayTimeSeconds]] / [[ videoState.duration|displayTimeSeconds]]
+                </span>
+              </li>
+              <li class="volume" ng-show="videoState.loaded">
+                <a href="#" ng-click="volumeToggleClicked($event)"></a>
+              </li>
+              <li class="progress" progress-bar
+                  ng-mousedown="onProgressMouseDown($event)">
+                <div class="slice-left"><div></div></div>
+                <div class="slice-right"><div></div></div>
+                <div class="slice-mid"><div></div></div>
+              </li>
             </ul>
             <div volume-bar class="volume-bar"
-                ng-mousedown="onVolumeMouseDown($event)"
-                ng-show="volumeBarVisible">
-                <div class="slice1"></div>
+                 ng-mousedown="onVolumeMouseDown($event)"
+                 ng-show="volumeBarVisible">
+              <div class="slice1"></div>
                 <div class="slice2"></div>
                 <div class="slice3"></div>
             </div>
-        </div>
-            <div class="workspace-tools group toolbar">
-                <div class="subtitles-language">
-                    {% blocktrans with language.get_language_code_display as language %}
-                    Editing {{ language }}&hellip;
-                    {% endblocktrans %}
-                </div>
-		<div class="toolbox">
-		  <div class="toolbox-inside">
-		    <a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
-		    <ul class="toolbox-menu">
-		      <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
-                      <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
-			  <span ng-show="timelineShown">Hide</span>
-			  <span ng-show="!timelineShown">Show</span>
-			  Timeline
-                      </a></li>
-		    </ul>
-		  </div>
-		</div>
+	    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
+	      <div ng-show="workflow.stage == 'type'">
+		<h1>{% trans "Thanks for making Subtitles!" %}</h1>
+		<ul>
+		  <li>{% trans "Play the video and type what you hear." %}</li>
+		  <li>{% trans "Press Enter to complete a subtitle." %}</li>
+		  <li>{% trans "Use the guide on the right to move to the next step." %}</li>
+		</ul>
+		<h1>{% trans "Press the TAB key to start!" %}</h1>
+	      </div>
+	      <div ng-show="workflow.stage == 'sync'">
+		<h1>{% trans "Subtitle Syncing" %}</h1>
+		<ul>
+		  <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
+		  <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
+		  <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
+		</ul>
+		<h1>{% trans "Press the TAB key to start!" %}</h1>
+	      </div>
+	      <div ng-show="workflow.stage == 'title'"></div>
+	      <div ng-show="workflow.stage == 'review'">
+		<h1>{% trans "Review your work" %}</h1>
+		<ul>
+		  <li>{% trans "Watch the video and make corrections." %}</li>
+		  <li>{% trans "Click Complete to sign off on your work." %}</li>
+		  <li>{% trans "Use the Save button to save and finish later." %}</li>
+		</ul>
+		<h1>{% trans "Press the TAB key to start!" %}</h1>
+	      </div>
+	    </div>
+          </div>
+          <div class="workspace-tools group toolbar">
+            <div class="subtitles-language">
+              {% blocktrans with language.get_language_code_display as language %}
+              Editing {{ language }}&hellip;
+              {% endblocktrans %}
             </div>
-            <div class="subtitles-wrapper"
-                ng-controller="WorkingSubtitlesController"
-                working-subtitles>
-                <div class="sync-help end">
-                    <span class="key">
-                        <span>
-                            &uarr;
-                        </span>
-                    </span>
-                    <div class="text">End now</div>
-                </div>
-
-                <div class="sync-help begin">
-                    <span class="key">
-                        <span>
-                            &darr;
-                        </span>
-                    </span>
-                    <div class="text">Begin now</div>
-                </div>
-                <div class="info-tray">
-                    <table>
-                        <tr>
-                            <th>Start</th>
-                            <td><em>[[ currentEdit.draft.startTime|displayTime ]]</em></td>
-                        </tr>
-                        <tr>
-                            <th>End</th>
-                            <td><em>[[ currentEdit.draft.endTime|displayTime ]]</em></td>
-                        </tr>
-                        <tr>
+	    <div class="toolbox">
+	      <div class="toolbox-inside">
+		<a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
+		<ul class="toolbox-menu">
+		  <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
+                  <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
+		      <span ng-show="timelineShown">Hide</span>
+		      <span ng-show="!timelineShown">Show</span>
+		      Timeline
+                  </a></li>
+		</ul>
+	      </div>
+	    </div>
+          </div>
+          <div class="subtitles-wrapper"
+               ng-controller="WorkingSubtitlesController"
+               working-subtitles>
+            <div class="sync-help end">
+              <span class="key">
+                <span>
+                  &uarr;
+                </span>
+              </span>
+              <div class="text">End now</div>
+            </div>
+	    
+            <div class="sync-help begin">
+              <span class="key">
+                <span>
+                  &darr;
+                </span>
+              </span>
+              <div class="text">Begin now</div>
+            </div>
+            <div class="info-tray">
+              <table>
+                <tr>
+                  <th>Start</th>
+                  <td><em>[[ currentEdit.draft.startTime|displayTime ]]</em></td>
+                </tr>
+                <tr>
+                  <th>End</th>
+                  <td><em>[[ currentEdit.draft.endTime|displayTime ]]</em></td>
+                </tr>
+                <tr>
                             <th>Characters</th>
                             <td>[[ currentEdit.draft.characterCount() ]]</td>
-                        </tr>
-                        <tr class="child"
-                            ng-repeat="count in currentEdit.lineCounts()">
-                            <th>Line [[ $index + 1 ]]</td>
-                            <td>[[ count ]]
-                        </tr>
-                        <tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
-                            <th>Chars/sec</th>
-                            <td>[[ currentEdit.draft.characterRate() ]]</td>
-                        </tr>
-                    </table>
-                </div>
+                </tr>
+                <tr class="child"
+                    ng-repeat="count in currentEdit.lineCounts()">
+                  <th>Line [[ $index + 1 ]]</th>
+		  <td>[[ count ]]</td>
+		</tr>
+		<tr class="char-rate" ng-show="currentEdit.draft.isSynced()">
+		  <th>Chars/sec</th>
+		  <td>[[ currentEdit.draft.characterRate() ]]</td>
+		</tr>
+	      </table>
+	    </div>
 
                 <div class="working subtitles" subtitle-scroller="working-subtitle-set" />
                     <ul class="subtitle-list"
