@@ -4,7 +4,7 @@
         <form method="post" action="">
             {% csrf_token %}
             {{ create_subtitles_form.video }}
-            <h3>{% trans 'Create Subtitles' %}</h3>
+            <h3>{% trans 'Add a new language!' %}</h3>
             <div class="global-errors"></div>
             <table>
                 {% include "_form_field_table.html" with field=create_subtitles_form.primary_audio_language_code %}
@@ -12,7 +12,7 @@
             </table>
             <div class="buttons">
                 <button>{% trans 'Continue' %}</button>
-                <button class="close">{% trans 'Close' %}</button>
+                <button class="close">{% trans 'Cancel' %}</button>
             </div>
         </form>
     </div>
