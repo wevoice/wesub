@@ -222,32 +222,32 @@
             </div>
 	    <div class="instructions-overlay" ng-controller="WorkflowProgressionController" ng-show="showOverlay()">
 	      <div ng-show="workflow.stage == 'type'">
-		<h1>Thanks for making Subtitles!</h1>
+		<h1>{% trans "Thanks for making Subtitles!" %}</h1>
 		<ul>
-		  <li>Watch the video and type everything you hear.</li>
-		  <li>Keyboard shortcuts are displayed on the left.</li>
-		  <li>The guide on the right tells you what's next.</li>
+		  <li>{% trans "Watch the video and type everything you hear." %}</li>
+		  <li>{% trans "Keyboard shortcuts are displayed on the left." %}</li>
+		  <li>{% trans "The guide on the right tells you what's next." %}</li>
 		</ul>
-		<h1>Press the TAB key to start subtitling!</h1>
+		<h1>{% trans "Press the TAB key to start subtitling!" %}</h1>
 	      </div>
 	      <div ng-show="workflow.stage == 'sync'">
-		<h1>Subtitle Syncing</h1>
+		<h1>{% trans "Subtitle Syncing" %}</h1>
 		<ul>
-		  <li>Tap the DOWN arrow to start a subtitle.</li>
-		  <li>Tap the UP arrow to set the end time (optional).</li>
-		  <li>Use the Tools menu to hide the timeline for typing mode.</li>
+		  <li>{% trans "Tap the DOWN arrow to start a subtitle." %}</li>
+		  <li>{% trans "Tap the UP arrow to set the end time (optional)." %}</li>
+		  <li>{% trans "Use the Tools menu to hide the timeline for typing mode." %}</li>
 		</ul>
-		<h1>Press the TAB key to start syncing!</h1>
+		<h1>{% trans "Press the TAB key to start syncing!" %}</h1>
 	      </div>
 	      <div ng-show="workflow.stage == 'title'"></div>
 	      <div ng-show="workflow.stage == 'review'">
-		<h1>Review your work</h1>
+		<h1>{% trans "Review your work" %}</h1>
 		<ul>
-		  <li>Watch the video and make corrections.</li>
-		  <li>Click Complete to sign off on your work.</li>
-		  <li>Use the Save button to save and finish later.</li>
+		  <li>{% trans "Watch the video and make corrections." %}</li>
+		  <li>{% trans "Click Complete to sign off on your work." %}</li>
+		  <li>{% trans "Use the Save button to save and finish later." %}</li>
 		</ul>
-		<h1>Press the TAB key to continue!</h1>
+		<h1>{% trans "Press the TAB key to continue!" %}</h1>
 	      </div>
 	    </div>
           </div>
@@ -383,7 +383,7 @@
                 ng-controller="WorkflowProgressionController">
                 <ul class="steps">
                     <li ng-class="{done: workflow.stageDone('type')}">
-                    1. Type what you hear
+                    1. {% trans "Type what you hear" %}
                         <div class="substeps"
                             ng-show="workflow.stage == 'type'">
                             <p ng-show="!workflow.canMoveToReview()">
@@ -396,7 +396,7 @@
                     </div>
                     </li>
                     <li ng-class="{done: workflow.stageDone('sync')}">
-                        2. Sync timing
+                        2. {% trans "Sync timing" %}
                         <div class="substeps"
                             ng-show="workflow.stage == 'sync'">
                             <p ng-show="!workflow.canMoveToTitle()">
@@ -415,7 +415,7 @@
                         </div>
                     </li>
                     <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-                        3. Translate title
+                        3. {% trans "Translate title" %}
                         <div class="substeps"
                             ng-show="workflow.stage == 'title'">
                             <p ng-show="!workflow.canMoveToReview()">
@@ -429,7 +429,7 @@
                                 </button>
                         </div>
                     </li>
-                    <li>[[ 3 + translating() ]]. Review and complete
+                    <li>[[ 3 + translating() ]]. {% trans "Review and complete" %}
                     <div class="substeps"
                         ng-show="workflow.stage == 'review'">
                         <p>{% trans "Watch the video again and verify that the subtitles are complete and correct." %}</p>
