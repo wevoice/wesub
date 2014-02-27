@@ -1,0 +1,114 @@
+aside.modal {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin: -250px 0 0 -280px;
+    width: 560px;
+    z-index: 11000;
+
+    border-radius: 3px;
+    box-shadow: 0, 0, 30px, rgba(black, .4);
+    background: $dark-grey;
+    color: #F1F1F1;
+    padding: 20px 40px;
+    font: normal 1.1em $Helvetica;
+
+    h3 {
+        font: normal 17px $Helvetica;
+        margin-bottom: 20px;
+        color: inherit;
+        border-bottom: 1px solid #777;
+    }
+
+    form {
+        margin: 0;
+        padding: 0;
+
+        table {
+            background: transparent;
+            width: auto;
+            margin: 0;
+
+            td, th {
+                padding: 0 0 10px 0;
+                margin: 0;
+                border: none;
+                font-weight: normal;
+                line-height: 20px;
+            }
+
+            tr.with-help td, tr.with-help th {
+                padding-bottom: 0;
+            }
+
+            td {
+                &.errors {
+                    padding-bottom: 0;
+                }
+
+                &.notation {
+                    margin-top: -18px;
+                }
+            }
+
+            th {
+                padding-right: 9px;
+            }
+
+            tr {
+                border: none;
+            }
+        }
+
+        ul.errorlist {
+            margin: 0;
+        }
+
+        label {
+            margin-right: 0.5em;
+        }
+
+        select {
+            color: #333;
+            line-height: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            width: 210px;
+
+            &[disabled] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                background: none;
+                border: none;
+                color: inherit;
+            }
+        }
+
+        footer.buttons {
+            @include clearfix;
+            margin-top: 24px;
+        }
+
+        footer.buttons button {
+            background: $medium-grey;
+            padding: 5px 20px;
+            margin: 0;
+            border: 0;
+            float: right;
+            margin-left: 5px;
+            border: 1px solid $dark-grey;
+
+            &:hover {
+                background: $medium-grey;
+                border: 1px solid $light-blue;
+            }
+
+            &.default {
+                background: $usblue;
+            }
+        }
+    }
+}

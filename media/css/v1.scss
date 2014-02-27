@@ -1,111 +1,16 @@
 @charset "UTF-8";
 
-// Fonts
-$Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
-
-@mixin border-radius($radius: 5px) {
-    -moz-background-clip: padding-box;
-    -moz-border-radius: $radius;
-    -webkit-background-clip: padding-box;
-    -webkit-border-radius: $radius;
-    background-clip: padding-box;
-    border-radius: $radius;
-}
-@mixin border-box() {
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-}
-@mixin box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
-    -moz-box-shadow: $horizontal $vertical $blur $color;
-    -webkit-box-shadow: $horizontal $vertical $blur $color;
-    box-shadow: $horizontal $vertical $blur $color;
-}
-@mixin inset-box-shadow($horizontal: 0px, $vertical: 1px, $blur: 2px, $color: #CCC) {
-    -moz-box-shadow: inset $horizontal $vertical $blur $color;
-    -webkit-box-shadow: inset $horizontal $vertical $blur $color;
-    box-shadow: inset $horizontal $vertical $blur $color;
-}
-@mixin multi-color-border($top, $sides, $bottom) {
-    border-bottom: 1px solid $bottom;
-    border-left: 1px solid $sides;
-    border-right: 1px solid $sides;
-    border-top: 1px solid $top;
-}
-@mixin multi-border-radius($topLeft: 5px, $topRight: 5px, $bottomRight: 5px, $bottomLeft: 5px) {
-    -moz-border-radius-bottomleft: $bottomLeft;
-    -moz-border-radius-bottomright: $bottomRight;
-    -moz-border-radius-topleft: $topLeft;
-    -moz-border-radius-topright: $topRight;
-    -webkit-border-bottom-left-radius: $bottomLeft;
-    -webkit-border-bottom-right-radius: $bottomRight;
-    -webkit-border-top-left-radius: $topLeft;
-    -webkit-border-top-right-radius: $topRight;
-    border-bottom-left-radius: $bottomLeft;
-    border-bottom-right-radius: $bottomRight;
-    border-top-left-radius: $topLeft;
-    border-top-right-radius: $topRight;
-}
-@mixin vertical-gradient($start: #000, $stop: #FFF) {
-    background: $start;
-    background-image: -moz-gradient(center top, $start 0%, $stop 100%);
-    background-image: -moz-linear-gradient(center top, $start 0%, $stop 100%);
-    background-image: -ms-linear-gradient($start, $stop);
-    background-image: -o-linear-gradient($start, $stop);
-    background-image: -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
-    background-image: -webkit-linear-gradient($start, $stop);
-    background-image: linear-gradient($start, $stop);
-}
-@mixin vertical-gradient-with-image($image, $start: #000, $stop: #FFF) {
-    background: $image, -moz-gradient(center top, $start 0%, $stop 100%);
-    background: $image, -moz-linear-gradient(center top, $start 0%, $stop 100%);
-    background: $image, -webkit-gradient(linear, left top, left bottom, from($start), to($stop));
-    background: ($start + $stop) / 2 $image;
-}
-@mixin linear-gradient($position, $first, $second, $third) {
-    background-image: -moz-linear-gradient($position, $first, $second, $third);
-    background-image: -ms-linear-gradient($position, $first, $second, $third);
-    background-image: -o-linear-gradient($position, $first, $second, $third);
-    background-image: -webkit-linear-gradient($position, $first, $second, $third);
-    background-image: linear-gradient($position, $first, $second, $third);
-}
-@mixin opacity($op) {
-    -khtml-opacity: $op;
-    -moz-opacity: $op;
-    opacity: $op;
-}
-@mixin box-right {
-    padding: 0;
-    position: absolute;
-    top: 2em; right: 0;
-    width: 120px;
-}
-@mixin block-level {
-    display: block;
-    width: 100%;
-}
-
-$dark: #486f87;
-$darker: #3e6782;
-$darkest: #2f3c45;
-$faint: #b7c3c9;
-$fainter: #dce2e5;
-$faintest: #f3f6f8;
-$light: #7692a3;
-$lighter: #a0b2bd;
-$normal: #678ca3;
-$usblue: #0f517a;
+@import "modules/colors";
+@import "modules/fonts";
+@import "modules/mixins";
+@import "partials/dialogs";
 
 /* General styles */
 body {
     overflow-y: scroll;
 }
-.group:after {
-    clear: both;
-    content: ".";
-    display: block;
-    height: 0;
-    visibility: hidden;
+.group {
+    @include clearfix();
 }
 .v1 {
     color: $darkest;
@@ -2307,116 +2212,6 @@ ol.subtitles-diff li{
         }
     }
 
-    .editor-style-modal {
-            @include border-radius(3px);
-            @include box-shadow(0, 0, 30px, rgba(black, .4));
-            background: #212223;
-            color: #F1F1F1;
-            padding: 40px;
-            font: normal 1.1em $Helvetica;
-
-            h3 {
-                font: normal 17px $Helvetica;
-                margin-bottom: 20px;
-                color: inherit;
-                border-bottom: 1px solid #777;
-            }
-
-            table {
-                background: transparent;
-                width: auto;
-                margin: 0;
-                font-size: inherit;
-
-                td, th {
-                    padding: 0 0 10px 0;
-                    margin: 0;
-                    border: none;
-                    font-weight: normal;
-                    line-height: 20px;
-                }
-
-                tr.with-help td, tr.with-help th {
-                    padding-bottom: 0;
-                }
-
-                td {
-
-                    &.errors {
-                        padding-bottom: 0;
-                    }
-
-                    &.notation {
-                        margin-top: -18px;
-                    }
-                }
-
-                th {
-                    padding-right: 9px;
-                }
-
-                tr {
-                    border: none;
-                }
-            }
-
-            ul.errorlist {
-                margin: 0;
-
-                li {
-                    color: inherit;
-                }
-            }
-
-
-            label {
-                color: inherit;
-                margin-right: 0.5em;
-            }
-
-            select {
-                color: #333;
-                line-height: 20px;
-                height: 20px;
-
-                &[disabled] {
-                    -webkit-appearance: none;
-                    -moz-appearance: none;
-                    appearance: none;
-                    background: none;
-                    border: none;
-                    color: inherit;
-                }
-            }
-
-            .buttons {
-                margin-top: 24px;
-            }
-
-            button {
-                background: solid #29B0BF;
-                background-image: none;
-                padding: 5px 20px;
-                border: 0;
-                float: right;
-                margin-left: 5px;
-
-                &:hover {
-                    background: solid #29B0BF;
-                    background-image: none;
-                }
-
-                &.close {
-                    @include opacity(1.0);
-                    background: #4A4B4C;
-                    line-height: normal;
-
-                    &:hover {
-                        color: inherit;
-                    }
-                }
-            }
-    }
     .upload-draft-modal {
 
         label {
