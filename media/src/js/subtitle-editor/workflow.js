@@ -37,7 +37,7 @@ var angular = angular || null;
             this.stage = 'sync';
         }
         this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.canMoveToReview()) {
+            if(self.stage == 'review' && !self.subtitleList.isComplete()) {
                 self.stage = 'sync';
             }
         });
@@ -48,9 +48,6 @@ var angular = angular || null;
            if (this.showOverlay) this.showOverlay = false;
 	},
         switchStage: function(newStage) {
-            if(newStage == 'review' && !this.canMoveToReview()) {
-                return;
-            }
 	    if (newStage == 'title') {
                 this.showOverlay = false; 
 		window.location.hash = 'set-title-modal';
@@ -59,20 +56,23 @@ var angular = angular || null;
             this.showOverlay = true;
             this.stage = newStage;
         },
-        canMoveToTitle: function() {
-	    if (this.translating())
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
-	    else return true;
-        },
-        canMoveToReview: function() {
-	    if (this.translating())
-		return (this.titleEdited());
-	    else
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
+        canMoveToNext: function() {
+            switch(this.stage) {
+                case 'type':
+                    return true;
+                    
+                case 'sync':
+                    return this.subtitleList.isComplete();
+
+                case 'title':
+                    return this.titleEdited();
+
+                case 'review':
+                    return false;
+
+                default:
+                    throw "invalid value for Workflow.stage: " + this.stage;
+            }
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {

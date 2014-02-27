@@ -36,38 +36,45 @@ describe('The Workflow class', function() {
         expect(workflow.stage).toBe('sync');
     });
 
-    it('can move to the the review stage once subs are complete and synced', function() {
+    it('can move to the the review/title stage once subs are complete and synced', function() {
         workflow.switchStage('sync');
-        expect(workflow.canMoveToReview()).toBeFalsy();
+        expect(workflow.canMoveToNext()).toBeFalsy();
         var sub = subtitleList.insertSubtitleBefore(null);
-        expect(workflow.canMoveToReview()).toBeFalsy();
+        expect(workflow.canMoveToNext()).toBeFalsy();
         subtitleList.updateSubtitleContent(sub, 'content');
-        expect(workflow.canMoveToReview()).toBeFalsy();
+        expect(workflow.canMoveToNext()).toBeFalsy();
         subtitleList.updateSubtitleTime(sub, 500, 1000);
-        expect(workflow.canMoveToReview()).toBeTruthy();
+        expect(workflow.canMoveToNext()).toBeTruthy();
 
         var sub2 = subtitleList.insertSubtitleBefore(null);
-        expect(workflow.canMoveToReview()).toBeFalsy();
+        expect(workflow.canMoveToNext()).toBeFalsy();
         subtitleList.updateSubtitleTime(sub2, 1500, 2000);
-        expect(workflow.canMoveToReview()).toBeFalsy();
+        expect(workflow.canMoveToNext()).toBeFalsy();
         subtitleList.updateSubtitleContent(sub2, 'content');
-        expect(workflow.canMoveToReview()).toBeTruthy();
+        expect(workflow.canMoveToNext()).toBeTruthy();
     });
 
-    it('only switches to the the review stage when canMoveToReview() is true', function() {
+    it('can never move to the review stage in translation mode once the title has been translated', function() {
         workflow.switchStage('sync');
-        workflow.switchStage('review');
-        expect(workflow.stage).toBe('sync');
+        insertSyncedAndCompletedSubtitle(subtitleList);
+        workflow.translating.andReturn(true);
+        workflow.switchStage('title');
+        expect(workflow.canMoveToNext()).toBeFalsy();
+        workflow.titleEdited.andReturn(true);
+        expect(workflow.canMoveToNext()).toBeTruthy();
+    });
 
+    it('can never move paste the review stage', function() {
+        workflow.switchStage('sync');
         insertSyncedAndCompletedSubtitle(subtitleList);
         workflow.switchStage('review');
-        expect(workflow.stage).toBe('review');
+        expect(workflow.canMoveToNext()).toBeFalsy();
     });
 
     it('moves back to sync if new unsynced subs are added', function() {
         workflow.switchStage('sync');
         insertSyncedAndCompletedSubtitle(subtitleList);
-        expect(workflow.canMoveToReview()).toBeTruthy();
+        expect(workflow.canMoveToNext()).toBeTruthy();
         workflow.switchStage('review');
         expect(workflow.stage).toBe('review');
 
@@ -75,7 +82,7 @@ describe('The Workflow class', function() {
         expect(workflow.stage).toBe('sync');
     });
 
-    it('knows whichs stage are done', function() {
+    it('knows which stages are done', function() {
         expect(workflow.stageDone('type')).toBeFalsy();
         expect(workflow.stageDone('sync')).toBeFalsy();
         workflow.switchStage('sync');
