@@ -48,16 +48,6 @@
             ng-cloak>
             <h1 ng-show="content.heading">[[ content.heading ]]</h1>
             <p ng-show="content.text">[[ content.text ]]</p>
-            <div ng-show="content.dfxpString" class="download">
-                <textarea class="download" ng-show="content.dfxpString">[[ content.dfxpString ]]</textarea>
-                <p>Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later.</p>
-            </div>
-            <div ng-show="showDownloadLink" class="download">
-                <a class="button yes" href="#" ng-click="onDownloadClick($event)">Download Subtitles</a>
-                <p>
-                To avoid data corruption, please do not open or edit the subtitles in any text editor.
-                </p>
-            </div>
             <div class="content.buttons"
                 ng-show="content.buttons.length">
                 <button ng-repeat="button in content.buttons"
@@ -447,5 +437,17 @@
         </footer>
     </aside>
     {% endif %}
+    <aside class="modal" ng-controller="SaveErrorModalController" ng-class="dialogManager.dialogCSSClass('save-error')">
+        <h3>{% trans "Error saving subtitles" %}</h3>
+        <p ng-if="canUseBlobURL()">{% trans "There was an error saving your subtitles. Save your subtitles using the download button below and upload them to the system later." %}</p>
+        <p ng-if="!canUseBlobURL()">{% trans "There was an error saving your subtitles.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
+        <textarea ng-if="!canUseBlobURL()" class="dfxp-string">[[ dfxpString ]]</textarea>
+        <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor" %}</p>
+        </div>
+        <footer class="buttons">
+            <button ng-if="canUseBlobURL()" class="default" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
+            <button ng-click="onClose($event)">{% trans "Close Editor" %}
+        </footer>
+    </aside>
 </body>
 </html>

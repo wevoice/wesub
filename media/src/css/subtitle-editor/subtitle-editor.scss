@@ -176,16 +176,6 @@ div.modal {
                 margin-top: 20px;
                 color: #CCC;
             }
-            textarea {
-                background: #E3E6E9;
-                font: normal 12px monospace;
-                height: 100px;
-                margin-bottom: 5px;
-                margin-top: 0;
-                padding: 10px;
-                width: 100%;
-                @include border-radius(3px);
-            }
         }
     }
 }
@@ -1489,4 +1479,17 @@ aside.modal#loading-modal {
 
 body.loading-finished aside.modal#loading-modal {
     display: none;
+}
+
+aside.modal {
+    textarea.dfxp-string {
+        background: #E3E6E9;
+        font: normal 12px monospace;
+        height: 100px;
+        margin-bottom: 5px;
+        margin-top: 0;
+        padding: 10px;
+        width: 100%;
+        @include border-radius(3px);
+    }
 }

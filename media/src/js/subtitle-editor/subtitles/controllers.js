@@ -385,22 +385,11 @@ var angular = angular || null;
             });
         };
         $scope.showErrorModal = function(message) {
-            function onClose() {
-                // set changesMade to false to prevent the beforeunload code
-                // from double-checking with the user to close the page.
-                $scope.changesMade = false;
-                window.location = '/videos/' + $scope.videoId + "/";
-            }
-
+            // set changesMade to false to prevent the beforeunload code
+            // from double-checking with the user to close the page.
+            $scope.changesMade = false;
             $scope.cancelUserIdleTimeout();
-
-            $scope.$root.$emit("show-modal", {
-                heading: message || "There was an error saving your subtitles. You'll need to save your subtitles with the link below, and upload them to the system later.",
-                buttons: [
-                    {'text': 'Close editor', 'class': 'no', 'fn': onClose}
-                ]
-            });
-            $scope.$root.$emit('show-modal-download');
+            $scope.dialogManager.open('save-error');
         };
 
         $scope.$root.$on('approve-task', function() {

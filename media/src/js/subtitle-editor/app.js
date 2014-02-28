@@ -258,7 +258,7 @@ var angular = angular || null;
                                 regainLockAfterIdle();
                             }},
                             {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
-                                $scope.$root.$emit('show-modal-download');
+                                                                                                               $scope.dialogManager.open('save-error');
                             }},
                             {'text': 'Close editor', 'class': 'no', 'fn': function() {
                                 window.location = '/videos/' + $scope.videoId + "/";
