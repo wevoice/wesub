@@ -98,10 +98,10 @@ var angular = angular || null;
             }
         }
 	/*
-	 * Might not be the right location
-	 * TODO: move this to the proper place (probably the SubtitleList
-	 * model.
-	 */
+         * Might not be the right location
+         * TODO: move this to the proper place (probably the SubtitleList
+         * model).
+         */
         $scope.copyTimingOver = function() {
             var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
             var nextReferenceSubtitle = $scope.referenceSubtitles.subtitleList.firstSubtitle();
@@ -142,6 +142,11 @@ var angular = angular || null;
             evt.stopPropagation();
             return false;
         };
+        $scope.onTitleClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.$root.$emit('show-metadata-modal');
+        }
         // Hide the loading modal after we are done with bootstrapping
         // everything
         $scope.$evalAsync(function() {

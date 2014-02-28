@@ -48,7 +48,6 @@ var angular = angular || null;
                 return;
             }
 	    if (newStage == 'title') {
-		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
             this.stage = newStage;
@@ -113,10 +112,12 @@ var angular = angular || null;
                 rewindPlayback();
 	    }
 	    else if ($scope.workflow.stage == 'sync') {
-		if ($scope.translating())
+		if ($scope.translating()) {
+                    $scope.$root.$emit('show-metadata-modal');
                     $scope.workflow.switchStage('title');
-		else
+                } else {
                     $scope.workflow.switchStage('review');
+                }
                 rewindPlayback();
             }
             evt.preventDefault();

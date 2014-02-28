@@ -14,6 +14,10 @@ aside.modal {
     padding: 20px 40px;
     font: normal 1.1em $Helvetica;
 
+    &.shown {
+        display: block;
+    }
+
     h3 {
         font: normal 17px $Helvetica;
         margin-bottom: 20px;

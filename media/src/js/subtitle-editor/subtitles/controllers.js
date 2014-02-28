@@ -587,9 +587,8 @@ var angular = angular || null;
     });
 
     module.controller("SubtitleMetadataController", function($scope) {
-        // We should expand the section by default if we are not working with
-        // the original language.  That way translators will know that they
-        // should fill something out there.
+        $scope.isVisible = false;
+
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
             description: $scope.workingSubtitles.description,
@@ -600,22 +599,18 @@ var angular = angular || null;
             $scope.workingSubtitles.title = subtitles.title;
             $scope.workingSubtitles.description = subtitles.description;
             $scope.workingSubtitles.metadata = subtitles.metadata;
+            $scope.isVisible = false;
         };
  
         $scope.reset = function() {
             $scope.currentSubtitles.title = $scope.workingSubtitles.title;
             $scope.currentSubtitles.description = $scope.workingSubtitles.description;
             $scope.currentSubtitles.metadata = $scope.workingSubtitles.metadata;
+            $scope.isVisible = false;
         };
 
-        var language = $scope.workingSubtitles.language;
-        $scope.collapsed = language.isPrimaryAudioLanguage;
-        $scope.onExpanderClicked = function($event) {
-            $scope.$root.$emit('metadata-expander-clicked');
-            $event.preventDefault();
-        }
-        $scope.$root.$on('metadata-expander-clicked', function() {
-            $scope.collapsed = !$scope.collapsed;
+        $scope.$root.$on('show-metadata-modal', function() {
+            $scope.isVisible = true;
         });
     });
 }).call(this);

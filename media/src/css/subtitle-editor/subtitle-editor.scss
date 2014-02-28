@@ -1,16 +1,15 @@
 @charset "UTF-8";
-@import "modal";
-// Fonts
-$Helvetica: 'Helvetica Neue', Helvetica, Arial, 'Liberation Sans', FreeSans, sans-serif;
-$OpenSans: 'Open Sans', $Helvetica;
+@import "../../../css/modules/colors";
+@import "../../../css/modules/fonts";
+@import "../../../css/modules/mixins";
+@import "../../../css/partials/dialogs";
+
+/* It would be nice to put this in the fonts module, but it's not really
+ * possible at this moment because the font urls are relative to the url of
+ * the CSS file.
+ */
 $CodePro: 'CodeProLC', $OpenSans;
 
-$sync-help-height: 54px;
-$span-key-height: 32px;
-$text-color: #565758;
-$dark-grey: #212223;
-
-// Custom fonts
 @font-face {
     font-family: 'CodeProLC';
     src: url('../../../fonts/CodeProLC.eot');
@@ -20,6 +19,11 @@ $dark-grey: #212223;
     font-weight: normal;
     font-style: normal;
 }
+
+
+$sync-help-height: 54px;
+$span-key-height: 32px;
+$text-color: #565758;
 
 // Mixins
 @mixin border-radius($radius: 5px) {
@@ -268,10 +272,6 @@ header.main {
             text-transform: lowercase;
             float: left;
         }
-        div.video-title-icon {
-            float: right;
-            padding: 12px 5px;
-        }
         div.video-title {
             margin: 0;
             padding: 10px 5px;
@@ -283,10 +283,12 @@ header.main {
             a {
               color: #D0D1D2;
               text-decoration: none;
-              padding: 0 10px;
               vertical-align: middle;
             }
-	}
+            img {
+                margin: 0 0 -1px 17px;
+            }
+        }
     }
     section.video {
         border-left: 1px solid #2B2C2D;
@@ -1436,40 +1438,30 @@ body.timeline-shown {
     }
 }
 
-// Styling of the new modals
-.modal-style {
-    @extend %modal;    
-    background: rgba(black, .6);
-    color: #F1F1F1;
-    div.modal-inner {
-      padding: 40px;
-      background: $dark-grey;
-      .modal-content {max-height: 200vh;}
-      div,
-      footer,
-      header {
-        border: none;
-        background: $dark-grey;
-      }
-      h1 {
-        font: normal 17px $Helvetica;
-      }
-      h2 {
-        font: normal 15px $Helvetica;
-        margin-bottom: 6px;
-      }
-      textarea {
-        background: #E3E6E9;
-        font: normal 12px monospace;
-        margin-bottom: 5px;
-        margin-top: 0;
-        padding: 10px;
+
+#set-title-modal {
+    label, textarea {
+        display: block;
         width: 100%;
-        &.refarea {  
-          background: #555;
-          color: #F1F1F1;
-          border: none;
+    }
+    label {
+        font: normal 17px $Helvetica;
+        margin: 12px 0 6px 0;
+
+        &:first-of-type {
+            margin-top: 0;
         }
-      }
-   }
+    }
+    textarea {
+        background: #E3E6E9;
+        margin: 0 0 5px 0;
+        padding: 10px;
+
+        &.refarea {
+            background: #555;
+            color: #F1F1F1;
+            border: none;
+        }
+    }
+
 }
