@@ -38,13 +38,11 @@
     <![endif]-->
 
 </head>
-<body ng-class="{ 'timeline-shown': timelineShown }">
+<body ng-class="{ 'timeline-shown': timelineShown, 'loading-finished': loadingFinished }">
+    <aside class="modal" id="loading-modal">{% trans "Loading subtitle editor&hellip;" %}</aside>
     <div class="modal"
         ng-controller="ModalController"
         ng-show="isVisible">
-        <div class="loading inner" ng-show='!content' >
-            <h1 class="loading"  >Loading subtitle editor&hellip;</h1>
-        </div>
         <div class="content inner ng-cloak"
             ng-show="content"
             ng-cloak>

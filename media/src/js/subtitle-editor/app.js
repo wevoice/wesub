@@ -63,6 +63,7 @@ var angular = angular || null;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
         $scope.scrollingSynced = true;
+        $scope.loadingFinished = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
 	$scope.dialogManager = new DialogManager();
@@ -151,7 +152,7 @@ var angular = angular || null;
         // Hide the loading modal after we are done with bootstrapping
         // everything
         $scope.$evalAsync(function() {
-            $scope.$root.$emit('hide-modal');
+            $scope.loadingFinished = true;
         });
         // Overrides for debugging
         $scope.overrides = {

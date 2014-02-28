@@ -30,7 +30,7 @@
          * @constructor
          */
 
-        $scope.isVisible = true;
+        $scope.isVisible = false;
         $scope.content = null;
         $scope.showDownloadLink = false;
 

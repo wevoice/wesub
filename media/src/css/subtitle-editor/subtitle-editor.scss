@@ -1456,7 +1456,6 @@ body.timeline-shown {
     }
 }
 
-
 #set-title-modal {
     label, textarea {
         display: block;
@@ -1482,4 +1481,12 @@ body.timeline-shown {
         }
     }
 
+}
+
+aside.modal#loading-modal {
+    display: block;
+}
+
+body.loading-finished aside.modal#loading-modal {
+    display: none;
 }
