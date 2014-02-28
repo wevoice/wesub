@@ -322,15 +322,18 @@ var angular = angular || null;
             // Reset the lock timer.
             $scope.minutesIdle = 0;
             // Workflow needs to know if TAB is pressed
-            if (evt.keyCode == 9)
+            if (evt.keyCode == 9 && !evt.shiftKey)
                 $scope.workflow.tabPressed();
             // Shortcuts that should work while editing a subtitle
             if ((evt.keyCode === 32 && evt.shiftKey) || 
-                evt.keyCode == 9) {
+                (evt.keyCode == 9 && !evt.shiftKey)) {
                 // Shift+Space or Tab: toggle play / pause.
                 evt.preventDefault();
                 evt.stopPropagation();
                 VideoPlayer.togglePlay();
+            } else if (evt.keyCode === 9 && evt.shiftKey) {
+                // Shift+Tab, go back 2 seconds
+                VideoPlayer.seek(VideoPlayer.currentTime() - 2000);
             } else if (evt.keyCode === 188 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Comma, go back 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() - 4000);
