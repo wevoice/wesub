@@ -149,11 +149,13 @@
 	    </div>
 	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern">+</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
 	    </div>
 	    <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('13-shift')">
 	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern">+</div>
 	      <div class="key-pattern">Enter</div>
 	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
 	    </div>
@@ -165,56 +167,61 @@
 	    </div>
 	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern">+</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
 	    </div>
 	    <div class="instruction-item teal-key" ng-click="handleMouseKeyDown('40')">
-	      <div class="key-pattern">Down Arrow</div>
+	      <div class="key-pattern">
+		<img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_212_down_arrow.png"></img></div>
 	      <div class="shortcut-desc">{% trans "Set the Start time" %}</div>
 	    </div>
 	    <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('38')">
-	      <div class="key-pattern">Up Arrow</div>
+	      <div class="key-pattern">
+		<img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_213_up_arrow.png"></img></div>
 	      <div class="shortcut-desc">{% trans "Set the End Time (optional)" %}</div>
 	    </div>
 	  </div>
-	      <div ng-show="workflow.stage == 'title'"></div>
-	      <div ng-show="workflow.stage == 'review'">
-		<div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
-		  <div class="key-pattern">Tab</div>
-		  <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
-		</div>
-		<div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
-		  <div class="key-pattern">Shift</div>
-		  <div class="key-pattern">Tab</div>
-		  <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
-		</div>
-		<div class="instruction-item blue-key" ng-click="handleMouseKeyDown('13-shift')">
-		  <div class="key-pattern">Shift</div>
-		  <div class="key-pattern">Enter</div>
-		  <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
-		</div>
-	      </div>
+	  <div ng-show="workflow.stage == 'title'"></div>
+	  <div ng-show="workflow.stage == 'review'">
+	    <div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-            <div class="language-selections group toolbar"
-                language-selector
-                 ng-controller="LanguageSelectorController">
-                <div class="select">
-                    <select name="language"
-                        ng-model='language'
-                        ng-options="item.name for item in languages">
-                    </select>
-                </div>
-                <div class="select">
-                    <select name="version" class="version-select">
-                        <option
-                                ng-repeat='thisVersion in versions'
-                                ng-selected='version == thisVersion'
-                                ng-disabled='thisVersion.visibility != "Public"'
-                                value="[[thisVersion.version_no]]">
-                            [[thisVersion|versionDropDownDisplay]]</option>
-                    </select>
-                </div>
-            </div>
+	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern">+</div>
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Skip back (2 seconds)" %}</div>
+	    </div>
+	    <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('13-shift')">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern">+</div>
+	      <div class="key-pattern">Enter</div>
+	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
+	    </div>
+	  </div>
+	</div>
+        <div class="language-selections group toolbar"
+             language-selector
+             ng-controller="LanguageSelectorController">
+          <div class="select">
+            <select name="language"
+                    ng-model='language'
+                    ng-options="item.name for item in languages">
+            </select>
+          </div>
+          <div class="select">
+            <select name="version" class="version-select">
+              <option
+                 ng-repeat='thisVersion in versions'
+                 ng-selected='version == thisVersion'
+                 ng-disabled='thisVersion.visibility != "Public"'
+                 value="[[thisVersion.version_no]]">
+                [[thisVersion|versionDropDownDisplay]]</option>
+            </select>
+          </div>
+        </div>
             <div class="subtitles-wrapper">
                 <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
                     <ul class="subtitle-list"
