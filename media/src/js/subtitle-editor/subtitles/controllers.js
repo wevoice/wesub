@@ -587,8 +587,6 @@ var angular = angular || null;
     });
 
     module.controller("SubtitleMetadataController", function($scope) {
-        $scope.isVisible = false;
-
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
             description: $scope.workingSubtitles.description,
@@ -599,18 +597,14 @@ var angular = angular || null;
             $scope.workingSubtitles.title = subtitles.title;
             $scope.workingSubtitles.description = subtitles.description;
             $scope.workingSubtitles.metadata = subtitles.metadata;
-            $scope.isVisible = false;
+            $scope.dialogManager.close();
         };
  
         $scope.reset = function() {
             $scope.currentSubtitles.title = $scope.workingSubtitles.title;
             $scope.currentSubtitles.description = $scope.workingSubtitles.description;
             $scope.currentSubtitles.metadata = $scope.workingSubtitles.metadata;
-            $scope.isVisible = false;
+            $scope.dialogManager.close();
         };
-
-        $scope.$root.$on('show-metadata-modal', function() {
-            $scope.isVisible = true;
-        });
     });
 }).call(this);

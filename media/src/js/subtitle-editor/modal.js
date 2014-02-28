@@ -85,16 +85,46 @@
         });
     });
     module.controller('DebugModalController', function($scope) {
-        $scope.isVisible = false;
-
         $scope.close = function($event) {
-            $scope.isVisible = false;
+            $scope.dialogManager.close();
             $event.stopPropagation();
             $event.preventDefault();
         }
-
-        $scope.$root.$on('show-debug-modal', function($event, heading) {
-            $scope.isVisible = true;
-        });
     })
+
+    function DialogManager() {
+        this.stack = [];
+    }
+
+    DialogManager.prototype = {
+        open: function(dialogName) {
+            this.stack.push(dialogName);
+        },
+        close: function() {
+            this.stack.pop();
+        },
+        current: function() {
+            if(this.stack.length > 0) {
+                return this.stack[this.stack.length - 1];
+            } else {
+                return null;
+            }
+        },
+        dialogCSSClass: function(dialogName) {
+            if(this.current() == dialogName) {
+                return 'shown';
+            } else {
+                return '';
+            }
+        },
+        overlayCSSClass: function() {
+            if(this.current() !== null) {
+                return 'shown';
+            } else {
+                return '';
+            }
+        }
+    }
+
+    module.value('DialogManager', DialogManager);
 }).call(this);

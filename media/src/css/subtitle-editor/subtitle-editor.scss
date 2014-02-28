@@ -1438,6 +1438,24 @@ body.timeline-shown {
     }
 }
 
+// Modal dialogs
+
+#modal-overlay {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 99;
+
+    &.shown {
+        display: block;
+    }
+}
+
 
 #set-title-modal {
     label, textarea {

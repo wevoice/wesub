@@ -113,7 +113,7 @@ var angular = angular || null;
 	    }
 	    else if ($scope.workflow.stage == 'sync') {
 		if ($scope.translating()) {
-                    $scope.$root.$emit('show-metadata-modal');
+                    $scope.dialogManager.open('metadata');
                     $scope.workflow.switchStage('title');
                 } else {
                     $scope.workflow.switchStage('review');

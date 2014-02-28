@@ -53,7 +53,7 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", function($scope, $controller,
-            EditorData, Workflow) {
+                DialogManager, EditorData, Workflow) {
 
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
@@ -65,6 +65,7 @@ var angular = angular || null;
         $scope.scrollingSynced = true;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
+	$scope.dialogManager = new DialogManager();
 	$scope.titleEdited = function(newValue) {
 	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
 	    return $scope.currentTitle.Edited;
@@ -137,7 +138,7 @@ var angular = angular || null;
             duration: null,
         };
         $scope.showDebugModal = function(evt) {
-            $scope.$root.$emit('show-debug-modal');
+            $scope.dialogManager.open('debug');
             evt.preventDefault();
             evt.stopPropagation();
             return false;
@@ -145,7 +146,7 @@ var angular = angular || null;
         $scope.onTitleClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
-            $scope.$root.$emit('show-metadata-modal');
+            $scope.dialogManager.open('metadata');
         }
         // Hide the loading modal after we are done with bootstrapping
         // everything

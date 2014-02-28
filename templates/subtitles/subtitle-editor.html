@@ -43,7 +43,7 @@
     {% if DEBUG %}
     <aside class="modal"
         ng-controller="DebugModalController"
-        ng-class="{'shown': isVisible}">
+        ng-class="dialogManager.dialogCSSClass('debug')">
 
         <h3>{% trans "Debugging Tools" %}</h3>
         <p>
@@ -420,7 +420,7 @@
         <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
         </div>
     </section>
-    <aside id="set-title-modal" class="modal" tabindex="-1" role="dialog" aria-labeledby="set-title-heading" ng-controller="SubtitleMetadataController" ng-class="{'shown': isVisible}" dir="[[ workingSubtitles.language.dir ]]">
+    <aside id="set-title-modal" class="modal" tabindex="-1" role="dialog" aria-labeledby="set-title-heading" ng-controller="SubtitleMetadataController" ng-class="dialogManager.dialogCSSClass('metadata')" dir="[[ workingSubtitles.language.dir ]]">
         <form>
             <h3 id="set-title-heading">{% trans "Edit title and description" %}</h3>
             <label>{% trans "Title" %}</label>
@@ -449,5 +449,6 @@
     {% include_bundle "subtitle-editor" %}
     {# include bold style too #}
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
 </body>
 </html>
