@@ -14,6 +14,10 @@ aside.modal {
     padding: 20px 40px;
     font: normal 1.1em $Helvetica;
 
+    p {
+        margin-bottom: 20px;
+    }
+
     &.shown {
         display: block;
     }
@@ -28,91 +32,91 @@ aside.modal {
     form {
         margin: 0;
         padding: 0;
+    }
 
-        table {
-            background: transparent;
-            width: auto;
+    table {
+        background: transparent;
+        width: auto;
+        margin: 0;
+
+        td, th {
+            padding: 0 0 10px 0;
             margin: 0;
+            border: none;
+            font-weight: normal;
+            line-height: 20px;
+        }
 
-            td, th {
-                padding: 0 0 10px 0;
-                margin: 0;
-                border: none;
-                font-weight: normal;
-                line-height: 20px;
-            }
+        tr.with-help td, tr.with-help th {
+            padding-bottom: 0;
+        }
 
-            tr.with-help td, tr.with-help th {
+        td {
+            &.errors {
                 padding-bottom: 0;
             }
 
-            td {
-                &.errors {
-                    padding-bottom: 0;
-                }
-
-                &.notation {
-                    margin-top: -18px;
-                }
-            }
-
-            th {
-                padding-right: 9px;
-            }
-
-            tr {
-                border: none;
+            &.notation {
+                margin-top: -18px;
             }
         }
 
-        ul.errorlist {
-            margin: 0;
+        th {
+            padding-right: 9px;
         }
 
-        label {
-            margin-right: 0.5em;
+        tr {
+            border: none;
         }
+    }
 
-        select {
-            color: #333;
-            line-height: 20px;
-            height: 20px;
-            border-radius: 3px;
-            border: 1px solid #ccc;
-            width: 210px;
+    ul.errorlist {
+        margin: 0;
+    }
 
-            &[disabled] {
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                appearance: none;
-                background: none;
-                border: none;
-                color: inherit;
-            }
+    label {
+        margin-right: 0.5em;
+    }
+
+    select {
+        color: #333;
+        line-height: 20px;
+        height: 20px;
+        border-radius: 3px;
+        border: 1px solid #ccc;
+        width: 210px;
+
+        &[disabled] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: none;
+            border: none;
+            color: inherit;
         }
+    }
 
-        footer.buttons {
-            @include clearfix;
-            margin-top: 24px;
-        }
+    footer.buttons {
+        @include clearfix;
+        margin-top: 24px;
+    }
 
-        footer.buttons button {
+    footer.buttons button {
+        background: $medium-grey;
+        padding: 5px 20px;
+        margin: 0;
+        border: 0;
+        float: right;
+        margin-left: 5px;
+        border: 1px solid $dark-grey;
+
+        &:hover {
             background: $medium-grey;
-            padding: 5px 20px;
-            margin: 0;
-            border: 0;
-            float: right;
-            margin-left: 5px;
-            border: 1px solid $dark-grey;
+            border: 1px solid $light-blue;
+        }
 
-            &:hover {
-                background: $medium-grey;
-                border: 1px solid $light-blue;
-            }
-
-            &.default {
-                background: $usblue;
-            }
+        &.default {
+            background: $usblue;
         }
     }
 }
