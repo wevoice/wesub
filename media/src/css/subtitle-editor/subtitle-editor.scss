@@ -786,10 +786,25 @@ section.main {
             color: $dark-grey;
             font-size: 12px;
             height: 242px;
+            width: 500px;
+            display: table;
             margin: 10px 30px;
             padding: 5px;
             span.key {
                 width: 20%;
+            }
+            div.key-row {
+                display: table-row;
+                table-layout: fixed;
+                div.instruction-item-small { 
+                  display: table-cell;
+                  width: 0.05%;
+                }
+                div.instruction-item { 
+                  display: table-cell;
+                  width: 2%;
+                  margin: 0px 10px;
+                }
             }
             div.instruction-item {
                 margin: 10px 0px;
