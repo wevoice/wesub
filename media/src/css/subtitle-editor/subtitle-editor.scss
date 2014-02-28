@@ -828,6 +828,9 @@ section.main {
                     cursor: pointer;
                 }
                 div.key-pattern {
+                    &.small {
+                    padding: 3px 5px;
+                    }
                     float: left;
                     border-bottom: 1px solid #474849;
                     box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
