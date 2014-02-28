@@ -301,7 +301,7 @@ var Site = function(Site) {
     };
     this.openModalDialog = function(modal_id) {
         var $target = $(modal_id);
-        $target.show();
+        $target.addClass('shown');
         $('body').append('<div class="well"></div>');
 
         $target.click(function(event){
@@ -313,7 +313,7 @@ var Site = function(Site) {
         });
     };
     this.closeModal = function(elt) {
-        elt.hide();
+        elt.removeClass('shown');
         $('body div.well').remove();
         $('html').unbind('click.modal');
     }

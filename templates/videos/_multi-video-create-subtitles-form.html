@@ -1,9 +1,9 @@
 {% load i18n %}
-<aside id="multi-video-create-subtitles-modal" class="modal{% if create_subtitles_form.is_bound %} start-open{% endif %}">
+<aside id="multi-video-create-subtitles-modal" class="modal{% if create_subtitles_form.is_bound %} start-open{% endif %}" role="dialog" aria-labeledby="multi-video-create-subtitles-heading">
     <form method="post" action="">
         {% csrf_token %}
         {{ create_subtitles_form.video }}
-        <h3>{% trans 'Add a new language!' %}</h3>
+        <h3 id="multi-video-create-subtitles-heading">{% trans 'Add a new language!' %}</h3>
         <div class="global-errors"></div>
         <table>
             {% include "_form_field_table.html" with field=create_subtitles_form.primary_audio_language_code %}
