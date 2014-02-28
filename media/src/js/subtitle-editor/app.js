@@ -127,6 +127,22 @@ var angular = angular || null;
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+        $scope.clearTiming = function() {
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleTime(nextWorkingSubtitle, -1, -1);
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+             }
+            $scope.$root.$emit('work-done');
+        }
+        $scope.clearText = function() {
+            var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
+            while (nextWorkingSubtitle) {
+                $scope.workingSubtitles.subtitleList.updateSubtitleContent(nextWorkingSubtitle, "");
+                nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
+             }
+            $scope.$root.$emit('work-done');
+        }
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
                      $scope.referenceSubtitles.getTitle());

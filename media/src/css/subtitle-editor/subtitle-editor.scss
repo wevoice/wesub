@@ -1207,6 +1207,15 @@ section.main {
                            &.show-timeline {
                              background: url('../../../images/subtitle-editor/glyphicons_054_clock.png') 10px no-repeat;
                            }
+                           &.clear-timing {
+                             background: url('../../../images/subtitle-editor/glyphicons_057_history.png') 10px no-repeat;
+                           }
+                           &.clear-text {
+                             background: url('../../../images/subtitle-editor/glyphicons_207_remove_2.png') 10px no-repeat;
+                           }
+                           &.revert-saved {
+                             background: url('../../../images/subtitle-editor/glyphicons_085_repeat.png') 10px no-repeat;
+                           }
                            &:hover {
                               background: #C5C5C5;
                               color: $dark-grey;
