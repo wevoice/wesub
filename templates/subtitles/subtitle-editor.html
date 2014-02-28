@@ -14,7 +14,6 @@
         {% endblocktrans %}
     </title>
 
-
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/third-party/reset.css" type="text/css" media="screen" charset="utf-8">
     <link rel="stylesheet" href="{{ STATIC_URL }}src/css/subtitle-editor/subtitle-editor-dev.css" type="text/css" media="screen" charset="utf-8">
 
@@ -40,25 +39,6 @@
 
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown }">
-    {% if DEBUG %}
-    <aside class="modal"
-        ng-controller="DebugModalController"
-        ng-class="dialogManager.dialogCSSClass('debug')">
-
-        <h3>{% trans "Debugging Tools" %}</h3>
-        <p>
-        <label>
-            <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
-        </label>
-        </p>
-        <p>
-            <button ng-click="saveAutoBackup()" class="yes">Save auto-backup</button>
-        </p>
-        <footer class="buttons">
-            <button ng-click="close($event)">Close</button>
-        </footer>
-    </aside>
-    {% endif %}
     <div class="modal"
         ng-controller="ModalController"
         ng-show="isVisible">
@@ -450,5 +430,24 @@
     {# include bold style too #}
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
+    {% if DEBUG %}
+    <aside class="modal"
+        ng-controller="DebugModalController"
+        ng-class="dialogManager.dialogCSSClass('debug')">
+
+        <h3>{% trans "Debugging Tools" %}</h3>
+        <p>
+        <label>
+            <input type="checkbox" ng-model="overrides.forceSaveError"> Force Error on Save
+        </label>
+        </p>
+        <p>
+            <button ng-click="saveAutoBackup()" class="yes">Save auto-backup</button>
+        </p>
+        <footer class="buttons">
+            <button ng-click="close($event)">Close</button>
+        </footer>
+    </aside>
+    {% endif %}
 </body>
 </html>
