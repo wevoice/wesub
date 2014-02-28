@@ -309,11 +309,11 @@
 	      <div class="toolbox-inside">
 		<a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
 		<ul class="toolbox-menu">
-		  <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">Copy Timing</a></li>
+		  <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">{% trans "Copy Timing" %}</a></li>
                   <li><a href="#" ng-click="toggleTimelineShown()" class="show-timeline">
-		      <span ng-show="timelineShown">Hide</span>
-		      <span ng-show="!timelineShown">Show</span>
-		      Timeline
+		      <span ng-show="timelineShown">{% trans "Hide" %}</span>
+		      <span ng-show="!timelineShown">{% trans "Show" %}</span>
+		      {% trans "Timeline" %}
                   </a></li>
 		</ul>
 	      </div>
