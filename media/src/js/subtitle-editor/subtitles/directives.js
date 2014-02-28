@@ -399,7 +399,7 @@ var USER_IDLE_MINUTES = 15;
             function startEditOn(draft) {
                 var li = subtitleMap[draft.storedSubtitle.id];
                 li.addClass('edit');
-                var textarea = $('<textarea class="subtitle-edit" />');
+                var textarea = $('<textarea class="subtitle-edit" placeholder="Type a subtitle and press Enter"/>');
                 textarea.val(draft.markdown);
                 li.append(textarea);
                 textarea.autosize();
