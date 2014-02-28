@@ -185,8 +185,7 @@
 	      </div>
 	    </div>
 	  </div>
-	  <div ng-show="workflow.stage == 'title'"></div>
-	  <div ng-show="workflow.stage == 'review'">
+	  <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
 	    <div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
