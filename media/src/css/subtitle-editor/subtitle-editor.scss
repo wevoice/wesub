@@ -10,6 +10,11 @@ $span-key-height: 32px;
 $text-color: #565758;
 $dark-grey: #212223;
 
+$reddish-pink: #d24655;
+$lighter-blue: #29b0bf;
+$blue: #126295;
+$teal: #15998e;
+
 // Custom fonts
 @font-face {
     font-family: 'CodeProLC';
@@ -789,7 +794,18 @@ section.main {
             div.instruction-item {
                 margin: 10px 0px;
                 padding: 10px;
-                background: #0C3F70;
+                &.reddish-pink-key {
+                    background: $reddish-pink;
+                }
+                &.lighter-blue-key {
+                    background: $lighter-blue;
+                }
+                &.blue-key {
+                    background: $blue;
+                }
+                &.teal-key {
+                    background: $teal;
+                }
                 display: table;
                 width: 100%;
                 @include border-radius(3px);
