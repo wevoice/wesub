@@ -174,13 +174,13 @@
 	    <div class="key-row">
 	      <div class="instruction-item teal-key" ng-click="handleMouseKeyDown('40')">
 		<div class="key-pattern small">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_212_down_arrow.png"></img></div>
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img></div>
 		<div class="shortcut-desc">{% trans "Start subtitle" %}</div>
 	      </div>
               <div class="instruction-item-small"></div>
 	      <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('38')">
 		<div class="key-pattern small">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_213_up_arrow.png"></img></div>
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img></div>
 		<div class="shortcut-desc">{% trans "End subtitle" %}</div>
 	      </div>
 	    </div>
@@ -324,18 +324,14 @@
                working-subtitles>
             <div class="sync-help end">
               <span class="key">
-                <span>
-                  &uarr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img>
               </span>
               <div class="text">End now</div>
             </div>
 	    
             <div class="sync-help begin">
               <span class="key">
-                <span>
-                  &darr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img>
               </span>
               <div class="text">Begin now</div>
             </div>
