@@ -71,7 +71,7 @@
             <div ng-cloak class="ng-cloak" ng-controller="SaveSessionController">
                 <div class="exit dropdown">
                     {% if DEBUG %}
-                        <a href="#" ng-click="showDebugModal($event)">
+                        <a href="#" ng-click="dialogManager.onOpenClick('debug', $event)">
                             Debug
                         </a>
                     {% endif %}
@@ -420,7 +420,6 @@
     <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
     {% if DEBUG %}
     <aside class="modal"
-        ng-controller="DebugModalController"
         ng-class="dialogManager.dialogCSSClass('debug')">
 
         <h3>{% trans "Debugging Tools" %}</h3>
@@ -433,7 +432,7 @@
             <button ng-click="saveAutoBackup()" class="yes">Save auto-backup</button>
         </p>
         <footer class="buttons">
-            <button ng-click="close($event)">Close</button>
+            <button ng-click="dialogManager.onCloseClick($event)">Close</button>
         </footer>
     </aside>
     {% endif %}

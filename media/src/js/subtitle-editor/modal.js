@@ -62,13 +62,6 @@
             }
         });
     });
-    module.controller('DebugModalController', function($scope) {
-        $scope.close = function($event) {
-            $scope.dialogManager.close();
-            $event.stopPropagation();
-            $event.preventDefault();
-        }
-    })
     module.controller('SaveErrorModalController', function($scope, Blob) {
         $scope.dfxpString = '';
 
@@ -112,6 +105,16 @@
         },
         close: function() {
             this.stack.pop();
+        },
+        onCloseClick: function($event) {
+            $event.stopPropagation();
+            $event.preventDefault();
+            this.close();
+        },
+        onOpenClick: function(dialogName, $event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            this.open(dialogName);
         },
         current: function() {
             if(this.stack.length > 0) {
