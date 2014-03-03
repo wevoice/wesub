@@ -63,12 +63,15 @@
             $scope.$root.$emit('notes-changed');
         };
 
-        $scope.$root.$on('editing-done', function($event, $editScope) {
-            if ($editScope.subtitleList.needsAnyTranscribed()) {
-                $scope.error = 'You have empty subtitles.';
-            } else {
-                $scope.error = null;
+        $scope.canApprove = function() {
+            return $scope.workingSubtitles.subtitleList.isComplete();
+        }
+
+        $scope.errorMessage = function() {
+            if(!$scope.canApprove()) {
+                return 'Not all lines are completed.';
             }
-        });
+            return null;
+        }
     });
 }).call(this);

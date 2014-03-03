@@ -28,6 +28,7 @@ var angular = angular || null;
     Workflow = function(subtitleList, translating, titleEdited) {
 	this.translating = translating;
 	this.titleEdited = titleEdited;
+	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
         if(this.subtitleList.length() == 0) {
@@ -36,37 +37,42 @@ var angular = angular || null;
             this.stage = 'sync';
         }
         this.subtitleList.addChangeCallback(function() {
-            if(self.stage == 'review' && !self.canMoveToReview()) {
+            if(self.stage == 'review' && !self.subtitleList.isComplete()) {
                 self.stage = 'sync';
             }
         });
     }
 
     Workflow.prototype = {
+	tabPressed: function(){
+           if (this.showOverlay) this.showOverlay = false;
+	},
         switchStage: function(newStage) {
-            if(newStage == 'review' && !this.canMoveToReview()) {
-                return;
-            }
 	    if (newStage == 'title') {
+                this.showOverlay = false; 
 		window.location.hash = 'set-title-modal';
 		this.titleEdited(true);
 	    }
+            this.showOverlay = true;
             this.stage = newStage;
         },
-        canMoveToTitle: function() {
-	    if (this.translating())
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
-	    else return true;
-        },
-        canMoveToReview: function() {
-	    if (this.translating())
-		return (this.titleEdited());
-	    else
-		return (this.subtitleList.length() > 0 &&
-			!this.subtitleList.needsAnyTranscribed() &&
-			!this.subtitleList.needsAnySynced());
+        canMoveToNext: function() {
+            switch(this.stage) {
+                case 'type':
+                    return true;
+                    
+                case 'sync':
+                    return this.subtitleList.isComplete();
+
+                case 'title':
+                    return this.titleEdited();
+
+                case 'review':
+                    return false;
+
+                default:
+                    throw "invalid value for Workflow.stage: " + this.stage;
+            }
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {
@@ -83,6 +89,18 @@ var angular = angular || null;
     module.value('Workflow', Workflow);
 
     module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
+
+        // If a blank list of subs start, we autimatically start edition
+        if ($scope.workflow.subtitleList.length() == 0) {
+            var newSub = $scope.workflow.subtitleList.insertSubtitleBefore(null);
+            $scope.currentEdit.start(newSub);
+        }
+
+        var notATask = !EditorData.task_needs_pane;
+
+        $scope.showOverlay = function() {
+            return (notATask && $scope.workflow.showOverlay);
+        }
 
         function rewindPlayback() {
             VideoPlayer.pause();
