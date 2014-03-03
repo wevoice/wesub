@@ -143,17 +143,17 @@
 	  
           <h1>{% trans "Keyboard controls" %}</h1>
 	  <div ng-show="workflow.stage == 'type'">
-	    <div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern small">+</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
 	    </div>
-	    <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('13-shift')">
+	    <div class="instruction-item blue-key">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern small">+</div>
 	      <div class="key-pattern">Enter</div>
@@ -161,42 +161,42 @@
 	    </div>
 	  </div>
 	  <div ng-show="workflow.stage == 'sync'">
-	    <div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern small">+</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
 	    </div>
 	    <div class="key-row">
-	      <div class="instruction-item teal-key" ng-click="handleMouseKeyDown('40')">
-		<div class="key-pattern">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_212_down_arrow.png"></img></div>
+	      <div class="instruction-item teal-key clickable" ng-click="handleMouseKeyDown('40')">
+		<div class="key-pattern small">
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img></div>
 		<div class="shortcut-desc">{% trans "Start subtitle" %}</div>
 	      </div>
               <div class="instruction-item-small"></div>
-	      <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('38')">
-		<div class="key-pattern">
-		  <img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_213_up_arrow.png"></img></div>
+	      <div class="instruction-item blue-key clickable" ng-click="handleMouseKeyDown('38')">
+		<div class="key-pattern small">
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img></div>
 		<div class="shortcut-desc">{% trans "End subtitle" %}</div>
 	      </div>
 	    </div>
 	  </div>
 	  <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
-	    <div class="instruction-item reddish-pink-key" ng-click="handleMouseKeyDown('9')">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
 	    </div>
-	    <div class="instruction-item lighter-blue-key" ng-click="handleMouseKeyDown('9-shift')">
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern small">+</div>
 	      <div class="key-pattern">Tab</div>
 	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
 	    </div>
-	    <div class="instruction-item blue-key" ng-click="handleMouseKeyDown('13-shift')">
+	    <div class="instruction-item blue-key">
 	      <div class="key-pattern">Shift</div>
 	      <div class="key-pattern small">+</div>
 	      <div class="key-pattern">Enter</div>
@@ -327,18 +327,14 @@
                working-subtitles>
             <div class="sync-help end">
               <span class="key">
-                <span>
-                  &uarr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img>
               </span>
               <div class="text">End now</div>
             </div>
 	    
             <div class="sync-help begin">
               <span class="key">
-                <span>
-                  &darr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img>
               </span>
               <div class="text">Begin now</div>
             </div>

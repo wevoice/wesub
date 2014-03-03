@@ -438,6 +438,10 @@ section.main {
         height: $span-key-height;
         float: left;
         margin-right: 10px;
+        padding: 9px;
+        opacity: 0.95;
+        border-bottom: 1px solid #474849;
+        box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
         position: relative;
         @include border-radius(3px);
 
@@ -824,7 +828,7 @@ section.main {
                 display: table;
                 width: 100%;
                 @include border-radius(3px);
-                &:hover {
+                &.clickable:hover {
                     cursor: pointer;
                 }
                 div.key-pattern {
@@ -835,6 +839,7 @@ section.main {
                     border-bottom: 1px solid #474849;
                     box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
                     background: white;
+                    opacity: 0.95;
                     margin: 0px 5px;
                     padding: 3px 20px;
                     @include border-radius(3px);
