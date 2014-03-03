@@ -211,18 +211,6 @@ button, .modal-inner a, a.button {
         margin-left: 0;
         margin-right: 0;
     }
-    &.last-chance {
-        background: none;
-        color: #4398C5;
-        display: block;
-        font-size: 11px;
-        margin-top: 20px;
-        padding: 0;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
 }
 
 .column {
@@ -1491,5 +1479,17 @@ aside.modal {
         padding: 10px;
         width: 100%;
         @include border-radius(3px);
+    }
+
+    footer.buttons {
+        button.last-chance {
+            background: none;
+            color: #4398C5;
+
+            &:hover {
+                text-decoration: underline;
+                border: 1px solid transparent;
+            }
+        }
     }
 }

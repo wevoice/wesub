@@ -108,7 +108,8 @@ aside.modal {
         border: 0;
         float: right;
         margin-left: 5px;
-        border: 1px solid $dark-grey;
+        border: 1px solid transparent;
+        outline: none;
 
         &:hover {
             background: $medium-grey;
@@ -117,6 +118,16 @@ aside.modal {
 
         &:first-of-type {
             background: $usblue;
+        }
+
+        &.link-style {
+            background: none;
+            color: #4398C5;
+
+            &:hover {
+                text-decoration: underline;
+                border: 1px solid transparent;
+            }
         }
     }
 }

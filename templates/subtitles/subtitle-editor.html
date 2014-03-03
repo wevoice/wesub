@@ -40,22 +40,6 @@
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown, 'loading-finished': loadingFinished }">
     <aside class="modal" id="loading-modal">{% trans "Loading subtitle editor&hellip;" %}</aside>
-    <div class="modal"
-        ng-controller="ModalController"
-        ng-show="isVisible">
-        <div class="content inner ng-cloak"
-            ng-show="content"
-            ng-cloak>
-            <h1 ng-show="content.heading">[[ content.heading ]]</h1>
-            <p ng-show="content.text">[[ content.text ]]</p>
-            <div class="content.buttons"
-                ng-show="content.buttons.length">
-                <button ng-repeat="button in content.buttons"
-                    ng-click="button.fn()"
-                    ng-class="button.class">[[ button.text ]]</button>
-            </div>
-        </div>
-    </div>
     <header class="main group">
         <section class="site left column">
             <h1>Amara</h1>
@@ -418,6 +402,14 @@
     {# include bold style too #}
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
+    <aside class="modal"
+        ng-class="dialogManager.dialogCSSClass('generic')">
+        <h3>[[ dialogManager.generic.title ]]</h3>
+        <p ng-if="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
+        <footer class="buttons">
+            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="button.callback()" ng-class="button.cssClass">[[ button.text ]]</button>
+        </footer>
+    </aside>
     {% if DEBUG %}
     <aside class="modal"
         ng-class="dialogManager.dialogCSSClass('debug')">

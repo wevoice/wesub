@@ -319,37 +319,29 @@ var angular = angular || null;
             }
         }
         $scope.showCloseModal = function(allowResume) {
-            var buttons = [];
+            var buttons = [
+                $scope.dialogManager.button('Exit', function() {
+                    $scope.dialogManager.close();
+                    window.location = $scope.primaryVideoURL;
+                })
+            ];
 
             if (allowResume && $scope.nextVersionNumber)  {
-                buttons.push({
-                    text: 'Resume editing',
-                    class: 'yes',
-                    fn: function() {
-                        $scope.$root.$emit('hide-modal');
-                        resumeEditing();
-                    },
-                });
+                buttons.push($scope.dialogManager.button(
+                            'Resume editing', function() {
+                    $scope.dialogManager.close();
+                    resumeEditing();
+                }));
             }
-
-            buttons.push({
-                'text': 'Exit', 'class': 'no', 'fn': function() {
-                    window.location = $scope.primaryVideoURL;
-                }
-            });
 
             if ($scope.status !== 'saved') {
-
-                buttons.push({
-                    'text': "Wait, don't discard my changes!", 'class': 'last-chance', 'fn': function() {
-                        $scope.$root.$emit('hide-modal');
-                    }
-                });
-
+                buttons.push($scope.dialogManager.linkButton(
+                    "Wait, don't discard my changes!",
+                    function() { $scope.dialogManager.close(); }));
             }
 
-            $scope.$root.$emit('show-modal', {
-                heading: closeDialogTitle(allowResume),
+            $scope.dialogManager.openDialog({
+                title: closeDialogTitle(allowResume),
                 buttons: buttons
             });
         };

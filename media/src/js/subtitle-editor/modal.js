@@ -136,6 +136,41 @@
             } else {
                 return '';
             }
+        },
+        button: function(text, callback, cssClass) {
+            return {
+                text: text,
+                callback: callback,
+                cssClass: cssClass || null
+            };
+        },
+        closeButton: function(callback) {
+            var that = this;
+            return this.button('Close', function() {
+                that.close();
+                if(callback) {
+                    callback();
+                }
+            });
+        },
+        linkButton: function(text, callback) {
+            return this.button(text, callback, 'link-style');
+        },
+        /*
+         * Open a dialog that doesn't need special HTML/code
+         *
+         * dialogDef is an object that defines the dialog.  It should contain
+         * the following properties:
+         *
+         *   title: dialog heading
+         *   text: dialog description (optional)
+         *   buttons: array defining the buttons.  Each element must be
+         *            either a simple string, or an object created by button()
+         *            or closeButton().
+         */
+        openDialog: function(dialogDef) {
+            this.generic = dialogDef;
+            this.open('generic');
         }
     }
 
