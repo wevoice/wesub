@@ -115,7 +115,7 @@ aside.modal {
             border: 1px solid $light-blue;
         }
 
-        &.default {
+        &:first-of-type {
             background: $usblue;
         }
     }

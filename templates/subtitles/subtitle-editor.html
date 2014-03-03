@@ -407,7 +407,7 @@
               <textarea rows="1" placeholder="Enter [[ key | metadataTypeName ]]" fixsize-bind="currentSubtitles.metadata[key]"></textarea>
             </div>
             <footer class="buttons">
-              <button class="default" ng-click="update(currentSubtitles)">Done</button>
+              <button ng-click="update(currentSubtitles)">Done</button>
               <button ng-click="reset()">Cancel</button>
             </footer>
         </form>
@@ -445,7 +445,7 @@
         <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor" %}</p>
         </div>
         <footer class="buttons">
-            <button ng-if="canUseBlobURL()" class="default" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
+            <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
             <button ng-click="onClose($event)">{% trans "Close Editor" %}
         </footer>
     </aside>
