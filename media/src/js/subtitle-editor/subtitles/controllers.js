@@ -352,28 +352,20 @@ var angular = angular || null;
                 return;
             }
 
-            var heading = "You have unsaved changes.  If you switch now you will lose you're work";
+            var dialogManager = $scope.dialogManager;
 
-            buttons = [
-                {
-                    text: 'Continue editing',
-                    class: 'no',
-                    fn: function() {
-                        $scope.$root.$emit('hide-modal');
-                    },
-                },
-                {
-                    text: 'Discard chnges',
-                    class: 'yes',
-                    fn: function() {
+            dialogManager.openDialog({
+                title: "You have unsaved changes.  If you switch now you will lose your work",
+                buttons: [
+                    dialogManager.button('Discard changes', function() {
+                        dialogManager.close();
+                        $scope.changesMade = false;
                         window.location = EditorData.oldEditorURL;
-                    },
-                },
-            ];
-
-            $scope.$root.$emit('show-modal', {
-                heading: heading,
-                buttons: buttons
+                    }),
+                    dialogManager.button('Continue editing', function() {
+                        dialogManager.close();
+                    })
+                ]
             });
         };
         $scope.showErrorModal = function(message) {

@@ -405,7 +405,7 @@
     <aside class="modal"
         ng-class="dialogManager.dialogCSSClass('generic')">
         <h3>[[ dialogManager.generic.title ]]</h3>
-        <p ng-if="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
+        <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
         <footer class="buttons">
             <button ng-repeat="button in dialogManager.generic.buttons" ng-click="button.callback()" ng-class="button.cssClass">[[ button.text ]]</button>
         </footer>
@@ -421,7 +421,8 @@
         </label>
         </p>
         <p>
-            <button ng-click="saveAutoBackup()" class="yes">Save auto-backup</button>
+            <button ng-click="saveAutoBackup()">Save auto-backup</button>
+            <button ng-click="showIdleModal()">Show idle dialog</button>
         </p>
         <footer class="buttons">
             <button ng-click="dialogManager.onCloseClick($event)">Close</button>

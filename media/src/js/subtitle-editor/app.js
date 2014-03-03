@@ -171,7 +171,6 @@ var angular = angular || null;
      */
     module.controller("AppControllerLocking", function($scope, $timeout,
                 EditorData, LockService) {
-        var secondsUntilClosing = 120;
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -190,7 +189,7 @@ var angular = angular || null;
             $scope.minutesIdle++;
 
             if ($scope.minutesIdle >= USER_IDLE_MINUTES) {
-                showIdleModal();
+                $scope.showIdleModal();
                 $timeout.cancel(regainLockTimer);
             } else {
                 startUserIdleTimer();
@@ -218,8 +217,8 @@ var angular = angular || null;
         function regainLockAfterIdle() {
             regainLock().then(function onSuccess(response) {
                 if (response.data.ok) {
+                    $scope.dialogManager.close();
                     $scope.minutesIdle = 0;
-                    $scope.$root.$emit('hide-modal');
                     startRegainLockTimer();
                     startUserIdleTimer();
                 } else {
@@ -231,63 +230,57 @@ var angular = angular || null;
                 window.location = '/videos/' + $scope.videoId + "/";
             });
         }
-        function showIdleModal() {
+        $scope.showIdleModal= function () {
+            var secondsUntilClosing = 120;
+            
+            function makeText() {
+                return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing;
+            }
 
-            var heading = "Warning: you've been idle for more than " + USER_IDLE_MINUTES + " minutes. " +
-                "To ensure no work is lost we will close your session in ";
-
-            var closeSessionTimeout;
-
-            var closeSession = function() {
-
-                secondsUntilClosing--;
-
-                if (secondsUntilClosing <= 0) {
-
-                    releaseLock();
-
-                    $scope.$root.$emit("show-modal", {
-                        heading: 'Your session has ended. You can try to resume, close the editor, or download your subtitles',
-                        buttons: [
-                            {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                                // TODO: Remove this duplication from below.
-                                if (closeSessionTimeout) {
-                                    $timeout.cancel(closeSessionTimeout);
-                                }
-
-                                regainLockAfterIdle();
-                            }},
-                            {'text': 'Download subtitles', 'class': 'no', 'fn': function() {
-                                                                                                               $scope.dialogManager.open('save-error');
-                            }},
-                            {'text': 'Close editor', 'class': 'no', 'fn': function() {
-                                window.location = '/videos/' + $scope.videoId + "/";
-                            }}
-                        ]
-                    });
-
+            function closeSessionTick() {
+                if (--secondsUntilClosing <= 0) {
+                    $scope.dialogManager.close();
+                    $scope.showCloseSessionModal();
                 } else {
-
-                    $scope.$root.$emit('change-modal-heading', heading + secondsUntilClosing + " seconds.");
-                    closeSessionTimeout = $timeout(closeSession, 1000);
-
+                    $scope.dialogManager.generic.text = makeText();
+                    closeSessionTimeout = $timeout(closeSessionTick, 1000);
                 }
-            };
+            }
 
-            $scope.$root.$emit("show-modal", {
-                heading: heading + secondsUntilClosing + " seconds.",
+            var closeSessionTimeout = $timeout(closeSessionTick, 1000);
+
+            $scope.dialogManager.openDialog({
+                title: 'Warning: Your session will close',
+                text: makeText(),
                 buttons: [
-                    {'text': 'Try to resume work', 'class': 'yes', 'fn': function() {
-                        if (closeSessionTimeout) {
-                            $timeout.cancel(closeSessionTimeout);
-                        }
-
-                        regainLockAfterIdle();
-                    }}
+                    $scope.dialogManager.button('Try to resume work',
+                        function() {
+                            if (closeSessionTimeout) {
+                                $timeout.cancel(closeSessionTimeout);
+                            }
+                            regainLockAfterIdle();
+                    })
                 ]
             });
 
-            closeSessionTimeout = $timeout(closeSession, 1000);
+        }
+
+        $scope.showCloseSessionModal = function() {
+            releaseLock();
+            var dialogManager = $scope.dialogManager;
+
+            dialogManager.openDialog({
+                text: 'Your session has ended. You can try to resume, or close the editor',
+                buttons: [
+                    dialogManager.button('Try to resume work', function() {
+                        regainLockAfterIdle();
+                    }),
+                    dialogManager.button('Close editor', function() {
+                        dialogManager.close();
+                        window.location = '/videos/' + $scope.videoId + "/";
+                    })
+                ]
+            });
         }
 
         startUserIdleTimer();
@@ -389,27 +382,19 @@ var angular = angular || null;
         }
 
         $scope.promptToRestoreAutoBackup = function() {
-            var dialog = {}
-            dialog.heading = 'You have an unsaved backup of your subtitling work, do you want to restore it?';
-            dialog.buttons = [
-                    {
-                        'text': 'Restore',
-                        'class': 'yes',
-                        'fn': function() {
-                            $scope.restoreAutoBackup();
-                            $scope.$emit('hide-modal');
-                        }
-                    },
-                    {
-                        'text': 'Discard',
-                        'class': 'no',
-                        'fn': function() {
-                            SubtitleBackupStorage.clearBackup();
-                            $scope.$emit('hide-modal');
-                        }
-                    },
-            ];
-            $scope.$root.$emit("show-modal", dialog);
+            $scope.dialogManager.openDialog({
+                title: 'You have an unsaved backup of your subtitling work, do you want to restore it?',
+                buttons: [
+                    $scope.dialogManager.button('Restore', function() {
+                        $scope.restoreAutoBackup();
+                        $scope.dialogManager.close();
+                    }),
+                    $scope.dialogManager.button('Discard', function() {
+                        SubtitleBackupStorage.clearBackup();
+                        $scope.dialogManager.close();
+                    })
+                ]
+            });
         }
 
         if(SubtitleBackupStorage.hasBackup(video.id,

@@ -35,17 +35,13 @@
                    ];
 
         $scope.showAdvancedModal = function() {
-
-            $scope.$root.$emit('show-modal', {
-                heading: 'Advanced keyboard controls',
+            $scope.dialogManager.openDialog({
+                title: 'Advanced keyboard controls',
                 text: 'Full list of keyboard shortcuts to go here.',
-                buttons: [{
-                    'text': 'Close', 'class': 'yes', 'fn': function() {
-                        $scope.$root.$emit('hide-modal');
-                    }
-                }]
+                buttons: [
+                    $scope.dialogManager.closeButton()
+                ]
             });
-
         };
 
     }]);

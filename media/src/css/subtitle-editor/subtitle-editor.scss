@@ -91,6 +91,17 @@ $text-color: #565758;
     @include vertical-gradient(rgba(#F3F4F5, 1), rgba(white, 0));
 }
 
+@mixin big-button {
+    font: normal 12px $OpenSans;
+    background: $light-blue;
+    color: #FFFFFF;
+    padding: 12px 10px;
+    cursor: pointer;
+    border: 1px solid $light-blue;
+    border-radius: 3px;
+}
+
+
 // Page
 html, body {
     background: #F3F4F5;
@@ -177,39 +188,6 @@ div.modal {
                 color: #CCC;
             }
         }
-    }
-}
-button, .modal-inner a, a.button {
-    border: 0;
-    color: #DEDFDF;
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: none;
-    font: normal 12px $OpenSans;
-    margin: 0 10px;
-    padding: 5px 20px;
-    text-decoration: none;
-    @include border-radius(2px);
-
-    &.approve {
-        background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
-    }
-    &.no {
-        background: #4A4B4C;
-    }
-    &.send-back {
-        background: #D24655 url('../../../images/thumbs-down.png') 10px center no-repeat;
-        margin-right: 5px;
-    }
-    &.yes {
-        background: #126895;
-    }
-    &:first-of-type {
-        margin-left: 0;
-    }
-    &:last-of-type {
-        margin-left: 0;
-        margin-right: 0;
     }
 }
 
@@ -640,6 +618,8 @@ section.main {
                     display: none;
                     padding: 0;
                     margin: 0;
+                    border: none;
+                    cursor: pointer;
                     background: transparent;
 
                     &:focus {
@@ -1163,14 +1143,10 @@ section.main {
                             font-size: 11px;
                         }
                         button {
+                            @include big-button;
                             margin-top: 10px;
-                            color: #FFFFFF;
-                            padding: 12px 10px;
-                            &.next-step {
-                                background: #29B0BF;
-                            }
                             &.endorse {
-                                background: #29B0BF url('../../../images/thumbs-up.png') 10px center no-repeat;
+                                background: $light-blue url('../../../images/thumbs-up.png') 10px center no-repeat;
                                 padding-left: 40px;
                             }
                         }
@@ -1479,6 +1455,10 @@ aside.modal {
         padding: 10px;
         width: 100%;
         @include border-radius(3px);
+    }
+
+    button {
+        @include big-button;
     }
 
     footer.buttons {
