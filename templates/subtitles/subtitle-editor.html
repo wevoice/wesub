@@ -306,7 +306,7 @@
               {% endblocktrans %}
             </div>
 	    <div class="toolbox">
-	      <div class="toolbox-inside">
+	      <div class="toolbox-inside" ng-controller="SaveSessionController">
 		<a href="#"><img src="{{ STATIC_URL }}images/subtitle-editor/glyphicons_halflings_135_wrench.png" alt="Tools"></img></a>
 		<ul class="toolbox-menu">
 		  <li ng-show="copyTimingEnabled()"><a href="#" class="copyover" ng-click="copyTimingOver()" title="Copy timing and paragraphs from reference language">{% trans "Copy Timing" %}</a></li>
@@ -317,7 +317,7 @@
                   </a></li>
 		  <li><a href="#" class="clear-timing" ng-click="clearTiming()" title="Clear timing of all subtitles">{% trans "Clear timing" %}</a></li>
 		  <li><a href="#" class="clear-text" ng-click="clearText()" title="Clear text of all subtitles">{% trans "Clear text" %}</a></li>
-		  <li><a href="#" class="revert-saved" ng-click="" title="Revert to last saved version">{% trans "Revert to last saved version" %}</a></li>
+		  <li><a href="#" class="revert-saved" ng-show="changesMade" ng-click="resetToLastSavedVersion()" title="Revert to last saved version">{% trans "Revert to last saved version" %}</a></li>
 		</ul>
 	      </div>
 	    </div>

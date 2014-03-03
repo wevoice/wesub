@@ -143,6 +143,15 @@ var angular = angular || null;
              }
             $scope.$root.$emit('work-done');
         }
+        $scope.resetToLastSavedVersion = function() {
+            if($scope.workingSubtitles.versionNumber) {
+                $scope.workingSubtitles.getSubtitles(EditorData.editingVersion.languageCode,
+                    $scope.workingSubtitles.versionNumber);
+            } else {
+                $scope.workingSubtitles.initEmptySubtitles(
+                    EditorData.editingVersion.languageCode, EditorData.baseLanguage);
+            }
+        }
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
                      $scope.referenceSubtitles.getTitle());
