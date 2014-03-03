@@ -135,47 +135,95 @@
         </section>
     </header>
     <section class="main ng-cloak" ng-cloak>
-        <section class="left column">
-            <div class="help-panel" ng-controller="HelpController">
-                <!-- not ready for release just yet
-                <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
-                -->
-
-                <h1>Keyboard controls</h1>
-                <ul ng-show="commands">
-                    <li ng-repeat="command in commands" class="group">
-                        <span class="key">
-                            <span>
-                                [[ command.key ]]
-                            </span>
-                        </span>
-                        <span class="description" ng-bind-html="command.description"></span>
-                    </li>
-                </ul>
-            </div>
-            <div class="preview">
-                Amara editor preview. <a href="http://pculture.freshdesk.com/categories/6573/forums/80247/topics/28857" target="blank">Learn more or leave feedback</a>.<br>
-            </div>
-            <div class="language-selections group toolbar"
-                language-selector
-                 ng-controller="LanguageSelectorController">
-                <div class="select">
-                    <select name="language"
-                        ng-model='language'
-                        ng-options="item.name for item in languages">
-                    </select>
-                </div>
-                <div class="select">
-                    <select name="version" class="version-select">
-                        <option
-                                ng-repeat='thisVersion in versions'
-                                ng-selected='version == thisVersion'
-                                ng-disabled='thisVersion.visibility != "Public"'
-                                value="[[thisVersion.version_no]]">
-                            [[thisVersion|versionDropDownDisplay]]</option>
-                    </select>
-                </div>
-            </div>
+      <section class="left column">
+        <div class="help-panel" ng-controller="WorkflowProgressionController">
+          <!-- not ready for release just yet
+               <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
+               -->
+	  
+          <h1>{% trans "Keyboard controls" %}</h1>
+	  <div ng-show="workflow.stage == 'type'">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+	    </div>
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern small">+</div>
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
+	    </div>
+	    <div class="instruction-item blue-key">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern small">+</div>
+	      <div class="key-pattern">Enter</div>
+	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
+	    </div>
+	  </div>
+	  <div ng-show="workflow.stage == 'sync'">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+	    </div>
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern small">+</div>
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
+	    </div>
+	    <div class="key-row">
+	      <div class="instruction-item teal-key clickable" ng-click="handleMouseKeyDown('40')">
+		<div class="key-pattern small">
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img></div>
+		<div class="shortcut-desc">{% trans "Start subtitle" %}</div>
+	      </div>
+              <div class="instruction-item-small"></div>
+	      <div class="instruction-item blue-key clickable" ng-click="handleMouseKeyDown('38')">
+		<div class="key-pattern small">
+		  <img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img></div>
+		<div class="shortcut-desc">{% trans "End subtitle" %}</div>
+	      </div>
+	    </div>
+	  </div>
+	  <div ng-show="(workflow.stage == 'review') || (workflow.stage == 'title')">
+	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Play / Pause" %}</div>
+	    </div>
+	    <div class="instruction-item lighter-blue-key clickable" ng-click="handleMouseKeyDown('9-shift')">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern small">+</div>
+	      <div class="key-pattern">Tab</div>
+	      <div class="shortcut-desc">{% trans "Skip back" %}</div>
+	    </div>
+	    <div class="instruction-item blue-key">
+	      <div class="key-pattern">Shift</div>
+	      <div class="key-pattern small">+</div>
+	      <div class="key-pattern">Enter</div>
+	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
+	    </div>
+	  </div>
+	</div>
+        <div class="language-selections group toolbar"
+             language-selector
+             ng-controller="LanguageSelectorController">
+          <div class="select">
+            <select name="language"
+                    ng-model='language'
+                    ng-options="item.name for item in languages">
+            </select>
+          </div>
+          <div class="select">
+            <select name="version" class="version-select">
+              <option
+                 ng-repeat='thisVersion in versions'
+                 ng-selected='version == thisVersion'
+                 ng-disabled='thisVersion.visibility != "Public"'
+                 value="[[thisVersion.version_no]]">
+                [[thisVersion|versionDropDownDisplay]]</option>
+            </select>
+          </div>
+        </div>
             <div class="subtitles-wrapper">
                 <div class="reference subtitles" subtitle-scroller="reference-subtitle-set">
                     <ul class="subtitle-list"
@@ -276,18 +324,14 @@
                working-subtitles>
             <div class="sync-help end">
               <span class="key">
-                <span>
-                  &uarr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/up_arrow.png"></img>
               </span>
               <div class="text">End now</div>
             </div>
 	    
             <div class="sync-help begin">
               <span class="key">
-                <span>
-                  &darr;
-                </span>
+		<img src="{{ STATIC_URL }}images/subtitle-editor/down_arrow.png"></img>
               </span>
               <div class="text">Begin now</div>
             </div>

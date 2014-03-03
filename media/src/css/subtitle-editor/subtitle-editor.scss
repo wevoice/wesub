@@ -10,6 +10,11 @@ $span-key-height: 32px;
 $text-color: #565758;
 $dark-grey: #212223;
 
+$reddish-pink: #d24655;
+$lighter-blue: #29b0bf;
+$blue: #126295;
+$teal: #15998e;
+
 // Custom fonts
 @font-face {
     font-family: 'CodeProLC';
@@ -433,6 +438,10 @@ section.main {
         height: $span-key-height;
         float: left;
         margin-right: 10px;
+        padding: 9px;
+        opacity: 0.95;
+        border-bottom: 1px solid #474849;
+        box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
         position: relative;
         @include border-radius(3px);
 
@@ -778,18 +787,71 @@ section.main {
     }
     section.left {
         div.help-panel {
-            background: #0C3F70;
-            color: white;
+            color: $dark-grey;
             font-size: 12px;
-            height: 200px;
-            margin: 10px;
-            padding: 10px;
-            @include border-radius(3px);
-
+            height: 242px;
+            width: 87%;
+            display: table;
+            margin: 10px 0px 0px 30px;
+            padding: 5px;
             span.key {
                 width: 20%;
             }
-
+            div.key-row {
+                display: table-row;
+                table-layout: fixed;
+                div.instruction-item-small { 
+                  display: table-cell;
+                  width: 0.05%;
+                }
+                div.instruction-item { 
+                  display: table-cell;
+                  width: 2%;
+                  margin: 0px 10px;
+                }
+            }
+            div.instruction-item {
+                margin: 10px 0px;
+                padding: 10px;
+                &.reddish-pink-key {
+                    background: $reddish-pink;
+                }
+                &.lighter-blue-key {
+                    background: $lighter-blue;
+                }
+                &.blue-key {
+                    background: $blue;
+                }
+                &.teal-key {
+                    background: $teal;
+                }
+                display: table;
+                width: 100%;
+                @include border-radius(3px);
+                &.clickable:hover {
+                    cursor: pointer;
+                }
+                div.key-pattern {
+                    &.small {
+                    padding: 3px 5px;
+                    }
+                    float: left;
+                    border-bottom: 1px solid #474849;
+                    box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
+                    background: white;
+                    opacity: 0.95;
+                    margin: 0px 5px;
+                    padding: 3px 20px;
+                    @include border-radius(3px);
+                    vertical-align: middle;
+                    display: table-cell;
+                }
+                div.shortcut-desc {
+                width: 100%;
+                text-align: right;
+                color: white;
+                }
+            }
             a.advanced {
                 color: white;
                 float: right;
@@ -804,7 +866,7 @@ section.main {
             h1 {
                 font-size: 16px;
                 font-weight: bold;
-                margin-bottom: 30px;
+                margin-bottom: 10px;
             }
             p {
                 font-size: 11px;
