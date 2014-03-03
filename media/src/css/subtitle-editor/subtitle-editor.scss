@@ -828,7 +828,7 @@ section.main {
                 display: table;
                 width: 100%;
                 @include border-radius(3px);
-                &:hover {
+                &.clickable:hover {
                     cursor: pointer;
                 }
                 div.key-pattern {
