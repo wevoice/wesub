@@ -26,11 +26,13 @@ class EditorPage(UnisubsPage):
     #SAVE ERROR MODAL
     
     _SAVE_ERROR = 'div.modal div h1'
+    _EDITOR_MODAL = 'div.modal div h1'
+    _MODAL_NO = 'button.no'
+    _MODAL_YES = 'button.yes'
     _SAVE_ERROR_TEXT = ("There was an error saving your subtitles. You'll "
                         "need to copy and save your subtitles below, and "
                         "upload them to the system later.")
     _SAVE_SUBS = 'div.download textarea'
-    _CLOSE = 'button.no'
     _MAIN = 'section.main'
 
     #LEFT COLUMN
@@ -73,13 +75,32 @@ class EditorPage(UnisubsPage):
     #RIGHT COLUMN
 
     _NEXT_STEP = 'div.substeps div button.next-step'
-    _ENDORSE = 'div.substeps button.endorse'
+    _ENDORSE = 'div.substeps button.endorse' #when completing subtitling.
+
+    # COLLAB PANEL
+    _COLLAB_PANEL = 'section.collab'
     _SEND_BACK = 'button.send-back'
     _APPROVE = 'button.approve'
     _NOTES = 'textarea[ng-model="notes"]'
 
-    def open_editor_page(self, video_id, lang):
+    def open_editor_page(self, video_id, lang, restore=False):
         self.open_page(self._URL.format(video_id, lang))
+        self.restore_autobackup(restore)
+        
+    def restore_autobackup(self, restore=False):
+        if self.is_element_visible(self._EDITOR_MODAL):
+            modal = self.get_text_by_css(self._EDITOR_MODAL)
+            self.logger.info(modal)
+            if restore:
+                self.click_by_css(self._MODAL_YES)
+            else:
+                self.click_by_css(self._MODAL_NO)
+ 
+
+
+    def open_ed_with_base(self, video_id, lang, base_lang='en'):
+        url = self._URL + '?base-language={2}'
+        self.open_page(url.format(video_id, lang, base_lang))
 
     def keyboard_controls_help(self):
         pass
@@ -128,10 +149,15 @@ class EditorPage(UnisubsPage):
         self.wait_for_element_present(self._VIDEO_SUBTITLE, wait_time=20)
         return self.get_text_by_css(self._VIDEO_SUBTITLE)
 
+
+    def legacy_editor(self):
+        self.click_link_text("Legacy Editor")
+        time.sleep(2)
+
     def save(self, save_option):
         """Click the save button and the choose one of the save options.
 
-        Options are: Resume editing, Back to full editor, Exit
+        Options are: Resume editing, Exit
 
         """
         self.click_by_css(self._SAVE)
@@ -170,7 +196,7 @@ class EditorPage(UnisubsPage):
 
     def working_language(self):
         """Return the curren working language displayed. """
-
+        self.wait_for_element_present(self._WORKING_LANGUAGE)
         return self.get_text_by_css(self._WORKING_LANGUAGE)
 
     def working_text(self, position=None):
@@ -251,12 +277,15 @@ class EditorPage(UnisubsPage):
         self.hover_by_css(self._TOOLS_MENU)
 
     def copy_timings(self):
+        copy_el = self.browser.find_element_by_css_selector(self._COPY_TIMING)
+        li = copy_el.parent
+        self.logger.info(dir(li))
+        hidden = li.get_attribute("class")
+        self.logger.info(hidden)
+        if hidden == 'ng-hide':
+           return "Element not displayed"
         self.hover_tools_menu()
-        try:
-            self.click_by_css(self._COPY_TIMING)
-            time.sleep(1)
-        except ElementNotVisibleException:
-            return "Element not displayed"
+        copy_el.click()
  
     def toggle_paragraph(self, position):
         """Toggles the paragraph marker on or off. """
@@ -279,8 +308,10 @@ class EditorPage(UnisubsPage):
 
         
 
-    def add_subs_to_the_end(self, subs):
+    def add_subs_to_the_end(self, subs=None):
         """Click Add subtitles at the end and add new lines"""
+        if not subs:
+            subs = ["line 1", "line 2", "line 3", "line 4", "line 5"]
         self.toggle_timeline('Show')
         for line in subs:
             self.browser.execute_script("window.location.hash='add-sub-at-end'")
@@ -320,11 +351,12 @@ class EditorPage(UnisubsPage):
         self.click_by_css(self._EXIT_BUTTON)
         self.handle_js_alert('accept')
 
+    def collab_panel_displayed(self):
+        return self.is_element_visible(self._COLLAB_PANEL)
+
     def approve_task(self):
         self.click_by_css(self._APPROVE)
         self.wait_for_element_not_present(self._APPROVE)
-
-
 
     def send_back_task(self): 
         self.click_by_css(self._SEND_BACK)

@@ -51,6 +51,9 @@ class TestCaseComments(WebdriverTestCase):
                 rmlocale(self.video.get_absolute_url())), msg)
 
 
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
+
     def test_video_lang_comment_message(self):
         """Message sent on video comment to followers has link to comments tab.
 

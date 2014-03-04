@@ -10,19 +10,14 @@ from webdriver_testing.pages.site_pages import watch_page
 from webdriver_testing import data_helpers
 from webdriver_testing.data_factories import UserFactory
 from webdriver_testing.data_factories import VideoUrlFactory
-from webdriver_testing.pages.editor_pages import subtitle_editor
-from webdriver_testing.pages.editor_pages import unisubs_menu 
 from webdriver_testing.data_factories import TeamVideoFactory
 from webdriver_testing.data_factories import TeamMemberFactory
-
-
 from webdriver_testing.data_factories import WorkflowFactory
 from webdriver_testing.data_factories import TeamLangPrefFactory
 from webdriver_testing.data_factories import UserLangFactory
+from webdriver_testing.pages.site_pages import editor_page
 from webdriver_testing.pages.site_pages.teams.tasks_tab import TasksTab
 from webdriver_testing.pages.site_pages.teams.videos_tab import VideosTab
-from webdriver_testing.pages.editor_pages import dialogs
-from webdriver_testing.pages.editor_pages import subtitle_editor
 
 class TestCaseUnpublishLast(WebdriverTestCase):
     """TestSuite for Unapprove / Delete last version of language.  """
@@ -32,8 +27,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseUnpublishLast, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.tasks_tab = TasksTab(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.watch_pg = watch_page.WatchPage(cls)
@@ -139,7 +133,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         cls.data_utils.complete_approve_task(tv, 20, cls.owner)
         return video, tv
 
-    def test_unpublish_last__perform_review(self):
+    def test_unpublish_last_perform_review(self):
         """Deleting last source can review
 
         """
@@ -147,30 +141,25 @@ class TestCaseUnpublishLast(WebdriverTestCase):
         self.tasks_tab.open_page('teams/%s/tasks/?lang=ru&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Review Russian Subtitles', 
+        self.tasks_tab.perform_task('Review Russian Subtitles', 
                                                self.video.title)
-        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_review(result='Accept')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.approve_task()
+
+        self.tasks_tab.open_page('teams/%s/tasks/?lang=ru&assignee=anyone'
+                                 % self.team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve Russian Subtitles',
                                            self.video.title))
 
-    def test_unpublish_last__perform_approve(self):
+    def test_unpublish_last_perform_approve(self):
         """Deleting last source can approve
         """
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?lang=de&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Approve German Subtitles', 
+        self.tasks_tab.perform_task('Approve German Subtitles', 
                                                self.video.title)
-        self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_approve(result='Approve')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.approve_task()
         self.assertTrue(self.video.subtitle_language('de').get_tip(public=True))
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
@@ -178,7 +167,7 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                         'Approve German Subtitles', self.video.title))
 
 
-    def test_unpublish__edit_forked_translation(self):
+    def test_unpublish_edit_forked_translation(self):
         """In-progress translations editable after last source deleted.
 
         """
@@ -188,11 +177,11 @@ class TestCaseUnpublishLast(WebdriverTestCase):
                                  self.team.slug, self.tv.pk))
 
         task_text = 'Translate Subtitles into Swedish'
-        self.tasks_tab.perform_assigned_task(task_text, self.video.title)
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
+        self.tasks_tab.perform_task(task_text, self.video.title)
+        self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
 
-
-    def test_unpublish__revision_not_searchable(self):
+    def test_unpublish_revision_not_searchable(self):
         """Unpublished (deleted) revision text doesn't show in search results.
 
         """
@@ -214,8 +203,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
     def setUpClass(cls):
         super(TestCaseDeleteLast, cls).setUpClass()
         cls.data_utils = data_helpers.DataHelpers()
-        cls.create_modal = dialogs.CreateLanguageSelection(cls)
-        cls.sub_editor = subtitle_editor.SubtitleEditor(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.tasks_tab = TasksTab(cls)
         cls.video_pg = video_page.VideoPage(cls)
         cls.watch_pg = watch_page.WatchPage(cls)
@@ -323,38 +311,32 @@ class TestCaseDeleteLast(WebdriverTestCase):
         cls.data_utils.complete_approve_task(tv, 20, cls.owner)
         return video, tv
 
-    def test_delete_last__perform_review(self):
+    def test_delete_last_perform_review(self):
         """Deleting last source can review
 
         """
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?lang=ru&assignee=anyone'
                                  % self.team.slug)
-
-        self.tasks_tab.perform_and_assign_task('Review Russian Subtitles', 
+        self.tasks_tab.perform_task('Review Russian Subtitles', 
                                                self.video.title)
-        self.assertEqual('Review subtitles', self.sub_editor.dialog_title())
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_review(result='Accept')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+        self.editor_pg.approve_task()
+        self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
+                                 % self.team.slug)
         self.assertTrue(self.tasks_tab.task_present('Approve Russian Subtitles',
                                            self.video.title))
 
-    def test_delete_last__perform_approve(self):
+    def test_delete_last_perform_approve(self):
         """Deleting last source can approve
         """
         self.tasks_tab.log_in(self.owner, 'password')
         self.tasks_tab.open_page('teams/%s/tasks/?lang=de&assignee=anyone'
                                  % self.team.slug)
 
-        self.tasks_tab.perform_and_assign_task('Approve German Subtitles', 
+        self.tasks_tab.perform_task('Approve German Subtitles', 
                                                self.video.title)
-        self.assertEqual('Approve subtitles', self.sub_editor.dialog_title())
-        self.sub_editor.continue_to_next_step() #to subtitle info 
-        self.sub_editor.complete_approve(result='Approve')
-        self.sub_editor.mark_subs_complete()
-        self.sub_editor.click_saved_ok()
+
+        self.editor_pg.approve_task()
         self.assertTrue(self.video.subtitle_language('de').get_tip(public=True))
         self.tasks_tab.open_page('teams/%s/tasks/?assignee=anyone'
                                  % self.team.slug)
@@ -362,7 +344,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
                         'Approve German Subtitles', self.video.title))
 
 
-    def test_delete_last__team_language_ui(self):
+    def test_delete_last_team_language_ui(self):
         """Unpublish last public version, team members see lang on video page.
 
 
@@ -375,7 +357,7 @@ class TestCaseDeleteLast(WebdriverTestCase):
 
 
 
-    def test_delete__edit_forked_translation(self):
+    def test_delete_edit_forked_translation(self):
         """In-progress translations editable after last source deleted.
 
         """
@@ -385,11 +367,12 @@ class TestCaseDeleteLast(WebdriverTestCase):
                                  self.team.slug, self.tv.pk))
 
         task_text = 'Translate Subtitles into Swedish'
-        self.tasks_tab.perform_assigned_task(task_text, self.video.title)
-        self.assertEqual('Typing', self.sub_editor.dialog_title())
+        self.tasks_tab.perform_task(task_text, self.video.title)
+        self.assertEqual(u'Editing Swedish\u2026', self.editor_pg.working_language())
+        self.assertEqual('English', self.editor_pg.selected_ref_language())
 
 
-    def test_delete__revision_not_searchable(self):
+    def test_delete_revision_not_searchable(self):
         """Unpublished (deleted) revision text doesn't show in search results.
 
         """

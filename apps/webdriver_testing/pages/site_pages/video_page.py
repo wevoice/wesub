@@ -36,9 +36,9 @@ class VideoPage(UnisubsPage):
     _COMMENTS_TAB = 'a[href="?tab=comments"]'
     _ACTIVITY_TAB = 'a[href="?tab=activity"]'
 
-
-    _ADD_SUBTITLES = "a.add_subtitles"
-
+    _CONTRIBUTE = "div.contribute"
+    _ADD_SUBTITLES = "a.open-modal"
+    _ADD_SUBS_TEXT = "Add a new langauge!"
     #VIDEO SIDE SECTION
     _INFO = "ul#video-menu.left_nav li:nth-child(1) > a"
     _ADD_TRANSLATION = "li.contribute a#add_translation"
@@ -178,7 +178,7 @@ class VideoPage(UnisubsPage):
         self.click_by_css(self._SUBTITLE_MENU)
 
     def displays_add_subtitles(self):
-        return self.is_element_visible(self._ADD_SUBTITLES)
+        return self.is_text_present(self._CONTRIBUTE, self._ADD_SUBS_TEXT)
 
     def displays_add_translation(self):
         return self.is_element_visible(self._ADD_TRANSLATION)

@@ -1,10 +1,10 @@
-from apps.webdriver_testing.webdriver_base import WebdriverTestCase
-from apps.webdriver_testing.pages.site_pages import video_page
-from apps.webdriver_testing.pages.site_pages import video_language_page
-from apps.webdriver_testing import data_helpers
-from apps.webdriver_testing.data_factories import UserFactory
-from apps.webdriver_testing.data_factories import VideoUrlFactory
-from apps.webdriver_testing.pages.editor_pages import subtitle_editor 
+from webdriver_testing.webdriver_base import WebdriverTestCase
+from webdriver_testing.pages.site_pages import video_page
+from webdriver_testing.pages.site_pages import video_language_page
+from webdriver_testing import data_helpers
+from webdriver_testing.data_factories import UserFactory
+from webdriver_testing.data_factories import VideoUrlFactory
+from webdriver_testing.pages.site_pages import editor_page 
 import codecs
 import os
 
@@ -18,6 +18,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         cls.data_utils = data_helpers.DataHelpers()
         cls.user = UserFactory.create(username = 'user')
         cls.video_pg = video_page.VideoPage(cls)
+        cls.editor_pg = editor_page.EditorPage(cls)
         cls.test_video = VideoUrlFactory().video
         cls.subs_data_dir = os.path.join(os.getcwd(), 'apps', 
             'webdriver_testing', 'subtitle_data')
@@ -43,7 +44,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         self.video_pg.open_page('videos/' + self.test_video.video_id + '/en/')
 
 
-    def test_untimed__txt(self):
+    def test_untimed_txt(self):
         """Upload untimed subs in a txt file.
 
         """
@@ -51,7 +52,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file) 
         self._upload_and_verify(sub_file)      
                 
-    def test_untimed__srt(self):
+    def test_untimed_srt(self):
         """Upload untimed subs in a srt file.
 
         """
@@ -59,7 +60,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file) 
         self._upload_and_verify(sub_file)           
 
-    def test_untimed__sbv(self):
+    def test_untimed_sbv(self):
         """Upload untimed subs in a sbv file.
 
         """
@@ -67,7 +68,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file)     
 
-    def test_untimed__ssa(self):
+    def test_untimed_ssa(self):
         """Upload untimed subs in a ssa file.
 
         """
@@ -75,7 +76,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)   
         self._upload_and_verify(sub_file)         
 
-    def test_untimed__ttml(self):
+    def test_untimed_ttml(self):
         """Upload untimed subs in a ttml file.
 
         """
@@ -83,7 +84,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file)     
 
-    def test_untimed__dfxp(self):
+    def test_untimed_dfxp(self):
         """Upload untimed subs in a dfxp file.
 
         """
@@ -91,7 +92,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file)     
 
-    def test_version__existing_translation(self):
+    def test_version_existing_translation(self):
         """On upload, create a new version and replace existing translation.
 
         Uploaded subs replace the existing version even if the existing
@@ -110,7 +111,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         subtitle_lang.clear_tip_cache() 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
 
-    def test__version__overwrite_existing(self):
+    def test_version_overwrite_existing(self):
         """On upload, create a new version and replace original transcription.
 
         Uploaded subs replace the existing version of original lang text.
@@ -130,7 +131,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         subtitle_lang.clear_tip_cache() 
         self.assertEqual(2, subtitle_lang.get_tip().version_number)
     
-    def test_upload__additional_translation(self):
+    def test_upload_additional_translation(self):
         """Uploading a set of subs in a new language.
 
         New language is created as a new version.
@@ -149,7 +150,7 @@ class TestCaseUntimedText(WebdriverTestCase):
         self.assertEqual(1, subtitle_lang.get_tip().version_number)
         self.assertEqual(43, subtitle_lang.get_subtitle_count() )
 
-    def test_display__site(self):
+    def test_display_site(self):
         """Upload untimed subs verify content displayed on site lang page. 
 
         """
@@ -185,23 +186,18 @@ class TestCaseUntimedText(WebdriverTestCase):
         video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         video_language_pg.edit_subtitles()
-        sub_editor = subtitle_editor.SubtitleEditor(self)
-        sub_editor.continue_past_help()
-        editor_sub_list = sub_editor.subtitles_list()
-
+        self.editor_pg.edit_sub_line("I would like to be under the sea", 1)
+        
         #Verify uploaded subs are displayed in the Editor
         #self.assertEqual(expected_list, editor_sub_list)
-        typed_subs = sub_editor.edit_subs()
-
-        sub_editor.save_and_exit()
+        self.editor_pg.save("Exit")
         video_language_pg.open_video_lang_page(
             self.test_video.video_id, 'en')
         displayed_list = video_language_pg.displayed_lines()
         #Verify the edited text is in the sub list
-        self.assertIn("I'd like to be Under the sea", displayed_list[0])
-
+        self.assertIn("I would like to be under the sea", displayed_list[0])
         #Verify the origal unedited text is still present in the sub list.
-        self.assertIn(expected_list[-1], displayed_list)
+        self.assertTrue(22, len(displayed_list))
 
  
 class TestCaseTimedText(WebdriverTestCase):
@@ -240,7 +236,7 @@ class TestCaseTimedText(WebdriverTestCase):
         self.video_lang_pg.open_video_lang_page(self.test_video.video_id, lang_code)
         self.assertEqual(expected_count, len(self.video_lang_pg.displayed_lines()))
 
-    def test_timed__txt(self):
+    def test_timed_txt(self):
         """Upload timed subs (en) in a txt file.
 
         """
@@ -248,7 +244,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)
         self._upload_and_verify(sub_file, 'English', 'en', 72)
 
-    def test_timed__srt(self):
+    def test_timed_srt(self):
         """Upload timed subs (sv) in a srt file.
 
         """
@@ -257,7 +253,7 @@ class TestCaseTimedText(WebdriverTestCase):
         self._upload_and_verify(sub_file, 'Swedish', 'sv', 72)
        
 
-    def test_timed__sbv(self):
+    def test_timed_sbv(self):
         """Upload timed subs (zh-cn) in a sbv file.
 
         """
@@ -265,7 +261,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file, 'Chinese, Simplified', 'zh-cn', 243)
 
-    def test_timed__ssa(self):
+    def test_timed_ssa(self):
         """Upload timed subs (hu) in a ssa file.
 
         """
@@ -274,7 +270,7 @@ class TestCaseTimedText(WebdriverTestCase):
         self._upload_and_verify(sub_file, 'Hungarian', 'hu', 243)
 
 
-    def test_timed__ttml(self):
+    def test_timed_ttml(self):
         """Upload timed subs (ar) in a ttml file.
 
         """
@@ -282,7 +278,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file, 'Arabic', 'ar', 243)
 
-    def test_timed__dfxp(self):
+    def test_timed_dfxp(self):
         """Upload timed subs (sv) in a dfxp file.
 
         """
@@ -290,7 +286,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file, 'Swedish', 'sv', 72)
 
-    def test_xml_entities__ssa(self):
+    def test_xml_entities_ssa(self):
         """Upload subs with entities (&) in ssa format.
 
         """
@@ -298,7 +294,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file, 'English', 'en', 5)
 
-    def test_xml_entities__sbv(self):
+    def test_xml_entities_sbv(self):
         """Upload subs with entities (&) in sbv format.
 
         """
@@ -306,7 +302,7 @@ class TestCaseTimedText(WebdriverTestCase):
         sub_file = os.path.join(self.subs_data_dir, test_file)       
         self._upload_and_verify(sub_file, 'English', 'en', 1194)
 
-    def test_xml_entities__srt(self):
+    def test_xml_entities_srt(self):
         """Upload subs with entities (&) in srt format.
 
         """

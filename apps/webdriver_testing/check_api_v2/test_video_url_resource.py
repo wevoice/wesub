@@ -177,13 +177,4 @@ class TestCaseVideoUrl(WebdriverTestCase):
             update_url = 'videos/{0}/urls/{1}/'.format(video.video_id, url_id)
             r = self.data_utils.make_request(self.user, 'delete', update_url)
         self.assertEqual('The last video url cannot be deleted', r.content)
-        #Open the video page on the ui - for the verification screenshot
         self.assertEqual(expected_url, video.get_video_url())
-
-
-
-
-
-
-
-        

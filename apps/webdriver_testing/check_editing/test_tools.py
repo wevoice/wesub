@@ -62,6 +62,7 @@ class TestCaseTools(WebdriverTestCase):
         cls.video_pg.log_in(cls.user.username, 'password')
 
     def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
         try:
             self.editor_pg.exit()
         except:

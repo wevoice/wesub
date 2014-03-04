@@ -35,8 +35,8 @@ class TestCaseFollowing(WebdriverTestCase):
 
         """
         self.create_pg.open_create_page()
-        self.create_pg.log_in(self.user, 'password')
-        url = 'http://qa.pculture.org/amara_tests/Birds_short.webmsd.webm'
+        self.create_pg.log_in(self.user.username, 'password')
+        url = 'http://www.youtube.com/watch?v=WqJineyEszo'
         self.create_pg.submit_video(url)
         self.assertEqual(self.FOLLOWING, self.video_pg.follow_text())
 
@@ -45,7 +45,7 @@ class TestCaseFollowing(WebdriverTestCase):
         """Subtitler is set to following for language contributed.
 
         """
-        self.video_pg.log_in(self.user, 'password')
+        self.video_pg.log_in(self.user.username, 'password')
         tv = self.data_utils.create_video()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
@@ -58,7 +58,7 @@ class TestCaseFollowing(WebdriverTestCase):
         """Not following is setting for Video after contribution subtitles.
 
         """
-        self.video_pg.log_in(self.user, 'password')
+        self.video_pg.log_in(self.user.username, 'password')
         tv = self.data_utils.create_video()
         sub_file = os.path.join(self.subs_data_dir, 'Untimed_text.dfxp')
         self.video_pg.open_video_page(tv.video_id)
@@ -66,13 +66,14 @@ class TestCaseFollowing(WebdriverTestCase):
         self.video_pg.open_video_page(tv.video_id)
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
-
+    def tearDown(self):
+        self.browser.get_screenshot_as_file("%s.png" % self.id())
 
     def test_default_not_following_video(self):
         """Non-contributor is not following video by default.
 
         """
-        self.video_pg.log_in(self.user, 'password')
+        self.video_pg.log_in(self.user.username, 'password')
         self.video_pg.open_video_page(self.video.video_id)
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 
@@ -80,7 +81,7 @@ class TestCaseFollowing(WebdriverTestCase):
         """Non-contributor is not following language by default.
 
         """
-        self.video_language_pg.log_in(self.user, 'password')
+        self.video_language_pg.log_in(self.user.username, 'password')
         self.video_language_pg.open_video_lang_page(self.video.video_id, 'en')
         self.assertEqual(self.NOT_FOLLOWING, self.video_pg.follow_text())
 

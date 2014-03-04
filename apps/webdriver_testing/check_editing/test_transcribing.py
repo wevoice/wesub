@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import unittest 
 from webdriver_testing.webdriver_base import WebdriverTestCase
 from webdriver_testing import data_helpers
 from webdriver_testing.pages.site_pages import video_page
-from webdriver_testing.pages.editor_pages import dialogs
-from webdriver_testing.pages.editor_pages import unisubs_menu
+from webdriver_testing.pages.site_pages import editor_page
+from webdriver_testing.pages.site_pages import site_modals
 from webdriver_testing.pages.editor_pages import subtitle_editor 
 from webdriver_testing.data_factories import UserFactory
 import os
@@ -14,7 +13,7 @@ import sys
 import time
 
 
-@unittest.skip('slow')
+#@unittest.skip('slow')
 class TestCaseTranscribing(WebdriverTestCase):
     """Tests for the Subtitle Transcription editor page.
         
@@ -22,9 +21,10 @@ class TestCaseTranscribing(WebdriverTestCase):
     NEW_BROWSER_PER_TEST_CASE = True
 
     def setUp(self):
-        self.skipTest('slow')
         super(TestCaseTranscribing, self).setUp()
         self.data_utils = data_helpers.DataHelpers()
+        self.modal = site_modals.SiteModals(self)
+        self.editor_pg = editor_page.EditorPage(self)
         td = {'url': ('http://qa.pculture.org/amara_tests/'
                    'Birds_short.webmsd.webm')
              }
@@ -33,19 +33,17 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.user = UserFactory.create()
         self.video_pg.open_video_page(self.test_video.video_id)
         self.video_pg.log_in(self.user.username, 'password')
-        self.video_pg.set_skiphowto()
-        self.create_modal = dialogs.CreateLanguageSelection(self)
         self.sub_editor = subtitle_editor.SubtitleEditor(self)
-        self.unisubs_menu = unisubs_menu.UnisubsMenu(self)
         self.video_pg.log_in(self.user.username, 'password')
         self.video_pg.add_subtitles()
-        self.create_modal.create_original_subs('English', 'English')
+        self.modal.add_language('English', 'English')
+        self.editor_pg.legacy_editor()
         self.typed_subs = self.sub_editor.type_subs()
 
     def tearDown(self):
         super(TestCaseTranscribing, self).tearDown()
 
-    def test_display__normal(self):
+    def test_display_normal(self):
         """Manually entered unsynced subs display in editor.
 
         """
@@ -62,28 +60,6 @@ class TestCaseTranscribing(WebdriverTestCase):
         self.assertEqual(self.typed_subs, self.sub_editor.subtitles_list())
 
         
-
-    def test_close__abruptly(self):
-        """Test subs are saved when browser closes abruptly.
-      
-        Note: the browser needs to be open for about 80 seconds for saving.
-        """
-
-        self.logger.info( 'sleeping for 90 seconds to trigger the save')
-        time.sleep(90)
-        self.logger.info('On page: %s' % self.sub_editor.current_url())
-        self.sub_editor.open_page("http://www.google.com")
-        self.sub_editor.handle_js_alert('accept')
-        time.sleep(5)
-        self.video_pg.open_video_page(self.test_video.video_id)
-        self.unisubs_menu.open_menu()
-        self.assertEqual(self.create_modal.warning_dialog_title(), 
-            'Resume editing?')
-
-        # Resume dialog - click OK
-        self.create_modal.resume_dialog_ok()
-        self.assertEqual(self.typed_subs, self.sub_editor.subtitles_list())
-
     def test_download(self):
         """Manually entered unsynced subs can be download from check page.
 
