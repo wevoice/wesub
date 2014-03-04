@@ -172,7 +172,6 @@ var angular = angular || null;
 
                     SubtitleStorage.approveTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
 
                     }, function onError(e) {
@@ -218,7 +217,6 @@ var angular = angular || null;
 
                     SubtitleStorage.sendBackTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        $scope.$root.$emit('show-loading-modal', message);
                         window.location = $scope.primaryVideoURL;
                         
                     }, function onError(e) {
