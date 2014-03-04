@@ -151,6 +151,7 @@ var angular = angular || null;
                 $scope.workingSubtitles.initEmptySubtitles(
                     EditorData.editingVersion.languageCode, EditorData.baseLanguage);
             }
+            $scope.$root.$emit('work-done');
         }
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
