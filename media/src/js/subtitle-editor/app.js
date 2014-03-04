@@ -303,17 +303,43 @@ var angular = angular || null;
             $scope.currentEdit.start(sub);
         }
 
+        // This function is to have the keyboard shortcut help
+        // panel trigger same actions as keystrokes
+        $scope.handleMouseKeyDown = function(keyString) {
+            var evt = {
+                ctrlKey: false,
+                shiftKey: false,
+                preventDefault: function() {},
+                stopPropagation: function() {},
+                target: {}
+            }
+            var keys = keyString.split('-');
+            evt.keyCode = parseInt(keys[0]);
+            for (var i = 1 ; i < keys.length ; i++) {
+                if (keys[i] == "ctrl")
+                    evt.ctrlKey = true;
+                else if (keys[i] == "shift")
+                    evt.shiftKey = true;
+            }
+            $scope.handleAppKeyDown(evt);
+        }
+
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-
+            // Workflow needs to know if TAB is pressed
+            if (evt.keyCode == 9 && !evt.shiftKey)
+                $scope.workflow.tabPressed();
             // Shortcuts that should work while editing a subtitle
             if ((evt.keyCode === 32 && evt.shiftKey) || 
-                evt.keyCode == 9) {
+                (evt.keyCode == 9 && !evt.shiftKey)) {
                 // Shift+Space or Tab: toggle play / pause.
                 evt.preventDefault();
                 evt.stopPropagation();
                 VideoPlayer.togglePlay();
+            } else if (evt.keyCode === 9 && evt.shiftKey) {
+                // Shift+Tab, go back 2 seconds
+                VideoPlayer.seek(VideoPlayer.currentTime() - 2000);
             } else if (evt.keyCode === 188 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Comma, go back 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() - 4000);

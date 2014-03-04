@@ -9,7 +9,6 @@
  * the CSS file.
  */
 $CodePro: 'CodeProLC', $OpenSans;
-
 @font-face {
     font-family: 'CodeProLC';
     src: url('../../../fonts/CodeProLC.eot');
@@ -20,10 +19,20 @@ $CodePro: 'CodeProLC', $OpenSans;
     font-style: normal;
 }
 
+/*
+ * These colors sould be put in the colors modules, but does it make sense to
+ * share them with the rest of the CSS?  Maybe we should have a different file
+ * for editor colors.
+ */
 
 $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
+$reddish-pink: #d24655;
+$lighter-blue: #29b0bf;
+$blue: #126295;
+$teal: #15998e;
+
 
 // Mixins
 @mixin border-radius($radius: 5px) {
@@ -391,6 +400,10 @@ section.main {
         height: $span-key-height;
         float: left;
         margin-right: 10px;
+        padding: 9px;
+        opacity: 0.95;
+        border-bottom: 1px solid #474849;
+        box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
         position: relative;
         @include border-radius(3px);
 
@@ -738,18 +751,71 @@ section.main {
     }
     section.left {
         div.help-panel {
-            background: #0C3F70;
-            color: white;
+            color: $dark-grey;
             font-size: 12px;
-            height: 200px;
-            margin: 10px;
-            padding: 10px;
-            @include border-radius(3px);
-
+            height: 242px;
+            width: 87%;
+            display: table;
+            margin: 10px 0px 0px 30px;
+            padding: 5px;
             span.key {
                 width: 20%;
             }
-
+            div.key-row {
+                display: table-row;
+                table-layout: fixed;
+                div.instruction-item-small { 
+                  display: table-cell;
+                  width: 0.05%;
+                }
+                div.instruction-item { 
+                  display: table-cell;
+                  width: 2%;
+                  margin: 0px 10px;
+                }
+            }
+            div.instruction-item {
+                margin: 10px 0px;
+                padding: 10px;
+                &.reddish-pink-key {
+                    background: $reddish-pink;
+                }
+                &.lighter-blue-key {
+                    background: $lighter-blue;
+                }
+                &.blue-key {
+                    background: $blue;
+                }
+                &.teal-key {
+                    background: $teal;
+                }
+                display: table;
+                width: 100%;
+                @include border-radius(3px);
+                &.clickable:hover {
+                    cursor: pointer;
+                }
+                div.key-pattern {
+                    &.small {
+                    padding: 3px 5px;
+                    }
+                    float: left;
+                    border-bottom: 1px solid #474849;
+                    box-shadow: 0 -5px 5px #E0E1E2 inset, -7px 0 7px rgba(0, 0, 0, 0.08);
+                    background: white;
+                    opacity: 0.95;
+                    margin: 0px 5px;
+                    padding: 3px 20px;
+                    @include border-radius(3px);
+                    vertical-align: middle;
+                    display: table-cell;
+                }
+                div.shortcut-desc {
+                width: 100%;
+                text-align: right;
+                color: white;
+                }
+            }
             a.advanced {
                 color: white;
                 float: right;
@@ -763,7 +829,8 @@ section.main {
             }
             h1 {
                 font-size: 16px;
-                margin-bottom: 30px;
+                font-weight: bold;
+                margin-bottom: 10px;
             }
             p {
                 font-size: 11px;
@@ -774,7 +841,7 @@ section.main {
 
                 li {
                     margin: 10px 0;
-
+                    font-size: 12px;
                     span.description {
                         display: block;
                         float: left;
@@ -851,6 +918,31 @@ section.main {
             // We move it upwards, covering the header
             margin-top: -38px;
             background: none repeat scroll 0 0 $dark-grey;
+            div.instructions-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                background: none repeat scroll 0 0 $dark-grey;
+                opacity: 0.95;
+                width: 100%;
+                height: 100%;
+                display: block;
+                div {
+                ul {
+                    list-style-image: url('../../../images/subtitle-editor/glyphicons_halflings_006_star.png');
+                    margin-left: 25px;
+                }
+                margin: 35px 40px 0px 40px;
+                color: white;
+                font-size: 12px;
+                line-height: 200%;
+                    h1 {
+                        line-height: 350%;
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+                }
+            }
             div.subtitle-overlay {
                 position: absolute;
                 bottom: 63px;
@@ -1247,6 +1339,11 @@ section.collab {
                     padding: 10px 0 10px 30px;
                     text-align: left;
                     width: 48%;
+
+                    &[disabled] {
+                        background: #888;
+                        cursor: default;
+                    }
                 }
             }
             &.open {
@@ -1268,19 +1365,10 @@ section.collab {
             }
         }
     }
-    div.errors {
-        .error {
-            background: #F2DEDE url('../../../images/warning.png') 10px center no-repeat;
-            border: 1px solid #EED3D7;
-            border-left: 0;
-            bottom: 30%;
-            color: #B94A48;
-            display: block;
-            padding: 10px 20px 10px 36px;
-            position: fixed;
-            z-index: 49;
-            @include multi-border-radius(0, 2px, 2px, 0);
-        }
+    .error {
+        margin-left: 20px;
+        font: normal 13px $OpenSans;
+        color: #ddd;
     }
 }
 
