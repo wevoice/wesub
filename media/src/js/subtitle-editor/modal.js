@@ -51,7 +51,7 @@
         $scope.onClose = function($event) {
             $scope.dialogManager.close();
             $event.preventDefault();
-            window.location = '/videos/' + $scope.videoId + "/";
+            $scope.exitToVideoPage();
         }
     })
 

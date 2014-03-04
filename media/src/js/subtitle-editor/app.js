@@ -53,7 +53,7 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", function($scope, $controller,
-                DialogManager, EditorData, Workflow) {
+                $window, DialogManager, EditorData, Workflow) {
 
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
@@ -138,6 +138,12 @@ var angular = angular || null;
             currentTime: null,
             duration: null,
         };
+        $scope.exitToVideoPage = function() {
+            $window.location = '/videos/' + $scope.videoId + '/';
+        }
+        $scope.exitToLegacyEditor = function() {
+            $window.location = EditorData.oldEditorURL;
+        }
         $scope.showDebugModal = function(evt) {
             $scope.dialogManager.open('debug');
             evt.preventDefault();
@@ -223,11 +229,11 @@ var angular = angular || null;
                     startUserIdleTimer();
                 } else {
                     window.alert("Sorry, could not restart your session.");
-                    window.location = '/videos/' + $scope.videoId + "/";
+                    $scope.exitToVideoPage();
                 }
             }, function onError() {
                 window.alert("Sorry, could not restart your session.");
-                window.location = '/videos/' + $scope.videoId + "/";
+                $scope.exitToVideoPage();
             });
         }
         $scope.showIdleModal= function () {
@@ -270,14 +276,14 @@ var angular = angular || null;
             var dialogManager = $scope.dialogManager;
 
             dialogManager.openDialog({
-                text: 'Your session has ended. You can try to resume, or close the editor',
+                text: 'Your session has ended. You can try to resume, or close the editor.',
                 buttons: [
                     dialogManager.button('Try to resume work', function() {
                         regainLockAfterIdle();
                     }),
                     dialogManager.button('Close editor', function() {
                         dialogManager.close();
-                        window.location = '/videos/' + $scope.videoId + "/";
+                        $scope.exitToVideoPage();
                     })
                 ]
             });

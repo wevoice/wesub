@@ -145,14 +145,17 @@ var angular = angular || null;
         $scope.autoBackupNeeded = false;
         $scope.notesChanged = false;
         $scope.nextVersionNumber = null;
-        $scope.primaryVideoURL = '/videos/' + $scope.videoId + '/';
 
         $scope.saveDisabled = function() {
             return !($scope.changesMade || $scope.notesChanged);
         };
 
         $scope.discard = function() {
-            $scope.showCloseModal(false);
+            if($scope.changesMade) {
+                $scope.showCloseModal(false);
+            } else {
+                $scope.exitToVideoPage();
+            }
         };
         $scope.getNotes = function() {
             var collabScope = angular.element($('section.collab').get(0)).scope();
@@ -172,7 +175,7 @@ var angular = angular || null;
 
                     SubtitleStorage.approveTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        window.location = $scope.primaryVideoURL;
+                        $scope.exitToVideoPage();
 
                     }, function onError(e) {
                         $scope.status = 'error';
@@ -217,8 +220,7 @@ var angular = angular || null;
 
                     SubtitleStorage.sendBackTask(versionNumber, $scope.getNotes()).then(function onSuccess(response) {
 
-                        window.location = $scope.primaryVideoURL;
-                        
+                        $scope.exitToVideoPage();
                     }, function onError(e) {
                         $scope.status = 'error';
                         $scope.showErrorModal();
@@ -320,7 +322,7 @@ var angular = angular || null;
             var buttons = [
                 $scope.dialogManager.button('Exit', function() {
                     $scope.dialogManager.close();
-                    window.location = $scope.primaryVideoURL;
+                    $scope.exitToVideoPage();
                 })
             ];
 
@@ -346,7 +348,7 @@ var angular = angular || null;
         $scope.switchToLegacyEditor = function($event) {
             $event.preventDefault();
             if(!$scope.changesMade) {
-                window.location = EditorData.oldEditorURL;
+                $scope.exitToLegacyEditor();
                 return;
             }
 
@@ -358,7 +360,7 @@ var angular = angular || null;
                     dialogManager.button('Discard changes', function() {
                         dialogManager.close();
                         $scope.changesMade = false;
-                        window.location = EditorData.oldEditorURL;
+                        $scope.exitToLegacyEditor();
                     }),
                     dialogManager.button('Continue editing', function() {
                         dialogManager.close();
