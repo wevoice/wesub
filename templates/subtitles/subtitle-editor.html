@@ -203,7 +203,7 @@
 	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
 	    </div>
 	  </div>
-	  <a title="" href="#guidelines-modal">{% trans "Subtitles Guidelines" %}</a>
+	  <a title="" href="#guidelines-modal">{% trans "Subtitles Guidelines" %} &#187;</a>
 	</div>
         <div class="language-selections group toolbar"
              language-selector
@@ -509,8 +509,7 @@
             <div class="content">
 	      <dl>
 		<dt>{% trans "Subtitle line length" %}</dt>
-		<dd>{% trans "Keep subtitle length to about 42 characters;
-avoid more than 2 lines per subtitle." %}</dd>
+		<dd>{% trans "Keep subtitle length to about 42 characters; avoid more than 2 lines per subtitle." %}</dd>
 
 		<dt>{% trans "Minimum duration" %}</dt>
 		<dd>{% trans "Subtitles should not be less than 1 second." %}</dd>
@@ -519,25 +518,26 @@ avoid more than 2 lines per subtitle." %}</dd>
 		<dd>{% trans "Split subtitles lasting more than 7 seconds." %}</dd>
 
 		<dt>{% trans "Reading speed" %}</dt>
-		<dd>{% trans "8-25 characters/second is recommended;
-8-16 characters/second for children." %}</dd>
+		<dd>{% trans "8-25 characters/second is recommended; 8-16 characters/second for children." %}</dd>
 
 		<dt>{% trans "Sounds" %}</dt>
-		<dd>{% trans "Describe meaningful sounds that are relevant to the plot.
-ex: (water dripping)" %}</dd>
+		<dd>{% trans "Describe meaningful sounds that are relevant to the plot. ex: (water dripping)" %}</dd>
 
 		<dt>{% trans "Music" %}</dt>
-		<dd>{% trans "Describe relevant music which does not have relevant lyrics.
-ex: ♪ (jazz music) ♪" %}</dd>
+		<dd>{% trans "Describe relevant music which does not have relevant lyrics. ex: ♪ (jazz music) ♪" %}</dd>
 
 		<dt>{% trans "Speaker Identification" %}</dt>
-		<dd>{% trans "Use parenthesis to indicate when someone is speaking off-screen.
-ex: (Michael) Wait for me!" %}</dd>
+		<dd>{% trans "Use parenthesis to indicate when someone is speaking off-screen. ex: (Michael) Wait for me!" %}</dd>
 
 	      </dl>
 	    </div>
 	  </div>
 	</div>
+	<footer>
+	  <a href="#!" class="close-action no" data-close="Close" data-dismiss="modal" title="Cancel" ng-click="reset()">
+	    {% trans "Close" %}
+	  </a>
+	</footer>
       </div>
     </section>
     <section id="set-title-modal" class="modal-style semantic-content" id="modal-text" tabindex="-1"

@@ -794,6 +794,12 @@ section.main {
             display: table;
             margin: 10px 0px 0px 30px;
             padding: 5px;
+            a {
+                color: $dark-grey;
+                font-size: 14px;
+                text-decoration: none;
+                line-height: 40px;
+            }
             span.key {
                 width: 20%;
             }
