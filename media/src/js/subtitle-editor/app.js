@@ -265,6 +265,9 @@ var angular = angular || null;
                                 $timeout.cancel(closeSessionTimeout);
                             }
                             regainLockAfterIdle();
+                    }),
+                    $scope.dialogManager.button('Close Editor', function() {
+                        $scope.exitToVideoPage();
                     })
                 ]
             });
