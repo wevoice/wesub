@@ -507,10 +507,16 @@
     {% endif %}
     <aside class="modal" ng-controller="SaveErrorModalController" ng-class="dialogManager.dialogCSSClass('save-error')">
         <h3>{% trans "Error saving subtitles" %}</h3>
-        <p ng-if="canUseBlobURL()">{% trans "There was an error saving your subtitles. Save your subtitles using the download button below and upload them to the system later." %}</p>
-        <p ng-if="!canUseBlobURL()">{% trans "There was an error saving your subtitles.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
-        <textarea ng-if="!canUseBlobURL()" class="dfxp-string">[[ dfxpString ]]</textarea>
-        <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor" %}</p>
+        <ng-switch on="canUseBlobURL()">
+            <div ng-switch-when="true">
+                <p>{% trans "There was an error saving your subtitles. Save your subtitles using the download button below and upload them to the system later." %}</p>
+                <p>{% trans "To avoid data corruption, please do not open the or edit the subtitles in any text editor" %}</p>
+            </div>
+            <div ng-switch-when="false">
+                <p>{% trans "There was an error saving your subtitles.  Copy the subtitles above and save them to your computer as subtitle_backup.dfxp. You can upload them later." %}</p>
+                <textarea class="dfxp-string">[[ dfxpString ]]</textarea>
+            </div>
+        </ng-switch>
         </div>
         <footer class="buttons">
             <button ng-if="canUseBlobURL()" ng-click="onDownload($event)">{% trans "Download Subtitles" %}
