@@ -202,10 +202,6 @@ def shortlink_for_video( video):
 
 @register.filter
 def multi_video_create_subtitles_data_attrs(video):
-    """Return a shortlink string for the video.
-
-    The pattern is http://amara.org/v/<pk>
-    """
     attrs = [
         ('data-video-id', video.id),
         ('data-video-langs', ':'.join(l.language_code for l in
