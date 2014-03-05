@@ -355,7 +355,7 @@ var angular = angular || null;
             var dialogManager = $scope.dialogManager;
 
             dialogManager.openDialog({
-                title: "You have unsaved changes.  If you switch now you will lose your work",
+                title: "You have unsaved changes.  If you switch now you will lose your work.",
                 buttons: [
                     dialogManager.button('Discard changes', function() {
                         dialogManager.close();

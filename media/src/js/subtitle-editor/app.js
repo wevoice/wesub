@@ -279,7 +279,7 @@ var angular = angular || null;
             var dialogManager = $scope.dialogManager;
 
             dialogManager.openDialog({
-                text: 'Your session has ended. You can try to resume, or close the editor.',
+                title: 'Your session has ended. You can try to resume, or close the editor.',
                 buttons: [
                     dialogManager.button('Try to resume work', function() {
                         regainLockAfterIdle();
