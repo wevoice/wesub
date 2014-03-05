@@ -240,7 +240,7 @@ var angular = angular || null;
             var secondsUntilClosing = 120;
             
             function makeText() {
-                return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing;
+                return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing + " seconds.";
             }
 
             function closeSessionTick() {
