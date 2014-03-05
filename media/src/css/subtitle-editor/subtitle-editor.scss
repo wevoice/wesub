@@ -1534,7 +1534,7 @@ body.timeline-shown {
     div.modal-inner {
       padding: 40px;
       background: $dark-grey;
-      .modal-content {max-height: 200vh;}
+      .modal-content {max-height: 500px;}
       div,
       footer,
       header {
@@ -1562,4 +1562,30 @@ body.timeline-shown {
         }
       }
    }
+}
+
+#guidelines-modal {
+    td {
+        padding: 8px;
+        font-size: 12px;
+    }
+    td.guideline-item {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    a.expand-link {
+        padding: 15px 0px 0px 0px;
+        line-height: 30px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    dt {
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 30px;
+    }
+    dd {
+        padding-left: 20px;
+    }
 }

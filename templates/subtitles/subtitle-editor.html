@@ -528,8 +528,62 @@
 
 		<dt>{% trans "Speaker Identification" %}</dt>
 		<dd>{% trans "Use parenthesis to indicate when someone is speaking off-screen. ex: (Michael) Wait for me!" %}</dd>
-
 	      </dl>
+	      <a class="expand-link" href="" ng-click="showAdvancedGuidelines = true" ng-init="showAdvancedGuidelines=false" ng-show="!showAdvancedGuidelines">{% trans "Show Advanced Guidelines" %} &#x25B6;</a>
+	      <a  class="expand-link" href="" ng-click="showAdvancedGuidelines = false" ng-show="showAdvancedGuidelines">{% trans "Hide Advanced Guidelines" %} &#x25BC;</a>
+	      <div ng-show="showAdvancedGuidelines" id="advanced-guidelines">
+
+		<table>
+		  <tr>
+		    <td class="guideline-item">{% trans "Translate the whole idea" %}</td>
+		    <td>{% trans "Translations don't need to be word for word. Look at the context." %}<br/>
+		      {% trans "Make sure you are using the correct punctuation for the whole unit of text." %}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Maximum timing offset" %}</td>
+		    <td>{% trans "Subtitles shouldn't start more than 0.5 seconds before or after the audio begins." %}</td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "On-screen texts" %}</td>
+		    <td>{% trans "Translate the texts on the video that are relevant to the plot." %}</td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Use meaningful speech" %}</td>
+		    <td>{% trans "Exclude things like “um” “ah” and other disfluencies." %}</td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Indicate inaudible parts" %}</td>
+		    <td>{% trans "If the audio is inaudible, it should be marked as [inaudible]." %}</td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Lyrics" %}</td>
+		    <td>{% trans "Wrap relevant lyrics in musical notes." %}<br/>
+		      {% trans "ex ♪ Tell me dear Billy, ♪" %}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Speaker identification" %}</td>
+		    <td>{% trans "Identify off-screen and unclear speakers in parentheses." %}<br/>
+		      {% trans "ex: (Michael) Wait for me!" %}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Foreign language" %}</td>
+		    <td>{% trans "Identify relevant speech in foreign language. " %}<br/>
+		      {% trans "ex: (Russian): Thank you." %}
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="guideline-item">{% trans "Simultaneous dialogue" %}</td>
+		    <td>{% trans "Used exclusively when two speakers talk in the same subtitle. " %}<br/>
+		      {% trans "Each speaker should have one line, and both lines should have an hyphen. " %}<br/>
+		      {% trans "- Sir, you are no gentleman." %}<br/>
+		      {% trans "- Rhett Butler: And you, Miss, are no lady." %}
+		    </td>
+		  </tr>
+		</table>
+	      </div>
 	    </div>
 	  </div>
 	</div>
