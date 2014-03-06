@@ -1574,18 +1574,13 @@ body.timeline-shown {
         font-weight: bold;
     }
 
+    .modal-content {
+        margin: 15px 0;
+    }
     a.expand-link {
         padding: 15px 0px 0px 0px;
         line-height: 30px;
         font-size: 14px;
         font-weight: bold;
-    }
-    dt {
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 30px;
-    }
-    dd {
-        padding-left: 20px;
     }
 }

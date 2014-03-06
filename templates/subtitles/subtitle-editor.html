@@ -507,32 +507,44 @@
 	<div class="modal-content">
           <div class="metadata">
             <div class="content">
-	      <dl>
-		<dt>{% trans "Subtitle line length" %}</dt>
-		<dd>{% trans "Keep subtitle length to about 42 characters; avoid more than 2 lines per subtitle." %}</dd>
-
-		<dt>{% trans "Minimum duration" %}</dt>
-		<dd>{% trans "Subtitles should not be less than 1 second." %}</dd>
-
-		<dt>{% trans "Maximum duration" %}</dt>
-		<dd>{% trans "Split subtitles lasting more than 7 seconds." %}</dd>
-
-		<dt>{% trans "Reading speed" %}</dt>
-		<dd>{% trans "8-25 characters/second is recommended; 8-16 characters/second for children." %}</dd>
-
-		<dt>{% trans "Sounds" %}</dt>
-		<dd>{% trans "Describe meaningful sounds that are relevant to the plot. ex: (water dripping)" %}</dd>
-
-		<dt>{% trans "Music" %}</dt>
-		<dd>{% trans "Describe relevant music which does not have relevant lyrics. ex: ♪ (jazz music) ♪" %}</dd>
-
-		<dt>{% trans "Speaker Identification" %}</dt>
-		<dd>{% trans "Use parenthesis to indicate when someone is speaking off-screen. ex: (Michael) Wait for me!" %}</dd>
-	      </dl>
+	      <table>
+		<tr>
+		  <td class="guideline-item">{% trans "Subtitle line length" %}</td>
+		  <td>{% trans "Keep subtitle length to about 42 characters;" %}<br/>
+		    {% trans "avoid more than 2 lines per subtitle." %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Minimum duration" %}</td>
+		  <td>{% trans "Subtitles should not be less than 1 second." %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Maximum duration" %}</td>
+		  <td>{% trans "Split subtitles lasting more than 7 seconds." %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Reading speed" %}</td>
+		  <td>{% trans "8-25 characters/second is recommended;" %}<br/>
+		    {% trans "8-16 characters/second for children." %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Sounds" %}</td>
+		  <td>{% trans "Describe meaningful sounds that are relevant to the plot." %}<br/>
+		    {% trans "ex: (water dripping)" %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Music" %}</td>
+		  <td>{% trans "Describe relevant music which does not have relevant lyrics." %}<br/>
+		    {% trans "ex: ♪ (jazz music) ♪" %}</td>
+		</tr>
+		<tr>
+		  <td class="guideline-item">{% trans "Speaker Identification" %}</td>
+		  <td>{% trans "Use parenthesis to indicate when someone is speaking off-screen." %}<br/>
+		    {% trans "ex: (Michael) Wait for me!" %}</td>
+		</tr>
+	      </table>
 	      <a class="expand-link" href="" ng-click="showAdvancedGuidelines = true" ng-init="showAdvancedGuidelines=false" ng-show="!showAdvancedGuidelines">{% trans "Show Advanced Guidelines" %} &#x25B6;</a>
 	      <a  class="expand-link" href="" ng-click="showAdvancedGuidelines = false" ng-show="showAdvancedGuidelines">{% trans "Hide Advanced Guidelines" %} &#x25BC;</a>
 	      <div ng-show="showAdvancedGuidelines" id="advanced-guidelines">
-
 		<table>
 		  <tr>
 		    <td class="guideline-item">{% trans "Translate the whole idea" %}</td>
