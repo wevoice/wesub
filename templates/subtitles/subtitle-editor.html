@@ -506,7 +506,7 @@
 	<header id="modal-label"><h1>{% trans "Amara Style Guide" %}</h1></header>
 	<div class="modal-content">
           <div class="metadata">
-            <div class="content">
+            <div class="content" ng-show="!teamGuidelines">
 	      <table>
 		<tr>
 		  <td>{% trans "Subtitle line length" %}</td>
@@ -596,6 +596,11 @@
 		  </tr>
 		</table>
 	      </div>
+	    </div>
+	    <div class="content" ng-show="teamGuidelines">
+	      <div ng-bind="teamGuidelines['subtitle']"></div>
+	      <div ng-bind="teamGuidelines['translate']"></div>
+	      <div ng-bind="teamGuidelines['review']"></div>
 	    </div>
 	  </div>
 	</div>

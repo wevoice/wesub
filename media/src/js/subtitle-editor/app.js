@@ -59,6 +59,7 @@ var angular = angular || null;
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
 
+        $scope.teamGuidelines = EditorData.guidelines;
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
