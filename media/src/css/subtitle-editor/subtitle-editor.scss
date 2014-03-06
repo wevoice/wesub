@@ -795,8 +795,10 @@ section.main {
             margin: 10px 0px 0px 30px;
             padding: 5px;
             a {
-                color: $dark-grey;
-                font-size: 14px;
+                color: $text-color;
+                font: normal 12px $OpenSans;
+                background: transparent;
+                font-size: 12px;
                 text-decoration: none;
                 line-height: 40px;
             }
@@ -1534,7 +1536,7 @@ body.timeline-shown {
     div.modal-inner {
       padding: 40px;
       background: $dark-grey;
-      .modal-content {max-height: 500px;}
+      .modal-content {max-height: 380px;}
       div,
       footer,
       header {
@@ -1569,11 +1571,6 @@ body.timeline-shown {
         padding: 8px;
         font-size: 12px;
     }
-    td.guideline-item {
-        font-size: 14px;
-        font-weight: bold;
-    }
-
     .modal-content {
         margin: 15px 0;
     }
