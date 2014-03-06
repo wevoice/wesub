@@ -358,8 +358,7 @@
                         </ul>
                         <div class="bootstrap">
                             <div class="modal upload-draft-modal"
-                                 id="upload-draft-{{ task.id }}"
-                                 style="display: none">
+                                id="upload-draft-{{ task.id }}">
                                 <form action="{% url teams:upload_draft slug=team.slug,video_id=task.team_video.video.video_id %}"
                                       method="post"
                                       enctype="multipart/form-data">

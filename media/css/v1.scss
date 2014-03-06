@@ -2203,6 +2203,11 @@ ol.subtitles-diff li{
     div.modal {
         display: none;
 
+        &.shown {
+            display: block;
+        }
+
+
         div.plain-text {
             margin-bottom: 0;
 
