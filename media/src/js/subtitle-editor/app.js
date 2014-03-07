@@ -52,14 +52,14 @@ var angular = angular || null;
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
-    module.controller("AppController", function($scope, $controller,
+    module.controller("AppController", ['$scope', '$sce', '$controller', 
+                      'EditorData', 'Workflow', function($scope, $sce, $controller,
             EditorData, Workflow) {
 
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
 
-        $scope.teamGuidelines = EditorData.guidelines;
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
         $scope.canAddAndRemove = EditorData.canAddAndRemove;
@@ -72,6 +72,17 @@ var angular = angular || null;
 	}
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
+        }
+        if (EditorData.guidelines) {
+            $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.guidelines['subtitle']),
+                                  'translate': $sce.trustAsHtml(EditorData.guidelines['translate']),
+                                  'review': $sce.trustAsHtml(EditorData.guidelines['review']) };
+            // Needs to be a function as we can only know once language was retrieved
+            $scope.teamTaskType = function() {
+                return $scope.translating() ? 'translate' : EditorData.task_needs_pane ? 'review' : 'subtitle';
+            };
+        } else {
+            $scope.teamTaskType = function() {return "";}
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
@@ -152,7 +163,7 @@ var angular = angular || null;
         $scope.overrides = {
             forceSaveError: false
         };
-    });
+    }]);
 
     /* AppController is large, so we split it into several components to
      * keep things a bit cleaner.  Each controller runs on the same scope.

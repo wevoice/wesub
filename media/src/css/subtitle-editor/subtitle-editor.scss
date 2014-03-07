@@ -1573,6 +1573,12 @@ body.timeline-shown {
     }
     .modal-content {
         margin: 15px 0;
+
+        div.team-all-guidelines {
+            div {
+                padding: 15px 0;
+            }
+        }
     }
     a.expand-link {
         padding: 15px 0px 0px 0px;

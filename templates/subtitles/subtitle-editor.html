@@ -598,9 +598,22 @@
 	      </div>
 	    </div>
 	    <div class="content" ng-show="teamGuidelines">
-	      <div ng-bind="teamGuidelines['subtitle']"></div>
-	      <div ng-bind="teamGuidelines['translate']"></div>
-	      <div ng-bind="teamGuidelines['review']"></div>
+	      <div ng-show="teamTaskType() == 'subtitle'" ng-bind-html="teamGuidelines['subtitle']"></div>
+	      <div ng-show="teamTaskType() == 'translate'" ng-bind-html="teamGuidelines['translate']"></div>
+	      <div ng-show="teamTaskType() == 'review'" ng-bind-html="teamGuidelines['review']"></div>
+	      <a class="expand-link" href="" ng-click="showAllTeamGuidelines = true"
+                 ng-init="showAllTeamGuidelines=false" ng-show="!showAllTeamGuidelines">
+		{% trans "Show All Guidelines" %} &#x25B6;
+	      </a>
+	      <a class="expand-link" href="" ng-click="showAllTeamGuidelines = false"
+		 ng-show="showAllTeamGuidelines">
+		{% trans "Hide All Guidelines" %} &#x25BC;
+	      </a>
+	      <div class="team-all-guidelines" ng-show="showAllTeamGuidelines" id="all-team-guidelines">
+		<div ng-bind-html="teamGuidelines['subtitle']"></div>
+		<div ng-bind-html="teamGuidelines['translate']"></div>
+		<div ng-bind-html="teamGuidelines['review']"></div>
+	      </div>
 	    </div>
 	  </div>
 	</div>
