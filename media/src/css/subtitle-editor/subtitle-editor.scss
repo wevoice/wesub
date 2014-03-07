@@ -1341,10 +1341,24 @@ section.collab {
                     padding: 10px 0 10px 30px;
                     text-align: left;
                     width: 48%;
+                    border: none;
+                    border-radius: 2px;
 
                     &[disabled] {
                         background: #888;
                         cursor: default;
+                    }
+
+                    &:first-of-type {
+                        margin-right: 5px;
+                    }
+
+                    &.send-back {
+                        background: #d24655 url("../../../images/thumbs-down.png") 10px center no-repeat;
+                    }
+
+                    &.approve {
+                        background: #29b0bf url("../../../images/thumbs-up.png") 10px center no-repeat;
                     }
                 }
             }
