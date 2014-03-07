@@ -76,13 +76,14 @@ var angular = angular || null;
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
             if (EditorData.teamAttributes.guidelines) {
-                $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle']),
-                                          'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate']),
-                                        'review': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['review']) };
+		var noGuideline = "No team guidelines for this action";
+                $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle'] || noGuideline),
+                                          'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate'] || noGuideline),
+                                          'review': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['review'] || noGuideline) };
             }
             // Needs to be a function as we can only know once language was retrieved
             $scope.teamTaskType = function() {
-                return $scope.translating() ? 'translate' : EditorData.task_needs_pane ? 'review' : 'subtitle';
+		return EditorData.task_needs_pane ? 'review' : $scope.translating() ? 'translate' : 'subtitle';
             };
         } else {
             $scope.teamTaskType = function() {return "";}

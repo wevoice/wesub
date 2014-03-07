@@ -614,8 +614,11 @@
 		{% trans "Hide All Guidelines" %} &#x25BC;
 	      </a>
 	      <div class="team-all-guidelines" ng-show="showAllTeamGuidelines" id="all-team-guidelines">
+		<h1>{% trans "Subtitling Guidelines" %}</h1>
 		<div ng-bind-html="teamGuidelines['subtitle']"></div>
+		<h1>{% trans "Translating Guidelines" %}</h1>
 		<div ng-bind-html="teamGuidelines['translate']"></div>
+		<h1>{% trans "Reviewing Guidelines" %}</h1>
 		<div ng-bind-html="teamGuidelines['review']"></div>
 	      </div>
 	    </div>
