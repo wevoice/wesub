@@ -75,7 +75,11 @@ var angular = angular || null;
         }
         if (EditorData.teamAttributes) {
             $scope.teamName = EditorData.teamAttributes.teamName
-            if (EditorData.teamAttributes.guidelines) {
+            if (EditorData.teamAttributes.guidelines &&
+		(EditorData.teamAttributes.guidelines['subtitle'] ||
+		 EditorData.teamAttributes.guidelines['translate'] ||
+		 EditorData.teamAttributes.guidelines['review'])
+	       ) {
 		var noGuideline = "No team guidelines for this action";
                 $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle'] || noGuideline),
                                           'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate'] || noGuideline),
