@@ -1536,7 +1536,7 @@ body.timeline-shown {
     div.modal-inner {
       padding: 40px;
       background: $dark-grey;
-      .modal-content {max-height: 380px;}
+      .modal-content {max-height: 385px;}
       div,
       footer,
       header {
@@ -1581,7 +1581,7 @@ body.timeline-shown {
         }
     }
     a.expand-link {
-        padding: 15px 0px 0px 0px;
+        padding: 10px 0px 10px 0px;
         line-height: 30px;
         font-size: 14px;
         font-weight: bold;

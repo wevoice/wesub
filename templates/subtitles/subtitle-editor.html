@@ -203,8 +203,10 @@
 	      <div class="shortcut-desc">{% trans "Insert a line break" %}</div>
 	    </div>
 	  </div>
-	  <a ng-show="teamName" title="" href="#guidelines-modal">[[ teamName ]] Guidelines &#187;</a>
-	  <a ng-show="!teamName" title="" href="#guidelines-modal">{% trans "Subtitling Guidelines" %} &#187;</a>
+          <ng-switch on="showTeamGuidelines()">
+	    <a ng-switch-when="true" title="" href="#guidelines-modal">[[ teamName ]] Guidelines &#187;</a>
+	    <a ng-switch-when="false" title="" href="#guidelines-modal">{% trans "Subtitling Guidelines" %} &#187;</a>
+	  </ng-switch>
 	</div>
         <div class="language-selections group toolbar"
              language-selector
@@ -505,8 +507,10 @@
 
       <div class="modal-inner">
 	<header id="modal-label">
-	  <h1 ng-show="teamName">[[ teamName ]] Guidelines</h1>
-	  <h1 ng-show="!teamName">{% trans "Amara Style Guide" %}</h1>
+          <ng-switch on="showTeamGuidelines()">
+	    <h1 ng-switch-when="true">[[ teamName ]] Guidelines</h1>
+	    <h1 ng-switch-when="false">{% trans "Amara Style Guidelines" %}</h1>
+	  </ng-switch>
 	</header>
 	<div class="modal-content">
           <div class="metadata">

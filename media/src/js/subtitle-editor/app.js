@@ -92,6 +92,11 @@ var angular = angular || null;
         } else {
             $scope.teamTaskType = function() {return "";}
         }
+        $scope.showTeamGuidelines = function() {
+            if (($scope.teamGuidelines) && ($scope.teamName))
+                return true;
+            return false; 
+        }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
         $scope.toggleScrollingSynced = function() {
