@@ -138,15 +138,15 @@ def assign_task_for_editor(video, language_code, user):
                      task.get_type_display())
 
 
-def get_team_settings_for_editor(video):
+def get_team_attributes_for_editor(video):
     team_video = video.get_team_video()
     if team_video:
         team = team_video.team
-        return dict(
+        return dict([('teamName', team.name), ('guidelines', dict(
             [(s.key_name.split('_', 1)[-1],
               linebreaks(urlize(force_escape(s.data))))
              for s in team.settings.guidelines()
-             if s.data.strip()])
+             if s.data.strip()]))])
     else:
         return None
 
@@ -268,9 +268,9 @@ def subtitle_editor(request, video_id, language_code):
         editor_data['savedNotes'] = task.body
         editor_data['task_needs_pane'] = task.get_type_display() in ('Review', 'Approve')
         editor_data['team_slug'] = task.team.slug
-    guidelines = get_team_settings_for_editor(video)
-    if guidelines:
-        editor_data['guidelines'] = guidelines
+    team_attributes = get_team_attributes_for_editor(video)
+    if team_attributes:
+        editor_data['teamAttributes'] = team_attributes
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,
         'DEBUG': settings.DEBUG,

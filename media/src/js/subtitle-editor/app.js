@@ -73,10 +73,13 @@ var angular = angular || null;
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
         }
-        if (EditorData.guidelines) {
-            $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.guidelines['subtitle']),
-                                  'translate': $sce.trustAsHtml(EditorData.guidelines['translate']),
-                                  'review': $sce.trustAsHtml(EditorData.guidelines['review']) };
+        if (EditorData.teamAttributes) {
+            $scope.teamName = EditorData.teamAttributes.teamName
+            if (EditorData.teamAttributes.guidelines) {
+                $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle']),
+                                          'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate']),
+                                        'review': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['review']) };
+            }
             // Needs to be a function as we can only know once language was retrieved
             $scope.teamTaskType = function() {
                 return $scope.translating() ? 'translate' : EditorData.task_needs_pane ? 'review' : 'subtitle';
