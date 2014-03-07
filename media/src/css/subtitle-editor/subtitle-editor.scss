@@ -251,7 +251,9 @@ header.main {
               vertical-align: middle;
             }
             img {
-                margin: 0 0 -1px 17px;
+                margin: 0;
+                padding: 2px 0 0 20px;
+                float: right;
             }
         }
     }
