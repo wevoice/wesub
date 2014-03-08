@@ -321,9 +321,6 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-            // Workflow needs to know if TAB is pressed
-            if (evt.keyCode == 9 && !evt.shiftKey)
-                $scope.workflow.tabPressed();
             // Shortcuts that should work while editing a subtitle
             if ((evt.keyCode === 32 && evt.shiftKey) || 
                 (evt.keyCode == 9 && !evt.shiftKey)) {

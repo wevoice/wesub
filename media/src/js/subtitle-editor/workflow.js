@@ -44,7 +44,7 @@ var angular = angular || null;
     }
 
     Workflow.prototype = {
-	tabPressed: function(){
+	playbackStarts: function(){
            if (this.showOverlay) this.showOverlay = false;
 	},
         switchStage: function(newStage) {
@@ -89,6 +89,8 @@ var angular = angular || null;
     module.value('Workflow', Workflow);
 
     module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
+
+        $scope.$root.$on("video-playback-starts", function() {$scope.workflow.playbackStarts();});
 
         // If a blank list of subs start, we autimatically start edition
         if ($scope.workflow.subtitleList.length() == 0) {
