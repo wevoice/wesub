@@ -10,6 +10,8 @@ $span-key-height: 32px;
 $text-color: #565758;
 $dark-grey: #212223;
 
+$video-height: 258px;
+
 $reddish-pink: #d24655;
 $lighter-blue: #29b0bf;
 $blue: #126295;
@@ -961,7 +963,7 @@ section.main {
                 background: none repeat scroll 0 0 $dark-grey;
                 opacity: 0.95;
                 width: 100%;
-                height: 100%;
+                height: $video-height;
                 display: block;
                 div {
                 ul {
@@ -1011,10 +1013,10 @@ section.main {
                 }
             }
             div.video-container {
-                height: 258px;
+                height: $video-height;
                 width: 100%;
                 iframe, video {
-                    height: 258px;
+                    height: $video-height;
                     width: 100%;
                 }
             }
