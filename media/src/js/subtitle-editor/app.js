@@ -80,7 +80,7 @@ var angular = angular || null;
 		 EditorData.teamAttributes.guidelines['translate'] ||
 		 EditorData.teamAttributes.guidelines['review'])
 	       ) {
-		var noGuideline = "No team guidelines for this action";
+		var noGuideline = "No guidelines specified.";
                 $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle'] || noGuideline),
                                           'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate'] || noGuideline),
                                           'review': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['review'] || noGuideline) };
