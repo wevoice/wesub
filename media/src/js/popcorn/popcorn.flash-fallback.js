@@ -134,7 +134,7 @@ var jQuery = window.jQuery || null;
                 'playlist': [
                     {
                         'url': impl.src,
-                        'autoPlay': true
+                        'autoPlay': false
                     }
                 ],
                 'onLoad': function () {
