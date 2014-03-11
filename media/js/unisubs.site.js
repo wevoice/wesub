@@ -67,12 +67,15 @@ var Site = function(Site) {
             this.tabContainer.empty();
             if(this.tabCache.hasOwnProperty(url)) {
                 this.tabContainer.append(this.tabCache[url]);
+                if(this.onComplete) {
+                    this.onComplete(this.tabContainer);
+                }
             } else {
                 var self = this;
                 this.tabContainer.load(url, null, function() {
                     self.cacheContents(url);
                     if(self.onComplete) {
-                        self.onComplete();
+                        self.onComplete(this);
                     }
                 });
             }
@@ -299,6 +302,21 @@ var Site = function(Site) {
             });
         }
     };
+    this.setupModalDialogs = function($rootElt) {
+        $('a.open-modal', $rootElt).each(function() {
+            var $link = $(this);
+            var modalId = $link.attr('href');
+            var $modal = $(modalId);
+            $link.bind('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                that.openModalForLink($link);
+            });
+            if($modal.hasClass('start-open')) {
+                that.openModalForLink($link);
+            }
+        });
+    }
     this.openModalDialog = function(modal_id) {
         var $target = $(modal_id);
         $target.addClass('shown');
@@ -402,21 +420,7 @@ var Site = function(Site) {
                     window.location = $(this).children('option:selected').attr('value');
                 });
             }
-            if ($('a.open-modal').length) {
-                $('a.open-modal').each(function() {
-                    var $link = $(this);
-                    var modalId = $link.attr('href');
-                    var $modal = $(modalId);
-                    $link.bind('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        that.openModalForLink($link);
-                    });
-                    if($modal.hasClass('start-open')) {
-                        that.openModalForLink($link);
-                    }
-                });
-            }
+            that.setupModalDialogs();
             $.fn.tabs = function(options){
                 this.each(function(){
                     var $this = $(this);
@@ -612,7 +616,8 @@ var Site = function(Site) {
                 });
             }
             setupRevisions();
-            var tabLoader = new AHAHTabLoader(function() {
+            var tabLoader = new AHAHTabLoader(function($container) {
+                that.setupModalDialogs($container);
                 // We may load new pagination links, in that case make sure
                 // they're loaded.
                 tabLoader.addLinks('.pagination');
@@ -665,7 +670,9 @@ var Site = function(Site) {
             });
             unisubs.widget.WidgetController.makeGeneralSettings(
                     window.WIDGET_SETTINGS);
-            var tabLoader = new AHAHTabLoader();
+            var tabLoader = new AHAHTabLoader(function($container) {
+                that.setupModalDialogs($container);
+            });
             tabLoader.addLinks('.tabs');
             unisubs.messaging.simplemessage.displayPendingMessages();
         },
