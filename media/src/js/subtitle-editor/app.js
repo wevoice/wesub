@@ -133,7 +133,8 @@ var angular = angular || null;
         $scope.showClearTimingModal = function() {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
-                title: 'You will loose all timing information. Do you want to continue?',
+                title: 'Confirm Timing Reset',
+                text: 'This will remove all subtitle timing. Do you want to continue?',
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearTiming();
@@ -158,7 +159,8 @@ var angular = angular || null;
         $scope.showClearTextModal = function() {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
-                title: 'You will loose all subtitle text. Do you want to continue?',
+                title: 'Confirm Text Reset',
+                text: 'This will remove all subtitle text. Do you want to continue?',
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearText();
@@ -183,7 +185,8 @@ var angular = angular || null;
         $scope.showResetModal = function() {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
-                title: 'You will loose all changes you have made since you last saved. Do you want to continue?',
+                title: 'Confirm Changes Reset',
+                text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.resetToLastSavedVersion();
