@@ -38,7 +38,7 @@ from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 from django.shortcuts import render_to_response, get_object_or_404, redirect
-
+from django.template.defaultfilters import urlize, linebreaks, force_escape
 
 from teams.permissions import can_add_version, can_assign_task
 
@@ -138,6 +138,18 @@ def assign_task_for_editor(video, language_code, user):
                      "the %s task for these subtitles" %
                      task.get_type_display())
 
+
+def get_team_attributes_for_editor(video):
+    team_video = video.get_team_video()
+    if team_video:
+        team = team_video.team
+        return dict([('teamName', team.name), ('guidelines', dict(
+            [(s.key_name.split('_', 1)[-1],
+              linebreaks(urlize(force_escape(s.data))))
+             for s in team.settings.guidelines()
+             if s.data.strip()]))])
+    else:
+        return None
 
 def get_task_for_editor(video, language_code):
     team_video = video.get_team_video()
@@ -263,7 +275,6 @@ def subtitle_editor(request, video_id, language_code):
         'staticURL': settings.STATIC_URL,
     }
 
-
     if task:
         editor_data['task_id'] = task.id
         editor_data['savedNotes'] = task.body
@@ -273,6 +284,10 @@ def subtitle_editor(request, video_id, language_code):
             'mode': Task.TYPE_NAMES[task.type].lower(),
             'task_id': task.id,
         })
+
+    team_attributes = get_team_attributes_for_editor(video)
+    if team_attributes:
+        editor_data['teamAttributes'] = team_attributes
 
     return render_to_response("subtitles/subtitle-editor.html", {
         'video': video,

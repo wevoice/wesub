@@ -760,6 +760,14 @@ section.main {
             display: table;
             margin: 10px 0px 0px 30px;
             padding: 5px;
+            a {
+                color: $text-color;
+                font: normal 12px $OpenSans;
+                background: transparent;
+                font-size: 12px;
+                text-decoration: none;
+                line-height: 40px;
+            }
             span.key {
                 width: 20%;
             }
@@ -1520,6 +1528,22 @@ body.timeline-shown {
         width: 100%;
     }
     label {
+// Styling of the new modals
+//.modal-style {
+//    @extend %modal;    
+//    background: rgba(black, .6);
+//    color: #F1F1F1;
+//    div.modal-inner {
+//      padding: 40px;
+//      background: $dark-grey;
+//      .modal-content {max-height: 385px;}
+//      div,
+//      footer,
+//      header {
+//        border: none;
+//        background: $dark-grey;
+//      }
+//      h1 {
         font: normal 17px $Helvetica;
         margin: 12px 0 6px 0;
 
@@ -1591,4 +1615,27 @@ aside.modal {
             }
         }
     }
+}
+
+aside.modal#guidelines-modal {
+    div.modal-content {
+        max-height: 385px;
+        overflow: scroll;
+        td {
+            padding: 8px;
+            font-size: 12px;
+        }
+        margin: 15px 0;
+        div.team-all-guidelines {
+            div {
+                padding: 15px 0;
+            }
+        }
+    a.expand-link {
+        padding: 10px 0px 10px 0px;
+        line-height: 30px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+}
 }
