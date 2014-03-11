@@ -129,6 +129,23 @@ var angular = angular || null;
             return ($scope.workingSubtitles.subtitleList.length() > 0 &&
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
+
+        $scope.showClearTimingModal = function() {
+            var dialogManager = $scope.dialogManager;
+            dialogManager.openDialog({
+                title: 'You will loose all timing information. Do you want to continue?',
+                buttons: [
+                    dialogManager.button('Continue', function() {
+                        $scope.clearTiming();
+                        dialogManager.close();
+                    }),
+                    dialogManager.button('Cancel', function() {
+                        dialogManager.close();
+                    })
+                ]
+            });
+        };
+
         $scope.clearTiming = function() {
             var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
             while (nextWorkingSubtitle) {
@@ -136,7 +153,24 @@ var angular = angular || null;
                 nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
              }
             $scope.$root.$emit('work-done');
-        }
+        };
+
+        $scope.showClearTextModal = function() {
+            var dialogManager = $scope.dialogManager;
+            dialogManager.openDialog({
+                title: 'You will loose all subtitle text. Do you want to continue?',
+                buttons: [
+                    dialogManager.button('Continue', function() {
+                        $scope.clearText();
+                        dialogManager.close();
+                    }),
+                    dialogManager.button('Cancel', function() {
+                        dialogManager.close();
+                    })
+                ]
+            });
+        };
+
         $scope.clearText = function() {
             var nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.firstSubtitle();
             while (nextWorkingSubtitle) {
@@ -144,7 +178,24 @@ var angular = angular || null;
                 nextWorkingSubtitle = $scope.workingSubtitles.subtitleList.nextSubtitle(nextWorkingSubtitle);
              }
             $scope.$root.$emit('work-done');
-        }
+        };
+
+        $scope.showResetModal = function() {
+            var dialogManager = $scope.dialogManager;
+            dialogManager.openDialog({
+                title: 'You will loose all changes you have made since you last saved. Do you want to continue?',
+                buttons: [
+                    dialogManager.button('Continue', function() {
+                        $scope.resetToLastSavedVersion();
+                        dialogManager.close();
+                    }),
+                    dialogManager.button('Cancel', function() {
+                        dialogManager.close();
+                    })
+                ]
+            });
+        };
+
         $scope.resetToLastSavedVersion = function() {
             if($scope.workingSubtitles.versionNumber) {
                 $scope.workingSubtitles.getSubtitles(EditorData.editingVersion.languageCode,
@@ -155,6 +206,7 @@ var angular = angular || null;
             }
             $scope.$root.$emit('work-done');
         }
+
         $scope.displayedTitle = function() {
             return ($scope.workingSubtitles.getTitle() || 
                      $scope.referenceSubtitles.getTitle());
