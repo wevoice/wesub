@@ -304,19 +304,15 @@ var Site = function(Site) {
         $target.addClass('shown');
         $('body').append('<div class="well"></div>');
 
-        $target.click(function(event){
-            event.stopPropagation();
-        });
-
-        $('html').bind('click.modal', function() {
-            that.closeModal($target);
+        $closeButton = $('.action-close, .close', $target);
+        $closeButton.bind('click.modal', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $target.removeClass('shown');
+            $('body div.well').remove();
+            $closeButton.unbind('click.modal');
         });
     };
-    this.closeModal = function(elt) {
-        elt.removeClass('shown');
-        $('body div.well').remove();
-        $('html').unbind('click.modal');
-    }
     this.openModalForLink = function(link) {
         var modalId = link.attr('href');
         if(modalId == '#multi-video-create-subtitles-modal') {
@@ -415,11 +411,6 @@ var Site = function(Site) {
                         e.preventDefault();
                         e.stopPropagation();
                         that.openModalForLink($link);
-                    });
-                    $('.action-close, .close', $modal).click(function(e){
-                        e.preventDefault();
-                        e.stopPropagation();
-                        that.closeModal($modal);
                     });
                     if($modal.hasClass('start-open')) {
                         that.openModalForLink($link);
