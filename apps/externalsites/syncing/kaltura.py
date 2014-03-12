@@ -99,6 +99,7 @@ def _add_captions(ks, video_id, language_code):
         'captionAsset:language': language,
         'captionAsset:partnerData': PARTNER_DATA_TAG,
         'captionAsset:format': CAPTION_TYPE_SRT,
+        'captionAsset:fileExt': 'srt',
     })
     return _node_text(_find_child(result, 'id'))
 
