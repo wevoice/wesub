@@ -131,6 +131,7 @@ def assign_task_for_editor(video, language_code, user):
         task = tasks[0]
         if task.assignee is None and can_assign_task(task, user):
             task.assignee = user
+            task.set_expiration()
             task.save()
 
         if task.assignee != user:
