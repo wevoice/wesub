@@ -794,6 +794,14 @@ section.main {
             display: table;
             margin: 10px 0px 0px 30px;
             padding: 5px;
+            a {
+                color: $text-color;
+                font: normal 12px $OpenSans;
+                background: transparent;
+                font-size: 12px;
+                text-decoration: none;
+                line-height: 40px;
+            }
             span.key {
                 width: 20%;
             }
@@ -1528,7 +1536,7 @@ body.timeline-shown {
     div.modal-inner {
       padding: 40px;
       background: $dark-grey;
-      .modal-content {max-height: 200vh;}
+      .modal-content {max-height: 385px;}
       div,
       footer,
       header {
@@ -1556,4 +1564,34 @@ body.timeline-shown {
         }
       }
    }
+}
+
+#guidelines-modal {
+    td {
+        padding: 8px;
+        font-size: 12px;
+    }
+    .modal-content {
+        margin: 15px 0;
+        div.metadata {
+            div.content {
+                div {
+                    p {
+                        padding: 8px 0;
+                    }
+                }
+            }
+        }
+        div.team-all-guidelines {
+            div {
+                padding: 15px 0;
+            }
+        }
+    }
+    a.expand-link {
+        padding: 10px 0px 10px 0px;
+        line-height: 30px;
+        font-size: 14px;
+        font-weight: bold;
+    }
 }
