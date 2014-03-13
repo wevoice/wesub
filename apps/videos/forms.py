@@ -376,8 +376,8 @@ class CreateSubtitlesFormBase(forms.Form):
             user_langs = [l.language for l in self.user.get_languages()]
         else:
             user_langs = get_user_languages_from_request(self.request)
-            if not user_langs:
-                user_langs = ['en']
+        if not user_langs:
+            user_langs = ['en']
         def sort_key(choice):
             code, label = choice
             if code in user_langs:
