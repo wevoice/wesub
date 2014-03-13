@@ -78,7 +78,7 @@ var angular = angular || null;
     }
 
     VisibleTimespan.prototype.fitsInBuffer = function(bufferTimespan) {
-        if(this.startTime >= 0 && this.startTime < bufferTimespan.startTime) {
+        if(this.startTime < bufferTimespan.startTime) {
             return false;
         }
         if(this.endTime > bufferTimespan.endTime) {
