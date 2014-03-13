@@ -378,45 +378,54 @@ var angular = angular || null;
                 div.css({left: x, width: width});
             }
 
-            function getUnsyncedSubtitle() {
+            function updateUnsyncedSubtitle() {
                 /* Sometimes we want to show the first unsynced subtitle for
                  * the timeline.
                  *
-                 * This method calculates if we want to show the subtitle, and
-                 * if so, it returns an object that mimics the SubtitleItem
-                 * API for the unsynced subtitle.
-                 *
-                 * If we shouldn't show the subtitle, it returns null.
+                 * This method calculates if we want to show the subtitle or
+                 * not and sets the unsyncedSubtitle variable accordingly.  If
+                 * we don't want to show it, we set it to none.  If we do, we
+                 * set it to a DraftSubtitle with the start/end times set
+                 * based on the current time.
                  */
                 var lastSynced = subtitleList().lastSyncedSubtitle();
                 if(lastSynced !== null &&
                     lastSynced.endTime > scope.currentTime) {
                     // Not past the end of the synced subtitles
-                    return null;
+                    unsyncedSubtitle = null;
+                    return;
                 }
                 var unsynced = subtitleList().firstUnsyncedSubtitle();
                 if(unsynced === null) {
-                    return null;
+                    // All subtitles are synced.
+                    unsyncedSubtitle = null;
+                    return;
                 }
                 if(unsynced.startTime >= 0 && unsynced.startTime >
                         bufferTimespan.endTime) {
                     // unsynced subtitle has its start time set, and it's past
                     // the end of the timeline.
-                    return null;
+                    unsyncedSubtitle = null;
+                    return;
                 }
 
-                // Okay, we have an unsynced subtitle to use.  Make a draft
-                // version since we are want to adjust the start/end times
-                // before we actuall have that data saved
-                var draft = unsynced.draftSubtitle();
+
+                if(unsyncedSubtitle === null) {
+                    unsyncedSubtitle = unsynced.draftSubtitle();
+                }
                 if(unsynced.startTime < 0) {
-                    draft.startTime = scope.currentTime;
-                    draft.endTime = scope.currentTime + DEFAULT_DURATION;
+                    unsyncedSubtitle.startTime = scope.currentTime;
+                    if(unsyncedSubtitle.startTime === null) {
+                        // currentTime hasn't been set yet.  Let's use time=0
+                        // for now.
+                        unsyncedSubtitle.startTime = 0;
+                    }
+                    unsyncedSubtitle.endTime = scope.currentTime + DEFAULT_DURATION;
                 } else {
-                    draft.endTime = Math.max(scope.currentTime,
+                    unsyncedSubtitle.startTime = unsynced.startTime;
+                    unsyncedSubtitle.endTime = Math.max(scope.currentTime,
                             unsynced.startTime + MIN_DURATION);
                 }
-                return draft;
             }
 
             function checkShownSubtitle() {
@@ -474,7 +483,7 @@ var angular = angular || null;
                 }
             }
             function placeUnsyncedSubtitle() {
-                unsyncedSubtitle = getUnsyncedSubtitle();
+                updateUnsyncedSubtitle();
                 if(unsyncedSubtitle !== null) {
                     if(unsyncedDiv === null) {
                         unsyncedDiv = makeDivForSubtitle(unsyncedSubtitle);
