@@ -562,7 +562,7 @@ var angular = angular || null;
     module.controller("SubtitleMetadataController", function($scope) {
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
-            description: $scope.workingSubtitles.description,
+            description: $scope.workingSubtitles.getDescription(),
             metadata: $scope.workingSubtitles.metadata
         };
         var backupSubtitles = _.clone($scope.currentSubtitles);
