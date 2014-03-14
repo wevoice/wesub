@@ -413,6 +413,7 @@ var angular = angular || null;
                 if(unsyncedSubtitle === null) {
                     unsyncedSubtitle = unsynced.draftSubtitle();
                 }
+                unsyncedSubtitle.markdown = unsynced.markdown;
                 if(unsynced.startTime < 0) {
                     unsyncedSubtitle.startTime = scope.currentTime;
                     if(unsyncedSubtitle.startTime === null) {
