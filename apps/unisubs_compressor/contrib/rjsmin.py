@@ -56,7 +56,7 @@ Both python 2 and python 3 are supported.
 .. _jsmin.c by Douglas Crockford:
    http://www.crockford.com/javascript/jsmin.c
 """
-__author__ = "Andr\xe9 Malo"
+__author__ = u'Andr&#233; Malo'
 __author__ = getattr(__author__, 'decode', lambda x: __author__)('latin-1')
 __docformat__ = "restructuredtext en"
 __license__ = "Apache License, Version 2.0"
