@@ -31,10 +31,10 @@ var angular = angular || null;
 	this.showOverlay = true;
         var self = this;
         this.subtitleList = subtitleList;
-        if(this.subtitleList.length() == 0) {
-            this.stage = 'type';
+        if(this.subtitleList.isComplete()) {
+            this.stage = 'review';
         } else {
-            this.stage = 'sync';
+            this.stage = 'type';
         }
         this.subtitleList.addChangeCallback(function() {
             if(self.stage == 'review' && !self.subtitleList.isComplete()) {
