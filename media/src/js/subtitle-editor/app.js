@@ -328,6 +328,8 @@ var angular = angular || null;
         }
 
         $scope.handleAppKeyDown = function(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
             // Reset the lock timer.
             $scope.minutesIdle = 0;
             // Workflow needs to know if TAB is pressed
@@ -337,8 +339,6 @@ var angular = angular || null;
             if ((evt.keyCode === 32 && evt.shiftKey) || 
                 (evt.keyCode == 9 && !evt.shiftKey)) {
                 // Shift+Space or Tab: toggle play / pause.
-                evt.preventDefault();
-                evt.stopPropagation();
                 VideoPlayer.togglePlay();
             } else if (evt.keyCode === 9 && evt.shiftKey) {
                 // Shift+Tab, go back 2 seconds
@@ -358,23 +358,17 @@ var angular = angular || null;
                 // unsynced sub
                 if($scope.timelineShown) {
                     $scope.$root.$emit("sync-next-start-time");
-                    evt.preventDefault();
-                    evt.stopPropagation();
                 }
             } else if(evt.keyCode == 38) {
                 // Up arrow, set the end time of the first
                 // unsynced sub
                 if($scope.timelineShown) {
                     $scope.$root.$emit("sync-next-end-time");
-                    evt.preventDefault();
-                    evt.stopPropagation();
                 }
             } else if(evt.keyCode == 13) {
                 if(!$scope.timelineShown) {
                     insertAndEditSubtitle();
-                    evt.preventDefault();
                 }
-
             }
         };
 
