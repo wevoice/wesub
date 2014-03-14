@@ -370,6 +370,12 @@ var angular = angular || null;
             // Reset the lock timer.
             $scope.minutesIdle = 0;
         };
+
+        $scope.handleAppMouseClick = function(evt) {
+            // Reset the lock timer.
+            $scope.minutesIdle = 0;
+            $scope.$root.$emit("app-click");
+        };
     });
 
     module.controller("AppControllerSubtitles", function($scope, $timeout,
