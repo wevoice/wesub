@@ -569,10 +569,10 @@
 	  <div ng-bind-html="teamGuidelines['review']"></div>
 	</div>
       </div>
-      <footer>
-	<a href="" ng-click="dialogManager.onCloseClick($event)">
+      <footer class="buttons">
+	<button ng-click="dialogManager.onCloseClick($event)">
 	  {% trans "Close" %}
-	</a>
+	</button>
       </footer>
     </aside>
     <aside id="set-title-modal" class="modal" tabindex="-1" role="dialog" aria-labeledby="set-title-heading" ng-controller="SubtitleMetadataController" ng-class="dialogManager.dialogCSSClass('metadata')" dir="[[ workingSubtitles.language.dir ]]">
