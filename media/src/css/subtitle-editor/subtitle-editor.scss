@@ -25,6 +25,8 @@ $CodePro: 'CodeProLC', $OpenSans;
  * for editor colors.
  */
 
+
+$video-height: 258px;
 $sync-help-height: 54px;
 $span-key-height: 32px;
 $text-color: #565758;
@@ -935,7 +937,7 @@ section.main {
                 background: none repeat scroll 0 0 $dark-grey;
                 opacity: 0.95;
                 width: 100%;
-                height: 100%;
+                height: $video-height;
                 display: block;
                 div {
                 ul {
@@ -985,10 +987,10 @@ section.main {
                 }
             }
             div.video-container {
-                height: 258px;
+                height: $video-height;
                 width: 100%;
                 iframe, video {
-                    height: 258px;
+                    height: $video-height;
                     width: 100%;
                 }
             }

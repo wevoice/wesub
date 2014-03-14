@@ -443,9 +443,8 @@ var angular = angular || null;
         $scope.handleAppKeyDown = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
-            // Workflow needs to know if TAB is pressed
+
             if (evt.keyCode == 9 && !evt.shiftKey) {
-                $scope.workflow.tabPressed();
                 VideoPlayer.togglePlay();
             } else if (evt.keyCode === 32 && evt.shiftKey) {
                 VideoPlayer.togglePlay();
@@ -479,6 +478,12 @@ var angular = angular || null;
         $scope.handleAppMouseMove = function(evt) {
             // Reset the lock timer.
             $scope.minutesIdle = 0;
+        };
+
+        $scope.handleAppMouseClick = function(evt) {
+            // Reset the lock timer.
+            $scope.minutesIdle = 0;
+            $scope.$root.$emit("app-click");
         };
     });
 
