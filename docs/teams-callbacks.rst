@@ -19,7 +19,7 @@ Available Data
 ==============
 When a POST request is made to the chosen URL, the following data will be sent:
 
-* `event_name` : A string, available events are: 
+* `event` : A string, available events are: 
 
  * `video-new` : A new video has been added through the team (through the web ui)
  * `video-edited` : Video data has been edited (video url, title, description)
@@ -35,3 +35,9 @@ When a POST request is made to the chosen URL, the following data will be sent:
 * `api_url`: The URL for the Amara API that will have the latest data for that event (subtitles, language or videos)
 * `language_code` : The human readable language code (i.e 'en' or 'es') for the this event. If the event is a language or subtitle event the language will be sent, else if it's a video event the parameter will be omitted. 
 
+
+Example
+=======
+A notification looks like: 
+```http://<NOTIFICATION_URL>?project=_root&api_url=%2Fapi2%2Fpartners%2Fvideos%2F<VIDEO_ID>%2Flanguages%2Fen%2F&team=<TEAM_SLUG>&language_code=en&video_id=<VIDEO_ID>&event=language-edit&language_id=682965
+```
