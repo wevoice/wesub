@@ -562,21 +562,21 @@ var angular = angular || null;
     module.controller("SubtitleMetadataController", function($scope) {
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
-            description: $scope.workingSubtitles.description,
+            description: $scope.workingSubtitles.getDescription(),
             metadata: $scope.workingSubtitles.metadata
         };
+        var backupSubtitles = _.clone($scope.currentSubtitles);
 
         $scope.update = function(subtitles) {
             $scope.workingSubtitles.title = subtitles.title;
             $scope.workingSubtitles.description = subtitles.description;
             $scope.workingSubtitles.metadata = subtitles.metadata;
+            backupSubtitles = _.clone(subtitles);
             $scope.dialogManager.close();
         };
  
         $scope.reset = function() {
-            $scope.currentSubtitles.title = $scope.workingSubtitles.title;
-            $scope.currentSubtitles.description = $scope.workingSubtitles.description;
-            $scope.currentSubtitles.metadata = $scope.workingSubtitles.metadata;
+            $scope.currentSubtitles = _.clone(backupSubtitles);
             $scope.dialogManager.close();
         };
     });
