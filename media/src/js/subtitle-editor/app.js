@@ -328,18 +328,15 @@ var angular = angular || null;
         }
 
         $scope.handleAppKeyDown = function(evt) {
-            evt.preventDefault();
-            evt.stopPropagation();
             // Reset the lock timer.
             $scope.minutesIdle = 0;
             // Workflow needs to know if TAB is pressed
-            if (evt.keyCode == 9 && !evt.shiftKey)
+            if (evt.keyCode == 9 && !evt.shiftKey) {
                 $scope.workflow.tabPressed();
-            // Shortcuts that should work while editing a subtitle
-            if ((evt.keyCode === 32 && evt.shiftKey) || 
-                (evt.keyCode == 9 && !evt.shiftKey)) {
-                // Shift+Space or Tab: toggle play / pause.
                 VideoPlayer.togglePlay();
+            } else if (evt.keyCode === 32 && evt.shiftKey) {
+                VideoPlayer.togglePlay();
+                // Shift+Space or Tab: toggle play / pause.
             } else if (evt.keyCode === 9 && evt.shiftKey) {
                 // Shift+Tab, go back 2 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() - 2000);
@@ -349,27 +346,21 @@ var angular = angular || null;
             } else if (evt.keyCode === 190 && evt.shiftKey && evt.ctrlKey) {
                 // Control+Shift+Period, go forward 4 seconds
                 VideoPlayer.seek(VideoPlayer.currentTime() + 4000);
-            } else if(evt.target.type == 'textarea') {
+            } else if (evt.target.type == 'textarea') {
                 return;
             }
             // Shortcuts that should be disabled while editing a subtitle
-            else if(evt.keyCode == 40) {
-                // Down arrow, set the start time of the first
-                // unsynced sub
-                if($scope.timelineShown) {
-                    $scope.$root.$emit("sync-next-start-time");
-                }
-            } else if(evt.keyCode == 38) {
-                // Up arrow, set the end time of the first
-                // unsynced sub
-                if($scope.timelineShown) {
-                    $scope.$root.$emit("sync-next-end-time");
-                }
-            } else if(evt.keyCode == 13) {
-                if(!$scope.timelineShown) {
-                    insertAndEditSubtitle();
-                }
+            else if ((evt.keyCode == 40) && ($scope.timelineShown)) {
+                $scope.$root.$emit("sync-next-start-time");
+            } else if ((evt.keyCode == 38) && ($scope.timelineShown)) {
+                $scope.$root.$emit("sync-next-end-time");
+            } else if ((evt.keyCode == 13) && (!$scope.timelineShown)) {
+                insertAndEditSubtitle();
+            } else {
+                return;
             }
+            evt.preventDefault();
+            evt.stopPropagation();
         };
 
         $scope.handleAppMouseMove = function(evt) {
