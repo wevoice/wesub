@@ -52,7 +52,8 @@ var angular = angular || null;
     module.constant('MIN_DURATION', 250); // 0.25 seconds
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
-    module.controller("AppController", function($scope, $controller,
+    module.controller("AppController", ['$scope', '$sce', '$controller', 
+                      'EditorData', 'Workflow', function($scope, $sce, $controller,
             EditorData, Workflow) {
 
         $controller('AppControllerSubtitles', {$scope: $scope});
@@ -71,6 +72,30 @@ var angular = angular || null;
 	}
         $scope.translating = function() {
             return ($scope.workingSubtitles.language.code !=  $scope.referenceSubtitles.language.code);
+        }
+        if (EditorData.teamAttributes) {
+            $scope.teamName = EditorData.teamAttributes.teamName
+            if (EditorData.teamAttributes.guidelines &&
+		(EditorData.teamAttributes.guidelines['subtitle'] ||
+		 EditorData.teamAttributes.guidelines['translate'] ||
+		 EditorData.teamAttributes.guidelines['review'])
+	       ) {
+		var noGuideline = "No guidelines specified.";
+                $scope.teamGuidelines = { 'subtitle': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['subtitle'] || noGuideline),
+                                          'translate': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['translate'] || noGuideline),
+                                          'review': $sce.trustAsHtml(EditorData.teamAttributes.guidelines['review'] || noGuideline) };
+            }
+            // Needs to be a function as we can only know once language was retrieved
+            $scope.teamTaskType = function() {
+		return EditorData.task_needs_pane ? 'review' : $scope.translating() ? 'translate' : 'subtitle';
+            };
+        } else {
+            $scope.teamTaskType = function() {return "";}
+        }
+        $scope.showTeamGuidelines = function() {
+            if (($scope.teamGuidelines) && ($scope.teamName))
+                return true;
+            return false; 
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
         $scope.timelineShown = !($scope.workflow.stage == 'type');
@@ -151,7 +176,7 @@ var angular = angular || null;
         $scope.overrides = {
             forceSaveError: false
         };
-    });
+    }]);
 
     /* AppController is large, so we split it into several components to
      * keep things a bit cleaner.  Each controller runs on the same scope.
