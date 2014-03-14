@@ -39,5 +39,5 @@ When a POST request is made to the chosen URL, the following data will be sent:
 Example
 =======
 A notification looks like: 
-http://<NOTIFICATION_URL>?project=_root&api_url=%2Fapi2%2Fpartners%2Fvideos%2F<VIDEO_ID>%2Flanguages%2Fen%2F&team=<TEAM_SLUG>&language_code=en&video_id=<VIDEO_ID>&event=language-edit&language_id=682965
+``http://<NOTIFICATION_URL>?project=_root&api_url=%2Fapi2%2Fpartners%2Fvideos%2F<VIDEO_ID>%2Flanguages%2Fen%2F&team=<TEAM_SLUG>&language_code=en&video_id=<VIDEO_ID>&event=language-edit&language_id=682965``
 
