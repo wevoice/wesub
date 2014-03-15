@@ -43,6 +43,7 @@ var angular = angular || null;
             pop.on('canplay', function() {
                 emitSignal('video-update');
             }).on('playing', function() {
+                if (!playing) emitSignal('video-playback-starts');
                 playing = true;
                 emitSignal('video-update');
             }).on('pause', function() {

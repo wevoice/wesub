@@ -107,7 +107,7 @@ class SendMessageForm(forms.Form):
         user = self.cleaned_data.get('user')
         email = self.cleaned_data.get('email')
         headers = {'Reply-To': email}
-        subject = _('Personal message from %(sender)s on universalsubtitles.org') % {'sender': self.sender.username}
+        subject = _('Personal message from %(sender)s on amara.org') % {'sender': self.sender.username}
         EmailMessage(subject, self.cleaned_data.get('message'), email, \
                      [user.email], headers=headers).send()
 

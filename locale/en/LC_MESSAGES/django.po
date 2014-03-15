@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 13:31-0600\n"
+"POT-Creation-Date: 2014-03-13 05:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -585,7 +585,7 @@ msgstr ""
 msgid "Another user is currently performing the %s task for these subtitles"
 msgstr ""
 
-#: apps/subtitles/views.py:194
+#: apps/subtitles/views.py:206
 msgid "You can't edit this subtitle because it's locked"
 msgstr ""
 
@@ -4236,61 +4236,66 @@ msgstr ""
 msgid "End subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:273
-msgid "How to start making subtitles."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:275
-msgid "Play the video and type what you hear."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:276
-msgid "Press Enter to complete a subtitle."
+#: templates/subtitles/subtitle-editor.html:208
+#: templates/subtitles/subtitle-editor.html:621
+msgid "Subtitling Guidelines"
 msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:277
-msgid "Use the guide on the right to move to the next step."
+msgid "How to start making subtitles."
 msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:279
-#: templates/subtitles/subtitle-editor.html:288
-#: templates/subtitles/subtitle-editor.html:298
+msgid "Play the video and type what you hear."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:280
+msgid "Press Enter to complete a subtitle."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:281
+msgid "Use the guide on the right to move to the next step."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:283
+#: templates/subtitles/subtitle-editor.html:292
+#: templates/subtitles/subtitle-editor.html:302
 msgid "Press the TAB key to start!"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:282
+#: templates/subtitles/subtitle-editor.html:286
 msgid "Subtitle Syncing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:284
+#: templates/subtitles/subtitle-editor.html:288
 msgid "Tap the DOWN arrow to start a subtitle."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:285
+#: templates/subtitles/subtitle-editor.html:289
 msgid "Tap the UP arrow to set the end time (optional)."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:286
+#: templates/subtitles/subtitle-editor.html:290
 msgid "Use the Tools menu to hide the timeline for typing mode."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:292
+#: templates/subtitles/subtitle-editor.html:296
 msgid "Review your work"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:294
+#: templates/subtitles/subtitle-editor.html:298
 msgid "Watch the video and make corrections."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:295
+#: templates/subtitles/subtitle-editor.html:299
 msgid "Click Complete to sign off on your work."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:296
+#: templates/subtitles/subtitle-editor.html:300
 msgid "Use the Save button to save and finish later."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:304
+#: templates/subtitles/subtitle-editor.html:308
 #, python-format
 msgid ""
 "\n"
@@ -4298,84 +4303,297 @@ msgid ""
 "              "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:428
+#: templates/subtitles/subtitle-editor.html:432
 msgid "1. Type what you hear"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:430
+#: templates/subtitles/subtitle-editor.html:434
 msgid "Is all the content subtitled?"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:433
+#: templates/subtitles/subtitle-editor.html:437
 msgid "Yes, start syncing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:438
+#: templates/subtitles/subtitle-editor.html:442
 msgid "2. Sync timing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:442
+#: templates/subtitles/subtitle-editor.html:446
 msgid "Not all lines are completed."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:445
+#: templates/subtitles/subtitle-editor.html:449
 msgid "All lines are completed."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:448
-#: templates/subtitles/subtitle-editor.html:504
+#: templates/subtitles/subtitle-editor.html:452
+#: templates/subtitles/subtitle-editor.html:643
 msgid "Edit title and description"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:449
-#: templates/subtitles/subtitle-editor.html:467
+#: templates/subtitles/subtitle-editor.html:453
+#: templates/subtitles/subtitle-editor.html:471
 msgid "Start reviewing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:457
+#: templates/subtitles/subtitle-editor.html:461
 msgid "3. Translate title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:462
+#: templates/subtitles/subtitle-editor.html:466
 msgid "Title and description were not edited yet."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:465
+#: templates/subtitles/subtitle-editor.html:469
 msgid "Title and description have been edited."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:475
+#: templates/subtitles/subtitle-editor.html:479
 msgid "3. Review and complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:476
+#: templates/subtitles/subtitle-editor.html:480
 msgid "4. Review and complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:480
+#: templates/subtitles/subtitle-editor.html:484
 msgid ""
 "Watch the video again and verify that the subtitles are complete and correct."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:482
+#: templates/subtitles/subtitle-editor.html:486
 msgid "Complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:509
+#: templates/subtitles/subtitle-editor.html:512
+msgid "Amara Style Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:520
+msgid "Subtitle line length"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:521
+msgid "Keep subtitle length to about 42 characters;"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:522
+msgid "avoid more than 2 lines per subtitle."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:525
+msgid "Minimum duration"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:526
+msgid "Subtitles should not be less than 1 second."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:529
+msgid "Maximum duration"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:530
+msgid "Split subtitles lasting more than 7 seconds."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:533
+msgid "Reading speed"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:534
+msgid "8-25 characters/second is recommended;"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:535
+msgid "8-16 characters/second for children."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:538
+msgid "Sounds"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:539
+msgid "Describe meaningful sounds that are relevant to the plot."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:540
+msgid "ex: (water dripping)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:543
+msgid "Music"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:544
+msgid "Describe relevant music which does not have relevant lyrics."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:545
+msgid "ex: ♪ (jazz music) ♪"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:548
+msgid "Speaker Identification"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:549
+msgid "Use parenthesis to indicate when someone is speaking off-screen."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:550
+#: templates/subtitles/subtitle-editor.html:588
+msgid "ex: (Michael) Wait for me!"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:553
+msgid "Show Advanced Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:554
+msgid "Hide Advanced Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:558
+msgid "Translate the whole idea"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:559
+msgid "Translations don't need to be word for word. Look at the context."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:560
+msgid ""
+"Make sure you are using the correct punctuation for the whole unit of text."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:564
+msgid "Maximum timing offset"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:565
+msgid ""
+"Subtitles shouldn't start more than 0.5 seconds before or after the audio "
+"begins."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:568
+msgid "On-screen texts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:569
+msgid "Translate the texts on the video that are relevant to the plot."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:572
+msgid "Use meaningful speech"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:573
+msgid "Exclude things like “um” “ah” and other disfluencies."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:576
+msgid "Indicate inaudible parts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:577
+msgid "If the audio is inaudible, it should be marked as [inaudible]."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:580
+msgid "Lyrics"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:581
+msgid "Wrap relevant lyrics in musical notes."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:582
+msgid "ex ♪ Tell me dear Billy, ♪"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:586
+msgid "Speaker identification"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:587
+msgid "Identify off-screen and unclear speakers in parentheses."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:592
+msgid "Foreign language"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:593
+msgid "Identify relevant speech in foreign language. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:594
+msgid "ex: (Russian): Thank you."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:598
+msgid "Simultaneous dialogue"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:599
+msgid "Used exclusively when two speakers talk in the same subtitle. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:600
+msgid ""
+"Each speaker should have one line, and both lines should have an hyphen. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:601
+msgid "- Sir, you are no gentleman."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:602
+msgid "- Rhett Butler: And you, Miss, are no lady."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:614
+msgid "Show All Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:618
+msgid "Hide All Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:623
+msgid "Translating Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:625
+msgid "Reviewing Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:633
+#: templates/videos/_feedback_form.html:35
+#: templates/videos/_upload_subtitles.html:10
+#: templates/videos/_video_url_panel.html:43
+#: templates/videos/video-page.html:50
+msgid "Close"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:648
 msgid "Title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:511
+#: templates/subtitles/subtitle-editor.html:650
 msgid "Enter Title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:517
+#: templates/subtitles/subtitle-editor.html:656
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:519
+#: templates/subtitles/subtitle-editor.html:658
 msgid "Enter Description"
 msgstr ""
 
@@ -5751,13 +5969,6 @@ msgstr ""
 
 #: templates/videos/_feedback_form.html:26
 msgid "Send Feedback"
-msgstr ""
-
-#: templates/videos/_feedback_form.html:35
-#: templates/videos/_upload_subtitles.html:10
-#: templates/videos/_video_url_panel.html:43
-#: templates/videos/video-page.html:50
-msgid "Close"
 msgstr ""
 
 #: templates/videos/_feedback_form.html:37
