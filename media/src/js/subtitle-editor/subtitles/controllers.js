@@ -563,14 +563,14 @@ var angular = angular || null;
         $scope.currentSubtitles = {
             title: $scope.workingSubtitles.getTitle(),
             description: $scope.workingSubtitles.getDescription(),
-            metadata: $scope.workingSubtitles.metadata
+            metadata: $scope.workingSubtitles.getMetadata()
         };
         var backupSubtitles = _.clone($scope.currentSubtitles);
 
         $scope.update = function(subtitles) {
             $scope.workingSubtitles.title = subtitles.title;
             $scope.workingSubtitles.description = subtitles.description;
-            $scope.workingSubtitles.metadata = subtitles.metadata;
+            $scope.workingSubtitles.metadata = _.clone(subtitles.metadata);
             backupSubtitles = _.clone(subtitles);
             $scope.dialogManager.close();
         };
