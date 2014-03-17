@@ -436,7 +436,7 @@ section.main {
             width: 120px;
             height: $sync-help-height;
             color: #ffffff;
-            z-index: 40;
+            z-index: 60;
 
             div.text {
                 line-height: $sync-help-height;
@@ -489,7 +489,7 @@ section.main {
             left: 100%;
             top: 45px;
             width: 200px;
-            z-index: 41;
+            z-index: 61;
 
             background: #e4e5e6;
             border-top: 1px solid #e6e7e8;
@@ -1159,7 +1159,7 @@ section.main {
                    top: 0;
                    right: -200px;
                    width: 200px;
-                   z-index: 53;
+                   z-index: 62;
 		   li { 
 		       list-style-type: none;
     		       display: inline-block;
