@@ -39,8 +39,7 @@ var angular = angular || null;
         var hours = date.getUTCHours(), minutes = date.getUTCMinutes(),
             seconds = date.getUTCSeconds(), cents = Math.floor(date.getUTCMilliseconds() / 10);
         var result = "" + (hours ? (hours + ":" + ("0" + minutes).slice (-2) + ":" + ("0" + seconds).slice (-2)) :
-                                   (minutes ? (minutes + ":" + ("0" + seconds).slice (-2)) :
-                                              seconds ));
+                                   (minutes + ":" + ("0" + seconds).slice (-2)));
         if (showFraction) result += "." + ("0" + cents).slice (-2);
         return result;
     }
