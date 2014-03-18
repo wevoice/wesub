@@ -142,6 +142,7 @@ var angular = angular || null;
                 rewindPlayback();
             }
             evt.preventDefault();
+            evt.stopPropagation();
         }
     });
 
