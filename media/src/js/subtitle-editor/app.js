@@ -157,11 +157,12 @@ var angular = angular || null;
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
 
-        $scope.showClearTimingModal = function() {
+        $scope.showClearTimingModal = function($event) {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
                 title: 'Confirm Timing Reset',
                 text: 'This will remove all subtitle timing. Do you want to continue?',
+                allowClose: 1,
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearTiming();
@@ -172,6 +173,8 @@ var angular = angular || null;
                     })
                 ]
             });
+            $event.stopPropagation();
+            $event.preventDefault();
         };
 
         $scope.clearTiming = function() {
@@ -183,11 +186,12 @@ var angular = angular || null;
             $scope.$root.$emit('work-done');
         };
 
-        $scope.showClearTextModal = function() {
+        $scope.showClearTextModal = function($event) {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
                 title: 'Confirm Text Reset',
                 text: 'This will remove all subtitle text. Do you want to continue?',
+                allowClose: 1,
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearText();
@@ -198,6 +202,8 @@ var angular = angular || null;
                     })
                 ]
             });
+            $event.stopPropagation();
+            $event.preventDefault();
         };
 
         $scope.clearText = function() {
@@ -209,11 +215,12 @@ var angular = angular || null;
             $scope.$root.$emit('work-done');
         };
 
-        $scope.showResetModal = function() {
+        $scope.showResetModal = function($event) {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
                 title: 'Confirm Changes Reset',
                 text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
+                allowClose: 1,
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.resetToLastSavedVersion();
@@ -224,6 +231,8 @@ var angular = angular || null;
                     })
                 ]
             });
+            $event.stopPropagation();
+            $event.preventDefault();
         };
 
         $scope.resetToLastSavedVersion = function() {

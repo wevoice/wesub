@@ -133,6 +133,8 @@
          *
          *   title: dialog heading
          *   text: dialog description (optional)
+         *   allowClose: if present, allow closing the dialog via escape/mouse
+         *               clicks outside of the element (optional)
          *   buttons: array defining the buttons.  Each element must be
          *            either a simple string, or an object created by button()
          *            or closeButton().
@@ -147,4 +149,52 @@
     }
 
     module.value('DialogManager', DialogManager);
+
+    module.directive('modalDialog', function($document) {
+        return function link($scope, elm, attrs) {
+            var dialogName = attrs.modalDialog;
+            function allowClose() {
+                if(dialogName == 'generic' &&
+                    $scope.dialogManager.generic.allowClose) {
+                    return true;
+                }
+                return attrs.allowClose !== undefined;
+            }
+            function bindCloseActions() {
+                if(!allowClose()) {
+                    return;
+                }
+                $document.bind("keydown.modal-" + dialogName, function(evt) {
+                    // Escape key closes the modal
+                    $scope.$eval(function() {
+                        if (evt.keyCode === 27) {
+                            $scope.dialogManager.close();
+                        }
+                    });
+                });
+                $document.bind("click.modal-" + dialogName, function(evt) {
+                    // Clicking outside the modal closes it
+                    $scope.$eval(function() {
+                        if ($(evt.target).closest('aside.modal').length == 0) {
+                            $scope.dialogManager.close();
+                        }
+                    });
+                });
+            }
+            function unbindCloseActions() {
+                $document.unbind("keydown.modal-" + dialogName);
+                $document.unbind("click.modal-" + dialogName);
+            }
+
+            $scope.$watch('dialogManager.current()', function(current) {
+                if(current == dialogName) {
+                    elm.addClass('shown');
+                    bindCloseActions();
+                } else {
+                    elm.removeClass('shown');
+                    unbindCloseActions();
+                }
+            });
+        };
+    });
 }).call(this);
