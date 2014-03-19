@@ -353,7 +353,7 @@ var angular = angular || null;
                         // mouse didn't move that much.  Interpret this as a
                         // click rather than a drag and seek to the current
                         // time.
-                        var deltaX = event.pageX - container.offset().left;
+                        var deltaX = evt.pageX - container.offset().left;
                         var deltaMS = pixelsToDuration(deltaX, scope.scale);
                         var seekTo = visibleTimespan.startTime + deltaMS;
                     } else {
