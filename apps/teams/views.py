@@ -1460,6 +1460,7 @@ def perform_task(request, slug=None, task_pk=None):
 
     if task.assignee_id != request.user.id:
         task.assignee = request.user
+        task.set_expiration()
         task.save()
 
     if not task.needs_start_dialog():
