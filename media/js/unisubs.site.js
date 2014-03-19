@@ -319,16 +319,31 @@ var Site = function(Site) {
     }
     this.openModalDialog = function(modal_id) {
         var $target = $(modal_id);
+        var $document = $(document);
         $target.addClass('shown');
         $('body').append('<div class="well"></div>');
 
-        $closeButton = $('.action-close, .close', $target);
-        $closeButton.bind('click.modal', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        function handleCloseEvent(evt) {
+            evt.preventDefault();
+            evt.stopPropagation();
             $target.removeClass('shown');
             $('body div.well').remove();
             $closeButton.unbind('click.modal');
+            $document.unbind('click.modal');
+            $document.unbind('keydown.modal');
+        }
+
+        $closeButton = $('.action-close, .close', $target);
+        $closeButton.bind('click.modal', handleCloseEvent);
+        $document.bind('click.modal', function(evt) {
+            if($(event.target).closest('aside.modal').length == 0) {
+                handleCloseEvent(evt);
+            }
+        });
+        $document.bind('keydown.modal', function(evt) {
+            if (evt.keyCode === 27) {
+                handleCloseEvent(evt);
+            }
         });
     };
     this.openModalForLink = function(link) {
