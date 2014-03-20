@@ -100,7 +100,8 @@ var angular = angular || null;
             return false; 
         }
         $scope.workflow = new Workflow($scope.workingSubtitles.subtitleList, $scope.translating, $scope.titleEdited);
-        $scope.timelineShown = !($scope.workflow.stage == 'type');
+        $scope.timelineShown = ($scope.workflow.stage != 'type' ||
+                EditorData.task_needs_pane);
         $scope.toggleScrollingSynced = function() {
             $scope.scrollingSynced = !$scope.scrollingSynced;
         }
