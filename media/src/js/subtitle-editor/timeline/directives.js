@@ -205,7 +205,7 @@ var angular = angular || null;
             var unsyncedSubtitle = null;
 
             function handleDragLeft(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
+                context.startTime = context.initialStartTime + deltaMS;
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
                 }
@@ -215,7 +215,7 @@ var angular = angular || null;
             }
 
             function handleDragRight(context, deltaMS) {
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
                 if(context.maxEndTime !== null &&
                         context.endTime > context.maxEndTime) {
                             context.endTime = context.maxEndTime;
@@ -226,8 +226,8 @@ var angular = angular || null;
             }
 
             function handleDragMiddle(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.startTime = context.initialStartTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
 
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
@@ -257,6 +257,8 @@ var angular = angular || null;
                     subtitle: subtitle,
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
+                    initialStartTime: subtitle.startTime,
+                    initialEndTime: subtitle.endTime
                 }
                 if(!subtitle.isDraft) {
                     var storedSubtitle = subtitle;
@@ -284,11 +286,14 @@ var angular = angular || null;
                 }
 
                 var initialPageX = evt.pageX;
+
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
                     var deltaMS = pixelsToDuration(deltaX, scope.scale);
                     dragHandler(context, deltaMS);
                     placeSubtitle(context.startTime, context.endTime, div);
+                    subtitleList().updateSubtitleTime(storedSubtitle,
+                        context.startTime, context.endTime);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     subtitleList().updateSubtitleTime(storedSubtitle,
