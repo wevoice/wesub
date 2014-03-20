@@ -144,14 +144,19 @@ var angular = angular || null;
         $scope.changesMade = false;
         $scope.autoBackupNeeded = false;
         $scope.notesChanged = false;
+        $scope.exiting = false;
         $scope.nextVersionNumber = null;
 
         $scope.saveDisabled = function() {
-            return !($scope.changesMade || $scope.notesChanged);
+            return !$scope.hasUnsavedWork();
+        };
+
+        $scope.hasUnsavedWork = function() {
+            return ($scope.changesMade || $scope.notesChanged);
         };
 
         $scope.discard = function() {
-            if($scope.changesMade) {
+            if($scope.hasUnsavedWork()) {
                 $scope.showCloseModal(false);
             } else {
                 $scope.exitToVideoPage();
@@ -197,7 +202,7 @@ var angular = angular || null;
             }
             options = defaults;
 
-            if(!$scope.changesMade && !$scope.notesChanged && !options.markComplete && !options.force) {
+            if(!$scope.hasUnsavedWork() && !options.markComplete && !options.force) {
                 return;
             }
 
@@ -322,6 +327,7 @@ var angular = angular || null;
             var buttons = [
                 $scope.dialogManager.button('Exit', function() {
                     $scope.dialogManager.close();
+                    $scope.exiting = true;
                     $scope.exitToVideoPage();
                 })
             ];
@@ -347,7 +353,7 @@ var angular = angular || null;
         };
         $scope.switchToLegacyEditor = function($event) {
             $event.preventDefault();
-            if(!$scope.changesMade) {
+            if(!$scope.hasUnsavedWork()) {
                 $scope.exitToLegacyEditor();
                 return;
             }
@@ -359,7 +365,7 @@ var angular = angular || null;
                 buttons: [
                     dialogManager.button('Discard changes', function() {
                         dialogManager.close();
-                        $scope.changesMade = false;
+                        $scope.exiting = true;
                         $scope.exitToLegacyEditor();
                     }),
                     dialogManager.button('Continue editing', function() {
@@ -369,9 +375,7 @@ var angular = angular || null;
             });
         };
         $scope.showErrorModal = function(message) {
-            // set changesMade to false to prevent the beforeunload code
-            // from double-checking with the user to close the page.
-            $scope.changesMade = false;
+            $scope.exiting = true;
             $scope.cancelUserIdleTimeout();
             $scope.dialogManager.open('save-error');
         };
@@ -402,7 +406,7 @@ var angular = angular || null;
         $timeout(handleAutoBackup, 60 * 1000);
 
         window.onbeforeunload = function() {
-            if($scope.changesMade) {
+            if($scope.hasUnsavedWork() && !$scope.exiting) {
               return "You have unsaved work";
             } else {
               return null;
