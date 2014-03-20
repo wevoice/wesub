@@ -756,7 +756,9 @@ section.main {
                 background: transparent;
                 font-size: 12px;
                 text-decoration: none;
-                line-height: 40px;
+                &.guidelines-link {
+                    line-height: 40px;
+                }
             }
             span.key {
                 width: 20%;
@@ -1599,11 +1601,26 @@ aside.modal {
         width: 100%;
         @include border-radius(3px);
     }
-
+    h3 {
+        margin: 20px 0;
+    }
     button {
         @include big-button;
     }
-
+    a {
+        color: white;
+        &.expand-link {
+            text-decoration: none;
+            padding: 10px 0px 10px 0px;
+            line-height: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    }
+    table td, th {
+        padding: 8px;
+        font-size: 12px;
+    }
     footer.buttons {
         button.last-chance {
             background: none;
@@ -1620,25 +1637,9 @@ aside.modal {
 aside.modal#guidelines-modal {
     width: 600px;
     div.modal-content {
-        td {
-            padding: 8px;
-            font-size: 12px;
-        }
         margin: 15px 0;
-        div.team-all-guidelines {
-            div {
-                padding: 15px 0;
-            }
-        }
-        a {
-            color: white;
-            text-decoration: none;
-            &.expand-link {
-                padding: 10px 0px 10px 0px;
-                line-height: 30px;
-                font-size: 14px;
-                font-weight: bold;
-            }
+        div.team-all-guidelines div {
+            padding: 15px 0;
         }
     }
 }
