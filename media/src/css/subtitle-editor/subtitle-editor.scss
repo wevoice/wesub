@@ -1351,11 +1351,7 @@ section.collab {
                     width: 48%;
                     border: none;
                     border-radius: 2px;
-
-                    &[disabled] {
-                        background: #888;
-                        cursor: default;
-                    }
+                    cursor: pointer;
 
                     &:first-of-type {
                         margin-right: 5px;
@@ -1368,6 +1364,12 @@ section.collab {
                     &.approve {
                         background: #29b0bf url("../../../images/thumbs-up.png") 10px center no-repeat;
                     }
+
+                    &[disabled] {
+                        background: #888;
+                        cursor: default;
+                    }
+
                 }
             }
             &.open {
@@ -1390,7 +1392,7 @@ section.collab {
         }
     }
     .error {
-        margin-left: 20px;
+        margin: 0 20px;
         font: normal 13px $OpenSans;
         color: #ddd;
     }

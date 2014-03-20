@@ -69,7 +69,7 @@
 
         $scope.errorMessage = function() {
             if(!$scope.canApprove()) {
-                return 'Not all lines are completed.';
+                return 'Some of the lines do not have text or timing. Please complete all the lines before accepting subtitles or send them back.';
             }
             return null;
         }
