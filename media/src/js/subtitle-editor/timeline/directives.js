@@ -249,7 +249,7 @@ var angular = angular || null;
             function handleMouseDown(evt, dragHandler) {
                 if(!scope.canSync) {
                     evt.preventDefault();
-                    return false;
+                    return;
                 }
                 VideoPlayer.pause();
                 var subtitle = evt.data.subtitle;
@@ -303,7 +303,7 @@ var angular = angular || null;
                 // need to prevent the default event from happening so that the
                 // browser's DnD code doesn't mess with us.
                 evt.preventDefault();
-                return false;
+                return;
             }
 
             function makeDivForSubtitle(subtitle) {
@@ -336,6 +336,9 @@ var angular = angular || null;
             }
 
             function handleMouseDownInTimeline(evt) {
+                // Not ideal solution
+                // We want to ignore here clicks on subtitles on the timeline
+                if (evt.target.nodeName != "DIV") return;
                 var initialPageX = evt.pageX;
                 var maxDeltaX = 0;
                 $(document).on('mousemove.timelinedrag', function(evt) {
@@ -353,7 +356,7 @@ var angular = angular || null;
                         // mouse didn't move that much.  Interpret this as a
                         // click rather than a drag and seek to the current
                         // time.
-                        var deltaX = event.pageX - container.offset().left;
+                        var deltaX = evt.pageX - container.offset().left;
                         var deltaMS = pixelsToDuration(deltaX, scope.scale);
                         var seekTo = visibleTimespan.startTime + deltaMS;
                     } else {
