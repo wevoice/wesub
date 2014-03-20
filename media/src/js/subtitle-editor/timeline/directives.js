@@ -415,6 +415,10 @@ var angular = angular || null;
 
                 if(unsyncedSubtitle === null) {
                     unsyncedSubtitle = unsynced.draftSubtitle();
+                } else if (unsyncedSubtitle.storedSubtitle.id != unsynced.id) {
+                    // We need to keep the stored subtitle up to date as
+                    // it is used in the video overlay
+                    unsyncedSubtitle = unsynced.draftSubtitle();
                 }
                 unsyncedSubtitle.markdown = unsynced.markdown;
                 if(unsynced.startTime < 0) {
