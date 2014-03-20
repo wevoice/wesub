@@ -166,7 +166,7 @@
                 }
                 $document.bind("keydown.modal-" + dialogName, function(evt) {
                     // Escape key closes the modal
-                    $scope.$eval(function() {
+                    $scope.$apply(function() {
                         if (evt.keyCode === 27) {
                             $scope.dialogManager.close();
                         }
@@ -174,7 +174,7 @@
                 });
                 $document.bind("click.modal-" + dialogName, function(evt) {
                     // Clicking outside the modal closes it
-                    $scope.$eval(function() {
+                    $scope.$apply(function() {
                         if ($(evt.target).closest('aside.modal').length == 0) {
                             $scope.dialogManager.close();
                         }
