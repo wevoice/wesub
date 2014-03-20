@@ -55,7 +55,8 @@
         }
     })
 
-    function DialogManager() {
+    function DialogManager(VideoPlayer) {
+        this.VideoPlayer = VideoPlayer;
         this.stack = [];
         this.generic = null;
         // Store generic dialogs that are open, but have been replaced with
@@ -65,6 +66,7 @@
 
     DialogManager.prototype = {
         open: function(dialogName) {
+            this.VideoPlayer.pause();
             this.stack.push(dialogName);
         },
         close: function() {

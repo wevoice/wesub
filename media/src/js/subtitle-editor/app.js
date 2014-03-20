@@ -53,11 +53,9 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
-                      '$window', 'DialogManager', 'EditorData', 'Workflow', function($scope, $sce, $controller,
-            $window, DialogManager, EditorData, Workflow) {
-
-
-
+                      '$window', 'DialogManager', 'EditorData', 'VideoPlayer',
+                      'Workflow', function($scope, $sce, $controller,
+            $window, DialogManager, EditorData, VideoPlayer, Workflow) {
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
@@ -69,7 +67,7 @@ var angular = angular || null;
         $scope.loadingFinished = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
-	$scope.dialogManager = new DialogManager();
+	$scope.dialogManager = new DialogManager(VideoPlayer);
 	$scope.titleEdited = function(newValue) {
 	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
 	    return $scope.currentTitle.Edited;
@@ -359,7 +357,7 @@ var angular = angular || null;
             });
         }
         $scope.showIdleModal= function () {
-            var secondsUntilClosing = 120;
+            var secondsUntilClosing = 5;
             
             function makeText() {
                 return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing + " seconds.";
