@@ -23,10 +23,12 @@
         ]);
 
     module.controller('SaveErrorModalController', function($scope, Blob) {
+        // Controller for the save-error dialog and resume-error dialog
+
         $scope.dfxpString = '';
 
         $scope.$watch('dialogManager.current()', function(value) {
-            if(value == 'save-error') {
+            if(value == 'save-error' || value == 'resume-error') {
                 // we just became the current dialog.  Get the DFXP for the
                 // current subtitle list.
                 var subtitleList = $scope.workingSubtitles.subtitleList;

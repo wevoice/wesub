@@ -295,8 +295,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($scope, $timeout,
-                EditorData, LockService) {
+    module.controller("AppControllerLocking", function($scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -348,16 +347,14 @@ var angular = angular || null;
                     startRegainLockTimer();
                     startUserIdleTimer();
                 } else {
-                    window.alert("Sorry, could not restart your session.");
-                    $scope.exitToVideoPage();
+                    $scope.showResumeSessionErrorModal();
                 }
             }, function onError() {
-                window.alert("Sorry, could not restart your session.");
-                $scope.exitToVideoPage();
+                $scope.showResumeSessionErrorModal();
             });
         }
-        $scope.showIdleModal= function () {
-            var secondsUntilClosing = 5;
+        $scope.showIdleModal = function () {
+            var secondsUntilClosing = 120;
             
             function makeText() {
                 return "You've been idle for more than " + USER_IDLE_MINUTES + " minutes. " + "To ensure no work is lost we will close your session in " + secondsUntilClosing + " seconds.";
@@ -391,7 +388,6 @@ var angular = angular || null;
                     })
                 ]
             });
-
         }
 
         $scope.showCloseSessionModal = function() {
@@ -412,10 +408,14 @@ var angular = angular || null;
             });
         }
 
+        $scope.showResumeSessionErrorModal = function() {
+            $scope.dialogManager.open('resume-error');
+        }
+
         startUserIdleTimer();
         startRegainLockTimer();
 
-        window.onunload = function() {
+        $window.onunload = function() {
             releaseLock();
         }
     });
