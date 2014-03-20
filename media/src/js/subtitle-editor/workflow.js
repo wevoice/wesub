@@ -75,11 +75,11 @@ var angular = angular || null;
         },
         stageDone: function(stageName) {
             if(stageName == 'type') {
-                return (this.stage == 'review' || this.stage == 'sync' || this.stage == 'title');
+                return (this.stage == 'review' || this.stage == 'title' || this.stage == 'sync');
             } else if(stageName == 'sync') {
-                return (this.stage == 'review' || this.stage == 'title');
+                return this.stage == 'review';
             } else if(stageName == 'title') {
-                return this.stage == 'review'
+                return (this.stage == 'review' || this.stage == 'sync');
             } else {
                 return false;
             }
@@ -122,22 +122,26 @@ var angular = angular || null;
         }
 
         $scope.onNextClicked = function(evt) {
-            if($scope.workflow.stage == 'type') {
+            if ($scope.workflow.stage == 'title') {
                 $scope.workflow.switchStage('sync');
                 if(!$scope.timelineShown) {
                     $scope.toggleTimelineShown();
                 }
                 rewindPlayback();
-            } else if ($scope.workflow.stage == 'title') {
-                $scope.workflow.switchStage('review');
-                rewindPlayback();
 	    }
 	    else if ($scope.workflow.stage == 'sync') {
+                $scope.workflow.switchStage('review');
+                rewindPlayback();
+            }
+	    else if ($scope.workflow.stage == 'type') {
 		if ($scope.translating()) {
                     $scope.dialogManager.open('metadata');
                     $scope.workflow.switchStage('title');
                 } else {
-                    $scope.workflow.switchStage('review');
+                    $scope.workflow.switchStage('sync');
+                    if(!$scope.timelineShown) {
+                        $scope.toggleTimelineShown();
+                    }
                 }
                 rewindPlayback();
             }

@@ -388,33 +388,16 @@
                     {% trans "1. Type what you hear" %}
                         <div class="substeps" ng-show="workflow.stage == 'type'">
                             <p>{% trans "Is all the content subtitled?" %}</p>
-                            <button class="next-step"
-                                ng-click="onNextClicked($event)">
-                                {% trans "Yes, start syncing" %}
+                            <button class="next-step" ng-click="onNextClicked($event)">
+                              <ng-switch on="translating()">
+                                <div ng-switch-when="true">{% trans "Yes, translate the title" %}</div>
+                                <div ng-switch-when="false">{% trans "Yes, start syncing" %}</div>
+                              </ng-switch>
                             </button>
                     </div>
                     </li>
-                    <li ng-class="{done: workflow.stageDone('sync')}">
-                        {% trans "2. Sync timing" %}
-                        <div class="substeps" ng-show="workflow.stage == 'sync'">
-                            <ng-switch on="workflow.canMoveToNext()">
-                                <p ng-switch-when="false">
-                                    {% trans "Not all lines are completed." %}
-                                </p>
-                                <div ng-switch-when="true">
-                                    <p>{% trans "All lines are completed." %}</p>
-                                    <button ng-click="onNextClicked($event)">
-                                        <ng-switch on="translating()">
-                                            <div ng-switch-when="true">{% trans "Edit title and description" %}</div>
-                                            <div ng-switch-when="false">{% trans "Start reviewing" %}</div>
-                                        </ng-switch>
-                                    </button>
-                                </div>
-                            </ng-switch>
-                        </div>
-                    </li>
                     <li ng-show="translating()" ng-class="{done: workflow.stageDone('title')}">
-                        {% trans "3. Translate title" %}
+                        {% trans "2. Translate title" %}
                         <div class="substeps"
                             ng-show="workflow.stage == 'title'">
                             <ng-switch on="workflow.canMoveToNext()">
@@ -424,7 +407,26 @@
                                 <div ng-switch-when="true">
                                     <p>{% trans "Title and description have been edited." %}</p>
                                     <button class="next-step" ng-click="onNextClicked($event)">
-                                        {% trans "Start reviewing" %}
+                                        {% trans "Start syncing" %}
+                                    </button>
+                                </div>
+                            </ng-switch>
+                        </div>
+                    </li>
+                    <li ng-class="{done: workflow.stageDone('sync')}">
+                        <ng-switch on="translating()">
+                            <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
+                            <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
+                        </ng-switch>
+                        <div class="substeps" ng-show="workflow.stage == 'sync'">
+                            <ng-switch on="workflow.canMoveToNext()">
+                                <p ng-switch-when="false">
+                                    {% trans "Not all lines are completed." %}
+                                </p>
+                                <div ng-switch-when="true">
+                                    <p>{% trans "All lines are completed." %}</p>
+                                    <button ng-click="onNextClicked($event)">
+				      {% trans "Start reviewing" %}
                                     </button>
                                 </div>
                             </ng-switch>
