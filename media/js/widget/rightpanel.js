@@ -297,7 +297,6 @@ unisubs.RightPanel.prototype.createSaveAndOpenInNewEditor = function(stepsDiv) {
         var videoType = this.parent_.parent_.videoPlayer_.videoPlayerType_;
         this.saveAndOpenInNewEditor = $d(
             'div', 'unisubs-saveandopeninneweditor',
-            $d('span', null, 'Beta: '),
             $d('a', {'href': '#'},
             $d('span', null, 'Save and open in new editor')));
 
