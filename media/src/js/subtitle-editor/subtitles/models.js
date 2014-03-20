@@ -250,6 +250,7 @@ var angular = angular || null;
             that.subtitles.push(that.makeItem(node));
             that.syncedCount++;
         });
+        this.emitChange('reload', null);
     }
 
     SubtitleList.prototype.addChangeCallback = function(callback) {
