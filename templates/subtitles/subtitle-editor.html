@@ -94,7 +94,7 @@
                <a class="advanced" ng-click="showAdvancedModal()">Advanced &raquo;</a>
                -->
 	  
-          <h1>{% trans "Keyboard controls" %}</h1>
+          <h1>{% trans "Keyboard controls" %}&nbsp;&nbsp;&nbsp;<a href="" ng-click="onMoreControlsClicked($event)">{% trans "more commands" %} &#187;</a></h1>
 	  <div ng-show="workflow.stage == 'type'">
 	    <div class="instruction-item reddish-pink-key clickable" ng-click="handleMouseKeyDown('9')">
 	      <div class="key-pattern">Tab</div>
@@ -157,8 +157,8 @@
 	    </div>
 	  </div>
           <ng-switch on="showTeamGuidelines()">
-	    <a ng-switch-when="true" title="" href="" ng-click="onGuidelinesClicked($event)">[[ teamName ]] Guidelines &#187;</a>
-	    <a ng-switch-when="false" title="" href="" ng-click="onGuidelinesClicked($event)">{% trans "Subtitling Guidelines" %} &#187;</a>
+	    <a class="guidelines-link" ng-switch-when="true" title="" href="" ng-click="onGuidelinesClicked($event)">[[ teamName ]] Guidelines &#187;</a>
+	    <a class="guidelines-link" ng-switch-when="false" title="" href="" ng-click="onGuidelinesClicked($event)">{% trans "Subtitling Guidelines" %} &#187;</a>
 	  </ng-switch>
 	</div>
         <div class="language-selections group toolbar"
@@ -571,6 +571,171 @@
 	  <div ng-bind-html="teamGuidelines['translate']"></div>
 	  <h1>{% trans "Reviewing Guidelines" %}</h1>
 	  <div ng-bind-html="teamGuidelines['review']"></div>
+	</div>
+      </div>
+      <footer class="buttons">
+	<button ng-click="dialogManager.onCloseClick($event)">
+	  {% trans "Close" %}
+	</button>
+      </footer>
+    </aside>
+    <aside modal-dialog="more-controls" allow-close class="modal" role="dialog" id="more-controls-modal" tabindex="-1" aria-labeledby="more-controls-heading" dir="[[ workingSubtitles.language.dir ]]">
+      <h3 id="more-controls-heading">{% trans "Keyboard Shortcuts" %}</h3>
+      <div class="modal-content">
+	<table>
+	  <thead>
+	    <tr>
+	      <th>{% trans "Action" %}</th>
+	      <th>{% trans "Windows / Linux" %}</th>
+	      <th>{% trans "OS X" %}</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <tr>
+	      <td> {% trans "Play / Pause video" %}</td>
+	      <td> {% trans "Tab" %}</td>
+	      <td> {% trans "Tab" %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Skip back 2 seconds" %}</td>
+	      <td> {% trans "Shift + Tab" %}</td>
+	      <td> {% trans "Shift + Tab" %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Skip back 4 seconds" %}</td>
+	      <td> {% trans "Ctrl + Shift + ," %}</td>
+	      <td> {% trans "CMD + Shift + ," %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Skip forward 4 seconds" %}</td>
+	      <td> {% trans "Ctrl + Shift + ." %}</td>
+	      <td> {% trans "CMD + Shift + ." %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Navigate to the next subtitle" %}</td>
+	      <td> {% trans "ENTER" %}</td>
+	      <td> {% trans "ENTER" %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Insert line break" %}</td>
+	      <td> {% trans "Shift + ENTER" %}</td>
+	      <td> {% trans "Shift + ENTER" %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Delete empty subtitle" %}</td>
+	      <td> {% trans "ESC" %}</td>
+	      <td> {% trans "ESC" %}</td>
+	    </tr>
+	    <tr>
+	      <td> {% trans "Exit edit mode of current subtitle" %}</td>
+	      <td> {% trans "ESC" %}</td>
+	      <td> {% trans "ESC" %}</td>
+	    </tr>
+	  </tbody>
+	</table>
+	<a class="expand-link" href="" ng-click="showBrowserShortcuts = true" ng-init="showBrowserShortcuts=false" ng-show="!showBrowserShortcuts">{% trans "Show Browser Shortcuts" %} &#x25B6;</a>
+	<a class="expand-link" href="" ng-click="showBrowserShortcuts = false" ng-show="showBrowserShortcuts">{% trans "Hide Browser Shortcuts" %} &#x25BC;</a>
+	<div ng-show="showBrowserShortcuts" id="browser-shortcuts">
+	  <h3> {% trans "Browser Defaults that should work" %}</h3>
+	  <table>
+	    <thead>
+	      <tr>
+		<th> {% trans "Action" %}</th>
+		<th> {% trans "Windows / Linux" %}</th>
+		<th> {% trans "OS X" %}</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td> {% trans "Jump to the next whole word" %}</td>
+		<td> {% trans "CTRL + RIGHT Arrow" %}</td>
+		<td> {% trans "ALT + RIGHT Arrow" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Jump to the previous whole word" %}</td>
+		<td> {% trans "CTRL + LEFT Arrow" %}</td>
+		<td> {% trans "ALT + LEFT Arrow" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Jump to the start of the subtitle" %}</td>
+		<td> {% trans "Fn + RIGHT Arrow" %}</td>
+		<td> {% trans "CMD + RIGHT Arrow" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Jump to the end of the subtitle" %}</td>
+		<td> {% trans "Fn + LEFT Arrow" %}</td>
+		<td> {% trans "CMD + LEFT Arrow" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Delete last complete word" %}</td>
+		<td> {% trans "CTRL + Backspace" %}</td>
+		<td> {% trans "CMD + Backspace" %}</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <h3> {% trans "Proposed Shortcuts (not yet implemented)" %}</h3>
+	  <p>See the <a target="_blank" href="http://support.amara.org/categories/6573/forums/74605/topics/78937">Keyboard shortcuts forum page</a> to offer your opinion.</p>
+	  <table>
+	    <thead>
+	      <tr>
+		<th> {% trans "Action" %}</th>
+		<th> {% trans "Windows / Linux" %}</th>
+		<th> {% trans "OS X" %}</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td> {% trans "Insert subtitle (above)" %}</td>
+		<td> {% trans "Alt + i" %}</td>
+		<td> {% trans "Alt + i" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Insert subtitle (below)" %}</td>
+		<td> {% trans "Alt + Shift + i" %}</td>
+		<td> {% trans "Alt + Shift + i" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Delete current subtitle" %}</td>
+		<td> {% trans "Alt + Delete (or Backspace)" %}</td>
+		<td> {% trans "Alt + Delete (or Backspace)" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Navigate to the previous line" %}</td>
+		<td> {% trans "Alt + UP Arrow" %}</td>
+		<td> {% trans "Alt + UP Arrow" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Undo last action" %}</td>
+		<td> {% trans "CTRL + z" %}</td>
+		<td> {% trans "CMD + z" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Redo last action" %}</td>
+		<td> {% trans "CTRL + Shift + z" %}</td>
+		<td> {% trans "CMD + Shift + z" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Save a version" %}</td>
+		<td> {% trans "CTRL + s" %}</td>
+		<td> {% trans "CMD + s" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Italics formatting" %}</td>
+		<td> {% trans "CTRL + i" %}</td>
+		<td> {% trans "CMD + i" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Bold formatting" %}</td>
+		<td> {% trans "CTRL + b" %}</td>
+		<td> {% trans "CMD + b" %}</td>
+	      </tr>
+	      <tr>
+		<td> {% trans "Timeline toggle" %}</td>
+		<td> {% trans "CTRL + t" %}</td>
+		<td> {% trans "CMD + t" %}</td>
+	      </tr>
+	    </tbody>
+	  </table>
 	</div>
       </div>
       <footer class="buttons">

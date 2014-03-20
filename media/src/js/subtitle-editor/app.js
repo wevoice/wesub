@@ -270,6 +270,11 @@ var angular = angular || null;
             $event.stopPropagation();
             $scope.dialogManager.open('guidelines');
         }
+        $scope.onMoreControlsClicked = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dialogManager.open('more-controls');
+        }
         $scope.onTitleClicked = function($event) {
             $event.preventDefault();
             $event.stopPropagation();
