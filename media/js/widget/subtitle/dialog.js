@@ -45,6 +45,7 @@ unisubs.subtitle.Dialog = function(videoSource, serverModel, subtitles, opt_open
      */
     this.state_ = null;
     this.currentSubtitlePanel_ = null;
+    this.savedNotes_ = null;
     this.rightPanelListener_ = new goog.events.EventHandler(this);
     this.doneButtonEnabled_ = true;
     this.exitURL = null;
@@ -673,15 +674,17 @@ unisubs.subtitle.Dialog.prototype.onNotesFetched_ = function(body) {
 unisubs.subtitle.Dialog.prototype.setNotesContent_ = function(panel, newContent) {
     if (panel && panel.bodyInput_) {
         panel.bodyInput_.value = newContent;
-        return true;
+        this.savedNotes_ = null;
+    } else {
+        this.savedNotes_ = newContent;
     }
-    return null;
 };
 unisubs.subtitle.Dialog.prototype.getNotesContent_ = function(panel) {
     if (panel && panel.bodyInput_) {
         return  panel.bodyInput_.value;
+    } else {
+        return this.savedNotes_;
     }
-    return null;
 };
 unisubs.subtitle.Dialog.prototype.getServerModel = function(){
     return this.serverModel_;
