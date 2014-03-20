@@ -415,8 +415,8 @@
                     </li>
                     <li ng-class="{done: workflow.stageDone('sync')}">
                         <ng-switch on="translating()">
-                            <div ng-switch-when="false">{% trans "3. Sync Timing" %}</div>
-                            <div ng-switch-when="true">{% trans "4. Sync Timing" %}</div>
+                            <div ng-switch-when="false">{% trans "2. Sync Timing" %}</div>
+                            <div ng-switch-when="true">{% trans "3. Sync Timing" %}</div>
                         </ng-switch>
                         <div class="substeps" ng-show="workflow.stage == 'sync'">
                             <ng-switch on="workflow.canMoveToNext()">
