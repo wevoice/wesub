@@ -205,7 +205,7 @@ var angular = angular || null;
             var unsyncedSubtitle = null;
 
             function handleDragLeft(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
+                context.startTime = context.initialStartTime + deltaMS;
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
                 }
@@ -215,7 +215,7 @@ var angular = angular || null;
             }
 
             function handleDragRight(context, deltaMS) {
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
                 if(context.maxEndTime !== null &&
                         context.endTime > context.maxEndTime) {
                             context.endTime = context.maxEndTime;
@@ -226,8 +226,8 @@ var angular = angular || null;
             }
 
             function handleDragMiddle(context, deltaMS) {
-                context.startTime = context.subtitle.startTime + deltaMS;
-                context.endTime = context.subtitle.endTime + deltaMS;
+                context.startTime = context.initialStartTime + deltaMS;
+                context.endTime = context.initialEndTime + deltaMS;
 
                 if(context.startTime < context.minStartTime) {
                     context.startTime = context.minStartTime;
@@ -248,8 +248,7 @@ var angular = angular || null;
 
             function handleMouseDown(evt, dragHandler) {
                 if(!scope.canSync) {
-                    evt.preventDefault();
-                    return;
+                    return false;
                 }
                 VideoPlayer.pause();
                 var subtitle = evt.data.subtitle;
@@ -258,6 +257,8 @@ var angular = angular || null;
                     subtitle: subtitle,
                     startTime: subtitle.startTime,
                     endTime: subtitle.endTime,
+                    initialStartTime: subtitle.startTime,
+                    initialEndTime: subtitle.endTime
                 }
                 if(!subtitle.isDraft) {
                     var storedSubtitle = subtitle;
@@ -267,7 +268,7 @@ var angular = angular || null;
                     var div = unsyncedDiv;
                 }
                 if(!div) {
-                    return;
+                    return false;
                 }
                 var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
                 if(nextSubtitle && nextSubtitle.isSynced()) {
@@ -285,11 +286,14 @@ var angular = angular || null;
                 }
 
                 var initialPageX = evt.pageX;
+
                 $(document).on('mousemove.timelinedrag', function(evt) {
                     var deltaX = evt.pageX - initialPageX;
                     var deltaMS = pixelsToDuration(deltaX, scope.scale);
                     dragHandler(context, deltaMS);
                     placeSubtitle(context.startTime, context.endTime, div);
+                    subtitleList().updateSubtitleTime(storedSubtitle,
+                        context.startTime, context.endTime);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     subtitleList().updateSubtitleTime(storedSubtitle,
@@ -302,8 +306,7 @@ var angular = angular || null;
                 });
                 // need to prevent the default event from happening so that the
                 // browser's DnD code doesn't mess with us.
-                evt.preventDefault();
-                return;
+                return false;
             }
 
             function makeDivForSubtitle(subtitle) {
@@ -336,9 +339,6 @@ var angular = angular || null;
             }
 
             function handleMouseDownInTimeline(evt) {
-                // Not ideal solution
-                // We want to ignore here clicks on subtitles on the timeline
-                if (evt.target.nodeName != "DIV") return;
                 var initialPageX = evt.pageX;
                 var maxDeltaX = 0;
                 $(document).on('mousemove.timelinedrag', function(evt) {
