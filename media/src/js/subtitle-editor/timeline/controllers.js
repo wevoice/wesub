@@ -227,10 +227,13 @@
             scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
         });
-        $scope.$root.$on('sync-next-end-time', function($event) {
+        // Sets the end of a subtitle at current position. If onlyUnsync is true
+        // it only does it if the current endTime is unsynced, ie partially 
+        // synced subtitle
+        var setEndSubtitle = function($event, onlyUnsync) {
             var subtitleList = $scope.workingSubtitles.subtitleList;
             var subtitle = willSync.end;
-            if(subtitle === null) {
+            if ((subtitle === null) || (onlyUnsync && (subtitle.endTime != -1))) {
                 return;
             }
             var syncTime = Math.max($scope.currentTime, subtitle.startTime +
@@ -239,6 +242,16 @@
                 syncTime);
             scrollToSubtitle(subtitle);
             $scope.$root.$emit("work-done");
-        });
+        };
+        var setEndSubtitleOnlyUnsync = function($event) {
+            setEndSubtitle($event, true);
+        };
+        var setEndSubtitleAll = function($event) {
+            setEndSubtitle($event, false);
+        };
+        // If playback is paused, currently partially synced subtitled gets
+        // entirely synced to avoid having half-synced subs in the timeline
+        $scope.$root.$on('video-playback-changes', setEndSubtitleOnlyUnsync);
+        $scope.$root.$on('sync-next-end-time', setEndSubtitleAll);
     });
 }).call(this);

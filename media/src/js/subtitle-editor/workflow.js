@@ -89,7 +89,7 @@ var angular = angular || null;
 
     module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
 
-        $scope.$root.$on("video-playback-starts", function() {$scope.workflow.appActionDone();});
+        $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
         $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
 
         // If a blank list of subs start, we autimatically start edition
