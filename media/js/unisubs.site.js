@@ -336,7 +336,9 @@ var Site = function(Site) {
         $closeButton = $('.action-close, .close', $target);
         $closeButton.bind('click.modal', handleCloseEvent);
         $document.bind('click.modal', function(evt) {
-            if($(event.target).closest('aside.modal').length == 0) {
+            var $target = $(evt.target);
+            if($target.closest('aside.modal').length == 0 &&
+                $target.closest('.bootstrap .modal').length == 0) {
                 handleCloseEvent(evt);
             }
         });
