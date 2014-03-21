@@ -280,9 +280,11 @@ var angular = angular || null;
                 if(!div) {
                     return false;
                 }
+                var previousDiv = null, nextDiv = null; 
                 var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
-                    context.nextSubtitleStartTimeOr = context.nextSubtitleStartTimeNew = null;
+                context.nextSubtitleStartTimeOr = context.nextSubtitleStartTimeNew = null;
                 if(nextSubtitle && nextSubtitle.isSynced()) {
+                    nextDiv = timelineDivs[nextSubtitle.id];
                     context.nextSubtitleStartTimeOr = nextSubtitle.startTime;
                     context.nextSubtitleStartTimeNew = null;
                     context.maxEndTime = nextSubtitle.startTime;
@@ -297,6 +299,7 @@ var angular = angular || null;
                 var prevSubtitle = subtitleList().prevSubtitle(storedSubtitle);
                 context.prevSubtitleEndTimeOr = context.prevSubtitleEndTimeNew = null;
                 if(prevSubtitle) {
+                    previousDiv = timelineDivs[prevSubtitle.id];
                     context.prevSubtitleEndTimeOr = prevSubtitle.endTime;
                     context.minStartTime = prevSubtitle.endTime;
                     context.minStartTimePush = prevSubtitle.startTime + MIN_DURATION;
@@ -314,19 +317,35 @@ var angular = angular || null;
                     placeSubtitle(context.startTime, context.endTime, div);
                     subtitleList().updateSubtitleTime(storedSubtitle,
                         context.startTime, context.endTime);
-                    if (context.previousSubtitleEndTimeNew) subtitleList().updateSubtitleTime(prevSubtitle,
-                        prevSubtitle.startTime, context.previousSubtitleEndTimeNew)
-                    if (context.nextSubtitleStartTimeNew) subtitleList().updateSubtitleTime(nextSubtitle,
-                        context.nextSubtitleStartTimeNew, nextSubtitle.endTime)
+                    if (previousDiv && context.previousSubtitleEndTimeNew)
+                        placeSubtitle(prevSubtitle.startTime, context.previousSubtitleEndTimeNew, previousDiv);
+                    if (nextDiv && context.nextSubtitleStartTimeNew)
+                        placeSubtitle(context.nextSubtitleStartTimeNew, nextSubtitle.endTime, nextDiv);
+                    if (context.previousSubtitleEndTimeNew)
+                        subtitleList().updateSubtitleTime(prevSubtitle,
+                            prevSubtitle.startTime, context.previousSubtitleEndTimeNew);
+                    if (context.nextSubtitleStartTimeNew) 
+                        subtitleList().updateSubtitleTime(nextSubtitle,
+                            context.nextSubtitleStartTimeNew, nextSubtitle.endTime);
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     subtitleList().updateSubtitleTime(storedSubtitle,
                         context.startTime, context.endTime);
+                    if (context.previousSubtitleEndTimeNew)
+                        subtitleList().updateSubtitleTime(prevSubtitle,
+                            prevSubtitle.startTime, context.previousSubtitleEndTimeNew);
+                    if (context.nextSubtitleStartTimeNew) 
+                        subtitleList().updateSubtitleTime(nextSubtitle,
+                            context.nextSubtitleStartTimeNew, nextSubtitle.endTime);
                     scope.$root.$emit("work-done");
                     scope.$root.$digest();
                 }).on('mouseleave.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     placeSubtitle(subtitle.startTime, subtitle.endTime, div);
+                    if (previousDiv && context.previousSubtitleEndTimeNew)
+                        placeSubtitle(prevSubtitle.startTime, context.previousSubtitleEndTimeNew, previousDiv);
+                    if (nextDiv && context.nextSubtitleStartTimeNew)
+                        placeSubtitle(context.nextSubtitleStartTimeNew, nextSubtitle.endTime, nextDiv);
                 });
                 // need to prevent the default event from happening so that the
                 // browser's DnD code doesn't mess with us.
