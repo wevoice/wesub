@@ -530,6 +530,7 @@ var angular = angular || null;
                     $scope.workingSubtitles.language.code,
                     editingVersion.versionNumber);
             $scope.workingSubtitles.subtitleList.loadXML(savedData);
+            $scope.$root.$emit('work-done');
         }
 
         $scope.promptToRestoreAutoBackup = function() {
