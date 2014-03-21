@@ -6,6 +6,7 @@
 # Arthur  Debert <arthur@stimuli.com.br>, 2011
 # Arthur  Debert <arthur@stimuli.com.br>, 2011
 # Arthur  Debert <arthur@stimuli.com.br>, 2011
+# brunomonteiro <brunomonteiro3@gmail.com>, 2014
 # Carlos Fernades Cunha <carlosfecunha@gmail.com>, 2012
 # cralize <cralize@gmail.com>, 2012
 # danimatielo <dacamat@gmail.com>, 2011
@@ -14,8 +15,9 @@
 # Enrico Nicoletto <enrico.BR@gmx.co.uk>, 2013
 # Gabriel Grumiche <g.grumiche@gmail.com>, 2011, 2012
 # Giovane Guerreiro <giovaneguerreiro@gmail.com>, 2012
-# jeser <e.jeser@gmail.com>, 2013
+# jeser <e.jeser@gmail.com>, 2013-2014
 # Kenzo Okamura <kenzo.okamura@gmail.com>, 2012
+# LP <lpmoura77@gmail.com>, 2014
 # Lucas Augusto Ribeiro <lucasaugustoribeiro@gmail.com>, 2012
 # Marco Tulio Costa <mmarcottulio@gmail.com>, 2012-2013
 # mattjiedasilva <mattjiedasilva@gmail.com>, 2012
@@ -25,8 +27,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Amara\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-03 13:31-0600\n"
-"PO-Revision-Date: 2014-03-12 21:45+0000\n"
+"POT-Creation-Date: 2014-03-21 17:26-0500\n"
+"PO-Revision-Date: 2014-03-21 23:02+0000\n"
 "Last-Translator: unisubsapi <universalsubtitles-dev@pculture.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/universalsubtitles/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +47,7 @@ msgstr "Ajude-nos a transcrever e traduzir este vídeo em Amara.org"
 
 #: apps/accountlinker/models.py:46
 msgid "Help us caption & translate this video!"
-msgstr ""
+msgstr "Ajude-nos a transcrever e traduzir este vídeo! "
 
 #: apps/accountlinker/views.py:103
 msgid "The user who requested this action doesn't match the current user."
@@ -95,7 +97,9 @@ msgid "Email"
 msgstr "E-mail"
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
-#: templates/messages/_messages.html:8 templates/videos/create.html:70
+#: templates/messages/_messages.html:8
+#: templates/subtitles/subtitle-editor.html:271
+#: templates/videos/create.html:70
 msgid "Hide"
 msgstr "Esconder"
 
@@ -195,15 +199,15 @@ msgstr ""
 
 #: apps/externalsites/forms.py:79
 msgid "Partner ID must contain only numbers"
-msgstr ""
+msgstr "Identidade do parceiro deve conter apenas números"
 
 #: apps/externalsites/models.py:105
 msgid "Partner ID"
-msgstr ""
+msgstr "Identidade do Parceiro"
 
 #: apps/externalsites/models.py:107
 msgid "Secret"
-msgstr ""
+msgstr "Segredo"
 
 #: apps/externalsites/models.py:108
 msgid ""
@@ -213,19 +217,19 @@ msgstr ""
 
 #: apps/externalsites/models.py:112
 msgid "Kaltura account"
-msgstr ""
+msgstr "Conta Kaltura"
 
 #: apps/externalsites/models.py:276
 msgid "Success"
-msgstr ""
+msgstr "Êxito"
 
 #: apps/externalsites/models.py:277
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: apps/externalsites/models.py:294
 msgid "Sync history"
-msgstr ""
+msgstr "Sincronizar histórico"
 
 #: apps/messages/forms.py:40
 msgid "You should be authenticated to write messages"
@@ -389,8 +393,8 @@ msgstr "Você não está logado."
 
 #: apps/profiles/forms.py:110
 #, python-format
-msgid "Personal message from %(sender)s on universalsubtitles.org"
-msgstr "Mensagem pessoal de %(sender)s em universalsubtitles.org"
+msgid "Personal message from %(sender)s on amara.org"
+msgstr ""
 
 #: apps/profiles/forms.py:155
 msgid "Confirm new password:"
@@ -408,29 +412,29 @@ msgstr "As duas senhas não coincidem."
 msgid "Your email was updated."
 msgstr "Seu e-mail foi atualizado."
 
-#: apps/profiles/views.py:88 apps/profiles/views.py:180
+#: apps/profiles/views.py:88 apps/profiles/views.py:167
 msgid "Your profile has been updated."
 msgstr "O seu perfil foi atualizado."
 
-#: apps/profiles/views.py:201
+#: apps/profiles/views.py:188
 msgid "Your account has been updated."
 msgstr "Sua conta foi atualizada."
 
-#: apps/profiles/views.py:252
+#: apps/profiles/views.py:239
 msgid "Your photo has been updated."
 msgstr "Sua foto foi enviada."
 
-#: apps/profiles/views.py:272
+#: apps/profiles/views.py:259
 msgid "Your photo has been removed."
 msgstr "Sua foto foi removida."
 
-#: apps/profiles/views.py:350
+#: apps/profiles/views.py:337
 msgid ""
 "We're tying up loose ends - your account will be removed shortly. Check back"
 " after 10 minutes"
-msgstr ""
+msgstr "Estamos amarrando as pontas soltas - a sua conta será removida em breve. Volte após 10 minutos"
 
-#: apps/profiles/views.py:354
+#: apps/profiles/views.py:341
 msgid "Account deleted."
 msgstr "Conta excluída."
 
@@ -544,7 +548,7 @@ msgstr "O tamanho do arquivo deve ser inferior a %d kb."
 msgid "Unsupported format. Please upload one of the following: %s"
 msgstr "Formato não suportado. Por favor envie um dos seguintes: % s"
 
-#: apps/subtitles/forms.py:212 apps/videos/forms.py:64 apps/videos/forms.py:85
+#: apps/subtitles/forms.py:212 apps/videos/forms.py:73 apps/videos/forms.py:94
 #: unisubs-integration/api/1_0/forms.py:324
 msgid "Can not detect file encoding"
 msgstr "Não pudemos detectar o 'encoding' do arquivo."
@@ -569,7 +573,7 @@ msgid "API"
 msgstr "API"
 
 #: apps/subtitles/models.py:1206
-#: templates/videos/language-revisions-tab.html:43
+#: templates/videos/language-revisions-tab.html:45
 msgid "Subtitle Editor"
 msgstr "Editor de Legenda"
 
@@ -598,18 +602,18 @@ msgstr "Enviado"
 msgid "Through web editor"
 msgstr "Através do editor web"
 
-#: apps/subtitles/views.py:136
+#: apps/subtitles/views.py:138
 #, python-format
 msgid "Another user is currently performing the %s task for these subtitles"
 msgstr ""
 
-#: apps/subtitles/views.py:194
+#: apps/subtitles/views.py:215
 msgid "You can't edit this subtitle because it's locked"
 msgstr "Você não pode editar esta legenda porque está bloqueada"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:38
 msgid "Public"
-msgstr ""
+msgstr "Público"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:39
 #: templates/teams/teams-list.html:67
@@ -618,7 +622,7 @@ msgstr "Privado"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:40
 msgid "Deleted"
-msgstr ""
+msgstr "Removido"
 
 #: apps/subtitles/templatetags/new_subtitles_tags.py:70
 #: templates/videos/_diffing-subtitle.html:17
@@ -655,157 +659,157 @@ msgstr "Equipe"
 msgid "User"
 msgstr "Usuário"
 
-#: apps/teams/forms.py:55 apps/teams/forms.py:163
+#: apps/teams/forms.py:59 apps/teams/forms.py:167
 #: apps/teams/templatetags/teams_tags.py:187
 #: libs/rosetta/templates/rosetta/languages.html:12
 msgid "Project"
 msgstr "Projeto"
 
-#: apps/teams/forms.py:59 apps/teams/forms.py:167
+#: apps/teams/forms.py:63 apps/teams/forms.py:171
 msgid "Let's keep things tidy, shall we?"
 msgstr "Vamos manter a casa organizada, ok?"
 
-#: apps/teams/forms.py:149 templates/videos/language-sync-history-tab.html:11
+#: apps/teams/forms.py:153 templates/videos/language-sync-history-tab.html:11
 msgid "Video URL"
 msgstr "URL do vídeo"
 
-#: apps/teams/forms.py:150
+#: apps/teams/forms.py:154
 msgid ""
 "Enter the URL of any compatible video or any video on our site. You can also"
 " browse the site and use the 'Add Video to Team' menu."
 msgstr "Insira a URL de qualquer vídeo compatível ou qualquer vídeo em seu site. Você também pode navegar pelo site e utilizar o menu 'Adicionar vídeo a equipe'."
 
-#: apps/teams/forms.py:158
+#: apps/teams/forms.py:162
 msgid "Video language"
 msgstr "Idioma do vídeo"
 
-#: apps/teams/forms.py:160
+#: apps/teams/forms.py:164
 msgid "It will be saved only if video does not exist in our database."
 msgstr "Será salvo apenas se o vídeo não existir em nossa base de dados."
 
-#: apps/teams/forms.py:214
+#: apps/teams/forms.py:218
 msgid "This video already belongs to a team."
 msgstr "Este vídeo já pertence a uma equipe."
 
-#: apps/teams/forms.py:220
+#: apps/teams/forms.py:224
 msgid "Set original language for this video."
 msgstr "Define o idioma original para este vídeo."
 
-#: apps/teams/forms.py:262
+#: apps/teams/forms.py:266
 msgid "Team intro video URL"
 msgstr "URL do vídeo de apresentação da equipe"
 
-#: apps/teams/forms.py:264
+#: apps/teams/forms.py:268
 msgid ""
 "You can put an optional video\n"
 "on your team homepage that explains what your team is about, to attract volunteers.\n"
 "Enter a link to any compatible video, or to any video page on our site."
 msgstr "Você pode colocar um vídeo opcional ⏎\nem sua página inicial da equipe que explica o que sua equipe faz, para atrair voluntários. ⏎\nInsira um link para qualquer video compatível, ou para qualquer página de vídeo em nosso site."
 
-#: apps/teams/forms.py:269
+#: apps/teams/forms.py:273
 msgid "Team URL: http://universalsubtitles.org/teams/"
 msgstr "URL da equipe: http://universalsubtitles.org/teams/"
 
-#: apps/teams/forms.py:314
+#: apps/teams/forms.py:318
 msgid "This video has already been transcribed."
 msgstr "Este vídeo já foi transcrito."
 
-#: apps/teams/forms.py:320
+#: apps/teams/forms.py:324
 msgid "No one has transcribed this video yet, so it can't be translated."
 msgstr "Ninguém transcreveu este vídeo, então, não pode ser traduzido."
 
-#: apps/teams/forms.py:327
+#: apps/teams/forms.py:331
 msgid "This language already has a complete set of subtitles."
 msgstr "Este novo idioma já possui uma conjunto completo de legendas."
 
-#: apps/teams/forms.py:340
+#: apps/teams/forms.py:344
 msgid "This language for this video does not exist or doesn't have a version."
 msgstr "A língua deste vídeo não existe ou não tem versão."
 
-#: apps/teams/forms.py:357
+#: apps/teams/forms.py:361
 msgid "There is already a task in progress for that video/language."
 msgstr "Já existe uma tarefa em progresso para este vídeo/idioma."
 
-#: apps/teams/forms.py:363
+#: apps/teams/forms.py:367
 #, python-format
 msgid "You must select a language for a %s task."
 msgstr "Você deve selecionar um idioma para uma tarefa de %s."
 
-#: apps/teams/forms.py:398
+#: apps/teams/forms.py:402
 msgid "That user has already been assigned the maximum number of tasks."
 msgstr "Aquele usuário já foi designado para o número máximo de tarefas."
 
-#: apps/teams/forms.py:420
+#: apps/teams/forms.py:424
 msgid "You do not have permission to assign this task."
 msgstr "Você não tem permissão para delegar essa tarefa."
 
-#: apps/teams/forms.py:427
+#: apps/teams/forms.py:431
 msgid "This user cannot perform that task."
 msgstr "Este usuário não pode realizar essa ação."
 
-#: apps/teams/forms.py:448
+#: apps/teams/forms.py:452
 msgid "You do not have permission to delete this task."
 msgstr "Você não tem permissão para deletar essa tarefa."
 
-#: apps/teams/forms.py:515
+#: apps/teams/forms.py:519
 msgid "You cannot blacklist a preferred language."
 msgstr "Você não pode colocar na lista negra uma língua favorita."
 
-#: apps/teams/forms.py:537 apps/teams/forms.py:539
+#: apps/teams/forms.py:541 apps/teams/forms.py:543
 msgid "User does not exist!"
 msgstr "Usuário não existe!"
 
-#: apps/teams/forms.py:546
+#: apps/teams/forms.py:550
 msgid "User is already a member of this team!"
 msgstr "Usuário já é membro deste grupo!"
 
-#: apps/teams/forms.py:551
+#: apps/teams/forms.py:555
 msgid "User has already been invited and has not replied yet."
 msgstr "Usuário já foi convidado mas ainda não respondeu."
 
-#: apps/teams/forms.py:573
+#: apps/teams/forms.py:577
 msgid ""
 "Type \"Yes I want to delete this language\" if you are sure you wish to "
 "continue"
-msgstr ""
+msgstr "Escreva \"Sim eu quero remover esse idioma\" se você tiver certeza que quer continuar"
 
-#: apps/teams/forms.py:575
+#: apps/teams/forms.py:579
 msgid "Are you sure?"
-msgstr ""
+msgstr "Você tem certeza?"
 
-#: apps/teams/forms.py:581
+#: apps/teams/forms.py:585
 msgid "Yes I want to delete this language"
-msgstr ""
+msgstr "Sim eu quero remover esse idioma"
 
-#: apps/teams/forms.py:582
+#: apps/teams/forms.py:586
 msgid "Confirmation text doesn't match"
-msgstr ""
+msgstr "O texto de confirmação não coincide"
 
-#: apps/teams/forms.py:608
+#: apps/teams/forms.py:612
 msgid "These subtitles are not under a team's control."
 msgstr "Estas legendas não estão sob o controle de uma equipe"
 
-#: apps/teams/forms.py:612
+#: apps/teams/forms.py:616
 msgid "You do not have permission to delete this language."
-msgstr ""
+msgstr "Você não tem permissão para remover esse idioma."
 
-#: apps/teams/forms.py:645
+#: apps/teams/forms.py:649
 msgid "You cannot perform that task."
 msgstr "Você não pode executar a tarefa."
 
-#: apps/teams/forms.py:648
+#: apps/teams/forms.py:652
 msgid "Mismatched video and task!"
 msgstr "Vídeo e Tarefa imcompatíveis!"
 
-#: apps/teams/forms.py:658
+#: apps/teams/forms.py:662
 msgid "Task has been deleted"
-msgstr ""
+msgstr "A tarefa foi removida"
 
-#: apps/teams/forms.py:664
+#: apps/teams/forms.py:668
 msgid "The selected language does not match the task."
 msgstr "O idioma selecionado não corresponde à tarefa."
 
-#: apps/teams/forms.py:672
+#: apps/teams/forms.py:676
 #, python-format
 msgid ""
 "The selected source language %(from_code)s does not match the existing "
@@ -846,17 +850,17 @@ msgstr "Apenas administradores"
 
 #: apps/teams/models.py:159
 msgid "Daily"
-msgstr ""
+msgstr "Diariamente"
 
 #: apps/teams/models.py:160
 msgid "Hourly"
-msgstr ""
+msgstr "A cada hora"
 
-#: apps/teams/models.py:163 apps/teams/models.py:3042
+#: apps/teams/models.py:163 apps/teams/models.py:3025
 msgid "name"
 msgstr "nome"
 
-#: apps/teams/models.py:164 apps/teams/models.py:3043
+#: apps/teams/models.py:164 apps/teams/models.py:3026
 msgid "slug"
 msgstr "slogan"
 
@@ -879,7 +883,7 @@ msgstr ""
 
 #: apps/teams/models.py:176
 msgid "videos public?"
-msgstr ""
+msgstr "vídeos públicos?"
 
 #: apps/teams/models.py:177 templates/search/search.html:138
 #: templates/teams/project_list.html:10
@@ -984,6 +988,14 @@ msgstr "Admin"
 msgid "Contributor"
 msgstr "Contribuidor"
 
+#: apps/teams/models.py:2135
+msgid "Resume"
+msgstr "Resumo"
+
+#: apps/teams/models.py:2137
+msgid "Start now"
+msgstr "Começar agora"
+
 #: apps/teams/notifications.py:196
 msgid "New activity on your team video"
 msgstr "Nova atividade na equipe do seu vídeo"
@@ -1013,7 +1025,7 @@ msgstr "A equipe não existe."
 msgid "You are already a member of this team."
 msgstr "Você já é membro desta equipe."
 
-#: apps/teams/rpc.py:50 apps/teams/views.py:959
+#: apps/teams/rpc.py:50 apps/teams/views.py:960
 msgid "You are now a member of this team."
 msgstr "Você agora é um membro desta equipe."
 
@@ -1080,27 +1092,27 @@ msgstr "Você não pode atribuir aquele papel para aquele membro."
 msgid "New %(team)s videos ready for subtitling!"
 msgstr "Novos vídeos de %(team)s prontos para serem legendados!"
 
-#: apps/teams/views.py:127 apps/teams/views.py:374 apps/teams/views.py:1719
-#: apps/teams/views.py:1735
+#: apps/teams/views.py:128 apps/teams/views.py:375 apps/teams/views.py:1748
+#: apps/teams/views.py:1764
 msgid "You do not have permission to edit this team."
 msgstr "Você não tem permissão para editar essa equipe."
 
-#: apps/teams/views.py:152 templates/profiles/edit.html:20
+#: apps/teams/views.py:153 templates/profiles/edit.html:20
 #: templates/teams/settings-projects-add.html:28
 #: templates/teams/settings-projects-edit.html:36
 #: templates/teams/teams-list.html:50
 msgid "Name"
 msgstr "Nome"
 
-#: apps/teams/views.py:153 templates/teams/teams-list.html:47
+#: apps/teams/views.py:154 templates/teams/teams-list.html:47
 msgid "Newest"
 msgstr "Mais novo"
 
-#: apps/teams/views.py:154 templates/teams/teams-list.html:44
+#: apps/teams/views.py:155 templates/teams/teams-list.html:44
 msgid "Most Members"
 msgstr "Maioria dos membros"
 
-#: apps/teams/views.py:197
+#: apps/teams/views.py:198
 #, python-format
 msgid ""
 "\n"
@@ -1115,237 +1127,241 @@ msgid ""
 "                "
 msgstr "\n                Sua equipe foi criada. Abaixo estão alguns passos:\n                <ul>\n                    <li><a href=\"%(edit)s\">Editar permissões de membros da equipe</a></li>\n                    <li><a href=\"%(activate)s\">Ativar e personalizar fluxo de trabalho para sua equipe</a></li>\n                    <li><a href=\"%(create)s\">Criar e personalizar projetos</a></li>\n                    <li><a href=\"%(lang)s\">Editar preferências do idioma</a></li>\n                    <li><a href=\"%(custom)s\">Personalizar instruções para criadores e tradutores de legendas</a></li>\n                </ul>\n                "
 
-#: apps/teams/views.py:223
+#: apps/teams/views.py:224
 msgid "You do not have permission to delete this team."
 msgstr "Você não tem permissão para remover essa equipe."
 
-#: apps/teams/views.py:260 apps/teams/views.py:309 apps/teams/views.py:389
+#: apps/teams/views.py:261 apps/teams/views.py:310 apps/teams/views.py:390
 msgid "Settings saved."
 msgstr "Configurações salvas."
 
-#: apps/teams/views.py:280
+#: apps/teams/views.py:281
 msgid "Guidelines and messages updated."
 msgstr "Diretrizes e mensagens atualizadas."
 
-#: apps/teams/views.py:568
+#: apps/teams/views.py:569
 msgid "You can't add that video to this team/project."
 msgstr "Você não pode adicionar esse vídeo a essa equipe/projeto."
 
-#: apps/teams/views.py:605
+#: apps/teams/views.py:606
 msgid "The video has been moved to the new team."
 msgstr "O vídeo foi movido para o novo time."
 
-#: apps/teams/views.py:618
+#: apps/teams/views.py:619
 msgid "You can't add videos to this team/project."
 msgstr "Você não pode adicionar vídeos a essa equipe/projeto."
 
-#: apps/teams/views.py:636
+#: apps/teams/views.py:637
 msgid "You can't edit this video."
 msgstr "Você não pode editar esse vídeo."
 
-#: apps/teams/views.py:645
+#: apps/teams/views.py:646
 msgid "Video has been updated."
 msgstr "O vídeo foi atualizado."
 
-#: apps/teams/views.py:673
+#: apps/teams/views.py:674
 msgid "Request must be a POST request."
 msgstr "A requisição deve ser POST."
 
-#: apps/teams/views.py:681
+#: apps/teams/views.py:682
 msgid "You can't delete that video."
 msgstr "Você pode excluir o vídeo."
 
-#: apps/teams/views.py:685
+#: apps/teams/views.py:686
 msgid "You can't remove that video."
 msgstr "Você não pode remover aquele vídeo."
 
-#: apps/teams/views.py:697
+#: apps/teams/views.py:698
 msgid "Video has been deleted from Amara."
 msgstr "Vídeo foi removido de Amara."
 
-#: apps/teams/views.py:700
+#: apps/teams/views.py:701
 msgid "Video has been removed from the team."
 msgstr "O vídeo foi removido da equipe."
 
-#: apps/teams/views.py:838
+#: apps/teams/views.py:839
 msgid "Member has been removed from the team."
 msgstr "O membro foi removido da equipe."
 
-#: apps/teams/views.py:841
+#: apps/teams/views.py:842
 msgid "Use the \"Leave this team\" button to remove yourself from this team."
 msgstr "Use o botão \"Deixar este grupo\" para sair do grupo."
 
-#: apps/teams/views.py:844
+#: apps/teams/views.py:845
 msgid "You don't have permission to remove this member from the team."
 msgstr "Você não tem permissão para remover esse membro da equipe."
 
-#: apps/teams/views.py:878
+#: apps/teams/views.py:879
 msgid "Application approved."
 msgstr "Solicitação aprovada."
 
-#: apps/teams/views.py:880 apps/teams/views.py:901
+#: apps/teams/views.py:881 apps/teams/views.py:902
 msgid "Application does not exist."
 msgstr "Não existe solicitação."
 
-#: apps/teams/views.py:882 apps/teams/views.py:903
+#: apps/teams/views.py:883 apps/teams/views.py:904
 msgid "Application already processed."
 msgstr "Solicitação já processada."
 
-#: apps/teams/views.py:884
+#: apps/teams/views.py:885
 msgid "You can't approve applications."
 msgstr "Você não pode aprovar aplicações."
 
-#: apps/teams/views.py:899
+#: apps/teams/views.py:900
 msgid "Application denied."
 msgstr "Solicitação negada."
 
-#: apps/teams/views.py:905
+#: apps/teams/views.py:906
 msgid "You can't deny applications."
 msgstr "Você não pode negar aplicações"
 
-#: apps/teams/views.py:915
+#: apps/teams/views.py:916
 msgid "You cannot invite people to this team."
 msgstr "Você não pode convidar pessoas para essa equipe."
 
-#: apps/teams/views.py:946
+#: apps/teams/views.py:947
 msgid "This invite is no longer valid"
 msgstr "Esse convide não é mais valido"
 
-#: apps/teams/views.py:955
+#: apps/teams/views.py:956
 msgid "You cannot join this team."
 msgstr "Você não pode entrar para essa equipe."
 
-#: apps/teams/views.py:1009
+#: apps/teams/views.py:1010
 msgid "You have left this team."
 msgstr "Você deixou a equipe."
 
-#: apps/teams/views.py:1065
+#: apps/teams/views.py:1066
 msgid "Member saved."
 msgstr "Membro salvo."
 
-#: apps/teams/views.py:1287
+#: apps/teams/views.py:1292
 msgid "You cannot view this team's tasks."
 msgstr "Você não pode ver as tarefas desta equipe."
 
-#: apps/teams/views.py:1442 apps/teams/views.py:1445
+#: apps/teams/views.py:1456 apps/teams/views.py:1459
 msgid "You are not allowed to perform this task."
 msgstr "Você não está autorizado a realizar essa tarefa."
 
-#: apps/teams/views.py:1505
+#: apps/teams/views.py:1534
 msgid "Task deleted."
 msgstr "Tarefa removida."
 
-#: apps/teams/views.py:1507
+#: apps/teams/views.py:1536
 msgid "You cannot delete this task."
 msgstr "Você não pode remover essa tarefa."
 
-#: apps/teams/views.py:1532
+#: apps/teams/views.py:1561
 msgid "Task declined."
 msgstr "Tarefa negada."
 
-#: apps/teams/views.py:1534
+#: apps/teams/views.py:1563
 msgid "Task assigned."
 msgstr "Tarefa delegada."
 
-#: apps/teams/views.py:1536
+#: apps/teams/views.py:1565
 msgid "You cannot assign this task."
 msgstr "Você não pode delegar esta tarefa."
 
-#: apps/teams/views.py:1578
+#: apps/teams/views.py:1607
 msgid "Draft uploaded successfully."
 msgstr "O upload do rascunho foi feito com sucesso."
 
-#: apps/teams/views.py:1595
+#: apps/teams/views.py:1624
 msgid "You are not allowed to download this transcript."
 msgstr "Você não tem permissão para fazer download da trascrição."
 
-#: apps/teams/views.py:1646
+#: apps/teams/views.py:1675
 msgid "There's already a project with this name"
 msgstr "Já existe um projeto com esse nome."
 
-#: apps/teams/views.py:1658
+#: apps/teams/views.py:1687
 msgid "Project added."
 msgstr "Projeto adicionado."
 
-#: apps/teams/views.py:1675
+#: apps/teams/views.py:1704
 msgid "You cannot edit that project."
 msgstr "Você não pode editar esse projeto."
 
-#: apps/teams/views.py:1686
+#: apps/teams/views.py:1715
 msgid "Project deleted."
 msgstr "Projeto removido."
 
-#: apps/teams/views.py:1704
+#: apps/teams/views.py:1733
 msgid "Project saved."
 msgstr "Projeto salvo."
 
-#: apps/teams/views.py:1745
+#: apps/teams/views.py:1774
 msgid "Successfully synced subtitles."
 msgstr "Legendas sincronizadas com sucesso."
 
-#: apps/teams/views.py:2056
+#: apps/teams/views.py:2085
 #, python-format
 msgid "Someone else is currently editing %s. Please try again later."
-msgstr ""
+msgstr "Alguém já está editando %s. Por favor, tente novamente mais tarde."
 
-#: apps/teams/views.py:2096
+#: apps/teams/views.py:2125
 msgid "Successfully deleted language."
-msgstr ""
+msgstr "Idioma removido com sucesso."
 
 #: apps/teams/templatetags/teams_tags.py:173
 #: templates/statistic/videos_statistic.html:12 templates/teams/tasks.html:152
 #: templates/teams/tasks.html.py:249
 #: templates/videos/set-original-language.html:13
-#: templates/videos/video-page.html:120
+#: templates/videos/video-page.html:115
 msgid "Video"
 msgid_plural "Videos"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Vídeos"
+msgstr[1] "Vídeos "
 
 #: apps/teams/templatetags/teams_tags.py:176
 msgid "Member"
 msgid_plural "Members"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Membro"
+msgstr[1] "Membros"
 
 #: apps/teams/templatetags/teams_tags.py:182
 msgid "Task"
 msgid_plural "Tasks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Tarefa"
+msgstr[1] "Tarefas"
 
 #: apps/teams/templatetags/teams_tags.py:276
 #, python-format
 msgid "Can somebody help me subtitle these videos? %(url)s"
 msgstr "Alguém poderia me ajudar a legendar estes vídeos? %(url)s"
 
-#: apps/videos/forms.py:55
+#: apps/videos/forms.py:52
+msgid "--Select language--"
+msgstr ""
+
+#: apps/videos/forms.py:64
 msgid "File should have txt format"
 msgstr "O arquivo deve ter formato txt"
 
-#: apps/videos/forms.py:59 apps/videos/forms.py:77
+#: apps/videos/forms.py:68 apps/videos/forms.py:86
 msgid "File size should be less {0} kb"
 msgstr "O tamanho do arquivo deve ser inferior a {0} kb"
 
-#: apps/videos/forms.py:68
+#: apps/videos/forms.py:77
 msgid "Can't encode file. It should have utf8 encoding."
 msgstr "Não foi possível codificar o arquivo. Ele deve ter codificação utf8."
 
-#: apps/videos/forms.py:81
+#: apps/videos/forms.py:90
 #, python-format
 msgid "Incorrect format. Upload .%s "
 msgstr "Formato incorreto. Envie .%s"
 
-#: apps/videos/forms.py:90 unisubs-integration/api/1_0/forms.py:315
+#: apps/videos/forms.py:99 unisubs-integration/api/1_0/forms.py:315
 #: unisubs-integration/api/1_0/forms.py:331
 msgid "Incorrect subtitles format"
 msgstr "Formato incorreto de legendas"
 
-#: apps/videos/forms.py:114 apps/videos/forms.py:198 utils/validators.py:41
+#: apps/videos/forms.py:123 apps/videos/forms.py:207 utils/validators.py:41
 msgid "This URL appears to be a broken link."
 msgstr "Parece que este link está quebrado."
 
-#: apps/videos/forms.py:120 utils/forms/unisub_video_form.py:88
+#: apps/videos/forms.py:129 utils/forms/unisub_video_form.py:88
 #, python-format
 msgid ""
 "Amara does not support that website or video format.\n"
@@ -1354,18 +1370,18 @@ msgid ""
 "href=\"mailto:%s\">contact us</a>!"
 msgstr "Amara não provê suporte ao formato do site ou do vídeo.\nSe você gostaria que nós adicionássemos suporte a um novo site ou\nformato, ou se você pensa que há algo errado, <a\nhref=\"mailto:%s\">nos contate</a>!"
 
-#: apps/videos/forms.py:131
+#: apps/videos/forms.py:140
 msgid "You have not permission add video URL for this video"
 msgstr "Você não tem permissão para adicionar uma URL a este vídeo"
 
-#: apps/videos/forms.py:183
+#: apps/videos/forms.py:192
 #, python-format
 msgid ""
 "Please try again with a link to a video page.\n"
 "                        <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Por favor tente novamente com um link para uma página de vídeo.\n                        <a href=\"mailto:%s\">Nos contate</a>, se há algum problema."
 
-#: apps/videos/forms.py:186 apps/videos/types/forms.py:21
+#: apps/videos/forms.py:195 apps/videos/types/forms.py:21
 #, python-format
 msgid ""
 "You must link to a video on a compatible site (like YouTube) or directly to a\n"
@@ -1373,59 +1389,73 @@ msgid ""
 "                    <a href=\"mailto:%s\">Contact us</a> if there's a problem."
 msgstr "Você precisa conectar a um site compatível (como YouTube) ou diretamente a\n\n                    um arquivo de vídeo compatível com navegadores HTML5. Por exemplo: http://mysite.com/myvideo.ogg ou http://mysite.com/myipadvideo.m4v\n                    <a href=\"mailto:%s\">Fale conosco</a> se detectar algum problema."
 
-#: apps/videos/forms.py:214
+#: apps/videos/forms.py:223
 msgid "Youtube usernames"
 msgstr "Nomes de usuário do Youtube"
 
-#: apps/videos/forms.py:214
+#: apps/videos/forms.py:223
 msgid "Enter usernames separated by comma."
 msgstr "Digite nomes de usuário separados por vírgula."
 
-#: apps/videos/forms.py:215
+#: apps/videos/forms.py:224
 msgid "Youtube page link."
 msgstr "Link da página do Youtube."
 
-#: apps/videos/forms.py:216
+#: apps/videos/forms.py:225
 msgid "For example: http://www.youtube.com/user/username"
 msgstr "Por exemplo: http://www.youtube.com/user/username"
 
-#: apps/videos/forms.py:217
+#: apps/videos/forms.py:226
 msgid ""
 "We support: rss 2.0 media feeds including Youtube, Vimeo, Dailymotion, and "
 "more."
 msgstr ""
 
-#: apps/videos/forms.py:260
+#: apps/videos/forms.py:269
 msgid ""
 "Sorry, we could not find a valid feed at the URL you provided. Please check "
 "the URL and try again."
 msgstr "Desculpe, nós não conseguimos encontrar um feed válido na URL que você forneceu. Por favor verifique a URL e tente novamente."
 
-#: apps/videos/forms.py:263
+#: apps/videos/forms.py:272
 msgid "Duplicate feed URL in form: {url}"
 msgstr ""
 
-#: apps/videos/forms.py:266
+#: apps/videos/forms.py:275
 msgid "Feed for {url} already exists"
-msgstr ""
+msgstr "Feed para {url} já existe"
 
-#: apps/videos/forms.py:271
+#: apps/videos/forms.py:280
 msgid ""
 "The videos are being added in the background. If you are logged in, you will"
 " receive a message when it's done"
 msgstr "Os vídeos estão sendo adicionados em plano de fundo. Se você estiver conectado, você receberá uma mensagem que estiver pronto."
 
-#: apps/videos/forms.py:286
+#: apps/videos/forms.py:295
 msgid "captcha"
 msgstr "captcha"
 
+#: apps/videos/forms.py:361 apps/videos/forms.py:428 apps/videos/forms.py:477
+msgid "Subtitle into:"
+msgstr ""
+
+#: apps/videos/forms.py:363 apps/videos/forms.py:472
+msgid "This video is in:"
+msgstr ""
+
+#: apps/videos/forms.py:364 apps/videos/forms.py:473
+#: templates/teams/tasks.html:380 templates/videos/_upload_subtitles.html:36
+msgid ""
+"Please double check the primary spoken language. This step cannot be undone."
+msgstr "Por favor verifique a língua falada primária. Este passo não pode ser desfeito."
+
 #: apps/videos/metadata.py:57
 msgid "Speaker Name"
-msgstr ""
+msgstr "Nome do Palestrante"
 
 #: apps/videos/metadata.py:58
 msgid "Location"
-msgstr ""
+msgstr "Localização"
 
 #: apps/videos/models.py:187
 msgid "in seconds"
@@ -1733,23 +1763,23 @@ msgstr "Uma versão desde vídeo com legendas em %(language_name)s acabou de ser
 
 #: apps/videos/views.py:137
 msgid "original"
-msgstr ""
+msgstr "original"
 
 #: apps/videos/views.py:142
 msgid "incomplete"
-msgstr ""
+msgstr "incompleto"
 
 #: apps/videos/views.py:150
 msgid "needs review"
-msgstr ""
+msgstr "necessita de revisão"
 
 #: apps/videos/views.py:153
 msgid "needs approval"
-msgstr ""
+msgstr "necessita de aprovação"
 
 #: apps/videos/views.py:158
 msgid "needs editing"
-msgstr ""
+msgstr "necessita de edição"
 
 #: apps/videos/views.py:260
 msgid ""
@@ -1769,37 +1799,37 @@ msgstr "Você enviou um vídeo que é hospedado sobre http. Seu navegador pode e
 msgid "Existing subtitles will be imported in a few minutes."
 msgstr "Legendas existentes serão importadas em poucos minutos."
 
-#: apps/videos/views.py:346 apps/videos/views.py:621
+#: apps/videos/views.py:346 apps/videos/views.py:631
 msgid "$title with subtitles | Amara"
-msgstr ""
+msgstr "$título com legendas | Amara"
 
-#: apps/videos/views.py:445
+#: apps/videos/views.py:449
 msgid ""
 "Thank you for uploading. It may take a minute or so for your subtitles to "
 "appear."
 msgstr "Obrigado por fazer o upload. Pode demorar um minuto ou mais para suas legendas aparecerem."
 
-#: apps/videos/views.py:741
+#: apps/videos/views.py:753
 msgid "You don't have permission to rollback this language"
 msgstr ""
 
-#: apps/videos/views.py:848
+#: apps/videos/views.py:860
 msgid "You have not permission change this URL"
 msgstr "Você não tem permissão para alterar esta URL"
 
-#: apps/videos/views.py:853 apps/videos/views.py:884
+#: apps/videos/views.py:865 apps/videos/views.py:896
 msgid "Object does not exist"
 msgstr "Não existe objeto."
 
-#: apps/videos/views.py:868
+#: apps/videos/views.py:880
 msgid "You have not permission delete this URL"
 msgstr "Você não tem permissão para excluir esta URL"
 
-#: apps/videos/views.py:872
+#: apps/videos/views.py:884
 msgid "You can't remove primary URL"
 msgstr "Você não pode remover a URL primária"
 
-#: apps/videos/views.py:1014
+#: apps/videos/views.py:1026
 #, python-format
 msgid "The language for %s has been changed"
 msgstr "O idioma para %s foi alterado"
@@ -1971,7 +2001,7 @@ msgstr "Ir"
 
 #: libs/rosetta/templates/rosetta/pofile.html:54
 #: templates/teams/tasks.html:233 templates/videos/_video_url_panel.html:19
-#: templates/videos/language-page.html:50
+#: templates/videos/language-page.html:55
 msgid "Original"
 msgstr "Original"
 
@@ -2891,7 +2921,7 @@ msgstr " Comunidade Netflix"
 
 #: templates/index.html:115
 msgid "ERB Community"
-msgstr ""
+msgstr "Comunidade ERB"
 
 #: templates/index.html:121
 msgid "Twitter"
@@ -3105,7 +3135,7 @@ msgid "Are you sure that you want to permanently delete your profile?"
 msgstr "Você tem certeza que deseja apagar permanentemente seu perfil?"
 
 #: templates/auth/delete_user.html:13 templates/messages/inbox.html:72
-#: templates/messages/sent.html:49 templates/teams/tasks.html:529
+#: templates/messages/sent.html:49 templates/teams/tasks.html:515
 msgid "Delete"
 msgstr "Apagar"
 
@@ -3113,7 +3143,10 @@ msgstr "Apagar"
 #: templates/profiles/_select_language_dialog.html:33
 #: templates/profiles/remove-third-party.html:26
 #: templates/teams/settings-projects-add.html:67
-#: templates/teams/tasks.html:607 templates/videos/_feedback_form.html:25
+#: templates/teams/tasks.html:593
+#: templates/videos/_create-subtitles-modal.html:20
+#: templates/videos/_feedback_form.html:25
+#: templates/videos/_multi-video-create-subtitles-form.html:14
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -3305,8 +3338,8 @@ msgid ""
 "    "
 msgstr "\n        You have %(msg_count)s new messages.\n    "
 
-#: templates/messages/_messages.html:7 templates/teams/dashboard.html:160
-#: templates/teams/dashboard.html.py:202
+#: templates/messages/_messages.html:7 templates/teams/dashboard.html:145
+#: templates/teams/dashboard.html.py:168
 #: templates/videos/_recent_activity.html:11
 msgid "View all"
 msgstr "Ver todos"
@@ -3481,7 +3514,7 @@ msgid "Submit"
 msgstr "Enviar"
 
 #: templates/profiles/_tabs.html:6 templates/teams/_tabs.html:21
-#: templates/videos/video-page.html:122
+#: templates/videos/video-page.html:117
 msgid "Activity"
 msgstr "Atividade"
 
@@ -3668,7 +3701,7 @@ msgid ""
 "                                    "
 msgstr "\nAmara vai <strong>anexar um crédito</strong> para as legendas, se o espaço permitir.⏎"
 
-#: templates/profiles/account.html:201 templates/teams/dashboard.html:99
+#: templates/profiles/account.html:201 templates/teams/dashboard.html:84
 #: templates/videos/_video_url_panel.html:44
 msgid "Learn more"
 msgstr "Saiba mais"
@@ -3730,56 +3763,56 @@ msgstr "Ir para sua caixa de entrada"
 msgid "unread message"
 msgstr "mensagem não lida"
 
-#: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:54
+#: templates/profiles/dashboard.html:44 templates/teams/dashboard.html:48
 msgid "Videos you're working on"
 msgstr "Vídeos que você está trabalhando"
 
-#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:87
-#: templates/teams/dashboard.html:69
-msgid "Create"
-msgstr "Criar"
+#: templates/profiles/dashboard.html:59
+#: templates/teams/_perform_task_link.html:11
+#, python-format
+msgid "Create %(language)s subtitles"
+msgstr ""
 
-#: templates/profiles/dashboard.html:60 templates/profiles/dashboard.html:63
-#: templates/profiles/dashboard.html:87 templates/profiles/dashboard.html:90
-#: templates/teams/dashboard.html:69 templates/teams/dashboard.html.py:73
-#: templates/videos/language-page.html:53
-msgid "subtitles"
-msgstr "legenda"
+#: templates/profiles/dashboard.html:61
+#: templates/teams/_perform_task_link.html:13
+#, python-format
+msgid "%(task_action)s %(language)s subtitles"
+msgstr ""
 
-#: templates/profiles/dashboard.html:98
+#: templates/profiles/dashboard.html:68
 msgid "I can't do this"
 msgstr "Eu não posso fazer isso"
 
-#: templates/profiles/dashboard.html:117
+#: templates/profiles/dashboard.html:87
 msgid "Activity on your videos"
 msgstr "Atividade em seus vídeos"
 
-#: templates/profiles/dashboard.html:128
+#: templates/profiles/dashboard.html:98
 msgid ""
 "\n"
 "                                Nothing happening yet.\n"
 "                            "
 msgstr "\nNada acontecendo ainda. ⏎"
 
-#: templates/profiles/dashboard.html:132
+#: templates/profiles/dashboard.html:102
 msgid ""
 "\n"
 "                                You haven't shared any videos yet.\n"
 "                            "
 msgstr "\nVocê não compartilhou nenhum vídeo ainda. ⏎"
 
-#: templates/profiles/dashboard.html:143
+#: templates/profiles/dashboard.html:113
 msgid "Activity in your teams"
 msgstr "Atividade em suas equipes"
 
-#: templates/profiles/dashboard.html:154
+#: templates/profiles/dashboard.html:124
 msgid ""
 "\n"
 "                                All's quiet in your teams so far.\n"
 "                            "
-msgstr ""
+msgstr "\nTudo está quieto até agora."
 
-#: templates/profiles/dashboard.html:158
+#: templates/profiles/dashboard.html:128
 msgid ""
 "\n"
 "                                You haven't joined any teams yet.\n"
@@ -4085,7 +4118,7 @@ msgstr "Método"
 msgid "Value"
 msgstr "Valor"
 
-#: templates/subtitles/subtitle-editor.html:12
+#: templates/subtitles/subtitle-editor.html:13
 #, python-format
 msgid ""
 "\n"
@@ -4093,90 +4126,109 @@ msgid ""
 "        "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:144
+#: templates/subtitles/subtitle-editor.html:43
+msgid "Loading subtitle editor&hellip;"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:48
+#: templates/subtitles/subtitle-editor.html:49
+#: templates/subtitles/subtitle-editor.html:751
+msgid "Edit title and description"
+msgstr "Editar título e descrição"
+
+#: templates/subtitles/subtitle-editor.html:97
 msgid "Keyboard controls"
+msgstr "Controles de teclado"
+
+#: templates/subtitles/subtitle-editor.html:97
+msgid "more commands"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:148
-#: templates/subtitles/subtitle-editor.html:166
-#: templates/subtitles/subtitle-editor.html:191
+#: templates/subtitles/subtitle-editor.html:101
+#: templates/subtitles/subtitle-editor.html:119
+#: templates/subtitles/subtitle-editor.html:144
 msgid "Play / Pause"
-msgstr ""
+msgstr "Play / Pausa"
 
-#: templates/subtitles/subtitle-editor.html:154
-#: templates/subtitles/subtitle-editor.html:172
-#: templates/subtitles/subtitle-editor.html:197
+#: templates/subtitles/subtitle-editor.html:107
+#: templates/subtitles/subtitle-editor.html:125
+#: templates/subtitles/subtitle-editor.html:150
 msgid "Skip back"
-msgstr ""
+msgstr "Voltar"
 
-#: templates/subtitles/subtitle-editor.html:160
-#: templates/subtitles/subtitle-editor.html:203
+#: templates/subtitles/subtitle-editor.html:113
+#: templates/subtitles/subtitle-editor.html:156
 msgid "Insert a line break"
-msgstr ""
+msgstr "Inserir quebra de linha"
 
-#: templates/subtitles/subtitle-editor.html:178
+#: templates/subtitles/subtitle-editor.html:131
 msgid "Start subtitle"
-msgstr ""
+msgstr "Começar a legendar"
 
-#: templates/subtitles/subtitle-editor.html:184
+#: templates/subtitles/subtitle-editor.html:137
 msgid "End subtitle"
+msgstr "Terminar legendagem"
+
+#: templates/subtitles/subtitle-editor.html:161
+#: templates/subtitles/subtitle-editor.html:570
+msgid "Subtitling Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:273
+#: templates/subtitles/subtitle-editor.html:230
 msgid "How to start making subtitles."
-msgstr ""
+msgstr "Como começar a legendar."
 
-#: templates/subtitles/subtitle-editor.html:275
+#: templates/subtitles/subtitle-editor.html:232
 msgid "Play the video and type what you hear."
-msgstr ""
+msgstr "Toque o vídeo e escreva o que você ouvir."
 
-#: templates/subtitles/subtitle-editor.html:276
+#: templates/subtitles/subtitle-editor.html:233
 msgid "Press Enter to complete a subtitle."
-msgstr ""
+msgstr "Aperte Enter para completar uma legenda."
 
-#: templates/subtitles/subtitle-editor.html:277
+#: templates/subtitles/subtitle-editor.html:234
 msgid "Use the guide on the right to move to the next step."
-msgstr ""
+msgstr "Use a guia à direita para ir para o próximo passo."
 
-#: templates/subtitles/subtitle-editor.html:279
-#: templates/subtitles/subtitle-editor.html:288
-#: templates/subtitles/subtitle-editor.html:298
+#: templates/subtitles/subtitle-editor.html:236
+#: templates/subtitles/subtitle-editor.html:245
+#: templates/subtitles/subtitle-editor.html:255
 msgid "Press the TAB key to start!"
-msgstr ""
+msgstr "Aperte a tecla TAB para começar!"
 
-#: templates/subtitles/subtitle-editor.html:282
+#: templates/subtitles/subtitle-editor.html:239
 msgid "Subtitle Syncing"
-msgstr ""
+msgstr "Sincronizando Legenda"
 
-#: templates/subtitles/subtitle-editor.html:284
+#: templates/subtitles/subtitle-editor.html:241
 msgid "Tap the DOWN arrow to start a subtitle."
-msgstr ""
+msgstr "Aperte a seta para baixo para começar uma legenda."
 
-#: templates/subtitles/subtitle-editor.html:285
+#: templates/subtitles/subtitle-editor.html:242
 msgid "Tap the UP arrow to set the end time (optional)."
-msgstr ""
+msgstr "Aperte a seta para cima para marcar o final (opcional)."
 
-#: templates/subtitles/subtitle-editor.html:286
+#: templates/subtitles/subtitle-editor.html:243
 msgid "Use the Tools menu to hide the timeline for typing mode."
-msgstr ""
+msgstr "Use o menu Ferramentas para ocultar a linha do tempo no modo digitação."
 
-#: templates/subtitles/subtitle-editor.html:292
+#: templates/subtitles/subtitle-editor.html:249
 msgid "Review your work"
-msgstr ""
+msgstr "Reveja seu trabalho"
 
-#: templates/subtitles/subtitle-editor.html:294
+#: templates/subtitles/subtitle-editor.html:251
 msgid "Watch the video and make corrections."
-msgstr ""
+msgstr "Assista ao vídeo e faça as correções."
 
-#: templates/subtitles/subtitle-editor.html:295
+#: templates/subtitles/subtitle-editor.html:252
 msgid "Click Complete to sign off on your work."
-msgstr ""
+msgstr "Clique Completo para sair do seu trabalho."
 
-#: templates/subtitles/subtitle-editor.html:296
+#: templates/subtitles/subtitle-editor.html:253
 msgid "Use the Save button to save and finish later."
-msgstr ""
+msgstr "Use o botão Salvar para salvar e terminar mais tarde."
 
-#: templates/subtitles/subtitle-editor.html:304
+#: templates/subtitles/subtitle-editor.html:261
 #, python-format
 msgid ""
 "\n"
@@ -4184,86 +4236,665 @@ msgid ""
 "              "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:428
+#: templates/subtitles/subtitle-editor.html:269
+msgid "Copy Timing"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:272
+msgid "Show"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:273
+msgid "Timeline"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:275
+msgid "Clear timing"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:276
+msgid "Clear text"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:277
+msgid "Revert to last saved version"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:388
 msgid "1. Type what you hear"
-msgstr ""
+msgstr "1. Escreva o que você ouvir"
 
-#: templates/subtitles/subtitle-editor.html:430
+#: templates/subtitles/subtitle-editor.html:390
 msgid "Is all the content subtitled?"
+msgstr "Todo o conteúdo foi legendado?"
+
+#: templates/subtitles/subtitle-editor.html:393
+msgid "Yes, translate the title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:433
+#: templates/subtitles/subtitle-editor.html:394
 msgid "Yes, start syncing"
+msgstr "Sim, começar sincronização"
+
+#: templates/subtitles/subtitle-editor.html:400
+msgid "2. Translate title"
 msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:405
+msgid "Title and description were not edited yet."
+msgstr "Título de descrição não foram editados."
+
+#: templates/subtitles/subtitle-editor.html:408
+msgid "Title and description have been edited."
+msgstr "Título e descrição foram editados."
+
+#: templates/subtitles/subtitle-editor.html:410
+msgid "Start syncing"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:418
+msgid "2. Sync Timing"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:419
+msgid "3. Sync Timing"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:424
+msgid "Not all lines are completed."
+msgstr "Nem todas as linhas foram completadas."
+
+#: templates/subtitles/subtitle-editor.html:427
+msgid "All lines are completed."
+msgstr "Todas as linhas estão completas."
+
+#: templates/subtitles/subtitle-editor.html:429
+msgid "Start reviewing"
+msgstr "Começar revisão"
+
+#: templates/subtitles/subtitle-editor.html:437
+msgid "3. Review and complete"
+msgstr "3. Revise e complete"
 
 #: templates/subtitles/subtitle-editor.html:438
-msgid "2. Sync timing"
-msgstr ""
+msgid "4. Review and complete"
+msgstr "4. Revise e complete"
 
 #: templates/subtitles/subtitle-editor.html:442
-msgid "Not all lines are completed."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:445
-msgid "All lines are completed."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:448
-#: templates/subtitles/subtitle-editor.html:504
-msgid "Edit title and description"
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:449
-#: templates/subtitles/subtitle-editor.html:467
-msgid "Start reviewing"
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:457
-msgid "3. Translate title"
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:462
-msgid "Title and description were not edited yet."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:465
-msgid "Title and description have been edited."
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:475
-msgid "3. Review and complete"
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:476
-msgid "4. Review and complete"
-msgstr ""
-
-#: templates/subtitles/subtitle-editor.html:480
 msgid ""
 "Watch the video again and verify that the subtitles are complete and "
 "correct."
-msgstr ""
+msgstr "Assista ao vídeo de novo e verifique se as legendas estão completas e corretas."
 
-#: templates/subtitles/subtitle-editor.html:482
+#: templates/subtitles/subtitle-editor.html:444
 msgid "Complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:509
-msgid "Title"
+#: templates/subtitles/subtitle-editor.html:464
+msgid "Amara Style Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:511
-msgid "Enter Title"
+#: templates/subtitles/subtitle-editor.html:469
+msgid "Subtitle line length"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:470
+msgid "Keep subtitle length to about 42 characters;"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:471
+msgid "avoid more than 2 lines per subtitle."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:474
+msgid "Minimum duration"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:475
+msgid "Subtitles should not be less than 1 second."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:478
+msgid "Maximum duration"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:479
+msgid "Split subtitles lasting more than 7 seconds."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:482
+msgid "Reading speed"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:483
+msgid "8-25 characters/second is recommended;"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:484
+msgid "8-16 characters/second for children."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:487
+msgid "Sounds"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:488
+msgid "Describe meaningful sounds that are relevant to the plot."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:489
+msgid "ex: (water dripping)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:492
+msgid "Music"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:493
+msgid "Describe relevant music which does not have relevant lyrics."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:494
+msgid "ex: ♪ (jazz music) ♪"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:497
+msgid "Speaker Identification"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:498
+msgid "Use parenthesis to indicate when someone is speaking off-screen."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:499
+#: templates/subtitles/subtitle-editor.html:537
+msgid "ex: (Michael) Wait for me!"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:502
+msgid "Show Advanced Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:503
+msgid "Hide Advanced Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:507
+msgid "Translate the whole idea"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:508
+msgid "Translations don't need to be word for word. Look at the context."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:509
+msgid ""
+"Make sure you are using the correct punctuation for the whole unit of text."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:513
+msgid "Maximum timing offset"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:514
+msgid ""
+"Subtitles shouldn't start more than 0.5 seconds before or after the audio "
+"begins."
 msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:517
+msgid "On-screen texts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:518
+msgid "Translate the texts on the video that are relevant to the plot."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:521
+msgid "Use meaningful speech"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:522
+msgid "Exclude things like “um” “ah” and other disfluencies."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:525
+msgid "Indicate inaudible parts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:526
+msgid "If the audio is inaudible, it should be marked as [inaudible]."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:529
+msgid "Lyrics"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:530
+msgid "Wrap relevant lyrics in musical notes."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:531
+msgid "ex ♪ Tell me dear Billy, ♪"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:535
+msgid "Speaker identification"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:536
+msgid "Identify off-screen and unclear speakers in parentheses."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:541
+msgid "Foreign language"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:542
+msgid "Identify relevant speech in foreign language. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:543
+msgid "ex: (Russian): Thank you."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:547
+msgid "Simultaneous dialogue"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:548
+msgid "Used exclusively when two speakers talk in the same subtitle. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:549
+msgid ""
+"Each speaker should have one line, and both lines should have an hyphen. "
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:550
+msgid "- Sir, you are no gentleman."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:551
+msgid "- Rhett Butler: And you, Miss, are no lady."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:563
+msgid "Show All Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:567
+msgid "Hide All Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:572
+msgid "Translating Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:574
+msgid "Reviewing Guidelines"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:580
+#: templates/subtitles/subtitle-editor.html:745
+#: templates/videos/_feedback_form.html:35
+#: templates/videos/_upload_subtitles.html:10
+#: templates/videos/_video_url_panel.html:43
+#: templates/videos/video-page.html:50
+msgid "Close"
+msgstr "Fechar"
+
+#: templates/subtitles/subtitle-editor.html:585
+msgid "Keyboard Shortcuts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:590
+#: templates/subtitles/subtitle-editor.html:645
+#: templates/subtitles/subtitle-editor.html:683
+#: templates/videos/language-sync-history-tab.html:43
+msgid "Action"
+msgstr "Ação"
+
+#: templates/subtitles/subtitle-editor.html:591
+#: templates/subtitles/subtitle-editor.html:646
+#: templates/subtitles/subtitle-editor.html:684
+msgid "Windows / Linux"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:592
+#: templates/subtitles/subtitle-editor.html:647
+#: templates/subtitles/subtitle-editor.html:685
+msgid "OS X"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:597
+msgid "Play / Pause video"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:598
+#: templates/subtitles/subtitle-editor.html:599
+msgid "Tab"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:602
+msgid "Skip back 2 seconds"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:603
+#: templates/subtitles/subtitle-editor.html:604
+msgid "Shift + Tab"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:607
+msgid "Skip back 4 seconds"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:608
+msgid "Ctrl + Shift + ,"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:609
+msgid "CMD + Shift + ,"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:612
+msgid "Skip forward 4 seconds"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:613
+msgid "Ctrl + Shift + ."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:614
+msgid "CMD + Shift + ."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:617
+msgid "Navigate to the next subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:618
+#: templates/subtitles/subtitle-editor.html:619
+msgid "ENTER"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:622
+msgid "Insert line break"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:623
+#: templates/subtitles/subtitle-editor.html:624
+msgid "Shift + ENTER"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:627
+msgid "Delete empty subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:628
+#: templates/subtitles/subtitle-editor.html:629
+#: templates/subtitles/subtitle-editor.html:633
+#: templates/subtitles/subtitle-editor.html:634
+msgid "ESC"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:632
+msgid "Exit edit mode of current subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:638
+msgid "Show Browser Shortcuts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:639
+msgid "Hide Browser Shortcuts"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:641
+msgid "Browser Defaults that should work"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:652
+msgid "Jump to the next whole word"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:653
+msgid "CTRL + RIGHT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:654
+msgid "ALT + RIGHT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:657
+msgid "Jump to the previous whole word"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:658
+msgid "CTRL + LEFT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:659
+msgid "ALT + LEFT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:662
+msgid "Jump to the start of the subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:663
+msgid "Fn + RIGHT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:664
+msgid "CMD + RIGHT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:667
+msgid "Jump to the end of the subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:668
+msgid "Fn + LEFT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:669
+msgid "CMD + LEFT Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:672
+msgid "Delete last complete word"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:673
+msgid "CTRL + Backspace"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:674
+msgid "CMD + Backspace"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:678
+msgid "Proposed Shortcuts (not yet implemented)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:690
+msgid "Insert subtitle (above)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:691
+#: templates/subtitles/subtitle-editor.html:692
+msgid "Alt + i"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:695
+msgid "Insert subtitle (below)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:696
+#: templates/subtitles/subtitle-editor.html:697
+msgid "Alt + Shift + i"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:700
+msgid "Delete current subtitle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:701
+#: templates/subtitles/subtitle-editor.html:702
+msgid "Alt + Delete (or Backspace)"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:705
+msgid "Navigate to the previous line"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:706
+#: templates/subtitles/subtitle-editor.html:707
+msgid "Alt + UP Arrow"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:710
+msgid "Undo last action"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:711
+msgid "CTRL + z"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:712
+msgid "CMD + z"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:715
+msgid "Redo last action"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:716
+msgid "CTRL + Shift + z"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:717
+msgid "CMD + Shift + z"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:720
+msgid "Save a version"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:721
+msgid "CTRL + s"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:722
+msgid "CMD + s"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:725
+msgid "Italics formatting"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:726
+msgid "CTRL + i"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:727
+msgid "CMD + i"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:730
+msgid "Bold formatting"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:731
+msgid "CTRL + b"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:732
+msgid "CMD + b"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:735
+msgid "Timeline toggle"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:736
+msgid "CTRL + t"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:737
+msgid "CMD + t"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:752
+msgid "Title"
+msgstr "Título"
+
+#: templates/subtitles/subtitle-editor.html:754
+msgid "Enter Title"
+msgstr "Entre com o Título"
+
+#: templates/subtitles/subtitle-editor.html:760
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
 msgstr "Descrição"
 
-#: templates/subtitles/subtitle-editor.html:519
+#: templates/subtitles/subtitle-editor.html:762
 msgid "Enter Description"
+msgstr "Entre com a Descrição"
+
+#: templates/subtitles/subtitle-editor.html:787
+msgid "Debugging Tools"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:805
+msgid "Error saving subtitles"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:808
+msgid ""
+"There was an error saving your subtitles. Save your subtitles using the "
+"download button below and upload them to the system later."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:809
+#: templates/subtitles/subtitle-editor.html:827
+msgid ""
+"To avoid data corruption, please do not open the or edit the subtitles in "
+"any text editor."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:812
+msgid ""
+"There was an error saving your subtitles.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:817
+#: templates/subtitles/subtitle-editor.html:835
+msgid "Download Subtitles"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:818
+#: templates/subtitles/subtitle-editor.html:836
+msgid "Close Editor"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:823
+msgid "Error resuming session"
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:826
+msgid ""
+"There was an error resuming your session. Save your subtitles using the "
+"download button below and upload them to the system later."
+msgstr ""
+
+#: templates/subtitles/subtitle-editor.html:830
+msgid ""
+"There was an error resuming your session.  Copy the subtitles above and save"
+" them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
 #: templates/teams/_application_form.html:4
@@ -4431,14 +5062,6 @@ msgstr "Junte-se à nossa equipe"
 msgid "to join our team"
 msgstr "se juntar à nossa equipe"
 
-#: templates/teams/_perform_task_link.html:4 templates/teams/tasks.html:344
-msgid "Resume"
-msgstr "Resumo"
-
-#: templates/teams/_perform_task_link.html:6 templates/teams/tasks.html:346
-msgid "Start now"
-msgstr "Começar agora"
-
 #: templates/teams/_subnav_settings.html:5 templates/teams/create.html:43
 msgid "Team Details"
 msgstr "Detalhes da Equipe"
@@ -4449,7 +5072,7 @@ msgstr "Fluxos de trabalho"
 
 #: templates/teams/_subnav_settings.html:25
 msgid "External Sites"
-msgstr ""
+msgstr "Sites Externos"
 
 #: templates/teams/_tabs.html:16 templates/teams/members-list.html:6
 msgid "Members"
@@ -4635,7 +5258,7 @@ msgstr "Que idioma é preciso?"
 msgid "Who should do it?"
 msgstr "Quem deve fazer isto?"
 
-#: templates/teams/create_task.html:68 templates/teams/tasks.html:613
+#: templates/teams/create_task.html:68 templates/teams/tasks.html:599
 msgid "Begin typing to search"
 msgstr "Comece a digitar para pesquisar"
 
@@ -4661,92 +5284,89 @@ msgstr "Formulário de nova tarefa"
 msgid "Back to tasks list"
 msgstr "Voltar para a lista de tarefas"
 
-#: templates/teams/dashboard.html:81
+#: templates/teams/dashboard.html:66
 msgid "Due in"
 msgstr "Devido em"
 
-#: templates/teams/dashboard.html:83
+#: templates/teams/dashboard.html:68
 msgid "Overdue by"
 msgstr "Vencido por"
 
-#: templates/teams/dashboard.html:93
+#: templates/teams/dashboard.html:78
 msgid "Helping out is easy!"
 msgstr "Ajudar é fácil!"
 
-#: templates/teams/dashboard.html:95
+#: templates/teams/dashboard.html:80
 msgid ""
 "\n"
 "                            Just find a video that interests you and click the button below it to get started!\n"
 "                        "
 msgstr "\nBasta encontrar um vídeo que lhe interessa e clicar no botão abaixo para começar!⏎"
 
-#: templates/teams/dashboard.html:99
+#: templates/teams/dashboard.html:84
 msgid " about subtitling in Amara."
 msgstr "sobre legendagem no Amara."
 
-#: templates/teams/dashboard.html:104
+#: templates/teams/dashboard.html:89
 msgid "Welcome!"
 msgstr "Bem vindo!"
 
-#: templates/teams/dashboard.html:109
+#: templates/teams/dashboard.html:94
 msgid ""
 "\n"
 "                            We need your help subtitling our videos!\n"
 "                        "
-msgstr ""
+msgstr "\nPrecisamos de sua ajuda para legendar nossos vídeos!"
 
-#: templates/teams/dashboard.html:121 templates/teams/dashboard.html.py:258
+#: templates/teams/dashboard.html:106 templates/teams/dashboard.html.py:200
 msgid "Videos that need your help"
 msgstr "Vídeos que precisam da sua ajuda"
 
-#: templates/teams/dashboard.html:123
+#: templates/teams/dashboard.html:108
 msgid "Some of the videos we're working on now"
 msgstr "Alguns dos vídeos que estamos trabalhando agora"
 
-#: templates/teams/dashboard.html:129 templates/teams/tasks.html:175
+#: templates/teams/dashboard.html:114 templates/teams/tasks.html:175
 msgid "Tell us what languages you speak"
 msgstr "Nos conte quais idiomas você fala"
 
-#: templates/teams/dashboard.html:129
+#: templates/teams/dashboard.html:114
 msgid "and we'll personalize this list for you"
 msgstr "e vamos personalizar essa lista para você"
 
-#: templates/teams/dashboard.html:157 templates/teams/dashboard.html.py:199
+#: templates/teams/dashboard.html:142 templates/teams/dashboard.html.py:165
 msgid " languages need your help"
 msgstr "idiomas que precisam da sua ajuda"
 
-#: templates/teams/dashboard.html:166 templates/teams/dashboard.html.py:194
+#: templates/teams/dashboard.html:161
 msgid "Create Subtitles"
 msgstr "Criar legendas"
 
-#: templates/teams/dashboard.html:207 templates/teams/dashboard.html.py:218
-msgid "Create "
-msgstr "Criar"
+#: templates/teams/dashboard.html:172 templates/teams/dashboard.html.py:179
+#, python-format
+msgid "Create %(language)s Subtitles"
+msgstr ""
 
-#: templates/teams/dashboard.html:209 templates/teams/dashboard.html.py:220
-msgid " Subtitles"
-msgstr "Legendas"
-
-#: templates/teams/dashboard.html:248
+#: templates/teams/dashboard.html:190
 msgid "Sorry, you've reached the maximum number of tasks for this team."
 msgstr "Desculpe, você já atingiu o número máximo de tarefas para esse time."
 
-#: templates/teams/dashboard.html:260
+#: templates/teams/dashboard.html:202
 msgid "Sorry, we couldn't find any videos for you."
 msgstr "Desculpe, não conseguimos encontrar nenhum vídeo para você."
 
-#: templates/teams/dashboard.html:264
+#: templates/teams/dashboard.html:206
 msgid "Update your language preferences"
 msgstr "Atualize suas preferências de idiomas"
 
-#: templates/teams/dashboard.html:270
+#: templates/teams/dashboard.html:212
 msgid "Add videos to the team"
 msgstr "Adicionar vídeo à equipe"
 
 #: templates/teams/delete-language.html:5
 #: templates/teams/delete-language.html:37
 msgid "Delete Language"
-msgstr ""
+msgstr "Excluir Idioma"
 
 #: templates/teams/delete-language.html:11
 #, python-format
@@ -4760,25 +5380,25 @@ msgstr ""
 
 #: templates/teams/delete-language.html:14
 msgid "WARNING!"
-msgstr ""
+msgstr "AVISO!"
 
 #: templates/teams/delete-language.html:16
 msgid "All subtitles for this language will be deleted"
-msgstr ""
+msgstr "Todas as legendas para este idioma serão excluídas"
 
 #: templates/teams/delete-language.html:17
 msgid "Any tasks for this language will be deleted"
-msgstr ""
+msgstr "Qualquer tarefa para este idioma será excluída"
 
 #: templates/teams/delete-language.html:18
 msgid "The language can no longer be used for translations"
-msgstr ""
+msgstr "O idioma não pode mais ser usado para traduções"
 
 #: templates/teams/delete-language.html:19
 msgid ""
 "Translation tasks will be deleted, unless there are other public subtitles "
 "that can be used"
-msgstr ""
+msgstr "Tarefas de seleção serão excluídas, exceto se houver outras legendas públicas que possam ser usadas"
 
 #: templates/teams/delete-language.html:26
 msgid "Delete Dependent Languages"
@@ -5156,10 +5776,22 @@ msgstr ""
 
 #: templates/teams/settings.html:58
 msgid "Square Logo"
-msgstr ""
+msgstr "Logo Quadrada"
 
 #: templates/teams/settings.html:63
 msgid "Recommended size: 100 x 100"
+msgstr "Tamanho recomendado: 100 x 100"
+
+#: templates/teams/start-subtitle-task.html:8
+msgid "Starting Task"
+msgstr ""
+
+#: templates/teams/start-subtitle-task.html:21 templates/teams/tasks.html:328
+msgid "Perform Task"
+msgstr "Realizar Tarefa"
+
+#: templates/teams/start-subtitle-task.html:30
+msgid "Start Subtitling"
 msgstr ""
 
 #: templates/teams/tasks.html:49
@@ -5266,7 +5898,7 @@ msgid "You don't have permission to perform this task."
 msgstr "Você não tem permissão para fazer esta tarefa."
 
 #: templates/teams/tasks.html:244 templates/teams/tasks.html.py:264
-#: templates/videos/diffing.html:83 templates/videos/language-page.html:101
+#: templates/videos/diffing.html:83 templates/videos/language-page.html:106
 msgid "Subtitles"
 msgstr "Legendas"
 
@@ -5303,102 +5935,93 @@ msgstr "Atribuída para"
 msgid "Unassigned"
 msgstr "Não atribuída"
 
-#: templates/teams/tasks.html:328
-msgid "Perform Task"
-msgstr "Realizar Tarefa"
-
 #: templates/teams/tasks.html:337
 msgid "You have reached the maximum number of tasks."
 msgstr "Você alcançou o número máximo de tarefas"
 
-#: templates/teams/tasks.html:360
+#: templates/teams/tasks.html:348
 msgid "Download draft"
 msgstr "Download de um rascunho"
 
-#: templates/teams/tasks.html:382
+#: templates/teams/tasks.html:369
 msgid "Upload a draft"
 msgstr "Upload de um rascunho"
 
-#: templates/teams/tasks.html:389 templates/videos/_upload_subtitles.html:31
+#: templates/teams/tasks.html:376 templates/videos/_upload_subtitles.html:31
 msgid "Video Language"
 msgstr "Idioma do Vídeo"
 
-#: templates/teams/tasks.html:393 templates/videos/_upload_subtitles.html:36
-msgid ""
-"Please double check the primary spoken language. This step cannot be undone."
-msgstr "Por favor verifique a língua falada primária. Este passo não pode ser desfeito."
-
-#: templates/teams/tasks.html:402
+#: templates/teams/tasks.html:389
 msgid "Translate from"
 msgstr "Traduzir de"
 
-#: templates/teams/tasks.html:412
+#: templates/teams/tasks.html:399
 msgid "Important:"
 msgstr "Importante:"
 
-#: templates/teams/tasks.html:412
+#: templates/teams/tasks.html:399
 msgid ""
 "Uploading a draft will not complete the task. After uploading, select "
 "\"Resume\" from the \"Perform Task\" drop-down to verify timing, video title"
 " and video description in the onsite editor and to submit the final version."
 msgstr "Carregar um projeto não irá completar a tarefa. Após o upload, selecione \"Continuar\" em \"Executar Tarefa\" em suspenso para verificar a cronometragem, título do vídeo e descrição do vídeo no editor no local e apresentar a versão final."
 
-#: templates/teams/tasks.html:417 templates/videos/_upload_subtitles.html:26
+#: templates/teams/tasks.html:404 templates/videos/_upload_subtitles.html:26
 #: templates/videos/video-page.html:62
 msgid "Language"
 msgstr "Idioma"
 
-#: templates/teams/tasks.html:427
+#: templates/teams/tasks.html:414
 msgid "File:"
 msgstr "Arquivo: "
 
-#: templates/teams/tasks.html:433
+#: templates/teams/tasks.html:420
 msgid "Accepted formats: .srt, .ssa, .sbv, .dfxp, .txt or .xml (for DFXP)"
 msgstr "Formatos aceitos: .srt, .ssa, .sbv, .dfxp, .txt ou .xml (para DFXP)"
 
-#: templates/teams/tasks.html:450
+#: templates/teams/tasks.html:436
 msgid "Download a draft"
 msgstr "Baixe o rascunho"
 
-#: templates/teams/tasks.html:455
+#: templates/teams/tasks.html:441
 msgid "Download a draft of these subtitles so you can work offline."
 msgstr "Baixe um projeto dessas legendas para que você possa trabalhar offline."
 
-#: templates/teams/tasks.html:492
+#: templates/teams/tasks.html:478
 msgid "Decline"
 msgstr "Recusar"
 
-#: templates/teams/tasks.html:519
+#: templates/teams/tasks.html:505
 msgid "Reassign"
 msgstr "Redelegar"
 
-#: templates/teams/tasks.html:521
+#: templates/teams/tasks.html:507
 msgid "Assign"
 msgstr "Atribuir"
 
-#: templates/teams/tasks.html:540
+#: templates/teams/tasks.html:526
 msgid "Delete task"
 msgstr "Tarefa removida."
 
-#: templates/teams/tasks.html:547
+#: templates/teams/tasks.html:533
 msgid "What would you like to do with the subtitles for this task?"
 msgstr "O que você gostaria de fazer com as legendas dessa tarefa?"
 
-#: templates/teams/tasks.html:555
+#: templates/teams/tasks.html:541
 msgid "Publish these subtitles immediately"
 msgstr "Publique essas legendas imediatamente"
 
-#: templates/teams/tasks.html:563
+#: templates/teams/tasks.html:549
 msgid ""
 "Delete these subtitles permanently (discard all drafts since the last "
 "published version)"
 msgstr "Deletar essas legendas permanentemente (descartar todos os rascunhos desde a versão publicada)"
 
-#: templates/teams/tasks.html:617
+#: templates/teams/tasks.html:603
 msgid "Assign to User"
 msgstr "Delegar ao Usuário"
 
-#: templates/teams/tasks.html:627
+#: templates/teams/tasks.html:613
 msgid "Sorry, no tasks here."
 msgstr "Desculpe, não há tarefas."
 
@@ -5406,7 +6029,7 @@ msgstr "Desculpe, não há tarefas."
 msgid "Edit team video"
 msgstr "Editar vídeo da equipe"
 
-#: templates/teams/team_video.html:27 templates/videos/video-page.html:136
+#: templates/teams/team_video.html:27 templates/videos/video-page.html:132
 msgid "Edit video"
 msgstr "Editar vídeo"
 
@@ -5485,7 +6108,7 @@ msgstr "Adicionar Vídeo"
 
 #: templates/teams/videos-list.html:74
 msgid "Project:"
-msgstr ""
+msgstr "Projeto:"
 
 #: templates/teams/videos-list.html:76 templates/teams/videos-list.html:89
 msgid "any"
@@ -5493,19 +6116,19 @@ msgstr "qualquer"
 
 #: templates/teams/videos-list.html:83
 msgid "Language:"
-msgstr ""
+msgstr "Idioma:"
 
 #: templates/teams/videos-list.html:85
 msgid "has"
-msgstr ""
+msgstr "tem"
 
 #: templates/teams/videos-list.html:86
 msgid "doesn't have"
-msgstr ""
+msgstr "não há"
 
 #: templates/teams/videos-list.html:97
 msgid "Sort:"
-msgstr ""
+msgstr "Ordenar:"
 
 #: templates/teams/videos-list.html:100
 msgid "name, a-z"
@@ -5525,11 +6148,11 @@ msgstr "tempo, mais velho"
 
 #: templates/teams/videos-list.html:112
 msgid "most completed languages"
-msgstr ""
+msgstr "idiomas mais completados"
 
 #: templates/teams/videos-list.html:115
 msgid "least completed languages"
-msgstr ""
+msgstr "idiomas menos completados"
 
 #: templates/teams/videos-list.html:133
 msgid "Rebuilding video index. Please try again in a few minutes"
@@ -5579,6 +6202,22 @@ msgstr "Deletar o vídeo por completo."
 
 #: templates/teams/billing/reports.html:8
 msgid "Generate Billing Report"
+msgstr "Gerar Relatório de Cobrança"
+
+#: templates/videos/_create-subtitles-modal.html:5
+#: templates/videos/_multi-video-create-subtitles-form.html:6
+#: templates/videos/video-page.html:95
+msgid "Add a new language!"
+msgstr ""
+
+#: templates/videos/_create-subtitles-modal.html:12
+#, python-format
+msgid "This video is in %(language)s"
+msgstr ""
+
+#: templates/videos/_create-subtitles-modal.html:19
+#: templates/videos/_multi-video-create-subtitles-form.html:13
+msgid "Continue"
 msgstr ""
 
 #: templates/videos/_error_feedback_form.html:7
@@ -5628,13 +6267,6 @@ msgstr "Enviar comentário"
 #: templates/videos/_feedback_form.html:26
 msgid "Send Feedback"
 msgstr "Enviar comentário"
-
-#: templates/videos/_feedback_form.html:35
-#: templates/videos/_upload_subtitles.html:10
-#: templates/videos/_video_url_panel.html:43
-#: templates/videos/video-page.html:50
-msgid "Close"
-msgstr "Fechar"
 
 #: templates/videos/_feedback_form.html:37
 msgid "Thank you for your feedback."
@@ -5768,7 +6400,7 @@ msgstr[1] ""
 
 #: templates/videos/_upload_subtitles.html:6
 msgid "Upload them directly."
-msgstr ""
+msgstr "Faça upload diretamente."
 
 #: templates/videos/_upload_subtitles.html:11
 msgid "Upload Subtitles"
@@ -6210,9 +6842,9 @@ msgid "Leave a comment"
 msgstr "Deixar um comentário"
 
 #: templates/videos/language-comments-tab.html:5
-#: templates/videos/language-page.html:102
+#: templates/videos/language-page.html:107
 #: templates/videos/video-comments-tab.html:5
-#: templates/videos/video-page.html:121
+#: templates/videos/video-page.html:116
 msgid "Comments"
 msgstr "Comentários"
 
@@ -6220,24 +6852,28 @@ msgstr "Comentários"
 msgid "Select two revisions to compare, please"
 msgstr "Por favor selecione duas revisões para comparar"
 
-#: templates/videos/language-page.html:68 templates/videos/video-page.html:68
+#: templates/videos/language-page.html:58
+msgid "subtitles"
+msgstr "legenda"
+
+#: templates/videos/language-page.html:73 templates/videos/video-page.html:68
 msgid "Follower"
 msgstr "Seguidor"
 
-#: templates/videos/language-page.html:74
+#: templates/videos/language-page.html:79
 msgid "Line"
 msgstr "Linha"
 
-#: templates/videos/language-page.html:103
+#: templates/videos/language-page.html:108
 msgid "Revisions"
 msgstr "Revisões"
 
-#: templates/videos/language-page.html:105
+#: templates/videos/language-page.html:110
 #: templates/videos/language-sync-history-tab.html:38
 msgid "Sync History"
 msgstr ""
 
-#: templates/videos/language-page.html:116
+#: templates/videos/language-page.html:122
 msgid "Edit SubtitleLanguage in Django Admin"
 msgstr ""
 
@@ -6254,8 +6890,8 @@ msgstr "Revisão"
 msgid "Rollback to version #"
 msgstr "Reverter para a versão #"
 
-#: templates/videos/language-revisions-tab.html:45
-msgid "Beta Subtitle Editor"
+#: templates/videos/language-revisions-tab.html:43
+msgid "Legacy Subtitle Editor"
 msgstr ""
 
 #: templates/videos/language-revisions-tab.html:54
@@ -6269,11 +6905,11 @@ msgstr "Sem legendas para este idioma."
 
 #: templates/videos/language-subtitles-tab.html:5
 msgid "Delete Subtitle Language"
-msgstr ""
+msgstr "Excluir Idioma de Legenda"
 
 #: templates/videos/language-subtitles-tab.html:13
 msgid "You must use the tasks panel to work with this version."
-msgstr ""
+msgstr "Você deve usar o painel de tarefas para trabalhar com esta versão."
 
 #: templates/videos/language-subtitles-tab.html:14
 #: templates/videos/language-subtitles-tab.html:20
@@ -6283,7 +6919,7 @@ msgstr "Editar legendas"
 
 #: templates/videos/language-subtitles-tab.html:19
 msgid "You do not have permission to edit this version."
-msgstr ""
+msgstr "Você não tem permissão para editar esta versão."
 
 #: templates/videos/language-subtitles-tab.html:37
 msgid "Download"
@@ -6299,7 +6935,7 @@ msgid ""
 "\n"
 "                        Subtitles translated from %(language)s\n"
 "                    "
-msgstr ""
+msgstr "\nLegendas traduzidas de %(language)s"
 
 #: templates/videos/language-subtitles-tab.html:58
 #, python-format
@@ -6315,7 +6951,7 @@ msgid ""
 "                    The most recent revision for this language is blank, but there are older\n"
 "                    revisions that contain subtitles.\n"
 "                    "
-msgstr ""
+msgstr "\nA revisão mais recente para este idioma está em branco, mas há revisões mais antigas que contém legendas."
 
 #: templates/videos/language-subtitles-tab.html:92
 msgid "View revision history"
@@ -6342,21 +6978,21 @@ msgid ""
 "\n"
 "                    This language contains subtitles that are still waiting to be moderated.  Check back later.\n"
 "                "
-msgstr ""
+msgstr "\nEste idioma contém legendas aguardando para serem moderadas. Verifique mais tarde."
 
 #: templates/videos/language-subtitles-tab.html:115
 msgid ""
 "\n"
 "                    Sorry, this language has been removed by Amara staff members or authorized users.\n"
 "                "
-msgstr ""
+msgstr "\nDesculpe, este idioma foi removido pela equipe Amara ou usuários autorizados."
 
 #: templates/videos/language-subtitles-tab.html:121
 msgid ""
 "\n"
 "                    No subtitles have been added for this language yet.\n"
 "                "
-msgstr ""
+msgstr "\nNenhuma legenda adicionada para este idioma"
 
 #: templates/videos/language-subtitles-tab.html:132
 msgid "Roll back to this version"
@@ -6369,24 +7005,24 @@ msgstr ""
 
 #: templates/videos/language-sync-history-tab.html:6
 msgid "No current public tip"
-msgstr ""
+msgstr "Sem dicas no momento"
 
 #: templates/videos/language-sync-history-tab.html:8
 msgid "Synced Versions"
-msgstr ""
+msgstr "Versões Sincronizadas"
 
 #: templates/videos/language-sync-history-tab.html:12
 #: templates/videos/language-sync-history-tab.html:44
 msgid "Version"
-msgstr ""
+msgstr "Versão"
 
 #: templates/videos/language-sync-history-tab.html:13
 msgid "Actions"
-msgstr ""
+msgstr "Ações"
 
 #: templates/videos/language-sync-history-tab.html:21
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: templates/videos/language-sync-history-tab.html:27
 #, python-format
@@ -6395,11 +7031,7 @@ msgstr ""
 
 #: templates/videos/language-sync-history-tab.html:29
 msgid "delete subtitles"
-msgstr ""
-
-#: templates/videos/language-sync-history-tab.html:43
-msgid "Action"
-msgstr ""
+msgstr "excluir legendas"
 
 #: templates/videos/language-sync-history-tab.html:45
 #: unisubs-integration/services/templates/services/translation_request_list.html:6
@@ -6408,11 +7040,11 @@ msgstr "Resultado"
 
 #: templates/videos/language-sync-history-tab.html:46
 msgid "Details"
-msgstr ""
+msgstr "Detalhes"
 
 #: templates/videos/language-sync-history-tab.html:60
 msgid "No Sync History"
-msgstr ""
+msgstr "Sem histórico de sincronização"
 
 #: templates/videos/latest_videos.html:20 templates/videos/volunteer.html:114
 #: templates/videos/volunteer_latest.html:21 templates/videos/watch.html:107
@@ -6534,8 +7166,8 @@ msgstr "Visualizar todas atividades"
 #: templates/videos/video-page.html:49
 msgid ""
 "Subtitles saved! You can share the video with friends, or get an embed code "
-"for your site. To add atranslation, click the button below."
-msgstr "Legendas salvas! Você pode compartilhar o vídeo com seus amigos, ou pegar um código de encorporação (embed code) para o seu site. Para adicionar uma tradução, clique no botão abaixo"
+"for your site. To add a translation, click the button below."
+msgstr ""
 
 #: templates/videos/video-page.html:73
 msgid "Contribute"
@@ -6557,23 +7189,7 @@ msgid ""
 "                "
 msgstr ""
 
-#: templates/videos/video-page.html:96
-msgid "This video doesn't have any subtitles yet."
-msgstr ""
-
-#: templates/videos/video-page.html:96
-msgid "Create subtitles now!"
-msgstr ""
-
-#: templates/videos/video-page.html:99
-msgid "Don't see one of your languages?"
-msgstr "Não vê um de seus idiomas?"
-
-#: templates/videos/video-page.html:99
-msgid "Create a new translation!"
-msgstr ""
-
-#: templates/videos/video-page.html:123
+#: templates/videos/video-page.html:118
 msgid "URLs"
 msgstr "URLs"
 
