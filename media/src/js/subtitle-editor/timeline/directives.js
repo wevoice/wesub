@@ -206,8 +206,13 @@ var angular = angular || null;
 
             function handleDragLeft(context, deltaMS) {
                 context.startTime = context.initialStartTime + deltaMS;
-                if(context.startTime < context.minStartTime) {
-                    context.startTime = context.minStartTime;
+                if (context.startTime < context.minStartTime) {
+                    if (context.startTime > context.minStartTimePush) {
+                        context.previousSubtitleEndTimeNew = context.startTime;
+                    } else {
+                        context.startTime = context.minStartTime;
+                        context.previousSubtitleEndTimeNew = context.minStartTime;
+                    }
                 }
                 if(context.startTime > context.endTime - MIN_DURATION) {
                     context.startTime = context.endTime - MIN_DURATION;
@@ -218,7 +223,12 @@ var angular = angular || null;
                 context.endTime = context.initialEndTime + deltaMS;
                 if(context.maxEndTime !== null &&
                         context.endTime > context.maxEndTime) {
-                            context.endTime = context.maxEndTime;
+                            if (context.endTime < context.maxEndTimePush) {
+                                context.nextSubtitleStartTimeNew = context.endTime;
+                            } else {
+                                context.nextSubtitleStartTimeNew = context.maxEndTime;
+                                context.endTime = context.maxEndTime;
+                            }
                         }
                 if(context.endTime < context.startTime + MIN_DURATION) {
                     context.endTime = context.startTime + MIN_DURATION;
@@ -271,18 +281,28 @@ var angular = angular || null;
                     return false;
                 }
                 var nextSubtitle = subtitleList().nextSubtitle(storedSubtitle);
+                    context.nextSubtitleStartTimeOr = context.nextSubtitleStartTimeNew = null;
                 if(nextSubtitle && nextSubtitle.isSynced()) {
+                    context.nextSubtitleStartTimeOr = nextSubtitle.startTime;
+                    context.nextSubtitleStartTimeNew = null;
                     context.maxEndTime = nextSubtitle.startTime;
+                    context.maxEndTimePush = nextSubtitle.endTime - MIN_DURATION;
                 } else if(scope.duration !== null) {
                     context.maxEndTime = scope.duration;
+                    context.maxEndTimePush = null;
                 } else {
                     context.maxEndTime = 10000000000000;
+                    context.maxEndTimePush = null;
                 }
                 var prevSubtitle = subtitleList().prevSubtitle(storedSubtitle);
+                context.prevSubtitleEndTimeOr = context.prevSubtitleEndTimeNew = null;
                 if(prevSubtitle) {
+                    context.prevSubtitleEndTimeOr = prevSubtitle.endTime;
                     context.minStartTime = prevSubtitle.endTime;
+                    context.minStartTimePush = prevSubtitle.startTime + MIN_DURATION;
                 } else {
                     context.minStartTime = 0;
+                    context.minStartTimePush = null;
                 }
 
                 var initialPageX = evt.pageX;
@@ -294,6 +314,10 @@ var angular = angular || null;
                     placeSubtitle(context.startTime, context.endTime, div);
                     subtitleList().updateSubtitleTime(storedSubtitle,
                         context.startTime, context.endTime);
+                    if (context.previousSubtitleEndTimeNew) subtitleList().updateSubtitleTime(prevSubtitle,
+                        prevSubtitle.startTime, context.previousSubtitleEndTimeNew)
+                    if (context.nextSubtitleStartTimeNew) subtitleList().updateSubtitleTime(nextSubtitle,
+                        context.nextSubtitleStartTimeNew, nextSubtitle.endTime)
                 }).on('mouseup.timelinedrag', function(evt) {
                     $(document).off('.timelinedrag');
                     subtitleList().updateSubtitleTime(storedSubtitle,
