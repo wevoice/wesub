@@ -64,6 +64,7 @@
         // Store generic dialogs that are open, but have been replaced with
         // others
         this.genericStack = [];
+        this.freezeBoxText = "";
     }
 
     DialogManager.prototype = {
@@ -90,7 +91,9 @@
             this.open(dialogName);
         },
         current: function() {
-            if(this.stack.length > 0) {
+            if(this.freezeBoxText) {
+                return 'freeze-box';
+            } else if(this.stack.length > 0) {
                 return this.stack[this.stack.length - 1];
             } else {
                 return null;
@@ -149,6 +152,30 @@
             }
             this.generic = dialogDef;
             this.open('generic');
+        },
+        showFreezeBox: function(text) {
+            /* Show the "freeze box". 
+             *
+             * The freeze box displays a simple message and the user can't
+             * close.  This to prevents any user-actions and obviously should
+             * be used very sparingly, for example while saving a copy and
+             * waiting for a response from the server.
+             *
+             * The Freeze box uses a separate system from the dialog stack.
+             * If the freeze box is active, then it will display regardless of
+             * any dialogs that are also open.
+             */
+            this.freezeBoxText = text;
+        },
+        closeFreezeBox: function() {
+            this.freezeBoxText = '';
+        },
+        freezeBoxCSSClass: function() {
+            if(this.freezeBoxText) {
+                return 'shown';
+            } else {
+                return '';
+            }
         }
     }
 

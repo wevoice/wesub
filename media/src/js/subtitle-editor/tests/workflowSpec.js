@@ -123,6 +123,9 @@ describe('WorkflowProgressionController', function() {
         $scope.currentEdit = {
             'start': jasmine.createSpy()
         };
+        $scope.dialogManager = {
+            'showFreezeBox': jasmine.createSpy()
+        };
         subtitleList.loadXML(null);
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = makeWorkflow(Workflow, subtitleList);
@@ -140,7 +143,7 @@ describe('WorkflowProgressionController', function() {
             // endoresment
             expect($scope.$emit).toHaveBeenCalledWith('save', {
                 'markComplete': true,
-                'allowResume': false
+                'exitAfter': true
             });
         });
 
