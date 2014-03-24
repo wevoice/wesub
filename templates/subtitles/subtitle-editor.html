@@ -310,7 +310,7 @@
                             <td>[[ currentEdit.draft.characterCount() ]]</td>
                 </tr>
                 <tr class="child"
-                    ng-repeat="count in currentEdit.lineCounts()">
+                    ng-repeat="count in currentEdit.lineCounts() track by $index">
                   <th>Line [[ $index + 1 ]]</th>
 		  <td>[[ count ]]</td>
 		</tr>
