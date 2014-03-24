@@ -670,16 +670,20 @@ section.main {
                     border-top: 1px solid #EBECED;
                     border-left: 0;
                     border-right: 0;
+                    height: 60px;
+                    line-height: 1.3em;
+                    overflow: hidden;
+                    padding: 6px 50px 0px 40px;
                 }
 
                 textarea {
                     font: normal 12px $OpenSans;
-                    line-height: 25px;
-                    height: 46px;
+                    //line-height: 25px;
+                    //height: 46px;
                     margin: 0;
                     display: block;
                     resize: none;
-                    padding: 10px 50px 10px 40px;
+                    //padding: 10px 50px 10px 40px;
                     width: 100%;
 
                     &:focus {
@@ -689,8 +693,8 @@ section.main {
                 span.subtitle-text {
                     cursor: text;
                     display: block;
-                    min-height: 46px;
-                    padding: 10px 50px 10px 40px;
+                    //min-height: 46px;
+                    //padding: 10px 50px 10px 40px;
 
                     b {
                         font-weight: bold;
