@@ -156,6 +156,26 @@ var angular = angular || null;
                      $scope.referenceSubtitles.subtitleList.syncedCount > 0)
         }
 
+        $scope.showCopyTimingModal = function($event) {
+            var dialogManager = $scope.dialogManager;
+            dialogManager.openDialog({
+                title: 'Confirm Copy Timing',
+                text: 'This will copy all subtitle timing from reference to working subtitles. Do you want to continue?',
+                allowClose: 1,
+                buttons: [
+                    dialogManager.button('Continue', function() {
+                        $scope.copyTimingOver();
+                        dialogManager.close();
+                    }),
+                    dialogManager.button('Cancel', function() {
+                        dialogManager.close();
+                    })
+                ]
+            });
+            $event.stopPropagation();
+            $event.preventDefault();
+        };
+
         $scope.showClearTimingModal = function($event) {
             var dialogManager = $scope.dialogManager;
             dialogManager.openDialog({
