@@ -94,11 +94,13 @@ describe('The Workflow class', function() {
         expect(workflow.stageDone('sync')).toBeTruthy();
     });
 
-    it('starts in the sync stage if we already have subs',
+    it('starts in the review stage if we already have subs',
             inject(function(Workflow) {
-        subtitleList.insertSubtitleBefore(null);
+        var sub = subtitleList.insertSubtitleBefore(null);
+        subtitleList.updateSubtitleContent(sub, 'sub text');
+        subtitleList.updateSubtitleTime(sub, 100, 200);
         workflow = makeWorkflow(Workflow, subtitleList);
-        expect(workflow.stage).toBe('sync');
+        expect(workflow.stage).toBe('review');
     }));
 });
 
@@ -118,6 +120,9 @@ describe('WorkflowProgressionController', function() {
         $scope.translating = function() { return false; }
         $scope.timelineShown = false;
         $scope.toggleTimelineShown = jasmine.createSpy();
+        $scope.currentEdit = {
+            'start': jasmine.createSpy()
+        };
         subtitleList.loadXML(null);
         $scope.workingSubtitles = { subtitleList: subtitleList };
         $scope.workflow = makeWorkflow(Workflow, subtitleList);
@@ -152,10 +157,12 @@ describe('WorkflowProgressionController', function() {
         it('changes the workflow stage', function() {
             var evt = {
                 preventDefault: jasmine.createSpy(),
+                stopPropagation: jasmine.createSpy(),
             };
             $scope.onNextClicked(evt);
             expect($scope.workflow.stage).toBe('sync')
             expect(evt.preventDefault).toHaveBeenCalled();
+            expect(evt.stopPropagation).toHaveBeenCalled();
             insertSyncedAndCompletedSubtitle(subtitleList);
             $scope.onNextClicked(evt);
             expect($scope.workflow.stage).toBe('review')
