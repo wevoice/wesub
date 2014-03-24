@@ -1431,7 +1431,7 @@ section.timeline {
             font-size: 11px;
             height: 28px;
             overflow: hidden;
-            padding: 7px 10px 0 10px;
+            padding: 7px 12px 0 12px;
             position: absolute;
             top: 10px;
             @include border-radius(3px);
@@ -1451,7 +1451,7 @@ section.timeline {
                 height: 100%;
                 position: absolute;
                 top: 0;
-                width: 4px;
+                width: 6px;
 
                 &.left {
                     background: #3E8982;
@@ -1463,7 +1463,7 @@ section.timeline {
                         content: "";
                         display: block;
                         height: 12px;
-                        left: -5px;
+                        left: -3px;
                         position: absolute;
                         top: 8px;
                         width: 12px;
@@ -1481,7 +1481,7 @@ section.timeline {
                         display: block;
                         height: 12px;
                         position: absolute;
-                        right: -5px;
+                        right: -3px;
                         top: 8px;
                         width: 12px;
                         @include border-radius(12px);
