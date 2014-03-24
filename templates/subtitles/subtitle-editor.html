@@ -167,7 +167,7 @@
           <div class="select">
             <select name="language"
                     ng-model='language'
-                    ng-options="item.name for item in languages">
+                    ng-options="item.name for item in languages | orderBy:'name'">
             </select>
           </div>
           <div class="select">
