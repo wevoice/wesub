@@ -135,7 +135,9 @@ unisubs.widget.SubtitleController.prototype.openSubtitleDialog =
 unisubs.widget.SubtitleController.prototype.openNewLanguageDialog = 
     function(opt_langState) 
 {
-    site.openModalDialog('#create-subtitles-modal');
+    // Have to use subscript notation to prevent closure from changing the
+    // attribute names.
+    window['site']['openModalDialog']('#create-subtitles-modal');
 };
 
 unisubs.widget.SubtitleController.prototype.subtitleDialogClosed_ = function(e) {
