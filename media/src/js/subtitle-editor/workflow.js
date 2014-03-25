@@ -87,7 +87,7 @@ var angular = angular || null;
     }
     module.value('Workflow', Workflow);
 
-    module.controller('WorkflowProgressionController', function($scope, EditorData, VideoPlayer) {
+    module.controller('WorkflowProgressionController', function($scope, $sce, EditorData, VideoPlayer) {
 
         $scope.$root.$on("video-playback-changes", function() {$scope.workflow.appActionDone();});
         $scope.$root.$on("app-click", function() {$scope.workflow.appActionDone();});
@@ -112,11 +112,13 @@ var angular = angular || null;
         $scope.endorse = function() {
             if(EditorData.task_id === undefined || 
                     EditorData.task_id === null) {
+                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Saving&hellip;"));
                 $scope.$root.$emit('save', {
-                    allowResume: false,
                     markComplete: true,
+                    exitAfter: true
                 });
             } else {
+                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Endorsing&hellip;"));
                 $scope.$root.$emit('approve-task');
             }
         }

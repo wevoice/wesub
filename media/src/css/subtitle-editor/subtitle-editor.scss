@@ -1572,8 +1572,9 @@ body.timeline-shown {
 
 }
 
-aside.modal#loading-modal {
-    display: block;
+aside.freeze-box {
+    display: none;
+    position: fixed;
     left: 25%;
     top: 20%;
     width: 50%;
@@ -1581,6 +1582,10 @@ aside.modal#loading-modal {
     margin: -50px 0 0 0;
     padding: 0;
     border-radius: 10px;
+    box-shadow: 0, 0, 30px, rgba(black, .4);
+    background: $dark-grey;
+    z-index: 12000;
+    color: #F1F1F1;
 
     h1 {
         text-align: center;
@@ -1588,9 +1593,17 @@ aside.modal#loading-modal {
         font: normal 20px $OpenSans;
         line-height: 100px;
     }
+
+    &.shown {
+        display: block;
+    }
 }
 
-body.loading-finished aside.modal#loading-modal {
+aside.freeze-box#loading {
+    display: block;
+}
+
+body.loading-finished aside.freeze-box#loading {
     display: none;
 }
 

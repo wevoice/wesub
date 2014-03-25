@@ -20,7 +20,7 @@
 
     var module = angular.module('amara.SubtitleEditor.collab', []);
 
-    module.controller('CollabController', function($scope, $timeout, EditorData) {
+    module.controller('CollabController', function($scope, $sce, $timeout, EditorData) {
 
         $scope.notes = EditorData.savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
@@ -51,12 +51,14 @@
         }
 
         $scope.approve = function() {
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Approving task&hellip;"));
             $scope.$root.$emit('approve-task');
         };
         $scope.toggleDocking = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
         };
         $scope.sendBack = function() {
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Sending task back&hellip;"));
             $scope.$root.$emit('send-back-task');
         };
         $scope.notesChanged = function() {

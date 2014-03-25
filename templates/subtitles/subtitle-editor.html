@@ -40,7 +40,7 @@
 
 </head>
 <body ng-class="{ 'timeline-shown': timelineShown, 'loading-finished': loadingFinished }">
-    <aside class="modal" id="loading-modal"><h1>{% trans "Loading subtitle editor&hellip;" %}</h1></aside>
+    <aside class="freeze-box" id="loading"><h1>{% trans "Loading subtitle editor&hellip;" %}</h1></aside>
     <header class="main group ng-cloak" ng-cloak>
         <section class="site left column">
             <h1>Amara</h1>
@@ -60,13 +60,13 @@
                             Debug
                         </a>
                     {% endif %}
-                    <a class="discard" href="#" ng-click="discard()">
+                    <a class="discard" href="#" ng-click="onExitClicked($event)">
                         Exit
                     </a>
-                    <a href="#" ng-click="switchToLegacyEditor($event)">
+                    <a href="#" ng-click="onLegacyEditorClicked($event)">
                         Legacy Editor
                     </a>
-                    <a class="save" href="#" ng-class="{ disabled: saveDisabled() }" ng-click="save()">
+                    <a class="save" href="#" ng-class="{ disabled: saveDisabled() }" ng-click="onSaveClicked($event)">
                         Save
                     </a>
                 </div>
@@ -775,6 +775,9 @@
     {# include bold style too #}
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <div id="modal-overlay" ng-class="dialogManager.overlayCSSClass()"></div>
+    <aside class="freeze-box" ng-class="dialogManager.freezeBoxCSSClass()">
+        <h1 ng-bind-html="dialogManager.freezeBoxText"></h1>
+    </aside>
     <aside modal-dialog="generic" class="modal">
         <h3>[[ dialogManager.generic.title ]]</h3>
         <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>

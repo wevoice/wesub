@@ -139,7 +139,7 @@ var angular = angular || null;
         $scope.$watch('versionNumber', $scope.versionNumberChanged);
     });
 
-    module.controller('SaveSessionController', function($scope, $q, $timeout, SubtitleBackupStorage, SubtitleStorage, EditorData) {
+    module.controller('SaveSessionController', function($scope, $q, $sce, $timeout, SubtitleBackupStorage, SubtitleStorage, EditorData) {
 
         $scope.changesMade = false;
         $scope.autoBackupNeeded = false;
@@ -150,6 +150,25 @@ var angular = angular || null;
         $scope.saveDisabled = function() {
             return !$scope.hasUnsavedWork();
         };
+
+        $scope.onSaveClicked = function($event) {
+            $event.preventDefault();
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Saving&hellip;"));
+            $scope.save()['finally'](function() {
+                $scope.dialogManager.closeFreezeBox();
+            });
+        }
+        $scope.onExitClicked = function($event) {
+            $event.preventDefault();
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Exiting&hellip;"));
+            $scope.discard();
+        }
+
+        $scope.onLegacyEditorClicked = function($event) {
+            $event.preventDefault();
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Exiting&hellip;"));
+            $scope.switchToLegacyEditor();
+        }
 
         $scope.hasUnsavedWork = function() {
             return ($scope.changesMade || $scope.notesChanged);
@@ -195,7 +214,7 @@ var angular = angular || null;
             var defaults = {
                 force: false,
                 markComplete: undefined,
-                allowResume: true,
+                exitAfter: false,
             }
             if(options !== undefined) {
                 angular.extend(defaults, options);
@@ -206,10 +225,14 @@ var angular = angular || null;
                 return;
             }
 
-            $scope.saveSession(options.markComplete)
+            return $scope.saveSession(options.markComplete)
                 .then(function(versionNumber) {
                 $scope.nextVersionNumber = versionNumber;
-                $scope.showCloseModal(options.allowResume);
+                if(options.exitAfter) {
+                    $scope.exitToVideoPage();
+                } else {
+                    $scope.showCloseModal(true);
+                }
             });
         };
         $scope.saveAndSendBack = function() {
@@ -351,8 +374,7 @@ var angular = angular || null;
                 buttons: buttons
             });
         };
-        $scope.switchToLegacyEditor = function($event) {
-            $event.preventDefault();
+        $scope.switchToLegacyEditor = function() {
             if(!$scope.hasUnsavedWork()) {
                 $scope.exitToLegacyEditor();
                 return;
