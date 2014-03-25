@@ -457,6 +457,11 @@
         <canvas class="timing" width="100" height="65" timeline-timing></canvas>
         <div timeline-subtitles class="subtitles-container" dir="{{ language.dir }}">
         </div>
+	<div class="nextSubSticker" ng-show="showUpcomingUnsyncedSubtitle">
+	  <div class="subtitle">
+	    <span class="handle left"></span><span class="upcomingUnsyncedSubtitleText"></span>
+	  </div>
+	</div>
     </section>
     <aside modal-dialog="guidelines" allow-close class="modal" role="dialog" id="guidelines-modal" tabindex="-1" aria-labeledby="guidelines-heading" dir="[[ workingSubtitles.language.dir ]]">
       <ng-switch on="showTeamGuidelines()">

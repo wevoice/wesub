@@ -1410,21 +1410,28 @@ section.timeline {
     width: 100%;
     z-index: 51;
 
-    div.current-time-marker {
-        background: #FC0D1B;
-        content: "";
-        display: block;
-        height: 65px;
-        left: 50%;
-        position: absolute;
-        width: 1px;
-        z-index: 54;
-    }
-    div.subtitles-container {
-        height: 65px;
-        position: absolute;
-        top: 0;
-        width: 100%;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         div.subtitle {
             background: #DADBDC;
@@ -1444,10 +1451,8 @@ section.timeline {
                 text-overflow: ellipsis;
                 width: 100%;
                 white-space: nowrap;
-                cursor: move;
             }
-            a.handle {
-                cursor: col-resize;
+            .handle {
                 height: 100%;
                 position: absolute;
                 top: 0;
@@ -1489,7 +1494,40 @@ section.timeline {
                 }
             }
         }
-
+    div.nextSubSticker {
+        height: 100%;
+        width: 75px;
+        padding-left: 5px;
+        background-color: $dark-grey;
+        float: right;
+        position: relative;
+        div.subtitle {
+            width: 75px;
+        }
+    }
+    div.current-time-marker {
+        background: #FC0D1B;
+        content: "";
+        display: block;
+        height: 65px;
+        left: 50%;
+        position: absolute;
+        width: 1px;
+        z-index: 54;
+    }
+    div.subtitles-container {
+        height: 65px;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        .subtitle {
+            span {
+                cursor: move;
+            }
+            .handle {
+                cursor: col-resize;
+            }
+        }
         div.unsynced {
             background: #FEFFE2;
         }
