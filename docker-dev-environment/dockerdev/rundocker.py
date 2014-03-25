@@ -53,9 +53,11 @@ def run_manage(manage_args, docker_args=None, settings='docker_dev_settings',
         run_docker("rm %s" % cid, stdout=dev_null)
     os.remove(cid_path(image_name))
 
-def run_shell():
+def run_shell(docker_args=None):
     image_name = unique_image_name('amara-dev-shell')
     run_cmd = _docker_manage_args(image_name)
+    if docker_args is not None:
+        run_cmd.extend(docker_args)
     run_cmd.extend(['amara-dev', '/bin/bash', '--init-file',
                     '/opt/ve/unisubs/bin/activate'])
     run_docker(" ".join(run_cmd))
@@ -74,7 +76,6 @@ def _docker_manage_args(image_name, settings='docker_dev_settings'):
     return [
         'run',
         '-i', '-t',
-        '-p 8000:8000',
         '-h=unisubs.example.com',
         '-cidfile=%s' % cid_path(image_name),
         '-e', 'DJANGO_SETTINGS_MODULE=%s' % settings,
