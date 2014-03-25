@@ -549,6 +549,10 @@ var angular = angular || null;
                     unsyncedDiv = null;
                 }
             }
+
+            scope.unsyncedShown = function() {
+                return (unsyncedDiv != null);
+            }
             // Put redrawSubtitles in the scope so that the controller can
             // call it.
             scope.redrawSubtitles = function(options) {

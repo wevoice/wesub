@@ -163,8 +163,12 @@
         }
 
         function updateUpcomingSubtitleSticker() {
-            var s =
+            if ($scope.unsyncedShown())
+                var s =
                 $scope.workingSubtitles.subtitleList.secondUnsyncedSubtitle();
+            else
+                var s =
+                $scope.workingSubtitles.subtitleList.firstUnsyncedSubtitle();
             if (s) {
                 // This is not good data binding but is kept consistent
                 // with placement of subs on the timeline.
