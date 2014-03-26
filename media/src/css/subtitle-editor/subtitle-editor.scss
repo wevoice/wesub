@@ -1411,7 +1411,78 @@ section.timeline {
     top: 290px;
     width: 100%;
     z-index: 51;
+    div.subtitle {
+        background: #DADBDC;
+        font-size: 11px;
+        height: 28px;
+        overflow: hidden;
+        padding: 7px 12px 0 12px;
+        position: absolute;
+        top: 10px;
+        @include border-radius(3px);
 
+        span {
+            // This is to avoid seeing the second line
+            height: 15px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            white-space: nowrap;
+        }
+        .handle {
+            height: 100%;
+            position: absolute;
+            top: 0;
+            width: 6px;
+
+            &.left {
+                background: #3E8982;
+                left: 0;
+                @include multi-border-radius(3px, 0, 0, 3px);
+                    
+                &:before {
+                    background: #3E8982;
+                    content: "";
+                    display: block;
+                    height: 12px;
+                    left: -3px;
+                    position: absolute;
+                    top: 8px;
+                    width: 12px;
+                    @include border-radius(12px);
+                }
+            }
+            &.right {
+                background: #A2A3A4;
+                right: 0;
+                @include multi-border-radius(0, 3px, 3px, 0);
+
+                &:before {
+                    background: #A2A3A4;
+                    content: "";
+                    display: block;
+                    height: 12px;
+                    position: absolute;
+                    right: -3px;
+                    top: 8px;
+                    width: 12px;
+                    @include border-radius(12px);
+                }
+             }
+         }
+    }
+    div.nextSubSticker {
+        height: 100%;
+        width: 150px;
+        padding-left: 5px;
+        background-color: $dark-grey;
+        float: right;
+        position: relative;
+        div.subtitle {
+            width: 150px;
+        }
+    }
     div.current-time-marker {
         background: #FC0D1B;
         content: "";
@@ -1427,71 +1498,14 @@ section.timeline {
         position: absolute;
         top: 0;
         width: 100%;
-
-        div.subtitle {
-            background: #DADBDC;
-            font-size: 11px;
-            height: 28px;
-            overflow: hidden;
-            padding: 7px 12px 0 12px;
-            position: absolute;
-            top: 10px;
-            @include border-radius(3px);
-
+        .subtitle {
             span {
-                // This is to avoid seeing the second line
-                height: 15px;
-                display: block;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 100%;
-                white-space: nowrap;
                 cursor: move;
             }
-            a.handle {
+            .handle {
                 cursor: col-resize;
-                height: 100%;
-                position: absolute;
-                top: 0;
-                width: 6px;
-
-                &.left {
-                    background: #3E8982;
-                    left: 0;
-                    @include multi-border-radius(3px, 0, 0, 3px);
-                    
-                    &:before {
-                        background: #3E8982;
-                        content: "";
-                        display: block;
-                        height: 12px;
-                        left: -3px;
-                        position: absolute;
-                        top: 8px;
-                        width: 12px;
-                        @include border-radius(12px);
-                    }
-                }
-                &.right {
-                    background: #A2A3A4;
-                    right: 0;
-                    @include multi-border-radius(0, 3px, 3px, 0);
-
-                    &:before {
-                        background: #A2A3A4;
-                        content: "";
-                        display: block;
-                        height: 12px;
-                        position: absolute;
-                        right: -3px;
-                        top: 8px;
-                        width: 12px;
-                        @include border-radius(12px);
-                    }
-                }
             }
         }
-
         div.unsynced {
             background: #FEFFE2;
         }

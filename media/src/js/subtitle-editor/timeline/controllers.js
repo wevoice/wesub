@@ -28,12 +28,14 @@
         $scope.currentTime = $scope.duration = null;
         // Subtitle at currentTime, or null.
         $scope.subtitle = null;
+        $scope.showUpcomingUnsyncedSubtitle = false;
         /* Subtitles that we will sync when the user hits the up/down arrows.
          *
          * Contains the following properties:
          *    start - subtitle whose startTime will be synced
          *    end - subtitle whose endTime will be synced
          */
+
         var willSync = { start: null, end: null};
         var lastTimeReturned = null;
         var lastTimeReturnedAt = null;
@@ -160,9 +162,28 @@
             }
         }
 
+        function updateUpcomingSubtitleSticker() {
+            if ($scope.unsyncedShown())
+                var s =
+                $scope.workingSubtitles.subtitleList.secondUnsyncedSubtitle();
+            else
+                var s =
+                $scope.workingSubtitles.subtitleList.firstUnsyncedSubtitle();
+            if (s) {
+                // This is not good data binding but is kept consistent
+                // with placement of subs on the timeline.
+                // Using bind-html, we would keep the formatting.
+                var span = $('span.upcomingUnsyncedSubtitleText');
+                span.html(s.content());
+                $scope.showUpcomingUnsyncedSubtitle = true; 
+            }
+            else $scope.showUpcomingUnsyncedSubtitle = false;
+        }
+
         function updateTimeline() {
             updateTime();
             updateWillSync();
+            updateUpcomingSubtitleSticker();
             $scope.redrawCanvas();
             $scope.redrawSubtitles();
         }
