@@ -349,7 +349,6 @@ var angular = angular || null;
         $scope.showCloseModal = function(allowResume) {
             var buttons = [
                 $scope.dialogManager.button('Exit', function() {
-                    $scope.dialogManager.close();
                     $scope.exiting = true;
                     $scope.exitToVideoPage();
                 })
@@ -358,15 +357,13 @@ var angular = angular || null;
             if (allowResume && $scope.nextVersionNumber)  {
                 buttons.push($scope.dialogManager.button(
                             'Resume editing', function() {
-                    $scope.dialogManager.close();
                     resumeEditing();
                 }));
             }
 
             if ($scope.status !== 'saved') {
                 buttons.push($scope.dialogManager.linkButton(
-                    "Wait, don't discard my changes!",
-                    function() { $scope.dialogManager.close(); }));
+                    "Wait, don't discard my changes!"));
             }
 
             $scope.dialogManager.openDialog({
@@ -386,13 +383,10 @@ var angular = angular || null;
                 title: "You have unsaved changes.  If you switch now you will lose your work.",
                 buttons: [
                     dialogManager.button('Discard changes', function() {
-                        dialogManager.close();
                         $scope.exiting = true;
                         $scope.exitToLegacyEditor();
                     }),
-                    dialogManager.button('Continue editing', function() {
-                        dialogManager.close();
-                    })
+                    dialogManager.button('Continue editing')
                 ]
             });
         };

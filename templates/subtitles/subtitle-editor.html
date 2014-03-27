@@ -787,7 +787,7 @@
         <h3>[[ dialogManager.generic.title ]]</h3>
         <p ng-show="dialogManager.generic.text">[[ dialogManager.generic.text ]]</p>
         <footer class="buttons">
-            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="button.callback()" ng-class="button.cssClass">[[ button.text ]]</button>
+            <button ng-repeat="button in dialogManager.generic.buttons" ng-click="dialogManager.onButtonClicked(button, $event)" ng-class="button.cssClass">[[ button.text ]]</button>
         </footer>
     </aside>
     {% if DEBUG %}

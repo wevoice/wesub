@@ -122,12 +122,7 @@
         },
         closeButton: function(callback) {
             var that = this;
-            return this.button('Close', function() {
-                that.close();
-                if(callback) {
-                    callback();
-                }
-            });
+            return this.button('Close', callback);
         },
         linkButton: function(text, callback) {
             return this.button(text, callback, 'link-style');
@@ -152,6 +147,14 @@
             }
             this.generic = dialogDef;
             this.open('generic');
+        },
+        onButtonClicked: function(button, $event) {
+            this.close();
+            $event.preventDefault();
+            $event.stopPropagation();
+            if(button.callback) {
+                button.callback();
+            }
         },
         showFreezeBox: function(text) {
             /* Show the "freeze box". 

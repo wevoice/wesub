@@ -56,5 +56,32 @@ describe('Test the SubtitleList class', function() {
         dialogManager.close();
         expect(dialogManager.current()).toBe(null);
     });
+
+    it('opens generic dialogs', function() {
+        dialogManager.openDialog({
+            title: 'foo',
+            buttons: [
+                dialogManager.button("Foo")
+            ]
+        });
+        expect(dialogManager.current()).toEqual('generic');
+    });
+
+    it('handles button clicks for generic dialogs', function() {
+        var callback = jasmine.createSpy();
+        var button = dialogManager.button("Foo", callback);
+        var $event = jasmine.createSpyObj('$event', ['preventDefault',
+            'stopPropagation']);
+        dialogManager.openDialog({
+            title: 'foo',
+            buttons: [ button ]
+        });
+        dialogManager.onButtonClicked(button, $event);
+        expect(callback).toHaveBeenCalled();
+        expect($event.preventDefault).toHaveBeenCalled();
+        expect($event.stopPropagation).toHaveBeenCalled();
+        expect(dialogManager.current()).toBe(null);
+    });
+
 });
 

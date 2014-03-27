@@ -165,11 +165,8 @@ var angular = angular || null;
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.copyTimingOver();
-                        dialogManager.close();
                     }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
+                    dialogManager.button('Cancel')
                 ]
             });
             $event.stopPropagation();
@@ -185,11 +182,8 @@ var angular = angular || null;
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearTiming();
-                        dialogManager.close();
                     }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
+                    dialogManager.button('Cancel')
                 ]
             });
             $event.stopPropagation();
@@ -214,11 +208,8 @@ var angular = angular || null;
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.clearText();
-                        dialogManager.close();
                     }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
+                    dialogManager.button('Cancel')
                 ]
             });
             $event.stopPropagation();
@@ -243,11 +234,8 @@ var angular = angular || null;
                 buttons: [
                     dialogManager.button('Continue', function() {
                         $scope.resetToLastSavedVersion();
-                        dialogManager.close();
                     }),
-                    dialogManager.button('Cancel', function() {
-                        dialogManager.close();
-                    })
+                    dialogManager.button('Cancel')
                 ]
             });
             $event.stopPropagation();
@@ -321,7 +309,7 @@ var angular = angular || null;
      * FIXME: this can probably be moved to a service to keep the app module
      * lean and mean.
      */
-    module.controller("AppControllerLocking", function($scope, $timeout, $window, EditorData, LockService) {
+    module.controller("AppControllerLocking", function($sce, $scope, $timeout, $window, EditorData, LockService) {
         var regainLockTimer;
 
         $scope.minutesIdle = 0;
@@ -366,9 +354,11 @@ var angular = angular || null;
         }
 
         function regainLockAfterIdle() {
+            $scope.dialogManager.showFreezeBox(
+                    $sce.trustAsHtml('Regaining lock&hellip;'));
             regainLock().then(function onSuccess(response) {
+                $scope.dialogManager.closeFreezeBox();
                 if (response.data.ok) {
-                    $scope.dialogManager.close();
                     $scope.minutesIdle = 0;
                     startRegainLockTimer();
                     startUserIdleTimer();
@@ -427,7 +417,6 @@ var angular = angular || null;
                         regainLockAfterIdle();
                     }),
                     dialogManager.button('Close editor', function() {
-                        dialogManager.close();
                         $scope.exitToVideoPage();
                     })
                 ]
@@ -559,11 +548,9 @@ var angular = angular || null;
                 buttons: [
                     $scope.dialogManager.button('Restore', function() {
                         $scope.restoreAutoBackup();
-                        $scope.dialogManager.close();
                     }),
                     $scope.dialogManager.button('Discard', function() {
                         SubtitleBackupStorage.clearBackup();
-                        $scope.dialogManager.close();
                     })
                 ]
             });
