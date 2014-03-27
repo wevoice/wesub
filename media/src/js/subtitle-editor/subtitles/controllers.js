@@ -347,29 +347,28 @@ var angular = angular || null;
             }
         }
         $scope.showCloseModal = function(allowResume) {
-            var buttons = [
-                $scope.dialogManager.button('Exit', function() {
+            var overrides = {
+                title: closeDialogTitle(allowResume),
+                buttons: [ 'exit' ]
+            };
+            var callbacks = {
+                exit: function() {
                     $scope.exiting = true;
                     $scope.exitToVideoPage();
-                })
-            ];
+                }
+            };
 
             if (allowResume && $scope.nextVersionNumber)  {
-                buttons.push($scope.dialogManager.button(
-                            'Resume editing', function() {
-                    resumeEditing();
-                }));
+                overrides.buttons.push('resume');
+                callbacks['resume'] = resumeEditing;
             }
 
             if ($scope.status !== 'saved') {
-                buttons.push($scope.dialogManager.linkButton(
-                    "Wait, don't discard my changes!"));
+                overrides.buttons.push('waitDontDiscard');
             }
 
-            $scope.dialogManager.openDialog({
-                title: closeDialogTitle(allowResume),
-                buttons: buttons
-            });
+            $scope.dialogManager.openDialog('subtitlesSaved', callbacks,
+                    overrides);
         };
         $scope.switchToLegacyEditor = function() {
             if(!$scope.hasUnsavedWork()) {
@@ -379,15 +378,11 @@ var angular = angular || null;
 
             var dialogManager = $scope.dialogManager;
 
-            dialogManager.openDialog({
-                title: "You have unsaved changes.  If you switch now you will lose your work.",
-                buttons: [
-                    dialogManager.button('Discard changes', function() {
-                        $scope.exiting = true;
-                        $scope.exitToLegacyEditor();
-                    }),
-                    dialogManager.button('Continue editing')
-                ]
+            dialogManager.openDialog('legacyEditorUnsavedWork', {
+                discardChanges: function() {
+                    $scope.exiting = true;
+                    $scope.exitToLegacyEditor();
+                }
             });
         };
         $scope.showErrorModal = function(message) {

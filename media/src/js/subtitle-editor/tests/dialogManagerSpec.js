@@ -11,6 +11,14 @@ describe('Test the SubtitleList class', function() {
         var DialogManager = $injector.get('DialogManager');
         VideoPlayer = $injector.get('VideoPlayer');
         dialogManager = new DialogManager(VideoPlayer);
+        // Replace the dialog definitions with our own
+        dialogManager.dialogs = {
+            testDialog: {
+                title: 'testTitle',
+                text: 'testText',
+                buttons: ['continueEditing', 'cancel']
+            }
+        };
     }));
 
     it('starts with no active dialog', function() {
@@ -58,30 +66,36 @@ describe('Test the SubtitleList class', function() {
     });
 
     it('opens generic dialogs', function() {
-        dialogManager.openDialog({
-            title: 'foo',
-            buttons: [
-                dialogManager.button("Foo")
-            ]
-        });
+        dialogManager.openDialog('testDialog');
         expect(dialogManager.current()).toEqual('generic');
+        expect(dialogManager.generic.title).toEqual('testTitle');
+        expect(dialogManager.generic.text).toEqual('testText');
+        expect(dialogManager.generic.buttons).toEqual([
+            {
+                text: 'Continue editing',
+                callback: null,
+                cssClass: null
+            },
+            {
+                text: 'Cancel',
+                callback: null,
+                cssClass: null
+            }
+        ]);
     });
 
     it('handles button clicks for generic dialogs', function() {
         var callback = jasmine.createSpy();
-        var button = dialogManager.button("Foo", callback);
         var $event = jasmine.createSpyObj('$event', ['preventDefault',
             'stopPropagation']);
-        dialogManager.openDialog({
-            title: 'foo',
-            buttons: [ button ]
+        dialogManager.openDialog('testDialog', {
+            continueEditing: callback
         });
-        dialogManager.onButtonClicked(button, $event);
+        dialogManager.onButtonClicked(dialogManager.generic.buttons[0], $event);
         expect(callback).toHaveBeenCalled();
         expect($event.preventDefault).toHaveBeenCalled();
         expect($event.stopPropagation).toHaveBeenCalled();
         expect(dialogManager.current()).toBe(null);
     });
-
 });
 

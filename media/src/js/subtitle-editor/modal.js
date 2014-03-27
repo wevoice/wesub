@@ -57,6 +57,14 @@
         }
     })
 
+    function makeButton(text, cssClass) {
+        // Make a button for the generic dialog
+        return {
+            text: text,
+            cssClass: cssClass || null
+        };
+    };
+
     function DialogManager(VideoPlayer) {
         this.VideoPlayer = VideoPlayer;
         this.stack = [];
@@ -113,40 +121,114 @@
                 return '';
             }
         },
-        button: function(text, callback, cssClass) {
-            return {
-                text: text,
-                callback: callback,
-                cssClass: cssClass || null
-            };
+        buttons: {
+            continueEditing: makeButton('Continue editing'),
+            continueButton: makeButton('Continue'),
+            // Note: we shouldn't use "continue" as a key because it's a
+            // javascript keyword
+            cancel: makeButton('Cancel'),
+            close: makeButton('Close'),
+            closeEditor: makeButton('Close Editor'),
+            resume: makeButton('Try to resume work'),
+            restore: makeButton('Restore'),
+            discard: makeButton('Discard'),
+            discardChanges: makeButton('Discard changes'),
+            exit: makeButton('Exit'),
+            waitDontDiscard: makeButton("Wait, don't discard my changes!",
+                    'link-style')
         },
-        closeButton: function(callback) {
-            var that = this;
-            return this.button('Close', callback);
-        },
-        linkButton: function(text, callback) {
-            return this.button(text, callback, 'link-style');
+        dialogs: {
+            subtitlesSaved: {
+                title: "Subtitles saved",
+                buttons: ['exit', 'resume', 'waitDontDiscard']
+            },
+            legacyEditorUnsavedWork: {
+                title: "You have unsaved changes.  If you switch now you will lose your work.",
+                buttons: [ 'discardChanges', 'continueEditing']
+            },
+            confirmCopyTiming: {
+                title: 'Confirm Copy Timing',
+                text: 'This will copy all subtitle timing from reference to working subtitles. Do you want to continue?',
+                buttons: [ 'continueButton', 'cancel' ]
+            },
+            confirmTimingReset: {
+                title: 'Confirm Timing Reset',
+                text: 'This will remove all subtitle timing. Do you want to continue?',
+                buttons: [ 'continueButton', 'cancel' ]
+            },
+            confirmTextReset: {
+                title: 'Confirm Text Reset',
+                text: 'This will remove all subtitle text. Do you want to continue?',
+                buttons: [ 'continueButton', 'cancel' ]
+            },
+            confirmChangesReset: {
+                title: 'Confirm Changes Reset',
+                text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
+                buttons: [ 'continueButton', 'cancel' ]
+            },
+            sessionWillClose: {
+                title: 'Warning: Your session will close',
+                buttons: ['resume', 'closeEditor']
+            },
+            sessionEnded: {
+                title: 'Your session has ended. You can try to resume, or close the editor.',
+                buttons: ['resume', 'closeEditor']
+            },
+            restoreAutoBackup: {
+                title: 'You have an unsaved backup of your subtitling work, do you want to restore it?',
+                buttons: ['restore', 'discard']
+            },
         },
         /*
          * Open a dialog that doesn't need special HTML/code
          *
-         * dialogDef is an object that defines the dialog.  It should contain
-         * the following properties:
+         * dialogName specifies which dialog to open.  It's a key from the
+         * dialogs dict.
          *
-         *   title: dialog heading
-         *   text: dialog description (optional)
-         *   allowClose: if present, allow closing the dialog via escape/mouse
-         *               clicks outside of the element (optional)
-         *   buttons: array defining the buttons.  Each element must be
-         *            either a simple string, or an object created by button()
-         *            or closeButton().
+         * callbacks is a dict that maps button key names to functions to
+         * call if that button is clicked.
+         *
+         * overrides is a dict of data to override the default title/text for
+         * the dialog.
+         *
          */
-        openDialog: function(dialogDef) {
+        openDialog: function(dialogName, callbacks, overrides) {
+            var dialog = this._makeGenericDialog(dialogName, callbacks,
+                    overrides);
             if(this.generic != null) {
                 this.genericStack.push(this.generic);
             }
-            this.generic = dialogDef;
+            this.generic = dialog;
             this.open('generic');
+        },
+        _makeGenericDialog: function(dialogName, callbacks, overrides) {
+            if(callbacks === undefined) {
+                callbacks = {};
+            }
+            // Creates the dialog object for openDialog
+            var that = this;
+            var dialogDef = this.dialogs[dialogName];
+            if(dialogDef === undefined) {
+                throw "no dialog named " + dialogName;
+            }
+            var dialog = _.clone(dialogDef);
+            if(overrides) {
+                dialog = _.extend(dialog, overrides);
+            }
+            // The buttons array contains button names.  Replace that with
+            // actual objects.  Also setup the callback function.
+            dialog.buttons = _.map(dialog.buttons, function(buttonName) {
+                var buttonDef = that.buttons[buttonName];
+                if(buttonDef === undefined) {
+                    throw "no button named " + buttonName;
+                };
+                return {
+                    text: buttonDef.text,
+                    cssClass: buttonDef.cssClass,
+                    callback: callbacks[buttonName] || null
+                };
+            });
+            return dialog;
         },
         onButtonClicked: function(button, $event) {
             this.close();

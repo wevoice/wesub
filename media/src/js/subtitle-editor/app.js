@@ -157,34 +157,16 @@ var angular = angular || null;
         }
 
         $scope.showCopyTimingModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Copy Timing',
-                text: 'This will copy all subtitle timing from reference to working subtitles. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.copyTimingOver();
-                    }),
-                    dialogManager.button('Cancel')
-                ]
+            $scope.dialogManager.openDialog('confirmCopyTiming', {
+                continueButton: $scope.copyTimingOver
             });
             $event.stopPropagation();
             $event.preventDefault();
         };
 
         $scope.showClearTimingModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Timing Reset',
-                text: 'This will remove all subtitle timing. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.clearTiming();
-                    }),
-                    dialogManager.button('Cancel')
-                ]
+            $scope.dialogManager.openDialog('confirmTimingReset', {
+                continueButton: $scope.clearTiming
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -200,17 +182,8 @@ var angular = angular || null;
         };
 
         $scope.showClearTextModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Text Reset',
-                text: 'This will remove all subtitle text. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.clearText();
-                    }),
-                    dialogManager.button('Cancel')
-                ]
+            $scope.dialogManager.openDialog('confirmTextReset', {
+                continueButton: $scope.clearText
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -226,17 +199,8 @@ var angular = angular || null;
         };
 
         $scope.showResetModal = function($event) {
-            var dialogManager = $scope.dialogManager;
-            dialogManager.openDialog({
-                title: 'Confirm Changes Reset',
-                text: 'This will revert all changes made since the last saved revision. Do you want to continue?',
-                allowClose: 1,
-                buttons: [
-                    dialogManager.button('Continue', function() {
-                        $scope.resetToLastSavedVersion();
-                    }),
-                    dialogManager.button('Cancel')
-                ]
+            $scope.dialogManager.openDialog('confirmChangesReset', {
+                continueButton: $scope.resetToLastSavedVersion
             });
             $event.stopPropagation();
             $event.preventDefault();
@@ -388,38 +352,24 @@ var angular = angular || null;
 
             var closeSessionTimeout = $timeout(closeSessionTick, 1000);
 
-            $scope.dialogManager.openDialog({
-                title: 'Warning: Your session will close',
-                text: makeText(),
-                buttons: [
-                    $scope.dialogManager.button('Try to resume work',
-                        function() {
-                            if (closeSessionTimeout) {
-                                $timeout.cancel(closeSessionTimeout);
-                            }
-                            regainLockAfterIdle();
-                    }),
-                    $scope.dialogManager.button('Close Editor', function() {
-                        $scope.exitToVideoPage();
-                    })
-                ]
-            });
+            $scope.dialogManager.openDialog('sessionWillClose', {
+                resume: function() {
+                    if (closeSessionTimeout) {
+                        $timeout.cancel(closeSessionTimeout);
+                    }
+                    regainLockAfterIdle();
+                },
+                closeEditor: $scope.exitToVideoPage
+            }, { text: makeText() });
         }
 
         $scope.showCloseSessionModal = function() {
             releaseLock();
             var dialogManager = $scope.dialogManager;
 
-            dialogManager.openDialog({
-                title: 'Your session has ended. You can try to resume, or close the editor.',
-                buttons: [
-                    dialogManager.button('Try to resume work', function() {
-                        regainLockAfterIdle();
-                    }),
-                    dialogManager.button('Close editor', function() {
-                        $scope.exitToVideoPage();
-                    })
-                ]
+            dialogManager.openDialog('sessionEnded', {
+                resume: regainLockAfterIdle,
+                closeEditor: $scope.exitToVideoPage
             });
         }
 
@@ -543,16 +493,9 @@ var angular = angular || null;
         }
 
         $scope.promptToRestoreAutoBackup = function() {
-            $scope.dialogManager.openDialog({
-                title: 'You have an unsaved backup of your subtitling work, do you want to restore it?',
-                buttons: [
-                    $scope.dialogManager.button('Restore', function() {
-                        $scope.restoreAutoBackup();
-                    }),
-                    $scope.dialogManager.button('Discard', function() {
-                        SubtitleBackupStorage.clearBackup();
-                    })
-                ]
+            $scope.dialogManager.openDialog('restoreAutoBackup', {
+                restore: $scope.restoreAutoBackup,
+                discard: SubtitleBackupStorage.clearBackup
             });
         }
 
