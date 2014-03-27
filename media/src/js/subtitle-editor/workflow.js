@@ -112,7 +112,7 @@ var angular = angular || null;
         $scope.endorse = function() {
             if(EditorData.task_id === undefined || 
                     EditorData.task_id === null) {
-                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Saving&hellip;"));
+                $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Completing subtitles&hellip;"));
                 $scope.$root.$emit('save', {
                     markComplete: true,
                     exitAfter: true

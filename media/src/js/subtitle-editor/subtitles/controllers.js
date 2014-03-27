@@ -166,7 +166,7 @@ var angular = angular || null;
 
         $scope.onLegacyEditorClicked = function($event) {
             $event.preventDefault();
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Exiting&hellip;"));
+            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Opening legacy editor&hellip;"));
             $scope.switchToLegacyEditor();
         }
 
