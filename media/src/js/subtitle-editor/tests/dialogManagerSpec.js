@@ -1,24 +1,38 @@
 describe('Test the SubtitleList class', function() {
     var dialogManager = null;
     var VideoPlayer;
+    var $scope;
 
     beforeEach(function() {
         module('amara.SubtitleEditor.mocks');
         module('amara.SubtitleEditor.modal');
     });
 
-    beforeEach(inject(function($injector) {
-        var DialogManager = $injector.get('DialogManager');
+    beforeEach(inject(function($controller, $injector, $rootScope) {
+        $scope = $rootScope.$new();
         VideoPlayer = $injector.get('VideoPlayer');
-        dialogManager = new DialogManager(VideoPlayer);
-        // Replace the dialog definitions with our own
-        dialogManager.dialogs = {
-            testDialog: {
-                title: 'testTitle',
-                text: 'testText',
-                buttons: ['continueEditing', 'cancel']
-            }
-        };
+        $controller('DialogController', {
+            $scope: $scope,
+            VideoPlayer: VideoPlayer,
+            Buttons: {
+                foo: {
+                    text: 'Foo',
+                    cssClass: null,
+                },
+                bar: {
+                    text: 'Bar',
+                    cssClass: null,
+                },
+            },
+            Dialogs: {
+                testDialog: {
+                    title: 'testTitle',
+                    text: 'testText',
+                    buttons: ['foo', 'bar']
+                }
+            },
+        });
+        dialogManager = $scope.dialogManager;
     }));
 
     it('starts with no active dialog', function() {
@@ -72,12 +86,12 @@ describe('Test the SubtitleList class', function() {
         expect(dialogManager.generic.text).toEqual('testText');
         expect(dialogManager.generic.buttons).toEqual([
             {
-                text: 'Continue editing',
+                text: 'Foo',
                 callback: null,
                 cssClass: null
             },
             {
-                text: 'Cancel',
+                text: 'Bar',
                 callback: null,
                 cssClass: null
             }
@@ -89,7 +103,7 @@ describe('Test the SubtitleList class', function() {
         var $event = jasmine.createSpyObj('$event', ['preventDefault',
             'stopPropagation']);
         dialogManager.openDialog('testDialog', {
-            continueEditing: callback
+            foo: callback
         });
         dialogManager.onButtonClicked(dialogManager.generic.buttons[0], $event);
         expect(callback).toHaveBeenCalled();

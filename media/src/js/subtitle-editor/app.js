@@ -53,12 +53,13 @@ var angular = angular || null;
     module.constant('DEFAULT_DURATION', 4000); // 4 seconds
 
     module.controller("AppController", ['$scope', '$sce', '$controller', 
-                      '$window', 'DialogManager', 'EditorData', 'VideoPlayer',
-                      'Workflow', function($scope, $sce, $controller,
-            $window, DialogManager, EditorData, VideoPlayer, Workflow) {
+                      '$window', 'EditorData', 'VideoPlayer', 'Workflow',
+                      function($scope, $sce, $controller, $window, EditorData,
+                          VideoPlayer, Workflow) {
         $controller('AppControllerSubtitles', {$scope: $scope});
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
+        $controller('DialogController', {$scope: $scope});
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
@@ -67,7 +68,6 @@ var angular = angular || null;
         $scope.loadingFinished = false;
 	$scope.currentTitle = {};
 	$scope.currentTitle.Edited = false;
-	$scope.dialogManager = new DialogManager(VideoPlayer);
 	$scope.titleEdited = function(newValue) {
 	    if (newValue != undefined) $scope.currentTitle.Edited = newValue;
 	    return $scope.currentTitle.Edited;
@@ -345,7 +345,7 @@ var angular = angular || null;
                     $scope.dialogManager.close();
                     $scope.showCloseSessionModal();
                 } else {
-                    $scope.dialogManager.generic.text = makeText();
+                    $scope.dialogManager.updateDialogText(makeText());
                     closeSessionTimeout = $timeout(closeSessionTick, 1000);
                 }
             }
