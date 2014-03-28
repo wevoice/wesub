@@ -566,7 +566,7 @@ var angular = angular || null;
             } else if (evt.keyCode === 27) {
                 // Escape cancels editing
                 finishEdit(false);
-                if(subtitle.markdown == '') {
+                if ((subtitle.markdown == '') && (!subtitle.isSynced())) {
                     subtitleList.removeSubtitle(subtitle);
                 }
                 evt.preventDefault();
