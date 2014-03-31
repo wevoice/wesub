@@ -269,6 +269,7 @@ header.main {
     }
     section.session {
         text-align: right;
+        background: black;
 
         button {
             -webkit-transition: color 0.03s linear;
@@ -283,6 +284,7 @@ header.main {
             padding: 0 12px;
             cursor: pointer;
             outline: none;
+            margin: 0;
 
             &:hover {
                 color: white;

@@ -260,7 +260,7 @@ describe('The SessionController', function() {
         session.subtitlesChanged();
         session.exitToLegacyEditor();
         var callbacks = $scope.dialogManager.openDialog.mostRecentCall.args[1];
-        callbacks.discardChanges();
+        callbacks.discardChangesAndOpenLegacyEditor();
         expectRedirectToLegacyEditor();
     });
 

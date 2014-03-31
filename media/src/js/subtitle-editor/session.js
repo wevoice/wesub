@@ -149,7 +149,7 @@ var angular = angular || null;
                     redirectToLegacyEditor();
                 } else {
                     $scope.dialogManager.openDialog('legacyEditorUnsavedWork', {
-                        'discardChanges': redirectToLegacyEditor
+                        'discardChangesAndOpenLegacyEditor': redirectToLegacyEditor
                     });
                 }
             },

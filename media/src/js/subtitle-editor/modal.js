@@ -77,7 +77,7 @@
         regainLock: makeButton('Try to resume work'),
         restore: makeButton('Restore'),
         discard: makeButton('Discard'),
-        discardChanges: makeButton('Discard changes'),
+        discardChangesAndOpenLegacyEditor: makeButton('Discard changes and open legacy editor'),
         exit: makeButton('Exit'),
         waitDontDiscard: makeButton("Wait, don't discard my changes!",
                 'link-style')
@@ -95,7 +95,7 @@
         },
         legacyEditorUnsavedWork: {
             title: "You have unsaved changes.  If you switch now you will lose your work.",
-            buttons: [ 'discardChanges', 'continueEditing'],
+            buttons: [ 'discardChangesAndOpenLegacyEditor', 'continueEditing'],
             allowClose: true
         },
         confirmCopyTiming: {
