@@ -84,9 +84,14 @@
     });
 
     module.value('Dialogs', {
-        subtitlesSaved: {
-            title: "Subtitles saved",
-            buttons: ['exit', 'resume', 'waitDontDiscard']
+        changesSaved: {
+            title: "Changes saved",
+            buttons: ['exit', 'resume']
+        },
+        unsavedWork: {
+            title: 'Your changes will be discarded.',
+            buttons: [ 'exit', 'waitDontDiscard' ],
+            allowClose: true
         },
         legacyEditorUnsavedWork: {
             title: "You have unsaved changes.  If you switch now you will lose your work.",

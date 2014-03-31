@@ -50,21 +50,9 @@
             };
         }
 
-        $scope.approve = function() {
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Accepting subtitles&hellip;"));
-            $scope.$root.$emit('approve-task');
-        };
         $scope.toggleDocking = function(module) {
             $scope.modulesOpen[module] = !$scope.modulesOpen[module];
         };
-        $scope.sendBack = function() {
-            $scope.dialogManager.showFreezeBox($sce.trustAsHtml("Sending subtitles back&hellip;"));
-            $scope.$root.$emit('send-back-task');
-        };
-        $scope.notesChanged = function() {
-            $scope.$root.$emit('notes-changed');
-        };
-
         $scope.canApprove = function() {
             return $scope.workingSubtitles.subtitleList.isComplete();
         }

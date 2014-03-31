@@ -26,6 +26,7 @@ var angular = angular || null;
         'amara.SubtitleEditor.modal',
         'amara.SubtitleEditor.dom',
         'amara.SubtitleEditor.lock',
+        'amara.SubtitleEditor.session',
         'amara.SubtitleEditor.workflow',
         'amara.SubtitleEditor.subtitles.controllers',
         'amara.SubtitleEditor.subtitles.directives',
@@ -60,6 +61,8 @@ var angular = angular || null;
         $controller('AppControllerLocking', {$scope: $scope});
         $controller('AppControllerEvents', {$scope: $scope});
         $controller('DialogController', {$scope: $scope});
+        $controller('SessionBackend', {$scope: $scope});
+        $controller('SessionController', {$scope: $scope});
 
         $scope.videoId = EditorData.video.id;
         $scope.canSync = EditorData.canSync;
@@ -484,6 +487,7 @@ var angular = angular || null;
                     $scope.workingSubtitles.versionNumber,
                     $scope.workingSubtitles.subtitleList.toXMLString());
         }
+
         $scope.restoreAutoBackup = function() {
             var savedData = SubtitleBackupStorage.getBackup(video.id,
                     $scope.workingSubtitles.language.code,
@@ -499,23 +503,27 @@ var angular = angular || null;
             });
         }
 
+        $scope.autoBackupNeeded = false;
+
+        // Check if we have an auto-backup to restore
         if(SubtitleBackupStorage.hasBackup(video.id,
                 $scope.workingSubtitles.language.code,
                 editingVersion.versionNumber)) {
             $timeout($scope.promptToRestoreAutoBackup);
         }
 
+        $scope.$on('work-done', function() {
+            $socpe.autoBackupNeeded = true;
+        });
 
-        $scope.saveSubtitles = function(markComplete) {
-            return SubtitleStorage.saveSubtitles(
-                    video.id,
-                    $scope.workingSubtitles.language.code,
-                    $scope.workingSubtitles.subtitleList.toXMLString(),
-                    $scope.workingSubtitles.title,
-                    $scope.workingSubtitles.description,
-                    $scope.workingSubtitles.metadata,
-                    markComplete);
-        };
+        function handleAutoBackup() {
+            if($scope.autoBackupNeeded) {
+                $scope.saveAutoBackup();
+                $scope.autoBackupNeeded = false;
+            }
+        }
+        $timeout(handleAutoBackup, 60 * 1000);
+
         function watchSubtitleAttributes(newValue, oldValue) {
             if(newValue != oldValue) {
                 $scope.$root.$emit('work-done');
@@ -525,6 +533,7 @@ var angular = angular || null;
         $scope.$watch('workingSubtitles.description', watchSubtitleAttributes);
         $scope.$watch('workingSubtitles.metadata', watchSubtitleAttributes,
                 true);
+
     });
 
 }).call(this);
