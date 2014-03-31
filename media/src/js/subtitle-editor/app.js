@@ -229,6 +229,9 @@ var angular = angular || null;
             currentTime: null,
             duration: null,
         };
+        $scope.collab = {
+            notes: EditorData.savedNotes
+        };
         $scope.exitToVideoPage = function() {
             $window.location = '/videos/' + $scope.videoId + '/';
         }

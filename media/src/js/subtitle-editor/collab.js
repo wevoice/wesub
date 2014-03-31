@@ -22,7 +22,6 @@
 
     module.controller('CollabController', function($scope, $sce, $timeout, EditorData) {
 
-        $scope.notes = EditorData.savedNotes || "";
         // Some modules can be opened and closed. These are the default states.
         $scope.modulesOpen = {
             notes: false,
