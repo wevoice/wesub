@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Universal Subtitles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-03-21 16:56-0500\n"
+"POT-Creation-Date: 2014-04-01 14:40-0500\n"
 "PO-Revision-Date: 2010-11-30 05:45+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,7 +79,7 @@ msgstr ""
 
 #: apps/auth/admin.py:79 templates/auth/_announcement.html:7
 #: templates/messages/_messages.html:8
-#: templates/subtitles/subtitle-editor.html:271
+#: templates/subtitles/subtitle-editor.html:245
 #: templates/videos/create.html:70
 msgid "Hide"
 msgstr ""
@@ -4251,103 +4251,103 @@ msgstr ""
 
 #: templates/subtitles/subtitle-editor.html:48
 #: templates/subtitles/subtitle-editor.html:49
-#: templates/subtitles/subtitle-editor.html:751
+#: templates/subtitles/subtitle-editor.html:730
 msgid "Edit title and description"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:97
+#: templates/subtitles/subtitle-editor.html:71
 msgid "Keyboard controls"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:97
+#: templates/subtitles/subtitle-editor.html:71
 msgid "more commands"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:101
-#: templates/subtitles/subtitle-editor.html:119
-#: templates/subtitles/subtitle-editor.html:144
+#: templates/subtitles/subtitle-editor.html:75
+#: templates/subtitles/subtitle-editor.html:93
+#: templates/subtitles/subtitle-editor.html:118
 msgid "Play / Pause"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:107
-#: templates/subtitles/subtitle-editor.html:125
-#: templates/subtitles/subtitle-editor.html:150
+#: templates/subtitles/subtitle-editor.html:81
+#: templates/subtitles/subtitle-editor.html:99
+#: templates/subtitles/subtitle-editor.html:124
 msgid "Skip back"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:113
-#: templates/subtitles/subtitle-editor.html:156
+#: templates/subtitles/subtitle-editor.html:87
+#: templates/subtitles/subtitle-editor.html:130
 msgid "Insert a line break"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:131
+#: templates/subtitles/subtitle-editor.html:105
 msgid "Start subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:137
+#: templates/subtitles/subtitle-editor.html:111
 msgid "End subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:161
-#: templates/subtitles/subtitle-editor.html:570
+#: templates/subtitles/subtitle-editor.html:135
+#: templates/subtitles/subtitle-editor.html:549
 msgid "Subtitling Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:230
+#: templates/subtitles/subtitle-editor.html:204
 msgid "How to start making subtitles."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:232
+#: templates/subtitles/subtitle-editor.html:206
 msgid "Play the video and type what you hear."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:233
+#: templates/subtitles/subtitle-editor.html:207
 msgid "Press Enter to complete a subtitle."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:234
+#: templates/subtitles/subtitle-editor.html:208
 msgid "Use the guide on the right to move to the next step."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:236
-#: templates/subtitles/subtitle-editor.html:245
-#: templates/subtitles/subtitle-editor.html:255
+#: templates/subtitles/subtitle-editor.html:210
+#: templates/subtitles/subtitle-editor.html:219
+#: templates/subtitles/subtitle-editor.html:229
 msgid "Press the TAB key to start!"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:239
+#: templates/subtitles/subtitle-editor.html:213
 msgid "Subtitle Syncing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:241
+#: templates/subtitles/subtitle-editor.html:215
 msgid "Tap the DOWN arrow to start a subtitle."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:242
+#: templates/subtitles/subtitle-editor.html:216
 msgid "Tap the UP arrow to set the end time (optional)."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:243
+#: templates/subtitles/subtitle-editor.html:217
 msgid "Use the Tools menu to hide the timeline for typing mode."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:249
+#: templates/subtitles/subtitle-editor.html:223
 msgid "Review your work"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:251
+#: templates/subtitles/subtitle-editor.html:225
 msgid "Watch the video and make corrections."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:252
+#: templates/subtitles/subtitle-editor.html:226
 msgid "Click Complete to sign off on your work."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:253
+#: templates/subtitles/subtitle-editor.html:227
 msgid "Use the Save button to save and finish later."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:261
+#: templates/subtitles/subtitle-editor.html:235
 #, python-format
 msgid ""
 "\n"
@@ -4355,306 +4355,306 @@ msgid ""
 "              "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:269
+#: templates/subtitles/subtitle-editor.html:243
 msgid "Copy Timing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:272
+#: templates/subtitles/subtitle-editor.html:246
 msgid "Show"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:273
+#: templates/subtitles/subtitle-editor.html:247
 msgid "Timeline"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:275
+#: templates/subtitles/subtitle-editor.html:249
 msgid "Clear timing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:276
+#: templates/subtitles/subtitle-editor.html:250
 msgid "Clear text"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:277
+#: templates/subtitles/subtitle-editor.html:251
 msgid "Revert to last saved version"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:388
+#: templates/subtitles/subtitle-editor.html:362
 msgid "1. Type what you hear"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:390
+#: templates/subtitles/subtitle-editor.html:364
 msgid "Is all the content subtitled?"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:393
+#: templates/subtitles/subtitle-editor.html:367
 msgid "Yes, translate the title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:394
+#: templates/subtitles/subtitle-editor.html:368
 msgid "Yes, start syncing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:400
+#: templates/subtitles/subtitle-editor.html:374
 msgid "2. Translate title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:405
+#: templates/subtitles/subtitle-editor.html:379
 msgid "Title and description were not edited yet."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:408
+#: templates/subtitles/subtitle-editor.html:382
 msgid "Title and description have been edited."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:410
+#: templates/subtitles/subtitle-editor.html:384
 msgid "Start syncing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:418
+#: templates/subtitles/subtitle-editor.html:392
 msgid "2. Sync Timing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:419
+#: templates/subtitles/subtitle-editor.html:393
 msgid "3. Sync Timing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:424
+#: templates/subtitles/subtitle-editor.html:398
 msgid "Not all lines are completed."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:427
+#: templates/subtitles/subtitle-editor.html:401
 msgid "All lines are completed."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:429
+#: templates/subtitles/subtitle-editor.html:403
 msgid "Start reviewing"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:437
+#: templates/subtitles/subtitle-editor.html:411
 msgid "3. Review and complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:438
+#: templates/subtitles/subtitle-editor.html:412
 msgid "4. Review and complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:442
+#: templates/subtitles/subtitle-editor.html:416
 msgid ""
 "Watch the video again and verify that the subtitles are complete and correct."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:444
+#: templates/subtitles/subtitle-editor.html:418
 msgid "Complete"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:464
+#: templates/subtitles/subtitle-editor.html:443
 msgid "Amara Style Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:469
+#: templates/subtitles/subtitle-editor.html:448
 msgid "Subtitle line length"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:470
+#: templates/subtitles/subtitle-editor.html:449
 msgid "Keep subtitle length to about 42 characters;"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:471
+#: templates/subtitles/subtitle-editor.html:450
 msgid "avoid more than 2 lines per subtitle."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:474
+#: templates/subtitles/subtitle-editor.html:453
 msgid "Minimum duration"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:475
+#: templates/subtitles/subtitle-editor.html:454
 msgid "Subtitles should not be less than 1 second."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:478
+#: templates/subtitles/subtitle-editor.html:457
 msgid "Maximum duration"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:479
+#: templates/subtitles/subtitle-editor.html:458
 msgid "Split subtitles lasting more than 7 seconds."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:482
+#: templates/subtitles/subtitle-editor.html:461
 msgid "Reading speed"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:483
+#: templates/subtitles/subtitle-editor.html:462
 msgid "8-25 characters/second is recommended;"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:484
+#: templates/subtitles/subtitle-editor.html:463
 msgid "8-16 characters/second for children."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:487
+#: templates/subtitles/subtitle-editor.html:466
 msgid "Sounds"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:488
+#: templates/subtitles/subtitle-editor.html:467
 msgid "Describe meaningful sounds that are relevant to the plot."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:489
+#: templates/subtitles/subtitle-editor.html:468
 msgid "ex: (water dripping)"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:492
+#: templates/subtitles/subtitle-editor.html:471
 msgid "Music"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:493
+#: templates/subtitles/subtitle-editor.html:472
 msgid "Describe relevant music which does not have relevant lyrics."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:494
+#: templates/subtitles/subtitle-editor.html:473
 msgid "ex: ♪ (jazz music) ♪"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:497
+#: templates/subtitles/subtitle-editor.html:476
 msgid "Speaker Identification"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:498
+#: templates/subtitles/subtitle-editor.html:477
 msgid "Use parenthesis to indicate when someone is speaking off-screen."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:499
-#: templates/subtitles/subtitle-editor.html:537
+#: templates/subtitles/subtitle-editor.html:478
+#: templates/subtitles/subtitle-editor.html:516
 msgid "ex: (Michael) Wait for me!"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:502
+#: templates/subtitles/subtitle-editor.html:481
 msgid "Show Advanced Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:503
+#: templates/subtitles/subtitle-editor.html:482
 msgid "Hide Advanced Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:507
+#: templates/subtitles/subtitle-editor.html:486
 msgid "Translate the whole idea"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:508
+#: templates/subtitles/subtitle-editor.html:487
 msgid "Translations don't need to be word for word. Look at the context."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:509
+#: templates/subtitles/subtitle-editor.html:488
 msgid ""
 "Make sure you are using the correct punctuation for the whole unit of text."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:513
+#: templates/subtitles/subtitle-editor.html:492
 msgid "Maximum timing offset"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:514
+#: templates/subtitles/subtitle-editor.html:493
 msgid ""
 "Subtitles shouldn't start more than 0.5 seconds before or after the audio "
 "begins."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:517
+#: templates/subtitles/subtitle-editor.html:496
 msgid "On-screen texts"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:518
+#: templates/subtitles/subtitle-editor.html:497
 msgid "Translate the texts on the video that are relevant to the plot."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:521
+#: templates/subtitles/subtitle-editor.html:500
 msgid "Use meaningful speech"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:522
+#: templates/subtitles/subtitle-editor.html:501
 msgid "Exclude things like “um” “ah” and other disfluencies."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:525
+#: templates/subtitles/subtitle-editor.html:504
 msgid "Indicate inaudible parts"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:526
+#: templates/subtitles/subtitle-editor.html:505
 msgid "If the audio is inaudible, it should be marked as [inaudible]."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:529
+#: templates/subtitles/subtitle-editor.html:508
 msgid "Lyrics"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:530
+#: templates/subtitles/subtitle-editor.html:509
 msgid "Wrap relevant lyrics in musical notes."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:531
+#: templates/subtitles/subtitle-editor.html:510
 msgid "ex ♪ Tell me dear Billy, ♪"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:535
+#: templates/subtitles/subtitle-editor.html:514
 msgid "Speaker identification"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:536
+#: templates/subtitles/subtitle-editor.html:515
 msgid "Identify off-screen and unclear speakers in parentheses."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:541
+#: templates/subtitles/subtitle-editor.html:520
 msgid "Foreign language"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:542
+#: templates/subtitles/subtitle-editor.html:521
 msgid "Identify relevant speech in foreign language. "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:543
+#: templates/subtitles/subtitle-editor.html:522
 msgid "ex: (Russian): Thank you."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:547
+#: templates/subtitles/subtitle-editor.html:526
 msgid "Simultaneous dialogue"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:548
+#: templates/subtitles/subtitle-editor.html:527
 msgid "Used exclusively when two speakers talk in the same subtitle. "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:549
+#: templates/subtitles/subtitle-editor.html:528
 msgid ""
 "Each speaker should have one line, and both lines should have an hyphen. "
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:550
+#: templates/subtitles/subtitle-editor.html:529
 msgid "- Sir, you are no gentleman."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:551
+#: templates/subtitles/subtitle-editor.html:530
 msgid "- Rhett Butler: And you, Miss, are no lady."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:563
+#: templates/subtitles/subtitle-editor.html:542
 msgid "Show All Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:567
+#: templates/subtitles/subtitle-editor.html:546
 msgid "Hide All Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:572
+#: templates/subtitles/subtitle-editor.html:551
 msgid "Translating Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:574
+#: templates/subtitles/subtitle-editor.html:553
 msgid "Reviewing Guidelines"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:580
-#: templates/subtitles/subtitle-editor.html:745
+#: templates/subtitles/subtitle-editor.html:559
+#: templates/subtitles/subtitle-editor.html:724
 #: templates/videos/_feedback_form.html:35
 #: templates/videos/_upload_subtitles.html:10
 #: templates/videos/_video_url_panel.html:43
@@ -4662,354 +4662,354 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:585
+#: templates/subtitles/subtitle-editor.html:564
 msgid "Keyboard Shortcuts"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:590
-#: templates/subtitles/subtitle-editor.html:645
-#: templates/subtitles/subtitle-editor.html:683
+#: templates/subtitles/subtitle-editor.html:569
+#: templates/subtitles/subtitle-editor.html:624
+#: templates/subtitles/subtitle-editor.html:662
 #: templates/videos/language-sync-history-tab.html:43
 msgid "Action"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:591
-#: templates/subtitles/subtitle-editor.html:646
-#: templates/subtitles/subtitle-editor.html:684
+#: templates/subtitles/subtitle-editor.html:570
+#: templates/subtitles/subtitle-editor.html:625
+#: templates/subtitles/subtitle-editor.html:663
 msgid "Windows / Linux"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:592
-#: templates/subtitles/subtitle-editor.html:647
-#: templates/subtitles/subtitle-editor.html:685
+#: templates/subtitles/subtitle-editor.html:571
+#: templates/subtitles/subtitle-editor.html:626
+#: templates/subtitles/subtitle-editor.html:664
 msgid "OS X"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:597
+#: templates/subtitles/subtitle-editor.html:576
 msgid "Play / Pause video"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:598
-#: templates/subtitles/subtitle-editor.html:599
+#: templates/subtitles/subtitle-editor.html:577
+#: templates/subtitles/subtitle-editor.html:578
 msgid "Tab"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:602
+#: templates/subtitles/subtitle-editor.html:581
 msgid "Skip back 2 seconds"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:603
-#: templates/subtitles/subtitle-editor.html:604
+#: templates/subtitles/subtitle-editor.html:582
+#: templates/subtitles/subtitle-editor.html:583
 msgid "Shift + Tab"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:607
+#: templates/subtitles/subtitle-editor.html:586
 msgid "Skip back 4 seconds"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:608
+#: templates/subtitles/subtitle-editor.html:587
 msgid "Ctrl + Shift + ,"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:609
+#: templates/subtitles/subtitle-editor.html:588
 msgid "CMD + Shift + ,"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:612
+#: templates/subtitles/subtitle-editor.html:591
 msgid "Skip forward 4 seconds"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:613
+#: templates/subtitles/subtitle-editor.html:592
 msgid "Ctrl + Shift + ."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:614
+#: templates/subtitles/subtitle-editor.html:593
 msgid "CMD + Shift + ."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:617
+#: templates/subtitles/subtitle-editor.html:596
 msgid "Navigate to the next subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:618
-#: templates/subtitles/subtitle-editor.html:619
+#: templates/subtitles/subtitle-editor.html:597
+#: templates/subtitles/subtitle-editor.html:598
 msgid "ENTER"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:622
+#: templates/subtitles/subtitle-editor.html:601
 msgid "Insert line break"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:623
-#: templates/subtitles/subtitle-editor.html:624
+#: templates/subtitles/subtitle-editor.html:602
+#: templates/subtitles/subtitle-editor.html:603
 msgid "Shift + ENTER"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:627
+#: templates/subtitles/subtitle-editor.html:606
 msgid "Delete empty subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:628
-#: templates/subtitles/subtitle-editor.html:629
-#: templates/subtitles/subtitle-editor.html:633
-#: templates/subtitles/subtitle-editor.html:634
+#: templates/subtitles/subtitle-editor.html:607
+#: templates/subtitles/subtitle-editor.html:608
+#: templates/subtitles/subtitle-editor.html:612
+#: templates/subtitles/subtitle-editor.html:613
 msgid "ESC"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:632
+#: templates/subtitles/subtitle-editor.html:611
 msgid "Exit edit mode of current subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:638
+#: templates/subtitles/subtitle-editor.html:617
 msgid "Show Browser Shortcuts"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:639
+#: templates/subtitles/subtitle-editor.html:618
 msgid "Hide Browser Shortcuts"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:641
+#: templates/subtitles/subtitle-editor.html:620
 msgid "Browser Defaults that should work"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:652
+#: templates/subtitles/subtitle-editor.html:631
 msgid "Jump to the next whole word"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:653
+#: templates/subtitles/subtitle-editor.html:632
 msgid "CTRL + RIGHT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:654
+#: templates/subtitles/subtitle-editor.html:633
 msgid "ALT + RIGHT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:657
+#: templates/subtitles/subtitle-editor.html:636
 msgid "Jump to the previous whole word"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:658
+#: templates/subtitles/subtitle-editor.html:637
 msgid "CTRL + LEFT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:659
+#: templates/subtitles/subtitle-editor.html:638
 msgid "ALT + LEFT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:662
+#: templates/subtitles/subtitle-editor.html:641
 msgid "Jump to the start of the subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:663
+#: templates/subtitles/subtitle-editor.html:642
 msgid "Fn + RIGHT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:664
+#: templates/subtitles/subtitle-editor.html:643
 msgid "CMD + RIGHT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:667
+#: templates/subtitles/subtitle-editor.html:646
 msgid "Jump to the end of the subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:668
+#: templates/subtitles/subtitle-editor.html:647
 msgid "Fn + LEFT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:669
+#: templates/subtitles/subtitle-editor.html:648
 msgid "CMD + LEFT Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:672
+#: templates/subtitles/subtitle-editor.html:651
 msgid "Delete last complete word"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:673
+#: templates/subtitles/subtitle-editor.html:652
 msgid "CTRL + Backspace"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:674
+#: templates/subtitles/subtitle-editor.html:653
 msgid "CMD + Backspace"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:678
+#: templates/subtitles/subtitle-editor.html:657
 msgid "Proposed Shortcuts (not yet implemented)"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:690
+#: templates/subtitles/subtitle-editor.html:669
 msgid "Insert subtitle (above)"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:691
-#: templates/subtitles/subtitle-editor.html:692
+#: templates/subtitles/subtitle-editor.html:670
+#: templates/subtitles/subtitle-editor.html:671
 msgid "Alt + i"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:695
+#: templates/subtitles/subtitle-editor.html:674
 msgid "Insert subtitle (below)"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:696
-#: templates/subtitles/subtitle-editor.html:697
+#: templates/subtitles/subtitle-editor.html:675
+#: templates/subtitles/subtitle-editor.html:676
 msgid "Alt + Shift + i"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:700
+#: templates/subtitles/subtitle-editor.html:679
 msgid "Delete current subtitle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:701
-#: templates/subtitles/subtitle-editor.html:702
+#: templates/subtitles/subtitle-editor.html:680
+#: templates/subtitles/subtitle-editor.html:681
 msgid "Alt + Delete (or Backspace)"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:705
+#: templates/subtitles/subtitle-editor.html:684
 msgid "Navigate to the previous line"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:706
-#: templates/subtitles/subtitle-editor.html:707
+#: templates/subtitles/subtitle-editor.html:685
+#: templates/subtitles/subtitle-editor.html:686
 msgid "Alt + UP Arrow"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:710
+#: templates/subtitles/subtitle-editor.html:689
 msgid "Undo last action"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:711
+#: templates/subtitles/subtitle-editor.html:690
 msgid "CTRL + z"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:712
+#: templates/subtitles/subtitle-editor.html:691
 msgid "CMD + z"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:715
+#: templates/subtitles/subtitle-editor.html:694
 msgid "Redo last action"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:716
+#: templates/subtitles/subtitle-editor.html:695
 msgid "CTRL + Shift + z"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:717
+#: templates/subtitles/subtitle-editor.html:696
 msgid "CMD + Shift + z"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:720
+#: templates/subtitles/subtitle-editor.html:699
 msgid "Save a version"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:721
+#: templates/subtitles/subtitle-editor.html:700
 msgid "CTRL + s"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:722
+#: templates/subtitles/subtitle-editor.html:701
 msgid "CMD + s"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:725
+#: templates/subtitles/subtitle-editor.html:704
 msgid "Italics formatting"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:726
+#: templates/subtitles/subtitle-editor.html:705
 msgid "CTRL + i"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:727
+#: templates/subtitles/subtitle-editor.html:706
 msgid "CMD + i"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:730
+#: templates/subtitles/subtitle-editor.html:709
 msgid "Bold formatting"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:731
+#: templates/subtitles/subtitle-editor.html:710
 msgid "CTRL + b"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:732
+#: templates/subtitles/subtitle-editor.html:711
 msgid "CMD + b"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:735
+#: templates/subtitles/subtitle-editor.html:714
 msgid "Timeline toggle"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:736
+#: templates/subtitles/subtitle-editor.html:715
 msgid "CTRL + t"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:737
+#: templates/subtitles/subtitle-editor.html:716
 msgid "CMD + t"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:752
+#: templates/subtitles/subtitle-editor.html:731
 msgid "Title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:754
+#: templates/subtitles/subtitle-editor.html:733
 msgid "Enter Title"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:760
+#: templates/subtitles/subtitle-editor.html:739
 #: templates/teams/settings-projects-add.html:32
 #: templates/teams/settings-projects-edit.html:40
 msgid "Description"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:762
+#: templates/subtitles/subtitle-editor.html:741
 msgid "Enter Description"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:787
+#: templates/subtitles/subtitle-editor.html:769
 msgid "Debugging Tools"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:805
+#: templates/subtitles/subtitle-editor.html:787
 msgid "Error saving subtitles"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:808
+#: templates/subtitles/subtitle-editor.html:790
 msgid ""
 "There was an error saving your subtitles. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr ""
 
+#: templates/subtitles/subtitle-editor.html:791
 #: templates/subtitles/subtitle-editor.html:809
-#: templates/subtitles/subtitle-editor.html:827
 msgid ""
 "To avoid data corruption, please do not open the or edit the subtitles in "
 "any text editor."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:812
+#: templates/subtitles/subtitle-editor.html:794
 msgid ""
 "There was an error saving your subtitles.  Copy the subtitles above and save "
 "them to your computer as subtitle_backup.dfxp. You can upload them later."
 msgstr ""
 
+#: templates/subtitles/subtitle-editor.html:799
 #: templates/subtitles/subtitle-editor.html:817
-#: templates/subtitles/subtitle-editor.html:835
 msgid "Download Subtitles"
 msgstr ""
 
+#: templates/subtitles/subtitle-editor.html:800
 #: templates/subtitles/subtitle-editor.html:818
-#: templates/subtitles/subtitle-editor.html:836
 msgid "Close Editor"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:823
+#: templates/subtitles/subtitle-editor.html:805
 msgid "Error resuming session"
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:826
+#: templates/subtitles/subtitle-editor.html:808
 msgid ""
 "There was an error resuming your session. Save your subtitles using the "
 "download button below and upload them to the system later."
 msgstr ""
 
-#: templates/subtitles/subtitle-editor.html:830
+#: templates/subtitles/subtitle-editor.html:812
 msgid ""
 "There was an error resuming your session.  Copy the subtitles above and save "
 "them to your computer as subtitle_backup.dfxp. You can upload them later."
