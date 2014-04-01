@@ -76,7 +76,13 @@ var angular = angular || null;
         // Public methods
         return {
             init: function() {
-                videoURLs = SubtitleStorage.getVideoURLs();
+                videoURLs = SubtitleStorage.getVideoURLs().map(function(url) {
+                    // Hack for apparent Chrome issue with HTML5 videos
+                    // if same video is open twice in the same browser instance
+                    if (window.chrome && /\.(mp4|mv4|ogg|ogv|webm)$/i.test(url))
+                        url += '?amaranoise=' + Date.now();
+                    return url
+                });
                 pop = window.Popcorn.smart('#video', videoURLs, {
                     controls: false,
                 });

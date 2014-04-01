@@ -96,6 +96,9 @@ var jQuery = window.jQuery || null;
             clip.onResume(function () {
                 onPlay();
             });
+            clip.onFinish(function () {
+                onPause();
+            });
             clip.onPause(function () {
                 onPause();
             });
