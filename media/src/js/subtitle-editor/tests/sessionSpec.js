@@ -35,6 +35,17 @@ describe('The SessionBackend', function() {
         $controller('SessionBackend', { $scope: $scope, });
     }));
 
+    function saveSubtitlesResponse(versionNumber) {
+        // Mock up the response from saveSubtitles.  Of course the actual
+        // response has much more data, but this is all the we care about.
+        return {
+            data: {
+                version_number: versionNumber
+            }
+        };
+
+    }
+
     it('saves subtitles', function() {
         var callback = jasmine.createSpy();
         $scope.sessionBackend.saveSubtitles(true).then(callback);
@@ -50,7 +61,8 @@ describe('The SessionBackend', function() {
         // update the version number and the promise returned by
         // sessionBackend.saveSubtitles() should also complete
         expect(callback).not.toHaveBeenCalled();
-        SubtitleStorage.deferreds.saveSubtitles.resolve(initialVersion+1);
+        SubtitleStorage.deferreds.saveSubtitles.resolve(
+            saveSubtitlesResponse(initialVersion+1));
         $rootScope.$digest();
         expect($scope.workingSubtitles.versionNumber).toEqual(initialVersion+1);
         expect(callback).toHaveBeenCalled();
@@ -100,7 +112,8 @@ describe('The SessionBackend', function() {
         // number to SubtitleStorage.approveTask
         $scope.sessionBackend.saveSubtitles(true)
             .then($scope.sessionBackend.approveTask);
-        SubtitleStorage.deferreds.saveSubtitles.resolve(initialVersion+1);
+        SubtitleStorage.deferreds.saveSubtitles.resolve(
+            saveSubtitlesResponse(initialVersion+1));
         $rootScope.$digest();
         expect(SubtitleStorage.approveTask).toHaveBeenCalledWith(
             initialVersion+1, $scope.collab.notes);

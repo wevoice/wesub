@@ -35,8 +35,8 @@ var angular = angular || null;
                     $scope.workingSubtitles.title,
                     $scope.workingSubtitles.description,
                     $scope.workingSubtitles.metadata,
-                    markComplete).then(function onSuccess(versionNumber) {
-                        $scope.workingSubtitles.versionNumber = versionNumber;
+                    markComplete).then(function onSuccess(response) {
+                        $scope.workingSubtitles.versionNumber = response.data.version_number;
                         return true;
                 });
             },
